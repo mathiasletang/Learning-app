@@ -158,6 +158,26 @@ export async function setStepDone(stepId: string, done: boolean): Promise<void> 
 
 /* ------------------------------ Bibliothèque ---------------------------- */
 
+/**
+ * Ouvre une ressource. Si c'est une vraie URL (http/https), on l'ouvre.
+ * Sinon c'est un fichier local (les 840 PDF vivent sur l'ordinateur, pas dans
+ * l'app) : on ne peut pas l'ouvrir depuis le web — on copie le chemin et on
+ * l'indique clairement plutôt que d'afficher une page blanche.
+ */
+export function openResource(path: string): void {
+  if (/^https?:\/\//i.test(path)) {
+    window.open(path, '_blank', 'noopener');
+    return;
+  }
+  const full = `Mathématiques avancées/${path}`;
+  void navigator.clipboard?.writeText(full).catch(() => {});
+  app().pushToast({
+    title: 'Ce document est sur ton ordinateur',
+    desc: `Chemin copié — ouvre-le depuis ton dossier : ${full}`,
+    icon: '📄',
+  });
+}
+
 export async function setDocRead(path: string, read: boolean): Promise<void> {
   const existing = await db.docs.get(path);
   const wasRead = existing?.read ?? false;

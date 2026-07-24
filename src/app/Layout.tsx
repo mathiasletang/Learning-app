@@ -57,7 +57,7 @@ export function Layout() {
       <aside className="sidebar" aria-label="Navigation principale">
         <div className="brand">
           <span className="brand__dot" aria-hidden />
-          Atelier
+          Cours avancés
         </div>
         <ProfileMini />
         <nav className="nav">
@@ -96,7 +96,7 @@ export function Layout() {
           />
           <div className="brand" style={{ padding: 0, fontSize: 'var(--fs-h3)' }}>
             <span className="brand__dot" aria-hidden />
-            Atelier
+            Cours avancés
           </div>
           <span className="spacer" />
           <ThemeToggle />

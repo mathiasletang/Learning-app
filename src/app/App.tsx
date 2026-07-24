@@ -21,7 +21,7 @@ function Splash() {
     <div style={{ display: 'grid', placeItems: 'center', minHeight: '100dvh' }}>
       <div className="row" style={{ gap: 'var(--s-3)', color: 'var(--text-secondary)' }}>
         <span className="brand__dot" aria-hidden />
-        Chargement de l'Atelier…
+        Chargement…
       </div>
     </div>
   );

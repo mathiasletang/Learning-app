@@ -2,8 +2,7 @@ import { useMemo, useState } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '@/core/db';
 import { allDocs, docsByFolder } from '@/core/content';
-import { openDocument } from '@/core/open';
-import { setDocRead } from '@/app/actions';
+import { setDocRead, openResource } from '@/app/actions';
 import { TRACK_LABEL } from '@/core/meta';
 import type { LibDoc, TrackId } from '@/core/types';
 import { PageHead } from '@/ui/PageHead';
@@ -49,7 +48,7 @@ function DocRow({ doc, read, onToggle }: { doc: LibDoc; read: boolean; onToggle:
           type="button"
           className="btn btn--ghost btn--icon btn--sm"
           aria-label={`Ouvrir ${doc.name}`}
-          onClick={() => openDocument(doc.path)}
+          onClick={() => openResource(doc.path)}
         >
           <Icon name="external" size={18} />
         </button>

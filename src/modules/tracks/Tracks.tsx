@@ -3,9 +3,9 @@ import { Link } from 'react-router-dom';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '@/core/db';
 import { getParcours } from '@/core/content';
-import { parseResource, openDocument, type ResourceKind } from '@/core/open';
+import { parseResource, type ResourceKind } from '@/core/open';
 import { BANKS } from '@/core/meta';
-import { setStepDone } from '@/app/actions';
+import { setStepDone, openResource } from '@/app/actions';
 import type { TrackId } from '@/core/types';
 import { PageHead } from '@/ui/PageHead';
 import { Card, Progress, Segmented, Icon, Tag } from '@/ui';
@@ -37,7 +37,7 @@ function ResourceChip({ res, label }: { res: string; label: string }) {
     );
   }
   return (
-    <button type="button" className="resource" onClick={() => openDocument(parsed.target)}>
+    <button type="button" className="resource" onClick={() => openResource(parsed.target)}>
       {icon} {label}
     </button>
   );

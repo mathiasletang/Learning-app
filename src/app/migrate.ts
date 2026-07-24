@@ -70,7 +70,7 @@ export async function runMigrationIfNeeded(): Promise<void> {
     await useApp.getState().refreshBadges();
     useApp.getState().pushToast({
       title: 'Progression importée',
-      desc: "Depuis l'ancienne version de l'Atelier.",
+      desc: "Depuis l'ancienne version.",
       icon: '📦',
       kind: 'success',
     });

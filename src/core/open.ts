@@ -1,15 +1,6 @@
-/* Ouverture d'un document (PDF/HTML) dans le lecteur du système / navigateur.
-   Les chemins sont relatifs au dossier parent « Mathématiques avancées/ ».
-   L'app n'embarque pas de visionneuse : on tente simplement d'ouvrir le chemin. */
-
-export function openDocument(path: string): void {
-  const url = encodeURI(path);
-  try {
-    window.open(url, '_blank', 'noopener');
-  } catch {
-    location.href = url;
-  }
-}
+/* Analyse des ressources de parcours (cours/qcm/pdf/page).
+   Les chemins de PDF sont relatifs au dossier parent « Mathématiques avancées/ ».
+   L'ouverture effective est gérée par openResource (couche app). */
 
 export type ResourceKind = 'course' | 'quiz' | 'pdf' | 'page';
 

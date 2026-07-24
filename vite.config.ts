@@ -17,8 +17,8 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.svg', 'apple-touch-icon.png', 'icons/*.png'],
       manifest: {
-        name: 'Atelier — apprentissage',
-        short_name: 'Atelier',
+        name: 'Cours avancés — apprentissage',
+        short_name: 'Cours avancés',
         description:
           "Application personnelle d'apprentissage : optimisation, maths financières, CFA et vocabulaire anglais.",
         lang: 'fr',

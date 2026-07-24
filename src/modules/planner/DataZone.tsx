@@ -17,7 +17,7 @@ export function DataZone() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `atelier-sauvegarde-${toDayStr()}.json`;
+    a.download = `cours-avances-sauvegarde-${toDayStr()}.json`;
     a.click();
     URL.revokeObjectURL(url);
     pushToast({ title: 'Sauvegarde exportée', icon: '💾', kind: 'success' });

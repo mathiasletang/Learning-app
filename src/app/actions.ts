@@ -5,6 +5,7 @@
    ========================================================================= */
 
 import { db } from '@/core/db';
+import { driveSearchUrl } from '@/core/config';
 import { toDayStr } from '@/core/date';
 import { schedule, initialSrs, type Grade } from '@/core/srs';
 import {
@@ -160,22 +161,16 @@ export async function setStepDone(stepId: string, done: boolean): Promise<void> 
 
 /**
  * Ouvre une ressource. Si c'est une vraie URL (http/https), on l'ouvre.
- * Sinon c'est un fichier local (les 840 PDF vivent sur l'ordinateur, pas dans
- * l'app) : on ne peut pas l'ouvrir depuis le web — on copie le chemin et on
- * l'indique clairement plutôt que d'afficher une page blanche.
+ * Sinon c'est un PDF de la bibliothèque : on lance une recherche dans le
+ * dossier Google Drive de l'utilisateur, sur le nom du fichier.
  */
 export function openResource(path: string): void {
   if (/^https?:\/\//i.test(path)) {
     window.open(path, '_blank', 'noopener');
     return;
   }
-  const full = `Mathématiques avancées/${path}`;
-  void navigator.clipboard?.writeText(full).catch(() => {});
-  app().pushToast({
-    title: 'Ce document est sur ton ordinateur',
-    desc: `Chemin copié — ouvre-le depuis ton dossier : ${full}`,
-    icon: '📄',
-  });
+  const name = path.split('/').pop() ?? path;
+  window.open(driveSearchUrl(name), '_blank', 'noopener');
 }
 
 export async function setDocRead(path: string, read: boolean): Promise<void> {

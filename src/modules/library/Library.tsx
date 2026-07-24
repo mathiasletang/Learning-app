@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '@/core/db';
 import { allDocs, docsByFolder } from '@/core/content';
+import { DRIVE_FOLDER_URL } from '@/core/config';
 import { setDocRead, openResource } from '@/app/actions';
 import { TRACK_LABEL } from '@/core/meta';
 import type { LibDoc, TrackId } from '@/core/types';
@@ -106,18 +107,28 @@ export function Library() {
     <>
       <PageHead
         title="Bibliothèque"
-        subtitle={`${allDocs().length} documents. Les PDF s'ouvrent dans le lecteur du système.`}
+        subtitle={`${allDocs().length} documents — cliquer ouvre la recherche dans ton Google Drive.`}
         actions={
-          <Segmented
-            options={[
-              { value: 'essentials', label: 'Essentiels' },
-              { value: 'sources', label: 'Sources' },
-              { value: 'search', label: 'Recherche' },
-            ]}
-            value={view}
-            onChange={(v) => setView(v as View)}
-            ariaLabel="Vue de la bibliothèque"
-          />
+          <>
+            <a
+              className="btn btn--secondary"
+              href={DRIVE_FOLDER_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <Icon name="external" size={18} /> Ouvrir mon Drive
+            </a>
+            <Segmented
+              options={[
+                { value: 'essentials', label: 'Essentiels' },
+                { value: 'sources', label: 'Sources' },
+                { value: 'search', label: 'Recherche' },
+              ]}
+              value={view}
+              onChange={(v) => setView(v as View)}
+              ariaLabel="Vue de la bibliothèque"
+            />
+          </>
         }
       />
 

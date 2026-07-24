@@ -7,10 +7,9 @@
    reconnaît pas. Il ne s'exécute qu'une fois.
    ========================================================================= */
 
-import { db, importAll, type ExportBundle } from '@/core/db';
-import { initialSrs } from '@/core/srs';
+import { db, importAll, DEFAULT_PREFS, type ExportBundle } from '@/core/db';
 import { toDayStr } from '@/core/date';
-import type { Flashcard, Note, SrsState } from '@/core/types';
+import type { Flashcard, Note, SrsState, UserPrefs } from '@/core/types';
 import { useApp } from './store';
 
 const LEGACY_KEY = 'atelier_v4';
@@ -26,6 +25,13 @@ function num(v: unknown, d = 0): number {
 }
 function str(v: unknown, d = ''): string {
   return typeof v === 'string' ? v : d;
+}
+function safeLocal(key: string): string | null {
+  try {
+    return localStorage.getItem(key);
+  } catch {
+    return null;
+  }
 }
 
 function pickSrs(v: unknown, today: string): SrsState {
@@ -76,19 +82,35 @@ export async function runMigrationIfNeeded(): Promise<void> {
 async function migrateLegacy(data: AnyObj): Promise<void> {
   const today = toDayStr();
 
-  // Gamification
-  const gam = asObj(data.gam) ?? asObj(data.gamification) ?? {};
-  const days = asObj(gam.days) ?? asObj(data.days) ?? {};
+  // Le prototype (atelier_v4) stocke l'état à plat : { qcm, docs, steps, time,
+  // cards, notes, vocab, xp, streak, lastDay, days, badges:{}, goal, goalDate,
+  // goalDone }. On lit à la racine, avec repli sur un éventuel objet imbriqué.
+  const g = asObj(data.gam) ?? asObj(data.gamification) ?? data;
+  const days = asObj(g.days) ?? asObj(data.days) ?? {};
+  const goal = num(data.goal ?? g.goal, DEFAULT_PREFS.dailyGoal);
+
   await db.gam.put({
     key: 'gam',
-    xp: num(gam.xp ?? data.xp),
-    streak: num(gam.streak ?? data.streak),
-    lastDay: str(gam.last_day ?? gam.lastDay ?? data.last_day),
-    goalDoneToday: num(gam.goal_done ?? gam.goalDoneToday),
-    goalDoneDay: str(gam.goalDoneDay, today),
+    xp: num(g.xp),
+    streak: num(g.streak),
+    lastDay: str(g.lastDay ?? g.last_day),
+    goalDoneToday: num(g.goalDone ?? g.goal_done),
+    goalDoneDay: str(g.goalDate ?? g.goalDoneDay),
     days: Object.fromEntries(Object.entries(days).map(([k, v]) => [k, num(v)])),
-    reviewsCount: num(gam.reviewsCount),
-    goalReachedEver: Boolean(gam.goalReachedEver),
+    reviewsCount: num(g.reviewsCount),
+    goalReachedEver: Boolean(g.goalReachedEver) || num(g.goalDone) >= goal,
+  });
+
+  // Préférences : objectif quotidien + thème/repli sidebar (clés localStorage
+  // distinctes dans le prototype : atelier_theme, atelier_collapsed).
+  const themeRaw = safeLocal('atelier_theme');
+  const theme: UserPrefs['theme'] =
+    themeRaw === 'light' || themeRaw === 'dark' ? themeRaw : DEFAULT_PREFS.theme;
+  await db.prefs.put({
+    ...DEFAULT_PREFS,
+    theme,
+    dailyGoal: goal,
+    sidebarCollapsed: safeLocal('atelier_collapsed') === 'true',
   });
 
   // Étapes cochées
@@ -194,6 +216,4 @@ async function migrateLegacy(data: AnyObj): Promise<void> {
       Object.entries(asObj(badgesRaw)!).map(([id, at]) => ({ id, at: str(at, today) })),
     );
   }
-
-  void initialSrs; // conservé pour usage futur éventuel
 }

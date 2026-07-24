@@ -25,16 +25,22 @@ npm run test       # tests (logique métier + rendu)
 npm run typecheck  # vérification des types
 ```
 
-## Brancher le vrai contenu
+## Contenu
 
-Le dépôt contient un **jeu de données factice** conforme au schéma, dans `src/content/`, pour que l'app tourne immédiatement. Pour utiliser le contenu réel :
+Le contenu pédagogique réel (897 QCM, 929 mots, 1 262 documents, 3 parcours, 5 cours) vit dans **`src/content/`** :
 
-1. Dépose les fichiers fournis dans `SPEC_DEVELOPPEUR/data/` :
-   `qcm.json`, `vocabulaire.json`, `catalogue.json`, `parcours.json`, et `cours/*.md`.
-2. Lance `npm run sync-content` (copie vers `src/content/`).
-3. `npm run build` (ou `npm run dev`).
+```
+src/content/
+├── qcm.json            # 897 questions (opt, fin, cfa, pre, eco)
+├── vocabulaire.json    # 929 cartes (finfr, verbs, nouns)
+├── catalogue.json      # 1 262 documents
+├── parcours.json       # 3 parcours (opt, fin, cfa)
+└── cours/*.md          # 5 cours (Markdown + LaTeX)
+```
 
-Le prototype de référence `ATELIER.html` peut rester à la racine ; il ne sert que de repère visuel et fonctionnel.
+C'est la source unique consommée par le chargeur (`src/core/content.ts`) et embarquée au build (donc disponible hors-ligne). Pour mettre à jour le contenu, remplace ces fichiers (le format est décrit dans `SCHEMA_DONNEES.md`) et relance `npm run build`.
+
+Le prototype de référence `ATELIER.html` reste à la racine ; il ne sert que de repère visuel et fonctionnel.
 
 ## Architecture
 
@@ -52,7 +58,7 @@ src/
 ├── modules/      # un module par écran (dashboard, tracks, courses, quiz,
 │                 #   flashcards, vocab, library, notes, stats, planner)
 ├── ui/           # design system (Button, Card, Tag, Ring, Modal…)
-├── content/      # copie build du contenu (remplacée par sync-content)
+├── content/      # contenu pédagogique (qcm, vocab, catalogue, parcours, cours)
 └── styles/       # tokens (thème clair/sombre), styles globaux, prose
 ```
 

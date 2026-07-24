@@ -77,6 +77,16 @@ function applyTheme(resolved: ResolvedTheme) {
   if (meta) meta.setAttribute('content', resolved === 'dark' ? '#100f0c' : '#faf8f4');
 }
 
+/** Miroir du choix brut de thème dans localStorage : c'est ce que lit le script
+    anti-flash d'index.html au tout premier paint (Dexie est asynchrone). */
+function mirrorThemeChoice(theme: UserPrefs['theme']) {
+  try {
+    localStorage.setItem('atelier.theme', theme);
+  } catch {
+    /* ignore */
+  }
+}
+
 /* ------------------------- Helpers de gamification ---------------------- */
 
 /** Met à jour la série : +1 si actif la veille, remise à 1 sinon. Idempotent le même jour. */
@@ -161,6 +171,7 @@ export const useApp = create<AppState>((set, get) => {
       const earned = (await db.badges.toArray()).map((b) => b.id);
       const resolved = resolveTheme(prefs.theme);
       applyTheme(resolved);
+      mirrorThemeChoice(prefs.theme);
 
       // Réagir aux changements système quand le thème est « auto ».
       if (!mediaListenerBound && typeof window !== 'undefined' && window.matchMedia) {
@@ -183,6 +194,7 @@ export const useApp = create<AppState>((set, get) => {
       const earned = (await db.badges.toArray()).map((b) => b.id);
       const resolved = resolveTheme(prefs.theme);
       applyTheme(resolved);
+      mirrorThemeChoice(prefs.theme);
       set({ prefs, gam, earnedBadges: earned, resolvedTheme: resolved });
     },
 
@@ -190,6 +202,7 @@ export const useApp = create<AppState>((set, get) => {
       const prefs = await savePrefs({ theme: t });
       const resolved = resolveTheme(t);
       applyTheme(resolved);
+      mirrorThemeChoice(t);
       set({ prefs, resolvedTheme: resolved });
     },
 

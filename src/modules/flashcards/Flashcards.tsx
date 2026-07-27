@@ -5,8 +5,7 @@ import { toDayStr } from '@/core/date';
 import { isMature } from '@/core/srs';
 import type { Flashcard } from '@/core/types';
 import { reviewFlashcard, createManualFlashcard, deleteFlashcard } from '@/app/actions';
-import { PageHead } from '@/ui/PageHead';
-import { Button, Card, Modal, Progress, Icon } from '@/ui';
+import { Button, Modal, Gauge, PageHead, Icon, Reveal } from '@/ui';
 import { SrsReviewer, type ReviewItem, type GradeButton } from '@/modules/review/SrsReviewer';
 
 const GRADES: GradeButton[] = [
@@ -25,17 +24,17 @@ export function Flashcards() {
   const [back, setBack] = useState('');
 
   const due = useMemo(() => cards.filter((c) => c.due <= today), [cards, today]);
-  const mature = useMemo(() => cards.filter((c) => isMature(c)).length, [cards]);
-  const cardMap = useMemo(() => new Map(cards.map((c) => [c.id, c])), [cards]);
+  const mature = useMemo(() => cards.filter(isMature).length, [cards]);
+  const byId = useMemo(() => new Map(cards.map((c) => [c.id, c])), [cards]);
 
-  if (reviewing && reviewing.length > 0) {
+  if (reviewing?.length) {
     const items: ReviewItem[] = reviewing.map((c) => ({
       id: c.id,
       front: <span dangerouslySetInnerHTML={{ __html: c.front }} />,
       back: (
         <div>
           <strong dangerouslySetInnerHTML={{ __html: c.back }} />
-          {c.expl && <div className="flip__expl" dangerouslySetInnerHTML={{ __html: c.expl }} />}
+          {c.expl && <div className="card-face__expl" dangerouslySetInnerHTML={{ __html: c.expl }} />}
         </div>
       ),
     }));
@@ -44,7 +43,7 @@ export function Flashcards() {
         items={items}
         grades={GRADES}
         onGrade={async (item, g) => {
-          const card = cardMap.get(item.id);
+          const card = byId.get(item.id);
           if (card) await reviewFlashcard(card, g);
         }}
         onExit={() => setReviewing(null)}
@@ -63,8 +62,14 @@ export function Flashcards() {
   return (
     <>
       <PageHead
-        title="Flashcards"
-        subtitle="Répétition espacée (SM-2). Les erreurs de QCM deviennent des cartes."
+        eyebrow="Répétition espacée"
+        title={due.length ? `${due.length} carte${due.length > 1 ? 's' : ''} à revoir` : 'Mémoire à jour'}
+        display
+        lead={
+          due.length
+            ? 'La bonne carte au bon moment : l’algorithme choisit l’instant où vous êtes sur le point d’oublier.'
+            : 'Rien n’est dû aujourd’hui. Les cartes reviendront quand l’oubli approchera.'
+        }
         actions={
           <Button variant="secondary" icon="plus" onClick={() => setAddOpen(true)}>
             Nouvelle carte
@@ -72,81 +77,85 @@ export function Flashcards() {
         }
       />
 
-      <div
-        className="grid"
-        style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', marginBottom: 'var(--s-6)' }}
-      >
-        <Card>
-          <span className="section-title" style={{ margin: 0 }}>
-            À réviser
-          </span>
-          <strong className="tnum" style={{ fontSize: 'var(--fs-display)', display: 'block' }}>
-            {due.length}
-          </strong>
-        </Card>
-        <Card>
-          <span className="section-title" style={{ margin: 0 }}>
-            Total
-          </span>
-          <strong className="tnum" style={{ fontSize: 'var(--fs-display)', display: 'block' }}>
-            {cards.length}
-          </strong>
-        </Card>
-        <Card>
-          <span className="section-title" style={{ margin: 0 }}>
-            Mémorisées
-          </span>
-          <strong className="tnum" style={{ fontSize: 'var(--fs-display)', display: 'block' }}>
-            {mature}
-          </strong>
-          <div style={{ marginTop: 'var(--s-2)' }}>
-            <Progress value={cards.length ? mature / cards.length : 0} colorVar="--good" />
-          </div>
-        </Card>
-      </div>
-
-      {due.length > 0 ? (
-        <Button variant="primary" icon="play" onClick={() => setReviewing(due)} block>
-          Réviser {due.length} carte{due.length > 1 ? 's' : ''}
+      {due.length > 0 && (
+        <Button variant="primary" icon="play" onClick={() => setReviewing(due)}>
+          Commencer la révision
         </Button>
-      ) : (
-        <Card pad="lg">
-          <div className="row" style={{ gap: 'var(--s-3)' }}>
-            <Icon name="check" size={22} />
-            <div>
-              <strong>Rien à réviser aujourd'hui</strong>
-              <p className="meta">Reviens demain, ou ajoute des cartes depuis tes erreurs de QCM.</p>
-            </div>
-          </div>
-        </Card>
       )}
 
-      {cards.length > 0 && (
-        <section style={{ marginTop: 'var(--s-8)' }}>
-          <div className="section-title">Toutes les cartes ({cards.length})</div>
-          <div className="stack" style={{ gap: 'var(--s-2)' }}>
-            {cards.map((c) => (
-              <Card key={c.id} className="row row--between" style={{ gap: 'var(--s-3)' }}>
-                <div style={{ minWidth: 0 }}>
-                  <div
-                    style={{ fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis' }}
-                    dangerouslySetInnerHTML={{ __html: c.front }}
-                  />
-                  <div className="meta" dangerouslySetInnerHTML={{ __html: c.back }} />
-                </div>
-                <div className="row" style={{ gap: 'var(--s-2)', flex: 'none' }}>
-                  <span className="meta tnum" title="Intervalle en jours">
-                    {c.interval}j
+      <section className="section">
+        <div className="section__head">
+          <h2>État de la mémoire</h2>
+          <span className="meta tnum">{cards.length} cartes</span>
+        </div>
+        <div className="figures">
+          <div>
+            <span className="figure__value tnum">{due.length}</span>
+            <span className="eyebrow figure__label">Dues</span>
+          </div>
+          <div>
+            <span className="figure__value tnum">{cards.length}</span>
+            <span className="eyebrow figure__label">Total</span>
+          </div>
+          <div>
+            <span className="figure__value tnum">{mature}</span>
+            <span className="eyebrow figure__label">Mémorisées</span>
+            <span className="micro figure__note">intervalle ≥ 21 jours</span>
+          </div>
+          <div>
+            <span className="figure__value tnum">
+              {cards.length ? `${Math.round((mature / cards.length) * 100)}%` : '—'}
+            </span>
+            <span className="eyebrow figure__label">Rétention</span>
+            <span style={{ display: 'block', marginTop: 'var(--s-3)', maxWidth: 96 }}>
+              <Gauge value={cards.length ? mature / cards.length : 0} colorVar="--positive" />
+            </span>
+          </div>
+        </div>
+      </section>
+
+      {cards.length > 0 ? (
+        <section className="section">
+          <div className="section__head">
+            <h2>Toutes les cartes</h2>
+          </div>
+          <div className="banklist">
+            {cards.map((c, i) => (
+              <Reveal key={c.id} delay={Math.min(i, 8) * 0.03} y={10}>
+                <div className="bankrow" style={{ cursor: 'default' }}>
+                  <span className="bankrow__index">{String(i + 1).padStart(2, '0')}</span>
+                  <span style={{ minWidth: 0 }}>
+                    <span
+                      style={{ display: 'block', fontWeight: 500 }}
+                      dangerouslySetInnerHTML={{ __html: c.front }}
+                    />
+                    <span
+                      className="micro"
+                      style={{ display: 'block', marginTop: 'var(--s-2)' }}
+                      dangerouslySetInnerHTML={{ __html: c.back }}
+                    />
                   </span>
-                  <Button
-                    variant="ghost"
-                    icon="trash"
+                  <span className="meta tnum">{c.interval} j</span>
+                  <button
+                    type="button"
+                    className="btn btn--ghost btn--icon"
                     aria-label="Supprimer la carte"
                     onClick={() => deleteFlashcard(c.id)}
-                  />
+                  >
+                    <Icon name="trash" size={16} />
+                  </button>
                 </div>
-              </Card>
+              </Reveal>
             ))}
+          </div>
+        </section>
+      ) : (
+        <section className="section">
+          <div className="empty">
+            <h3>Aucune carte pour l'instant</h3>
+            <p className="meta">
+              Les questions manquées en séance de QCM deviennent des cartes, d'un seul geste.
+            </p>
           </div>
         </section>
       )}
@@ -154,7 +163,7 @@ export function Flashcards() {
       <Modal
         open={addOpen}
         onClose={() => setAddOpen(false)}
-        title="Nouvelle flashcard"
+        title="Nouvelle carte"
         footer={
           <>
             <span className="spacer" />
@@ -167,27 +176,13 @@ export function Flashcards() {
           </>
         }
       >
-        <label className="stack" style={{ gap: 'var(--s-2)', marginBottom: 'var(--s-4)' }}>
-          <span className="section-title" style={{ margin: 0 }}>
-            Recto (question)
-          </span>
-          <textarea
-            className="textarea"
-            rows={2}
-            value={front}
-            onChange={(e) => setFront(e.target.value)}
-          />
+        <label className="stack" style={{ gap: 'var(--s-3)', marginBottom: 'var(--s-6)' }}>
+          <span className="eyebrow">Recto — la question</span>
+          <textarea className="field" rows={2} value={front} onChange={(e) => setFront(e.target.value)} />
         </label>
-        <label className="stack" style={{ gap: 'var(--s-2)' }}>
-          <span className="section-title" style={{ margin: 0 }}>
-            Verso (réponse)
-          </span>
-          <textarea
-            className="textarea"
-            rows={2}
-            value={back}
-            onChange={(e) => setBack(e.target.value)}
-          />
+        <label className="stack" style={{ gap: 'var(--s-3)' }}>
+          <span className="eyebrow">Verso — la réponse</span>
+          <textarea className="field" rows={3} value={back} onChange={(e) => setBack(e.target.value)} />
         </label>
       </Modal>
     </>

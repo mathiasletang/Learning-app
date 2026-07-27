@@ -2,14 +2,14 @@ import { useRef, useState } from 'react';
 import { exportAll, importAll, resetAll, type ExportBundle } from '@/core/db';
 import { toDayStr } from '@/core/date';
 import { useApp } from '@/app/store';
-import { Button, Card, Modal, Icon } from '@/ui';
+import { Button, Modal } from '@/ui';
 
 export function DataZone() {
   const pushToast = useApp((s) => s.pushToast);
   const reload = useApp((s) => s.reloadFromDb);
   const refreshBadges = useApp((s) => s.refreshBadges);
   const fileRef = useRef<HTMLInputElement>(null);
-  const [confirmReset, setConfirmReset] = useState(false);
+  const [confirm, setConfirm] = useState(false);
 
   async function doExport() {
     const bundle = await exportAll();
@@ -20,22 +20,20 @@ export function DataZone() {
     a.download = `cours-avances-sauvegarde-${toDayStr()}.json`;
     a.click();
     URL.revokeObjectURL(url);
-    pushToast({ title: 'Sauvegarde exportée', icon: '💾', kind: 'success' });
+    pushToast({ title: 'Sauvegarde exportée' });
   }
 
   async function doImport(file: File) {
     try {
-      const text = await file.text();
-      const bundle = JSON.parse(text) as ExportBundle;
+      const bundle = JSON.parse(await file.text()) as ExportBundle;
       await importAll(bundle, 'replace');
       await reload();
       await refreshBadges();
-      pushToast({ title: 'Progression importée', icon: '📥', kind: 'success' });
+      pushToast({ title: 'Progression importée' });
     } catch (e) {
       pushToast({
         title: 'Import impossible',
         desc: e instanceof Error ? e.message : 'Fichier invalide.',
-        icon: '⚠️',
       });
     }
   }
@@ -43,20 +41,25 @@ export function DataZone() {
   async function doReset() {
     await resetAll();
     await reload();
-    setConfirmReset(false);
-    pushToast({ title: 'Progression réinitialisée', icon: '🧹' });
+    setConfirm(false);
+    pushToast({ title: 'Progression réinitialisée' });
   }
 
   return (
-    <Card pad="lg">
-      <div className="section-title">Données — sauvegarde et portabilité</div>
-      <p className="meta" style={{ marginBottom: 'var(--s-4)' }}>
-        Tes données vivent sur cet appareil. Exporte régulièrement : c'est ton filet de sécurité et
-        le moyen de passer d'un appareil à l'autre.
+    <>
+      <div className="section__head">
+        <h2>Vos données</h2>
+        <span className="micro">Sur cet appareil</span>
+      </div>
+
+      <p className="lead" style={{ marginBottom: 'var(--s-8)' }}>
+        Rien ne quitte votre navigateur. Exportez de temps en temps : c'est votre filet de sécurité,
+        et le moyen de passer d'un appareil à l'autre.
       </p>
+
       <div className="row row--wrap" style={{ gap: 'var(--s-3)' }}>
         <Button variant="primary" icon="download" onClick={doExport}>
-          Exporter (JSON)
+          Exporter
         </Button>
         <Button variant="secondary" icon="upload" onClick={() => fileRef.current?.click()}>
           Importer
@@ -73,35 +76,33 @@ export function DataZone() {
           }}
         />
         <span className="spacer" />
-        <Button variant="danger" icon="trash" onClick={() => setConfirmReset(true)}>
+        <Button variant="danger" icon="trash" onClick={() => setConfirm(true)}>
           Réinitialiser
         </Button>
       </div>
 
       <Modal
-        open={confirmReset}
-        onClose={() => setConfirmReset(false)}
-        title="Tout réinitialiser ?"
+        open={confirm}
+        onClose={() => setConfirm(false)}
+        title="Tout effacer ?"
         footer={
           <>
             <span className="spacer" />
-            <Button variant="ghost" onClick={() => setConfirmReset(false)}>
+            <Button variant="ghost" onClick={() => setConfirm(false)}>
               Annuler
             </Button>
             <Button variant="danger" onClick={doReset}>
-              Réinitialiser
+              Effacer
             </Button>
           </>
         }
       >
-        <p className="row" style={{ gap: 'var(--s-3)', alignItems: 'flex-start' }}>
-          <Icon name="trash" size={22} />
-          <span>
-            Cette action efface toute ta progression (XP, révisions, notes, temps…) sur cet
-            appareil. Le contenu (cours, QCM) n'est pas touché. Pense à exporter avant.
-          </span>
+        <p className="meta">
+          Cette action supprime toute votre progression sur cet appareil : expérience, révisions,
+          notes, temps. Le contenu (cours, questions, vocabulaire) reste intact. Pensez à exporter
+          avant.
         </p>
       </Modal>
-    </Card>
+    </>
   );
 }

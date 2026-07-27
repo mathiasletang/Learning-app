@@ -1,11 +1,8 @@
 import type { ButtonHTMLAttributes, ReactNode } from 'react';
 import { Icon, type IconName } from './Icon';
 
-type Variant = 'primary' | 'secondary' | 'ghost' | 'danger';
-
 interface Props extends ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: Variant;
-  size?: 'md' | 'sm';
+  variant?: 'primary' | 'secondary' | 'ghost' | 'danger';
   block?: boolean;
   icon?: IconName;
   iconRight?: IconName;
@@ -14,7 +11,6 @@ interface Props extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 export function Button({
   variant = 'secondary',
-  size = 'md',
   block,
   icon,
   iconRight,
@@ -23,21 +19,14 @@ export function Button({
   ...rest
 }: Props) {
   const iconOnly = !children && (icon || iconRight);
-  const cls = [
-    'btn',
-    `btn--${variant}`,
-    size === 'sm' && 'btn--sm',
-    block && 'btn--block',
-    iconOnly && 'btn--icon',
-    className,
-  ]
+  const cls = ['btn', `btn--${variant}`, block && 'btn--block', iconOnly && 'btn--icon', className]
     .filter(Boolean)
     .join(' ');
   return (
     <button className={cls} {...rest}>
-      {icon && <Icon name={icon} size={size === 'sm' ? 16 : 18} />}
+      {icon && <Icon name={icon} size={17} />}
       {children}
-      {iconRight && <Icon name={iconRight} size={size === 'sm' ? 16 : 18} />}
+      {iconRight && <Icon name={iconRight} size={17} />}
     </button>
   );
 }

@@ -1,13 +1,12 @@
 import { useMemo } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '@/core/db';
-import { useApp } from '@/app/store';
+import { useApp, useLevel } from '@/app/store';
 import { toDayStr, addDays } from '@/core/date';
 import { BADGES } from '@/core/gamification';
 import { BANKS, BANK_ORDER, SUBJECTS, subjectLabel, subjectColorVar } from '@/core/meta';
 import type { BankId } from '@/core/types';
-import { PageHead } from '@/ui/PageHead';
-import { Card } from '@/ui';
+import { PageHead, Gauge, Reveal } from '@/ui';
 import './stats.css';
 
 function heatLevel(xp: number): 0 | 1 | 2 | 3 | 4 {
@@ -18,43 +17,56 @@ function heatLevel(xp: number): 0 | 1 | 2 | 3 | 4 {
   return 4;
 }
 
+/** Courbe d'XP sur 14 jours — tracé lissé, sans axes. */
+function Spark({ points }: { points: { day: string; xp: number }[] }) {
+  const w = 720;
+  const h = 120;
+  const max = Math.max(1, ...points.map((p) => p.xp));
+  const step = points.length > 1 ? w / (points.length - 1) : w;
+  const coords = points.map((p, i) => [i * step, h - (p.xp / max) * h] as const);
+  const line = coords.map(([x, y], i) => `${i ? 'L' : 'M'}${x.toFixed(1)} ${y.toFixed(1)}`).join(' ');
+  const area = `${line} L${w} ${h} L0 ${h} Z`;
+  const last = coords[coords.length - 1];
+
+  return (
+    <svg className="spark" viewBox={`0 0 ${w} ${h + 8}`} preserveAspectRatio="none" role="img"
+      aria-label="Progression de l'expérience sur quatorze jours">
+      <path className="spark__area" d={area} />
+      <path className="spark__line" d={line} vectorEffect="non-scaling-stroke" />
+      <line className="spark__base" x1={0} y1={h} x2={w} y2={h} vectorEffect="non-scaling-stroke" />
+      {last && <circle className="spark__dot" cx={last[0]} cy={last[1]} r={3} />}
+    </svg>
+  );
+}
+
 export function Stats() {
   const gam = useApp((s) => s.gam);
+  const level = useLevel();
   const earned = useApp((s) => s.earnedBadges);
   const badgeRows = useLiveQuery(() => db.badges.toArray(), [], []);
   const sessions = useLiveQuery(() => db.qcmSessions.toArray(), [], []);
   const timeLogs = useLiveQuery(() => db.timeLogs.toArray(), [], []);
   const today = toDayStr();
 
-  const badgeDate = useMemo(
-    () => new Map(badgeRows.map((b) => [b.id, b.at])),
-    [badgeRows],
+  const badgeDate = useMemo(() => new Map(badgeRows.map((b) => [b.id, b.at])), [badgeRows]);
+
+  const heat = useMemo(() => {
+    const start = addDays(today, -181);
+    return Array.from({ length: 182 }, (_, i) => {
+      const day = addDays(start, i);
+      return { day, xp: gam.days[day] ?? 0 };
+    });
+  }, [today, gam.days]);
+
+  const xp14 = useMemo(
+    () =>
+      Array.from({ length: 14 }, (_, i) => {
+        const day = addDays(today, -(13 - i));
+        return { day, xp: gam.days[day] ?? 0 };
+      }),
+    [today, gam.days],
   );
 
-  // Heatmap : 26 semaines (≈ 6 mois), colonnes = semaines.
-  const heatDays = useMemo(() => {
-    const days: { day: string; xp: number }[] = [];
-    // recule jusqu'au lundi il y a ~26 semaines
-    const start = addDays(today, -181);
-    for (let i = 0; i <= 181; i++) {
-      const day = addDays(start, i);
-      days.push({ day, xp: gam.days[day] ?? 0 });
-    }
-    return days;
-  }, [today, gam.days]);
-
-  // Courbe d'XP : 14 derniers jours.
-  const xp14 = useMemo(() => {
-    const arr: { day: string; xp: number }[] = [];
-    for (let i = 13; i >= 0; i--) {
-      const day = addDays(today, -i);
-      arr.push({ day, xp: gam.days[day] ?? 0 });
-    }
-    return arr;
-  }, [today, gam.days]);
-  const maxXp14 = Math.max(1, ...xp14.map((d) => d.xp));
-
-  // Précision par matière (banque).
   const precision = useMemo(() => {
     const acc = new Map<BankId, { score: number; total: number }>();
     for (const s of sessions) {
@@ -66,134 +78,152 @@ export function Stats() {
     return acc;
   }, [sessions]);
 
-  // Temps par matière (heures).
-  const timeBySubject = useMemo(() => {
+  const bySubject = useMemo(() => {
     const acc = new Map<string, number>();
     for (const t of timeLogs) acc.set(t.subject, (acc.get(t.subject) ?? 0) + t.minutes);
     return acc;
   }, [timeLogs]);
-  const maxMinutes = Math.max(1, ...timeBySubject.values());
+  const maxMin = Math.max(1, ...bySubject.values());
+
+  const activeDays = Object.values(gam.days).filter((x) => x > 0).length;
+  const totalHours = [...bySubject.values()].reduce((a, b) => a + b, 0) / 60;
+  const answered = sessions.reduce((n, s) => n + s.total, 0);
 
   return (
     <>
-      <PageHead title="Statistiques" subtitle="Ton activité, ta précision et tes badges." />
+      <PageHead
+        eyebrow="Statistiques"
+        title="Ce que le travail a laissé."
+        display
+        lead="Le détail compte moins que la régularité. Ces courbes n'ont qu'un but : montrer si la pratique tient dans la durée."
+      />
 
-      <Card pad="lg" style={{ marginBottom: 'var(--s-5)' }}>
-        <div className="section-title">Activité (6 mois)</div>
-        <div className="heatmap" role="img" aria-label="Carte d'activité des 6 derniers mois">
-          {heatDays.map((d) => (
-            <div
-              key={d.day}
-              className={`heatmap__cell heat-${heatLevel(d.xp)}`}
-              title={`${d.day} · ${d.xp} XP`}
-            />
-          ))}
+      <div className="figures">
+        <div>
+          <span className="figure__value tnum">{level.level}</span>
+          <span className="eyebrow figure__label">Niveau</span>
+          <span className="micro figure__note tnum">{gam.xp} XP</span>
         </div>
-        <div className="legend" style={{ marginTop: 'var(--s-3)' }}>
-          Moins
-          {[0, 1, 2, 3, 4].map((l) => (
-            <span key={l} className={`legend__cell heat-${l}`} />
-          ))}
-          Plus
+        <div>
+          <span className="figure__value tnum">{gam.streak}</span>
+          <span className="eyebrow figure__label">Série</span>
+          <span className="micro figure__note">jours consécutifs</span>
         </div>
-      </Card>
-
-      <Card pad="lg" style={{ marginBottom: 'var(--s-5)' }}>
-        <div className="section-title">XP — 14 derniers jours</div>
-        <div className="bars">
-          {xp14.map((d) => (
-            <div key={d.day} className="bars__col">
-              <div
-                className="bars__bar"
-                style={{ height: `${(d.xp / maxXp14) * 100}%` }}
-                title={`${d.day} · ${d.xp} XP`}
-              />
-              <span className="bars__label">{d.day.slice(8)}</span>
-            </div>
-          ))}
+        <div>
+          <span className="figure__value tnum">{activeDays}</span>
+          <span className="eyebrow figure__label">Jours actifs</span>
         </div>
-      </Card>
-
-      <div
-        className="grid"
-        style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', marginBottom: 'var(--s-5)' }}
-      >
-        <Card pad="lg">
-          <div className="section-title">Précision par matière</div>
-          {BANK_ORDER.every((b) => !precision.get(b)) ? (
-            <p className="meta">Fais des QCM pour voir ta précision.</p>
-          ) : (
-            BANK_ORDER.map((b) => {
-              const a = precision.get(b);
-              if (!a || a.total === 0) return null;
-              const ratio = a.score / a.total;
-              return (
-                <div key={b} className="bar-row">
-                  <span className="bar-row__label">{BANKS[b].short}</span>
-                  <span className="bar-row__track">
-                    <span
-                      className="bar-row__fill"
-                      style={{ width: `${ratio * 100}%`, background: `var(${BANKS[b].colorVar})` }}
-                    />
-                  </span>
-                  <span className="bar-row__value">{Math.round(ratio * 100)}%</span>
-                </div>
-              );
-            })
-          )}
-        </Card>
-
-        <Card pad="lg">
-          <div className="section-title">Temps par matière</div>
-          {timeBySubject.size === 0 ? (
-            <p className="meta">Enregistre du temps de travail pour voir la répartition.</p>
-          ) : (
-            SUBJECTS.filter((s) => timeBySubject.has(s.id)).map((s) => {
-              const min = timeBySubject.get(s.id) ?? 0;
-              return (
-                <div key={s.id} className="bar-row">
-                  <span className="bar-row__label">{subjectLabel(s.id)}</span>
-                  <span className="bar-row__track">
-                    <span
-                      className="bar-row__fill"
-                      style={{ width: `${(min / maxMinutes) * 100}%`, background: `var(${subjectColorVar(s.id)})` }}
-                    />
-                  </span>
-                  <span className="bar-row__value">
-                    {(min / 60).toFixed(1)} h
-                  </span>
-                </div>
-              );
-            })
-          )}
-        </Card>
+        <div>
+          <span className="figure__value tnum">{totalHours.toFixed(0)} h</span>
+          <span className="eyebrow figure__label">Temps cumulé</span>
+          <span className="micro figure__note tnum">{answered} questions</span>
+        </div>
       </div>
 
-      <Card pad="lg">
-        <div className="section-title">
-          Badges ({earned.length}/{BADGES.length})
+      <section className="section">
+        <div className="section__head">
+          <h2>Activité</h2>
+          <span className="micro">Six derniers mois</span>
         </div>
-        <div className="badge-wall">
-          {BADGES.map((b) => {
+        <Reveal>
+          <div className="heat" role="img" aria-label="Carte d'activité des six derniers mois">
+            {heat.map((d) => (
+              <div key={d.day} className={`heat__cell h${heatLevel(d.xp)}`} title={`${d.day} · ${d.xp} XP`} />
+            ))}
+          </div>
+          <div className="legend micro" style={{ marginTop: 'var(--s-4)' }}>
+            Moins
+            {[0, 1, 2, 3, 4].map((l) => (
+              <span key={l} className={`legend__cell h${l}`} style={l === 0 ? { background: 'var(--hairline)' } : undefined} />
+            ))}
+            Plus
+          </div>
+        </Reveal>
+      </section>
+
+      <section className="section">
+        <div className="section__head">
+          <h2>Expérience acquise</h2>
+          <span className="micro">Quatorze jours</span>
+        </div>
+        <Reveal>
+          <Spark points={xp14} />
+          <div className="row row--between micro" style={{ marginTop: 'var(--s-3)' }}>
+            <span>{xp14[0]?.day.slice(5).replace('-', '/')}</span>
+            <span>Aujourd'hui</span>
+          </div>
+        </Reveal>
+      </section>
+
+      <section className="section">
+        <div className="section__head">
+          <h2>Précision par matière</h2>
+        </div>
+        {BANK_ORDER.every((b) => !precision.get(b)?.total) ? (
+          <p className="meta">Aucune séance de questions pour l'instant.</p>
+        ) : (
+          BANK_ORDER.map((b) => {
+            const a = precision.get(b);
+            if (!a?.total) return null;
+            const r = a.score / a.total;
+            return (
+              <div className="bar" key={b}>
+                <span className="bar__label">{BANKS[b].title}</span>
+                <Gauge value={r} colorVar={BANKS[b].colorVar} thick />
+                <span className="bar__value">{Math.round(r * 100)}%</span>
+              </div>
+            );
+          })
+        )}
+      </section>
+
+      <section className="section">
+        <div className="section__head">
+          <h2>Temps par matière</h2>
+        </div>
+        {bySubject.size === 0 ? (
+          <p className="meta">Aucune séance chronométrée pour l'instant.</p>
+        ) : (
+          SUBJECTS.filter((s) => bySubject.has(s.id)).map((s) => {
+            const min = bySubject.get(s.id) ?? 0;
+            return (
+              <div className="bar" key={s.id}>
+                <span className="bar__label">{subjectLabel(s.id)}</span>
+                <Gauge value={min / maxMin} colorVar={subjectColorVar(s.id)} thick />
+                <span className="bar__value">{(min / 60).toFixed(1)} h</span>
+              </div>
+            );
+          })
+        )}
+      </section>
+
+      <section className="section">
+        <div className="section__head">
+          <h2>Distinctions</h2>
+          <span className="micro tnum">
+            {earned.length} / {BADGES.length}
+          </span>
+        </div>
+        <div className="badges">
+          {BADGES.map((b, i) => {
             const has = earned.includes(b.id);
             const at = badgeDate.get(b.id);
             return (
-              <div key={b.id} className={`badge ${has ? 'is-earned' : ''}`}>
-                <div className="badge__icon" aria-hidden>
-                  {b.icon}
+              <Reveal key={b.id} delay={Math.min(i, 8) * 0.03} y={10}>
+                <div className={`badge ${has ? 'is-earned' : ''}`}>
+                  <p className="badge__name">{b.title}</p>
+                  <span className="micro badge__desc">{b.desc}</span>
+                  {has && at && (
+                    <span className="micro badge__desc tnum">
+                      {new Date(at).toLocaleDateString('fr-FR')}
+                    </span>
+                  )}
                 </div>
-                <div className="badge__title">{b.title}</div>
-                <div className="badge__desc">{b.desc}</div>
-                {has && at && (
-                  <div className="meta tnum" style={{ marginTop: 'var(--s-1)' }}>
-                    {new Date(at).toLocaleDateString('fr-FR')}
-                  </div>
-                )}
-              </div>
+              </Reveal>
             );
           })}
         </div>
-      </Card>
+      </section>
     </>
   );
 }

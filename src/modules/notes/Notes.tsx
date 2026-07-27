@@ -4,12 +4,11 @@ import { db } from '@/core/db';
 import type { Note } from '@/core/types';
 import { renderMarkdown } from '@/core/markdown';
 import { saveNote, deleteNote } from '@/app/actions';
-import { SUBJECTS } from '@/core/meta';
-import { PageHead } from '@/ui/PageHead';
-import { Button, Icon } from '@/ui';
+import { SUBJECTS, subjectLabel } from '@/core/meta';
+import { Button, Icon, PageHead } from '@/ui';
 import './notes.css';
 
-function newDraft(): Note {
+function draft(): Note {
   return {
     id: `note:${Date.now()}`,
     title: '',
@@ -21,7 +20,7 @@ function newDraft(): Note {
 
 export function Notes() {
   const notes = useLiveQuery(() => db.notes.orderBy('updatedAt').reverse().toArray(), [], []);
-  const [draft, setDraft] = useState<Note | null>(null);
+  const [current, setCurrent] = useState<Note | null>(null);
   const [query, setQuery] = useState('');
   const [saved, setSaved] = useState(true);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -29,94 +28,92 @@ export function Notes() {
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!q) return notes;
-    return notes.filter(
-      (n) => n.title.toLowerCase().includes(q) || n.body.toLowerCase().includes(q),
-    );
+    return notes.filter((n) => n.title.toLowerCase().includes(q) || n.body.toLowerCase().includes(q));
   }, [notes, query]);
 
-  const preview = useMemo(() => (draft ? renderMarkdown(draft.body) : ''), [draft]);
+  const preview = useMemo(() => (current ? renderMarkdown(current.body) : ''), [current]);
 
-  // Sauvegarde automatique (débounce), seulement si la note a du contenu.
   useEffect(() => {
-    if (!draft) return;
-    if (!draft.title.trim() && !draft.body.trim()) return;
+    if (!current) return;
+    if (!current.title.trim() && !current.body.trim()) return;
     setSaved(false);
     if (timer.current) clearTimeout(timer.current);
     timer.current = setTimeout(async () => {
-      await saveNote({ ...draft, updatedAt: new Date().toISOString() });
+      await saveNote({ ...current, updatedAt: new Date().toISOString() });
       setSaved(true);
     }, 600);
     return () => {
       if (timer.current) clearTimeout(timer.current);
     };
-  }, [draft]);
+  }, [current]);
 
-  function patch(p: Partial<Note>) {
-    setDraft((d) => (d ? { ...d, ...p } : d));
-  }
-
-  async function removeCurrent() {
-    if (!draft) return;
-    await deleteNote(draft.id);
-    setDraft(null);
-  }
+  const patch = (p: Partial<Note>) => setCurrent((n) => (n ? { ...n, ...p } : n));
 
   return (
     <>
       <PageHead
-        title="Notes"
-        subtitle="Markdown + LaTeX, aperçu en temps réel, sauvegarde automatique."
+        eyebrow="Notes"
+        title="Ce que vous en retenez."
+        display
+        lead="Markdown et LaTeX, aperçu à droite, enregistrement continu. Écrire une démonstration avec ses mots est la meilleure façon de la retenir."
         actions={
-          <Button variant="primary" icon="plus" onClick={() => setDraft(newDraft())}>
+          <Button variant="primary" icon="plus" onClick={() => setCurrent(draft())}>
             Nouvelle note
           </Button>
         }
       />
 
       <div className="notes">
-        <aside className="notes__list" aria-label="Liste des notes">
-          <span style={{ position: 'relative' }}>
-            <Icon name="search" size={16} className="input-icon" />
+        <aside className="notes__aside" aria-label="Mes notes">
+          <label className="search">
+            <span className="sr-only">Rechercher une note</span>
+            <span className="search__icon">
+              <Icon name="search" size={16} />
+            </span>
             <input
-              className="input"
-              style={{ paddingLeft: 'var(--s-8)' }}
+              className="field"
               placeholder="Rechercher…"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
             />
-          </span>
-          {filtered.length === 0 && <p className="meta">Aucune note.</p>}
-          {filtered.map((n) => (
-            <button
-              key={n.id}
-              type="button"
-              className={`note-item ${draft?.id === n.id ? 'is-active' : ''}`}
-              onClick={() => setDraft(n)}
-            >
-              <div className="note-item__title">{n.title || 'Sans titre'}</div>
-              <div className="note-item__meta">
-                {SUBJECTS.find((s) => s.id === n.subject)?.label ?? n.subject} ·{' '}
-                {new Date(n.updatedAt).toLocaleDateString('fr-FR')}
-              </div>
-            </button>
-          ))}
+          </label>
+
+          {filtered.length === 0 ? (
+            <p className="micro">Aucune note.</p>
+          ) : (
+            <div className="notes__list">
+              {filtered.map((n) => (
+                <button
+                  key={n.id}
+                  type="button"
+                  className={`note-item ${current?.id === n.id ? 'is-active' : ''}`}
+                  onClick={() => setCurrent(n)}
+                >
+                  <span className="note-item__title">{n.title || 'Sans titre'}</span>
+                  <span className="micro note-item__meta">
+                    {subjectLabel(n.subject)} · {new Date(n.updatedAt).toLocaleDateString('fr-FR')}
+                  </span>
+                </button>
+              ))}
+            </div>
+          )}
         </aside>
 
         <section>
-          {draft ? (
+          {current ? (
             <>
-              <div className="row row--between" style={{ marginBottom: 'var(--s-3)', gap: 'var(--s-3)' }}>
-                <input
-                  className="input"
-                  placeholder="Titre de la note"
-                  value={draft.title}
-                  onChange={(e) => patch({ title: e.target.value })}
-                  style={{ fontWeight: 700 }}
-                />
+              <input
+                className="editor__title"
+                placeholder="Titre"
+                value={current.title}
+                onChange={(e) => patch({ title: e.target.value })}
+                aria-label="Titre de la note"
+              />
+              <div className="editor__bar">
                 <select
-                  className="select"
-                  style={{ maxWidth: 160 }}
-                  value={draft.subject}
+                  className="field"
+                  style={{ maxWidth: 190 }}
+                  value={current.subject}
                   onChange={(e) => patch({ subject: e.target.value })}
                   aria-label="Matière"
                 >
@@ -126,34 +123,44 @@ export function Notes() {
                     </option>
                   ))}
                 </select>
-                <Button variant="ghost" icon="trash" aria-label="Supprimer la note" onClick={removeCurrent} />
+                <span className="micro">{saved ? 'Enregistré' : 'Enregistrement…'}</span>
+                <span className="spacer" />
+                <Button
+                  variant="ghost"
+                  icon="trash"
+                  aria-label="Supprimer la note"
+                  onClick={async () => {
+                    await deleteNote(current.id);
+                    setCurrent(null);
+                  }}
+                />
               </div>
-              <div className="editor">
-                <div className="editor__pane">
-                  <label className="section-title" htmlFor="note-body">
-                    Éditeur
-                  </label>
+
+              <div className="editor__panes">
+                <div>
+                  <p className="eyebrow" style={{ marginBottom: 'var(--s-4)' }}>
+                    Écriture
+                  </p>
                   <textarea
-                    id="note-body"
-                    className="textarea editor__textarea"
-                    value={draft.body}
+                    className="editor__write"
+                    value={current.body}
                     onChange={(e) => patch({ body: e.target.value })}
-                    placeholder={'# Titre\n\nÉcris en Markdown. Formule : $e^{i\\pi}+1=0$'}
+                    placeholder={'## Idée\n\nUne formule : $\\nabla f(x^\\star) = 0$'}
+                    aria-label="Corps de la note"
                   />
                 </div>
-                <div className="editor__pane">
-                  <div className="section-title">Aperçu</div>
-                  <div className="editor__preview prose" dangerouslySetInnerHTML={{ __html: preview }} />
+                <div className="editor__preview">
+                  <p className="eyebrow" style={{ marginBottom: 'var(--s-4)' }}>
+                    Aperçu
+                  </p>
+                  <div className="prose prose--compact" dangerouslySetInnerHTML={{ __html: preview }} />
                 </div>
               </div>
-              <p className="save-hint" style={{ marginTop: 'var(--s-2)' }}>
-                {saved ? '✓ Enregistré' : 'Enregistrement…'}
-              </p>
             </>
           ) : (
             <div className="empty">
-              <div className="empty__icon">📝</div>
-              <p>Sélectionne une note ou crée-en une nouvelle.</p>
+              <h3>Rien d'ouvert</h3>
+              <p className="meta">Choisissez une note à gauche, ou commencez-en une nouvelle.</p>
             </div>
           )}
         </section>

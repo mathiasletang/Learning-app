@@ -1,4 +1,5 @@
 import { useEffect, useRef, type ReactNode } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
 import { Button } from './Button';
 
 interface Props {
@@ -6,59 +7,63 @@ interface Props {
   onClose: () => void;
   title?: string;
   children: ReactNode;
-  wide?: boolean;
   footer?: ReactNode;
 }
 
-export function Modal({ open, onClose, title, children, wide, footer }: Props) {
+export function Modal({ open, onClose, title, children, footer }: Props) {
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!open) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-    };
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose();
     document.addEventListener('keydown', onKey);
-    // focus dans la boîte pour le clavier
     ref.current?.focus();
-    const prevOverflow = document.body.style.overflow;
+    const prev = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
     return () => {
       document.removeEventListener('keydown', onKey);
-      document.body.style.overflow = prevOverflow;
+      document.body.style.overflow = prev;
     };
   }, [open, onClose]);
 
-  if (!open) return null;
-
   return (
-    <div
-      className="modal__backdrop"
-      onMouseDown={(e) => {
-        if (e.target === e.currentTarget) onClose();
-      }}
-    >
-      <div
-        className={`modal ${wide ? 'modal--wide' : ''}`}
-        role="dialog"
-        aria-modal="true"
-        aria-label={title}
-        tabIndex={-1}
-        ref={ref}
-      >
-        {title && (
-          <div className="row row--between" style={{ marginBottom: 'var(--s-4)' }}>
-            <h2>{title}</h2>
-            <Button variant="ghost" icon="x" aria-label="Fermer" onClick={onClose} />
-          </div>
-        )}
-        {children}
-        {footer && (
-          <div className="row row--between" style={{ marginTop: 'var(--s-5)', gap: 'var(--s-3)' }}>
-            {footer}
-          </div>
-        )}
-      </div>
-    </div>
+    <AnimatePresence>
+      {open && (
+        <motion.div
+          className="scrim"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.22 }}
+          onMouseDown={(e) => e.target === e.currentTarget && onClose()}
+        >
+          <motion.div
+            className="modal"
+            initial={{ opacity: 0, y: 14, scale: 0.985 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 8, scale: 0.99 }}
+            transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
+            role="dialog"
+            aria-modal="true"
+            aria-label={title}
+            tabIndex={-1}
+            ref={ref}
+          >
+            {title && (
+              <div className="row row--between" style={{ marginBottom: 'var(--s-6)' }}>
+                <h2>{title}</h2>
+                <Button variant="ghost" icon="x" aria-label="Fermer" onClick={onClose} />
+              </div>
+            )}
+            {children}
+            {footer && (
+              <div className="row" style={{ marginTop: 'var(--s-8)', gap: 'var(--s-3)' }}>
+                {footer}
+              </div>
+            )}
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 }

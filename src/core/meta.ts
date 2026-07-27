@@ -12,11 +12,11 @@ export interface BankMeta {
 }
 
 export const BANKS: Record<BankId, BankMeta> = {
-  opt: { id: 'opt', title: 'Optimisation', short: 'Optim', lang: 'fr', colorVar: '--subj-opt', themeKey: 'opt' },
-  fin: { id: 'fin', title: 'Mathématiques financières', short: 'Finance', lang: 'fr', colorVar: '--subj-fin', themeKey: 'fin' },
-  cfa: { id: 'cfa', title: 'CFA Level I', short: 'CFA', lang: 'en', colorVar: '--subj-cfa', themeKey: 'cfa' },
-  pre: { id: 'pre', title: 'Prérequis', short: 'Prérequis', lang: 'fr', colorVar: '--subj-pre', themeKey: 'pre' },
-  eco: { id: 'eco', title: 'Économie et économétrie', short: 'Éco', lang: 'fr', colorVar: '--subj-eco', themeKey: 'eco' },
+  opt: { id: 'opt', title: 'Optimisation', short: 'Optim', lang: 'fr', colorVar: '--m-opt', themeKey: 'opt' },
+  fin: { id: 'fin', title: 'Mathématiques financières', short: 'Finance', lang: 'fr', colorVar: '--m-fin', themeKey: 'fin' },
+  cfa: { id: 'cfa', title: 'CFA Level I', short: 'CFA', lang: 'en', colorVar: '--m-cfa', themeKey: 'cfa' },
+  pre: { id: 'pre', title: 'Prérequis', short: 'Prérequis', lang: 'fr', colorVar: '--m-pre', themeKey: 'pre' },
+  eco: { id: 'eco', title: 'Économie et économétrie', short: 'Éco', lang: 'fr', colorVar: '--m-eco', themeKey: 'eco' },
 };
 
 export const BANK_ORDER: BankId[] = ['opt', 'fin', 'cfa', 'pre', 'eco'];
@@ -103,11 +103,11 @@ export const TRACK_LABEL: Record<TrackId, string> = {
 
 /** Matières pour les notes / le temps de travail. */
 export const SUBJECTS = [
-  { id: 'opt', label: 'Optimisation', colorVar: '--subj-opt' },
-  { id: 'fin', label: 'Maths financières', colorVar: '--subj-fin' },
-  { id: 'cfa', label: 'CFA', colorVar: '--subj-cfa' },
-  { id: 'pre', label: 'Prérequis', colorVar: '--subj-pre' },
-  { id: 'eco', label: 'Économie', colorVar: '--subj-eco' },
+  { id: 'opt', label: 'Optimisation', colorVar: '--m-opt' },
+  { id: 'fin', label: 'Maths financières', colorVar: '--m-fin' },
+  { id: 'cfa', label: 'CFA', colorVar: '--m-cfa' },
+  { id: 'pre', label: 'Prérequis', colorVar: '--m-pre' },
+  { id: 'eco', label: 'Économie', colorVar: '--m-eco' },
   { id: 'gen', label: 'Général', colorVar: '--accent' },
 ] as const;
 

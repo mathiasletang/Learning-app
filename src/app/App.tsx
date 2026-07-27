@@ -16,7 +16,6 @@ import { Notes } from '@/modules/notes/Notes';
 import { Stats } from '@/modules/stats/Stats';
 import { Time } from '@/modules/planner/Time';
 import { Planner } from '@/modules/planner/Planner';
-import { Typefaces } from '@/modules/typefaces/Typefaces';
 
 /** Ouverture : la marque seule, le temps du chargement. */
 function Splash() {
@@ -62,8 +61,6 @@ export function App() {
           <Route path="stats" element={<Stats />} />
           <Route path="temps" element={<Time />} />
           <Route path="planning" element={<Planner />} />
-          {/* Page temporaire : choix de la police de texte. */}
-          <Route path="polices" element={<Typefaces />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Route>
       </Routes>

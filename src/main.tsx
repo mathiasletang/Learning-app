@@ -1,17 +1,10 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 
-// Polices auto-hébergées + rendu mathématique, embarqués (hors-ligne).
-// Titres : Instrument Serif (éditorial). Texte : Manrope (humaniste, doux).
-import '@fontsource/instrument-serif/400.css';
-import '@fontsource/instrument-serif/400-italic.css';
-import '@fontsource-variable/manrope';
-// Candidates en comparaison sur /#/polices (temporaire).
-import '@fontsource/poppins/400.css';
-import '@fontsource/poppins/500.css';
-import '@fontsource/poppins/600.css';
-import '@fontsource-variable/plus-jakarta-sans';
+// Police auto-hébergée, embarquée (hors-ligne) : DM Sans pour l'intégralité
+// des caractères, chiffres compris. Romain et italique.
 import '@fontsource-variable/dm-sans';
+import '@fontsource-variable/dm-sans/wght-italic.css';
 import 'katex/dist/katex.min.css';
 
 // Système de design, du plus général au plus précis.

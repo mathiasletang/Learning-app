@@ -46,6 +46,9 @@ export default defineConfig({
         maximumFileSizeToCacheInBytes: 8 * 1024 * 1024,
         cleanupOutdatedCaches: true,
         navigateFallback: 'index.html',
+        // Sans cette exclusion, ouvrir un PDF (qui est une navigation) renvoie
+        // index.html : on recevait l'application au lieu du document.
+        navigateFallbackDenylist: [/^\/cours\//, /\.pdf$/i, /\/[^/?]+\.[^/?]+$/],
       },
       devOptions: {
         enabled: false,

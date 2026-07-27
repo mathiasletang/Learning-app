@@ -131,7 +131,7 @@ const LEVEL_BY_FOLDER: Record<string, Level> = {
   '07_MIT-OpenCourseWare/6-253_Analyse-convexe-et-optimisation_Bertsekas': 'M2',
   '07_MIT-OpenCourseWare/6-854_Algorithmes-avances': 'M2',
   '08_Cours-en-francais/Bordeaux_Dossal': 'M1',
-  '08_Cours-en-francais/Dauphine_Royer': 'M1',
+  '08_Cours-en-francais/Dauphine_Royer': 'L3', // référence pratique du niveau L3
   '08_Cours-en-francais/Polytechnique_Allaire': 'M1',
   '09_ENS-Paris_Aspremont/M1_ENS': 'M1',
   '09_ENS-Paris_Aspremont/M2_MVA': 'M2',

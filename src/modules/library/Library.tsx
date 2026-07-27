@@ -1,11 +1,11 @@
 import { useMemo, useState } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '@/core/db';
-import { allDocs, docsByFolder } from '@/core/content';
+import { allDocs, docsByFolder, levelCounts } from '@/core/content';
 import { DRIVE_FOLDER_URL } from '@/core/config';
 import { setDocRead, openResource } from '@/app/actions';
-import { TRACK_LABEL } from '@/core/meta';
-import type { LibDoc, TrackId } from '@/core/types';
+import { TRACK_LABEL, LEVELS, LEVEL_DESC } from '@/core/meta';
+import type { LibDoc, TrackId, Level } from '@/core/types';
 import { PageHead, Icon, Tabs, Tag, Reveal } from '@/ui';
 import './library.css';
 
@@ -15,8 +15,9 @@ const TRACK_COLOR: Record<TrackId, string> = {
   cfa: '--m-cfa',
 };
 
-type View = 'essentials' | 'sources' | 'search';
+type View = 'levels' | 'essentials' | 'sources' | 'search';
 type Filter = 'all' | TrackId;
+type LevelFilter = 'all' | Level;
 
 const SEARCH_CAP = 200;
 
@@ -36,6 +37,7 @@ function Doc({ doc, read, onToggle }: { doc: LibDoc; read: boolean; onToggle: ()
         <p className="doc__name">{doc.name}</p>
         <span className="micro doc__where">{doc.folder}</span>
       </div>
+      <span className="doc__level">{doc.level}</span>
       <span className="micro doc__pages">{doc.pages} p.</span>
       <button
         type="button"
@@ -50,14 +52,17 @@ function Doc({ doc, read, onToggle }: { doc: LibDoc; read: boolean; onToggle: ()
 }
 
 export function Library() {
-  const [view, setView] = useState<View>('essentials');
+  const [view, setView] = useState<View>('levels');
   const [filter, setFilter] = useState<Filter>('all');
+  const [level, setLevel] = useState<LevelFilter>('all');
   const [query, setQuery] = useState('');
+  const counts = useMemo(() => levelCounts(), []);
 
   const readRows = useLiveQuery(() => db.docs.filter((d) => d.read).toArray(), [], []);
   const readSet = useMemo(() => new Set(readRows.map((d) => d.path)), [readRows]);
 
-  const matches = (d: LibDoc) => filter === 'all' || d.track === filter;
+  const matches = (d: LibDoc) =>
+    (filter === 'all' || d.track === filter) && (level === 'all' || d.level === level);
 
   /* Essentiels : la pièce maîtresse de chaque fonds. */
   const essentials = useMemo(() => {
@@ -77,7 +82,19 @@ export function Library() {
     if (!q) return base;
     return base.filter((d) => d.name.toLowerCase().includes(q) || d.folder.toLowerCase().includes(q));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [query, filter]);
+  }, [query, filter, level]);
+
+  /* Vue par niveau : les sources d'un niveau, chacune dépliable. */
+  const levelSections = useMemo(
+    () =>
+      LEVELS.map((lv) => ({
+        level: lv,
+        groups: docsByFolder()
+          .map((g) => ({ ...g, docs: g.docs.filter((d) => filter === 'all' || d.track === filter) }))
+          .filter((g) => g.docs.length > 0 && g.docs[0].level === lv),
+      })).filter((s) => s.groups.length > 0),
+    [filter],
+  );
 
   const toggle = (d: LibDoc) => setDocRead(d.path, !readSet.has(d.path));
 
@@ -102,8 +119,9 @@ export function Library() {
             </a>
             <Tabs
               options={[
+                { value: 'levels', label: 'Par niveau' },
                 { value: 'essentials', label: 'Essentiels' },
-                { value: 'sources', label: 'Sources' },
+                { value: 'sources', label: 'Toutes les sources' },
                 { value: 'search', label: 'Recherche' },
               ]}
               value={view}
@@ -114,8 +132,8 @@ export function Library() {
         }
       />
 
-      {view !== 'sources' && (
-        <div className="chips" style={{ marginBottom: 'var(--s-8)' }}>
+      <div className="filters">
+        <div className="chips">
           {filters.map((f) => (
             <button
               key={f.value}
@@ -126,6 +144,65 @@ export function Library() {
             >
               {f.label}
             </button>
+          ))}
+        </div>
+
+        {view !== 'levels' && (
+          <div className="chips">
+            <button
+              type="button"
+              className="chip"
+              aria-pressed={level === 'all'}
+              onClick={() => setLevel('all')}
+            >
+              Tous niveaux
+            </button>
+            {LEVELS.map((lv) => (
+              <button
+                key={lv}
+                type="button"
+                className="chip"
+                aria-pressed={level === lv}
+                onClick={() => setLevel(lv)}
+              >
+                {lv} <span className="chip__count">{counts[lv]}</span>
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {view === 'levels' && (
+        <div>
+          {levelSections.map((section) => (
+            <section className="levelsec" key={section.level}>
+              <header className="levelsec__head">
+                <div>
+                  <p className="levelsec__badge">{section.level}</p>
+                  <p className="meta levelsec__desc">{LEVEL_DESC[section.level]}</p>
+                </div>
+                <span className="micro tnum">
+                  {section.groups.reduce((n, g) => n + g.docs.length, 0)} documents ·{' '}
+                  {section.groups.length} sources
+                </span>
+              </header>
+
+              <div style={{ borderTop: '1px solid var(--hairline)' }}>
+                {section.groups.map((g) => (
+                  <details className="source" key={g.folder}>
+                    <summary>
+                      <span className="source__name">{g.docs[0].source}</span>
+                      <span className="micro tnum">{g.docs.length}</span>
+                    </summary>
+                    <div className="source__body">
+                      {g.docs.map((d) => (
+                        <Doc key={d.path} doc={d} read={readSet.has(d.path)} onToggle={() => toggle(d)} />
+                      ))}
+                    </div>
+                  </details>
+                ))}
+              </div>
+            </section>
           ))}
         </div>
       )}

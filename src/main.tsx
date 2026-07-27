@@ -1,9 +1,10 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 
-// Polices auto-hébergées + rendu mathématique, embarqués (hors-ligne).
-import '@fontsource-variable/fraunces';
-import '@fontsource-variable/inter';
+// Police auto-hébergée, embarquée (hors-ligne) : DM Sans pour l'intégralité
+// des caractères, chiffres compris. Romain et italique.
+import '@fontsource-variable/dm-sans';
+import '@fontsource-variable/dm-sans/wght-italic.css';
 import 'katex/dist/katex.min.css';
 
 // Système de design, du plus général au plus précis.

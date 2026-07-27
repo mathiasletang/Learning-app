@@ -5,7 +5,7 @@
    ========================================================================= */
 
 import { db } from '@/core/db';
-import { driveSearchUrl } from '@/core/config';
+import { driveSearchUrl, localPdfUrl } from '@/core/config';
 import { toDayStr } from '@/core/date';
 import { schedule, initialSrs, type Grade } from '@/core/srs';
 import {
@@ -160,13 +160,19 @@ export async function setStepDone(stepId: string, done: boolean): Promise<void> 
 /* ------------------------------ Bibliothèque ---------------------------- */
 
 /**
- * Ouvre une ressource. Si c'est une vraie URL (http/https), on l'ouvre.
- * Sinon c'est un PDF de la bibliothèque : on lance une recherche dans le
- * dossier Google Drive de l'utilisateur, sur le nom du fichier.
+ * Ouvre une ressource, dans l'ordre de préférence :
+ *   1. une vraie URL (http/https) → telle quelle ;
+ *   2. un PDF hébergé par l'application (public/cours/) → ouverture directe ;
+ *   3. sinon → recherche dans le dossier Google Drive de l'utilisateur.
  */
 export function openResource(path: string): void {
   if (/^https?:\/\//i.test(path)) {
     window.open(path, '_blank', 'noopener');
+    return;
+  }
+  const local = localPdfUrl(path);
+  if (local) {
+    window.open(local, '_blank', 'noopener');
     return;
   }
   const name = path.split('/').pop() ?? path;

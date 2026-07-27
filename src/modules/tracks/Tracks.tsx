@@ -42,6 +42,12 @@ function Resource({ res, label }: { res: string; label: string }) {
 
 const TRACKS: TrackId[] = ['opt', 'fin', 'cfa'];
 
+/** Les phases préfixées « L3 · », « M1 · », « M2 · » affichent leur niveau. */
+function splitLevel(title: string): { level: string | null; rest: string } {
+  const m = /^(L3|M1|M2)\s*·\s*(.+)$/.exec(title);
+  return m ? { level: m[1], rest: m[2] } : { level: null, rest: title };
+}
+
 export function Tracks() {
   const parcours = getParcours();
   const [track, setTrack] = useState<TrackId>('opt');
@@ -95,13 +101,22 @@ export function Tracks() {
       {current.phases.map((phase, pi) => {
         const total = phase.steps.length;
         const pDone = phase.steps.filter((s) => doneSet.has(s.id)).length;
+        const { level, rest } = splitLevel(phase.t);
+        const prevLevel = pi > 0 ? splitLevel(current.phases[pi - 1].t).level : null;
+        const startsLevel = level !== null && level !== prevLevel;
         return (
           <Reveal key={phase.id} y={16}>
+            {startsLevel && (
+              <div className="levelmark">
+                <span className="levelmark__badge">{level}</span>
+                <span className="rule" style={{ flex: 1 }} />
+              </div>
+            )}
             <section className="phase">
               <header className="phase__head">
                 <span className="phase__num">{String(pi + 1).padStart(2, '0')}</span>
                 <div>
-                  <h2 className="phase__title">{phase.t}</h2>
+                  <h2 className="phase__title">{rest}</h2>
                   {phase.d && <p className="meta phase__desc">{phase.d}</p>}
                 </div>
                 <div className="phase__meter">

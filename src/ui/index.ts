@@ -1,8 +1,10 @@
 export { Icon, type IconName } from './Icon';
 export { Button } from './Button';
-export { Card, CardButton } from './Card';
+export { Surface, TileLink, TileButton } from './Surface';
 export { Tag } from './Tag';
-export { Progress } from './Progress';
+export { Gauge } from './Gauge';
 export { Ring } from './Ring';
 export { Modal } from './Modal';
-export { Segmented } from './Segmented';
+export { Tabs } from './Tabs';
+export { PageHead } from './PageHead';
+export { Reveal, Stagger, staggerItem } from './Reveal';

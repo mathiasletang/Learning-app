@@ -6,18 +6,13 @@ import { DRIVE_FOLDER_URL } from '@/core/config';
 import { setDocRead, openResource } from '@/app/actions';
 import { TRACK_LABEL } from '@/core/meta';
 import type { LibDoc, TrackId } from '@/core/types';
-import { PageHead } from '@/ui/PageHead';
-import { Card, Segmented, Icon, Tag } from '@/ui';
+import { PageHead, Icon, Tabs, Tag, Reveal } from '@/ui';
 import './library.css';
 
-/** Liste optionnelle de chemins « essentiels » (à remplir depuis le prototype).
-    Si vide, on retient automatiquement le document le plus volumineux par source. */
-const ESSENTIAL_PATHS: string[] = [];
-
 const TRACK_COLOR: Record<TrackId, string> = {
-  opt: '--subj-opt',
-  fin: '--subj-fin',
-  cfa: '--subj-cfa',
+  opt: '--m-opt',
+  fin: '--m-fin',
+  cfa: '--m-cfa',
 };
 
 type View = 'essentials' | 'sources' | 'search';
@@ -25,7 +20,7 @@ type Filter = 'all' | TrackId;
 
 const SEARCH_CAP = 200;
 
-function DocRow({ doc, read, onToggle }: { doc: LibDoc; read: boolean; onToggle: () => void }) {
+function Doc({ doc, read, onToggle }: { doc: LibDoc; read: boolean; onToggle: () => void }) {
   return (
     <div className="doc">
       <button
@@ -35,25 +30,21 @@ function DocRow({ doc, read, onToggle }: { doc: LibDoc; read: boolean; onToggle:
         aria-label={read ? `Marquer non lu : ${doc.name}` : `Marquer lu : ${doc.name}`}
         onClick={onToggle}
       >
-        <Icon name="check" size={16} />
+        <Icon name="check" size={12} strokeWidth={2} />
       </button>
       <div className="doc__main">
-        <div className="doc__name">{doc.name}</div>
-        <div className="doc__meta tnum">
-          {doc.folder} · {doc.pages} p.
-        </div>
+        <p className="doc__name">{doc.name}</p>
+        <span className="micro doc__where">{doc.folder}</span>
       </div>
-      <div className="doc__actions">
-        <Tag colorVar={TRACK_COLOR[doc.track]}>{TRACK_LABEL[doc.track]}</Tag>
-        <button
-          type="button"
-          className="btn btn--ghost btn--icon btn--sm"
-          aria-label={`Ouvrir ${doc.name}`}
-          onClick={() => openResource(doc.path)}
-        >
-          <Icon name="external" size={18} />
-        </button>
-      </div>
+      <span className="micro doc__pages">{doc.pages} p.</span>
+      <button
+        type="button"
+        className="doc__open"
+        aria-label={`Ouvrir ${doc.name} dans Drive`}
+        onClick={() => openResource(doc.path)}
+      >
+        <Icon name="external" size={16} />
+      </button>
     </div>
   );
 }
@@ -66,14 +57,10 @@ export function Library() {
   const readRows = useLiveQuery(() => db.docs.filter((d) => d.read).toArray(), [], []);
   const readSet = useMemo(() => new Set(readRows.map((d) => d.path)), [readRows]);
 
-  const matchFilter = (d: LibDoc) => filter === 'all' || d.track === filter;
+  const matches = (d: LibDoc) => filter === 'all' || d.track === filter;
 
+  /* Essentiels : la pièce maîtresse de chaque fonds. */
   const essentials = useMemo(() => {
-    if (ESSENTIAL_PATHS.length) {
-      const set = new Set(ESSENTIAL_PATHS);
-      return allDocs().filter((d) => set.has(d.path));
-    }
-    // Heuristique : le document le plus volumineux de chaque source.
     const best = new Map<string, LibDoc>();
     for (const d of allDocs()) {
       const cur = best.get(d.folder);
@@ -84,21 +71,19 @@ export function Library() {
 
   const grouped = useMemo(() => docsByFolder(), []);
 
-  const searchResults = useMemo(() => {
+  const results = useMemo(() => {
     const q = query.trim().toLowerCase();
-    const base = allDocs().filter(matchFilter);
+    const base = allDocs().filter(matches);
     if (!q) return base;
-    return base.filter(
-      (d) => d.name.toLowerCase().includes(q) || d.folder.toLowerCase().includes(q),
-    );
+    return base.filter((d) => d.name.toLowerCase().includes(q) || d.folder.toLowerCase().includes(q));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query, filter]);
 
   const toggle = (d: LibDoc) => setDocRead(d.path, !readSet.has(d.path));
 
-  const filterChips: { value: Filter; label: string }[] = [
+  const filters: { value: Filter; label: string }[] = [
     { value: 'all', label: 'Tous' },
-    { value: 'opt', label: 'Optim' },
+    { value: 'opt', label: 'Optimisation' },
     { value: 'fin', label: 'Finance' },
     { value: 'cfa', label: 'CFA' },
   ];
@@ -106,19 +91,16 @@ export function Library() {
   return (
     <>
       <PageHead
-        title="Bibliothèque"
-        subtitle={`${allDocs().length} documents — cliquer ouvre la recherche dans ton Google Drive.`}
+        eyebrow="Bibliothèque"
+        title="Le fonds documentaire."
+        display
+        lead={`${allDocs().length} documents, ${grouped.length} sources — MIT, Stanford, UCLA, Dauphine, Schweser. Ouvrir un titre le cherche dans votre Drive.`}
         actions={
           <>
-            <a
-              className="btn btn--secondary"
-              href={DRIVE_FOLDER_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <Icon name="external" size={18} /> Ouvrir mon Drive
+            <a className="btn btn--secondary" href={DRIVE_FOLDER_URL} target="_blank" rel="noopener noreferrer">
+              <Icon name="external" size={16} /> Mon Drive
             </a>
-            <Segmented
+            <Tabs
               options={[
                 { value: 'essentials', label: 'Essentiels' },
                 { value: 'sources', label: 'Sources' },
@@ -133,43 +115,47 @@ export function Library() {
       />
 
       {view !== 'sources' && (
-        <div className="chips" style={{ marginBottom: 'var(--s-4)' }}>
-          {filterChips.map((c) => (
+        <div className="chips" style={{ marginBottom: 'var(--s-8)' }}>
+          {filters.map((f) => (
             <button
-              key={c.value}
+              key={f.value}
               type="button"
               className="chip"
-              aria-pressed={filter === c.value}
-              onClick={() => setFilter(c.value)}
+              aria-pressed={filter === f.value}
+              onClick={() => setFilter(f.value)}
             >
-              {c.label}
+              {f.label}
             </button>
           ))}
         </div>
       )}
 
       {view === 'essentials' && (
-        <Card>
-          <div className="section-title">Essentiels ({essentials.filter(matchFilter).length})</div>
-          <div className="stack">
-            {essentials.filter(matchFilter).map((d) => (
-              <DocRow key={d.path} doc={d} read={readSet.has(d.path)} onToggle={() => toggle(d)} />
+        <>
+          <p className="micro" style={{ marginBottom: 'var(--s-5)' }}>
+            Une pièce maîtresse par source · {essentials.filter(matches).length} titres
+          </p>
+          <div className="doclist">
+            {essentials.filter(matches).map((d, i) => (
+              <Reveal key={d.path} delay={Math.min(i, 10) * 0.03} y={10}>
+                <Doc doc={d} read={readSet.has(d.path)} onToggle={() => toggle(d)} />
+              </Reveal>
             ))}
           </div>
-        </Card>
+        </>
       )}
 
       {view === 'sources' && (
-        <div>
+        <div style={{ borderTop: '1px solid var(--hairline)' }}>
           {grouped.map((g) => (
             <details className="source" key={g.folder}>
               <summary>
-                <span style={{ flex: 1 }}>{g.folder}</span>
-                <span className="meta tnum">{g.docs.length}</span>
+                <span className="source__name">{g.folder}</span>
+                <span className="micro tnum">{g.docs.length}</span>
               </summary>
               <div className="source__body">
                 {g.docs.map((d) => (
-                  <DocRow key={d.path} doc={d} read={readSet.has(d.path)} onToggle={() => toggle(d)} />
+                  <Doc key={d.path} doc={d} read={readSet.has(d.path)} onToggle={() => toggle(d)} />
                 ))}
               </div>
             </details>
@@ -179,32 +165,35 @@ export function Library() {
 
       {view === 'search' && (
         <>
-          <label className="row" style={{ marginBottom: 'var(--s-4)' }}>
+          <label className="search" style={{ maxWidth: 480, marginBottom: 'var(--s-6)' }}>
             <span className="sr-only">Rechercher un document</span>
-            <span style={{ position: 'relative', flex: 1 }}>
-              <Icon name="search" size={18} className="input-icon" />
-              <input
-                className="input"
-                style={{ paddingLeft: 'var(--s-10)' }}
-                placeholder="Rechercher par nom ou dossier…"
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-              />
+            <span className="search__icon">
+              <Icon name="search" size={17} />
             </span>
+            <input
+              className="field"
+              placeholder="Titre, auteur, dossier…"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+            />
           </label>
-          <p className="meta" style={{ marginBottom: 'var(--s-3)' }}>
-            {searchResults.length} résultat{searchResults.length > 1 ? 's' : ''}
-            {searchResults.length > SEARCH_CAP ? ` (${SEARCH_CAP} affichés)` : ''}
+          <p className="micro" style={{ marginBottom: 'var(--s-5)' }}>
+            {results.length} document{results.length > 1 ? 's' : ''}
+            {results.length > SEARCH_CAP ? ` — ${SEARCH_CAP} affichés` : ''}
           </p>
-          <Card>
-            <div className="stack">
-              {searchResults.slice(0, SEARCH_CAP).map((d) => (
-                <DocRow key={d.path} doc={d} read={readSet.has(d.path)} onToggle={() => toggle(d)} />
-              ))}
-            </div>
-          </Card>
+          <div className="doclist">
+            {results.slice(0, SEARCH_CAP).map((d) => (
+              <Doc key={d.path} doc={d} read={readSet.has(d.path)} onToggle={() => toggle(d)} />
+            ))}
+          </div>
         </>
       )}
+
+      <p className="micro" style={{ marginTop: 'var(--s-10)' }}>
+        <Tag colorVar={TRACK_COLOR[filter === 'all' ? 'opt' : filter]}>
+          {filter === 'all' ? 'Tous parcours' : TRACK_LABEL[filter]}
+        </Tag>
+      </p>
     </>
   );
 }

@@ -6,24 +6,26 @@ import { getParcours } from '@/core/content';
 import { SUBJECTS, subjectLabel } from '@/core/meta';
 import { logTime } from '@/app/actions';
 import type { TrackId } from '@/core/types';
-import { PageHead } from '@/ui/PageHead';
-import { Button, Card, Icon } from '@/ui';
+import { PageHead, Button, Gauge, Icon, Reveal } from '@/ui';
+import './planner.css';
 
-function fmt(sec: number): string {
+function clock(sec: number): string {
   const h = Math.floor(sec / 3600);
   const m = Math.floor((sec % 3600) / 60);
   const s = sec % 60;
-  return `${h > 0 ? h + ':' : ''}${String(m).padStart(h > 0 ? 2 : 1, '0')}:${String(s).padStart(2, '0')}`;
+  return h > 0
+    ? `${h}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`
+    : `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
 }
 
 export function Time() {
   const [subject, setSubject] = useState('opt');
   const [running, setRunning] = useState(false);
   const [elapsed, setElapsed] = useState(0);
-  const startRef = useRef<number>(0);
-  const [manualDate, setManualDate] = useState(toDayStr());
-  const [manualMin, setManualMin] = useState(30);
-  const [manualSubject, setManualSubject] = useState('opt');
+  const startRef = useRef(0);
+  const [mDate, setMDate] = useState(toDayStr());
+  const [mMin, setMMin] = useState(45);
+  const [mSubject, setMSubject] = useState('opt');
 
   const logs = useLiveQuery(() => db.timeLogs.reverse().sortBy('date'), [], []);
 
@@ -33,7 +35,7 @@ export function Time() {
     return () => clearInterval(id);
   }, [running]);
 
-  function startStop() {
+  function toggle() {
     if (running) {
       const minutes = Math.round(elapsed / 60);
       if (minutes > 0) logTime(toDayStr(), subject, minutes);
@@ -46,7 +48,7 @@ export function Time() {
     }
   }
 
-  const totalsBySubject = useMemo(() => {
+  const totals = useMemo(() => {
     const acc = new Map<string, number>();
     for (const l of logs) acc.set(l.subject, (acc.get(l.subject) ?? 0) + l.minutes);
     return acc;
@@ -63,148 +65,150 @@ export function Time() {
   }, [logs]);
 
   const parcours = getParcours();
-  const trackHours: { id: TrackId; label: string; target: number; done: number }[] = (
-    ['opt', 'fin', 'cfa'] as TrackId[]
-  ).map((t) => ({
+  const tracks = (['opt', 'fin', 'cfa'] as TrackId[]).map((t) => ({
     id: t,
     label: parcours[t].titre,
     target: parcours[t].heures,
-    done: (totalsBySubject.get(t) ?? 0) / 60,
+    done: (totals.get(t) ?? 0) / 60,
   }));
+
+  const grand = [...totals.values()].reduce((a, b) => a + b, 0) / 60;
 
   return (
     <>
-      <PageHead title="Temps de travail" subtitle="Chronomètre de session et saisie manuelle." />
+      <PageHead
+        eyebrow="Temps de travail"
+        title="Les heures posées."
+        display
+        lead="Un chronomètre pour les séances, une saisie manuelle pour le reste. Ce qui se mesure finit par se faire."
+      />
 
-      <div
-        className="grid"
-        style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', marginBottom: 'var(--s-6)' }}
-      >
-        <Card pad="lg">
-          <div className="section-title">Chronomètre</div>
-          <div
-            className="tnum"
-            style={{ fontSize: '44px', fontWeight: 800, textAlign: 'center', margin: 'var(--s-3) 0' }}
-          >
-            {fmt(elapsed)}
+      <div className="timer">
+        <div className="timer__face">
+          <span className="eyebrow">{running ? 'En cours' : 'Chronomètre'}</span>
+          <p className="timer__digits tnum">{clock(elapsed)}</p>
+          <div className="row" style={{ gap: 'var(--s-3)', marginTop: 'var(--s-6)' }}>
+            <select
+              className="field"
+              style={{ maxWidth: 200 }}
+              value={subject}
+              onChange={(e) => setSubject(e.target.value)}
+              aria-label="Matière de la séance"
+              disabled={running}
+            >
+              {SUBJECTS.map((s) => (
+                <option key={s.id} value={s.id}>
+                  {s.label}
+                </option>
+              ))}
+            </select>
+            <Button variant={running ? 'secondary' : 'primary'} icon={running ? 'check' : 'play'} onClick={toggle}>
+              {running ? 'Arrêter et noter' : 'Démarrer'}
+            </Button>
           </div>
-          <select
-            className="select"
-            value={subject}
-            onChange={(e) => setSubject(e.target.value)}
-            aria-label="Matière du chronomètre"
-            style={{ marginBottom: 'var(--s-3)' }}
-            disabled={running}
-          >
-            {SUBJECTS.map((s) => (
-              <option key={s.id} value={s.id}>
-                {s.label}
-              </option>
-            ))}
-          </select>
-          <Button variant={running ? 'danger' : 'primary'} icon={running ? 'check' : 'play'} onClick={startStop} block>
-            {running ? 'Arrêter et enregistrer' : 'Démarrer'}
-          </Button>
-        </Card>
+        </div>
 
-        <Card pad="lg">
-          <div className="section-title">Saisie manuelle</div>
-          <label className="stack" style={{ gap: 'var(--s-1)', marginBottom: 'var(--s-3)' }}>
-            <span className="meta">Date</span>
+        <div className="timer__manual">
+          <p className="eyebrow" style={{ marginBottom: 'var(--s-5)' }}>
+            Saisie manuelle
+          </p>
+          <div className="stack" style={{ gap: 'var(--s-4)' }}>
             <input
               type="date"
-              className="input"
-              value={manualDate}
-              onChange={(e) => setManualDate(e.target.value)}
+              className="field"
+              value={mDate}
+              onChange={(e) => setMDate(e.target.value)}
+              aria-label="Date"
             />
-          </label>
-          <div className="row" style={{ gap: 'var(--s-3)', marginBottom: 'var(--s-3)' }}>
-            <label className="stack" style={{ gap: 'var(--s-1)', flex: 1 }}>
-              <span className="meta">Matière</span>
-              <select
-                className="select"
-                value={manualSubject}
-                onChange={(e) => setManualSubject(e.target.value)}
-              >
-                {SUBJECTS.map((s) => (
-                  <option key={s.id} value={s.id}>
-                    {s.label}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label className="stack" style={{ gap: 'var(--s-1)', width: 100 }}>
-              <span className="meta">Minutes</span>
-              <input
-                type="number"
-                min={1}
-                className="input tnum"
-                value={manualMin}
-                onChange={(e) => setManualMin(Number(e.target.value))}
-              />
-            </label>
+            <select
+              className="field"
+              value={mSubject}
+              onChange={(e) => setMSubject(e.target.value)}
+              aria-label="Matière"
+            >
+              {SUBJECTS.map((s) => (
+                <option key={s.id} value={s.id}>
+                  {s.label}
+                </option>
+              ))}
+            </select>
+            <input
+              type="number"
+              min={1}
+              className="field tnum"
+              value={mMin}
+              onChange={(e) => setMMin(Number(e.target.value))}
+              aria-label="Minutes"
+            />
+            <Button variant="secondary" icon="plus" onClick={() => logTime(mDate, mSubject, mMin)}>
+              Ajouter
+            </Button>
           </div>
-          <Button
-            variant="secondary"
-            icon="plus"
-            block
-            onClick={() => logTime(manualDate, manualSubject, manualMin)}
-          >
-            Ajouter
-          </Button>
-        </Card>
+        </div>
       </div>
 
-      <Card pad="lg" style={{ marginBottom: 'var(--s-6)' }}>
-        <div className="section-title">Volume par parcours (vs estimé)</div>
-        {trackHours.map((t) => (
-          <div key={t.id} className="bar-row">
-            <span className="bar-row__label">{t.label}</span>
-            <span className="bar-row__track">
-              <span
-                className="bar-row__fill"
-                style={{ width: `${Math.min(100, (t.done / t.target) * 100)}%`, background: 'var(--accent)' }}
-              />
-            </span>
-            <span className="bar-row__value tnum">
-              {t.done.toFixed(1)}/{t.target} h
+      <section className="section">
+        <div className="section__head">
+          <h2>Face aux volumes estimés</h2>
+          <span className="meta tnum">{grand.toFixed(1)} h au total</span>
+        </div>
+        {tracks.map((t) => (
+          <div className="bar" key={t.id}>
+            <span className="bar__label">{t.label}</span>
+            <Gauge value={Math.min(1, t.done / t.target)} colorVar={`--m-${t.id}`} thick />
+            <span className="bar__value">
+              {t.done.toFixed(1)} / {t.target} h
             </span>
           </div>
         ))}
-      </Card>
+      </section>
 
-      <section>
-        <div className="section-title">Journal</div>
-        {byDay.length === 0 && <p className="meta">Aucune session enregistrée.</p>}
-        {byDay.map(([day, entries]) => {
-          const total = entries.reduce((n, e) => n + e.minutes, 0);
-          return (
-            <Card key={day} style={{ marginBottom: 'var(--s-2)' }}>
-              <div className="row row--between">
-                <strong className="tnum">{new Date(day).toLocaleDateString('fr-FR', { weekday: 'short', day: 'numeric', month: 'short' })}</strong>
-                <span className="meta tnum">{(total / 60).toFixed(1)} h</span>
-              </div>
-              <div className="stack" style={{ gap: 'var(--s-1)', marginTop: 'var(--s-2)' }}>
-                {entries.map((e) => (
-                  <div key={e.id} className="row row--between meta">
-                    <span>{subjectLabel(e.subject)}</span>
-                    <span className="row" style={{ gap: 'var(--s-2)' }}>
-                      <span className="tnum">{e.minutes} min</span>
-                      <button
-                        type="button"
-                        className="btn btn--ghost btn--icon btn--sm"
-                        aria-label="Supprimer cette entrée"
-                        onClick={() => db.timeLogs.delete(e.id)}
-                      >
-                        <Icon name="trash" size={15} />
-                      </button>
-                    </span>
+      <section className="section">
+        <div className="section__head">
+          <h2>Journal</h2>
+        </div>
+        {byDay.length === 0 ? (
+          <div className="empty">
+            <h3>Aucune séance notée</h3>
+            <p className="meta">Lancez le chronomètre au début de votre prochaine session.</p>
+          </div>
+        ) : (
+          <div className="banklist">
+            {byDay.map(([day, entries], i) => {
+              const total = entries.reduce((n, e) => n + e.minutes, 0);
+              return (
+                <Reveal key={day} delay={Math.min(i, 8) * 0.04} y={10}>
+                  <div className="daylog">
+                    <div className="daylog__head">
+                      <span className="daylog__date">
+                        {new Date(day).toLocaleDateString('fr-FR', {
+                          weekday: 'long',
+                          day: 'numeric',
+                          month: 'long',
+                        })}
+                      </span>
+                      <span className="meta tnum">{(total / 60).toFixed(1)} h</span>
+                    </div>
+                    {entries.map((e) => (
+                      <div className="daylog__row" key={e.id}>
+                        <span className="meta">{subjectLabel(e.subject)}</span>
+                        <span className="micro tnum">{e.minutes} min</span>
+                        <button
+                          type="button"
+                          className="btn btn--ghost btn--icon"
+                          aria-label="Supprimer cette entrée"
+                          onClick={() => db.timeLogs.delete(e.id)}
+                        >
+                          <Icon name="trash" size={15} />
+                        </button>
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
-            </Card>
-          );
-        })}
+                </Reveal>
+              );
+            })}
+          </div>
+        )}
       </section>
     </>
   );

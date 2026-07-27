@@ -1,34 +1,20 @@
 import type { CSSProperties, ReactNode } from 'react';
 
-interface TagProps {
+interface Props {
   children: ReactNode;
-  variant?: 'default' | 'good' | 'bad';
-  /** Variable CSS de couleur de matière (ex. '--subj-opt') → teinte + texte. */
+  /** Variable CSS de matière, ex. '--m-opt'. Affiche une pastille colorée. */
   colorVar?: string;
-  tintVar?: string;
+  strong?: boolean;
   className?: string;
 }
 
-export function Tag({ children, variant = 'default', colorVar, tintVar, className = '' }: TagProps) {
+/** Étiquette éditoriale : petites capitales espacées + pastille discrète. */
+export function Tag({ children, colorVar, strong, className = '' }: Props) {
   const style: CSSProperties = {};
-  const isSubject = Boolean(colorVar);
-  if (colorVar) {
-    (style as Record<string, string>)['--_color'] = `var(${colorVar})`;
-    (style as Record<string, string>)['--_tint'] = tintVar
-      ? `var(${tintVar})`
-      : `var(${colorVar}-tint)`;
-  }
-  const cls = [
-    'tag',
-    isSubject && 'tag--subject',
-    variant === 'good' && 'tag--good',
-    variant === 'bad' && 'tag--bad',
-    className,
-  ]
-    .filter(Boolean)
-    .join(' ');
+  if (colorVar) (style as Record<string, string>)['--_c'] = `var(${colorVar})`;
   return (
-    <span className={cls} style={style}>
+    <span className={`tag ${strong ? 'tag--strong' : ''} ${className}`} style={style}>
+      {colorVar && <span className="tag__dot" aria-hidden />}
       {children}
     </span>
   );

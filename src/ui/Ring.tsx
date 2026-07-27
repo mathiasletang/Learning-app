@@ -9,24 +9,17 @@ interface Props {
   label?: string;
 }
 
-/** Anneau de progression SVG (score, objectif…). Accessible via aria-label. */
-export function Ring({ value, size = 120, stroke = 10, colorVar, children, label }: Props) {
+/** Anneau de progression — trait fin, extrémités arrondies. */
+export function Ring({ value, size = 128, stroke = 2, colorVar, children, label }: Props) {
   const v = Math.max(0, Math.min(1, value));
   const r = (size - stroke) / 2;
   const c = 2 * Math.PI * r;
-  const style: CSSProperties = {};
-  if (colorVar) (style as Record<string, string>)['--_color'] = `var(${colorVar})`;
+  const style: CSSProperties = { width: size, height: size };
+  if (colorVar) (style as Record<string, string>)['--_c'] = `var(${colorVar})`;
   return (
-    <div className="ring" style={{ position: 'relative', width: size, height: size, ...style }}>
+    <div className="ring" style={style}>
       <svg width={size} height={size} role="img" aria-label={label}>
-        <circle
-          className="ring__track"
-          cx={size / 2}
-          cy={size / 2}
-          r={r}
-          fill="none"
-          strokeWidth={stroke}
-        />
+        <circle className="ring__track" cx={size / 2} cy={size / 2} r={r} fill="none" strokeWidth={stroke} />
         <circle
           className="ring__value"
           cx={size / 2}

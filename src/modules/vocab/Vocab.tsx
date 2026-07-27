@@ -6,9 +6,9 @@ import { isMature } from '@/core/srs';
 import type { DeckId, VocabCard } from '@/core/types';
 import { allVocabCards, vocabDecks, DECK_ORDER } from '@/core/content';
 import { reviewVocab } from '@/app/actions';
-import { PageHead } from '@/ui/PageHead';
-import { Button, Card, Segmented, Tag, Icon } from '@/ui';
+import { Button, Icon, PageHead, Tabs, Reveal } from '@/ui';
 import { SrsReviewer, type ReviewItem, type GradeButton } from '@/modules/review/SrsReviewer';
+import './vocab.css';
 
 const GRADES: GradeButton[] = [
   { grade: 0, label: 'Non', tone: 'again' },
@@ -38,22 +38,18 @@ export function Vocab() {
     [deck],
   );
 
-  // File de révision : cartes dues + un quota de cartes neuves.
   const queue = useMemo(() => {
-    const dueReview: VocabCard[] = [];
+    const dueNow: VocabCard[] = [];
     const fresh: VocabCard[] = [];
     for (const c of pool) {
       const srs = srsMap.get(c.id);
       if (!srs) fresh.push(c);
-      else if (srs.due <= today) dueReview.push(c);
+      else if (srs.due <= today) dueNow.push(c);
     }
-    return [...dueReview, ...fresh.slice(0, NEW_PER_SESSION)];
+    return [...dueNow, ...fresh.slice(0, NEW_PER_SESSION)];
   }, [pool, srsMap, today]);
 
-  const mastered = useMemo(
-    () => srsRows.filter((r) => isMature(r)).length,
-    [srsRows],
-  );
+  const mastered = useMemo(() => srsRows.filter(isMature).length, [srsRows]);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -61,12 +57,8 @@ export function Vocab() {
     return pool.filter((c) => c.t.toLowerCase().includes(q) || c.d.toLowerCase().includes(q));
   }, [pool, query]);
 
-  if (reviewing && reviewing.length > 0) {
-    const items: ReviewItem[] = reviewing.map((c) => ({
-      id: c.id,
-      front: c.t,
-      back: c.d,
-    }));
+  if (reviewing?.length) {
+    const items: ReviewItem[] = reviewing.map((c) => ({ id: c.id, front: c.t, back: c.d }));
     return (
       <SrsReviewer
         items={items}
@@ -77,18 +69,20 @@ export function Vocab() {
     );
   }
 
-  const deckChips: { value: DeckId | 'all'; label: string }[] = [
+  const chips: { value: DeckId | 'all'; label: string }[] = [
     { value: 'all', label: 'Tous' },
-    ...DECK_ORDER.map((d) => ({ value: d, label: `${decks[d].court} (${decks[d].cards.length})` })),
+    ...DECK_ORDER.map((d) => ({ value: d, label: `${decks[d].court} · ${decks[d].cards.length}` })),
   ];
 
   return (
     <>
       <PageHead
-        title="Vocabulaire"
-        subtitle="Anglais — finance, verbes et noms du registre académique (C1-C2)."
+        eyebrow="Vocabulaire · English"
+        title="Le mot juste."
+        display
+        lead={`${allVocabCards().length} termes de finance, d'économie et du registre académique. Parcourez-les, ou laissez la répétition espacée les installer.`}
         actions={
-          <Segmented
+          <Tabs
             options={[
               { value: 'browse', label: 'Parcourir' },
               { value: 'review', label: 'Réviser' },
@@ -100,102 +94,83 @@ export function Vocab() {
         }
       />
 
-      <div className="chips" style={{ marginBottom: 'var(--s-5)' }}>
-        {deckChips.map((d) => (
+      <div className="chips" style={{ marginBottom: 'var(--s-10)' }}>
+        {chips.map((c) => (
           <button
-            key={d.value}
+            key={c.value}
             type="button"
             className="chip"
-            aria-pressed={deck === d.value}
-            onClick={() => setDeck(d.value)}
+            aria-pressed={deck === c.value}
+            onClick={() => setDeck(c.value)}
           >
-            {d.label}
+            {c.label}
           </button>
         ))}
       </div>
 
       {view === 'browse' ? (
         <>
-          <label className="row" style={{ marginBottom: 'var(--s-4)' }}>
+          <label className="search" style={{ maxWidth: 460, marginBottom: 'var(--s-8)' }}>
             <span className="sr-only">Rechercher un mot</span>
-            <span style={{ position: 'relative', flex: 1 }}>
-              <Icon
-                name="search"
-                size={18}
-                className="input-icon"
-              />
-              <input
-                className="input"
-                style={{ paddingLeft: 'var(--s-10)' }}
-                placeholder="Rechercher un mot ou une définition…"
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-              />
+            <span className="search__icon">
+              <Icon name="search" size={17} />
             </span>
+            <input
+              className="field"
+              placeholder="Rechercher un mot, une définition…"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+            />
           </label>
-          <p className="meta" style={{ marginBottom: 'var(--s-3)' }}>
-            {filtered.length} résultat{filtered.length > 1 ? 's' : ''}
-            {filtered.length > LIST_CAP ? ` (${LIST_CAP} affichés)` : ''}
+
+          <p className="micro" style={{ marginBottom: 'var(--s-5)' }}>
+            {filtered.length} entrée{filtered.length > 1 ? 's' : ''}
+            {filtered.length > LIST_CAP ? ` — ${LIST_CAP} affichées` : ''}
           </p>
-          <div className="stack" style={{ gap: 'var(--s-2)' }}>
-            {filtered.slice(0, LIST_CAP).map((c) => (
-              <Card key={c.id} className="row" style={{ gap: 'var(--s-4)', alignItems: 'baseline' }}>
-                <strong style={{ minWidth: 140, flex: 'none' }}>{c.t}</strong>
-                <span className="meta" style={{ color: 'var(--text)' }}>
-                  {c.d}
-                </span>
-              </Card>
+
+          <dl className="glossary">
+            {filtered.slice(0, LIST_CAP).map((c, i) => (
+              <Reveal key={c.id} delay={Math.min(i, 10) * 0.02} y={10}>
+                <div className="glossary__row">
+                  <dt className="glossary__term">{c.t}</dt>
+                  <dd className="glossary__def">{c.d}</dd>
+                </div>
+              </Reveal>
             ))}
-          </div>
+          </dl>
         </>
       ) : (
         <>
-          <div
-            className="grid"
-            style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', marginBottom: 'var(--s-6)' }}
-          >
-            <Card>
-              <span className="section-title" style={{ margin: 0 }}>
-                À réviser
-              </span>
-              <strong className="tnum" style={{ fontSize: 'var(--fs-display)', display: 'block' }}>
-                {queue.length}
-              </strong>
-            </Card>
-            <Card>
-              <span className="section-title" style={{ margin: 0 }}>
-                Mots suivis
-              </span>
-              <strong className="tnum" style={{ fontSize: 'var(--fs-display)', display: 'block' }}>
-                {srsRows.length}
-              </strong>
-            </Card>
-            <Card>
-              <span className="section-title" style={{ margin: 0 }}>
-                Maîtrisés
-              </span>
-              <strong className="tnum" style={{ fontSize: 'var(--fs-display)', display: 'block' }}>
-                {mastered}
-              </strong>
-            </Card>
+          <div className="figures">
+            <div>
+              <span className="figure__value tnum">{queue.length}</span>
+              <span className="eyebrow figure__label">Dans la file</span>
+            </div>
+            <div>
+              <span className="figure__value tnum">{srsRows.length}</span>
+              <span className="eyebrow figure__label">Mots suivis</span>
+            </div>
+            <div>
+              <span className="figure__value tnum">{mastered}</span>
+              <span className="eyebrow figure__label">Maîtrisés</span>
+            </div>
+            <div>
+              <span className="figure__value tnum">{pool.length}</span>
+              <span className="eyebrow figure__label">Dans ce paquet</span>
+            </div>
           </div>
-          {queue.length > 0 ? (
-            <Button variant="primary" icon="play" onClick={() => setReviewing(queue)} block>
-              Réviser {queue.length} mot{queue.length > 1 ? 's' : ''}
-            </Button>
-          ) : (
-            <Card pad="lg">
-              <div className="row" style={{ gap: 'var(--s-3)' }}>
-                <Icon name="check" size={22} />
-                <div>
-                  <strong>Tout est à jour</strong>
-                  <p className="meta">Aucun mot à réviser dans ce paquet aujourd'hui.</p>
-                </div>
+
+          <div style={{ marginTop: 'var(--s-10)' }}>
+            {queue.length ? (
+              <Button variant="primary" icon="play" onClick={() => setReviewing(queue)}>
+                Réviser {queue.length} mot{queue.length > 1 ? 's' : ''}
+              </Button>
+            ) : (
+              <div className="empty">
+                <h3>Tout est à jour</h3>
+                <p className="meta">Aucun mot de ce paquet n'attend d'être revu aujourd'hui.</p>
               </div>
-            </Card>
-          )}
-          <div style={{ marginTop: 'var(--s-6)' }}>
-            <Tag>Store SRS distinct des flashcards</Tag>
+            )}
           </div>
         </>
       )}

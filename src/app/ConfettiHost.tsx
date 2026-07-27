@@ -7,10 +7,10 @@ interface Piece {
   delay: number;
   dur: number;
   color: string;
-  rot: number;
 }
 
-const COLORS = ['--accent', '--subj-fin', '--subj-cfa', '--good', '--warn'];
+/* Palette retenue : les confettis restent dans le monde chromatique de l'app. */
+const COLORS = ['--accent', '--m-fin', '--m-cfa', '--positive', '--ink-3'];
 
 export function ConfettiHost() {
   const nonce = useApp((s) => s.confettiNonce);
@@ -19,16 +19,16 @@ export function ConfettiHost() {
   useEffect(() => {
     if (nonce === 0) return;
     if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return;
-    const batch: Piece[] = Array.from({ length: 80 }, (_, i) => ({
-      id: nonce * 1000 + i,
-      left: Math.random() * 100,
-      delay: Math.random() * 0.3,
-      dur: 1.6 + Math.random() * 1.4,
-      color: COLORS[i % COLORS.length],
-      rot: Math.random() * 360,
-    }));
-    setPieces(batch);
-    const t = setTimeout(() => setPieces([]), 3400);
+    setPieces(
+      Array.from({ length: 60 }, (_, i) => ({
+        id: nonce * 1000 + i,
+        left: Math.random() * 100,
+        delay: Math.random() * 0.4,
+        dur: 2 + Math.random() * 1.6,
+        color: COLORS[i % COLORS.length],
+      })),
+    );
+    const t = setTimeout(() => setPieces([]), 4200);
     return () => clearTimeout(t);
   }, [nonce]);
 
@@ -44,7 +44,6 @@ export function ConfettiHost() {
             background: `var(${p.color})`,
             animationDelay: `${p.delay}s`,
             animationDuration: `${p.dur}s`,
-            transform: `rotate(${p.rot}deg)`,
           }}
         />
       ))}

@@ -1,11 +1,10 @@
 import { useMemo } from 'react';
 import { getParcours } from '@/core/content';
 import { useApp } from '@/app/store';
-import { BANKS } from '@/core/meta';
 import type { TrackId } from '@/core/types';
-import { PageHead } from '@/ui/PageHead';
-import { Button, Card } from '@/ui';
+import { PageHead, Button, Reveal } from '@/ui';
 import { DataZone } from './DataZone';
+import './planner.css';
 
 const TRACKS: TrackId[] = ['opt', 'fin', 'cfa'];
 
@@ -16,23 +15,23 @@ export function Planner() {
 
   const months = useMemo(() => {
     const now = new Date();
-    return Array.from({ length: 6 }, (_, i) => {
-      const d = new Date(now.getFullYear(), now.getMonth() + i, 1);
-      return d.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
-    });
+    return Array.from({ length: 6 }, (_, i) =>
+      new Date(now.getFullYear(), now.getMonth() + i, 1).toLocaleDateString('fr-FR', {
+        month: 'long',
+        year: 'numeric',
+      }),
+    );
   }, []);
 
-  // Répartit les phases de chaque parcours sur 6 mois (proportionnel aux heures).
+  /* Répartit les phases sur six mois, au prorata des heures estimées. */
   const plan = useMemo(() => {
     const grid: Record<TrackId, string[][]> = { opt: [], fin: [], cfa: [] };
     for (const t of TRACKS) {
-      const track = parcours[t];
       const cells: string[][] = Array.from({ length: 6 }, () => []);
-      const total = Math.max(1, track.phases.reduce((n, p) => n + p.h, 0));
+      const total = Math.max(1, parcours[t].phases.reduce((n, p) => n + p.h, 0));
       let cum = 0;
-      for (const phase of track.phases) {
-        const m = Math.min(5, Math.floor((cum / total) * 6));
-        cells[m].push(phase.t);
+      for (const phase of parcours[t].phases) {
+        cells[Math.min(5, Math.floor((cum / total) * 6))].push(phase.t);
         cum += phase.h;
       }
       grid[t] = cells;
@@ -42,20 +41,25 @@ export function Planner() {
 
   return (
     <>
-      <PageHead title="Planning" subtitle="Vue indicative sur 6 mois — optimisation, finance et CFA en parallèle." />
+      <PageHead
+        eyebrow="Planning"
+        title="Six mois, trois fronts."
+        display
+        lead="Une répartition indicative des phases, au prorata des heures estimées. Elle n'engage à rien : elle donne un cap."
+      />
 
-      <Card pad="lg" style={{ marginBottom: 'var(--s-6)' }}>
-        <div className="section-title">Objectif quotidien</div>
-        <div className="row" style={{ gap: 'var(--s-3)' }}>
+      <section>
+        <p className="eyebrow" style={{ marginBottom: 'var(--s-5)' }}>
+          Objectif quotidien
+        </p>
+        <div className="goal">
           <Button
             variant="secondary"
             icon="x"
             aria-label="Diminuer l'objectif"
-            onClick={() => setDailyGoal(Math.max(1, dailyGoal - 5))}
+            onClick={() => setDailyGoal(Math.max(5, dailyGoal - 5))}
           />
-          <strong className="tnum" style={{ fontSize: 'var(--fs-h1)', minWidth: 90, textAlign: 'center' }}>
-            {dailyGoal}
-          </strong>
+          <span className="goal__value">{dailyGoal}</span>
           <Button
             variant="secondary"
             icon="plus"
@@ -64,47 +68,52 @@ export function Planner() {
           />
           <span className="meta">questions par jour</span>
         </div>
-      </Card>
+      </section>
 
-      <Card pad="lg" style={{ marginBottom: 'var(--s-6)', overflowX: 'auto' }}>
-        <div className="section-title">Feuille de route</div>
-        <table className="prose" style={{ width: '100%', borderCollapse: 'collapse', display: 'table' }}>
-          <thead>
-            <tr>
-              <th style={{ textAlign: 'left', padding: 'var(--s-2)' }}>Mois</th>
-              {TRACKS.map((t) => (
-                <th key={t} style={{ textAlign: 'left', padding: 'var(--s-2)', color: `var(${BANKS[t].colorVar})` }}>
-                  {parcours[t].titre}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {months.map((m, i) => (
-              <tr key={m}>
-                <td style={{ padding: 'var(--s-2)', fontWeight: 600, textTransform: 'capitalize', whiteSpace: 'nowrap' }}>
-                  {m}
-                </td>
+      <section className="section">
+        <div className="section__head">
+          <h2>Feuille de route</h2>
+          <span className="micro">Indicatif</span>
+        </div>
+
+        <div className="plan__head">
+          <span />
+          {TRACKS.map((t) => (
+            <span key={t} className="eyebrow">
+              {parcours[t].titre}
+            </span>
+          ))}
+        </div>
+
+        <div className="plan">
+          {months.map((m, i) => (
+            <Reveal key={m} delay={i * 0.05} y={12}>
+              <div className="plan__month">
+                <span className="plan__label">{m}</span>
                 {TRACKS.map((t) => (
-                  <td key={t} style={{ padding: 'var(--s-2)', verticalAlign: 'top' }}>
+                  <div className="plan__cell" key={t} data-track={parcours[t].court}>
                     {plan[t][i].length ? (
                       plan[t][i].map((title, k) => (
-                        <div key={k} className="meta" style={{ color: 'var(--text)' }}>
+                        <span className="plan__item" key={k}>
                           {title}
-                        </div>
+                        </span>
                       ))
                     ) : (
-                      <span className="meta">—</span>
+                      <span className="plan__item" style={{ color: 'var(--ink-3)' }}>
+                        —
+                      </span>
                     )}
-                  </td>
+                  </div>
                 ))}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </Card>
+              </div>
+            </Reveal>
+          ))}
+        </div>
+      </section>
 
-      <DataZone />
+      <section className="section">
+        <DataZone />
+      </section>
     </>
   );
 }

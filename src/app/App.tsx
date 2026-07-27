@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { useApp } from './store';
 import { Layout } from './Layout';
 import { Dashboard } from '@/modules/dashboard/Dashboard';
@@ -16,13 +17,20 @@ import { Stats } from '@/modules/stats/Stats';
 import { Time } from '@/modules/planner/Time';
 import { Planner } from '@/modules/planner/Planner';
 
+/** Ouverture : la marque seule, le temps du chargement. */
 function Splash() {
   return (
     <div style={{ display: 'grid', placeItems: 'center', minHeight: '100dvh' }}>
-      <div className="row" style={{ gap: 'var(--s-3)', color: 'var(--text-secondary)' }}>
-        <span className="brand__dot" aria-hidden />
-        Chargement…
-      </div>
+      <motion.p
+        className="wordmark"
+        style={{ textAlign: 'center', fontSize: '1.75rem' }}
+        initial={{ opacity: 0, y: 6 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+      >
+        Cours
+        <span>avancés</span>
+      </motion.p>
     </div>
   );
 }

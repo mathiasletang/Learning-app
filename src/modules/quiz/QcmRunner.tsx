@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import type { Question, QcmMode } from '@/core/types';
 import { shuffleOptions, hashSeed } from '@/core/quiz';
 import type { AnswerEntry } from '@/app/actions';
@@ -15,41 +16,38 @@ interface Props {
 }
 
 export function QcmRunner({ questions, mode, onFinish, onQuit }: Props) {
-  const sessionSeed = useMemo(() => Math.floor(Math.random() * 1e9), []);
+  const seed = useMemo(() => Math.floor(Math.random() * 1e9), []);
   const [index, setIndex] = useState(0);
   const [selected, setSelected] = useState<number | null>(null);
   const [revealed, setRevealed] = useState(false);
   const [timeLeft, setTimeLeft] = useState(TIMED_SECONDS);
-  const answersRef = useRef<AnswerEntry[]>([]);
-  const startRef = useRef(Date.now());
+  const answers = useRef<AnswerEntry[]>([]);
+  const startedAt = useRef(Date.now());
 
   const isTrain = mode === 'train';
   const isTimed = mode === 'timed';
   const q = questions[index];
 
   const shuffled = useMemo(
-    () => shuffleOptions(q.options, q.answer, hashSeed(`${sessionSeed}:${q.id}`)),
-    [q.id, q.options, q.answer, sessionSeed],
+    () => shuffleOptions(q.options, q.answer, hashSeed(`${seed}:${q.id}`)),
+    [q.id, q.options, q.answer, seed],
   );
 
   const advance = useCallback(
-    (displaySelected: number | null) => {
-      const correct = displaySelected !== null && displaySelected === shuffled.answer;
-      answersRef.current.push({ q, correct });
+    (choice: number | null) => {
+      answers.current.push({ q, correct: choice !== null && choice === shuffled.answer });
       if (index + 1 < questions.length) {
         setIndex((i) => i + 1);
         setSelected(null);
         setRevealed(false);
         setTimeLeft(TIMED_SECONDS);
       } else {
-        const dur = Math.round((Date.now() - startRef.current) / 1000);
-        onFinish(answersRef.current, dur);
+        onFinish(answers.current, Math.round((Date.now() - startedAt.current) / 1000));
       }
     },
     [index, questions.length, q, shuffled.answer, onFinish],
   );
 
-  // Timer du mode chronométré : 30 s / question, avance automatique.
   useEffect(() => {
     if (!isTimed) return;
     if (timeLeft <= 0) {
@@ -60,7 +58,7 @@ export function QcmRunner({ questions, mode, onFinish, onQuit }: Props) {
     return () => clearTimeout(t);
   }, [isTimed, timeLeft, advance, selected]);
 
-  const handleSelect = useCallback(
+  const choose = useCallback(
     (i: number) => {
       if (isTrain && revealed) return;
       setSelected(i);
@@ -69,12 +67,11 @@ export function QcmRunner({ questions, mode, onFinish, onQuit }: Props) {
     [isTrain, revealed],
   );
 
-  // Clavier : 1-4 pour choisir, Entrée pour valider/continuer.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key >= '1' && e.key <= '4') {
         const i = Number(e.key) - 1;
-        if (i < shuffled.options.length) handleSelect(i);
+        if (i < shuffled.options.length) choose(i);
       } else if (e.key === 'Enter') {
         if (isTrain && !revealed) return;
         advance(selected);
@@ -82,102 +79,114 @@ export function QcmRunner({ questions, mode, onFinish, onQuit }: Props) {
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [handleSelect, advance, selected, isTrain, revealed, shuffled.options.length]);
+  }, [choose, advance, selected, isTrain, revealed, shuffled.options.length]);
 
-  const canAdvance = isTrain ? revealed : true;
   const isLast = index + 1 === questions.length;
+  const right = selected === shuffled.answer;
 
   return (
-    <div className="qcm-runner">
-      <div className="qcm-topline">
-        <Button variant="ghost" icon="x" aria-label="Quitter la session" onClick={onQuit} />
+    <div className="run">
+      <div className="run__bar">
+        <Button variant="ghost" icon="x" aria-label="Quitter la séance" onClick={onQuit} />
         <div
-          className="qcm-progress-track"
+          className="run__ticks"
           role="progressbar"
           aria-valuenow={index + 1}
           aria-valuemin={1}
           aria-valuemax={questions.length}
         >
-          <div
-            className="qcm-progress-fill"
-            style={{ width: `${((index + 1) / questions.length) * 100}%` }}
-          />
+          {questions.map((_, i) => (
+            <span
+              key={i}
+              className={`run__tick ${i < index ? 'run__tick--done' : ''} ${i === index ? 'run__tick--now' : ''}`}
+            />
+          ))}
         </div>
-        <span className="meta tnum" style={{ minWidth: 54, textAlign: 'right' }}>
+        <span className="meta tnum">
           {index + 1}/{questions.length}
         </span>
         {isTimed && (
           <span
-            className={`qcm-timer ${timeLeft <= 5 ? 'qcm-timer--low' : ''}`}
+            className={`run__timer ${timeLeft <= 5 ? 'run__timer--low' : ''}`}
             aria-label={`${timeLeft} secondes restantes`}
           >
-            {timeLeft}s
+            {timeLeft}
           </span>
         )}
       </div>
 
-      <p className="meta">Question {index + 1}</p>
-      <h2 className="qcm-question" dangerouslySetInnerHTML={{ __html: q.question }} />
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={q.id}
+          initial={{ opacity: 0, y: 14 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -10 }}
+          transition={{ duration: 0.42, ease: [0.22, 1, 0.36, 1] }}
+        >
+          <p className="eyebrow">{q.themeLabel}</p>
+          <h2 className="question" dangerouslySetInnerHTML={{ __html: q.question }} />
 
-      <div className="qcm-options" role="group" aria-label="Réponses possibles">
-        {shuffled.options.map((opt, i) => {
-          const isCorrect = i === shuffled.answer;
-          let cls = 'qcm-option';
-          let mark: 'check' | 'x' | null = null;
-          if (revealed) {
-            if (isCorrect) {
-              cls += ' qcm-option--correct';
-              mark = 'check';
-            } else if (selected === i) {
-              cls += ' qcm-option--wrong';
-              mark = 'x';
-            }
-          }
-          return (
-            <button
-              key={i}
-              type="button"
-              className={cls}
-              aria-pressed={selected === i}
-              disabled={revealed}
-              onClick={() => handleSelect(i)}
+          <div className="answers" role="group" aria-label="Réponses">
+            {shuffled.options.map((opt, i) => {
+              const isRight = i === shuffled.answer;
+              let cls = 'answer';
+              let mark: 'check' | 'x' | null = null;
+              if (revealed) {
+                if (isRight) {
+                  cls += ' answer--right';
+                  mark = 'check';
+                } else if (selected === i) {
+                  cls += ' answer--wrong';
+                  mark = 'x';
+                }
+              }
+              return (
+                <button
+                  key={i}
+                  type="button"
+                  className={cls}
+                  aria-pressed={selected === i}
+                  disabled={revealed}
+                  onClick={() => choose(i)}
+                >
+                  <span className="answer__key">{LETTERS[i]}</span>
+                  <span>{opt}</span>
+                  {mark ? (
+                    <span className="answer__mark">
+                      <Icon name={mark} size={17} strokeWidth={1.8} />
+                    </span>
+                  ) : (
+                    <span />
+                  )}
+                </button>
+              );
+            })}
+          </div>
+
+          {revealed && isTrain && (
+            <motion.div
+              className="explain"
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
             >
-              <span className="qcm-option__key" aria-hidden>
-                {LETTERS[i]}
+              <span className="eyebrow explain__verdict" style={{ color: right ? 'var(--positive)' : 'var(--negative)' }}>
+                {right ? 'Correct' : 'À revoir'}
               </span>
-              <span>{opt}</span>
-              {mark && (
-                <span className={`qcm-option__mark ${isCorrect ? '' : ''}`} aria-hidden>
-                  <Icon name={mark} size={20} />
-                </span>
-              )}
-            </button>
-          );
-        })}
-      </div>
+              <div dangerouslySetInnerHTML={{ __html: q.explanation }} />
+            </motion.div>
+          )}
+        </motion.div>
+      </AnimatePresence>
 
-      {revealed && isTrain && (
-        <div className="qcm-explain">
-          <strong>{selected === shuffled.answer ? '✓ Correct' : '✕ À revoir'}</strong>
-          <div
-            style={{ marginTop: 'var(--s-2)' }}
-            dangerouslySetInnerHTML={{ __html: q.explanation }}
-          />
-        </div>
-      )}
-
-      <div className="qcm-actions">
-        {!isTrain && !isTimed && (
-          <span className="meta" style={{ alignSelf: 'center' }}>
-            {mode === 'exam' ? 'Correction à la fin' : ''}
-          </span>
-        )}
+      <div className="run__foot">
+        {mode === 'exam' && <span className="micro">Correction à la fin de la séance</span>}
         <span className="spacer" />
         <Button
           variant="primary"
-          disabled={!canAdvance}
+          disabled={isTrain ? !revealed : false}
           onClick={() => advance(selected)}
-          iconRight={isLast ? undefined : 'chevronRight'}
+          iconRight={isLast ? undefined : 'arrowRight'}
         >
           {isLast ? 'Terminer' : 'Suivant'}
         </Button>

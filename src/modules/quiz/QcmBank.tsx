@@ -5,8 +5,7 @@ import { BANKS } from '@/core/meta';
 import { questionsByBank, themesOf } from '@/core/content';
 import { failedQuestionIds, finalizeQcm, type AnswerEntry } from '@/app/actions';
 import { useApp } from '@/app/store';
-import { PageHead } from '@/ui/PageHead';
-import { Button, Card, Icon, Segmented, Tag } from '@/ui';
+import { Button, Icon, PageHead, Tag } from '@/ui';
 import { QcmRunner } from './QcmRunner';
 import { QcmResults } from './QcmResults';
 import './quiz.css';
@@ -14,19 +13,12 @@ import './quiz.css';
 type Size = '10' | '20' | '40' | 'all';
 type Phase = 'setup' | 'running' | 'results';
 
-const MODE_OPTS: { value: QcmMode; label: string }[] = [
-  { value: 'train', label: 'Entraînement' },
-  { value: 'exam', label: 'Examen' },
-  { value: 'timed', label: 'Chronométré' },
-  { value: 'review', label: 'Révision' },
+const MODES: { value: QcmMode; name: string; desc: string }[] = [
+  { value: 'train', name: 'Entraînement', desc: 'Correction et explication après chaque question.' },
+  { value: 'exam', name: 'Examen', desc: 'Aucune correction avant la fin. Conditions réelles.' },
+  { value: 'timed', name: 'Chronométré', desc: 'Trente secondes par question, passage automatique.' },
+  { value: 'review', name: 'Révision', desc: 'Uniquement les questions déjà manquées.' },
 ];
-
-const MODE_DESC: Record<QcmMode, string> = {
-  train: 'Correction immédiate avec explication après chaque question.',
-  exam: 'Correction affichée seulement à la fin.',
-  timed: '30 secondes par question, avance automatique.',
-  review: 'Rejoue uniquement les questions déjà ratées.',
-};
 
 function shuffle<T>(arr: T[]): T[] {
   const a = [...arr];
@@ -59,7 +51,7 @@ export function QcmBank() {
       <>
         <PageHead title="Banque introuvable" />
         <Link className="btn btn--secondary" to="/qcm">
-          Retour aux QCM
+          Retour aux questions
         </Link>
       </>
     );
@@ -71,19 +63,18 @@ export function QcmBank() {
     if (mode === 'review') {
       const failed = await failedQuestionIds();
       pool = pool.filter((q) => failed.has(q.id));
-      if (pool.length === 0) {
+      if (!pool.length) {
         pushToast({
-          title: 'Aucune question à réviser',
-          desc: 'Fais d’abord des sessions : les questions ratées viendront ici.',
-          icon: '📭',
+          title: 'Rien à réviser',
+          desc: 'Faites d’abord une séance : les questions manquées viendront ici.',
         });
         return;
       }
     }
     pool = shuffle(pool);
     if (size !== 'all') pool = pool.slice(0, Number(size));
-    if (pool.length === 0) {
-      pushToast({ title: 'Aucune question disponible', icon: '📭' });
+    if (!pool.length) {
+      pushToast({ title: 'Aucune question disponible' });
       return;
     }
     setQuestions(pool);
@@ -98,67 +89,66 @@ export function QcmBank() {
   }
 
   if (phase === 'running') {
-    return (
-      <QcmRunner
-        questions={questions}
-        mode={mode}
-        onFinish={onFinish}
-        onQuit={() => setPhase('setup')}
-      />
-    );
+    return <QcmRunner questions={questions} mode={mode} onFinish={onFinish} onQuit={() => setPhase('setup')} />;
   }
-
   if (phase === 'results') {
     return (
-      <QcmResults
-        answers={answers}
-        xpEarned={xpEarned}
-        onRestart={() => start()}
-        onHome={() => setPhase('setup')}
-      />
+      <QcmResults answers={answers} xpEarned={xpEarned} onRestart={start} onHome={() => setPhase('setup')} />
     );
   }
 
-  const available =
-    theme != null ? (themes.find((t) => t.code === theme)?.count ?? 0) : questionsByBank(bankId).length;
+  const available = theme
+    ? (themes.find((t) => t.code === theme)?.count ?? 0)
+    : questionsByBank(bankId).length;
 
   return (
     <>
       <PageHead
+        eyebrow="Séance de questions"
         title={meta.title}
-        subtitle={
-          <span className="row" style={{ gap: 'var(--s-2)' }}>
-            <Tag colorVar={meta.colorVar}>{meta.short}</Tag>
-            <span className="tnum">{questionsByBank(bankId).length} questions</span>
-            {meta.lang === 'en' && <Tag>English</Tag>}
-          </span>
+        display
+        lead={
+          <>
+            {questionsByBank(bankId).length} questions réparties en {themes.length} thèmes
+            {meta.lang === 'en' ? ', en anglais' : ''}. Choisissez votre cadre de travail.
+          </>
         }
         actions={
-          <Link className="btn btn--ghost" to="/qcm">
-            <Icon name="arrowLeft" size={18} /> Banques
+          <Link className="arrow-link" to="/qcm">
+            <Icon name="arrowLeft" size={16} /> Toutes les banques
           </Link>
         }
       />
 
-      <Card pad="lg" style={{ maxWidth: 720 }}>
-        <div className="qcm-setup__group">
-          <div className="section-title">Mode</div>
-          <Segmented options={MODE_OPTS} value={mode} onChange={setMode} ariaLabel="Mode de jeu" />
-          <p className="meta" style={{ marginTop: 'var(--s-2)' }}>
-            {MODE_DESC[mode]}
-          </p>
+      <div className="setup">
+        <div className="setup__block">
+          <p className="eyebrow setup__legend">Mode</p>
+          <div className="mode-list">
+            {MODES.map((m) => (
+              <button
+                key={m.value}
+                type="button"
+                className="mode"
+                aria-pressed={mode === m.value}
+                onClick={() => setMode(m.value)}
+              >
+                <span className="mode__mark" aria-hidden />
+                <span>
+                  <span className="mode__name">{m.name}</span>
+                  <span className="meta mode__desc" style={{ display: 'block' }}>
+                    {m.desc}
+                  </span>
+                </span>
+              </button>
+            ))}
+          </div>
         </div>
 
-        <div className="qcm-setup__group">
-          <div className="section-title">Thème</div>
+        <div className="setup__block">
+          <p className="eyebrow setup__legend">Thème</p>
           <div className="chips">
-            <button
-              type="button"
-              className="chip"
-              aria-pressed={theme === null}
-              onClick={() => setTheme(null)}
-            >
-              Tous les thèmes
+            <button type="button" className="chip" aria-pressed={theme === null} onClick={() => setTheme(null)}>
+              Tous
             </button>
             {themes.map((t) => (
               <button
@@ -168,14 +158,14 @@ export function QcmBank() {
                 aria-pressed={theme === t.code}
                 onClick={() => setTheme(t.code)}
               >
-                {t.label} <span className="meta tnum">{t.count}</span>
+                {t.label} <span className="chip__count">{t.count}</span>
               </button>
             ))}
           </div>
         </div>
 
-        <div className="qcm-setup__group">
-          <div className="section-title">Nombre de questions</div>
+        <div className="setup__block">
+          <p className="eyebrow setup__legend">Longueur</p>
           <div className="chips">
             {(['10', '20', '40', 'all'] as Size[]).map((s) => (
               <button
@@ -185,16 +175,19 @@ export function QcmBank() {
                 aria-pressed={size === s}
                 onClick={() => setSize(s)}
               >
-                {s === 'all' ? `Tout (${available})` : s}
+                {s === 'all' ? `Tout · ${available}` : `${s} questions`}
               </button>
             ))}
           </div>
         </div>
 
-        <Button variant="primary" icon="play" onClick={start} block>
-          Commencer
-        </Button>
-      </Card>
+        <div className="setup__block row" style={{ gap: 'var(--s-4)' }}>
+          <Button variant="primary" icon="play" onClick={start}>
+            Commencer
+          </Button>
+          <Tag colorVar={meta.colorVar}>{meta.short}</Tag>
+        </div>
+      </div>
     </>
   );
 }

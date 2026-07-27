@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState, type ReactNode } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
 import type { Grade } from '@/core/srs';
 import { Button } from '@/ui';
 import './review.css';
@@ -59,28 +60,29 @@ export function SrsReviewer({ items, grades, onGrade, onExit }: Props) {
 
   return (
     <div className="srs">
-      <div className="srs__top">
+      <div className="srs__bar">
         <Button variant="ghost" icon="x" aria-label="Quitter la révision" onClick={onExit} />
         <div
-          className="qcm-progress-track"
+          className="run__ticks"
           role="progressbar"
           aria-valuenow={index + 1}
           aria-valuemin={1}
           aria-valuemax={items.length}
         >
-          <div
-            className="qcm-progress-fill"
-            style={{ width: `${((index + 1) / items.length) * 100}%` }}
-          />
+          {items.map((_, i) => (
+            <span
+              key={i}
+              className={`run__tick ${i < index ? 'run__tick--done' : ''} ${i === index ? 'run__tick--now' : ''}`}
+            />
+          ))}
         </div>
-        <span className="srs__count meta">
+        <span className="meta tnum">
           {index + 1}/{items.length}
         </span>
       </div>
 
       <div
-        className="flip"
-        style={{ position: 'relative' }}
+        className="card-face"
         role="button"
         tabIndex={0}
         aria-label={flipped ? 'Réponse affichée' : 'Appuyer pour révéler la réponse'}
@@ -92,32 +94,48 @@ export function SrsReviewer({ items, grades, onGrade, onExit }: Props) {
           }
         }}
       >
-        <span className="flip__side-label">{flipped ? 'Réponse' : 'Question'}</span>
-        {!flipped ? (
-          <>
-            <div className="flip__front">{current.front}</div>
-            <div className="flip__hint">Appuyer pour révéler</div>
-          </>
-        ) : (
-          <div className="flip__back">{current.back}</div>
-        )}
+        <span className="eyebrow card-face__side">{flipped ? 'Réponse' : 'Question'}</span>
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={`${current.id}-${flipped}`}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.34, ease: [0.22, 1, 0.36, 1] }}
+          >
+            {flipped ? (
+              <div className="card-face__back">{current.back}</div>
+            ) : (
+              <div className="card-face__front">{current.front}</div>
+            )}
+          </motion.div>
+        </AnimatePresence>
+        {!flipped && <span className="micro card-face__hint">Appuyer pour révéler</span>}
       </div>
 
-      {flipped && (
-        <div className="srs__grades">
-          {grades.map((g, i) => (
-            <button
-              key={g.grade}
-              type="button"
-              className={`grade-btn grade-btn--${g.tone}`}
-              onClick={() => grade(g.grade)}
-            >
-              {g.label}
-              <small>{i + 1}</small>
-            </button>
-          ))}
-        </div>
-      )}
+      <AnimatePresence>
+        {flipped && (
+          <motion.div
+            className="grades"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+          >
+            {grades.map((g, i) => (
+              <button
+                key={g.grade}
+                type="button"
+                className={`grade grade--${g.tone}`}
+                onClick={() => grade(g.grade)}
+              >
+                {g.label}
+                <small>{i + 1}</small>
+              </button>
+            ))}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

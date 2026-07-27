@@ -1,34 +1,40 @@
 import { Link } from 'react-router-dom';
 import { BANK_ORDER, BANKS } from '@/core/meta';
-import { questionsByBank, themesOf } from '@/core/content';
-import { PageHead } from '@/ui/PageHead';
-import { CardButton, Tag } from '@/ui';
+import { questionsByBank, themesOf, allQuestions } from '@/core/content';
+import { PageHead, Icon, Reveal } from '@/ui';
+import './quiz.css';
 
 export function QcmHome() {
   return (
     <>
       <PageHead
-        title="QCM"
-        subtitle="Cinq banques, quatre modes de jeu. Choisis une banque pour régler ta session."
+        eyebrow="Questions"
+        title="Cinq banques, une méthode."
+        display
+        lead={`${allQuestions().length} questions à choix multiple, corrigées et expliquées. Choisissez une banque, puis le cadre de la séance.`}
       />
-      <div className="grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))' }}>
-        {BANK_ORDER.map((b) => {
+
+      <div className="banklist">
+        {BANK_ORDER.map((b, i) => {
           const meta = BANKS[b];
           const count = questionsByBank(b).length;
           const nThemes = themesOf(b).length;
           return (
-            <Link key={b} to={`/qcm/${b}`} style={{ textDecoration: 'none' }}>
-              <CardButton pad="lg" style={{ height: '100%' }} tabIndex={-1}>
-                <div className="row row--between">
-                  <Tag colorVar={meta.colorVar}>{meta.short}</Tag>
-                  {meta.lang === 'en' && <span className="meta">English</span>}
-                </div>
-                <h3 style={{ marginTop: 'var(--s-3)' }}>{meta.title}</h3>
-                <p className="meta tnum">
-                  {count} questions · {nThemes} thèmes
-                </p>
-              </CardButton>
-            </Link>
+            <Reveal key={b} delay={i * 0.06} y={14}>
+              <Link to={`/qcm/${b}`} className="bankrow">
+                <span className="bankrow__index">{String(i + 1).padStart(2, '0')}</span>
+                <span>
+                  <span className="bankrow__name" style={{ display: 'block' }}>
+                    {meta.title}
+                  </span>
+                  <span className="micro" style={{ marginTop: 'var(--s-2)', display: 'block' }}>
+                    {nThemes} thèmes{meta.lang === 'en' ? ' · English' : ''}
+                  </span>
+                </span>
+                <span className="bankrow__meta meta tnum">{count}</span>
+                <Icon name="arrowRight" size={17} className="bankrow__arrow" />
+              </Link>
+            </Reveal>
           );
         })}
       </div>

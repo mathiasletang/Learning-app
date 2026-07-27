@@ -74,7 +74,7 @@ function applyTheme(resolved: ResolvedTheme) {
   if (typeof document === 'undefined') return;
   document.documentElement.dataset.theme = resolved;
   const meta = document.querySelector('meta[name="theme-color"]:not([media])');
-  if (meta) meta.setAttribute('content', resolved === 'dark' ? '#100f0c' : '#faf8f4');
+  if (meta) meta.setAttribute('content', resolved === 'dark' ? '#100f0d' : '#fbfaf8');
 }
 
 /** Miroir du choix brut de thème dans localStorage : c'est ce que lit le script

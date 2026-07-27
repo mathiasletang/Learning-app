@@ -2,8 +2,10 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 
 // Polices auto-hébergées + rendu mathématique, embarqués (hors-ligne).
-import '@fontsource-variable/fraunces';
-import '@fontsource-variable/inter';
+// Titres : Instrument Serif (éditorial). Texte : Manrope (humaniste, doux).
+import '@fontsource/instrument-serif/400.css';
+import '@fontsource/instrument-serif/400-italic.css';
+import '@fontsource-variable/manrope';
 import 'katex/dist/katex.min.css';
 
 // Système de design, du plus général au plus précis.

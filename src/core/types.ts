@@ -49,12 +49,17 @@ export interface VocabCard {
 /** catalogue.json : [dossier, [[nom, pages], …]][] */
 export type RawCatalogue = [string, [string, number][]][];
 
+/** Niveau d'étude estimé d'un document. */
+export type Level = 'L3' | 'M1' | 'M2';
+
 export interface LibDoc {
   path: string; // dossier/nom (relatif au dossier parent)
   folder: string;
   name: string;
   pages: number;
   track: TrackId; // parcours d'appartenance
+  level: Level; // niveau estimé (L3 / M1 / M2)
+  source: string; // libellé lisible de la source
 }
 
 export interface Step {

@@ -22,7 +22,15 @@ import type {
   ParcoursData,
   Course,
 } from './types';
-import { BANK_ORDER, themeLabel, folderTrack, COURSE_FILE, COURSE_TITLE } from './meta';
+import {
+  BANK_ORDER,
+  themeLabel,
+  folderTrack,
+  folderLevel,
+  sourceLabel,
+  COURSE_FILE,
+  COURSE_TITLE,
+} from './meta';
 import { estimateDifficulty } from './quiz';
 
 /* --------------------------------- QCM ---------------------------------- */
@@ -114,12 +122,27 @@ export function allDocs(): LibDoc[] {
   if (_docs) return _docs;
   const out: LibDoc[] = [];
   for (const [folder, files] of catalogue) {
+    const track = folderTrack(folder);
+    const level = folderLevel(folder);
+    const source = sourceLabel(folder);
     for (const [name, pages] of files) {
-      out.push({ path: `${folder}/${name}`, folder, name, pages, track: folderTrack(folder) });
+      out.push({ path: `${folder}/${name}`, folder, name, pages, track, level, source });
     }
   }
   _docs = out;
   return out;
+}
+
+/** Documents d'un niveau donné (L3 / M1 / M2). */
+export function docsByLevel(level: LibDoc['level']): LibDoc[] {
+  return allDocs().filter((d) => d.level === level);
+}
+
+/** Compte par niveau, pour les onglets. */
+export function levelCounts(): Record<LibDoc['level'], number> {
+  const acc = { L3: 0, M1: 0, M2: 0 };
+  for (const d of allDocs()) acc[d.level]++;
+  return acc;
 }
 
 /** Regroupement par dossier source. */

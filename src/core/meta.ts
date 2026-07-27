@@ -1,6 +1,6 @@
 /* Métadonnées d'affichage du contenu (libellés, couleurs). Source : SCHEMA_DONNEES.md */
 
-import type { BankId, TrackId } from './types';
+import type { BankId, TrackId, Level } from './types';
 
 export interface BankMeta {
   id: BankId;
@@ -100,6 +100,83 @@ export const TRACK_LABEL: Record<TrackId, string> = {
   fin: 'Finance',
   cfa: 'CFA',
 };
+
+/* ------------------------- Niveau des documents -------------------------- */
+
+/**
+ * Niveau d'étude estimé, par dossier source. Le classement s'appuie sur le
+ * niveau réel du cours d'origine (numéro de cours MIT/Stanford/UCLA, mention
+ * M1/M2 pour l'ENS), pas sur une devinette à partir du titre.
+ *
+ * L3 — bases : probabilités, recherche opérationnelle, théorie financière I.
+ * M1 — cœur du programme : convexité, dualité, statistiques, investissements.
+ * M2 — avancé et recherche : algorithmes, contrôle stochastique, articles.
+ */
+const LEVEL_BY_FOLDER: Record<string, Level> = {
+  // ---- Optimisation ----
+  '01_Reference_Boyd_Vandenberghe': 'M1',
+  '02_Stanford_EE364a_Optimisation-convexe-I': 'M1',
+  '03_Stanford_EE364b_Optimisation-convexe-II': 'M2',
+  '04_UCLA_EE236A_Programmation-lineaire': 'L3',
+  '05_UCLA_EE236B_Optimisation-convexe': 'M1',
+  '06_UCLA_EE236C_Methodes-premier-ordre': 'M2',
+  '07_MIT-OpenCourseWare/15-053_Optimisation-en-sciences-de-gestion': 'L3',
+  '07_MIT-OpenCourseWare/15-084_Programmation-non-lineaire-avancee': 'M2',
+  '07_MIT-OpenCourseWare/15-093_Methodes-doptimisation': 'M2',
+  '07_MIT-OpenCourseWare/18-433_Optimisation-combinatoire': 'M2',
+  '07_MIT-OpenCourseWare/6-079_Introduction-a-loptimisation-convexe': 'M1',
+  '07_MIT-OpenCourseWare/6-231_Programmation-dynamique-et-controle-stochastique': 'M2',
+  '07_MIT-OpenCourseWare/6-252_Programmation-non-lineaire': 'M1',
+  '07_MIT-OpenCourseWare/6-253_Analyse-convexe-et-optimisation_Bertsekas': 'M2',
+  '07_MIT-OpenCourseWare/6-854_Algorithmes-avances': 'M2',
+  '08_Cours-en-francais/Bordeaux_Dossal': 'M1',
+  '08_Cours-en-francais/Dauphine_Royer': 'M1',
+  '08_Cours-en-francais/Polytechnique_Allaire': 'M1',
+  '09_ENS-Paris_Aspremont/M1_ENS': 'M1',
+  '09_ENS-Paris_Aspremont/M2_MVA': 'M2',
+  '10_Cornell_ORIE6334_Optimisation-combinatoire-approchee': 'M2',
+  '11_Articles-de-reference': 'M2',
+  '12_Nemirovski_Georgia-Tech': 'M2',
+  // ---- Mathématiques financières ----
+  '20_MATHS-FINANCIERES/21_Probabilites/MIT-18.440_Probabilites': 'L3',
+  '20_MATHS-FINANCIERES/21_Probabilites/MIT-18.600_Probabilites-et-variables-aleatoires': 'L3',
+  '20_MATHS-FINANCIERES/21_Probabilites/MIT-6.041_Systemes-probabilistes': 'L3',
+  '20_MATHS-FINANCIERES/22_Statistiques/MIT-18.650_Statistiques-appliquees': 'M1',
+  '20_MATHS-FINANCIERES/23_Processus-stochastiques/MIT-15.070_Processus-stochastiques-avances': 'M2',
+  '20_MATHS-FINANCIERES/24_Finance/MIT-15.401_Theorie-financiere-I': 'L3',
+  '20_MATHS-FINANCIERES/24_Finance/MIT-15.433_Investissements': 'M1',
+  '20_MATHS-FINANCIERES/24_Finance/MIT-15.450_Analytique-de-la-finance': 'M2',
+  '20_MATHS-FINANCIERES/24_Finance/MIT-18.S096_Mathematiques-pour-la-finance': 'M1',
+  // ---- CFA ----
+  CFA: 'M1',
+};
+
+export function folderLevel(folder: string): Level {
+  const exact = LEVEL_BY_FOLDER[folder];
+  if (exact) return exact;
+  // Repli : une mention explicite dans le chemin l'emporte, sinon M1.
+  const up = folder.toUpperCase();
+  if (up.includes('/L3') || up.includes('_L3') || up.startsWith('L3')) return 'L3';
+  if (up.includes('M2')) return 'M2';
+  return 'M1';
+}
+
+export const LEVELS: Level[] = ['L3', 'M1', 'M2'];
+
+export const LEVEL_DESC: Record<Level, string> = {
+  L3: 'Les bases — probabilités, programmation linéaire, théorie financière.',
+  M1: 'Le cœur du programme — convexité, dualité, statistiques, investissements.',
+  M2: 'Avancé et recherche — algorithmes, contrôle stochastique, articles.',
+};
+
+/** Libellé lisible d'une source, à partir du nom de dossier. */
+export function sourceLabel(folder: string): string {
+  const last = folder.split('/').pop() ?? folder;
+  return last
+    .replace(/^\d+[_-]/, '')
+    .replace(/[_-]/g, ' ')
+    .trim();
+}
 
 /** Matières pour les notes / le temps de travail. */
 export const SUBJECTS = [

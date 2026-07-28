@@ -114,6 +114,7 @@ export const TRACK_LABEL: Record<TrackId, string> = {
  */
 const LEVEL_BY_FOLDER: Record<string, Level> = {
   // ---- Optimisation ----
+  '00_L3_Toulon_Faccanoni': 'L3',
   '00_L3_Universite-Paris-Cite_Garrigos': 'L3',
   '01_Reference_Boyd_Vandenberghe': 'M1',
   '02_Stanford_EE364a_Optimisation-convexe-I': 'M1',

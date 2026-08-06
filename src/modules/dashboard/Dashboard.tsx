@@ -4,7 +4,8 @@ import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '@/core/db';
 import { toDayStr } from '@/core/date';
 import { useApp } from '@/app/store';
-import { allQuestions, getParcours, stepIdsOfTrack, allVocabCards } from '@/core/content';
+import { allQuestions, getParcours, stepIdsOfTrack } from '@/core/content';
+import { WORD_COUNT } from '@/core/lexicon-meta';
 import { BANKS, BANK_ORDER } from '@/core/meta';
 import type { TrackId } from '@/core/types';
 import { openResource } from '@/app/actions';
@@ -89,7 +90,7 @@ export function Dashboard() {
   }
 
   const totalQ = allQuestions().length;
-  const totalV = allVocabCards().length;
+  const totalV = WORD_COUNT;
 
   return (
     <>

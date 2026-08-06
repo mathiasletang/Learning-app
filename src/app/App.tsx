@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { Suspense, lazy, useEffect } from 'react';
 import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useApp } from './store';
@@ -10,7 +10,11 @@ import { CourseView } from '@/modules/courses/CourseView';
 import { QcmHome } from '@/modules/quiz/QcmHome';
 import { QcmBank } from '@/modules/quiz/QcmBank';
 import { Flashcards } from '@/modules/flashcards/Flashcards';
-import { Vocab } from '@/modules/vocab/Vocab';
+/* Le lexique pèse un méga-octet : on ne le charge qu'en entrant dans la page.
+   Le service worker le met en cache, donc il reste disponible hors-ligne. */
+const English = lazy(() =>
+  import('@/modules/english/English').then((m) => ({ default: m.English })),
+);
 import { Library } from '@/modules/library/Library';
 import { Notes } from '@/modules/notes/Notes';
 import { Stats } from '@/modules/stats/Stats';
@@ -55,7 +59,16 @@ export function App() {
           <Route path="qcm" element={<QcmHome />} />
           <Route path="qcm/:bank" element={<QcmBank />} />
           <Route path="flashcards" element={<Flashcards />} />
-          <Route path="vocabulaire" element={<Vocab />} />
+          <Route
+            path="anglais"
+            element={
+              <Suspense fallback={<p className="meta">Chargement du lexique…</p>}>
+                <English />
+              </Suspense>
+            }
+          />
+          {/* Ancien chemin — les liens et raccourcis déjà posés restent valides. */}
+          <Route path="vocabulaire" element={<Navigate to="/anglais" replace />} />
           <Route path="bibliotheque" element={<Library />} />
           <Route path="notes" element={<Notes />} />
           <Route path="stats" element={<Stats />} />

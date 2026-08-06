@@ -27,7 +27,7 @@ export const NAV: NavGroup[] = [
     label: 'Mémoriser',
     items: [
       { to: '/flashcards', label: 'Flashcards', icon: 'cards' },
-      { to: '/vocabulaire', label: 'Vocabulaire', icon: 'vocab' },
+      { to: '/anglais', label: 'Anglais', icon: 'vocab' },
     ],
   },
   {

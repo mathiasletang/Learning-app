@@ -17,6 +17,7 @@ export function driveSearchUrl(fileName: string): string {
  * → URL servie. Le polycopié L3 est le cours de référence du parcours.
  */
 export const LOCAL_PDFS: Record<string, string> = {
+  '00_L3_Toulon_Faccanoni/cours_L3_Faccanoni.pdf': 'cours/cours_L3_Faccanoni.pdf',
   '00_L3_Universite-Paris-Cite_Garrigos/cours_optim_L3.pdf': 'cours/cours_optim_L3.pdf',
 };
 

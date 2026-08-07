@@ -46,6 +46,37 @@ export interface VocabCard {
   d: string; // définition (verso)
 }
 
+/* --------------------------- Lexique anglais ---------------------------- */
+
+/** Une entrée du lexique, telle que stockée dans lexique.json. */
+export interface RawLexEntry {
+  t: string; // terme anglais
+  e: string; // définition anglaise
+  f: string; // traduction / définition française
+  th: number; // index du thème
+}
+
+export interface LexTheme {
+  id: number;
+  label: string;
+  count: number;
+}
+
+export interface LexData {
+  themes: LexTheme[];
+  words: RawLexEntry[];
+}
+
+/** Entrée enrichie d'un identifiant stable, utilisée par l'application. */
+export interface LexEntry extends RawLexEntry {
+  id: string; // `w:${index}`
+  index: number;
+  theme: string; // libellé du thème
+}
+
+/** Sens d'interrogation d'une carte. */
+export type LexDirection = 'en-fr' | 'fr-en';
+
 /** catalogue.json : [dossier, [[nom, pages], …]][] */
 export type RawCatalogue = [string, [string, number][]][];
 

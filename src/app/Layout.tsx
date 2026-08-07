@@ -58,7 +58,7 @@ export function Layout() {
   }, [sheet]);
 
   const badgeFor = (to: string) =>
-    to === '/flashcards' ? due.cards : to === '/vocabulaire' ? due.vocab : 0;
+    to === '/flashcards' ? due.cards : to === '/anglais' ? due.vocab : 0;
 
   return (
     <div className="app">

@@ -6,7 +6,6 @@
    ========================================================================= */
 
 import qcmRaw from '@/content/qcm.json';
-import vocabRaw from '@/content/vocabulaire.json';
 import catalogueRaw from '@/content/catalogue.json';
 import parcoursRaw from '@/content/parcours.json';
 
@@ -14,9 +13,6 @@ import type {
   QcmData,
   Question,
   BankId,
-  VocabData,
-  VocabCard,
-  DeckId,
   RawCatalogue,
   LibDoc,
   ParcoursData,
@@ -80,36 +76,6 @@ export function themesOf(bank: BankId): { code: string; label: string; count: nu
     label: themeLabel(bank, code),
     count,
   }));
-}
-
-/* ------------------------------ VOCABULAIRE ----------------------------- */
-
-const vocab = vocabRaw as VocabData;
-
-export function vocabDecks(): VocabData {
-  return vocab;
-}
-
-export const DECK_ORDER: DeckId[] = ['finfr', 'verbs', 'nouns'];
-
-let _vocabCards: VocabCard[] | null = null;
-
-export function allVocabCards(): VocabCard[] {
-  if (_vocabCards) return _vocabCards;
-  const out: VocabCard[] = [];
-  for (const deck of DECK_ORDER) {
-    const d = vocab[deck];
-    if (!d) continue;
-    d.cards.forEach((c, index) => {
-      out.push({ id: `v:${deck}:${index}`, deck, index, t: c.t, d: c.d });
-    });
-  }
-  _vocabCards = out;
-  return out;
-}
-
-export function vocabCardsOfDeck(deck: DeckId): VocabCard[] {
-  return allVocabCards().filter((c) => c.deck === deck);
 }
 
 /* ------------------------------ BIBLIOTHÈQUE ---------------------------- */

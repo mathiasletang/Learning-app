@@ -16,6 +16,7 @@ const parcoursPath = resolve(root, 'src/content/parcours.json');
 const parcours = JSON.parse(readFileSync(parcoursPath, 'utf8'));
 
 /* Raccourcis de dossiers */
+const FAC = '00_L3_Toulon_Faccanoni';
 const L3 = '00_L3_Universite-Paris-Cite_Garrigos';
 const DAU = '08_Cours-en-francais/Dauphine_Royer';
 const EE236A = '04_UCLA_EE236A_Programmation-lineaire';
@@ -41,6 +42,7 @@ const p = (folder, file, label) => {
 const cours = (id, label) => [`cours:${id}`, label];
 const qcm = (bank, label) => [`qcm:${bank}`, label];
 
+const POLY_FAC = 'cours_L3_Faccanoni.pdf';
 const POLY_L3 = 'cours_optim_L3.pdf';
 const POLY_DAU = '00_POLY_Methodes-doptimisation-pour-la-science-des-donnees.pdf';
 const LIVRE = '00_LIVRE_Boyd-Vandenberghe_Convex-Optimization.pdf';
@@ -48,9 +50,52 @@ const LIVRE = '00_LIVRE_Boyd-Vandenberghe_Convex-Optimization.pdf';
 const phases = [
   /* ------------------------------- L3 --------------------------------- */
   {
+    id: 'oL30',
+    t: 'L3 · Point de départ — Faccanoni',
+    d: "Le cours central : un recueil d'exercices entièrement corrigés (Gloria Faccanoni, Université de Toulon, 217 p.). Tout part des fonctions de plusieurs variables et monte jusqu'aux extrema liés — c'est par là qu'on reprend. Il s'ouvre directement dans l'application.",
+    h: 50,
+    steps: [
+      {
+        id: 'l30a',
+        t: 'Chapitre 1 — Fonctions de plusieurs variables (p. 3-14)',
+        r: [p(FAC, POLY_FAC, 'Faccanoni — chapitre 1'), cours('notations', 'Décodeur de notations')],
+      },
+      {
+        id: 'l30b',
+        t: 'Chapitre 2 — Limites et continuité, normes (p. 15-26)',
+        r: [p(FAC, POLY_FAC, 'Faccanoni — chapitre 2')],
+      },
+      {
+        id: 'l30c',
+        t: 'Chapitre 3.1-3.2 — Dérivées partielles, gradient, différentiabilité (p. 27-40)',
+        r: [p(FAC, POLY_FAC, 'Faccanoni — chapitre 3'), qcm('pre', 'QCM Prérequis')],
+      },
+      {
+        id: 'l30d',
+        t: 'Chapitre 3.3-3.4 — Hessienne et fonctions implicites (p. 41-88)',
+        r: [p(FAC, POLY_FAC, 'Faccanoni — chapitre 3 (suite)'), cours('s0', 'Série 0 — Remise en route')],
+      },
+      {
+        id: 'l30e',
+        t: 'Chapitre 4.1 — Extrema libres (p. 89-96)',
+        r: [p(FAC, POLY_FAC, 'Faccanoni — extrema libres')],
+      },
+      {
+        id: 'l30f',
+        t: 'Chapitre 4.2 — Extrema liés, multiplicateurs de Lagrange (p. 97-176)',
+        r: [p(FAC, POLY_FAC, 'Faccanoni — extrema liés'), qcm('opt', 'QCM Optimisation')],
+      },
+      {
+        id: 'l30g',
+        t: 'Annexe A — Polynômes de Taylor et développements limités (p. 177+)',
+        r: [p(FAC, POLY_FAC, 'Faccanoni — annexe A')],
+      },
+    ],
+  },
+  {
     id: 'oL3a',
     t: 'L3 · Le cours de référence',
-    d: "Le polycopié de Guillaume Garrigos (Université Paris Cité, 144 p.) couvre tout le socle en français. Il s'ouvre directement dans l'application : c'est le fil conducteur du niveau L3.",
+    d: "Une fois Faccanoni digéré, le polycopié de Guillaume Garrigos (Université Paris Cité, 144 p.) reprend les mêmes notions avec plus de théorie et introduit la dualité. Il s'ouvre lui aussi directement dans l'application.",
     h: 45,
     steps: [
       {

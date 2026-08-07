@@ -4,13 +4,18 @@ import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '@/core/db';
 import { toDayStr } from '@/core/date';
 import { useApp } from '@/app/store';
-import { allQuestions, getParcours, stepIdsOfTrack, allVocabCards } from '@/core/content';
+import { allQuestions, getParcours, stepIdsOfTrack } from '@/core/content';
+import { WORD_COUNT } from '@/core/lexicon-meta';
 import { BANKS, BANK_ORDER } from '@/core/meta';
 import type { TrackId } from '@/core/types';
+import { openResource } from '@/app/actions';
 import { Icon, Tag, Gauge, Reveal } from '@/ui';
 import './dashboard.css';
 
 const TRACKS: TrackId[] = ['opt', 'fin', 'cfa'];
+
+/** Le cours de référence du niveau L3 — point de départ du travail. */
+const CENTRAL_PDF = '00_L3_Toulon_Faccanoni/cours_L3_Faccanoni.pdf';
 
 function greeting(): string {
   const h = new Date().getHours();
@@ -85,7 +90,7 @@ export function Dashboard() {
   }
 
   const totalQ = allQuestions().length;
-  const totalV = allVocabCards().length;
+  const totalV = WORD_COUNT;
 
   return (
     <>
@@ -195,20 +200,17 @@ export function Dashboard() {
                 </span>
               </Link>
 
-              <Link to={due > 0 ? '/flashcards' : '/vocabulaire'} className="tile">
-                <Tag>Mémoire</Tag>
-                <h3 style={{ marginTop: 'var(--s-4)' }}>
-                  {due > 0 ? `${due} à revoir` : 'Rien à revoir'}
-                </h3>
+              {/* Le cours central : accessible en un geste depuis l'accueil. */}
+              <button type="button" className="tile" onClick={() => openResource(CENTRAL_PDF)}>
+                <Tag colorVar="--m-opt">Cours central · L3</Tag>
+                <h3 style={{ marginTop: 'var(--s-4)' }}>Faccanoni — Optimisation</h3>
                 <p className="meta" style={{ marginTop: 'var(--s-2)' }}>
-                  {due > 0
-                    ? 'La répétition espacée fixe ce qui vient d’être appris.'
-                    : 'Revenez demain, la file se remplira.'}
+                  Recueil d'exercices corrigés, 217 pages. Le document par lequel tout commence.
                 </p>
                 <span className="arrow-link" style={{ marginTop: 'var(--s-6)' }}>
-                  {due > 0 ? 'Réviser' : 'Explorer le vocabulaire'} <Icon name="arrowRight" size={16} />
+                  Ouvrir le cours <Icon name="external" size={16} />
                 </span>
-              </Link>
+              </button>
             </div>
           </div>
         </Reveal>

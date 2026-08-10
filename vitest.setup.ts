@@ -1,6 +1,5 @@
 import '@testing-library/jest-dom/vitest';
 import 'fake-indexeddb/auto';
-import { vi } from 'vitest';
 
 // jsdom n'implémente pas IntersectionObserver — requis par les apparitions
 // au défilement (Framer Motion `whileInView`).
@@ -21,15 +20,17 @@ if (!('IntersectionObserver' in window)) {
 }
 
 // jsdom n'implémente pas matchMedia — polyfill minimal (thème auto, confettis…).
+// Fonction ordinaire, pas vi.fn() : une remise à zéro des mocks entre tests
+// effacerait l'implémentation et casserait les rendus suivants.
 if (!window.matchMedia) {
-  window.matchMedia = vi.fn().mockImplementation((query: string) => ({
+  window.matchMedia = ((query: string) => ({
     matches: false,
     media: query,
     onchange: null,
-    addEventListener: vi.fn(),
-    removeEventListener: vi.fn(),
-    addListener: vi.fn(),
-    removeListener: vi.fn(),
-    dispatchEvent: vi.fn(),
-  }));
+    addEventListener: () => {},
+    removeEventListener: () => {},
+    addListener: () => {},
+    removeListener: () => {},
+    dispatchEvent: () => false,
+  })) as typeof window.matchMedia;
 }

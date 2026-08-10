@@ -25,7 +25,7 @@ export function CourseView() {
     return (
       <>
         <PageHead title="Cours introuvable" />
-        <Link className="btn btn--secondary" to="/cours">
+        <Link className="btn btn--secondary" to="/maths?s=documents">
           Retour aux cours
         </Link>
       </>
@@ -38,14 +38,14 @@ export function CourseView() {
         <motion.div className="readbar__fill" style={{ scaleX: progress }} />
       </div>
 
-      <Link className="reader__back" to="/cours">
+      <Link className="reader__back" to="/maths?s=documents">
         <Icon name="arrowLeft" size={16} /> Cours
       </Link>
 
       <article className="prose" dangerouslySetInnerHTML={{ __html: html }} />
 
       <footer className="reader__foot">
-        <Link className="arrow-link" to="/cours">
+        <Link className="arrow-link" to="/maths?s=documents">
           <Icon name="arrowLeft" size={16} /> Tous les cours
         </Link>
         {next && (

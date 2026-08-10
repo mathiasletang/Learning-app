@@ -9,6 +9,7 @@ import {
   searchWords,
   shortTheme,
   shuffled,
+  wordById,
   wordCount,
   wordsOfTheme,
 } from '@/core/lexicon';
@@ -18,13 +19,14 @@ import { SrsReviewer, type ReviewItem, type GradeButton } from '@/modules/review
 import { Drill, type DrillMode } from './Drill';
 import './english.css';
 
-type View = 'browse' | 'cards' | 'learn' | 'write';
+type View = 'browse' | 'cards' | 'learn' | 'write' | 'errors';
 
 const VIEWS: { value: View; label: string }[] = [
   { value: 'browse', label: 'Parcourir' },
   { value: 'cards', label: 'Cartes' },
   { value: 'learn', label: 'Apprendre' },
   { value: 'write', label: 'Écrire' },
+  { value: 'errors', label: 'Erreurs' },
 ];
 
 const GRADES: GradeButton[] = [
@@ -88,6 +90,15 @@ export function English() {
 
   const results = useMemo(() => searchWords(query, { theme, limit: LIST_CAP }), [query, theme]);
 
+  /* Les mots déjà ratés au moins une fois — enfin visibles, donc ciblables. */
+  const errorWords = useMemo(() => {
+    return srsRows
+      .filter((r) => r.id.startsWith('w:') && r.lapses > 0)
+      .sort((a, b) => b.lapses - a.lapses || (a.due < b.due ? -1 : 1))
+      .map((r) => ({ srs: r, word: wordById(r.id) }))
+      .filter((e): e is { srs: (typeof srsRows)[number]; word: LexEntry } => e.word !== undefined);
+  }, [srsRows]);
+
   const start = () => {
     setScore(null);
     setSession(queue.slice(0, size));
@@ -100,7 +111,7 @@ export function English() {
 
   /* ------------------------- Séance en cours -------------------------- */
 
-  if (session?.length && view === 'cards') {
+  if (session?.length && (view === 'cards' || view === 'errors')) {
     const items: ReviewItem[] = session.map((w) => {
       const { front, back, sub } = faces(w, dir);
       return {
@@ -148,13 +159,14 @@ export function English() {
   return (
     <>
       <PageHead
-        eyebrow="Anglais · lexique"
-        title="Le mot juste, sans détour."
+        eyebrow="Lexique"
+        title="Anglais"
         display
         lead={
           <>
             {wordCount().toLocaleString('fr-FR')} mots, chacun avec sa définition anglaise et sa
-            traduction française. Cherchez-en un, ou lancez une séance de quelques minutes.
+            traduction française. Le mot juste, sans détour : cherchez-en un, ou lancez une séance
+            de quelques minutes.
           </>
         }
         actions={
@@ -204,6 +216,7 @@ export function English() {
         </button>
       </div>
 
+      {view !== 'errors' && (
       <div className="lex-themes" role="group" aria-label="Thèmes">
         <button
           type="button"
@@ -226,8 +239,53 @@ export function English() {
           </button>
         ))}
       </div>
+      )}
 
-      {view === 'browse' ? (
+      {view === 'errors' ? (
+        <>
+          {errorWords.length === 0 ? (
+            <div className="empty">
+              <h3>Aucune erreur enregistrée</h3>
+              <p className="meta">
+                Les mots que vous raterez en séance apparaîtront ici, pour les cibler volontairement.
+              </p>
+            </div>
+          ) : (
+            <>
+              <div className="row row--wrap" style={{ gap: 'var(--s-4)', marginBottom: 'var(--s-8)' }}>
+                <Button
+                  variant="primary"
+                  icon="play"
+                  onClick={() => {
+                    setScore(null);
+                    setSession(shuffled(errorWords.map((e) => e.word)).slice(0, 50));
+                  }}
+                >
+                  Revoir mes {Math.min(50, errorWords.length)} erreurs
+                </Button>
+                <span className="meta">
+                  {errorWords.length} mot{errorWords.length > 1 ? 's' : ''} raté
+                  {errorWords.length > 1 ? 's' : ''} au moins une fois, les plus fragiles d'abord.
+                </span>
+              </div>
+              <div className="lexlist">
+                {errorWords.slice(0, LIST_CAP).map(({ srs, word: w }) => (
+                  <div className="lexrow" key={w.id}>
+                    <div>
+                      <span className="lexrow__term">{w.t}</span>
+                      {w.f && <span className="lexrow__fr">{w.f}</span>}
+                    </div>
+                    <p className="lexrow__def">{w.e}</p>
+                    <span className="micro lexrow__theme tnum">
+                      {srs.lapses} échec{srs.lapses > 1 ? 's' : ''}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
+        </>
+      ) : view === 'browse' ? (
         <>
           <p className="micro" style={{ marginBottom: 'var(--s-4)' }}>
             {query.trim()

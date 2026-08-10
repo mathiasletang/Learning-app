@@ -5,11 +5,12 @@ import { db } from '@/core/db';
 import { getParcours } from '@/core/content';
 import { parseResource, type ResourceKind } from '@/core/open';
 import { BANKS } from '@/core/meta';
+import type { SubjectDef } from '@/core/subjects';
 import { setStepDone, openResource } from '@/app/actions';
 import type { TrackId } from '@/core/types';
-import { PageHead, Gauge, Icon, Tabs, Tag, Reveal } from '@/ui';
+import { Gauge, Icon, Tabs, Tag, Reveal } from '@/ui';
 import type { IconName } from '@/ui/Icon';
-import './tracks.css';
+import '@/modules/tracks/tracks.css';
 
 const RES_ICON: Record<ResourceKind, IconName> = {
   course: 'book',
@@ -40,17 +41,16 @@ function Resource({ res, label }: { res: string; label: string }) {
   );
 }
 
-const TRACKS: TrackId[] = ['opt', 'fin', 'cfa'];
-
 /** Les phases préfixées « L3 · », « M1 · », « M2 · » affichent leur niveau. */
 function splitLevel(title: string): { level: string | null; rest: string } {
   const m = /^(L3|M1|M2)\s*·\s*(.+)$/.exec(title);
   return m ? { level: m[1], rest: m[2] } : { level: null, rest: title };
 }
 
-export function Tracks() {
+/** La route de la matière : phases, étapes à cocher, ressources en un geste. */
+export function SubjectTrack({ def }: { def: SubjectDef }) {
   const parcours = getParcours();
-  const [track, setTrack] = useState<TrackId>('opt');
+  const [track, setTrack] = useState<TrackId>(def.tracks[0]);
   const doneSet = useLiveQuery(
     () => db.steps.filter((s) => s.done).toArray().then((r) => new Set(r.map((s) => s.stepId))),
     [],
@@ -58,29 +58,22 @@ export function Tracks() {
   );
 
   const current = parcours[track];
-  const allIds = useMemo(
-    () => current.phases.flatMap((p) => p.steps.map((s) => s.id)),
-    [current],
-  );
+  const allIds = useMemo(() => current.phases.flatMap((p) => p.steps.map((s) => s.id)), [current]);
   const done = allIds.filter((id) => doneSet.has(id)).length;
   const ratio = allIds.length ? done / allIds.length : 0;
 
   return (
     <>
-      <PageHead
-        eyebrow="Parcours"
-        title="Une route, phase par phase."
-        display
-        lead="Chaque étape est un geste concret : lire un chapitre, faire une série, passer un QCM. Cochez, et la route avance."
-        actions={
+      {def.tracks.length > 1 && (
+        <div style={{ marginBottom: 'var(--s-8)' }}>
           <Tabs
-            options={TRACKS.map((t) => ({ value: t, label: parcours[t].court }))}
+            options={def.tracks.map((t) => ({ value: t, label: parcours[t].court }))}
             value={track}
             onChange={(v) => setTrack(v as TrackId)}
             ariaLabel="Choisir un parcours"
           />
-        }
-      />
+        </div>
+      )}
 
       <div className="track-hero">
         <div>

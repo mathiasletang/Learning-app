@@ -156,8 +156,13 @@ export function English() {
 
   const dirLabel = dir === 'en-fr' ? 'Anglais → Français' : 'Français → Anglais';
 
+  const scope = {
+    '--accent': 'var(--d-en)',
+    '--accent-wash': 'color-mix(in srgb, var(--d-en) 10%, var(--surface))',
+  } as React.CSSProperties;
+
   return (
-    <>
+    <div style={scope}>
       <PageHead
         eyebrow="Lexique"
         title="Anglais"
@@ -385,6 +390,6 @@ export function English() {
           </div>
         </div>
       )}
-    </>
+    </div>
   );
 }

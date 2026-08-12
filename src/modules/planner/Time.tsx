@@ -6,7 +6,7 @@ import { getParcours } from '@/core/content';
 import { SUBJECTS, subjectLabel } from '@/core/meta';
 import { logTime } from '@/app/actions';
 import type { TrackId } from '@/core/types';
-import { PageHead, Button, Gauge, Icon, Reveal } from '@/ui';
+import { Button, Gauge, Icon, Reveal } from '@/ui';
 import './planner.css';
 
 function clock(sec: number): string {
@@ -18,7 +18,7 @@ function clock(sec: number): string {
     : `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
 }
 
-export function Time() {
+export function TimeSection() {
   const [subject, setSubject] = useState('opt');
   const [running, setRunning] = useState(false);
   const [elapsed, setElapsed] = useState(0);
@@ -76,13 +76,6 @@ export function Time() {
 
   return (
     <>
-      <PageHead
-        eyebrow="Temps de travail"
-        title="Les heures posées."
-        display
-        lead="Un chronomètre pour les séances, une saisie manuelle pour le reste. Ce qui se mesure finit par se faire."
-      />
-
       <div className="timer">
         <div className="timer__face">
           <span className="eyebrow">{running ? 'En cours' : 'Chronomètre'}</span>

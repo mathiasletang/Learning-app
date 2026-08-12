@@ -1,7 +1,8 @@
 import { useMemo, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams, useSearchParams } from 'react-router-dom';
 import type { BankId, QcmMode, Question } from '@/core/types';
 import { BANKS } from '@/core/meta';
+import { bankSubject, SUBJECT_DEFS } from '@/core/subjects';
 import { questionsByBank, themesOf } from '@/core/content';
 import { failedQuestionIds, finalizeQcm, type AnswerEntry } from '@/app/actions';
 import { useApp } from '@/app/store';
@@ -13,12 +14,19 @@ import './quiz.css';
 type Size = '10' | '20' | '40' | 'all';
 type Phase = 'setup' | 'running' | 'results';
 
+/* Le mode « Révision » n'est pas proposé ici : les erreurs se travaillent
+   dans la section Révision de chaque matière, qui mène ici toute réglée. */
 const MODES: { value: QcmMode; name: string; desc: string }[] = [
   { value: 'train', name: 'Entraînement', desc: 'Correction et explication après chaque question.' },
   { value: 'exam', name: 'Examen', desc: 'Aucune correction avant la fin. Conditions réelles.' },
   { value: 'timed', name: 'Chronométré', desc: 'Trente secondes par question, passage automatique.' },
-  { value: 'review', name: 'Révision', desc: 'Uniquement les questions déjà manquées.' },
 ];
+
+const REVIEW_MODE = {
+  value: 'review' as QcmMode,
+  name: 'Révision',
+  desc: 'Uniquement les questions déjà manquées.',
+};
 
 function shuffle<T>(arr: T[]): T[] {
   const a = [...arr];
@@ -29,33 +37,46 @@ function shuffle<T>(arr: T[]): T[] {
   return a;
 }
 
+function isMode(v: string | null): v is QcmMode {
+  return v === 'train' || v === 'exam' || v === 'timed' || v === 'review';
+}
+
 export function QcmBank() {
   const { bank } = useParams<{ bank: string }>();
+  const [params] = useSearchParams();
   const pushToast = useApp((s) => s.pushToast);
-
-  const [theme, setTheme] = useState<string | null>(null);
-  const [size, setSize] = useState<Size>('20');
-  const [mode, setMode] = useState<QcmMode>('train');
-  const [phase, setPhase] = useState<Phase>('setup');
-  const [questions, setQuestions] = useState<Question[]>([]);
-  const [answers, setAnswers] = useState<AnswerEntry[]>([]);
-  const [xpEarned, setXpEarned] = useState(0);
 
   const valid = bank && bank in BANKS;
   const bankId = bank as BankId;
   const meta = valid ? BANKS[bankId] : null;
   const themes = useMemo(() => (valid ? themesOf(bankId) : []), [bankId, valid]);
 
+  /* La séance arrive préréglée quand on vient de « Reprendre » ou de Révision. */
+  const urlMode = params.get('mode');
+  const urlTheme = params.get('theme');
+  const [mode, setMode] = useState<QcmMode>(isMode(urlMode) ? urlMode : 'train');
+  const [theme, setTheme] = useState<string | null>(
+    urlTheme && themes.some((t) => t.code === urlTheme) ? urlTheme : null,
+  );
+  const [size, setSize] = useState<Size>('20');
+  const [phase, setPhase] = useState<Phase>('setup');
+  const [questions, setQuestions] = useState<Question[]>([]);
+  const [answers, setAnswers] = useState<AnswerEntry[]>([]);
+  const [xpEarned, setXpEarned] = useState(0);
+
   if (!valid || !meta) {
     return (
       <>
         <PageHead title="Banque introuvable" />
-        <Link className="btn btn--secondary" to="/qcm">
-          Retour aux questions
+        <Link className="btn btn--secondary" to="/">
+          Retour à l'accueil
         </Link>
       </>
     );
   }
+
+  const subject = SUBJECT_DEFS[bankSubject(bankId)];
+  const modes = mode === 'review' ? [...MODES, REVIEW_MODE] : MODES;
 
   async function start() {
     let pool = questionsByBank(bankId);
@@ -114,8 +135,8 @@ export function QcmBank() {
           </>
         }
         actions={
-          <Link className="arrow-link" to="/qcm">
-            <Icon name="arrowLeft" size={16} /> Toutes les banques
+          <Link className="arrow-link" to={`${subject.path}?s=exercer`}>
+            <Icon name="arrowLeft" size={16} /> {subject.label} · S'exercer
           </Link>
         }
       />
@@ -124,7 +145,7 @@ export function QcmBank() {
         <div className="setup__block">
           <p className="eyebrow setup__legend">Mode</p>
           <div className="mode-list">
-            {MODES.map((m) => (
+            {modes.map((m) => (
               <button
                 key={m.value}
                 type="button"
@@ -181,7 +202,8 @@ export function QcmBank() {
           </div>
         </div>
 
-        <div className="setup__block row" style={{ gap: 'var(--s-4)' }}>
+        {/* Le bouton reste visible pendant qu'on règle — surtout sur mobile. */}
+        <div className="setup__block qcm-start row" style={{ gap: 'var(--s-4)' }}>
           <Button variant="primary" icon="play" onClick={start}>
             Commencer
           </Button>

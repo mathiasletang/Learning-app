@@ -3,12 +3,18 @@ import { getParcours } from '@/core/content';
 import { useApp } from '@/app/store';
 import type { TrackId } from '@/core/types';
 import { PageHead, Button, Reveal } from '@/ui';
-import { DataZone } from './DataZone';
-import './planner.css';
+import { StatsSections } from '@/modules/stats/Stats';
+import { TimeSection } from '@/modules/planner/Time';
+import { DataZone } from '@/modules/planner/DataZone';
 
 const TRACKS: TrackId[] = ['opt', 'fin', 'cfa'];
 
-export function Planner() {
+/**
+ * Tout le suivi au même endroit : objectif, activité, précision, temps,
+ * feuille de route et données. Chaque mesure a un domicile unique — plus
+ * de temps compté deux fois, plus d'export caché dans un onglet Planning.
+ */
+export function Suivi() {
   const parcours = getParcours();
   const dailyGoal = useApp((s) => s.prefs.dailyGoal);
   const setDailyGoal = useApp((s) => s.setDailyGoal);
@@ -42,10 +48,10 @@ export function Planner() {
   return (
     <>
       <PageHead
-        eyebrow="Planning"
-        title="Six mois, trois fronts."
+        eyebrow="Mesures et réglages"
+        title="Suivi"
         display
-        lead="Une répartition indicative des phases, au prorata des heures estimées. Elle n'engage à rien : elle donne un cap."
+        lead="Ce que le travail a laissé : régularité, précision, heures. Et, en bas de page, vos données — export, import, réinitialisation."
       />
 
       <section>
@@ -70,10 +76,21 @@ export function Planner() {
         </div>
       </section>
 
+      <div className="section">
+        <StatsSections />
+      </div>
+
+      <section className="section">
+        <div className="section__head">
+          <h2>Temps de travail</h2>
+        </div>
+        <TimeSection />
+      </section>
+
       <section className="section">
         <div className="section__head">
           <h2>Feuille de route</h2>
-          <span className="micro">Indicatif</span>
+          <span className="micro">Six mois, indicatif</span>
         </div>
 
         <div className="plan__head">

@@ -4,9 +4,9 @@ import { db } from '@/core/db';
 import { useApp, useLevel } from '@/app/store';
 import { toDayStr, addDays } from '@/core/date';
 import { BADGES } from '@/core/gamification';
-import { BANKS, BANK_ORDER, SUBJECTS, subjectLabel, subjectColorVar } from '@/core/meta';
+import { BANKS, BANK_ORDER } from '@/core/meta';
 import type { BankId } from '@/core/types';
-import { PageHead, Gauge, Reveal } from '@/ui';
+import { Gauge, Reveal } from '@/ui';
 import './stats.css';
 
 function heatLevel(xp: number): 0 | 1 | 2 | 3 | 4 {
@@ -39,7 +39,7 @@ function Spark({ points }: { points: { day: string; xp: number }[] }) {
   );
 }
 
-export function Stats() {
+export function StatsSections() {
   const gam = useApp((s) => s.gam);
   const level = useLevel();
   const earned = useApp((s) => s.earnedBadges);
@@ -83,7 +83,6 @@ export function Stats() {
     for (const t of timeLogs) acc.set(t.subject, (acc.get(t.subject) ?? 0) + t.minutes);
     return acc;
   }, [timeLogs]);
-  const maxMin = Math.max(1, ...bySubject.values());
 
   const activeDays = Object.values(gam.days).filter((x) => x > 0).length;
   const totalHours = [...bySubject.values()].reduce((a, b) => a + b, 0) / 60;
@@ -91,13 +90,6 @@ export function Stats() {
 
   return (
     <>
-      <PageHead
-        eyebrow="Statistiques"
-        title="Ce que le travail a laissé."
-        display
-        lead="Le détail compte moins que la régularité. Ces courbes n'ont qu'un but : montrer si la pratique tient dans la durée."
-      />
-
       <div className="figures">
         <div>
           <span className="figure__value tnum">{level.level}</span>
@@ -171,26 +163,6 @@ export function Stats() {
                 <span className="bar__label">{BANKS[b].title}</span>
                 <Gauge value={r} colorVar={BANKS[b].colorVar} thick />
                 <span className="bar__value">{Math.round(r * 100)}%</span>
-              </div>
-            );
-          })
-        )}
-      </section>
-
-      <section className="section">
-        <div className="section__head">
-          <h2>Temps par matière</h2>
-        </div>
-        {bySubject.size === 0 ? (
-          <p className="meta">Aucune séance chronométrée pour l'instant.</p>
-        ) : (
-          SUBJECTS.filter((s) => bySubject.has(s.id)).map((s) => {
-            const min = bySubject.get(s.id) ?? 0;
-            return (
-              <div className="bar" key={s.id}>
-                <span className="bar__label">{subjectLabel(s.id)}</span>
-                <Gauge value={min / maxMin} colorVar={subjectColorVar(s.id)} thick />
-                <span className="bar__value">{(min / 60).toFixed(1)} h</span>
               </div>
             );
           })

@@ -1,9 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { NavLink, Outlet, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '@/core/db';
 import { toDayStr } from '@/core/date';
+import { cardInSubject } from '@/core/subjects';
 import { NAV } from './nav';
 import { useApp, useLevel } from './store';
 import { Icon, Button, Gauge } from '@/ui';
@@ -11,11 +12,28 @@ import { ThemeToggle } from './ThemeToggle';
 import { ToastHost } from './ToastHost';
 import { ConfettiHost } from './ConfettiHost';
 
-function useDueCount() {
+/** Éléments dus, ventilés par destination de navigation. */
+function useDueBadges() {
   const today = toDayStr();
-  const cards = useLiveQuery(() => db.flashcards.where('due').belowOrEqual(today).count(), [today], 0);
-  const vocab = useLiveQuery(() => db.vocabSrs.where('due').belowOrEqual(today).count(), [today], 0);
-  return { cards: cards ?? 0, vocab: vocab ?? 0 };
+  const dueCards = useLiveQuery(
+    () => db.flashcards.where('due').belowOrEqual(today).toArray(),
+    [today],
+    [],
+  );
+  const vocab = useLiveQuery(
+    () => db.vocabSrs.where('due').belowOrEqual(today).count(),
+    [today],
+    0,
+  );
+  return useMemo(() => {
+    const maths = dueCards.filter((c) => cardInSubject(c, 'maths')).length;
+    const cfa = dueCards.filter((c) => cardInSubject(c, 'cfa')).length;
+    return {
+      '/anglais': vocab ?? 0,
+      '/maths': maths,
+      '/cfa': cfa,
+    } as Record<string, number>;
+  }, [dueCards, vocab]);
 }
 
 function Wordmark() {
@@ -47,7 +65,7 @@ function LevelFoot() {
 export function Layout() {
   const [sheet, setSheet] = useState(false);
   const loc = useLocation();
-  const due = useDueCount();
+  const badges = useDueBadges();
 
   useEffect(() => setSheet(false), [loc.pathname]);
   useEffect(() => {
@@ -56,9 +74,6 @@ export function Layout() {
       document.body.style.overflow = '';
     };
   }, [sheet]);
-
-  const badgeFor = (to: string) =>
-    to === '/flashcards' ? due.cards : to === '/anglais' ? due.vocab : 0;
 
   return (
     <div className="app">
@@ -69,26 +84,23 @@ export function Layout() {
       <aside className="rail" aria-label="Navigation principale">
         <Wordmark />
         <nav className="rail__nav">
-          {NAV.map((group) => (
-            <div className="navgroup" key={group.label}>
-              <p className="eyebrow navgroup__label">{group.label}</p>
-              {group.items.map((item) => {
-                const n = badgeFor(item.to);
-                return (
-                  <NavLink
-                    key={item.to}
-                    to={item.to}
-                    end={item.end}
-                    className={({ isActive }) => `navlink ${isActive ? 'is-active' : ''}`}
-                  >
-                    <Icon name={item.icon} size={16} />
-                    {item.label}
-                    {n > 0 && <span className="navlink__count tnum">{n}</span>}
-                  </NavLink>
-                );
-              })}
-            </div>
-          ))}
+          <div className="navgroup">
+            {NAV.map((item) => {
+              const n = badges[item.to] ?? 0;
+              return (
+                <NavLink
+                  key={item.to}
+                  to={item.to}
+                  end={item.end}
+                  className={({ isActive }) => `navlink ${isActive ? 'is-active' : ''}`}
+                >
+                  <Icon name={item.icon} size={16} />
+                  {item.label}
+                  {n > 0 && <span className="navlink__count tnum">{n}</span>}
+                </NavLink>
+              );
+            })}
+          </div>
         </nav>
         <LevelFoot />
       </aside>
@@ -135,31 +147,28 @@ export function Layout() {
               className="sheet__close"
               onClick={() => setSheet(false)}
             />
-            {NAV.map((group, gi) => (
-              <div className="sheet__group" key={group.label}>
-                <p className="eyebrow sheet__label">{group.label}</p>
-                {group.items.map((item, ii) => (
-                  <motion.div
-                    key={item.to}
-                    initial={{ opacity: 0, y: 14 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{
-                      duration: 0.5,
-                      delay: 0.05 + gi * 0.05 + ii * 0.035,
-                      ease: [0.22, 1, 0.36, 1],
-                    }}
+            <div className="sheet__group">
+              {NAV.map((item, i) => (
+                <motion.div
+                  key={item.to}
+                  initial={{ opacity: 0, y: 14 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{
+                    duration: 0.5,
+                    delay: 0.05 + i * 0.045,
+                    ease: [0.22, 1, 0.36, 1],
+                  }}
+                >
+                  <NavLink
+                    to={item.to}
+                    end={item.end}
+                    className={({ isActive }) => `sheet__link ${isActive ? 'is-active' : ''}`}
                   >
-                    <NavLink
-                      to={item.to}
-                      end={item.end}
-                      className={({ isActive }) => `sheet__link ${isActive ? 'is-active' : ''}`}
-                    >
-                      {item.label}
-                    </NavLink>
-                  </motion.div>
-                ))}
-              </div>
-            ))}
+                    {item.label}
+                  </NavLink>
+                </motion.div>
+              ))}
+            </div>
           </motion.div>
         )}
       </AnimatePresence>

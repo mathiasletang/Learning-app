@@ -25,11 +25,13 @@ import {
   Plus,
   RotateCcw,
   Search,
+  Sigma,
   SlidersHorizontal,
   Sparkles,
   SquareStack,
   Sun,
   Target,
+  TrendingUp,
   Trash2,
   Type,
   Upload,
@@ -72,6 +74,8 @@ const MAP = {
   refresh: RotateCcw,
   settings: SlidersHorizontal,
   book: BookOpen,
+  sigma: Sigma,
+  chart: TrendingUp,
 } satisfies Record<string, LucideIcon>;
 
 export type IconName = keyof typeof MAP;

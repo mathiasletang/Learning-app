@@ -120,7 +120,7 @@ export function SubjectDocs({ def }: { def: SubjectDef }) {
         {inSubject.length} documents · ouvrir un titre le cherche dans votre Drive.
       </p>
 
-      {/* Les fiches de révision — la version travaillée du cours central. */}
+      {/* Les fiches de révision — la version travaillée des cours sources. */}
       {fiches.length > 0 && (
         <section style={{ marginBottom: 'var(--s-12)' }}>
           <div className="section__head">
@@ -129,21 +129,31 @@ export function SubjectDocs({ def }: { def: SubjectDef }) {
               {fiches.length} fiches · ≈ {Math.round(fiches.reduce((n, f) => n + f.minutes, 0) / 60)} h
             </span>
           </div>
-          <nav className="toc">
-            {fiches.map((f, i) => (
-              <Link key={f.id} to={`/fiche/${f.id}`} className="toc__item">
-                <span className="toc__num">{String(i + 1).padStart(2, '0')}</span>
-                <span>
-                  <span className="toc__title">{f.title}</span>
-                  <span className="meta toc__desc">
-                    {f.chapter} · {DIFFICULTY_LABEL[f.difficulty]} · ≈ {f.minutes} min —{' '}
-                    {f.concepts.join(', ')}
-                  </span>
-                </span>
-                <Icon name="arrowRight" size={18} className="toc__arrow" />
-              </Link>
-            ))}
-          </nav>
+          {[...new Set(fiches.map((f) => f.course))].map((course) => {
+            const group = fiches.filter((f) => f.course === course);
+            return (
+              <div key={course} style={{ marginBottom: 'var(--s-8)' }}>
+                <p className="eyebrow" style={{ marginBottom: 'var(--s-4)' }}>
+                  {course}
+                </p>
+                <nav className="toc">
+                  {group.map((f, i) => (
+                    <Link key={f.id} to={`/fiche/${f.id}`} className="toc__item">
+                      <span className="toc__num">{String(i + 1).padStart(2, '0')}</span>
+                      <span>
+                        <span className="toc__title">{f.title}</span>
+                        <span className="meta toc__desc">
+                          {f.chapter} · {DIFFICULTY_LABEL[f.difficulty]} · ≈ {f.minutes} min —{' '}
+                          {f.concepts.join(', ')}
+                        </span>
+                      </span>
+                      <Icon name="arrowRight" size={18} className="toc__arrow" />
+                    </Link>
+                  ))}
+                </nav>
+              </div>
+            );
+          })}
         </section>
       )}
 

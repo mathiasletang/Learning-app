@@ -32,6 +32,7 @@ export const DIFFICULTY_LABEL: Record<FicheDifficulty, string> = {
 };
 
 const COURSE_FACCANONI = 'Faccanoni · Optimisation L3';
+const COURSE_GARRIGOS = 'Garrigos · Optimisation L3';
 
 export const FICHES: FicheMeta[] = [
   {
@@ -121,6 +122,61 @@ export const FICHES: FicheMeta[] = [
     difficulty: 'intermediaire',
     minutes: 60,
     concepts: ['Linéarisation', 'Polynôme de Taylor', "Borne d'erreur", 'DL usuels'],
+  },
+  {
+    id: 'boite-a-outils',
+    file: '09-boite-a-outils.md',
+    title: 'Boîte à outils : matrices, Taylor, quadratiques',
+    chapter: 'Chapitre I',
+    subject: 'maths',
+    course: COURSE_GARRIGOS,
+    difficulty: 'intermediaire',
+    minutes: 60,
+    concepts: ['Rayleigh', 'Définie positive', 'Taylor-Lagrange', 'Fonctions quadratiques'],
+  },
+  {
+    id: 'existence',
+    file: '10-existence.md',
+    title: 'Existence de minimiseurs et coercivité',
+    chapter: 'Chapitre II',
+    subject: 'maths',
+    course: COURSE_GARRIGOS,
+    difficulty: 'avance',
+    minutes: 75,
+    concepts: ['Infimum vs minimum', 'Coercivité', "Théorème d'existence", "Conditions d'optimalité"],
+  },
+  {
+    id: 'convexite',
+    file: '11-convexite.md',
+    title: 'Optimisation convexe et forte convexité',
+    chapter: 'Chapitre III',
+    subject: 'maths',
+    course: COURSE_GARRIGOS,
+    difficulty: 'avance',
+    minutes: 90,
+    concepts: ['Caractérisations de la convexité', 'Min local = global', 'Forte convexité', 'Existence + unicité'],
+  },
+  {
+    id: 'descente-gradient',
+    file: '12-descente-gradient.md',
+    title: 'Algorithmes : descente de gradient et Newton',
+    chapter: 'Chapitre IV',
+    subject: 'maths',
+    course: COURSE_GARRIGOS,
+    difficulty: 'avance',
+    minutes: 90,
+    concepts: ['Directions de descente', 'Méthode du gradient', 'Newton', 'Conditionnement'],
+  },
+  {
+    id: 'kkt',
+    file: '13-kkt.md',
+    title: 'Optimisation sous contraintes : Lagrange-KKT',
+    chapter: 'Chapitre V',
+    subject: 'maths',
+    course: COURSE_GARRIGOS,
+    difficulty: 'avance',
+    minutes: 120,
+    concepts: ['Contraintes actives', 'Qualification', 'Stationnarité', 'Complémentarité', 'Système KKT'],
   },
 ];
 

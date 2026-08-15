@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '@/core/db';
 import { allDocs, docsByFolder, getCourses } from '@/core/content';
+import { fichesOfSubject, DIFFICULTY_LABEL } from '@/core/fiches';
 import { DRIVE_FOLDER_URL } from '@/core/config';
 import { setDocRead, openResource } from '@/app/actions';
 import { LEVELS, LEVEL_DESC } from '@/core/meta';
@@ -95,6 +96,7 @@ export function SubjectDocs({ def }: { def: SubjectDef }) {
 
   const toggle = (d: LibDoc) => setDocRead(d.path, !readSet.has(d.path));
   const courses = def.id === 'maths' ? getCourses() : [];
+  const fiches = fichesOfSubject(def.id);
 
   return (
     <>
@@ -117,6 +119,33 @@ export function SubjectDocs({ def }: { def: SubjectDef }) {
       <p className="micro" style={{ marginBottom: 'var(--s-8)' }}>
         {inSubject.length} documents · ouvrir un titre le cherche dans votre Drive.
       </p>
+
+      {/* Les fiches de révision — la version travaillée du cours central. */}
+      {fiches.length > 0 && (
+        <section style={{ marginBottom: 'var(--s-12)' }}>
+          <div className="section__head">
+            <h2>Fiches de révision</h2>
+            <span className="micro tnum">
+              {fiches.length} fiches · ≈ {Math.round(fiches.reduce((n, f) => n + f.minutes, 0) / 60)} h
+            </span>
+          </div>
+          <nav className="toc">
+            {fiches.map((f, i) => (
+              <Link key={f.id} to={`/fiche/${f.id}`} className="toc__item">
+                <span className="toc__num">{String(i + 1).padStart(2, '0')}</span>
+                <span>
+                  <span className="toc__title">{f.title}</span>
+                  <span className="meta toc__desc">
+                    {f.chapter} · {DIFFICULTY_LABEL[f.difficulty]} · ≈ {f.minutes} min —{' '}
+                    {f.concepts.join(', ')}
+                  </span>
+                </span>
+                <Icon name="arrowRight" size={18} className="toc__arrow" />
+              </Link>
+            ))}
+          </nav>
+        </section>
+      )}
 
       {/* Les textes de méthode — écrits pour être lus dans l'ordre. */}
       {courses.length > 0 && (

@@ -10,10 +10,16 @@ describe('fiches de révision — intégrité', () => {
     }
   });
 
-  it('couvre les cinq chapitres du cours source', () => {
-    const chapters = new Set(getFiches().map((f) => f.chapter.split(' ·')[0]));
+  it('couvre les chapitres des deux cours sources', () => {
+    const facc = getFiches().filter((f) => f.course.startsWith('Faccanoni'));
+    const gar = getFiches().filter((f) => f.course.startsWith('Garrigos'));
+    const chFacc = new Set(facc.map((f) => f.chapter.split(' ·')[0]));
     for (const c of ['Chapitre 1', 'Chapitre 2', 'Chapitre 3', 'Chapitre 4', 'Annexe A']) {
-      expect(chapters).toContain(c);
+      expect(chFacc).toContain(c);
+    }
+    const chGar = new Set(gar.map((f) => f.chapter.split(' ·')[0]));
+    for (const c of ['Chapitre I', 'Chapitre II', 'Chapitre III', 'Chapitre IV', 'Chapitre V']) {
+      expect(chGar).toContain(c);
     }
   });
 
@@ -37,9 +43,10 @@ describe('fiches de révision — intégrité', () => {
   });
 
   it('retrouve les fiches par matière et par id', () => {
-    expect(fichesOfSubject('maths').length).toBe(8);
+    expect(fichesOfSubject('maths').length).toBe(13);
     expect(fichesOfSubject('cfa')).toHaveLength(0);
     expect(getFiche('extrema-lies')?.title).toContain('Lagrange');
+    expect(getFiche('kkt')?.course).toContain('Garrigos');
     expect(getFiche('inconnue')).toBeUndefined();
   });
 });

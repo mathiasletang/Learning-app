@@ -46,8 +46,15 @@ export function Subject({ id }: { id: SubjectId }) {
     label: s === 'revision' && due > 0 ? `${SECTION_LABEL[s]} · ${due}` : SECTION_LABEL[s],
   }));
 
+  /* Toute la page adopte la couleur du domaine : surtitre, onglets, puces,
+     jauges — on sait immédiatement dans quelle matière on se trouve. */
+  const scope = {
+    '--accent': `var(${def.colorVar})`,
+    '--accent-wash': `color-mix(in srgb, var(${def.colorVar}) 10%, var(--surface))`,
+  } as React.CSSProperties;
+
   return (
-    <>
+    <div style={scope}>
       <PageHead
         eyebrow="Matière"
         title={def.label}
@@ -70,6 +77,6 @@ export function Subject({ id }: { id: SubjectId }) {
       {section === 'notes' && (
         <NotesPanel subjects={def.noteSubjects} defaultSubject={def.noteSubjects[0]} />
       )}
-    </>
+    </div>
   );
 }

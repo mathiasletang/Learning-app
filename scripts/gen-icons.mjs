@@ -7,9 +7,9 @@ import { fileURLToPath } from 'node:url';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 
-// Palette : charbon profond, marque cognac. Sobre, reconnaissable au loin.
-const BG = [28, 28, 26]; // charbon #1c1c1a
-const FG = [199, 154, 110]; // cognac #c79a6e
+// Palette : graphite froid, marque indigo. Sobre, reconnaissable au loin.
+const BG = [16, 18, 24]; // graphite #101218
+const FG = [111, 114, 245]; // indigo clair #6f72f5
 
 function crc32(buf) {
   let c = ~0;
@@ -92,8 +92,8 @@ write('public/icons/icon-512-maskable.png', pngRGBA(512, makeDraw(512, { maskabl
 write('public/apple-touch-icon.png', pngRGBA(180, makeDraw(180)));
 
 const favicon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-  <rect width="32" height="32" rx="8" fill="#1c1c1a"/>
-  <rect x="10" y="10" width="12" height="12" rx="4" fill="#c79a6e"/>
+  <rect width="32" height="32" rx="8" fill="#101218"/>
+  <rect x="10" y="10" width="12" height="12" rx="4" fill="#6f72f5"/>
 </svg>
 `;
 write('public/favicon.svg', Buffer.from(favicon, 'utf8'));

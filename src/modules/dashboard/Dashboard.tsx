@@ -132,15 +132,18 @@ export function Dashboard() {
       </Reveal>
 
       {/* ------------------------- Les trois fronts ------------------------ */}
-      <section className="section">
+      <section className="section" style={{ marginTop: 'var(--section-sm)' }}>
         <div className="section__head">
           <h2>Vos trois fronts</h2>
         </div>
 
         <div className="fronts">
           <Reveal delay={0.02}>
-            <Link to="/anglais" className="tile front">
-              <Tag colorVar="--m-cfa">Anglais</Tag>
+            <Link to="/anglais" className="tile front" style={{ '--_c': 'var(--d-en)' } as React.CSSProperties}>
+              <span className="front__chip" aria-hidden>
+                <Icon name="vocab" size={17} strokeWidth={1.8} />
+              </span>
+              <Tag colorVar="--d-en">Anglais</Tag>
               <h3 className="front__title">
                 {(dueVocab ?? 0) > 0
                   ? `${dueVocab} mot${(dueVocab ?? 0) > 1 ? 's' : ''} à revoir`
@@ -156,7 +159,10 @@ export function Dashboard() {
           </Reveal>
 
           <Reveal delay={0.07}>
-            <Link to="/maths" className="tile front">
+            <Link to="/maths" className="tile front" style={{ '--_c': 'var(--m-opt)' } as React.CSSProperties}>
+              <span className="front__chip" aria-hidden>
+                <Icon name="sigma" size={17} strokeWidth={1.8} />
+              </span>
               <Tag colorVar="--m-opt">Maths</Tag>
               <h3 className="front__title">{nextMaths ? nextMaths.step : 'Parcours terminé'}</h3>
               <p className="meta front__note">
@@ -170,8 +176,11 @@ export function Dashboard() {
           </Reveal>
 
           <Reveal delay={0.12}>
-            <Link to="/cfa" className="tile front">
-              <Tag colorVar="--m-fin">CFA · Finance</Tag>
+            <Link to="/cfa" className="tile front" style={{ '--_c': 'var(--m-cfa)' } as React.CSSProperties}>
+              <span className="front__chip" aria-hidden>
+                <Icon name="chart" size={17} strokeWidth={1.8} />
+              </span>
+              <Tag colorVar="--m-cfa">CFA · Finance</Tag>
               <h3 className="front__title">{nextCfa ? nextCfa.step : 'Parcours terminé'}</h3>
               <p className="meta front__note">
                 {nextCfa ? nextCfa.phase : 'Consolidez avec les questions.'}

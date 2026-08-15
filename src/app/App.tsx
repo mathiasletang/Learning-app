@@ -6,6 +6,7 @@ import { Layout } from './Layout';
 import { Dashboard } from '@/modules/dashboard/Dashboard';
 import { Subject } from '@/modules/subject/Subject';
 import { CourseView } from '@/modules/courses/CourseView';
+import { FicheView } from '@/modules/fiches/FicheView';
 import { QcmBank } from '@/modules/quiz/QcmBank';
 import { Suivi } from '@/modules/suivi/Suivi';
 
@@ -73,6 +74,7 @@ export function App() {
           <Route path="suivi" element={<Suivi />} />
           {/* Pages « séance » : lancées depuis les matières. */}
           <Route path="cours/:id" element={<CourseView />} />
+          <Route path="fiche/:id" element={<FicheView />} />
           <Route path="qcm/:bank" element={<QcmBank />} />
           {/* Anciens chemins — liens et raccourcis déjà posés restent valides. */}
           <Route path="vocabulaire" element={<Navigate to="/anglais" replace />} />

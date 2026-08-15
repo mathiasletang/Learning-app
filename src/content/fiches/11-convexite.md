@@ -10,8 +10,6 @@
 | **Concepts clés** | Ensemble convexe, fonction convexe (3 caractérisations), min local = global, forte convexité, existence + unicité |
 | **Poids à l'examen** | Le théorème « convexe ⟹ point critique = min global » est l'argument le plus rentable de toute copie d'optimisation. La forte convexité est le cœur des exercices d'algorithmes. |
 
----
-
 ## 🎯 Vue d'ensemble
 
 La convexité est la propriété qui **globalise** : tout ce que les fiches 6 et 10 concluaient localement devient global. Le chapitre construit l'échelle complète :
@@ -24,8 +22,6 @@ FORTEMENT CONVEXE (µ > 0)   =  convexe + µ/2‖·‖²  ·  λmin(∇²f) ≥ 
 Quadratiques :  convexe ⟺ A ≽ 0  ·  fortement convexe ⟺ A ≻ 0
 ```
 
----
-
 ## 🔴 Concept 1 — Ensembles et fonctions convexes
 
 **Définitions (III.2, III.7).**
@@ -36,8 +32,6 @@ Quadratiques :  convexe ⟺ A ≽ 0  ·  fortement convexe ⟺ A ≻ 0
 **Intuition.** Ensemble convexe : sans creux (la boule oui, la *sphère* non — elle est creuse, exemple III.3). Fonction convexe : le graphe sous ses cordes ; l'**épigraphe** $\{(x,y) \mid f(x) \leq y\}$ est un ensemble convexe (prop. III.8) — le pont entre les deux notions.
 
 **Stabilité (props. III.10–III.12)** : somme de convexes convexe ; composée $f \circ A$ avec $A$ linéaire convexe ; et $\operatorname{argmin}_C f$ est un ensemble **convexe**.
-
----
 
 ## 🔴 Concept 2 — Les trois caractérisations (différentiable)
 
@@ -56,8 +50,6 @@ Quadratiques :  convexe ⟺ A ≽ 0  ·  fortement convexe ⟺ A ≻ 0
 - Si $\operatorname{int} C = \varnothing$, on ne peut rien dire : $f(x) = x^3$ est convexe (car constante !) sur $C = \{-1\}$ alors que $f'' < 0$ (remarque III.22).
 - Quadratiques (prop. III.23) : $f = \langle Ax,x\rangle + \langle b,x\rangle + c$ convexe $\iff A \succeq 0$.
 
----
-
 ## 🔴 Concept 3 — Ce que la convexité achète
 
 **Théorème III.24 (min local = global).**
@@ -70,8 +62,6 @@ Quadratiques :  convexe ⟺ A ≽ 0  ·  fortement convexe ⟺ A ≻ 0
 C'est *l'équivalence* qui court-circuite toute l'étude de nature : plus de hessienne à classer, plus d'étude directe — annuler le gradient suffit. **Gare au bord** (remarque III.26) : l'équivalence exige $\bar x$ intérieur ; au bord, voir KKT (fiche 13).
 
 **Quadratiques (prop. III.27)** : $f = \tfrac12\langle Ax,x\rangle + \langle b,x\rangle + c$ admet des minimiseurs $\iff A \succeq 0$ **et** $b \in \operatorname{Im} A$ ; alors $\operatorname{argmin} f = \{x \mid Ax + b = 0\}$.
-
----
 
 ## 🔴 Concept 4 — Forte convexité : existence ET unicité
 
@@ -99,8 +89,6 @@ C'est le trio gagnant : existence (coercivité), unicité (forte convexité), et
 
 **Exemple du cours (III.38).** $f = \tfrac12\langle Ax,x\rangle$, $A = \begin{pmatrix}3&1\\1&2\end{pmatrix}$ : $\chi_A(\mu) = \mu^2 - 5\mu + 5$, racines $\frac{5 \pm \sqrt5}{2}$, donc $f$ est $\mu$-convexe avec $\mu = \frac{5-\sqrt5}{2}$.
 
----
-
 ## ⚠️ Common mistakes
 
 1. **Vérifier $\nabla^2 f \succeq 0$ en un seul point** — la convexité exige la famille entière.
@@ -109,8 +97,6 @@ C'est le trio gagnant : existence (coercivité), unicité (forte convexité), et
 4. **Oublier $b \in \operatorname{Im} A$** pour les quadratiques semi-définies — $A \succeq 0$ seul ne suffit pas à l'existence ($f(x) = 0\cdot x^2 + x$…).
 5. **Conclure la convexité d'une fonction sur un ensemble d'intérieur vide via la hessienne** — on est « aveugle » hors de $C$ ($x^3$ sur $\{-1\}$).
 6. **Chercher la nature d'un point critique d'une fonction convexe** — inutile : c'est un minimum global, par théorème.
-
----
 
 ## 📌 Ultimate Review
 
@@ -124,8 +110,6 @@ C'est le trio gagnant : existence (coercivité), unicité (forte convexité), et
 
 **Formulas to know**
 $$f(y) \geq f(x) + \langle\nabla f(x), y-x\rangle \quad ; \quad f \in \Gamma_\mu \iff f - \tfrac{\mu}{2}\lVert\cdot\rVert^2 \in \Gamma_0 \iff \lambda_{\min}(\nabla^2 f) \geq \mu$$
-
----
 
 ## 🧠 Active Recall
 
@@ -158,8 +142,6 @@ Stricte : inégalité de convexité stricte (ou $\nabla^2 f \succ 0$ point par p
 
 $A \succ 0$ ⟹ $f$ fortement convexe (prop. III.36) ⟹ existence + unicité (thm. III.41). Le point critique : $\nabla f = Ax - b = 0 \iff x^* = A^{-1}b$, minimum global par le théorème III.25.
 </details>
-
----
 
 ## 🃏 Flashcards
 

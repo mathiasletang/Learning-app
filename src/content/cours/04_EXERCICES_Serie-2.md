@@ -131,8 +131,6 @@ $$\min\ x_1^2+x_2^2 \quad\text{s.t.}\quad x_1\geq1,\ x_2\geq1,\ x_1+x_2=3$$
 
 *Attention en (a) : la contrainte n'est pas sous forme standard.*
 
----
-
 ### Exercice 2 — Calculer une fonction duale
 
 Reprends le problème (a) :
@@ -145,13 +143,9 @@ $$\min\ x_1^2+x_2^2 \quad\text{s.t.}\quad x_1+x_2\geq2$$
 5. Résous le primal géométriquement. Trouve $x^\star$ et $p^\star$.
 6. Y a-t-il un saut de dualité ?
 
----
-
 ### Exercice 3 — Vérifier les quatre conditions KKT
 
 Toujours le même problème. Vérifie une par une les quatre conditions KKT au point $(x^\star,\lambda^\star)$ trouvé.
-
----
 
 ### Exercice 4 — Contrainte active, contrainte inactive
 
@@ -162,8 +156,6 @@ $$\min\ x_1^2+x_2^2 \quad\text{s.t.}\quad x_1+x_2\geq2,\ \ x_1\geq0$$
 3. Quelle contrainte est active ? Laquelle ne l'est pas ? Que valent les multiplicateurs correspondants ?
 4. Relie ta réponse aux écarts complémentaires.
 
----
-
 ### Exercice 5 — Sensibilité
 
 Toujours le problème de l'exercice 2, mais avec la contrainte $x_1+x_2\geq c$.
@@ -171,8 +163,6 @@ Toujours le problème de l'exercice 2, mais avec la contrainte $x_1+x_2\geq c$.
 1. Calcule $p^\star(c)$ en fonction de $c$.
 2. Calcule $\dfrac{dp^\star}{dc}$ en $c=2$.
 3. Compare à $\lambda^\star$. Commente.
-
----
 
 ### Exercice 6 — Le programme du consommateur ⭐
 
@@ -190,8 +180,6 @@ avec $\alpha_i>0$, $p_i>0$, $b>0$. Note $A=\sum_i\alpha_i$.
 6. Interprète la formule obtenue.
 7. Calcule l'utilité optimale $u^\star(b)$ puis $du^\star/db$. Compare à $\lambda^\star$.
 
----
-
 ### Exercice 7 — Moindres carrés sous contrainte d'égalité
 
 $$\min\ \|x\|_2^2 \quad\text{s.t.}\quad Ax=b$$
@@ -202,8 +190,6 @@ avec $A\in\mathbb{R}^{m\times n}$, $m<n$, de rang plein.
 2. Condition de stationnarité : exprime $x$ en fonction de $\nu$.
 3. Injecte dans la contrainte et trouve $\nu^\star$, puis $x^\star$.
 4. Quel objet classique reconnais-tu ?
-
----
 
 ### Exercice 8 — Raisonner par les écarts complémentaires
 
@@ -217,8 +203,6 @@ On te dit que la solution optimale est $x^\star=(3,1)$.
 3. Calcule les multiplicateurs des contraintes actives.
 4. Interprète-les économiquement.
 
----
-
 ### Exercice 9 — Quand la dualité forte tombe en panne
 
 $$\min\ -x^2 \quad\text{s.t.}\quad -1\leq x\leq1$$
@@ -227,8 +211,6 @@ $$\min\ -x^2 \quad\text{s.t.}\quad -1\leq x\leq1$$
 2. Écris $L$ et calcule $g(\lambda_1,\lambda_2)$.
 3. Que vaut $d^\star$ ?
 4. Pourquoi la dualité forte échoue-t-elle ici ?
-
----
 
 ### Exercice 10 — Slater n'est pas gratuit
 
@@ -244,8 +226,6 @@ $$\min\ e^{-x} \quad\text{s.t.}\quad \frac{x^2}{y}\leq0,\qquad \mathbf{dom}: y>0
 
 # Corrigés
 
----
-
 ### Corrigé 1
 
 **(a)** La contrainte $x_1+x_2\geq2$ doit être réécrite $2-x_1-x_2\leq0$. Donc
@@ -258,8 +238,6 @@ $$L(x,\lambda)=x_1^2+x_2^2+\lambda(2-x_1-x_2),\qquad \lambda\geq0$$
 **(c)** Réécriture : $1-x_1\leq0$, $1-x_2\leq0$, $x_1+x_2-3=0$.
 $$L=x_1^2+x_2^2+\lambda_1(1-x_1)+\lambda_2(1-x_2)+\nu(x_1+x_2-3)$$
 avec $\lambda_1,\lambda_2\geq0$, $\nu$ **de signe libre**.
-
----
 
 ### Corrigé 2
 
@@ -283,8 +261,6 @@ $$x^\star=(1,1),\qquad p^\star=1+1=\boxed{2}$$
 
 *Remarquer aussi : $x^\star=(\lambda^\star/2,\lambda^\star/2)=(1,1)$. Le minimiseur du Lagrangien au prix optimal **est** la solution primale. Ce n'est pas un hasard : c'est le mécanisme même de la dualité forte.*
 
----
-
 ### Corrigé 3
 
 Au point $x^\star=(1,1)$, $\lambda^\star=2$ :
@@ -300,8 +276,6 @@ Au point $x^\star=(1,1)$, $\lambda^\star=2$ :
 $$\nabla f_0(x^\star)+\lambda^\star\nabla f_1(x^\star)=\begin{pmatrix}2\\2\end{pmatrix}+2\begin{pmatrix}-1\\-1\end{pmatrix}=\begin{pmatrix}0\\0\end{pmatrix}$$ ✓
 
 Les quatre conditions sont vérifiées, le problème est convexe et Slater tient : $(1,1)$ est **la** solution globale. ∎
-
----
 
 ### Corrigé 4
 
@@ -323,8 +297,6 @@ $$\boxed{x^\star=(1,1),\quad \lambda^\star=2,\quad \mu^\star=0}$$
 
 **Lecture économique :** une contrainte qui ne mord pas ne coûte rien. Son prix implicite est nul, et on peut l'ignorer complètement. C'est ce qui rend les KKT exploitables en pratique : on devine quelles contraintes sont actives, on résout le système réduit, puis on vérifie.
 
----
-
 ### Corrigé 5
 
 **1.** Par le même raisonnement géométrique (projection de l'origine sur $x_1+x_2=c$) : $x^\star=(c/2,\ c/2)$, donc
@@ -337,8 +309,6 @@ $$p^\star(c)=\frac{c^2}{4}+\frac{c^2}{4}=\frac{c^2}{2}$$
 **Interprétation.** Durcir la contrainte d'une unité (passer de $c=2$ à $c=3$) coûte environ $\lambda^\star=2$ unités d'objectif. La relâcher d'une unité en fait gagner autant.
 
 *Lien avec la formule de la partie A.7 : en écrivant la contrainte perturbée $2-x_1-x_2\leq u$, on a $c=2-u$, d'où $p^\star(u)=(2-u)^2/2$ et $\partial p^\star/\partial u=-(2-u)=-2=-\lambda^\star$ en $u=0$. Les deux formulations disent la même chose ; seule la convention de signe change. Vérifie toujours dans quel sens le livre perturbe.*
-
----
 
 ### Corrigé 6 ⭐
 
@@ -376,8 +346,6 @@ $$\frac{du^\star}{db}=\frac{A}{b}=\boxed{\lambda^\star}$$
 
 *Si tu ne retiens qu'un exercice de cette série, c'est celui-là. Toute la théorie du consommateur est un problème d'optimisation convexe, et ses résultats sont des conséquences des conditions KKT.*
 
----
-
 ### Corrigé 7
 
 **1.** $L(x,\nu)=x^Tx+\nu^T(Ax-b)$, avec $\nu\in\mathbb{R}^m$ **de signe libre**.
@@ -395,8 +363,6 @@ $$x^\star=-\tfrac12A^T\nu^\star=\boxed{A^T(AA^T)^{-1}b}$$
 *Le système $Ax=b$ avec $m<n$ a une infinité de solutions ; la dualité sélectionne la plus « petite ». On retrouve ici, par un chemin totalement différent, la formule des moindres carrés généralisés — celle qui est derrière la régression linéaire.*
 
 **Vérification numérique** avec $A=\begin{pmatrix}1&1&0\\0&1&1\end{pmatrix}$, $b=(2,3)^T$ : la formule donne $x^\star\approx(0{,}333;\ 1{,}667;\ 1{,}333)$, et on vérifie $Ax^\star=b$ exactement.
-
----
 
 ### Corrigé 8
 
@@ -421,8 +387,6 @@ D'où $\boxed{\lambda_1=2,\quad \lambda_2=1}$. Les deux sont $\geq0$ ✓ (admiss
 
 Ce sont les **prix duaux** que renvoie n'importe quel solveur de programmation linéaire (Gurobi, CPLEX, le solveur d'Excel). En pratique, ils sont souvent plus utiles que la solution elle-même : ils disent où investir.
 
----
-
 ### Corrigé 9
 
 **1.** $-x^2$ est minimale quand $x^2$ est maximal, soit en $x=\pm1$ : $\boxed{p^\star=-1}$.
@@ -440,8 +404,6 @@ $$g(\lambda_1,\lambda_2)=-\infty \quad\text{pour tous }\lambda_1,\lambda_2\geq0$
 **Pourquoi ?** Le problème n'est **pas convexe** : on minimise $-x^2$, dont la dérivée seconde vaut $-2<0$. L'objectif est concave, pas convexe. La condition de Slater ne s'applique donc pas, et rien ne garantit la dualité forte.
 
 *Ici l'échec est total : le dual ne donne aucune information. C'est le cas général pour les problèmes non convexes — et c'est précisément pour cela qu'on tient tant à la convexité.*
-
----
 
 ### Corrigé 10
 
@@ -461,8 +423,6 @@ $$g(\lambda)=\inf_{x,\,y>0}L=0 \quad\text{pour tout }\lambda\geq0$$
 Mais **la condition de Slater échoue** : il n'existe aucun point *strictement* admissible, puisque $x^2/y<0$ est impossible avec $y>0$. Le seul point admissible sature la contrainte.
 
 **C'est l'exemple canonique** (Boyd, §5.3.2) qui montre que la convexité seule ne suffit pas. Il faut la convexité **et** Slater. Retiens-le : c'est le contre-exemple que tout le monde cite.
-
----
 
 ## Récapitulatif
 

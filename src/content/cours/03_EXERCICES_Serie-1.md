@@ -5,8 +5,6 @@
 
 Cette série couvre le contenu des chapitres 2 et 3 de Boyd. C'est le socle : tout le reste en dépend.
 
----
-
 ## Rappels utiles
 
 **Ensemble convexe.** $C$ est convexe si pour tous $x,y\in C$ et $\theta\in[0,1]$ :
@@ -24,8 +22,6 @@ $$f \text{ convexe} \iff f(y)\geq f(x)+\nabla f(x)^T(y-x)\quad \forall x,y$$
 **Condition du second ordre** (si $f$ deux fois dérivable) :
 $$f \text{ convexe} \iff \nabla^2 f(x)\succeq 0 \quad \forall x$$
 
----
-
 ## Énoncés
 
 ### Exercice 1 — Reconnaître les ensembles convexes
@@ -41,14 +37,10 @@ Lesquels sont convexes ? Justifie en une phrase.
 7. $\mathbb{Z}$ (les entiers)
 8. $\{X\in\mathbf{S}^n \mid X\succeq 0\}$
 
----
-
 ### Exercice 2 — L'intersection
 
 Montre que si $C_1$ et $C_2$ sont convexes, alors $C_1\cap C_2$ l'est.
 Puis : l'union de deux convexes est-elle convexe ? Justifie.
-
----
 
 ### Exercice 3 — Le polyèdre
 
@@ -57,13 +49,9 @@ Un **polyèdre** est $P=\{x \mid Ax\preceq b,\ Cx=d\}$.
 1. Montre que $P$ est convexe, en utilisant l'exercice 2.
 2. Quel objet économique très classique est un polyèdre ? (indice : contrainte de budget)
 
----
-
 ### Exercice 4 — Convexité par la définition
 
 Montre **directement par la définition** (sans dériver) que $f(x)=|x|$ est convexe sur $\mathbb{R}$.
-
----
 
 ### Exercice 5 — La condition du premier ordre
 
@@ -72,8 +60,6 @@ Soit $f$ convexe et dérivable, et $x^\star$ tel que $\nabla f(x^\star)=0$.
 1. Déduis de la condition du premier ordre que $x^\star$ est un **minimum global**.
 2. Pourquoi est-ce faux si $f$ n'est pas convexe ? Donne un contre-exemple.
 3. En une phrase : pourquoi est-ce **la** raison pour laquelle on aime la convexité ?
-
----
 
 ### Exercice 6 — Opérations qui préservent la convexité
 
@@ -86,13 +72,9 @@ Vrai ou faux ? Justifie.
 5. Si $f$ convexe et $A$ une matrice, alors $x\mapsto f(Ax+b)$ est convexe.
 6. Si $f_1,f_2$ convexes, alors $f_1f_2$ est convexe.
 
----
-
 ### Exercice 7 — Les normes sont convexes
 
 Montre que toute norme $\|\cdot\|$ est une fonction convexe, en n'utilisant que les deux axiomes : homogénéité $\|\alpha x\|=|\alpha|\,\|x\|$ et inégalité triangulaire.
-
----
 
 ### Exercice 8 — log-sum-exp
 
@@ -104,8 +86,6 @@ Soit $f(x)=\ln\left(e^{x_1}+e^{x_2}\right)$ sur $\mathbb{R}^2$.
 
 *Cette fonction est l'approximation lisse du maximum. Elle est partout : en optimisation, en apprentissage (softmax), en économie (modèles de choix discret / logit).*
 
----
-
 ### Exercice 9 — Quasi-concavité et économie
 
 Soit $u(x_1,x_2)=x_1x_2$ sur $\mathbb{R}^2_{++}$ (utilité Cobb-Douglas).
@@ -113,8 +93,6 @@ Soit $u(x_1,x_2)=x_1x_2$ sur $\mathbb{R}^2_{++}$ (utilité Cobb-Douglas).
 1. On a vu en Série 0 que $u$ n'est **pas** concave. Redis pourquoi en une ligne.
 2. Montre que l'ensemble $\{x\in\mathbb{R}^2_{++} \mid u(x)\geq \alpha\}$ est convexe pour tout $\alpha>0$.
 3. Comment appelle-t-on cette propriété ? Que représente cet ensemble en microéconomie ?
-
----
 
 ### Exercice 10 — Mise en forme
 
@@ -126,8 +104,6 @@ $$\begin{array}{ll}\text{minimize} & x_1^2+x_2^2\\ \text{s.t.} & \dfrac{x_1}{x_2
 ---
 
 # Corrigés
-
----
 
 ### Corrigé 1
 
@@ -142,8 +118,6 @@ $$\begin{array}{ll}\text{minimize} & x_1^2+x_2^2\\ \text{s.t.} & \dfrac{x_1}{x_2
 7. **Non convexe.** Le milieu de $0$ et $1$ est $0{,}5\notin\mathbb{Z}$.
 8. **Convexe.** C'est le **cône des matrices semi-définies positives**. Si $X\succeq0$ et $Y\succeq0$, alors pour $\theta\in[0,1]$ : $z^T(\theta X+(1-\theta)Y)z=\theta z^TXz+(1-\theta)z^TYz\geq0$. ✓
 
----
-
 ### Corrigé 2
 
 **Intersection.** Soient $x,y\in C_1\cap C_2$ et $\theta\in[0,1]$.
@@ -156,8 +130,6 @@ Donc le point appartient à l'intersection. ∎
 
 **Union : non.** Contre-exemple dans $\mathbb{R}$ : $C_1=[0,1]$, $C_2=[2,3]$. Le milieu de $0$ et $3$ est $1{,}5$, qui n'est dans ni l'un ni l'autre.
 
----
-
 ### Corrigé 3
 
 **1.** $Ax\preceq b$ signifie $a_i^Tx\leq b_i$ pour chaque ligne $i$ : c'est une intersection de **demi-espaces**. $Cx=d$ est une intersection d'**hyperplans**. Chacun est convexe (exercice 1), et une intersection de convexes est convexe (exercice 2). Donc $P$ est convexe. ∎
@@ -165,8 +137,6 @@ Donc le point appartient à l'intersection. ∎
 **2.** **L'ensemble budgétaire** $\{x\succeq 0 \mid p^Tx\leq b\}$. C'est un polyèdre : l'intersection de l'orthant positif et d'un demi-espace. En dimension 2, c'est le triangle familier du cours de micro.
 
 *C'est le premier point de contact concret entre ton cours d'économie et Boyd. Ta droite de budget est un hyperplan ; ton ensemble de consommation admissible est un polyèdre ; le programme du consommateur est un problème d'optimisation convexe.*
-
----
 
 ### Corrigé 4
 
@@ -177,8 +147,6 @@ $$= \theta|x|+(1-\theta)|y| \quad \text{(car } \theta,1-\theta\geq 0)$$
 C'est exactement la définition de la convexité. ∎
 
 *Noter qu'on n'a jamais dérivé — c'est heureux, $|x|$ n'est pas dérivable en 0. La définition par la corde s'applique aux fonctions non lisses, contrairement aux critères par la hessienne.*
-
----
 
 ### Corrigé 5
 
@@ -191,8 +159,6 @@ Contre-exemple : $f(x)=x^3$. On a $f'(0)=0$, mais $0$ n'est ni un minimum ni un 
 Autre : $f(x)=-x^2$, où $f'(0)=0$ correspond à un **maximum**.
 
 **3.** **Parce que « annuler le gradient » devient une condition suffisante d'optimalité globale.** Dans le cas général, résoudre $\nabla f=0$ ne fournit que des candidats locaux, sans moyen de savoir lequel est le meilleur — algorithmiquement, c'est un problème très dur. En convexe, il n'y a rien à comparer : tout point stationnaire est LA solution. C'est toute la différence entre un problème que l'on sait résoudre et un problème que l'on ne sait pas résoudre.
-
----
 
 ### Corrigé 6
 
@@ -208,8 +174,6 @@ Autre : $f(x)=-x^2$, où $f'(0)=0$ correspond à un **maximum**.
 6. **FAUX.** Contre-exemple : $f_1(x)=x$ et $f_2(x)=1-x$, toutes deux affines donc convexes. Leur produit $f_1f_2 = x-x^2$ a pour dérivée seconde $-2<0$ : il est **concave**.
    *Le produit de fonctions convexes n'a aucune raison d'être convexe. Il faut des hypothèses supplémentaires (positivité et monotonie de même sens) pour que ça marche.*
 
----
-
 ### Corrigé 7
 
 Soient $x,y$ et $\theta\in[0,1]$ :
@@ -219,8 +183,6 @@ $$= \theta\|x\|+(1-\theta)\|y\| \quad \text{(car } 0\leq\theta\leq1)$$
 ∎
 
 *Conséquence : $\|x\|_1$, $\|x\|_2$, $\|x\|_\infty$ sont toutes convexes. C'est pourquoi on peut mettre une pénalité en norme dans un objectif sans casser la convexité — le LASSO, la ridge regression et le compressed sensing reposent entièrement là-dessus.*
-
----
 
 ### Corrigé 8
 
@@ -238,8 +200,6 @@ $$\nabla f(x)=\frac{1}{e^{x_1}+e^{x_2}}\begin{pmatrix}e^{x_1}\\e^{x_2}\end{pmatr
 
 **3.** $\nabla^2f\succeq0$ partout ⟹ $f$ est **convexe** sur $\mathbb{R}^2$.
 
----
-
 ### Corrigé 9
 
 **1.** Sa hessienne $\begin{pmatrix}0&1\\1&0\end{pmatrix}$ a pour valeurs propres $+1$ et $-1$ : elle est indéfinie, donc $u$ n'est ni convexe ni concave.
@@ -254,8 +214,6 @@ En microéconomie, $\{x \mid u(x)\geq\alpha\}$ est l'ensemble des paniers **au m
 
 *Retiens ce point : l'économie n'a besoin que de la quasi-concavité, jamais de la concavité. C'est une hypothèse strictement plus faible, et c'est la bonne. Boyd traite la quasi-convexité au chapitre 3.4.*
 
----
-
 ### Corrigé 10
 
 **Tel qu'écrit, le problème n'est pas sous forme convexe.** La contrainte $x_1/x_2\leq1$ fait intervenir un quotient : la fonction $(x_1,x_2)\mapsto x_1/x_2$ n'est pas convexe sur $\{x_2>0\}$.
@@ -268,8 +226,6 @@ $$\begin{array}{ll}\text{minimize} & x_1^2+x_2^2\\ \text{s.t.} & x_1-x_2\leq0\en
 objectif convexe, contrainte **linéaire** : c'est un QP, parfaitement convexe.
 
 *La leçon dépasse l'exercice. Un problème peut être convexe sans en avoir l'air ; savoir le mettre en forme est une compétence à part entière — c'est tout l'objet du chapitre 4 de Boyd, et la raison d'être de la « programmation convexe disciplinée » (DCP) derrière CVXPY. Un solveur refusera la première écriture et acceptera la seconde, alors que c'est le même problème.*
-
----
 
 ## Ce qu'il faut retenir
 

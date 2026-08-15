@@ -10,8 +10,6 @@
 | **Concepts clés** | Dérivées partielles, gradient, jacobienne, chain rule, dérivée directionnelle, élasticité |
 | **Poids à l'examen** | Le calcul de dérivées partielles est présent dans *chaque* exercice d'optimisation. La chain rule et la dérivée en un point « à problème » sont des questions ciblées classiques. |
 
----
-
 ## 🎯 Vue d'ensemble
 
 Une fonction d'une variable a *une* dérivée ; une fonction de $n$ variables en a $n$ — une par direction d'axe. Ce chapitre définit ces **dérivées partielles**, les rassemble dans le **gradient**, apprend à dériver des compositions (**chain rule**) et généralise à toute direction (**dérivée directionnelle**). C'est la boîte à outils de calcul : les fiches 4 à 7 ne font que l'exploiter.
@@ -23,8 +21,6 @@ Dérivée partielle ∂f/∂x  (une par variable)
         ├── composé → CHAIN RULE
         └── projeté sur v → DÉRIVÉE DIRECTIONNELLE ∇f·v
 ```
-
----
 
 ## 🔴 Concept 1 — Dérivées partielles premières
 
@@ -54,8 +50,6 @@ Le cours répète cette mise en garde dans plusieurs corrigés (« Attention : i
 - Aux points définis par cas : la définition, pas les règles.
 - Dérivable (toutes les $\partial_i f$ existent) **n'implique pas** continue — contrairement au cas d'une variable ! (Voir fiche 4.)
 
----
-
 ## 🔴 Concept 2 — Gradient et jacobienne
 
 **Définition (déf. 3.2).**
@@ -66,8 +60,6 @@ Le cours répète cette mise en garde dans plusieurs corrigés (« Attention : i
 **Intuition géométrique (exemple du cours).** Pour $f(x,y) = x^2 + y$ en $(-1, 1)$ : $\nabla f(-1,1) = (-2, 1)^T$ ; la courbe de niveau 2 est la parabole $y = -x^2 + 2$, dont la tangente en $(-1,1)$ est bien perpendiculaire à $(-2,1)^T$. Le gradient pointe dans la direction de **plus forte montée** — cette orthogonalité aux niveaux est le cœur géométrique de Lagrange (fiche 7).
 
 **Définition (déf. 3.3).** Pour $\mathbf{f} : \mathbb{R}^n \to \mathbb{R}^m$ (un empilement de $m$ fonctions scalaires), la **matrice jacobienne** rassemble les gradients des composantes. Exemple du cours : $\mathbf f(x,y) = (xy,\; x - y,\; x + y^2)$ donne $J_{\mathbf f} = \begin{pmatrix} y & 1 & 1 \\ x & -1 & 2y \end{pmatrix}$.
-
----
 
 ## 🔴 Concept 3 — Règle de la chaîne (chain rule)
 
@@ -90,8 +82,6 @@ La pression **décroît** : l'effet volume l'emporte sur l'effet température. T
 
 **Où la chain rule resurgit** : dérivation implicite ($\varphi' = -\partial_x f / \partial_y f$, fiche 5), théorème d'Euler, justification de Lagrange (fiche 7). C'est la formule la plus réutilisée du cours.
 
----
-
 ## 🟠 Concept 4 — Dérivée directionnelle et classe C¹
 
 **Définition (déf. 3.5).** $f$ est de **classe $C^1$** sur $D$ si $f$, $\partial_x f$, $\partial_y f$ sont continues sur $D$. (Rôle clé en fiche 4 : $C^1 \Rightarrow$ différentiable.)
@@ -105,8 +95,6 @@ La pression **décroît** : l'effet volume l'emporte sur l'effet température. T
 
 **⚠️ Nuance.** La formule $\nabla f \cdot v$ exige la **différentiabilité** ; en un point pathologique, seule la définition par limite fait foi.
 
----
-
 ## 🟡 Concept 5 — Élasticité (applications économiques)
 
 Pour $f(x_0,y_0) \neq 0$, l'**élasticité partielle** par rapport à $x$ est
@@ -114,8 +102,6 @@ $$E^x_f(x_0,y_0) = \frac{x_0}{f(x_0,y_0)}\,\partial_x f(x_0,y_0)$$
 — le pourcentage de variation de $f$ pour 1 % de variation de $x$. $|E| > 1$ : élastique ; $< 1$ : rigide ; $= 1$ : unitaire.
 
 **Exemple clé (du cours).** Cobb-Douglas $f(x,y) = x^\alpha y^\beta$ : $E^x_f = \alpha$ et $E^y_f = \beta$, **constantes** — c'est précisément ce qui rend ces fonctions si populaires en modélisation. Autre exemple du cours : une demande $D(p, r)$ avec $E^p_D < 0$ (le prix freine) et $E^r_D > 0$ (le revenu stimule).
-
----
 
 ## ⚠️ Common mistakes
 
@@ -125,8 +111,6 @@ $$E^x_f(x_0,y_0) = \frac{x_0}{f(x_0,y_0)}\,\partial_x f(x_0,y_0)$$
 4. **Confondre $\nabla f \cdot v$ et la définition** de la dérivée directionnelle quand $f$ n'est pas différentiable.
 5. **$x^y$** : dériver par rapport à $y$ donne $\ln(x)\,x^y$ — pas $y\,x^{y-1}$ (ça, c'est par rapport à $x$).
 6. **Croire que dérivable ⟹ continue** — faux en plusieurs variables (voir fiche 4).
-
----
 
 ## 📌 Ultimate Review
 
@@ -142,8 +126,6 @@ $$E^x_f(x_0,y_0) = \frac{x_0}{f(x_0,y_0)}\,\partial_x f(x_0,y_0)$$
 **Formulas to know**
 $$\partial_x f(x_0,y_0) = \lim_{h\to0}\tfrac{f(x_0+h,\,y_0)-f(x_0,y_0)}{h} \qquad \nabla f = (\partial_{x_1}f, \dots, \partial_{x_n}f)^T$$
 $$g' = \partial_x f\, x' + \partial_y f\, y' \qquad \frac{\partial f}{\partial v} = \nabla f \cdot v \ (\text{si diff.}) \qquad E^x_f = \frac{x}{f}\,\partial_x f$$
-
----
 
 ## 🧠 Active Recall
 
@@ -176,8 +158,6 @@ Cobb-Douglas ⟹ $E^x_N = 2/3$ : une hausse de 1 % des heures de travail augment
 
 Par la définition : $\partial_x f(0,0) = \lim_h \frac{f(h,0)-0}{h} = \lim_h \frac{0}{h} = 0$ ; de même $\partial_y f(0,0) = 0$ : $f$ est *dérivable* en $(0,0)$. Pourtant $f(t,t) = \tfrac12 \not\to 0$ : $f$ n'est **pas continue** en $(0,0)$. Conclusion majeure : en plusieurs variables, dérivable n'implique pas continue.
 </details>
-
----
 
 ## 🃏 Flashcards
 

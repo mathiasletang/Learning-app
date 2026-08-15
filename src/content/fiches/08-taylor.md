@@ -10,13 +10,9 @@
 | **Concepts clés** | Linéarisation, polynôme de Taylor, majoration d'erreur, DL, Taylor-Young, équivalents |
 | **Poids à l'examen** | Rarement une question isolée, mais l'outil resurgit partout : DL d'ordre 2 en deux variables (fiche 4), études de signe des restrictions (fiches 2 et 6), approximations numériques. |
 
----
-
 ## 🎯 Vue d'ensemble
 
 Remplacer une fonction compliquée par un polynôme qui lui colle localement : c'est *l'idée* la plus rentable de l'analyse. L'annexe du cours la déroule en une variable — linéarisation (ordre 1), polynôme de Taylor (ordre $n$), contrôle de l'erreur, développements limités — et la fiche 4 l'a déjà étendue à deux variables. Objectif ici : des automatismes de calcul rapides et fiables.
-
----
 
 ## 🔴 Concept 1 — Linéarisation
 
@@ -30,8 +26,6 @@ $$L(x) = f(x_0) + f'(x_0)(x - x_0)$$
 $$(1+x)^n \simeq 1 + nx \qquad \text{et} \qquad \sin x \simeq x \qquad (x \simeq 0)$$
 Applications du cours : $\sqrt[3]{1{,}2} = (1+0{,}2)^{1/3} \simeq 1{,}066$ ; $1{,}002^{100} \simeq 1{,}2$ ; le pendule ; mesurer un angle sans rapporteur (marquer 60 mm sur chaque côté : la corde en mm ≈ l'angle en degrés).
 
----
-
 ## 🔴 Concept 2 — Polynôme de Taylor et erreur
 
 **Définition (déf. A.3).** Le **polynôme de Taylor** d'ordre $n$ de $f$ en $x_0$ :
@@ -43,8 +37,6 @@ Il copie $f$ jusqu'à la dérivée $n$-ième : $P_n^{(k)}(x_0) = f^{(k)}(x_0)$ p
 > $$|f(x) - P_n(x)| \leq \frac{(b-a)^{n+1}}{(n+1)!}\, M.$$
 
 **Exemple (du cours).** $\sin x \simeq x$ sur $[-0{,}5;\,0{,}5]$ : l'erreur est $\leq \frac{(0{,}5)^2}{2}\sin(0{,}5) \leq 0{,}06$. Savoir *borner* l'erreur est ce qui distingue une approximation d'une devinette.
-
----
 
 ## 🟠 Concept 3 — Développements limités et Taylor-Young
 
@@ -67,8 +59,6 @@ $$\sin x = x - \frac{x^3}{6} + o(x^3) \qquad \cos x = 1 - \frac{x^2}{2} + o(x^2)
 - **Fiches 2 et 6** : pour trancher le signe d'une restriction $g(t) = f(\gamma(t))$ (limite ou étude directe), un DL de $g$ en $0$ suffit souvent.
 - **Équivalents** ($f \sim g$ si $f/g \to 1$, déf. A.12) : accélèrent les calculs de limites d'une variable qui apparaissent après restriction ou passage en polaires.
 
----
-
 ## ⚠️ Common mistakes
 
 1. **Confondre $\simeq$ et $=$** — une approximation sans contrôle d'erreur n'est pas une égalité ; le théorème A.6 fournit la borne.
@@ -76,8 +66,6 @@ $$\sin x = x - \frac{x^3}{6} + o(x^3) \qquad \cos x = 1 - \frac{x^2}{2} + o(x^2)
 3. **Tronquer trop tôt** — si le terme d'ordre 1 s'annule (cas typique : point critique !), il *faut* l'ordre 2 ; si l'ordre 2 s'annule, l'ordre suivant, etc.
 4. **Sommer des $o(\cdot)$ d'ordres différents** sans aligner : tout ramener au même $o(x^n)$.
 5. **Utiliser un équivalent dans une somme** — les équivalents se multiplient et se divisent bien, mais ne s'additionnent pas.
-
----
 
 ## 📌 Ultimate Review
 
@@ -88,8 +76,6 @@ $$\sin x = x - \frac{x^3}{6} + o(x^3) \qquad \cos x = 1 - \frac{x^2}{2} + o(x^2)
 5. Les 5 DL usuels en 0 (exp, ln, sin, cos, $(1+x)^\alpha$).
 6. En deux variables : gradient = ordre 1, hessienne = ordre 2.
 7. Équivalents : produits/quotients oui, sommes non.
-
----
 
 ## 🧠 Active Recall
 
@@ -116,8 +102,6 @@ $f = \sqrt{x}$ en $x_0 = 4$ : $L(x) = 2 + \frac{x-4}{4}$, donc $\sqrt{4{,}1} \si
 
 $d$ change de signe avec $k$ (négatif pour $k<0$, positif pour $k>0$) : le point n'est pas un extremum — c'est le mécanisme de l'exemple $x^2 + y^3$ de la fiche 6.
 </details>
-
----
 
 ## 🃏 Flashcards
 

@@ -10,8 +10,6 @@
 | **Concepts clés** | Max/min local et global, Weierstrass, Fermat, point critique, condition du 2ᵉ ordre, étude directe |
 | **Poids à l'examen** | LA question centrale : « déterminer et classer les extrema de $f$ ». Tombera, sous une forme ou une autre, à chaque épreuve. |
 
----
-
 ## 🎯 Vue d'ensemble
 
 Optimiser, c'est répondre à deux questions que le cours sépare soigneusement : **existe-t-il** un extremum (Weierstrass) ? et **où est-il** (Fermat + classification) ? La mécanique est un entonnoir :
@@ -25,8 +23,6 @@ Optimiser, c'est répondre à deux questions que le cours sépare soigneusement 
 
 Chaque flèche a ses hypothèses et ses pièges : c'est exactement là-dessus que les copies se départagent.
 
----
-
 ## 🟠 Concept 1 — Vocabulaire et existence
 
 **Définition (déf. 4.1).** $f$ admet un **maximum global** en $x_0$ si $f(x) \leq f(x_0)$ pour tout $x \in D$ ; un **maximum local** si c'est vrai dans une boule $B(x_0, r) \cap D$. (Minimum : inégalités inverses.)
@@ -36,8 +32,6 @@ Chaque flèche a ses hypothèses et ses pièges : c'est exactement là-dessus qu
 
 **Intuition et limites.** Fermé : contient sa frontière ; borné : tient dans une boule. Exemples du cours : $[-1;1]^2$ compact ✓ ; $\{x \geq 0, y \geq 0\}$ fermé mais non borné ✗ ; le disque *ouvert* borné mais non fermé ✗. Les extrema garantis peuvent être **au bord** — que Fermat ne détecte pas : sur un compact, il faut étudier l'intérieur (points critiques) *et* la frontière (fiche 7).
 
----
-
 ## 🔴 Concept 2 — Condition nécessaire : Fermat et points critiques
 
 **Théorème de Fermat (thm. 4.3).**
@@ -46,8 +40,6 @@ Chaque flèche a ses hypothèses et ses pièges : c'est exactement là-dessus qu
 **Définition (déf. 4.4).** Un point où $\nabla f = 0$ est un **point stationnaire** (ou critique).
 
 **Intuition.** Plan tangent horizontal. Mais attention au sens de l'implication : **extremum ⟹ critique**, jamais l'inverse — le point-selle $f(x,y) = x^2 - y^2$ en $(0,0)$ est critique sans être un extremum (col de montagne : minimum le long de la crête, maximum le long de la route).
-
----
 
 ## 🔴 Concept 3 — Classification : la condition du second ordre
 
@@ -81,15 +73,11 @@ pour $(h,k)$ voisin de $(0,0)$ : signe constant $\geq 0$ ⟹ minimum local ($\le
 
 **Exemple « cas douteux » type.** $f(x,y) = x^2 + y^4$ : en $(0,0)$, $\det H_f = 0$. Étude directe : $d(h,k) = h^2 + k^4 \geq 0$ pour tout $(h,k)$ ⟹ **minimum global**. (Alors que $f(x,y) = x^2 + y^3$ : $d(0,k) = k^3$ change de signe ⟹ selle. Même hessienne, natures opposées — d'où l'impossibilité de conclure par $H$.)
 
----
-
 ## 🟡 Concept 4 — Application : les moindres carrés
 
 Le cours (§4.1.1) applique la machinerie au problème d'ajuster une droite $y = mx + q$ à $n$ points $(x_i, y_i)$ : minimiser
 $$E(m, q) = \sum_{i=1}^n \big(y_i - (m x_i + q)\big)^2.$$
 On annule $\nabla E$ (deux équations linéaires — les *équations normales*), et la hessienne est définie positive : l'unique point critique est le minimum global. C'est la **droite de régression** — à savoir reconstruire, elle sert aussi en statistiques et en économétrie.
-
----
 
 ## ⚠️ Common mistakes
 
@@ -100,8 +88,6 @@ On annule $\nabla E$ (deux équations linéaires — les *équations normales*),
 5. **Oublier la frontière** quand le domaine n'est pas ouvert — Fermat ne voit pas les bords (Weierstrass peut y placer les extrema).
 6. **Erreurs de résolution du système** $\nabla f = 0$ — diviser par une quantité qui peut être nulle fait perdre des candidats ; factoriser plutôt.
 7. **Évaluer la hessienne « en général » et pas au point critique** — les signes doivent être pris *au candidat*.
-
----
 
 ## 📌 Ultimate Review
 
@@ -117,8 +103,6 @@ On annule $\nabla E$ (deux équations linéaires — les *équations normales*),
 $$\nabla f = 0 \quad ; \quad \det H_f = \partial_{xx}f\,\partial_{yy}f - (\partial_{xy}f)^2 \quad ; \quad d(h,k) = f(x_0{+}h, y_0{+}k) - f(x_0,y_0)$$
 
 **Methods to know** : le protocole complet en 5 étapes ; l'étude directe ; l'argument de globalité.
-
----
 
 ## 🧠 Active Recall
 
@@ -151,8 +135,6 @@ Fermat (ordre 1) : *filtre* les candidats — condition nécessaire, ne classe r
 
 C'est un minimum **global** (unique) : pour une fonction convexe, le graphe est au-dessus de son plan tangent en ce point, qui est horizontal — donc $f(x) \geq f(x_0)$ partout.
 </details>
-
----
 
 ## 🃏 Flashcards
 

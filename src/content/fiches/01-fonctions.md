@@ -10,8 +10,6 @@
 | **Concepts clés** | Domaine de définition, graphe, fonctions partielles, lignes de niveau |
 | **Poids à l'examen** | Le domaine de définition et les lignes de niveau sont des questions quasi systématiques en début d'épreuve. |
 
----
-
 ## 🎯 Vue d'ensemble
 
 Ce chapitre étend aux fonctions de **plusieurs variables** ce que vous savez des fonctions d'une variable. Pourquoi c'est important : toute la suite du cours — dérivées partielles, différentiabilité, extrema, Lagrange — travaille sur ces objets. Si vous ne savez pas dire *où vit* une fonction (son domaine) et *à quoi elle ressemble* (ses coupes et ses niveaux), rien de ce qui suit ne tiendra.
@@ -28,8 +26,6 @@ Fonction f : Rⁿ → R
 ```
 
 **Connexion** : fonctions partielles → dérivées partielles (fiche 3) ; lignes de niveau → gradient orthogonal aux niveaux (fiche 3) → interprétation géométrique de Lagrange (fiche 7). Ce chapitre plante les décors de tout le cours.
-
----
 
 ## 🔴 Concept 1 — Fonction de plusieurs variables et domaine de définition
 
@@ -62,8 +58,6 @@ la région entre l'axe des $x$ (exclu) et la parabole $y = x^2$ (incluse).
 - Un domaine se construit *condition par condition*, puis par intersection.
 - Toujours distinguer $\geq$ (frontière incluse) de $>$ (frontière exclue) — cette distinction deviendra cruciale pour Weierstrass (fiche 6 : fermé + borné = compact).
 
----
-
 ## 🟠 Concept 2 — Fonctions partielles (les coupes verticales)
 
 **Définition (Faccanoni, déf. 1.2).**
@@ -79,8 +73,6 @@ la région entre l'axe des $x$ (exclu) et la parabole $y = x^2$ (incluse).
 **À retenir**
 - Fonction partielle = une variable figée, fonction d'**une** variable qui en résulte.
 - Ne pas confondre $f_{x=a}$ (fonction partielle) et $f_{,x} = \partial_x f$ (dérivée partielle) — le cours met explicitement en garde contre cette confusion de notation.
-
----
 
 ## 🔴 Concept 3 — Lignes de niveau (les coupes horizontales)
 
@@ -107,8 +99,6 @@ la région entre l'axe des $x$ (exclu) et la parabole $y = x^2$ (incluse).
 - Serrage des courbes ⇔ raideur de la pente — lecture qualitative demandée en examen.
 - Le gradient sera **orthogonal** aux lignes de niveau (fiche 3) : retenez l'image dès maintenant.
 
----
-
 ## ⚠️ Common mistakes
 
 1. **Oublier une condition du domaine** — un dénominateur qui contient lui-même une racine impose *deux* conditions ($\geq 0$ ET $\neq 0$, donc $> 0$).
@@ -116,8 +106,6 @@ la région entre l'axe des $x$ (exclu) et la parabole $y = x^2$ (incluse).
 3. **Confondre $f_{x=a}$ et $\partial_x f$** — la première est une fonction partielle, la seconde une dérivée.
 4. **Tracer un niveau vide** — vérifier l'existence de solutions avant de tracer.
 5. **Frontières incluses/exclues mal marquées** — $\ln$ exige strictement $>0$, la racine accepte $=0$.
-
----
 
 ## 📌 Ultimate Review
 
@@ -132,8 +120,6 @@ la région entre l'axe des $x$ (exclu) et la parabole $y = x^2$ (incluse).
 **Definitions to know** : fonction de plusieurs variables, domaine, image, surface représentative (déf. 1.1) ; fonctions partielles (déf. 1.2) ; lignes de niveau (déf. 1.3).
 
 **Methods to know** : détermination et représentation d'un domaine ; détermination des courbes de niveau avec discussion selon $k$.
-
----
 
 ## 🧠 Active Recall
 
@@ -166,8 +152,6 @@ Toutes deux sont des coupes de la surface : la fonction partielle est une coupe 
 
 Là où les isobares sont les plus **rapprochées** : le gradient de pression y est le plus intense (exercice 1.4 du cours — réponse : San Francisco).
 </details>
-
----
 
 ## 🃏 Flashcards
 

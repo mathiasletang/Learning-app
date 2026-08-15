@@ -2,8 +2,6 @@
 
 Ce fichier répond à une seule question : **dans quel ordre travailler pour ne pas être perdu.**
 
----
-
 ## 1. Où tu en es, concrètement
 
 Tu m'as dit : dérivées, gradient, matrices, valeurs propres, hessienne, formes quadratiques — tu maîtrises, mais tu n'y as pas touché depuis deux mois. Lagrangien et KKT : jamais vraiment vu.
@@ -17,8 +15,6 @@ L'optimisation convexe demande :
 - rien d'autre.
 
 Elle ne demande **ni probabilités, ni statistiques, ni intégration**. C'est un point que le plan que tu m'as transmis rate complètement, et je vais y revenir.
-
----
 
 ## 2. Ce que vaut le programme de ChatGPT
 
@@ -68,8 +64,6 @@ Le vrai obstacle quand on vient de l'économie n'est pas le niveau mathématique
 
 « Mathématiques pour la finance » et « optimisation pour l'économie » ne se recouvrent que partiellement. Tu m'as dit vouloir mener les deux de front — très bien, mais il faut alors deux fils distincts, pas un seul programme qui mélange tout. C'est ce que propose la section suivante.
 
----
-
 ## 3. Le parcours
 
 Tu as choisi de mener l'optimisation et les probabilités en parallèle. Voici la structure. Les durées supposent **10 à 12 heures par semaine**. Si tu en fais moins, étire — ne compresse pas.
@@ -84,8 +78,6 @@ Tu as dit que ça reviendrait en deux ou trois jours. Fais-le proprement avant d
 > - Tu fais moins → reprends les chapitres 5 et 6 de Strang (18.06) sur les matrices symétriques et les formes quadratiques avant de continuer. Deux jours suffiront.
 
 En parallèle, lis `01_NOTATIONS_le-decodeur.md` en entier. Une heure. Reviens-y dès que tu bloques sur un symbole.
-
----
 
 ### FIL A — Optimisation (le fil principal)
 
@@ -138,8 +130,6 @@ Je conseille EE236A en premier si ton objectif reste l'économie.
 
 C'est aussi ici que **Python devient utile**. Installe CVXPY et résous les problèmes de Boyd numériquement. Rien ne révèle mieux une incompréhension qu'un solveur qui refuse ton problème.
 
----
-
 ### FIL B — Probabilités (le fil finance, 3 à 4 h/semaine)
 
 À mener en parallèle, sans presser. Il n'alimente pas l'optimisation avant longtemps — c'est la piste finance.
@@ -149,8 +139,6 @@ C'est aussi ici que **Python devient utile**. Installe CVXPY et résous les prob
 3. Le calcul stochastique (Shreve) vient **après** Stat 110. Pas avant. C'est la principale erreur des autodidactes en finance quantitative : attaquer Itô sans maîtriser l'espérance conditionnelle.
 
 Une remarque : ce fil n'a pas besoin d'être synchronisé avec le fil A. Si l'optimisation te passionne, mets 80 % de ton temps dessus et laisse les probabilités mijoter. Mieux vaut un fil maîtrisé et un fil lent que deux fils bâclés.
-
----
 
 ## 4. Calendrier réaliste
 
@@ -167,8 +155,6 @@ Une remarque : ce fil n'a pas besoin d'être synchronisé avec le fil A. Si l'op
 
 Ce n'est ni rapide ni lent. C'est le rythme réel.
 
----
-
 ## 5. Trois principes qui font la différence
 
 **Écris les preuves à la main.** Lire une démonstration donne l'illusion de comprendre. Referme le livre et réécris-la : tu verras immédiatement où ça casse. C'est désagréable et c'est le seul mécanisme qui fonctionne.
@@ -177,8 +163,6 @@ Ce n'est ni rapide ni lent. C'est le rythme réel.
 
 **Ne cherche pas à tout comprendre du premier coup.** Boyd se lit trois fois. La première pour la carte, la deuxième pour les mécanismes, la troisième pour les détails. Vouloir tout saisir au premier passage est la meilleure façon de s'arrêter au chapitre 2.
 
----
-
 ## 6. Ce que tu ne dois PAS faire maintenant
 
 - **`12_Nemirovski_Georgia-Tech`** — 14 400 pages de niveau doctorat. C'est un trésor, mais y entrer maintenant te découragerait en une heure. Reviens-y dans un an.
@@ -186,8 +170,6 @@ Ce n'est ni rapide ni lent. C'est le rythme réel.
 - **`09_ENS-Paris_Aspremont/M2_MVA`** — niveau M2, suppose Boyd acquis.
 - **`10_Cornell_ORIE6334`** — optimisation combinatoire, sujet différent.
 - **Le poly CNRS de ton dossier `BASE OPTIMISATION A VOIR EN 1ER`** — c'est un cours de **L1 économie**. Tu es largement au-dessus. Garde-le comme aide-mémoire de géométrie, rien de plus.
-
----
 
 ## 7. Les fichiers de ce dossier
 

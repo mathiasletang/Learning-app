@@ -10,8 +10,6 @@
 | **Concepts clés** | Directions de descente, méthode du gradient, Newton, gradient Lipschitz, conditionnement, vitesses de convergence |
 | **Poids à l'examen** | Exercices types : « montrer que $d$ est une direction de descente », « écrire l'itération du gradient pour $f$ », « discuter la convergence selon le pas ». Aussi la base des TP. |
 
----
-
 ## 🎯 Vue d'ensemble
 
 Annuler $\nabla f$ à la main est rarement possible : on **itère**. Le chapitre définit les méthodes itératives, identifie ce qui fait *descendre* (les directions de descente), en déduit les deux algorithmes canoniques — **gradient** (ordre 1) et **Newton** (ordre 2) — puis quantifie leur vitesse via la régularité de $f$ (gradient lipschitzien, forte convexité, conditionnement).
@@ -24,8 +22,6 @@ Vitesse : souslinéaire < linéaire (géométrique) < superlinéaire (quadratiqu
 Régularité : ∇f L-Lipschitz (borne le pas) · µ-convexité (garantit le taux) · cond = L/µ
 ```
 
----
-
 ## 🔴 Concept 1 — Méthodes itératives et directions de descente
 
 **Définition (IV.1).** Un **algorithme itératif** du premier ordre génère $x_{k+1} = \mathcal{A}(x_k)$ ; toute méthode du premier ordre s'écrit
@@ -37,8 +33,6 @@ $$x_{k+1} = x_k + \rho_k d_k, \qquad \rho_k > 0 \text{ (pas)}, \quad d_k \in \ma
 **Proposition IV.11.** Il existe une direction de descente en $x$ **ssi $x$ n'est pas un point critique** (prendre $d = -\nabla f(x)$ : $\langle\nabla f, d\rangle = -\lVert\nabla f\rVert^2 < 0$).
 
 **Décroissance garantie (prop. IV.12, « lemme d'Armijo »).** Le long d'une direction de descente, $f(x + td) < f(x)$ pour tout pas $t$ **assez petit**. Trois leçons du cours : la descente n'est garantie que localement ; le pas compte autant que la direction ; les directions de descente « pointent vers l'intérieur » des sous-niveaux.
-
----
 
 ## 🔴 Concept 2 — La méthode du gradient
 
@@ -56,8 +50,6 @@ $$x_{k+1} = \operatorname{argmin}_{x'} \; f(x_k) + \langle\nabla f(x_k), x' - x_
 2. Cas quadratique $f = \tfrac12\langle Ax,x\rangle + \langle b,x\rangle$ : l'itération devient **linéaire**, $x_{k+1} = (I - \rho A)x_k - \rho b$ — la convergence se lit sur les valeurs propres de $I - \rho A$ (il faut $|1 - \rho\lambda_i| < 1$ pour tout $i$, d'où la contrainte de pas $0 < \rho < 2/\lambda_{\max}$).
 3. Discuter le pas : trop grand ⟹ divergence/oscillation ; trop petit ⟹ lenteur.
 
----
-
 ## 🟠 Concept 3 — La méthode de Newton
 
 **Proposition IV.18.** Si $\nabla^2 f(x) \succ 0$, minimiser le modèle de Taylor **d'ordre 2** en $x$ donne le point
@@ -74,8 +66,6 @@ et $-\nabla^2 f(x)^{-1}\nabla f(x)$ est une direction de descente (preuve par Ra
 
 **Gradient vs Newton en une phrase** : le gradient minimise le modèle d'ordre 1 (robuste, pas cher, linéaire) ; Newton minimise le modèle d'ordre 2 (cher, fragile, superlinéaire).
 
----
-
 ## 🟠 Concept 4 — Régularité et conditionnement
 
 **Définition (IV.23).** $F$ est **$L$-lipschitzienne** si $\lVert F(x) - F(y)\rVert \leq L\lVert x - y\rVert$ ; la meilleure constante est $\operatorname{Lip}(F)$. Pour $F$ différentiable, elle se calcule via la jacobienne (prop. IV.25) : $\operatorname{Lip}(F) = \sup_x \lVert J_F(x)\rVert$. Pour $\nabla f$ : $L = \sup_x \lVert \nabla^2 f(x)\rVert = \sup_x \lambda_{\max}$ (symétrie + prop. I.36).
@@ -87,8 +77,6 @@ $$\operatorname{cond}(f) = \frac{L}{\mu} \;\geq\; 1.$$
 
 **Vitesses (déf. IV.5)** : $r_{k+1} \leq \theta r_k$ ($\theta < 1$) : **linéaire** (= géométrique, $r_k \leq \theta^k r_0$) ; $r_{k+1} \leq \theta r_k^\beta$ ($\beta > 1$) : **superlinéaire** ($\beta = 2$ : quadratique) ; $r_k \leq C/k^\alpha$ : **souslinéaire**.
 
----
-
 ## ⚠️ Common mistakes
 
 1. **Signe de la direction** — on descend selon $-\nabla f$ ; écrire $x_{k+1} = x_k + \rho\nabla f(x_k)$ fait *monter*.
@@ -97,8 +85,6 @@ $$\operatorname{cond}(f) = \frac{L}{\mu} \;\geq\; 1.$$
 4. **Confondre convergence linéaire et « lente »** — linéaire = géométrique = exponentielle en $k$ ; c'est la *sous*linéaire qui est lente.
 5. **Oublier que le taux dépend du conditionnement** — un gradient peut être correct sur une fonction bien conditionnée et interminable sur une vallée étroite.
 6. **Pas fixe trop grand sur une quadratique** — divergence dès que $\rho \geq 2/\lambda_{\max}$ : toujours vérifier la contrainte de pas.
-
----
 
 ## 📌 Ultimate Review
 
@@ -112,8 +98,6 @@ $$\operatorname{cond}(f) = \frac{L}{\mu} \;\geq\; 1.$$
 
 **Formulas to know**
 $$x_{k+1} = x_k - \rho_k\nabla f(x_k) \qquad x_{k+1} = x_k - \nabla^2 f(x_k)^{-1}\nabla f(x_k) \qquad \operatorname{cond}(f) = L/\mu$$
-
----
 
 ## 🧠 Active Recall
 
@@ -146,8 +130,6 @@ Coût par itération : gradient $O(N)$ dérivées / Newton hessienne + système 
 
 $\langle\nabla f, d\rangle = -\langle\nabla f, D^{-1}\nabla f\rangle \leq -\lambda_{\min}(D^{-1})\lVert\nabla f\rVert^2 < 0$ par Rayleigh ($D^{-1} \succ 0$), pourvu que $\nabla f(x) \neq 0$. (Mécanisme de l'exercice IV.21 de quasi-Newton.)
 </details>
-
----
 
 ## 🃏 Flashcards
 

@@ -10,8 +10,6 @@
 | **Concepts clés** | Valeurs propres, (semi-)définie positive, inégalité de Rayleigh, Taylor-Lagrange, fonctions quadratiques |
 | **Poids à l'examen** | Ces outils ne font pas l'objet de questions isolées : ils sont *les briques de chaque preuve et de chaque exercice* des chapitres II à V. |
 
----
-
 ## 🎯 Vue d'ensemble
 
 Le cours de Garrigos commence par affûter les outils : tout ce qui suit — existence, convexité, algorithmes, KKT — s'exprime en langage matriciel. Trois familles d'outils à maîtriser : le **spectre des matrices symétriques** (et la définie-positivité), les **formules de Taylor** version $\mathbb{R}^N$, et les **fonctions quadratiques**, le laboratoire de tout le cours.
@@ -21,8 +19,6 @@ Matrices symétriques → λmin, λmax → Rayleigh → (semi-)définie positive
 Différentielle → gradient, jacobienne, hessienne → Taylor (Young / Lagrange)
 Quadratiques  f = ⟨Ax,x⟩+⟨b,x⟩+c → ∇f, ∇²f explicites → cas d'école permanent
 ```
-
----
 
 ## 🔴 Concept 1 — Spectre et définie-positivité
 
@@ -40,8 +36,6 @@ Le cours insiste : la borne *inférieure* est « la seule » inégalité classiq
 
 **À retenir** — $\lambda_{\min}$ est *le* nombre à connaître d'une matrice symétrique : il décide de la positivité (I.45), minore les formes quadratiques (I.39), et mesurera la forte convexité (fiche 11).
 
----
-
 ## 🟠 Concept 2 — Différentielle, gradient, hessienne (version compacte)
 
 - **Jacobienne** (prop. I.61) : matrice des dérivées partielles d'une application $F : \mathbb{R}^N \to \mathbb{R}^M$.
@@ -50,8 +44,6 @@ Le cours insiste : la borne *inférieure* est « la seule » inégalité classiq
 $$f(x+h) = f(x) + \langle \nabla f(x), h\rangle + \tfrac12 \langle \nabla^2 f(x)\,h, h\rangle + o(\lVert h\rVert^2).$$
 
 **Taylor-Lagrange (versions exactes)** — ordre 1 (prop. I.74) : il existe $z \in \,]a, x[$ tel que $f(x) = f(a) + \langle \nabla f(z), x - a\rangle$ ; ordre 2 (prop. I.87) : reste exact avec la hessienne en un point intermédiaire. **Différence d'usage** : Young ($o(\cdot)$) sert aux limites et aux conditions d'optimalité ; Lagrange (point intermédiaire) sert aux **majorations globales** (convergence des algorithmes, fiche 12).
-
----
 
 ## 🔴 Concept 3 — Fonctions quadratiques : le cas d'école
 
@@ -69,8 +61,6 @@ Avec la normalisation $f(x) = \tfrac12\langle Ax,x\rangle + \langle b,x\rangle +
 2. Lire directement $\nabla f = Ax + b$, $\nabla^2 f = A$.
 3. Contrôle : les dérivées partielles calculées à la main doivent coïncider.
 
----
-
 ## ⚠️ Common mistakes
 
 1. **« Norme d'opérateur = rayon spectral » pour une matrice non symétrique** — faux (remarque I.37) ; en général c'est $\sqrt{\lambda_{\max}(A^\top A)}$.
@@ -78,8 +68,6 @@ Avec la normalisation $f(x) = \tfrac12\langle Ax,x\rangle + \langle b,x\rangle +
 3. **Confondre définie positive et semi-définie positive** — l'inversibilité fait la différence (I.45.ii).
 4. **Utiliser Taylor-Young pour une borne globale** — le $o(\lVert h \rVert^2)$ n'est valable qu'au voisinage ; pour une inégalité valable partout, c'est Taylor-Lagrange.
 5. **Tester la positivité sur quelques vecteurs** — il faut un argument spectral ou un critère (diagonale/déterminant), pas trois essais.
-
----
 
 ## 📌 Ultimate Review
 
@@ -89,8 +77,6 @@ Avec la normalisation $f(x) = \tfrac12\langle Ax,x\rangle + \langle b,x\rangle +
 4. $\nabla^2 f = J(\nabla f)$, symétrique ; Taylor-Young ordre 2 avec $\tfrac12\langle \nabla^2 f\, h, h\rangle$.
 5. Quadratique $\tfrac12\langle Ax,x\rangle + \langle b,x\rangle + c$ ($A$ sym.) : $\nabla f = Ax + b$, $\nabla^2 f = A$.
 6. Moindres carrés = fonction quadratique.
-
----
 
 ## 🧠 Active Recall
 
@@ -117,8 +103,6 @@ $f = \tfrac12\langle Ax,x\rangle + \langle b,x\rangle$ avec $A = \begin{pmatrix}
 
 Rayleigh + Cauchy-Schwarz : $f(x) \geq \lVert x\rVert^2 - \lVert b\rVert \lVert x\rVert \to +\infty$ quand $\lVert x \rVert \to \infty$ : coercive (et fortement convexe — fiche 11).
 </details>
-
----
 
 ## 🃏 Flashcards
 

@@ -10,8 +10,6 @@
 | **Concepts clés** | Polyèdres, contraintes actives, qualification, stationnarité, complémentarité, système KKT |
 | **Poids à l'examen** | L'exercice « résoudre le système KKT » est l'aboutissement du programme — c'est lui qui départage les copies. La complémentarité ($\alpha_i g_i = 0$) structure toute la résolution. |
 
----
-
 ## 🎯 Vue d'ensemble
 
 La fiche 7 traitait les contraintes d'**égalité** (Lagrange classique). Garrigos généralise aux **inégalités** $g_i(x) \leq 0$ — le cas réellement courant (budgets, capacités, positivité). L'idée-force : au bord, Fermat devient $\nabla f(\bar x) + \text{« gradient de la contrainte »} = 0$, et le signe du multiplicateur encode *de quel côté* la contrainte pousse.
@@ -24,15 +22,11 @@ Contraintes mixtes          ∇f + Σ αi∇gi + Σ βj∇hj = 0
 Hypothèse : contrainte RÉGULIÈRE (affine, ou gradients actifs indépendants)
 ```
 
----
-
 ## 🟡 Concept 1 — Le décor : polyèdres et optimisation linéaire
 
 **Définition (V.3).** Un **polyèdre** est $C = \{x \mid Ax \preceq b\}$ — une intersection **finie de demi-espaces** (remarque V.4). Boîtes $\{\alpha_i \leq x_i \leq \beta_i\}$, sous-espaces affines $[Ax = b]$ : tous des polyèdres, tous **convexes**.
 
 **Définition (V.11).** L'**optimisation linéaire** (LP) : minimiser $\langle c, x\rangle$ sous $Ax \preceq b$ — objectif linéaire, contrainte polyédrale. Exemple historique du cours : le transport optimal de Monge.
-
----
 
 ## 🔴 Concept 2 — Une inégalité simple : d'où viennent les conditions
 
@@ -47,8 +41,6 @@ $$\exists\, \alpha \geq 0 : \quad \nabla f(\bar x) + \alpha\,\nabla g(\bar x) = 
 - **Qualification** : $\nabla g(\bar x) \neq 0$ — sans elle, le théorème peut échouer (exercice V.26 du cours : contrainte non régulière, minimiseurs qui ne vérifient pas KKT).
 
 **Intuition de la preuve (du cours).** Si $\nabla f(\bar x)$ n'était pas colinéaire à $\nabla g(\bar x)$, on trouverait une *direction de descente commune* à $f$ et $g$ (surjectivité) : on améliorerait $f$ tout en restant admissible — contradiction. Et si $\alpha < 0$, $-\nabla f$ redeviendrait une telle direction. Le signe $\alpha \geq 0$ dit que **le gradient de $f$ pousse vers l'extérieur** de la contrainte.
-
----
 
 ## 🔴 Concept 3 — Le théorème général de Lagrange-KKT
 
@@ -80,8 +72,6 @@ Un point vérifiant ce système est un **point critique du problème** (remarque
 4. **Cas active** ($x + y = 1$) : $x = 2 - \alpha$, $y = -\alpha$, somme $= 2 - 2\alpha = 1 \Rightarrow \alpha = \tfrac12 \geq 0$ ✓, $(x,y) = \left(\tfrac32, -\tfrac12\right)$.
 5. Unique candidat + existence + convexité ⟹ **minimiseur global** $\left(\tfrac32, -\tfrac12\right)$. La contrainte est active : l'optimum libre $(2,0)$ violait le budget, la solution s'est plaquée au bord.
 
----
-
 ## ⚠️ Common mistakes
 
 1. **Se tromper de signe sur les multiplicateurs** — $\alpha_i \geq 0$ pour les *inégalités* (écrites $g_i \leq 0$, stationnarité écrite avec $+$), $\beta_j$ **libres** pour les égalités. Toujours normaliser les contraintes en $g \leq 0$ d'abord.
@@ -90,8 +80,6 @@ Un point vérifiant ce système est un **point critique du problème** (remarque
 4. **Ignorer la qualification** — l'exercice V.26 du cours construit un minimiseur qui ne vérifie *pas* KKT car la contrainte n'y est pas qualifiée. Contraintes affines : régularité automatique, dites-le.
 5. **Croire qu'un point KKT est un minimiseur** — candidat seulement, sauf convexité.
 6. **Compter les contraintes actives dans $I(x)$ pour les égalités** — la notion d'« active » ne concerne que les inégalités.
-
----
 
 ## 📌 Ultimate Review
 
@@ -105,8 +93,6 @@ Un point vérifiant ce système est un **point critique du problème** (remarque
 8. Contrainte inactive ⟹ multiplicateur nul ⟹ retour à Fermat.
 
 **Formulas to know** — le système KKT complet (les 4 blocs), et le cas simple $\nabla f + \alpha\nabla g = 0$, $\alpha g = 0$, $\alpha \geq 0$.
-
----
 
 ## 🧠 Active Recall
 
@@ -139,8 +125,6 @@ Lagrange classique : contraintes d'égalité seulement, multiplicateurs libres. 
 
 Active : le budget est entièrement dépensé (l'optimum est sur le bord). $\alpha > 0$ : le budget est *contraignant* — un euro de plus augmenterait strictement l'utilité optimale, $\alpha$ mesurant cette utilité marginale du revenu. $\alpha = 0$ (inactive) : l'optimum n'épuise pas le budget, le relâcher ne change rien.
 </details>
-
----
 
 ## 🃏 Flashcards
 

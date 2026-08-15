@@ -3,7 +3,7 @@ import { Link, useParams } from 'react-router-dom';
 import { motion, useScroll, useSpring } from 'framer-motion';
 import { getFiche, fichesOfSubject, DIFFICULTY_LABEL } from '@/core/fiches';
 import { SUBJECT_DEFS } from '@/core/subjects';
-import { renderMarkdown } from '@/core/markdown';
+import { renderMarkdown, decorateFiche } from '@/core/markdown';
 import { PageHead, Icon, Tag } from '@/ui';
 import '@/modules/courses/courses.css';
 
@@ -15,7 +15,7 @@ export function FicheView() {
   const { scrollYProgress } = useScroll();
   const progress = useSpring(scrollYProgress, { stiffness: 120, damping: 30, restDelta: 0.001 });
 
-  const html = useMemo(() => (fiche ? renderMarkdown(fiche.markdown) : ''), [fiche]);
+  const html = useMemo(() => (fiche ? decorateFiche(renderMarkdown(fiche.markdown)) : ''), [fiche]);
 
   if (!fiche) {
     return (
@@ -51,7 +51,7 @@ export function FicheView() {
         <span className="micro">{fiche.course}</span>
       </p>
 
-      <article className="prose" dangerouslySetInnerHTML={{ __html: html }} />
+      <article className="prose prose--fiche" dangerouslySetInnerHTML={{ __html: html }} />
 
       <footer className="reader__foot">
         <Link className="arrow-link" to={back}>

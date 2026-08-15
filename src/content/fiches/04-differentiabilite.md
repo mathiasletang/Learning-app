@@ -10,8 +10,6 @@
 | **Concepts clés** | Différentiabilité, différentielle, plan tangent, Schwarz, hessienne, convexité |
 | **Poids à l'examen** | « Montrer que $f$ est (ou n'est pas) différentiable en $(0,0)$ » est un exercice rituel ; la hessienne est l'outil central des fiches 6–7. |
 
----
-
 ## 🎯 Vue d'ensemble
 
 En une variable, dérivable = différentiable = il existe une tangente. En deux variables, **l'équivalence se brise** : les dérivées partielles ne regardent que deux directions, ce qui est trop faible pour garantir un *plan tangent*. La différentiabilité comble ce déficit : elle exige que l'approximation linéaire soit bonne **dans toutes les directions à la fois**. Ce chapitre établit la hiérarchie des régularités, construit le plan tangent, puis monte à l'ordre 2 : dérivées secondes, théorème de Schwarz, hessienne et convexité — les munitions des fiches extrema.
@@ -24,8 +22,6 @@ En une variable, dérivable = différentiable = il existe une tangente. En deux 
 Ordre 2 : dérivées secondes → Schwarz (symétrie) → HESSIENNE
           → DL ordre 2 → convexité/concavité
 ```
-
----
 
 ## 🔴 Concept 1 — Différentiabilité
 
@@ -56,8 +52,6 @@ Ordre 2 : dérivées secondes → Schwarz (symétrie) → HESSIENNE
 
 **Contre-exemple (du cours).** $f = \frac{xy^2}{x^2+y^4}$ (hors origine), $f(0,0)=0$ : dérivable en $(0,0)$ mais pas continue ⟹ pas différentiable. La dérivabilité est *trop faible*.
 
----
-
 ## 🔴 Concept 2 — Différentielle, plan tangent, linéarisation
 
 **Définition (déf. 3.12).** En tout point où $f$ est différentiable, la **différentielle** est
@@ -77,8 +71,6 @@ $$L(x,y) = f(x_0,y_0) + (x - x_0)\,\partial_x f(x_0,y_0) + (y - y_0)\,\partial_y
 
 **Estimation d'erreurs (prop. 3.14).** Si les mesures ont des incertitudes $r_1, r_2$, alors $|f(x_1,y_1) - f(x_0,y_0)| \leq A r_1 + B r_2$ avec $A, B$ des majorants de $|\partial_x f|, |\partial_y f|$ sur le rectangle d'incertitude — l'outil des exercices de physique/économie appliquée.
 
----
-
 ## 🟡 Concept 3 — Fonctions homogènes et théorème d'Euler
 
 **Définition (déf. 3.15).** $f$ est **homogène de degré $k$** si $f(\lambda x) = \lambda^k f(x)$ pour tout $\lambda > 0$.
@@ -87,8 +79,6 @@ $$L(x,y) = f(x_0,y_0) + (x - x_0)\,\partial_x f(x_0,y_0) + (y - y_0)\,\partial_y
 $$\sum_{i=1}^n x_i\, \partial_{x_i} f(x) = k\, f(x).$$
 
 **Exemple économique (du cours).** Cobb-Douglas à rendements constants $f = x^\alpha y^{1-\alpha}$ : homogène de degré 1, donc $x\,\partial_x f + y\,\partial_y f = f$ — « la production permet exactement de rémunérer les facteurs à leur productivité marginale ».
-
----
 
 ## 🔴 Concept 4 — Dérivées secondes, Schwarz, hessienne
 
@@ -106,8 +96,6 @@ Vérification recommandée en pratique : calculer les deux croisées est un auto
 **DL d'ordre 2 (déf. 3.19, forme matricielle).** Pour $f \in C^2$ :
 $$f(x) = f(x_0) + (x - x_0)^T \nabla f(x_0) + \tfrac12 (x-x_0)^T H_f(x_0)\,(x - x_0) + o(\lVert x - x_0\rVert^2)$$
 La hessienne est le « terme d'ordre 2 » : elle dit si la surface se courbe vers le haut, vers le bas, ou en selle — d'où son rôle décisif pour les extrema (fiche 6).
-
----
 
 ## 🟠 Concept 5 — Convexité
 
@@ -128,8 +116,6 @@ La hessienne est le « terme d'ordre 2 » : elle dit si la surface se courbe ver
 
 **Pourquoi c'est précieux** : pour une fonction convexe, tout minimum local est **global** — l'argument qui transformera vos conclusions locales en conclusions globales (fiches 6–7).
 
----
-
 ## ⚠️ Common mistakes
 
 1. **« Dérivable donc continue »** — FAUX en plusieurs variables. La bonne chaîne : $C^1 \Rightarrow$ différentiable $\Rightarrow$ continue et dérivable, sans retour.
@@ -138,8 +124,6 @@ La hessienne est le « terme d'ordre 2 » : elle dit si la surface se courbe ver
 4. **Appliquer Schwarz sans continuité des croisées** — l'hypothèse fait partie du théorème.
 5. **Confondre différentielle (forme $\mathrm{d}f$) et plan tangent (fonction affine $L$)** — même contenu, objets différents.
 6. **Vérifier la convexité en un seul point** — les conditions sur $H_f$ doivent valoir **partout sur $D$**.
-
----
 
 ## 📌 Ultimate Review
 
@@ -154,8 +138,6 @@ La hessienne est le « terme d'ordre 2 » : elle dit si la surface se courbe ver
 
 **Definitions to know** : différentiabilité (3.8), différentielle (3.12), plan tangent (3.13), homogénéité (3.15), hessienne (3.20), convexité (3.22).
 **Methods to know** : le protocole « différentiable en (0,0) ? » en 4 étapes ; l'approximation par linéarisation ; le test de convexité par hessienne.
-
----
 
 ## 🧠 Active Recall
 
@@ -188,8 +170,6 @@ SDP partout ⟺ convexité (équivalence). Définie positive partout ⟹ convexi
 
 Continuité : $|f| \leq r|\cos^3\vartheta| \leq r \to 0$ ✓. Partielles : $\partial_x f(0,0) = \lim \frac{h^3/h^2}{h} = 1$, $\partial_y f(0,0) = 0$. Critère : $\frac{f(h,k) - h}{\sqrt{h^2+k^2}} = \frac{h^3 - h(h^2+k^2)}{(h^2+k^2)^{3/2}} = \frac{-hk^2}{(h^2+k^2)^{3/2}} = -\cos\vartheta\sin^2\vartheta$ : dépend de $\vartheta$, pas de limite nulle ⟹ **non différentiable** (bien que continue et dérivable).
 </details>
-
----
 
 ## 🃏 Flashcards
 

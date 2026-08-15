@@ -10,13 +10,9 @@
 | **Concepts clés** | Théorème des fonctions implicites, dérivation implicite, tangente à une courbe de niveau |
 | **Poids à l'examen** | Question type : « montrer que $f(x,y)=0$ définit $y = \varphi(x)$ au voisinage de tel point, calculer $\varphi'$ et la tangente ». Aussi l'outil caché derrière la méthode de réduction (fiche 7). |
 
----
-
 ## 🎯 Vue d'ensemble
 
 Une équation $f(x,y) = 0$ dessine une courbe. Peut-on la lire comme le graphe d'une fonction $y = \varphi(x)$ ? Globalement, rarement (le cercle échoue) ; **localement**, oui — sous une condition simple : $\partial_y f \neq 0$. Le théorème des fonctions implicites donne l'existence de $\varphi$, **et** une formule pour $\varphi'$ sans jamais résoudre l'équation. C'est de la chain rule déguisée, et c'est l'outil qui justifie la dérivation « le long d'une contrainte » (fiche 7).
-
----
 
 ## 🔴 Concept — Le théorème des fonctions implicites
 
@@ -56,8 +52,6 @@ $$\partial_x \varphi = -\frac{\partial_x f}{\partial_z f}, \qquad \partial_y \va
 5. Tangente : $y = -\frac35(x-2) - 2 = -\frac35 x - \frac45$.
 (Ici on peut vérifier : $y = \frac{1 - \sqrt{12x+1}}{2}$ est la branche passant par $(2,-2)$.)
 
----
-
 ## ⚠️ Common mistakes
 
 1. **Oublier le signe moins** dans $\varphi' = -\partial_x f / \partial_y f$ — l'erreur n° 1, catastrophique en cascade.
@@ -65,8 +59,6 @@ $$\partial_x \varphi = -\frac{\partial_x f}{\partial_z f}, \qquad \partial_y \va
 3. **Ne pas vérifier $\partial_y f \neq 0$** — c'est l'hypothèse qui fait tout ; en un point où elle échoue, il n'y a souvent *pas* de fonction implicite (cercle en $(1,0)$).
 4. **Oublier de vérifier que le point est sur la courbe** ($f(x_0,y_0) = k$) avant tout.
 5. Si $\partial_y f = 0$ mais $\partial_x f \neq 0$ : on peut exprimer **$x = \psi(y)$** — le théorème marche en échangeant les rôles.
-
----
 
 ## 📌 Ultimate Review
 
@@ -76,8 +68,6 @@ $$\partial_x \varphi = -\frac{\partial_x f}{\partial_z f}, \qquad \partial_y \va
 4. Tangente : $y = \varphi'(x_0)(x-x_0) + y_0$.
 5. Trois variables : $z = \varphi(x,y)$, $\partial_x \varphi = -\partial_x f/\partial_z f$, $\partial_y \varphi = -\partial_y f/\partial_z f$.
 6. $\partial_y f = 0$ : point suspect (tangente verticale, croisement de branches) ; essayer $x = \psi(y)$.
-
----
 
 ## 🧠 Active Recall
 
@@ -104,8 +94,6 @@ En $(0,1)$ : $\partial_y f = 2y = 2 \neq 0$ ⟹ oui ($\varphi(x) = \sqrt{1-x^2}$
 
 $f = e^{xy} + x - y$, $f(0,0) = 1$ ✓. $\partial_x f = ye^{xy} + 1 \to 1$ ; $\partial_y f = xe^{xy} - 1 \to -1 \neq 0$. $\varphi'(0) = -\frac{1}{-1} = 1$ : tangente $y = x$.
 </details>
-
----
 
 ## 🃏 Flashcards
 

@@ -10,8 +10,6 @@
 | **Concepts clés** | Infimum vs minimum, minimiseur, coercivité, existence, conditions d'optimalité revisitées |
 | **Poids à l'examen** | « Montrer que $f$ admet un minimiseur » — la question d'ouverture type des sujets d'optimisation. La coercivité est l'argument attendu. |
 
----
-
 ## 🎯 Vue d'ensemble
 
 La fiche 6 (Faccanoni) répondait à « *où* sont les extrema ». Garrigos pose la question préalable, plus profonde : **existent-ils ?** L'inf d'une fonction peut ne jamais être atteint ($e^x$), ou n'être pas fini ($x$). Le chapitre construit le bon vocabulaire (infimum / minimum / minimiseur / argmin), l'outil d'existence (**coercivité**), puis re-démontre les conditions d'optimalité avec le formalisme $\nabla^2 f \succeq 0$.
@@ -23,8 +21,6 @@ EXISTENCE   : f continue + coercive + C fermé  ⟹  argmin ≠ ∅
 CANDIDATS   : ∇f = 0 (Fermat, à l'INTÉRIEUR de C seulement !)
 NATURE      : CNO : ∇²f ≽ 0 · CSO : ∇²f ≻ 0 ⟹ min local · ni ≽0 ni ≼0 ⟹ selle
 ```
-
----
 
 ## 🔴 Concept 1 — Vocabulaire de précision
 
@@ -46,8 +42,6 @@ NATURE      : CNO : ∇²f ≽ 0 · CSO : ∇²f ≻ 0 ⟹ min local · ni ≽0 
 
 **Contre-exemple frappant (II.7).** $f(x) = x(x-1)(x+1)$ : $\inf f = -\infty$ (pas minorée !) et pourtant $x = 1/\sqrt3$ est un minimiseur **local**. Le local ne dit rien du global.
 
----
-
 ## 🔴 Concept 2 — Coercivité : l'arme d'existence
 
 **Définition (II.25).**
@@ -65,8 +59,6 @@ NATURE      : CNO : ∇²f ≽ 0 · CSO : ∇²f ≻ 0 ⟹ min local · ni ≽0 
 
 **Propositions utiles** : sur un $C$ **borné**, toute fonction est coercive (prop. II.33 — la limite est vide) ; coercivité $\iff$ sous-niveaux bornés (prop. II.34).
 
----
-
 ## 🔴 Concept 3 — Le théorème d'existence
 
 **Théorème (II.35, via le lemme des suites minimisantes II.37).**
@@ -80,8 +72,6 @@ NATURE      : CNO : ∇²f ≽ 0 · CSO : ∇²f ≻ 0 ⟹ min local · ni ≽0 
 3. $f$ est coercive sur $C$ (minoration).
 4. Donc, par le théorème d'existence, $\operatorname{argmin}_C f \neq \varnothing$. ∎
 
----
-
 ## 🟠 Concept 4 — Conditions d'optimalité, version Garrigos
 
 Reformulation matricielle de la fiche 6, avec deux précisions importantes :
@@ -92,8 +82,6 @@ Reformulation matricielle de la fiche 6, avec deux précisions importantes :
 - **Corollaire II.24 (selle)** : si $\nabla f(\bar x) = 0$ et $\nabla^2 f(\bar x)$ n'est **ni** SDP **ni** semi-définie négative ⟹ point-selle.
 - **Local → global (remarque II.20)** : pour disqualifier un candidat du titre de minimiseur global, il suffit d'exhiber *un* point où $f$ est plus petite.
 
----
-
 ## ⚠️ Common mistakes
 
 1. **Confondre minimum et minimiseur** — valeur vs point ; le cours « martèle » la distinction.
@@ -102,8 +90,6 @@ Reformulation matricielle de la fiche 6, avec deux précisions importantes :
 4. **Appliquer Fermat en un point du bord** — $x^2$ sur $[1,2]$ : le minimiseur ne vérifie pas $f' = 0$.
 5. **Croire que point critique du 2ᵉ ordre ⟹ minimiseur** — $x^3$, $-x^4$ en 0.
 6. **Conclure « global » depuis la CSO** — elle ne donne que du local ; global = coercivité + comparaison, ou convexité (fiche 11).
-
----
 
 ## 📌 Ultimate Review
 
@@ -116,8 +102,6 @@ Reformulation matricielle de la fiche 6, avec deux précisions importantes :
 7. Quadratique : coercive $\iff$ fortement convexe $\iff A \succ 0$ (avec Rayleigh).
 
 **Methods to know** : le schéma de rédaction d'existence en 4 lignes ; les deux tests de coercivité.
-
----
 
 ## 🧠 Active Recall
 
@@ -150,8 +134,6 @@ Domaine borné (fermé) ⟹ compacité : Bolzano suffit, pas besoin d'étudier l
 
 Non coercive : le long de $y = x$, $f = 0$ constante alors que $\lVert(x,x)\rVert \to \infty$ (exercice II.29.3). Mais l'existence n'exige pas la coercivité (condition suffisante, pas nécessaire !) : $f \geq 0 = f(x,x)$, donc $\min f = 0$ et $\operatorname{argmin} f = \{(x,y) \mid y = x\}$ — un continuum de minimiseurs.
 </details>
-
----
 
 ## 🃏 Flashcards
 

@@ -10,8 +10,6 @@
 | **Concepts clés** | Normes, boules, limite en un point, coordonnées polaires, continuité, prolongement |
 | **Poids à l'examen** | L'exercice « la limite existe-t-elle ? » est un classique absolu. La technique polaire est l'outil n° 1. |
 
----
-
 ## 🎯 Vue d'ensemble
 
 En une variable, on approche un point par la gauche ou par la droite. Dans le plan, on peut l'approcher par **une infinité de chemins** : droites, paraboles, spirales… C'est *le* saut conceptuel du chapitre, et la source de tous les pièges. Le cours construit d'abord les outils de mesure de distance (**normes**, **boules**), définit la limite, puis donne les deux armes pratiques : les **restrictions à des courbes** (pour montrer qu'une limite n'existe PAS) et les **coordonnées polaires** (pour montrer qu'elle existe).
@@ -24,8 +22,6 @@ Limite = f(A)  →  Continuité  →  Prolongement par continuité
 ```
 
 **Connexion** : la continuité est la brique de Weierstrass (fiche 6) ; le critère de différentiabilité (fiche 4) est *une limite de ce type* — cette fiche est donc un outil permanent.
-
----
 
 ## 🟡 Concept 1 — Normes et boules
 
@@ -46,8 +42,6 @@ Limite = f(A)  →  Continuité  →  Prolongement par continuité
 
 **À retenir** — Les trois axiomes ; les trois boules dessinées ; et surtout : *l'existence et la valeur d'une limite ne dépendent pas de la norme choisie* (propriété 2.5).
 
----
-
 ## 🔴 Concept 2 — Limite en un point
 
 **Définition (déf. 2.4).**
@@ -67,8 +61,6 @@ Limite = f(A)  →  Continuité  →  Prolongement par continuité
 le chemin $y=0$ donne $f(x, 0) = 1 \to 1$ ; le chemin $x=0$ donne $f(0,y) = -1 \to -1$. Deux limites différentes ⟹ **la limite n'existe pas**.
 
 **Contre-exemple célèbre (du cours, à méditer).** $f(x,y) = \dfrac{xy^2}{x^2+y^4}$ : la limite le long de *toute droite* passant par l'origine vaut $0$, mais le long de la parabole $x = y^2$, $f(y^2, y) = \tfrac12$. Les droites ne suffisent pas !
-
----
 
 ## 🔴 Concept 3 — Coordonnées polaires : l'arme pro-existence
 
@@ -96,8 +88,6 @@ $$\lim_{(x,y)\to(a,b)} f(x,y) = \lim_{\substack{r \to 0 \\ \forall \vartheta}} f
 3. Majoration : $|f - 0| \leq \tfrac{r}{2} \xrightarrow[r \to 0]{} 0$, **indépendamment de $\vartheta$**.
 4. Conclusion : $\lim = 0$. ✓
 
----
-
 ## 🟠 Concept 4 — Continuité et prolongement
 
 **Définition (déf. 2.9).** $f$ est **continue en $A \in D$** si elle y possède une limite égale à $f(A)$ ; continue sur $D$ si c'est vrai en tout point.
@@ -108,8 +98,6 @@ $$\lim_{(x,y)\to(a,b)} f(x,y) = \lim_{\substack{r \to 0 \\ \forall \vartheta}} f
 
 **Exemple (du cours).** $f(x,y) = \dfrac{xy}{x^2+y^2}$ : $f(0,t) = 0$ mais $f(t,t) = \tfrac12$ ⟹ pas de limite en $(0,0)$ ⟹ **pas prolongeable**. En revanche $\dfrac{xy}{\sqrt{x^2+y^2}} \to 0$ : prolongeable par la valeur $0$.
 
----
-
 ## ⚠️ Common mistakes
 
 1. **Conclure à l'existence après avoir testé des chemins** — même toutes les droites ne prouvent rien (contre-exemple $\frac{xy^2}{x^2+y^4}$). Les chemins ne servent qu'à **réfuter**.
@@ -117,8 +105,6 @@ $$\lim_{(x,y)\to(a,b)} f(x,y) = \lim_{\substack{r \to 0 \\ \forall \vartheta}} f
 3. **Choisir la mauvaise candidate** $\ell$ : toujours la calculer sur un chemin *avant* de majorer.
 4. **Polaires mal centrées** : pour une limite en $(a,b) \neq (0,0)$, poser $x = a + r\cos\vartheta$, $y = b + r\sin\vartheta$ — pas $x = r\cos\vartheta$.
 5. **Confondre « pas de limite » et « limite infinie »** : $\lim = +\infty$ est un énoncé précis (déf. 2.4), pas une absence de limite.
-
----
 
 ## 📌 Ultimate Review
 
@@ -135,8 +121,6 @@ $$x = a + r\cos\vartheta,\quad y = b + r\sin\vartheta,\quad r = \text{distance �
 $$|f(a{+}r\cos\vartheta,\, b{+}r\sin\vartheta) - \ell| \leq s(r) \xrightarrow[r\to0]{} 0 \implies \lim f = \ell$$
 
 **Methods to know** : la procédure en 4 étapes « la limite existe-t-elle ? » ; l'étude de continuité en un point spécial ; le prolongement.
-
----
 
 ## 🧠 Active Recall
 
@@ -169,8 +153,6 @@ Réfuter est *local à un chemin* : deux restrictions discordantes suffisent. Pr
 
 En polaires, les $r$ se simplifient totalement : $f$ ne dépend que de $\vartheta$. Sauf cas dégénéré (quotient constant), la valeur varie avec la direction : la limite en $(0,0)$ n'existe pas. Exemple : $\frac{x^2-y^2}{x^2+y^2} = \cos 2\vartheta$.
 </details>
-
----
 
 ## 🃏 Flashcards
 

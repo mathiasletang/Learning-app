@@ -4,8 +4,6 @@ Le vrai obstacle quand on vient de l'économie n'est pas la difficulté mathéma
 
 Ce fichier est ce code. Garde-le ouvert à côté de toi.
 
----
-
 ## 1. Comment est bâti un texte mathématique
 
 Tout cours d'optimisation alterne cinq types de blocs. Les reconnaître fait gagner un temps considérable, parce qu'on ne les lit pas de la même façon.
@@ -21,8 +19,6 @@ Tout cours d'optimisation alterne cinq types de blocs. Les reconnaître fait gag
 Une preuve se termine par `□`, `∎` ou `QED`. Quand tu vois ce symbole, l'argument est clos.
 
 Un réflexe utile : devant un théorème, demande-toi toujours **« que se passe-t-il si je retire une hypothèse ? »**. En général tout s'écroule, et comprendre *comment* ça s'écroule est la meilleure façon de comprendre à quoi sert l'hypothèse.
-
----
 
 ## 2. Ensembles et espaces
 
@@ -44,8 +40,6 @@ Un réflexe utile : devant un théorème, demande-toi toujours **« que se passe
 | $\{x \mid P(x)\}$ | « l'ensemble des x tels que P(x) » | La barre `|` se lit **« tels que »**. Parfois notée `:` |
 
 **Le double indice `++` compte.** $\mathbb{R}_+$ inclut zéro, $\mathbb{R}_{++}$ non. Cette différence d'un seul caractère change des théorèmes entiers (typiquement : la condition de Slater exige une inégalité **stricte**).
-
----
 
 ## 3. Vecteurs et matrices
 
@@ -72,8 +66,6 @@ C'est pour cela que le produit scalaire s'écrit $x^T y$ : il faut transposer $x
 | $A^{-1}$ | Inverse |
 | $A^\dagger$ | Pseudo-inverse (quand $A$ n'est pas inversible) |
 
----
-
 ## 4. Normes
 
 | Notation | Nom | Formule |
@@ -85,8 +77,6 @@ C'est pour cela que le produit scalaire s'écrit $x^T y$ : il faut transposer $x
 | $\|x\|$ | Norme générique | Sans indice, c'est en général la norme 2 |
 
 **Pourquoi trois normes ?** Parce qu'elles ne pénalisent pas de la même façon. La norme 1 favorise les solutions **creuses** (beaucoup de zéros) — c'est tout le principe du LASSO en économétrie. La norme 2 lisse. La norme infinie ne regarde que le pire écart.
-
----
 
 ## 5. Le piège n°1 : $\succeq$ contre $\geq$
 
@@ -120,8 +110,6 @@ En pratique, la voie 2 est la plus rapide en petite dimension.
 
 **Pourquoi c'est central en optimisation :** une fonction deux fois dérivable est convexe **si et seulement si** sa hessienne est semi-définie positive partout. Toute la convexité se ramène à cette vérification.
 
----
-
 ## 6. Dérivées
 
 | Notation | Nom | Nature |
@@ -142,8 +130,6 @@ $$f(x+h) \approx f(x) + \nabla f(x)^T h + \tfrac{1}{2}h^T\nabla^2 f(x)\,h$$
 
 Le terme du milieu est un scalaire (produit scalaire), le dernier aussi (forme quadratique).
 
----
-
 ## 7. Vocabulaire des ensembles et des fonctions
 
 | Notation | Nom | Sens |
@@ -161,8 +147,6 @@ Le terme du milieu est un scalaire (produit scalaire), le dernier aussi (forme q
 
 **Pourquoi `relint` et pas `int` ?** Un segment dans le plan a un intérieur vide (il est « plat »), mais son intérieur relatif ne l'est pas. C'est une précaution technique qui revient dans les conditions de Slater.
 
----
-
 ## 8. Le piège n°2 : $\inf$ contre $\min$
 
 | Notation | Sens |
@@ -177,8 +161,6 @@ Exemple : $f(x)=e^{x}$ sur $\mathbb{R}$. On a $\inf f = 0$, mais aucun $x$ ne do
 Les auteurs écrivent `inf` par prudence quand ils ne savent pas encore si le minimum est atteint. Une bonne partie des théorèmes d'existence sert précisément à passer de `inf` à `min`.
 
 **Ne confonds jamais $\min$ et $\arg\min$.** $\min_x (x-3)^2 = 0$ ; $\arg\min_x (x-3)^2 = 3$. L'un est une valeur, l'autre un point.
-
----
 
 ## 9. La forme standard d'un problème
 
@@ -210,8 +192,6 @@ $$
 
 **Convention à retenir :** tout est ramené à une **minimisation**, et toutes les inégalités sont écrites $\leq 0$. Maximiser $f$ revient à minimiser $-f$ ; une contrainte $g(x)\geq 0$ se réécrit $-g(x)\leq 0$. Cette normalisation est systématique et permet d'avoir une théorie unique.
 
----
-
 ## 10. Lagrangien et dualité
 
 C'est le sujet que tu n'as jamais vu. Voici les notations, le mécanisme est traité dans la Série 2.
@@ -242,8 +222,6 @@ Autres notations liées :
 
 ⚠️ **Attention à $f^\star$.** Selon le contexte, l'étoile désigne soit la **valeur optimale**, soit la **conjuguée de Fenchel**. Ce sont deux objets sans rapport. On les distingue au contexte : $p^\star$ est un nombre, $f^*(y)$ est une fonction évaluée en $y$.
 
----
-
 ## 11. Symboles logiques
 
 | Symbole | Lecture |
@@ -262,8 +240,6 @@ Autres notations liées :
 | $\mapsto$ | « s'envoie sur » (définit une application) |
 | $\setminus$ | privé de : $A\setminus B$ |
 | $\square$, $\blacksquare$ | fin de preuve |
-
----
 
 ## 12. Les abréviations anglaises
 
@@ -290,8 +266,6 @@ Quelques tournures qui déroutent au début :
 - *« The proof is left as an exercise »* → Fais-le. C'est là qu'on apprend.
 - *« Clearly / It is easy to see that… »* → Ce n'est presque jamais évident. Si tu bloques, ce n'est pas un problème de niveau : l'auteur a sauté des étapes.
 
----
-
 ## 13. Sigles des familles de problèmes
 
 | Sigle | Développé | Ce que c'est |
@@ -308,8 +282,6 @@ Quelques tournures qui déroutent au début :
 | **IPM** | Interior Point Method | Méthode de points intérieurs |
 
 Ces familles sont **emboîtées** : LP ⊂ QP ⊂ SOCP ⊂ SDP. Chacune est un cas particulier de la suivante. Savoir dans quelle famille tombe un problème détermine quel solveur l'attaque et à quelle vitesse.
-
----
 
 ## 14. Correspondances avec ce que tu connais déjà en économie
 
@@ -331,8 +303,6 @@ C'est le tableau qui te fera gagner le plus de temps. La théorie que tu as appr
 
 La dernière ligne mérite qu'on s'y arrête. **Le premier théorème du bien-être — l'équilibre concurrentiel est Pareto-optimal — est, mathématiquement, un résultat de dualité.** Les prix d'équilibre sont les variables duales du problème d'allocation. Quand tu auras fini le chapitre 5 de Boyd, relis ton cours de micro : tu ne le liras plus de la même façon.
 
----
-
 ## 15. Les cinq pièges à mémoriser
 
 1. **$A \succeq 0$ ≠ coefficients positifs.** C'est une propriété spectrale, pas une propriété des entrées.
@@ -340,8 +310,6 @@ La dernière ligne mérite qu'on s'y arrête. **Le premier théorème du bien-ê
 3. **$\min$ ≠ $\arg\min$.** Une valeur contre un point.
 4. **$\inf$ ≠ $\min$.** La borne inférieure peut ne pas être atteinte.
 5. **$f^\star$ est ambigu** : valeur optimale ou conjuguée de Fenchel, selon le contexte.
-
----
 
 ## 16. Quand tu bloques sur une notation inconnue
 

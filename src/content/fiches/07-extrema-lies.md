@@ -10,8 +10,6 @@
 | **Concepts clés** | Contrainte d'égalité, multiplicateur de Lagrange, lagrangien, méthode de réduction, interprétation de λ |
 | **Poids à l'examen** | L'exercice « optimiser sous contrainte » (utilité sous budget, coût sous production…) est systématique. Le cours résout *chaque* exercice par les **deux** méthodes : faites pareil. |
 
----
-
 ## 🎯 Vue d'ensemble
 
 Optimiser $f$ **le long d'une courbe** $g(x,y) = 0$ — suivre le chemin de montagne et chercher son point le plus haut — change la donne : les extrema n'annulent plus $\nabla f$. La bonne condition devient géométrique : à l'optimum, la courbe de niveau de $f$ et la contrainte sont **tangentes**, donc leurs gradients **parallèles** :
@@ -24,8 +22,6 @@ MÉTHODE 2 · RÉDUCTION    exprimer la contrainte (y = h(x) ou paramétrage) �
 ```
 
 La réduction est plus simple *quand elle est possible* ; Lagrange marche toujours (sous ses hypothèses). En examen, savoir les deux — et vérifier l'une par l'autre.
-
----
 
 ## 🔴 Concept 1 — Le théorème des multiplicateurs de Lagrange
 
@@ -40,8 +36,6 @@ La réduction est plus simple *quand elle est possible* ; Lagrange marche toujou
 **Interprétation de $\lambda$ (à citer en examen, très apprécié).** $\lambda$ mesure l'**intensité de la contrainte** : c'est la variation de la valeur optimale de $f$ quand on relâche la contrainte d'une unité ($g = k \to k+1$). $\lambda = 0$ : contrainte inopérante ; $\lambda$ grand : contrainte très pénalisante. En économie, c'est l'*utilité marginale du revenu* dans le problème du consommateur.
 
 **⚠️ Encadré ATTENTION du cours.** Lagrange ne fournit que des **candidats**. Il ne classe rien : la nature (max/min/ni l'un ni l'autre) doit être établie ensuite.
-
----
 
 ## 🔴 Concept 2 — Méthode 1 : le lagrangien (cas $n=2$, $m=1$)
 
@@ -58,8 +52,6 @@ $$\Delta(x_0,y_0,\lambda_0) = \partial_{xx}\mathcal{L}\cdot\partial_{yy}\mathcal
 - $\Delta \leq 0$ ⟹ pas de conclusion directe → **étude directe** : signe de $d(h,k) = f(x_0{+}h, y_0{+}k) - f(x_0,y_0)$ pour $(h,k)$ voisins de $(0,0)$ **liés par la contrainte** $g(x_0{+}h, y_0{+}k) = 0$.
 
 ⚠️ Notez la différence avec les extrema libres : ici c'est la hessienne **du lagrangien** (à $\lambda_0$ fixé), et le cas $\Delta \leq 0$ n'est pas synonyme de selle — seulement d'indétermination.
-
----
 
 ## 🔴 Concept 3 — Méthode 2 : la réduction
 
@@ -88,8 +80,6 @@ $$\nabla\mathcal{L} = 0 \iff \begin{cases} y = 2\lambda \\ x = 2\lambda \\ 2(x+y
 $$\frac{\partial_x U}{p_1} = \frac{\partial_y U}{p_2} = \lambda$$
 — à l'optimum, les utilités marginales par euro dépensé s'égalisent, et $\lambda$ est l'utilité marginale du revenu. Formulation à connaître **par cœur** pour les applications micro.
 
----
-
 ## ⚠️ Common mistakes
 
 1. **Oublier la contrainte dans le système** — trois équations, pas deux : $g = 0$ en fait partie.
@@ -99,8 +89,6 @@ $$\frac{\partial_x U}{p_1} = \frac{\partial_y U}{p_2} = \lambda$$
 5. **Oublier l'hypothèse $\nabla g \neq 0$** aux candidats — un point où $\nabla g = 0$ peut être un extremum *non détecté* par Lagrange.
 6. **Réduction : oublier de restreindre le domaine** de la variable restante ($x \in ]0; \ell/2[$ pour le champ : les côtés sont positifs).
 7. **Signe de $\lambda$ sur-interprété** — dans la convention $\mathcal{L} = f - \lambda g$, comparer $\nabla f = \lambda \nabla g$ ; ne pas tirer de conclusions de son signe sans réfléchir à l'orientation de $g$.
-
----
 
 ## 📌 Ultimate Review
 
@@ -117,8 +105,6 @@ $$\frac{\partial_x U}{p_1} = \frac{\partial_y U}{p_2} = \lambda$$
 $$\mathcal{L}(x,y,\lambda) = f - \lambda g \qquad \nabla f = \lambda \nabla g \qquad \Delta = \partial_{xx}\mathcal{L}\,\partial_{yy}\mathcal{L} - (\partial_{xy}\mathcal{L})^2$$
 
 **Methods to know** : le protocole en 6 étapes ; les deux méthodes sur un même exercice ; l'argument Weierstrass + candidat unique.
-
----
 
 ## 🧠 Active Recall
 
@@ -151,8 +137,6 @@ Réduction : plus simple, donne directement la *nature* (fonction d'une variable
 
 Lagrange : $y = 2\lambda$, $x = 8\lambda$, $2x + 8y = 240$ ⟹ $16\lambda + 16\lambda = 240$, $\lambda = 7{,}5$, $(x, y) = (60, 15)$, $U = 900$. Réduction en contrôle : $y = 30 - x/4$, $\tilde U = 30x - x^2/4$, max en $x = 60$ ✓. $\lambda = 7{,}5$ : un euro de budget supplémentaire augmenterait l'utilité optimale d'environ 7,5 unités.
 </details>
-
----
 
 ## 🃏 Flashcards
 

@@ -10,6 +10,25 @@ describe('fiches de révision — intégrité', () => {
     }
   });
 
+  it('couvre les dix topics du QuickSheet CFA', () => {
+    const cfa = getFiches().filter((f) => f.course.startsWith('Schweser'));
+    const topics = new Set(cfa.map((f) => f.chapter.split(' ·')[0]));
+    for (const t of [
+      'Ethics',
+      'Quantitative Methods',
+      'Economics',
+      'Financial Statement Analysis',
+      'Corporate Issuers',
+      'Portfolio Management',
+      'Equity Investments',
+      'Fixed Income',
+      'Derivatives',
+      'Alternative Investments',
+    ]) {
+      expect(topics).toContain(t);
+    }
+  });
+
   it('couvre les chapitres des deux cours sources', () => {
     const facc = getFiches().filter((f) => f.course.startsWith('Faccanoni'));
     const gar = getFiches().filter((f) => f.course.startsWith('Garrigos'));
@@ -44,9 +63,10 @@ describe('fiches de révision — intégrité', () => {
 
   it('retrouve les fiches par matière et par id', () => {
     expect(fichesOfSubject('maths').length).toBe(13);
-    expect(fichesOfSubject('cfa')).toHaveLength(0);
+    expect(fichesOfSubject('cfa').length).toBe(10);
     expect(getFiche('extrema-lies')?.title).toContain('Lagrange');
     expect(getFiche('kkt')?.course).toContain('Garrigos');
+    expect(getFiche('cfa-fixed-income')?.course).toContain('Schweser');
     expect(getFiche('inconnue')).toBeUndefined();
   });
 });

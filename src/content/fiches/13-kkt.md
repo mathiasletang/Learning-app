@@ -12,7 +12,7 @@
 
 ## 🎯 Vue d'ensemble
 
-La fiche 7 traitait les contraintes d'**égalité** (Lagrange classique). Garrigos généralise aux **inégalités** $g_i(x) \leq 0$ — le cas réellement courant (budgets, capacités, positivité). L'idée-force : au bord, Fermat devient $\nabla f(\bar x) + \text{« gradient de la contrainte »} = 0$, et le signe du multiplicateur encode *de quel côté* la contrainte pousse.
+La fiche 7 traitait les contraintes d'**égalité** (Lagrange classique). Garrigos généralise aux **inégalités** $g_i(x) \leq 0$ — le cas réellement courant (budgets, capacités, positivité). L'idée-force : au bord, Fermat devient « $\nabla f(\bar x) + \text{gradient de la contrainte} = 0$ », et le signe du multiplicateur encode *de quel côté* la contrainte pousse.
 
 ```
 Fermat (intérieur)          ∇f = 0

@@ -80,6 +80,52 @@ $$\nabla\mathcal{L} = 0 \iff \begin{cases} y = 2\lambda \\ x = 2\lambda \\ 2(x+y
 $$\frac{\partial_x U}{p_1} = \frac{\partial_y U}{p_2} = \lambda$$
 — à l'optimum, les utilités marginales par euro dépensé s'égalisent, et $\lambda$ est l'utilité marginale du revenu. Formulation à connaître **par cœur** pour les applications micro.
 
+### Comment savoir quelle méthode utiliser ?
+
+| Indice dans l'énoncé | Méthode | Pourquoi |
+|---|---|---|
+| Contrainte linéaire ($2x + 8y = 240$) | Réduction (ou Lagrange) | $y$ s'exprime en une ligne ; nature offerte |
+| Contrainte cercle/ellipse | Paramétrage ou Lagrange | $x = r\cos t$ marche ; expliciter $y(x)$ casse la symétrie |
+| Contrainte insoluble ($x^5 + y + e^y = 3$) | Lagrange seul | Aucune explicitation possible |
+| « Interpréter le multiplicateur » | Lagrange obligatoire | $\lambda$ n'existe que là |
+| Domaine compact + une seule question | L'une des deux + Weierstrass | Candidat unique ⟹ conclusion sans classification fine |
+
+### Exemple piège — le candidat que Lagrange ne voit pas
+
+**Question.** Minimiser $f(x,y) = x$ sous $g(x,y) = x^3 - y^2 = 0$.
+
+**Approche standard.** $\nabla\mathcal{L} = 0$ : $1 = 3\lambda x^2$, $0 = -2\lambda y$, $x^3 = y^2$. De la deuxième : $\lambda = 0$ (impossible, contredit la première) ou $y = 0$ — alors $x = 0$, mais la première devient $1 = 0$ : **aucun candidat**. Conclure « pas d'extremum » ?
+
+**Pourquoi c'est faux.** La contrainte $x^3 = y^2$ impose $x \geq 0$ : le point $(0,0)$ **minimise** $f = x$ sur la courbe. Lagrange ne le trouve pas car $\nabla g(0,0) = (0, 0)$ : l'hypothèse de qualification $\nabla g \neq 0$ **échoue** précisément là.
+
+**Leçon.** Toujours vérifier séparément les points où $\nabla g = 0$ *sur la contrainte* : ce sont des candidats hors-système. (Même pathologie que le point de rebroussement de la fiche 5.)
+
+### Exercices progressifs
+
+**🟢 Niveau 1** — Extrema de $f(x,y) = xy$ sous $x + y = 6$.
+<details><summary>Correction</summary>
+
+*Réduction* : $y = 6 - x$, $\tilde f = 6x - x^2$, $\tilde f' = 6 - 2x = 0$ en $x = 3$, $\tilde f'' = -2 < 0$ : **maximum** lié en $(3,3)$, $f = 9$. *Lagrange en contrôle* : $y = \lambda$, $x = \lambda$, $x + y = 6$ ⟹ $(3,3)$, $\lambda = 3$ ✓.
+</details>
+
+**🟡 Niveau 2** — Distance minimale de l'origine à la droite $x + 2y = 5$.
+<details><summary>Correction</summary>
+
+Minimiser $f = x^2 + y^2$ (le **carré** de la distance — même optimum, calculs plus doux) sous $g = x + 2y - 5 = 0$. Lagrange : $2x = \lambda$, $2y = 2\lambda$ ⟹ $y = 2x$ ; contrainte : $x + 4x = 5$, $x = 1$ : candidat $(1, 2)$, distance $\sqrt{5}$. Unique candidat, $f \to \infty$ le long de la droite ⟹ minimum global. **Interprétation** : $(1,2)$ est le pied de la perpendiculaire — Lagrange retrouve la géométrie élémentaire ($\nabla f \parallel (1,2)$, normale à la droite).
+</details>
+
+**🟠 Niveau 3** — Extrema de $f(x,y) = x^2 + y^2$ sous $\dfrac{x^2}{4} + y^2 = 1$ (ellipse).
+<details><summary>Correction</summary>
+
+Lagrange : $2x = \lambda \tfrac{x}{2}$, $2y = 2\lambda y$, contrainte. Première équation : $x(2 - \tfrac{\lambda}{2}) = 0$ ⟹ $x = 0$ **ou** $\lambda = 4$ — ne pas diviser par $x$ ! · $x = 0$ ⟹ $y = \pm 1$, $f = 1$ ($\lambda = 1$). · $\lambda = 4$ ⟹ deuxième équation : $y = 0$ ⟹ $x = \pm 2$, $f = 4$. Ellipse compacte : **min $1$ en $(0, \pm1)$, max $4$ en $(\pm2, 0)$**. **Interprétation** : le point de l'ellipse le plus proche de l'origine est au bout du petit axe, le plus éloigné au bout du grand axe.
+</details>
+
+**🔴 Niveau 4 — type partiel (production)** — Une firme produit $Q(K, L) = K^{1/2}L^{1/2}$ au coût $2K + 8L$. Minimisez le coût pour produire $Q = 4$, et donnez le coût marginal d'une unité de production supplémentaire.
+<details><summary>Correction</summary>
+
+Minimiser $f = 2K + 8L$ sous $g = K^{1/2}L^{1/2} - 4 = 0$. Lagrange : $2 = \lambda \tfrac12 K^{-1/2}L^{1/2}$ et $8 = \lambda \tfrac12 K^{1/2}L^{-1/2}$. Le quotient des deux : $\tfrac14 = \tfrac{L}{K}$ ⟹ $K = 4L$. Contrainte : $(4L)^{1/2}L^{1/2} = 2L = 4$ ⟹ $L = 2$, $K = 8$. Coût optimal $= 16 + 16 = 32$ (les dépenses en chaque facteur s'égalisent — propriété Cobb-Douglas). $\lambda$ : de $2 = \lambda \tfrac12 (L/K)^{1/2} = \lambda \tfrac12 \cdot \tfrac12$ ⟹ $\lambda = 8$ : produire une **5ᵉ unité coûterait environ 8** — c'est le coût marginal à l'optimum.
+</details>
+
 ## ⚠️ Common mistakes
 
 1. **Oublier la contrainte dans le système** — trois équations, pas deux : $g = 0$ en fait partie.

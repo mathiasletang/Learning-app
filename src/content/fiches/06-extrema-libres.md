@@ -73,6 +73,59 @@ pour $(h,k)$ voisin de $(0,0)$ : signe constant $\geq 0$ ⟹ minimum local ($\le
 
 **Exemple « cas douteux » type.** $f(x,y) = x^2 + y^4$ : en $(0,0)$, $\det H_f = 0$. Étude directe : $d(h,k) = h^2 + k^4 \geq 0$ pour tout $(h,k)$ ⟹ **minimum global**. (Alors que $f(x,y) = x^2 + y^3$ : $d(0,k) = k^3$ change de signe ⟹ selle. Même hessienne, natures opposées — d'où l'impossibilité de conclure par $H$.)
 
+### Deuxième exemple complet — système non linéaire
+
+$f(x,y) = x^3 + y^3 - 3xy$ sur $\mathbb{R}^2$.
+1. Polynôme, $\mathbb{R}^2$ ouvert.
+2. $\nabla f = (3x^2 - 3y,\; 3y^2 - 3x) = 0$ : la première équation donne $y = x^2$ ; substituée dans la seconde : $x^4 - x = x(x^3 - 1) = 0$, soit $x = 0$ ou $x = 1$ — on **factorise** au lieu de diviser par $x$, sinon $(0,0)$ disparaît. **Candidats** : $(0,0)$ et $(1,1)$.
+3. $H_f = \begin{pmatrix} 6x & -3 \\ -3 & 6y \end{pmatrix}$, $\det H_f = 36xy - 9$.
+4. En $(0,0)$ : $\det = -9 < 0$ ⟹ **selle**. En $(1,1)$ : $\det = 27 > 0$, $\partial_{xx} f = 6 > 0$ ⟹ **minimum local**, $f(1,1) = -1$.
+5. Global ? $f(x,0) = x^3 \to \pm\infty$ ⟹ pas d'extrema globaux. **Interprétation** : le terme de couplage $-3xy$ creuse une selle à l'origine et repousse le minimum en $(1,1)$.
+
+### Troisième exemple complet — Weierstrass et la frontière
+
+$f(x,y) = x^2 + y^2 - 2x$ sur le disque **fermé** $\bar D = \{x^2 + y^2 \leq 4\}$.
+1. $\bar D$ compact, $f$ continue ⟹ max et min globaux **existent** (Weierstrass).
+2. *Intérieur* : $\nabla f = (2x - 2,\, 2y) = 0$ en $(1, 0)$, qui est bien intérieur ; $f(1,0) = -1$. ($H = \operatorname{diag}(2,2)$ : minimum local.)
+3. *Frontière* : paramétrer $x = 2\cos t$, $y = 2\sin t$ : $g(t) = 4 - 4\cos t$, $g' = 4\sin t = 0$ en $t = 0$ et $t = \pi$, soit $(2, 0)$ avec $f = 0$ et $(-2, 0)$ avec $f = 8$.
+4. *Comparer toutes les valeurs* : $-1 < 0 < 8$ ⟹ **min global $-1$ en $(1,0)$** (intérieur), **max global $8$ en $(-2,0)$** (au bord).
+**Interprétation** : le maximum est au bord — Fermat ne l'aurait jamais trouvé ; sur un compact, l'étude de la frontière n'est pas optionnelle. (La paramétrisation est la méthode de réduction de la fiche 7.)
+
+### Le choix de l'argument de globalité
+
+| Situation | Argument | Exemple |
+|---|---|---|
+| $H_f$ (semi-)définie de signe constant **partout** | Convexité/concavité ⟹ local = global | $x^2+y^2-2x-4y$ |
+| $d(h,k)$ de signe constant pour $(h,k)$ **quelconque** | Globalité directe | $x^2 + y^4$ |
+| Une restriction $f(x, 0)$ tend vers $\pm\infty$ | **Pas** d'extremum global de ce côté | $x^3 + y^3 - 3xy$ |
+| Domaine compact | Weierstrass + comparaison intérieur/bord | Exemple ci-dessus |
+
+### Exercices progressifs
+
+**🟢 Niveau 1** — Extrema de $f(x,y) = x^2 + xy + y^2 + 1$.
+<details><summary>Correction</summary>
+
+$\nabla f = (2x + y,\, x + 2y) = 0 \Rightarrow (0,0)$ unique. $\det H = 4 - 1 = 3 > 0$, $\partial_{xx} f = 2 > 0$ : minimum local ; $H$ définie positive **partout** ⟹ strictement convexe ⟹ minimum **global** $f(0,0) = 1$.
+</details>
+
+**🟡 Niveau 2** — Extrema de $f(x,y) = x^4 + y^4 - 4xy$.
+<details><summary>Correction</summary>
+
+$\nabla f = (4x^3 - 4y,\, 4y^3 - 4x) = 0$ : $y = x^3$ puis $x^9 = x$, donc $x = 0, \pm 1$ : candidats $(0,0)$, $(1,1)$, $(-1,-1)$. $H = \begin{pmatrix} 12x^2 & -4 \\ -4 & 12y^2\end{pmatrix}$. En $(0,0)$ : $\det = -16 < 0$, selle. En $(\pm1,\pm1)$ : $\det = 144 - 16 > 0$, $\partial_{xx} = 12 > 0$ : deux minima locaux, $f = -2$. Par symétrie et croissance en $\lVert(x,y)\rVert$ grande, ce sont les minima globaux.
+</details>
+
+**🟠 Niveau 3 — le piège de la division** — Extrema de $f(x,y) = x^2 y - x^2$.
+<details><summary>Correction</summary>
+
+$\nabla f = (2x(y-1),\, x^2) = 0$. *Erreur classique* : diviser la première équation par $x$ et conclure $y = 1$ — on perd tout. *Correct* : la **seconde** équation impose $x = 0$, et alors la première est vérifiée pour **tout $y$** : toute la droite $\{x = 0\}$ est critique. $\det H = 2(y-1)\cdot 0 - (2x)^2 = 0$ sur cette droite : étude directe. $d(h, k) = h^2(y_0 + k) - h^2 = h^2(y_0 - 1 + k)$ : signe de $y_0 - 1$ au voisinage. $y_0 > 1$ : minima locaux (non stricts) ; $y_0 < 1$ : maxima locaux ; $y_0 = 1$ : selle dégénérée (le signe change avec $k$). Une droite entière de points critiques, trois natures — tout sauf automatique.
+</details>
+
+**🔴 Niveau 4 — type partiel** — Déterminez les extrema globaux de $f(x,y) = xy$ sur le carré $[0,1]^2$.
+<details><summary>Correction</summary>
+
+Compact + continue ⟹ Weierstrass. Intérieur : $\nabla f = (y, x) = 0$ en $(0,0)$ — **pas intérieur** : aucun candidat intérieur. Tout se joue au bord : sur $\{x=0\}$ et $\{y=0\}$, $f = 0$ ; sur $\{x=1\}$, $f = y$ croît de 0 à 1 ; sur $\{y=1\}$, $f = x$ croît de 0 à 1. **Min global $0$** (atteint sur deux côtés entiers), **max global $1$ en $(1,1)$** (un coin). **Interprétation** : les coins d'un domaine sont des candidats à part entière — les oublier est l'erreur type de cet exercice.
+</details>
+
 ## 🟡 Concept 4 — Application : les moindres carrés
 
 Le cours (§4.1.1) applique la machinerie au problème d'ajuster une droite $y = mx + q$ à $n$ points $(x_i, y_i)$ : minimiser

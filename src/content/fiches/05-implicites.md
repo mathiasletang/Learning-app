@@ -52,6 +52,33 @@ $$\partial_x \varphi = -\frac{\partial_x f}{\partial_z f}, \qquad \partial_y \va
 5. Tangente : $y = -\frac35(x-2) - 2 = -\frac35 x - \frac45$.
 (Ici on peut vérifier : $y = \frac{1 - \sqrt{12x+1}}{2}$ est la branche passant par $(2,-2)$.)
 
+### Exercices résolus
+
+**🟢 Niveau 1** — L'ellipse $x^2 + 4y^2 = 8$ au point $(2, 1)$ : existence de $\varphi$ et pente de la tangente.
+<details><summary>Correction</summary>
+
+$f(2,1) = 4 + 4 = 8$ ✓ ; $\partial_y f = 8y = 8 \neq 0$ ✓ ⟹ $y = \varphi(x)$ existe. $\varphi'(2) = -\dfrac{2x}{8y}\Big|_{(2,1)} = -\dfrac{4}{8} = -\dfrac12$. Tangente : $y = -\tfrac12(x-2) + 1$.
+</details>
+
+**🟡 Niveau 2 — dérivée seconde** — Reprendre $y^2 - y - 3x = 0$ en $(2,-2)$ et calculer $\varphi''(2)$. La courbe est-elle localement convexe ou concave ?
+<details><summary>Correction</summary>
+
+Redériver l'identité $2\varphi\varphi' - \varphi' - 3 = 0$ (déjà dérivée une fois) : $2(\varphi')^2 + 2\varphi\varphi'' - \varphi'' = 0$, d'où $\varphi'' = \dfrac{-2(\varphi')^2}{2\varphi - 1}$. En $(2,-2)$ : $\varphi'' = \dfrac{-2 \cdot \tfrac{9}{25}}{-5} = \dfrac{18}{125} > 0$ ⟹ la branche est localement **convexe**. **Interprétation** : le signe de $\varphi''$ se lit sans jamais expliciter $\varphi$ — tout sort de l'identité dérivée deux fois.
+</details>
+
+**🟠 Niveau 3 — trois variables** — La surface $x^2 + y^2 + z^2 - xyz = 4$ au point $(0, 0, 2)$ : montrer que $z = \varphi(x,y)$ localement et écrire le plan tangent.
+<details><summary>Correction</summary>
+
+$f(0,0,2) = 4$ ✓ ; $\partial_z f = 2z - xy = 4 \neq 0$ ✓ ⟹ $\varphi$ existe. $\partial_x \varphi = -\dfrac{2x - yz}{2z - xy}\Big|_{(0,0,2)} = 0$ ; $\partial_y \varphi = -\dfrac{2y - xz}{2z - xy}\Big|_{(0,0,2)} = 0$. Plan tangent : $z = 2$ — horizontal : le point est un « sommet » local de la surface de niveau.
+</details>
+
+**🔴 Niveau 4 — le piège du point singulier** — Que dire de $y^2 = x^3$ (courbe $f = y^2 - x^3 = 0$) au voisinage de $(0,0)$ ?
+<details><summary>Correction</summary>
+
+*Approche naïve* : appliquer la formule $\varphi' = 3x^2/2y$ — mais en $(0,0)$, $\partial_y f = 2y = 0$ **et** $\partial_x f = -3x^2 = 0$ : aucune des deux versions du théorème ne s'applique (on ne peut ni exprimer $y(x)$, ni $x(y)$ par le théorème).
+*Ce qui se passe réellement* : la courbe a un **point de rebroussement** en $(0,0)$ (deux branches $y = \pm x^{3/2}$ qui se rejoignent en pointe). Quand les deux dérivées partielles s'annulent, le point est *singulier* : le théorème est muet, et la géométrie peut être pathologique. À l'examen : signaler l'échec des hypothèses est la réponse attendue.
+</details>
+
 ## ⚠️ Common mistakes
 
 1. **Oublier le signe moins** dans $\varphi' = -\partial_x f / \partial_y f$ — l'erreur n° 1, catastrophique en cascade.

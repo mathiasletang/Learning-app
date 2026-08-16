@@ -52,6 +52,30 @@ Ordre 2 : dérivées secondes → Schwarz (symétrie) → HESSIENNE
 
 **Contre-exemple (du cours).** $f = \frac{xy^2}{x^2+y^4}$ (hors origine), $f(0,0)=0$ : dérivable en $(0,0)$ mais pas continue ⟹ pas différentiable. La dérivabilité est *trop faible*.
 
+### Exercices résolus — le protocole en action
+
+**🟢 Niveau 1** — $f(x,y) = x^2 + y^2$ en $(0,0)$.
+<details><summary>Correction</summary>
+
+Polynôme ⟹ $C^1$ sur $\mathbb{R}^2$ ⟹ différentiable **par le théorème 3.11**, aucune limite à calculer. Réflexe d'examen : ne dérouler le protocole complet que là où le raccourci $C^1$ échoue.
+</details>
+
+**🟡 Niveau 2** — $f(x,y) = \dfrac{x^2 y}{x^2+y^2}$ hors origine, $f(0,0) = 0$.
+<details><summary>Correction</summary>
+
+1. Continuité : $|f| \leq r\cos^2\vartheta\,|\sin\vartheta| \leq r \to 0$ ✓.
+2. Partielles en $(0,0)$ : $\partial_x f(0,0) = \lim \frac{0}{h} = 0$, $\partial_y f(0,0) = \lim \frac{0}{k} = 0$.
+3. Critère : $\dfrac{f(h,k) - 0}{\sqrt{h^2+k^2}} = \dfrac{h^2k}{(h^2+k^2)^{3/2}} = \cos^2\vartheta\sin\vartheta$ — dépend de $\vartheta$ (vaut $0$ sur les axes, $\tfrac{1}{2\sqrt2} \cdot \sqrt2 \approx 0{,}35$ en $\vartheta = \tfrac\pi4$).
+4. Pas de limite nulle ⟹ **non différentiable**, bien que continue et dérivable. C'est le cas d'école : chaque étape du protocole réussit sauf la dernière.
+</details>
+
+**🟠 Niveau 3 — le piège inverse** — $f(x,y) = (x^2+y^2)\sin\!\left(\tfrac{1}{\sqrt{x^2+y^2}}\right)$ hors origine, $f(0,0) = 0$.
+<details><summary>Correction</summary>
+
+*Erreur classique* : « les partielles ne sont pas continues en $(0,0)$, donc $f$ n'est pas différentiable ». C'est confondre l'implication ($C^1 \Rightarrow$ diff.) avec sa réciproque, qui est **fausse**.
+*Correct* : critère direct — $\left|\dfrac{f(h,k)}{\sqrt{h^2+k^2}}\right| \leq \dfrac{h^2+k^2}{\sqrt{h^2+k^2}} = r \to 0$ ⟹ **différentiable** en $(0,0)$ (avec $\nabla f(0,0) = (0,0)$). Une fonction peut être différentiable sans être $C^1$ : le théorème 3.11 est un raccourci, pas un critère.
+</details>
+
 ## 🔴 Concept 2 — Différentielle, plan tangent, linéarisation
 
 **Définition (déf. 3.12).** En tout point où $f$ est différentiable, la **différentielle** est
@@ -69,7 +93,15 @@ $$L(x,y) = f(x_0,y_0) + (x - x_0)\,\partial_x f(x_0,y_0) + (y - y_0)\,\partial_y
 
 **Exemple complet (du cours).** Approcher $f(1{,}1;\, -0{,}1)$ pour $f(x,y) = x e^{xy}$ : en $(1, 0)$, $f = 1$, $\partial_x f = e^{xy} + xye^{xy} \to 1$, $\partial_y f = x^2 e^{xy} \to 1$, donc $L(x,y) = x + y$ et $f(1{,}1; -0{,}1) \approx 1{,}1 - 0{,}1 = 1$ (valeur exacte $\approx 0{,}985$).
 
+**Deuxième exemple calculé.** Approcher $\ln(0{,}97 \cdot 1{,}05)$ avec $f(x,y) = \ln(xy)$ en $(1,1)$ : $f(1,1) = 0$, $\partial_x f = \tfrac1x \to 1$, $\partial_y f = \tfrac1y \to 1$, donc $L(x,y) = (x-1) + (y-1)$ et $f(0{,}97;\,1{,}05) \approx -0{,}03 + 0{,}05 = 0{,}02$ (exact : $\ln(1{,}0185) \approx 0{,}0183$). **Interprétation** : la linéarisation transforme un produit en somme d'écarts — les « % de variation » s'additionnent, exactement l'intuition économique des taux de croissance.
+
 **Estimation d'erreurs (prop. 3.14).** Si les mesures ont des incertitudes $r_1, r_2$, alors $|f(x_1,y_1) - f(x_0,y_0)| \leq A r_1 + B r_2$ avec $A, B$ des majorants de $|\partial_x f|, |\partial_y f|$ sur le rectangle d'incertitude — l'outil des exercices de physique/économie appliquée.
+
+**Exercice 🟡** — Un cylindre a un rayon mesuré $r = 5$ cm à $\pm 0{,}1$ cm et une hauteur $h = 10$ cm à $\pm 0{,}2$ cm. Majorez l'erreur sur le volume $V = \pi r^2 h$.
+<details><summary>Correction</summary>
+
+$\partial_r V = 2\pi r h$, $\partial_h V = \pi r^2$. Sur le rectangle d'incertitude ($r \leq 5{,}1$, $h \leq 10{,}2$) : $|\partial_r V| \leq 2\pi(5{,}1)(10{,}2) \approx 326{,}8$ et $|\partial_h V| \leq \pi (5{,}1)^2 \approx 81{,}7$. Donc $|\Delta V| \leq 326{,}8(0{,}1) + 81{,}7(0{,}2) \approx 49$ cm³ — soit environ 6 % du volume nominal ($\approx 785$ cm³). **Interprétation** : l'erreur sur $r$ pèse deux fois plus (le rayon entre au carré) — c'est lui qu'il faut mesurer précisément.
+</details>
 
 ## 🟡 Concept 3 — Fonctions homogènes et théorème d'Euler
 
@@ -115,6 +147,24 @@ La hessienne est le « terme d'ordre 2 » : elle dit si la surface se courbe ver
 **Interprétation** : $f$ convexe ⟺ le graphe est **au-dessus** de chacun de ses plans tangents (et concave : en dessous) — c'est la première partie de la prop. 3.23.
 
 **Pourquoi c'est précieux** : pour une fonction convexe, tout minimum local est **global** — l'argument qui transformera vos conclusions locales en conclusions globales (fiches 6–7).
+
+### Exemples calculés — le test de convexité en pratique
+
+**Exemple 1 — convexe partout.** $f(x,y) = x^2 + xy + y^2$ : $H_f = \begin{pmatrix} 2 & 1 \\ 1 & 2 \end{pmatrix}$, constante. $\det = 3 > 0$ et $\partial_{xx} f = 2 > 0$ : définie positive **partout** ⟹ strictement convexe sur $\mathbb{R}^2$.
+
+**Exemple 2 — ni l'un ni l'autre.** $f(x,y) = x^2 - y^2$ : $H_f = \begin{pmatrix} 2 & 0 \\ 0 & -2 \end{pmatrix}$, $\det = -4 < 0$ : ni SDP ni SDN — $f$ n'est ni convexe ni concave (c'est la selle type).
+
+**Exemple 3 — le domaine compte.** $f(x,y) = x^3 + y^2$ : $H_f = \begin{pmatrix} 6x & 0 \\ 0 & 2 \end{pmatrix}$. Sur $\mathbb{R}^2$, $6x$ change de signe : pas convexe. Sur le demi-plan **convexe** $\{x > 0\}$ : $\det = 12x > 0$ et $6x > 0$ ⟹ strictement convexe. **Interprétation** : la convexité est une propriété *de la fonction sur un domaine*, jamais de la fonction seule.
+
+**Exercice 🔴 — type examen** — Pour quelles valeurs de $a$ la fonction $f(x,y) = x^2 + 2axy + y^2$ est-elle convexe sur $\mathbb{R}^2$ ? Strictement convexe ?
+<details><summary>Correction</summary>
+
+$H_f = \begin{pmatrix} 2 & 2a \\ 2a & 2 \end{pmatrix}$, $\det = 4(1 - a^2)$, $\partial_{xx} f = 2 > 0$.
+- Convexe ⟺ SDP ⟺ $1 - a^2 \geq 0$ ⟺ $\boxed{-1 \leq a \leq 1}$.
+- $|a| < 1$ : définie positive ⟹ strictement convexe.
+- $|a| = 1$ : $f = (x \pm y)^2$, nulle sur toute une droite — convexe mais pas strictement.
+**Interprétation** : $a$ mesure le couplage des variables ; trop de couplage ($|a|>1$) creuse une direction de selle.
+</details>
 
 ## ⚠️ Common mistakes
 

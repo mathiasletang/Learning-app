@@ -37,7 +37,25 @@ Dérivée partielle ∂f/∂x  (une par variable)
 
 **Exemple.** $f(x,y) = 3x^2 + xy - 2y^2$ : $\partial_x f = 6x + y$, $\partial_y f = x - 4y$.
 
-**Exemple plus fin (exercice 3.1 du cours).** $f(x,y) = x^y$ ($x > 0$) : écrire $x^y = e^{y\ln x}$, d'où $\partial_x f = y\,x^{y-1}$ et $\partial_y f = \ln(x)\, x^y$.
+### La gamme de calcul — une forme, un réflexe
+
+Cinq exemples calculés, du plus simple au plus complet ; c'est la variété qu'il faut savoir traiter à vitesse d'examen :
+
+**1. Polynôme.** $f = 3x^2 + xy - 2y^2$ (ci-dessus) : chaque monôme se dérive séparément ; $xy$ donne $y$ en $x$ et $x$ en $y$.
+
+**2. Produit.** $f = x^2\sin y$ : $\partial_x f = 2x\sin y$ — ici $\sin y$ est une **constante multiplicative**, pas besoin de règle du produit ; $\partial_y f = x^2\cos y$. La règle du produit ne sert que si **les deux facteurs contiennent la variable de dérivation**.
+
+**3. Exponentielle composée.** $f = e^{xy^2}$ : $\partial_x f = y^2 e^{xy^2}$, $\partial_y f = 2xy\, e^{xy^2}$ — dériver l'exposant par rapport à la bonne variable, le reste suit.
+
+**4. Logarithme.** $f = \ln(x^2 + y^2)$ (hors de l'origine) : $\partial_x f = \dfrac{2x}{x^2+y^2}$, $\partial_y f = \dfrac{2y}{x^2+y^2}$ — la règle $\left(\ln u\right)' = u'/u$, avec le bon $u'$.
+
+**5. Puissance variable (exercice 3.1 du cours).** $f = x^y$ ($x > 0$) : écrire $x^y = e^{y\ln x}$, d'où $\partial_x f = y\,x^{y-1}$ et $\partial_y f = \ln(x)\, x^y$. Deux règles différentes selon la variable — le piège classique du chapitre.
+
+**Exercice éclair 🟢** — $f(x,y,z) = z\,e^{x}\ln y$ : les trois dérivées partielles ?
+<details><summary>Correction</summary>
+
+$\partial_x f = z\,e^x \ln y$ ; $\partial_y f = \dfrac{z\,e^x}{y}$ ; $\partial_z f = e^x \ln y$. À trois variables, la mécanique est identique : on fige les deux autres.
+</details>
 
 ### ⚠️ Le cas « point à problème » (réflexe d'examen)
 
@@ -80,6 +98,17 @@ $$\partial_u g = f'(x(u,v))\,\partial_u x, \qquad \partial_v g = f'(x(u,v))\,\pa
 $$P'(t) = \partial_T P \cdot T' + \partial_V P \cdot V' = \frac{R}{V}T' - \frac{RT}{V^2}V' = \frac{8{,}31}{100}(0{,}1) - \frac{8{,}31 \cdot 300}{100^2}(0{,}2) \approx -0{,}042 \text{ kPa/s}.$$
 La pression **décroît** : l'effet volume l'emporte sur l'effet température. Toujours interpréter le signe.
 
+**Deuxième exemple calculé — cas $\mathbb{R}^2 \to \mathbb{R}^2 \to \mathbb{R}$.** $g(u,v) = f(x,y)$ avec $f(x,y) = x^2 y$, $x = uv$, $y = u - v$ :
+- $\partial_u g = \underbrace{2xy}_{\partial_x f}\cdot\underbrace{v}_{\partial_u x} + \underbrace{x^2}_{\partial_y f}\cdot\underbrace{1}_{\partial_u y} = 2uv^2(u-v) + u^2v^2$ ;
+- $\partial_v g = 2xy \cdot u + x^2 \cdot (-1) = 2u^2v(u-v) - u^2v^2$.
+- **Contrôle** : substituer d'abord ($g = u^2v^2(u-v)$) puis dériver directement redonne exactement ces expressions. En examen, ce contrôle par substitution est le meilleur détecteur d'erreur quand il est praticable.
+
+**Exercice 🟡** — La demande d'un bien est $D(p, r) = \dfrac{r}{p^2}$ ; le prix suit $p(t) = 2 + t$ et le revenu $r(t) = 100e^{0{,}02t}$. Calculez $D'(t)$ en $t = 0$ et interprétez.
+<details><summary>Correction</summary>
+
+$D' = \partial_p D\cdot p' + \partial_r D\cdot r' = -\dfrac{2r}{p^3}\cdot 1 + \dfrac{1}{p^2}\cdot 2e^{0{,}02t}$. En $t=0$ : $p = 2$, $r = 100$ : $D' = -\dfrac{200}{8} + \dfrac{2}{4} = -24{,}5$. **Interprétation** : la hausse du prix fait chuter la demande bien plus vite que la croissance du revenu ne la soutient — le signe et la comparaison des deux termes sont la réponse attendue, pas seulement le nombre. (Même mécanique que l'exemple des gaz parfaits.)
+</details>
+
 **Où la chain rule resurgit** : dérivation implicite ($\varphi' = -\partial_x f / \partial_y f$, fiche 5), théorème d'Euler, justification de Lagrange (fiche 7). C'est la formule la plus réutilisée du cours.
 
 ## 🟠 Concept 4 — Dérivée directionnelle et classe C¹
@@ -94,6 +123,22 @@ La pression **décroît** : l'effet volume l'emporte sur l'effet température. T
 **Exemple (du cours).** $f = x^2 - y^2$ en $(1,2)$, direction $v = (3,5)$ : par la formule, $3 \cdot 2 + 5 \cdot (-4) = -14$ ; la définition redonne bien $-14$.
 
 **⚠️ Nuance.** La formule $\nabla f \cdot v$ exige la **différentiabilité** ; en un point pathologique, seule la définition par limite fait foi.
+
+### Comment savoir quelle définition utiliser ?
+
+| L'énoncé dit… | Outil | Pourquoi |
+|---|---|---|
+| $f$ polynomiale, $C^1$, « fonction usuelle » | $\nabla f \cdot v$ | Différentiabilité acquise (fiche 4) |
+| $f$ définie par cas au point demandé | Définition par limite | Les règles de calcul n'y ont pas cours |
+| « Dans quelle direction $f$ croît-elle le plus vite ? » | Direction de $\nabla f$ | La dérivée directionnelle $\nabla f\cdot v$ est maximale pour $v$ colinéaire à $\nabla f$ |
+
+**Exercice 🟠** — $f(x,y) = x^2y$ en $(1,2)$. (a) Dérivée dans la direction $v = \left(\tfrac{3}{5}, \tfrac{4}{5}\right)$ ; (b) direction de plus forte croissance et taux correspondant.
+<details><summary>Correction</summary>
+
+$\nabla f = (2xy,\, x^2)$, donc $\nabla f(1,2) = (4, 1)$.
+(a) $\partial_v f = 4\cdot\tfrac35 + 1\cdot\tfrac45 = \tfrac{16}{5} = 3{,}2$.
+(b) Direction $\dfrac{(4,1)}{\lVert(4,1)\rVert} = \dfrac{1}{\sqrt{17}}(4,1)$, taux $\lVert \nabla f \rVert = \sqrt{17} \approx 4{,}12$. **Interprétation** : 3,2 < 4,12 — dériver dans une direction oblique perd une partie de la pente maximale, exactement comme monter un flanc de colline en biais.
+</details>
 
 ## 🟡 Concept 5 — Élasticité (applications économiques)
 

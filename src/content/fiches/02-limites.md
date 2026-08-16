@@ -62,6 +62,18 @@ le chemin $y=0$ donne $f(x, 0) = 1 \to 1$ ; le chemin $x=0$ donne $f(0,y) = -1 \
 
 **Contre-exemple célèbre (du cours, à méditer).** $f(x,y) = \dfrac{xy^2}{x^2+y^4}$ : la limite le long de *toute droite* passant par l'origine vaut $0$, mais le long de la parabole $x = y^2$, $f(y^2, y) = \tfrac12$. Les droites ne suffisent pas !
 
+### Exemple piège — le jumeau de l'exercice 2.8.4
+
+**Question.** $\lim_{(0,0)} \dfrac{x^2 y\, e^y}{x^4 + 4y^2}$ existe-t-elle ?
+
+**Approche fausse (et pourquoi elle séduit).** Le long de toute droite $y = mx$ : $f(x, mx) = \dfrac{m x\, e^{mx}}{x^2 + 4m^2} \to 0$. Toutes les droites concordent — on serait tenté de conclure $\ell = 0$.
+
+**Pourquoi c'est faux.** Les degrés sont déséquilibrés ($x^4$ contre $y^2$ au dénominateur) : c'est le signal qu'une **parabole** peut faire mieux qu'une droite. Le chemin à tester est celui qui équilibre les degrés, $y = \tfrac{x^2}{2}$.
+
+**Approche correcte.** $f\!\left(x, \tfrac{x^2}{2}\right) = \dfrac{x^2 \cdot \tfrac{x^2}{2}\, e^{x^2/2}}{x^4 + x^4} = \tfrac14\, e^{x^2/2} \xrightarrow[x\to0]{} \tfrac14 \neq 0$. Deux chemins, deux valeurs : **la limite n'existe pas** (exercice 2.8.4 du cours).
+
+**Le réflexe** : dénominateur en $x^{2p}$ et $y^{2q}$ avec $p \neq q$ ⟹ tester la courbe $y \sim x^{p/q}$ qui met les deux termes au même poids.
+
 ## 🔴 Concept 3 — Coordonnées polaires : l'arme pro-existence
 
 On pose $x = a + r\cos\vartheta$, $y = b + r\sin\vartheta$ ($r > 0$, $\vartheta \in [0; 2\pi[$) : $r$ est la **distance** au point $(a,b)$, et
@@ -88,6 +100,54 @@ $$\lim_{(x,y)\to(a,b)} f(x,y) = \lim_{\substack{r \to 0 \\ \forall \vartheta}} f
 3. Majoration : $|f - 0| \leq \tfrac{r}{2} \xrightarrow[r \to 0]{} 0$, **indépendamment de $\vartheta$**.
 4. Conclusion : $\lim = 0$. ✓
 
+### Une même limite, trois preuves — l'exercice 2.7 du cours
+
+Pour $f(x,y) = \dfrac{6x^2 y}{x^2+y^2}$, montrer que $\lim_{(0,0)} f = 0$ de trois façons — un exercice de style qui apprend ce que chaque outil fait vraiment :
+
+1. **Par la définition** ($\varepsilon$-$\delta$). Puisque $x^2 + y^2 \geq x^2$ et $\sqrt{x^2+y^2} \geq |y|$ : $\left|\tfrac{6x^2y}{x^2+y^2}\right| \leq \tfrac{6x^2 |y|}{x^2} = 6|y| \leq 6\sqrt{x^2+y^2}$. Il suffit donc de prendre $\delta = \varepsilon/6$.
+2. **Par le théorème de pincement.** $0 \leq |f| \leq 6|y| \to 0$ quand $(x,y) \to (0,0)$.
+3. **Par les polaires.** $f = 6r\cos^2\vartheta\sin\vartheta$, et $|6r\cos^2\vartheta\sin\vartheta| \leq 6r \to 0$ pour tout $\vartheta$.
+
+**Interprétation** : les trois preuves reposent sur la **même majoration** vue sous trois habits. En examen, la version polaire (3) est la plus rapide ; la version (1) montre ce que « $\delta$ en fonction de $\varepsilon$ » veut dire concrètement.
+
+### Exercices progressifs — la batterie 2.8 du cours
+
+**🟢 Niveau 1** — $\lim_{(0,0)} \dfrac{x^4+y^4}{x^2+y^2}$.
+<details><summary>Correction</summary>
+
+Candidate $0$ (chemin $y=0$ : $x^2 \to 0$). Polaires : $f = r^2(\cos^4\vartheta + \sin^4\vartheta) \leq r^2 \cdot 2 \to 0$. **Limite $= 0$.** Numérateur de degré 4 contre 2 au dénominateur : les $r$ survivants font le travail.
+</details>
+
+**🟢 Niveau 1 bis** — $\lim_{(0,0)} \dfrac{x^3}{x^2+y^2}$.
+<details><summary>Correction</summary>
+
+Polaires : $f = r\cos^3\vartheta$, $|f| \leq r \to 0$. **Limite $= 0$** (exercice 2.8.8).
+</details>
+
+**🟡 Niveau 2** — $\lim_{(0,0)} \dfrac{x^4 - 4y^2}{x^2+2y^2}$.
+<details><summary>Correction</summary>
+
+Chemin $y = 0$ : $\tfrac{x^4}{x^2} = x^2 \to 0$. Chemin $x = 0$ : $\tfrac{-4y^2}{2y^2} = -2 \to -2$. Deux valeurs : **pas de limite** (exercice 2.8.3). Deux chemins ont suffi — inutile de passer en polaires.
+</details>
+
+**🟡 Niveau 2 bis** — $\lim_{(0,0)} \dfrac{x+y}{x^2+y^2}$.
+<details><summary>Correction</summary>
+
+Polaires : $f = \dfrac{\cos\vartheta + \sin\vartheta}{r}$ — le long de $y = x$ ($\vartheta = \tfrac{\pi}{4}$), $f = \tfrac{\sqrt2}{r} \to +\infty$. Numérateur de degré 1 contre 2 : la fonction **explose** ; pas de limite finie (exercice 2.8.6).
+</details>
+
+**🟠 Niveau 3 — hors de l'origine** — $\lim_{(2,0)} \dfrac{xy - 2y}{x^2 + y^2 - 4x + 4}$.
+<details><summary>Correction</summary>
+
+Réécrire d'abord : numérateur $= y(x-2)$, dénominateur $= (x-2)^2 + y^2$. Polaires **centrées en $(2,0)$** : $x = 2 + r\cos\vartheta$, $y = r\sin\vartheta$ : $f = \dfrac{r^2 \sin\vartheta\cos\vartheta}{r^2} = \sin\vartheta\cos\vartheta$ — dépend de $\vartheta$, tous les $r$ se sont simplifiés : **pas de limite** (exercice 2.8.9). Deux leçons : factoriser pour reconnaître le centre, et centrer les polaires au bon point.
+</details>
+
+**🔴 Niveau 4 — type examen** — $f(x,y) = \dfrac{x\ln(1+x^3)}{y(x^2+y^2)}$ : limite en $(0,0)$ ? (Exercice 2.3 du cours.)
+<details><summary>Correction</summary>
+
+Le long de $y = x^2$ (pour équilibrer le $y$ isolé du dénominateur) : $f = \dfrac{x\ln(1+x^3)}{x^2(x^2+x^4)} \sim \dfrac{x \cdot x^3}{x^4} = 1$ (car $\ln(1+u) \sim u$). Le long de $y = x$ : $f = \dfrac{\ln(1+x^3)}{x(x^2+x^2)} \cdot x \sim \dfrac{x^4}{2x^3} = \tfrac{x}{2} \to 0$. Deux chemins, deux valeurs ($1 \neq 0$) : **pas de limite**. L'équivalent $\ln(1+u) \sim u$ est l'outil d'une variable qui débloque le calcul.
+</details>
+
 ## 🟠 Concept 4 — Continuité et prolongement
 
 **Définition (déf. 2.9).** $f$ est **continue en $A \in D$** si elle y possède une limite égale à $f(A)$ ; continue sur $D$ si c'est vrai en tout point.
@@ -97,6 +157,19 @@ $$\lim_{(x,y)\to(a,b)} f(x,y) = \lim_{\substack{r \to 0 \\ \forall \vartheta}} f
 **Propriété 2.11 (le réflexe pratique).** Polynômes, exponentielles, logarithmes, fonctions trigonométriques sont continus sur leur domaine ; sommes, produits, composées, quotients (dénominateur non nul) de fonctions continues sont continus. **En dehors des points à problème, la continuité est donc automatique** — tout l'exercice se concentre sur le point spécial (souvent $(0,0)$ où la fonction est définie par cas).
 
 **Exemple (du cours).** $f(x,y) = \dfrac{xy}{x^2+y^2}$ : $f(0,t) = 0$ mais $f(t,t) = \tfrac12$ ⟹ pas de limite en $(0,0)$ ⟹ **pas prolongeable**. En revanche $\dfrac{xy}{\sqrt{x^2+y^2}} \to 0$ : prolongeable par la valeur $0$.
+
+**Exercice résolu (exercice 2.6 du cours).** $f(x,y) = \dfrac{\sin(x^2) - \sin(y^2)}{x^2+y^2}$ est-elle prolongeable en $(0,0)$ ?
+- Chemin $y = 0$ : $\dfrac{\sin(x^2)}{x^2} \to 1$ (équivalent $\sin u \sim u$).
+- Chemin $x = 0$ : $\dfrac{-\sin(y^2)}{y^2} \to -1$.
+- Deux valeurs ⟹ pas de limite ⟹ **pas prolongeable**. **Interprétation** : la surface a un « pli » irréconciliable au-dessus de l'origine — aucune valeur $\tilde f(0,0)$ ne peut recoller les deux nappes.
+
+**Le schéma de décision complet** :
+
+| Constat | Conclusion |
+|---|---|
+| Deux chemins, deux limites | Pas de limite ⟹ pas prolongeable |
+| Tous chemins concordent vers $\ell$ + majoration polaire $s(r) \to 0$ | Limite $= \ell$ ⟹ prolongeable par $\tilde f(A) = \ell$ |
+| $\lvert f \rvert \geq M(r) \to +\infty$ | Limite infinie ⟹ pas de prolongement (fini) |
 
 ## ⚠️ Common mistakes
 

@@ -50,6 +50,18 @@ $$x_{k+1} = \operatorname{argmin}_{x'} \; f(x_k) + \langle\nabla f(x_k), x' - x_
 2. Cas quadratique $f = \tfrac12\langle Ax,x\rangle + \langle b,x\rangle$ : l'itération devient **linéaire**, $x_{k+1} = (I - \rho A)x_k - \rho b$ — la convergence se lit sur les valeurs propres de $I - \rho A$ (il faut $|1 - \rho\lambda_i| < 1$ pour tout $i$, d'où la contrainte de pas $0 < \rho < 2/\lambda_{\max}$).
 3. Discuter le pas : trop grand ⟹ divergence/oscillation ; trop petit ⟹ lenteur.
 
+**Exemple entièrement déroulé.** $f(x,y) = \tfrac12(x^2 + 10y^2)$, départ $(10, 1)$, pas $\rho = 0{,}1$ :
+- $\nabla f = (x, 10y)$ ⟹ itération $x_{k+1} = 0{,}9\,x_k$, $y_{k+1} = 0$ (car $1 - 0{,}1 \cdot 10 = 0$).
+- Trajectoire : $(10, 1) \to (9, 0) \to (8{,}1, 0) \to \cdots$ — $y$ tué en un pas (le pas est *pile* $1/\lambda_2$), $x$ décroît géométriquement en $0{,}9^k$.
+- Avec $\rho = 0{,}19$ : $y_{k+1} = -0{,}9\,y_k$ **oscille** en s'amortissant ($1 - 1{,}9 = -0{,}9$) ; avec $\rho = 0{,}21$ : $|1 - 2{,}1| = 1{,}1 > 1$, $y_k$ **diverge**. Trois régimes du même algorithme, uniquement par le pas.
+- **Interprétation** : chaque valeur propre a son pas idéal $1/\lambda_i$ ; un pas fixe doit les servir toutes — d'où le compromis dicté par $\lambda_{\max}$, et le zigzag quand $\operatorname{cond}$ est grand.
+
+**Exercice 🟡** — Écrivez deux itérations de gradient pour $f(x,y) = x^2 + y^2 + xy$, départ $(1, 1)$, pas $\rho = \tfrac14$.
+<details><summary>Correction</summary>
+
+$\nabla f = (2x + y,\, 2y + x)$. $x_1 = (1,1) - \tfrac14(3,3) = (\tfrac14, \tfrac14)$ ; $\nabla f(x_1) = (\tfrac34, \tfrac34)$, $x_2 = (\tfrac14,\tfrac14) - \tfrac14(\tfrac34,\tfrac34) = (\tfrac{1}{16}, \tfrac{1}{16})$. Sur la diagonale, chaque pas divise par 4 : convergence géométrique de taux $\tfrac14$ vers le minimiseur $(0,0)$ ($A = \begin{pmatrix}2&1\\1&2\end{pmatrix} \succ 0$, direction $(1,1)$ propre pour $\lambda = 3$ : $1 - \tfrac34 = \tfrac14$).
+</details>
+
 ## 🟠 Concept 3 — La méthode de Newton
 
 **Proposition IV.18.** Si $\nabla^2 f(x) \succ 0$, minimiser le modèle de Taylor **d'ordre 2** en $x$ donne le point
@@ -65,6 +77,16 @@ et $-\nabla^2 f(x)^{-1}\nabla f(x)$ est une direction de descente (preuve par Ra
 - Les **quasi-Newton** remplacent $\nabla^2 f^{-1}$ par une approximation peu coûteuse (ex. IV.21 : diagonale de la hessienne).
 
 **Gradient vs Newton en une phrase** : le gradient minimise le modèle d'ordre 1 (robuste, pas cher, linéaire) ; Newton minimise le modèle d'ordre 2 (cher, fragile, superlinéaire).
+
+**Exemple révélateur — Newton sur une quadratique.** $f = \tfrac12\langle Ax,x\rangle + \langle b,x\rangle$ avec $A \succ 0$ : $\nabla f = Ax + b$, $\nabla^2 f = A$, donc
+$$x_1 = x_0 - A^{-1}(Ax_0 + b) = -A^{-1}b = x^* :$$
+Newton converge en **une itération**, depuis n'importe quel $x_0$ — le modèle d'ordre 2 d'une quadratique, c'est elle-même. C'est le test de santé mentale de tout exercice de Newton.
+
+**Exercice 🟠** — Une itération de Newton pour $f(x,y) = x^4 + y^2$ depuis $(1, 1)$. Que remarque-t-on ?
+<details><summary>Correction</summary>
+
+$\nabla f = (4x^3, 2y)$, $\nabla^2 f = \operatorname{diag}(12x^2, 2) \succ 0$ hors de $\{x=0\}$. $x_1 = (1,1) - \operatorname{diag}(\tfrac{1}{12}, \tfrac12)(4, 2) = (1 - \tfrac13,\, 1 - 1) = (\tfrac23, 0)$. La composante quadratique ($y$) est résolue **exactement en un pas** ; la composante quartique ($x$) suit $x_{k+1} = \tfrac23 x_k$ — linéaire seulement. **Interprétation** : la vitesse superlinéaire de Newton est un phénomène *local* (près du minimiseur, où le modèle d'ordre 2 devient exact) ; loin de lui, ou quand la courbure s'annule ($\nabla^2 f(0,0)$ singulière ici), la magie s'éteint.
+</details>
 
 ## 🟠 Concept 4 — Régularité et conditionnement
 

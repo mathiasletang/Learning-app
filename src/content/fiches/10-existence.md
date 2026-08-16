@@ -59,6 +59,32 @@ NATURE      : CNO : ∇²f ≽ 0 · CSO : ∇²f ≻ 0 ⟹ min local · ni ≽0 
 
 **Propositions utiles** : sur un $C$ **borné**, toute fonction est coercive (prop. II.33 — la limite est vide) ; coercivité $\iff$ sous-niveaux bornés (prop. II.34).
 
+### Exercices résolus — coercive ou pas ?
+
+**🟢 Niveau 1** — $f(x,y) = x^2 + y^2 - 4x + 6y$ sur $\mathbb{R}^2$.
+<details><summary>Correction</summary>
+
+Quadratique avec $A = 2I$ ($\lambda_{\min} = 2 > 0$) : Rayleigh donne $f \geq \lVert(x,y)\rVert^2 - \sqrt{52}\,\lVert(x,y)\rVert \to +\infty$. **Coercive** — et donc (continue, $\mathbb{R}^2$ fermé) elle admet un minimiseur global.
+</details>
+
+**🟡 Niveau 2** — $f(x,y) = x^2 + y^4 - xy$ sur $\mathbb{R}^2$.
+<details><summary>Correction</summary>
+
+Piège : le terme croisé n'est pas dominé par Rayleigh (la partie quadratique $x^2 - xy$ a $\det = -\tfrac14 < 0$). Minorer autrement : $|xy| \leq \tfrac12 x^2 + \tfrac12 y^2$, donc $f \geq \tfrac12 x^2 + y^4 - \tfrac12 y^2$. Chaque morceau tend vers $+\infty$ dans sa variable et la somme minore par $\tfrac12\min(x^2,\, 2y^4 - y^2)$… plus simplement : si $\lVert(x,y)\rVert \to \infty$, alors $x^2 \to \infty$ ou $y^4 \to \infty$, et le membre de droite part à $+\infty$. **Coercive.** Leçon : l'inégalité $|ab| \leq \tfrac{a^2+b^2}{2}$ est l'outil à tout faire des minorations.
+</details>
+
+**🟠 Niveau 3** — $f(x,y) = (x^2 + y^2)e^{-x}$ sur $\mathbb{R}^2$.
+<details><summary>Correction</summary>
+
+Le long de l'axe $y = 0$, $x \to +\infty$ : $f = x^2 e^{-x} \to 0$ — une suite divergente le long de laquelle $f$ plafonne. **Non coercive.** (Et de fait $\inf f = 0$, non atteint hors de l'origine… $f(0,0) = 0$ : ici l'inf est atteint en $(0,0)$ — l'existence sans coercivité, encore.)
+</details>
+
+**🔴 Niveau 4 — type examen** — Montrer que $f(x,y) = \ln(1 + x^2 + y^2) $ n'est pas coercive... vrai ou faux ?
+<details><summary>Correction</summary>
+
+**Faux** : $\ln(1 + \lVert x\rVert^2) \to +\infty$ quand $\lVert x\rVert \to \infty$ — la croissance est lente mais la limite est bien $+\infty$ le long de *toute* suite divergente : $f$ **est** coercive. Ne pas confondre « croît lentement » et « ne diverge pas » ; la coercivité ne demande aucune vitesse.
+</details>
+
 ## 🔴 Concept 3 — Le théorème d'existence
 
 **Théorème (II.35, via le lemme des suites minimisantes II.37).**

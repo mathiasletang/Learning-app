@@ -5,7 +5,7 @@
 | **Matière** | Maths · Optimisation |
 | **Cours source** | Faccanoni, chapitre 3, §3.2–3.3, p. 34–45 |
 | **Difficulté** | 🔴 Must know — la question théorique favorite des examens |
-| **Temps d'étude estimé** | 1 h 30 |
+| **Temps d'étude estimé** | 2 h |
 | **Prérequis** | Fiches 2 et 3 (limites en polaires, dérivées partielles) |
 | **Concepts clés** | Différentiabilité, différentielle, plan tangent, Schwarz, hessienne, convexité |
 | **Poids à l'examen** | « Montrer que $f$ est (ou n'est pas) différentiable en $(0,0)$ » est un exercice rituel ; la hessienne est l'outil central des fiches 6–7. |

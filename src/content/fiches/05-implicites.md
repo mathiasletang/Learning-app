@@ -5,7 +5,7 @@
 | **Matière** | Maths · Optimisation |
 | **Cours source** | Faccanoni, chapitre 3, §3.4, p. 45–46 |
 | **Difficulté** | 🟠 Should know |
-| **Temps d'étude estimé** | 45 min |
+| **Temps d'étude estimé** | 1 h |
 | **Prérequis** | Fiches 3–4 (chain rule, $C^1$) |
 | **Concepts clés** | Théorème des fonctions implicites, dérivation implicite, tangente à une courbe de niveau |
 | **Poids à l'examen** | Question type : « montrer que $f(x,y)=0$ définit $y = \varphi(x)$ au voisinage de tel point, calculer $\varphi'$ et la tangente ». Aussi l'outil caché derrière la méthode de réduction (fiche 7). |

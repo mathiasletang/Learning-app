@@ -5,7 +5,7 @@
 | **Matière** | CFA · Level 1 |
 | **Source** | Schweser, *QuickSheet 2024*, p. 4–5 |
 | **Difficulté** | 🟡 Intermédiaire |
-| **Temps d'étude estimé** | 1 h 30 |
+| **Temps d'étude estimé** | 2 h |
 | **Prérequis** | Actualisation, CAPM pour $k_e$ (fiche 19) |
 | **Concepts clés** | Marge, indices, ordres, EMH, Porter, PESTLE, DDM (Gordon, multi-étapes), multiples de prix |
 | **Place dans la source** | Deux volets distincts dans le QuickSheet : microstructure des marchés, puis évaluation des actions. |
@@ -73,6 +73,26 @@ $$\frac{P_0}{E_1} = \frac{D_1/E_1}{k - g} = \frac{\text{payout ratio}}{k - g}$$
 
 - **Leading P/E** = prix / BPA prévisionnel 12 mois ; **trailing P/E** = prix / BPA des 12 derniers mois.
 - **P/B** = prix / valeur comptable par action ; **P/S** = prix / CA par action ; **P/CF** = prix / cash-flow par action.
+
+### Exercices calculés
+
+**🟢 Niveau 1 — marge** — Achat de 200 actions à 50 avec une marge initiale de 60 %. Le titre monte à 55 : rendement sur capital engagé ?
+<details><summary>Correction</summary>
+
+Levier $= 1/0{,}6 \approx 1{,}67$. HPR du titre $= 10\,\%$ ⟹ rendement levé $\approx 16{,}7\,\%$ (hors intérêts d'emprunt et dividendes). En cas de baisse à 45, la perte serait $-16{,}7\,\%$ : le levier est symétrique.
+</details>
+
+**🟡 Niveau 2 — DDM multi-étapes** — $D_0 = 1$, croissance 20 % pendant 2 ans, puis 5 % pour toujours ; $k_e = 10\,\%$. Valeur ?
+<details><summary>Correction</summary>
+
+$D_1 = 1{,}20$, $D_2 = 1{,}44$, $D_3 = 1{,}44 \times 1{,}05 = 1{,}512$. Valeur terminale en $t=2$ : $P_2 = \dfrac{1{,}512}{0{,}10 - 0{,}05} = 30{,}24$. $V_0 = \dfrac{1{,}20}{1{,}1} + \dfrac{1{,}44 + 30{,}24}{1{,}1^2} = 1{,}09 + 26{,}18 \approx 27{,}27$. Les pièges déjoués : $P_2$ utilise $D_3$ (pas $D_2$), et $P_2$ s'actualise **2 ans** (pas 3).
+</details>
+
+**🟠 Niveau 3 — multiplicateur** — Payout 60 %, $k_e = 11\,\%$, croissance 5 %. P/E prospectif « justifié » ? Effet d'une hausse de $g$ à 6 % ?
+<details><summary>Correction</summary>
+
+$P_0/E_1 = \dfrac{0{,}60}{0{,}11 - 0{,}05} = 10$. Avec $g = 6\,\%$ : $0{,}60/0{,}05 = 12$ — un point de croissance = 20 % de P/E en plus. **Interprétation** : la sensibilité explosive du multiple à l'écart $k - g$ est la « critical relationship » de la source vue côté multiples.
+</details>
 
 ### Comment mener une évaluation DDM multi-étapes ?
 

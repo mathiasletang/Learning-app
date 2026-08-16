@@ -5,7 +5,7 @@
 | **Matière** | Maths · Optimisation |
 | **Cours source** | Garrigos, chapitre III, p. 43–58 |
 | **Difficulté** | 🔴 Must know |
-| **Temps d'étude estimé** | 1 h 30 |
+| **Temps d'étude estimé** | 2 h |
 | **Prérequis** | Fiches 4, 9, 10 (hessienne, Rayleigh, existence) |
 | **Concepts clés** | Ensemble convexe, fonction convexe (3 caractérisations), min local = global, forte convexité, existence + unicité |
 | **Poids à l'examen** | Le théorème « convexe ⟹ point critique = min global » est l'argument le plus rentable de toute copie d'optimisation. La forte convexité est le cœur des exercices d'algorithmes. |

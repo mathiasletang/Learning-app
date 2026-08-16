@@ -5,7 +5,7 @@
 | **Matière** | Maths · Optimisation |
 | **Cours source** | Faccanoni, chapitre 4, §4.2, p. 100–103 (+ nombreux exercices corrigés) |
 | **Difficulté** | 🔴 Must know — l'autre moitié de l'examen |
-| **Temps d'étude estimé** | 2 h |
+| **Temps d'étude estimé** | 2 h 30 |
 | **Prérequis** | Fiches 3–6 (gradient, hessienne, extrema libres, implicites) |
 | **Concepts clés** | Contrainte d'égalité, multiplicateur de Lagrange, lagrangien, méthode de réduction, interprétation de λ |
 | **Poids à l'examen** | L'exercice « optimiser sous contrainte » (utilité sous budget, coût sous production…) est systématique. Le cours résout *chaque* exercice par les **deux** méthodes : faites pareil. |

@@ -5,7 +5,7 @@
 | **Matière** | CFA · Level 1 |
 | **Source** | Schweser, *QuickSheet 2024*, p. 3 |
 | **Difficulté** | 🟡 Intermédiaire |
-| **Temps d'étude estimé** | 1 h |
+| **Temps d'étude estimé** | 1 h 20 |
 | **Prérequis** | Actualisation (fiche 15), compte de résultat (fiche 17) |
 | **Concepts clés** | Gouvernance, capital allocation, NPV/IRR, ROIC, options réelles, WACC, théories de structure du capital |
 | **Place dans la source** | Topic compact : deux formules d'évaluation (NPV, WACC) entourées de classifications. |
@@ -60,6 +60,18 @@ Seule la dette porte l'ajustement fiscal $(1-t)$ : ses intérêts sont déductib
 2. Actualiser au coût du capital $k$ (le WACC si le projet est au risque moyen de la firme).
 3. NPV > 0 ⟹ le projet crée de la valeur ; l'IRR est le $k$ qui rend la NPV nulle.
 4. Contrôler la cohérence : si $k <$ IRR, la NPV doit être positive.
+
+**Exercice 🟡 — WACC complet** — Structure cible : 40 % dette ($k_d = 6\,\%$), 10 % préférentielles ($k_{ps} = 8\,\%$), 50 % actions ($k_s = 12\,\%$) ; impôt 30 %. WACC ? Un projet au risque moyen d'IRR 9 % est-il acceptable ?
+<details><summary>Correction</summary>
+
+$WACC = 0{,}4 \times 6\,\%(1-0{,}3) + 0{,}1 \times 8\,\% + 0{,}5 \times 12\,\% = 1{,}68 + 0{,}8 + 6{,}0 = 8{,}48\,\%$. IRR $9\,\% > 8{,}48\,\%$ ⟹ **accepter** (NPV > 0 au coût du capital). Vérifier deux réflexes : $(1-t)$ sur la dette seule, et les poids de la structure **cible**, pas comptable.
+</details>
+
+**Exercice 🟠 — ROIC vs WACC** — NOPAT 84, capital total comptable moyen 700, WACC de 8,48 %. La firme crée-t-elle de la valeur ?
+<details><summary>Correction</summary>
+
+$ROIC = 84/700 = 12\,\% > WACC = 8{,}48\,\%$ : chaque euro de capital investi rapporte 3,5 points au-dessus de son coût — création de valeur. **Interprétation** : c'est la comparaison ROIC/WACC (pas le ROIC isolé) qui juge l'allocation du capital ; un ROIC de 12 % détruirait de la valeur avec un WACC de 14 %.
+</details>
 
 ## ⚠️ Common mistakes
 

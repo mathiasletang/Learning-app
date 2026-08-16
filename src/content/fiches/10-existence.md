@@ -5,7 +5,7 @@
 | **Matière** | Maths · Optimisation |
 | **Cours source** | Garrigos, chapitre II, p. 29–42 |
 | **Difficulté** | 🔴 Must know |
-| **Temps d'étude estimé** | 1 h 15 |
+| **Temps d'étude estimé** | 1 h 40 |
 | **Prérequis** | Fiches 6 et 9 (extrema libres, Rayleigh) |
 | **Concepts clés** | Infimum vs minimum, minimiseur, coercivité, existence, conditions d'optimalité revisitées |
 | **Poids à l'examen** | « Montrer que $f$ admet un minimiseur » — la question d'ouverture type des sujets d'optimisation. La coercivité est l'argument attendu. |

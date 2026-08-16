@@ -5,7 +5,7 @@
 | **Matière** | CFA · Level 1 |
 | **Source** | Schweser, *QuickSheet — Critical Concepts for the 2024 CFA Exam*, p. 1 |
 | **Difficulté** | 🟢 Fondamental (mais à mémoriser mot pour mot) |
-| **Temps d'étude estimé** | 45 min |
+| **Temps d'étude estimé** | 1 h |
 | **Prérequis** | Aucun |
 | **Concepts clés** | Standards I–VII, sous-standards, GIPS, composites, vérification |
 | **Place dans la source** | Premier topic du QuickSheet : l'architecture complète des Standards y est listée, avec les fondements GIPS. |
@@ -60,6 +60,40 @@ La liste intégrale du QuickSheet (p. 1) :
 6. Pooled Fund Time-Weighted Return Report
 7. Pooled Fund Money-Weighted Return Report
 8. GIPS Advertising Guidelines
+
+### S'entraîner à coder les situations
+
+Le format d'examen : une vignette, retrouver le sous-standard. La gamme complète, par Standard :
+
+**🟢 Niveau 1** — Un analyste diffuse une rumeur pour faire monter un titre qu'il détient.
+<details><summary>Réponse</summary>
+
+II(B) *Market Manipulation* — fausser le marché relève de l'intégrité des marchés, pas des devoirs aux clients.
+</details>
+
+**🟢 Niveau 1 bis** — Un gérant exécute les ordres de son propre compte avant ceux de ses clients.
+<details><summary>Réponse</summary>
+
+VI(B) *Priority of Transactions* — les transactions des clients passent d'abord ; c'est un conflit d'intérêts, pas un manquement à III(A).
+</details>
+
+**🟡 Niveau 2** — Une analyste présente les performances d'une stratégie en omettant les années perdantes.
+<details><summary>Réponse</summary>
+
+III(D) *Performance Presentation* — présentation trompeuse de la performance. (Si elle inventait des chiffres : I(C) *Misrepresentation* serait aussi en jeu — distinguer la présentation sélective du mensonge pur.)
+</details>
+
+**🟡 Niveau 2 bis** — Un candidat CFA signe « John Smith, CFA Level II » sur ses cartes de visite alors qu'il n'a que réussi le Level I.
+<details><summary>Réponse</summary>
+
+VII(B) *Reference to CFA Institute, the CFA Designation, and the CFA Program* — l'usage de la référence au programme est encadré.
+</details>
+
+**🟠 Niveau 3 — la frontière fine** — Un gérant accepte d'un client satisfait un bonus annuel conditionné à la performance du portefeuille, sans en parler à personne. Quel(s) sous-standard(s) ?
+<details><summary>Réponse</summary>
+
+IV(B) *Additional Compensation Arrangements* (l'arrangement devait être déclaré à l'employeur) — et la situation crée le terrain d'un conflit VI(A) *Disclosure of Conflicts* vis-à-vis des autres clients : le gérant est incité à favoriser ce compte. Le réflexe : une rémunération externe touche presque toujours IV(B) **et** VI(A).
+</details>
 
 ## ⚠️ Common mistakes
 

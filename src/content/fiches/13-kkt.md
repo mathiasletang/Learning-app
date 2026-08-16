@@ -5,7 +5,7 @@
 | **Matière** | Maths · Optimisation |
 | **Cours source** | Garrigos, chapitre V, p. 83–124 |
 | **Difficulté** | 🔴 Must know — le sommet du cours |
-| **Temps d'étude estimé** | 2 h |
+| **Temps d'étude estimé** | 2 h 30 |
 | **Prérequis** | Fiches 7, 10, 11 (Lagrange à égalités, Fermat intérieur, convexité) |
 | **Concepts clés** | Polyèdres, contraintes actives, qualification, stationnarité, complémentarité, système KKT |
 | **Poids à l'examen** | L'exercice « résoudre le système KKT » est l'aboutissement du programme — c'est lui qui départage les copies. La complémentarité ($\alpha_i g_i = 0$) structure toute la résolution. |

@@ -5,7 +5,7 @@
 | **Matière** | CFA · Level 1 |
 | **Source** | Schweser, *QuickSheet 2024*, p. 2–3 |
 | **Difficulté** | 🔴 Avancé (le topic le plus volumineux de la source) |
-| **Temps d'étude estimé** | 2 h |
+| **Temps d'étude estimé** | 2 h 30 |
 | **Prérequis** | Comptabilité générale (bilan, compte de résultat, flux) |
 | **Concepts clés** | EPS dilué, classifications de titres, CFO, ratios de liquidité/rotation/rentabilité, cash conversion cycle, DuPont, LIFO/FIFO, impôts différés, leases |
 | **Place dans la source** | Le topic qui s'étend sur le plus de colonnes du QuickSheet — pivot de l'examen. |
@@ -56,6 +56,15 @@ $$\text{diluted EPS} = \frac{\big[\text{NI} - \text{div. préf.}\big] + \text{di
 | Marge brute plus basse | Marge brute plus haute |
 | Stocks au bilan plus bas | Stocks au bilan plus hauts |
 
+### Exercice calculé — l'EPS dilué de bout en bout
+
+Société : résultat net 500, dividendes préférentiels 50 ; 100 actions ordinaires en moyenne pondérée. Dette convertible : intérêts 40, convertible en 20 actions ; taux d'impôt 25 %.
+
+- **Basic EPS** $= \dfrac{500 - 50}{100} = 4{,}50$.
+- **Diluted EPS** $= \dfrac{(500 - 50) + 40(1 - 0{,}25)}{100 + 20} = \dfrac{480}{120} = 4{,}00$.
+- **Contrôle de dilution** : 4,00 < 4,50 ⟹ la dette convertible est bien dilutive, on la garde dans le calcul. (Si le résultat était *supérieur* au basic, le titre serait antidilutif — on l'exclut : le diluted EPS ne peut jamais dépasser le basic.)
+- **Interprétation** : la conversion ajouterait 20 actions mais rendrait 30 d'intérêts après impôt — l'effet net par action est la vraie mesure du risque de dilution pour l'actionnaire.
+
 ## 🔴 Concept 4 — La boîte à ratios
 
 **Liquidité** : current = actifs courants / passifs courants ; quick = (cash + titres + créances) / passifs courants ; cash ratio = (cash + titres) / passifs courants ; *defensive interval* = (cash + titres + créances) / dépenses cash journalières.
@@ -77,6 +86,20 @@ $$ROE = \underbrace{\frac{NI}{\text{ventes}}}_{\text{marge nette}} \times \under
 **Cinq facteurs (étendu)** :
 $$ROE = \frac{NI}{EBT}\times\frac{EBT}{EBIT}\times\frac{EBIT}{CA}\times\frac{CA}{\text{actifs moy.}}\times\frac{\text{actifs moy.}}{\text{equity moy.}}$$
 soit : *tax burden × interest burden × EBIT margin × asset turnover × leverage*.
+
+### Exercice calculé — DuPont complet
+
+Données : NI 120, EBT 160, EBIT 200, CA 2 000, actifs moyens 1 000, equity moyen 400.
+
+- **3 facteurs** : marge nette $= 6\,\%$ ; rotation $= 2$ ; levier $= 2{,}5$ ⟹ $ROE = 0{,}06 \times 2 \times 2{,}5 = 30\,\%$.
+- **5 facteurs** : tax burden $= 120/160 = 0{,}75$ ; interest burden $= 160/200 = 0{,}80$ ; EBIT margin $= 10\,\%$ ; rotation $= 2$ ; levier $= 2{,}5$ ⟹ $0{,}75 \times 0{,}80 \times 0{,}10 \times 2 \times 2{,}5 = 30\,\%$ ✓.
+- **Interprétation** : le ROE de 30 % vient pour moitié du levier (2,5×). Si l'endettement se réduit à levier 1,5, à exploitation constante le ROE tombe à 18 % : le DuPont sépare la performance opérationnelle (marge × rotation = 12 % en ROA) de l'amplification financière — exactement ce qu'un analyste doit distinguer.
+
+**Exercice 🟠 — sensibilité** — Même société : l'interest burden passe de 0,80 à 0,60 (charges d'intérêts doublées). Nouveau ROE, toutes choses égales ?
+<details><summary>Correction</summary>
+
+$ROE = 0{,}75 \times 0{,}60 \times 0{,}10 \times 2 \times 2{,}5 = 22{,}5\,\%$. Un tiers du burden d'intérêts en plus efface 7,5 points de ROE — le levier amplifie dans les deux sens, et le DuPont 5 facteurs montre le canal exact.
+</details>
 
 ## 🟡 Concept 6 — Sujets d'ajustement
 

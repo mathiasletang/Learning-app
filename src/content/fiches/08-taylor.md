@@ -5,7 +5,7 @@
 | **Matière** | Maths · Optimisation |
 | **Cours source** | Faccanoni, annexe A, p. 177 sq. |
 | **Difficulté** | 🟠 Should know (boîte à outils transversale) |
-| **Temps d'étude estimé** | 1 h |
+| **Temps d'étude estimé** | 1 h 20 |
 | **Prérequis** | Dérivation une variable |
 | **Concepts clés** | Linéarisation, polynôme de Taylor, majoration d'erreur, DL, Taylor-Young, équivalents |
 | **Poids à l'examen** | Rarement une question isolée, mais l'outil resurgit partout : DL d'ordre 2 en deux variables (fiche 4), études de signe des restrictions (fiches 2 et 6), approximations numériques. |

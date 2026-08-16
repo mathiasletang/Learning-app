@@ -5,7 +5,7 @@
 | **Matière** | Maths · Optimisation |
 | **Cours source** | Faccanoni, chapitre 4, §4.1, p. 89–96 (+ moindres carrés p. 93) |
 | **Difficulté** | 🔴 Must know — le cœur de l'examen |
-| **Temps d'étude estimé** | 2 h |
+| **Temps d'étude estimé** | 2 h 30 |
 | **Prérequis** | Fiches 3–4 (gradient, hessienne, convexité) |
 | **Concepts clés** | Max/min local et global, Weierstrass, Fermat, point critique, condition du 2ᵉ ordre, étude directe |
 | **Poids à l'examen** | LA question centrale : « déterminer et classer les extrema de $f$ ». Tombera, sous une forme ou une autre, à chaque épreuve. |

@@ -5,7 +5,7 @@
 | **Matière** | Maths · Optimisation |
 | **Cours source** | Faccanoni, chapitre 3, §3.1, p. 27–34 |
 | **Difficulté** | 🔴 Must know — socle de tout le reste |
-| **Temps d'étude estimé** | 1 h 30 |
+| **Temps d'étude estimé** | 2 h |
 | **Prérequis** | Fiches 1–2 ; dérivation en une variable |
 | **Concepts clés** | Dérivées partielles, gradient, jacobienne, chain rule, dérivée directionnelle, élasticité |
 | **Poids à l'examen** | Le calcul de dérivées partielles est présent dans *chaque* exercice d'optimisation. La chain rule et la dérivée en un point « à problème » sont des questions ciblées classiques. |

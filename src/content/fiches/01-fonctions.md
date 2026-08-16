@@ -5,7 +5,7 @@
 | **Matière** | Maths · Optimisation |
 | **Cours source** | Faccanoni, *Optimisation L3* (Univ. Toulon), chapitre 1, p. 3–14 |
 | **Difficulté** | 🟢 Fondamental |
-| **Temps d'étude estimé** | 45 min |
+| **Temps d'étude estimé** | 1 h |
 | **Prérequis** | Fonctions d'une variable (M11), lecture de graphes |
 | **Concepts clés** | Domaine de définition, graphe, fonctions partielles, lignes de niveau |
 | **Poids à l'examen** | Le domaine de définition et les lignes de niveau sont des questions quasi systématiques en début d'épreuve. |

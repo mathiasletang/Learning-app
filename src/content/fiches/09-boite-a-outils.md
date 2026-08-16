@@ -5,7 +5,7 @@
 | **Matière** | Maths · Optimisation |
 | **Cours source** | Garrigos, *Optimisation L3* (Univ. Paris-Cité), chapitre I, p. 9–28 |
 | **Difficulté** | 🟡 Intermédiaire (rappels instrumentaux) |
-| **Temps d'étude estimé** | 1 h |
+| **Temps d'étude estimé** | 1 h 20 |
 | **Prérequis** | Algèbre linéaire L2, fiches 3–4 (gradient, hessienne) |
 | **Concepts clés** | Valeurs propres, (semi-)définie positive, inégalité de Rayleigh, Taylor-Lagrange, fonctions quadratiques |
 | **Poids à l'examen** | Ces outils ne font pas l'objet de questions isolées : ils sont *les briques de chaque preuve et de chaque exercice* des chapitres II à V. |

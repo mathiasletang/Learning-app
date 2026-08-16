@@ -5,7 +5,7 @@
 | **Matière** | Maths · Optimisation |
 | **Cours source** | Garrigos, chapitre IV, p. 59–82 |
 | **Difficulté** | 🔴 Must know |
-| **Temps d'étude estimé** | 1 h 30 |
+| **Temps d'étude estimé** | 2 h |
 | **Prérequis** | Fiches 9–11 (Rayleigh, coercivité, forte convexité) |
 | **Concepts clés** | Directions de descente, méthode du gradient, Newton, gradient Lipschitz, conditionnement, vitesses de convergence |
 | **Poids à l'examen** | Exercices types : « montrer que $d$ est une direction de descente », « écrire l'itération du gradient pour $f$ », « discuter la convergence selon le pas ». Aussi la base des TP. |

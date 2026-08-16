@@ -5,7 +5,7 @@
 | **Matière** | Maths · Optimisation |
 | **Cours source** | Faccanoni, *Optimisation L3*, chapitre 2, p. 15–26 |
 | **Difficulté** | 🟡 Intermédiaire |
-| **Temps d'étude estimé** | 1 h 15 |
+| **Temps d'étude estimé** | 1 h 40 |
 | **Prérequis** | Fiche 1 ; limites d'une variable |
 | **Concepts clés** | Normes, boules, limite en un point, coordonnées polaires, continuité, prolongement |
 | **Poids à l'examen** | L'exercice « la limite existe-t-elle ? » est un classique absolu. La technique polaire est l'outil n° 1. |

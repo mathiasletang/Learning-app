@@ -5,7 +5,7 @@
 | **Matière** | Maths · Optimisation |
 | **Cours source** | Faccanoni, annexe A, p. 177 sq. |
 | **Difficulté** | 🟠 Should know (boîte à outils transversale) |
-| **Temps d'étude estimé** | 1 h |
+| **Temps d'étude estimé** | 1 h 20 |
 | **Prérequis** | Dérivation une variable |
 | **Concepts clés** | Linéarisation, polynôme de Taylor, majoration d'erreur, DL, Taylor-Young, équivalents |
 | **Poids à l'examen** | Rarement une question isolée, mais l'outil resurgit partout : DL d'ordre 2 en deux variables (fiche 4), études de signe des restrictions (fiches 2 et 6), approximations numériques. |
@@ -52,6 +52,34 @@ $$f(x) = \sum_{k=0}^n \frac{f^{(k)}(x_0)}{k!}(x - x_0)^k + o\big((x - x_0)^n\big
 **DL usuels en 0** (le kit de survie) :
 $$e^x = 1 + x + \frac{x^2}{2} + o(x^2) \qquad \ln(1+x) = x - \frac{x^2}{2} + o(x^2)$$
 $$\sin x = x - \frac{x^3}{6} + o(x^3) \qquad \cos x = 1 - \frac{x^2}{2} + o(x^2) \qquad (1+x)^\alpha = 1 + \alpha x + \frac{\alpha(\alpha-1)}{2}x^2 + o(x^2)$$
+
+### Exemples calculés — la mécanique des DL composés
+
+**Exemple 1 — composition.** DL d'ordre 2 de $e^{\sin x}$ en 0 : $\sin x = x + o(x^2)$, donc $e^{\sin x} = 1 + (x + o(x^2)) + \tfrac{(x + o(x^2))^2}{2} + o(x^2) = 1 + x + \tfrac{x^2}{2} + o(x^2)$. On substitue le DL *dans* le DL, en ne gardant que les termes d'ordre $\leq 2$.
+
+**Exemple 2 — quotient et équivalent.** $\lim_{x\to0} \dfrac{\ln(1+x) - x}{x^2}$ : le DL $\ln(1+x) = x - \tfrac{x^2}{2} + o(x^2)$ donne un numérateur $-\tfrac{x^2}{2} + o(x^2)$, d'où la limite $-\tfrac12$. Sans DL, forme indéterminée $\tfrac00$ tenace.
+
+**Exemple 3 — le piège de la somme.** $\lim_{x\to0}\dfrac{\sin x - x}{x^3}$ : *faux* de remplacer $\sin x \sim x$ pour conclure « $0$ » — **les équivalents ne s'additionnent pas** (ici on soustrait justement les termes principaux). *Correct* : DL d'ordre 3, $\sin x - x = -\tfrac{x^3}{6} + o(x^3)$, limite $-\tfrac16$. Règle : dès qu'une somme fait s'annuler les ordres bas, pousser le DL un cran plus loin.
+
+### Exercices progressifs
+
+**🟢 Niveau 1** — DL d'ordre 2 de $\sqrt{1+x}$ en 0, puis estimation de $\sqrt{1{,}1}$.
+<details><summary>Correction</summary>
+
+$(1+x)^{1/2} = 1 + \tfrac{x}{2} - \tfrac{x^2}{8} + o(x^2)$. En $x = 0{,}1$ : $1 + 0{,}05 - 0{,}00125 = 1{,}04875$ (exact : $1{,}04881$). L'ordre 2 gagne deux décimales sur la linéarisation.
+</details>
+
+**🟡 Niveau 2** — Bornez l'erreur commise en remplaçant $e^x$ par $1 + x + \tfrac{x^2}{2}$ sur $[0;\,0{,}5]$.
+<details><summary>Correction</summary>
+
+$f'''(x) = e^x \leq e^{0{,}5} < 1{,}65$ sur l'intervalle ; théorème A.6 : $|f - P_2| \leq \dfrac{(0{,}5)^3}{3!}\cdot 1{,}65 \approx 0{,}034$. **Interprétation** : trois termes suffisent pour deux décimales sûres sur tout l'intervalle.
+</details>
+
+**🟠 Niveau 3 — vers la fiche 6** — Soit $g(k) = f(0, k) - f(0,0)$ avec $g(k) = ak^2 + bk^4 + o(k^4)$. Discutez la nature du point selon $a$ et $b$.
+<details><summary>Correction</summary>
+
+$a > 0$ : $g > 0$ près de 0 — la restriction monte (compatible minimum). $a < 0$ : elle descend (compatible maximum ou selle). $a = 0$ : le signe passe à $b$ — c'est exactement le cas douteux $\det H = 0$ de la fiche 6, où $x^2 + y^4$ ($b>0$, minimum) et $x^2 - y^4$ ($b<0$, selle) se départagent à l'ordre 4. Le DL est *l'outil* de l'étude directe.
+</details>
 
 ### Où cela sert dans CE cours
 

@@ -5,7 +5,7 @@
 | **Matière** | CFA · Level 1 |
 | **Source** | Schweser, *QuickSheet 2024*, p. 6 |
 | **Difficulté** | 🟢 Fondamental |
-| **Temps d'étude estimé** | 1 h |
+| **Temps d'étude estimé** | 1 h 20 |
 | **Prérequis** | Aucun |
 | **Concepts clés** | Cycle de vie, hiérarchie de juste valeur, restrictions de rachat, frais (2 et 20, hurdles, waterfalls), stratégies de hedge funds, private capital, contango/backwardation |
 | **Place dans la source** | Dernier topic du QuickSheet : presque exclusivement du vocabulaire à restituer, une formule (prix futures des commodities). |
@@ -57,6 +57,32 @@ Classes : HF (4 familles) · private capital (LBO, VC) · immobilier · commodit
 $$\text{futures} \approx \text{spot}\,(1 + R_f) + \text{coûts de stockage} - \text{convenience yield}$$
 
 **Infrastructure** : actifs longs d'usage public (transport, utilities, communications, social) ; *brownfield* (existant) vs *greenfield* (à construire).
+
+### Exercices calculés — les frais dans tous leurs états
+
+**🟢 Niveau 1** — Hedge fund « 2 et 20 », AUM initial 100 M, rendement brut 15 %, pas de hurdle ni HWM. Frais totaux et rendement net ?
+<details><summary>Correction</summary>
+
+Management : $2\,\% \times 100 = 2$ M. Performance (sur le gain brut) : $20\,\% \times 15 = 3$ M. Total 5 M ⟹ rendement net $= (115 - 5 - 100)/100 = 10\,\%$. Un tiers de la performance est partie en frais.
+</details>
+
+**🟡 Niveau 2 — hard vs soft hurdle** — Rendement 12 %, hurdle 8 %, incentive 20 %. Frais de performance dans les deux conventions ?
+<details><summary>Correction</summary>
+
+Hard : $20\,\% \times (12 - 8) = 0{,}8\,\%$ de l'actif. Soft : hurdle franchi ⟹ $20\,\% \times 12 = 2{,}4\,\%$ — trois fois plus. La distinction assiette entière/excédent est le cœur de la question.
+</details>
+
+**🟠 Niveau 3 — high water mark** — Fonds à 100, monte à 120 (frais de perf. payés), retombe à 95, remonte à 110. Frais de performance sur la remontée ?
+<details><summary>Correction</summary>
+
+**Aucun** : le HWM est à 120 ; tant que la valeur ne dépasse pas ce sommet, pas d'incentive — la remontée 95 → 110 ne fait que rattraper des pertes déjà « facturées ». Les frais reprendront au-delà de 120 seulement.
+</details>
+
+**🔴 Niveau 4 — commodities** — Spot 80, $R_f = 4\,\%$, coûts de stockage 3, convenience yield 10. Prix futures approximatif, et régime du marché ?
+<details><summary>Correction</summary>
+
+Futures $\approx 80(1{,}04) + 3 - 10 = 76{,}2 < 80$ : **backwardation** — le convenience yield (la valeur de détenir la marchandise physique, ici élevée : pénurie, besoin industriel) l'emporte sur le coût de portage. Avec un convenience yield de 2, on aurait $84{,}2 > 80$ : contango ordinaire.
+</details>
 
 ### Comment traiter une question de frais de performance ?
 

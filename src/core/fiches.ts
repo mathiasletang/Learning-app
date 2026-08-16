@@ -44,7 +44,7 @@ export const FICHES: FicheMeta[] = [
     subject: 'maths',
     course: COURSE_FACCANONI,
     difficulty: 'fondamental',
-    minutes: 45,
+    minutes: 60,
     concepts: ['Domaine de définition', 'Fonctions partielles', 'Lignes de niveau'],
   },
   {
@@ -55,7 +55,7 @@ export const FICHES: FicheMeta[] = [
     subject: 'maths',
     course: COURSE_FACCANONI,
     difficulty: 'intermediaire',
-    minutes: 75,
+    minutes: 100,
     concepts: ['Normes et boules', 'Restrictions à des courbes', 'Coordonnées polaires', 'Prolongement'],
   },
   {
@@ -66,7 +66,7 @@ export const FICHES: FicheMeta[] = [
     subject: 'maths',
     course: COURSE_FACCANONI,
     difficulty: 'avance',
-    minutes: 90,
+    minutes: 120,
     concepts: ['Dérivées partielles', 'Gradient', 'Règle de la chaîne', 'Dérivée directionnelle', 'Élasticité'],
   },
   {
@@ -77,7 +77,7 @@ export const FICHES: FicheMeta[] = [
     subject: 'maths',
     course: COURSE_FACCANONI,
     difficulty: 'avance',
-    minutes: 90,
+    minutes: 120,
     concepts: ['Différentiabilité', 'Plan tangent', 'Schwarz', 'Hessienne', 'Convexité'],
   },
   {
@@ -88,7 +88,7 @@ export const FICHES: FicheMeta[] = [
     subject: 'maths',
     course: COURSE_FACCANONI,
     difficulty: 'intermediaire',
-    minutes: 45,
+    minutes: 60,
     concepts: ['Théorème des fonctions implicites', 'Dérivation implicite', 'Tangente à un niveau'],
   },
   {
@@ -99,7 +99,7 @@ export const FICHES: FicheMeta[] = [
     subject: 'maths',
     course: COURSE_FACCANONI,
     difficulty: 'avance',
-    minutes: 120,
+    minutes: 150,
     concepts: ['Weierstrass', 'Fermat', 'Points critiques', 'Condition du 2ᵉ ordre', 'Moindres carrés'],
   },
   {
@@ -110,7 +110,7 @@ export const FICHES: FicheMeta[] = [
     subject: 'maths',
     course: COURSE_FACCANONI,
     difficulty: 'avance',
-    minutes: 120,
+    minutes: 150,
     concepts: ['Multiplicateurs de Lagrange', 'Lagrangien', 'Méthode de réduction', 'Interprétation de λ'],
   },
   {
@@ -121,7 +121,7 @@ export const FICHES: FicheMeta[] = [
     subject: 'maths',
     course: COURSE_FACCANONI,
     difficulty: 'intermediaire',
-    minutes: 60,
+    minutes: 80,
     concepts: ['Linéarisation', 'Polynôme de Taylor', "Borne d'erreur", 'DL usuels'],
   },
   {
@@ -132,7 +132,7 @@ export const FICHES: FicheMeta[] = [
     subject: 'maths',
     course: COURSE_GARRIGOS,
     difficulty: 'intermediaire',
-    minutes: 60,
+    minutes: 80,
     concepts: ['Rayleigh', 'Définie positive', 'Taylor-Lagrange', 'Fonctions quadratiques'],
   },
   {
@@ -143,7 +143,7 @@ export const FICHES: FicheMeta[] = [
     subject: 'maths',
     course: COURSE_GARRIGOS,
     difficulty: 'avance',
-    minutes: 75,
+    minutes: 100,
     concepts: ['Infimum vs minimum', 'Coercivité', "Théorème d'existence", "Conditions d'optimalité"],
   },
   {
@@ -154,7 +154,7 @@ export const FICHES: FicheMeta[] = [
     subject: 'maths',
     course: COURSE_GARRIGOS,
     difficulty: 'avance',
-    minutes: 90,
+    minutes: 120,
     concepts: ['Caractérisations de la convexité', 'Min local = global', 'Forte convexité', 'Existence + unicité'],
   },
   {
@@ -165,7 +165,7 @@ export const FICHES: FicheMeta[] = [
     subject: 'maths',
     course: COURSE_GARRIGOS,
     difficulty: 'avance',
-    minutes: 90,
+    minutes: 120,
     concepts: ['Directions de descente', 'Méthode du gradient', 'Newton', 'Conditionnement'],
   },
   {
@@ -176,7 +176,7 @@ export const FICHES: FicheMeta[] = [
     subject: 'maths',
     course: COURSE_GARRIGOS,
     difficulty: 'avance',
-    minutes: 120,
+    minutes: 150,
     concepts: ['Contraintes actives', 'Qualification', 'Stationnarité', 'Complémentarité', 'Système KKT'],
   },
   {
@@ -187,7 +187,7 @@ export const FICHES: FicheMeta[] = [
     subject: 'cfa',
     course: COURSE_QUICKSHEET,
     difficulty: 'fondamental',
-    minutes: 45,
+    minutes: 60,
     concepts: ['Standards I–VII', 'Sous-standards', 'GIPS', 'Composites', 'Vérification'],
   },
   {
@@ -198,7 +198,7 @@ export const FICHES: FicheMeta[] = [
     subject: 'cfa',
     course: COURSE_QUICKSHEET,
     difficulty: 'intermediaire',
-    minutes: 90,
+    minutes: 120,
     concepts: ['HPR', 'Moyennes', 'Variance de portefeuille', 'Loi normale', 'Tests', 'Régression'],
   },
   {
@@ -209,7 +209,7 @@ export const FICHES: FicheMeta[] = [
     subject: 'cfa',
     course: COURSE_QUICKSHEET,
     difficulty: 'fondamental',
-    minutes: 60,
+    minutes: 80,
     concepts: ['Structures de marché', 'Cycle', 'Politique monétaire', 'Balance des paiements', 'Change'],
   },
   {
@@ -220,7 +220,7 @@ export const FICHES: FicheMeta[] = [
     subject: 'cfa',
     course: COURSE_QUICKSHEET,
     difficulty: 'avance',
-    minutes: 120,
+    minutes: 150,
     concepts: ['EPS dilué', 'CFO', 'Ratios', 'Cash conversion cycle', 'DuPont', 'LIFO/FIFO'],
   },
   {
@@ -231,7 +231,7 @@ export const FICHES: FicheMeta[] = [
     subject: 'cfa',
     course: COURSE_QUICKSHEET,
     difficulty: 'intermediaire',
-    minutes: 60,
+    minutes: 80,
     concepts: ['Gouvernance', 'NPV/IRR', 'ROIC', 'Options réelles', 'WACC', 'Structure du capital'],
   },
   {
@@ -242,7 +242,7 @@ export const FICHES: FicheMeta[] = [
     subject: 'cfa',
     course: COURSE_QUICKSHEET,
     difficulty: 'intermediaire',
-    minutes: 75,
+    minutes: 100,
     concepts: ['IPS', 'Frontière efficiente', 'CAPM/SML', 'Sharpe vs Treynor', 'Biais comportementaux'],
   },
   {
@@ -253,7 +253,7 @@ export const FICHES: FicheMeta[] = [
     subject: 'cfa',
     course: COURSE_QUICKSHEET,
     difficulty: 'intermediaire',
-    minutes: 90,
+    minutes: 120,
     concepts: ['Marge', 'Indices', 'EMH', 'Porter/PESTLE', 'Gordon', 'Multiples'],
   },
   {
@@ -264,7 +264,7 @@ export const FICHES: FicheMeta[] = [
     subject: 'cfa',
     course: COURSE_QUICKSHEET,
     difficulty: 'avance',
-    minutes: 120,
+    minutes: 150,
     concepts: ['Full/flat price', 'YTM et spreads', 'Duration', 'Convexité', 'Crédit', 'Titrisation'],
   },
   {
@@ -275,7 +275,7 @@ export const FICHES: FicheMeta[] = [
     subject: 'cfa',
     course: COURSE_QUICKSHEET,
     difficulty: 'intermediaire',
-    minutes: 60,
+    minutes: 80,
     concepts: ['Prix unique', 'Valeur du forward', 'FRA/Swaps', 'Options', 'Put-call parity'],
   },
   {
@@ -286,7 +286,7 @@ export const FICHES: FicheMeta[] = [
     subject: 'cfa',
     course: COURSE_QUICKSHEET,
     difficulty: 'fondamental',
-    minutes: 60,
+    minutes: 80,
     concepts: ['Cycle de vie', 'Frais et waterfalls', 'Hedge funds', 'Private capital', 'Commodities'],
   },
 ];

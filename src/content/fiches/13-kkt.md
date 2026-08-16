@@ -5,7 +5,7 @@
 | **Matière** | Maths · Optimisation |
 | **Cours source** | Garrigos, chapitre V, p. 83–124 |
 | **Difficulté** | 🔴 Must know — le sommet du cours |
-| **Temps d'étude estimé** | 2 h |
+| **Temps d'étude estimé** | 2 h 30 |
 | **Prérequis** | Fiches 7, 10, 11 (Lagrange à égalités, Fermat intérieur, convexité) |
 | **Concepts clés** | Polyèdres, contraintes actives, qualification, stationnarité, complémentarité, système KKT |
 | **Poids à l'examen** | L'exercice « résoudre le système KKT » est l'aboutissement du programme — c'est lui qui départage les copies. La complémentarité ($\alpha_i g_i = 0$) structure toute la résolution. |
@@ -71,6 +71,31 @@ Un point vérifiant ce système est un **point critique du problème** (remarque
 3. **Cas inactive** ($\alpha = 0$) : $(x,y) = (2, 0)$ ; admissibilité : $2 + 0 = 2 > 1$ ✗.
 4. **Cas active** ($x + y = 1$) : $x = 2 - \alpha$, $y = -\alpha$, somme $= 2 - 2\alpha = 1 \Rightarrow \alpha = \tfrac12 \geq 0$ ✓, $(x,y) = \left(\tfrac32, -\tfrac12\right)$.
 5. Unique candidat + existence + convexité ⟹ **minimiseur global** $\left(\tfrac32, -\tfrac12\right)$. La contrainte est active : l'optimum libre $(2,0)$ violait le budget, la solution s'est plaquée au bord.
+
+### Deuxième exemple complet — deux inégalités, quatre cas
+
+Minimiser $f(x,y) = (x-2)^2 + (y-1)^2$ sur $C = \{x \geq 0,\ y \geq 0,\ x + y \leq 1\}$… réduit ici aux deux contraintes utiles : $g_1 = x + y - 1 \leq 0$ et $g_2 = -y \leq 0$ (l'optimum libre $(2,1)$ viole visiblement $g_1$ ; $x \geq 0$ ne sera jamais actif, on le vérifie à la fin).
+
+Stationnarité : $2(x-2) + \alpha_1 = 0$ et $2(y-1) + \alpha_1 - \alpha_2 = 0$.
+
+| Cas | Hypothèses | Résolution | Verdict |
+|---|---|---|---|
+| 1 | $\alpha_1 = \alpha_2 = 0$ | $(2,1)$ | $g_1 = 2 > 0$ ✗ inadmissible |
+| 2 | $g_1 = 0$, $\alpha_2 = 0$ | $x - 2 = y - 1$ et $x + y = 1$ ⟹ $(1, 0)$, $\alpha_1 = 2$ | $\alpha_1 \geq 0$ ✓, $y = 0$ admissible ✓ |
+| 3 | $\alpha_1 = 0$, $g_2 = 0$ | $y = 0$, $x = 2$ | $g_1 = 1 > 0$ ✗ |
+| 4 | $g_1 = g_2 = 0$ | $(1, 0)$, puis $\alpha_1 = 2$, $\alpha_2 = \alpha_1 + 2(y-1) = 0$ | Coïncide avec le cas 2 |
+
+$f$ fortement convexe, contraintes affines ⟹ l'unique candidat $(1,0)$ est le **minimiseur global**, $f = 2$. **Interprétation** : les deux contraintes se rejoignent au coin $(1,0)$ — l'optimum est un *sommet* du polyèdre, $\alpha_2 = 0$ signale que $y \geq 0$ y est active « par coïncidence » sans pousser.
+
+### Exemple piège — conclure sans vérifier le cas
+
+**Question.** Minimiser $f(x,y) = x^2 + y^2$ sur $\{x + y \geq 2\}$.
+
+**Approche fausse.** Écrire directement « la contrainte est active » (ou pire, l'oublier et répondre $(0,0)$ — inadmissible : $0 + 0 < 2$).
+
+**Approche correcte.** Normaliser d'abord : $g = 2 - x - y \leq 0$, stationnarité $2x - \alpha = 0$, $2y - \alpha = 0$. Cas inactive : $(0,0)$, $g = 2 > 0$ ✗. Cas active : $x = y$, $x + y = 2$ ⟹ $(1,1)$, $\alpha = 2 \geq 0$ ✓. Convexité ⟹ minimiseur global $(1,1)$.
+
+**Le point du piège** : la contrainte est $\geq$ — sans la réécrire en $g \leq 0$, le signe de $\alpha$ n'a plus aucun sens et le « cas actif » se résout avec la mauvaise orientation. Normaliser est l'étape 0 de tout système KKT.
 
 ## ⚠️ Common mistakes
 

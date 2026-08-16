@@ -5,7 +5,7 @@
 | **Matière** | CFA · Level 1 |
 | **Source** | Schweser, *QuickSheet 2024*, p. 2 |
 | **Difficulté** | 🟢 Fondamental |
-| **Temps d'étude estimé** | 1 h |
+| **Temps d'étude estimé** | 1 h 20 |
 | **Prérequis** | Micro/macro L1–L2 |
 | **Concepts clés** | Structures de marché, seuil d'arrêt, cycle, politique monétaire/budgétaire, balance des paiements, taux de change |
 | **Place dans la source** | Topic qualitatif : beaucoup de classifications à restituer, deux formules de change seulement. |
@@ -75,6 +75,32 @@ $$\frac{\text{forward}}{\text{spot}} = \frac{1 + i_{\text{price}}}{1 + i_{\text{
 1. Identifier price/base : dans « EUR/USD = 1,10 » au sens de la source, EUR est la monnaie de prix, USD la base — 1,10 EUR pour 1 USD.
 2. Pour le forward : mettre le taux d'intérêt de la monnaie de **prix** au numérateur, celui de la **base** au dénominateur.
 3. Vérifier l'intuition : la monnaie au taux d'intérêt le plus élevé se déprécie à terme (forward > spot pour la paire cotée).
+
+### Exercices calculés
+
+**🟢 Niveau 1 — seuils** — RT = 900, coût variable total = 700, coût fixe = 300. Continuer ou fermer à court terme ?
+<details><summary>Correction</summary>
+
+RT (900) > CVT (700) mais RT < CT (1000) : **continuer à court terme** — les 200 au-dessus du variable absorbent une partie des coûts fixes (fermer coûterait les 300 entiers). À long terme, sans amélioration, sortir.
+</details>
+
+**🟡 Niveau 2 — identité macro** — Déficit budgétaire de 4 % du PIB, épargne privée excédant l'investissement de 1 %. Que dit l'identité sur la balance commerciale ?
+<details><summary>Correction</summary>
+
+$(G-T) = (S-I) - (X-M)$ : $4 = 1 - (X-M)$ ⟹ $X - M = -3\,\%$ : **déficit commercial de 3 % du PIB**. C'est le « déficits jumeaux » : un déficit public non financé par l'épargne domestique s'importe de l'étranger.
+</details>
+
+**🟠 Niveau 3 — change réel** — FX nominal 1,20 (price/base), CPI base 110, CPI price 121. Taux réel ? Le pouvoir d'achat de la monnaie de base a-t-il monté ou baissé si le taux réel initial était 1,20 ?
+<details><summary>Correction</summary>
+
+Réel $= 1{,}20 \times \dfrac{110}{121} \approx 1{,}091$. Le taux réel a baissé de 1,20 à 1,09 : en termes réels, une unité de monnaie de base s'échange contre moins de pouvoir d'achat de la monnaie de prix — la monnaie de **base s'est dépréciée en termes réels**. Mécanique : l'inflation est plus forte dans le pays de la monnaie de prix ($CPI$ 121 contre 110) et le nominal n'a pas bougé pour compenser. Réflexe d'examen : poser les CPI au bon étage — $CPI_{base}$ au numérateur.
+</details>
+
+**🔴 Niveau 4 — forward** — Spot 1,50 (price/base), taux price 6 %, taux base 2 %. Un dealer cote le forward 1 an à 1,53. Arbitrage ?
+<details><summary>Correction</summary>
+
+Forward théorique : $1{,}50 \times \dfrac{1{,}06}{1{,}02} \approx 1{,}5588$. Le dealer cote 1,53 < 1,5588 : le forward est **trop bas** — acheter la base à terme à 1,53, la fabriquer synthétiquement à 1,5588 en sens inverse (emprunter la price currency, placer en base) : profit sans risque de $\approx 0{,}029$ par unité. L'écart de taux (+4 %) devait déprécier la base à terme de ~4 % : toute cote qui ne le reflète pas s'arbitre.
+</details>
 
 ## ⚠️ Common mistakes
 

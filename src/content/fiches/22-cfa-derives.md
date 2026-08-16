@@ -5,7 +5,7 @@
 | **Matière** | CFA · Level 1 |
 | **Source** | Schweser, *QuickSheet 2024*, p. 6 |
 | **Difficulté** | 🟡 Intermédiaire |
-| **Temps d'étude estimé** | 1 h |
+| **Temps d'étude estimé** | 1 h 20 |
 | **Prérequis** | Actualisation, notion de position longue/courte |
 | **Concepts clés** | Loi du prix unique, pricing risque-neutre, valeur d'un forward, FRA, swaps, valeur intrinsèque, facteurs des options, put-call parity |
 | **Place dans la source** | Topic charnière : deux principes (arbitrage, valeur vs prix), une formule de forward, la table des facteurs et la parité. |
@@ -67,6 +67,26 @@ $$S = c - p + X(1+R_f)^{-T} \qquad p = c - S + X(1+R_f)^{-T}$$
 $$c = S + p - X(1+R_f)^{-T} \qquad X(1+R_f)^{-T} = S + p - c$$
 
 **Parité forward** : remplacer $S$ par $F_0(T)(1+R_f)^{-T}$ dans n'importe laquelle des relations (à $t = 0$).
+
+### Exercices calculés
+
+**🟢 Niveau 1 — intrinsèque** — Call de strike 50 sur une action à 47 : intrinsèque ? Et le put de même strike ?
+<details><summary>Correction</summary>
+
+Call : $\max(0, 47 - 50) = 0$ (hors de la monnaie). Put : $\max(0, 50 - 47) = 3$. Toute valeur de marché du call au-dessus de 0 est de la valeur temps pure.
+</details>
+
+**🟡 Niveau 2 — valeur d'un forward en cours de vie** — Forward sur un actif sans coûts ni bénéfices, $F_0(T) = 105$, $R_f = 5\,\%$. À mi-vie ($T - t = 0{,}5$ an), le spot vaut 104. Valeur pour le long ?
+<details><summary>Correction</summary>
+
+$V_t = S_t - F_0(T)(1+R_f)^{-(T-t)} = 104 - 105(1{,}05)^{-0{,}5} = 104 - 102{,}47 \approx +1{,}53$. Le long gagne : le spot a monté plus vite que l'actualisation du prix contractuel ne l'exigeait. Le short a exactement $-1{,}53$ — jeu à somme nulle.
+</details>
+
+**🟠 Niveau 3 — arbitrage par la parité** — $S = 60$, $c = 8$, $p = 4$, $X = 58$, $(1+R_f)^{-T} = 0{,}95$. Y a-t-il arbitrage ?
+<details><summary>Correction</summary>
+
+Membre gauche : $c + X(1+R_f)^{-T} = 8 + 55{,}1 = 63{,}1$. Membre droit : $S + p = 64$. Écart 0,9 : le portefeuille call + obligation est **trop bon marché** — l'acheter et vendre action + put encaisse 0,9 sans risque (payoffs identiques à l'échéance). En examen, l'écart signé indique le sens de l'arbitrage.
+</details>
 
 ### Comment retrouver un prix manquant par la parité ?
 

@@ -5,7 +5,7 @@
 | **Matière** | Maths · Optimisation |
 | **Cours source** | Garrigos, *Optimisation L3* (Univ. Paris-Cité), chapitre I, p. 9–28 |
 | **Difficulté** | 🟡 Intermédiaire (rappels instrumentaux) |
-| **Temps d'étude estimé** | 1 h |
+| **Temps d'étude estimé** | 1 h 20 |
 | **Prérequis** | Algèbre linéaire L2, fiches 3–4 (gradient, hessienne) |
 | **Concepts clés** | Valeurs propres, (semi-)définie positive, inégalité de Rayleigh, Taylor-Lagrange, fonctions quadratiques |
 | **Poids à l'examen** | Ces outils ne font pas l'objet de questions isolées : ils sont *les briques de chaque preuve et de chaque exercice* des chapitres II à V. |
@@ -36,6 +36,20 @@ Le cours insiste : la borne *inférieure* est « la seule » inégalité classiq
 
 **À retenir** — $\lambda_{\min}$ est *le* nombre à connaître d'une matrice symétrique : il décide de la positivité (I.45), minore les formes quadratiques (I.39), et mesurera la forte convexité (fiche 11).
 
+### Exemples calculés — lire une matrice 2×2 en trente secondes
+
+**Exemple 1 — définie positive.** $A = \begin{pmatrix} 3 & 1 \\ 1 & 3 \end{pmatrix}$ : diagonale $> 0$, $\det = 8 > 0$ ⟹ $A \succ 0$. Spectre exact : $\lambda = 3 \pm 1$, soit $\{2, 4\}$ — et Rayleigh encadre : $2\lVert x\rVert^2 \leq \langle Ax,x\rangle \leq 4\lVert x\rVert^2$.
+
+**Exemple 2 — semi-définie seulement.** $A = \begin{pmatrix} 1 & 1 \\ 1 & 1 \end{pmatrix}$ : $\det = 0$, diagonale $\geq 0$ ⟹ SDP mais pas définie ($\lambda = \{0, 2\}$ ; $\langle Ax,x\rangle = (x_1+x_2)^2$ s'annule sur toute la droite $x_2 = -x_1$).
+
+**Exemple 3 — indéfinie malgré une diagonale positive.** $A = \begin{pmatrix} 1 & 3 \\ 3 & 1 \end{pmatrix}$ : diagonale $> 0$ **mais** $\det = -8 < 0$ ⟹ indéfinie ($\lambda = \{-2, 4\}$). La diagonale seule ne suffit jamais : c'est le piège n° 5 ci-dessous en action.
+
+**Exercice 🟡** — Pour quelles valeurs de $c$ la matrice $A = \begin{pmatrix} 2 & c \\ c & 8 \end{pmatrix}$ est-elle définie positive ? Donnez alors le meilleur minorant de Rayleigh pour $c = 2$.
+<details><summary>Correction</summary>
+
+$\det = 16 - c^2 > 0$ et diagonale $> 0$ ⟹ $|c| < 4$. Pour $c = 2$ : $\lambda = 5 \pm \sqrt{13}$, donc $\lambda_{\min} = 5 - \sqrt{13} \approx 1{,}39$ et $\langle Ax,x\rangle \geq 1{,}39\,\lVert x\rVert^2$. **Interprétation** : plus le couplage $c$ grandit, plus $\lambda_{\min}$ fond — à $|c| = 4$ la positivité meurt.
+</details>
+
 ## 🟠 Concept 2 — Différentielle, gradient, hessienne (version compacte)
 
 - **Jacobienne** (prop. I.61) : matrice des dérivées partielles d'une application $F : \mathbb{R}^N \to \mathbb{R}^M$.
@@ -60,6 +74,18 @@ Avec la normalisation $f(x) = \tfrac12\langle Ax,x\rangle + \langle b,x\rangle +
 1. Mettre sous la forme $\tfrac12\langle Ax,x\rangle + \langle b,x\rangle + c$ avec $A$ **symétrique** (symétriser par $\frac{A+A^\top}{2}$, prop. I.47, au besoin).
 2. Lire directement $\nabla f = Ax + b$, $\nabla^2 f = A$.
 3. Contrôle : les dérivées partielles calculées à la main doivent coïncider.
+
+**Exemple pas à pas.** $f(x,y) = 2x^2 - 3xy + 5y^2 + x - 7$.
+- *Étape 1* : $\tfrac12\langle Ax,x\rangle$ avec $A = \begin{pmatrix} 4 & -3 \\ -3 & 10\end{pmatrix}$ (les termes carrés doublés sur la diagonale, le coefficient croisé $-3$ réparti symétriquement), $b = (1, 0)^\top$, $c = -7$.
+- *Étape 2* : $\nabla f = Ax + b = (4x - 3y + 1,\; -3x + 10y)^\top$, $\nabla^2 f = A$ partout.
+- *Étape 3 (contrôle)* : à la main, $\partial_x f = 4x - 3y + 1$ ✓, $\partial_y f = -3x + 10y$ ✓.
+- *Bonus* : $\det A = 31 > 0$, diagonale $> 0$ ⟹ $A \succ 0$ ⟹ $f$ strictement convexe, un unique minimiseur ($Ax^* = -b$).
+
+**Exercice 🟠 — moindres carrés (exercice I.94 du cours)** — Montrez que $f(x) = \lVert Mx - y\rVert^2$ est quadratique et donnez $\nabla f$ et $\nabla^2 f$.
+<details><summary>Correction</summary>
+
+$f = \langle Mx - y, Mx - y\rangle = \langle M^\top M x, x\rangle - 2\langle M^\top y, x\rangle + \lVert y\rVert^2$ : quadratique avec $A = 2M^\top M$ (symétrique d'office), $b = -2M^\top y$. Donc $\nabla f = 2M^\top(Mx - y)$ et $\nabla^2 f = 2M^\top M \succeq 0$ — toujours SDP : les moindres carrés sont convexes, et $\nabla f = 0$ redonne les **équations normales** $M^\top M x = M^\top y$ (pont avec la fiche 6).
+</details>
 
 ## ⚠️ Common mistakes
 

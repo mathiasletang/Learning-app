@@ -5,7 +5,7 @@
 | **Matière** | Maths · Optimisation |
 | **Cours source** | Garrigos, chapitre III, p. 43–58 |
 | **Difficulté** | 🔴 Must know |
-| **Temps d'étude estimé** | 1 h 30 |
+| **Temps d'étude estimé** | 2 h |
 | **Prérequis** | Fiches 4, 9, 10 (hessienne, Rayleigh, existence) |
 | **Concepts clés** | Ensemble convexe, fonction convexe (3 caractérisations), min local = global, forte convexité, existence + unicité |
 | **Poids à l'examen** | Le théorème « convexe ⟹ point critique = min global » est l'argument le plus rentable de toute copie d'optimisation. La forte convexité est le cœur des exercices d'algorithmes. |
@@ -88,6 +88,34 @@ C'est le trio gagnant : existence (coercivité), unicité (forte convexité), et
 3. **Méthode des inégalités** (souvent plus rapide) : chercher $\mu > 0$ tel que $\nabla^2 f(x) - \mu I \succeq 0$ pour tout $x$ — critères diagonale/déterminant, sans calculer de valeurs propres.
 
 **Exemple du cours (III.38).** $f = \tfrac12\langle Ax,x\rangle$, $A = \begin{pmatrix}3&1\\1&2\end{pmatrix}$ : $\chi_A(\mu) = \mu^2 - 5\mu + 5$, racines $\frac{5 \pm \sqrt5}{2}$, donc $f$ est $\mu$-convexe avec $\mu = \frac{5-\sqrt5}{2}$.
+
+**Exemple par la méthode des inégalités.** $f(x,y) = 2x^2 + y^2 + \tfrac{xy}{2}$ : $\nabla^2 f = \begin{pmatrix} 4 & \tfrac12 \\ \tfrac12 & 2 \end{pmatrix}$. Tester $\nabla^2 f - \mu I \succeq 0$ : diagonale $\geq 0$ exige $\mu \leq 2$ ; déterminant $(4-\mu)(2-\mu) - \tfrac14 \geq 0$. En $\mu = 2$ : $-\tfrac14 < 0$, trop grand. En $\mu = \tfrac{3}{2}$ : $\tfrac52 \cdot \tfrac12 - \tfrac14 = 1 \geq 0$ ✓ — donc $f \in \Gamma_{3/2}$, sans calcul de valeurs propres. (Le $\mu$ optimal — $\lambda_{\min} = 3 - \sqrt{1 + \tfrac14} \approx 1{,}88$ — est meilleur, mais un $\mu$ valide suffit presque toujours en exercice.)
+
+### Exercices résolus
+
+**🟢 Niveau 1** — $f(x,y) = e^x + e^y$ : convexe ? fortement convexe ? coercive ?
+<details><summary>Correction</summary>
+
+$\nabla^2 f = \operatorname{diag}(e^x, e^y) \succ 0$ partout ⟹ (strictement) convexe. Mais $\lambda_{\min} = \min(e^x, e^y) \to 0$ quand $x \to -\infty$ : pas de $\mu > 0$ uniforme ⟹ **pas fortement convexe**. Pas coercive non plus : $f(x, 0) = e^x + 1 \to 1$ quand $x \to -\infty$ — c'est $e^x$ en deux dimensions, le contre-exemple canonique dédoublé.
+</details>
+
+**🟡 Niveau 2** — La somme d'une fonction convexe et d'une fonction $\mu$-fortement convexe est-elle fortement convexe ?
+<details><summary>Correction</summary>
+
+Oui, $\mu$-fortement : si $g \in \Gamma_0$ et $h \in \Gamma_\mu$, alors $(g + h) - \tfrac{\mu}{2}\lVert\cdot\rVert^2 = g + (h - \tfrac{\mu}{2}\lVert\cdot\rVert^2)$ est une somme de deux convexes (prop. III.30 + stabilité III.10). Application immédiate : $f + \tfrac{\mu}{2}\lVert\cdot\rVert^2$ (régularisation) est fortement convexe pour toute $f$ convexe — l'astuce constante du chapitre algorithmes.
+</details>
+
+**🟠 Niveau 3** — Montrez que $f(x,y) = \ln(e^x + e^y)$ est convexe mais jamais fortement convexe.
+<details><summary>Correction</summary>
+
+Convexité : $\nabla^2 f = \dfrac{e^{x+y}}{(e^x+e^y)^2}\begin{pmatrix} 1 & -1 \\ -1 & 1 \end{pmatrix} \succeq 0$ (diagonale $\geq 0$, $\det = 0$) — SDP partout ⟹ convexe. Mais $\det \nabla^2 f = 0$ **partout** : $\lambda_{\min} = 0$ en tout point, aucune marge $\mu > 0$ possible. **Interprétation** : $f$ est constante le long de la direction $(1,1)$ à une fonction affine près ($f(x+t, y+t) = f(x,y) + t$) — plate dans une direction, donc jamais fortement convexe.
+</details>
+
+**🔴 Niveau 4 — type examen (le trio complet)** — $f(x,y) = x^2 + 2y^2 + \cos(x) $ : montrer que $f$ admet un unique minimiseur sur $\mathbb{R}^2$.
+<details><summary>Correction</summary>
+
+$\nabla^2 f = \begin{pmatrix} 2 - \cos x & 0 \\ 0 & 4 \end{pmatrix}$ avec $2 - \cos x \geq 1$ : $\lambda_{\min}(\nabla^2 f) \geq 1$ **partout** ⟹ $f \in \Gamma_1(\mathbb{R}^2)$, fortement convexe. Continue + $\mathbb{R}^2$ fermé ⟹ (thm. III.41) coercive, existence et **unicité** du minimiseur — sans résoudre $\nabla f = 0$ (qui est transcendant : $2x = \sin x$, $y = 0$). **Interprétation** : la forte convexité permet de conclure sur l'existence/unicité même quand le point exact est incalculable à la main — c'est sa vraie puissance en examen.
+</details>
 
 ## ⚠️ Common mistakes
 

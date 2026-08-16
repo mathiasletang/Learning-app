@@ -5,7 +5,7 @@
 | **Matière** | CFA · Level 1 |
 | **Source** | Schweser, *QuickSheet 2024*, p. 5–6 |
 | **Difficulté** | 🔴 Avancé |
-| **Temps d'étude estimé** | 2 h |
+| **Temps d'étude estimé** | 2 h 30 |
 | **Prérequis** | Actualisation (fiche 15) |
 | **Concepts clés** | Full/flat price, YTM et mesures de rendement, spreads, taux forward, duration (Macaulay, modifiée, effective), convexité, risque de crédit, titrisation |
 | **Place dans la source** | Deuxième topic le plus long du QuickSheet, du vocabulaire obligataire jusqu'aux ABS. |
@@ -77,6 +77,32 @@ $$\text{Expected loss} = \text{probabilité de défaut} \times \text{loss given 
 **Notations** : investment grade ≥ Baa3/BBB− ; non-investment grade ≤ Ba1/BB+ ; CFR (émetteur) vs CCR (titre). Secured (collatéral dédié, senior) vs unsecured (créance générale).
 
 **Titrisation** (p. 5–6) : RMBS (agency = prêts conformes ; nonagency ⟹ rehaussement de crédit) ; rehaussement interne : excess spread, surdimensionnement, structure en cascade. Risque de **prépaiement** : *contraction* (remboursements plus rapides) et *extension* (plus lents). CMO (adossés à des pass-throughs ; sequential-pay ou PAC/support) ; CMBS (non-recourse) ; ABS cartes de crédit ; CDO (avec gestionnaire de collatéral).
+
+### Exercices calculés
+
+**🟢 Niveau 1 — prix et coupon** — Obligation 3 ans, coupon annuel 4 %, YTM 6 %, pair 100. Prix, et prime ou décote ?
+<details><summary>Correction</summary>
+
+$P = \dfrac{4}{1{,}06} + \dfrac{4}{1{,}06^2} + \dfrac{104}{1{,}06^3} = 3{,}77 + 3{,}56 + 87{,}32 \approx 94{,}65$. Coupon (4 %) < YTM (6 %) ⟹ **décote**, conforme à la règle. En vieillissant, ce prix remontera vers 100 le long de la trajectoire à rendement constant.
+</details>
+
+**🟡 Niveau 2 — full/flat** — Coupon annuel 5 %, pair 100 ; 90 jours écoulés sur une période de 360. Full price si le PV au dernier coupon vaut 98 et YTM 6 % ; accrued ; flat ?
+<details><summary>Correction</summary>
+
+Full $= 98 \times (1{,}06)^{90/360} = 98 \times 1{,}0147 \approx 99{,}44$. Accrued $= 5 \times \tfrac{90}{360} = 1{,}25$. Flat $= 99{,}44 - 1{,}25 = 98{,}19$ — c'est la cote ; l'acheteur règle pourtant le full.
+</details>
+
+**🟠 Niveau 3 — forward** — $S_1 = 3\,\%$, $S_2 = 4\,\%$. Taux forward 1 an dans 1 an (« 1y1y ») ?
+<details><summary>Correction</summary>
+
+$(1{,}04)^2 = (1{,}03)(1 + 1y1y)$ ⟹ $1y1y = \dfrac{1{,}0816}{1{,}03} - 1 \approx 5{,}01\,\%$. **Interprétation** : pour que 2 ans à 4 % équivalent à 1 an à 3 % réinvesti, la deuxième année doit rapporter ~5 % — le forward est la pente implicite de la courbe.
+</details>
+
+**🔴 Niveau 4 — duration + convexité** — Duration modifiée 7,2, convexité 60. Estimez la variation de prix pour +100 pb, puis pour −100 pb.
+<details><summary>Correction</summary>
+
+$+100$ pb : $-7{,}2(0{,}01) + \tfrac12(60)(0{,}01)^2 = -7{,}2\,\% + 0{,}3\,\% = -6{,}9\,\%$. $-100$ pb : $+7{,}2\,\% + 0{,}3\,\% = +7{,}5\,\%$. La convexité **ajoute** dans les deux sens : la hausse de prix est plus grande que la baisse — l'asymétrie favorable qui fait de la convexité une qualité.
+</details>
 
 ### Comment estimer la variation de prix d'une obligation ?
 

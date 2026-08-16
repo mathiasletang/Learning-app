@@ -5,7 +5,7 @@
 | **Matière** | CFA · Level 1 |
 | **Source** | Schweser, *QuickSheet 2024*, p. 1–2 |
 | **Difficulté** | 🟡 Intermédiaire |
-| **Temps d'étude estimé** | 1 h 30 |
+| **Temps d'étude estimé** | 2 h |
 | **Prérequis** | Statistiques L2 (fiches MIT 18.600/18.650 du parcours en renfort) |
 | **Concepts clés** | HPR, moyennes, dispersion, Bayes, portefeuille à 2 actifs, loi normale, TCL, erreurs de type I/II, régression |
 | **Place dans la source** | Le topic le plus dense en formules du QuickSheet : deux colonnes pleines, toutes exigibles en calcul direct. |
@@ -50,6 +50,26 @@ $$s_{\text{target}} = \sqrt{\frac{\sum_{X_i < \text{target}} (X_i - \text{target
 $$E(R_p) = w_A E(R_A) + w_B E(R_B)$$
 $$\text{var}(R_p) = w_A^2\sigma^2(R_A) + w_B^2\sigma^2(R_B) + 2\,w_A w_B\,\sigma(R_A)\,\sigma(R_B)\,\rho(R_A,R_B)$$
 
+### Exercices calculés — rendements et moyennes
+
+**🟢 Niveau 1** — Une action achetée 40, revendue 43 après un dividende de 1. HPR ? Annualisé si la détention a duré 73 jours ?
+<details><summary>Correction</summary>
+
+$HPR = \dfrac{43 - 40 + 1}{40} = 10\,\%$. Annualisé : $(1{,}10)^{365/73} - 1 = (1{,}10)^5 - 1 \approx 61{,}1\,\%$. **Interprétation** : annualiser un rendement de 73 jours suppose de le composer cinq fois — d'où l'écart spectaculaire avec $10 \times 5 = 50\,\%$.
+</details>
+
+**🟡 Niveau 2** — Rendements annuels : $+50\,\%$ puis $-50\,\%$. Moyenne arithmétique, moyenne géométrique, et laquelle décrit la réalité de l'investisseur ?
+<details><summary>Correction</summary>
+
+Arithmétique : $0\,\%$. Géométrique : $\sqrt{1{,}5 \times 0{,}5} - 1 = \sqrt{0{,}75} - 1 \approx -13{,}4\,\%$ par an. Un capital de 100 finit à $100 \times 1{,}5 \times 0{,}5 = 75$ : c'est la **géométrique** qui décrit le rendement composé réellement subi — l'arithmétique surestime toujours (sauf volatilité nulle).
+</details>
+
+**🟠 Niveau 3 — piège** — Un portefeuille cible 6 % ; rendements observés : 4 %, 8 %, 5 %, 10 %, 3 % ($n = 5$). Calculez la target downside deviation.
+<details><summary>Correction</summary>
+
+*Erreur classique* : inclure les cinq écarts. *Correct* : seules les observations **sous la cible** entrent — 4, 5 et 3 : écarts $-2, -1, -3$. $s_{target} = \sqrt{\dfrac{4 + 1 + 9}{5-1}} = \sqrt{3{,}5} \approx 1{,}87\,\%$. Le dénominateur reste $n - 1 = 4$ (pas le nombre d'observations sous la cible) — deuxième piège du même calcul.
+</details>
+
 ## 🟠 Concept 4 — Normale, TCL, erreur standard
 
 **Loi normale** : entièrement décrite par moyenne et variance. Intervalles à mémoriser (p. 1) :
@@ -65,6 +85,20 @@ $$\text{var}(R_p) = w_A^2\sigma^2(R_A) + w_B^2\sigma^2(R_B) + 2\,w_A w_B\,\sigma
 - **Théorème central limite** : pour $n$ grand, la distribution de la moyenne d'échantillon tend vers une normale de moyenne $\mu$ et de variance $\sigma^2/n$.
 - **Erreur standard de la moyenne** : $\sigma_{\bar{x}} = \sigma/\sqrt{n}$ (variance de population connue), $s_{\bar{x}} = s/\sqrt{n}$ (inconnue).
 - **Rééchantillonnage** : *jackknife* (moyennes en retirant une observation à la fois) ; *bootstrap* (tirages répétés de taille $n$ **avec remise**).
+
+### Exercices calculés — probabilités et inférence
+
+**🟡 Bayes en situation** — 2 % des fonds sont « stars ». Un signal de sélection détecte 80 % des stars, mais s'allume aussi pour 10 % des fonds ordinaires. Un fonds déclenche le signal : probabilité que ce soit une star ?
+<details><summary>Correction</summary>
+
+$P(\text{signal}) = 0{,}02(0{,}8) + 0{,}98(0{,}1) = 0{,}114$. Bayes : $P(\text{star}\mid\text{signal}) = \dfrac{0{,}8}{0{,}114} \times 0{,}02 \approx 14\,\%$. **Interprétation** : même un bon signal reste noyé quand la base est rare — l'erreur d'ignorer le taux de base est exactement ce que Bayes corrige.
+</details>
+
+**🟡 Intervalle avec le TCL** — Population $\mu$ inconnue, $\sigma = 12$. Échantillon $n = 36$, $\bar x = 50$. Intervalle à 95 % pour $\mu$ ?
+<details><summary>Correction</summary>
+
+Erreur standard : $\sigma_{\bar x} = 12/\sqrt{36} = 2$. Intervalle : $50 \pm 1{,}96 \times 2 = [46{,}1;\ 53{,}9]$. Avec $n = 144$, l'erreur standard tomberait à 1 : quadrupler $n$ divise l'incertitude par 2 — la racine carrée est la leçon du TCL.
+</details>
 
 ## 🟡 Concept 5 — Tests d'hypothèses
 

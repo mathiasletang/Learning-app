@@ -5,7 +5,7 @@
 | **Matière** | CFA · Level 1 |
 | **Source** | Schweser, *QuickSheet 2024*, p. 4 |
 | **Difficulté** | 🟡 Intermédiaire |
-| **Temps d'étude estimé** | 1 h 15 |
+| **Temps d'étude estimé** | 1 h 40 |
 | **Prérequis** | Espérance/variance de portefeuille (fiche 15) |
 | **Concepts clés** | IPS, frontière efficiente, risque systématique, CAPM/SML, Sharpe, Treynor, alpha de Jensen, biais comportementaux |
 | **Place dans la source** | Le seul topic du QuickSheet illustré par trois graphiques (frontière, CML, SML). |
@@ -60,6 +60,26 @@ Le Treynor d'un portefeuille P est la pente de la droite RFR→P dans le plan (�
 **Erreurs cognitives — persévérance des croyances** : conservatisme, confirmation, représentativité, illusion de contrôle, rétrospection (*hindsight*).
 **Erreurs cognitives — traitement de l'information** : ancrage et ajustement, comptabilité mentale, cadrage, disponibilité.
 **Biais émotionnels** : aversion aux pertes, excès de confiance, défaut de self-control, statu quo, dotation (*endowment*), aversion au regret.
+
+### Exercices calculés
+
+**🟢 Niveau 1 — CAPM direct** — RFR 2 %, prime de marché 6 %, β = 0,8. Rendement exigé ?
+<details><summary>Correction</summary>
+
+$E(R) = 2 + 0{,}8 \times 6 = 6{,}8\,\%$. (Attention à l'énoncé : « prime de marché » = $E(R_{mkt}) - RFR$ déjà calculée ; si on donne $E(R_{mkt}) = 8\,\%$, la prime est $8 - 2 = 6$.)
+</details>
+
+**🟡 Niveau 2 — mesures ajustées** — Portefeuille : rendement 11 %, σ 20 %, β 1,25. Marché : 9 %, σ 15 %. RFR 3 %. Sharpe et Treynor du portefeuille et du marché ; un investisseur non diversifié doit-il préférer ce portefeuille au marché ?
+<details><summary>Correction</summary>
+
+Sharpe : portefeuille $(11-3)/20 = 0{,}40$ ; marché $(9-3)/15 = 0{,}40$. Treynor : portefeuille $(11-3)/1{,}25 = 6{,}4$ ; marché $(9-3)/1 = 6$. Le portefeuille bat le marché **par unité de risque systématique** (Treynor) mais fait jeu égal en risque total (Sharpe) : son risque spécifique consomme l'avantage. Pour un investisseur **non diversifié** (risque total pertinent), indifférence ; pour une poche d'un ensemble diversifié, le portefeuille est préférable.
+</details>
+
+**🟠 Niveau 3 — alpha de Jensen** — Même portefeuille (β 1,25, rendement réalisé 11 %), marché 9 %, RFR 3 %. Alpha ?
+<details><summary>Correction</summary>
+
+Rendement exigé par le CAPM : $3 + 1{,}25(9-3) = 10{,}5\,\%$. $\alpha = 11 - 10{,}5 = +0{,}5\,\%$ : au-dessus de la SML — surperformance ajustée du risque systématique, cohérente avec le Treynor supérieur.
+</details>
 
 ### Comment choisir entre Sharpe et Treynor ?
 

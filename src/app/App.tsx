@@ -8,6 +8,7 @@ import { Subject } from '@/modules/subject/Subject';
 import { CourseView } from '@/modules/courses/CourseView';
 import { FicheView } from '@/modules/fiches/FicheView';
 import { QcmBank } from '@/modules/quiz/QcmBank';
+import { Cards } from '@/modules/review/Cards';
 import { Suivi } from '@/modules/suivi/Suivi';
 
 /* Le lexique pèse un méga-octet : les pages qui s'en servent sont chargées à
@@ -77,6 +78,7 @@ export function App() {
           <Route path="cours/:id" element={<CourseView />} />
           <Route path="fiche/:id" element={<FicheView />} />
           <Route path="qcm/:bank" element={<QcmBank />} />
+          <Route path="cartes/:deck" element={<Cards />} />
           {/* Anciens chemins — liens et raccourcis déjà posés restent valides. */}
           <Route path="vocabulaire" element={<Navigate to="/anglais" replace />} />
           <Route path="parcours" element={<Navigate to="/maths" replace />} />

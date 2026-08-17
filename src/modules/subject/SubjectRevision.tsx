@@ -122,8 +122,14 @@ export function SubjectRevision({ def }: { def: SubjectDef }) {
         ) : (
           <span className="meta">Rien n'est dû aujourd'hui.</span>
         )}
+        {/* Le second mode : parcourir le paquet sans rien replanifier. */}
+        {cards.length > 0 && (
+          <Link className="btn btn--secondary" to={`/cartes/${def.id}`}>
+            <Icon name="cards" size={17} /> Parcourir les cartes
+          </Link>
+        )}
         {pending.length > 0 && (
-          <Button variant="secondary" icon="cards" onClick={integrate}>
+          <Button variant="secondary" icon="check" onClick={integrate}>
             Intégrer {pending.length} erreur{pending.length > 1 ? 's' : ''} de QCM
           </Button>
         )}

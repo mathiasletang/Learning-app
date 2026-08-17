@@ -8,3 +8,4 @@ export { Modal } from './Modal';
 export { Tabs } from './Tabs';
 export { PageHead } from './PageHead';
 export { Reveal, Stagger, staggerItem } from './Reveal';
+export { YearLine } from './YearLine';

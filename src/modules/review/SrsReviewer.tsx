@@ -45,8 +45,12 @@ export function SrsReviewer({ items, grades, onGrade, onExit }: Props) {
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === ' ' || e.key === 'Enter') {
+        /* La carte et les boutons répondent déjà à ces deux touches : les
+           traiter ici aussi retournerait la carte une seconde fois. */
+        const el = e.target as HTMLElement | null;
+        if (el?.closest?.('button, a, [role="button"]')) return;
         e.preventDefault();
-        if (!flipped) setFlipped(true);
+        setFlipped((f) => !f);
       } else if (flipped && e.key >= '1' && e.key <= '4') {
         const g = grades[Number(e.key) - 1];
         if (g) grade(g.grade);
@@ -85,12 +89,16 @@ export function SrsReviewer({ items, grades, onGrade, onExit }: Props) {
         className="card-face"
         role="button"
         tabIndex={0}
-        aria-label={flipped ? 'Réponse affichée' : 'Appuyer pour révéler la réponse'}
-        onClick={() => !flipped && setFlipped(true)}
+        aria-label={
+          flipped
+            ? 'Réponse affichée — appuyer pour revenir à la question'
+            : 'Appuyer pour révéler la réponse'
+        }
+        onClick={() => setFlipped((f) => !f)}
         onKeyDown={(e) => {
-          if ((e.key === 'Enter' || e.key === ' ') && !flipped) {
+          if (e.key === 'Enter' || e.key === ' ') {
             e.preventDefault();
-            setFlipped(true);
+            setFlipped((f) => !f);
           }
         }}
       >
@@ -110,7 +118,9 @@ export function SrsReviewer({ items, grades, onGrade, onExit }: Props) {
             )}
           </motion.div>
         </AnimatePresence>
-        {!flipped && <span className="micro card-face__hint">Appuyer pour révéler</span>}
+        <span className="micro card-face__hint">
+          {flipped ? 'Appuyer pour revenir à la question' : 'Appuyer pour révéler'}
+        </span>
       </div>
 
       <AnimatePresence>

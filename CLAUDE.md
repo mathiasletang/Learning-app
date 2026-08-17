@@ -86,6 +86,31 @@ Tout écran se vérifie à **390 px**, pas seulement en 1440.
   fond ≥ 96 % d'opacité, et repli opaque via `@supports not (backdrop-filter)`.
 - Les titres portent `scroll-margin-top` pour ne pas atterrir sous la barre.
 
+## Où vivent les PDF
+
+Le catalogue compte 718 documents, **663 Mo**. Ils ne sont pas dans le repo, et
+il ne faut pas les y mettre : git conserve chaque version pour toujours, ne
+compresse pas les PDF, et Netlify reclone le dépôt à chaque build — y compris
+pour chaque aperçu de PR.
+
+Trois niveaux, dans cet ordre (`openResource`, `src/app/actions.ts`) :
+
+1. une URL `http(s)` → ouverture directe ;
+2. un PDF de `public/cours/` → servi par l'application ;
+3. sinon → recherche par nom dans le dossier Drive de l'utilisateur.
+
+Le niveau 2 contient **uniquement les documents que `parcours.json` pointe
+explicitement** — une trentaine, 19 Mo. `npm run cours` les copie depuis le
+dossier de cours local et régénère `src/content/cours-locaux.json`. À relancer
+après toute modification de `parcours.json` qui ajoute ou retire une référence.
+
+Ne jamais héberger les notes Schweser du CFA : produit commercial de Kaplan,
+sur un dépôt et des aperçus publics. `scripts/importer-cours.mjs` les exclut,
+un test le vérifie. Seule exception, décidée par l'utilisateur pour son dépôt
+passé en privé : le QuickSheet (`CFA/2024 L1 Quick Sheet.pdf`), écrit à la
+main dans `config.ts`. Même prudence pour `11_Articles-de-reference` (articles
+de revues). MIT OCW est en CC BY-NC-SA, redistribuable avec attribution.
+
 ## Avant de dire que c'est fini
 
 1. `npm run typecheck`

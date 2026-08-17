@@ -145,6 +145,10 @@ export interface Gamification {
   days: Record<string, number>; // date -> xp gagné ce jour
   reviewsCount: number; // total de révisions SRS (flashcards + vocab)
   goalReachedEver: boolean; // objectif du jour déjà atteint au moins une fois
+  /** Mots de vocabulaire travaillés aujourd'hui (objectif quotidien anglais).
+      Optionnels : les données déjà en base ne les ont pas. */
+  wordsDoneToday?: number;
+  wordsDay?: string;
 }
 
 export interface StepProgress {

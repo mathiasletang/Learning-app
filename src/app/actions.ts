@@ -144,6 +144,7 @@ export async function reviewVocab(id: string, grade: Grade): Promise<void> {
   const next = schedule(current, grade, today);
   await db.vocabSrs.put({ id, ...next });
   await app().incReviews(1);
+  await app().registerWordsDone(1);
   const xp = xpForReview(grade);
   if (xp > 0) await app().addXp(xp);
   else await app().registerActivity();

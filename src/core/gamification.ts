@@ -21,6 +21,7 @@ export function xpForReview(grade: Grade): number {
   return 0;
 }
 
+export const DAILY_WORD_GOAL = 20; // mots de vocabulaire par jour (page Anglais)
 export const XP_STEP = 15; // étape de parcours cochée
 export const XP_DOC = 3; // document lu
 export const XP_NOTE = 5; // note créée

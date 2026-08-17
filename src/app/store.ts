@@ -16,7 +16,13 @@ import {
   DEFAULT_GAM,
 } from '@/core/db';
 import { toDayStr, addDays } from '@/core/date';
-import { levelFromXp, evaluateBadges, BADGES, type BadgeContext } from '@/core/gamification';
+import {
+  levelFromXp,
+  evaluateBadges,
+  BADGES,
+  DAILY_WORD_GOAL,
+  type BadgeContext,
+} from '@/core/gamification';
 import { getParcours } from '@/core/content';
 
 export type ResolvedTheme = 'light' | 'dark';
@@ -50,6 +56,7 @@ interface AppState {
   registerActivity: () => Promise<void>;
   incReviews: (n: number) => Promise<void>;
   registerQuestionsDone: (count: number) => Promise<void>;
+  registerWordsDone: (count: number) => Promise<void>;
   refreshBadges: () => Promise<string[]>;
 
   fireConfetti: () => void;
@@ -262,6 +269,25 @@ export const useApp = create<AppState>((set, get) => {
           title: 'Objectif du jour atteint !',
           desc: `${goal} questions — bravo.`,
           icon: '🎯',
+          kind: 'success',
+        });
+      }
+    },
+
+    async registerWordsDone(count) {
+      const t = toDayStr();
+      let reachedNow = false;
+      await commitGam((g) => {
+        const s = touchStreak(g, t);
+        const before = s.wordsDay === t ? (s.wordsDoneToday ?? 0) : 0;
+        const done = before + count;
+        reachedNow = before < DAILY_WORD_GOAL && done >= DAILY_WORD_GOAL;
+        return { ...s, wordsDoneToday: done, wordsDay: t };
+      });
+      if (reachedNow) {
+        get().pushToast({
+          title: 'Objectif vocabulaire atteint',
+          desc: `${DAILY_WORD_GOAL} mots travaillés aujourd'hui.`,
           kind: 'success',
         });
       }

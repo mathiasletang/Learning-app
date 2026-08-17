@@ -65,7 +65,7 @@ export function TimeSection() {
   }, [logs]);
 
   const parcours = getParcours();
-  const tracks = (['opt', 'fin', 'cfa'] as TrackId[]).map((t) => ({
+  const tracks = (['opt', 'fin', 'cfa', 'code'] as TrackId[]).map((t) => ({
     id: t,
     label: parcours[t].titre,
     target: parcours[t].heures,

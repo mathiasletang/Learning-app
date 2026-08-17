@@ -9,7 +9,7 @@
 
 import type { BankId, TrackId, Flashcard } from './types';
 
-export type SubjectId = 'maths' | 'cfa';
+export type SubjectId = 'maths' | 'cfa' | 'code';
 
 export interface SubjectDef {
   id: SubjectId;
@@ -46,9 +46,19 @@ export const SUBJECT_DEFS: Record<SubjectId, SubjectDef> = {
     noteSubjects: ['cfa', 'fin'],
     lead: 'Le CFA Level I et les mathématiques financières — parcours, documents, questions et erreurs, au même endroit.',
   },
+  code: {
+    id: 'code',
+    path: '/code',
+    label: 'Code',
+    colorVar: '--m-code',
+    banks: [],
+    tracks: ['code'],
+    noteSubjects: ['code'],
+    lead: 'Python quant, du premier script au portefeuille optimisé — 390 heures en huit phases, adossées à des ressources libres.',
+  },
 };
 
-export const SUBJECT_ORDER: SubjectId[] = ['maths', 'cfa'];
+export const SUBJECT_ORDER: SubjectId[] = ['maths', 'cfa', 'code'];
 
 /** Matière d'appartenance d'une banque de questions. */
 export function bankSubject(bank: BankId): SubjectId {

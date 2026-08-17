@@ -31,6 +31,7 @@ import {
   SquareStack,
   Sun,
   Target,
+  Terminal,
   TrendingUp,
   Trash2,
   Type,
@@ -75,6 +76,7 @@ const MAP = {
   settings: SlidersHorizontal,
   book: BookOpen,
   sigma: Sigma,
+  code: Terminal,
   chart: TrendingUp,
 } satisfies Record<string, LucideIcon>;
 

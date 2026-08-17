@@ -99,6 +99,16 @@ export const TRACK_LABEL: Record<TrackId, string> = {
   opt: 'Optimisation',
   fin: 'Finance',
   cfa: 'CFA',
+  code: 'Programmation',
+};
+
+/** Couleur d'un parcours. Les trois premiers empruntent celle de leur banque
+    éponyme ; le parcours Code n'a pas de banque et porte la sienne. */
+export const TRACK_COLOR: Record<TrackId, string> = {
+  opt: '--m-opt',
+  fin: '--m-fin',
+  cfa: '--m-cfa',
+  code: '--m-code',
 };
 
 /* ------------------------- Niveau des documents -------------------------- */

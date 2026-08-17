@@ -1,4 +1,5 @@
 import { useEffect, useRef, type ReactNode } from 'react';
+import { createPortal } from 'react-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Button } from './Button';
 
@@ -26,7 +27,11 @@ export function Modal({ open, onClose, title, children, footer }: Props) {
     };
   }, [open, onClose]);
 
-  return (
+  /* La fenêtre se pose sur le corps du document, jamais à l'endroit d'où on
+     l'a ouverte : la barre latérale est en `position: sticky`, donc un
+     contexte d'empilement, et un voile en `position: fixed` rendu à
+     l'intérieur s'y retrouve enfermé — visible mais inatteignable au clic. */
+  const tree = (
     <AnimatePresence>
       {open && (
         <motion.div
@@ -66,4 +71,6 @@ export function Modal({ open, onClose, title, children, footer }: Props) {
       )}
     </AnimatePresence>
   );
+
+  return typeof document === 'undefined' ? tree : createPortal(tree, document.body);
 }

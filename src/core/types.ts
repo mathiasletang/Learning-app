@@ -126,13 +126,24 @@ export interface Course {
 
 /* ----------------------------- PROGRESSION ------------------------------ */
 
+/** Apparence : les trois modes d'origine, plus le mode personnalisé. */
+export type ThemeChoice = 'light' | 'dark' | 'auto' | 'custom';
+
 export interface UserPrefs {
   key: 'prefs';
-  theme: 'light' | 'dark' | 'auto';
+  theme: ThemeChoice;
   dailyGoal: number; // nombre de questions
   sidebarCollapsed: boolean;
   installPromptDismissed?: boolean;
   persistedRequested?: boolean;
+  /* --- Mode personnalisé. Optionnels : les bases déjà en place ne les ont
+     pas, et leur absence vaut « réglage d'usine ». --------------------- */
+  /** Couleur d'accent choisie, en hexadécimal. */
+  accent?: string;
+  /** Intensité de la teinte, de 0 (discrète) à 1 (intense). */
+  accentIntensity?: number;
+  /** Fond neutre du mode personnalisé — la couleur n'y touche pas. */
+  customBase?: 'light' | 'dark' | 'auto';
 }
 
 export interface Gamification {

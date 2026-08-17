@@ -74,7 +74,20 @@ Le stockage passe par `src/app/store.ts` et `src/core/db.ts`.
 - `--m-opt`, `--d-en`, `--m-cfa`… : la **matière** en cours. Les onglets d'une
   page de matière prennent la couleur de cette matière, volontairement.
 
-Ne pas « harmoniser » les deux.
+Ne pas « harmoniser » les deux — **dans les modes Clair, Sombre et
+Automatique**. C'est la règle d'origine, et elle tient.
+
+Le mode **Personnalisé** l'écarte, sur décision de l'utilisateur : la couleur
+choisie emporte aussi les couleurs de matière (`paletteVars`,
+`src/core/palette.ts`), pour que la page entière soit à lui. Ne pas
+« rétablir » les couleurs de matière dans ce mode en croyant corriger un
+oubli.
+
+Ce qui est **sémantique** échappe aux deux régimes et ne suit jamais une
+couleur préférée : `--positive`, `--negative`, `--warn` (mise en garde,
+priorité haute) et `--warn-soft` (priorité moyenne). Un avertissement doit se
+lire comme un avertissement. Ne pas rebrancher `prose.css` sur `--m-cfa` /
+`--m-fin` : c'est précisément ce qui a été démêlé.
 
 ## Mobile
 

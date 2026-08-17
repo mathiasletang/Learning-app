@@ -17,6 +17,13 @@ import {
 } from '@/core/db';
 import { toDayStr, addDays } from '@/core/date';
 import {
+  DEFAULT_ACCENT,
+  DEFAULT_INTENSITY,
+  derivePalette,
+  isValidHex,
+  paletteVars,
+} from '@/core/palette';
+import {
   levelFromXp,
   evaluateBadges,
   BADGES,
@@ -48,6 +55,10 @@ interface AppState {
   reloadFromDb: () => Promise<void>;
 
   setTheme: (t: UserPrefs['theme']) => Promise<void>;
+  /** Couleur d'accent du mode personnalisé — bascule aussi dans ce mode. */
+  setAccent: (hex: string) => Promise<void>;
+  setAccentIntensity: (v: number) => Promise<void>;
+  setCustomBase: (b: NonNullable<UserPrefs['customBase']>) => Promise<void>;
   setDailyGoal: (n: number) => Promise<void>;
   setSidebarCollapsed: (b: boolean) => Promise<void>;
   patchPrefs: (p: Partial<UserPrefs>) => Promise<void>;
@@ -73,8 +84,18 @@ function systemTheme(): ResolvedTheme {
     : 'light';
 }
 
-function resolveTheme(theme: UserPrefs['theme']): ResolvedTheme {
-  return theme === 'auto' ? systemTheme() : theme;
+/**
+ * Le fond neutre effectif. Le mode personnalisé ne décide pas du fond : il
+ * décide de la couleur d'accent, et suit son propre réglage de fond (le
+ * système par défaut). C'est ce qui permet d'avoir sa couleur le soir sans
+ * se voir imposer un fond clair.
+ */
+function resolveTheme(prefs: Pick<UserPrefs, 'theme' | 'customBase'>): ResolvedTheme {
+  if (prefs.theme === 'custom') {
+    const base = prefs.customBase ?? 'auto';
+    return base === 'auto' ? systemTheme() : base;
+  }
+  return prefs.theme === 'auto' ? systemTheme() : prefs.theme;
 }
 
 function applyTheme(resolved: ResolvedTheme) {
@@ -84,14 +105,73 @@ function applyTheme(resolved: ResolvedTheme) {
   if (meta) meta.setAttribute('content', resolved === 'dark' ? '#101218' : '#f4f5f8');
 }
 
+/**
+ * Pose (ou retire) les jetons d'accent dérivés de la couleur choisie.
+ *
+ * Les styles en ligne sur :root l'emportent sur la feuille de style : seuls
+ * les jetons --accent-* sont remplacés, tout le neutre — fonds, encres,
+ * filets — reste celui de tokens.css. Hors mode personnalisé, on nettoie,
+ * et l'application retrouve son indigo sans rien avoir à recharger.
+ */
+function applyAccent(prefs: UserPrefs, resolved: ResolvedTheme) {
+  if (typeof document === 'undefined') return;
+  const root = document.documentElement;
+  const both =
+    prefs.theme === 'custom'
+      ? {
+          light: paletteVars(derivePalette(accentOf(prefs), 'light', intensityOf(prefs))),
+          dark: paletteVars(derivePalette(accentOf(prefs), 'dark', intensityOf(prefs))),
+        }
+      : null;
+
+  for (const name of ACCENT_VARS) {
+    if (both) root.style.setProperty(name, both[resolved][name]);
+    else root.style.removeProperty(name);
+  }
+  mirrorAccent(both);
+}
+
+const accentOf = (p: UserPrefs) => p.accent ?? DEFAULT_ACCENT;
+const intensityOf = (p: UserPrefs) => p.accentIntensity ?? DEFAULT_INTENSITY;
+
+const ACCENT_VARS = Object.keys(paletteVars(derivePalette(DEFAULT_ACCENT, 'light')));
+
 /** Miroir du choix brut de thème dans localStorage : c'est ce que lit le script
     anti-flash d'index.html au tout premier paint (Dexie est asynchrone). */
-function mirrorThemeChoice(theme: UserPrefs['theme']) {
+function mirrorThemeChoice(prefs: Pick<UserPrefs, 'theme' | 'customBase'>) {
   try {
-    localStorage.setItem('atelier.theme', theme);
+    /* Le script d'index.html ne connaît que light | dark | auto : on lui donne
+       le fond, pas le mode, pour qu'un thème personnalisé ne le déroute pas. */
+    localStorage.setItem(
+      'atelier.theme',
+      prefs.theme === 'custom' ? (prefs.customBase ?? 'auto') : prefs.theme,
+    );
   } catch {
     /* ignore */
   }
+}
+
+/**
+ * Miroir des jetons dérivés : sans lui, le premier paint serait indigo.
+ * Les deux fonds y sont écrits, pour qu'un basculement du système pendant la
+ * nuit n'affiche pas une palette calculée pour l'autre.
+ */
+function mirrorAccent(both: Record<ResolvedTheme, Record<string, string>> | null) {
+  try {
+    if (both) localStorage.setItem('atelier.accent', JSON.stringify(both));
+    else localStorage.removeItem('atelier.accent');
+  } catch {
+    /* ignore */
+  }
+}
+
+/** Fond, accent et miroirs : tout ce qu'un changement d'apparence entraîne. */
+function applyAppearance(prefs: UserPrefs): ResolvedTheme {
+  const resolved = resolveTheme(prefs);
+  applyTheme(resolved);
+  applyAccent(prefs, resolved);
+  mirrorThemeChoice(prefs);
+  return resolved;
 }
 
 /* ------------------------- Helpers de gamification ---------------------- */
@@ -176,17 +256,21 @@ export const useApp = create<AppState>((set, get) => {
         await db.gam.put(gam);
       }
       const earned = (await db.badges.toArray()).map((b) => b.id);
-      const resolved = resolveTheme(prefs.theme);
+      const resolved = resolveTheme(prefs);
       applyTheme(resolved);
-      mirrorThemeChoice(prefs.theme);
+      applyAccent(prefs, resolved);
+      mirrorThemeChoice(prefs);
 
-      // Réagir aux changements système quand le thème est « auto ».
+      // Réagir aux changements système quand le fond suit le système.
       if (!mediaListenerBound && typeof window !== 'undefined' && window.matchMedia) {
         mediaListenerBound = true;
         window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
-          if (get().prefs.theme === 'auto') {
+          const p = get().prefs;
+          if (p.theme === 'auto' || (p.theme === 'custom' && (p.customBase ?? 'auto') === 'auto')) {
             const r = systemTheme();
             applyTheme(r);
+            // La palette dérivée dépend du fond : elle se recalcule avec lui.
+            applyAccent(p, r);
             set({ resolvedTheme: r });
           }
         });
@@ -199,18 +283,36 @@ export const useApp = create<AppState>((set, get) => {
       const prefs = await getPrefs();
       const gam = await getGam();
       const earned = (await db.badges.toArray()).map((b) => b.id);
-      const resolved = resolveTheme(prefs.theme);
+      const resolved = resolveTheme(prefs);
       applyTheme(resolved);
-      mirrorThemeChoice(prefs.theme);
+      applyAccent(prefs, resolved);
+      mirrorThemeChoice(prefs);
       set({ prefs, gam, earnedBadges: earned, resolvedTheme: resolved });
     },
 
     async setTheme(t) {
       const prefs = await savePrefs({ theme: t });
-      const resolved = resolveTheme(t);
-      applyTheme(resolved);
-      mirrorThemeChoice(t);
-      set({ prefs, resolvedTheme: resolved });
+      applyAppearance(prefs);
+      set({ prefs, resolvedTheme: resolveTheme(prefs) });
+    },
+
+    async setAccent(hex) {
+      if (!isValidHex(hex)) return;
+      const prefs = await savePrefs({ accent: hex, theme: 'custom' });
+      applyAppearance(prefs);
+      set({ prefs, resolvedTheme: resolveTheme(prefs) });
+    },
+
+    async setAccentIntensity(v) {
+      const prefs = await savePrefs({ accentIntensity: Math.min(1, Math.max(0, v)) });
+      applyAppearance(prefs);
+      set({ prefs });
+    },
+
+    async setCustomBase(b) {
+      const prefs = await savePrefs({ customBase: b });
+      applyAppearance(prefs);
+      set({ prefs, resolvedTheme: resolveTheme(prefs) });
     },
 
     async setDailyGoal(n) {

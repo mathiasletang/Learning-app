@@ -28,6 +28,18 @@
             t = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
           }
           document.documentElement.dataset.theme = t;
+          // Thème personnalisé : les jetons dérivés sont déjà calculés, on les
+          // repose tels quels. Sans cela, l'indigo s'afficherait le temps
+          // qu'IndexedDB réponde.
+          var a = localStorage.getItem('atelier.accent');
+          if (a) {
+            var vars = JSON.parse(a)[t] || {};
+            for (var k in vars) {
+              if (k.indexOf('--accent') === 0 || k === '--on-accent' || k === '--ring') {
+                document.documentElement.style.setProperty(k, vars[k]);
+              }
+            }
+          }
         } catch (e) {
           document.documentElement.dataset.theme = 'light';
         }

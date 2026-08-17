@@ -8,7 +8,7 @@ import { getParcours } from '@/core/content';
 import { WORD_COUNT } from '@/core/lexicon-meta';
 import { cardInSubject } from '@/core/subjects';
 import { openResource } from '@/app/actions';
-import { Icon, Tag, Gauge, Reveal } from '@/ui';
+import { Icon, Tag, Gauge, Reveal, YearLine } from '@/ui';
 import './dashboard.css';
 
 /** Le cours de référence du niveau L3 — point de départ du travail. */
@@ -127,7 +127,23 @@ export function Dashboard() {
             <span className="micro tnum">
               {goalToday}/{dailyGoal} questions{goalToday >= dailyGoal ? ' · atteint' : ''}
             </span>
+            {gam.streak > 0 ? (
+              <span className="streak-chip micro tnum">
+                <Icon name="flame" size={15} strokeWidth={1.9} />
+                {gam.streak} jour{gam.streak > 1 ? 's' : ''} de série
+              </span>
+            ) : (
+              <span className="streak-chip streak-chip--off micro">
+                Lancez votre série aujourd'hui
+              </span>
+            )}
           </div>
+        </div>
+      </Reveal>
+
+      <Reveal delay={0.04}>
+        <div style={{ marginTop: 'var(--s-6)' }}>
+          <YearLine />
         </div>
       </Reveal>
 

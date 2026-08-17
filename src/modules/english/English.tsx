@@ -16,7 +16,7 @@ import {
 import { reviewVocab } from '@/app/actions';
 import { useApp } from '@/app/store';
 import { DAILY_WORD_GOAL } from '@/core/gamification';
-import { Button, Icon, PageHead, Tabs } from '@/ui';
+import { Button, Icon, PageHead, Tabs, YearLine } from '@/ui';
 import { SrsReviewer, type ReviewItem, type GradeButton } from '@/modules/review/SrsReviewer';
 import { Drill, type DrillMode } from './Drill';
 import './english.css';
@@ -68,16 +68,6 @@ function minutesFor(n: number): number {
   return Math.max(2, Math.round(n / 6));
 }
 
-/** « 2027 dans N jours » — la sensation du temps qui passe, sans widget criard. */
-function yearLine(now = new Date()) {
-  const year = now.getFullYear();
-  const nextYear = new Date(year + 1, 0, 1);
-  const start = new Date(year, 0, 1);
-  const days = Math.ceil((nextYear.getTime() - now.getTime()) / 86_400_000);
-  const pct = (now.getTime() - start.getTime()) / (nextYear.getTime() - start.getTime());
-  return { next: year + 1, days, pct };
-}
-
 export function English() {
   const themes = lexThemes();
   const today = toDayStr();
@@ -85,7 +75,6 @@ export function English() {
   const streak = gam.streak;
   const wordsToday = gam.wordsDay === today ? (gam.wordsDoneToday ?? 0) : 0;
   const goalDone = wordsToday >= DAILY_WORD_GOAL;
-  const year = yearLine();
 
   const [view, setView] = useState<View>('etudier');
   const [mode, setMode] = useState<Mode>('cards');
@@ -368,15 +357,9 @@ export function English() {
           </div>
 
           {/* ------- Le temps qui passe : discret, mais présent ---------- */}
-          <p className="year-line meta">
-            <span className="tnum">
-              {year.next} dans {year.days} jour{year.days > 1 ? 's' : ''}
-            </span>
-            <span className="year-line__bar" aria-hidden>
-              <span className="year-line__fill" style={{ width: `${year.pct * 100}%` }} />
-            </span>
-            <span className="tnum">{Math.round(year.pct * 100)} % de {year.next - 1} écoulés</span>
-          </p>
+          <div className="hub-year">
+            <YearLine />
+          </div>
 
           {/* ------------ Niveau 3 : entraînement sur mesure ------------- */}
           <section className="section" aria-label="S'entraîner">

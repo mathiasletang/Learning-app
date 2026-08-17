@@ -23,9 +23,9 @@ const BASES: { value: NonNullable<UserPrefs['customBase']>; label: string }[] = 
  * Le panneau d'apparence : quatre modes, et — pour le mode personnalisé — la
  * couleur d'accent, son intensité et le fond neutre qui la porte.
  *
- * Tout s'applique à la frappe : il n'y a rien à valider. La couleur ne teinte
- * que la famille --accent-* ; fonds, encres et filets restent ceux de
- * tokens.css, et les couleurs de matière gardent les leurs.
+ * Tout s'applique à la frappe : il n'y a rien à valider. La couleur emporte
+ * l'accent ET les couleurs de matière ; fonds, encres, filets et couleurs
+ * sémantiques restent ceux de tokens.css.
  */
 export function AppearancePanel({ open, onClose }: { open: boolean; onClose: () => void }) {
   const prefs = useApp((s) => s.prefs);
@@ -131,8 +131,9 @@ export function AppearancePanel({ open, onClose }: { open: boolean; onClose: () 
           </div>
 
           <p className="micro appear__note">
-            La couleur sert d'accent : commandes, éléments actifs, liens, jauges et petits signes.
-            Les fonds restent neutres, et chaque matière garde sa propre couleur.
+            Votre couleur porte toute l'interface : commandes, éléments actifs, liens, jauges et
+            onglets de matière. Les fonds restent neutres ; réussite, erreur et mise en garde gardent
+            les leurs, pour rester lisibles comme telles.
           </p>
         </div>
       )}

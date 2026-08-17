@@ -15,6 +15,7 @@ import {
 } from '@/core/lexicon';
 import { reviewVocab } from '@/app/actions';
 import { useApp } from '@/app/store';
+import { DAILY_WORD_GOAL } from '@/core/gamification';
 import { Button, Icon, PageHead, Tabs } from '@/ui';
 import { SrsReviewer, type ReviewItem, type GradeButton } from '@/modules/review/SrsReviewer';
 import { Drill, type DrillMode } from './Drill';
@@ -67,10 +68,24 @@ function minutesFor(n: number): number {
   return Math.max(2, Math.round(n / 6));
 }
 
+/** « 2027 dans N jours » — la sensation du temps qui passe, sans widget criard. */
+function yearLine(now = new Date()) {
+  const year = now.getFullYear();
+  const nextYear = new Date(year + 1, 0, 1);
+  const start = new Date(year, 0, 1);
+  const days = Math.ceil((nextYear.getTime() - now.getTime()) / 86_400_000);
+  const pct = (now.getTime() - start.getTime()) / (nextYear.getTime() - start.getTime());
+  return { next: year + 1, days, pct };
+}
+
 export function English() {
   const themes = lexThemes();
   const today = toDayStr();
-  const streak = useApp((s) => s.gam.streak);
+  const gam = useApp((s) => s.gam);
+  const streak = gam.streak;
+  const wordsToday = gam.wordsDay === today ? (gam.wordsDoneToday ?? 0) : 0;
+  const goalDone = wordsToday >= DAILY_WORD_GOAL;
+  const year = yearLine();
 
   const [view, setView] = useState<View>('etudier');
   const [mode, setMode] = useState<Mode>('cards');
@@ -134,6 +149,7 @@ export function English() {
       const n = Math.min(20, dueAll.length);
       return {
         kind: 'due' as const,
+        eyebrow: 'Priorité du jour',
         title: 'Réviser votre vocabulaire',
         detail: `${dueAll.length.toLocaleString('fr-FR')} mot${dueAll.length > 1 ? 's' : ''} attend${dueAll.length > 1 ? 'ent' : ''} d'être revu${dueAll.length > 1 ? 's' : ''} — la mémoire n'attend pas.`,
         cta: `Réviser ${n} mots · ≈ ${minutesFor(n)} min`,
@@ -147,6 +163,7 @@ export function English() {
       const n = Math.min(20, errorWords.length);
       return {
         kind: 'errors' as const,
+        eyebrow: 'Priorité du jour',
         title: 'Renforcer vos mots fragiles',
         detail: `Rien n'est dû aujourd'hui, mais ${errorWords.length} mot${errorWords.length > 1 ? 's ont' : ' a'} déjà été raté${errorWords.length > 1 ? 's' : ''} — le bon moment pour les consolider.`,
         cta: `Revoir ${n} erreurs · ≈ ${minutesFor(n)} min`,
@@ -159,6 +176,7 @@ export function English() {
     const n = 20;
     return {
       kind: 'fresh' as const,
+      eyebrow: "Aujourd'hui",
       title: 'Découvrir de nouveaux mots',
       detail:
         globalSeen === 0
@@ -242,8 +260,8 @@ export function English() {
         display
         lead={
           <>
-            {wordCount().toLocaleString('fr-FR')} mots de vocabulaire, trois façons de s'exercer,
-            et vos erreurs qui ne se perdent plus.
+            {wordCount().toLocaleString('fr-FR')} mots suivis · trois techniques d'exercice · vos
+            erreurs mémorisées, jamais perdues.
           </>
         }
         actions={
@@ -273,7 +291,7 @@ export function English() {
 
           <section className="hub-cta" aria-label="Séance recommandée">
             <div className="hub-cta__body">
-              <p className="eyebrow">Aujourd'hui</p>
+              <p className="eyebrow">{reco.eyebrow}</p>
               <h2 className="hub-cta__title">{reco.title}</h2>
               <p className="meta hub-cta__detail">{reco.detail}</p>
             </div>
@@ -281,6 +299,39 @@ export function English() {
               {reco.cta}
             </Button>
           </section>
+
+          {/* -------- Objectif du jour : 20 mots, données réelles -------- */}
+          <div
+            className={`word-goal ${goalDone ? 'word-goal--done' : ''}`}
+            role="group"
+            aria-label="Objectif du jour"
+          >
+            <span className="eyebrow word-goal__label">
+              {goalDone ? (
+                <>
+                  <Icon name="check" size={14} strokeWidth={2.2} /> Objectif du jour atteint
+                </>
+              ) : (
+                'Objectif du jour'
+              )}
+            </span>
+            <div
+              className="word-goal__bar"
+              role="progressbar"
+              aria-valuenow={Math.min(wordsToday, DAILY_WORD_GOAL)}
+              aria-valuemin={0}
+              aria-valuemax={DAILY_WORD_GOAL}
+            >
+              <span
+                className="word-goal__fill"
+                style={{ width: `${Math.min(100, (wordsToday / DAILY_WORD_GOAL) * 100)}%` }}
+              />
+            </div>
+            <span className="meta tnum word-goal__count">
+              {Math.min(wordsToday, DAILY_WORD_GOAL)} / {DAILY_WORD_GOAL} mots
+              {wordsToday > DAILY_WORD_GOAL ? ` (+${wordsToday - DAILY_WORD_GOAL})` : ''}
+            </span>
+          </div>
 
           {/* --------------- Niveau 2 : où en suis-je ? ------------------ */}
           <div className="figures hub-figures">
@@ -297,12 +348,35 @@ export function English() {
               <span className="eyebrow figure__label">Acquis</span>
             </div>
             <div>
-              <span className="figure__value tnum">{streak}</span>
-              <span className="eyebrow figure__label">
-                Jour{streak > 1 ? 's' : ''} de série
-              </span>
+              {streak > 0 ? (
+                <>
+                  <span className="figure__value tnum figure__value--streak">
+                    <Icon name="flame" size={22} strokeWidth={1.9} />
+                    {streak}
+                  </span>
+                  <span className="eyebrow figure__label">
+                    Jour{streak > 1 ? 's' : ''} de série
+                  </span>
+                </>
+              ) : (
+                <>
+                  <span className="figure__value figure__value--muted">—</span>
+                  <span className="eyebrow figure__label">Lancez votre série</span>
+                </>
+              )}
             </div>
           </div>
+
+          {/* ------- Le temps qui passe : discret, mais présent ---------- */}
+          <p className="year-line meta">
+            <span className="tnum">
+              {year.next} dans {year.days} jour{year.days > 1 ? 's' : ''}
+            </span>
+            <span className="year-line__bar" aria-hidden>
+              <span className="year-line__fill" style={{ width: `${year.pct * 100}%` }} />
+            </span>
+            <span className="tnum">{Math.round(year.pct * 100)} % de {year.next - 1} écoulés</span>
+          </p>
 
           {/* ------------ Niveau 3 : entraînement sur mesure ------------- */}
           <section className="section" aria-label="S'entraîner">

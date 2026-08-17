@@ -1,7 +1,15 @@
-import { describe, it, expect } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { describe, it, expect, afterEach } from 'vitest';
+import { render, screen, waitFor, cleanup } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { db } from '@/core/db';
+import { toDayStr } from '@/core/date';
+import { allWords } from '@/core/lexicon';
 import { English } from './English';
+
+afterEach(async () => {
+  cleanup();
+  await db.vocabSrs.clear();
+});
 
 describe("Anglais — hub d'apprentissage", () => {
   it("ouvre sur la séance du jour, s'entraîne, puis consulte le dictionnaire", async () => {
@@ -38,5 +46,27 @@ describe("Anglais — hub d'apprentissage", () => {
       expect(document.querySelectorAll('.lexrow').length).toBeLessThan(rows.length);
     });
     expect(screen.getAllByText(/budget/i).length).toBeGreaterThan(0);
+  });
+
+  it("priorise les mots dus, puis les erreurs, selon l'état de la mémoire", async () => {
+    const today = toDayStr();
+    const [a, b] = allWords();
+
+    // État « mots dus » : la priorité du jour est la révision.
+    await db.vocabSrs.put({ id: a.id, ef: 2.5, reps: 1, interval: 1, due: today, lapses: 0 });
+    render(<English />);
+    expect(await screen.findByText(/Priorité du jour/)).toBeInTheDocument();
+    expect(await screen.findByText(/Réviser votre vocabulaire/)).toBeInTheDocument();
+    cleanup();
+
+    // État « rien de dû, mais des erreurs » : la priorité devient la consolidation.
+    await db.vocabSrs.clear();
+    await db.vocabSrs.put({ id: b.id, ef: 2.5, reps: 2, interval: 30, due: '2099-01-01', lapses: 3 });
+    render(<English />);
+    expect(await screen.findByText(/Renforcer vos mots fragiles/)).toBeInTheDocument();
+
+    // L'objectif du jour et la ligne temporelle sont visibles.
+    expect(screen.getByText(/Objectif du jour/)).toBeInTheDocument();
+    expect(screen.getByText(/dans \d+ jours?/)).toBeInTheDocument();
   });
 });

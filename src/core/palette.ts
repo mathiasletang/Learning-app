@@ -280,9 +280,21 @@ export function derivePalette(
   };
 }
 
+/**
+ * Les couleurs d'identité des matières — anglais teal, maths bleu, CFA
+ * cuivre… En mode personnalisé, elles suivent la couleur choisie : la page
+ * entière est à vous, onglets et pastilles de matière compris.
+ *
+ * Ce qui est SÉMANTIQUE ne suit pas : réussite, erreur, mise en garde et
+ * priorité d'un concept gardent leurs jetons propres. Une couleur préférée
+ * ne doit pas rendre un avertissement illisible comme avertissement.
+ */
+const SUBJECT_VARS = ['--d-en', '--m-opt', '--m-pre', '--m-eco', '--m-fin', '--m-cfa', '--m-code'];
+
 /** La palette telle que la lisent les feuilles de style : des jetons CSS. */
 export function paletteVars(p: Palette): Record<string, string> {
   return {
+    ...Object.fromEntries(SUBJECT_VARS.map((v) => [v, p.accent])),
     '--accent': p.accent,
     '--accent-deep': p.accentDeep,
     '--accent-ink': p.accentDeep,

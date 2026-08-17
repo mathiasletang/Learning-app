@@ -30,7 +30,7 @@ describe('Apparence — le mode personnalisé', () => {
     await userEvent.click(perso);
     await waitFor(() => expect(useApp.getState().prefs.theme).toBe('custom'));
 
-    await userEvent.click(screen.getByRole('button', { name: 'Vert' }));
+    await userEvent.click(await screen.findByRole('button', { name: 'Vert' }));
     await waitFor(() => expect(useApp.getState().prefs.accent).toBe('#1f9254'));
 
     // La famille entière est posée, pas seulement la couleur cliquée.
@@ -46,11 +46,34 @@ describe('Apparence — le mode personnalisé', () => {
   it('ne teinte que l’accent : le fond neutre reste celui des jetons', async () => {
     const perso = await ouvrirLePanneau();
     await userEvent.click(perso);
-    await userEvent.click(screen.getByRole('button', { name: 'Rose' }));
+    await userEvent.click(await screen.findByRole('button', { name: 'Rose' }));
     await waitFor(() => expect(cssVar('--accent-solid')).not.toBe(''));
 
     // Aucun jeton neutre n'est écrasé en ligne — ni fond, ni encre, ni filet.
     for (const nom of ['--canvas', '--surface', '--ink', '--ink-2', '--hairline']) {
+      expect(cssVar(nom)).toBe('');
+    }
+    // Le sémantique non plus : réussite, erreur, mise en garde.
+    for (const nom of ['--positive', '--negative', '--warn', '--warn-soft']) {
+      expect(cssVar(nom)).toBe('');
+    }
+  });
+
+  it('emporte les couleurs de matière : la page entière suit', async () => {
+    const perso = await ouvrirLePanneau();
+    await userEvent.click(perso);
+    await userEvent.click(await screen.findByRole('button', { name: 'Bleu' }));
+    await waitFor(() => expect(cssVar('--m-opt')).not.toBe(''));
+
+    // Onglets de matière, pastilles de l'accueil, surtitres : même couleur.
+    for (const nom of ['--d-en', '--m-opt', '--m-cfa', '--m-code']) {
+      expect(cssVar(nom)).toBe(cssVar('--accent'));
+    }
+
+    // Retour en mode Clair : chaque matière retrouve sa couleur d'origine.
+    await userEvent.click(screen.getByRole('radio', { name: /Clair/ }));
+    await waitFor(() => expect(root().dataset.theme).toBe('light'));
+    for (const nom of ['--d-en', '--m-opt', '--m-cfa', '--m-code']) {
       expect(cssVar(nom)).toBe('');
     }
   });
@@ -58,7 +81,7 @@ describe('Apparence — le mode personnalisé', () => {
   it('retrouve le thème après un redémarrage', async () => {
     const perso = await ouvrirLePanneau();
     await userEvent.click(perso);
-    await userEvent.click(screen.getByRole('button', { name: 'Orange' }));
+    await userEvent.click(await screen.findByRole('button', { name: 'Orange' }));
     await waitFor(() => expect(cssVar('--accent-solid')).not.toBe(''));
     const avant = cssVar('--accent-solid');
 
@@ -93,7 +116,7 @@ describe('Apparence — le mode personnalisé', () => {
   it('module l’intensité sans perdre le contraste', async () => {
     const perso = await ouvrirLePanneau();
     await userEvent.click(perso);
-    await userEvent.click(screen.getByRole('button', { name: 'Violet' }));
+    await userEvent.click(await screen.findByRole('button', { name: 'Violet' }));
     await waitFor(() => expect(cssVar('--accent-wash')).not.toBe(''));
     const intense = cssVar('--accent-wash');
 

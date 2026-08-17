@@ -92,6 +92,18 @@ describe('Palette dérivée — le contrat de lisibilité', () => {
     }
   });
 
+  it('emporte les couleurs de matière, mais pas les couleurs sémantiques', () => {
+    const v = paletteVars(derivePalette('#7c4dea', 'light', 0.5));
+    // La page entière suit la couleur : anglais, maths, CFA, code…
+    for (const nom of ['--d-en', '--m-opt', '--m-pre', '--m-eco', '--m-fin', '--m-cfa', '--m-code']) {
+      expect(v[nom]).toBe(v['--accent']);
+    }
+    // Réussite, erreur et mise en garde restent hors de portée.
+    for (const nom of ['--positive', '--negative', '--warn', '--warn-soft']) {
+      expect(v).not.toHaveProperty(nom);
+    }
+  });
+
   it('refuse les saisies qui n’en sont pas, sans casser', () => {
     expect(isValidHex('#abc')).toBe(true);
     expect(isValidHex('rouge')).toBe(false);

@@ -7,7 +7,7 @@ import { StatsSections } from '@/modules/stats/Stats';
 import { TimeSection } from '@/modules/planner/Time';
 import { DataZone } from '@/modules/planner/DataZone';
 
-const TRACKS: TrackId[] = ['opt', 'fin', 'cfa'];
+const TRACKS: TrackId[] = ['opt', 'fin', 'cfa', 'code'];
 
 /**
  * Tout le suivi au même endroit : objectif, activité, précision, temps,
@@ -31,7 +31,7 @@ export function Suivi() {
 
   /* Répartit les phases sur six mois, au prorata des heures estimées. */
   const plan = useMemo(() => {
-    const grid: Record<TrackId, string[][]> = { opt: [], fin: [], cfa: [] };
+    const grid: Record<TrackId, string[][]> = { opt: [], fin: [], cfa: [], code: [] };
     for (const t of TRACKS) {
       const cells: string[][] = Array.from({ length: 6 }, () => []);
       const total = Math.max(1, parcours[t].phases.reduce((n, p) => n + p.h, 0));

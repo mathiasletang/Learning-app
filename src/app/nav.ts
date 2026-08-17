@@ -16,6 +16,7 @@ export const NAV: NavItem[] = [
   { to: '/', label: 'Accueil', icon: 'home', end: true },
   { to: '/anglais', label: 'Anglais', icon: 'vocab' },
   { to: '/maths', label: 'Maths', icon: 'sigma' },
+  { to: '/code', label: 'Code', icon: 'code' },
   { to: '/cfa', label: 'CFA · Finance', icon: 'chart' },
   { to: '/suivi', label: 'Suivi', icon: 'stats' },
 ];

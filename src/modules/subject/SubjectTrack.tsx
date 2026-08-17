@@ -4,7 +4,7 @@ import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '@/core/db';
 import { getParcours } from '@/core/content';
 import { parseResource, type ResourceKind } from '@/core/open';
-import { BANKS } from '@/core/meta';
+import { TRACK_COLOR } from '@/core/meta';
 import type { SubjectDef } from '@/core/subjects';
 import { setStepDone, openResource } from '@/app/actions';
 import type { TrackId } from '@/core/types';
@@ -77,7 +77,7 @@ export function SubjectTrack({ def }: { def: SubjectDef }) {
 
       <div className="track-hero">
         <div>
-          <Tag colorVar={BANKS[track].colorVar}>{current.titre}</Tag>
+          <Tag colorVar={TRACK_COLOR[track]}>{current.titre}</Tag>
           <p className="track-hero__aim">{current.cible}</p>
         </div>
         <div className="track-hero__stat">
@@ -86,7 +86,7 @@ export function SubjectTrack({ def }: { def: SubjectDef }) {
             {done} / {allIds.length} étapes · {current.heures} h estimées
           </p>
           <div style={{ marginTop: 'var(--s-4)', minWidth: 160 }}>
-            <Gauge value={ratio} colorVar={BANKS[track].colorVar} thick />
+            <Gauge value={ratio} colorVar={TRACK_COLOR[track]} thick />
           </div>
         </div>
       </div>
@@ -116,7 +116,7 @@ export function SubjectTrack({ def }: { def: SubjectDef }) {
                   <span className="micro tnum">
                     {pDone}/{total} · {phase.h} h
                   </span>
-                  <Gauge value={total ? pDone / total : 0} colorVar={BANKS[track].colorVar} />
+                  <Gauge value={total ? pDone / total : 0} colorVar={TRACK_COLOR[track]} />
                 </div>
               </header>
 

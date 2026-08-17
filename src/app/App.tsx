@@ -70,6 +70,7 @@ export function App() {
             }
           />
           <Route path="maths" element={<Subject id="maths" />} />
+          <Route path="code" element={<Subject id="code" />} />
           <Route path="cfa" element={<Subject id="cfa" />} />
           <Route path="suivi" element={<Suivi />} />
           {/* Pages « séance » : lancées depuis les matières. */}

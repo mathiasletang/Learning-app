@@ -6,7 +6,7 @@
 /* ------------------------------- CONTENU -------------------------------- */
 
 export type BankId = 'opt' | 'fin' | 'cfa' | 'pre' | 'eco';
-export type TrackId = 'opt' | 'fin' | 'cfa';
+export type TrackId = 'opt' | 'fin' | 'cfa' | 'code';
 export type DeckId = 'finfr' | 'verbs' | 'nouns';
 
 /** Une question telle que fournie dans qcm.json. */

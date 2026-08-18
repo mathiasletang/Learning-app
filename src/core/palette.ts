@@ -289,7 +289,19 @@ export function derivePalette(
  * priorité d'un concept gardent leurs jetons propres. Une couleur préférée
  * ne doit pas rendre un avertissement illisible comme avertissement.
  */
-const SUBJECT_VARS = ['--d-en', '--m-opt', '--m-pre', '--m-eco', '--m-fin', '--m-cfa', '--m-code'];
+const SUBJECT_VARS = [
+  '--d-en',
+  '--m-opt',
+  '--m-pre',
+  '--m-eco',
+  '--m-fin',
+  '--m-cfa',
+  '--m-code',
+  '--c-cours',
+  '--c-perso',
+  '--c-sport',
+  '--c-rdv',
+];
 
 /** La palette telle que la lisent les feuilles de style : des jetons CSS. */
 export function paletteVars(p: Palette): Record<string, string> {

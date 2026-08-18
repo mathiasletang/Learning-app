@@ -6,27 +6,57 @@ import { addDays, parseDay } from '@/core/date';
 import {
   dayGoals,
   formatDuration,
+  monthGrid,
   ratio,
+  shiftMonth,
   sortEvents,
   sortTasks,
   tasksForDay,
   weekDays,
+  weekStart,
 } from '@/core/planning';
 import type { PlanEvent, Task } from '@/core/types';
 import { createTask, scheduleTask } from '@/app/actions';
 import { Button, PageHead, Tabs } from '@/ui';
 import { EventForm, ScheduleForm, TaskForm } from './forms';
-import { DayTimeline, TaskRow, WeekGrid } from './views';
-import { useNow } from './shared';
+import { DayTimeline, MonthGrid, TaskRow, WeekGrid, WeekTimeGrid } from './views';
+import { useMediaQuery, useNow } from './shared';
 import './planning.css';
 
-type View = 'jour' | 'semaine' | 'taches';
+type View = 'jour' | 'semaine' | 'mois' | 'taches';
 
 const VIEWS: { value: View; label: string }[] = [
   { value: 'jour', label: 'Jour' },
   { value: 'semaine', label: 'Semaine' },
+  { value: 'mois', label: 'Mois' },
   { value: 'taches', label: 'Tâches' },
 ];
+
+/** Le titre suit la vue : on ne lit pas « votre journée » devant un mois. */
+const TITRE: Record<View, string> = {
+  jour: 'Votre journée',
+  semaine: 'Votre semaine',
+  mois: 'Votre mois',
+  taches: 'Vos tâches',
+};
+
+/** « Août 2026 », capitale en tête. */
+function monthLabel(day: string): string {
+  return parseDay(day)
+    .toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })
+    .replace(/^\w/, (c) => c.toUpperCase());
+}
+
+/** « 17 – 23 août » : l'amplitude d'une semaine, sans répéter le mois. */
+function weekLabel(day: string): string {
+  const jours = weekDays(day);
+  const a = parseDay(jours[0]);
+  const b = parseDay(jours[6]);
+  const memeMois = a.getMonth() === b.getMonth();
+  const fmt = (d: Date, avecMois: boolean) =>
+    d.toLocaleDateString('fr-FR', avecMois ? { day: 'numeric', month: 'long' } : { day: 'numeric' });
+  return `${fmt(a, !memeMois)} – ${fmt(b, true)}`;
+}
 
 function dayLabel(day: string, today: string): string {
   if (day === today) return "Aujourd'hui";
@@ -50,15 +80,30 @@ export function Planning() {
   const view: View = raw && VIEWS.some((v) => v.value === raw) ? raw : 'jour';
   const day = params.get('j') || today;
 
-  const setView = (v: View) => setParams(v === 'jour' ? {} : { v }, { replace: false });
-  const setDay = (d: string) =>
-    setParams(d === today ? { v: 'jour' } : { v: 'jour', j: d }, { replace: false });
+  const large = useMediaQuery('(min-width: 900px)');
+
+  const setView = (v: View) =>
+    setParams(v === 'jour' && day === today ? {} : { v, ...(day === today ? {} : { j: day }) }, {
+      replace: false,
+    });
+  /* Le jour affiché voyage d'une vue à l'autre : cliquer un jour du mois ouvre
+     sa journée, revenir à la semaine montre la sienne. */
+  const goto = (d: string, v: View = view) =>
+    setParams(v === 'jour' && d === today ? {} : { v, ...(d === today ? {} : { j: d }) }, {
+      replace: false,
+    });
+  const setDay = (d: string) => goto(d, 'jour');
 
   const events = useLiveQuery(() => db.events.toArray(), [], null);
   const tasks = useLiveQuery(() => db.tasks.toArray(), [], null);
   const logs = useLiveQuery(() => db.timeLogs.where('date').equals(day).toArray(), [day], []);
 
-  const [eventForm, setEventForm] = useState<{ open: boolean; event?: PlanEvent }>({ open: false });
+  const [eventForm, setEventForm] = useState<{
+    open: boolean;
+    event?: PlanEvent;
+    date?: string;
+    start?: string;
+  }>({ open: false });
   const [taskForm, setTaskForm] = useState<{ open: boolean; task?: Task }>({ open: false });
   const [scheduling, setScheduling] = useState<Task | null>(null);
   const [quick, setQuick] = useState('');
@@ -88,20 +133,95 @@ export function Planning() {
     <>
       <PageHead
         eyebrow="Planning"
-        title="Votre journée"
+        title={TITRE[view]}
         display
-        lead="Ce qui est prévu, ce qui reste à faire, et par quoi commencer. Les séances mènent directement au travail."
+        lead="Vos séances, vos cours, vos rendez-vous et vos tâches, au même endroit. Une séance d'étude mène directement au travail."
         actions={<Tabs options={VIEWS} value={view} onChange={setView} ariaLabel="Vues du planning" />}
       />
 
       {view === 'semaine' ? (
-        <WeekGrid
-          days={weekDays(day)}
-          events={events}
-          tasks={tasks}
-          today={today}
-          onOpenDay={(d) => setDay(d)}
-        />
+        <>
+          <div className="plan__daybar">
+            <Button
+              variant="ghost"
+              icon="arrowLeft"
+              aria-label="Semaine précédente"
+              onClick={() => goto(addDays(weekStart(day), -7))}
+            />
+            <h2 className="plan__dayname plan__dayname--wide">{weekLabel(day)}</h2>
+            <Button
+              variant="ghost"
+              icon="arrowRight"
+              aria-label="Semaine suivante"
+              onClick={() => goto(addDays(weekStart(day), 7))}
+            />
+            {weekStart(day) !== weekStart(today) && (
+              <Button variant="ghost" onClick={() => goto(today)}>
+                Cette semaine
+              </Button>
+            )}
+            <span className="spacer" />
+            <Button variant="primary" icon="plus" onClick={() => setEventForm({ open: true })}>
+              Ajouter
+            </Button>
+          </div>
+          {/* Sept colonnes d'heures sur un téléphone seraient illisibles : en
+              petite largeur, la semaine reste une liste par jour. */}
+          {large ? (
+            <WeekTimeGrid
+              days={weekDays(day)}
+              events={events}
+              today={today}
+              now={now}
+              onOpenDay={(d) => setDay(d)}
+              onEdit={(e) => setEventForm({ open: true, event: e })}
+              onCreate={(d, start) => setEventForm({ open: true, date: d, start })}
+            />
+          ) : (
+            <WeekGrid
+              days={weekDays(day)}
+              events={events}
+              tasks={tasks}
+              today={today}
+              onOpenDay={(d) => setDay(d)}
+            />
+          )}
+        </>
+      ) : view === 'mois' ? (
+        <>
+          <div className="plan__daybar">
+            <Button
+              variant="ghost"
+              icon="arrowLeft"
+              aria-label="Mois précédent"
+              onClick={() => goto(shiftMonth(day, -1))}
+            />
+            <h2 className="plan__dayname plan__dayname--wide">{monthLabel(day)}</h2>
+            <Button
+              variant="ghost"
+              icon="arrowRight"
+              aria-label="Mois suivant"
+              onClick={() => goto(shiftMonth(day, 1))}
+            />
+            {day.slice(0, 7) !== today.slice(0, 7) && (
+              <Button variant="ghost" onClick={() => goto(today)}>
+                Ce mois-ci
+              </Button>
+            )}
+            <span className="spacer" />
+            <Button variant="primary" icon="plus" onClick={() => setEventForm({ open: true })}>
+              Ajouter
+            </Button>
+          </div>
+          <MonthGrid
+            weeks={monthGrid(day)}
+            events={events}
+            tasks={tasks}
+            today={today}
+            month={day}
+            onOpenDay={(d) => setDay(d)}
+          />
+        </>
       ) : view === 'taches' ? (
         <section className="section">
           <div className="plan__quick">
@@ -210,7 +330,8 @@ export function Planning() {
       <EventForm
         open={eventForm.open}
         event={eventForm.event}
-        date={day}
+        date={eventForm.date ?? day}
+        start={eventForm.start}
         onClose={() => setEventForm({ open: false })}
       />
       <TaskForm

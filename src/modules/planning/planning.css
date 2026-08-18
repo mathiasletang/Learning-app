@@ -573,3 +573,333 @@
     font-weight: var(--fw-strong);
   }
 }
+
+/* ====================== Semaine — la grille horaire ======================= */
+/* Les heures en marge, sept colonnes, les séances à leur place réelle. Un
+   agenda, pas un tableau : les filets sont là pour situer, pas pour encadrer. */
+
+.grid {
+  --gutter: 56px;
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  background: var(--surface);
+}
+.grid__head,
+.grid__allday {
+  display: grid;
+  grid-template-columns: var(--gutter) repeat(7, minmax(0, 1fr));
+  border-bottom: 1px solid var(--hairline);
+}
+.grid__gutter {
+  border-right: 1px solid var(--hairline);
+}
+.grid__dayname {
+  display: grid;
+  justify-items: center;
+  gap: 2px;
+  padding: var(--s-3) var(--s-2);
+  border: 0;
+  border-left: 1px solid var(--hairline);
+  background: transparent;
+  color: var(--ink-2);
+  transition: background var(--t-fast), color var(--t-fast);
+}
+.grid__dayname:hover {
+  background: var(--canvas);
+  color: var(--ink);
+}
+.grid__daynum {
+  font-size: var(--fs-h3);
+  font-weight: var(--fw-title);
+  letter-spacing: var(--ls-tight);
+}
+.grid__dayname[data-today='true'] {
+  color: var(--accent);
+}
+.grid__dayname[data-today='true'] .grid__daynum {
+  color: var(--on-accent);
+  background: var(--accent-solid);
+  border-radius: var(--r-full);
+  min-width: 1.9em;
+  text-align: center;
+}
+
+.grid__allday {
+  min-height: 34px;
+  align-items: stretch;
+}
+.grid__gutter.micro {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: var(--s-2);
+  color: var(--ink-3);
+}
+.grid__alldaycell {
+  display: grid;
+  gap: 2px;
+  align-content: start;
+  padding: 3px;
+  border-left: 1px solid var(--hairline);
+}
+.grid__band {
+  padding: 2px var(--s-2);
+  border: 0;
+  border-left: 3px solid var(--_c);
+  border-radius: var(--r-sm);
+  background: color-mix(in srgb, var(--_c) 16%, transparent);
+  color: var(--ink);
+  font-size: var(--fs-micro);
+  text-align: left;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.grid__body {
+  position: relative;
+  display: grid;
+  grid-template-columns: var(--gutter) repeat(7, minmax(0, 1fr));
+}
+.grid__hours {
+  position: relative;
+}
+.grid__hour {
+  position: absolute;
+  right: var(--s-2);
+  transform: translateY(-0.5em);
+  color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
+}
+.grid__col {
+  position: relative;
+  border-left: 1px solid var(--hairline);
+}
+.grid__col[data-today='true'] {
+  background: color-mix(in srgb, var(--accent) 4%, transparent);
+}
+/* Chaque heure est une cible : cliquer un creux ouvre le formulaire à l'heure. */
+.grid__slot {
+  position: absolute;
+  left: 0;
+  right: 0;
+  padding: 0;
+  border: 0;
+  border-top: 1px solid var(--hairline);
+  background: transparent;
+  transition: background var(--t-fast);
+}
+.grid__slot:hover {
+  background: var(--accent-wash);
+}
+
+.grid__event {
+  position: absolute;
+  display: grid;
+  align-content: start;
+  gap: 1px;
+  padding: 3px var(--s-2);
+  border: 0;
+  border-left: 3px solid var(--_c);
+  border-radius: var(--r-sm);
+  background: color-mix(in srgb, var(--_c) 20%, var(--surface));
+  color: var(--ink);
+  text-align: left;
+  overflow: hidden;
+  transition: box-shadow var(--t-fast), transform var(--t-fast);
+}
+.grid__event:hover {
+  box-shadow: var(--shadow-md);
+  z-index: 2;
+}
+.grid__eventtitle {
+  font-size: var(--fs-micro);
+  font-weight: 550;
+  line-height: 1.25;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+}
+.grid__eventtime {
+  font-size: var(--fs-micro);
+  color: var(--ink-2);
+}
+.grid__event[data-done='true'] {
+  background: transparent;
+  border-left-style: dashed;
+  color: var(--ink-3);
+}
+.grid__event[data-done='true'] .grid__eventtitle {
+  text-decoration: line-through;
+  text-decoration-thickness: 1px;
+}
+.grid__event[data-running='true'] {
+  box-shadow: 0 0 0 1px var(--accent);
+}
+/* L'heure courante : un filet, comme dans un agenda. */
+.grid__now {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: var(--negative);
+  z-index: 3;
+}
+.grid__now::before {
+  content: '';
+  position: absolute;
+  left: -3px;
+  top: -3px;
+  width: 7px;
+  height: 7px;
+  border-radius: var(--r-full);
+  background: var(--negative);
+}
+
+/* ============================ Mois ======================================= */
+
+.month {
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  background: var(--surface);
+}
+.month__head,
+.month__week {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+}
+.month__head {
+  border-bottom: 1px solid var(--hairline);
+}
+.month__dayname {
+  padding: var(--s-2) var(--s-3);
+  color: var(--ink-3);
+}
+.month__week {
+  border-bottom: 1px solid var(--hairline);
+}
+.month__week:last-child {
+  border-bottom: 0;
+}
+.month__cell {
+  display: grid;
+  align-content: start;
+  gap: 2px;
+  min-height: 104px;
+  min-width: 0;
+  padding: var(--s-2);
+  border: 0;
+  border-left: 1px solid var(--hairline);
+  background: transparent;
+  text-align: left;
+  transition: background var(--t-fast);
+}
+.month__cell:first-child {
+  border-left: 0;
+}
+.month__cell:hover {
+  background: var(--canvas);
+}
+.month__num {
+  font-size: var(--fs-meta);
+  color: var(--ink-2);
+  justify-self: start;
+  padding: 1px 6px;
+}
+.month__cell[data-today='true'] .month__num {
+  background: var(--accent-solid);
+  color: var(--on-accent);
+  border-radius: var(--r-full);
+}
+/* Les jours des mois voisins restent visibles, mais en retrait. */
+.month__cell[data-outside='true'] {
+  background: var(--canvas-alt);
+}
+.month__cell[data-outside='true'] .month__num,
+.month__cell[data-outside='true'] .month__event {
+  opacity: 0.55;
+}
+.month__event {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  font-size: var(--fs-micro);
+  line-height: 1.35;
+  color: var(--ink-2);
+}
+.month__bullet {
+  flex: 0 0 auto;
+  width: 6px;
+  height: 6px;
+  border-radius: var(--r-full);
+  background: var(--_c);
+}
+.month__time {
+  color: var(--ink-3);
+}
+.month__title {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.month__event[data-done='true'] .month__title {
+  text-decoration: line-through;
+  text-decoration-thickness: 1px;
+  color: var(--ink-3);
+}
+.month__more,
+.month__tasks {
+  color: var(--ink-3);
+}
+
+.timeline__note {
+  margin-top: var(--s-2);
+  padding-left: var(--s-3);
+  border-left: 2px solid var(--hairline-strong);
+  color: var(--ink-2);
+  white-space: pre-line;
+}
+
+.form__check {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  font-size: var(--fs-meta);
+  color: var(--ink-2);
+}
+
+.plan__dayname--wide {
+  min-width: 14ch;
+}
+
+/* ------------------------------- Mobile ---------------------------------- */
+
+@media (max-width: 620px) {
+  .month__cell {
+    min-height: 68px;
+    padding: 4px;
+  }
+  /* Sur un téléphone, une pastille par événement suffit : le titre reviendrait
+     à trois lettres. On ouvre la journée pour lire. */
+  .month__time,
+  .month__title,
+  .month__tasks {
+    display: none;
+  }
+  .month__event {
+    display: inline-flex;
+  }
+  .month__cell {
+    grid-auto-flow: row;
+  }
+  .month__num {
+    padding: 0 4px;
+    font-size: var(--fs-micro);
+  }
+}

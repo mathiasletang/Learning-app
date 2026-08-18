@@ -125,6 +125,61 @@ describe('Planning — le planning et les tâches ne font qu’un', () => {
     expect(semaine.length).toBeGreaterThanOrEqual(7);
   });
 
+  it('accueille la vie hors étude, sans la compter comme du travail', async () => {
+    await db.events.bulkPut([
+      {
+        id: 'e-rdv',
+        date: TODAY,
+        start: '09:00',
+        minutes: 60,
+        title: 'Dentiste',
+        subject: 'rdv',
+        note: '12 rue des Lilas',
+        createdAt: new Date().toISOString(),
+      },
+      {
+        id: 'e-maths',
+        date: TODAY,
+        start: '14:00',
+        minutes: 60,
+        title: 'Différentiabilité',
+        subject: 'maths',
+        createdAt: new Date().toISOString(),
+      },
+    ]);
+    monter();
+
+    // Le rendez-vous s'affiche avec sa note, mais sans chronomètre.
+    expect(await screen.findByText('Dentiste')).toBeInTheDocument();
+    expect(screen.getByText('12 rue des Lilas')).toBeInTheDocument();
+    expect(screen.getAllByRole('button', { name: /Commencer/ })).toHaveLength(1);
+
+    // Les objectifs ne comptent que la séance d'étude : une seule, pas deux.
+    const seances = document.querySelectorAll('.plan__goal')[0];
+    expect(seances.textContent).toContain('Séances');
+    expect(seances.textContent).toContain('0 / 1');
+
+    // Le cocher ne remplit pas le relevé de temps d'étude.
+    await userEvent.click(screen.getByRole('button', { name: /^Fait$/ }));
+    await waitFor(async () => expect((await db.events.get('e-rdv'))?.doneAt).toBeTruthy());
+    expect(await db.timeLogs.count()).toBe(0);
+  });
+
+  it('déroule le mois entier, semaine par semaine', async () => {
+    monter();
+    // La page charge d'abord sa journée ; les onglets viennent avec.
+    await userEvent.click(await screen.findByRole('tab', { name: 'Mois' }));
+
+    // Des semaines complètes : le compte de cases est un multiple de sept.
+    const cellules = await waitFor(() => {
+      const c = document.querySelectorAll('.month__cell');
+      expect(c.length).toBeGreaterThanOrEqual(28);
+      return c;
+    });
+    expect(cellules.length % 7).toBe(0);
+    expect(document.querySelector('.month__cell[data-today="true"]')).toBeTruthy();
+  });
+
   it('conserve tout après un rechargement de la page', async () => {
     const tache = await createTask({ title: 'Exercices Faccanoni', priority: 'mid', due: TODAY });
     await scheduleTask(tache, TODAY, '09:00', 60);

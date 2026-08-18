@@ -91,8 +91,19 @@ lire comme un avertissement. Ne pas rebrancher `prose.css` sur `--m-cfa` /
 
 ## Planning et tâches — un seul système
 
-`src/core/planning.ts` (pur, testé) + `src/modules/planning/`. Trois vues d'un
-même jeu de données : Jour, Semaine, Tâches. Pas deux entrées de navigation.
+`src/core/planning.ts` (pur, testé) + `src/modules/planning/`. Quatre vues d'un
+même jeu de données : Jour, Semaine, Mois, Tâches. Pas deux entrées de
+navigation.
+
+- Le planning n'est pas réservé à l'étude : `PLAN_SUBJECTS` porte un drapeau
+  `study`. Cours et TD, personnel, sport et rendez-vous se posent dans la
+  journée mais **ne comptent ni dans les objectifs ni dans `db.timeLogs`** —
+  gonfler le temps d'étude avec un rendez-vous chez le dentiste le rendrait
+  inutile. `autre` reste du côté travail : c'est le fourre-tout d'une séance
+  posée sans préciser la matière.
+- La semaine est une vraie grille horaire au-dessus de 900 px, une liste par
+  jour en dessous : sept colonnes d'heures sur un téléphone sont illisibles.
+- Une séance hors étude n'a ni « Commencer » ni chronomètre : elle se coche.
 
 - Une tâche placée dans la journée **devient** une séance (`PlanEvent.taskId`).
   Terminer la séance coche la tâche — `completeEvent()` dans `actions.ts` est le

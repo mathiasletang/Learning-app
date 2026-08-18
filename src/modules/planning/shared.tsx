@@ -6,6 +6,7 @@ import {
   eventEnd,
   formatDuration,
   isRunning,
+  isStudy,
   subjectMeta,
   toMinutes,
 } from '@/core/planning';
@@ -20,6 +21,10 @@ export const SUBJECT_ICON: Record<PlanSubject, IconName> = {
   maths: 'sigma',
   cfa: 'chart',
   code: 'code',
+  cours: 'school',
+  perso: 'heart',
+  sport: 'sport',
+  rdv: 'meeting',
   autre: 'clock',
 };
 
@@ -40,6 +45,21 @@ export function useNow(): { day: string; minutes: number; ms: number } {
     minutes: now.getHours() * 60 + now.getMinutes(),
     ms: now.getTime(),
   };
+}
+
+/** Vrai tant que la fenêtre satisfait la requête média — la grille horaire à
+    sept colonnes n'a aucun sens sur un téléphone. */
+export function useMediaQuery(query: string): boolean {
+  const [ok, setOk] = useState(() => window.matchMedia?.(query).matches ?? false);
+  useEffect(() => {
+    const mq = window.matchMedia?.(query);
+    if (!mq) return;
+    const onChange = () => setOk(mq.matches);
+    onChange();
+    mq.addEventListener('change', onChange);
+    return () => mq.removeEventListener('change', onChange);
+  }, [query]);
+  return ok;
 }
 
 /** « dans 42 min », « dans 2 h 10 », « il y a 15 min ». */
@@ -82,8 +102,24 @@ export function EventActions({ event, compact }: { event: PlanEvent; compact?: b
     return (
       <span className="plan__done">
         <Icon name="check" size={15} strokeWidth={2.2} />
-        {event.doneMinutes ? formatDuration(event.doneMinutes) : 'Terminée'}
+        {event.doneMinutes && isStudy(event.subject)
+          ? formatDuration(event.doneMinutes)
+          : 'Terminé'}
       </span>
+    );
+  }
+
+  /* Hors étude — un cours en amphi, un rendez-vous : rien à lancer et rien à
+     chronométrer, seulement de quoi le cocher quand c'est passé. */
+  if (!isStudy(event.subject)) {
+    return (
+      <button
+        type="button"
+        className="btn btn--secondary"
+        onClick={() => completeEvent(event)}
+      >
+        <Icon name="check" size={16} /> Fait
+      </button>
     );
   }
 

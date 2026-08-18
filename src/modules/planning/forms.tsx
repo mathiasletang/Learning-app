@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { toDayStr } from '@/core/date';
-import { PLAN_SUBJECTS, PRIORITY_LABEL, subjectMeta } from '@/core/planning';
+import { PLAN_SUBJECTS, PRIORITY_LABEL, STUDY_SUBJECTS, subjectMeta } from '@/core/planning';
 import type { PlanEvent, PlanSubject, Priority, Task } from '@/core/types';
 import { createEvent, createTask, deleteEvent, deleteTask, updateEvent, updateTask } from '@/app/actions';
 import { Button, Modal } from '@/ui';
@@ -16,6 +16,7 @@ export function EventForm({
   onClose,
   event,
   date,
+  start: startProposé,
 }: {
   open: boolean;
   onClose: () => void;
@@ -23,6 +24,8 @@ export function EventForm({
   event?: PlanEvent;
   /** Jour proposé à la création. */
   date: string;
+  /** Heure proposée — celle du créneau cliqué dans la grille. */
+  start?: string;
 }) {
   const [title, setTitle] = useState('');
   const [subject, setSubject] = useState<PlanSubject>('maths');
@@ -30,6 +33,8 @@ export function EventForm({
   const [start, setStart] = useState('09:00');
   const [minutes, setMinutes] = useState(60);
   const [link, setLink] = useState('');
+  const [note, setNote] = useState('');
+  const [allDay, setAllDay] = useState(false);
 
   /* À l'ouverture, le formulaire se cale sur la séance ou sur des valeurs
      plausibles — on ne retape pas ce que l'application peut deviner. */
@@ -38,10 +43,12 @@ export function EventForm({
     setTitle(event?.title ?? '');
     setSubject(event?.subject ?? 'maths');
     setDay(event?.date ?? date);
-    setStart(event?.start ?? prochaineHeureRonde());
+    setStart(event?.start ?? startProposé ?? prochaineHeureRonde());
     setMinutes(event?.minutes ?? 60);
     setLink(event?.link ?? '');
-  }, [open, event, date]);
+    setNote(event?.note ?? '');
+    setAllDay(!!event?.allDay);
+  }, [open, event, date, startProposé]);
 
   const activity = activityByRoute(link);
 
@@ -49,10 +56,12 @@ export function EventForm({
     const nom = title.trim() || activity?.label || subjectMeta(subject).label;
     const payload = {
       date: day,
-      start,
-      minutes,
+      start: allDay ? '00:00' : start,
+      minutes: allDay ? 0 : minutes,
       title: nom,
       subject,
+      note: note.trim() || undefined,
+      allDay: allDay || undefined,
       link: link || undefined,
       linkLabel: activity?.label,
     };
@@ -91,7 +100,7 @@ export function EventForm({
       }
     >
       <div className="form">
-        <label className="form__field">
+        <label className="form__field" hidden={!subjectMeta(subject).study}>
           <span className="eyebrow">Activité</span>
           <select
             className="field"
@@ -130,17 +139,27 @@ export function EventForm({
 
         <div className="form__row">
           <label className="form__field">
-            <span className="eyebrow">Matière</span>
+            <span className="eyebrow">Catégorie</span>
             <select
               className="field"
               value={subject}
               onChange={(e) => setSubject(e.target.value as PlanSubject)}
             >
-              {PLAN_SUBJECTS.map((s) => (
-                <option key={s.id} value={s.id}>
-                  {s.label}
-                </option>
-              ))}
+              {/* Les matières comptent dans le temps d'étude ; le reste non. */}
+              <optgroup label="Étude">
+                {PLAN_SUBJECTS.filter((s) => s.study).map((s) => (
+                  <option key={s.id} value={s.id}>
+                    {s.label}
+                  </option>
+                ))}
+              </optgroup>
+              <optgroup label="Hors étude">
+                {PLAN_SUBJECTS.filter((s) => !s.study).map((s) => (
+                  <option key={s.id} value={s.id}>
+                    {s.label}
+                  </option>
+                ))}
+              </optgroup>
             </select>
           </label>
           <label className="form__field">
@@ -149,32 +168,50 @@ export function EventForm({
           </label>
         </div>
 
-        <div className="form__row">
-          <label className="form__field">
-            <span className="eyebrow">Début</span>
-            <input
-              className="field"
-              type="time"
-              value={start}
-              step={300}
-              onChange={(e) => setStart(e.target.value)}
-            />
-          </label>
-          <label className="form__field">
-            <span className="eyebrow">Durée</span>
-            <select
-              className="field"
-              value={minutes}
-              onChange={(e) => setMinutes(Number(e.target.value))}
-            >
-              {DURATIONS.map((d) => (
-                <option key={d} value={d}>
-                  {d < 60 ? `${d} min` : d % 60 === 0 ? `${d / 60} h` : `${Math.floor(d / 60)} h ${d % 60}`}
-                </option>
-              ))}
-            </select>
-          </label>
-        </div>
+        {!allDay && (
+          <div className="form__row">
+            <label className="form__field">
+              <span className="eyebrow">Début</span>
+              <input
+                className="field"
+                type="time"
+                value={start}
+                step={300}
+                onChange={(e) => setStart(e.target.value)}
+              />
+            </label>
+            <label className="form__field">
+              <span className="eyebrow">Durée</span>
+              <select
+                className="field"
+                value={minutes}
+                onChange={(e) => setMinutes(Number(e.target.value))}
+              >
+                {DURATIONS.map((d) => (
+                  <option key={d} value={d}>
+                    {d < 60 ? `${d} min` : d % 60 === 0 ? `${d / 60} h` : `${Math.floor(d / 60)} h ${d % 60}`}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </div>
+        )}
+
+        <label className="form__check">
+          <input type="checkbox" checked={allDay} onChange={(e) => setAllDay(e.target.checked)} />
+          <span>Journée entière — sans horaire (examen, voyage, anniversaire)</span>
+        </label>
+
+        <label className="form__field">
+          <span className="eyebrow">Note</span>
+          <textarea
+            className="field"
+            rows={2}
+            value={note}
+            placeholder="Lieu, salle, ce qu'il faut apporter…"
+            onChange={(e) => setNote(e.target.value)}
+          />
+        </label>
       </div>
     </Modal>
   );
@@ -317,7 +354,7 @@ export function TaskForm({
               onChange={(e) => setSubject(e.target.value as PlanSubject | '')}
             >
               <option value="">Aucune</option>
-              {PLAN_SUBJECTS.filter((s) => s.id !== 'autre').map((s) => (
+              {STUDY_SUBJECTS.map((s) => (
                 <option key={s.id} value={s.id}>
                   {s.label}
                 </option>

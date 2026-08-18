@@ -16,7 +16,7 @@ import {
   XP_DOC,
   XP_NOTE,
 } from '@/core/gamification';
-import { elapsedMinutes, nextOccurrence, subjectMeta } from '@/core/planning';
+import { elapsedMinutes, isStudy, nextOccurrence, subjectMeta } from '@/core/planning';
 import type {
   Question,
   QcmMode,
@@ -322,7 +322,11 @@ export async function completeEvent(event: PlanEvent): Promise<number> {
   const minutes = Math.max(1, Math.min(mesure > 0 ? mesure : event.minutes, 4 * 60));
 
   await db.events.put({ ...event, doneAt: new Date().toISOString(), doneMinutes: minutes });
-  await logTime(event.date, subjectMeta(event.subject).timeSubject, minutes);
+  /* Un rendez-vous chez le médecin n'est pas du temps d'étude : seules les
+     matières alimentent le relevé, sinon le chiffre ne veut plus rien dire. */
+  if (isStudy(event.subject)) {
+    await logTime(event.date, subjectMeta(event.subject).timeSubject, minutes);
+  }
 
   if (event.taskId) {
     const task = await db.tasks.get(event.taskId);

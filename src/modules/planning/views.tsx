@@ -1,11 +1,14 @@
 import { Link } from 'react-router-dom';
 import { addDays, parseDay } from '@/core/date';
 import {
+  dayRange,
   formatDuration,
   isDone,
   isRunning,
   isOverdue,
+  layoutDay,
   PRIORITY_LABEL,
+  sameMonth,
   sortEvents,
   subjectMeta,
   tasksForDay,
@@ -50,7 +53,8 @@ export function DayTimeline({
   return (
     <ol className="timeline">
       {sortEvents(events).map((ev) => {
-        const passe = enCours && toMinutes(ev.start) + ev.minutes < now.minutes && !isDone(ev);
+        const passe =
+          enCours && !ev.allDay && toMinutes(ev.start) + ev.minutes < now.minutes && !isDone(ev);
         return (
           <li
             key={ev.id}
@@ -58,7 +62,7 @@ export function DayTimeline({
             data-done={isDone(ev)}
             data-running={isRunning(ev)}
           >
-            <span className="timeline__hour tnum">{ev.start}</span>
+            <span className="timeline__hour tnum">{ev.allDay ? 'jour' : ev.start}</span>
             <span
               className="timeline__mark"
               style={{ background: `var(${subjectMeta(ev.subject).colorVar})` }}
@@ -87,7 +91,12 @@ export function DayTimeline({
                   {ev.linkLabel}
                 </Link>
               )}
-              <EventClock event={ev} nowMs={now.ms} />
+              {ev.allDay ? (
+                <span className="micro plan__clock">Journée entière</span>
+              ) : (
+                <EventClock event={ev} nowMs={now.ms} />
+              )}
+              {ev.note && <p className="micro timeline__note">{ev.note}</p>}
               <div className="timeline__foot">
                 <EventActions event={ev} />
               </div>
@@ -250,6 +259,212 @@ export function WeekGrid({
           </button>
         );
       })}
+    </div>
+  );
+}
+
+/* --------------------------- Semaine, en grille -------------------------- */
+
+const PX_PAR_MINUTE = 0.85;
+
+/**
+ * La semaine comme un agenda : les heures en marge, sept colonnes, et les
+ * séances posées à leur place réelle. Deux séances qui se chevauchent se
+ * partagent la largeur.
+ */
+export function WeekTimeGrid({
+  days,
+  events,
+  today,
+  now,
+  onOpenDay,
+  onEdit,
+  onCreate,
+}: {
+  days: string[];
+  events: PlanEvent[];
+  today: string;
+  now: ReturnType<typeof useNow>;
+  onOpenDay: (day: string) => void;
+  onEdit: (e: PlanEvent) => void;
+  onCreate: (day: string, start: string) => void;
+}) {
+  const semaine = events.filter((e) => days.includes(e.date));
+  const [from, to] = dayRange(semaine);
+  const heures = Array.from({ length: to - from }, (_, i) => from + i);
+  const hauteur = (to - from) * 60 * PX_PAR_MINUTE;
+  const journees = days.map((d) => semaine.filter((e) => e.date === d && e.allDay));
+  const aDesJourneesEntieres = journees.some((j) => j.length > 0);
+
+  return (
+    <div className="grid">
+      <div className="grid__head">
+        <span className="grid__gutter" aria-hidden />
+        {days.map((day) => {
+          const d = parseDay(day);
+          return (
+            <button
+              key={day}
+              type="button"
+              className="grid__dayname"
+              data-today={day === today}
+              onClick={() => onOpenDay(day)}
+            >
+              <span className="eyebrow">
+                {d.toLocaleDateString('fr-FR', { weekday: 'short' }).replace('.', '')}
+              </span>
+              <span className="grid__daynum tnum">{d.getDate()}</span>
+            </button>
+          );
+        })}
+      </div>
+
+      {aDesJourneesEntieres && (
+        <div className="grid__allday">
+          <span className="grid__gutter micro">Journée</span>
+          {days.map((day, i) => (
+            <div key={day} className="grid__alldaycell">
+              {journees[i].map((ev) => (
+                <button
+                  key={ev.id}
+                  type="button"
+                  className="grid__band"
+                  style={{ '--_c': `var(${subjectMeta(ev.subject).colorVar})` } as React.CSSProperties}
+                  onClick={() => onEdit(ev)}
+                >
+                  {ev.title}
+                </button>
+              ))}
+            </div>
+          ))}
+        </div>
+      )}
+
+      <div className="grid__body" style={{ height: hauteur }}>
+        <div className="grid__gutter grid__hours">
+          {heures.map((h) => (
+            <span key={h} className="micro grid__hour" style={{ top: (h - from) * 60 * PX_PAR_MINUTE }}>
+              {String(h).padStart(2, '0')}:00
+            </span>
+          ))}
+        </div>
+
+        {days.map((day) => (
+          <div key={day} className="grid__col" data-today={day === today}>
+            {heures.map((h) => (
+              <button
+                key={h}
+                type="button"
+                className="grid__slot"
+                style={{ top: (h - from) * 60 * PX_PAR_MINUTE, height: 60 * PX_PAR_MINUTE }}
+                aria-label={`Planifier le ${day} à ${String(h).padStart(2, '0')}:00`}
+                onClick={() => onCreate(day, `${String(h).padStart(2, '0')}:00`)}
+              />
+            ))}
+
+            {layoutDay(semaine.filter((e) => e.date === day)).map(({ event, from: f, to: t, column, columns }) => (
+              <button
+                key={event.id}
+                type="button"
+                className="grid__event"
+                data-done={isDone(event)}
+                data-running={isRunning(event)}
+                style={
+                  {
+                    top: (f - from * 60) * PX_PAR_MINUTE,
+                    height: Math.max(18, (t - f) * PX_PAR_MINUTE - 2),
+                    left: `calc(${(column / columns) * 100}% + 2px)`,
+                    width: `calc(${100 / columns}% - 4px)`,
+                    '--_c': `var(${subjectMeta(event.subject).colorVar})`,
+                  } as React.CSSProperties
+                }
+                onClick={() => onEdit(event)}
+              >
+                <span className="grid__eventtitle">{event.title}</span>
+                <span className="grid__eventtime tnum">{event.start}</span>
+              </button>
+            ))}
+
+            {day === today && now.minutes >= from * 60 && now.minutes <= to * 60 && (
+              <span
+                className="grid__now"
+                style={{ top: (now.minutes - from * 60) * PX_PAR_MINUTE }}
+                aria-hidden
+              />
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* ---------------------------------- Mois --------------------------------- */
+
+/** Le mois entier, cinq ou six semaines — la vue d'ensemble. */
+export function MonthGrid({
+  weeks,
+  events,
+  tasks,
+  today,
+  month,
+  onOpenDay,
+}: {
+  weeks: string[][];
+  events: PlanEvent[];
+  tasks: Task[];
+  today: string;
+  month: string;
+  onOpenDay: (day: string) => void;
+}) {
+  const JOURS = ['lun', 'mar', 'mer', 'jeu', 'ven', 'sam', 'dim'];
+  return (
+    <div className="month">
+      <div className="month__head">
+        {JOURS.map((j) => (
+          <span key={j} className="eyebrow month__dayname">
+            {j}
+          </span>
+        ))}
+      </div>
+      {weeks.map((semaine) => (
+        <div key={semaine[0]} className="month__week">
+          {semaine.map((day) => {
+            const jour = sortEvents(events.filter((e) => e.date === day));
+            const ouvertes = tasksForDay(tasks, day).filter((t) => !t.doneAt).length;
+            return (
+              <button
+                key={day}
+                type="button"
+                className="month__cell"
+                data-today={day === today}
+                data-outside={!sameMonth(day, month)}
+                onClick={() => onOpenDay(day)}
+              >
+                <span className="month__num tnum">{parseDay(day).getDate()}</span>
+                {jour.slice(0, 3).map((ev) => (
+                  <span
+                    key={ev.id}
+                    className="month__event"
+                    data-done={isDone(ev)}
+                    style={{ '--_c': `var(${subjectMeta(ev.subject).colorVar})` } as React.CSSProperties}
+                  >
+                    <span className="month__bullet" aria-hidden />
+                    {!ev.allDay && <span className="tnum month__time">{ev.start}</span>}
+                    <span className="month__title">{ev.title}</span>
+                  </span>
+                ))}
+                {jour.length > 3 && <span className="micro month__more">+ {jour.length - 3}</span>}
+                {ouvertes > 0 && (
+                  <span className="micro month__tasks">
+                    {ouvertes} tâche{ouvertes > 1 ? 's' : ''}
+                  </span>
+                )}
+              </button>
+            );
+          })}
+        </div>
+      ))}
     </div>
   );
 }

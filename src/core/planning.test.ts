@@ -1,13 +1,20 @@
 import { describe, it, expect } from 'vitest';
 import {
+  dayRange,
   dayGoals,
   elapsedMinutes,
   eventEnd,
   formatDuration,
   isOverdue,
   nextOccurrence,
+  isStudy,
+  layoutDay,
+  monthGrid,
   nextUp,
   ratio,
+  sameMonth,
+  shiftMonth,
+  sortEvents,
   sortTasks,
   startsIn,
   tasksForDay,
@@ -140,7 +147,11 @@ describe('Planning — la semaine et les objectifs', () => {
   });
 
   it('ne compte que du réel : séances posées, tâches dues, temps enregistré', () => {
-    const events = [ev('09:00', 90, { doneAt: 'x' }), ev('14:00', 60)];
+    // Des séances d'étude : ce sont les seules à peser dans les compteurs.
+    const events = [
+      ev('09:00', 90, { subject: 'maths', doneAt: 'x' }),
+      ev('14:00', 60, { subject: 'anglais' }),
+    ];
     const tasks = [task('a', { doneAt: 'x' }), task('b'), task('c')];
     const logs = [
       { date: TODAY, subject: 'opt', minutes: 80 },
@@ -159,5 +170,79 @@ describe('Planning — la semaine et les objectifs', () => {
     });
     expect(ratio(0, 0)).toBe(0);
     expect(ratio(3, 2)).toBe(1);
+  });
+});
+
+describe('Planning — la vie hors étude', () => {
+  it('sépare ce qui est du travail de ce qui n’en est pas', () => {
+    expect(isStudy('maths')).toBe(true);
+    expect(isStudy('anglais')).toBe(true);
+    expect(isStudy('rdv')).toBe(false);
+    expect(isStudy('sport')).toBe(false);
+    expect(isStudy('cours')).toBe(false); // un amphi s'assiste, il ne se compte pas
+    // Sans précision, une séance vient de l'application d'étude : elle compte.
+    expect(isStudy(undefined)).toBe(true);
+    expect(isStudy('autre')).toBe(true);
+  });
+
+  it('ne compte que l’étude dans les objectifs du jour', () => {
+    const journee = [
+      ev('09:00', 90, { subject: 'maths', doneAt: 'x' }),
+      ev('11:00', 60, { subject: 'maths' }),
+      ev('13:00', 60, { subject: 'rdv', doneAt: 'x' }),
+      ev('18:00', 60, { subject: 'sport' }),
+    ];
+    const g = dayGoals(journee, [], []);
+    expect(g.sessions).toEqual({ done: 1, total: 2 });
+    expect(g.minutes.planned).toBe(150); // ni le rendez-vous ni le sport
+  });
+
+  it('met les journées entières en tête, sans durée planifiée', () => {
+    const journee = [ev('09:00', 60, { subject: 'maths' }), ev('00:00', 0, { allDay: true, subject: 'cfa', title: 'Examen' })];
+    expect(sortEvents(journee)[0].title).toBe('Examen');
+    expect(dayGoals(journee, [], []).minutes.planned).toBe(60);
+  });
+});
+
+describe('Planning — le mois et la grille horaire', () => {
+  it('couvre le mois par semaines entières, sans trou', () => {
+    const grille = monthGrid('2026-08-18');
+    expect(grille[0]).toHaveLength(7);
+    expect(grille[0][0]).toBe('2026-07-27'); // le lundi qui ouvre la première semaine
+    expect(grille[grille.length - 1][6]).toBe('2026-09-06');
+    expect(grille.flat()).toContain('2026-08-31');
+    // Février 2026 commence un dimanche : la grille reste complète.
+    expect(monthGrid('2026-02-15')[0][0]).toBe('2026-01-26');
+    expect(shiftMonth('2026-08-18', 1)).toBe('2026-09-01');
+    expect(shiftMonth('2026-01-15', -1)).toBe('2025-12-01');
+    expect(sameMonth('2026-08-01', '2026-08-31')).toBe(true);
+    expect(sameMonth('2026-08-31', '2026-09-01')).toBe(false);
+  });
+
+  it('partage la largeur entre les séances qui se chevauchent', () => {
+    const slots = layoutDay([
+      ev('09:00', 60, { title: 'A' }),
+      ev('09:30', 60, { title: 'B' }),
+      ev('11:00', 30, { title: 'C' }),
+    ]);
+    const [a, b, c] = slots;
+    // A et B se chevauchent : deux colonnes, chacune la sienne.
+    expect([a.column, a.columns]).toEqual([0, 2]);
+    expect([b.column, b.columns]).toEqual([1, 2]);
+    // C est seule : elle reprend toute la largeur.
+    expect([c.column, c.columns]).toEqual([0, 1]);
+  });
+
+  it('donne une hauteur minimale aux séances très courtes', () => {
+    const [slot] = layoutDay([ev('09:00', 5)]);
+    expect(slot.to - slot.from).toBe(15);
+  });
+
+  it('élargit l’amplitude horaire aux séances qui sortent du cadre', () => {
+    expect(dayRange([])).toEqual([7, 22]);
+    expect(dayRange([ev('06:15', 60)])).toEqual([6, 22]);
+    expect(dayRange([ev('22:30', 60)])).toEqual([7, 24]);
+    // Les journées entières ne déforment pas l'amplitude.
+    expect(dayRange([ev('00:00', 0, { allDay: true })])).toEqual([7, 22]);
   });
 });

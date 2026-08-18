@@ -228,8 +228,24 @@ export interface Note {
 
 export type Priority = 'low' | 'mid' | 'high';
 
-/** Domaine d'une séance ou d'une tâche — les matières, plus « autre ». */
-export type PlanSubject = 'anglais' | 'maths' | 'cfa' | 'code' | 'autre';
+/**
+ * Domaine d'une séance ou d'une tâche.
+ *
+ * Les quatre premières sont des matières : elles font partie de l'étude, et
+ * leur temps rejoint le relevé. Les suivantes sont la vie hors étude — un
+ * emploi du temps qui ne sait pas noter un rendez-vous chez le médecin n'est
+ * pas un emploi du temps. « autre » sert de fourre-tout neutre.
+ */
+export type PlanSubject =
+  | 'anglais'
+  | 'maths'
+  | 'cfa'
+  | 'code'
+  | 'cours'
+  | 'perso'
+  | 'sport'
+  | 'rdv'
+  | 'autre';
 
 /**
  * Une séance placée dans la journée. Elle peut viser une activité précise de
@@ -243,6 +259,10 @@ export interface PlanEvent {
   minutes: number; // durée prévue
   title: string;
   subject?: PlanSubject;
+  /** Note libre : lieu, salle, ce qu'il faut apporter, ce qui s'est dit. */
+  note?: string;
+  /** Sans horaire — examen, anniversaire, jour de voyage. */
+  allDay?: boolean;
   link?: string; // route interne, ex. /fiche/lagrange
   linkLabel?: string;
   taskId?: string; // tâche d'origine, tenue à jour avec la séance

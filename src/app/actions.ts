@@ -16,6 +16,7 @@ import {
   XP_DOC,
   XP_NOTE,
 } from '@/core/gamification';
+import { elapsedMinutes, nextOccurrence, subjectMeta } from '@/core/planning';
 import type {
   Question,
   QcmMode,
@@ -23,6 +24,8 @@ import type {
   Flashcard,
   Note,
   BankId,
+  PlanEvent,
+  Task,
 } from '@/core/types';
 import { useApp } from './store';
 
@@ -210,4 +213,127 @@ export async function logTime(date: string, subject: string, minutes: number): P
   await db.timeLogs.add({ date, subject, minutes });
   const xp = xpForMinutes(minutes);
   if (xp > 0) await app().addXp(xp);
+}
+
+/* ------------------------- Planning et tâches --------------------------- */
+
+/**
+ * Le planning et la liste de tâches sont un seul système vu de deux côtés :
+ * une tâche devient une séance, et terminer la séance clôt la tâche. Toutes
+ * les écritures passent par ici pour que ce lien ne se défasse jamais.
+ */
+
+const uid = (p: string) => `${p}:${Date.now().toString(36)}${Math.random().toString(36).slice(2, 7)}`;
+
+export async function createTask(input: Omit<Task, 'id' | 'createdAt'>): Promise<Task> {
+  const task: Task = { ...input, id: uid('t'), createdAt: new Date().toISOString() };
+  await db.tasks.put(task);
+  return task;
+}
+
+export async function updateTask(id: string, patch: Partial<Task>): Promise<void> {
+  const current = await db.tasks.get(id);
+  if (current) await db.tasks.put({ ...current, ...patch, id });
+}
+
+export async function deleteTask(id: string): Promise<void> {
+  await db.tasks.delete(id);
+  // La séance survit à sa tâche, mais cesse de s'y référer.
+  const linked = await db.events.where('taskId').equals(id).toArray();
+  await Promise.all(linked.map((e) => db.events.put({ ...e, taskId: undefined })));
+}
+
+/**
+ * Cocher une tâche. Une tâche récurrente cochée fait naître son occurrence
+ * suivante — on ne perd jamais le rendez-vous, et rien n'est supprimé.
+ */
+export async function toggleTask(task: Task): Promise<void> {
+  const done = !task.doneAt;
+  await db.tasks.put({ ...task, doneAt: done ? new Date().toISOString() : undefined });
+  if (!done) return;
+
+  const suivante = nextOccurrence(task);
+  if (suivante) {
+    await createTask({
+      title: task.title,
+      note: task.note,
+      priority: task.priority,
+      due: suivante,
+      subject: task.subject,
+      minutes: task.minutes,
+      repeat: task.repeat,
+    });
+  }
+  await app().registerActivity();
+}
+
+/** Reporter une tâche — jamais la supprimer parce qu'elle a pris du retard. */
+export async function rescheduleTask(id: string, due: string): Promise<void> {
+  await updateTask(id, { due });
+}
+
+export async function createEvent(input: Omit<PlanEvent, 'id' | 'createdAt'>): Promise<PlanEvent> {
+  const event: PlanEvent = { ...input, id: uid('e'), createdAt: new Date().toISOString() };
+  await db.events.put(event);
+  return event;
+}
+
+export async function updateEvent(id: string, patch: Partial<PlanEvent>): Promise<void> {
+  const current = await db.events.get(id);
+  if (current) await db.events.put({ ...current, ...patch, id });
+}
+
+export async function deleteEvent(id: string): Promise<void> {
+  await db.events.delete(id);
+}
+
+/** Placer une tâche dans la journée : la séance garde le lien vers la tâche. */
+export async function scheduleTask(
+  task: Task,
+  date: string,
+  start: string,
+  minutes?: number,
+): Promise<PlanEvent> {
+  return createEvent({
+    date,
+    start,
+    minutes: minutes ?? task.minutes ?? 60,
+    title: task.title,
+    subject: task.subject,
+    taskId: task.id,
+  });
+}
+
+/** Lancer une séance : c'est le départ du chronomètre, rien de plus. */
+export async function startEvent(id: string): Promise<void> {
+  await updateEvent(id, { startedAt: new Date().toISOString() });
+}
+
+/**
+ * Terminer une séance. Le temps retenu est celui réellement passé quand la
+ * séance a été lancée, sinon la durée prévue — dans les deux cas il rejoint
+ * db.timeLogs, le même relevé que celui du Suivi. La tâche d'origine, s'il y
+ * en a une, est cochée par la même occasion.
+ */
+export async function completeEvent(event: PlanEvent): Promise<number> {
+  if (event.doneAt) return 0;
+  const mesure = event.startedAt ? elapsedMinutes(event.startedAt) : 0;
+  // Une séance oubliée ouverte toute la nuit ne vaut pas huit heures d'étude.
+  const minutes = Math.max(1, Math.min(mesure > 0 ? mesure : event.minutes, 4 * 60));
+
+  await db.events.put({ ...event, doneAt: new Date().toISOString(), doneMinutes: minutes });
+  await logTime(event.date, subjectMeta(event.subject).timeSubject, minutes);
+
+  if (event.taskId) {
+    const task = await db.tasks.get(event.taskId);
+    if (task && !task.doneAt) await toggleTask(task);
+  }
+  await app().registerActivity();
+  await app().refreshBadges();
+  return minutes;
+}
+
+/** Rouvrir une séance cochée par erreur — le temps déjà compté reste acquis. */
+export async function reopenEvent(id: string): Promise<void> {
+  await updateEvent(id, { doneAt: undefined, startedAt: undefined });
 }

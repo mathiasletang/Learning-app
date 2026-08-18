@@ -16,6 +16,8 @@ import type {
   Note,
   TimeLog,
   Badge,
+  PlanEvent,
+  Task,
 } from './types';
 import { toDayStr } from './date';
 
@@ -50,6 +52,8 @@ export class AtelierDB extends Dexie {
   notes!: Table<Note, string>;
   timeLogs!: Table<TimeLog, number>;
   badges!: Table<Badge, string>;
+  events!: Table<PlanEvent, string>;
+  tasks!: Table<Task, string>;
 
   constructor() {
     super('atelier');
@@ -65,6 +69,12 @@ export class AtelierDB extends Dexie {
       notes: 'id, updatedAt, subject',
       timeLogs: '++id, date, subject',
       badges: 'id',
+    });
+    /* v2 — le planning et les tâches. Deux tables ajoutées : Dexie conserve
+       les données existantes, rien à migrer. */
+    this.version(2).stores({
+      events: 'id, date, taskId',
+      tasks: 'id, due, doneAt',
     });
   }
 }
@@ -112,11 +122,13 @@ export interface ExportBundle {
     notes: Note[];
     timeLogs: TimeLog[];
     badges: Badge[];
+    events?: PlanEvent[];
+    tasks?: Task[];
   };
 }
 
 export async function exportAll(): Promise<ExportBundle> {
-  const [prefs, gam, steps, docs, qcmResults, qcmSessions, flashcards, vocabSrs, notes, timeLogs, badges] =
+  const [prefs, gam, steps, docs, qcmResults, qcmSessions, flashcards, vocabSrs, notes, timeLogs, badges, events, tasks] =
     await Promise.all([
       db.prefs.toArray(),
       db.gam.toArray(),
@@ -129,12 +141,14 @@ export async function exportAll(): Promise<ExportBundle> {
       db.notes.toArray(),
       db.timeLogs.toArray(),
       db.badges.toArray(),
+      db.events.toArray(),
+      db.tasks.toArray(),
     ]);
   return {
     app: 'atelier',
     version: 1,
     exportedAt: new Date().toISOString(),
-    data: { prefs, gam, steps, docs, qcmResults, qcmSessions, flashcards, vocabSrs, notes, timeLogs, badges },
+    data: { prefs, gam, steps, docs, qcmResults, qcmSessions, flashcards, vocabSrs, notes, timeLogs, badges, events, tasks },
   };
 }
 
@@ -145,7 +159,7 @@ export async function importAll(bundle: ExportBundle, mode: 'replace' | 'merge' 
   const d = bundle.data;
   await db.transaction(
     'rw',
-    [db.prefs, db.gam, db.steps, db.docs, db.qcmResults, db.qcmSessions, db.flashcards, db.vocabSrs, db.notes, db.timeLogs, db.badges],
+    [db.prefs, db.gam, db.steps, db.docs, db.qcmResults, db.qcmSessions, db.flashcards, db.vocabSrs, db.notes, db.timeLogs, db.badges, db.events, db.tasks],
     async () => {
       if (mode === 'replace') {
         await Promise.all([
@@ -160,6 +174,8 @@ export async function importAll(bundle: ExportBundle, mode: 'replace' | 'merge' 
           db.notes.clear(),
           db.timeLogs.clear(),
           db.badges.clear(),
+          db.events.clear(),
+          db.tasks.clear(),
         ]);
       }
       await Promise.all([
@@ -179,6 +195,8 @@ export async function importAll(bundle: ExportBundle, mode: 'replace' | 'merge' 
           ? db.timeLogs.bulkPut(mode === 'merge' ? d.timeLogs.map(({ id: _id, ...t }) => t as TimeLog) : d.timeLogs)
           : undefined,
         d.badges?.length ? db.badges.bulkPut(d.badges) : undefined,
+        d.events?.length ? db.events.bulkPut(d.events) : undefined,
+        d.tasks?.length ? db.tasks.bulkPut(d.tasks) : undefined,
       ]);
     },
   );
@@ -187,7 +205,7 @@ export async function importAll(bundle: ExportBundle, mode: 'replace' | 'merge' 
 export async function resetAll(): Promise<void> {
   await db.transaction(
     'rw',
-    [db.prefs, db.gam, db.steps, db.docs, db.qcmResults, db.qcmSessions, db.flashcards, db.vocabSrs, db.notes, db.timeLogs, db.badges],
+    [db.prefs, db.gam, db.steps, db.docs, db.qcmResults, db.qcmSessions, db.flashcards, db.vocabSrs, db.notes, db.timeLogs, db.badges, db.events, db.tasks],
     async () => {
       await Promise.all([
         db.prefs.clear(),
@@ -201,6 +219,8 @@ export async function resetAll(): Promise<void> {
         db.notes.clear(),
         db.timeLogs.clear(),
         db.badges.clear(),
+        db.events.clear(),
+        db.tasks.clear(),
       ]);
     },
   );

@@ -224,6 +224,48 @@ export interface Note {
   updatedAt: string;
 }
 
+/* ------------------------- Planning et tâches --------------------------- */
+
+export type Priority = 'low' | 'mid' | 'high';
+
+/** Domaine d'une séance ou d'une tâche — les matières, plus « autre ». */
+export type PlanSubject = 'anglais' | 'maths' | 'cfa' | 'code' | 'autre';
+
+/**
+ * Une séance placée dans la journée. Elle peut viser une activité précise de
+ * l'application (`link`) et venir d'une tâche (`taskId`) — c'est ce lien qui
+ * évite d'avoir deux systèmes à tenir à jour.
+ */
+export interface PlanEvent {
+  id: string;
+  date: string; // YYYY-MM-DD
+  start: string; // HH:MM
+  minutes: number; // durée prévue
+  title: string;
+  subject?: PlanSubject;
+  link?: string; // route interne, ex. /fiche/lagrange
+  linkLabel?: string;
+  taskId?: string; // tâche d'origine, tenue à jour avec la séance
+  startedAt?: string; // ISO — séance en cours
+  doneAt?: string; // ISO
+  doneMinutes?: number; // temps réellement passé, mesuré ou repris du prévu
+  createdAt: string;
+}
+
+export interface Task {
+  id: string;
+  title: string;
+  note?: string;
+  priority: Priority;
+  due?: string; // YYYY-MM-DD
+  subject?: PlanSubject;
+  minutes?: number; // durée estimée
+  /** Récurrence simple : l'occurrence suivante naît quand celle-ci est faite. */
+  repeat?: 'daily' | 'weekly';
+  doneAt?: string;
+  createdAt: string;
+}
+
 export interface TimeLog {
   id?: number;
   date: string; // YYYY-MM-DD

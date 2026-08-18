@@ -9,6 +9,7 @@ import { CourseView } from '@/modules/courses/CourseView';
 import { FicheView } from '@/modules/fiches/FicheView';
 import { QcmBank } from '@/modules/quiz/QcmBank';
 import { Cards } from '@/modules/review/Cards';
+import { Planning } from '@/modules/planning/Planning';
 import { Suivi } from '@/modules/suivi/Suivi';
 
 /* Le lexique pèse un méga-octet : les pages qui s'en servent sont chargées à
@@ -73,6 +74,7 @@ export function App() {
           <Route path="maths" element={<Subject id="maths" />} />
           <Route path="code" element={<Subject id="code" />} />
           <Route path="cfa" element={<Subject id="cfa" />} />
+          <Route path="planning" element={<Planning />} />
           <Route path="suivi" element={<Suivi />} />
           {/* Pages « séance » : lancées depuis les matières. */}
           <Route path="cours/:id" element={<CourseView />} />
@@ -89,7 +91,8 @@ export function App() {
           <Route path="notes" element={<Navigate to="/maths?s=notes" replace />} />
           <Route path="stats" element={<Navigate to="/suivi" replace />} />
           <Route path="temps" element={<Navigate to="/suivi" replace />} />
-          <Route path="planning" element={<Navigate to="/suivi" replace />} />
+          {/* « planning » renvoyait au suivi du temps du prototype ; c'est
+             désormais une page à part entière, déclarée plus haut. */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Route>
       </Routes>

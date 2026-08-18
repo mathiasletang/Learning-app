@@ -52,7 +52,7 @@ describe('App — rendu de bout en bout', () => {
   });
 
   it('redirige les anciens chemins vers la nouvelle carte', async () => {
-    window.location.hash = '#/planning';
+    window.location.hash = '#/stats';
     render(<App />);
     await waitFor(() =>
       expect(screen.getByRole('heading', { name: /^Suivi$/i })).toBeInTheDocument(),

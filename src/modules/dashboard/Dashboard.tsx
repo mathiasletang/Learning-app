@@ -9,6 +9,7 @@ import { WORD_COUNT } from '@/core/lexicon-meta';
 import { cardInSubject } from '@/core/subjects';
 import { openResource } from '@/app/actions';
 import { Icon, Tag, Gauge, Reveal, YearLine } from '@/ui';
+import { TodayPanel } from '@/modules/planning/TodayPanel';
 import './dashboard.css';
 
 /** Le cours de référence du niveau L3 — point de départ du travail. */
@@ -94,8 +95,13 @@ export function Dashboard() {
         </motion.h1>
       </section>
 
-      {/* ------------------- L'action du jour : réviser -------------------- */}
+      {/* --------- La journée : prochaine séance, séances, tâches ---------- */}
       <Reveal>
+        <TodayPanel />
+      </Reveal>
+
+      {/* ------------------- L'action du jour : réviser -------------------- */}
+      <Reveal delay={0.02}>
         <div className="today">
           {due > 0 ? (
             <Link to="/reviser" className="today__cta">

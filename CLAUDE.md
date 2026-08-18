@@ -89,6 +89,25 @@ priorité haute) et `--warn-soft` (priorité moyenne). Un avertissement doit se
 lire comme un avertissement. Ne pas rebrancher `prose.css` sur `--m-cfa` /
 `--m-fin` : c'est précisément ce qui a été démêlé.
 
+## Planning et tâches — un seul système
+
+`src/core/planning.ts` (pur, testé) + `src/modules/planning/`. Trois vues d'un
+même jeu de données : Jour, Semaine, Tâches. Pas deux entrées de navigation.
+
+- Une tâche placée dans la journée **devient** une séance (`PlanEvent.taskId`).
+  Terminer la séance coche la tâche — `completeEvent()` dans `actions.ts` est le
+  seul endroit qui noue les deux. Ne pas dupliquer cette logique dans l'UI.
+- Une tâche déjà planifiée ne s'affiche pas **aussi** dans les tâches du jour :
+  la séance la représente. Sinon la journée paraît deux fois plus chargée.
+- Le temps d'une séance terminée part dans `db.timeLogs`, le relevé que lisait
+  déjà le Suivi. Pas de second compteur de temps.
+- Les chiffres du jour (`dayGoals`) se déduisent des séances posées, des tâches
+  dues et du temps enregistré. **Ne pas inventer d'objectif** : s'il n'y a rien
+  de prévu, les jauges restent à zéro.
+- Une tâche non faite n'est jamais supprimée ni déplacée d'office : on propose
+  de la reporter. Une tâche récurrente cochée fait naître son occurrence
+  suivante.
+
 ## Mobile
 
 Tout écran se vérifie à **390 px**, pas seulement en 1440.

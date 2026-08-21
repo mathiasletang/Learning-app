@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fiche 315 — Paquets et espaces de noms : library, ::, :::</title>
+<script>
+window.MathJax={tex:{inlineMath:[["$","$"]],displayMath:[["$$","$$"]],processEscapes:true},
+ options:{skipHtmlTags:["script","noscript","style","textarea","pre","code"]},
+ svg:{fontCache:"global"},
+ startup:{pageReady:()=>MathJax.startup.defaultPageReady().then(()=>{document.body.classList.add("ready")})}};
+setTimeout(function(){document.body.classList.add("ready")},2500);
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+/* ============================================================
+   MathiasLearn — feuille de style des fiches
+   Reprise intégrale des tokens de 00_PARCOURS/*.html
+   + blocs pédagogiques (callouts, méthode, essentiels, recall)
+   ============================================================ */
+:root{--bg:#faf9f7;--card:#fff;--ink:#1a1a1a;--muted:#6b6b6b;--line:#e5e2dd;--accent:#8b5e34;
+ --hl:#fdf8ef;--ok:#2d7d4f;--okbg:#f0f7f3;--warn:#b3402f;--warnbg:#fdf3f1;--blue:#2f5d8b;--bluebg:#f1f5fa}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+ font:17px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;padding:0 16px 100px}
+.nav{position:sticky;top:0;background:rgba(250,249,247,.96);backdrop-filter:blur(8px);
+ border-bottom:1px solid var(--line);margin:0 -16px 30px;padding:11px 16px;z-index:50;
+ display:flex;gap:6px;flex-wrap:wrap;font-size:13px}
+.nav a{color:var(--muted);text-decoration:none;padding:4px 9px;border-radius:5px;white-space:nowrap}
+.nav a:hover{background:var(--line);color:var(--ink)}
+.nav a.on{background:var(--accent);color:#fff}
+main{max-width:780px;margin:0 auto}
+h1{font-size:31px;letter-spacing:-.02em;margin:.4em 0 .5em;line-height:1.25}
+h2{font-size:23px;margin:2.2em 0 .7em;padding-bottom:.3em;border-bottom:1px solid var(--line)}
+h3{font-size:19px;margin:1.9em 0 .5em;color:var(--accent)}
+h4{font-size:17px;margin:1.5em 0 .4em}
+p{margin:.8em 0} a{color:var(--accent)} hr{border:0;border-top:1px solid var(--line);margin:2.6em 0}
+table{border-collapse:collapse;width:100%;margin:1.3em 0;font-size:15.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+th{background:#f3f0eb;font-weight:600}
+tr:nth-child(even) td{background:#fcfbfa}
+code{font-family:"SF Mono",Menlo,Consolas,monospace;font-size:.88em;background:#f2efea;padding:2px 6px;border-radius:4px;overflow-wrap:break-word}
+pre{background:#f2efea;padding:14px 16px;border-radius:8px;overflow-x:auto}
+pre code{background:none;padding:0;white-space:pre}
+blockquote{border-left:3px solid var(--accent);background:var(--hl);margin:1.4em 0;padding:14px 20px;border-radius:0 8px 8px 0}
+blockquote p:first-child{margin-top:0} blockquote p:last-child{margin-bottom:0}
+ul,ol{padding-left:1.5em} li{margin:.35em 0} em{color:#4a4a4a}
+mjx-container[display="true"]{margin:1.1em 0!important;overflow-x:auto;overflow-y:hidden;padding:2px 0}
+mjx-container svg{max-width:100%}
+body:not(.ready) main{opacity:0} main{opacity:1;transition:opacity .25s}
+
+/* --- bandeau de tête de fiche --- */
+.cours{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--accent);
+ border-radius:0 10px 10px 0;padding:18px 22px;margin:0 0 34px}
+.cours h4{margin:0 0 4px;font-size:14px;text-transform:uppercase;letter-spacing:.07em;color:var(--accent)}
+.cours .cs{color:var(--muted);font-size:14.5px;margin:0 0 14px}
+
+/* --- exercices / corrigés --- */
+.ex{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:6px 24px 20px;margin:18px 0}
+.ex>h3:first-child{margin-top:14px}
+details.cor{margin-top:18px;border:1px solid var(--line);border-radius:8px;background:#fcfbfa;overflow:hidden}
+details.cor>summary{cursor:pointer;padding:12px 16px;font-weight:600;font-size:15px;color:var(--accent);
+ list-style:none;display:flex;align-items:center;gap:9px;user-select:none;transition:.15s;min-height:44px}
+details.cor>summary::-webkit-details-marker{display:none}
+details.cor>summary:hover{background:var(--hl)}
+details.cor>summary::before{content:"\25B6";font-size:10px;transition:transform .18s;display:inline-block}
+details.cor[open]>summary::before{transform:rotate(90deg)}
+details.cor[open]>summary{background:var(--okbg);color:var(--ok);border-bottom:1px solid var(--line)}
+.cor .in{padding:4px 20px 16px}
+.cor .in>*:first-child{margin-top:.9em}
+
+/* --- blocs pédagogiques (callouts) ---
+   Générés depuis une citation Markdown dont le premier **gras** commence
+   par un mot-clé : DÉFINITION, THÉORÈME, MÉTHODE, PIÈGE, INTUITION… */
+.cal{border:1px solid var(--line);border-left:4px solid var(--accent);background:var(--card);
+ border-radius:0 10px 10px 0;padding:15px 20px;margin:1.5em 0}
+.cal>p:first-child{margin-top:0}.cal>p:last-child,.cal>ul:last-child,.cal>ol:last-child{margin-bottom:0}
+.cal .lab{display:block;font-size:12.5px;text-transform:uppercase;letter-spacing:.08em;
+ font-weight:700;color:var(--accent);margin-bottom:6px}
+.cal.formel{background:var(--hl)}
+.cal.piege{border-left-color:var(--warn);background:var(--warnbg)}
+.cal.piege .lab{color:var(--warn)}
+.cal.methode{border-left-color:var(--ok);background:var(--okbg)}
+.cal.methode .lab{color:var(--ok)}
+.cal.intu{border-left-color:var(--blue);background:var(--bluebg)}
+.cal.intu .lab{color:var(--blue)}
+.cal.plus{border-left-style:dashed;background:#faf9f7}
+.cal.plus .lab{color:var(--muted)}
+
+/* --- révision express --- */
+.ess{background:var(--card);border:1px solid var(--accent);border-radius:10px;padding:4px 24px 20px;margin:1.6em 0}
+.ess h3{margin-top:1.3em}
+.rec{background:var(--card);border:1px dashed var(--accent);border-radius:10px;padding:4px 24px 18px;margin:1.6em 0}
+.rec ol{counter-reset:none}
+
+/* --- impression / PDF --- */
+@media print{
+ .nav{display:none}
+ body{padding:0;background:#fff;font-size:11.2pt;line-height:1.55}
+ main{max-width:none}
+ h1{font-size:23pt}h2{font-size:15pt;margin-top:1.5em}h3{font-size:12.6pt}
+ h2,h3,h4{break-after:avoid;page-break-after:avoid}
+ table,.cal,blockquote{break-inside:avoid;page-break-inside:avoid}
+ table{display:table;font-size:9.6pt}
+ details.cor{border:1px solid var(--line);background:#fcfbfa}
+ details.cor>summary{display:none}
+ details.cor .in{padding-top:10px}
+ .cal,.ex,.ess,.rec{box-shadow:none}
+ a{color:var(--ink);text-decoration:none}
+}
+@page{margin:16mm 15mm 18mm}
+
+/* --- exemples travaillés --- */
+.exm{background:#fcfbfa;border:1px solid var(--line);border-radius:10px;padding:2px 20px 14px;margin:1.5em 0}
+.exm>h4:first-child{margin:14px 0 .5em;color:var(--accent);font-size:13px;text-transform:uppercase;letter-spacing:.07em}
+
+
+/* --- pastilles de priorité (conventions des fiches de l'app) --- */
+h2[data-prio], h3[data-prio], h4[data-prio]{position:relative}
+h2[data-prio]::before,h3[data-prio]::before,h4[data-prio]::before{
+ content:"";display:inline-block;width:9px;height:9px;border-radius:50%;
+ margin-right:9px;vertical-align:middle;background:var(--muted)}
+[data-prio="must"]::before{background:var(--warn)}
+[data-prio="high"]::before{background:#d98324}
+[data-prio="mid"]::before{background:#c9a227}
+[data-prio="low"]::before{background:var(--ok)}
+/* corrigés des fiches de l'app : même traitement que les corrigés des séries */
+details.cor>summary::after{content:""}
+</style></head><body>
+<div class="nav"><a href="00_COMMENCER_ICI.html">Commencer ici</a><a href="01_NOTATIONS_le-decodeur.html">Notations</a><a href="02_EXERCICES_Serie-0.html">Série 0 — Remise en route</a><a href="03_EXERCICES_Serie-1.html">Série 1 — Convexité</a><a href="04_EXERCICES_Serie-2.html">Série 2 — KKT</a><a href="05_AUTO-EVALUATION.html">Auto-évaluation (quiz)</a><a href="06_FICHE_Optimisation-deux-variables.html">Fiche — Optimisation à 2 variables</a></div>
+<main><h1>Fiche 315 — Paquets et espaces de noms : <code>library</code>, <code>::</code>, <code>:::</code></h1>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Matière</strong></td>
+<td>Code · Langage R</td>
+</tr>
+<tr>
+<td><strong>Cours source</strong></td>
+<td>R Core Team, <em>An Introduction to R</em> 4.6.1 — chapitre 13 « Packages » (§13.1 paquets standard, §13.2 paquets contribués et CRAN, §13.3 espaces de noms)</td>
+</tr>
+<tr>
+<td><strong>Sources d'appoint</strong></td>
+<td><em>R Language Definition</em> 4.6.1, §3.5.4 « Search path » ; <em>Writing R Extensions</em> 4.6.1, chapitre 1 « Creating R packages » (renvoi explicite du §13)</td>
+</tr>
+<tr>
+<td><strong>Difficulté</strong></td>
+<td> Fondamental — court, mais il conditionne tout usage réel de R</td>
+</tr>
+<tr>
+<td><strong>Temps d'étude estimé</strong></td>
+<td>45 min</td>
+</tr>
+<tr>
+<td><strong>Prérequis</strong></td>
+<td>Fiches 306 et 310 (chemin de recherche, environnements)</td>
+</tr>
+<tr>
+<td><strong>Concepts clés</strong></td>
+<td>paquet, chargement, <strong>efficacité</strong> et <strong>protection contre les collisions</strong>, <code>library()</code>, <code>install.packages()</code>, <code>update.packages()</code>, <code>search()</code>, <code>loadedNamespaces()</code>, paquets <strong>standard</strong>, <strong>recommandés</strong> et <strong>contribués</strong>, CRAN, Bioconductor, <strong>espace de noms</strong> et ses <strong>trois rôles</strong>, <code>::</code>, <code>:::</code>, <code>getAnywhere()</code>, chargement automatique</td>
+</tr>
+<tr>
+<td><strong>À retenir en priorité</strong></td>
+<td><strong>Les trois rôles d'un espace de noms</strong> · <strong><code>::</code> n'atteint que ce qui est exporté</strong> · <strong><code>search()</code> ne montre pas tout</strong> · <strong>un paquet chargé automatiquement n'entre pas dans le chemin de recherche</strong>.</td>
+</tr>
+</tbody></table>
+<h2>Vue d'ensemble</h2>
+<pre><code>LE PRINCIPE   « ALL R functions and datasets are STORED IN PACKAGES.
+                ONLY WHEN A PACKAGE IS LOADED are its contents available. »
+
+DEUX RAISONS  EFFICACITE      une liste complete prendrait plus de memoire
+                              et serait plus longue a parcourir
+              DEVELOPPEURS    « PROTECTED FROM NAME CLASHES with other code »
+
+LES COMMANDES library()            ce qui est INSTALLE
+              library(boot)        CHARGER un paquet
+              install.packages()   installer
+              update.packages()    mettre a jour
+              search()             ce qui est CHARGE ET SUR LE CHEMIN
+              loadedNamespaces()   ce qui est charge SANS y etre
+
+TROIS CATEGORIES
+   STANDARD (base)   « part of the R source code » -- toujours disponibles
+   RECOMMANDES       livres avec toute distribution binaire
+   CONTRIBUES        des milliers, sur CRAN et Bioconductor
+
+UN ESPACE DE NOMS FAIT TROIS CHOSES
+   1. CACHER   les fonctions et donnees a usage interne
+   2. PROTEGER contre un nom choisi par l'utilisateur ou un autre paquet
+   3. DESIGNER un objet d'un paquet particulier
+
+DEUX OPERATEURS   base::t     ce qui est EXPORTE
+                  pkg:::f     y compris ce qui est CACHE
+                  getAnywhere()  cherche dans PLUSIEURS paquets
+
+!! « When packages with namespaces are LOADED AUTOMATICALLY
+    they are NOT ADDED TO THE SEARCH LIST. »
+</code></pre>
+<p><strong>Le problème posé.</strong> <em>« <strong>All R functions and datasets are stored in packages. Only when a package is loaded are its contents available.</strong> »</em> (§13)</p>
+<div class="cal intu"><span class="lab">Intuition — les deux raisons, et elles ne se ressemblent pas.</span>
+<p> <em>« <strong>This is done both for efficiency</strong> (the full list would take <strong>more memory</strong> and would take <strong>longer to search</strong> than a subset), <strong>and to aid package developers, who are protected from name clashes with other code.</strong> »</em></p>
+<p>La première est <strong>une question de coût</strong> : ne charger que ce qui sert. La seconde est <strong>une question de correction</strong> : garantir qu'un paquet continue de fonctionner quoi que l'utilisateur définisse par ailleurs. C'est cette seconde raison qui donne naissance aux <strong>espaces de noms</strong> (concept 3), et elle répond exactement au problème de masquage rencontré en fiche 306.</p>
+</div>
+<p><em>« The process of developing packages is described in Section "Creating R packages" in <strong>Writing R Extensions</strong>. <strong>Here, we will describe them from a user's point of view.</strong> »</em> — la production d'un paquet est l'objet de la fiche 319.</p>
+<h2 data-prio="must">Concept 1 — Les commandes de l'utilisateur</h2>
+<table>
+<thead>
+<tr>
+<th>Commande (§13)</th>
+<th>Ce qu'elle fait</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong><code>library()</code></strong> <em>sans argument</em></td>
+<td><em>« To see <strong>which packages are installed at your site</strong> »</em></td>
+</tr>
+<tr>
+<td><strong><code>library(boot)</code></strong></td>
+<td><em>« To <strong>load a particular package</strong> »</em></td>
+</tr>
+<tr>
+<td><strong><code>install.packages()</code></strong> · <strong><code>update.packages()</code></strong></td>
+<td><em>« Users connected to the Internet can use … to <strong>install and update</strong> packages »</em> — <em>« available through the <strong>Packages menu</strong> in the Windows and macOS GUIs »</em></td>
+</tr>
+<tr>
+<td><strong><code>search()</code></strong></td>
+<td><em>« To see <strong>which packages are currently loaded</strong> … to display <strong>the search list</strong> »</em></td>
+</tr>
+<tr>
+<td><strong><code>loadedNamespaces()</code></strong></td>
+<td> <em>« <strong>Some packages may be loaded but not available on the search list</strong> … these <strong>will be included in the list given by</strong> »</em></td>
+</tr>
+<tr>
+<td><strong><code>help.start()</code></strong></td>
+<td><em>« To see a list of <strong>all available help topics in an installed package</strong> … then <strong>navigate to the package listing in the Reference section</strong> »</em></td>
+</tr>
+</tbody></table>
+<blockquote>
+<p class="cal piege"> <strong>La distinction entre <code>search()</code> et <code>loadedNamespaces()</code> est le point pratique du chapitre.</strong> Un paquet peut être <strong>chargé</strong> — donc actif, ses fonctions utilisables par <code>::</code> — <strong>sans figurer dans le chemin de recherche</strong>. <code>search()</code> seul donne donc une vue <strong>incomplète</strong> de ce qui est en mémoire. La raison est donnée au §13.3 : <em>« <strong>When packages with namespaces are loaded automatically they are not added to the search list.</strong> »</em></p>
+</blockquote>
+<p><strong>Le paquet cité en exemple</strong> est <strong><code>boot</code></strong>, <em>« containing functions from <strong>Davison &amp; Hinkley (1997)</strong> »</em> — l'ouvrage sur le bootstrap déjà présent dans les références du manuel.</p>
+<h2 data-prio="high">Concept 2 — Les trois catégories de paquets</h2>
+<div class="cal formel"><span class="lab">Définition (§13.1).</span>
+<p> <em>« <strong>The standard (or base) packages are considered part of the R source code.</strong> They contain <strong>the basic functions that allow R to work</strong>, and <strong>the datasets and standard statistical and graphical functions that are described in this manual</strong>. <strong>They should be automatically available in any R installation.</strong> »</em></p>
+</div>
+<div class="cal formel"><span class="lab">Définition (§13.2).</span>
+<p> <em>« <strong>There are thousands of contributed packages for R, written by many different authors.</strong> Some of these packages <strong>implement specialized statistical methods</strong>, others <strong>give access to data or hardware</strong>, and others are <strong>designed to complement textbooks</strong>. »</em></p>
+<p><em>« <strong>Some (the recommended packages) are distributed with every binary distribution of R.</strong> <strong>Most are available for download from CRAN … and other repositories such as Bioconductor.</strong> »</em></p>
+<p class="cal piege"> <em>« The R FAQ contains a list of CRAN packages <strong>current at the time of release</strong>, but <strong>the collection of available packages changes very frequently</strong>. »</em></p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Catégorie</th>
+<th>Statut</th>
+<th>Disponibilité</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Standard</strong> (<em>base</em>)</td>
+<td><em>« part of the R source code »</em></td>
+<td><strong>toujours</strong></td>
+</tr>
+<tr>
+<td><strong>Recommandés</strong></td>
+<td>distribués avec <strong>toute distribution binaire</strong></td>
+<td><strong>installés</strong>, à charger</td>
+</tr>
+<tr>
+<td><strong>Contribués</strong></td>
+<td><strong>des milliers</strong>, auteurs divers</td>
+<td><strong>à installer</strong> depuis CRAN, Bioconductor…</td>
+</tr>
+</tbody></table>
+<p><strong>La fiche 300 avait donné le chiffre</strong> : <em>« There are <strong>about 25 packages</strong> supplied with R (called "standard" and "recommended" packages) »</em> (§1.3). Ce sont les deux premières lignes du tableau réunies.</p>
+<h2 data-prio="must">Concept 3 — Les espaces de noms</h2>
+<div class="cal formel"><span class="lab">Définition (§13.3).</span>
+<p> <em>« <strong>Packages have namespaces, which do three things</strong> :</em></p>
+<ol>
+<li><em>« <strong>they allow the package writer to hide functions and data that are meant only for internal use</strong> »</em> ;</li>
+<li><em>« <strong>they prevent functions from breaking when a user (or other package writer) picks a name that clashes with one in the package</strong> »</em> ;</li>
+<li><em>« <strong>they provide a way to refer to an object within a particular package</strong>. »</em></li>
+</ol>
+</div>
+<blockquote>
+<p><strong>L'exemple du cours (§13.3).</strong> *« For example, <strong><code>t()</code> is the transpose function in R, but users might define their own function named <code>t</code></strong>. <strong>Namespaces prevent the user's definition from taking precedence, and breaking every function that tries to transpose a matrix.</strong> »*</p>
+</blockquote>
+<p><strong>Voilà le problème de la fiche 306 résolu.</strong> Le chemin de recherche prend <strong>la première correspondance</strong>, donc un <code>t</code> défini dans l'espace de travail <strong>masque</strong> celui de <code>base</code> — pour l'utilisateur. Mais <strong>pas pour le paquet</strong>, dont le code trouve <strong>son</strong> <code>t</code> avant tout le reste.</p>
+<div class="cal plus"><span class="lab">Complément — le mécanisme exact (R Language Definition §3.5.4).</span>
+<p> <em>« <strong>Packages which have a namespace have a different search path.</strong> When a search for an R object is started from an object in such a package, <strong>the package itself is searched first, then its imports, then the base namespace and finally the global environment and the rest of the regular search path.</strong> <strong>The effect is that references to other objects in the same package will be resolved to the package, and objects cannot be masked by objects of the same name in the global environment or in other packages.</strong> »</em></p>
+<p>$$\text{le paquet} \;\to\; \text{ses imports} \;\to\; \texttt{base} \;\to\; \texttt{.GlobalEnv} \;\to\; \text{le reste du chemin}$$</p>
+<p><strong>Le paquet passe avant tout.</strong> C'est ce qui fait de son fonctionnement une propriété <strong>de son code</strong>, et non de l'état de la session.</p>
+</div>
+<h3>3.1 Les deux opérateurs</h3>
+<div class="cal formel"><span class="lab">Définition (§13.3).</span>
+<p> <em>« <strong>There are two operators that work with namespaces.</strong> »</em></p>
+<ul>
+<li><strong><code>::</code></strong> — <em>« <strong>The double-colon operator <code>::</code> selects definitions from a particular namespace.</strong> In the example above, <strong>the transpose function will always be available as <code>base::t</code>, because it is defined in the base package.</strong>  <strong>Only functions that are exported from the package can be retrieved in this way.</strong> »</em></li>
+<li><strong><code>:::</code></strong> — <em>« <strong>The triple-colon operator <code>:::</code> may be seen in a few places in R code : it acts like the double-colon operator but also allows access to hidden objects.</strong>  <strong>Users are more likely to use the <code>getAnywhere()</code> function, which searches multiple packages.</strong> »</em></li>
+</ul>
+</div>
+<table>
+<thead>
+<tr>
+<th>Écriture</th>
+<th>Portée</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong><code>paquet::objet</code></strong></td>
+<td><strong>uniquement ce qui est exporté</strong></td>
+</tr>
+<tr>
+<td><strong><code>paquet:::objet</code></strong></td>
+<td><strong>y compris ce qui est caché</strong></td>
+</tr>
+<tr>
+<td><strong><code>getAnywhere("objet")</code></strong></td>
+<td><em>« <strong>searches multiple packages</strong> »</em> — pour l'utilisateur</td>
+</tr>
+</tbody></table>
+<div class="cal intu"><span class="lab">En clair — quand utiliser quoi.</span>
+
+<ul>
+<li><strong><code>::</code></strong> est <strong>la bonne écriture</strong> dès qu'un nom peut être ambigu : <code>stats::filter</code>, <code>base::t</code>. Elle documente d'où vient la fonction et <strong>survit à tout masquage</strong>.</li>
+<li><strong><code>:::</code></strong> franchit une frontière que l'auteur du paquet a <strong>volontairement posée</strong>. Le cours en parle au passé — <em>« may be seen in a few places in R code »</em> — et <strong>oriente aussitôt vers <code>getAnywhere()</code></strong>. Un objet caché n'est pas dans le contrat public : il peut changer de nom ou disparaître sans préavis.</li>
+</ul>
+<p>C'est la même distinction qu'en fiche 311, où <strong><code>getS3method("generic","class")</code></strong> est <em>« la voie officielle »</em> pour lire une méthode non exportée.</p>
+</div>
+<h3>3.2 Le chargement automatique</h3>
+<blockquote>
+<p class="cal piege"> <strong>Règle (§13.3).</strong> <em>« <strong>Packages are often inter-dependent, and loading one may cause others to be automatically loaded.</strong> <strong>The colon operators described above will also cause automatic loading of the associated package.</strong> <strong>When packages with namespaces are loaded automatically they are not added to the search list.</strong> »</em></p>
+</blockquote>
+<p><strong>Trois faits en trois phrases</strong>, et le troisième explique le concept 1 :</p>
+<ol>
+<li>charger un paquet peut <strong>en charger d'autres</strong> ;</li>
+<li><strong><code>::</code> suffit à déclencher un chargement</strong> — écrire <code>pkg::f()</code> charge <code>pkg</code> si nécessaire ;</li>
+<li>ces chargements automatiques <strong>n'apparaissent pas dans <code>search()</code></strong> — d'où <strong><code>loadedNamespaces()</code></strong>.</li>
+</ol>
+<details class="cor">
+<summary><strong>Exercice résolu — diagnostiquer un conflit de noms</strong></summary><div class="in">
+
+<p><strong>Énoncé.</strong> Un utilisateur charge deux paquets. Depuis, <code>filter(x, rep(1,3))</code> ne fait plus ce qu'il attendait, et un message a signalé un objet masqué. Comment diagnostiquer et corriger ?</p>
+<p><em>Étape 1 — voir l'ordre.</em> <code>search()</code> donne le chemin, du plus prioritaire au moins :</p>
+<pre><code class="language-r">search()
+</code></pre>
+<p>Le rappel de la fiche 306 : <strong>le premier élément est <code>.GlobalEnv</code></strong>, le dernier <strong><code>package:base</code></strong>, et <em>« other environments are inserted in the path using <code>attach</code> or <code>library</code> »</em> (<em>R Language Definition</em> §3.5.4). <strong>Un paquet chargé récemment est inséré près du début</strong> — il masque donc ceux d'avant.</p>
+<p><em>Étape 2 — voir ce que contient chaque position.</em> <code>ls(2)</code>, <code>ls(3)</code>… — <em>« <code>ls</code> (or <code>objects</code>) can be used to <strong>examine the contents of any position on the search path</strong> »</em> (§6.3.5, fiche 306). On repère ainsi <strong>quelles positions définissent <code>filter</code></strong>.</p>
+<p><em>Étape 3 — comprendre le message de masquage.</em> R signale, au chargement, les objets qu'un paquet masque. Ce n'est <strong>pas une erreur</strong> : c'est le fonctionnement normal du chemin de recherche, <strong>la première correspondance gagne</strong>.</p>
+<p><em>Étape 4 — la correction immédiate.</em> Nommer explicitement le paquet voulu :</p>
+<pre><code class="language-r">stats::filter(x, rep(1, 3))
+</code></pre>
+<p><em>« <strong>The double-colon operator <code>::</code> selects definitions from a particular namespace.</strong> »</em> L'écriture <strong>ne dépend plus de l'ordre du chemin</strong> — c'est sa vertu principale.</p>
+<p><em>Étape 5 — pourquoi les paquets, eux, ne cassent pas.</em> Parce qu'<em>« <strong>objects cannot be masked by objects of the same name in the global environment or in other packages</strong> »</em> dès qu'il y a un espace de noms : le code interne de <code>stats</code> trouve <strong>son</strong> <code>filter</code> avant tout le reste. <strong>Seul l'utilisateur est exposé.</strong></p>
+<p><em>Étape 6 — vérifier ce qui est réellement chargé.</em> Si un <code>pkg::f()</code> a fonctionné sans <code>library(pkg)</code>, c'est le chargement automatique : <em>« <strong>The colon operators … will also cause automatic loading of the associated package</strong> »</em>. Et ce paquet <strong>n'est pas dans <code>search()</code></strong> — il faut <strong><code>loadedNamespaces()</code></strong> pour le voir.</p>
+<p><em>Étape 7 — la règle à adopter.</em> Dans un script destiné à durer, <strong>préfixer par <code>::</code> toute fonction dont le nom est courant</strong> : <code>filter</code>, <code>select</code>, <code>t</code>, <code>c</code>, <code>data</code>. Cela documente l'origine et <strong>immunise contre l'ordre de chargement</strong>.</p>
+<p><em>Étape 8 — ce qu'il ne faut pas faire.</em> Recourir à <code>:::</code> pour contourner un problème : l'objet visé est <strong>délibérément caché</strong>, hors du contrat public. Le cours oriente vers <strong><code>getAnywhere()</code></strong> <em>« which searches multiple packages »</em> — pour <strong>lire</strong>, non pour <strong>dépendre</strong>.</p>
+</div></details>
+
+<h2>Comment reconnaître le type d'exercice</h2>
+<table>
+<thead>
+<tr>
+<th>Le signal dans l'énoncé</th>
+<th>Ce qu'il faut mobiliser</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>« quels paquets ai-je ? »</td>
+<td><strong><code>library()</code></strong> sans argument</td>
+</tr>
+<tr>
+<td>« charger un paquet »</td>
+<td><strong><code>library(nom)</code></strong></td>
+</tr>
+<tr>
+<td>« installer / mettre à jour »</td>
+<td><strong><code>install.packages()</code></strong> · <strong><code>update.packages()</code></strong></td>
+</tr>
+<tr>
+<td>« qu'est-ce qui est chargé ? »</td>
+<td><strong><code>search()</code></strong> — puis  <strong><code>loadedNamespaces()</code></strong></td>
+</tr>
+<tr>
+<td>« ma fonction a changé de comportement »</td>
+<td><strong>masquage</strong> — voir <code>search()</code> et <code>ls(n)</code></td>
+</tr>
+<tr>
+<td>« lever une ambiguïté de nom »</td>
+<td><strong><code>paquet::fonction</code></strong></td>
+</tr>
+<tr>
+<td>« accéder à une fonction interne »</td>
+<td><strong><code>:::</code></strong> — ou plutôt <strong><code>getAnywhere()</code></strong></td>
+</tr>
+<tr>
+<td>« pourquoi ce paquet n'est pas dans <code>search()</code> ? »</td>
+<td><strong>chargement automatique</strong> d'un paquet à espace de noms</td>
+</tr>
+<tr>
+<td>« pourquoi mon paquet ne casse pas si je redéfinis <code>t</code> ? »</td>
+<td>l'<strong>espace de noms</strong></td>
+</tr>
+<tr>
+<td>« où trouver l'aide d'un paquet ? »</td>
+<td><strong><code>help.start()</code></strong>, section Reference</td>
+</tr>
+<tr>
+<td>« d'où viennent les paquets ? »</td>
+<td><strong>CRAN</strong>, <strong>Bioconductor</strong>, et autres dépôts</td>
+</tr>
+<tr>
+<td>« comment écrire un paquet ? »</td>
+<td> <strong>hors de ce chapitre</strong> — <em>Writing R Extensions</em> (fiche 319)</td>
+</tr>
+</tbody></table>
+<h2>Comment résoudre ce type d'exercice</h2>
+<p><strong>Protocole « mettre en place son environnement de travail » — 4 étapes.</strong></p>
+<ol>
+<li><strong><code>library()</code></strong> pour voir ce qui est installé.</li>
+<li><strong><code>install.packages("nom")</code></strong> si nécessaire — connexion requise.</li>
+<li><strong><code>library(nom)</code></strong> au début du script, <strong>une fois</strong>.</li>
+<li>Vérifier avec <strong><code>search()</code></strong> — et <strong><code>loadedNamespaces()</code></strong> pour ce qui n'y figure pas.</li>
+</ol>
+<p><strong>Protocole « écrire du code robuste aux conflits » — 4 étapes.</strong></p>
+<ol>
+<li>Préfixer par <strong><code>paquet::</code></strong> toute fonction dont le nom est courant ou ambigu.</li>
+<li>Ne <strong>jamais</strong> dépendre de l'ordre de chargement des paquets.</li>
+<li>Éviter <strong><code>:::</code></strong> : ce qui est caché <strong>n'est pas un contrat</strong>.</li>
+<li>Pour lire une définition interne, utiliser <strong><code>getAnywhere()</code></strong> — ou <code>getS3method()</code> pour une méthode S3 (fiche 311).</li>
+</ol>
+<h2 data-prio="must">Common mistakes</h2>
+<table>
+<thead>
+<tr>
+<th>Erreur</th>
+<th>Correction</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Croire toutes les fonctions disponibles d'emblée</td>
+<td><em>« <strong>Only when a package is loaded</strong> are its contents available »</em></td>
+</tr>
+<tr>
+<td>Croire <code>search()</code> exhaustif</td>
+<td> certains paquets sont <strong>chargés sans y figurer</strong></td>
+</tr>
+<tr>
+<td>S'appuyer sur l'ordre de chargement</td>
+<td>utiliser <strong><code>::</code></strong></td>
+</tr>
+<tr>
+<td>Utiliser <code>:::</code> pour contourner</td>
+<td>l'objet est <strong>délibérément caché</strong> → <code>getAnywhere()</code></td>
+</tr>
+<tr>
+<td>Croire <code>::</code> capable d'atteindre un objet interne</td>
+<td> <em>« <strong>Only functions that are exported</strong> … can be retrieved in this way »</em></td>
+</tr>
+<tr>
+<td>S'étonner qu'un paquet non chargé explicitement soit actif</td>
+<td><strong>interdépendances</strong> et <strong>chargement par <code>::</code></strong></td>
+</tr>
+<tr>
+<td>Croire qu'un paquet casse si l'on redéfinit un de ses noms</td>
+<td> l'<strong>espace de noms</strong> l'en protège</td>
+</tr>
+<tr>
+<td>Confondre « installé » et « chargé »</td>
+<td><code>library()</code> liste les <strong>installés</strong>, <code>search()</code> les <strong>chargés et attachés</strong></td>
+</tr>
+<tr>
+<td>Se fier à la liste de la R FAQ</td>
+<td><em>« <strong>the collection … changes very frequently</strong> »</em></td>
+</tr>
+<tr>
+<td>Chercher la création de paquets ici</td>
+<td>c'est <strong>Writing R Extensions</strong></td>
+</tr>
+</tbody></table>
+<h2>Ultimate Review</h2>
+<p><strong>Le principe.</strong> <em>« <strong>All R functions and datasets are stored in packages. Only when a package is loaded are its contents available.</strong> »</em> Deux raisons : <strong>l'efficacité</strong> (<em>« more memory … longer to search »</em>) et <strong>la protection des développeurs</strong> (<em>« <strong>protected from name clashes with other code</strong> »</em>).</p>
+<p><strong>Les commandes.</strong> <strong><code>library()</code></strong> — les paquets <strong>installés</strong> · <strong><code>library(nom)</code></strong> — <strong>charger</strong> · <strong><code>install.packages()</code></strong> / <strong><code>update.packages()</code></strong> — installer et mettre à jour, <em>« available through the <strong>Packages menu</strong> »</em> · <strong><code>search()</code></strong> — la <strong>liste de recherche</strong> ·  <strong><code>loadedNamespaces()</code></strong> — ceux <em>« <strong>loaded but not available on the search list</strong> »</em> · <strong><code>help.start()</code></strong> puis la section <strong>Reference</strong>.</p>
+<p><strong>Trois catégories.</strong> <strong>Standard</strong> (<em>base</em>) — <em>« considered <strong>part of the R source code</strong> … <strong>automatically available in any R installation</strong> »</em> · <strong>recommandés</strong> — <em>« distributed with <strong>every binary distribution</strong> »</em> · <strong>contribués</strong> — <em>« <strong>thousands</strong> … written by <strong>many different authors</strong> »</em>, sur <strong>CRAN</strong>, <strong>Bioconductor</strong> et autres dépôts ;  <em>« the collection … <strong>changes very frequently</strong> »</em>.</p>
+<p><strong>Un espace de noms fait trois choses.</strong> (1) <em>« <strong>hide functions and data that are meant only for internal use</strong> »</em> ; (2) <em>« <strong>prevent functions from breaking when a user (or other package writer) picks a name that clashes</strong> »</em> ; (3) <em>« <strong>provide a way to refer to an object within a particular package</strong> »</em>.</p>
+<p><strong>L'exemple.</strong> <em>« <strong><code>t()</code> is the transpose function in R, but users might define their own function named <code>t</code>. Namespaces prevent the user's definition from taking precedence, and breaking every function that tries to transpose a matrix.</strong> »</em></p>
+<p><strong>Le chemin de recherche d'un paquet à espace de noms</strong> (<em>R Language Definition</em> §3.5.4) : <strong>le paquet → ses imports → <code>base</code> → l'environnement global → le reste</strong> ; <em>« <strong>objects cannot be masked by objects of the same name in the global environment or in other packages</strong> »</em>.</p>
+<p><strong>Deux opérateurs.</strong> <strong><code>::</code></strong> — <em>« <strong>selects definitions from a particular namespace</strong> »</em>,  <em>« <strong>only functions that are exported … can be retrieved in this way</strong> »</em> · <strong><code>:::</code></strong> — <em>« acts like the double-colon operator <strong>but also allows access to hidden objects</strong> »</em>,  <em>« <strong>Users are more likely to use the <code>getAnywhere()</code> function, which searches multiple packages.</strong> »</em></p>
+<p><strong>Le chargement automatique.</strong> <em>« <strong>Packages are often inter-dependent, and loading one may cause others to be automatically loaded.</strong> <strong>The colon operators … will also cause automatic loading.</strong>  <strong>When packages with namespaces are loaded automatically they are not added to the search list.</strong> »</em></p>
+<p><strong>Pour aller plus loin.</strong> <em>« The process of developing packages is described in Section "Creating R packages" in <strong>Writing R Extensions</strong> »</em> — fiche 319.</p>
+<div class="rec"><h2>Active Recall</h2><details class="cor">
+<summary>Pourquoi les fonctions de R sont-elles rangées dans des paquets, et pourquoi ne sont-elles pas toutes chargées ?</summary><div class="in">
+
+<p><em>« <strong>All R functions and datasets are stored in packages. Only when a package is loaded are its contents available.</strong> <strong>This is done both for efficiency</strong> (the full list would take <strong>more memory</strong> and would take <strong>longer to search</strong> than a subset), <strong>and to aid package developers, who are protected from name clashes with other code.</strong> »</em> (§13)</p>
+<p><strong>Deux raisons de nature différente</strong> : l'une est <strong>un coût</strong> (mémoire et temps de recherche), l'autre est <strong>une garantie de correction</strong> — un paquet doit fonctionner quoi que l'utilisateur définisse par ailleurs.</p>
+<p>C'est la seconde qui donne naissance aux <strong>espaces de noms</strong> (§13.3), et qui résout le problème de masquage rencontré au chapitre 6 (fiche 306).</p>
+</div></details><details class="cor">
+<summary>Quelle différence entre <code>search()</code> et <code>loadedNamespaces()</code> ?</summary><div class="in">
+
+<p>*« To see which packages are currently loaded, use <strong><code>search()</code></strong> to display the search list.  <strong>Some packages may be loaded but not available on the search list</strong> … <strong>these will be included in the list given by <code>loadedNamespaces()</code></strong>. »* (§13)</p>
+<p><strong>La raison est donnée au §13.3</strong> : <em>« <strong>When packages with namespaces are loaded automatically they are not added to the search list.</strong> »</em></p>
+<p>Un paquet chargé par <strong>dépendance</strong> — ou par un simple <strong><code>pkg::f()</code></strong> — est <strong>actif en mémoire</strong> sans figurer dans <code>search()</code>. Se fier au seul <code>search()</code> donne donc une vue <strong>incomplète</strong> de ce qui tourne.</p>
+</div></details><details class="cor">
+<summary>Quelles sont les trois catégories de paquets ?</summary><div class="in">
+
+<table>
+<thead>
+<tr>
+<th>Catégorie</th>
+<th>Ce qu'en dit le cours</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Standard</strong> (<em>base</em>)</td>
+<td><em>« <strong>considered part of the R source code</strong> … contain <strong>the basic functions that allow R to work</strong> … <strong>should be automatically available in any R installation</strong> »</em> (§13.1)</td>
+</tr>
+<tr>
+<td><strong>Recommandés</strong></td>
+<td><em>« Some (the recommended packages) are <strong>distributed with every binary distribution of R</strong> »</em> (§13.2)</td>
+</tr>
+<tr>
+<td><strong>Contribués</strong></td>
+<td><em>« <strong>There are thousands</strong> … written by <strong>many different authors</strong> »</em> — méthodes spécialisées, accès à des données ou du matériel, compléments de manuels</td>
+</tr>
+</tbody></table>
+<p>Le §1.3 avait donné le total des deux premières : <em>« <strong>about 25 packages</strong> supplied with R »</em>.</p>
+<p>Les contribués viennent de <strong>CRAN</strong> et d'autres dépôts comme <strong>Bioconductor</strong> —  <em>« the collection of available packages <strong>changes very frequently</strong> »</em>.</p>
+</div></details><details class="cor">
+<summary>Quelles sont les trois fonctions d'un espace de noms ?</summary><div class="in">
+
+<p><em>« <strong>Packages have namespaces, which do three things</strong> »</em> (§13.3) :</p>
+<ol>
+<li><em>« they allow the package writer to <strong>hide functions and data that are meant only for internal use</strong> »</em> ;</li>
+<li><em>« they <strong>prevent functions from breaking when a user (or other package writer) picks a name that clashes with one in the package</strong> »</em> ;</li>
+<li><em>« they <strong>provide a way to refer to an object within a particular package</strong> »</em>.</li>
+</ol>
+<p><strong>Cacher, protéger, désigner.</strong> L'exemple du cours illustre la deuxième : <em>« <code>t()</code> is the transpose function … <strong>Namespaces prevent the user's definition from taking precedence, and breaking every function that tries to transpose a matrix.</strong> »</em></p>
+</div></details><details class="cor">
+<summary>Quelle est la différence entre <code>::</code> et <code>:::</code> ? Que recommande le cours ?</summary><div class="in">
+
+<p><em>« <strong>The double-colon operator <code>::</code> selects definitions from a particular namespace</strong> …  <strong>Only functions that are exported from the package can be retrieved in this way.</strong> »</em></p>
+<p><em>« <strong>The triple-colon operator <code>:::</code></strong> … <strong>acts like the double-colon operator but also allows access to hidden objects.</strong>  <strong>Users are more likely to use the <code>getAnywhere()</code> function, which searches multiple packages.</strong> »</em> (§13.3)</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Portée</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>pkg::f</code></td>
+<td><strong>ce qui est exporté</strong></td>
+</tr>
+<tr>
+<td><code>pkg:::f</code></td>
+<td><strong>y compris ce qui est caché</strong></td>
+</tr>
+<tr>
+<td><code>getAnywhere("f")</code></td>
+<td>cherche <strong>dans plusieurs paquets</strong></td>
+</tr>
+</tbody></table>
+<p><strong>Le cours oriente vers <code>getAnywhere()</code></strong> parce qu'un objet caché relève du <strong>premier rôle</strong> de l'espace de noms — il est <em>« meant only for internal use »</em>, donc hors du contrat public : il peut changer sans préavis.</p>
+</div></details><details class="cor">
+<summary>Que se passe-t-il quand on écrit <code>pkg::f()</code> sans avoir chargé <code>pkg</code> ?</summary><div class="in">
+
+<p><em>« <strong>Packages are often inter-dependent, and loading one may cause others to be automatically loaded.</strong> <strong>The colon operators described above will also cause automatic loading of the associated package.</strong>  <strong>When packages with namespaces are loaded automatically they are not added to the search list.</strong> »</em> (§13.3)</p>
+<p><strong>Trois conséquences.</strong> (1) L'appel <strong>fonctionne</strong> : <code>::</code> charge le paquet si besoin. (2) Le paquet <strong>n'apparaît pas dans <code>search()</code></strong>. (3) Ses fonctions <strong>ne sont pas accessibles sans préfixe</strong> — puisqu'il n'est pas sur le chemin.</p>
+<p>C'est un comportement utile : on peut <strong>dépendre ponctuellement</strong> d'un paquet sans encombrer le chemin de recherche ni risquer de masquer quoi que ce soit.</p>
+</div></details><details class="cor">
+<summary>Pourquoi redéfinir <code>t</code> ne casse-t-il pas les paquets qui l'utilisent ?</summary><div class="in">
+
+<p>Parce que le chemin de recherche <strong>d'un paquet à espace de noms</strong> n'est pas celui de l'utilisateur (<em>R Language Definition</em> §3.5.4) :</p>
+<p>$$\text{le paquet} \to \text{ses imports} \to \texttt{base} \to \texttt{.GlobalEnv} \to \text{le reste}$$</p>
+<p><em>« <strong>The effect is that references to other objects in the same package will be resolved to the package, and objects cannot be masked by objects of the same name in the global environment or in other packages.</strong> »</em></p>
+<p><strong>Le paquet passe avant tout.</strong> Le <code>t</code> de l'utilisateur, qui vit dans <code>.GlobalEnv</code>, arrive <strong>après</strong> <code>base</code> dans cette chaîne — il ne peut donc rien masquer côté paquet.</p>
+<p class="cal piege"> <strong>Mais l'utilisateur, lui, reste exposé</strong> : dans sa session, <code>t</code> désigne bien sa définition. D'où l'intérêt de <strong><code>base::t</code></strong>.</p>
+</div></details></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h2>Flashcards</h2>
+<table>
+<thead>
+<tr>
+<th>Question</th>
+<th>Réponse</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Où sont rangées toutes les fonctions de R ?</td>
+<td>Dans des <strong>paquets</strong></td>
+</tr>
+<tr>
+<td>Quand leur contenu est-il disponible ?</td>
+<td><strong>Seulement une fois le paquet chargé</strong></td>
+</tr>
+<tr>
+<td>La première raison de ce découpage ?</td>
+<td>L'<strong>efficacité</strong> — mémoire et temps de recherche</td>
+</tr>
+<tr>
+<td>La seconde ?</td>
+<td>Protéger les développeurs des <strong>collisions de noms</strong></td>
+</tr>
+<tr>
+<td>Voir les paquets installés ?</td>
+<td><strong><code>library()</code></strong> sans argument</td>
+</tr>
+<tr>
+<td>Charger un paquet ?</td>
+<td><strong><code>library(nom)</code></strong></td>
+</tr>
+<tr>
+<td>Le paquet donné en exemple ?</td>
+<td><strong><code>boot</code></strong> — Davison &amp; Hinkley (1997)</td>
+</tr>
+<tr>
+<td>Installer et mettre à jour ?</td>
+<td><strong><code>install.packages()</code></strong> · <strong><code>update.packages()</code></strong></td>
+</tr>
+<tr>
+<td>Où trouver ces commandes en interface graphique ?</td>
+<td>Le menu <strong>Packages</strong></td>
+</tr>
+<tr>
+<td>Voir ce qui est chargé et attaché ?</td>
+<td><strong><code>search()</code></strong></td>
+</tr>
+<tr>
+<td>Et ce qui est chargé sans y être ?</td>
+<td><strong><code>loadedNamespaces()</code></strong></td>
+</tr>
+<tr>
+<td>Voir les rubriques d'aide d'un paquet ?</td>
+<td><strong><code>help.start()</code></strong>, section <strong>Reference</strong></td>
+</tr>
+<tr>
+<td>Que sont les paquets standard ?</td>
+<td><em>« <strong>part of the R source code</strong> »</em></td>
+</tr>
+<tr>
+<td>Sont-ils toujours disponibles ?</td>
+<td><strong>Oui</strong>, dans toute installation</td>
+</tr>
+<tr>
+<td>Que sont les paquets recommandés ?</td>
+<td>Livrés avec <strong>toute distribution binaire</strong></td>
+</tr>
+<tr>
+<td>Combien de paquets contribués ?</td>
+<td><strong>Des milliers</strong></td>
+</tr>
+<tr>
+<td>Deux dépôts cités ?</td>
+<td><strong>CRAN</strong> et <strong>Bioconductor</strong></td>
+</tr>
+<tr>
+<td>La liste de la R FAQ est-elle à jour ?</td>
+<td> La collection <strong>change très fréquemment</strong></td>
+</tr>
+<tr>
+<td>Combien de choses fait un espace de noms ?</td>
+<td><strong>Trois</strong></td>
+</tr>
+<tr>
+<td>La première ?</td>
+<td><strong>Cacher</strong> ce qui est à usage interne</td>
+</tr>
+<tr>
+<td>La deuxième ?</td>
+<td><strong>Empêcher les collisions de casser le paquet</strong></td>
+</tr>
+<tr>
+<td>La troisième ?</td>
+<td><strong>Désigner</strong> un objet d'un paquet précis</td>
+</tr>
+<tr>
+<td>L'exemple du cours ?</td>
+<td><strong><code>t()</code></strong>, la transposition</td>
+</tr>
+<tr>
+<td>Que fait <code>::</code> ?</td>
+<td>Il <strong>sélectionne dans un espace de noms</strong></td>
+</tr>
+<tr>
+<td>Sa limite ?</td>
+<td> <strong>Seulement ce qui est exporté</strong></td>
+</tr>
+<tr>
+<td>Que fait <code>:::</code> ?</td>
+<td>Comme <code>::</code>, <strong>plus les objets cachés</strong></td>
+</tr>
+<tr>
+<td>Que recommande le cours à sa place ?</td>
+<td><strong><code>getAnywhere()</code></strong></td>
+</tr>
+<tr>
+<td>Pourquoi ?</td>
+<td>Il <strong>cherche dans plusieurs paquets</strong></td>
+</tr>
+<tr>
+<td>Charger un paquet peut-il en charger d'autres ?</td>
+<td><strong>Oui</strong> — interdépendances</td>
+</tr>
+<tr>
+<td><code>::</code> déclenche-t-il un chargement ?</td>
+<td><strong>Oui</strong></td>
+</tr>
+<tr>
+<td>Ces paquets entrent-ils dans <code>search()</code> ?</td>
+<td> <strong>Non</strong></td>
+</tr>
+<tr>
+<td>L'ordre de recherche depuis un paquet ?</td>
+<td>Paquet → <strong>imports</strong> → <code>base</code> → global → reste</td>
+</tr>
+<tr>
+<td>Que garantit cet ordre ?</td>
+<td>Qu'un objet <strong>ne peut pas être masqué</strong></td>
+</tr>
+<tr>
+<td>Où lire comment écrire un paquet ?</td>
+<td><strong>Writing R Extensions</strong></td>
+</tr>
+</tbody></table>
+</main>
+
+
+
+
+</body></html>

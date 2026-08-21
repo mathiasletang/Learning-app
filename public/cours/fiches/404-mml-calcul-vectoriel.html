@@ -1,0 +1,1567 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fiche 404 — Calcul vectoriel : gradients, jacobiennes, rétropropagation, Taylor multivarié</title>
+<script>
+window.MathJax={tex:{inlineMath:[["$","$"]],displayMath:[["$$","$$"]],processEscapes:true},
+ options:{skipHtmlTags:["script","noscript","style","textarea","pre","code"]},
+ svg:{fontCache:"global"},
+ startup:{pageReady:()=>MathJax.startup.defaultPageReady().then(()=>{document.body.classList.add("ready")})}};
+setTimeout(function(){document.body.classList.add("ready")},2500);
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+/* ============================================================
+   MathiasLearn — feuille de style des fiches
+   Reprise intégrale des tokens de 00_PARCOURS/*.html
+   + blocs pédagogiques (callouts, méthode, essentiels, recall)
+   ============================================================ */
+:root{--bg:#faf9f7;--card:#fff;--ink:#1a1a1a;--muted:#6b6b6b;--line:#e5e2dd;--accent:#8b5e34;
+ --hl:#fdf8ef;--ok:#2d7d4f;--okbg:#f0f7f3;--warn:#b3402f;--warnbg:#fdf3f1;--blue:#2f5d8b;--bluebg:#f1f5fa}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+ font:17px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;padding:0 16px 100px}
+.nav{position:sticky;top:0;background:rgba(250,249,247,.96);backdrop-filter:blur(8px);
+ border-bottom:1px solid var(--line);margin:0 -16px 30px;padding:11px 16px;z-index:50;
+ display:flex;gap:6px;flex-wrap:wrap;font-size:13px}
+.nav a{color:var(--muted);text-decoration:none;padding:4px 9px;border-radius:5px;white-space:nowrap}
+.nav a:hover{background:var(--line);color:var(--ink)}
+.nav a.on{background:var(--accent);color:#fff}
+main{max-width:780px;margin:0 auto}
+h1{font-size:31px;letter-spacing:-.02em;margin:.4em 0 .5em;line-height:1.25}
+h2{font-size:23px;margin:2.2em 0 .7em;padding-bottom:.3em;border-bottom:1px solid var(--line)}
+h3{font-size:19px;margin:1.9em 0 .5em;color:var(--accent)}
+h4{font-size:17px;margin:1.5em 0 .4em}
+p{margin:.8em 0} a{color:var(--accent)} hr{border:0;border-top:1px solid var(--line);margin:2.6em 0}
+table{border-collapse:collapse;width:100%;margin:1.3em 0;font-size:15.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+th{background:#f3f0eb;font-weight:600}
+tr:nth-child(even) td{background:#fcfbfa}
+code{font-family:"SF Mono",Menlo,Consolas,monospace;font-size:.88em;background:#f2efea;padding:2px 6px;border-radius:4px;overflow-wrap:break-word}
+pre{background:#f2efea;padding:14px 16px;border-radius:8px;overflow-x:auto}
+pre code{background:none;padding:0;white-space:pre}
+blockquote{border-left:3px solid var(--accent);background:var(--hl);margin:1.4em 0;padding:14px 20px;border-radius:0 8px 8px 0}
+blockquote p:first-child{margin-top:0} blockquote p:last-child{margin-bottom:0}
+ul,ol{padding-left:1.5em} li{margin:.35em 0} em{color:#4a4a4a}
+mjx-container[display="true"]{margin:1.1em 0!important;overflow-x:auto;overflow-y:hidden;padding:2px 0}
+mjx-container svg{max-width:100%}
+body:not(.ready) main{opacity:0} main{opacity:1;transition:opacity .25s}
+
+/* --- bandeau de tête de fiche --- */
+.cours{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--accent);
+ border-radius:0 10px 10px 0;padding:18px 22px;margin:0 0 34px}
+.cours h4{margin:0 0 4px;font-size:14px;text-transform:uppercase;letter-spacing:.07em;color:var(--accent)}
+.cours .cs{color:var(--muted);font-size:14.5px;margin:0 0 14px}
+
+/* --- exercices / corrigés --- */
+.ex{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:6px 24px 20px;margin:18px 0}
+.ex>h3:first-child{margin-top:14px}
+details.cor{margin-top:18px;border:1px solid var(--line);border-radius:8px;background:#fcfbfa;overflow:hidden}
+details.cor>summary{cursor:pointer;padding:12px 16px;font-weight:600;font-size:15px;color:var(--accent);
+ list-style:none;display:flex;align-items:center;gap:9px;user-select:none;transition:.15s;min-height:44px}
+details.cor>summary::-webkit-details-marker{display:none}
+details.cor>summary:hover{background:var(--hl)}
+details.cor>summary::before{content:"\25B6";font-size:10px;transition:transform .18s;display:inline-block}
+details.cor[open]>summary::before{transform:rotate(90deg)}
+details.cor[open]>summary{background:var(--okbg);color:var(--ok);border-bottom:1px solid var(--line)}
+.cor .in{padding:4px 20px 16px}
+.cor .in>*:first-child{margin-top:.9em}
+
+/* --- blocs pédagogiques (callouts) ---
+   Générés depuis une citation Markdown dont le premier **gras** commence
+   par un mot-clé : DÉFINITION, THÉORÈME, MÉTHODE, PIÈGE, INTUITION… */
+.cal{border:1px solid var(--line);border-left:4px solid var(--accent);background:var(--card);
+ border-radius:0 10px 10px 0;padding:15px 20px;margin:1.5em 0}
+.cal>p:first-child{margin-top:0}.cal>p:last-child,.cal>ul:last-child,.cal>ol:last-child{margin-bottom:0}
+.cal .lab{display:block;font-size:12.5px;text-transform:uppercase;letter-spacing:.08em;
+ font-weight:700;color:var(--accent);margin-bottom:6px}
+.cal.formel{background:var(--hl)}
+.cal.piege{border-left-color:var(--warn);background:var(--warnbg)}
+.cal.piege .lab{color:var(--warn)}
+.cal.methode{border-left-color:var(--ok);background:var(--okbg)}
+.cal.methode .lab{color:var(--ok)}
+.cal.intu{border-left-color:var(--blue);background:var(--bluebg)}
+.cal.intu .lab{color:var(--blue)}
+.cal.plus{border-left-style:dashed;background:#faf9f7}
+.cal.plus .lab{color:var(--muted)}
+
+/* --- révision express --- */
+.ess{background:var(--card);border:1px solid var(--accent);border-radius:10px;padding:4px 24px 20px;margin:1.6em 0}
+.ess h3{margin-top:1.3em}
+.rec{background:var(--card);border:1px dashed var(--accent);border-radius:10px;padding:4px 24px 18px;margin:1.6em 0}
+.rec ol{counter-reset:none}
+
+/* --- impression / PDF --- */
+@media print{
+ .nav{display:none}
+ body{padding:0;background:#fff;font-size:11.2pt;line-height:1.55}
+ main{max-width:none}
+ h1{font-size:23pt}h2{font-size:15pt;margin-top:1.5em}h3{font-size:12.6pt}
+ h2,h3,h4{break-after:avoid;page-break-after:avoid}
+ table,.cal,blockquote{break-inside:avoid;page-break-inside:avoid}
+ table{display:table;font-size:9.6pt}
+ details.cor{border:1px solid var(--line);background:#fcfbfa}
+ details.cor>summary{display:none}
+ details.cor .in{padding-top:10px}
+ .cal,.ex,.ess,.rec{box-shadow:none}
+ a{color:var(--ink);text-decoration:none}
+}
+@page{margin:16mm 15mm 18mm}
+
+/* --- exemples travaillés --- */
+.exm{background:#fcfbfa;border:1px solid var(--line);border-radius:10px;padding:2px 20px 14px;margin:1.5em 0}
+.exm>h4:first-child{margin:14px 0 .5em;color:var(--accent);font-size:13px;text-transform:uppercase;letter-spacing:.07em}
+
+
+/* --- pastilles de priorité (conventions des fiches de l'app) --- */
+h2[data-prio], h3[data-prio], h4[data-prio]{position:relative}
+h2[data-prio]::before,h3[data-prio]::before,h4[data-prio]::before{
+ content:"";display:inline-block;width:9px;height:9px;border-radius:50%;
+ margin-right:9px;vertical-align:middle;background:var(--muted)}
+[data-prio="must"]::before{background:var(--warn)}
+[data-prio="high"]::before{background:#d98324}
+[data-prio="mid"]::before{background:#c9a227}
+[data-prio="low"]::before{background:var(--ok)}
+/* corrigés des fiches de l'app : même traitement que les corrigés des séries */
+details.cor>summary::after{content:""}
+</style></head><body>
+<div class="nav"><a href="00_COMMENCER_ICI.html">Commencer ici</a><a href="01_NOTATIONS_le-decodeur.html">Notations</a><a href="02_EXERCICES_Serie-0.html">Série 0 — Remise en route</a><a href="03_EXERCICES_Serie-1.html">Série 1 — Convexité</a><a href="04_EXERCICES_Serie-2.html">Série 2 — KKT</a><a href="05_AUTO-EVALUATION.html">Auto-évaluation (quiz)</a><a href="06_FICHE_Optimisation-deux-variables.html">Fiche — Optimisation à 2 variables</a></div>
+<main><h1>Fiche 404 — Calcul vectoriel : gradients, jacobiennes, rétropropagation, Taylor multivarié</h1>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Matière</strong></td>
+<td>Maths · Apprentissage automatique</td>
+</tr>
+<tr>
+<td><strong>Cours source</strong></td>
+<td>Deisenroth, Faisal &amp; Ong, <em>Mathematics for Machine Learning</em>, Cambridge University Press — chapitre 5 « Vector Calculus » (p. 139-178)</td>
+</tr>
+<tr>
+<td><strong>Difficulté</strong></td>
+<td> Avancé — l'outil qui rend l'apprentissage possible</td>
+</tr>
+<tr>
+<td><strong>Temps d'étude estimé</strong></td>
+<td>140 min</td>
+</tr>
+<tr>
+<td><strong>Prérequis</strong></td>
+<td>Fiche 401 (matrices, applications linéaires) · Fiche 403 (déterminant, trace)</td>
+</tr>
+<tr>
+<td><strong>Concepts clés</strong></td>
+<td>Quotient différentiel, dérivée, polynôme de Taylor, série de Taylor, série de Maclaurin, fonction analytique, règles de dérivation, dérivée partielle, gradient, règle de la chaîne multivariée, fonction à valeurs vectorielles, jacobienne, disposition au numérateur, déterminant jacobien, gradient de matrices, tenseur, identités utiles, rétropropagation, différentiation automatique, mode direct et mode inverse, graphe de calcul, variables intermédiaires, dérivées d'ordre supérieur, hessienne, linéarisation, série de Taylor multivariée, produit extérieur d'ordre $k$</td>
+</tr>
+<tr>
+<td><strong>Poids à l'examen</strong></td>
+<td>Le <strong>gradient est un VECTEUR LIGNE</strong> $1\times n$ · la <strong>jacobienne</strong> $J(i,j)=\partial f_i/\partial x_j$ de taille $m\times n$ · la <strong>règle de la chaîne</strong> $\frac{\partial}{\partial x}g(f(x))=\frac{\partial g}{\partial f}\frac{\partial f}{\partial x}$ · $|\det J|$ = <strong>facteur d'échelle des volumes</strong> · les <strong>dix identités</strong> de gradients matriciels · la <strong>rétropropagation</strong> = mode INVERSE de la différentiation automatique · la <strong>hessienne symétrique</strong> · le <strong>Taylor multivarié</strong> $\sum_k\frac{D^k_xf(x_0)}{k!}\delta^k$.</td>
+</tr>
+</tbody></table>
+<h2>Vue d'ensemble</h2>
+<pre><code>LE FIL DU CHAPITRE : dériver — de R→R jusqu'aux TENSEURS
+
+  §5.1 UNIVARIÉ            df/dx := lim_{h→0} (f(x+h) − f(x))/h
+        TAYLOR   Tn(x) = Σ_{k≤n} f^(k)(x0)/k! (x − x0)^k     x0 = 0 → MACLAURIN
+        RÈGLES   produit · quotient · somme · CHAÎNE (g∘f)' = g'(f) f'
+  §5.2 DÉRIVÉES PARTIELLES ET GRADIENT      ∇x f = df/dx ∈ R^(1×n)   ⚠️ VECTEUR LIGNE
+        CHAÎNE MULTIVARIÉE   ∂g/∂x = (∂g/∂f)(∂f/∂x)   ← « les dimensions voisines s'annulent »
+  §5.3 FONCTIONS À VALEURS VECTORIELLES     f : R^n → R^m
+        JACOBIENNE  J = df/dx ∈ R^(m×n) ,  J(i,j) = ∂fi/∂xj    (disposition au NUMÉRATEUR)
+        |det J| = facteur d'échelle des AIRES / VOLUMES
+        f: R→R scalaire · f: R^D→R ligne 1×D · f: R→R^E colonne E×1 · f: R^D→R^E matrice E×D
+  §5.4 GRADIENTS DE MATRICES               résultat = TENSEUR multidimensionnel
+        astuce : APLATIR (isomorphisme R^(m×n) ≅ R^(mn)) → la chaîne redevient un produit matriciel
+  §5.5 DIX IDENTITÉS UTILES                 tr, det, inverse, x^T a, a^T X b, x^T B x…
+  §5.6 RÉTROPROPAGATION ET DIFF. AUTOMATIQUE
+        réseau profond y = (fK ∘ … ∘ f1)(x)  ,  L(θ) = ‖y − fK(θ,x)‖²
+        ∂L/∂θi = (∂L/∂fK)(∂fK/∂f^{K−1})…(∂f^{i+1}/∂θi)     ← on RÉUTILISE les calculs
+        MODE INVERSE = rétropropagation (⚠️ le moins cher quand entrée ≫ sortie)
+        MODE DIRECT = les gradients suivent le flot des données
+  §5.7 ORDRE SUPÉRIEUR      HESSIENNE H = ∇²f ∈ R^(n×n) , SYMÉTRIQUE si f deux fois C¹
+  §5.8 LINÉARISATION ET TAYLOR MULTIVARIÉ
+        f(x) ≈ f(x0) + (∇x f)(x0)(x − x0)
+        f(x) = Σ_k D^k_x f(x0)/k! δ^k  ,  δ := x − x0  ,  δ^k = produit EXTÉRIEUR k fois
+        k=0 : f(x0)   k=1 : ∇f·δ   k=2 : ½ δᵀ H δ   k=3 : tenseur d'ordre 3
+
+LE MOT D'ORDRE   « LE GRADIENT POINTE DANS LA DIRECTION DE LA PLUS FORTE PENTE »
+</code></pre>
+<blockquote>
+<p><strong>La phrase-programme.</strong> <em>« Nous discuterons de comment calculer les gradients de fonctions, ce qui est souvent essentiel pour faciliter l'apprentissage dans les modèles d'apprentissage automatique, puisque <strong>le gradient pointe dans la direction de la plus forte montée</strong>. Le calcul vectoriel est donc l'un des outils mathématiques fondamentaux dont nous avons besoin. »</em></p>
+</blockquote>
+<blockquote>
+<p class="cal piege"> <strong>L'hypothèse de travail.</strong> <em>« Dans tout ce livre, nous supposons que les fonctions sont <strong>DIFFÉRENTIABLES</strong>. »</em> Les extensions aux <strong>sous-différentiels</strong> (fonctions continues mais non différentiables en certains points) et aux fonctions <strong>avec contraintes</strong> (ch. 7) ne sont pas couvertes ici.</p>
+</blockquote>
+<h2 data-prio="must">Concept 1 — Dérivation d'une fonction d'une variable (§5.1)</h2>
+<h3>1.1 Quotient différentiel et dérivée</h3>
+<div class="cal formel"><span class="lab">Définition 5.1 (Quotient différentiel).</span>
+<p>
+$$\boxed{\;\frac{\delta y}{\delta x}:=\frac{f(x+\delta x)-f(x)}{\delta x}\;}$$
+calcule la <strong>pente de la SÉCANTE</strong> passant par deux points du graphe de $f$.</p>
+</div>
+<p>C'est aussi la <strong>pente MOYENNE</strong> de $f$ entre $x$ et $x+\delta x$, si l'on suppose $f$ linéaire. À la limite $\delta x\to0$, on obtient la <strong>TANGENTE</strong>.</p>
+<div class="cal formel"><span class="lab">Définition 5.2 (Dérivée).</span>
+<p> Pour $h&gt;0$, la dérivée de $f$ en $x$ est la limite
+$$\boxed{\;\frac{df}{dx}:=\lim_{h\to0}\frac{f(x+h)-f(x)}{h}\;}$$
+et la sécante devient une <strong>tangente</strong>.</p>
+</div>
+<blockquote>
+<p> <strong>La phrase à retenir.</strong> <em>« La dérivée de $f$ pointe dans la direction de la <strong>PLUS FORTE MONTÉE</strong> de $f$. »</em></p>
+</blockquote>
+<p><strong>Exemple 5.2 — la dérivée de $x^n$ retrouvée par la définition.</strong> On sait que la réponse est $nx^{n-1}$, mais le livre la <strong>dérive</strong> à partir de la limite du quotient différentiel, via le développement du binôme de $(x+h)^n$ : tous les termes en $h^2$ et au-delà s'annulent à la limite, seul $nx^{n-1}h/h$ survit.</p>
+<h3>1.2 Séries de Taylor</h3>
+<div class="cal formel"><span class="lab">Définition 5.3 (Polynôme de Taylor).</span>
+<p> Le <strong>polynôme de Taylor de degré $n$</strong> de $f:\mathbb R\to\mathbb R$ en $x_0$ est
+$$\boxed{\;T_n(x):=\sum_{k=0}^{n}\frac{f^{(k)}(x_0)}{k!}(x-x_0)^k\;}$$
+où $f^{(k)}(x_0)$ est la $k$-ième dérivée de $f$ en $x_0$ (supposée exister) et $\frac{f^{(k)}(x_0)}{k!}$ les <strong>coefficients</strong> du polynôme.</p>
+</div>
+<div class="cal formel"><span class="lab">Définition 5.4 (Série de Taylor).</span>
+<p> Pour $f\in C^\infty$ (indéfiniment continûment différentiable),
+$$\boxed{\;T_\infty(x)=\sum_{k=0}^{\infty}\frac{f^{(k)}(x_0)}{k!}(x-x_0)^k\;}$$
+Pour $x_0=0$, on obtient la <strong>SÉRIE DE MACLAURIN</strong>. Si $f(x)=T_\infty(x)$, alors $f$ est dite <strong>ANALYTIQUE</strong>.</p>
+</div>
+<blockquote>
+<p class="cal piege"> <strong>La remarque critique.</strong> *« En général, un polynôme de Taylor de degré $n$ est une <strong>APPROXIMATION</strong> d'une fonction, qui n'a pas à être un polynôme. Le polynôme de Taylor est similaire à $f$ <strong>dans un VOISINAGE de $x_0$</strong>. Cependant, un polynôme de Taylor de degré $n$ est une <strong>REPRÉSENTATION EXACTE</strong> d'un polynôme $f$ de degré $k\leqslant n$, puisque toutes les dérivées $f^{(i)}$, $i&gt;k$, s'annulent. »*</p>
+</blockquote>
+<p><strong>Exemple 5.3 — le cas exact.</strong> $f(x)=x^4$ et $T_6$ en $x_0=1$. Les coefficients :</p>
+<p>$$f(1)=1,\quad f'(1)=4,\quad f''(1)=12,\quad f^{(3)}(1)=24,\quad f^{(4)}(1)=24,\quad f^{(5)}(1)=f^{(6)}(1)=0$$</p>
+<p>$$T_6(x)=1+4(x-1)+\frac{12}{2!}(x-1)^2+\frac{24}{3!}(x-1)^3+\frac{24}{4!}(x-1)^4=x^4$$</p>
+<p class="cal piege"> <strong>$T_6$ reproduit $f$ EXACTEMENT</strong> : il n'y a <strong>aucune erreur d'approximation</strong>, car $f$ est un polynôme de degré $4\leqslant6$.</p>
+<details class="cor">
+<summary> Contrôle numérique en cinq points</summary><div class="in">
+
+<p>$T_6(x)-x^4$ évalué en $x=0{,}3$ ; $1{,}0$ ; $2{,}0$ ; $-1{,}5$ ; $3{,}7$ donne <strong>$0$ partout</strong> (à la précision machine). Le polynôme de Taylor coïncide donc <strong>globalement</strong>, pas seulement au voisinage de $1$ </p>
+</div></details>
+
+<p><strong>Exemple 5.4 — la série de Maclaurin de $\sin+\cos$.</strong> Pour $f(x)=\sin(x)+\cos(x)\in C^\infty$ en $x_0=0$ :</p>
+<p>$$f(0)=1,\quad f'(0)=1,\quad f''(0)=-1,\quad f^{(3)}(0)=-1,\quad f^{(4)}(0)=f(0)=1,\ \dots$$</p>
+<blockquote>
+<p> <strong>Le motif.</strong> <em>« Les coefficients de notre série de Taylor sont <strong>uniquement $\pm1$</strong> (puisque $\sin(0)=0$), chacun apparaissant <strong>DEUX FOIS</strong> avant de basculer sur l'autre. De plus, $f^{(k+4)}(0)=f^{(k)}(0)$ »</em> — période 4.</p>
+</blockquote>
+<p>$$T_\infty(x)=1+x-\frac{1}{2!}x^2-\frac{1}{3!}x^3+\frac{1}{4!}x^4+\frac{1}{5!}x^5-\dots$$</p>
+<p>En regroupant :</p>
+<p>$$\boxed{\;T_\infty(x)=\underbrace{\sum_{k=0}^{\infty}\frac{(-1)^k}{(2k)!}x^{2k}}_{=\cos(x)}+\underbrace{\sum_{k=0}^{\infty}\frac{(-1)^k}{(2k+1)!}x^{2k+1}}_{=\sin(x)}\;}$$</p>
+<details class="cor">
+<summary> Contrôle : $T_{13}$ contre la valeur exacte</summary><div class="in">
+
+<p>$f(0{,}7)=\sin(0{,}7)+\cos(0{,}7)=1{,}4090598745$ et $T_{13}(0{,}7)=1{,}4090598745$ — <strong>identiques à 10 décimales</strong>  Les coefficients utilisés sont bien $[1,1,-1,-1,1,1,-1,-1,\dots]$, de période 4.</p>
+</div></details>
+
+<h3>1.3 Les quatre règles de dérivation</h3>
+<p>$$\text{Produit :}\qquad\big(f(x)g(x)\big)'=f'(x)g(x)+f(x)g'(x)$$
+$$\text{Quotient :}\qquad\left(\frac{f(x)}{g(x)}\right)'=\frac{f'(x)g(x)-f(x)g'(x)}{\big(g(x)\big)^2}$$
+$$\text{Somme :}\qquad\big(f(x)+g(x)\big)'=f'(x)+g'(x)$$
+$$\boxed{\;\text{CHAÎNE :}\qquad\big(g(f(x))\big)'=(g\circ f)'(x)=g'(f(x))\,f'(x)\;}$$</p>
+<p>où $g\circ f$ dénote la composition $x\mapsto f(x)\mapsto g(f(x))$.</p>
+<p><strong>Exemple 5.5.</strong> Pour $h(x)=(2x+1)^4$ : on pose $f(x)=2x+1$ et $g(f)=f^4$, d'où $f'(x)=2$ et $g'(f)=4f^3$ :</p>
+<p>$$h'(x)=g'(f)f'(x)=4f^3\cdot2=4(2x+1)^3\cdot2=\boxed{8(2x+1)^3}$$</p>
+<details class="cor">
+<summary> Contrôle par différences finies centrées</summary><div class="in">
+
+<table>
+<thead>
+<tr>
+<th>$x$</th>
+<th>dérivée numérique</th>
+<th>$8(2x+1)^3$</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$0{,}3$</td>
+<td>$32{,}768$</td>
+<td>$32{,}768$ </td>
+</tr>
+<tr>
+<td>$-1{,}2$</td>
+<td>$-21{,}952$</td>
+<td>$-21{,}952$ </td>
+</tr>
+<tr>
+<td>$2{,}0$</td>
+<td>$1000{,}0$</td>
+<td>$1000{,}0$ </td>
+</tr>
+</tbody></table>
+</div></details>
+
+<h2 data-prio="must">Concept 2 — Dérivées partielles et gradient (§5.2)</h2>
+<blockquote>
+<p><strong>La méthode.</strong> <em>« On trouve le gradient de $f$ relativement à $x$ en <strong>faisant varier UNE variable à la fois et en gardant les autres CONSTANTES</strong>. Le gradient est alors la collection de ces dérivées partielles. »</em></p>
+</blockquote>
+<div class="cal formel"><span class="lab">Définition 5.5 (Dérivée partielle).</span>
+<p> Pour $f:\mathbb R^n\to\mathbb R$ de $n$ variables $x_1,\dots,x_n$ :
+$$\frac{\partial f}{\partial x_1}=\lim_{h\to0}\frac{f(x_1+h,x_2,\dots,x_n)-f(x)}{h},\quad\dots,\quad\frac{\partial f}{\partial x_n}=\lim_{h\to0}\frac{f(x_1,\dots,x_{n-1},x_n+h)-f(x)}{h}$$
+et on les rassemble dans le <strong>VECTEUR LIGNE</strong>
+$$\boxed{\;\nabla_xf=\operatorname{grad}f=\frac{df}{dx}=\begin{bmatrix}\dfrac{\partial f(x)}{\partial x_1}&amp;\dfrac{\partial f(x)}{\partial x_2}&amp;\cdots&amp;\dfrac{\partial f(x)}{\partial x_n}\end{bmatrix}\in\mathbb R^{1\times n}\;}$$
+Ce vecteur ligne est le <strong>GRADIENT</strong> de $f$, ou la <strong>JACOBIENNE</strong>.</p>
+</div>
+<blockquote>
+<p class="cal piege"> <strong>La convention du livre — à ne surtout pas oublier.</strong> <em>« Il n'est pas rare dans la littérature de définir le vecteur gradient comme un <strong>vecteur COLONNE</strong>, suivant la convention que les vecteurs sont généralement des colonnes. La raison pour laquelle nous définissons le gradient comme un <strong>vecteur LIGNE</strong> est double :</em></p>
+<ol>
+<li><em>on peut généraliser le gradient de façon <strong>cohérente</strong> aux fonctions à valeurs vectorielles $f:\mathbb R^n\to\mathbb R^m$ (le gradient devient alors une <strong>matrice</strong>) ;</em></li>
+<li><em>on peut appliquer <strong>immédiatement</strong> la règle de la chaîne multivariée <strong>sans se soucier de la dimension</strong> du gradient. »</em></li>
+</ol>
+</blockquote>
+<p><strong>Exemple 5.6 — dérivées partielles avec la règle de la chaîne.</strong> Pour $f(x,y)=(x+2y^3)^2$ :</p>
+<p>$$\frac{\partial f}{\partial x}=2(x+2y^3)\frac{\partial}{\partial x}(x+2y^3)=2(x+2y^3)$$
+$$\frac{\partial f}{\partial y}=2(x+2y^3)\frac{\partial}{\partial y}(x+2y^3)=12(x+2y^3)y^2$$</p>
+<p><strong>Exemple 5.7 — un gradient complet.</strong> Pour $f(x_1,x_2)=x_1^2x_2+x_1x_2^3\in\mathbb R$ :</p>
+<p>$$\frac{\partial f}{\partial x_1}=2x_1x_2+x_2^3,\qquad\frac{\partial f}{\partial x_2}=x_1^2+3x_1x_2^2$$</p>
+<p>$$\boxed{\;\frac{df}{dx}=\begin{bmatrix}2x_1x_2+x_2^3&amp;x_1^2+3x_1x_2^2\end{bmatrix}\in\mathbb R^{1\times2}\;}$$</p>
+<details class="cor">
+<summary> Contrôles numériques des exemples 5.6 et 5.7</summary><div class="in">
+
+<p><strong>Ex. 5.6</strong>, en $(x,y)=(0{,}4;1{,}1)$ : $\partial f/\partial x$ numérique $=6{,}124$ contre $2(x+2y^3)=6{,}124$  ; $\partial f/\partial y$ numérique $=44{,}46024$ contre $12(x+2y^3)y^2=44{,}46024$  (idem en $(-1{,}0;0{,}5)$ : $-1{,}5$ et $-2{,}25$).</p>
+<p><strong>Ex. 5.7</strong>, en $(1{,}3;0{,}7)$ : $2{,}163$ contre $2x_1x_2+x_2^3=2{,}163$  et $3{,}601$ contre $x_1^2+3x_1x_2^2=3{,}601$ </p>
+</div></details>
+
+<h3>2.2 Les règles multivariées</h3>
+<blockquote>
+<p class="cal piege"> <strong>L'avertissement.</strong> <em>« Quand on calcule des dérivées <strong>relativement à des vecteurs</strong> $x\in\mathbb R^n$, il faut faire attention : nos gradients impliquent maintenant des <strong>vecteurs et des matrices</strong>, et la multiplication matricielle <strong>n'est PAS commutative</strong> — l'ORDRE COMPTE. »</em></p>
+</blockquote>
+<p>$$\text{Produit :}\qquad\frac{\partial}{\partial x}\big(f(x)g(x)\big)=\frac{\partial f}{\partial x}g(x)+f(x)\frac{\partial g}{\partial x}$$
+$$\text{Somme :}\qquad\frac{\partial}{\partial x}\big(f(x)+g(x)\big)=\frac{\partial f}{\partial x}+\frac{\partial g}{\partial x}$$
+$$\boxed{\;\text{CHAÎNE :}\qquad\frac{\partial}{\partial x}\big(g(f(x))\big)=\frac{\partial g}{\partial f}\frac{\partial f}{\partial x}\;}$$</p>
+<blockquote>
+<p> <strong>Le mnémonique des « dimensions voisines ».</strong> *« La règle de la chaîne ressemble aux règles de multiplication matricielle où les <strong>dimensions voisines</strong> doivent correspondre. En allant de gauche à droite, $\partial f$ apparaît au « <strong>dénominateur</strong> » du premier facteur et au « <strong>numérateur</strong> » du second. En multipliant les facteurs, la multiplication est définie, les dimensions de $\partial f$ correspondent, et $\partial f$ <strong>« s'annule »</strong>, laissant $\partial g/\partial x$. »*</p>
+</blockquote>
+<blockquote>
+<p class="cal piege"> <em>« Ce n'est <strong>qu'une INTUITION</strong>, pas mathématiquement correct, puisque la dérivée partielle <strong>n'est PAS une fraction</strong>. »</em></p>
+</blockquote>
+<h3>2.3 La règle de la chaîne appliquée</h3>
+<p><strong>Cas 1 — $f:\mathbb R^2\to\mathbb R$ avec $x_1(t)$, $x_2(t)$ :</strong></p>
+<p>$$\frac{df}{dt}=\begin{bmatrix}\dfrac{\partial f}{\partial x_1}&amp;\dfrac{\partial f}{\partial x_2}\end{bmatrix}\begin{bmatrix}\dfrac{\partial x_1(t)}{\partial t}\\[6pt]\dfrac{\partial x_2(t)}{\partial t}\end{bmatrix}=\frac{\partial f}{\partial x_1}\frac{\partial x_1}{\partial t}+\frac{\partial f}{\partial x_2}\frac{\partial x_2}{\partial t}$$</p>
+<p><strong>Exemple 5.8.</strong> Pour $f(x_1,x_2)=x_1^2+2x_2$ avec $x_1=\sin t$, $x_2=\cos t$ :</p>
+<p>$$\frac{df}{dt}=2\sin t\cdot\cos t+2\cdot(-\sin t)=2\sin t\cos t-2\sin t=\boxed{2\sin t\,(\cos t-1)}$$</p>
+<details class="cor">
+<summary> Contrôle numérique</summary><div class="in">
+
+<table>
+<thead>
+<tr>
+<th>$t$</th>
+<th>dérivée numérique</th>
+<th>$2\sin t(\cos t-1)$</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$0{,}4$</td>
+<td>$-0{,}061481$</td>
+<td>$-0{,}061481$ </td>
+</tr>
+<tr>
+<td>$1{,}9$</td>
+<td>$-2{,}504458$</td>
+<td>$-2{,}504458$ </td>
+</tr>
+<tr>
+<td>$-0{,}8$</td>
+<td>$0{,}435139$</td>
+<td>$0{,}435139$ </td>
+</tr>
+</tbody></table>
+</div></details>
+
+<p><strong>Cas 2 — $x_1(s,t)$ et $x_2(s,t)$ :</strong></p>
+<p>$$\frac{\partial f}{\partial s}=\frac{\partial f}{\partial x_1}\frac{\partial x_1}{\partial s}+\frac{\partial f}{\partial x_2}\frac{\partial x_2}{\partial s},\qquad\frac{\partial f}{\partial t}=\frac{\partial f}{\partial x_1}\frac{\partial x_1}{\partial t}+\frac{\partial f}{\partial x_2}\frac{\partial x_2}{\partial t}$$</p>
+<p>et, sous forme de <strong>produit matriciel</strong> :</p>
+<p>$$\frac{df}{d(s,t)}=\underbrace{\frac{\partial f}{\partial x}}_{1\times2}\underbrace{\frac{\partial x}{\partial(s,t)}}_{2\times2}$$</p>
+<blockquote>
+<p class="cal piege"> <strong>Le contrôle de sécurité recommandé.</strong> <em>« Cette écriture compacte n'est correcte que si l'on est attentif à la <strong>DÉFINITION du gradient</strong>. »</em> Vérifier systématiquement les <strong>dimensions</strong> de chaque facteur.</p>
+</blockquote>
+<h2 data-prio="must">Concept 3 — Gradients de fonctions à valeurs vectorielles (§5.3)</h2>
+<h3>3.1 La jacobienne</h3>
+<p>Pour $f:\mathbb R^n\to\mathbb R^m$ (un <strong>champ de vecteurs</strong>), $f(x)=[f_1(x),\dots,f_m(x)]^\top$ : chaque $f_i:\mathbb R^n\to\mathbb R$ se dérive <strong>exactement comme au §5.2</strong>.</p>
+<p>La dérivée partielle relativement à $x_i$ est un <strong>vecteur COLONNE</strong> :</p>
+<p>$$\frac{\partial f}{\partial x_i}=\begin{bmatrix}\partial f_1/\partial x_i\\\vdots\\\partial f_m/\partial x_i\end{bmatrix}\in\mathbb R^m$$</p>
+<div class="cal formel"><span class="lab">Définition 5.6 (Jacobienne).</span>
+<p> La collection de <strong>toutes</strong> les dérivées partielles du <strong>premier ordre</strong> d'une fonction à valeurs vectorielles $f:\mathbb R^n\to\mathbb R^m$ est la <strong>JACOBIENNE</strong>. C'est une matrice $m\times n$ :
+$$\boxed{\;J=\nabla_xf=\frac{df(x)}{dx}=\begin{bmatrix}\dfrac{\partial f_1(x)}{\partial x_1}&amp;\cdots&amp;\dfrac{\partial f_1(x)}{\partial x_n}\\\vdots&amp;&amp;\vdots\\\dfrac{\partial f_m(x)}{\partial x_1}&amp;\cdots&amp;\dfrac{\partial f_m(x)}{\partial x_n}\end{bmatrix},\qquad J(i,j)=\frac{\partial f_i}{\partial x_j}\;}$$</p>
+</div>
+<blockquote>
+<p class="cal piege"> <strong>La convention de disposition.</strong> <em>« Dans ce livre, nous utilisons la <strong>DISPOSITION AU NUMÉRATEUR</strong> : la dérivée $df/dx$ de $f\in\mathbb R^m$ relativement à $x\in\mathbb R^n$ est une matrice $m\times n$, où <strong>les éléments de $f$ définissent les LIGNES</strong> et <strong>les éléments de $x$ définissent les COLONNES</strong>. Il existe aussi la <strong>disposition au DÉNOMINATEUR</strong>, qui en est la <strong>TRANSPOSÉE</strong>. »</em></p>
+</blockquote>
+<h3>3.2 Le tableau des dimensions (figure 5.6) — à mémoriser</h3>
+<table>
+<thead>
+<tr>
+<th>Fonction</th>
+<th>Gradient</th>
+<th>Taille</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$f:\mathbb R\to\mathbb R$</td>
+<td>Un <strong>scalaire</strong></td>
+<td>$1\times1$</td>
+</tr>
+<tr>
+<td>$f:\mathbb R^D\to\mathbb R$</td>
+<td>Un <strong>vecteur LIGNE</strong></td>
+<td>$1\times D$</td>
+</tr>
+<tr>
+<td>$f:\mathbb R\to\mathbb R^E$</td>
+<td>Un <strong>vecteur COLONNE</strong></td>
+<td>$E\times1$</td>
+</tr>
+<tr>
+<td>$f:\mathbb R^D\to\mathbb R^E$</td>
+<td>Une <strong>MATRICE</strong></td>
+<td>$E\times D$</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p> <strong>Le réflexe méthodologique du livre.</strong> Dans chaque exemple, il <strong>commence par déterminer la DIMENSION du gradient cherché</strong>, avant tout calcul. C'est le meilleur garde-fou.</p>
+</blockquote>
+<h3>3.3 Le déterminant jacobien comme facteur d'échelle</h3>
+<p><strong>Le problème.</strong> Les vecteurs $b_1=[1,0]^\top$, $b_2=[0,1]^\top$ engendrent le carré unité d'aire $\det\begin{bmatrix}1&amp;0\\0&amp;1\end{bmatrix}=1$. Les vecteurs $c_1=[-2,1]^\top$, $c_2=[1,1]^\top$ engendrent un parallélogramme d'aire</p>
+<p>$$\left|\det\begin{bmatrix}-2&amp;1\\1&amp;1\end{bmatrix}\right|=|-3|=3$$</p>
+<p><strong>Approche 1 — algèbre linéaire.</strong> C'est un <strong>changement de base</strong> de $(b_1,b_2)$ vers $(c_1,c_2)$, de matrice</p>
+<p>$$J=\begin{bmatrix}-2&amp;1\\1&amp;1\end{bmatrix}\qquad\text{telle que}\qquad Jb_1=c_1,\ Jb_2=c_2$$</p>
+<p>et $|\det(J)|=3$.</p>
+<p><strong>Approche 2 — dérivées partielles</strong> (celle qui <strong>se généralise au non linéaire</strong>). Avec $y_1=-2x_1+x_2$ et $y_2=x_1+x_2$ :</p>
+<p>$$\frac{\partial y_1}{\partial x_1}=-2,\quad\frac{\partial y_1}{\partial x_2}=1,\quad\frac{\partial y_2}{\partial x_1}=1,\quad\frac{\partial y_2}{\partial x_2}=1\qquad\Longrightarrow\qquad J=\begin{bmatrix}-2&amp;1\\1&amp;1\end{bmatrix}$$</p>
+<blockquote>
+<p> <strong>Le résultat général.</strong> <em>« La jacobienne représente la transformation de coordonnées cherchée. Elle est <strong>EXACTE si la transformation est LINÉAIRE</strong>. Si la transformation est <strong>NON LINÉAIRE</strong>, la jacobienne <strong>approche localement</strong> cette transformation par une transformation linéaire. »</em>
+$$\boxed{\;|\det(J)|=\text{le facteur par lequel les AIRES ou VOLUMES sont mis à l'échelle}\;}$$</p>
+</blockquote>
+<blockquote>
+<p class="cal piege"> <strong>Où cela resservira.</strong> <em>« Le déterminant jacobien et les transformations de variables deviendront pertinents au <strong>§6.7</strong>, quand on transformera des variables aléatoires et des lois de probabilité. Ces transformations sont extrêmement pertinentes en apprentissage automatique dans le contexte de l'entraînement de réseaux profonds par la <strong>REPARAMÉTRISATION</strong>, aussi appelée analyse de perturbation infinitésimale. »</em></p>
+</blockquote>
+<h3>3.4 Trois exemples fondateurs</h3>
+<p><strong>Exemple 5.9 — le gradient de $f(x)=Ax$.</strong></p>
+<p><strong>Étape 1 — la dimension.</strong> $f:\mathbb R^N\to\mathbb R^M$, donc $df/dx\in\mathbb R^{M\times N}$.</p>
+<p><strong>Étape 2 — les partielles.</strong> $f_i(x)=\sum_{j=1}^{N}A_{ij}x_j$ donne $\dfrac{\partial f_i}{\partial x_j}=A_{ij}$.</p>
+<p><strong>Étape 3 — le résultat.</strong></p>
+<p>$$\boxed{\;\frac{df}{dx}=A\in\mathbb R^{M\times N}\;}$$</p>
+<p class="cal piege"> Le résultat est <strong>la matrice $A$ elle-même</strong> — l'analogue matriciel de $(ax)'=a$.</p>
+<p><strong>Exemple 5.10 — chaîne avec composition.</strong> Pour $h=f\circ g$ avec</p>
+<p>$$f:\mathbb R^2\to\mathbb R,\ f(x)=\exp(x_1x_2^2)\qquad g:\mathbb R\to\mathbb R^2,\ x=g(t)=\begin{bmatrix}t\cos t\\t\sin t\end{bmatrix}$$</p>
+<p><strong>Les dimensions d'abord</strong> : $\dfrac{\partial f}{\partial x}\in\mathbb R^{1\times2}$ et $\dfrac{\partial g}{\partial t}\in\mathbb R^{2\times1}$.</p>
+<p>$$\frac{dh}{dt}=\frac{\partial f}{\partial x}\frac{\partial x}{\partial t}=\begin{bmatrix}\exp(x_1x_2^2)x_2^2&amp;2\exp(x_1x_2^2)x_1x_2\end{bmatrix}\begin{bmatrix}\cos t-t\sin t\\\sin t+t\cos t\end{bmatrix}$$</p>
+<p>$$\boxed{\;\frac{dh}{dt}=\exp(x_1x_2^2)\Big[x_2^2(\cos t-t\sin t)+2x_1x_2(\sin t+t\cos t)\Big]\;}$$</p>
+<p>avec $x_1=t\cos t$ et $x_2=t\sin t$.</p>
+<details class="cor">
+<summary> Contrôle numérique de l'exemple 5.10</summary><div class="in">
+
+<table>
+<thead>
+<tr>
+<th>$t$</th>
+<th>dérivée numérique de $h$</th>
+<th>formule (5.74c)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$0{,}6$</td>
+<td>$0{,}435521$</td>
+<td>$0{,}435521$ </td>
+</tr>
+<tr>
+<td>$1{,}4$</td>
+<td>$-2{,}358059$</td>
+<td>$-2{,}358059$ </td>
+</tr>
+</tbody></table>
+</div></details>
+
+<p><strong>Exemple 5.11 — le gradient d'une perte des moindres carrés.</strong> Le modèle linéaire</p>
+<p>$$y=\Phi\theta,\qquad\theta\in\mathbb R^D,\ \Phi\in\mathbb R^{N\times D},\ y\in\mathbb R^N$$</p>
+<p>avec</p>
+<p>$$L(e):=\lVert e\rVert^2,\qquad e(\theta):=y-\Phi\theta$$</p>
+<p><strong>Étape 1 — la dimension.</strong> $\dfrac{\partial L}{\partial\theta}\in\mathbb R^{1\times D}$.</p>
+<p><strong>Étape 2 — la chaîne.</strong> $\dfrac{\partial L}{\partial\theta}=\dfrac{\partial L}{\partial e}\dfrac{\partial e}{\partial\theta}$, dont le $d$-ième élément est $\sum_{n=1}^{N}\dfrac{\partial L}{\partial e}[n]\,\dfrac{\partial e}{\partial\theta}[n,d]$.</p>
+<p><strong>Étape 3 — les deux facteurs.</strong> Comme $\lVert e\rVert^2=e^\top e$ :</p>
+<p>$$\frac{\partial L}{\partial e}=2e^\top\in\mathbb R^{1\times N},\qquad\frac{\partial e}{\partial\theta}=-\Phi\in\mathbb R^{N\times D}$$</p>
+<p><strong>Étape 4 — le résultat.</strong></p>
+<p>$$\boxed{\;\frac{\partial L}{\partial\theta}=-2e^\top\Phi=-2\underbrace{(y^\top-\theta^\top\Phi^\top)}_{1\times N}\underbrace{\Phi}_{N\times D}\in\mathbb R^{1\times D}\;}$$</p>
+<blockquote>
+<p class="cal piege"> <strong>La remarque du livre.</strong> <em>« On aurait obtenu le même résultat <strong>sans la règle de la chaîne</strong>, en regardant directement $L_2(\theta):=\lVert y-\Phi\theta\rVert^2=(y-\Phi\theta)^\top(y-\Phi\theta)$. Cette approche reste praticable pour des fonctions simples comme $L_2$, mais devient <strong>IMPRATICABLE pour des compositions PROFONDES</strong>. »</em></p>
+</blockquote>
+<h2 data-prio="high">Concept 4 — Gradients de matrices et identités (§5.4-5.5)</h2>
+<h3>4.1 Le problème du tenseur</h3>
+<p>Le gradient d'une matrice $m\times n$ relativement à une matrice $p\times q$ est une jacobienne de taille $(m\times n)\times(p\times q)$ — un <strong>tenseur à QUATRE dimensions</strong>, d'entrées $J_{ijkl}=\partial A_{ij}/\partial B_{kl}$.</p>
+<blockquote>
+<p> <strong>L'astuce de l'aplatissement.</strong> <em>« Puisque les matrices représentent des applications linéaires, on peut exploiter le fait qu'il existe un <strong>ISOMORPHISME d'espaces vectoriels</strong> entre $\mathbb R^{m\times n}$ et $\mathbb R^{mn}$. On peut donc <strong>remodeler</strong> nos matrices en vecteurs de longueurs $mn$ et $pq$, et le gradient devient une jacobienne de taille $mn\times pq$. »</em></p>
+</blockquote>
+<div class="cal intu"><span class="lab">Pourquoi c'est préférable.</span>
+<p class="cal piege">  <em>« En pratique, il est souvent souhaitable de remodeler la matrice en vecteur : la <strong>règle de la chaîne se réduit à une simple MULTIPLICATION MATRICIELLE</strong>, alors qu'avec une jacobienne-tenseur, il faut faire davantage attention <strong>aux dimensions sur lesquelles sommer</strong>. »</em></p>
+</div>
+<p><strong>Exemple 5.12 — $f=Ax$, gradient relativement à $A$.</strong></p>
+<p><strong>Étape 1 — la dimension.</strong> $\dfrac{df}{dA}\in\mathbb R^{M\times(M\times N)}$.</p>
+<p><strong>Étape 2 — expliciter.</strong> $f_i=\sum_{j=1}^{N}A_{ij}x_j$, donc</p>
+<p>$$\frac{\partial f_i}{\partial A_{iq}}=x_q,\qquad\frac{\partial f_i}{\partial A_{kq}}=0\ \text{ pour } k\neq i$$</p>
+<p><strong>Étape 3 — le résultat.</strong> $\dfrac{\partial f_i}{\partial A_{i,:}}=x^\top\in\mathbb R^{1\times1\times N}$ et $0^\top$ pour les autres lignes.</p>
+<p><strong>Exemple 5.13 — $f(R)=R^\top R=:K$, gradient relativement à $R$.</strong></p>
+<p><strong>Étape 1 — la dimension.</strong> $\dfrac{dK}{dR}\in\mathbb R^{(N\times N)\times(M\times N)}$, un <strong>tenseur</strong>, avec $\dfrac{dK_{pq}}{dR}\in\mathbb R^{1\times M\times N}$.</p>
+<p><strong>Étape 2 — expliciter.</strong> En notant $r_i$ la $i$-ème colonne de $R$, chaque entrée de $K$ est un produit scalaire de deux colonnes :</p>
+<p>$$K_{pq}=r_p^\top r_q=\sum_{m=1}^{M}R_{mp}R_{mq}$$</p>
+<p><strong>Étape 3 — la partielle, par cas.</strong></p>
+<p>$$\boxed{\;\frac{\partial K_{pq}}{\partial R_{ij}}=\partial_{pqij}=\begin{cases}R_{iq}&amp;\text{si } j=p,\ p\neq q\\ R_{ip}&amp;\text{si } j=q,\ p\neq q\\ 2R_{iq}&amp;\text{si } j=p,\ p=q\\ 0&amp;\text{sinon}\end{cases}\;}$$</p>
+<p class="cal piege"> Le facteur <strong>$2$</strong> apparaît <strong>seulement sur la diagonale</strong> ($p=q$), où $R_{mp}$ et $R_{mq}$ sont <strong>la même variable</strong>.</p>
+<h3>4.2 Les dix identités à connaître</h3>
+<p>Avec $\operatorname{tr}(\cdot)$ la trace, $\det(\cdot)$ le déterminant et $f(X)^{-1}$ l'inverse (supposé exister) :</p>
+<p>$$\frac{\partial}{\partial X}f(X)^\top=\left(\frac{\partial f(X)}{\partial X}\right)^\top$$</p>
+<p>$$\frac{\partial}{\partial X}\operatorname{tr}\big(f(X)\big)=\operatorname{tr}\left(\frac{\partial f(X)}{\partial X}\right)$$</p>
+<p>$$\frac{\partial}{\partial X}\det\big(f(X)\big)=\det\big(f(X)\big)\operatorname{tr}\left(f(X)^{-1}\frac{\partial f(X)}{\partial X}\right)$$</p>
+<p>$$\frac{\partial}{\partial X}f(X)^{-1}=-f(X)^{-1}\frac{\partial f(X)}{\partial X}f(X)^{-1}$$</p>
+<p>$$\frac{\partial\,a^\top X^{-1}b}{\partial X}=-(X^{-1})^\top ab^\top(X^{-1})^\top$$</p>
+<p>$$\frac{\partial\,x^\top a}{\partial x}=a^\top\qquad\qquad\frac{\partial\,a^\top x}{\partial x}=a^\top$$</p>
+<p>$$\frac{\partial\,a^\top Xb}{\partial X}=ab^\top$$</p>
+<p>$$\boxed{\;\frac{\partial\,x^\top Bx}{\partial x}=x^\top(B+B^\top)\;}$$</p>
+<p>$$\boxed{\;\frac{\partial}{\partial s}(x-As)^\top W(x-As)=-2(x-As)^\top WA\quad\text{pour } W\text{ SYMÉTRIQUE}\;}$$</p>
+<blockquote>
+<p class="cal piege"> <strong>Deux pièges dans cette liste.</strong> (i) $\dfrac{\partial x^\top Bx}{\partial x}=x^\top(B+B^\top)$, <strong>pas $2x^\top B$</strong> — sauf si $B$ est <strong>symétrique</strong>. (ii) La dernière identité exige explicitement <strong>$W$ symétrique</strong> ; c'est elle qui donne le gradient des moindres carrés pondérés.</p>
+</blockquote>
+<blockquote>
+<p class="cal piege"> <strong>La remarque sur les tenseurs.</strong> <em>« Ce livre ne couvre que les traces et transposées <strong>de matrices</strong>. Mais les dérivées peuvent être des tenseurs de dimension supérieure, où la trace et la transposée usuelles <strong>ne sont pas définies</strong>. Dans ces cas, la trace d'un tenseur $D\times D\times E\times F$ serait une matrice de dimension $E\times F$ — un cas particulier de <strong>CONTRACTION TENSORIELLE</strong>. De même, « transposer » un tenseur veut dire <strong>échanger les deux premières dimensions</strong>. »</em></p>
+</blockquote>
+<h2 data-prio="must">Concept 5 — Rétropropagation et différentiation automatique (§5.6)</h2>
+<h3>5.1 Le problème</h3>
+<p>Considérons</p>
+<p>$$f(x)=\sqrt{x^2+\exp(x^2)}+\cos\big(x^2+\exp(x^2)\big)$$</p>
+<p>Par la règle de la chaîne :</p>
+<p>$$\frac{df}{dx}=\frac{2x+2x\exp(x^2)}{2\sqrt{x^2+\exp(x^2)}}-\sin\big(x^2+\exp(x^2)\big)\big(2x+2x\exp(x^2)\big)$$</p>
+<p>$$=2x\left(\frac{1}{2\sqrt{x^2+\exp(x^2)}}-\sin\big(x^2+\exp(x^2)\big)\right)\big(1+\exp(x^2)\big)$$</p>
+<blockquote>
+<p class="cal piege"> <strong>Le diagnostic.</strong> <em>« Écrire le gradient explicitement de cette façon est souvent <strong>impraticable</strong>, car cela donne une expression très longue. En pratique, si l'on n'est pas prudent, l'implémentation du gradient pourrait être <strong>SIGNIFICATIVEMENT PLUS COÛTEUSE que le calcul de la fonction elle-même</strong> — ce qui impose une surcharge inutile. »</em></p>
+</blockquote>
+<details class="cor">
+<summary> Contrôle de la formule (5.110)</summary><div class="in">
+
+<table>
+<thead>
+<tr>
+<th>$x$</th>
+<th>dérivée numérique</th>
+<th>formule (5.110)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$0{,}5$</td>
+<td>$-1{,}360431$</td>
+<td>$-1{,}360431$ </td>
+</tr>
+<tr>
+<td>$1{,}1$</td>
+<td>$11{,}713402$</td>
+<td>$11{,}713402$ </td>
+</tr>
+<tr>
+<td>$-0{,}7$</td>
+<td>$1{,}874002$</td>
+<td>$1{,}874002$ </td>
+</tr>
+</tbody></table>
+</div></details>
+
+<h3>5.2 Gradients dans un réseau profond</h3>
+<p>Un réseau profond calcule</p>
+<p>$$y=(f_K\circ f_{K-1}\circ\dots\circ f_1)(x)=f_K\big(f_{K-1}(\dots(f_1(x))\dots)\big)$$</p>
+<p>où $x$ sont les entrées (par exemple des images), $y$ les observations (par exemple des étiquettes de classe), et <strong>chaque $f_i$ possède ses propres paramètres</strong>.</p>
+<p>Dans un réseau multicouche, $f_i(x_{i-1})=\sigma(A_{i-1}x_{i-1}+b_{i-1})$ où $\sigma$ est une <strong>fonction d'activation</strong> : <strong>sigmoïde</strong> $\frac{1}{1+e^{-x}}$, <strong>tanh</strong>, ou <strong>ReLU</strong> (<em>rectified linear unit</em>).</p>
+<p>$$f_0:=x,\qquad f_i:=\sigma_i(A_{i-1}f_{i-1}+b_{i-1}),\quad i=1,\dots,K$$</p>
+<p>et on minimise la <strong>perte quadratique</strong></p>
+<p>$$L(\theta)=\lVert y-f_K(\theta,x)\rVert^2,\qquad\theta=\{A_0,b_0,\dots,A_{K-1},b_{K-1}\}$$</p>
+<p><strong>Les gradients par la règle de la chaîne :</strong></p>
+<p>$$\frac{\partial L}{\partial\theta_{K-1}}=\frac{\partial L}{\partial f_K}\frac{\partial f_K}{\partial\theta_{K-1}}$$
+$$\frac{\partial L}{\partial\theta_{K-2}}=\frac{\partial L}{\partial f_K}\frac{\partial f_K}{\partial f_{K-1}}\frac{\partial f_{K-1}}{\partial\theta_{K-2}}$$
+$$\frac{\partial L}{\partial\theta_{K-3}}=\frac{\partial L}{\partial f_K}\frac{\partial f_K}{\partial f_{K-1}}\frac{\partial f_{K-1}}{\partial f_{K-2}}\frac{\partial f_{K-2}}{\partial\theta_{K-3}}$$
+$$\boxed{\;\frac{\partial L}{\partial\theta_i}=\frac{\partial L}{\partial f_K}\frac{\partial f_K}{\partial f_{K-1}}\cdots\frac{\partial f_{i+2}}{\partial f_{i+1}}\frac{\partial f_{i+1}}{\partial\theta_i}\;}$$</p>
+<blockquote>
+<p> <strong>La lecture des deux types de termes.</strong> Les termes $\dfrac{\partial f_{j+1}}{\partial f_j}$ sont les dérivées partielles de la <strong>sortie d'une couche relativement à ses ENTRÉES</strong> ; le dernier terme $\dfrac{\partial f_{i+1}}{\partial\theta_i}$ est la dérivée de la sortie d'une couche relativement à ses <strong>PARAMÈTRES</strong>.</p>
+</blockquote>
+<blockquote>
+<p> <strong>L'idée centrale de la rétropropagation.</strong> <em>« En supposant qu'on a <strong>déjà calculé</strong> les dérivées partielles $\partial L/\partial\theta_{i+1}$, <strong>l'ESSENTIEL DU CALCUL PEUT ÊTRE RÉUTILISÉ</strong> pour calculer $\partial L/\partial\theta_i$. »</em></p>
+</blockquote>
+<p><strong>La chronologie.</strong> <em>Kelley (1960), Bryson (1961), Dreyfus (1962), Rumelhart</em> et al. <em>(1986).</em></p>
+<h3>5.3 La différentiation automatique</h3>
+<blockquote>
+<p><strong>Le statut.</strong> <em>« Il se trouve que la <strong>rétropropagation est un CAS PARTICULIER</strong> d'une technique générale de l'analyse numérique appelée <strong>DIFFÉRENTIATION AUTOMATIQUE</strong>. »</em></p>
+</blockquote>
+<div class="cal intu"><span class="lab">Ce que c'est.</span>
+<p>  <em>« Un ensemble de techniques pour évaluer <strong>NUMÉRIQUEMENT (par opposition à SYMBOLIQUEMENT) le gradient EXACT (à la précision machine près)</strong> d'une fonction, en travaillant avec des <strong>variables intermédiaires</strong> et en appliquant la règle de la chaîne. »</em> Elle applique une série d'opérations arithmétiques élémentaires (addition, multiplication) et de fonctions élémentaires ($\sin$, $\cos$, $\exp$, $\log$).</p>
+</div>
+<blockquote>
+<p class="cal piege"> <strong>Trois choses différentes, à ne pas confondre :</strong>
+$$\text{différentiation AUTOMATIQUE}\neq\text{différentiation SYMBOLIQUE}\neq\text{approximation NUMÉRIQUE (différences finies)}$$</p>
+</blockquote>
+<p><strong>Les deux modes.</strong> Pour un graphe $x\to a\to b\to y$, la chaîne donne $\dfrac{dy}{dx}=\dfrac{dy}{db}\dfrac{db}{da}\dfrac{da}{dx}$. Par <strong>associativité</strong> du produit matriciel, on peut choisir l'ordre :</p>
+<p>$$\boxed{\;\text{MODE INVERSE :}\quad\frac{dy}{dx}=\left(\frac{dy}{db}\frac{db}{da}\right)\frac{da}{dx}\;}$$</p>
+<p>$$\boxed{\;\text{MODE DIRECT :}\quad\frac{dy}{dx}=\frac{dy}{db}\left(\frac{db}{da}\frac{da}{dx}\right)\;}$$</p>
+<table>
+<thead>
+<tr>
+<th>Mode</th>
+<th>Sens</th>
+<th>Quand l'utiliser</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>INVERSE</strong> (<em>reverse</em>)</td>
+<td>Les gradients se propagent <strong>EN ARRIÈRE</strong>, à rebours du flot des données</td>
+<td> <strong>C'est la RÉTROPROPAGATION.</strong> Significativement <strong>moins cher</strong> quand la dimension d'<strong>entrée est BEAUCOUP PLUS GRANDE</strong> que celle de la sortie — le cas des réseaux de neurones</td>
+</tr>
+<tr>
+<td><strong>DIRECT</strong> (<em>forward</em>)</td>
+<td>Les gradients suivent les données, de gauche à droite</td>
+<td>Moins cher dans le cas inverse (peu d'entrées, beaucoup de sorties)</td>
+</tr>
+</tbody></table>
+<p><em>Référence donnée : Baydin</em> et al. <em>(2018) pour un panorama de la différentiation automatique en apprentissage automatique.</em></p>
+<h3>5.4 Exemple 5.14 — le graphe de calcul en pratique</h3>
+<p>Pour la fonction $f(x)=\sqrt{x^2+\exp(x^2)}+\cos\big(x^2+\exp(x^2)\big)$, on introduit des <strong>variables intermédiaires</strong> :</p>
+<p>$$a=x^2,\quad b=\exp(a),\quad c=a+b,\quad d=\sqrt c,\quad e=\cos(c),\quad f=d+e$$</p>
+<blockquote>
+<p> <em>« C'est le même processus de pensée qui se produit quand on applique la règle de la chaîne. Et cet ensemble d'équations demande <strong>MOINS d'opérations</strong> qu'une implémentation directe. »</em></p>
+</blockquote>
+<p><strong>Les dérivées élémentaires</strong> (chacune <strong>triviale</strong>) :</p>
+<p>$$\frac{\partial a}{\partial x}=2x,\quad\frac{\partial b}{\partial a}=\exp(a),\quad\frac{\partial c}{\partial a}=1=\frac{\partial c}{\partial b},\quad\frac{\partial d}{\partial c}=\frac{1}{2\sqrt c},\quad\frac{\partial e}{\partial c}=-\sin(c),\quad\frac{\partial f}{\partial d}=1=\frac{\partial f}{\partial e}$$</p>
+<p><strong>La remontée</strong> — en travaillant <strong>à rebours depuis la sortie</strong> :</p>
+<p>$$\frac{\partial f}{\partial c}=\frac{\partial f}{\partial d}\frac{\partial d}{\partial c}+\frac{\partial f}{\partial e}\frac{\partial e}{\partial c}=1\cdot\frac{1}{2\sqrt c}+1\cdot(-\sin c)$$
+$$\frac{\partial f}{\partial b}=\frac{\partial f}{\partial c}\frac{\partial c}{\partial b}=\frac{\partial f}{\partial c}\cdot1$$
+$$\frac{\partial f}{\partial a}=\frac{\partial f}{\partial b}\frac{\partial b}{\partial a}+\frac{\partial f}{\partial c}\frac{\partial c}{\partial a}=\frac{\partial f}{\partial b}\exp(a)+\frac{\partial f}{\partial c}\cdot1$$
+$$\frac{\partial f}{\partial x}=\frac{\partial f}{\partial a}\frac{\partial a}{\partial x}=\frac{\partial f}{\partial a}\cdot2x$$</p>
+<blockquote>
+<p> <strong>L'observation contre-intuitive du livre.</strong> <em>« En pensant à chacune de ces dérivées comme à une <strong>variable</strong>, on observe que <strong>le calcul requis pour obtenir la dérivée est de COMPLEXITÉ SIMILAIRE au calcul de la fonction elle-même</strong>. C'est assez contre-intuitif, puisque l'expression mathématique de la dérivée est <strong>significativement plus compliquée</strong> que celle de la fonction. »</em></p>
+</blockquote>
+<p class="cal piege"> Noter les <strong>deux chemins</strong> dans $\partial f/\partial c$ et $\partial f/\partial a$ : le nœud $c$ est utilisé <strong>deux fois</strong> ($d$ et $e$), donc les contributions <strong>s'additionnent</strong>.</p>
+<h3>5.5 Le formalisme général</h3>
+<p>Soient $x_1,\dots,x_d$ les variables d'<strong>entrée</strong>, $x_{d+1},\dots,x_{D-1}$ les variables <strong>intermédiaires</strong>, et $x_D$ la variable de <strong>sortie</strong>. Le graphe de calcul s'écrit</p>
+<p>$$\boxed{\;\text{Pour } i=d+1,\dots,D:\qquad x_i=g_i\big(x_{\operatorname{Pa}(x_i)}\big)\;}$$</p>
+<p>où les $g_i$ sont des fonctions élémentaires et $x_{\operatorname{Pa}(x_i)}$ les <strong>nœuds PARENTS</strong> de $x_i$. Avec $f=x_D$, on a $\dfrac{\partial f}{\partial x_D}=1$, puis, <strong>à rebours</strong> :</p>
+<p>$$\boxed{\;\frac{\partial f}{\partial x_i}=\sum_{x_j:\,x_i\in\operatorname{Pa}(x_j)}\frac{\partial f}{\partial x_j}\frac{\partial x_j}{\partial x_i}\;}$$</p>
+<ul>
+<li>L'équation $x_i=g_i(x_{\operatorname{Pa}(x_i)})$ est la <strong>PROPAGATION AVANT</strong> de la fonction.</li>
+<li>L'équation de la somme est la <strong>RÉTROPROPAGATION</strong> du gradient à travers le graphe.</li>
+</ul>
+<blockquote>
+<p class="cal piege"> <strong>Les limites.</strong> <em>« L'approche fonctionne dès qu'on a une fonction exprimable comme un graphe de calcul dont les fonctions élémentaires sont différentiables. En fait, ce peut même ne pas être une fonction mathématique mais un <strong>PROGRAMME INFORMATIQUE</strong>. Cependant, tous les programmes ne peuvent pas être automatiquement différentiés — par exemple si l'on ne trouve pas de fonctions élémentaires différentiables. Les structures de programmation comme les <strong>boucles for</strong> et les <strong>instructions if</strong> demandent aussi plus de soin. »</em></p>
+</blockquote>
+<h2 data-prio="high">Concept 6 — Dérivées d'ordre supérieur et hessienne (§5.7)</h2>
+<p><strong>La notation, pour $f:\mathbb R^2\to\mathbb R$ de variables $x,y$ :</strong></p>
+<table>
+<thead>
+<tr>
+<th>Notation</th>
+<th>Signification</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$\dfrac{\partial^2f}{\partial x^2}$</td>
+<td>Dérivée partielle <strong>seconde</strong> de $f$ relativement à $x$</td>
+</tr>
+<tr>
+<td>$\dfrac{\partial^nf}{\partial x^n}$</td>
+<td>Dérivée partielle <strong>$n$-ième</strong> relativement à $x$</td>
+</tr>
+<tr>
+<td>$\dfrac{\partial^2f}{\partial y\,\partial x}=\dfrac{\partial}{\partial y}\left(\dfrac{\partial f}{\partial x}\right)$</td>
+<td> D'abord relativement à <strong>$x$</strong>, <strong>PUIS</strong> relativement à <strong>$y$</strong></td>
+</tr>
+<tr>
+<td>$\dfrac{\partial^2f}{\partial x\,\partial y}$</td>
+<td>D'abord <strong>$y$</strong>, puis <strong>$x$</strong></td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>Le théorème de symétrie.</strong> Si $f(x,y)$ est <strong>deux fois (continûment) différentiable</strong>, alors
+$$\boxed{\;\frac{\partial^2f}{\partial x\,\partial y}=\frac{\partial^2f}{\partial y\,\partial x}\;}$$
+<em>« l'ORDRE de différentiation N'IMPORTE PAS »</em>, et la matrice hessienne est <strong>SYMÉTRIQUE</strong>.</p>
+</blockquote>
+<blockquote>
+<p><strong>La hessienne.</strong> C'est la <strong>collection de toutes les dérivées partielles du SECOND ordre</strong> :
+$$\boxed{\;H=\begin{bmatrix}\dfrac{\partial^2f}{\partial x^2}&amp;\dfrac{\partial^2f}{\partial x\,\partial y}\\[8pt]\dfrac{\partial^2f}{\partial x\,\partial y}&amp;\dfrac{\partial^2f}{\partial y^2}\end{bmatrix}\;}$$
+notée $\nabla^2_{x,y}f(x,y)$. En général, pour $x\in\mathbb R^n$ et $f:\mathbb R^n\to\mathbb R$, $H$ est une matrice $n\times n$.</p>
+</blockquote>
+<blockquote>
+<p> <strong>Ce qu'elle mesure.</strong> <em>« La hessienne mesure la <strong>COURBURE</strong> de la fonction localement autour de $(x,y)$. »</em> Elle est requise par la <strong>méthode de Newton</strong> pour l'optimisation (Nocedal &amp; Wright 2006).</p>
+</blockquote>
+<blockquote>
+<p class="cal piege"> <strong>Cas vectoriel.</strong> <em>« Si $f:\mathbb R^n\to\mathbb R^m$ est un champ de vecteurs, la hessienne est un TENSEUR $(m\times n\times n)$. »</em></p>
+</blockquote>
+<h2 data-prio="must">Concept 7 — Linéarisation et série de Taylor multivariée (§5.8)</h2>
+<h3>7.1 La linéarisation</h3>
+<p>$$\boxed{\;f(x)\approx f(x_0)+(\nabla_xf)(x_0)(x-x_0)\;}$$</p>
+<p>C'est une <strong>approximation LOCALEMENT LINÉAIRE</strong> de $f$ autour de $x_0$ — le <strong>Taylor d'ordre 1</strong>.  Elle n'est bonne <strong>qu'au voisinage</strong> de $x_0$.</p>
+<h3>7.2 La série de Taylor multivariée</h3>
+<div class="cal formel"><span class="lab">Définition 5.7 (Série de Taylor multivariée).</span>
+<p> Pour $f:\mathbb R^D\to\mathbb R$ lisse en $x_0$, en posant $\delta:=x-x_0$ :
+$$\boxed{\;f(x)=\sum_{k=0}^{\infty}\frac{D_x^kf(x_0)}{k!}\,\delta^k\;}$$
+où $D_x^kf(x_0)$ est la <strong>$k$-ième dérivée TOTALE</strong> de $f$ relativement à $x$, évaluée en $x_0$.</p>
+</div>
+<div class="cal formel"><span class="lab">Définition 5.8 (Polynôme de Taylor).</span>
+<p> Le polynôme de Taylor de degré $n$ contient les <strong>$n+1$ premières</strong> composantes :
+$$T_n(x)=\sum_{k=0}^{n}\frac{D_x^kf(x_0)}{k!}\,\delta^k$$</p>
+</div>
+<blockquote>
+<p class="cal piege"> <strong>La notation $\delta^k$ est « légèrement relâchée ».</strong> <em>« $\delta^k$ n'est pas défini pour des vecteurs $x\in\mathbb R^D$, $D&gt;1$, et $k&gt;1$. »</em> En réalité, $D_x^kf$ <strong>et</strong> $\delta^k$ sont des <strong>TENSEURS d'ordre $k$</strong>. Le tenseur $\delta^k\in\mathbb R^{D\times D\times\dots\times D}$ ($k$ fois) est le <strong>produit EXTÉRIEUR</strong> $k$-uple, noté $\otimes$ :
+$$\delta^2:=\delta\otimes\delta=\delta\delta^\top,\quad\delta^2[i,j]=\delta[i]\delta[j]$$
+$$\delta^3:=\delta\otimes\delta\otimes\delta,\quad\delta^3[i,j,k]=\delta[i]\delta[j]\delta[k]$$</p>
+</blockquote>
+<p><strong>Les quatre premiers termes, explicitement :</strong></p>
+<p>$$k=0:\quad D_x^0f(x_0)\delta^0=f(x_0)\in\mathbb R$$</p>
+<p>$$k=1:\quad D_x^1f(x_0)\delta^1=\underbrace{\nabla_xf(x_0)}_{1\times D}\underbrace{\delta}_{D\times1}=\sum_{i=1}^{D}\nabla_xf(x_0)[i]\,\delta[i]\in\mathbb R$$</p>
+<p>$$\boxed{\;k=2:\quad D_x^2f(x_0)\delta^2=\operatorname{tr}\big(\underbrace{H(x_0)}_{D\times D}\underbrace{\delta}_{D\times1}\underbrace{\delta^\top}_{1\times D}\big)=\delta^\top H(x_0)\,\delta=\sum_{i=1}^{D}\sum_{j=1}^{D}H[i,j]\,\delta[i]\delta[j]\;}$$</p>
+<p>$$k=3:\quad D_x^3f(x_0)\delta^3=\sum_{i=1}^{D}\sum_{j=1}^{D}\sum_{k=1}^{D}D_x^3f(x_0)[i,j,k]\,\delta[i]\delta[j]\delta[k]\in\mathbb R$$</p>
+<p class="cal piege"> Le terme $D_x^kf(x_0)\delta^k$ contient <strong>exactement des polynômes d'ordre $k$</strong>.</p>
+<p><em>Le livre note aussi les implémentations <code>np.einsum('i,i',Df1,d)</code>, <code>np.einsum('ij,i,j',Df2,d,d)</code>, <code>np.einsum('ijk,i,j,k',Df3,d,d,d)</code>.</em></p>
+<h3>7.3 Exemple 5.15 — le développement complet en deux variables</h3>
+<p>$$f(x,y)=x^2+2xy+y^3\qquad\text{autour de }(x_0,y_0)=(1,2)$$</p>
+<blockquote>
+<p> <strong>La prédiction avant le calcul.</strong> <em>« La fonction est un polynôme de degré 3. On cherche un développement de Taylor, qui est lui-même une combinaison linéaire de polynômes. On <strong>ne s'attend donc PAS</strong> à ce que le développement contienne des termes d'ordre 4 ou plus. Il devrait suffire de déterminer les <strong>QUATRE PREMIERS termes</strong> pour une représentation <strong>EXACTE</strong>. »</em></p>
+</blockquote>
+<p><strong>Ordre 0 :</strong> $f(1,2)=1+4+8=13$</p>
+<p><strong>Ordre 1 :</strong></p>
+<p>$$\frac{\partial f}{\partial x}=2x+2y\ \Rightarrow\ \frac{\partial f}{\partial x}(1,2)=6,\qquad\frac{\partial f}{\partial y}=2x+3y^2\ \Rightarrow\ \frac{\partial f}{\partial y}(1,2)=14$$</p>
+<p>$$\frac{D_{x,y}^1f(1,2)}{1!}\,\delta=\begin{bmatrix}6&amp;14\end{bmatrix}\begin{bmatrix}x-1\\y-2\end{bmatrix}=6(x-1)+14(y-2)$$</p>
+<p><strong>Ordre 2 :</strong></p>
+<p>$$\frac{\partial^2f}{\partial x^2}=2,\qquad\frac{\partial^2f}{\partial y^2}=6y,\qquad\frac{\partial^2f}{\partial y\,\partial x}=\frac{\partial^2f}{\partial x\,\partial y}=2$$</p>
+<p>$$H=\begin{bmatrix}2&amp;2\\2&amp;6y\end{bmatrix}\qquad\Longrightarrow\qquad H(1,2)=\begin{bmatrix}2&amp;2\\2&amp;12\end{bmatrix}$$</p>
+<p>$$\frac{D_{x,y}^2f(1,2)}{2!}\,\delta^2=\frac12\delta^\top H(1,2)\delta=(x-1)^2+2(x-1)(y-2)+6(y-2)^2$$</p>
+<p><strong>Ordre 3 :</strong> la seule dérivée troisième non nulle est $\dfrac{\partial^3f}{\partial y^3}=6$, donc</p>
+<p>$$D_{x,y}^3f[:,:,1]=\begin{bmatrix}0&amp;0\\0&amp;0\end{bmatrix},\qquad D_{x,y}^3f[:,:,2]=\begin{bmatrix}0&amp;0\\0&amp;6\end{bmatrix}$$</p>
+<p>$$\frac{D_{x,y}^3f(1,2)}{3!}\,\delta^3=\frac{6}{6}(y-2)^3=(y-2)^3$$</p>
+<p><strong>Le résultat final :</strong></p>
+<p>$$\boxed{\;f(x,y)=13+6(x-1)+14(y-2)+(x-1)^2+2(x-1)(y-2)+6(y-2)^2+(y-2)^3\;}$$</p>
+<details class="cor">
+<summary> Vérification que le développement est EXACT partout</summary><div class="in">
+
+<table>
+<thead>
+<tr>
+<th>$(x,y)$</th>
+<th>$f(x,y)$</th>
+<th>$T_3(x,y)$</th>
+<th>écart</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$(0{,}3\ ;\ 1{,}4)$</td>
+<td>$3{,}674000$</td>
+<td>$3{,}674000$</td>
+<td>$0$ </td>
+</tr>
+<tr>
+<td>$(2{,}5\ ;\ -1{,}0)$</td>
+<td>$0{,}250000$</td>
+<td>$0{,}250000$</td>
+<td>$0$ </td>
+</tr>
+<tr>
+<td>$(1{,}0\ ;\ 2{,}0)$</td>
+<td>$13{,}000000$</td>
+<td>$13{,}000000$</td>
+<td>$0$ </td>
+</tr>
+<tr>
+<td>$(-3{,}0\ ;\ 4{,}5)$</td>
+<td>$73{,}125000$</td>
+<td>$73{,}125000$</td>
+<td>$0$ </td>
+</tr>
+</tbody></table>
+<p class="cal piege"> L'écart est <strong>nul même TRÈS LOIN</strong> de $(1,2)$ : c'est la marque d'un développement de Taylor d'un <strong>polynôme</strong> de degré $\leqslant n$ — il est <strong>exact globalement</strong>, pas seulement localement.</p>
+<p>Contrôles intermédiaires : $f(1,2)=13$  ; $f_x(1,2)=2\cdot1+2\cdot2=6$  ; $f_y(1,2)=2\cdot1+3\cdot4=14$  ; $H(1,2)=\begin{bmatrix}2&amp;2\\2&amp;12\end{bmatrix}$  ; $\partial^3f/\partial y^3=6$ </p>
+</div></details>
+
+<h2>Comment reconnaître le type d'exercice</h2>
+<table>
+<thead>
+<tr>
+<th>L'énoncé dit...</th>
+<th>Le type</th>
+<th>La méthode</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>« Calculer $f'(x)$ »</td>
+<td><strong>§5.1.2</strong></td>
+<td>Produit / quotient / somme / chaîne</td>
+</tr>
+<tr>
+<td>« Développement de Taylor de degré $n$ en $x_0$ »</td>
+<td><strong>Déf. 5.3</strong></td>
+<td>Calculer $f^{(k)}(x_0)$ pour $k\leqslant n$, puis $\sum f^{(k)}(x_0)(x-x_0)^k/k!$</td>
+</tr>
+<tr>
+<td>« Série de Maclaurin »</td>
+<td><strong>Déf. 5.4</strong></td>
+<td>Taylor en $x_0=0$ ; chercher un <strong>motif périodique</strong> dans les dérivées</td>
+</tr>
+<tr>
+<td>« Calculer le gradient de $f:\mathbb R^n\to\mathbb R$ »</td>
+<td><strong>Déf. 5.5</strong></td>
+<td>Une partielle par variable, rangées en <strong>vecteur LIGNE $1\times n$</strong></td>
+</tr>
+<tr>
+<td>« Calculer la jacobienne »</td>
+<td><strong>Déf. 5.6</strong></td>
+<td>$J(i,j)=\partial f_i/\partial x_j$, taille $m\times n$ ( $m$ = sorties, $n$ = entrées)</td>
+</tr>
+<tr>
+<td>« $f$ dépend de $x(t)$ »</td>
+<td><strong>Chaîne multivariée</strong></td>
+<td>$\dfrac{df}{dt}=\dfrac{\partial f}{\partial x}\dfrac{\partial x}{\partial t}$ ;  <strong>vérifier les dimensions</strong></td>
+</tr>
+<tr>
+<td>« De combien l'aire est-elle multipliée ? »</td>
+<td><strong>Déterminant jacobien</strong></td>
+<td>$|\det J|$</td>
+</tr>
+<tr>
+<td>« Gradient de $Ax$ relativement à $x$ »</td>
+<td><strong>Ex. 5.9</strong></td>
+<td>$\dfrac{d(Ax)}{dx}=A$</td>
+</tr>
+<tr>
+<td>« Gradient d'une perte des moindres carrés »</td>
+<td><strong>Ex. 5.11</strong></td>
+<td>Poser $L(e)=\lVert e\rVert^2$, $e(\theta)=y-\Phi\theta$, puis $\dfrac{\partial L}{\partial\theta}=-2e^\top\Phi$</td>
+</tr>
+<tr>
+<td>« Dérivée relativement à une MATRICE »</td>
+<td><strong>§5.4</strong></td>
+<td>Déterminer la taille du <strong>tenseur</strong> ; envisager d'<strong>aplatir</strong></td>
+</tr>
+<tr>
+<td>« $\dfrac{\partial}{\partial X}\operatorname{tr}$ / $\det$ / $X^{-1}$ »</td>
+<td><strong>§5.5</strong></td>
+<td>Chercher dans la table des <strong>dix identités</strong></td>
+</tr>
+<tr>
+<td>« Rétropropager le gradient »</td>
+<td><strong>§5.6</strong></td>
+<td>Graphe de calcul, variables intermédiaires, remontée depuis la sortie</td>
+</tr>
+<tr>
+<td>« Mode direct ou inverse ? »</td>
+<td><strong>§5.6.2</strong></td>
+<td>Entrée $\gg$ sortie $\Rightarrow$ <strong>INVERSE</strong> (rétropropagation)</td>
+</tr>
+<tr>
+<td>« Calculer la hessienne »</td>
+<td><strong>§5.7</strong></td>
+<td>Toutes les partielles <strong>secondes</strong> ;  elle est <strong>symétrique</strong> si $f$ est deux fois $C^1$</td>
+</tr>
+<tr>
+<td>« Linéariser $f$ autour de $x_0$ »</td>
+<td><strong>§5.8</strong></td>
+<td>$f(x_0)+(\nabla_xf)(x_0)(x-x_0)$</td>
+</tr>
+<tr>
+<td>« Développement de Taylor multivarié »</td>
+<td><strong>Déf. 5.7</strong></td>
+<td>$k=0$ : $f(x_0)$ ; $k=1$ : $\nabla f\cdot\delta$ ; $k=2$ : $\frac12\delta^\top H\delta$ ; $k=3$ : tenseur</td>
+</tr>
+</tbody></table>
+<h2>Comment résoudre : les cinq méthodes pas-à-pas</h2>
+<p><strong>Méthode A — Tout calcul de gradient (le protocole du livre).</strong></p>
+<ol>
+<li><strong>DÉTERMINER LA DIMENSION du résultat AVANT tout calcul</strong> — $f:\mathbb R^n\to\mathbb R^m$ donne $m\times n$.</li>
+<li>Décomposer en fonctions élémentaires.</li>
+<li>Calculer les partielles <strong>une variable à la fois</strong>.</li>
+<li>Ranger dans la jacobienne : <strong>lignes = sorties, colonnes = entrées</strong>.</li>
+<li>Contrôle : la dimension obtenue correspond-elle à l'étape 1 ?</li>
+</ol>
+<p><strong>Méthode B — Règle de la chaîne multivariée.</strong></p>
+<ol>
+<li>Identifier la composition $x\to f\to g$.</li>
+<li>Écrire les <strong>dimensions</strong> de $\partial g/\partial f$ et $\partial f/\partial x$.</li>
+<li>Vérifier que les <strong>dimensions voisines s'annulent</strong>.</li>
+<li>Multiplier <strong>dans le bon ordre</strong> : $\dfrac{\partial g}{\partial f}\dfrac{\partial f}{\partial x}$ — jamais l'inverse.</li>
+<li>Substituer les variables intermédiaires par leurs expressions.</li>
+<li>Contrôle numérique par <strong>différences finies centrées</strong> sur deux ou trois points.</li>
+</ol>
+<p><strong>Méthode C — Taylor univarié.</strong></p>
+<ol>
+<li>Calculer $f^{(k)}(x_0)$ pour $k=0,\dots,n$.</li>
+<li>Chercher un <strong>motif</strong> ou une <strong>périodicité</strong> (Ex. 5.4 : période 4).</li>
+<li>Assembler $\sum_k f^{(k)}(x_0)(x-x_0)^k/k!$.</li>
+<li>Si $f$ est un <strong>polynôme de degré $\leqslant n$</strong>, le développement est <strong>EXACT</strong> : le vérifier en développant.</li>
+</ol>
+<p><strong>Méthode D — Taylor multivarié.</strong></p>
+<ol>
+<li>Poser $\delta=x-x_0$.</li>
+<li>$k=0$ : $f(x_0)$.</li>
+<li>$k=1$ : $\nabla_xf(x_0)\,\delta$ — un produit $(1\times D)(D\times1)$.</li>
+<li>$k=2$ : $\frac{1}{2}\delta^\top H(x_0)\delta$ — développer explicitement en $\sum_{i,j}H[i,j]\delta_i\delta_j/2$.</li>
+<li>$k=3$ : identifier les <strong>rares</strong> dérivées troisièmes non nulles.</li>
+<li>Contrôle : si $f$ est un polynôme de degré $d$, s'arrêter à $n=d$ et vérifier l'<strong>égalité exacte</strong>.</li>
+</ol>
+<p><strong>Méthode E — Rétropropagation.</strong></p>
+<ol>
+<li>Construire le <strong>graphe de calcul</strong> avec des variables intermédiaires.</li>
+<li><strong>Propagation avant</strong> : évaluer chaque nœud.</li>
+<li>Initialiser $\partial f/\partial x_D=1$ à la sortie.</li>
+<li>Remonter : pour chaque nœud, <strong>SOMMER sur tous ses enfants</strong> $\sum_j\dfrac{\partial f}{\partial x_j}\dfrac{\partial x_j}{\partial x_i}$.</li>
+<li> Un nœud utilisé <strong>plusieurs fois</strong> reçoit <strong>plusieurs contributions additives</strong>.</li>
+<li>Contrôle : comparer à une <strong>différence finie</strong> sur un point.</li>
+</ol>
+<h2 data-prio="must">Common mistakes</h2>
+<table>
+<thead>
+<tr>
+<th>Erreur</th>
+<th>Correction</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Écrire le gradient en <strong>colonne</strong></td>
+<td> Dans ce livre, le gradient est un <strong>VECTEUR LIGNE</strong> $1\times n$ — c'est ce qui rend la chaîne automatique</td>
+</tr>
+<tr>
+<td>Confondre disposition au numérateur et au dénominateur</td>
+<td> Elles sont <strong>TRANSPOSÉES</strong> l'une de l'autre ; le livre utilise la disposition au <strong>numérateur</strong></td>
+</tr>
+<tr>
+<td>Inverser lignes et colonnes de la jacobienne</td>
+<td> $J(i,j)=\partial f_i/\partial x_j$ : <strong>lignes = SORTIES</strong>, <strong>colonnes = ENTRÉES</strong></td>
+</tr>
+<tr>
+<td>Multiplier les facteurs de la chaîne dans le mauvais ordre</td>
+<td> $\dfrac{\partial g}{\partial f}\dfrac{\partial f}{\partial x}$, jamais $\dfrac{\partial f}{\partial x}\dfrac{\partial g}{\partial f}$ — la multiplication matricielle n'est <strong>pas commutative</strong></td>
+</tr>
+<tr>
+<td>Traiter $\partial f/\partial x$ comme une <strong>fraction</strong></td>
+<td> Le livre le dit : <em>« ce n'est qu'une intuition, pas mathématiquement correct »</em></td>
+</tr>
+<tr>
+<td>Se lancer dans le calcul sans vérifier les dimensions</td>
+<td> <strong>Toujours déterminer la taille du résultat en PREMIER</strong> — c'est le protocole du livre</td>
+</tr>
+<tr>
+<td>Croire qu'un polynôme de Taylor est toujours approximatif</td>
+<td> Pour un <strong>polynôme de degré $k\leqslant n$</strong>, $T_n=f$ <strong>EXACTEMENT</strong> (Ex. 5.3 et 5.15)</td>
+</tr>
+<tr>
+<td>Croire que Taylor converge partout</td>
+<td> Le polynôme est similaire à $f$ <strong>dans un VOISINAGE de $x_0$</strong> ; hors voisinage, il peut diverger</td>
+</tr>
+<tr>
+<td>Oublier le $k!$ au dénominateur</td>
+<td>Il vient de la dérivation répétée de $(x-x_0)^k$</td>
+</tr>
+<tr>
+<td>Écrire $\dfrac{\partial x^\top Bx}{\partial x}=2x^\top B$</td>
+<td> C'est $x^\top(B+B^\top)$ — l'égalité avec $2x^\top B$ n'a lieu que si $B$ est <strong>symétrique</strong></td>
+</tr>
+<tr>
+<td>Oublier la condition « $W$ symétrique »</td>
+<td> L'identité $\dfrac{\partial}{\partial s}(x-As)^\top W(x-As)=-2(x-As)^\top WA$ l'exige explicitement</td>
+</tr>
+<tr>
+<td>Écrire $\dfrac{\partial}{\partial X}f(X)^{-1}=-f(X)^{-2}\dfrac{\partial f}{\partial X}$</td>
+<td> C'est $-f(X)^{-1}\dfrac{\partial f}{\partial X}f(X)^{-1}$ — l'inverse <strong>encadre</strong> la dérivée des deux côtés</td>
+</tr>
+<tr>
+<td>Oublier le facteur 2 sur la diagonale dans l'exemple 5.13</td>
+<td> Quand $p=q$, $\partial K_{pq}/\partial R_{ij}=2R_{iq}$ car la variable apparaît <strong>deux fois</strong></td>
+</tr>
+<tr>
+<td>Négliger les <strong>chemins multiples</strong> en rétropropagation</td>
+<td> Un nœud utilisé plusieurs fois reçoit <strong>une contribution ADDITIVE par chemin</strong></td>
+</tr>
+<tr>
+<td>Croire que la rétropropagation est propre aux réseaux de neurones</td>
+<td> C'est un <strong>cas particulier</strong> de la différentiation automatique en <strong>mode inverse</strong></td>
+</tr>
+<tr>
+<td>Confondre différentiation automatique et symbolique</td>
+<td> Trois choses distinctes : <strong>automatique</strong> (numérique exacte), <strong>symbolique</strong>, <strong>différences finies</strong> (approchée)</td>
+</tr>
+<tr>
+<td>Utiliser le mode direct pour un réseau profond</td>
+<td> Le <strong>mode INVERSE</strong> est bien moins cher quand la dimension d'entrée dépasse celle de la sortie</td>
+</tr>
+<tr>
+<td>Croire que tout programme est différentiable automatiquement</td>
+<td> Les <strong>boucles for</strong> et <strong>instructions if</strong> demandent du soin ; certaines fonctions élémentaires ne sont pas différentiables</td>
+</tr>
+<tr>
+<td>Croire la hessienne toujours symétrique</td>
+<td> Elle l'est si $f$ est <strong>deux fois continûment différentiable</strong> — l'hypothèse compte</td>
+</tr>
+<tr>
+<td>Croire la hessienne toujours une matrice</td>
+<td> Pour un <strong>champ de vecteurs</strong> $f:\mathbb R^n\to\mathbb R^m$, c'est un <strong>TENSEUR</strong> $(m\times n\times n)$</td>
+</tr>
+<tr>
+<td>Écrire $\delta^2$ comme $\delta$ au carré</td>
+<td> C'est le <strong>produit EXTÉRIEUR</strong> $\delta\delta^\top$, une matrice $D\times D$</td>
+</tr>
+<tr>
+<td>Oublier le $\frac12$ du terme quadratique de Taylor</td>
+<td> $\dfrac{D_x^2f(x_0)}{2!}\delta^2=\dfrac12\delta^\top H\delta$</td>
+</tr>
+<tr>
+<td>Croire $|\det J|$ exact pour une transformation non linéaire</td>
+<td> La jacobienne approche <strong>LOCALEMENT</strong> la transformation ; elle n'est exacte que dans le cas <strong>linéaire</strong></td>
+</tr>
+<tr>
+<td>Croire que calculer un gradient coûte bien plus cher que la fonction</td>
+<td> Avec la diff. automatique, le coût est de <strong>complexité SIMILAIRE</strong> — le livre insiste sur ce point contre-intuitif</td>
+</tr>
+</tbody></table>
+<h2>Ultimate Review</h2>
+<pre><code>═════════ LES NEUF FORMULES À SAVOIR SANS HÉSITER ═════════
+  1.  df/dx := lim_{h→0} (f(x+h) − f(x))/h
+  2.  Tn(x) = Σ_{k=0..n} f^(k)(x0)/k! · (x − x0)^k        x0 = 0 → Maclaurin
+  3.  CHAÎNE   (g∘f)' = g'(f) f'      ∂/∂x g(f(x)) = (∂g/∂f)(∂f/∂x)
+  4.  ∇x f = df/dx ∈ R^(1×n)                     ⚠️ VECTEUR LIGNE
+  5.  JACOBIENNE  J(i,j) = ∂fi/∂xj ∈ R^(m×n)     lignes = sorties
+  6.  |det J| = facteur d'échelle des volumes
+  7.  d(Ax)/dx = A         ∂(xᵀBx)/∂x = xᵀ(B + Bᵀ)
+      ∂L/∂θ = −2 eᵀ Φ      pour L = ‖y − Φθ‖²
+  8.  H = ∇²f  SYMÉTRIQUE si f deux fois C¹  ·  mesure la COURBURE
+  9.  TAYLOR MULTIVARIÉ  f(x) = Σ_k D^k f(x0)/k! · δ^k   ,   δ = x − x0
+      k=0 : f(x0)   k=1 : ∇f·δ   k=2 : ½ δᵀ H δ
+═══════════════════════════════════════════════════════════
+</code></pre>
+<p><strong>Le tableau des dimensions — la référence de survie :</strong></p>
+<table>
+<thead>
+<tr>
+<th>$f$</th>
+<th>$df/dx$</th>
+<th>Taille</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$\mathbb R\to\mathbb R$</td>
+<td>scalaire</td>
+<td>$1\times1$</td>
+</tr>
+<tr>
+<td>$\mathbb R^D\to\mathbb R$</td>
+<td>vecteur <strong>ligne</strong></td>
+<td>$1\times D$</td>
+</tr>
+<tr>
+<td>$\mathbb R\to\mathbb R^E$</td>
+<td>vecteur <strong>colonne</strong></td>
+<td>$E\times1$</td>
+</tr>
+<tr>
+<td>$\mathbb R^D\to\mathbb R^E$</td>
+<td><strong>matrice</strong></td>
+<td>$E\times D$</td>
+</tr>
+<tr>
+<td>$\mathbb R^{m\times n}\to\mathbb R^{p\times q}$</td>
+<td><strong>tenseur</strong></td>
+<td>$(p\times q)\times(m\times n)$</td>
+</tr>
+</tbody></table>
+<p><strong>Les trois façons de calculer une dérivée :</strong></p>
+<table>
+<thead>
+<tr>
+<th>Méthode</th>
+<th>Nature</th>
+<th>Coût</th>
+<th>Exactitude</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Symbolique</strong></td>
+<td>Expression fermée</td>
+<td> Explosion de la taille de l'expression</td>
+<td>Exacte</td>
+</tr>
+<tr>
+<td><strong>Différences finies</strong></td>
+<td>$\frac{f(x+h)-f(x-h)}{2h}$</td>
+<td>Une évaluation par variable</td>
+<td> <strong>Approchée</strong></td>
+</tr>
+<tr>
+<td><strong>Automatique</strong></td>
+<td>Graphe + chaîne</td>
+<td> <strong>Même ordre que $f$</strong></td>
+<td>Exacte à la précision machine</td>
+</tr>
+</tbody></table>
+<p><strong>Les deux modes de la différentiation automatique :</strong></p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Mode DIRECT</th>
+<th>Mode INVERSE (= rétropropagation)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Sens</td>
+<td>Avec le flot des données</td>
+<td> <strong>À rebours</strong></td>
+</tr>
+<tr>
+<td>Parenthésage</td>
+<td>$\frac{dy}{db}\left(\frac{db}{da}\frac{da}{dx}\right)$</td>
+<td>$\left(\frac{dy}{db}\frac{db}{da}\right)\frac{da}{dx}$</td>
+</tr>
+<tr>
+<td>Bon quand</td>
+<td>Peu d'entrées, beaucoup de sorties</td>
+<td> <strong>Beaucoup d'entrées, peu de sorties</strong> (réseaux de neurones)</td>
+</tr>
+</tbody></table>
+<p><strong>Où chaque notion resservira dans le livre :</strong></p>
+<table>
+<thead>
+<tr>
+<th>Notion du ch. 5</th>
+<th>Suite</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Gradient, descente de gradient</td>
+<td><strong>Optimisation continue</strong> (ch. 7)</td>
+</tr>
+<tr>
+<td>Déterminant jacobien</td>
+<td><strong>Transformation de variables aléatoires</strong> (§6.7), reparamétrisation</td>
+</tr>
+<tr>
+<td>Perte des moindres carrés et son gradient</td>
+<td><strong>Régression linéaire</strong> (ch. 9)</td>
+</tr>
+<tr>
+<td>Hessienne</td>
+<td><strong>Méthode de Newton</strong>, convexité (ch. 7)</td>
+</tr>
+<tr>
+<td>Rétropropagation</td>
+<td>Entraînement des <strong>réseaux profonds</strong></td>
+</tr>
+<tr>
+<td>Taylor multivarié</td>
+<td>Approximations locales, <strong>Laplace</strong>, méthodes du second ordre</td>
+</tr>
+</tbody></table>
+<div class="rec"><h2>Active Recall</h2><p><strong>Dérivation univariée</strong></p><ol>
+<li>Écrire le quotient différentiel. Que calcule-t-il géométriquement ?</li>
+<li>Écrire la définition de la dérivée. Que devient la sécante ?</li>
+<li>Dans quelle direction pointe la dérivée ?</li>
+<li>Écrire le polynôme de Taylor de degré $n$ et la série de Taylor.</li>
+<li>Qu'est-ce que la série de Maclaurin ? Une fonction analytique ?</li>
+<li>Quand un polynôme de Taylor est-il une représentation <strong>exacte</strong> ?</li>
+<li>Dans l'exemple 5.3, pourquoi $T_6=x^4$ exactement ?</li>
+<li>Quel motif suivent les coefficients dans l'exemple 5.4 ? Quelle est la période ?</li>
+<li>Donner les quatre règles de dérivation.</li>
+<li>Détailler l'exemple 5.5.</li>
+</ol><p><strong>Dérivées partielles et gradient</strong>
+11. Comment calcule-t-on une dérivée partielle ?
+12. Quelle est la taille du gradient de $f:\mathbb R^n\to\mathbb R$ ?
+13. Donner les <strong>deux raisons</strong> pour lesquelles le livre choisit un vecteur ligne.
+14. Écrire la règle de la chaîne multivariée.
+15. Expliquer le mnémonique des « dimensions voisines ». Quelle réserve le livre y met-il ?
+16. Écrire $df/dt$ quand $f(x_1,x_2)$ avec $x_1(t)$, $x_2(t)$.
+17. Détailler l'exemple 5.8.</p><p><strong>Jacobienne</strong>
+18. Définir la jacobienne. Quelle est sa taille ? Quelle convention de disposition ?
+19. Donner le tableau des quatre dimensions de gradient.
+20. Que représente $|\det J|$ ?
+21. La jacobienne est-elle exacte pour une transformation non linéaire ?
+22. Que vaut le gradient de $f(x)=Ax$ ?
+23. Détailler l'exemple 5.10 (les deux dimensions, puis le produit).
+24. Détailler l'exemple 5.11 : dimension, chaîne, les deux facteurs, résultat.
+25. Pourquoi le livre dit-il que l'approche directe devient impraticable ?</p><p><strong>Gradients de matrices</strong>
+26. Quelle est la taille du gradient d'une matrice $m\times n$ relativement à une $p\times q$ ?
+27. Quelle astuce le livre propose-t-il et pourquoi ?
+28. Détailler l'exemple 5.13. D'où vient le facteur $2$ ?
+29. Écrire les identités pour $\operatorname{tr}$, $\det$ et $f(X)^{-1}$.
+30. Écrire $\dfrac{\partial x^\top Bx}{\partial x}$ et $\dfrac{\partial a^\top Xb}{\partial X}$.
+31. Que devient la trace pour un tenseur ? Et la transposée ?</p><p><strong>Rétropropagation</strong>
+32. Pourquoi écrire un gradient explicitement est-il impraticable ?
+33. Écrire la composition d'un réseau profond et sa perte.
+34. Citer trois fonctions d'activation.
+35. Écrire $\partial L/\partial\theta_i$. Quel est l'apport de la rétropropagation ?
+36. Qu'est-ce que la différentiation automatique ? De quoi diffère-t-elle ?
+37. Distinguer mode direct et mode inverse. Lequel est la rétropropagation ?
+38. Pourquoi le mode inverse est-il moins cher pour les réseaux ?
+39. Détailler les six variables intermédiaires de l'exemple 5.14.
+40. Quelle est l'observation contre-intuitive sur le coût ?
+41. Écrire la formule générale de la propagation avant et de la rétropropagation.
+42. Quelles sont les limites de la différentiation automatique ?</p><p><strong>Ordre supérieur et Taylor multivarié</strong>
+43. Distinguer $\dfrac{\partial^2f}{\partial y\,\partial x}$ et $\dfrac{\partial^2f}{\partial x\,\partial y}$.
+44. Sous quelle condition la hessienne est-elle symétrique ?
+45. Que mesure la hessienne ? Quelle est sa taille pour $f:\mathbb R^n\to\mathbb R$ ? Pour un champ de vecteurs ?
+46. Écrire la linéarisation de $f$ autour de $x_0$.
+47. Écrire la série de Taylor multivariée. Qu'est-ce que $\delta$ ?
+48. Qu'est-ce que $\delta^k$ exactement ?
+49. Écrire les termes $k=0,1,2,3$.
+50. Détailler l'exemple 5.15 : ordre 0, 1, 2, 3.
+51. Pourquoi le développement est-il exact et pas seulement local ?</p></div>
+
+
+
+
+
+
+
+<h2>Flashcards</h2>
+<table>
+<thead>
+<tr>
+<th>Question</th>
+<th>Réponse</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Quotient différentiel ?</td>
+<td>$\dfrac{f(x+\delta x)-f(x)}{\delta x}$ — la pente de la <strong>SÉCANTE</strong></td>
+</tr>
+<tr>
+<td>Dérivée ?</td>
+<td>$\dfrac{df}{dx}=\lim_{h\to0}\dfrac{f(x+h)-f(x)}{h}$ — la <strong>TANGENTE</strong></td>
+</tr>
+<tr>
+<td>Direction de la dérivée ?</td>
+<td> La <strong>plus forte MONTÉE</strong></td>
+</tr>
+<tr>
+<td>Polynôme de Taylor de degré $n$ ?</td>
+<td>$T_n(x)=\sum_{k=0}^{n}\dfrac{f^{(k)}(x_0)}{k!}(x-x_0)^k$</td>
+</tr>
+<tr>
+<td>Série de Taylor ?</td>
+<td>La même somme, jusqu'à $\infty$, pour $f\in C^\infty$</td>
+</tr>
+<tr>
+<td>Série de Maclaurin ?</td>
+<td>Taylor en  <strong>$x_0=0$</strong></td>
+</tr>
+<tr>
+<td>Fonction analytique ?</td>
+<td>$f(x)=T_\infty(x)$</td>
+</tr>
+<tr>
+<td>Quand $T_n$ est-il exact ?</td>
+<td> Pour un <strong>polynôme de degré $k\leqslant n$</strong> — toutes les dérivées $f^{(i)}$, $i&gt;k$, s'annulent</td>
+</tr>
+<tr>
+<td>$T_6$ de $x^4$ en $x_0=1$ ?</td>
+<td>$=x^4$ <strong>exactement</strong> ; coefficients $1,4,12,24,24,0,0$</td>
+</tr>
+<tr>
+<td>Motif des coefficients de $\sin+\cos$ ?</td>
+<td> Seulement $\pm1$, chacun <strong>DEUX FOIS</strong>, avec $f^{(k+4)}(0)=f^{(k)}(0)$</td>
+</tr>
+<tr>
+<td>Règle du produit ?</td>
+<td>$(fg)'=f'g+fg'$</td>
+</tr>
+<tr>
+<td>Règle du quotient ?</td>
+<td>$\left(\dfrac fg\right)'=\dfrac{f'g-fg'}{g^2}$</td>
+</tr>
+<tr>
+<td>Règle de la chaîne ?</td>
+<td>$(g\circ f)'(x)=g'(f(x))f'(x)$</td>
+</tr>
+<tr>
+<td>Dérivée de $(2x+1)^4$ ?</td>
+<td>$8(2x+1)^3$</td>
+</tr>
+<tr>
+<td>Comment calcule-t-on une partielle ?</td>
+<td> <strong>Une variable à la fois</strong>, les autres <strong>constantes</strong></td>
+</tr>
+<tr>
+<td>Taille du gradient de $f:\mathbb R^n\to\mathbb R$ ?</td>
+<td> $1\times n$ — un <strong>VECTEUR LIGNE</strong></td>
+</tr>
+<tr>
+<td>Les deux raisons du vecteur ligne ?</td>
+<td>Généralisation <strong>cohérente</strong> aux fonctions vectorielles · application <strong>immédiate</strong> de la chaîne</td>
+</tr>
+<tr>
+<td>Autres noms du gradient ?</td>
+<td>$\nabla_xf$, $\operatorname{grad}f$, $df/dx$, la <strong>jacobienne</strong></td>
+</tr>
+<tr>
+<td>Chaîne multivariée ?</td>
+<td>$\dfrac{\partial}{\partial x}g(f(x))=\dfrac{\partial g}{\partial f}\dfrac{\partial f}{\partial x}$</td>
+</tr>
+<tr>
+<td>Le mnémonique ?</td>
+<td>Les <strong>dimensions voisines</strong> correspondent, $\partial f$ « s'annule »</td>
+</tr>
+<tr>
+<td>La réserve du livre ?</td>
+<td> <em>« Ce n'est qu'une intuition »</em> — $\partial f/\partial x$ <strong>n'est pas une fraction</strong></td>
+</tr>
+<tr>
+<td>Gradient de l'exemple 5.7 ?</td>
+<td>$\begin{bmatrix}2x_1x_2+x_2^3&amp;x_1^2+3x_1x_2^2\end{bmatrix}$</td>
+</tr>
+<tr>
+<td>Résultat de l'exemple 5.8 ?</td>
+<td>$2\sin t(\cos t-1)$</td>
+</tr>
+<tr>
+<td>Jacobienne ?</td>
+<td>La collection des partielles du <strong>premier ordre</strong>, $J(i,j)=\partial f_i/\partial x_j$</td>
+</tr>
+<tr>
+<td>Sa taille ?</td>
+<td>$m\times n$ :  <strong>lignes = SORTIES</strong>, <strong>colonnes = ENTRÉES</strong></td>
+</tr>
+<tr>
+<td>Disposition au numérateur ?</td>
+<td>$df/dx\in\mathbb R^{m\times n}$ — la disposition au <strong>dénominateur</strong> en est la <strong>transposée</strong></td>
+</tr>
+<tr>
+<td>Gradient de $f:\mathbb R^D\to\mathbb R$ ?</td>
+<td>Vecteur <strong>ligne</strong> $1\times D$</td>
+</tr>
+<tr>
+<td>Gradient de $f:\mathbb R\to\mathbb R^E$ ?</td>
+<td>Vecteur <strong>colonne</strong> $E\times1$</td>
+</tr>
+<tr>
+<td>Gradient de $f:\mathbb R^D\to\mathbb R^E$ ?</td>
+<td><strong>Matrice</strong> $E\times D$</td>
+</tr>
+<tr>
+<td>$|\det J|$ ?</td>
+<td> Le facteur d'échelle des <strong>AIRES / VOLUMES</strong></td>
+</tr>
+<tr>
+<td>Exact ou approché ?</td>
+<td><strong>Exact</strong> si linéaire ·  approximation <strong>LOCALE</strong> si non linéaire</td>
+</tr>
+<tr>
+<td>$|\det J|$ dans l'exemple du §5.3 ?</td>
+<td>$3$ (matrice $\begin{bmatrix}-2&amp;1\\1&amp;1\end{bmatrix}$)</td>
+</tr>
+<tr>
+<td>Où le déterminant jacobien resservira-t-il ?</td>
+<td> <strong>§6.7</strong> — transformation de variables aléatoires, <strong>reparamétrisation</strong></td>
+</tr>
+<tr>
+<td>$d(Ax)/dx$ ?</td>
+<td>$A$</td>
+</tr>
+<tr>
+<td>Le protocole du livre avant tout calcul ?</td>
+<td> <strong>Déterminer la DIMENSION du gradient</strong></td>
+</tr>
+<tr>
+<td>$\partial L/\partial\theta$ pour $L=\lVert y-\Phi\theta\rVert^2$ ?</td>
+<td>$-2e^\top\Phi=-2(y^\top-\theta^\top\Phi^\top)\Phi\in\mathbb R^{1\times D}$</td>
+</tr>
+<tr>
+<td>$\partial L/\partial e$ pour $L=\lVert e\rVert^2$ ?</td>
+<td>$2e^\top\in\mathbb R^{1\times N}$</td>
+</tr>
+<tr>
+<td>Gradient d'une matrice relativement à une matrice ?</td>
+<td>Un <strong>TENSEUR</strong> $(m\times n)\times(p\times q)$</td>
+</tr>
+<tr>
+<td>L'astuce du livre ?</td>
+<td> <strong>Aplatir</strong> : $\mathbb R^{m\times n}$ est isomorphe à $\mathbb R^{mn}$</td>
+</tr>
+<tr>
+<td>Pourquoi ?</td>
+<td>La chaîne redevient une <strong>simple multiplication matricielle</strong></td>
+</tr>
+<tr>
+<td>Le facteur $2$ de l'exemple 5.13 ?</td>
+<td> Quand $p=q$, la variable $R_{iq}$ apparaît <strong>deux fois</strong> dans $K_{pp}=\sum_m R_{mp}^2$</td>
+</tr>
+<tr>
+<td>$\dfrac{\partial}{\partial X}\operatorname{tr}(f(X))$ ?</td>
+<td>$\operatorname{tr}\left(\dfrac{\partial f(X)}{\partial X}\right)$</td>
+</tr>
+<tr>
+<td>$\dfrac{\partial}{\partial X}\det(f(X))$ ?</td>
+<td>$\det(f(X))\operatorname{tr}\left(f(X)^{-1}\dfrac{\partial f(X)}{\partial X}\right)$</td>
+</tr>
+<tr>
+<td>$\dfrac{\partial}{\partial X}f(X)^{-1}$ ?</td>
+<td> $-f(X)^{-1}\dfrac{\partial f(X)}{\partial X}f(X)^{-1}$</td>
+</tr>
+<tr>
+<td>$\dfrac{\partial x^\top a}{\partial x}$ ?</td>
+<td>$a^\top$</td>
+</tr>
+<tr>
+<td>$\dfrac{\partial a^\top Xb}{\partial X}$ ?</td>
+<td>$ab^\top$</td>
+</tr>
+<tr>
+<td>$\dfrac{\partial x^\top Bx}{\partial x}$ ?</td>
+<td> $x^\top(B+B^\top)$ — <strong>pas</strong> $2x^\top B$</td>
+</tr>
+<tr>
+<td>$\dfrac{\partial}{\partial s}(x-As)^\top W(x-As)$ ?</td>
+<td>$-2(x-As)^\top WA$  pour $W$ <strong>SYMÉTRIQUE</strong></td>
+</tr>
+<tr>
+<td>Trace d'un tenseur $D\times D\times E\times F$ ?</td>
+<td>Une matrice $E\times F$ — une <strong>contraction tensorielle</strong></td>
+</tr>
+<tr>
+<td>« Transposer » un tenseur ?</td>
+<td> <strong>Échanger les deux premières dimensions</strong></td>
+</tr>
+<tr>
+<td>Composition d'un réseau profond ?</td>
+<td>$y=(f_K\circ\dots\circ f_1)(x)$, $f_i=\sigma(A_{i-1}f_{i-1}+b_{i-1})$</td>
+</tr>
+<tr>
+<td>Trois fonctions d'activation ?</td>
+<td><strong>Sigmoïde</strong> $\frac{1}{1+e^{-x}}$ · <strong>tanh</strong> · <strong>ReLU</strong></td>
+</tr>
+<tr>
+<td>La perte quadratique ?</td>
+<td>$L(\theta)=\lVert y-f_K(\theta,x)\rVert^2$</td>
+</tr>
+<tr>
+<td>$\partial L/\partial\theta_i$ ?</td>
+<td>$\dfrac{\partial L}{\partial f_K}\dfrac{\partial f_K}{\partial f_{K-1}}\cdots\dfrac{\partial f_{i+1}}{\partial\theta_i}$</td>
+</tr>
+<tr>
+<td>L'idée-clé de la rétropropagation ?</td>
+<td> <strong>RÉUTILISER</strong> les calculs déjà faits pour la couche $i+1$</td>
+</tr>
+<tr>
+<td>Les auteurs cités ?</td>
+<td><strong>Kelley (1960), Bryson (1961), Dreyfus (1962), Rumelhart et al. (1986)</strong></td>
+</tr>
+<tr>
+<td>Différentiation automatique ?</td>
+<td>Évaluation <strong>numérique</strong> du gradient <strong>EXACT</strong> (à la précision machine) via variables intermédiaires + chaîne</td>
+</tr>
+<tr>
+<td>Elle diffère de ?</td>
+<td> La différentiation <strong>symbolique</strong> et les <strong>différences finies</strong></td>
+</tr>
+<tr>
+<td>Mode inverse ?</td>
+<td>Les gradients remontent <strong>à rebours</strong> du flot des données — c'est la <strong>rétropropagation</strong></td>
+</tr>
+<tr>
+<td>Mode direct ?</td>
+<td>Les gradients suivent les données de gauche à droite</td>
+</tr>
+<tr>
+<td>Quand le mode inverse gagne-t-il ?</td>
+<td> Quand la dimension d'<strong>entrée est bien plus grande</strong> que celle de la sortie</td>
+</tr>
+<tr>
+<td>Sur quoi repose le choix de mode ?</td>
+<td>L'<strong>ASSOCIATIVITÉ</strong> du produit matriciel</td>
+</tr>
+<tr>
+<td>Les six variables de l'exemple 5.14 ?</td>
+<td>$a=x^2$, $b=\exp(a)$, $c=a+b$, $d=\sqrt c$, $e=\cos(c)$, $f=d+e$</td>
+</tr>
+<tr>
+<td>L'observation contre-intuitive ?</td>
+<td> Le calcul du gradient est de <strong>complexité SIMILAIRE</strong> à celui de la fonction</td>
+</tr>
+<tr>
+<td>Propagation avant, formule générale ?</td>
+<td>$x_i=g_i(x_{\operatorname{Pa}(x_i)})$ pour $i=d+1,\dots,D$</td>
+</tr>
+<tr>
+<td>Rétropropagation, formule générale ?</td>
+<td>$\dfrac{\partial f}{\partial x_i}=\sum_{j:\,x_i\in\operatorname{Pa}(x_j)}\dfrac{\partial f}{\partial x_j}\dfrac{\partial x_j}{\partial x_i}$</td>
+</tr>
+<tr>
+<td>Initialisation de la remontée ?</td>
+<td>$\partial f/\partial x_D=1$</td>
+</tr>
+<tr>
+<td>Les limites de la diff. automatique ?</td>
+<td> <strong>Boucles for</strong>, <strong>instructions if</strong>, fonctions élémentaires non différentiables</td>
+</tr>
+<tr>
+<td>$\dfrac{\partial^2f}{\partial y\,\partial x}$ signifie ?</td>
+<td>D'abord relativement à <strong>$x$</strong>, PUIS à <strong>$y$</strong></td>
+</tr>
+<tr>
+<td>Quand l'ordre n'importe-t-il pas ?</td>
+<td> Si $f$ est <strong>deux fois (continûment) différentiable</strong></td>
+</tr>
+<tr>
+<td>Hessienne ?</td>
+<td>La collection de <strong>toutes</strong> les partielles du <strong>SECOND ordre</strong>, notée $\nabla^2f$</td>
+</tr>
+<tr>
+<td>Sa taille ?</td>
+<td>$n\times n$ pour $f:\mathbb R^n\to\mathbb R$ ;  un <strong>tenseur</strong> $(m\times n\times n)$ pour un champ de vecteurs</td>
+</tr>
+<tr>
+<td>Que mesure-t-elle ?</td>
+<td>La <strong>COURBURE</strong> locale</td>
+</tr>
+<tr>
+<td>Où sert-elle ?</td>
+<td>La <strong>méthode de NEWTON</strong> pour l'optimisation</td>
+</tr>
+<tr>
+<td>Linéarisation ?</td>
+<td>$f(x)\approx f(x_0)+(\nabla_xf)(x_0)(x-x_0)$</td>
+</tr>
+<tr>
+<td>Série de Taylor multivariée ?</td>
+<td>$f(x)=\sum_{k=0}^{\infty}\dfrac{D_x^kf(x_0)}{k!}\delta^k$ avec $\delta:=x-x_0$</td>
+</tr>
+<tr>
+<td>Qu'est-ce que $\delta^k$ ?</td>
+<td> Le <strong>produit EXTÉRIEUR</strong> $k$-uple : $\delta^2=\delta\delta^\top$, $\delta^3[i,j,k]=\delta_i\delta_j\delta_k$</td>
+</tr>
+<tr>
+<td>Terme $k=1$ ?</td>
+<td>$\nabla_xf(x_0)\,\delta$ — produit $(1\times D)(D\times1)$</td>
+</tr>
+<tr>
+<td>Terme $k=2$ ?</td>
+<td>$\dfrac12\delta^\top H(x_0)\delta=\dfrac12\operatorname{tr}(H\delta\delta^\top)$</td>
+</tr>
+<tr>
+<td>Ordre des polynômes dans le terme $k$ ?</td>
+<td> <strong>Exactement $k$</strong></td>
+</tr>
+<tr>
+<td>$f(1,2)$ dans l'exemple 5.15 ?</td>
+<td>$13$</td>
+</tr>
+<tr>
+<td>Gradient en $(1,2)$ ?</td>
+<td>$\begin{bmatrix}6&amp;14\end{bmatrix}$</td>
+</tr>
+<tr>
+<td>Hessienne en $(1,2)$ ?</td>
+<td>$\begin{bmatrix}2&amp;2\\2&amp;12\end{bmatrix}$</td>
+</tr>
+<tr>
+<td>Seule dérivée troisième non nulle ?</td>
+<td>$\partial^3f/\partial y^3=6$</td>
+</tr>
+<tr>
+<td>Le développement complet ?</td>
+<td>$13+6(x-1)+14(y-2)+(x-1)^2+2(x-1)(y-2)+6(y-2)^2+(y-2)^3$</td>
+</tr>
+<tr>
+<td>Est-il exact ?</td>
+<td> <strong>OUI, globalement</strong> — car $f$ est un polynôme de degré 3</td>
+</tr>
+</tbody></table>
+</main>
+
+
+
+
+</body></html>

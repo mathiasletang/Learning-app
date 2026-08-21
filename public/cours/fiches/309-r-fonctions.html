@@ -1,0 +1,1161 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fiche 309 — Écrire ses fonctions : arguments, défauts, ... et évaluation paresseuse</title>
+<script>
+window.MathJax={tex:{inlineMath:[["$","$"]],displayMath:[["$$","$$"]],processEscapes:true},
+ options:{skipHtmlTags:["script","noscript","style","textarea","pre","code"]},
+ svg:{fontCache:"global"},
+ startup:{pageReady:()=>MathJax.startup.defaultPageReady().then(()=>{document.body.classList.add("ready")})}};
+setTimeout(function(){document.body.classList.add("ready")},2500);
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+/* ============================================================
+   MathiasLearn — feuille de style des fiches
+   Reprise intégrale des tokens de 00_PARCOURS/*.html
+   + blocs pédagogiques (callouts, méthode, essentiels, recall)
+   ============================================================ */
+:root{--bg:#faf9f7;--card:#fff;--ink:#1a1a1a;--muted:#6b6b6b;--line:#e5e2dd;--accent:#8b5e34;
+ --hl:#fdf8ef;--ok:#2d7d4f;--okbg:#f0f7f3;--warn:#b3402f;--warnbg:#fdf3f1;--blue:#2f5d8b;--bluebg:#f1f5fa}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+ font:17px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;padding:0 16px 100px}
+.nav{position:sticky;top:0;background:rgba(250,249,247,.96);backdrop-filter:blur(8px);
+ border-bottom:1px solid var(--line);margin:0 -16px 30px;padding:11px 16px;z-index:50;
+ display:flex;gap:6px;flex-wrap:wrap;font-size:13px}
+.nav a{color:var(--muted);text-decoration:none;padding:4px 9px;border-radius:5px;white-space:nowrap}
+.nav a:hover{background:var(--line);color:var(--ink)}
+.nav a.on{background:var(--accent);color:#fff}
+main{max-width:780px;margin:0 auto}
+h1{font-size:31px;letter-spacing:-.02em;margin:.4em 0 .5em;line-height:1.25}
+h2{font-size:23px;margin:2.2em 0 .7em;padding-bottom:.3em;border-bottom:1px solid var(--line)}
+h3{font-size:19px;margin:1.9em 0 .5em;color:var(--accent)}
+h4{font-size:17px;margin:1.5em 0 .4em}
+p{margin:.8em 0} a{color:var(--accent)} hr{border:0;border-top:1px solid var(--line);margin:2.6em 0}
+table{border-collapse:collapse;width:100%;margin:1.3em 0;font-size:15.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+th{background:#f3f0eb;font-weight:600}
+tr:nth-child(even) td{background:#fcfbfa}
+code{font-family:"SF Mono",Menlo,Consolas,monospace;font-size:.88em;background:#f2efea;padding:2px 6px;border-radius:4px;overflow-wrap:break-word}
+pre{background:#f2efea;padding:14px 16px;border-radius:8px;overflow-x:auto}
+pre code{background:none;padding:0;white-space:pre}
+blockquote{border-left:3px solid var(--accent);background:var(--hl);margin:1.4em 0;padding:14px 20px;border-radius:0 8px 8px 0}
+blockquote p:first-child{margin-top:0} blockquote p:last-child{margin-bottom:0}
+ul,ol{padding-left:1.5em} li{margin:.35em 0} em{color:#4a4a4a}
+mjx-container[display="true"]{margin:1.1em 0!important;overflow-x:auto;overflow-y:hidden;padding:2px 0}
+mjx-container svg{max-width:100%}
+body:not(.ready) main{opacity:0} main{opacity:1;transition:opacity .25s}
+
+/* --- bandeau de tête de fiche --- */
+.cours{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--accent);
+ border-radius:0 10px 10px 0;padding:18px 22px;margin:0 0 34px}
+.cours h4{margin:0 0 4px;font-size:14px;text-transform:uppercase;letter-spacing:.07em;color:var(--accent)}
+.cours .cs{color:var(--muted);font-size:14.5px;margin:0 0 14px}
+
+/* --- exercices / corrigés --- */
+.ex{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:6px 24px 20px;margin:18px 0}
+.ex>h3:first-child{margin-top:14px}
+details.cor{margin-top:18px;border:1px solid var(--line);border-radius:8px;background:#fcfbfa;overflow:hidden}
+details.cor>summary{cursor:pointer;padding:12px 16px;font-weight:600;font-size:15px;color:var(--accent);
+ list-style:none;display:flex;align-items:center;gap:9px;user-select:none;transition:.15s;min-height:44px}
+details.cor>summary::-webkit-details-marker{display:none}
+details.cor>summary:hover{background:var(--hl)}
+details.cor>summary::before{content:"\25B6";font-size:10px;transition:transform .18s;display:inline-block}
+details.cor[open]>summary::before{transform:rotate(90deg)}
+details.cor[open]>summary{background:var(--okbg);color:var(--ok);border-bottom:1px solid var(--line)}
+.cor .in{padding:4px 20px 16px}
+.cor .in>*:first-child{margin-top:.9em}
+
+/* --- blocs pédagogiques (callouts) ---
+   Générés depuis une citation Markdown dont le premier **gras** commence
+   par un mot-clé : DÉFINITION, THÉORÈME, MÉTHODE, PIÈGE, INTUITION… */
+.cal{border:1px solid var(--line);border-left:4px solid var(--accent);background:var(--card);
+ border-radius:0 10px 10px 0;padding:15px 20px;margin:1.5em 0}
+.cal>p:first-child{margin-top:0}.cal>p:last-child,.cal>ul:last-child,.cal>ol:last-child{margin-bottom:0}
+.cal .lab{display:block;font-size:12.5px;text-transform:uppercase;letter-spacing:.08em;
+ font-weight:700;color:var(--accent);margin-bottom:6px}
+.cal.formel{background:var(--hl)}
+.cal.piege{border-left-color:var(--warn);background:var(--warnbg)}
+.cal.piege .lab{color:var(--warn)}
+.cal.methode{border-left-color:var(--ok);background:var(--okbg)}
+.cal.methode .lab{color:var(--ok)}
+.cal.intu{border-left-color:var(--blue);background:var(--bluebg)}
+.cal.intu .lab{color:var(--blue)}
+.cal.plus{border-left-style:dashed;background:#faf9f7}
+.cal.plus .lab{color:var(--muted)}
+
+/* --- révision express --- */
+.ess{background:var(--card);border:1px solid var(--accent);border-radius:10px;padding:4px 24px 20px;margin:1.6em 0}
+.ess h3{margin-top:1.3em}
+.rec{background:var(--card);border:1px dashed var(--accent);border-radius:10px;padding:4px 24px 18px;margin:1.6em 0}
+.rec ol{counter-reset:none}
+
+/* --- impression / PDF --- */
+@media print{
+ .nav{display:none}
+ body{padding:0;background:#fff;font-size:11.2pt;line-height:1.55}
+ main{max-width:none}
+ h1{font-size:23pt}h2{font-size:15pt;margin-top:1.5em}h3{font-size:12.6pt}
+ h2,h3,h4{break-after:avoid;page-break-after:avoid}
+ table,.cal,blockquote{break-inside:avoid;page-break-inside:avoid}
+ table{display:table;font-size:9.6pt}
+ details.cor{border:1px solid var(--line);background:#fcfbfa}
+ details.cor>summary{display:none}
+ details.cor .in{padding-top:10px}
+ .cal,.ex,.ess,.rec{box-shadow:none}
+ a{color:var(--ink);text-decoration:none}
+}
+@page{margin:16mm 15mm 18mm}
+
+/* --- exemples travaillés --- */
+.exm{background:#fcfbfa;border:1px solid var(--line);border-radius:10px;padding:2px 20px 14px;margin:1.5em 0}
+.exm>h4:first-child{margin:14px 0 .5em;color:var(--accent);font-size:13px;text-transform:uppercase;letter-spacing:.07em}
+
+
+/* --- pastilles de priorité (conventions des fiches de l'app) --- */
+h2[data-prio], h3[data-prio], h4[data-prio]{position:relative}
+h2[data-prio]::before,h3[data-prio]::before,h4[data-prio]::before{
+ content:"";display:inline-block;width:9px;height:9px;border-radius:50%;
+ margin-right:9px;vertical-align:middle;background:var(--muted)}
+[data-prio="must"]::before{background:var(--warn)}
+[data-prio="high"]::before{background:#d98324}
+[data-prio="mid"]::before{background:#c9a227}
+[data-prio="low"]::before{background:var(--ok)}
+/* corrigés des fiches de l'app : même traitement que les corrigés des séries */
+details.cor>summary::after{content:""}
+</style></head><body>
+<div class="nav"><a href="00_COMMENCER_ICI.html">Commencer ici</a><a href="01_NOTATIONS_le-decodeur.html">Notations</a><a href="02_EXERCICES_Serie-0.html">Série 0 — Remise en route</a><a href="03_EXERCICES_Serie-1.html">Série 1 — Convexité</a><a href="04_EXERCICES_Serie-2.html">Série 2 — KKT</a><a href="05_AUTO-EVALUATION.html">Auto-évaluation (quiz)</a><a href="06_FICHE_Optimisation-deux-variables.html">Fiche — Optimisation à 2 variables</a></div>
+<main><h1>Fiche 309 — Écrire ses fonctions : arguments, défauts, <code>...</code> et évaluation paresseuse</h1>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Matière</strong></td>
+<td>Code · Langage R</td>
+</tr>
+<tr>
+<td><strong>Cours source</strong></td>
+<td>R Core Team, <em>An Introduction to R</em> 4.6.1 — chapitre 10 « Writing your own functions » (§10.1 exemples simples, §10.2 opérateurs binaires, §10.3 arguments nommés et défauts, §10.4 l'argument <code>...</code>, §10.5 assignations dans une fonction, §10.6 exemples avancés)</td>
+</tr>
+<tr>
+<td><strong>Sources d'appoint</strong></td>
+<td><em>R Language Definition</em> 4.6.1, chapitre 4 « Functions » — §4.1 écrire, §4.1.2 arguments, §4.2 fonctions comme objets, §4.3.1 environnement d'évaluation, §4.3.2 <strong>appariement des arguments</strong>, §4.3.3 <strong>évaluation des arguments</strong> ; §2.1.5 « Function objects », §2.1.8 « Promise objects »</td>
+</tr>
+<tr>
+<td><strong>Difficulté</strong></td>
+<td> Avancé — le chapitre qui fait passer d'utilisateur à programmeur</td>
+</tr>
+<tr>
+<td><strong>Temps d'étude estimé</strong></td>
+<td>2 h</td>
+</tr>
+<tr>
+<td><strong>Prérequis</strong></td>
+<td>Fiches 300 à 308</td>
+</tr>
+<tr>
+<td><strong>Concepts clés</strong></td>
+<td>définition, valeur = <strong>dernière expression</strong>, fonction <strong>anonyme</strong>, opérateur <code>%nom%</code>, arguments <strong>nommés</strong> et <strong>positionnels</strong>, <strong>défauts arbitraires</strong>, <code>...</code>, <code>list(...)</code>, <code>..1</code>/<code>..n</code>, assignations <strong>locales</strong>, <code>&lt;&lt;-</code>, <code>assign()</code>, appariement en <strong>trois passes</strong>, <code>missing()</code>, <strong>call-by-value</strong>, <strong>évaluation paresseuse</strong>, <strong>promesses</strong>, <strong>forcer</strong>, <code>substitute()</code>, <code>match.arg</code>, <code>match.call</code>, <code>pmatch</code></td>
+</tr>
+<tr>
+<td><strong>À retenir en priorité</strong></td>
+<td><strong>L'appariement en trois passes</strong> · <strong>les défauts sont évalués dans la fonction, les arguments fournis chez l'appelant</strong> · <strong>l'évaluation paresseuse</strong> · <strong><code>&lt;&lt;-</code></strong> · le fait qu'<strong>une fonction ne modifie jamais son argument</strong>.</td>
+</tr>
+</tbody></table>
+<h2>Vue d'ensemble</h2>
+<pre><code>DEFINIR       nom &lt;- function(arg1, arg2, ...) expression
+              « The value of the expression is THE VALUE RETURNED »
+              une fonction sans nom est ANONYME (apply, outer...)
+
+OPERATEUR     "%!%" &lt;- function(X, y) { ... }      s'utilise  X %!% y
+              (noter les GUILLEMETS dans la definition)
+
+ARGUMENTS     positionnels, puis nommes -- dans N'IMPORTE QUEL ORDRE une fois nommes
+              defauts : arg = expression
+              « defaults may be ARBITRARY EXPRESSIONS, even involving OTHER
+                ARGUMENTS to the same function »
+
+APPARIEMENT EN TROIS PASSES
+   1. tags EXACTS
+   2. tags PARTIELS     (seulement AVANT le ... s'il y en a un)
+   3. POSITION          (le ... prend tout le reste, nomme ou non)
+   reste non apparie -&gt; ERREUR
+
+...           passe des arguments a une autre fonction
+              list(...) les evalue tous ; ..1, ..2, ..n un par un
+
+ASSIGNATIONS  « any ordinary assignments done within the function are
+                LOCAL AND TEMPORARY and are LOST AFTER EXIT »
+              pour sortir : &lt;&lt;-  ou  assign()
+
+EVALUATION    call-by-value : changer un argument NE CHANGE PAS l'appelant
+              PARESSEUSE : « arguments are NOT EVALUATED UNTIL NEEDED »
+                           « in some cases the argument WILL NEVER BE EVALUATED »
+              une PROMESSE : expression + environnement -&gt; puis valeur, une SEULE fois
+
+OU SONT-ILS EVALUES ?
+   arguments FOURNIS -&gt; dans le cadre de l'APPELANT
+   arguments par DEFAUT -&gt; dans le cadre de la FONCTION
+</code></pre>
+<p><strong>Le problème posé.</strong> <em>« The R language allows the user to <strong>create objects of mode function</strong>. <strong>These are true R functions</strong> that are stored in a special internal form and may be used in further expressions … <strong>In the process, the language gains enormously in power, convenience and elegance</strong>, and <strong>learning to write useful functions is one of the main ways to make your use of R comfortable and productive</strong>. »</em> (§10)</p>
+<div class="cal intu"><span class="lab">Intuition — il n'y a pas deux catégories de fonctions.</span>
+<p> <em>« <strong>It should be emphasized that most of the functions supplied as part of the R system, such as <code>mean()</code>, <code>var()</code>, <code>postscript()</code> and so on, are themselves written in R and thus do not differ materially from user written functions.</strong> »</em> (§10)</p>
+<p>Le §1.1 l'avait annoncé (<em>« most of the system supplied functions are themselves written in the S language »</em>, fiche 300). Ici, la conséquence est explicitée : <strong>vos fonctions sont des citoyennes de première classe</strong>. Elles se passent en argument, se rangent dans des listes, se renvoient comme résultat — et rien ne les distingue de <code>mean</code>.</p>
+</div>
+<h2 data-prio="must">Concept 1 — Définir une fonction</h2>
+<div class="cal formel"><span class="lab">Définition (§10).</span>
+<p> <em>« A function is defined by an assignment of the form</em></p>
+<pre><code class="language-r">nom &lt;- function(arg_1, arg_2, ...) expression
+</code></pre>
+<p><em>The <code>expression</code> is an R expression, (<strong>usually a grouped expression</strong>), that uses the arguments to calculate a value. <strong>The value of the expression is the value returned for the function.</strong> »</em></p>
+<p><em>« A call to the function then usually takes the form <code>nom(expr_1, expr_2, ...)</code> and <strong>may occur anywhere a function call is legitimate</strong>. »</em></p>
+</div>
+<p><strong>Il n'y a pas de <code>return</code> obligatoire.</strong> La valeur de la fonction est <strong>celle de son corps</strong>, donc celle de sa <strong>dernière expression</strong> (fiche 308, §9.1 : <em>« the value of the group is the result of the last expression »</em>).</p>
+<div class="cal plus"><span class="lab">Complément (R Language Definition §4.1.1).</span>
+<p> *« The syntax for writing a function is <code>function ( arglist ) body</code>. … An argument list is a <strong>comma separated list of formal arguments</strong>. A formal argument can be <strong>a symbol</strong>, <strong>a statement of the form <code>symbol = expression</code></strong>, or <strong>the special formal argument <code>...</code></strong>. »*</p>
+<p><em>« <strong>Generally functions are assigned to symbols but they don't need to be.</strong> The value returned by the call to <code>function</code> <strong>is a function</strong>. <strong>If this is not given a name it is referred to as an anonymous function.</strong> <strong>Anonymous functions are most frequently used as arguments to other functions such as the <code>apply</code> family or <code>outer</code>.</strong> »</em></p>
+</div>
+<p>C'est exactement ce qu'on a écrit en fiche 305 sans le nommer :</p>
+<pre><code class="language-r">z &lt;- outer(x, y, function(x, y) cos(y)/(1 + x^2))
+</code></pre>
+<p>La fonction n'a <strong>pas de nom</strong> : elle est créée, passée, utilisée, oubliée.</p>
+<div class="cal plus"><span class="lab">Complément (§4.2).</span>
+<p> <em>« <strong>Functions are first class objects in R.</strong> They can be used <strong>anywhere that an R object is required</strong>. In particular they can be <strong>passed as arguments to functions and returned as values from functions</strong>. »</em></p>
+</div>
+<h3>1.1 Le premier exemple du cours : la statistique $t$ à deux échantillons</h3>
+<blockquote>
+<p><strong>Exemple (§10.1).</strong> *« consider a function to calculate the two sample t-statistic, <strong>showing "all the steps"</strong>. This is <strong>an artificial example</strong>, of course, since there are other, simpler ways of achieving the same end. »*</p>
+</blockquote>
+<pre><code class="language-r">twosam &lt;- function(y1, y2) {
+  n1  &lt;- length(y1); n2  &lt;- length(y2)
+  yb1 &lt;- mean(y1);   yb2 &lt;- mean(y2)
+  s1  &lt;- var(y1);    s2  &lt;- var(y2)
+  s   &lt;- ((n1-1)*s1 + (n2-1)*s2)/(n1+n2-2)
+  tst &lt;- (yb1 - yb2)/sqrt(s*(1/n1 + 1/n2))
+  tst
+}
+</code></pre>
+<pre><code class="language-r">tstat &lt;- twosam(data$male, data$female); tstat
+</code></pre>
+<div class="cal intu"><span class="lab">Contrôle — reconnaître la formule.</span>
+<p> La variable <code>s</code> est <strong>la variance mise en commun</strong> (<em>pooled variance</em>)
+$$s_p^2=\frac{(n_1-1)s_1^2+(n_2-1)s_2^2}{n_1+n_2-2}$$
+et <code>tst</code> est la statistique de Student à variances égales
+$$t=\frac{\bar y_1-\bar y_2}{s_p\sqrt{\tfrac1{n_1}+\tfrac1{n_2}}}$$
+— le dénominateur du code, <code>sqrt(s*(1/n1 + 1/n2))</code>, est bien $s_p\sqrt{1/n_1+1/n_2}$ puisque <code>s</code> est <strong>la variance</strong>, pas l'écart-type. </p>
+<p>Et la dernière ligne, <code>tst</code>, <strong>n'est pas une coquetterie</strong> : c'est ce qui fait la valeur de retour.</p>
+</div>
+<h3>1.2 Le second exemple : le « backslash » de Matlab</h3>
+<blockquote>
+<p><strong>Exemple (§10.1).</strong> *« consider a function to <strong>emulate directly the Matlab backslash command</strong>, which returns <strong>the coefficients of the orthogonal projection of the vector <code>y</code> onto the column space of the matrix <code>X</code></strong>. (<strong>This is ordinarily called the least squares estimate of the regression coefficients.</strong>) »*</p>
+<p><em>« given a $n\times1$ vector <code>y</code> and an $n\times p$ matrix <code>X</code>, then $X\backslash y$ is defined as $(X^{\mathsf T}X)^{-}X^{\mathsf T}y$, <strong>where $(X^{\mathsf T}X)^{-}$ is a generalized inverse</strong> »</em>.</p>
+</blockquote>
+<pre><code class="language-r">bslash &lt;- function(X, y) {
+  X &lt;- qr(X)
+  qr.coef(X, y)
+}
+regcoeff &lt;- bslash(Xmat, yvar)
+</code></pre>
+<p><em>« The classical R function <code>lsfit()</code> <strong>does this job quite well, and more</strong>. <strong>It in turn uses the functions <code>qr()</code> and <code>qr.coef()</code> in the slightly counterintuitive way above.</strong> Hence <strong>there is probably some value in having just this part isolated in a simple to use function if it is going to be in frequent use</strong>. »</em></p>
+<div class="cal methode"><span class="lab">Méthode — la justification d'écrire une fonction.</span>
+<p> Le cours ne dit pas « écrivez des fonctions parce que c'est bien ». Il donne un critère : <strong>isoler un usage fréquent d'une mécanique contre-intuitive</strong>. <code>qr()</code> puis <code>qr.coef()</code> est <em>« slightly counterintuitive »</em> ; l'envelopper une fois évite de s'en souvenir vingt fois.</p>
+</div>
+<p class="cal piege"> <strong>Notez <code>X &lt;- qr(X)</code> dans le corps.</strong> L'argument <code>X</code> est réassigné — et le §10.5 garantit que <strong>cela n'affecte pas l'appelant</strong>. C'est ce qui rend l'écriture sûre.</p>
+<h2 data-prio="must">Concept 2 — Définir un opérateur binaire</h2>
+<div class="cal methode"><span class="lab">Méthode (§10.2).</span>
+<p> *« Had we given the <code>bslash()</code> function a different name, namely <strong>one of the form <code>%anything%</code></strong>, it <strong>could have been used as a binary operator</strong> in expressions rather than in function form. »*</p>
+</div>
+<pre><code class="language-r">"%!%" &lt;- function(X, y) { ... }     # noter les GUILLEMETS
+X %!% y                             # s'utilise ainsi
+</code></pre>
+<p>*« (<strong>Note the use of quote marks.</strong>) … <strong>The backslash symbol itself is not a convenient choice as it presents special problems in this context.</strong> »*</p>
+<p><em>« <strong>The matrix multiplication operator <code>%*%</code> and the outer product matrix operator <code>%o%</code> are other examples of binary operators defined in this way.</strong> »</em></p>
+<div class="cal intu"><span class="lab">En clair — pourquoi les guillemets.</span>
+<p> <code>%!%</code> n'est pas un identifiant valide (fiche 300) : le parseur ne peut pas le lire comme un nom. Les guillemets en font <strong>une chaîne</strong>, et l'assignation crée un objet portant ce nom. C'est le mécanisme de la fiche 302 : <em>« objects can have names that are not identifiers »</em>. Et à l'usage, c'est la remarque du §3.1.4 (fiche 301) qui joue : <strong>un opérateur est une fonction</strong>, donc définir une fonction au bon nom suffit à créer un opérateur.</p>
+</div>
+<h2 data-prio="must">Concept 3 — Arguments nommés et valeurs par défaut</h2>
+<blockquote>
+<p><strong>Règle (§10.3).</strong> <em>« if arguments to called functions are given in the <strong>"name=object" form</strong>, they may be <strong>given in any order</strong>. Furthermore <strong>the argument sequence may begin in the unnamed, positional form, and specify named arguments after the positional arguments</strong>. »</em></p>
+</blockquote>
+<pre><code class="language-r">fun1 &lt;- function(data, data.frame, graph, limit) { ... }
+
+ans &lt;- fun1(d, df, TRUE, 20)                                  # tout positionnel
+ans &lt;- fun1(d, df, graph = TRUE, limit = 20)                  # mixte
+ans &lt;- fun1(data = d, limit = 20, graph = TRUE, data.frame = df)  # tout nomme, ordre libre
+</code></pre>
+<p><em>« <strong>are all equivalent</strong> »</em>.</p>
+<blockquote>
+<p><strong>Règle — les défauts (§10.3).</strong> <em>« In many cases arguments can be given <strong>commonly appropriate default values</strong>, in which case <strong>they may be omitted altogether from the call when the defaults are appropriate</strong>. »</em></p>
+</blockquote>
+<pre><code class="language-r">fun1 &lt;- function(data, data.frame, graph = TRUE, limit = 20) { ... }
+
+ans &lt;- fun1(d, df)              # equivalent aux trois appels ci-dessus
+ans &lt;- fun1(d, df, limit = 10)  # « changes one of the defaults »
+</code></pre>
+<blockquote>
+<p class="cal piege"> <strong>La phrase à ne pas manquer (§10.3).</strong> <em>« <strong>It is important to note that defaults may be arbitrary expressions, even involving other arguments to the same function ; they are not restricted to be constants</strong> as in our simple example here. »</em></p>
+<p>Un défaut peut donc s'écrire <code>n = length(x)</code>, <code>label = deparse(x)</code>, <code>sd = sqrt(var(x))</code>. Cela n'est possible que parce que <strong>les défauts ne sont pas évalués à la définition</strong>, mais <strong>au moment où on en a besoin</strong> — c'est le concept 7.</p>
+</blockquote>
+<div class="cal plus"><span class="lab">Complément (R Language Definition §4.1.2).</span>
+<p> <em>« Default values … can be specified using the special form <code>name = expression</code>. In this case, <strong>if the user does not specify a value … the expression will be associated with the corresponding symbol. When a value is needed the expression is evaluated in the evaluation frame of the function.</strong> »</em></p>
+<p>*« Default behaviours can also be specified by using <strong>the function <code>missing</code></strong>. <strong>When <code>missing</code> is called with the name of a formal argument it returns <code>TRUE</code> if the formal argument was not matched with any actual argument and has not been subsequently modified in the body of the function.</strong> …  <strong>The <code>missing</code> function does not force evaluation of the argument.</strong> »*</p>
+</div>
+<h2 data-prio="must">Concept 4 — L'argument <code>...</code></h2>
+<div class="cal formel"><span class="lab">Définition (§10.4).</span>
+<p> <em>« Another frequent requirement is <strong>to allow one function to pass on argument settings to another</strong>. For example many graphics functions use the function <code>par()</code> and functions like <code>plot()</code> <strong>allow the user to pass on graphical parameters to <code>par()</code> to control the graphical output</strong>. This can be done by <strong>including an extra argument, literally <code>...</code>, of the function, which may then be passed on</strong>. »</em></p>
+</div>
+<pre><code class="language-r">fun1 &lt;- function(data, data.frame, graph = TRUE, limit = 20, ...) {
+  [omitted statements]
+  if (graph)
+    par(pch = "*", ...)
+  [more omissions]
+}
+</code></pre>
+<blockquote>
+<p><strong>Règle (§10.4).</strong> <em>« <strong>Less frequently, a function will need to refer to components of <code>...</code>.</strong> The expression <strong><code>list(...)</code> evaluates all such arguments and returns them in a named list</strong>, while <strong><code>..1</code>, <code>..2</code>, etc. evaluate them one at a time, with <code>..n</code> returning the n-th unmatched argument</strong>. »</em></p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>Besoin</th>
+<th>Écriture</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Transmettre</strong> tels quels</td>
+<td>mettre <code>...</code> dans l'appel — c'est l'usage normal</td>
+</tr>
+<tr>
+<td>Les <strong>examiner tous</strong></td>
+<td><strong><code>list(...)</code></strong> — les évalue et rend <strong>une liste nommée</strong></td>
+</tr>
+<tr>
+<td>En prendre <strong>un seul</strong></td>
+<td><strong><code>..1</code></strong>, <strong><code>..2</code></strong>, … — le <strong>n-ième non apparié</strong></td>
+</tr>
+</tbody></table>
+<div class="cal plus"><span class="lab">Complément (R Language Definition §4.1.2).</span>
+<p> <em>« The special type of argument <code>...</code> <strong>can contain any number of supplied arguments</strong>. It is used for a variety of purposes. <strong>It allows you to write a function that takes an arbitrary number of arguments.</strong> It can be used to <strong>absorb some arguments into an intermediate function which can then be extracted by functions called subsequently</strong>. »</em></p>
+<p>Et (§2.1.9, fiche 303) : <em>« <strong>If a function has <code>...</code> as a formal argument then any actual arguments that do not match a formal argument are matched with <code>...</code>.</strong> »</em></p>
+</div>
+<p class="cal piege"> <strong><code>list(...)</code> force l'évaluation.</strong> Le §2.1.9 le note entre parenthèses : *« The object can be captured (<strong>with promises being forced!</strong>) as a list »*. Tant qu'on se contente de transmettre <code>...</code>, rien n'est évalué (concept 7) ; dès qu'on écrit <code>list(...)</code>, tout l'est.</p>
+<h2 data-prio="must">Concept 5 — L'appariement des arguments en trois passes</h2>
+<blockquote>
+<p><strong>Règle (<em>R Language Definition</em> §4.3.2).</strong> <em>« The first thing that occurs in a function evaluation is <strong>the matching of formal to the actual or supplied arguments</strong>. This is done by <strong>a three-pass process</strong> »</em> :</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>Passe</th>
+<th>Règle</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>1. Tags exacts</strong></td>
+<td><em>« For each named supplied argument the list of formal arguments is searched for an item whose name <strong>matches exactly</strong>. <strong>It is an error to have the same formal argument match several actuals or vice versa.</strong> »</em></td>
+</tr>
+<tr>
+<td><strong>2. Tags partiels</strong></td>
+<td><em>« Each remaining named supplied argument is compared to the remaining formal arguments <strong>using partial matching</strong> … <strong>It is an error to have multiple partial matches.</strong> … <strong>If the formal arguments contain <code>...</code> then partial matching is only applied to arguments that precede it.</strong> »</em></td>
+</tr>
+<tr>
+<td><strong>3. Position</strong></td>
+<td><em>« Any unmatched formal arguments are <strong>bound to unnamed supplied arguments, in order</strong>. <strong>If there is a <code>...</code> argument, it will take up the remaining arguments, tagged or not.</strong> »</em></td>
+</tr>
+</tbody></table>
+<p><em>« <strong>If any arguments remain unmatched an error is declared.</strong> »</em></p>
+<blockquote>
+<p><strong>L'exemple du manuel, à décortiquer (§4.3.2).</strong> *« Notice that if <code>f &lt;- function(fumble, fooey) fbody</code>, then <strong><code>f(f = 1, fo = 2)</code> is illegal</strong>, even though <strong>the 2nd actual argument only matches <code>fooey</code></strong>. <strong><code>f(f = 1, fooey = 2)</code> is legal though</strong>, since <strong>the second argument matches exactly and is removed from consideration for partial matching</strong>. »*</p>
+<p><strong>Pourquoi <code>f(f = 1, fo = 2)</code> échoue.</strong> Passe 1 : aucun tag n'apparie exactement (<code>f</code> n'est pas <code>fumble</code>, <code>fo</code> n'est pas <code>fooey</code>). Passe 2 : <code>f</code> est un préfixe <strong>de <code>fumble</code> et de <code>fooey</code></strong> → <strong>appariement partiel multiple</strong> → erreur. Le fait que <code>fo</code> désigne sans ambiguïté <code>fooey</code> <strong>n'y change rien</strong>, parce que <code>f</code> a été traité <strong>avant</strong>.</p>
+<p><strong>Pourquoi <code>f(f = 1, fooey = 2)</code> réussit.</strong> Passe 1 : <code>fooey</code> apparie <strong>exactement</strong> et <strong>sort du jeu</strong>. Passe 2 : <code>f</code> n'a plus que <code>fumble</code> comme candidat → appariement partiel <strong>unique</strong> → succès.</p>
+<p><strong>La leçon</strong> : l'appariement partiel dépend de <strong>ce qui reste</strong>, donc de l'ordre des passes. Un argument abrégé peut devenir ambigu <strong>parce qu'un autre argument a changé</strong>.</p>
+</blockquote>
+<blockquote>
+<p class="cal piege"> <strong>L'exception des primitives (§4.3.2).</strong> *« <strong>This subsection applies to closures but not to primitive functions.</strong> The latter <strong>typically ignore tags and do positional matching</strong>, but their help pages should be consulted <strong>for exceptions, which include <code>log</code>, <code>round</code>, <code>signif</code>, <code>rep</code> and <code>seq.int</code></strong>. »*</p>
+</blockquote>
+<p>*« Argument matching is augmented by the functions <strong><code>match.arg</code>, <code>match.call</code> and <code>match.fun</code></strong>. Access to the partial matching algorithm used by R is via <strong><code>pmatch</code></strong>. »*</p>
+<h2 data-prio="must">Concept 6 — Les assignations dans une fonction sont locales</h2>
+<blockquote>
+<p><strong>Règle (§10.5).</strong> <em>« <strong>Note that any ordinary assignments done within the function are local and temporary and are lost after exit from the function.</strong> Thus <strong>the assignment <code>X &lt;- qr(X)</code> does not affect the value of the argument in the calling program.</strong> »</em></p>
+</blockquote>
+<div class="cal plus"><span class="lab">Complément (R Language Definition §4.3.3).</span>
+<p> <em>« <strong>The semantics of invoking a function in R are call-by-value.</strong> In general, <strong>supplied arguments behave as if they are local variables initialized with the value supplied and the name of the corresponding formal argument</strong>. <strong>Changing the value of a supplied argument within a function will not affect the value of the variable in the calling frame.</strong> »</em></p>
+</div>
+<p>C'est la sémantique de copie de la fiche 302, appliquée aux fonctions. <strong>Une fonction R ne modifie jamais son argument</strong> — la seule exception du langage restant l'environnement (fiche 303).</p>
+<div class="cal methode"><span class="lab">Méthode — sortir de la fonction quand même (§10.5).</span>
+<p> <em>« <strong>If global and permanent assignments are intended within a function, then either the "superassignment" operator, <code>&lt;&lt;-</code>, or the function <code>assign()</code> can be used.</strong> »</em></p>
+</div>
+<p><em>« To understand completely the rules governing the scope of R assignments the reader needs to be familiar with <strong>the notion of an evaluation frame</strong>. This is <strong>a somewhat advanced, though hardly difficult, topic</strong> and is not covered further here. »</em> — c'est l'objet de la <strong>fiche 310</strong>.</p>
+<h2 data-prio="must">Concept 7 — Évaluation paresseuse et promesses</h2>
+<p>C'est la partie du langage qui explique le plus de comportements surprenants, et <em>An Introduction to R</em> n'en dit rien. Tout vient de la <em>R Language Definition</em> §4.3.3.</p>
+<blockquote>
+<p><strong>Règle — où les arguments sont évalués.</strong> <em>« One of the most important things to know about the evaluation of arguments to a function is that <strong>supplied arguments and default arguments are treated differently</strong>. <strong>The supplied arguments to a function are evaluated in the evaluation frame of the calling function. The default arguments to a function are evaluated in the evaluation frame of the function.</strong> »</em></p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Évalué <strong>où</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Argument <strong>fourni</strong> par l'appelant</td>
+<td>dans le cadre de <strong>l'appelant</strong></td>
+</tr>
+<tr>
+<td>Argument <strong>par défaut</strong></td>
+<td>dans le cadre de <strong>la fonction</strong></td>
+</tr>
+</tbody></table>
+<p><strong>C'est ce qui rend possible</strong> la phrase du §10.3 : <em>« defaults may be arbitrary expressions, <strong>even involving other arguments to the same function</strong> »</em>. Un défaut <code>n = length(x)</code> est évalué <strong>là où <code>x</code> existe</strong> — à l'intérieur de la fonction.</p>
+<blockquote>
+<p><strong>Règle — la paresse.</strong> <em>« <strong>R has a form of lazy evaluation of function arguments. Arguments are not evaluated until needed.</strong> <strong>It is important to realize that in some cases the argument will never be evaluated.</strong> »</em></p>
+</blockquote>
+<blockquote>
+<p class="cal piege"> <strong>La conséquence de style (§4.3.3).</strong> <em>« Thus, <strong>it is bad style to use arguments to functions to cause side-effects</strong>. While in C it is common to use the form <code>foo(x = y)</code> to invoke <code>foo</code> with the value of <code>y</code> and simultaneously to assign the value of <code>y</code> to <code>x</code>, <strong>this same style should not be used in R. There is no guarantee that the argument will ever be evaluated and hence the assignment may not take place.</strong> »</em></p>
+<p>*« It is also worth noting that <strong>the effect of <code>foo(x &lt;- y)</code>, if the argument is evaluated, is to change the value of <code>x</code> in the calling environment and not in the evaluation environment of <code>foo</code></strong>. »*</p>
+</blockquote>
+<h3>7.1 Le mécanisme : la promesse</h3>
+<div class="cal formel"><span class="lab">Définition (§4.3.3).</span>
+<p> <em>« It is possible to <strong>access the actual (not default) expressions used as arguments inside the function</strong>. <strong>The mechanism is implemented via promises.</strong> When a function is being evaluated <strong>the actual expression used as an argument is stored in the promise together with a pointer to the environment the function was called from</strong>. When (if) the argument is evaluated <strong>the stored expression is evaluated in the environment that the function was called from</strong>. … <strong>The resulting value is then also stored in a separate spot in the promise. Subsequent evaluations retrieve this stored value (a second evaluation is not carried out).</strong> <strong>Access to the unevaluated expression is also available using <code>substitute</code>.</strong> »</em></p>
+</div>
+<p><strong>Le détail complet :</strong></p>
+<blockquote>
+<p><em>« When a function is called, <strong>each formal argument is assigned a promise in the local environment of the call</strong>, with <strong>the expression slot containing the actual argument</strong> (if it exists) and <strong>the environment slot containing the environment of the caller</strong>. <strong>If no actual argument … is given … and there is a default expression, it is similarly assigned to the expression slot, but with the environment set to the local environment.</strong> »</em></p>
+<p><em>« <strong>The process of filling the value slot of a promise by evaluating the contents of the expression slot in the promise's environment is called forcing the promise. A promise will only be forced once</strong>, the value slot content being used directly later on. »</em></p>
+</blockquote>
+<p><strong>Résumé du mécanisme en quatre temps</strong> : (1) à l'appel, chaque argument formel reçoit <strong>une promesse</strong> ; (2) la promesse contient <strong>l'expression</strong> et <strong>l'environnement</strong> ; (3) au premier usage, elle est <strong>forcée</strong> — l'expression est évaluée <strong>dans son environnement</strong> ; (4) la valeur est <strong>mémorisée</strong>, et les usages suivants la relisent.</p>
+<blockquote>
+<p><strong>L'exemple du manuel — pourquoi une ligne « inutile » ne l'est pas (§4.3.3).</strong> <em>« This is occasionally useful when <strong>a default expression depends on the value of another formal argument</strong> or other variable in the local environment. This is seen in the following example <strong>where the lone <code>label</code> ensures that the label is based on the value of <code>x</code> before it is changed in the next line</strong> »</em> :</p>
+</blockquote>
+<pre><code class="language-r">function(x, label = deparse(x)) {
+  label            # &lt;- FORCE la promesse MAINTENANT
+  x &lt;- x + 1
+  print(label)
+}
+</code></pre>
+<p><strong>Sans la ligne <code>label</code> seule</strong>, la promesse ne serait forcée qu'au <code>print</code>, donc <strong>après</strong> <code>x &lt;- x + 1</code> — et <code>deparse(x)</code> décrirait la valeur modifiée. La ligne isolée ne « fait rien » : elle <strong>fixe le moment de l'évaluation</strong>.</p>
+<p><em>« <strong>The expression slot of a promise can itself involve other promises.</strong> This happens whenever an unevaluated argument is passed as an argument to another function. <strong>When forcing a promise, other promises in its expression will also be forced recursively</strong> as they are evaluated. »</em></p>
+<h2 data-prio="high">Concept 8 — Trois exemples avancés du cours</h2>
+<details class="cor">
+<summary><strong>Exemple 1 (§10.6.1) — facteurs d'efficacité d'un plan en blocs</strong></summary><div class="in">
+
+<blockquote>
+<p><strong>Énoncé.</strong> <em>« A block design is defined by two factors, say <code>blocks</code> ($b$ levels) and <code>varieties</code> ($v$ levels). If $R$ and $K$ are the $v\times v$ and $b\times b$ <strong>replications and block size matrices</strong>, and $N$ is the $b\times v$ <strong>incidence matrix</strong>, then the efficiency factors are defined as <strong>the eigenvalues of the matrix</strong></em>
+$$E = I_v - R^{-1/2}N^{\mathsf T}K^{-1}N R^{-1/2} = I_v - A^{\mathsf T}A, \qquad A = K^{-1/2}NR^{-1/2}$$</p>
+</blockquote>
+<pre><code class="language-r">bdeff &lt;- function(blocks, varieties) {
+  blocks    &lt;- as.factor(blocks)             # minor safety move
+  b         &lt;- length(levels(blocks))
+  varieties &lt;- as.factor(varieties)          # minor safety move
+  v         &lt;- length(levels(varieties))
+  K &lt;- as.vector(table(blocks))              # remove dim attr
+  R &lt;- as.vector(table(varieties))           # remove dim attr
+  N &lt;- table(blocks, varieties)
+  A &lt;- 1/sqrt(K) * N * rep(1/sqrt(R), rep(b, v))
+  sv &lt;- svd(A)
+  list(eff = 1 - sv$d^2, blockcv = sv$u, varietycv = sv$v)
+}
+</code></pre>
+<p><em>Étape 1 — les « minor safety moves ».</em> <code>as.factor()</code> sur les deux arguments : la fonction accepte donc <strong>aussi bien un facteur qu'un vecteur ordinaire</strong>. C'est le même mécanisme que celui noté au §4.2 pour <code>tapply</code> (fiche 304) — <em>« arguments are coerced to factors when necessary »</em>.</p>
+<p><em>Étape 2 — les « remove dim attr ».</em> <code>table()</code> rend <strong>un tableau à une dimension</strong> (fiche 302), muni d'un <code>dim</code>. <code>as.vector()</code> l'enlève — c'est la voie officielle du §5.9 (fiche 305). Sans cela, l'arithmétique de l'étape 4 se heurterait à la règle 3 du recyclage mixte : <em>« the arrays must all have the same <code>dim</code> attribute or an error results »</em>.</p>
+<p><em>Étape 3 — l'incidence.</em> <code>N &lt;- table(blocks, varieties)</code> — la voie directe du §5.3 (fiche 305), préférée à <code>crossprod</code> des indicatrices.</p>
+<p><em>Étape 4 — la ligne dense.</em> <code>A &lt;- 1/sqrt(K) * N * rep(1/sqrt(R), rep(b, v))</code> construit $K^{-1/2}NR^{-1/2}$ <strong>par recyclage</strong> : le premier facteur, de longueur $b$, se recycle <strong>le long des colonnes</strong> de la matrice $b\times v$ (ordre colonne-majeur, fiche 305) ; le second, fabriqué par <code>rep(1/sqrt(R), rep(b, v))</code>, répète <strong>chaque</strong> élément de $R^{-1/2}$ <strong>$b$ fois</strong>, ce qui le fait varier <strong>par colonne</strong>. Multiplier à gauche par une diagonale et à droite par une autre, <strong>sans construire aucune matrice diagonale</strong>.</p>
+<p><em>Étape 5 — la SVD plutôt que les valeurs propres.</em> <em>« It is <strong>numerically slightly better</strong> to work with the singular value decomposition on this occasion rather than the eigenvalue routines. »</em> Puisque $E = I_v - A^{\mathsf T}A$, les valeurs propres de $E$ valent $1 - d_i^2$ où les $d_i$ sont <strong>les valeurs singulières de $A$</strong> — d'où <code>1 - sv$d^2</code>. Calculer $A^{\mathsf T}A$ <strong>puis</strong> ses valeurs propres élèverait le conditionnement au carré ; la SVD l'évite.</p>
+<p><em>Étape 6 — le résultat est une liste.</em> <em>« The result of the function is <strong>a list</strong> giving <strong>not only the efficiency factors as the first component, but also the block and variety canonical contrasts, since sometimes these give additional useful qualitative information</strong>. »</em> C'est le patron du §1.3 (fiche 300) : <strong>rendre un objet interrogeable</strong>, pas un nombre.</p>
+</div></details>
+
+<details class="cor">
+<summary><strong>Exemple 2 (§10.6.2) — supprimer tous les noms d'un tableau imprimé</strong></summary><div class="in">
+
+<blockquote>
+<p><strong>Énoncé.</strong> <em>« For printing purposes with large matrices or arrays, it is often useful to <strong>print them in close block form without the array names or numbers</strong>.  <strong>Removing the <code>dimnames</code> attribute will not achieve this effect, but rather the array must be given a <code>dimnames</code> attribute consisting of empty strings.</strong> »</em></p>
+</blockquote>
+<p><strong>La version manuelle :</strong></p>
+<pre><code class="language-r">temp &lt;- X
+dimnames(temp) &lt;- list(rep("", nrow(X)), rep("", ncol(X)))
+temp; rm(temp)
+</code></pre>
+<p><strong>La version en fonction :</strong></p>
+<pre><code class="language-r">no.dimnames &lt;- function(a) {
+  ## Remove all dimension names from an array for compact printing.
+  d &lt;- list()
+  l &lt;- 0
+  for (i in dim(a)) {
+    d[[l &lt;- l + 1]] &lt;- rep("", i)
+  }
+  dimnames(a) &lt;- d
+  a
+}
+</code></pre>
+<p><em>Étape 1 — pourquoi <code>dimnames(a) &lt;- NULL</code> ne suffit pas.</em> Sans <code>dimnames</code>, R <strong>réinvente</strong> des étiquettes <code>[1,]</code>, <code>[,1]</code>… à l'affichage. Pour n'avoir <strong>rien</strong>, il faut des noms qui soient <strong>des chaînes vides</strong> — c'est le point que le cours souligne.</p>
+<p><em>Étape 2 — la boucle.</em> Elle parcourt <strong><code>dim(a)</code></strong>, donc fonctionne pour <strong>un nombre quelconque de dimensions</strong>, pas seulement pour une matrice.</p>
+<p><em>Étape 3 — la ligne à décoder.</em> <code>d[[l &lt;- l + 1]] &lt;- rep("", i)</code>. L'assignation <code>l &lt;- l + 1</code> est <strong>une expression qui vaut la nouvelle valeur</strong> (fiche 308, §9.1) : on incrémente <strong>et</strong> on utilise le résultat comme indice, en une fois. C'est l'illustration directe de <em>« an assignment is an expression whose result is the value assigned »</em>.</p>
+<p><em>Étape 4 — la valeur de retour.</em> Le <code>a</code> final. La fonction <strong>modifie sa copie locale</strong> et la rend ; l'original de l'appelant est intact (§10.5).</p>
+<p><em>Étape 5 — la remarque du cours.</em> <em>« It also <strong>illustrates how some effective and useful user functions can be quite short</strong>. »</em> Et : <em>« This is particularly useful for <strong>large integer arrays, where patterns are the real interest rather than the values</strong>. »</em></p>
+</div></details>
+
+<details class="cor">
+<summary><strong>Exemple 3 (§10.6.3) — intégration numérique récursive</strong></summary><div class="in">
+
+<blockquote>
+<p><strong>Énoncé.</strong> <em>« <strong>Functions may be recursive, and may themselves define functions within themselves.</strong>  <strong>Note, however, that such functions, or indeed variables, are not inherited by called functions in higher evaluation frames as they would be if they were on the search path.</strong> »</em></p>
+<p><em>« The integrand is evaluated at <strong>the end points of the range and in the middle</strong>. <strong>If the one-panel trapezium rule answer is close enough to the two panel, then the latter is returned as the value. Otherwise the same process is recursively applied to each panel.</strong> The result is <strong>an adaptive integration process that concentrates function evaluations in regions where the integrand is farthest from linear</strong>. »</em></p>
+</blockquote>
+<pre><code class="language-r">area &lt;- function(f, a, b, eps = 1.0e-06, lim = 10) {
+  fun1 &lt;- function(f, a, b, fa, fb, a0, eps, lim, fun) {
+    ## function `fun1' is only visible inside `area'
+    d  &lt;- (a + b)/2
+    h  &lt;- (b - a)/4
+    fd &lt;- f(d)
+    a1 &lt;- h * (fa + fd)
+    a2 &lt;- h * (fd + fb)
+    if (abs(a0 - a1 - a2) &lt; eps || lim == 0)
+      return(a1 + a2)
+    else {
+      return(fun(f, a, d, fa, fd, a1, eps, lim - 1, fun) +
+             fun(f, d, b, fd, fb, a2, eps, lim - 1, fun))
+    }
+  }
+  fa &lt;- f(a)
+  fb &lt;- f(b)
+  a0 &lt;- ((fa + fb) * (b - a))/2
+  fun1(f, a, b, fa, fb, a0, eps, lim, fun1)
+}
+</code></pre>
+<p><em>Étape 1 — la règle du trapèze.</em> Sur $[a,b]$, un panneau donne $a_0 = \frac{(f(a)+f(b))(b-a)}{2}$. Deux panneaux, avec $d$ le milieu et $h = (b-a)/4$, donnent $a_1 = h(f(a)+f(d))$ et $a_2 = h(f(d)+f(b))$ — chacun étant l'aire d'un trapèze de largeur $(b-a)/2$, d'où le $h$ qui vaut <strong>le quart</strong> de la largeur totale.</p>
+<p><em>Étape 2 — le critère d'arrêt.</em> <code>abs(a0 - a1 - a2) &lt; eps</code> compare <strong>une estimation grossière à une estimation fine</strong>. Si elles s'accordent, la fine est acceptée. C'est le principe de l'intégration <strong>adaptative</strong>.</p>
+<p><em>Étape 3 — le garde-fou.</em> <code>|| lim == 0</code> borne la profondeur de récursion.  Et <strong><code>||</code> est ici indispensable</strong> : c'est l'opérateur <strong>court-circuit</strong> de la fiche 308.</p>
+<p><em>Étape 4 — le point le plus déroutant : pourquoi <code>fun</code> en argument ?</em> <code>fun1</code> s'appelle elle-même <strong>sous le nom <code>fun</code></strong>, qu'elle reçoit en argument, et <code>area</code> termine par <code>fun1(..., fun1)</code> — elle <strong>se passe elle-même</strong>. C'est là qu'intervient l'avertissement du cours : <em>« such functions … <strong>are not inherited by called functions in higher evaluation frames as they would be if they were on the search path</strong> »</em>. <code>fun1</code> est <strong>locale à <code>area</code></strong> ; les cadres d'évaluation créés par ses propres appels <strong>ne la voient pas</strong> par le chemin de recherche. La passer en argument est <strong>la solution que le cours retient</strong>. C'est <em>« the little puzzle in R programming »</em> qu'il annonce.</p>
+<p><em>Étape 5 — la mise en garde de performance.</em> <em>« There is, however, <strong>a heavy overhead</strong>, and the function is <strong>only competitive with other algorithms when the integrand is both smooth and very difficult to evaluate</strong>. »</em> Le cours ne présente donc <strong>pas</strong> cette fonction comme un bon intégrateur, mais comme un exercice de programmation.</p>
+</div></details>
+
+<h2>Comment reconnaître le type d'exercice</h2>
+<table>
+<thead>
+<tr>
+<th>Le signal dans l'énoncé</th>
+<th>Ce qu'il faut mobiliser</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>« écrire une fonction qui… »</td>
+<td><code>nom &lt;- function(args) { … }</code> — <strong>dernière expression = valeur</strong></td>
+</tr>
+<tr>
+<td>« la passer à <code>apply</code>, <code>outer</code>, <code>sapply</code> »</td>
+<td>une <strong>fonction anonyme</strong> suffit</td>
+</tr>
+<tr>
+<td>« en faire un opérateur »</td>
+<td><strong><code>"%nom%" &lt;- function(a, b) …</code></strong></td>
+</tr>
+<tr>
+<td>« appeler dans n'importe quel ordre »</td>
+<td><strong>arguments nommés</strong></td>
+</tr>
+<tr>
+<td>« une valeur par défaut dépendant d'un autre argument »</td>
+<td>c'est <strong>permis</strong> — évalué <strong>dans la fonction</strong></td>
+</tr>
+<tr>
+<td>« transmettre des options à <code>par()</code> »</td>
+<td><strong><code>...</code></strong></td>
+</tr>
+<tr>
+<td>« un nombre quelconque d'arguments »</td>
+<td><strong><code>...</code></strong>, puis <code>list(...)</code></td>
+</tr>
+<tr>
+<td>« le n-ième argument non apparié »</td>
+<td><strong><code>..n</code></strong></td>
+</tr>
+<tr>
+<td>« erreur : argument apparié plusieurs fois »</td>
+<td><strong>appariement partiel ambigu</strong> — passe 2</td>
+</tr>
+<tr>
+<td>« mon abréviation d'argument marchait avant »</td>
+<td>l'ambiguïté dépend de <strong>ce qui reste</strong></td>
+</tr>
+<tr>
+<td>« ma fonction ne modifie pas la variable »</td>
+<td><strong>call-by-value</strong> — c'est normal</td>
+</tr>
+<tr>
+<td>« je veux modifier une variable extérieure »</td>
+<td><strong><code>&lt;&lt;-</code></strong> ou <strong><code>assign()</code></strong></td>
+</tr>
+<tr>
+<td>« l'argument invalide ne provoque pas d'erreur »</td>
+<td><strong>il n'a jamais été évalué</strong></td>
+</tr>
+<tr>
+<td>« <code>deparse(x)</code> décrit la mauvaise valeur »</td>
+<td>forcer la promesse <strong>plus tôt</strong></td>
+</tr>
+<tr>
+<td>« savoir si l'argument a été fourni »</td>
+<td><strong><code>missing()</code></strong> — sans forcer l'évaluation</td>
+</tr>
+<tr>
+<td>« récupérer le texte de l'argument »</td>
+<td><strong><code>substitute()</code></strong></td>
+</tr>
+<tr>
+<td>« une fonction récursive locale »</td>
+<td><strong>la passer en argument</strong> — elle n'est pas héritée</td>
+</tr>
+</tbody></table>
+<h2>Comment résoudre ce type d'exercice</h2>
+<p><strong>Protocole « écrire une fonction utilisable » — 5 étapes.</strong></p>
+<ol>
+<li><strong>Identifier ce qui varie</strong> — cela devient les arguments ; ce qui ne varie presque jamais devient <strong>un défaut</strong>.</li>
+<li><strong>Ordonner les arguments</strong> : les indispensables d'abord (appelés positionnellement), les optionnels ensuite (appelés par nom).</li>
+<li><strong>Placer <code>...</code></strong> si la fonction transmet à une autre — et se rappeler qu'après lui, <strong>l'appariement partiel ne joue plus</strong>.</li>
+<li><strong>Rendre un objet, pas un nombre</strong>, quand plusieurs choses sont calculées : une <strong>liste nommée</strong> (patron <code>bdeff</code>).</li>
+<li><strong>Ne pas oublier la dernière expression</strong> — c'est la valeur de retour ; <code>return()</code> n'est nécessaire que pour <strong>sortir tôt</strong>.</li>
+</ol>
+<p><strong>Protocole « déboguer un appariement d'arguments » — 4 étapes.</strong></p>
+<ol>
+<li>Écrire les <strong>noms complets</strong> des arguments : si l'erreur disparaît, c'était un <strong>appariement partiel</strong>.</li>
+<li>Vérifier la <strong>passe 1</strong> : un même formel apparié deux fois → erreur.</li>
+<li>Vérifier la <strong>passe 2</strong> : un préfixe ambigu → erreur, <strong>même si un autre argument le désambiguïserait</strong>.</li>
+<li>Vérifier si un <strong><code>...</code></strong> précède les arguments abrégés : après lui, <strong>plus d'appariement partiel</strong>.</li>
+</ol>
+<p><strong>Protocole « maîtriser le moment de l'évaluation » — 4 étapes.</strong></p>
+<ol>
+<li>Se demander <strong>si</strong> l'argument sera évalué : <em>« in some cases the argument will never be evaluated »</em>.</li>
+<li>Se demander <strong>où</strong> : fourni → chez <strong>l'appelant</strong> ; défaut → dans <strong>la fonction</strong>.</li>
+<li>Si le moment compte, <strong>forcer la promesse</strong> en nommant l'argument sur une ligne seule (idiome <code>label</code>).</li>
+<li><strong>Ne jamais compter sur un effet de bord</strong> d'argument : <em>« it is bad style … »</em>.</li>
+</ol>
+<h2 data-prio="must">Common mistakes</h2>
+<table>
+<thead>
+<tr>
+<th>Erreur</th>
+<th>Correction</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Croire <code>return()</code> obligatoire</td>
+<td><strong>la dernière expression</strong> est la valeur</td>
+</tr>
+<tr>
+<td>Oublier la dernière ligne du corps</td>
+<td>la fonction rend alors la valeur de l'assignation, <strong>invisiblement</strong></td>
+</tr>
+<tr>
+<td>Définir un opérateur sans guillemets</td>
+<td><code>%!%</code> n'est pas un identifiant → <strong><code>"%!%" &lt;- …</code></strong></td>
+</tr>
+<tr>
+<td>Choisir <code>\</code> comme caractère d'opérateur</td>
+<td><em>« <strong>not a convenient choice</strong> … special problems »</em></td>
+</tr>
+<tr>
+<td>Croire les défauts limités à des constantes</td>
+<td><em>« <strong>defaults may be arbitrary expressions</strong> »</em></td>
+</tr>
+<tr>
+<td>Croire qu'une fonction modifie son argument</td>
+<td><strong>call-by-value</strong> — <em>« lost after exit »</em></td>
+</tr>
+<tr>
+<td>Utiliser <code>&lt;&lt;-</code> sans savoir où il écrit</td>
+<td>il remonte les <strong>enclos</strong> (fiche 310)</td>
+</tr>
+<tr>
+<td>Abréger un nom d'argument dans du code durable</td>
+<td>l'ambiguïté dépend de <strong>ce qui reste</strong></td>
+</tr>
+<tr>
+<td>Abréger après un <code>...</code></td>
+<td><em>« partial matching is <strong>only applied to arguments that precede it</strong> »</em></td>
+</tr>
+<tr>
+<td>Croire les primitives soumises aux mêmes règles</td>
+<td>elles <em>« <strong>typically ignore tags</strong> »</em> — sauf <code>log</code>, <code>round</code>, <code>signif</code>, <code>rep</code>, <code>seq.int</code></td>
+</tr>
+<tr>
+<td>Utiliser <code>foo(x = y)</code> pour assigner</td>
+<td><em>« <strong>there is no guarantee that the argument will ever be evaluated</strong> »</em></td>
+</tr>
+<tr>
+<td>Croire <code>foo(x &lt;- y)</code> local</td>
+<td>il modifie <code>x</code> <strong>chez l'appelant</strong></td>
+</tr>
+<tr>
+<td>Croire un défaut évalué à la définition</td>
+<td>il l'est <strong>quand on en a besoin</strong>, dans la fonction</td>
+</tr>
+<tr>
+<td>Croire qu'une promesse est réévaluée</td>
+<td><em>« <strong>A promise will only be forced once</strong> »</em></td>
+</tr>
+<tr>
+<td>Écrire <code>list(...)</code> par réflexe</td>
+<td>cela <strong>force</strong> tous les arguments</td>
+</tr>
+<tr>
+<td>Attendre d'une fonction locale qu'elle se voie elle-même</td>
+<td><em>« <strong>not inherited by called functions in higher evaluation frames</strong> »</em></td>
+</tr>
+<tr>
+<td>Utiliser <code>missing()</code> en croyant lire la valeur</td>
+<td><em>« <strong>does not force evaluation</strong> »</em></td>
+</tr>
+</tbody></table>
+<h2>Ultimate Review</h2>
+<p><strong>Définir.</strong> <code>nom &lt;- function(args) expression</code> · <em>« <strong>The value of the expression is the value returned</strong> »</em> · le corps est <em>« usually a grouped expression »</em> · un appel <em>« <strong>may occur anywhere a function call is legitimate</strong> »</em> · <strong>les fonctions du système sont écrites en R</strong> et <em>« <strong>do not differ materially from user written functions</strong> »</em>.</p>
+<p><strong>Formel et anonyme.</strong> Un argument formel est <strong>un symbole</strong>, <strong><code>symbole = expression</code></strong>, ou <strong><code>...</code></strong> · <em>« <strong>Generally functions are assigned to symbols but they don't need to be</strong> »</em> — sans nom, c'est une <strong>fonction anonyme</strong>, <em>« most frequently used as arguments to other functions such as <strong>the <code>apply</code> family or <code>outer</code></strong> »</em> · <em>« <strong>Functions are first class objects in R</strong> »</em>.</p>
+<p><strong>Opérateur binaire.</strong> Un nom de la forme <strong><code>%anything%</code></strong> · <strong>guillemets obligatoires</strong> à la définition · <code>%*%</code> et <code>%o%</code> en sont des exemples · <strong><code>\</code> est un mauvais choix</strong>.</p>
+<p><strong>Arguments.</strong> Nommés → <strong>n'importe quel ordre</strong> · on peut commencer en <strong>positionnel</strong> puis nommer · défauts par <code>arg = expression</code> ·  <em>« <strong>defaults may be arbitrary expressions, even involving other arguments to the same function</strong> »</em> · <strong><code>missing()</code></strong> dit si un formel n'a pas été apparié — <strong>sans forcer l'évaluation</strong>.</p>
+<p><strong><code>...</code>.</strong> Sert à <em>« <strong>allow one function to pass on argument settings to another</strong> »</em> · <strong><code>list(...)</code></strong> <em>« evaluates all such arguments and returns them in <strong>a named list</strong> »</em> ( <strong>il force</strong>) · <strong><code>..1</code>, <code>..2</code>, <code>..n</code></strong> rendent <em>« the <strong>n-th unmatched argument</strong> »</em> · tout actuel n'appariant aucun formel <strong>tombe dans <code>...</code></strong>.</p>
+<p><strong>Appariement — trois passes.</strong> (1) <strong>tags exacts</strong>, un formel = un actuel, sinon <strong>erreur</strong> ; (2) <strong>tags partiels</strong>, <em>« It is an error to have <strong>multiple partial matches</strong> »</em>, et <strong>seulement avant un <code>...</code></strong> ; (3) <strong>position</strong>, le <code>...</code> prenant <em>« the remaining arguments, <strong>tagged or not</strong> »</em>. Reste non apparié → <strong>erreur</strong>. Exemple : <code>f(f=1, fo=2)</code> <strong>illégal</strong>, <code>f(f=1, fooey=2)</code> <strong>légal</strong>.  <strong>Les primitives ignorent les tags</strong> — exceptions : <code>log</code>, <code>round</code>, <code>signif</code>, <code>rep</code>, <code>seq.int</code>. Outils : <strong><code>match.arg</code>, <code>match.call</code>, <code>match.fun</code>, <code>pmatch</code></strong>.</p>
+<p><strong>Assignations.</strong> <em>« <strong>any ordinary assignments done within the function are local and temporary and are lost after exit</strong> »</em> · <strong>call-by-value</strong> : <em>« <strong>Changing the value of a supplied argument within a function will not affect the value of the variable in the calling frame</strong> »</em> · pour sortir : <strong><code>&lt;&lt;-</code></strong> ou <strong><code>assign()</code></strong>.</p>
+<p><strong>Évaluation.</strong>  <strong>Fournis → cadre de l'appelant ; défauts → cadre de la fonction.</strong> · <strong>Paresseuse</strong> : <em>« <strong>Arguments are not evaluated until needed</strong> … <strong>in some cases the argument will never be evaluated</strong> »</em> · d'où : <em>« <strong>it is bad style to use arguments to functions to cause side-effects</strong> »</em>, et <code>foo(x &lt;- y)</code> modifie <code>x</code> <strong>chez l'appelant</strong>.</p>
+<p><strong>Promesses.</strong> Trois fentes : <strong>expression</strong>, <strong>environnement</strong>, <strong>valeur</strong> · à l'appel, chaque formel reçoit une promesse (environnement = <strong>celui de l'appelant</strong> ; pour un défaut, <strong>l'environnement local</strong>) · <strong>forcer</strong> = évaluer l'expression dans son environnement · <em>« <strong>A promise will only be forced once</strong> »</em> · <strong><code>substitute</code></strong> lit l'expression · les promesses <strong>se forcent récursivement</strong>.</p>
+<p><strong>L'idiome du forçage.</strong> Une ligne portant le seul nom de l'argument <strong>fixe le moment de l'évaluation</strong> : <code>function(x, label = deparse(x)) { label; x &lt;- x + 1; print(label) }</code>.</p>
+<p><strong>Les trois exemples avancés.</strong> <strong><code>bdeff</code></strong> — <code>as.factor</code> en garde-fou, <code>as.vector</code> pour ôter <code>dim</code>, produit de diagonales <strong>par recyclage</strong>, <strong>SVD plutôt que valeurs propres</strong>, résultat en <strong>liste</strong>. <strong><code>no.dimnames</code></strong> —  <em>« removing the <code>dimnames</code> attribute <strong>will not achieve this effect</strong> »</em>, il faut <strong>des chaînes vides</strong> ; <code>d[[l &lt;- l + 1]]</code> exploite l'assignation-expression ; <em>« <strong>effective and useful user functions can be quite short</strong> »</em>. <strong><code>area</code></strong> — récursive, <code>fun1</code> <strong>locale</strong>, passée <strong>en argument à elle-même</strong> parce que <em>« <strong>not inherited by called functions in higher evaluation frames</strong> »</em> ; <em>« <strong>a heavy overhead</strong> »</em>.</p>
+<div class="rec"><h2>Active Recall</h2><details class="cor">
+<summary>Comment définit-on une fonction, et qu'est-ce qui en fait la valeur de retour ?</summary><div class="in">
+
+<p><em>« A function is defined by <strong>an assignment of the form</strong> <code>nom &lt;- function(arg_1, arg_2, ...) expression</code>. The <code>expression</code> is an R expression, (<strong>usually a grouped expression</strong>), that uses the arguments to calculate a value. <strong>The value of the expression is the value returned for the function.</strong> »</em> (§10)</p>
+<p><strong>Il n'y a pas de <code>return</code> obligatoire</strong> : la valeur du corps est celle de <strong>sa dernière expression</strong> (fiche 308, §9.1). <code>return()</code> ne sert qu'à <strong>sortir tôt</strong>, comme dans l'exemple <code>area</code> du §10.6.3.</p>
+<p class="cal piege"> L'erreur classique est de terminer le corps par <strong>une assignation</strong> : la fonction rend alors cette valeur <strong>invisiblement</strong>, et l'appel semble ne rien produire.</p>
+</div></details><details class="cor">
+<summary>Qu'est-ce qu'une fonction anonyme, et où les rencontre-t-on ?</summary><div class="in">
+
+<p><em>« <strong>Generally functions are assigned to symbols but they don't need to be.</strong> The value returned by the call to <code>function</code> <strong>is a function</strong>. <strong>If this is not given a name it is referred to as an anonymous function.</strong> <strong>Anonymous functions are most frequently used as arguments to other functions such as the <code>apply</code> family or <code>outer</code>.</strong> »</em> (<em>R Language Definition</em> §4.1.1)</p>
+<p>L'exemple le plus visible du cours est en fiche 305 :</p>
+<pre><code class="language-r">z &lt;- outer(x, y, function(x, y) cos(y)/(1 + x^2))
+</code></pre>
+<p>C'est possible parce que <em>« <strong>Functions are first class objects in R.</strong> They can be used <strong>anywhere that an R object is required</strong> … <strong>passed as arguments</strong> … <strong>and returned as values from functions</strong> »</em> (§4.2).</p>
+</div></details><details class="cor">
+<summary>Comment définit-on un opérateur binaire, et pourquoi faut-il des guillemets ?</summary><div class="in">
+
+<p>*« Had we given the function <strong>a name of the form <code>%anything%</code></strong>, it <strong>could have been used as a binary operator</strong> »* (§10.2) :</p>
+<pre><code class="language-r">"%!%" &lt;- function(X, y) { ... }
+X %!% y
+</code></pre>
+<p>*« (<strong>Note the use of quote marks.</strong>) »*</p>
+<p><strong>Les guillemets sont nécessaires</strong> parce que <code>%!%</code> <strong>n'est pas un identifiant valide</strong> (fiche 300) : le parseur ne peut pas le lire comme un nom. La chaîne contourne la restriction — c'est le <em>« objects can have names that are not identifiers »</em> de la fiche 302.</p>
+<p>Et cela fonctionne parce qu'<strong>un opérateur est une fonction</strong> (fiche 301, §3.1.4) : <code>%*%</code> et <code>%o%</code> sont <em>« other examples of binary operators defined in this way »</em>.</p>
+<p class="cal piege"> <em>« <strong>The backslash symbol itself is not a convenient choice</strong> as it presents special problems in this context. »</em></p>
+</div></details><details class="cor">
+<summary>Décrire les trois passes de l'appariement des arguments.</summary><div class="in">
+
+<p><em>« This is done by <strong>a three-pass process</strong> »</em> (<em>R Language Definition</em> §4.3.2) :</p>
+<ol>
+<li><strong>Tags exacts.</strong> <em>« For each named supplied argument the list of formal arguments is searched for an item whose name <strong>matches exactly</strong>. <strong>It is an error to have the same formal argument match several actuals or vice versa.</strong> »</em></li>
+<li><strong>Tags partiels.</strong> <em>« Each remaining named supplied argument is compared to the remaining formal arguments <strong>using partial matching</strong> … <strong>It is an error to have multiple partial matches.</strong> … <strong>If the formal arguments contain <code>...</code> then partial matching is only applied to arguments that precede it.</strong> »</em></li>
+<li><strong>Position.</strong> <em>« Any unmatched formal arguments are bound to unnamed supplied arguments, <strong>in order</strong>. <strong>If there is a <code>...</code> argument, it will take up the remaining arguments, tagged or not.</strong> »</em></li>
+</ol>
+<p><em>« <strong>If any arguments remain unmatched an error is declared.</strong> »</em></p>
+</div></details><details class="cor">
+<summary>Pourquoi <code>f(f = 1, fo = 2)</code> est-il illégal alors que <code>f(f = 1, fooey = 2)</code> ne l'est pas, pour <code>f &lt;- function(fumble, fooey)</code> ?</summary><div class="in">
+
+<p><em>« Notice that if <code>f &lt;- function(fumble, fooey) fbody</code>, then <strong><code>f(f = 1, fo = 2)</code> is illegal</strong>, even though the 2nd actual argument only matches <code>fooey</code>. <strong><code>f(f = 1, fooey = 2)</code> is legal though, since the second argument matches exactly and is removed from consideration for partial matching.</strong> »</em> (§4.3.2)</p>
+<p><strong>Le premier cas.</strong> Passe 1 : aucun tag exact. Passe 2 : <code>f</code> est un préfixe <strong>de <code>fumble</code> et de <code>fooey</code></strong> → <strong>appariement partiel multiple</strong> → erreur. Le fait que <code>fo</code> lèverait l'ambiguïté n'y change rien : <code>f</code> est traité <strong>dans la même passe</strong>, sur <strong>tous</strong> les formels restants.</p>
+<p><strong>Le second cas.</strong> Passe 1 : <code>fooey</code> apparie exactement et <strong>sort du jeu</strong>. Passe 2 : <code>f</code> n'a plus que <code>fumble</code> en face → unique → succès.</p>
+<p><strong>La leçon</strong> : l'ambiguïté d'un nom abrégé <strong>dépend de ce qui reste</strong>. Un appel qui marchait peut cesser de marcher parce qu'un <strong>autre</strong> argument a changé.</p>
+</div></details><details class="cor">
+<summary>Une fonction peut-elle modifier son argument ?</summary><div class="in">
+
+<p>Non. <em>« <strong>Note that any ordinary assignments done within the function are local and temporary and are lost after exit from the function.</strong> Thus <strong>the assignment <code>X &lt;- qr(X)</code> does not affect the value of the argument in the calling program.</strong> »</em> (§10.5)</p>
+<p>Et la formulation générale (<em>R Language Definition</em> §4.3.3) : <em>« <strong>The semantics of invoking a function in R are call-by-value.</strong> … <strong>Changing the value of a supplied argument within a function will not affect the value of the variable in the calling frame.</strong> »</em></p>
+<p>C'est la sémantique de copie de la fiche 302 (mécanisme <code>`*tmp*`</code>). <strong>L'unique exception du langage</strong> reste <strong>l'environnement</strong>, <em>« not copied when passed to functions »</em> (fiche 303).</p>
+<p>Pour sortir volontairement : *« either the <strong>"superassignment" operator, <code>&lt;&lt;-</code></strong>, or the function <strong><code>assign()</code></strong> can be used »*.</p>
+</div></details><details class="cor">
+<summary>Où un argument fourni est-il évalué ? Et un argument par défaut ?</summary><div class="in">
+
+<p><em>« One of the most important things to know … is that <strong>supplied arguments and default arguments are treated differently</strong>. <strong>The supplied arguments to a function are evaluated in the evaluation frame of the calling function. The default arguments to a function are evaluated in the evaluation frame of the function.</strong> »</em> (§4.3.3)</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Évalué dans</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>argument <strong>fourni</strong></td>
+<td>le cadre de <strong>l'appelant</strong></td>
+</tr>
+<tr>
+<td>argument par <strong>défaut</strong></td>
+<td>le cadre de <strong>la fonction</strong></td>
+</tr>
+</tbody></table>
+<p><strong>C'est ce qui rend possible</strong> la phrase du §10.3 : <em>« <strong>defaults may be arbitrary expressions, even involving other arguments to the same function</strong> »</em>. Un défaut <code>n = length(x)</code> <strong>a besoin</strong> d'être évalué là où <code>x</code> existe — c'est-à-dire <strong>dans la fonction</strong>.</p>
+</div></details><details class="cor">
+<summary>Qu'est-ce que l'évaluation paresseuse, et quelle règle de style en découle ?</summary><div class="in">
+
+<p><em>« <strong>R has a form of lazy evaluation of function arguments. Arguments are not evaluated until needed.</strong> <strong>It is important to realize that in some cases the argument will never be evaluated.</strong> »</em> (§4.3.3)</p>
+<p class="cal piege"> <strong>La règle de style</strong> : <em>« Thus, <strong>it is bad style to use arguments to functions to cause side-effects</strong>. While in C it is common to use the form <code>foo(x = y)</code> … <strong>this same style should not be used in R. There is no guarantee that the argument will ever be evaluated and hence the assignment may not take place.</strong> »</em></p>
+<p>Et un second avertissement : <em>« the effect of <code>foo(x &lt;- y)</code>, <strong>if the argument is evaluated</strong>, is <strong>to change the value of <code>x</code> in the calling environment and not in the evaluation environment of <code>foo</code></strong> »</em>.</p>
+<p><strong>Conséquence pratique utile</strong> : un argument jamais utilisé peut être <strong>invalide sans conséquence</strong> — un défaut coûteux n'est calculé que si on s'en sert.</p>
+</div></details><details class="cor">
+<summary>Qu'est-ce qu'une promesse, et que signifie « forcer » ?</summary><div class="in">
+
+<p><em>« When a function is called, <strong>each formal argument is assigned a promise in the local environment of the call</strong>, with <strong>the expression slot containing the actual argument</strong> and <strong>the environment slot containing the environment of the caller</strong>. <strong>If no actual argument … is given and there is a default expression, it is similarly assigned … but with the environment set to the local environment.</strong> »</em> (§4.3.3)</p>
+<p><em>« <strong>The process of filling the value slot of a promise by evaluating the contents of the expression slot in the promise's environment is called forcing the promise. A promise will only be forced once</strong>, the value slot content being used directly later on. »</em></p>
+<p><strong>Trois fentes</strong> : expression, environnement, valeur. <strong>Quatre temps</strong> : créer, attendre, forcer, mémoriser.</p>
+<p><em>« <strong>Access to the unevaluated expression is also available using <code>substitute</code>.</strong> »</em> — c'est ainsi que <code>plot(x, y)</code> sait écrire « x » et « y » sur les axes (fiche 316).</p>
+<p><em>« <strong>When forcing a promise, other promises in its expression will also be forced recursively.</strong> »</em></p>
+</div></details><details class="cor">
+<summary>Que fait la ligne <code>label</code> seule dans cet exemple, et pourquoi n'est-elle pas inutile ?</summary><div class="in">
+
+<pre><code class="language-r">function(x, label = deparse(x)) {
+  label
+  x &lt;- x + 1
+  print(label)
+}
+</code></pre>
+<p><em>« This is occasionally useful when <strong>a default expression depends on the value of another formal argument</strong> … This is seen in the following example <strong>where the lone <code>label</code> ensures that the label is based on the value of <code>x</code> before it is changed in the next line</strong>. »</em> (§4.3.3)</p>
+<p><strong>Sans cette ligne</strong>, la promesse de <code>label</code> ne serait forcée qu'au <code>print</code>, donc <strong>après</strong> <code>x &lt;- x + 1</code> : <code>deparse(x)</code> décrirait la valeur <strong>modifiée</strong>.</p>
+<p>La ligne isolée <strong>ne calcule rien d'utile</strong> — elle <strong>fixe le moment de l'évaluation</strong>. C'est l'idiome du « forçage » : nommer un argument sur une ligne seule.</p>
+</div></details><details class="cor">
+<summary>À quoi sert <code>...</code>, et comment accède-t-on à son contenu ?</summary><div class="in">
+
+<p><em>« Another frequent requirement is <strong>to allow one function to pass on argument settings to another</strong> … This can be done by <strong>including an extra argument, literally <code>...</code>, of the function, which may then be passed on</strong>. »</em> (§10.4)</p>
+<pre><code class="language-r">fun1 &lt;- function(data, data.frame, graph = TRUE, limit = 20, ...) {
+  if (graph) par(pch = "*", ...)
+}
+</code></pre>
+<p><em>« Less frequently, a function will need to refer to components of <code>...</code>. <strong>The expression <code>list(...)</code> evaluates all such arguments and returns them in a named list</strong>, while <strong><code>..1</code>, <code>..2</code>, etc. evaluate them one at a time, with <code>..n</code> returning the n-th unmatched argument</strong>. »</em></p>
+<p class="cal piege"> <strong><code>list(...)</code> force les promesses</strong> (§2.1.9 : <em>« with promises being forced! »</em>). Tant qu'on <strong>transmet</strong> <code>...</code>, rien n'est évalué.</p>
+<p>Et : <em>« <strong>If a function has <code>...</code> as a formal argument then any actual arguments that do not match a formal argument are matched with <code>...</code></strong> »</em> (§2.1.9).</p>
+</div></details><details class="cor">
+<summary>Dans l'exemple <code>area</code>, pourquoi <code>fun1</code> se passe-t-elle elle-même en argument ?</summary><div class="in">
+
+<p>Parce que le cours prévient (§10.6.3) : <em>« <strong>Functions may be recursive, and may themselves define functions within themselves.</strong> <strong>Note, however, that such functions, or indeed variables, are not inherited by called functions in higher evaluation frames as they would be if they were on the search path.</strong> »</em></p>
+<p><code>fun1</code> est <strong>définie à l'intérieur de <code>area</code></strong>, donc locale. Les cadres d'évaluation créés par ses propres appels <strong>ne la trouvent pas</strong> par le chemin de recherche (fiche 306) — le chemin ne contient que <code>.GlobalEnv</code>, les objets attachés et les paquets.</p>
+<p>La solution retenue par le cours est de <strong>la passer en argument</strong> : <code>area</code> termine par <code>fun1(f, a, b, fa, fb, a0, eps, lim, fun1)</code> — elle se transmet elle-même sous le nom <code>fun</code>.</p>
+<p>C'est ce que le cours appelle <em>« a little puzzle in R programming »</em>. La fiche 310 montrera l'autre voie : la <strong>portée lexicale</strong>, qui rend cette gymnastique inutile dans d'autres constructions.</p>
+</div></details><details class="cor">
+<summary>Pourquoi <code>dimnames(a) &lt;- NULL</code> ne suffit-il pas à imprimer un tableau sans étiquettes ?</summary><div class="in">
+
+<p><em>«  <strong>Removing the <code>dimnames</code> attribute will not achieve this effect, but rather the array must be given a <code>dimnames</code> attribute consisting of empty strings.</strong> »</em> (§10.6.2)</p>
+<p>Sans <code>dimnames</code>, R <strong>réinvente</strong> des étiquettes à l'affichage — <code>[1,]</code>, <code>[,1]</code>, etc. Pour n'avoir <strong>rien</strong>, il faut des noms qui existent <strong>et soient vides</strong> :</p>
+<pre><code class="language-r">dimnames(temp) &lt;- list(rep("", nrow(X)), rep("", ncol(X)))
+</code></pre>
+<p>La fonction <code>no.dimnames()</code> du cours généralise à un nombre quelconque de dimensions en bouclant sur <code>dim(a)</code>, et le cours souligne qu'elle <em>« illustrates how <strong>some effective and useful user functions can be quite short</strong> »</em>.</p>
+<p class="cal piege"> Noter la ligne <code>d[[l &lt;- l + 1]] &lt;- rep("", i)</code> : elle <strong>incrémente et utilise</strong> en une fois, parce qu'<em>« an assignment is an expression whose result is the value assigned »</em> (fiche 308).</p>
+</div></details><details class="cor">
+<summary>Dans <code>bdeff</code>, pourquoi <code>as.vector(table(...))</code> et pourquoi la SVD plutôt que <code>eigen</code> ?</summary><div class="in">
+
+<p><strong><code>as.vector</code></strong> : <code>table()</code> rend <strong>un tableau à une dimension</strong> (fiche 302), donc muni d'un <code>dim</code>. Le commentaire du cours est explicite — <em>« remove dim attr »</em>. Sans cela, l'arithmétique <code>1/sqrt(K) * N * ...</code> se heurterait à la règle 3 du recyclage mixte (fiche 305) : <em>« the arrays must all have the same <code>dim</code> attribute <strong>or an error results</strong> »</em>.</p>
+<p><strong>La SVD</strong> : <em>« <strong>It is numerically slightly better to work with the singular value decomposition on this occasion rather than the eigenvalue routines.</strong> »</em></p>
+<p>Puisque $E = I_v - A^{\mathsf T}A$, les valeurs propres de $E$ valent $1-d_i^2$, les $d_i$ étant <strong>les valeurs singulières de $A$</strong> — d'où <code>1 - sv$d^2</code>. Passer par $A^{\mathsf T}A$ <strong>élèverait le conditionnement au carré</strong> ; la SVD travaille directement sur $A$.</p>
+<p>Et le résultat est <strong>une liste</strong> : <em>« not only the efficiency factors as the first component, but also the block and variety canonical contrasts »</em>.</p>
+</div></details></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h2>Flashcards</h2>
+<table>
+<thead>
+<tr>
+<th>Question</th>
+<th>Réponse</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>La forme d'une définition ?</td>
+<td><code>nom &lt;- function(args) expression</code></td>
+</tr>
+<tr>
+<td>Qu'est-ce qui est renvoyé ?</td>
+<td>La valeur de <strong>l'expression</strong> — la <strong>dernière</strong></td>
+</tr>
+<tr>
+<td><code>return()</code> est-il obligatoire ?</td>
+<td><strong>Non</strong></td>
+</tr>
+<tr>
+<td>Les fonctions du système sont écrites en quoi ?</td>
+<td><strong>En R</strong> — elles <em>« do not differ materially »</em></td>
+</tr>
+<tr>
+<td>Les trois formes d'un argument formel ?</td>
+<td>Un <strong>symbole</strong> · <code>symbole = expression</code> · <strong><code>...</code></strong></td>
+</tr>
+<tr>
+<td>Une fonction sans nom s'appelle ?</td>
+<td>Une fonction <strong>anonyme</strong></td>
+</tr>
+<tr>
+<td>Où les rencontre-t-on surtout ?</td>
+<td>La famille <strong><code>apply</code></strong> et <strong><code>outer</code></strong></td>
+</tr>
+<tr>
+<td>Les fonctions sont-elles de première classe ?</td>
+<td><strong>Oui</strong> — passables et renvoyables</td>
+</tr>
+<tr>
+<td>Comment nommer un opérateur binaire ?</td>
+<td><strong><code>%anything%</code></strong></td>
+</tr>
+<tr>
+<td>Que faut-il à la définition ?</td>
+<td>Des <strong>guillemets</strong></td>
+</tr>
+<tr>
+<td>Pourquoi ?</td>
+<td><code>%!%</code> <strong>n'est pas un identifiant</strong></td>
+</tr>
+<tr>
+<td>Deux opérateurs définis ainsi ?</td>
+<td><strong><code>%*%</code></strong> et <strong><code>%o%</code></strong></td>
+</tr>
+<tr>
+<td>Quel caractère éviter ?</td>
+<td><strong><code>\</code></strong> — <em>« special problems »</em></td>
+</tr>
+<tr>
+<td>Les arguments nommés doivent-ils être ordonnés ?</td>
+<td><strong>Non</strong></td>
+</tr>
+<tr>
+<td>Peut-on mêler positionnel et nommé ?</td>
+<td><strong>Oui</strong> — positionnel d'abord</td>
+</tr>
+<tr>
+<td>Un défaut peut-il être une expression ?</td>
+<td><strong>Oui</strong> — <em>« arbitrary expressions »</em></td>
+</tr>
+<tr>
+<td>Peut-il dépendre d'un autre argument ?</td>
+<td><strong>Oui</strong></td>
+</tr>
+<tr>
+<td>Quelle fonction dit qu'un argument manque ?</td>
+<td><strong><code>missing()</code></strong></td>
+</tr>
+<tr>
+<td>Force-t-elle l'évaluation ?</td>
+<td><strong>Non</strong></td>
+</tr>
+<tr>
+<td>À quoi sert <code>...</code> ?</td>
+<td><strong>Transmettre</strong> des arguments à une autre fonction</td>
+</tr>
+<tr>
+<td>Comment tous les récupérer ?</td>
+<td><strong><code>list(...)</code></strong> — une <strong>liste nommée</strong></td>
+</tr>
+<tr>
+<td>Effet secondaire de <code>list(...)</code> ?</td>
+<td>Il <strong>force</strong> toutes les promesses</td>
+</tr>
+<tr>
+<td>Comment prendre le n-ième ?</td>
+<td><strong><code>..n</code></strong></td>
+</tr>
+<tr>
+<td>Que devient un actuel n'appariant aucun formel ?</td>
+<td>Il tombe dans <strong><code>...</code></strong></td>
+</tr>
+<tr>
+<td>Combien de passes d'appariement ?</td>
+<td><strong>Trois</strong></td>
+</tr>
+<tr>
+<td>Passe 1 ?</td>
+<td><strong>Tags exacts</strong></td>
+</tr>
+<tr>
+<td>Passe 2 ?</td>
+<td><strong>Tags partiels</strong></td>
+</tr>
+<tr>
+<td>Passe 3 ?</td>
+<td><strong>Position</strong></td>
+</tr>
+<tr>
+<td>Que se passe-t-il s'il reste un actuel ?</td>
+<td><strong>Erreur</strong></td>
+</tr>
+<tr>
+<td>Deux appariements partiels possibles ?</td>
+<td><strong>Erreur</strong></td>
+</tr>
+<tr>
+<td>L'appariement partiel après un <code>...</code> ?</td>
+<td><strong>N'a pas lieu</strong></td>
+</tr>
+<tr>
+<td>Que prend le <code>...</code> en passe 3 ?</td>
+<td>Tout le reste, <strong>nommé ou non</strong></td>
+</tr>
+<tr>
+<td><code>f(f=1, fo=2)</code> pour <code>function(fumble, fooey)</code> ?</td>
+<td><strong>Illégal</strong></td>
+</tr>
+<tr>
+<td><code>f(f=1, fooey=2)</code> ?</td>
+<td><strong>Légal</strong></td>
+</tr>
+<tr>
+<td>Pourquoi ?</td>
+<td><code>fooey</code> <strong>sort du jeu</strong> en passe 1</td>
+</tr>
+<tr>
+<td>Les primitives suivent-elles ces règles ?</td>
+<td><strong>Non</strong> — elles ignorent les tags</td>
+</tr>
+<tr>
+<td>Cinq exceptions citées ?</td>
+<td><code>log</code> · <code>round</code> · <code>signif</code> · <code>rep</code> · <code>seq.int</code></td>
+</tr>
+<tr>
+<td>Trois fonctions d'appariement ?</td>
+<td><code>match.arg</code> · <code>match.call</code> · <code>match.fun</code></td>
+</tr>
+<tr>
+<td>L'accès à l'algorithme partiel ?</td>
+<td><strong><code>pmatch</code></strong></td>
+</tr>
+<tr>
+<td>Que deviennent les assignations dans une fonction ?</td>
+<td><strong>Locales et temporaires</strong>, perdues à la sortie</td>
+</tr>
+<tr>
+<td>Quelle est la sémantique d'appel ?</td>
+<td><strong>Call-by-value</strong></td>
+</tr>
+<tr>
+<td>Une fonction modifie-t-elle son argument ?</td>
+<td><strong>Non</strong></td>
+</tr>
+<tr>
+<td>Comment assigner à l'extérieur ?</td>
+<td><strong><code>&lt;&lt;-</code></strong> ou <strong><code>assign()</code></strong></td>
+</tr>
+<tr>
+<td>Où est évalué un argument fourni ?</td>
+<td>Chez <strong>l'appelant</strong></td>
+</tr>
+<tr>
+<td>Où est évalué un défaut ?</td>
+<td>Dans <strong>la fonction</strong></td>
+</tr>
+<tr>
+<td>Qu'est-ce que l'évaluation paresseuse ?</td>
+<td><em>« <strong>not evaluated until needed</strong> »</em></td>
+</tr>
+<tr>
+<td>Un argument peut-il n'être jamais évalué ?</td>
+<td><strong>Oui</strong></td>
+</tr>
+<tr>
+<td>Que dit le manuel des effets de bord d'arguments ?</td>
+<td><em>« <strong>it is bad style</strong> »</em></td>
+</tr>
+<tr>
+<td>Où <code>foo(x &lt;- y)</code> modifie-t-il <code>x</code> ?</td>
+<td>Dans l'environnement <strong>de l'appelant</strong></td>
+</tr>
+<tr>
+<td>Les trois fentes d'une promesse ?</td>
+<td><strong>Expression</strong>, <strong>environnement</strong>, <strong>valeur</strong></td>
+</tr>
+<tr>
+<td>Quel environnement pour un argument fourni ?</td>
+<td>Celui de <strong>l'appelant</strong></td>
+</tr>
+<tr>
+<td>Et pour un défaut ?</td>
+<td><strong>L'environnement local</strong></td>
+</tr>
+<tr>
+<td>Que veut dire « forcer » ?</td>
+<td><strong>Évaluer l'expression</strong> dans son environnement</td>
+</tr>
+<tr>
+<td>Combien de fois une promesse est-elle forcée ?</td>
+<td><strong>Une seule</strong></td>
+</tr>
+<tr>
+<td>Comment lire l'expression non évaluée ?</td>
+<td><strong><code>substitute()</code></strong></td>
+</tr>
+<tr>
+<td>Les promesses imbriquées ?</td>
+<td>Forcées <strong>récursivement</strong></td>
+</tr>
+<tr>
+<td>Comment forcer volontairement ?</td>
+<td>Nommer l'argument <strong>sur une ligne seule</strong></td>
+</tr>
+<tr>
+<td>Une fonction locale est-elle visible de ses appels ?</td>
+<td><strong>Non</strong> — pas par le chemin de recherche</td>
+</tr>
+<tr>
+<td>Comment <code>area</code> contourne-t-elle cela ?</td>
+<td>En <strong>se passant elle-même</strong> en argument</td>
+</tr>
+<tr>
+<td>Pourquoi <code>as.vector(table(x))</code> dans <code>bdeff</code> ?</td>
+<td>Pour <strong>ôter l'attribut <code>dim</code></strong></td>
+</tr>
+<tr>
+<td>Pourquoi la SVD dans <code>bdeff</code> ?</td>
+<td><em>« <strong>numerically slightly better</strong> »</em></td>
+</tr>
+<tr>
+<td>Que rend <code>bdeff</code> ?</td>
+<td><strong>Une liste</strong> — efficacités <strong>et</strong> contrastes canoniques</td>
+</tr>
+<tr>
+<td>Suffit-il d'ôter <code>dimnames</code> pour un affichage nu ?</td>
+<td><strong>Non</strong> — il faut des <strong>chaînes vides</strong></td>
+</tr>
+<tr>
+<td>Que dit le cours de <code>no.dimnames</code> ?</td>
+<td>Que de bonnes fonctions <strong>peuvent être très courtes</strong></td>
+</tr>
+<tr>
+<td>Quel est le coût de <code>area</code> ?</td>
+<td><em>« <strong>a heavy overhead</strong> »</em></td>
+</tr>
+</tbody></table>
+</main>
+
+
+
+
+</body></html>

@@ -1,0 +1,1224 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fiche 92 — Méthodes numériques : arbres, Monte-Carlo, différences finies</title>
+<script>
+window.MathJax={tex:{inlineMath:[["$","$"]],displayMath:[["$$","$$"]],processEscapes:true},
+ options:{skipHtmlTags:["script","noscript","style","textarea","pre","code"]},
+ svg:{fontCache:"global"},
+ startup:{pageReady:()=>MathJax.startup.defaultPageReady().then(()=>{document.body.classList.add("ready")})}};
+setTimeout(function(){document.body.classList.add("ready")},2500);
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+/* ============================================================
+   MathiasLearn — feuille de style des fiches
+   Reprise intégrale des tokens de 00_PARCOURS/*.html
+   + blocs pédagogiques (callouts, méthode, essentiels, recall)
+   ============================================================ */
+:root{--bg:#faf9f7;--card:#fff;--ink:#1a1a1a;--muted:#6b6b6b;--line:#e5e2dd;--accent:#8b5e34;
+ --hl:#fdf8ef;--ok:#2d7d4f;--okbg:#f0f7f3;--warn:#b3402f;--warnbg:#fdf3f1;--blue:#2f5d8b;--bluebg:#f1f5fa}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+ font:17px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;padding:0 16px 100px}
+.nav{position:sticky;top:0;background:rgba(250,249,247,.96);backdrop-filter:blur(8px);
+ border-bottom:1px solid var(--line);margin:0 -16px 30px;padding:11px 16px;z-index:50;
+ display:flex;gap:6px;flex-wrap:wrap;font-size:13px}
+.nav a{color:var(--muted);text-decoration:none;padding:4px 9px;border-radius:5px;white-space:nowrap}
+.nav a:hover{background:var(--line);color:var(--ink)}
+.nav a.on{background:var(--accent);color:#fff}
+main{max-width:780px;margin:0 auto}
+h1{font-size:31px;letter-spacing:-.02em;margin:.4em 0 .5em;line-height:1.25}
+h2{font-size:23px;margin:2.2em 0 .7em;padding-bottom:.3em;border-bottom:1px solid var(--line)}
+h3{font-size:19px;margin:1.9em 0 .5em;color:var(--accent)}
+h4{font-size:17px;margin:1.5em 0 .4em}
+p{margin:.8em 0} a{color:var(--accent)} hr{border:0;border-top:1px solid var(--line);margin:2.6em 0}
+table{border-collapse:collapse;width:100%;margin:1.3em 0;font-size:15.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+th{background:#f3f0eb;font-weight:600}
+tr:nth-child(even) td{background:#fcfbfa}
+code{font-family:"SF Mono",Menlo,Consolas,monospace;font-size:.88em;background:#f2efea;padding:2px 6px;border-radius:4px;overflow-wrap:break-word}
+pre{background:#f2efea;padding:14px 16px;border-radius:8px;overflow-x:auto}
+pre code{background:none;padding:0;white-space:pre}
+blockquote{border-left:3px solid var(--accent);background:var(--hl);margin:1.4em 0;padding:14px 20px;border-radius:0 8px 8px 0}
+blockquote p:first-child{margin-top:0} blockquote p:last-child{margin-bottom:0}
+ul,ol{padding-left:1.5em} li{margin:.35em 0} em{color:#4a4a4a}
+mjx-container[display="true"]{margin:1.1em 0!important;overflow-x:auto;overflow-y:hidden;padding:2px 0}
+mjx-container svg{max-width:100%}
+body:not(.ready) main{opacity:0} main{opacity:1;transition:opacity .25s}
+
+/* --- bandeau de tête de fiche --- */
+.cours{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--accent);
+ border-radius:0 10px 10px 0;padding:18px 22px;margin:0 0 34px}
+.cours h4{margin:0 0 4px;font-size:14px;text-transform:uppercase;letter-spacing:.07em;color:var(--accent)}
+.cours .cs{color:var(--muted);font-size:14.5px;margin:0 0 14px}
+
+/* --- exercices / corrigés --- */
+.ex{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:6px 24px 20px;margin:18px 0}
+.ex>h3:first-child{margin-top:14px}
+details.cor{margin-top:18px;border:1px solid var(--line);border-radius:8px;background:#fcfbfa;overflow:hidden}
+details.cor>summary{cursor:pointer;padding:12px 16px;font-weight:600;font-size:15px;color:var(--accent);
+ list-style:none;display:flex;align-items:center;gap:9px;user-select:none;transition:.15s;min-height:44px}
+details.cor>summary::-webkit-details-marker{display:none}
+details.cor>summary:hover{background:var(--hl)}
+details.cor>summary::before{content:"\25B6";font-size:10px;transition:transform .18s;display:inline-block}
+details.cor[open]>summary::before{transform:rotate(90deg)}
+details.cor[open]>summary{background:var(--okbg);color:var(--ok);border-bottom:1px solid var(--line)}
+.cor .in{padding:4px 20px 16px}
+.cor .in>*:first-child{margin-top:.9em}
+
+/* --- blocs pédagogiques (callouts) ---
+   Générés depuis une citation Markdown dont le premier **gras** commence
+   par un mot-clé : DÉFINITION, THÉORÈME, MÉTHODE, PIÈGE, INTUITION… */
+.cal{border:1px solid var(--line);border-left:4px solid var(--accent);background:var(--card);
+ border-radius:0 10px 10px 0;padding:15px 20px;margin:1.5em 0}
+.cal>p:first-child{margin-top:0}.cal>p:last-child,.cal>ul:last-child,.cal>ol:last-child{margin-bottom:0}
+.cal .lab{display:block;font-size:12.5px;text-transform:uppercase;letter-spacing:.08em;
+ font-weight:700;color:var(--accent);margin-bottom:6px}
+.cal.formel{background:var(--hl)}
+.cal.piege{border-left-color:var(--warn);background:var(--warnbg)}
+.cal.piege .lab{color:var(--warn)}
+.cal.methode{border-left-color:var(--ok);background:var(--okbg)}
+.cal.methode .lab{color:var(--ok)}
+.cal.intu{border-left-color:var(--blue);background:var(--bluebg)}
+.cal.intu .lab{color:var(--blue)}
+.cal.plus{border-left-style:dashed;background:#faf9f7}
+.cal.plus .lab{color:var(--muted)}
+
+/* --- révision express --- */
+.ess{background:var(--card);border:1px solid var(--accent);border-radius:10px;padding:4px 24px 20px;margin:1.6em 0}
+.ess h3{margin-top:1.3em}
+.rec{background:var(--card);border:1px dashed var(--accent);border-radius:10px;padding:4px 24px 18px;margin:1.6em 0}
+.rec ol{counter-reset:none}
+
+/* --- impression / PDF --- */
+@media print{
+ .nav{display:none}
+ body{padding:0;background:#fff;font-size:11.2pt;line-height:1.55}
+ main{max-width:none}
+ h1{font-size:23pt}h2{font-size:15pt;margin-top:1.5em}h3{font-size:12.6pt}
+ h2,h3,h4{break-after:avoid;page-break-after:avoid}
+ table,.cal,blockquote{break-inside:avoid;page-break-inside:avoid}
+ table{display:table;font-size:9.6pt}
+ details.cor{border:1px solid var(--line);background:#fcfbfa}
+ details.cor>summary{display:none}
+ details.cor .in{padding-top:10px}
+ .cal,.ex,.ess,.rec{box-shadow:none}
+ a{color:var(--ink);text-decoration:none}
+}
+@page{margin:16mm 15mm 18mm}
+
+/* --- exemples travaillés --- */
+.exm{background:#fcfbfa;border:1px solid var(--line);border-radius:10px;padding:2px 20px 14px;margin:1.5em 0}
+.exm>h4:first-child{margin:14px 0 .5em;color:var(--accent);font-size:13px;text-transform:uppercase;letter-spacing:.07em}
+
+
+/* --- pastilles de priorité (conventions des fiches de l'app) --- */
+h2[data-prio], h3[data-prio], h4[data-prio]{position:relative}
+h2[data-prio]::before,h3[data-prio]::before,h4[data-prio]::before{
+ content:"";display:inline-block;width:9px;height:9px;border-radius:50%;
+ margin-right:9px;vertical-align:middle;background:var(--muted)}
+[data-prio="must"]::before{background:var(--warn)}
+[data-prio="high"]::before{background:#d98324}
+[data-prio="mid"]::before{background:#c9a227}
+[data-prio="low"]::before{background:var(--ok)}
+/* corrigés des fiches de l'app : même traitement que les corrigés des séries */
+details.cor>summary::after{content:""}
+</style></head><body>
+<div class="nav"><a href="00_COMMENCER_ICI.html">Commencer ici</a><a href="01_NOTATIONS_le-decodeur.html">Notations</a><a href="02_EXERCICES_Serie-0.html">Série 0 — Remise en route</a><a href="03_EXERCICES_Serie-1.html">Série 1 — Convexité</a><a href="04_EXERCICES_Serie-2.html">Série 2 — KKT</a><a href="05_AUTO-EVALUATION.html">Auto-évaluation (quiz)</a><a href="06_FICHE_Optimisation-deux-variables.html">Fiche — Optimisation à 2 variables</a></div>
+<main><h1>Fiche 92 — Méthodes numériques : arbres, Monte-Carlo, différences finies</h1>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Matière</strong></td>
+<td>Maths · Finance de marché</td>
+</tr>
+<tr>
+<td><strong>Cours source</strong></td>
+<td>John C. Hull, <em>Options, Futures, and Other Derivatives</em>, 8ᵉ éd., Pearson — chapitre 20 « Basic Numerical Procedures »</td>
+</tr>
+<tr>
+<td><strong>Difficulté</strong></td>
+<td> Must know — les trois outils de tout desk quantitatif</td>
+</tr>
+<tr>
+<td><strong>Temps d'étude estimé</strong></td>
+<td>2 h</td>
+</tr>
+<tr>
+<td><strong>Prérequis</strong></td>
+<td>Fiches 85, 86, 87, 89, 90</td>
+</tr>
+<tr>
+<td><strong>Concepts clés</strong></td>
+<td>Arbre binomial CRR, grecques par l'arbre, dividendes en montant, arbre à $p=0{,}5$, arbre trinomial, paramètres dépendant du temps, simulation de Monte-Carlo, erreur type, variables antithétiques, variable de contrôle, échantillonnage préférentiel et stratifié, suites quasi-aléatoires, différences finies implicites et explicites, Crank-Nicolson</td>
+</tr>
+<tr>
+<td><strong>Poids à l'examen</strong></td>
+<td>Construire un arbre et <strong>tester l'exercice à chaque nœud</strong> · les <strong>grecques par l'arbre</strong> · l'<strong>erreur type</strong> de Monte-Carlo · l'<strong>équivalence</strong> différences finies explicites / arbre trinomial.</td>
+</tr>
+</tbody></table>
+<h2>Vue d'ensemble</h2>
+<pre><code>TROIS OUTILS, TROIS DOMAINES
+  ARBRES / DIFF. FINIES   AMÉRICAINES et décisions avant maturité — on remonte le temps
+  MONTE-CARLO             payoffs dépendant du CHEMIN, ou PLUSIEURS variables — on avance
+
+ARBRE CRR   u = e^{σ√Δt}   d = 1/u   p = (a−d)/(u−d)   a = e^{(r−q)Δt}
+GRECQUES    Δ par les nœuds (1,·) · Γ par les nœuds (2,·) · Θ par f_{2,1} − f_{0,0}
+MONTE-CARLO erreur type = ω/√M  →  DOUBLER la précision coûte QUATRE fois plus d'essais
+DIFF. FINIES  implicite : robuste, système à résoudre · explicite : ≡ ARBRE TRINOMIAL
+</code></pre>
+<p><strong>Le partage des rôles, énoncé d'entrée.</strong> <em>Monte-Carlo est habituellement utilisé quand <strong>le payoff dépend de l'historique</strong> de la variable sous-jacente, <strong>ou quand il y a plusieurs variables</strong>. Les arbres et les différences finies sont habituellement utilisés pour les <strong>options américaines</strong> et les dérivés où <strong>le détenteur a des décisions à prendre avant maturité</strong>. <strong>En plus de valoriser un dérivé, toutes ces procédures permettent de calculer les grecques.</strong></em></p>
+<h2 data-prio="must">Concept 1 — L'arbre binomial : dérivation complète des paramètres</h2>
+<p><strong>Le principe de valorisation risque-neutre.</strong> <em>(1) Supposer que le rendement espéré de <strong>tous les actifs négociés</strong> est le taux sans risque. (2) Valoriser les payoffs en calculant leur <strong>espérance</strong> et en <strong>actualisant au taux sans risque</strong>.</em></p>
+<details class="cor">
+<summary><strong>Comment $p$, $u$ et $d$ sont déterminés — les trois conditions</strong></summary><div class="in">
+
+<blockquote>
+<p><em><strong>Les paramètres $p$, $u$ et $d$ doivent donner les valeurs correctes de la MOYENNE et de la VARIANCE des variations de prix sur un intervalle $\Delta t$.</strong></em></p>
+</blockquote>
+<p><em>Étape 1 — la condition de moyenne.</em> En monde risque-neutre, le rendement espéré est $r$ ; l'actif procurant un rendement $q$, <strong>les plus-values doivent fournir $r-q$</strong>. L'espérance en fin d'intervalle doit donc être $Se^{(r-q)\Delta t}$ :
+$$Se^{(r-q)\Delta t}=pSu+(1-p)Sd\quad\Longrightarrow\quad\boxed{e^{(r-q)\Delta t}=pu+(1-p)d}\;\text{(20.1)}$$</p>
+<p><em>Étape 2 — la condition de variance.</em> La variance de $1+R$ (où $R$ est le rendement en pourcentage) vaut $pu^2+(1-p)d^2-e^{2(r-q)\Delta t}$. <em>Comme <strong>ajouter une constante ne change pas la variance</strong>, c'est aussi la variance de $R$, qui vaut $\sigma^2\Delta t$.</em> En utilisant (20.1) :
+$$\boxed{e^{(r-q)\Delta t}(u+d)-ud-e^{2(r-q)\Delta t}=\sigma^2\Delta t}\;\text{(20.2)}$$</p>
+<p><em>Étape 3 — la troisième condition, choisie par Cox, Ross et Rubinstein (1979).</em>
+$$\boxed{u=1/d}\;\text{(20.3)}$$</p>
+<p><em>Étape 4 — la solution</em>, en ignorant les termes d'ordre supérieur à $\Delta t$ :
+$$\boxed{p=\frac{a-d}{u-d}\quad u=e^{\sigma\sqrt{\Delta t}}\quad d=e^{-\sigma\sqrt{\Delta t}}\quad a=e^{(r-q)\Delta t}}\;\text{(20.4)-(20.7)}$$
+<em>La variable $a$ s'appelle le <strong>facteur de croissance</strong>.</em></p>
+<p class="cal piege"> <strong>La vérification esquissée par Hull.</strong> <em>(20.4) et (20.7) satisfont <strong>exactement</strong> (20.1) et (20.3). En développant $e^x=1+x+x^2/2+\cdots$ et en ignorant les termes d'ordre supérieur à $\Delta t$, on vérifie que (20.2) est satisfaite.</em></p>
+</div></details>
+
+<p><strong>L'arbre des prix.</strong> <em>À la date $i\Delta t$, on considère <strong>$i+1$</strong> prix :</em>
+$$\boxed{S_0u^jd^{i-j},\qquad j=0,1,\ldots,i}$$
+<em>La relation $u=1/d$ fait que <strong>l'arbre se recombine</strong> : une hausse suivie d'une baisse donne le même prix qu'une baisse suivie d'une hausse.</em> (Ainsi $S_0u^2d=S_0u$.)</p>
+<p><strong>La remontée, écrite algébriquement.</strong> Avec $f_{i,j}$ la valeur au nœud $(i,j)$ :
+$$f_{N,j}=\max\big(K-S_0u^jd^{N-j},0\big)\quad\text{(put)}$$
+$$\boxed{f_{i,j}=\max\Big\{K-S_0u^jd^{i-j},\ e^{-r\Delta t}\big[pf_{i+1,j+1}+(1-p)f_{i+1,j}\big]\Big\}}$$</p>
+<div class="cal intu"><span class="lab">Ce que capture cette récurrence, et c'est plus que ce qu'on croit.</span>
+<p class="cal piege">  <em>Comme les calculs partent de $T$ et remontent, <strong>la valeur en $i\Delta t$ capture non seulement l'effet des possibilités d'exercice anticipé EN $i\Delta t$, mais aussi celui des exercices à TOUTES les dates ultérieures</strong>.</em></p>
+</div>
+<details class="cor">
+<summary><strong>Exercice résolu — un put américain à cinq pas (exemple 20.1)</strong></summary><div class="in">
+
+<p><strong>Données.</strong> Put américain <strong>5 mois</strong> sur action sans dividende. $S_0=50$, $K=50$, $r=10\,\%$, $\sigma=40\,\%$, $T=0{,}4167$, $q=0$. <strong>Cinq pas</strong> d'un mois : $\Delta t=0{,}0833$.</p>
+<p><em>Étape 1 — les paramètres.</em>
+$$u=e^{0{,}4\sqrt{0{,}0833}}=\mathbf{1{,}1224}\quad d=\mathbf{0{,}8909}\quad a=e^{0{,}10\times0{,}0833}=\mathbf{1{,}0084}\quad p=\mathbf{0{,}5073}$$
+<em>Étape 2 — un prix quelconque.</em> Au nœud $(i=4,j=1)$ : $50\times1{,}1224\times0{,}8909^3=\mathbf{39{,}69}$.
+<em>Étape 3 — les payoffs terminaux.</em> $\max(K-S_T,0)$ ; par exemple $50{,}00-35{,}36=\mathbf{14{,}64}$.
+<em>Étape 4 — un nœud où l'on n'exerce PAS (nœud E, $S=50$, $t=4\Delta t$).</em>
+$$(0{,}5073\times0+0{,}4927\times5{,}45)e^{-0{,}10\times0{,}0833}=\mathbf{2{,}66}$$
+<em>L'exercice donnerait <strong>zéro</strong> (cours et strike valent tous deux 50) : <strong>il vaut clairement mieux attendre</strong>.</em>
+<em>Étape 5 — un nœud où l'on exerce (nœud A, $S=39{,}69$, $t=4\Delta t$).</em>
+$$\text{continuation}=(0{,}5073\times5{,}45+0{,}4927\times14{,}64)e^{-0{,}008333}=\mathbf{9{,}90}$$
+$$\text{exercice}=50{,}00-39{,}69=\mathbf{10{,}31}\ &gt;\ 9{,}90\ \Longrightarrow\ f=\mathbf{10{,}31}$$
+<em>Étape 6 — le piège : un nœud dans la monnaie où l'on n'exerce PAS (nœud B, $S=39{,}69$, $t=3\Delta t$).</em>
+$$\text{exercice}=10{,}31\qquad \text{continuation}=(0{,}5073\times6{,}38+0{,}4927\times14{,}64)e^{-0{,}008333}=\mathbf{10{,}36}$$</p>
+<blockquote>
+<p class="cal piege"> <em><strong>Il n'est PAS toujours optimal d'exercer une option quand elle est dans la monnaie.</strong></em> La valeur au nœud est <strong>10,36</strong>.</p>
+</blockquote>
+<p><em>Étape 7 — la racine.</em> $\boxed{\mathbf{4{,}49}}$.</p>
+<p><strong>La convergence.</strong></p>
+<table>
+<thead>
+<tr>
+<th>Nombre de pas</th>
+<th>5</th>
+<th>30</th>
+<th>50</th>
+<th>100</th>
+<th>500</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Prix</td>
+<td>4,49</td>
+<td><strong>4,263</strong></td>
+<td><strong>4,272</strong></td>
+<td><strong>4,278</strong></td>
+<td><strong>4,283</strong></td>
+</tr>
+</tbody></table>
+<p><em>En pratique <strong>$N=30$ donne habituellement des résultats raisonnables</strong>.</em></p>
+</div></details>
+
+<h2 data-prio="must">Concept 2 — Les grecques par l'arbre</h2>
+<p>$$\boxed{\Delta=\frac{f_{1,1}-f_{1,0}}{S_0u-S_0d}}\;\text{(20.8)}$$</p>
+<p>$$\boxed{\Gamma=\frac{\dfrac{f_{2,2}-f_{2,1}}{S_0u^2-S_0}-\dfrac{f_{2,1}-f_{2,0}}{S_0-S_0d^2}}{h}}\;\text{(20.9)}\qquad h=0{,}5\big(S_0u^2-S_0d^2\big)$$</p>
+<p>$$\boxed{\Theta=\frac{f_{2,1}-f_{0,0}}{2\Delta t}}\;\text{(20.10)}\qquad\qquad \mathcal V=\frac{f^\ast-f}{\Delta\sigma}\ \text{(nouvel arbre)}$$</p>
+<blockquote>
+<p><strong>La logique du gamma.</strong> <em>On a <strong>deux estimations du delta</strong> en $2\Delta t$ : l'une à mi-chemin entre les deuxième et troisième nœuds, l'autre entre les premier et deuxième. <strong>Gamma est la variation du delta divisée par la distance $h$ entre les deux prix</strong>.</em></p>
+</blockquote>
+<p class="cal piege"> <strong>Ces formules donnent le delta en $\Delta t$ et le gamma en $2\Delta t$</strong> — <em>en pratique, <strong>on les utilise aussi comme estimations en zéro</strong></em>. Raffinement possible signalé en note : <em>démarrer l'arbre en $-2\Delta t$ avec le cours $S_0$ à cette date</em>, ce qui donne trois prix en zéro.</p>
+<p class="cal piege"> <strong>Pour véga et rhô, il faut reconstruire l'arbre</strong> avec un paramètre légèrement modifié — <em>en gardant <strong>le même nombre de pas</strong></em>.</p>
+<details class="cor">
+<summary><strong>Exercice résolu — les grecques du put de l'exemple 20.1</strong></summary><div class="in">
+
+<p><em>Étape 1 — delta</em>, à partir de $f_{1,0}=6{,}96$ et $f_{1,1}=2{,}16$ :
+$$\Delta=\frac{2{,}16-6{,}96}{56{,}12-44{,}55}=\frac{-4{,}80}{11{,}57}=\boxed{\mathbf{-0{,}41}}$$
+<em>Étape 2 — gamma</em>, à partir des nœuds B, C, F ($62{,}99$ / $50{,}00$ / $39{,}69$ portant $0{,}64$ / $3{,}77$ / $10{,}36$). D'abord $h=0{,}5(62{,}99-39{,}69)=\mathbf{11{,}65}$, puis
+$$\Gamma=\frac{\dfrac{0{,}64-3{,}77}{62{,}99-50{,}00}-\dfrac{3{,}77-10{,}36}{50{,}00-39{,}69}}{11{,}65}=\frac{-0{,}2410+0{,}6392}{11{,}65}=\boxed{\mathbf{0{,}03}}$$
+<em>Étape 3 — thêta</em>, à partir des nœuds D ($3{,}77$) et C ($4{,}49$) :
+$$\Theta=\frac{3{,}77-4{,}49}{0{,}1667}=\boxed{\mathbf{-4{,}3}\ \text{par an}}=-0{,}012\ \text{par jour calendaire}$$</p>
+<p><em>Étape 4 — la mise en garde.</em> <em><strong>Ce ne sont que des estimations grossières. Elles s'améliorent progressivement à mesure que le nombre de pas augmente.</strong></em> Avec <strong>50 pas</strong> : delta $\mathbf{-0{,}415}$, gamma $\mathbf{0{,}034}$, thêta $\mathbf{-0{,}0117}$ ; par petites perturbations, véga $\mathbf{0{,}123}$ et rhô $\mathbf{-0{,}072}$.</p>
+</div></details>
+
+<h2 data-prio="high">Concept 3 — Dividendes, arbres alternatifs, paramètres variables</h2>
+<h3>3.1 Les dividendes</h3>
+<table>
+<thead>
+<tr>
+<th>Hypothèse</th>
+<th>Traitement</th>
+<th>L'arbre recombine ?</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Rendement continu $q$</strong></td>
+<td>valoriser comme une option sur indice</td>
+<td><strong>oui</strong></td>
+</tr>
+<tr>
+<td><strong>Rendements discrets</strong> connus</td>
+<td>$u$, $d$, $p$ calculés <strong>comme s'il n'y avait pas de dividende</strong> ; les nœuds <strong>après</strong> détachement portent $S_0(1-\delta_i)u^jd^{i-j}$, où $\delta_i$ est le <strong>rendement cumulé</strong> de tous les détachements avant $i\Delta t$</td>
+<td><strong>oui</strong></td>
+</tr>
+<tr>
+<td><strong>Montant en dollars</strong> connu</td>
+<td>nœuds avant : $S_0u^jd^{i-j}$ ; <strong>après</strong> : $S_0u^jd^{i-j}-D$</td>
+<td> <strong>NON</strong></td>
+</tr>
+</tbody></table>
+<blockquote>
+<p class="cal piege"> <strong>Le problème du dividende en montant.</strong> <em>Si la volatilité est supposée constante, <strong>l'arbre ne se recombine pas</strong>, ce qui signifie que <strong>le nombre de nœuds à évaluer devient très grand</strong>.</em> C'est pourquoi, pour les options longues, <em>on suppose souvent par commodité un <strong>rendement continu</strong></em>.</p>
+</blockquote>
+<h3>3.2 L'arbre à probabilités égales</h3>
+<p>*Au lieu d'imposer $u=1/d$, on peut <strong>poser $p=0{,}5$</strong>.* La solution, aux termes d'ordre supérieur près :
+$$\boxed{u=e^{(r-q-\sigma^2/2)\Delta t+\sigma\sqrt{\Delta t}}\qquad d=e^{(r-q-\sigma^2/2)\Delta t-\sigma\sqrt{\Delta t}}}$$</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Avantage</th>
+<th>Inconvénient</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>$p=0{,}5$</strong></td>
+<td><em>les probabilités sont <strong>toujours 0,5</strong>, quels que soient $\sigma$ et le nombre de pas</em></td>
+<td><em>il est <strong>moins direct de calculer delta, gamma et rhô</strong>, car <strong>l'arbre n'est plus centré sur $S_0$</strong></em></td>
+</tr>
+</tbody></table>
+<blockquote>
+<p class="cal piege"> <strong>Le vrai motif technique, en note de Hull.</strong> <em>Quand les pas sont si grands que $\sigma&lt;(r-q)\sqrt{\Delta t}$, <strong>l'arbre de Cox-Ross-Rubinstein donne des probabilités NÉGATIVES</strong>. <strong>La procédure alternative n'a pas ce défaut.</strong></em></p>
+</blockquote>
+<details class="cor">
+<summary><strong>Exercice résolu — un call américain sur devise avec l'arbre à $p=0{,}5$ (exemple 20.6)</strong></summary><div class="in">
+
+<p><strong>Données.</strong> Call <strong>9 mois</strong> sur devise. $S_0=0{,}79$, $K=0{,}795$, $r=6\,\%$, $r_f=10\,\%$, $\sigma=4\,\%$, $T=0{,}75$, <strong>trois pas</strong> ($\Delta t=0{,}25$).</p>
+<p><em>Étape 1 — les deux paramètres.</em>
+$$u=e^{(0{,}06-0{,}10-0{,}0016/2)\times0{,}25+0{,}04\sqrt{0{,}25}}=e^{-0{,}0102+0{,}02}=\mathbf{1{,}0098}$$
+$$d=e^{-0{,}0102-0{,}02}=\mathbf{0{,}9703}$$
+<em>Étape 2 — l'arbre des changes.</em> $0{,}79\to0{,}7978$ ou $0{,}7665$ ; puis $0{,}8056$ / $0{,}7740$ / $0{,}7437$ ; puis $0{,}8136$ / $0{,}7817$ / $0{,}7510$ / $0{,}7216$.
+<em>Étape 3 — remonter avec $p=0{,}5$ partout.</em> Valeur de l'option : $\boxed{\mathbf{0{,}0026}}$.</p>
+<p class="cal piege"> <strong>Ici $u$ et $d$ sont tous deux inférieurs à ce que donnerait CRR</strong> : l'arbre <strong>dérive vers le bas</strong> parce que $r&lt;r_f$. C'est visible dans le fait que $ud=e^{-0{,}0204}&lt;1$ — l'arbre <strong>n'est pas centré</strong> sur 0,79.</p>
+</div></details>
+
+<h3>3.3 L'arbre trinomial</h3>
+<p>$$\boxed{u=e^{\sigma\sqrt{3\Delta t}}\qquad d=\frac1u}$$
+$$\boxed{p_u=\sqrt{\frac{\Delta t}{12\sigma^2}}\left(r-q-\frac{\sigma^2}{2}\right)+\frac16\qquad p_m=\frac23\qquad p_d=-\sqrt{\frac{\Delta t}{12\sigma^2}}\left(r-q-\frac{\sigma^2}{2}\right)+\frac16}$$</p>
+<p><em>Les calculs sont analogues : <strong>on remonte, et à chaque nœud on compare la valeur d'exercice à la valeur de continuation</strong></em>
+$$e^{-r\Delta t}\big(p_uf_u+p_mf_m+p_df_d\big)$$</p>
+<blockquote>
+<p class="cal piege"> <strong>Le résultat structurel à retenir.</strong> <em><strong>L'approche par arbre trinomial se révèle ÉQUIVALENTE à la méthode des différences finies EXPLICITES</strong></em> (concept 6).</p>
+</blockquote>
+<p><strong>Le maillage adaptatif (Figlewski et Gao).</strong> <em>Un arbre à <strong>haute résolution</strong> ($\Delta t$ petit) est <strong>greffé</strong> sur un arbre à basse résolution. Pour une américaine ordinaire, <strong>la haute résolution est surtout utile près du strike, à la fin de la vie de l'option</strong>.</em></p>
+<h3>3.4 Paramètres dépendant du temps</h3>
+<p><em>En pratique $r$, $q$, $r_f$ et $\sigma$ sont <strong>supposés dépendre du temps</strong>, leurs valeurs entre $t$ et $t+\Delta t$ étant <strong>leurs valeurs forward</strong>.</em></p>
+<p><strong>Pour $r$ et $q$</strong> — on modifie <strong>seulement $a$</strong>, ce qui <em>ne change pas la géométrie de l'arbre, puisque $u$ et $d$ n'en dépendent pas</em> :
+$$\boxed{a=e^{[f(t)-g(t)]\Delta t}}\;\text{(20.11)}\qquad\Longrightarrow\qquad p=\frac{e^{[f(t)-g(t)]\Delta t}-d}{u-d}\;\text{(20.12)}$$
+*où $f(t)$ est le <strong>taux forward</strong> entre $t$ et $t+\Delta t$ et $g(t)$ la valeur forward de $q$. <strong>Et l'on actualise entre $t$ et $t+\Delta t$ avec $f(t)$</strong>.*</p>
+<p><strong>Pour $\sigma$ — plus délicat.</strong> <em>Une approche consiste à rendre <strong>les longueurs de pas inversement proportionnelles au taux de variance</strong> : $u$ et $d$ restent alors <strong>toujours les mêmes</strong> et l'arbre <strong>recombine</strong>.</em> Avec $V=\sigma(T)^2T$ et $N$ pas, on choisit les dates $t_i$ telles que
+$$\boxed{\sigma(t_i)^2t_i=\frac{iV}{N}}$$
+*La variance entre $t_{i-1}$ et $t_i$ vaut alors <strong>$V/N$ pour tout $i$</strong>.*</p>
+<h2 data-prio="must">Concept 4 — La simulation de Monte-Carlo</h2>
+<details class="cor">
+<summary><strong>L'idée, illustrée par le calcul de $\pi$ avec des fléchettes</strong></summary><div class="in">
+
+<p><em>Un carré de côté <strong>1</strong>, un cercle inscrit de rayon <strong>0,5</strong>. <strong>Lancez des fléchettes au hasard</strong> et calculez le pourcentage tombant dans le cercle.</em> Aire du carré <strong>1</strong>, aire du cercle $\pi\times0{,}5^2=\pi/4$. <em>La <strong>proportion</strong> tombant dans le cercle devrait donc être $\pi/4$ : <strong>on estime $\pi$ en multipliant cette proportion par 4</strong>.</em></p>
+<p><strong>Au tableur.</strong> A1 et B1 valent <code>=RAND()</code> (position horizontale et verticale de la fléchette). C1 vaut</p>
+<pre><code>=IF((A1-0.5)^2+(B1-0.5)^2&lt;0.5^2, 4, 0)
+</code></pre>
+<p><em>ce qui met <strong>4</strong> si la fléchette est dans le cercle et <strong>0</strong> sinon.</em> Répliquer sur 100 lignes, puis moyenne et écart-type. <strong>Résultat d'un tirage : moyenne 3,04, écart-type 1,69.</strong></p>
+<blockquote>
+<p class="cal piege"> <em><strong>Augmenter le nombre d'essais améliore la précision — mais la convergence vers 3,14159 est LENTE.</strong></em> C'est tout le problème de Monte-Carlo, quantifié au concept 4.2.</p>
+</blockquote>
+</div></details>
+
+<p><strong>La procédure en cinq étapes.</strong></p>
+<ol>
+<li><strong>Tirer une trajectoire aléatoire</strong> pour $S$ en monde risque-neutre.</li>
+<li>Calculer le <strong>payoff</strong> du dérivé.</li>
+<li><strong>Répéter</strong> pour obtenir de nombreuses valeurs de payoff.</li>
+<li>Calculer la <strong>moyenne</strong> → estimation du payoff espéré en monde risque-neutre.</li>
+<li><strong>Actualiser au taux sans risque</strong>.</li>
+</ol>
+<p><strong>La discrétisation.</strong> À partir de $dS=\hat\mu S\,dt+\sigma S\,dz$ :
+$$S(t+\Delta t)-S(t)=\hat\mu S(t)\Delta t+\sigma S(t)\varepsilon\sqrt{\Delta t}\;\text{(20.14)}$$</p>
+<p class="cal piege"> <strong>Mais il vaut mieux simuler $\ln S$.</strong> Par le lemme d'Itô,
+$$d\ln S=\left(\hat\mu-\frac{\sigma^2}{2}\right)dt+\sigma\,dz\;\text{(20.15)}\quad\Longrightarrow\quad\boxed{S(t+\Delta t)=S(t)\exp\left[\left(\hat\mu-\frac{\sigma^2}{2}\right)\Delta t+\sigma\varepsilon\sqrt{\Delta t}\right]}$$</p>
+<div class="cal intu"><span class="lab">Pourquoi c'est mieux, et Hull le dit en note.</span>
+<p class="cal piege">  *Cette équation est <strong>exactement vraie</strong>, alors que (20.14) n'est exacte <strong>qu'à la limite $\Delta t\to0$</strong>.* Avec la forme logarithmique, <strong>on peut sauter directement en $T$</strong> si le payoff ne dépend que de $S_T$.</p>
+</div>
+<p><em>Valeurs de $\hat\mu$ : <strong>$r$</strong> pour une action sans dividende, <strong>$r-r_f$</strong> pour un change, etc.  <strong>La volatilité est la même en monde risque-neutre que dans le monde réel</strong> (Girsanov, fiche 85).</em></p>
+<details class="cor">
+<summary><strong>Vérifier Black-Scholes par Monte-Carlo, au tableur (Business Snapshot 20.2)</strong></summary><div class="in">
+
+<p><strong>Les données en ligne 2.</strong> $S_0=50$, $K=50$, $r=0{,}05$, $\sigma=0{,}3$, $T=0{,}5$. Les cellules D4, E4, F4 calculent $d_1$, $d_2$ et le prix Black-Scholes : <strong>4,817</strong>.</p>
+<p><em>Étape 1 — le tirage normal.</em> <code>NORMSINV(RAND())</code> donne un tirage de la loi normale centrée réduite.
+<em>Étape 2 — la cellule A1 : un tirage de $S_T$.</em></p>
+<pre><code>=$C$2*EXP(($E$2-$F$2*$F$2/2)*$G$2+$F$2*NORMSINV(RAND())*SQRT($G$2))
+</code></pre>
+<p><em>Étape 3 — la cellule B1 : la valeur actuelle du payoff.</em></p>
+<pre><code>=EXP(-$E$2*$G$2)*MAX(A1-$D$2,0)
+</code></pre>
+<p><em>Étape 4 — répliquer sur 1 000 lignes</em>*, puis <code>AVERAGE(B1:B1000)</code> et <code>STDEV(B1:B1000)</code>.
+<em>Étape 5 — le résultat.</em> Moyenne <strong>4,98</strong>, écart-type <strong>7,68</strong> — <em>pas trop loin du prix Black-Scholes de <strong>4,817</strong></em>.</p>
+</div></details>
+
+<h3>4.1 Plusieurs variables et tirages corrélés</h3>
+<p>Pour $n$ variables : $\theta_i(t+\Delta t)-\theta_i(t)=\hat m_i\theta_i\Delta t+s_i\theta_i\varepsilon_i\sqrt{\Delta t}$ ;(20.18), les $\varepsilon_i$ étant tirés d'une <strong>normale multivariée</strong>.</p>
+<p><strong>Deux variables corrélées.</strong> À partir de $x_1,x_2$ <strong>indépendants</strong> :
+$$\boxed{\varepsilon_1=x_1\qquad \varepsilon_2=\rho x_1+\sqrt{1-\rho^2}\,x_2}$$</p>
+<p><strong>$n$ variables — la décomposition de Cholesky.</strong>
+$$\varepsilon_1=\alpha_{11}x_1,\qquad \varepsilon_2=\alpha_{21}x_1+\alpha_{22}x_2,\qquad \varepsilon_3=\alpha_{31}x_1+\alpha_{32}x_2+\alpha_{33}x_3,\ \ldots$$
+<em>On choisit les $\alpha_{ij}$ <strong>pas à pas</strong> : $\alpha_{11}=1$ ; $\alpha_{21}$ tel que $\alpha_{21}\alpha_{11}=\rho_{21}$ ; $\alpha_{22}$ tel que $\alpha_{21}^2+\alpha_{22}^2=1$ ; $\alpha_{31}$ tel que $\alpha_{31}\alpha_{11}=\rho_{31}$ ; $\alpha_{32}$ tel que $\alpha_{31}\alpha_{21}+\alpha_{32}\alpha_{22}=\rho_{32}$ ; $\alpha_{33}$ tel que $\alpha_{31}^2+\alpha_{32}^2+\alpha_{33}^2=1$ ; et ainsi de suite.</em></p>
+<blockquote>
+<p class="cal piege"> <strong>Un test de cohérence gratuit.</strong> <em>Si les équations pour les $\alpha$ <strong>n'ont pas de solution réelle</strong>, c'est que <strong>la structure de corrélation supposée est intérieurement incohérente</strong>.</em></p>
+</blockquote>
+<h3>4.2 La précision, et son coût</h3>
+<p>$$\boxed{\text{erreur type}=\frac{\omega}{\sqrt M}}\qquad\qquad \mu-\frac{1{,}96\,\omega}{\sqrt M}&lt;f&lt;\mu+\frac{1{,}96\,\omega}{\sqrt M}$$
+où $\mu$ est la <strong>moyenne</strong> des payoffs actualisés, $\omega$ leur <strong>écart-type</strong> et $M$ le nombre d'essais.</p>
+<blockquote>
+<p class="cal piege"> <strong>La loi d'airain de Monte-Carlo.</strong> <em><strong>L'incertitude est inversement proportionnelle à la RACINE CARRÉE du nombre d'essais. Pour DOUBLER la précision, il faut QUADRUPLER le nombre d'essais ; pour la multiplier par 10, il faut multiplier les essais par 100.</strong></em></p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>Exemple</th>
+<th>$\mu$</th>
+<th>$\omega$</th>
+<th>$M$</th>
+<th>Erreur type</th>
+<th>Intervalle à 95 %</th>
+<th>Vraie valeur</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>$\pi$</strong> (20.7)</td>
+<td>3,04</td>
+<td>1,69</td>
+<td>100</td>
+<td><strong>0,169</strong></td>
+<td><strong>2,71 à 3,37</strong></td>
+<td>3,14159 </td>
+</tr>
+<tr>
+<td><strong>Option</strong> (20.8)</td>
+<td>4,98</td>
+<td>7,68</td>
+<td>1 000</td>
+<td><strong>0,24</strong></td>
+<td><strong>4,51 à 5,45</strong></td>
+<td>4,817 </td>
+</tr>
+</tbody></table>
+<p><strong>Les grecques par Monte-Carlo.</strong> <em>Calculer $\hat f$, puis augmenter $x$ de $\Delta x$ et recalculer $\hat f^\ast$ ; l'estimation est $(\hat f^\ast-\hat f)/\Delta x$.</em></p>
+<blockquote>
+<p class="cal piege"> <em><strong>Pour minimiser l'erreur type, le nombre d'intervalles $N$, LES TIRAGES ALÉATOIRES UTILISÉS, et le nombre d'essais $M$ doivent être LES MÊMES pour $\hat f$ et $\hat f^\ast$.</strong></em></p>
+</blockquote>
+<p><strong>Échantillonner à travers un arbre.</strong> <em>Au lieu de tirer dans le processus, on peut utiliser un arbre à $N$ pas et <strong>échantillonner parmi les $2^N$ trajectoires possibles</strong> : à chaque nœud, tirer un nombre entre 0 et 1 et prendre la branche basse s'il est inférieur à $1-p$.</em></p>
+<details class="cor">
+<summary><strong>Exercice résolu — valoriser une option asiatique par échantillonnage dans l'arbre (exemple 20.9)</strong></summary><div class="in">
+
+<p><strong>Le produit.</strong> Payoff $\max(S_{\text{moy}}-50,0)$, où $S_{\text{moy}}$ est <strong>le cours moyen sur les 5 mois</strong> (premier et dernier inclus) — une <strong>option asiatique</strong>.</p>
+<p><strong>Dix essais sur l'arbre de l'exemple 20.1</strong> (U = hausse, D = baisse) :</p>
+<table>
+<thead>
+<tr>
+<th>Essai</th>
+<th>Trajectoire</th>
+<th>Cours moyen</th>
+<th>Payoff</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>UUUUD</td>
+<td>64,98</td>
+<td>14,98</td>
+</tr>
+<tr>
+<td>2</td>
+<td>UUUDD</td>
+<td>59,82</td>
+<td>9,82</td>
+</tr>
+<tr>
+<td>3</td>
+<td>DDDUU</td>
+<td>42,31</td>
+<td>0,00</td>
+</tr>
+<tr>
+<td>4</td>
+<td>UUUUU</td>
+<td>68,04</td>
+<td>18,04</td>
+</tr>
+<tr>
+<td>5</td>
+<td>UUDDU</td>
+<td>55,22</td>
+<td>5,22</td>
+</tr>
+<tr>
+<td>6</td>
+<td>UDUUD</td>
+<td>55,22</td>
+<td>5,22</td>
+</tr>
+<tr>
+<td>7</td>
+<td>DDUDD</td>
+<td>42,31</td>
+<td>0,00</td>
+</tr>
+<tr>
+<td>8</td>
+<td>UUDDU</td>
+<td>55,22</td>
+<td>5,22</td>
+</tr>
+<tr>
+<td>9</td>
+<td>UUUDU</td>
+<td>62,25</td>
+<td>12,25</td>
+</tr>
+<tr>
+<td>10</td>
+<td>DDUUD</td>
+<td>45,56</td>
+<td>0,00</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td><strong>Moyenne</strong></td>
+<td><strong>7,08</strong></td>
+</tr>
+</tbody></table>
+<p><em>Étape finale — actualiser.</em>
+$$7{,}08\,e^{-0{,}1\times5/12}=\boxed{\mathbf{6{,}79}}$$</p>
+<p class="cal piege"> <em><strong>Ceci illustre la méthodologie. En pratique il faudrait beaucoup plus de pas et beaucoup plus d'essais pour obtenir une réponse précise.</strong></em></p>
+<p><strong>Pourquoi cette option exige Monte-Carlo.</strong> Le payoff dépend de <strong>toute la trajectoire</strong>, pas seulement de $S_T$ : <strong>on ne peut pas remonter un arbre</strong>, car la valeur en un nœud dépendrait du chemin par lequel on y est arrivé.</p>
+</div></details>
+
+<p><strong>Quand utiliser Monte-Carlo.</strong></p>
+<table>
+<thead>
+<tr>
+<th>Avantage</th>
+<th>Détail</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Dimension</strong></td>
+<td><em>plus efficace dès <strong>trois variables stochastiques ou plus</strong> — le temps de calcul croît <strong>approximativement linéairement</strong> avec le nombre de variables, alors qu'il croît <strong>exponentiellement</strong> pour la plupart des autres procédures</em></td>
+</tr>
+<tr>
+<td><strong>Erreur type</strong></td>
+<td><em>c'est l'une des rares méthodes qui <strong>fournit une mesure de sa propre précision</strong></em></td>
+</tr>
+<tr>
+<td><strong>Souplesse</strong></td>
+<td><em>elle accommode des <strong>payoffs complexes</strong> et des <strong>processus stochastiques complexes</strong></em></td>
+</tr>
+<tr>
+<td><strong>Trajectoire</strong></td>
+<td><em>utilisable quand <strong>le payoff dépend d'une fonction de toute la trajectoire</strong>, pas seulement de la valeur terminale</em></td>
+</tr>
+</tbody></table>
+<p class="cal piege"> <strong>La limite majeure</strong> : <em>Monte-Carlo travaille <strong>du début vers la fin</strong>, ce qui la rend <strong>inadaptée aux options américaines</strong></em> — des extensions existent (chapitre 26).</p>
+<h2 data-prio="high">Concept 5 — Les six techniques de réduction de variance</h2>
+<blockquote>
+<p><em>Simuler naïvement exige <strong>un très grand nombre d'essais</strong>, ce qui est <strong>très coûteux en temps de calcul</strong>. Ces procédures peuvent conduire à des <strong>économies spectaculaires</strong>.</em></p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>Technique</th>
+<th>Principe</th>
+<th>Pourquoi ça marche</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Variables antithétiques</strong></td>
+<td>chaque essai calcule <strong>deux</strong> valeurs : $f_1$ avec les tirages $\varepsilon$, $f_2$ avec <strong>$-\varepsilon$</strong> ; on retient $\bar f=(f_1+f_2)/2$</td>
+<td><em>quand une valeur est <strong>au-dessus</strong> de la vraie, l'autre tend à être <strong>en dessous</strong>, et réciproquement</em> ; l'erreur type $\bar\omega/\sqrt M$ est <em>habituellement <strong>bien inférieure</strong> à celle obtenue avec $2M$ essais aléatoires</em></td>
+</tr>
+<tr>
+<td><strong>Variable de contrôle</strong></td>
+<td>deux dérivés <strong>similaires</strong> A (à valoriser) et B (<strong>solution analytique connue</strong>) ; <strong>mêmes tirages, même $\Delta t$</strong> : $\boxed{f_A=f_A^\ast-f_B^\ast+f_B}$ ;(20.20)</td>
+<td>on <strong>retranche l'erreur de simulation</strong> mesurée sur B</td>
+</tr>
+<tr>
+<td><strong>Échantillonnage préférentiel</strong></td>
+<td>ne tirer que les <strong>trajectoires importantes</strong></td>
+<td><em>pour un call très hors la monnaie, la plupart des trajectoires donnent <strong>un payoff nul</strong> — <strong>c'est du temps de calcul gaspillé</strong></em></td>
+</tr>
+<tr>
+<td><strong>Échantillonnage stratifié</strong></td>
+<td>tirer des valeurs <strong>représentatives</strong> plutôt qu'aléatoires</td>
+<td>pour $n$ intervalles équiprobables, la valeur représentative du $i$-ème est $\boxed{N^{-1}\!\left(\dfrac{i-0{,}5}{n}\right)}$</td>
+</tr>
+<tr>
+<td><strong>Appariement des moments</strong></td>
+<td>ajuster les tirages : $\boxed{\varepsilon_i^\ast=\dfrac{\varepsilon_i-m}{s}}$</td>
+<td>les tirages ajustés ont <strong>exactement</strong> moyenne 0 et écart-type 1</td>
+</tr>
+<tr>
+<td><strong>Suites quasi-aléatoires</strong></td>
+<td>suites <strong>à faible discrépance</strong> (Sobol')</td>
+<td>l'erreur type devient proportionnelle à $\boldsymbol{1/M}$ <strong>et non $1/\sqrt M$</strong></td>
+</tr>
+</tbody></table>
+<details class="cor">
+<summary><strong>Deux précisions qui font la différence en pratique</strong></summary><div class="in">
+
+<p><strong>Échantillonnage préférentiel, mécaniquement.</strong> <em>Soit $F$ la loi <strong>inconditionnelle</strong> de $S_T$ et $q$ <strong>la probabilité, connue analytiquement</strong>, que $S_T&gt;K$. Alors $G=F/q$ est la loi <strong>conditionnelle</strong> à $S_T&gt;K$. <strong>On tire dans $G$ plutôt que dans $F$, et l'estimation est le payoff actualisé moyen MULTIPLIÉ PAR $q$.</strong></em></p>
+<p><strong>Appariement des moments — coût et complémentarité.</strong> <em>Il <strong>économise du temps de calcul</strong> mais peut <strong>poser des problèmes de mémoire, car chaque nombre tiré doit être stocké jusqu'à la fin</strong>. On l'appelle aussi <strong>rééchantillonnage quadratique</strong>. <strong>Il est souvent utilisé avec les variables antithétiques</strong> : celles-ci appariant <strong>automatiquement tous les moments impairs</strong>, l'objectif devient d'apparier <strong>le second et éventuellement le quatrième</strong>.</em></p>
+<p><strong>Quasi-aléatoire contre stratifié.</strong> <em>Le terme « quasi-aléatoire » est <strong>un abus de langage</strong> : une telle suite est <strong>totalement déterministe</strong>. La différence avec l'échantillonnage stratifié est la <strong>souplesse</strong> : le stratifié <strong>suppose connu d'avance le nombre de tirages</strong>, alors qu'une suite quasi-aléatoire <strong>« comble » en permanence les trous entre les points existants</strong> — <strong>à chaque étape, les points sont approximativement uniformément répartis</strong> dans l'espace des probabilités.</em></p>
+</div></details>
+
+<h2 data-prio="must">Concept 6 — Les différences finies</h2>
+<blockquote>
+<p><strong>Le principe.</strong> <em>Résoudre <strong>l'équation différentielle</strong> que le dérivé satisfait, en la <strong>convertissant en équations aux différences</strong> résolues itérativement.</em></p>
+</blockquote>
+<p><strong>Le maillage.</strong> <em>On divise $[0,T]$ en $N$ intervalles $\Delta t=T/N$, et on choisit $S_{\max}$ <strong>assez élevé pour que le put y soit pratiquement sans valeur</strong> ; $\Delta S=S_{\max}/M$ donne $M+1$ prix. <strong>On choisit $S_{\max}$ pour que l'un des prix de la grille soit le cours courant.</strong></em> Le nœud $(i,j)$ correspond à la date $i\Delta t$ et au cours $j\Delta S$.</p>
+<h3>6.1 La méthode implicite</h3>
+<p><strong>Les approximations.</strong>
+$$\frac{\partial f}{\partial S}\approx\frac{f_{i,j+1}-f_{i,j-1}}{2\Delta S}\;\text{(20.24)}\qquad \frac{\partial f}{\partial t}\approx\frac{f_{i+1,j}-f_{i,j}}{\Delta t}\;\text{(20.25)}\qquad \frac{\partial^2f}{\partial S^2}\approx\frac{f_{i,j+1}+f_{i,j-1}-2f_{i,j}}{\Delta S^2}\;\text{(20.26)}$$</p>
+<p><em>(20.24) est la <strong>moyenne</strong> des approximations <strong>avant</strong> (20.22) et <strong>arrière</strong> (20.23) — <em>une approximation plus symétrique</em>.</em></p>
+<p><strong>En substituant dans (20.21) avec $S=j\Delta S$ :</strong>
+$$\boxed{a_jf_{i,j-1}+b_jf_{i,j}+c_jf_{i,j+1}=f_{i+1,j}}\;\text{(20.27)}$$
+$$a_j=\tfrac12(r-q)j\Delta t-\tfrac12\sigma^2j^2\Delta t\qquad b_j=1+\sigma^2j^2\Delta t+r\Delta t\qquad c_j=-\tfrac12(r-q)j\Delta t-\tfrac12\sigma^2j^2\Delta t$$</p>
+<p><strong>Les trois conditions aux bords.</strong>
+$$f_{N,j}=\max(K-j\Delta S,0)\;\text{(20.28)}\qquad f_{i,0}=K\;\text{(20.29)}\qquad f_{i,M}=0\;\text{(20.30)}$$</p>
+<details class="cor">
+<summary><strong>Comment on résout, et pourquoi il n'y a pas de matrice à inverser</strong></summary><div class="in">
+
+<p><em>Étape 1.</em> En $i=N-1$, (20.27) donne <strong>$M-1$ équations simultanées</strong> dont <strong>les membres de droite sont connus</strong> (payoffs terminaux), avec $f_{N-1,0}=K$ et $f_{N-1,M}=0$.
+<em>Étape 2 — la résolution en cascade.</em> *Cela <strong>n'implique pas d'inverser une matrice</strong> : l'équation $j=1$ exprime $f_{N-1,2}$ en fonction de $f_{N-1,1}$ ; combinée à elle, l'équation $j=2$ exprime $f_{N-1,3}$ en fonction de $f_{N-1,1}$ ; et ainsi de suite. <strong>La dernière équation $j=M-1$ se résout alors en $f_{N-1,1}$</strong>, d'où l'on déduit tous les autres.*
+<em>Étape 3 — l'exercice anticipé.</em> <em>Chaque $f_{N-1,j}$ est comparé à $K-j\Delta S$ : si $f_{N-1,j}&lt;K-j\Delta S$, <strong>l'exercice est optimal</strong> et l'on pose $f_{N-1,j}=K-j\Delta S$.</em>
+<em>Étape 4 — répéter</em> jusqu'à obtenir $f_{0,1},\ldots,f_{0,M-1}$.</p>
+<p><strong>Exercice résolu (exemple 20.10).</strong> Sur le put américain de l'exemple 20.1, avec $M=20$, $N=10$, $\Delta S=5$ <em>(prix évalué tous les 5 dollars entre 0 et 100, tous les demi-mois)</em> :</p>
+<table>
+<thead>
+<tr>
+<th>Quantité</th>
+<th>Valeur</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Américaine, par la grille</td>
+<td><strong>4,07</strong></td>
+</tr>
+<tr>
+<td><strong>Européenne</strong>, par la <strong>même</strong> grille</td>
+<td><strong>3,91</strong></td>
+</tr>
+<tr>
+<td>Européenne <strong>vraie</strong> (Black-Scholes)</td>
+<td><strong>4,08</strong></td>
+</tr>
+<tr>
+<td><strong>Estimation par variable de contrôle</strong></td>
+<td>$4{,}07+(4{,}08-3{,}91)=\boxed{\mathbf{4{,}24}}$</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p class="cal piege"> <strong>La variable de contrôle s'applique aussi aux différences finies.</strong> <em>On utilise <strong>la même grille</strong> pour valoriser une option similaire dont <strong>la valorisation analytique est disponible</strong>, puis on applique (20.20).</em> Ici la correction vaut <strong>+0,17</strong> — plus de 4 % du prix.</p>
+</blockquote>
+</div></details>
+
+<h3>6.2 La méthode explicite</h3>
+<blockquote>
+<p><strong>La simplification.</strong> *On suppose que $\partial f/\partial S$ et $\partial^2f/\partial S^2$ au point $(i,j)$ sont <strong>les mêmes qu'au point $(i+1,j)$</strong>.*</p>
+</blockquote>
+<p>$$\boxed{f_{i,j}=a_j^\ast f_{i+1,j-1}+b_j^\ast f_{i+1,j}+c_j^\ast f_{i+1,j+1}}\;\text{(20.34)}$$
+$$a_j^\ast=\frac{-\tfrac12(r-q)j\Delta t+\tfrac12\sigma^2j^2\Delta t}{1+r\Delta t}\quad b_j^\ast=\frac{1-\sigma^2j^2\Delta t}{1+r\Delta t}\quad c_j^\ast=\frac{\tfrac12(r-q)j\Delta t+\tfrac12\sigma^2j^2\Delta t}{1+r\Delta t}$$</p>
+<blockquote>
+<p><strong>L'équivalence avec l'arbre trinomial — et elle est littérale.</strong> <em>Dans (20.34), on peut interpréter les termes comme des <strong>probabilités</strong> :</em></p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>Terme</th>
+<th>Interprétation</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$-\tfrac12(r-q)j\Delta t+\tfrac12\sigma^2j^2\Delta t$</td>
+<td>probabilité que le cours <strong>baisse</strong> de $j\Delta S$ à $(j-1)\Delta S$</td>
+</tr>
+<tr>
+<td>$1-\sigma^2j^2\Delta t$</td>
+<td>probabilité qu'il reste <strong>inchangé</strong></td>
+</tr>
+<tr>
+<td>$\tfrac12(r-q)j\Delta t+\tfrac12\sigma^2j^2\Delta t$</td>
+<td>probabilité qu'il <strong>monte</strong></td>
+</tr>
+</tbody></table>
+<p><em>Les trois somment à <strong>un</strong>, et donnent une hausse espérée de $(r-q)j\Delta S\Delta t=(r-q)S\Delta t$ — <strong>exactement la hausse espérée en monde risque-neutre</strong>. Le facteur $1/(1+r\Delta t)$ est <strong>l'actualisation</strong>.</em></p>
+<h3>6.3 Comparaison, changement de variable, variantes</h3>
+<table>
+<thead>
+<tr>
+<th></th>
+<th><strong>Implicite</strong></th>
+<th><strong>Explicite</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Résolution</td>
+<td>$M-1$ <strong>équations simultanées</strong> par pas</td>
+<td><strong>directe</strong>, nœud par nœud</td>
+</tr>
+<tr>
+<td>Robustesse</td>
+<td><em><strong>très robuste : elle converge TOUJOURS</strong></em> vers la solution quand $\Delta S,\Delta t\to0$</td>
+<td><em>peut <strong>ne pas converger</strong></em></td>
+</tr>
+<tr>
+<td>Équivalence</td>
+<td>—</td>
+<td><strong>arbre trinomial</strong></td>
+</tr>
+</tbody></table>
+<p class="cal piege"> <strong>La règle générale de stabilité.</strong> <em>Dans les méthodes de différences finies, <strong>$\Delta S$ doit rester proportionnel à $\sqrt{\Delta t}$</strong> quand ils tendent vers zéro.</em> Et <em>Hull et White montrent qu'il suffit ici de <strong>construire la grille en $\ln S$ plutôt qu'en $S$</strong> pour assurer la convergence</em>.</p>
+<p><strong>Le changement de variable.</strong> <em>Avec un mouvement brownien géométrique, il est <strong>plus efficace numériquement</strong> d'utiliser $Z=\ln S$ :</em>
+$$\boxed{\frac{\partial f}{\partial t}+\left(r-q-\frac{\sigma^2}{2}\right)\frac{\partial f}{\partial Z}+\frac12\sigma^2\frac{\partial^2f}{\partial Z^2}=rf}$$
+<em>La grille évalue alors le dérivé pour des valeurs <strong>également espacées de $Z$</strong> plutôt que de $S$</em> — <strong>et les coefficients ne dépendent plus de $j$</strong>.</p>
+<p><strong>Deux variantes hybrides.</strong></p>
+<table>
+<thead>
+<tr>
+<th>Méthode</th>
+<th>Principe</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><em><strong>Hopscotch</strong></em></td>
+<td><em>on <strong>alterne</strong> entre calculs explicites et implicites en passant d'un nœud à l'autre. À chaque date, on fait d'abord tous les nœuds « explicites » ; <strong>les nœuds « implicites » se traitent alors sans résoudre de système</strong>, puisque les valeurs adjacentes sont déjà calculées</em></td>
+</tr>
+<tr>
+<td><strong>Crank-Nicolson</strong></td>
+<td>la <strong>moyenne</strong> des méthodes explicite et implicite ; <em>sa mise en œuvre est <strong>similaire à l'implicite</strong>, et <strong>son avantage est une convergence plus rapide</strong> que l'une ou l'autre</em></td>
+</tr>
+</tbody></table>
+<p><strong>Les applications.</strong> <em>Les différences finies traitent les mêmes problèmes que les arbres — <strong>américaines comme européennes</strong> — mais <strong>ne peuvent pas facilement traiter les payoffs dépendant de l'historique</strong>. Elles peuvent, <strong>au prix d'une augmentation considérable du temps de calcul</strong>, traiter plusieurs variables d'état : <strong>la grille devient multidimensionnelle</strong>.</em> Les grecques se calculent <strong>comme pour les arbres</strong> : delta, gamma et thêta <strong>directement</strong> sur la grille ; <strong>véga exige de recalculer</strong> avec une volatilité modifiée.</p>
+<h2>Comment reconnaître le type d'exercice</h2>
+<table>
+<thead>
+<tr>
+<th>Signal</th>
+<th>Méthode</th>
+<th>Pourquoi</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Option <strong>américaine</strong></td>
+<td><strong>arbre</strong> ou <strong>différences finies</strong></td>
+<td>on remonte le temps → test d'exercice possible</td>
+</tr>
+<tr>
+<td>Payoff dépendant de <strong>la moyenne</strong>, du <strong>max</strong>, du <strong>chemin</strong></td>
+<td><strong>Monte-Carlo</strong></td>
+<td>impossible de remonter un arbre</td>
+</tr>
+<tr>
+<td><strong>Trois variables ou plus</strong></td>
+<td><strong>Monte-Carlo</strong></td>
+<td>temps <strong>linéaire</strong> en la dimension</td>
+</tr>
+<tr>
+<td>« quelle précision ? »</td>
+<td><strong>Monte-Carlo</strong></td>
+<td>$\omega/\sqrt M$ — la seule méthode qui le dit</td>
+</tr>
+<tr>
+<td>$\sigma&lt;(r-q)\sqrt{\Delta t}$</td>
+<td>arbre à <strong>$p=0{,}5$</strong></td>
+<td>CRR donnerait des probabilités <strong>négatives</strong></td>
+</tr>
+<tr>
+<td>Dividende <strong>en montant</strong></td>
+<td>attention</td>
+<td>l'arbre <strong>ne recombine pas</strong></td>
+</tr>
+<tr>
+<td>« pourquoi l'explicite ne converge pas ? »</td>
+<td><strong>stabilité</strong></td>
+<td>$\Delta S\propto\sqrt{\Delta t}$, ou grille en $\ln S$</td>
+</tr>
+</tbody></table>
+<h2>Comment résoudre ce type d'exercice</h2>
+<p><strong>Protocole arbre — 6 étapes.</strong></p>
+<ol>
+<li>$\Delta t=T/N$, puis $u=e^{\sigma\sqrt{\Delta t}}$, $d=1/u$, $a$ selon le sous-jacent, $p=(a-d)/(u-d)$.</li>
+<li><strong>Vérifier $0&lt;p&lt;1$</strong>.</li>
+<li>Prix au nœud $(i,j)$ : $S_0u^jd^{i-j}$.</li>
+<li>Payoffs terminaux.</li>
+<li>Remonter : $\max$(exercice, continuation) à <strong>chaque</strong> nœud pour une américaine.</li>
+<li>Grecques : $\Delta$ par $(1,\cdot)$, $\Gamma$ par $(2,\cdot)$, $\Theta$ par $f_{2,1}-f_{0,0}$ ; <strong>reconstruire l'arbre</strong> pour véga et rhô.</li>
+</ol>
+<p><strong>Protocole Monte-Carlo — 5 étapes.</strong></p>
+<ol>
+<li>Écrire le processus <strong>risque-neutre</strong> ($\hat\mu=r$, ou $r-q$, ou $r-r_f$, ou 0 pour un futures).</li>
+<li>Simuler <strong>$\ln S$</strong>, pas $S$ — c'est <strong>exact</strong>.</li>
+<li>Calculer le payoff, <strong>actualiser à $r$</strong>, répéter $M$ fois.</li>
+<li>Reporter <strong>moyenne $\mu$ ET écart-type $\omega$</strong> ; erreur type $=\omega/\sqrt M$.</li>
+<li>Donner l'<strong>intervalle à 95 %</strong> : $\mu\pm1{,}96\,\omega/\sqrt M$.</li>
+</ol>
+<h2 data-prio="must">Common mistakes</h2>
+<table>
+<thead>
+<tr>
+<th>Erreur</th>
+<th>Correction</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Croire qu'on exerce dès que l'option est dans la monnaie</td>
+<td>Nœud B : <strong>10,36 &gt; 10,31</strong>, on n'exerce <strong>pas</strong></td>
+</tr>
+<tr>
+<td>Simuler $S$ plutôt que $\ln S$</td>
+<td>La forme logarithmique est <strong>exacte</strong>, l'autre non</td>
+</tr>
+<tr>
+<td>Oublier de reporter l'écart-type d'une simulation</td>
+<td>Sans lui, <strong>aucune mesure de précision</strong></td>
+</tr>
+<tr>
+<td>Croire qu'on double la précision en doublant $M$</td>
+<td>Il faut <strong>quadrupler</strong></td>
+</tr>
+<tr>
+<td>Utiliser des tirages différents pour $\hat f$ et $\hat f^\ast$</td>
+<td><strong>Mêmes</strong> tirages, <strong>même</strong> $N$, <strong>même</strong> $M$</td>
+</tr>
+<tr>
+<td>Utiliser Monte-Carlo pour une américaine</td>
+<td>Elle <strong>avance</strong> dans le temps — inadaptée</td>
+</tr>
+<tr>
+<td>Utiliser un arbre pour une option asiatique</td>
+<td>Le payoff dépend <strong>du chemin</strong></td>
+</tr>
+<tr>
+<td>Oublier que le dividende en montant casse la recombinaison</td>
+<td>Le nombre de nœuds <strong>explose</strong></td>
+</tr>
+<tr>
+<td>Prendre CRR quand $\sigma$ est très petite</td>
+<td>Probabilités <strong>négatives</strong> — utiliser $p=0{,}5$</td>
+</tr>
+<tr>
+<td>Croire que l'explicite converge toujours</td>
+<td><strong>Non</strong> — $\Delta S\propto\sqrt{\Delta t}$, ou grille en $\ln S$</td>
+</tr>
+<tr>
+<td>Croire qu'il faut inverser une matrice en implicite</td>
+<td>Résolution <strong>en cascade</strong></td>
+</tr>
+<tr>
+<td>Oublier la variable de contrôle en différences finies</td>
+<td>Elle valait <strong>+0,17</strong> dans l'exemple, soit <strong>4 %</strong></td>
+</tr>
+</tbody></table>
+<h2>Ultimate Review</h2>
+<p><strong>L'arbre CRR.</strong> $u=e^{\sigma\sqrt{\Delta t}}$, $d=1/u$, $p=\frac{a-d}{u-d}$, $a=e^{(r-q)\Delta t}$ ; prix $S_0u^jd^{i-j}$ ; $f_{i,j}=\max(\text{exercice},e^{-r\Delta t}[pf_{i+1,j+1}+(1-p)f_{i+1,j}])$.</p>
+<p><strong>Les grecques par l'arbre.</strong>
+$$\Delta=\frac{f_{1,1}-f_{1,0}}{S_0u-S_0d}\qquad \Gamma=\frac{\frac{f_{2,2}-f_{2,1}}{S_0u^2-S_0}-\frac{f_{2,1}-f_{2,0}}{S_0-S_0d^2}}{0{,}5(S_0u^2-S_0d^2)}\qquad \Theta=\frac{f_{2,1}-f_{0,0}}{2\Delta t}$$</p>
+<p><strong>Les arbres alternatifs.</strong> $p=0{,}5$ : $u,d=e^{(r-q-\sigma^2/2)\Delta t\pm\sigma\sqrt{\Delta t}}$ — <strong>jamais de probabilité négative</strong>. <strong>Trinomial</strong> : $u=e^{\sigma\sqrt{3\Delta t}}$, $p_m=2/3$ — <strong>équivalent aux différences finies explicites</strong>.</p>
+<p><strong>Monte-Carlo.</strong> Simuler $\ln S$ · erreur type $\omega/\sqrt M$ · IC $\mu\pm1{,}96\omega/\sqrt M$ · corrélation : $\varepsilon_2=\rho x_1+\sqrt{1-\rho^2}x_2$, ou <strong>Cholesky</strong> · six réductions de variance, dont <strong>antithétiques</strong> et <strong>variable de contrôle</strong> $f_A=f_A^\ast-f_B^\ast+f_B$.</p>
+<p><strong>Différences finies.</strong> Implicite : $a_jf_{i,j-1}+b_jf_{i,j}+c_jf_{i,j+1}=f_{i+1,j}$, <strong>toujours convergente</strong>. Explicite : $f_{i,j}=a_j^\ast f_{i+1,j-1}+b_j^\ast f_{i+1,j}+c_j^\ast f_{i+1,j+1}$, <strong>= arbre trinomial</strong>. <strong>Crank-Nicolson</strong> : moyenne des deux, <strong>convergence plus rapide</strong>.</p>
+<p><strong>Le partage des rôles.</strong> Monte-Carlo <strong>avance</strong> (européennes, chemins, dimension) ; arbres et différences finies <strong>remontent</strong> (américaines, décisions).</p>
+<p><strong>Les chiffres du chapitre.</strong> Exemple 20.1 : $u=1{,}1224$, $p=\mathbf{0{,}5073}$, prix <strong>4,49</strong> à 5 pas, <strong>4,283</strong> à 500 · grecques : $\Delta=-0{,}41$, $\Gamma=0{,}03$, $\Theta=-4{,}3$/an ; à 50 pas $-0{,}415$, $0{,}034$, $-0{,}0117$, véga <strong>0,123</strong>, rhô <strong>−0,072</strong> · exemple 20.6 : $u=1{,}0098$, valeur <strong>0,0026</strong> · $\pi$ : $3{,}04\pm0{,}331$ → <strong>2,71 à 3,37</strong> · option : $4{,}98\pm0{,}47$ → <strong>4,51 à 5,45</strong>, vraie valeur <strong>4,817</strong> · asiatique : moyenne <strong>7,08</strong>, valeur <strong>6,79</strong> · différences finies : <strong>4,07</strong> / <strong>3,91</strong> / <strong>4,08</strong> → <strong>4,24</strong>.</p>
+<div class="rec"><h2>Active Recall</h2><details class="cor">
+<summary>Comment les trois conditions déterminent-elles $p$, $u$ et $d$ ?</summary><div class="in">
+
+<p><strong>(1) Moyenne</strong> : $e^{(r-q)\Delta t}=pu+(1-p)d$ — la croissance risque-neutre. <strong>(2) Variance</strong> : $e^{(r-q)\Delta t}(u+d)-ud-e^{2(r-q)\Delta t}=\sigma^2\Delta t$. <strong>(3) La convention de Cox, Ross et Rubinstein</strong> : $u=1/d$.</p>
+<p>Solution (aux termes d'ordre supérieur à $\Delta t$ près) : $u=e^{\sigma\sqrt{\Delta t}}$, $d=1/u$, $p=(a-d)/(u-d)$ avec $a=e^{(r-q)\Delta t}$ — <strong>le facteur de croissance</strong>.</p>
+</div></details><details class="cor">
+<summary>Pourquoi l'arbre CRR se recombine-t-il, et pourquoi est-ce important ?</summary><div class="in">
+
+<p>Parce que $u=1/d$ : une hausse suivie d'une baisse donne $S_0ud=S_0$, <strong>le même prix</strong> qu'une baisse suivie d'une hausse. Le nombre de nœuds à la date $i\Delta t$ est donc <strong>$i+1$</strong> et non $2^i$ : le coût de calcul est <strong>quadratique</strong> au lieu d'<strong>exponentiel</strong>. C'est exactement ce qui se perd avec un <strong>dividende en montant fixe</strong> — d'où l'usage d'un <strong>rendement</strong> pour les options longues.</p>
+</div></details><details class="cor">
+<summary>Sur l'arbre de l'exemple 20.1, au nœud où $S=39{,}69$ à $t=3\Delta t$, faut-il exercer ?</summary><div class="in">
+
+<p><strong>Non.</strong> L'exercice donnerait $50{,}00-39{,}69=\mathbf{10{,}31}$, mais la continuation vaut
+$$(0{,}5073\times6{,}38+0{,}4927\times14{,}64)e^{-0{,}10\times0{,}0833}=\mathbf{10{,}36}$$</p>
+<blockquote>
+<p class="cal piege"> <em><strong>Il n'est pas toujours optimal d'exercer une option quand elle est dans la monnaie.</strong></em></p>
+</blockquote>
+<p>En revanche, <strong>au nœud suivant</strong> ($t=4\Delta t$, même cours), la continuation ne vaut que <strong>9,90</strong> contre 10,31 d'exercice : <strong>on exerce</strong>.</p>
+</div></details><details class="cor">
+<summary>Calculer delta, gamma et thêta sur un arbre.</summary><div class="in">
+
+<p>$$\Delta=\frac{f_{1,1}-f_{1,0}}{S_0u-S_0d}\qquad \Gamma=\frac{\dfrac{f_{2,2}-f_{2,1}}{S_0u^2-S_0}-\dfrac{f_{2,1}-f_{2,0}}{S_0-S_0d^2}}{h},\ h=0{,}5(S_0u^2-S_0d^2)\qquad \Theta=\frac{f_{2,1}-f_{0,0}}{2\Delta t}$$</p>
+<p>Sur l'exemple : $\Delta=\frac{2{,}16-6{,}96}{11{,}57}=\mathbf{-0{,}41}$ ; $h=11{,}65$ et $\Gamma=\mathbf{0{,}03}$ ; $\Theta=\frac{3{,}77-4{,}49}{0{,}1667}=\mathbf{-4{,}3}$ par an.</p>
+<p><strong>Véga et rhô exigent de reconstruire l'arbre</strong>, avec <strong>le même nombre de pas</strong>.</p>
+</div></details><details class="cor">
+<summary>Quand faut-il préférer l'arbre à $p=0{,}5$ à l'arbre CRR ?</summary><div class="in">
+
+<p>Quand <em>les pas sont si grands que $\sigma&lt;(r-q)\sqrt{\Delta t}$</em> : <strong>l'arbre CRR donne alors des probabilités négatives</strong>, ce que l'arbre alternatif évite. Ses paramètres : $u,d=e^{(r-q-\sigma^2/2)\Delta t\pm\sigma\sqrt{\Delta t}}$, avec $p=0{,}5$ <strong>quels que soient $\sigma$ et le nombre de pas</strong>.</p>
+<p><strong>Son inconvénient</strong> : <em>il est <strong>moins direct de calculer delta, gamma et rhô</strong>, car <strong>l'arbre n'est plus centré sur $S_0$</strong></em>.</p>
+</div></details><details class="cor">
+<summary>Comment traite-t-on un rendement de dividende discret, et un dividende en montant ?</summary><div class="in">
+
+<p><strong>Rendement discret</strong> : $u$, $d$, $p$ se calculent <strong>comme s'il n'y avait pas de dividende</strong> ; les nœuds <strong>après</strong> détachement portent $S_0(1-\delta_i)u^jd^{i-j}$, où $\delta_i$ est le <strong>rendement cumulé</strong> de tous les détachements avant $i\Delta t$. <strong>L'arbre recombine.</strong></p>
+<p><strong>Montant en dollars</strong> : nœuds après détachement à $S_0u^jd^{i-j}-D$.  <em><strong>L'arbre NE recombine PAS : le nombre de nœuds à évaluer devient très grand.</strong></em></p>
+</div></details><details class="cor">
+<summary>Pourquoi simuler $\ln S$ plutôt que $S$ ?</summary><div class="in">
+
+<p>Parce que la récurrence logarithmique
+$$S(t+\Delta t)=S(t)\exp\left[\left(\hat\mu-\frac{\sigma^2}{2}\right)\Delta t+\sigma\varepsilon\sqrt{\Delta t}\right]$$
+est <strong>exactement vraie</strong>, alors que la forme en $\Delta S$ <em>n'est exacte <strong>qu'à la limite $\Delta t\to0$</strong></em>. Conséquence pratique : si le payoff ne dépend que de $S_T$, <strong>on peut sauter directement en $T$ en un seul tirage</strong>.</p>
+</div></details><details class="cor">
+<summary>Quelle est l'erreur type d'une simulation, et que coûte l'amélioration de la précision ?</summary><div class="in">
+
+<p>$$\text{erreur type}=\frac{\omega}{\sqrt M},\qquad \text{IC 95 \%}=\mu\pm\frac{1{,}96\,\omega}{\sqrt M}$$
+<em><strong>Pour DOUBLER la précision, il faut QUADRUPLER le nombre d'essais ; pour la multiplier par 10, multiplier les essais par 100.</strong></em></p>
+<p>Exemple : $\mu=4{,}98$, $\omega=7{,}68$, $M=1\,000$ → erreur type <strong>0,24</strong>, IC <strong>4,51 à 5,45</strong>, contenant bien le prix Black-Scholes de <strong>4,817</strong>.</p>
+</div></details><details class="cor">
+<summary>Comment tirer $n$ variables normales corrélées ?</summary><div class="in">
+
+<p>Pour <strong>deux</strong> : $\varepsilon_1=x_1$, $\varepsilon_2=\rho x_1+\sqrt{1-\rho^2}\,x_2$ à partir de tirages <strong>indépendants</strong>.</p>
+<p>Pour <strong>$n$</strong> — <strong>décomposition de Cholesky</strong> : $\varepsilon_i=\sum_{k\le i}\alpha_{ik}x_k$, les $\alpha$ étant déterminés <strong>pas à pas</strong> : $\alpha_{11}=1$ ; $\alpha_{21}\alpha_{11}=\rho_{21}$ ; $\alpha_{21}^2+\alpha_{22}^2=1$ ; etc.</p>
+<blockquote>
+<p class="cal piege"> <em>Si ces équations <strong>n'ont pas de solution réelle</strong>, <strong>la structure de corrélation supposée est intérieurement incohérente</strong>.</em></p>
+</blockquote>
+</div></details><details class="cor">
+<summary>Expliquer les techniques des variables antithétiques et de la variable de contrôle.</summary><div class="in">
+
+<p><strong>Antithétiques</strong> : chaque essai calcule $f_1$ avec les tirages $\varepsilon$ <strong>et</strong> $f_2$ avec $-\varepsilon$ ; on retient $\bar f=(f_1+f_2)/2$. <em>Cela fonctionne bien parce que <strong>quand une valeur est au-dessus de la vraie, l'autre tend à être en dessous</strong>.</em> L'erreur type $\bar\omega/\sqrt M$ est <strong>bien inférieure</strong> à celle de $2M$ essais indépendants.</p>
+<p><strong>Variable de contrôle</strong> : deux dérivés similaires A (à valoriser) et B (<strong>analytique connue</strong>) ; <strong>mêmes tirages, même $\Delta t$</strong> ; puis
+$$f_A=f_A^\ast-f_B^\ast+f_B$$
+— on <strong>retranche l'erreur de simulation</strong> mesurée sur B. Elle s'applique aussi aux <strong>différences finies</strong> (exemple 20.10, correction de <strong>+0,17</strong>).</p>
+</div></details><details class="cor">
+<summary>Pourquoi une option asiatique exige-t-elle Monte-Carlo ?</summary><div class="in">
+
+<p>Parce que son payoff, $\max(S_{\text{moy}}-K,0)$, <strong>dépend de toute la trajectoire</strong>. On ne peut pas <strong>remonter</strong> un arbre : la valeur en un nœud dépendrait <strong>du chemin par lequel on y est arrivé</strong>, alors que la remontée suppose qu'elle ne dépend que du nœud.</p>
+<p>On peut néanmoins <strong>échantillonner à travers un arbre</strong> : tirer une trajectoire parmi les $2^N$ possibles, calculer le payoff, répéter. Dans l'exemple à dix essais : moyenne <strong>7,08</strong>, valeur $7{,}08e^{-0{,}1\times5/12}=\mathbf{6{,}79}$.</p>
+</div></details><details class="cor">
+<summary>Comment la méthode implicite se résout-elle sans inverser de matrice ?</summary><div class="in">
+
+<p><strong>En cascade.</strong> <em>L'équation $j=1$ exprime $f_{N-1,2}$ en fonction de $f_{N-1,1}$ ; combinée à elle, l'équation $j=2$ exprime $f_{N-1,3}$ en fonction de $f_{N-1,1}$ ; et ainsi de suite jusqu'à $j=M-2$. <strong>La dernière équation, $j=M-1$, se résout alors en $f_{N-1,1}$</strong></em>, d'où l'on remonte tous les autres. On compare ensuite chaque valeur à $K-j\Delta S$ pour l'exercice anticipé.</p>
+</div></details><details class="cor">
+<summary>En quoi la méthode explicite est-elle un arbre trinomial ?</summary><div class="in">
+
+<p>Dans $f_{i,j}=a_j^\ast f_{i+1,j-1}+b_j^\ast f_{i+1,j}+c_j^\ast f_{i+1,j+1}$, les numérateurs s'interprètent comme des <strong>probabilités</strong> : $-\frac12(r-q)j\Delta t+\frac12\sigma^2j^2\Delta t$ (baisse), $1-\sigma^2j^2\Delta t$ (inchangé), $\frac12(r-q)j\Delta t+\frac12\sigma^2j^2\Delta t$ (hausse). <em>Elles <strong>somment à un</strong> et donnent une hausse espérée de $(r-q)S\Delta t$ — <strong>exactement celle du monde risque-neutre</strong>.</em> Le facteur $1/(1+r\Delta t)$ est l'<strong>actualisation</strong>.</p>
+</div></details><details class="cor">
+<summary>Comparer méthodes implicite et explicite, et citer les deux variantes hybrides.</summary><div class="in">
+
+<p><strong>Implicite</strong> : <em>très robuste — <strong>elle converge toujours</strong> vers la solution quand $\Delta S$ et $\Delta t$ tendent vers zéro</em> ; mais il faut résoudre $M-1$ équations par pas. <strong>Explicite</strong> : directe, mais <strong>peut ne pas converger</strong> — remède : garder $\Delta S\propto\sqrt{\Delta t}$, ou <strong>construire la grille en $\ln S$</strong>.</p>
+<p><strong>Hybrides</strong> : <em><strong>hopscotch</strong></em>, qui <strong>alterne</strong> nœud à nœud — <em>les nœuds implicites se traitent <strong>sans système</strong>, les valeurs adjacentes étant déjà calculées</em> ; et <strong>Crank-Nicolson</strong>, <strong>moyenne</strong> des deux, dont <em>l'avantage est une <strong>convergence plus rapide</strong> que l'une ou l'autre</em>.</p>
+</div></details><details class="cor">
+<summary>Quand Monte-Carlo est-elle la meilleure méthode, et quelle est sa limite ?</summary><div class="in">
+
+<p><strong>Meilleure</strong> dès <strong>trois variables stochastiques ou plus</strong> : <em>le temps de calcul croît <strong>approximativement linéairement</strong> avec le nombre de variables, alors qu'il croît <strong>exponentiellement</strong> pour la plupart des autres procédures</em>. Autres avantages : <strong>elle fournit une erreur type</strong>, accommode des <strong>payoffs et processus complexes</strong>, et gère les payoffs <strong>dépendant de toute la trajectoire</strong>.</p>
+<p><strong>La limite</strong> : elle <strong>avance dans le temps</strong>, donc <strong>ne convient pas aux américaines</strong> — des extensions existent (chapitre 26).</p>
+</div></details></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h2>Flashcards</h2>
+<table>
+<thead>
+<tr>
+<th>Question</th>
+<th>Réponse</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Quand utiliser Monte-Carlo ?</td>
+<td>Payoff <strong>dépendant du chemin</strong> ou <strong>plusieurs variables</strong></td>
+</tr>
+<tr>
+<td>Quand utiliser arbres et différences finies ?</td>
+<td><strong>Américaines</strong> et décisions avant maturité</td>
+</tr>
+<tr>
+<td>Les deux conditions sur $p$, $u$, $d$ ?</td>
+<td><strong>Moyenne</strong> et <strong>variance</strong> correctes</td>
+</tr>
+<tr>
+<td>La troisième condition de CRR ?</td>
+<td>$u=1/d$</td>
+</tr>
+<tr>
+<td>Formule de $u$ ? de $a$ ?</td>
+<td>$e^{\sigma\sqrt{\Delta t}}$ · $e^{(r-q)\Delta t}$</td>
+</tr>
+<tr>
+<td>Comment s'appelle $a$ ?</td>
+<td>Le <strong>facteur de croissance</strong></td>
+</tr>
+<tr>
+<td>Prix au nœud $(i,j)$ ?</td>
+<td>$S_0u^jd^{i-j}$</td>
+</tr>
+<tr>
+<td>Combien de prix à la date $i\Delta t$ ?</td>
+<td>$i+1$</td>
+</tr>
+<tr>
+<td>Pourquoi l'arbre recombine-t-il ?</td>
+<td>Parce que $u=1/d$</td>
+</tr>
+<tr>
+<td>Que capture la valeur en $i\Delta t$ ?</td>
+<td>L'exercice en $i\Delta t$ <strong>et à toutes les dates ultérieures</strong></td>
+</tr>
+<tr>
+<td>Exerce-t-on toujours quand c'est dans la monnaie ?</td>
+<td><strong>Non</strong></td>
+</tr>
+<tr>
+<td>Combien de pas en pratique ?</td>
+<td><strong>$N=30$</strong> donne des résultats raisonnables</td>
+</tr>
+<tr>
+<td>Formule du delta par l'arbre ?</td>
+<td>$\frac{f_{1,1}-f_{1,0}}{S_0u-S_0d}$</td>
+</tr>
+<tr>
+<td>Que vaut $h$ dans le gamma ?</td>
+<td>$0{,}5(S_0u^2-S_0d^2)$</td>
+</tr>
+<tr>
+<td>Formule du thêta ?</td>
+<td>$\frac{f_{2,1}-f_{0,0}}{2\Delta t}$</td>
+</tr>
+<tr>
+<td>Comment obtenir véga et rhô ?</td>
+<td><strong>Reconstruire</strong> l'arbre, <strong>même nombre de pas</strong></td>
+</tr>
+<tr>
+<td>Traitement d'un rendement discret ?</td>
+<td>Nœuds $\times(1-\delta_i)$ après détachement</td>
+</tr>
+<tr>
+<td>Problème du dividende en montant ?</td>
+<td>L'arbre <strong>ne recombine pas</strong></td>
+</tr>
+<tr>
+<td>Paramètres de l'arbre à $p=0{,}5$ ?</td>
+<td>$u,d=e^{(r-q-\sigma^2/2)\Delta t\pm\sigma\sqrt{\Delta t}}$</td>
+</tr>
+<tr>
+<td>Son avantage ?</td>
+<td>Probabilités <strong>toujours 0,5</strong></td>
+</tr>
+<tr>
+<td>Son inconvénient ?</td>
+<td>Arbre <strong>non centré</strong> sur $S_0$</td>
+</tr>
+<tr>
+<td>Quand CRR échoue-t-il ?</td>
+<td>Si $\sigma&lt;(r-q)\sqrt{\Delta t}$ → probabilités <strong>négatives</strong></td>
+</tr>
+<tr>
+<td>$u$ d'un arbre trinomial ?</td>
+<td>$e^{\sigma\sqrt{3\Delta t}}$</td>
+</tr>
+<tr>
+<td>$p_m$ d'un arbre trinomial ?</td>
+<td>$\mathbf{2/3}$</td>
+</tr>
+<tr>
+<td>À quoi le trinomial équivaut-il ?</td>
+<td>Aux différences finies <strong>explicites</strong></td>
+</tr>
+<tr>
+<td>Qu'est-ce que le maillage adaptatif ?</td>
+<td>Greffer un arbre <strong>fin</strong> sur un arbre <strong>grossier</strong></td>
+</tr>
+<tr>
+<td>Comment rendre $r$ et $q$ variables ?</td>
+<td>$a=e^{[f(t)-g(t)]\Delta t}$, <strong>géométrie inchangée</strong></td>
+</tr>
+<tr>
+<td>Comment rendre $\sigma$ variable ?</td>
+<td>Pas de temps tels que $\sigma(t_i)^2t_i=iV/N$</td>
+</tr>
+<tr>
+<td>Les cinq étapes de Monte-Carlo ?</td>
+<td>Tirer · payoff · répéter · moyenne · <strong>actualiser</strong></td>
+</tr>
+<tr>
+<td>Que vaut $\hat\mu$ pour une action ? un change ?</td>
+<td>$r$ · $r-r_f$</td>
+</tr>
+<tr>
+<td>Pourquoi simuler $\ln S$ ?</td>
+<td>La récurrence est <strong>exacte</strong></td>
+</tr>
+<tr>
+<td>Formule de l'erreur type ?</td>
+<td>$\omega/\sqrt M$</td>
+</tr>
+<tr>
+<td>Coût pour doubler la précision ?</td>
+<td><strong>Quadrupler</strong> les essais</td>
+</tr>
+<tr>
+<td>IC à 95 % ?</td>
+<td>$\mu\pm1{,}96\,\omega/\sqrt M$</td>
+</tr>
+<tr>
+<td>Tirage de deux normales corrélées ?</td>
+<td>$\varepsilon_2=\rho x_1+\sqrt{1-\rho^2}\,x_2$</td>
+</tr>
+<tr>
+<td>Nom de la méthode générale ?</td>
+<td>La décomposition de <strong>Cholesky</strong></td>
+</tr>
+<tr>
+<td>Que signale l'absence de solution réelle ?</td>
+<td>Une corrélation <strong>incohérente</strong></td>
+</tr>
+<tr>
+<td>Condition pour estimer une grecque par MC ?</td>
+<td><strong>Mêmes tirages</strong>, même $N$, même $M$</td>
+</tr>
+<tr>
+<td>Principe des variables antithétiques ?</td>
+<td>Utiliser aussi $-\varepsilon$</td>
+</tr>
+<tr>
+<td>Formule de la variable de contrôle ?</td>
+<td>$f_A=f_A^\ast-f_B^\ast+f_B$</td>
+</tr>
+<tr>
+<td>Pourquoi l'échantillonnage préférentiel ?</td>
+<td>Éviter les trajectoires à <strong>payoff nul</strong></td>
+</tr>
+<tr>
+<td>Valeur représentative du $i$-ème strate ?</td>
+<td>$N^{-1}\!\left(\frac{i-0{,}5}{n}\right)$</td>
+</tr>
+<tr>
+<td>Formule de l'appariement des moments ?</td>
+<td>$\varepsilon_i^\ast=(\varepsilon_i-m)/s$</td>
+</tr>
+<tr>
+<td>Son autre nom ?</td>
+<td>Rééchantillonnage <strong>quadratique</strong></td>
+</tr>
+<tr>
+<td>Avantage des suites quasi-aléatoires ?</td>
+<td>Erreur type en $\mathbf{1/M}$</td>
+</tr>
+<tr>
+<td>Sont-elles aléatoires ?</td>
+<td><strong>Non</strong> — totalement <strong>déterministes</strong></td>
+</tr>
+<tr>
+<td>Équation implicite ?</td>
+<td>$a_jf_{i,j-1}+b_jf_{i,j}+c_jf_{i,j+1}=f_{i+1,j}$</td>
+</tr>
+<tr>
+<td>Que vaut $b_j$ ?</td>
+<td>$1+\sigma^2j^2\Delta t+r\Delta t$</td>
+</tr>
+<tr>
+<td>Faut-il inverser une matrice ?</td>
+<td><strong>Non</strong> — résolution <strong>en cascade</strong></td>
+</tr>
+<tr>
+<td>Avantage de la méthode implicite ?</td>
+<td>Elle <strong>converge toujours</strong></td>
+</tr>
+<tr>
+<td>Règle de stabilité générale ?</td>
+<td>$\Delta S\propto\sqrt{\Delta t}$</td>
+</tr>
+<tr>
+<td>Autre remède à la non-convergence ?</td>
+<td>Grille en $\ln S$</td>
+</tr>
+<tr>
+<td>EDP après changement de variable ?</td>
+<td>$f_t+(r-q-\frac{\sigma^2}2)f_Z+\frac12\sigma^2f_{ZZ}=rf$</td>
+</tr>
+<tr>
+<td>Principe de la méthode <em>hopscotch</em> ?</td>
+<td><strong>Alterner</strong> explicite et implicite nœud par nœud</td>
+</tr>
+<tr>
+<td>Qu'est-ce que Crank-Nicolson ?</td>
+<td>La <strong>moyenne</strong> des deux méthodes</td>
+</tr>
+<tr>
+<td>Son avantage ?</td>
+<td><strong>Convergence plus rapide</strong></td>
+</tr>
+<tr>
+<td>Limite des différences finies ?</td>
+<td>Payoffs <strong>dépendant de l'historique</strong></td>
+</tr>
+</tbody></table>
+</main>
+
+
+
+
+</body></html>

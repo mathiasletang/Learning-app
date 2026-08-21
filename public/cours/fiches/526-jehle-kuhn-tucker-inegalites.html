@@ -1,0 +1,1797 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fiche 526 — Contraintes d'inégalité et conditions de Kuhn-Tucker</title>
+<script>
+window.MathJax={tex:{inlineMath:[["$","$"]],displayMath:[["$$","$$"]],processEscapes:true},
+ options:{skipHtmlTags:["script","noscript","style","textarea","pre","code"]},
+ svg:{fontCache:"global"},
+ startup:{pageReady:()=>MathJax.startup.defaultPageReady().then(()=>{document.body.classList.add("ready")})}};
+setTimeout(function(){document.body.classList.add("ready")},2500);
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+/* ============================================================
+   MathiasLearn — feuille de style des fiches
+   Reprise intégrale des tokens de 00_PARCOURS/*.html
+   + blocs pédagogiques (callouts, méthode, essentiels, recall)
+   ============================================================ */
+:root{--bg:#faf9f7;--card:#fff;--ink:#1a1a1a;--muted:#6b6b6b;--line:#e5e2dd;--accent:#8b5e34;
+ --hl:#fdf8ef;--ok:#2d7d4f;--okbg:#f0f7f3;--warn:#b3402f;--warnbg:#fdf3f1;--blue:#2f5d8b;--bluebg:#f1f5fa}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+ font:17px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;padding:0 16px 100px}
+.nav{position:sticky;top:0;background:rgba(250,249,247,.96);backdrop-filter:blur(8px);
+ border-bottom:1px solid var(--line);margin:0 -16px 30px;padding:11px 16px;z-index:50;
+ display:flex;gap:6px;flex-wrap:wrap;font-size:13px}
+.nav a{color:var(--muted);text-decoration:none;padding:4px 9px;border-radius:5px;white-space:nowrap}
+.nav a:hover{background:var(--line);color:var(--ink)}
+.nav a.on{background:var(--accent);color:#fff}
+main{max-width:780px;margin:0 auto}
+h1{font-size:31px;letter-spacing:-.02em;margin:.4em 0 .5em;line-height:1.25}
+h2{font-size:23px;margin:2.2em 0 .7em;padding-bottom:.3em;border-bottom:1px solid var(--line)}
+h3{font-size:19px;margin:1.9em 0 .5em;color:var(--accent)}
+h4{font-size:17px;margin:1.5em 0 .4em}
+p{margin:.8em 0} a{color:var(--accent)} hr{border:0;border-top:1px solid var(--line);margin:2.6em 0}
+table{border-collapse:collapse;width:100%;margin:1.3em 0;font-size:15.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+th{background:#f3f0eb;font-weight:600}
+tr:nth-child(even) td{background:#fcfbfa}
+code{font-family:"SF Mono",Menlo,Consolas,monospace;font-size:.88em;background:#f2efea;padding:2px 6px;border-radius:4px;overflow-wrap:break-word}
+pre{background:#f2efea;padding:14px 16px;border-radius:8px;overflow-x:auto}
+pre code{background:none;padding:0;white-space:pre}
+blockquote{border-left:3px solid var(--accent);background:var(--hl);margin:1.4em 0;padding:14px 20px;border-radius:0 8px 8px 0}
+blockquote p:first-child{margin-top:0} blockquote p:last-child{margin-bottom:0}
+ul,ol{padding-left:1.5em} li{margin:.35em 0} em{color:#4a4a4a}
+mjx-container[display="true"]{margin:1.1em 0!important;overflow-x:auto;overflow-y:hidden;padding:2px 0}
+mjx-container svg{max-width:100%}
+body:not(.ready) main{opacity:0} main{opacity:1;transition:opacity .25s}
+
+/* --- bandeau de tête de fiche --- */
+.cours{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--accent);
+ border-radius:0 10px 10px 0;padding:18px 22px;margin:0 0 34px}
+.cours h4{margin:0 0 4px;font-size:14px;text-transform:uppercase;letter-spacing:.07em;color:var(--accent)}
+.cours .cs{color:var(--muted);font-size:14.5px;margin:0 0 14px}
+
+/* --- exercices / corrigés --- */
+.ex{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:6px 24px 20px;margin:18px 0}
+.ex>h3:first-child{margin-top:14px}
+details.cor{margin-top:18px;border:1px solid var(--line);border-radius:8px;background:#fcfbfa;overflow:hidden}
+details.cor>summary{cursor:pointer;padding:12px 16px;font-weight:600;font-size:15px;color:var(--accent);
+ list-style:none;display:flex;align-items:center;gap:9px;user-select:none;transition:.15s;min-height:44px}
+details.cor>summary::-webkit-details-marker{display:none}
+details.cor>summary:hover{background:var(--hl)}
+details.cor>summary::before{content:"\25B6";font-size:10px;transition:transform .18s;display:inline-block}
+details.cor[open]>summary::before{transform:rotate(90deg)}
+details.cor[open]>summary{background:var(--okbg);color:var(--ok);border-bottom:1px solid var(--line)}
+.cor .in{padding:4px 20px 16px}
+.cor .in>*:first-child{margin-top:.9em}
+
+/* --- blocs pédagogiques (callouts) ---
+   Générés depuis une citation Markdown dont le premier **gras** commence
+   par un mot-clé : DÉFINITION, THÉORÈME, MÉTHODE, PIÈGE, INTUITION… */
+.cal{border:1px solid var(--line);border-left:4px solid var(--accent);background:var(--card);
+ border-radius:0 10px 10px 0;padding:15px 20px;margin:1.5em 0}
+.cal>p:first-child{margin-top:0}.cal>p:last-child,.cal>ul:last-child,.cal>ol:last-child{margin-bottom:0}
+.cal .lab{display:block;font-size:12.5px;text-transform:uppercase;letter-spacing:.08em;
+ font-weight:700;color:var(--accent);margin-bottom:6px}
+.cal.formel{background:var(--hl)}
+.cal.piege{border-left-color:var(--warn);background:var(--warnbg)}
+.cal.piege .lab{color:var(--warn)}
+.cal.methode{border-left-color:var(--ok);background:var(--okbg)}
+.cal.methode .lab{color:var(--ok)}
+.cal.intu{border-left-color:var(--blue);background:var(--bluebg)}
+.cal.intu .lab{color:var(--blue)}
+.cal.plus{border-left-style:dashed;background:#faf9f7}
+.cal.plus .lab{color:var(--muted)}
+
+/* --- révision express --- */
+.ess{background:var(--card);border:1px solid var(--accent);border-radius:10px;padding:4px 24px 20px;margin:1.6em 0}
+.ess h3{margin-top:1.3em}
+.rec{background:var(--card);border:1px dashed var(--accent);border-radius:10px;padding:4px 24px 18px;margin:1.6em 0}
+.rec ol{counter-reset:none}
+
+/* --- impression / PDF --- */
+@media print{
+ .nav{display:none}
+ body{padding:0;background:#fff;font-size:11.2pt;line-height:1.55}
+ main{max-width:none}
+ h1{font-size:23pt}h2{font-size:15pt;margin-top:1.5em}h3{font-size:12.6pt}
+ h2,h3,h4{break-after:avoid;page-break-after:avoid}
+ table,.cal,blockquote{break-inside:avoid;page-break-inside:avoid}
+ table{display:table;font-size:9.6pt}
+ details.cor{border:1px solid var(--line);background:#fcfbfa}
+ details.cor>summary{display:none}
+ details.cor .in{padding-top:10px}
+ .cal,.ex,.ess,.rec{box-shadow:none}
+ a{color:var(--ink);text-decoration:none}
+}
+@page{margin:16mm 15mm 18mm}
+
+/* --- exemples travaillés --- */
+.exm{background:#fcfbfa;border:1px solid var(--line);border-radius:10px;padding:2px 20px 14px;margin:1.5em 0}
+.exm>h4:first-child{margin:14px 0 .5em;color:var(--accent);font-size:13px;text-transform:uppercase;letter-spacing:.07em}
+
+
+/* --- pastilles de priorité (conventions des fiches de l'app) --- */
+h2[data-prio], h3[data-prio], h4[data-prio]{position:relative}
+h2[data-prio]::before,h3[data-prio]::before,h4[data-prio]::before{
+ content:"";display:inline-block;width:9px;height:9px;border-radius:50%;
+ margin-right:9px;vertical-align:middle;background:var(--muted)}
+[data-prio="must"]::before{background:var(--warn)}
+[data-prio="high"]::before{background:#d98324}
+[data-prio="mid"]::before{background:#c9a227}
+[data-prio="low"]::before{background:var(--ok)}
+/* corrigés des fiches de l'app : même traitement que les corrigés des séries */
+details.cor>summary::after{content:""}
+</style></head><body>
+<div class="nav"><a href="00_COMMENCER_ICI.html">Commencer ici</a><a href="01_NOTATIONS_le-decodeur.html">Notations</a><a href="02_EXERCICES_Serie-0.html">Série 0 — Remise en route</a><a href="03_EXERCICES_Serie-1.html">Série 1 — Convexité</a><a href="04_EXERCICES_Serie-2.html">Série 2 — KKT</a><a href="05_AUTO-EVALUATION.html">Auto-évaluation (quiz)</a><a href="06_FICHE_Optimisation-deux-variables.html">Fiche — Optimisation à 2 variables</a></div>
+<main><h1>Fiche 526 — Contraintes d'inégalité et conditions de Kuhn-Tucker</h1>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Matière</strong></td>
+<td>Maths · Microéconomie avancée</td>
+</tr>
+<tr>
+<td><strong>Cours source</strong></td>
+<td>Jehle &amp; Reny, <em>Advanced Microeconomic Theory</em>, 3ᵉ éd., Pearson 2011 — appendice mathématique, §A2.3.5 et §A2.3.6 (p. 591-601)</td>
+</tr>
+<tr>
+<td><strong>Difficulté</strong></td>
+<td> Avancé — l'outil de tous les programmes avec coins et non-négativité</td>
+</tr>
+<tr>
+<td><strong>Temps d'étude estimé</strong></td>
+<td>125 min</td>
+</tr>
+<tr>
+<td><strong>Prérequis</strong></td>
+<td><a href="525-jehle-lagrange-contraintes-egalite.md">Fiche 525</a> — lagrangien, multiplicateurs, qualification des contraintes · <a href="522-jehle-fonctions-reelles-concavite.md">Fiche 522</a> — quasiconcavité</td>
+</tr>
+<tr>
+<td><strong>Concepts clés</strong></td>
+<td>Contrainte d'inégalité, contrainte de non-négativité, contrainte saturée, solution intérieure, solution en coin, programmation non linéaire, programmation linéaire, gradient perpendiculaire au niveau, cône des combinaisons linéaires non négatives, conditions de Kuhn-Tucker, complémentarité des écarts, qualification des contraintes, programmation quasiconcave</td>
+</tr>
+<tr>
+<td><strong>Poids à l'examen</strong></td>
+<td>Le problème (A2.30) et  <strong>LES TROIS CAS de la figure A2.9</strong> · <strong>les trois conditions (A2.31)</strong> et leur construction · l'<strong>exemple A2.10</strong> et sa <strong>règle de pouce</strong> · les conditions de minimisation <strong>(A2.32)</strong> · le <strong>théorème A2.19</strong> ·  <strong>la dérivation GÉOMÉTRIQUE des conditions de Kuhn-Tucker</strong> <em>(pentes, gradients, CÔNE)</em> · le <strong>THÉORÈME A2.20</strong> avec sa preuve ·  <strong>la COMPLÉMENTARITÉ DES ÉCARTS</strong> · <strong>la QUALIFICATION DES CONTRAINTES</strong> et le contre-exemple $g(x)=x^3\leq0$.</td>
+</tr>
+</tbody></table>
+<h2>Vue d'ensemble</h2>
+<pre><code>LE FIL DU §A2.3.5 - §A2.3.6 : de la NON-NEGATIVITE a KUHN-TUCKER
+
+  §A2.3.5  LE PROBLEME LE PLUS SIMPLE
+
+     max f(x)   sous contrainte   x &gt;= 0            (A2.30)
+
+     LES TROIS CAS DE LA FIGURE A2.9 :
+
+       CAS 1  le max global est en x1 &lt; 0, INFAISABLE
+              -&gt;  x* = 0   ET   f'(x*) &lt; 0
+              «  LA CONTRAINTE EST SATUREE  »
+
+       CAS 2  le max global est PILE en x* = 0
+              -&gt;  x* = 0   ET   f'(x*) = 0
+              «  saturee, MAIS CELA N'A PAS D'IMPORTANCE  »
+
+       CAS 3  le max est a l'INTERIEUR
+              -&gt;  x* &gt; 0   ET   f'(x*) = 0
+              «  LA CONTRAINTE N'EST PAS SATUREE  »
+
+     LE POINT COMMUN :  DANS LES TROIS CAS, LE PRODUIT
+     x* f'(x*)  EST NUL !
+
+     ... mais cela ne suffit pas : le cas « GENANT » x~ = 0
+     avec f'(x~) &gt; 0 donne AUSSI un produit nul, et c'est
+     un MINIMUM.  -&gt;  on l'ECARTE en exigeant f' &lt;= 0.
+
+     LES TROIS CONDITIONS  (A2.31) :
+        1.  f'(x*) &lt;= 0
+        2.  x* f'(x*) = 0
+        3.  x* &gt;= 0
+
+     POUR UN MINIMUM  (A2.32) :  f'(x*) &gt;= 0  ( SEUL LE 1 CHANGE )
+
+     THEOREME A2.19  le cas a n variables : LES TROIS CONDITIONS
+     TIENNENT POUR CHAQUE VARIABLE SEPAREMENT
+
+  §A2.3.6  LE CAS GENERAL
+
+     max f(x1, x2)  s.c.  g1 &lt;= 0  ET  g2 &lt;= 0        (A2.33)
+     -&gt;  UN PROBLEME DE PROGRAMMATION NON LINEAIRE
+
+     LA DERIVATION GEOMETRIQUE :
+       la pente du niveau de f est ENTRE celles de g1 et g2
+       -&gt;  (A2.34)
+       le GRADIENT est PERPENDICULAIRE a son ensemble de niveau
+       -&gt;  GRADIENT(f) est DANS LE CONE engendre par
+           GRADIENT(g1) et GRADIENT(g2)
+       -&gt;  GRADIENT(f) est une COMBINAISON LINEAIRE NON NEGATIVE
+           des gradients des contraintes SATUREES
+
+  THEOREME A2.20  (KUHN-TUCKER) :
+
+     dL/dx_i = df/dx_i - SOMME_j lambda_j dg_j/dx_i = 0
+     lambda_j &gt;= 0        g_j(x*) &lt;= 0
+     lambda_j g_j(x*) = 0    &lt;-  LA COMPLEMENTARITE DES ECARTS
+
+     « Si une contrainte est LACHE, son multiplicateur est NUL ;
+       si un multiplicateur est POSITIF, sa contrainte est
+       SATUREE. »
+
+     LA QUALIFICATION DES CONTRAINTES est INDISPENSABLE :
+     le contre-exemple  max x  s.c.  x^3 &lt;= 0
+</code></pre>
+<blockquote>
+<p class="cal piege"> <strong>Note de transcription — spécifique à cette section.</strong> Le PDF  <strong>PERD LES SYMBOLES « PRIME »</strong> : <em>« $f(x^*)&lt;0$ »</em> signifie <strong>$f'(x^*)&lt;0$</strong>, et <em>« $x^*[f(x^*)]=0$ »</em> signifie <strong>$x^*\,f'(x^*)=0$</strong>. Il  <strong>exporte le PRODUIT CARTÉSIEN $\times$ comme un « + »</strong> <em>(« $g^j:\mathbb{R}^n+A\to\mathbb{R}$ » signifie $\mathbb{R}^n\times A$, et « la matrice $K+n$ » signifie $K\times n$)</em>,  <strong>perd le barré de $\notin$</strong> <em>(exporté « $\in/$ »)</em> et celui de $\neq$, et  <strong>rend le symbole $\nabla$ des figures par le caractère arabe <code>ٌ</code></strong>. Il perd également $\sum$. Les figures utilisent l'encodage Symbol Mac <em>(<code>ϭ</code> = « = », <code>Ͻ</code> = « &lt; », <code>Ͼ</code> = « &gt; »)</em>. <strong>Réparation de transcription, non ajout de contenu.</strong></p>
+</blockquote>
+<h2 data-prio="high">Concept 1 — §A2.3.5 : le problème le plus simple</h2>
+<h3>1.1 Le motif</h3>
+<blockquote>
+<p><em>« Dans de nombreuses applications économiques, nous devons <strong>maximiser ou minimiser quelque chose sous des contraintes QUI IMPLIQUENT DES INÉGALITÉS, AU LIEU DE — OU EN PLUS DE — simples égalités. Par exemple, UNE RESTRICTION DE BON SENS dans la plupart des problèmes est d'exiger que LES VARIABLES ÉCONOMIQUES NE SOIENT DISPONIBLES QU'EN QUANTITÉS NON NÉGATIVES.</strong> »</em></p>
+</blockquote>
+<blockquote>
+<p><em>« <strong>L'analyse lagrangienne DOIT ÊTRE MODIFIÉE pour accommoder ce genre de restrictions et d'autres, plus compliquées.</strong> »</em></p>
+</blockquote>
+<h3>1.2 Le programme de départ</h3>
+<blockquote>
+<p><em>« <strong>Pour aider à fournir de l'intuition pour les problèmes plus compliqués À VENIR, nous commençons par LE PROBLÈME LE PLUS SIMPLE POSSIBLE : maximiser une fonction d'UNE variable sous UNE CONTRAINTE DE NON-NÉGATIVITÉ sur la variable de choix.</strong> »</em></p>
+</blockquote>
+<p>$$\max_{x}\ f(x)\qquad\text{sous contrainte}\qquad x\geq0 \tag{A2.30}$$</p>
+<blockquote>
+<p><em>« Si nous considérons le problème avec soin, <strong>en gardant à l'esprit que LA RÉGION PERTINENTE pour les solutions est LA DEMI-DROITE RÉELLE NON NÉGATIVE, il semble que L'UNE DE TROIS CHOSES puisse se produire.</strong> »</em></p>
+</blockquote>
+<h2 data-prio="must">Concept 2 —  Les trois cas de la figure A2.9</h2>
+<h3>2.1 Cas 1 — la contrainte est SATURÉE</h3>
+<blockquote>
+<p><em>« Le maximum (GLOBAL) est en $x_1$. <strong>MAIS $x_1&lt;0$ N'EST PAS RÉALISABLE parce qu'il VIOLE LA CONTRAINTE de non-négativité. CLAIREMENT, le maximum de $f$ sous $x\geq0$ est atteint SUR LA FRONTIÈRE de l'ensemble réalisable, en $x^*=0$. Ici, nous disons que LA CONTRAINTE EST SATURÉE.</strong> »</em></p>
+</blockquote>
+<p>$$\textbf{CAS 1 :}\qquad x^*=0 \qquad\textbf{et}\qquad f'(x^*)&lt;0$$</p>
+<h3>2.2 Cas 2 — saturée, mais SANS IMPORTANCE</h3>
+<blockquote>
+<p><em>« Le maximum global <strong>est ATTEIGNABLE, MAIS TOUT JUSTE. La fonction est maximisée PILE AU POINT $x^*=0$, sur la frontière. LA CONTRAINTE EST DE NOUVEAU SATURÉE, MAIS CELA N'A PAS VRAIMENT D'IMPORTANCE.</strong> »</em></p>
+</blockquote>
+<p>$$\textbf{CAS 2 :}\qquad x^*=0 \qquad\textbf{et}\qquad f'(x^*)=0$$</p>
+<h3>2.3 Cas 3 — la contrainte n'est PAS saturée</h3>
+<blockquote>
+<p><em>« <strong>Le cas 3 SEUL correspond au genre que nous avons rencontré auparavant. Là, le maximum se produit en $x^*&gt;0$, À L'INTÉRIEUR de l'ensemble réalisable. LA CONTRAINTE N'EST PAS SATURÉE, et nous disons que LE PROBLÈME ADMET UNE SOLUTION INTÉRIEURE parce que la solution est STRICTEMENT à l'intérieur de la région réalisable.</strong> »</em></p>
+</blockquote>
+<p>$$\textbf{CAS 3 :}\qquad x^*&gt;0 \qquad\textbf{et}\qquad f'(x^*)=0$$</p>
+<table>
+<thead>
+<tr>
+<th>Le cas</th>
+<th>La légende de la figure A2.9</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>(a) Cas 1</strong></td>
+<td><em>« <strong>la contrainte est SATURÉE</strong> »</em></td>
+</tr>
+<tr>
+<td><strong>(b) Cas 2</strong></td>
+<td><em>« <strong>la contrainte est saturée MAIS SANS PERTINENCE</strong> »</em></td>
+</tr>
+<tr>
+<td><strong>(c) Cas 3</strong></td>
+<td><em>« <strong>la contrainte n'est PAS saturée</strong> »</em></td>
+</tr>
+</tbody></table>
+<h2 data-prio="must">Concept 3 —  Les trois conditions (A2.31)</h2>
+<h3>3.1 Le point commun aux trois cas</h3>
+<blockquote>
+<p><em>« À ce stade, <strong>la question se pose : Y A-T-IL UN ENSEMBLE COMMODE DE CONDITIONS que nous pouvons utiliser POUR RÉSUMER LES TROIS POSSIBILITÉS ?</strong> »</em></p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>Le cas</th>
+<th>Les deux conditions</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>1</strong></td>
+<td>$x^*=0$ <strong>et</strong> $f'(x^*)&lt;0$</td>
+</tr>
+<tr>
+<td><strong>2</strong></td>
+<td>$x^*=0$ <strong>et</strong> $f'(x^*)=0$</td>
+</tr>
+<tr>
+<td><strong>3</strong></td>
+<td>$x^*&gt;0$ <strong>et</strong> $f'(x^*)=0$</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p class="cal piege"> <em>« <strong>Y a-t-il quelque chose de COMMUN AUX TROIS ? REGARDEZ ATTENTIVEMENT. DANS CHAQUE CAS, MULTIPLIEZ LES DEUX CONDITIONS ENSEMBLE et remarquez que LE PRODUIT SERA TOUJOURS ZÉRO !</strong> »</em></p>
+</blockquote>
+<p>$$\boxed{\;x^*\big[f'(x^*)\big]=0 \qquad\textbf{dans les TROIS cas}\;}$$</p>
+<h3 data-prio="must">3.2  Le cas « GÊNANT » qu'il faut écarter</h3>
+<blockquote>
+<p><em>« <strong>CELA SEUL, CEPENDANT, NE SUFFIT PAS TOUT À FAIT. Regardez à nouveau le cas 3. CLAIREMENT, $\tilde{x}=0$ NE DONNE PAS un maximum de la fonction dans la région réalisable. Là, $f'(\tilde{x})&gt;0$, donc en augmentant $x$ EN S'ÉLOIGNANT DE LA FRONTIÈRE ET EN ENTRANT DANS LA RÉGION RÉALISABLE, LA VALEUR DE LA FONCTION AUGMENTERA.</strong> »</em></p>
+</blockquote>
+<blockquote>
+<p class="cal piege"> <em>« <strong>NÉANMOINS, LE PRODUIT $\tilde{x}\,[f'(\tilde{x})]=0$ MÊME SI $\tilde{x}$ EST UN MINIMUM, PAS UN MAXIMUM, sous $x\geq0$. Nous pouvons ÉCARTER cette possibilité INDÉSIRABLE EN EXIGEANT SIMPLEMENT QUE LA FONCTION SOIT NON CROISSANTE quand nous augmentons $x$.</strong> »</em></p>
+</blockquote>
+<h3>3.3 Les trois conditions</h3>
+<blockquote>
+<p><strong>LES CONDITIONS (A2.31) — maximisation sous $x\geq0$</strong>
+Si $x^*$ résout (A2.30), alors <strong>les trois doivent tenir</strong> :
+<strong>Condition 1.</strong> $\ f'(x^*)\leq0$
+<strong>Condition 2.</strong> $\ x^*\big[f'(x^*)\big]=0$
+<strong>Condition 3.</strong> $\ x^*\geq0$</p>
+</blockquote>
+<blockquote>
+<p class="cal piege"> <em>« <strong>Notez que ces trois conditions, ENSEMBLE, ÉCARTENT le problème du « minimum » qu'on vient de décrire. En $\tilde{x}=0$, même si $\tilde{x}f'(\tilde{x})=0$, LA CONDITION 1 EST VIOLÉE parce que $f'(\tilde{x})&gt;0$.</strong> »</em></p>
+</blockquote>
+<details class="cor">
+<summary><strong>EXEMPLE A2.10 — et  LA RÈGLE DE POUCE</strong></summary><div class="in">
+
+<p>$$\max_{x}\ 6-x^2-4x \qquad\text{sous contrainte}\qquad x\geq0$$</p>
+<p><strong>En dérivant</strong> : $f'(x)=-2x-4$. Les conditions (A2.31) donnent</p>
+<p>$$\textbf{1.}\ -2x^*-4\leq0 \qquad \textbf{2.}\ x^*\big[-2x^*-4\big]=0 \qquad \textbf{3.}\ x^*\geq0$$</p>
+<blockquote>
+<p class="cal piege"> <em>« Essayer de résoudre des conditions comme celles-ci <strong>peut parfois DEVENIR DÉSORDONNÉ. UNE RÈGLE DE POUCE QUI MARCHE HABITUELLEMENT EST DE SE CONCENTRER SUR LE TERME PRODUIT (2). RÉSOLVEZ-LE D'ABORD, PUIS ASSUREZ-VOUS QUE LES AUTRES CONDITIONS SONT SATISFAITES.</strong> »</em></p>
+</blockquote>
+<p><strong>En multipliant par $-1$ et en factorisant un 2</strong> :</p>
+<p>$$2x^*\big[x^*+2\big]=0$$</p>
+<blockquote>
+<p><em>« <strong>Les seules valeurs qui satisfont ceci sont $x=0$ et $x=-2$. CEPENDANT, LA CONDITION 3 ÉCARTE $x=-2$, ne laissant que $x=0$ comme candidat. En s'assurant que ceci satisfait AUSSI la condition 1</strong>, nous obtenons $0-4=-4\leq0$, donc <strong>la solution doit être $x^*=0$.</strong> »</em> </p>
+</blockquote>
+</div></details>
+
+<h3>3.4 Les conditions de MINIMISATION</h3>
+<blockquote>
+<p><em>« Les conditions pour un <strong>MINIMUM</strong> de $f(x)$ sous $x\geq0$ peuvent aussi être facilement dérivées. <strong>Le raisonnement est EXACTEMENT LE MÊME, sauf que CETTE FOIS LE CAS GÊNANT surgit SI LA FONCTION EST DÉCROISSANTE à la frontière. Nous l'écartons EN EXIGEANT QUE LA DÉRIVÉE SOIT NON NÉGATIVE.</strong> »</em></p>
+</blockquote>
+<blockquote>
+<p><strong>LES CONDITIONS (A2.32) — minimisation sous $x\geq0$</strong>
+<strong>Condition 1.</strong>  $\ f'(x^*)\geq0$
+<strong>Condition 2.</strong> $\ x^*\big[f'(x^*)\big]=0$
+<strong>Condition 3.</strong> $\ x^*\geq0$</p>
+</blockquote>
+<p class="cal piege"> <strong>SEULE LA CONDITION 1 CHANGE DE SENS.</strong></p>
+<h3>3.5 Le théorème A2.19</h3>
+<blockquote>
+<p><em>« De manière <strong>TOUT À FAIT SENSÉE</strong>, (A2.31) et (A2.32) <strong>SE GÉNÉRALISENT au cas de l'optimisation de fonctions réelles de N'IMPORTE QUEL nombre de variables sous des contraintes de non-négativité sur TOUTES. Dans le cas multivarié, LES TROIS CONDITIONS DOIVENT TENIR POUR CHAQUE VARIABLE SÉPARÉMENT, avec LES DÉRIVÉES PARTIELLES de la fonction SUBSTITUÉES à la dérivée unique.</strong> »</em></p>
+</blockquote>
+<div class="cal formel"><span class="lab">THÉORÈME A2.19 — Conditions nécessaires pour les optima des fonctions réelles sous contraintes de non-négativité</span>
+<p>
+Soit $f(\mathbf{x})$ <strong>continûment différentiable</strong>.
+<strong>1.</strong> Si $\mathbf{x}^*$ <strong>MAXIMISE</strong> $f(\mathbf{x})$ sous $\mathbf{x}\geq\mathbf{0}$, alors pour $i=1,\dots,n$ :
+$$\textbf{(i)}\ \frac{\partial f(\mathbf{x}^*)}{\partial x_i}\leq0 \qquad \textbf{(ii)}\ x_i^*\frac{\partial f(\mathbf{x}^*)}{\partial x_i}=0 \qquad \textbf{(iii)}\ x_i^*\geq0$$
+<strong>2.</strong> Si $\mathbf{x}^*$ <strong>MINIMISE</strong> $f(\mathbf{x})$ sous $\mathbf{x}\geq\mathbf{0}$, alors pour $i=1,\dots,n$ :
+$$\textbf{(i)}\ \frac{\partial f(\mathbf{x}^*)}{\partial x_i}\geq0 \qquad \textbf{(ii)}\ x_i^*\frac{\partial f(\mathbf{x}^*)}{\partial x_i}=0 \qquad \textbf{(iii)}\ x_i^*\geq0$$</p>
+</div>
+<blockquote>
+<p><em>« <strong>Le théorème est DIRECT et sa preuve est laissée en exercice.</strong> »</em></p>
+</blockquote>
+<h2 data-prio="must">Concept 4 — §A2.3.6 : le problème de programmation non linéaire</h2>
+<h3>4.1 Le programme</h3>
+<blockquote>
+<p><em>« Considérons maintenant <strong>l'optimisation sous DES CONTRAINTES D'INÉGALITÉ GÉNÉRALES.</strong> »</em></p>
+</blockquote>
+<p>$$\max_{(x_1,x_2)\in\mathbb{R}^2}\ f(x_1,x_2)\qquad\text{s.c.}\qquad g^1(x_1,x_2)\leq0 \quad\text{et}\quad g^2(x_1,x_2)\leq0 \tag{A2.33}$$</p>
+<h3 data-prio="must">4.2  Linéaire contre non linéaire</h3>
+<blockquote>
+<p><em>« Un tel problème est communément appelé <strong>UN PROBLÈME DE PROGRAMMATION NON LINÉAIRE. Dans les problèmes de PROGRAMMATION LINÉAIRE, UNE FONCTION LINÉAIRE est optimisée SOUS DES CONTRAINTES D'INÉGALITÉ LINÉAIRES. Dans (A2.33), IL N'Y A PAS DE TELLES LIMITATIONS sur la forme de la fonction objectif et des relations de contrainte, de sorte que VOUS POUVEZ VOIR QUE LES PROBLÈMES DE PROGRAMMATION LINÉAIRE SONT UN CAS PARTICULIER DES NON LINÉAIRES.</strong> »</em></p>
+</blockquote>
+<blockquote>
+<p class="cal piege"> <em>« <strong>Les méthodes conçues pour traiter le problème général non linéaire DOIVENT BEAUCOUP À L'ÉTUDE PRÉCOCE DU CAS LINÉAIRE.</strong> »</em></p>
+</blockquote>
+<h3>4.3 Le cadre de la dérivation</h3>
+<blockquote>
+<p><em>« <strong>Pour être SPÉCIFIQUE, nous supposerons que $f$, $g^1$ et $g^2$ sont STRICTEMENT CROISSANTES en chaque coordonnée.</strong> »</em></p>
+</blockquote>
+<p><em>(Fig. A2.10 : <strong>« l'ensemble réalisable »</strong> — la région hachurée est <em>« l'ensemble des points satisfaisant les DEUX contraintes »</em>.)</em></p>
+<blockquote>
+<p><em>« <strong>Parce que $f$ est CROISSANTE, ses ensembles de niveau AUGMENTENT EN VALEUR quand nous nous éloignons de l'origine.</strong> »</em> La figure A2.11 représente une situation où <strong>$f$ est maximisée en $\mathbf{x}^*$</strong>, où <em>« <strong>les DEUX contraintes sont SATURÉES et égales à zéro</strong> »</em>.</p>
+</blockquote>
+<blockquote>
+<p class="cal piege"> <em>« <strong>Notez qu'en $\mathbf{x}^*$, l'ensemble de niveau de $f$ N'EST TANGENT À AUCUNE des lignes sur lesquelles les contraintes sont satisfaites avec égalité.</strong> »</em></p>
+</blockquote>
+<h2 data-prio="must">Concept 5 —  La dérivation géométrique de Kuhn-Tucker</h2>
+<h3>5.1 L'encadrement des pentes</h3>
+<blockquote>
+<p><em>« <strong>Que pouvons-nous dire EN GÉNÉRAL de la PENTE de l'ensemble de niveau de $f$ en $\mathbf{x}^*$ ?</strong> »</em></p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>L'argument, mot pour mot</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>1</strong></td>
+<td>*« D'abord, <strong>elle doit être FAIBLEMENT PLUS RAIDE que la pente de l'ensemble de niveau de $g^1$ en $\mathbf{x}^*$. AUTREMENT, IL Y AURAIT DES POINTS RÉALISABLES AU NORD-OUEST DE $\mathbf{x}^*$ QUI ATTEIGNENT UNE VALEUR PLUS ÉLEVÉE DE $f$.</strong> ( <strong>Assurez-vous de voir ceci avant de poursuivre !</strong>) »*</td>
+</tr>
+<tr>
+<td><strong>2</strong></td>
+<td><em>« De même, en $\mathbf{x}^*$, <strong>la pente du niveau de $f$ doit être FAIBLEMENT PLUS PLATE que la pente du niveau de $g^2$.</strong> »</em></td>
+</tr>
+</tbody></table>
+<p><strong>Les trois pentes</strong> étant respectivement $\ -\dfrac{\partial f/\partial x_1}{\partial f/\partial x_2}$, $\ -\dfrac{\partial g^1/\partial x_1}{\partial g^1/\partial x_2}$ et $\ -\dfrac{\partial g^2/\partial x_1}{\partial g^2/\partial x_2}$, on obtient</p>
+<p>$$-\frac{\partial g^1(\mathbf{x}^*)/\partial x_1}{\partial g^1(\mathbf{x}^*)/\partial x_2}\ \leq\ -\frac{\partial f(\mathbf{x}^*)/\partial x_1}{\partial f(\mathbf{x}^*)/\partial x_2}\ \leq\ -\frac{\partial g^2(\mathbf{x}^*)/\partial x_1}{\partial g^2(\mathbf{x}^*)/\partial x_2}$$</p>
+<p><strong>puis, « après multiplication par $-1$ et passage aux inverses »</strong> :</p>
+<p>$$\boxed{\;\frac{\partial g^1(\mathbf{x}^*)/\partial x_2}{\partial g^1(\mathbf{x}^*)/\partial x_1}\ \leq\ \frac{\partial f(\mathbf{x}^*)/\partial x_2}{\partial f(\mathbf{x}^*)/\partial x_1}\ \leq\ \frac{\partial g^2(\mathbf{x}^*)/\partial x_2}{\partial g^2(\mathbf{x}^*)/\partial x_1}\;} \tag{A2.34}$$</p>
+<h3 data-prio="must">5.2  Le rappel de géométrie vectorielle</h3>
+<blockquote>
+<p><em>« <strong>Rappelons un peu de géométrie avec les vecteurs. UN VECTEUR $(z_1,z_2)$, ÉTANT LE SEGMENT DE DROITE DE L'ORIGINE AU POINT $(z_1,z_2)$, A POUR PENTE $z_2/z_1$.</strong> »</em></p>
+</blockquote>
+<p>⟹ <strong>les trois termes de (A2.34) sont LES PENTES DES TROIS GRADIENTS</strong> $\nabla g^1(\mathbf{x}^*)$, $\nabla f(\mathbf{x}^*)$ et $\nabla g^2(\mathbf{x}^*)$.</p>
+<blockquote>
+<p><em>« Par conséquent, <strong>(A2.34) nous dit que LA PENTE DU VECTEUR GRADIENT $\nabla f(\mathbf{x}^*)$ SE TROUVE ENTRE LES PENTES DES VECTEURS GRADIENTS $\nabla g^1(\mathbf{x}^*)$ ET $\nabla g^2(\mathbf{x}^*)$.</strong> »</em></p>
+</blockquote>
+<blockquote>
+<p><em>(Note 5.)</em>  <em>« <strong>Nous venons de montrer que LES PENTES DES VECTEURS GRADIENTS SONT LES INVERSES OPPOSÉS DES PENTES DE LEURS ENSEMBLES DE NIVEAU. PAR CONSÉQUENT, ILS SONT PERPENDICULAIRES À LEURS ENSEMBLES DE NIVEAU.</strong> »</em></p>
+</blockquote>
+<h3 data-prio="must">5.3  LE CÔNE — le cœur de l'idée</h3>
+<p>*(Fig. A2.12 : <strong>« les vecteurs gradients »</strong>, dessinés <em>« COMME SI $\mathbf{x}^*$ ÉTAIT L'ORIGINE »</em>.)*</p>
+<blockquote>
+<p class="cal piege"> <em>« <strong>LE CÔNE HACHURÉ AU NORD-EST de la fig. A2.12 est L'ENSEMBLE DE TOUS LES VECTEURS qui peuvent s'écrire comme UNE COMBINAISON LINÉAIRE NON NÉGATIVE de $\nabla g^1(\mathbf{x}^*)$ et $\nabla g^2(\mathbf{x}^*)$. ÉVIDEMMENT, $\nabla f(\mathbf{x}^*)$ SE TROUVE DANS CET ENSEMBLE</strong> »</em>.</p>
+</blockquote>
+<p>⟹ <strong>il existe des réels $\lambda_1^*,\lambda_2^*$ tels que</strong></p>
+<p>$$\frac{\partial f(\mathbf{x}^*)}{\partial x_i}-\sum_{j=1}^{2}\lambda_j^*\frac{\partial g^j(\mathbf{x}^*)}{\partial x_i}=0\ \ (i=1,2),\qquad \lambda_1^*\geq0,\ \lambda_2^*\geq0$$</p>
+<p><em>« et bien sûr, dans notre exemple, <strong>les contraintes sont satisfaites AVEC ÉGALITÉ</strong> »</em> : $g^1(\mathbf{x}^*)=0$ et $g^2(\mathbf{x}^*)=0$.</p>
+<h3 data-prio="must">5.4  Ce que le théorème doit encore couvrir</h3>
+<blockquote>
+<p><em>« <strong>EN GÉNÉRAL, TOUTES LES CONTRAINTES N'ONT PAS BESOIN D'ÊTRE SATISFAITES AVEC ÉGALITÉ à la solution optimale. Le théorème de Kuhn-Tucker ci-dessous fournit des conditions nécessaires DU GENRE QUE NOUS VENONS DE DÉRIVER, TOUT EN TRAITANT AUSSI les situations où CERTAINES CONTRAINTES NE SONT PAS SATURÉES à l'optimum.</strong> »</em></p>
+</blockquote>
+<p>$$\boxed{\;\textbf{« Le théorème montre qu'À L'OPTIMUM, LE GRADIENT DE $f$ PEUT S'EXPRIMER}\\\textbf{COMME UNE COMBINAISON LINÉAIRE NON NÉGATIVE DES GRADIENTS}\\\textbf{DES $g^j$ ASSOCIÉS AUX CONTRAINTES SATURÉES $j$. »}\;}$$</p>
+<blockquote>
+<p class="cal piege"> <em>« <strong>Nous énonçons le théorème POUR LES PROBLÈMES DE MAXIMISATION SEULEMENT parce que TOUT PROBLÈME DE MINIMISATION PEUT ÊTRE RÉSOLU EN MAXIMISANT LA NÉGATIVE de la fonction objectif SOUS LES MÊMES CONTRAINTES.</strong> »</em></p>
+</blockquote>
+<h2 data-prio="must">Concept 6 — Le théorème A2.20 de Kuhn-Tucker</h2>
+<h3>6.1 L'énoncé</h3>
+<div class="cal formel"><span class="lab">THÉORÈME A2.20 — (Kuhn-Tucker) Conditions nécessaires pour les maxima des fonctions réelles sous contraintes d'inégalité</span>
+<p>
+Soient $f(\mathbf{x})$ et $g^j(\mathbf{x})$, $j=1,\dots,m$, des fonctions réelles <strong>continues</strong> sur $D\subset\mathbb{R}^n$. Soit $\mathbf{x}^*$ <strong>un point INTÉRIEUR de $D$</strong> qui <strong>maximise $f(\mathbf{x})$ sur $D$ sous les contraintes $g^j(\mathbf{x})\leq0$</strong>, et supposons que <strong>$f$ et chaque $g^j$ sont continûment différentiables sur un ouvert contenant $\mathbf{x}^*$</strong>.
+ <strong>Si les vecteurs gradients $\nabla g^j(\mathbf{x}^*)$ associés aux contraintes $j$ QUI SONT SATURÉES en $\mathbf{x}^*$ sont LINÉAIREMENT INDÉPENDANTS</strong>, alors <strong>il existe un vecteur UNIQUE $\boldsymbol{\lambda}^*$</strong> tel que $(\mathbf{x}^*,\boldsymbol{\lambda}^*)$ satisfait <strong>les conditions de Kuhn-Tucker</strong> :
+$$\frac{\partial\mathcal{L}(\mathbf{x}^*,\boldsymbol{\lambda}^*)}{\partial x_i}=\frac{\partial f(\mathbf{x}^*)}{\partial x_i}-\sum_{j=1}^{m}\lambda_j^*\frac{\partial g^j(\mathbf{x}^*)}{\partial x_i}=0,\qquad i=1,\dots,n$$
+$$\boxed{\;\lambda_j^*\geq0,\qquad g^j(\mathbf{x}^*)\leq0,\qquad \lambda_j^*\,g^j(\mathbf{x}^*)=0,\qquad j=1,\dots,m\;}$$</p>
+</div>
+<p class="cal piege"> <strong>Trois différences avec Lagrange</strong> <em>(<a href="525-jehle-lagrange-contraintes-egalite.md">fiche 525</a>, théorème A2.16)</em> :</p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>La différence</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>1</strong></td>
+<td> <strong>Les $\lambda_j^*$ doivent être NON NÉGATIFS</strong> <em>(un signe, alors que Lagrange n'en impose aucun)</em></td>
+</tr>
+<tr>
+<td><strong>2</strong></td>
+<td> <strong>Les contraintes ne sont satisfaites qu'avec INÉGALITÉ</strong> $g^j\leq0$</td>
+</tr>
+<tr>
+<td><strong>3</strong></td>
+<td> <strong>LA CONDITION DE COMPLÉMENTARITÉ $\lambda_j^*g^j(\mathbf{x}^*)=0$</strong></td>
+</tr>
+</tbody></table>
+<h3>6.2 La preuve</h3>
+<details class="cor">
+<summary><strong>Étape 1 — la mise en place et l'ensemble $B$</strong></summary><div class="in">
+
+<blockquote>
+<p><em>« <strong>SANS PERTE, supposons que LES $K\geq0$ PREMIÈRES contraintes sont SATURÉES et que les autres NE LE SONT PAS. Définissons $\lambda_j^*=0$ pour $j=K+1,\dots,m$. Par conséquent, QUELLES QUE SOIENT les valeurs de $\lambda_1^*,\dots,\lambda_K^*$, IL SERA VRAI QUE $\lambda_j^*g^j(\mathbf{x}^*)=0$ POUR TOUT $j$.</strong> »</em></p>
+</blockquote>
+<p><strong>Définir le CÔNE</strong> :</p>
+<p>$$B=\Big\{\mathbf{b}\in\mathbb{R}^n\ \Big|\ \mathbf{b}=\sum_{j=1}^{K}\lambda_j\nabla g^j(\mathbf{x}^*),\ \text{pour certains } \lambda_1\geq0,\dots,\lambda_K\geq0\Big\}$$</p>
+<p class="cal piege"> <em>« et notez que <strong>$B$ est CONVEXE. On peut aussi montrer que $B$ est FERMÉ</strong> <em>(voir l'exercice A2.29)</em>. »</em></p>
+</div></details>
+
+<details class="cor">
+<summary><strong>Étape 2 — pourquoi il suffit de montrer $\nabla f(\mathbf{x}^*)\in B$</strong></summary><div class="in">
+
+<blockquote>
+<p><em>« <strong>SI $\nabla f(\mathbf{x}^*)\in B$, ALORS $\nabla f(\mathbf{x}^*)-\sum_{j=1}^{K}\lambda_j^*\nabla g^j(\mathbf{x}^*)=\mathbf{0}$ pour certains $\lambda_1^*\geq0,\dots,\lambda_K^*\geq0$.</strong> »</em></p>
+</blockquote>
+<p><strong>L'UNICITÉ</strong> : <em>« de tels $\lambda_i^*$ <strong>SONT UNIQUES</strong> car si l'on avait aussi $\nabla f(\mathbf{x}^*)-\sum_j\hat{\lambda}_j\nabla g^j(\mathbf{x}^*)=\mathbf{0}$, <strong>alors en SOUSTRAYANT les deux égalités on obtient $\sum_{j=1}^{K}(\lambda_j^*-\hat{\lambda}_j)\nabla g^j(\mathbf{x}^*)=\mathbf{0}$.  L'INDÉPENDANCE LINÉAIRE des $\nabla g^j(\mathbf{x}^*)$ implique $\lambda_j^*=\hat{\lambda}_j$.</strong> »</em></p>
+<p>⟹ <em>« <strong>il SUFFIT donc de montrer que $\nabla f(\mathbf{x}^*)$ EST CONTENU DANS $B$.</strong> »</em></p>
+</div></details>
+
+<details class="cor">
+<summary><strong> Étape 3 — la contradiction, via le théorème de SÉPARATION</strong></summary><div class="in">
+
+<p><strong>Poser</strong> $\mathbf{a}^*=\nabla f(\mathbf{x}^*)$ et <strong>supposer par l'absurde</strong> $\mathbf{a}^*\notin B$.</p>
+<table>
+<thead>
+<tr>
+<th>Pas</th>
+<th>L'argument</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>1</strong></td>
+<td><em>« Alors <strong>les deux ensembles CONVEXES FERMÉS $A=\{\mathbf{a}^*\}$ et $B$ sont DISJOINTS</strong> »</em> ⟹  <strong>par le THÉORÈME A2.24</strong> <em>(un théorème de SÉPARATION, §A2.5)</em>, il existe $\mathbf{p}\in\mathbb{R}^n$ avec $\ \mathbf{p}\cdot\mathbf{a}^*&gt;\mathbf{p}\cdot\mathbf{b}$ <strong>pour tout $\mathbf{b}\in B$</strong> <strong>(P.1)</strong></td>
+</tr>
+<tr>
+<td><strong>2</strong></td>
+<td> <em>« <strong>EN PARTICULIER, $\mathbf{p}\cdot\mathbf{a}^*&gt;0$ PARCE QUE $\mathbf{0}\in B$</strong> »</em></td>
+</tr>
+<tr>
+<td><strong>3</strong></td>
+<td>*« De plus, <strong>$\mathbf{p}\cdot\nabla g^j(\mathbf{x}^*)\leq0$ pour tout $j=1,\dots,K$</strong>, car si cela échouait pour un tel $j$, <strong>(P.1) serait VIOLÉE en posant $\mathbf{b}=\lambda\nabla g^j(\mathbf{x}^*)$ pour $\lambda&gt;0$ ASSEZ GRAND</strong> »*</td>
+</tr>
+<tr>
+<td><strong>4</strong></td>
+<td>⟹ $\ \nabla f(\mathbf{x}^*)\cdot\mathbf{p}&gt;0\ $ et $\ \nabla g^j(\mathbf{x}^*)\cdot\mathbf{p}\leq0$ <strong>(P.2)</strong></td>
+</tr>
+</tbody></table>
+</div></details>
+
+<details class="cor">
+<summary><strong>Étape 4 — le vecteur $\mathbf{z}$ et la direction admissible</strong></summary><div class="in">
+
+<blockquote>
+<p><em>« <strong>Parce que $\nabla g^1(\mathbf{x}^*),\dots,\nabla g^K(\mathbf{x}^*)$ sont LINÉAIREMENT INDÉPENDANTS, la matrice $K\times n$ $G$ dont la $j$-ième ligne est $\nabla g^j(\mathbf{x}^*)$ A POUR IMAGE TOUT $\mathbb{R}^K$.</strong> »</em> <em>(Note 6 : <em>« <strong>c'est un fait de base d'ALGÈBRE LINÉAIRE. Cependant, il peut se prouver TRÈS DIRECTEMENT en utilisant le théorème A2.24 — une preuve QUE VOUS POURRIEZ VOULOIR ESSAYER.</strong> »</em>)</em></p>
+</blockquote>
+<p><strong>En prenant $\mathbf{w}=(-1,-1,\dots,-1)$</strong>, il existe $\mathbf{z}$ avec $G\mathbf{z}=\mathbf{w}$, donc</p>
+<p>$$\nabla g^j(\mathbf{x}^*)\cdot\mathbf{z}&lt;0\qquad\text{pour tout } j=1,\dots,K \tag{P.3}$$</p>
+<p><strong>Par (P.2), on peut choisir $\delta&gt;0$ assez petit pour que</strong></p>
+<p>$$\nabla f(\mathbf{x}^*)\cdot(\mathbf{p}+\delta\mathbf{z})&gt;0 \tag{P.4}$$</p>
+</div></details>
+
+<details class="cor">
+<summary><strong>Étape 5 — la contradiction finale</strong></summary><div class="in">
+
+<blockquote>
+<p>*« Parce que $\mathbf{x}^*$ est <strong>à l'INTÉRIEUR de $D$</strong>, $f\big(\mathbf{x}^*+\varepsilon(\mathbf{p}+\delta\mathbf{z})\big)$ est <strong>bien définie</strong> tant que $|\varepsilon|$ est assez petit. »*</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>La contrainte</th>
+<th>Pourquoi elle reste satisfaite</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Les NON saturées</strong> $j=K+1,\dots,m$</td>
+<td> <em>« satisfaites pour $\varepsilon&gt;0$ assez petit <strong>PAR CONTINUITÉ</strong> »</em></td>
+</tr>
+<tr>
+<td><strong>Les SATURÉES</strong> $j=1,\dots,K$</td>
+<td> <strong>par (P.2) et (P.3)</strong> : $\ \dfrac{dg^j\big(\mathbf{x}^*+\varepsilon(\mathbf{p}+\delta\mathbf{z})\big)}{d\varepsilon}=\nabla g^j(\mathbf{x}^*)\cdot(\mathbf{p}+\delta\mathbf{z})&lt;0$</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p>⟹ <em>« pour $\varepsilon&gt;0$ assez petit, <strong>$\mathbf{x}^*+\varepsilon(\mathbf{p}+\delta\mathbf{z})$ EST RÉALISABLE et doit donc donner une valeur de $f$ QUI N'EST PAS SUPÉRIEURE au maximum $f(\mathbf{x}^*)$</strong> »</em> ⟹</p>
+</blockquote>
+<p>$$\left.\frac{df\big(\mathbf{x}^*+\varepsilon(\mathbf{p}+\delta\mathbf{z})\big)}{d\varepsilon}\right|_{\varepsilon=0}\leq0$$</p>
+<blockquote>
+<p class="cal piege"> *« <strong>Mais selon (P.4)</strong>, cette dérivée vaut $\nabla f(\mathbf{x}^*)\cdot(\mathbf{p}+\delta\mathbf{z})&gt;0$, <strong>CE QUI EST LA CONTRADICTION RECHERCHÉE.</strong> »* $\blacksquare$</p>
+</blockquote>
+<p class="cal piege"> <strong>L'idée de la preuve en une phrase</strong> : si $\nabla f$ <strong>sortait</strong> du cône, <strong>on pourrait construire une direction RÉALISABLE qui AUGMENTE $f$</strong> — donc $\mathbf{x}^*$ ne serait pas un maximum.</p>
+</div></details>
+
+<h3 data-prio="must">6.3  Ce que le théorème NE donne PAS</h3>
+<blockquote>
+<p><em>« <strong>Les conditions de Kuhn-Tucker du théorème A2.20 ne sont QUE DES CONDITIONS NÉCESSAIRES DU PREMIER ORDRE pour les optima LOCAUX. DES CONDITIONS SUFFISANTES SONT DISPONIBLES QUAND LA FONCTION OBJECTIF EST CONCAVE OU QUASICONCAVE. Le lecteur intéressé peut consulter LUENBERGER (1973) ou ARROW ET ENTHOVEN (1961) sur ce point. Pour nos besoins, les conditions nécessaires du théorème A2.20 SUFFISENT.</strong> »</em></p>
+</blockquote>
+<h3>6.4 Les contraintes de non-négativité</h3>
+<blockquote>
+<p><em>« Le théorème de Kuhn-Tucker est souvent écrit <strong>avec les contraintes de non-négativité $x_1\geq0,\dots,x_n\geq0$ DONNÉES EXPLICITEMENT. Le théorème A2.20 S'APPLIQUE ENCORE puisque CHAQUE CONTRAINTE DE NON-NÉGATIVITÉ PEUT S'ÉCRIRE COMME UNE FONCTION DE CONTRAINTE $g^j$.</strong> »</em></p>
+</blockquote>
+<blockquote>
+<p class="cal piege"> <em>« <strong>En effet, si les contraintes de non-négativité sont LES SEULES contraintes, alors LE THÉORÈME A2.20 SE RÉDUIT AU THÉORÈME A2.19</strong> <em>(voir l'exercice A2.30)</em>. »</em></p>
+</blockquote>
+<h2 data-prio="must">Concept 7 —  La complémentarité des écarts</h2>
+<h3>7.1 Le nom et le sens</h3>
+<blockquote>
+<p><em>« <strong>La conclusion que $\lambda_j^*g^j(\mathbf{x}^*)=0$ pour $j=1,\dots,m$ est appelée LA COMPLÉMENTARITÉ DES ÉCARTS (« complementary slackness »).</strong> »</em></p>
+</blockquote>
+<p>$$\boxed{\;\textbf{« Elle dit que SI UNE CONTRAINTE EST LÂCHE, SON MULTIPLICATEUR DE}\\\textbf{LAGRANGE ASSOCIÉ DOIT ÊTRE NUL, tandis que SI UN MULTIPLICATEUR}\\\textbf{EST POSITIF, SA CONTRAINTE ASSOCIÉE DOIT ÊTRE SATURÉE. »}\;}$$</p>
+<table>
+<thead>
+<tr>
+<th>La situation</th>
+<th>Ce qu'on en déduit</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$g^j(\mathbf{x}^*)&lt;0$ <em>(contrainte <strong>LÂCHE</strong>)</em></td>
+<td> <strong>$\lambda_j^*=0$</strong></td>
+</tr>
+<tr>
+<td>$\lambda_j^*&gt;0$</td>
+<td> <strong>$g^j(\mathbf{x}^*)=0$</strong> <em>(contrainte <strong>SATURÉE</strong>)</em></td>
+</tr>
+<tr>
+<td>$g^j(\mathbf{x}^*)=0$ <strong>et</strong> $\lambda_j^*=0$</td>
+<td> <strong>Possible</strong> — le cas « saturée mais sans importance » <em>(cas 2 de la fig. A2.9)</em></td>
+</tr>
+</tbody></table>
+<h3>7.2 L'interprétation économique du multiplicateur</h3>
+<blockquote>
+<p class="cal piege"> <em>« Comme il vous sera demandé de le montrer à l'exercice A2.33, <strong>LE MULTIPLICATEUR DE LAGRANGE $\lambda_j^*$ PEUT S'INTERPRÉTER COMME L'AUGMENTATION MARGINALE DE LA FONCTION OBJECTIF QUAND LA $j$-IÈME CONTRAINTE EST RELÂCHÉE.</strong> »</em></p>
+</blockquote>
+<p class="cal piege"> <strong>C'est ce qui donne enfin son sens économique au multiplicateur</strong> — <em>« seulement incident »</em> dans la <a href="525-jehle-lagrange-contraintes-egalite.md">fiche 525</a>, il devient ici <strong>la VALEUR MARGINALE de la ressource rare</strong>. <em>(La démonstration relève du <strong>théorème de l'enveloppe</strong>, §A2.4.)</em></p>
+<h2 data-prio="must">Concept 8 —  La qualification des contraintes</h2>
+<h3>8.1 Pourquoi elle est indispensable</h3>
+<blockquote>
+<p><em>« La condition d'indépendance linéaire du théorème A2.20 est <strong>UNE PARMI TOUTE UNE VARIÉTÉ de QUALIFICATIONS DES CONTRAINTES possibles. Pour voir QU'UNE TELLE QUALIFICATION EST NÉCESSAIRE, considérez le problème</strong> »</em> :</p>
+</blockquote>
+<p>$$\max\ f(x)=x\qquad\text{sous contrainte}\qquad g(x)=x^3\leq0,\qquad D=(-\infty,\infty)$$</p>
+<details class="cor">
+<summary><strong> Le contre-exemple, décortiqué</strong></summary><div class="in">
+
+<table>
+<thead>
+<tr>
+<th>L'élément</th>
+<th>Sa valeur</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>La solution</strong></td>
+<td> <strong>$x^*=0$</strong> <em>(car $x^3\leq0\iff x\leq0$, et $f=x$ y est maximisée en $0$)</em></td>
+</tr>
+<tr>
+<td>$\nabla g(x^*)$</td>
+<td> <strong>$3(0)^2=0$</strong></td>
+</tr>
+<tr>
+<td>$\nabla f(x^*)$</td>
+<td><strong>$1$</strong></td>
+</tr>
+</tbody></table>
+<blockquote>
+<p class="cal piege"> <em>« <strong>Par conséquent, LA CONCLUSION DU THÉORÈME A2.20 ÉCHOUE.</strong> »</em> — il faudrait $1-\lambda\cdot0=0$, <strong>impossible</strong>.</p>
+</blockquote>
+<blockquote>
+<p><em>« <strong>Ceci NE CONTREDIT PAS le théorème, bien sûr, parce que L'ENSEMBLE SINGLETON DE GRADIENTS $\{\nabla g(x^*)\}$ correspondant à l'unique contrainte saturée N'EST PAS LINÉAIREMENT INDÉPENDANT.</strong> »</em></p>
+</blockquote>
+<p><em>( <strong>Le vecteur nul n'est jamais linéairement indépendant</strong> — c'est exactement le point.)</em></p>
+<blockquote>
+<p class="cal piege"> <em>« <strong>Ainsi, ON NE PEUT PAS SIMPLEMENT SUPPRIMER LA QUALIFICATION DES CONTRAINTES.</strong> »</em></p>
+</blockquote>
+</div></details>
+
+<h3>8.2 Il en existe d'autres</h3>
+<blockquote>
+<p><em>« <strong>L'exercice A2.31 fournit PLUSIEURS QUALIFICATIONS DES CONTRAINTES, dont CHACUNE PEUT REMPLACER la condition d'indépendance linéaire du théorème A2.20 SANS CHANGER LA CONCLUSION du théorème, SAUF EN CE QUI CONCERNE L'UNICITÉ des multiplicateurs.</strong> »</em></p>
+</blockquote>
+<p class="cal piege"> <strong>Le prix à payer</strong> : les qualifications plus faibles <strong>préservent l'EXISTENCE des multiplicateurs, mais pas leur UNICITÉ.</strong></p>
+<h2>Comment reconnaître le type d'exercice</h2>
+<table>
+<thead>
+<tr>
+<th>Signal dans l'énoncé</th>
+<th>Famille</th>
+<th>Marche à suivre</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>« … sous contrainte $x\geq0$ »</td>
+<td><strong>(A2.30)</strong></td>
+<td> <strong>Les TROIS conditions (A2.31)</strong></td>
+</tr>
+<tr>
+<td>Un maximum hors du domaine réalisable</td>
+<td><strong>Cas 1</strong></td>
+<td> <strong>Solution EN COIN</strong> : $x^*=0$, $f'(x^*)&lt;0$</td>
+</tr>
+<tr>
+<td>Un maximum pile sur la frontière</td>
+<td><strong>Cas 2</strong></td>
+<td> <strong>Saturée MAIS SANS IMPORTANCE</strong></td>
+</tr>
+<tr>
+<td>Un maximum strictement à l'intérieur</td>
+<td><strong>Cas 3</strong></td>
+<td> <strong>SOLUTION INTÉRIEURE</strong>, $f'=0$</td>
+</tr>
+<tr>
+<td>Un problème de MINIMISATION sous $x\geq0$</td>
+<td><strong>(A2.32)</strong></td>
+<td> <strong>Seule la condition 1 s'inverse : $f'\geq0$</strong></td>
+</tr>
+<tr>
+<td>Plusieurs variables, non-négativité</td>
+<td><strong>Théorème A2.19</strong></td>
+<td> <strong>Les trois conditions POUR CHAQUE VARIABLE</strong></td>
+</tr>
+<tr>
+<td>« … s.c. $g^j(\mathbf{x})\leq0$ »</td>
+<td><strong>(A2.33)</strong></td>
+<td> <strong>KUHN-TUCKER</strong> <em>(thm A2.20)</em></td>
+</tr>
+<tr>
+<td>« la contrainte est-elle saturée ? »</td>
+<td><strong>§A2.3.6</strong></td>
+<td> <strong>Regarder $\lambda_j^*$</strong> — complémentarité</td>
+</tr>
+<tr>
+<td>« que vaut le multiplicateur ? »</td>
+<td><strong>§A2.3.6</strong></td>
+<td> <strong>La VALEUR MARGINALE du relâchement de la contrainte</strong></td>
+</tr>
+<tr>
+<td>Un problème de MINIMISATION sous $g\leq0$</td>
+<td><strong>§A2.3.6</strong></td>
+<td> <strong>Maximiser $-f$ sous LES MÊMES contraintes</strong></td>
+</tr>
+<tr>
+<td>Le gradient d'une contrainte s'annule</td>
+<td><strong>Qualification</strong></td>
+<td> <strong>Kuhn-Tucker PEUT ÉCHOUER</strong> — cf. $x^3\leq0$</td>
+</tr>
+<tr>
+<td>« $f$ quasiconcave, $g$ quasiconvexe »</td>
+<td><strong>Exercice A2.32</strong></td>
+<td> <strong>Programmation QUASICONCAVE d'Arrow-Enthoven</strong></td>
+</tr>
+</tbody></table>
+<p><strong>Les trois réflexes de cadrage :</strong></p>
+<ol>
+<li><strong>Toujours écrire les contraintes sous la forme $g^j(\mathbf{x})\leq0$</strong>, jamais $\geq$.  <strong>Le signe des $\lambda_j$ en dépend entièrement.</strong></li>
+<li><strong>Attaquer par le terme PRODUIT.</strong> <em>« Une RÈGLE DE POUCE qui marche habituellement est de se concentrer sur LE TERME PRODUIT. Résolvez-le d'abord, puis assurez-vous que les autres conditions sont satisfaites. »</em></li>
+<li><strong>Ne jamais oublier que Kuhn-Tucker n'est que NÉCESSAIRE.</strong> <em>« Des conditions suffisantes sont disponibles quand la fonction objectif est CONCAVE OU QUASICONCAVE. »</em></li>
+</ol>
+<h2>Comment résoudre ce type d'exercice — les cinq méthodes</h2>
+<h3>Méthode 1 — Résoudre un problème sous contrainte de non-négativité</h3>
+<table>
+<thead>
+<tr>
+<th>Pas</th>
+<th>L'action</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>1</strong></td>
+<td><strong>Écrire les trois conditions</strong> —  <strong>$f'\leq0$ pour un MAX, $f'\geq0$ pour un MIN</strong></td>
+</tr>
+<tr>
+<td><strong>2</strong></td>
+<td> <strong>Résoudre D'ABORD le produit $x^*f'(x^*)=0$</strong> — il donne <strong>$x^*=0$ OU $f'(x^*)=0$</strong></td>
+</tr>
+<tr>
+<td><strong>3</strong></td>
+<td><strong>Éliminer les racines qui violent $x^*\geq0$</strong></td>
+</tr>
+<tr>
+<td><strong>4</strong></td>
+<td><strong>Vérifier la condition 1 sur ce qui reste</strong></td>
+</tr>
+<tr>
+<td><strong>5</strong></td>
+<td> <strong>Ne pas oublier que le cas $x^*=0$ avec $f'&gt;0$ est UN MINIMUM déguisé</strong></td>
+</tr>
+</tbody></table>
+<h3>Méthode 2 — Appliquer le théorème A2.19 à $n$ variables</h3>
+<p class="cal piege"> <strong>Les trois conditions valent POUR CHAQUE $i$ SÉPARÉMENT</strong> :</p>
+<p>$$\frac{\partial f(\mathbf{x}^*)}{\partial x_i}\leq0 \qquad x_i^*\frac{\partial f(\mathbf{x}^*)}{\partial x_i}=0 \qquad x_i^*\geq0$$</p>
+<p>⟹ <strong>il faut donc examiner $n$ « alternatives » indépendantes</strong>, chacune donnant <strong>soit $x_i^*=0$, soit $\partial f/\partial x_i=0$</strong>.</p>
+<h3>Méthode 3 — Appliquer Kuhn-Tucker</h3>
+<ol>
+<li><strong>Réécrire toutes les contraintes sous la forme $g^j(\mathbf{x})\leq0$.</strong></li>
+<li><strong>Former</strong> $\ \mathcal{L}=f(\mathbf{x})-\sum_j\lambda_j g^j(\mathbf{x})$.</li>
+<li><strong>Écrire les conditions</strong> :</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>La condition</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Stationnarité</strong></td>
+<td>$\partial f/\partial x_i-\sum_j\lambda_j^*\,\partial g^j/\partial x_i=0$</td>
+</tr>
+<tr>
+<td><strong>Non-négativité des multiplicateurs</strong></td>
+<td> $\lambda_j^*\geq0$</td>
+</tr>
+<tr>
+<td><strong>Réalisabilité</strong></td>
+<td>$g^j(\mathbf{x}^*)\leq0$</td>
+</tr>
+<tr>
+<td> <strong>Complémentarité</strong></td>
+<td>$\lambda_j^*\,g^j(\mathbf{x}^*)=0$</td>
+</tr>
+</tbody></table>
+<ol start="4">
+<li> <strong>ÉNUMÉRER LES CAS</strong> : pour chaque contrainte, <strong>soit elle est saturée ($g^j=0$), soit son multiplicateur est nul ($\lambda_j^*=0$)</strong>.</li>
+<li><strong>Résoudre chaque cas et écarter ceux qui violent une condition.</strong></li>
+</ol>
+<h3>Méthode 4 — Traiter un problème de MINIMISATION</h3>
+<p class="cal piege"> <em>« <strong>Tout problème de minimisation peut être résolu EN MAXIMISANT LA NÉGATIVE de la fonction objectif SOUS LES MÊMES CONTRAINTES.</strong> »</em></p>
+<p>$$\min f(\mathbf{x}) \ \text{ s.c. } \ g^j(\mathbf{x})\leq0 \qquad\Longleftrightarrow\qquad \max\big(-f(\mathbf{x})\big) \ \text{ s.c. } \ g^j(\mathbf{x})\leq0$$</p>
+<p class="cal piege"> <strong>Puis on renverse les signes dans les conditions obtenues.</strong></p>
+<h3>Méthode 5 — Lire la complémentarité des écarts</h3>
+<table>
+<thead>
+<tr>
+<th>Ce qu'on observe</th>
+<th>Ce qu'on conclut</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Une contrainte <strong>NON saturée</strong></td>
+<td> <strong>Son $\lambda_j^*$ est NUL</strong> — elle <strong>n'a aucun effet</strong> sur la solution</td>
+</tr>
+<tr>
+<td>Un $\lambda_j^*$ <strong>STRICTEMENT positif</strong></td>
+<td> <strong>Sa contrainte est SATURÉE</strong> — elle « mord »</td>
+</tr>
+<tr>
+<td>Un $\lambda_j^*$ <strong>grand</strong></td>
+<td> <strong>Relâcher cette contrainte apporterait BEAUCOUP</strong></td>
+</tr>
+</tbody></table>
+<p class="cal piege"> <strong>En pratique</strong>, cela permet de <strong>deviner quelles contraintes sont actives</strong> avant de résoudre.</p>
+<h2>Les exercices du livre (§A2.6) — ceux qui portent sur §A2.3.5-A2.3.6</h2>
+<blockquote>
+<p class="cal piege"> <strong>Le livre NE FOURNIT PAS de corrigé.</strong> Les énoncés sont <strong>ceux de Jehle &amp; Reny</strong> <em>(exercices A2.26 à A2.32)</em>. <strong>Les pistes de résolution sont un ENRICHISSEMENT PÉDAGOGIQUE.</strong></p>
+</blockquote>
+<details class="cor">
+<summary><strong>A2.26 — le coût de la contrainte</strong></summary><div class="in">
+
+<blockquote>
+<p><em>« <strong>Représentez $f(x)=6-x^2-4x$. Trouvez le point où la fonction atteint son maximum (GLOBAL) NON CONTRAINT et calculez la valeur de la fonction en ce point. Comparez ceci à la valeur qu'elle atteint quand elle est maximisée SOUS LA CONTRAINTE DE NON-NÉGATIVITÉ $x\geq0$.</strong> »</em></p>
+</blockquote>
+<blockquote>
+<p><strong>Piste (hors cours).</strong>
+<strong>Le maximum NON contraint</strong> : $f'(x)=-2x-4=0$ ⟹  <strong>$x=-2$</strong>, et $f(-2)=6-4+8=\mathbf{10}$.
+<strong>Le maximum SOUS $x\geq0$</strong> : c'est <strong>l'exemple A2.10</strong> ⟹  <strong>$x^*=0$</strong>, et $f(0)=\mathbf{6}$.</p>
+<p>$$\boxed{\;\textbf{La contrainte COÛTE } \ 10-6=\mathbf{4} \ \textbf{ unités de valeur objectif.}\;}$$</p>
+<p class="cal piege"> <strong>C'est exactement le CAS 1 de la figure A2.9</strong> : le maximum libre est <strong>infaisable</strong>, et <strong>la solution est EN COIN, avec $f'(0)=-4&lt;0$</strong>.</p>
+</blockquote>
+</div></details>
+
+<details class="cor">
+<summary><strong>A2.27 — les trois cas du MINIMUM, et le cas « gênant »</strong></summary><div class="in">
+
+<blockquote>
+<p><em>« En minimisant $f(x)$ sous $x\geq0$, <strong>il y a TROIS cas possibles. La contrainte peut être SATURÉE, SATURÉE MAIS SANS PERTINENCE, ou NON SATURÉE. Construisez trois graphes comme ceux de la fig. A2.9 pour illustrer ces trois cas. CONVAINQUEZ-VOUS que les trois conditions de (A2.32) rendent compte des trois cas. CONSTRUISEZ UN QUATRIÈME CAS montrant le cas « GÊNANT » évoqué dans le texte</strong> […] »</em></p>
+</blockquote>
+<blockquote>
+<p><strong>Piste (hors cours).</strong></p>
+<table>
+<thead>
+<tr>
+<th>Le cas</th>
+<th>La configuration</th>
+<th>Les conditions</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>SATURÉE</strong></td>
+<td>Le min libre est <strong>en $x&lt;0$</strong> ; sur $x\geq0$, $f$ <strong>croît</strong> dès l'origine</td>
+<td>$x^*=0$ <strong>et</strong>  <strong>$f'(0)&gt;0$</strong></td>
+</tr>
+<tr>
+<td><strong>SATURÉE, SANS PERTINENCE</strong></td>
+<td>Le min libre est <strong>PILE en $0$</strong></td>
+<td>$x^*=0$ <strong>et</strong> $f'(0)=0$</td>
+</tr>
+<tr>
+<td><strong>NON SATURÉE</strong></td>
+<td>Le min est <strong>à l'intérieur</strong></td>
+<td>$x^*&gt;0$ <strong>et</strong> $f'(x^*)=0$</td>
+</tr>
+</tbody></table>
+<p class="cal piege"> <strong>LE CAS GÊNANT</strong> : $\tilde{x}=0$ <strong>avec $f'(\tilde{x})&lt;0$</strong> — le produit $\tilde{x}f'(\tilde{x})$ <strong>vaut ENCORE zéro</strong>, mais <strong>la fonction DÉCROÎT en entrant dans la région réalisable</strong>, donc $\tilde{x}=0$ est <strong>un MAXIMUM, pas un minimum</strong>.
+ <strong>C'est précisément la condition 1 de (A2.32), $f'(x^*)\geq0$, qui l'écarte</strong> — exactement le miroir de ce que fait $f'\leq0$ dans (A2.31).</p>
+</blockquote>
+</div></details>
+
+<details class="cor">
+<summary><strong>A2.28 —  énoncer Kuhn-Tucker pour un MINIMUM</strong></summary><div class="in">
+
+<blockquote>
+<p><em>« <strong>Énoncez le théorème de Kuhn-Tucker pour le problème de minimisation suivant</strong> »</em> :
+$$\min_{x_1,x_2}\ f(x_1,x_2)\qquad\text{s.c.}\qquad g(x_1,x_2)\leq0 \quad\text{et}\quad x_1\geq0,\ x_2\geq0$$</p>
+</blockquote>
+<blockquote>
+<p><strong>Piste (hors cours).</strong>
+ <strong>La marche à suivre du livre</strong> : <em>« tout problème de minimisation peut être résolu <strong>EN MAXIMISANT LA NÉGATIVE</strong> »</em>. On applique donc le théorème A2.20 à $-f$, avec les contraintes $g\leq0$ <strong>et $-x_i\leq0$</strong>.</p>
+<p><strong>Le résultat, avec $\mathcal{L}=f+\lambda g$</strong> <em>( <strong>noter le SIGNE PLUS</strong>, conséquence du passage à $-f$)</em> — sous la qualification des contraintes, il existe $\lambda^*\geq0$ tel que :</p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>La condition</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>(i)</strong></td>
+<td> $\dfrac{\partial f(\mathbf{x}^*)}{\partial x_i}+\lambda^*\dfrac{\partial g(\mathbf{x}^*)}{\partial x_i}\ \geq\ 0$, $i=1,2$</td>
+</tr>
+<tr>
+<td><strong>(ii)</strong></td>
+<td> $x_i^*\left[\dfrac{\partial f(\mathbf{x}^*)}{\partial x_i}+\lambda^*\dfrac{\partial g(\mathbf{x}^*)}{\partial x_i}\right]=0$</td>
+</tr>
+<tr>
+<td><strong>(iii)</strong></td>
+<td>$x_i^*\geq0$</td>
+</tr>
+<tr>
+<td><strong>(iv)</strong></td>
+<td>$\lambda^*\geq0$, $\ g(\mathbf{x}^*)\leq0$, $\ \lambda^*g(\mathbf{x}^*)=0$</td>
+</tr>
+</tbody></table>
+<p class="cal piege"> <strong>La structure est EXACTEMENT celle du théorème A2.19(2) combinée à la complémentarité de Kuhn-Tucker</strong> : les conditions de non-négativité produisent <strong>des inégalités « $\geq0$ » avec complémentarité en $x_i$</strong>, tandis que la contrainte $g$ produit <strong>la complémentarité en $\lambda$</strong>.</p>
+</blockquote>
+</div></details>
+
+<details class="cor">
+<summary><strong>A2.30 —  montrer que A2.20 REDONNE A2.19</strong></summary><div class="in">
+
+<blockquote>
+<p><em>« <strong>Montrez que le théorème A2.20 se réduit au théorème A2.19 quand les seules contraintes sont $x_1\geq0,\dots,x_n\geq0$.</strong> »</em></p>
+</blockquote>
+<blockquote>
+<p><strong>Piste (hors cours) — le calcul complet.</strong></p>
+<p><strong>Écrire les contraintes sous la forme requise</strong> : $\ g^i(\mathbf{x})=-x_i\leq0$, $i=1,\dots,n$. Alors
+$$\frac{\partial g^i}{\partial x_j}=\begin{cases}-1&amp;\text{si } j=i\\0&amp;\text{sinon}\end{cases}$$</p>
+<table>
+<thead>
+<tr>
+<th>La condition de Kuhn-Tucker</th>
+<th>Ce qu'elle devient</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$\dfrac{\partial f}{\partial x_i}-\sum_j\lambda_j^*\dfrac{\partial g^j}{\partial x_i}=0$</td>
+<td>$\dfrac{\partial f}{\partial x_i}+\lambda_i^*=0$ ⟹  $\dfrac{\partial f}{\partial x_i}=-\lambda_i^*$</td>
+</tr>
+<tr>
+<td>$\lambda_i^*\geq0$</td>
+<td>⟹  <strong>$\dfrac{\partial f(\mathbf{x}^*)}{\partial x_i}\leq0$</strong>  <em>(condition (i) de A2.19)</em></td>
+</tr>
+<tr>
+<td>$\lambda_i^*g^i(\mathbf{x}^*)=0$, soit $\lambda_i^*(-x_i^*)=0$</td>
+<td>⟹ $\lambda_i^*x_i^*=0$ ⟹  <strong>$x_i^*\dfrac{\partial f}{\partial x_i}=x_i^*(-\lambda_i^*)=0$</strong>  <em>(condition (ii))</em></td>
+</tr>
+<tr>
+<td>$g^i(\mathbf{x}^*)\leq0$</td>
+<td>⟹  <strong>$x_i^*\geq0$</strong>  <em>(condition (iii))</em></td>
+</tr>
+</tbody></table>
+<p class="cal piege"> <strong>Les trois conditions du théorème A2.19 sont EXACTEMENT les conditions de Kuhn-Tucker réécrites</strong> — et le multiplicateur $\lambda_i^*$ <strong>n'est autre que $-\partial f/\partial x_i$</strong>, c'est-à-dire <strong>la « pente perdue » à la frontière</strong>. </p>
+</blockquote>
+</div></details>
+
+<details class="cor">
+<summary><strong>A2.31 — les cinq qualifications des contraintes</strong></summary><div class="in">
+
+<blockquote>
+<p>Avec <strong>les $K$ premières contraintes SATURÉES</strong> et une contrainte dite <strong>LINÉAIRE si $g^j(\mathbf{x})=a_j+\mathbf{b}^j\cdot\mathbf{x}$</strong>, le livre liste :
+<strong>(i)</strong> <em>« $\nabla g^1(\mathbf{x}^*),\dots,\nabla g^K(\mathbf{x}^*)$ sont <strong>LINÉAIREMENT INDÉPENDANTS</strong> »</em>
+<strong>(ii)</strong> <em>« <strong>AUCUNE COMBINAISON CONVEXE</strong> des $\nabla g^j(\mathbf{x}^*)$ n'est <strong>le vecteur NUL</strong> »</em>
+<strong>(iii)</strong> <em>« <strong>il existe $\mathbf{z}$ tel que $\nabla g^j(\mathbf{x}^*)\cdot\mathbf{z}&lt;0$ pour tout $j=1,\dots,K$</strong> »</em>
+<strong>(iv)</strong> <em>« il existe $\mathbf{z}$ tel que $\nabla g^j(\mathbf{x}^*)\cdot\mathbf{z}\leq0$ pour tout $j$, <strong>avec l'inégalité STRICTE pour les contraintes NON LINÉAIRES</strong> »</em>
+<strong>(v)</strong> <em>(une condition de « courbe réalisable » différentiable)</em></p>
+<p><strong>(a)</strong> <em>« Montrez que <strong>(i) ⟹ (ii) ⟹ (iii) ⟹ (iv) ⟹ (v)</strong> »</em> · <strong>(b)</strong> <em>« Montrez que <strong>(iv) est TOUJOURS satisfaite si TOUTES les contraintes sont LINÉAIRES</strong> »</em> · <strong>(c)</strong> <em>« … prouvez que <strong>si (v) tient, il existe des multiplicateurs NON NÉGATIFS</strong> […] <strong>Vous aurez donc GÉNÉRALISÉ le théorème A2.20.</strong> »</em></p>
+</blockquote>
+<blockquote>
+<p><strong>Piste (hors cours).</strong>
+ <strong>La hiérarchie va DU PLUS FORT AU PLUS FAIBLE</strong> : (i) est <strong>la plus exigeante</strong>, (v) <strong>la plus faible</strong>. <strong>Plus la qualification est faible, plus le théorème s'applique largement</strong> —  <strong>mais l'UNICITÉ des multiplicateurs se perd en chemin</strong>, comme le livre le souligne : <em>« sauf en ce qui concerne l'unicité »</em>.
+<strong>(iii) ⟹ (iv)</strong> est immédiat <em>(une inégalité stricte partout implique a fortiori le mélange demandé)</em>.
+<strong>(b)</strong> : si toutes les contraintes sont linéaires,  <strong>(iv) n'exige plus AUCUNE inégalité stricte</strong> — il suffit de prendre $\mathbf{z}=\mathbf{0}$, qui donne $\nabla g^j\cdot\mathbf{0}=0\leq0$ 
+ <strong>La morale pratique</strong> : <strong>en programmation LINÉAIRE, la qualification est AUTOMATIQUE</strong> — c'est pourquoi Kuhn-Tucker y fonctionne toujours.</p>
+</blockquote>
+</div></details>
+
+<details class="cor">
+<summary><strong>A2.32 —  la programmation QUASICONCAVE d'Arrow-Enthoven</strong></summary><div class="in">
+
+<blockquote>
+<p><em>« Arrow et Enthoven (1961) considèrent <strong>le problème de PROGRAMMATION QUASICONCAVE</strong> »</em> :
+$$\max_{\mathbf{x}}\ f(\mathbf{x})\qquad\text{s.c.}\qquad g(\mathbf{x})\leq0 \quad\text{et}\quad \mathbf{x}\geq\mathbf{0}$$
+<em>« où <strong>$f(\mathbf{x})$ est QUASICONCAVE et $g(\mathbf{x})$ est QUASICONVEXE</strong> ».</em>
+<strong>(a)</strong> <em>« <strong>Montrez que si $\mathbf{x}^*$ est un maximum LOCAL, c'est aussi un maximum GLOBAL.</strong> »</em>
+<strong>(b)</strong> <em>« <strong>Montrez que si $f(\mathbf{x})$ est STRICTEMENT quasiconcave, alors le maximum global est UNIQUE.</strong> »</em></p>
+</blockquote>
+<blockquote>
+<p><strong>Piste (hors cours).</strong></p>
+<p class="cal piege"> <strong>L'observation préalable, décisive</strong> :  <strong>L'ENSEMBLE RÉALISABLE EST CONVEXE.</strong> En effet, $g$ <strong>quasiconvexe</strong> ⟹ <strong>par le THÉORÈME A1.18</strong>, <strong>ses ensembles INFÉRIEURS $I(0)=\{g\leq0\}$ sont CONVEXES</strong> ; et $\mathbb{R}^n_+$ est convexe ⟹  <strong>leur INTERSECTION est convexe</strong> <em>(théorème A1.1, <a href="521-jehle-ensembles-applications.md">fiche 521</a>)</em>.</p>
+<p><strong>(b) — LE PLUS DIRECT.</strong> Si $\mathbf{x}^*$ et $\mathbf{x}'\neq\mathbf{x}^*$ étaient <strong>deux maxima globaux</strong>, on aurait $f(\mathbf{x}^*)=f(\mathbf{x}')=M$. <strong>L'ensemble réalisable étant convexe</strong>, $\mathbf{x}^t$ <strong>est réalisable</strong>, et <strong>la STRICTE quasiconcavité</strong> donne
+$$f(\mathbf{x}^t)&gt;\min\big[f(\mathbf{x}^*),f(\mathbf{x}')\big]=M$$
+ <strong>ce qui CONTREDIT que $M$ soit le maximum.</strong> </p>
+<p><strong>(a) — LE MÊME ARGUMENT, en local.</strong> Si $\mathbf{x}'$ réalisable vérifiait $f(\mathbf{x}')&gt;f(\mathbf{x}^*)$, alors pour $t$ <strong>assez petit</strong> $\mathbf{x}^t$ est <strong>réalisable ET dans tout voisinage de $\mathbf{x}^*$</strong>, et la quasiconcavité donne
+$$f(\mathbf{x}^t)\ \geq\ \min\big[f(\mathbf{x}'),f(\mathbf{x}^*)\big]=f(\mathbf{x}^*)$$</p>
+<div class="cal plus"><span class="lab">Enrichissement pédagogique (hors cours) — une réserve honnête sur (a).</span>
+<p> Avec la quasiconcavité <strong>SIMPLE</strong>, l'argument ne fournit que <strong>« $\geq$ »</strong>, ce qui <strong>ne contredit pas</strong> un maximum local <strong>au sens FAIBLE</strong> <em>(« $f(\mathbf{x}^*)\geq f(\mathbf{x})$ dans un voisinage »)</em>. <strong>Un témoin</strong> : sur $[0,2]$, la fonction <strong>constante sur $[0,1]$ puis croissante sur $[1,2]$</strong> est <strong>quasiconcave</strong> <em>(elle est croissante au sens faible)</em>, et <strong>tout point de $(0,1)$ est un maximum local faible SANS être global</strong>. <strong>La conclusion de (a) est correcte</strong> dès que l'on lit <em>« maximum local »</em> <strong>au sens STRICT</strong>, ou dès que $f$ est <strong>STRICTEMENT quasiconcave</strong> — auquel cas l'inégalité devient $f(\mathbf{x}^t)&gt;f(\mathbf{x}^*)$ et <strong>la contradiction est immédiate</strong>.  <strong>Le livre ne précise pas cette lecture ; il est prudent de l'expliciter dans une copie.</strong></p>
+</div>
+<p class="cal piege"> <strong>La portée</strong> : c'est <strong>ce résultat qui rend la microéconomie traitable</strong> — on suppose <strong>l'utilité QUASICONCAVE</strong> et <strong>les contraintes QUASICONVEXES</strong> <em>(souvent linéaires)</em>, et <strong>les conditions de Kuhn-Tucker deviennent alors SUFFISANTES pour un optimum GLOBAL.</strong></p>
+</blockquote>
+</div></details>
+
+<h2 data-prio="must">Common mistakes</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>L'erreur</th>
+<th>Pourquoi c'est faux</th>
+<th>Ce qu'il faut écrire</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>Traiter $x\geq0$ comme une égalité</td>
+<td> <strong>Elle peut être SATURÉE ou NON</strong> — c'est tout l'enjeu</td>
+<td>Trois cas</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Oublier le cas 2</td>
+<td> <em>« la contrainte est saturée <strong>MAIS CELA N'A PAS VRAIMENT D'IMPORTANCE</strong> »</em></td>
+<td>$x^*=0$ <strong>et</strong> $f'=0$</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Croire qu'une solution intérieure est la norme</td>
+<td> <em>« <strong>le CAS 3 SEUL correspond au genre que nous avons rencontré auparavant</strong> »</em></td>
+<td></td>
+</tr>
+<tr>
+<td>4</td>
+<td>Ne retenir que $x^*f'(x^*)=0$</td>
+<td> <em>« <strong>CELA SEUL NE SUFFIT PAS TOUT À FAIT</strong> »</em></td>
+<td>Il faut <strong>les TROIS conditions</strong></td>
+</tr>
+<tr>
+<td>5</td>
+<td>Oublier le cas « gênant »</td>
+<td> <strong>$\tilde{x}=0$ avec $f'&gt;0$ donne AUSSI un produit nul — et c'est un MINIMUM</strong></td>
+<td>D'où $f'\leq0$</td>
+</tr>
+<tr>
+<td>6</td>
+<td>Inverser la condition 1 pour un min</td>
+<td> <strong>MAX : $f'\leq0$ · MIN : $f'\geq0$</strong></td>
+<td>(A2.31) vs (A2.32)</td>
+</tr>
+<tr>
+<td>7</td>
+<td>Résoudre les conditions dans le désordre</td>
+<td> <strong>La RÈGLE DE POUCE : le TERME PRODUIT D'ABORD</strong></td>
+<td>Exemple A2.10</td>
+</tr>
+<tr>
+<td>8</td>
+<td>Garder une racine négative</td>
+<td> <strong>La condition 3 l'écarte</strong></td>
+<td>$x=-2$ dans l'exemple A2.10</td>
+</tr>
+<tr>
+<td>9</td>
+<td>Oublier de vérifier la condition 1 à la fin</td>
+<td> <em>« <strong>assurez-vous que les AUTRES conditions sont satisfaites</strong> »</em></td>
+<td></td>
+</tr>
+<tr>
+<td>10</td>
+<td>Appliquer les conditions globalement à $n$ variables</td>
+<td> <em>« <strong>les trois conditions doivent tenir POUR CHAQUE VARIABLE SÉPARÉMENT</strong> »</em></td>
+<td>Thm A2.19</td>
+</tr>
+<tr>
+<td>11</td>
+<td>Croire que le théorème A2.19 est suffisant</td>
+<td> <strong>Ce sont des conditions NÉCESSAIRES</strong></td>
+<td>Titre du théorème</td>
+</tr>
+<tr>
+<td>12</td>
+<td>Confondre programmation linéaire et non linéaire</td>
+<td> <em>« <strong>les problèmes LINÉAIRES sont UN CAS PARTICULIER des non linéaires</strong> »</em></td>
+<td></td>
+</tr>
+<tr>
+<td>13</td>
+<td>Chercher une TANGENCE dans (A2.33)</td>
+<td> <em>« en $\mathbf{x}^*$, <strong>l'ensemble de niveau de $f$ N'EST TANGENT À AUCUNE</strong> des lignes de contrainte »</em></td>
+<td>C'est un <strong>coin</strong></td>
+</tr>
+<tr>
+<td>14</td>
+<td>Mal orienter les inégalités de pentes</td>
+<td> <em>« <strong>FAIBLEMENT PLUS RAIDE</strong> que $g^1$ et <strong>FAIBLEMENT PLUS PLATE</strong> que $g^2$ »</em></td>
+<td>(A2.34)</td>
+</tr>
+<tr>
+<td>15</td>
+<td>Oublier de renverser en prenant les inverses</td>
+<td> <strong>Multiplier par $-1$ ET passer aux inverses renverse DEUX FOIS</strong></td>
+<td>Le passage à (A2.34)</td>
+</tr>
+<tr>
+<td>16</td>
+<td>Croire que le gradient est tangent au niveau</td>
+<td> <strong>Il est PERPENDICULAIRE</strong> <em>(note 5)</em></td>
+<td></td>
+</tr>
+<tr>
+<td>17</td>
+<td>Oublier la pente d'un vecteur</td>
+<td> <strong>Le vecteur $(z_1,z_2)$ a pour pente $z_2/z_1$</strong></td>
+<td></td>
+</tr>
+<tr>
+<td>18</td>
+<td>Croire que le cône admet des coefficients négatifs</td>
+<td> <strong>COMBINAISON LINÉAIRE NON NÉGATIVE</strong></td>
+<td>D'où $\lambda_j\geq0$</td>
+</tr>
+<tr>
+<td>19</td>
+<td>Écrire $\lambda_j$ sans contrainte de signe</td>
+<td> <strong>Kuhn-Tucker EXIGE $\lambda_j^*\geq0$</strong> — Lagrange non</td>
+<td>La grande différence</td>
+</tr>
+<tr>
+<td>20</td>
+<td>Écrire les contraintes en $\geq0$</td>
+<td> <strong>Le signe des $\lambda$ dépend de la convention $g^j\leq0$</strong></td>
+<td></td>
+</tr>
+<tr>
+<td>21</td>
+<td>Oublier la complémentarité</td>
+<td> <strong>$\lambda_j^*g^j(\mathbf{x}^*)=0$</strong></td>
+<td>La condition la plus caractéristique</td>
+</tr>
+<tr>
+<td>22</td>
+<td>Mal lire la complémentarité</td>
+<td> <em>« si une contrainte est <strong>LÂCHE</strong>, son multiplicateur est <strong>NUL</strong> ; si un multiplicateur est <strong>POSITIF</strong>, sa contrainte est <strong>SATURÉE</strong> »</em></td>
+<td></td>
+</tr>
+<tr>
+<td>23</td>
+<td>Croire que $\lambda_j^*=0$ implique contrainte lâche</td>
+<td> <strong>NON</strong> — le cas « saturée mais sans importance » a <strong>les deux nuls</strong></td>
+<td>Cas 2</td>
+</tr>
+<tr>
+<td>24</td>
+<td>Croire Kuhn-Tucker suffisant</td>
+<td> <em>« <strong>QUE des conditions NÉCESSAIRES du PREMIER ORDRE pour les optima LOCAUX</strong> »</em></td>
+<td></td>
+</tr>
+<tr>
+<td>25</td>
+<td>Ignorer où trouver les conditions suffisantes</td>
+<td> <em>« <strong>LUENBERGER (1973) ou ARROW ET ENTHOVEN (1961)</strong> »</em> — quand $f$ est <strong>concave ou quasiconcave</strong></td>
+<td></td>
+</tr>
+<tr>
+<td>26</td>
+<td>Traiter les contraintes de non-négativité à part</td>
+<td> <em>« <strong>chaque contrainte de non-négativité peut s'écrire comme une fonction $g^j$</strong> »</em></td>
+<td></td>
+</tr>
+<tr>
+<td>27</td>
+<td>Oublier que A2.20 ⟹ A2.19</td>
+<td> <strong>Le théorème A2.19 est LE CAS PARTICULIER où $g^i=-x_i$</strong></td>
+<td>Exercice A2.30</td>
+</tr>
+<tr>
+<td>28</td>
+<td>Oublier la qualification des contraintes</td>
+<td> <strong>Le contre-exemple $g(x)=x^3\leq0$</strong></td>
+<td><em>« on ne peut pas simplement la supprimer »</em></td>
+</tr>
+<tr>
+<td>29</td>
+<td>Croire le contre-exemple contradictoire</td>
+<td> <em>« <strong>CECI NE CONTREDIT PAS le théorème</strong> parce que $\{\nabla g(x^*)\}=\{0\}$ <strong>n'est PAS linéairement indépendant</strong> »</em></td>
+<td></td>
+</tr>
+<tr>
+<td>30</td>
+<td>Croire l'indépendance linéaire seule possible</td>
+<td> <em>« <strong>UNE PARMI TOUTE UNE VARIÉTÉ</strong> de qualifications »</em></td>
+<td>Exercice A2.31</td>
+</tr>
+<tr>
+<td>31</td>
+<td>Croire les qualifications faibles gratuites</td>
+<td> <strong>Elles conservent l'EXISTENCE mais PAS l'UNICITÉ</strong></td>
+<td></td>
+</tr>
+<tr>
+<td>32</td>
+<td>Croire que $\mathbf{x}^*$ peut être sur la frontière de $D$</td>
+<td> <strong>Le théorème exige $\mathbf{x}^*$ INTÉRIEUR à $D$</strong></td>
+<td><em>(La contrainte, elle, peut être saturée)</em></td>
+</tr>
+<tr>
+<td>33</td>
+<td>Oublier que $B$ doit être fermé</td>
+<td> <strong>Le théorème de séparation A2.24 l'exige</strong></td>
+<td>Exercice A2.29</td>
+</tr>
+<tr>
+<td>34</td>
+<td>Rater le rôle de $\mathbf{0}\in B$</td>
+<td> <strong>C'est ce qui donne $\mathbf{p}\cdot\mathbf{a}^*&gt;0$</strong></td>
+<td>Pas 2 de la preuve</td>
+</tr>
+<tr>
+<td>35</td>
+<td>Oublier pourquoi $\lambda$ « assez grand »</td>
+<td> <strong>Si $\mathbf{p}\cdot\nabla g^j&gt;0$, on peut faire exploser $\mathbf{p}\cdot\mathbf{b}$ et violer (P.1)</strong></td>
+<td></td>
+</tr>
+<tr>
+<td>36</td>
+<td>Confondre $\mathbf{p}$ et $\mathbf{z}$</td>
+<td> <strong>$\mathbf{p}$ vient de la SÉPARATION · $\mathbf{z}$ de la SURJECTIVITÉ de $G$</strong></td>
+<td>Et l'on combine $\mathbf{p}+\delta\mathbf{z}$</td>
+</tr>
+<tr>
+<td>37</td>
+<td>Croire les multiplicateurs sans signification</td>
+<td> <strong>Ils mesurent LA VALEUR MARGINALE du relâchement de la contrainte</strong></td>
+<td>Exercice A2.33</td>
+</tr>
+<tr>
+<td>38</td>
+<td>Minimiser directement avec les conditions de max</td>
+<td> <strong>Maximiser $-f$ SOUS LES MÊMES contraintes</strong></td>
+<td></td>
+</tr>
+<tr>
+<td>39</td>
+<td>Croire l'ensemble réalisable toujours convexe</td>
+<td> <strong>Il l'est si $g$ est QUASICONVEXE</strong> <em>(thm A1.18)</em></td>
+<td>Exercice A2.32</td>
+</tr>
+<tr>
+<td>40</td>
+<td>Croire qu'un max local est global sans hypothèse</td>
+<td> <strong>Il faut $f$ QUASICONCAVE et l'ensemble réalisable CONVEXE</strong></td>
+<td>Exercice A2.32(a)</td>
+</tr>
+</tbody></table>
+<h2>Ultimate Review</h2>
+<p><strong>§A2.3.5 — LA NON-NÉGATIVITÉ.</strong></p>
+<p>$$\max_x\ f(x)\qquad\text{s.c.}\qquad x\geq0 \tag{A2.30}$$</p>
+<p><strong>LES TROIS CAS (figure A2.9)</strong> :</p>
+<table>
+<thead>
+<tr>
+<th>Le cas</th>
+<th>La configuration</th>
+<th>Les conditions</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>1 — SATURÉE</strong></td>
+<td><em>« le maximum global est en $x_1&lt;0$, <strong>qui VIOLE la contrainte</strong> »</em></td>
+<td>$x^*=0$,  $f'(x^*)&lt;0$</td>
+</tr>
+<tr>
+<td><strong>2 — saturée, SANS IMPORTANCE</strong></td>
+<td><em>« maximisée <strong>PILE au point $x^*=0$</strong> »</em></td>
+<td>$x^*=0$, $f'(x^*)=0$</td>
+</tr>
+<tr>
+<td><strong>3 — NON saturée</strong></td>
+<td> <em>« <strong>SOLUTION INTÉRIEURE</strong> »</em></td>
+<td>$x^*&gt;0$, $f'(x^*)=0$</td>
+</tr>
+</tbody></table>
+<p class="cal piege"> <strong>LE POINT COMMUN</strong> : <em>« <strong>DANS CHAQUE CAS, MULTIPLIEZ LES DEUX CONDITIONS et remarquez que LE PRODUIT SERA TOUJOURS ZÉRO !</strong> »</em></p>
+<p class="cal piege"> <strong>LE CAS GÊNANT à écarter</strong> : $\tilde{x}=0$ avec $f'(\tilde{x})&gt;0$ — <em>« <strong>le produit vaut ENCORE zéro MÊME SI $\tilde{x}$ est UN MINIMUM</strong> »</em>.</p>
+<p>$$\boxed{\;\textbf{(A2.31) — MAX} : \ f'(x^*)\leq0,\quad x^*f'(x^*)=0,\quad x^*\geq0\\\textbf{(A2.32) — MIN} : \ f'(x^*)\geq0,\quad x^*f'(x^*)=0,\quad x^*\geq0\;}$$</p>
+<p class="cal piege"> <strong>SEULE LA CONDITION 1 CHANGE DE SENS.</strong></p>
+<p><strong>LA RÈGLE DE POUCE</strong> <em>(exemple A2.10)</em> :  <em>« <strong>CONCENTREZ-VOUS SUR LE TERME PRODUIT. RÉSOLVEZ-LE D'ABORD, PUIS ASSUREZ-VOUS QUE LES AUTRES CONDITIONS SONT SATISFAITES.</strong> »</em></p>
+<p><strong>THÉORÈME A2.19</strong> :  <strong>les trois conditions tiennent POUR CHAQUE VARIABLE SÉPARÉMENT</strong>, avec <strong>les PARTIELLES à la place de la dérivée</strong>.</p>
+<p><strong>§A2.3.6 — KUHN-TUCKER.</strong></p>
+<p>$$\max\ f(x_1,x_2)\qquad\text{s.c.}\qquad g^1\leq0,\ g^2\leq0 \tag{A2.33}$$</p>
+<p class="cal piege"> <strong>UN PROBLÈME DE PROGRAMMATION NON LINÉAIRE</strong> — <em>« les problèmes LINÉAIRES en sont <strong>UN CAS PARTICULIER</strong> »</em>.</p>
+<p><strong>LA DÉRIVATION GÉOMÉTRIQUE</strong> :</p>
+<ol>
+<li>La pente du niveau de $f$ est  <em>« <strong>FAIBLEMENT PLUS RAIDE</strong> que celle de $g^1$ »</em> et <em>« <strong>FAIBLEMENT PLUS PLATE</strong> que celle de $g^2$ »</em> ⟹ <strong>(A2.34)</strong></li>
+<li> <strong>Un vecteur $(z_1,z_2)$ a pour pente $z_2/z_1$</strong> ⟹ <strong>(A2.34) encadre LA PENTE DE $\nabla f$ entre celles de $\nabla g^1$ et $\nabla g^2$</strong></li>
+<li> <em>(Note 5)</em> <strong>le GRADIENT est PERPENDICULAIRE à son ensemble de niveau</strong></li>
+<li>⟹  <strong>$\nabla f(\mathbf{x}^*)$ EST DANS LE CÔNE des COMBINAISONS LINÉAIRES NON NÉGATIVES de $\nabla g^1$ et $\nabla g^2$</strong></li>
+</ol>
+<p>$$\boxed{\;\textbf{« À L'OPTIMUM, LE GRADIENT DE $f$ S'EXPRIME COMME UNE COMBINAISON}\\\textbf{LINÉAIRE NON NÉGATIVE DES GRADIENTS DES CONTRAINTES SATURÉES. »}\;}$$</p>
+<p><strong>THÉORÈME A2.20 (KUHN-TUCKER)</strong> — sous  <strong>l'INDÉPENDANCE LINÉAIRE des gradients des contraintes SATURÉES</strong>, il existe <strong>un $\boldsymbol{\lambda}^*$ UNIQUE</strong> avec :</p>
+<p>$$\frac{\partial f(\mathbf{x}^*)}{\partial x_i}-\sum_{j=1}^{m}\lambda_j^*\frac{\partial g^j(\mathbf{x}^*)}{\partial x_i}=0 \qquad\qquad \lambda_j^*\geq0,\quad g^j(\mathbf{x}^*)\leq0,\quad \lambda_j^*g^j(\mathbf{x}^*)=0$$</p>
+<p><em>La preuve</em> : poser $B$ = <strong>le cône</strong>, supposer $\nabla f\notin B$,  <strong>SÉPARER par le théorème A2.24</strong> ⟹ <strong>(P.1)-(P.2)</strong> ;  <strong>l'indépendance linéaire rend $G$ SURJECTIVE</strong> ⟹ <strong>(P.3)</strong> ; <strong>combiner en $\mathbf{p}+\delta\mathbf{z}$</strong> ⟹ <strong>une direction RÉALISABLE qui AUGMENTE $f$</strong> ⟹ <strong>contradiction</strong>.</p>
+<p class="cal piege"> <strong>LA COMPLÉMENTARITÉ DES ÉCARTS</strong> : <em>« <strong>si une contrainte est LÂCHE, son multiplicateur est NUL ; si un multiplicateur est POSITIF, sa contrainte est SATURÉE</strong> »</em> — et  <strong>$\lambda_j^*$ mesure « L'AUGMENTATION MARGINALE de la fonction objectif quand la $j$-ième contrainte est RELÂCHÉE »</strong>.</p>
+<p class="cal piege"> <strong>KUHN-TUCKER N'EST QUE NÉCESSAIRE</strong> : <em>« des conditions SUFFISANTES sont disponibles quand la fonction objectif est <strong>CONCAVE OU QUASICONCAVE</strong> »</em> <em>(Luenberger 1973 · Arrow et Enthoven 1961)</em>.</p>
+<p><strong>LA QUALIFICATION DES CONTRAINTES</strong> — le contre-exemple :</p>
+<p>$$\max\ x \quad\text{s.c.}\quad x^3\leq0 \qquad\Longrightarrow\qquad x^*=0,\ \ \nabla g(x^*)=0,\ \ \nabla f(x^*)=1$$</p>
+<p class="cal piege"> <strong>La conclusion du théorème ÉCHOUE</strong> — mais <strong>sans contradiction</strong>, car $\{\mathbf{0}\}$ <strong>n'est pas linéairement indépendant</strong>.  <em>« <strong>On ne peut pas simplement supprimer la qualification des contraintes.</strong> »</em></p>
+<div class="rec"><h2>Active Recall</h2><details class="cor">
+<summary><strong>1. Pourquoi faut-il modifier l'analyse lagrangienne ?</strong></summary><div class="in">
+
+<blockquote>
+<p><em>« Dans de nombreuses applications économiques, nous devons optimiser <strong>sous des contraintes QUI IMPLIQUENT DES INÉGALITÉS, AU LIEU DE — OU EN PLUS DE — simples égalités. Par exemple, UNE RESTRICTION DE BON SENS est d'exiger que LES VARIABLES ÉCONOMIQUES NE SOIENT DISPONIBLES QU'EN QUANTITÉS NON NÉGATIVES.</strong> »</em></p>
+</blockquote>
+<p class="cal piege"> <em>« <strong>L'analyse lagrangienne DOIT ÊTRE MODIFIÉE.</strong> »</em> Le livre commence par  <em>« <strong>LE PROBLÈME LE PLUS SIMPLE POSSIBLE</strong> »</em> : $\max_x f(x)$ s.c. $x\geq0$ <strong>(A2.30)</strong>.</p>
+</div></details><details class="cor">
+<summary><strong>2.  Décrire les trois cas de la figure A2.9.</strong></summary><div class="in">
+
+<table>
+<thead>
+<tr>
+<th>Le cas</th>
+<th>Ce que dit le livre</th>
+<th>Les conditions</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>1</strong></td>
+<td><em>« le max global est en $x_1$, <strong>MAIS $x_1&lt;0$ N'EST PAS RÉALISABLE</strong> […] atteint <strong>SUR LA FRONTIÈRE</strong>. <strong>LA CONTRAINTE EST SATURÉE.</strong> »</em></td>
+<td>$x^*=0$,  <strong>$f'(x^*)&lt;0$</strong></td>
+</tr>
+<tr>
+<td><strong>2</strong></td>
+<td>*« <strong>ATTEIGNABLE, MAIS TOUT JUSTE</strong> […] maximisée <strong>PILE au point $x^*=0$</strong>. Saturée, <strong>mais cela n'a pas vraiment d'importance.</strong> »*</td>
+<td>$x^*=0$, $f'(x^*)=0$</td>
+</tr>
+<tr>
+<td><strong>3</strong></td>
+<td><em>« <strong>le CAS 3 SEUL correspond au genre rencontré auparavant</strong> […] <strong>SOLUTION INTÉRIEURE</strong> parce que la solution est <strong>STRICTEMENT à l'intérieur</strong> »</em></td>
+<td>$x^*&gt;0$, $f'(x^*)=0$</td>
+</tr>
+</tbody></table>
+</div></details><details class="cor">
+<summary><strong>3.  Quel est le point commun aux trois cas ?</strong></summary><div class="in">
+
+<blockquote>
+<p><em>« <strong>Y a-t-il quelque chose de COMMUN AUX TROIS ? REGARDEZ ATTENTIVEMENT. DANS CHAQUE CAS, MULTIPLIEZ LES DEUX CONDITIONS ENSEMBLE et remarquez que LE PRODUIT SERA TOUJOURS ZÉRO !</strong> »</em></p>
+</blockquote>
+<p>$$x^*\big[f'(x^*)\big]=0$$</p>
+<p class="cal piege"> <strong>Mais</strong> <em>« <strong>CELA SEUL NE SUFFIT PAS TOUT À FAIT</strong> »</em>.</p>
+</div></details><details class="cor">
+<summary><strong>4.  Quel est le cas « GÊNANT », et comment l'écarter ?</strong></summary><div class="in">
+
+<blockquote>
+<p>*« En $\tilde{x}=0$ avec <strong>$f'(\tilde{x})&gt;0$</strong>, en augmentant $x$ <strong>en s'éloignant de la frontière et en entrant dans la région réalisable, LA VALEUR DE LA FONCTION AUGMENTERA. NÉANMOINS, LE PRODUIT $\tilde{x}f'(\tilde{x})=0$ MÊME SI $\tilde{x}$ EST UN MINIMUM, PAS UN MAXIMUM.</strong> »*</p>
+</blockquote>
+<blockquote>
+<p class="cal piege"> <em>« Nous pouvons ÉCARTER cette possibilité <strong>EN EXIGEANT SIMPLEMENT QUE LA FONCTION SOIT NON CROISSANTE</strong> quand nous augmentons $x$ »</em> ⟹ <strong>la condition $f'(x^*)\leq0$</strong>.</p>
+</blockquote>
+</div></details><details class="cor">
+<summary><strong>5. Énoncer (A2.31) et (A2.32).</strong></summary><div class="in">
+
+<table>
+<thead>
+<tr>
+<th></th>
+<th>MAXIMUM (A2.31)</th>
+<th>MINIMUM (A2.32)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>1</strong></td>
+<td> $f'(x^*)\leq0$</td>
+<td> $f'(x^*)\geq0$</td>
+</tr>
+<tr>
+<td><strong>2</strong></td>
+<td>$x^*\big[f'(x^*)\big]=0$</td>
+<td>$x^*\big[f'(x^*)\big]=0$</td>
+</tr>
+<tr>
+<td><strong>3</strong></td>
+<td>$x^*\geq0$</td>
+<td>$x^*\geq0$</td>
+</tr>
+</tbody></table>
+<p class="cal piege"> <strong>Pour le minimum</strong>, <em>« le cas gênant surgit <strong>si la fonction est DÉCROISSANTE à la frontière</strong>. Nous l'écartons <strong>en exigeant que la dérivée soit NON NÉGATIVE</strong> »</em>.</p>
+</div></details><details class="cor">
+<summary><strong>6. Refaire l'exemple A2.10 et énoncer la règle de pouce.</strong></summary><div class="in">
+
+<p>$\max\ 6-x^2-4x$ s.c. $x\geq0$ ⟹ $f'(x)=-2x-4$.</p>
+<blockquote>
+<p class="cal piege"> <em>« <strong>Une RÈGLE DE POUCE qui marche habituellement est de SE CONCENTRER SUR LE TERME PRODUIT. RÉSOLVEZ-LE D'ABORD, PUIS assurez-vous que les autres conditions sont satisfaites.</strong> »</em></p>
+</blockquote>
+<p>$$2x^*\big[x^*+2\big]=0 \ \Longrightarrow\ x=0 \text{ ou } x=-2$$</p>
+<p class="cal piege"> <strong>La condition 3 écarte $x=-2$</strong> ; <strong>la condition 1 donne $-4\leq0$ </strong> ⟹ $x^*=0$.</p>
+</div></details><details class="cor">
+<summary><strong>7. Énoncer le théorème A2.19.</strong></summary><div class="in">
+
+<blockquote>
+<p><em>« De manière <strong>TOUT À FAIT SENSÉE</strong>, (A2.31) et (A2.32) se généralisent […] <strong>LES TROIS CONDITIONS DOIVENT TENIR POUR CHAQUE VARIABLE SÉPARÉMENT, avec LES DÉRIVÉES PARTIELLES substituées à la dérivée unique.</strong> »</em></p>
+</blockquote>
+<p><strong>MAX</strong> : $\ \dfrac{\partial f(\mathbf{x}^*)}{\partial x_i}\leq0$, $\ x_i^*\dfrac{\partial f(\mathbf{x}^*)}{\partial x_i}=0$, $\ x_i^*\geq0$
+<strong>MIN</strong> :  $\ \dfrac{\partial f(\mathbf{x}^*)}{\partial x_i}\geq0$ <em>(les deux autres inchangées)</em></p>
+</div></details><details class="cor">
+<summary><strong>8. Distinguer programmation linéaire et non linéaire.</strong></summary><div class="in">
+
+<blockquote>
+<p><em>« Un tel problème est communément appelé <strong>UN PROBLÈME DE PROGRAMMATION NON LINÉAIRE. Dans les problèmes LINÉAIRES, UNE FONCTION LINÉAIRE est optimisée SOUS DES CONTRAINTES D'INÉGALITÉ LINÉAIRES. Dans (A2.33), IL N'Y A PAS DE TELLES LIMITATIONS, de sorte que LES PROBLÈMES LINÉAIRES SONT UN CAS PARTICULIER DES NON LINÉAIRES.</strong> »</em></p>
+</blockquote>
+<p class="cal piege"> <em>« <strong>Les méthodes pour le cas général DOIVENT BEAUCOUP À L'ÉTUDE PRÉCOCE DU CAS LINÉAIRE.</strong> »</em></p>
+</div></details><details class="cor">
+<summary><strong>9.  Construire l'encadrement des pentes (A2.34).</strong></summary><div class="in">
+
+<p><strong>En $\mathbf{x}^*$ où les deux contraintes sont saturées</strong>, la pente du niveau de $f$ doit être :</p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>La condition et sa raison</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>1</strong></td>
+<td> <em>« <strong>FAIBLEMENT PLUS RAIDE</strong> que celle de $g^1$. <strong>AUTREMENT, IL Y AURAIT DES POINTS RÉALISABLES AU NORD-OUEST QUI ATTEIGNENT UNE VALEUR PLUS ÉLEVÉE.</strong> »</em></td>
+</tr>
+<tr>
+<td><strong>2</strong></td>
+<td><em>« <strong>FAIBLEMENT PLUS PLATE</strong> que celle de $g^2$ »</em></td>
+</tr>
+</tbody></table>
+<p><strong>Après multiplication par $-1$ et passage aux inverses</strong> :</p>
+<p>$$\frac{\partial g^1/\partial x_2}{\partial g^1/\partial x_1}\leq\frac{\partial f/\partial x_2}{\partial f/\partial x_1}\leq\frac{\partial g^2/\partial x_2}{\partial g^2/\partial x_1} \tag{A2.34}$$</p>
+</div></details><details class="cor">
+<summary><strong>10.  Passer des pentes aux GRADIENTS.</strong></summary><div class="in">
+
+<blockquote>
+<p><em>« <strong>UN VECTEUR $(z_1,z_2)$, ÉTANT LE SEGMENT DE L'ORIGINE AU POINT, A POUR PENTE $z_2/z_1$.</strong> »</em></p>
+</blockquote>
+<p>⟹ <strong>les trois termes de (A2.34) sont les PENTES des trois gradients</strong> ⟹ <em>« <strong>la pente de $\nabla f(\mathbf{x}^*)$ SE TROUVE ENTRE celles de $\nabla g^1(\mathbf{x}^*)$ et $\nabla g^2(\mathbf{x}^*)$</strong> »</em>.</p>
+<blockquote>
+<p><em>(Note 5.)</em>  <em>« <strong>les pentes des vecteurs gradients sont LES INVERSES OPPOSÉS des pentes de leurs ensembles de niveau. PAR CONSÉQUENT, ILS SONT PERPENDICULAIRES À LEURS ENSEMBLES DE NIVEAU.</strong> »</em></p>
+</blockquote>
+</div></details><details class="cor">
+<summary><strong>11.  Décrire le CÔNE et sa conséquence.</strong></summary><div class="in">
+
+<blockquote>
+<p><em>« <strong>LE CÔNE HACHURÉ AU NORD-EST de la fig. A2.12 est L'ENSEMBLE DE TOUS LES VECTEURS qui peuvent s'écrire comme UNE COMBINAISON LINÉAIRE NON NÉGATIVE de $\nabla g^1(\mathbf{x}^*)$ et $\nabla g^2(\mathbf{x}^*)$. ÉVIDEMMENT, $\nabla f(\mathbf{x}^*)$ SE TROUVE DANS CET ENSEMBLE.</strong> »</em></p>
+</blockquote>
+<p>⟹ <strong>il existe $\lambda_1^*,\lambda_2^*\geq0$</strong> avec $\ \nabla f(\mathbf{x}^*)-\sum_j\lambda_j^*\nabla g^j(\mathbf{x}^*)=\mathbf{0}$.</p>
+<p class="cal piege"> *(Les gradients sont dessinés <strong>« COMME SI $\mathbf{x}^*$ ÉTAIT L'ORIGINE »</strong>.)*</p>
+</div></details><details class="cor">
+<summary><strong>12. Énoncer le théorème A2.20.</strong></summary><div class="in">
+
+<p>$\mathbf{x}^*$ <strong>intérieur à $D$</strong> maximise $f$ sous $g^j\leq0$ ; $f$ et les $g^j$ <strong>continûment différentiables</strong> au voisinage.  <strong>Si les $\nabla g^j(\mathbf{x}^*)$ des contraintes SATURÉES sont LINÉAIREMENT INDÉPENDANTS</strong>, il existe <strong>un $\boldsymbol{\lambda}^*$ UNIQUE</strong> avec</p>
+<p>$$\frac{\partial f}{\partial x_i}-\sum_{j=1}^{m}\lambda_j^*\frac{\partial g^j}{\partial x_i}=0 \qquad \lambda_j^*\geq0 \qquad g^j(\mathbf{x}^*)\leq0 \qquad \lambda_j^*g^j(\mathbf{x}^*)=0$$</p>
+<p class="cal piege"> <strong>Trois nouveautés par rapport à Lagrange</strong> :  <strong>le SIGNE des $\lambda_j$</strong>,  <strong>les contraintes en INÉGALITÉ</strong>,  <strong>la COMPLÉMENTARITÉ</strong>.</p>
+</div></details><details class="cor">
+<summary><strong>13.  Résumer la preuve du théorème A2.20.</strong></summary><div class="in">
+
+<table>
+<thead>
+<tr>
+<th>Étape</th>
+<th>L'argument</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>1</strong></td>
+<td><strong>Supposer les $K$ premières contraintes SATURÉES</strong>, poser $\lambda_j^*=0$ pour les autres ⟹  <strong>la complémentarité est automatique</strong></td>
+</tr>
+<tr>
+<td><strong>2</strong></td>
+<td><strong>Définir le cône</strong> $B=\{\sum_{j\leq K}\lambda_j\nabla g^j(\mathbf{x}^*),\ \lambda_j\geq0\}$ —  <strong>CONVEXE et FERMÉ</strong></td>
+</tr>
+<tr>
+<td><strong>3</strong></td>
+<td> <strong>Il SUFFIT de montrer $\nabla f(\mathbf{x}^*)\in B$</strong> <em>(l'unicité venant de l'indépendance linéaire)</em></td>
+</tr>
+<tr>
+<td><strong>4</strong></td>
+<td> <strong>Par l'absurde</strong> : si $\nabla f\notin B$,  <strong>le THÉORÈME A2.24 SÉPARE</strong> ⟹ $\mathbf{p}\cdot\mathbf{a}^*&gt;\mathbf{p}\cdot\mathbf{b}$ <strong>(P.1)</strong>, d'où $\nabla f\cdot\mathbf{p}&gt;0$ et $\nabla g^j\cdot\mathbf{p}\leq0$ <strong>(P.2)</strong></td>
+</tr>
+<tr>
+<td><strong>5</strong></td>
+<td> <strong>L'indépendance linéaire rend $G$ SURJECTIVE</strong> ⟹ il existe $\mathbf{z}$ avec $\nabla g^j\cdot\mathbf{z}&lt;0$ <strong>(P.3)</strong></td>
+</tr>
+<tr>
+<td><strong>6</strong></td>
+<td><strong>Combiner</strong> : $\ \nabla f\cdot(\mathbf{p}+\delta\mathbf{z})&gt;0$ <strong>(P.4)</strong>, mais $\mathbf{x}^*+\varepsilon(\mathbf{p}+\delta\mathbf{z})$ <strong>est RÉALISABLE</strong> ⟹  <strong>CONTRADICTION</strong></td>
+</tr>
+</tbody></table>
+<p class="cal piege"> <strong>En une phrase</strong> : <strong>si $\nabla f$ sortait du cône, on construirait une direction réalisable qui augmente $f$.</strong></p>
+</div></details><details class="cor">
+<summary><strong>14.  Énoncer la complémentarité des écarts.</strong></summary><div class="in">
+
+<blockquote>
+<p><em>« La conclusion que $\lambda_j^*g^j(\mathbf{x}^*)=0$ est appelée <strong>LA COMPLÉMENTARITÉ DES ÉCARTS</strong>. »</em></p>
+</blockquote>
+<blockquote>
+<p class="cal piege"> <em>« Elle dit que <strong>SI UNE CONTRAINTE EST LÂCHE, SON MULTIPLICATEUR DOIT ÊTRE NUL, tandis que SI UN MULTIPLICATEUR EST POSITIF, SA CONTRAINTE DOIT ÊTRE SATURÉE.</strong> »</em></p>
+</blockquote>
+<p class="cal piege"> <strong>Et le sens économique</strong> : <em>« <strong>$\lambda_j^*$ peut s'interpréter comme L'AUGMENTATION MARGINALE DE LA FONCTION OBJECTIF QUAND LA $j$-IÈME CONTRAINTE EST RELÂCHÉE</strong> »</em> <em>(exercice A2.33)</em>.</p>
+</div></details><details class="cor">
+<summary><strong>15.  Que Kuhn-Tucker ne donne-t-il PAS ?</strong></summary><div class="in">
+
+<blockquote>
+<p><em>« <strong>Les conditions de Kuhn-Tucker ne sont QUE DES CONDITIONS NÉCESSAIRES DU PREMIER ORDRE pour les optima LOCAUX. DES CONDITIONS SUFFISANTES SONT DISPONIBLES QUAND LA FONCTION OBJECTIF EST CONCAVE OU QUASICONCAVE</strong> <em>(Luenberger 1973 ; Arrow et Enthoven 1961)</em>. <strong>Pour nos besoins, les conditions nécessaires SUFFISENT.</strong> »</em></p>
+</blockquote>
+</div></details><details class="cor">
+<summary><strong>16.  Comment le théorème A2.20 redonne-t-il A2.19 ?</strong></summary><div class="in">
+
+<blockquote>
+<p><em>« Le théorème A2.20 <strong>s'applique encore</strong> puisque <strong>chaque contrainte de non-négativité peut s'écrire comme une fonction $g^j$. EN EFFET, si les contraintes de non-négativité sont LES SEULES, alors LE THÉORÈME A2.20 SE RÉDUIT AU THÉORÈME A2.19.</strong> »</em></p>
+</blockquote>
+<p><strong>Le calcul</strong> <em>(exercice A2.30)</em> : avec $g^i(\mathbf{x})=-x_i$, la stationnarité donne $\partial f/\partial x_i=-\lambda_i^*\leq0$, la complémentarité $\lambda_i^*x_i^*=0$ donne $x_i^*\partial f/\partial x_i=0$, et la réalisabilité $x_i^*\geq0$. </p>
+</div></details><details class="cor">
+<summary><strong>17.  Le contre-exemple de la qualification des contraintes.</strong></summary><div class="in">
+
+<p>$$\max\ f(x)=x \qquad\text{s.c.}\qquad g(x)=x^3\leq0,\qquad D=(-\infty,\infty)$$</p>
+<p>⟹  <strong>$x^*=0$, $\nabla g(x^*)=0$, $\nabla f(x^*)=1$</strong> ⟹ <em>« <strong>LA CONCLUSION DU THÉORÈME A2.20 ÉCHOUE</strong> »</em> <em>(on ne peut pas avoir $1-\lambda\cdot0=0$)</em>.</p>
+<blockquote>
+<p><em>« <strong>Ceci NE CONTREDIT PAS le théorème parce que l'ensemble singleton $\{\nabla g(x^*)\}$ N'EST PAS LINÉAIREMENT INDÉPENDANT. Ainsi, ON NE PEUT PAS SIMPLEMENT SUPPRIMER LA QUALIFICATION DES CONTRAINTES.</strong> »</em></p>
+</blockquote>
+<p class="cal piege"> <strong>L'indépendance linéaire est <em>« UNE PARMI TOUTE UNE VARIÉTÉ »</em></strong> — les autres <em>(exercice A2.31)</em> <strong>préservent l'EXISTENCE mais PAS L'UNICITÉ</strong> des multiplicateurs.</p>
+</div></details><details class="cor">
+<summary><strong>18.  Traiter la programmation quasiconcave (exercice A2.32).</strong></summary><div class="in">
+
+<p>$\max f$ s.c. $g\leq0$, $\mathbf{x}\geq\mathbf{0}$, avec <strong>$f$ QUASICONCAVE et $g$ QUASICONVEXE</strong>.</p>
+<p class="cal piege"> <strong>L'observation clé</strong> : <strong>$g$ quasiconvexe</strong> ⟹ <em>(théorème A1.18)</em> <strong>$\{g\leq0\}$ est CONVEXE</strong> ⟹ <em>(théorème A1.1)</em>  <strong>L'ENSEMBLE RÉALISABLE EST CONVEXE</strong>.</p>
+<p><strong>(b) L'unicité</strong> : deux maxima globaux distincts $\mathbf{x}^*,\mathbf{x}'$ de même valeur $M$ donneraient, <strong>par STRICTE quasiconcavité</strong>, $f(\mathbf{x}^t)&gt;\min=M$ ⟹ <strong>contradiction</strong> </p>
+<p><strong>(a) Local ⟹ global</strong> : le même argument donne $f(\mathbf{x}^t)\geq f(\mathbf{x}^*)$ —  <strong>strictement concluant si le maximum local est pris AU SENS STRICT, ou si $f$ est STRICTEMENT quasiconcave</strong> <em>(enrichissement hors cours)</em>.</p>
+</div></details></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h2>Flashcards</h2>
+<table>
+<thead>
+<tr>
+<th>Question</th>
+<th>Réponse</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>La restriction « de bon sens » ?</td>
+<td> <strong>Les quantités doivent être NON NÉGATIVES</strong></td>
+</tr>
+<tr>
+<td>Le problème (A2.30) ?</td>
+<td>$\max_x f(x)$ s.c. $x\geq0$</td>
+</tr>
+<tr>
+<td>Cas 1 de la fig. A2.9 ?</td>
+<td> <strong>$x^*=0$, $f'(x^*)&lt;0$ — contrainte SATURÉE</strong></td>
+</tr>
+<tr>
+<td>Cas 2 ?</td>
+<td>$x^*=0$, $f'(x^*)=0$ —  <strong>saturée MAIS SANS IMPORTANCE</strong></td>
+</tr>
+<tr>
+<td>Cas 3 ?</td>
+<td> <strong>$x^*&gt;0$, $f'(x^*)=0$ — SOLUTION INTÉRIEURE</strong></td>
+</tr>
+<tr>
+<td> Le point commun aux trois ?</td>
+<td> <strong>Le PRODUIT $x^*f'(x^*)$ est NUL</strong></td>
+</tr>
+<tr>
+<td>Suffit-il ?</td>
+<td> <strong>NON — « pas tout à fait »</strong></td>
+</tr>
+<tr>
+<td>Le cas « gênant » ?</td>
+<td> <strong>$\tilde{x}=0$ avec $f'&gt;0$ — c'est un MINIMUM</strong></td>
+</tr>
+<tr>
+<td>Comment l'écarter ?</td>
+<td> <strong>En exigeant $f'\leq0$</strong></td>
+</tr>
+<tr>
+<td>Les trois conditions (A2.31) ?</td>
+<td>$f'\leq0$ · $x^*f'=0$ · $x^*\geq0$</td>
+</tr>
+<tr>
+<td>Pour un MINIMUM (A2.32) ?</td>
+<td> <strong>$f'\geq0$</strong> <em>(les deux autres inchangées)</em></td>
+</tr>
+<tr>
+<td> La règle de pouce ?</td>
+<td> <strong>RÉSOUDRE LE TERME PRODUIT D'ABORD</strong></td>
+</tr>
+<tr>
+<td>La solution de l'exemple A2.10 ?</td>
+<td>$x^*=0$</td>
+</tr>
+<tr>
+<td>Théorème A2.19 ?</td>
+<td> <strong>Les trois conditions POUR CHAQUE VARIABLE</strong></td>
+</tr>
+<tr>
+<td>Ces conditions sont… ?</td>
+<td> <strong>NÉCESSAIRES</strong></td>
+</tr>
+<tr>
+<td>Le problème (A2.33) ?</td>
+<td> <strong>PROGRAMMATION NON LINÉAIRE</strong></td>
+</tr>
+<tr>
+<td>La programmation linéaire est… ?</td>
+<td> <strong>UN CAS PARTICULIER</strong></td>
+</tr>
+<tr>
+<td>Y a-t-il tangence en $\mathbf{x}^*$ ?</td>
+<td> <strong>NON — « tangent à AUCUNE des lignes »</strong></td>
+</tr>
+<tr>
+<td>La pente du niveau de $f$ vs $g^1$ ?</td>
+<td> <strong>FAIBLEMENT PLUS RAIDE</strong></td>
+</tr>
+<tr>
+<td>vs $g^2$ ?</td>
+<td> <strong>FAIBLEMENT PLUS PLATE</strong></td>
+</tr>
+<tr>
+<td>Pourquoi ?</td>
+<td> <strong>Sinon il y aurait des points réalisables MEILLEURS au NORD-OUEST</strong></td>
+</tr>
+<tr>
+<td>La pente d'un vecteur $(z_1,z_2)$ ?</td>
+<td>$z_2/z_1$</td>
+</tr>
+<tr>
+<td>Le gradient et son niveau ?</td>
+<td> <strong>PERPENDICULAIRES</strong></td>
+</tr>
+<tr>
+<td> Ce qu'est le CÔNE ?</td>
+<td> <strong>Les COMBINAISONS LINÉAIRES NON NÉGATIVES des gradients</strong></td>
+</tr>
+<tr>
+<td>Où se trouve $\nabla f(\mathbf{x}^*)$ ?</td>
+<td> <strong>DANS LE CÔNE</strong></td>
+</tr>
+<tr>
+<td>Théorème A2.20, la stationnarité ?</td>
+<td>$\partial f/\partial x_i-\sum_j\lambda_j^*\partial g^j/\partial x_i=0$</td>
+</tr>
+<tr>
+<td>Le signe des $\lambda_j^*$ ?</td>
+<td> <strong>$\geq0$</strong></td>
+</tr>
+<tr>
+<td> La condition caractéristique ?</td>
+<td> <strong>$\lambda_j^*g^j(\mathbf{x}^*)=0$</strong></td>
+</tr>
+<tr>
+<td>Son nom ?</td>
+<td> <strong>LA COMPLÉMENTARITÉ DES ÉCARTS</strong></td>
+</tr>
+<tr>
+<td>Ce qu'elle dit ?</td>
+<td> <strong>Contrainte LÂCHE ⟹ multiplicateur NUL · multiplicateur POSITIF ⟹ contrainte SATURÉE</strong></td>
+</tr>
+<tr>
+<td>Le sens économique de $\lambda_j^*$ ?</td>
+<td> <strong>L'augmentation MARGINALE de l'objectif quand la contrainte est RELÂCHÉE</strong></td>
+</tr>
+<tr>
+<td>L'hypothèse sur $\mathbf{x}^*$ ?</td>
+<td> <strong>INTÉRIEUR à $D$</strong></td>
+</tr>
+<tr>
+<td>L'hypothèse sur les gradients ?</td>
+<td> <strong>LINÉAIREMENT INDÉPENDANTS, pour les contraintes SATURÉES</strong></td>
+</tr>
+<tr>
+<td>Combien de $\boldsymbol{\lambda}^*$ ?</td>
+<td> <strong>UN SEUL — il est UNIQUE</strong></td>
+</tr>
+<tr>
+<td>L'outil central de la preuve ?</td>
+<td> <strong>LE THÉORÈME DE SÉPARATION A2.24</strong></td>
+</tr>
+<tr>
+<td>Pourquoi $\mathbf{p}\cdot\mathbf{a}^*&gt;0$ ?</td>
+<td> <strong>Parce que $\mathbf{0}\in B$</strong></td>
+</tr>
+<tr>
+<td>Le rôle de $\mathbf{z}$ ?</td>
+<td> <strong>La SURJECTIVITÉ de $G$ donne $\nabla g^j\cdot\mathbf{z}&lt;0$</strong></td>
+</tr>
+<tr>
+<td>L'idée de la preuve en une phrase ?</td>
+<td> <strong>Hors du cône, on construit une direction RÉALISABLE qui AUGMENTE $f$</strong></td>
+</tr>
+<tr>
+<td>Kuhn-Tucker est-il suffisant ?</td>
+<td> <strong>NON — seulement NÉCESSAIRE</strong></td>
+</tr>
+<tr>
+<td>Quand a-t-on des conditions suffisantes ?</td>
+<td> <strong>Quand $f$ est CONCAVE ou QUASICONCAVE</strong></td>
+</tr>
+<tr>
+<td>Les références citées ?</td>
+<td><strong>Luenberger (1973) · Arrow et Enthoven (1961)</strong></td>
+</tr>
+<tr>
+<td>Les contraintes $x_i\geq0$ ?</td>
+<td> <strong>S'écrivent $g^i=-x_i\leq0$</strong></td>
+</tr>
+<tr>
+<td>A2.20 avec elles seules ?</td>
+<td> <strong>SE RÉDUIT à A2.19</strong></td>
+</tr>
+<tr>
+<td> Le contre-exemple de la qualification ?</td>
+<td> <strong>$\max x$ s.c. $x^3\leq0$</strong></td>
+</tr>
+<tr>
+<td>Pourquoi échoue-t-il ?</td>
+<td> <strong>$\nabla g(0)=0$ n'est PAS linéairement indépendant</strong></td>
+</tr>
+<tr>
+<td>Peut-on supprimer la qualification ?</td>
+<td> <strong>NON</strong></td>
+</tr>
+<tr>
+<td>D'autres qualifications existent-elles ?</td>
+<td> <strong>OUI — mais l'UNICITÉ se perd</strong></td>
+</tr>
+<tr>
+<td>Comment minimiser ?</td>
+<td> <strong>Maximiser $-f$ sous LES MÊMES contraintes</strong></td>
+</tr>
+<tr>
+<td>L'ensemble réalisable est convexe si… ?</td>
+<td> <strong>$g$ est QUASICONVEXE</strong> <em>(thm A1.18)</em></td>
+</tr>
+<tr>
+<td>Programmation quasiconcave, (b) ?</td>
+<td> <strong>$f$ strictement quasiconcave ⟹ maximum global UNIQUE</strong></td>
+</tr>
+<tr>
+<td>Le coût de la contrainte dans A2.26 ?</td>
+<td> <strong>$10-6=4$</strong></td>
+</tr>
+</tbody></table>
+</main>
+
+
+
+
+</body></html>

@@ -1,0 +1,2011 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fiche 103 — HJM, LIBOR Market Model et titres hypothécaires d'agence</title>
+<script>
+window.MathJax={tex:{inlineMath:[["$","$"]],displayMath:[["$$","$$"]],processEscapes:true},
+ options:{skipHtmlTags:["script","noscript","style","textarea","pre","code"]},
+ svg:{fontCache:"global"},
+ startup:{pageReady:()=>MathJax.startup.defaultPageReady().then(()=>{document.body.classList.add("ready")})}};
+setTimeout(function(){document.body.classList.add("ready")},2500);
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+/* ============================================================
+   MathiasLearn — feuille de style des fiches
+   Reprise intégrale des tokens de 00_PARCOURS/*.html
+   + blocs pédagogiques (callouts, méthode, essentiels, recall)
+   ============================================================ */
+:root{--bg:#faf9f7;--card:#fff;--ink:#1a1a1a;--muted:#6b6b6b;--line:#e5e2dd;--accent:#8b5e34;
+ --hl:#fdf8ef;--ok:#2d7d4f;--okbg:#f0f7f3;--warn:#b3402f;--warnbg:#fdf3f1;--blue:#2f5d8b;--bluebg:#f1f5fa}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+ font:17px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;padding:0 16px 100px}
+.nav{position:sticky;top:0;background:rgba(250,249,247,.96);backdrop-filter:blur(8px);
+ border-bottom:1px solid var(--line);margin:0 -16px 30px;padding:11px 16px;z-index:50;
+ display:flex;gap:6px;flex-wrap:wrap;font-size:13px}
+.nav a{color:var(--muted);text-decoration:none;padding:4px 9px;border-radius:5px;white-space:nowrap}
+.nav a:hover{background:var(--line);color:var(--ink)}
+.nav a.on{background:var(--accent);color:#fff}
+main{max-width:780px;margin:0 auto}
+h1{font-size:31px;letter-spacing:-.02em;margin:.4em 0 .5em;line-height:1.25}
+h2{font-size:23px;margin:2.2em 0 .7em;padding-bottom:.3em;border-bottom:1px solid var(--line)}
+h3{font-size:19px;margin:1.9em 0 .5em;color:var(--accent)}
+h4{font-size:17px;margin:1.5em 0 .4em}
+p{margin:.8em 0} a{color:var(--accent)} hr{border:0;border-top:1px solid var(--line);margin:2.6em 0}
+table{border-collapse:collapse;width:100%;margin:1.3em 0;font-size:15.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+th{background:#f3f0eb;font-weight:600}
+tr:nth-child(even) td{background:#fcfbfa}
+code{font-family:"SF Mono",Menlo,Consolas,monospace;font-size:.88em;background:#f2efea;padding:2px 6px;border-radius:4px;overflow-wrap:break-word}
+pre{background:#f2efea;padding:14px 16px;border-radius:8px;overflow-x:auto}
+pre code{background:none;padding:0;white-space:pre}
+blockquote{border-left:3px solid var(--accent);background:var(--hl);margin:1.4em 0;padding:14px 20px;border-radius:0 8px 8px 0}
+blockquote p:first-child{margin-top:0} blockquote p:last-child{margin-bottom:0}
+ul,ol{padding-left:1.5em} li{margin:.35em 0} em{color:#4a4a4a}
+mjx-container[display="true"]{margin:1.1em 0!important;overflow-x:auto;overflow-y:hidden;padding:2px 0}
+mjx-container svg{max-width:100%}
+body:not(.ready) main{opacity:0} main{opacity:1;transition:opacity .25s}
+
+/* --- bandeau de tête de fiche --- */
+.cours{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--accent);
+ border-radius:0 10px 10px 0;padding:18px 22px;margin:0 0 34px}
+.cours h4{margin:0 0 4px;font-size:14px;text-transform:uppercase;letter-spacing:.07em;color:var(--accent)}
+.cours .cs{color:var(--muted);font-size:14.5px;margin:0 0 14px}
+
+/* --- exercices / corrigés --- */
+.ex{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:6px 24px 20px;margin:18px 0}
+.ex>h3:first-child{margin-top:14px}
+details.cor{margin-top:18px;border:1px solid var(--line);border-radius:8px;background:#fcfbfa;overflow:hidden}
+details.cor>summary{cursor:pointer;padding:12px 16px;font-weight:600;font-size:15px;color:var(--accent);
+ list-style:none;display:flex;align-items:center;gap:9px;user-select:none;transition:.15s;min-height:44px}
+details.cor>summary::-webkit-details-marker{display:none}
+details.cor>summary:hover{background:var(--hl)}
+details.cor>summary::before{content:"\25B6";font-size:10px;transition:transform .18s;display:inline-block}
+details.cor[open]>summary::before{transform:rotate(90deg)}
+details.cor[open]>summary{background:var(--okbg);color:var(--ok);border-bottom:1px solid var(--line)}
+.cor .in{padding:4px 20px 16px}
+.cor .in>*:first-child{margin-top:.9em}
+
+/* --- blocs pédagogiques (callouts) ---
+   Générés depuis une citation Markdown dont le premier **gras** commence
+   par un mot-clé : DÉFINITION, THÉORÈME, MÉTHODE, PIÈGE, INTUITION… */
+.cal{border:1px solid var(--line);border-left:4px solid var(--accent);background:var(--card);
+ border-radius:0 10px 10px 0;padding:15px 20px;margin:1.5em 0}
+.cal>p:first-child{margin-top:0}.cal>p:last-child,.cal>ul:last-child,.cal>ol:last-child{margin-bottom:0}
+.cal .lab{display:block;font-size:12.5px;text-transform:uppercase;letter-spacing:.08em;
+ font-weight:700;color:var(--accent);margin-bottom:6px}
+.cal.formel{background:var(--hl)}
+.cal.piege{border-left-color:var(--warn);background:var(--warnbg)}
+.cal.piege .lab{color:var(--warn)}
+.cal.methode{border-left-color:var(--ok);background:var(--okbg)}
+.cal.methode .lab{color:var(--ok)}
+.cal.intu{border-left-color:var(--blue);background:var(--bluebg)}
+.cal.intu .lab{color:var(--blue)}
+.cal.plus{border-left-style:dashed;background:#faf9f7}
+.cal.plus .lab{color:var(--muted)}
+
+/* --- révision express --- */
+.ess{background:var(--card);border:1px solid var(--accent);border-radius:10px;padding:4px 24px 20px;margin:1.6em 0}
+.ess h3{margin-top:1.3em}
+.rec{background:var(--card);border:1px dashed var(--accent);border-radius:10px;padding:4px 24px 18px;margin:1.6em 0}
+.rec ol{counter-reset:none}
+
+/* --- impression / PDF --- */
+@media print{
+ .nav{display:none}
+ body{padding:0;background:#fff;font-size:11.2pt;line-height:1.55}
+ main{max-width:none}
+ h1{font-size:23pt}h2{font-size:15pt;margin-top:1.5em}h3{font-size:12.6pt}
+ h2,h3,h4{break-after:avoid;page-break-after:avoid}
+ table,.cal,blockquote{break-inside:avoid;page-break-inside:avoid}
+ table{display:table;font-size:9.6pt}
+ details.cor{border:1px solid var(--line);background:#fcfbfa}
+ details.cor>summary{display:none}
+ details.cor .in{padding-top:10px}
+ .cal,.ex,.ess,.rec{box-shadow:none}
+ a{color:var(--ink);text-decoration:none}
+}
+@page{margin:16mm 15mm 18mm}
+
+/* --- exemples travaillés --- */
+.exm{background:#fcfbfa;border:1px solid var(--line);border-radius:10px;padding:2px 20px 14px;margin:1.5em 0}
+.exm>h4:first-child{margin:14px 0 .5em;color:var(--accent);font-size:13px;text-transform:uppercase;letter-spacing:.07em}
+
+
+/* --- pastilles de priorité (conventions des fiches de l'app) --- */
+h2[data-prio], h3[data-prio], h4[data-prio]{position:relative}
+h2[data-prio]::before,h3[data-prio]::before,h4[data-prio]::before{
+ content:"";display:inline-block;width:9px;height:9px;border-radius:50%;
+ margin-right:9px;vertical-align:middle;background:var(--muted)}
+[data-prio="must"]::before{background:var(--warn)}
+[data-prio="high"]::before{background:#d98324}
+[data-prio="mid"]::before{background:#c9a227}
+[data-prio="low"]::before{background:var(--ok)}
+/* corrigés des fiches de l'app : même traitement que les corrigés des séries */
+details.cor>summary::after{content:""}
+</style></head><body>
+<div class="nav"><a href="00_COMMENCER_ICI.html">Commencer ici</a><a href="01_NOTATIONS_le-decodeur.html">Notations</a><a href="02_EXERCICES_Serie-0.html">Série 0 — Remise en route</a><a href="03_EXERCICES_Serie-1.html">Série 1 — Convexité</a><a href="04_EXERCICES_Serie-2.html">Série 2 — KKT</a><a href="05_AUTO-EVALUATION.html">Auto-évaluation (quiz)</a><a href="06_FICHE_Optimisation-deux-variables.html">Fiche — Optimisation à 2 variables</a></div>
+<main><h1>Fiche 103 — HJM, LIBOR Market Model et titres hypothécaires d'agence</h1>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Matière</strong></td>
+<td>Maths · Finance de marché · Modèles de taux</td>
+</tr>
+<tr>
+<td><strong>Cours source</strong></td>
+<td>John C. Hull, <em>Options, Futures, and Other Derivatives</em>, 8ᵉ éd., Pearson — chapitre 31 « Interest Rate Derivatives: HJM and LMM »</td>
+</tr>
+<tr>
+<td><strong>Difficulté</strong></td>
+<td> Must know — les modèles multi-facteurs à volatilité libre</td>
+</tr>
+<tr>
+<td><strong>Temps d'étude estimé</strong></td>
+<td>1 h 50</td>
+</tr>
+<tr>
+<td><strong>Prérequis</strong></td>
+<td>Fiches 99 (numéraires), 100 (caps et swaptions), 102 (modèles du taux court), 81 (titrisation)</td>
+</tr>
+<tr>
+<td><strong>Concepts clés</strong></td>
+<td>Modèle de Heath-Jarrow-Morton, taux forward instantané, condition de non-arbitrage HJM, processus non markovien, arbre non recombinant, LIBOR Market Model, modèle BGM, monde forward risque-neutre roulant, volatilités $\Lambda_i$, cap <em>ratchet</em>, cap <em>sticky</em>, <em>flexi cap</em>, volatilité de swap dans le LMM, calibration par ACP, skew de volatilité et modèle CEV, swaption bermudienne, MBS d'agence, fonction de prépaiement, CMO, IO et PO, <em>option-adjusted spread</em></td>
+</tr>
+<tr>
+<td><strong>Poids à l'examen</strong></td>
+<td><strong>Le résultat HJM</strong> $m(t,T)=s(t,T)\displaystyle\int_t^Ts(t,\tau)d\tau$ · le <strong>drift du LMM</strong> $\sum_{i=m(t)}^{k}\dfrac{\delta_iF_i\sigma_i\sigma_k}{1+\delta_iF_i}$ · $\sigma_k^2t_k=\sum_{i=1}^{k}\Lambda_{k-i}^2\delta_{i-1}$ · l'<strong>OAS</strong> par interpolation.</td>
+</tr>
+</tbody></table>
+<h2>Vue d'ensemble</h2>
+<pre><code>LES DEUX LIMITES DES MODÈLES DU CHAPITRE 30
+  1. la PLUPART n'ont QU'UN facteur
+  2. ils ne donnent PAS une LIBERTÉ COMPLÈTE dans le choix de la structure de volatilité
+  (rendre a et σ fonctions du temps ⇒ volatilité NON STATIONNAIRE)
+
+HJM (1990-1992)   la CONDITION DE NON-ARBITRAGE de la courbe des taux
+  dF(t,T) = v(t,T) v_T(t,T) dt − v_T(t,T) dz
+  ⇒  m(t,T) = s(t,T) ∫_t^T s(t,τ) dτ        LE DRIFT EST DICTÉ PAR LES VOLATILITÉS
+  ⚠️ le processus de r est NON MARKOVIEN → arbre NON RECOMBINANT (2^30 ≈ 1 milliard)
+     → MONTE-CARLO OBLIGATOIRE
+
+LMM / BGM   exprimé en TAUX FORWARD OBSERVABLES (ceux des caps), pas instantanés
+  monde forward risque-neutre ROULANT (numéraire = CD roulé à chaque pas)
+  dF_k/F_k = Σ_{i=m(t)}^{k} [δᵢFᵢσᵢσ_k/(1+δᵢFᵢ)] dt + σ_k dz
+  σ_k(t) = Λ_{k−m(t)}   fonction ESCALIER   σ_k² t_k = Σ Λ²_{k−i} δ_{i−1}
+
+CE QUI DÉPEND DU NOMBRE DE FACTEURS
+  cap ORDINAIRE : NON (un seul taux forward)
+  ratchet, sticky, flexi : OUI (loi JOINTE de plusieurs taux forward)
+
+MBS D'AGENCE   le PRÉPAIEMENT est une option américaine à 30 ans donnée à l'emprunteur
+  CMO (classes A/B/C) · IO et PO · valorisation MONTE-CARLO · OAS par interpolation
+</code></pre>
+<p><strong>Les deux limites, énoncées d'entrée.</strong> <em>Les modèles du chapitre 30 sont <strong>faciles à implémenter</strong> et, utilisés avec soin, garantissent que la plupart des dérivés non standard sont valorisés de façon cohérente avec les caps, swaptions et options sur obligations.  <em><strong>Deux LIMITES : (1) la plupart n'impliquent QU'UN facteur ; (2) ils ne donnent PAS à l'utilisateur une liberté complète dans le choix de la structure de volatilité.</strong></em> En rendant $a$ et $\sigma$ fonctions du temps, on peut coller aux volatilités observées aujourd'hui, <strong>mais la structure par terme de volatilité devient alors NON STATIONNAIRE</strong> (fiche 102, §30.8).</em></p>
+<blockquote>
+<p class="cal piege"> <em>Les modèles de ce chapitre <strong>exigent BIEN PLUS de temps de calcul</strong>. <strong>En conséquence, ils servent souvent à la RECHERCHE ET AU DÉVELOPPEMENT plutôt qu'à la valorisation de routine.</strong></em></p>
+</blockquote>
+<h2 data-prio="must">Concept 1 — Le modèle de Heath, Jarrow et Morton</h2>
+<h3>1.1 Les notations et le point de départ</h3>
+<p><em>En 1990, <strong>David Heath, Bob Jarrow et Andy Morton</strong> publient un article important <strong>décrivant les conditions de NON-ARBITRAGE que doit satisfaire un modèle de la courbe des taux</strong>.</em></p>
+<table>
+<thead>
+<tr>
+<th>Notation</th>
+<th>Signification</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$P(t,T)$</td>
+<td>prix en $t$ d'un zéro-coupon de principal 1 dollar maturant en $T$</td>
+</tr>
+<tr>
+<td>$\Omega_t$</td>
+<td><strong>le vecteur des valeurs PASSÉES ET PRÉSENTES</strong> de taux et de prix d'obligations pertinentes pour déterminer les volatilités</td>
+</tr>
+<tr>
+<td>$v(t,T,\Omega_t)$</td>
+<td><strong>la volatilité de $P(t,T)$</strong></td>
+</tr>
+<tr>
+<td>$F(t,T)$</td>
+<td>le <strong>taux forward INSTANTANÉ</strong> vu en $t$ pour un contrat maturant en $T$</td>
+</tr>
+<tr>
+<td>$r(t)$</td>
+<td>le taux court sans risque</td>
+</tr>
+</tbody></table>
+<p><strong>Le point de départ.</strong> <em>Un zéro-coupon est <strong>un titre négocié ne procurant aucun revenu</strong>. Son rendement dans le monde risque-neutre traditionnel doit donc être $r$ :</em></p>
+<p>$$\boxed{dP(t,T)=r(t)P(t,T)\,dt+v(t,T,\Omega_t)P(t,T)\,dz(t)}\;\text{(31.1)}$$</p>
+<blockquote>
+<p class="cal piege"> <strong>La condition de bord essentielle :</strong> <em>comme <strong>la volatilité d'un prix d'obligation décline vers ZÉRO à maturité</strong>, on doit avoir</em> $\boxed{v(t,t,\Omega_t)=0}$</p>
+<p><em>(C'est équivalent à supposer que <strong>tous les zéro-coupon ont des drifts FINIS à tout instant</strong>. Si la volatilité ne déclinait pas vers zéro, <strong>un drift INFINI pourrait être nécessaire</strong> pour garantir que le prix égale la valeur faciale à maturité.)</em></p>
+</blockquote>
+<h3>1.2 La dérivation du résultat HJM</h3>
+<details class="cor">
+<summary><strong>De (31.1) au résultat HJM — les cinq étapes</strong></summary><div class="in">
+
+<p><em>Étape 1 — le taux forward en termes de prix d'obligations</em> (équation 4.5, fiche 77) :
+$$f(t,T_1,T_2)=\frac{\ln P(t,T_1)-\ln P(t,T_2)}{T_2-T_1}\;\text{(31.2)}$$</p>
+<p><em>Étape 2 — appliquer Itô à chaque logarithme :</em>
+$$d\ln P(t,T_i)=\left[r(t)-\frac{v(t,T_i,\Omega_t)^2}{2}\right]dt+v(t,T_i,\Omega_t)\,dz(t)$$</p>
+<p><em>Étape 3 — substituer dans (31.2) :</em>
+$$\boxed{df(t,T_1,T_2)=\frac{v(t,T_2)^2-v(t,T_1)^2}{2(T_2-T_1)}\,dt+\frac{v(t,T_1)-v(t,T_2)}{T_2-T_1}\,dz(t)}\;\text{(31.3)}$$</p>
+<blockquote>
+<p class="cal piege"> <em><strong>« (31.3) montre que le processus risque-neutre de $f$ dépend UNIQUEMENT des $v$. Il ne dépend de $r$ et des $P$ que dans la mesure où les $v$ eux-mêmes en dépendent. »</strong></em></p>
+</blockquote>
+<p><em>Étape 4 — passer à la limite.</em> On pose $T_1=T$ et $T_2=T+\Delta T$, puis $\Delta T\to0$ : $f$ devient $F(t,T)$, le coefficient de $dz$ devient $-v_T$ et celui de $dt$ devient $\frac12\frac{\partial(v^2)}{\partial T}=v\,v_T$ :</p>
+<p>$$\boxed{dF(t,T)=v(t,T,\Omega_t)\,v_T(t,T,\Omega_t)\,dt-v_T(t,T,\Omega_t)\,dz(t)}\;\text{(31.4)}$$</p>
+<blockquote>
+<p class="cal piege"> <em><strong>« (31.4) montre qu'il y a UN LIEN entre le DRIFT et l'ÉCART-TYPE d'un taux forward instantané. C'EST LE RÉSULTAT CLÉ DE HJM. »</strong></em></p>
+</blockquote>
+<p><em>Étape 5 — l'intégration.</em> En intégrant $v_\tau(t,\tau,\Omega_t)$ de $\tau=t$ à $\tau=T$ et <strong>en utilisant $v(t,t,\Omega_t)=0$</strong> :
+$$v(t,T,\Omega_t)=\int_t^Tv_\tau(t,\tau,\Omega_t)\,d\tau$$</p>
+<p>En notant $m$ et $s$ le drift et l'écart-type instantanés de $F(t,T)$, de sorte que $dF=m\,dt+s\,dz$ :</p>
+<p>$$\boxed{m(t,T,\Omega_t)=s(t,T,\Omega_t)\int_t^Ts(t,\tau,\Omega_t)\,d\tau}\;\text{(31.5)}$$</p>
+<p><strong>C'est LE RÉSULTAT HJM.</strong></p>
+<p><strong>L'extension à plusieurs facteurs indépendants.</strong> Si $dF=m\,dt+\sum_ks_k\,dz_k$ :
+$$\boxed{m(t,T,\Omega_t)=\sum_ks_k(t,T,\Omega_t)\int_t^Ts_k(t,\tau,\Omega_t)\,d\tau}\;\text{(31.6)}$$</p>
+</div></details>
+
+<h3>1.3 Le problème d'implémentation</h3>
+<blockquote>
+<p class="cal piege"> <em><strong>« Le processus du taux court $r$ dans le modèle HJM général est NON MARKOVIEN. Cela signifie que le processus de $r$ à un instant futur $t$ dépend DU CHEMIN suivi par $r$ entre maintenant et $t$, aussi bien que de la valeur de $r$ en $t$. C'EST LE PROBLÈME CLÉ dans l'implémentation d'un modèle HJM général. »</strong></em></p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>Conséquence</th>
+<th>Détail</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Monte-Carlo obligatoire</strong></td>
+<td><em>il faut y recourir</em></td>
+</tr>
+<tr>
+<td><strong>Arbre non recombinant</strong></td>
+<td><em>il est <strong>difficile d'utiliser un arbre</strong>, parce que <strong>l'arbre ne recombine généralement PAS</strong>. Avec un facteur et un arbre binomial, il y a $\mathbf{2^n}$ nœuds après $n$ pas —  <strong>pour $n=30$, cela fait environ UN MILLIARD</strong> (précisément 1 073 741 824)</em></td>
+</tr>
+</tbody></table>
+<p class="cal piege"> <strong>La nuance importante.</strong> <em>« <strong>Le modèle HJM de (31.4) est TROMPEUSEMENT COMPLEXE.</strong> Un taux forward PARTICULIER $F(t,T)$ est <strong>markovien dans la plupart des applications</strong> et peut être représenté par un arbre recombinant.  <strong>MAIS LE MÊME ARBRE NE PEUT PAS SERVIR POUR TOUS LES TAUX FORWARD.</strong> »</em></p>
+<h2 data-prio="must">Concept 2 — Le LIBOR Market Model</h2>
+<h3>2.1 La motivation et les notations</h3>
+<table>
+<thead>
+<tr>
+<th>Défaut de HJM</th>
+<th>Conséquence</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>1</strong></td>
+<td><em>il est exprimé en <strong>taux forward INSTANTANÉS</strong>, qui <strong>ne sont PAS directement observables</strong> sur le marché</em></td>
+</tr>
+<tr>
+<td><strong>2</strong></td>
+<td><em>il est <strong>difficile à CALIBRER</strong> aux prix des instruments activement négociés</em></td>
+</tr>
+</tbody></table>
+<blockquote>
+<p>*D'où la proposition de <strong>Brace, Gatarek et Musiela (BGM)</strong>, <strong>Jamshidian</strong>, et <strong>Miltersen, Sandmann et Sondermann</strong> : le <strong>LIBOR MARKET MODEL (LMM)</strong> ou <strong>modèle BGM</strong>,  <strong>exprimé en termes des taux forward AVEC LESQUELS LES TRADERS ONT L'HABITUDE DE TRAVAILLER</strong>.*</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>Notation</th>
+<th>Signification</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$t_1,t_2,\dots$</td>
+<td><strong>les dates de réinitialisation des caps</strong> négociés aujourd'hui ($t_0=0$). <em>Aux États-Unis, les caps les plus populaires sont <strong>trimestriels</strong> : $t_1\approx0{,}25$, $t_2\approx0{,}5$, etc.</em></td>
+</tr>
+<tr>
+<td>$\delta_k=t_{k+1}-t_k$</td>
+<td>l'intervalle</td>
+</tr>
+<tr>
+<td>$F_k(t)$</td>
+<td><strong>le taux forward entre $t_k$ et $t_{k+1}$</strong> vu en $t$, en composition $\delta_k$ et décompte actual/actual</td>
+</tr>
+<tr>
+<td>$m(t)$</td>
+<td> <strong>l'indice de la PROCHAINE date de réinitialisation</strong> : le plus petit entier tel que $t\leqslant t_{m(t)}$</td>
+</tr>
+<tr>
+<td>$\zeta_k(t)$</td>
+<td>la volatilité de $F_k(t)$ en $t$</td>
+</tr>
+</tbody></table>
+<h3>2.2 Le monde forward risque-neutre ROULANT</h3>
+<p><strong>Le point de départ.</strong> <em>Par le §27.4 (fiche 99), <strong>dans un monde forward risque-neutre par rapport à $P(t,t_{k+1})$, $F_k(t)$ est une MARTINGALE</strong> :</em></p>
+<p>$$\boxed{dF_k(t)=\zeta_k(t)F_k(t)\,dz}\;\text{(31.7)}$$</p>
+<blockquote>
+<p class="cal piege"> <em><strong>« En pratique, il est souvent LE PLUS COMMODE de valoriser les dérivés de taux en travaillant dans un monde qui est TOUJOURS forward risque-neutre par rapport à une obligation maturant À LA PROCHAINE DATE DE RÉINITIALISATION. Nous l'appelons LE MONDE FORWARD RISQUE-NEUTRE ROULANT. »</strong></em></p>
+<p><em>Dans ce monde, <strong>on peut actualiser de $t_{k+1}$ à $t_k$ en utilisant le taux zéro observé EN $t_k$ pour la maturité $t_{k+1}$. ON N'A PAS À SE SOUCIER de ce qui arrive aux taux ENTRE $t_k$ et $t_{k+1}$.</strong></em></p>
+</blockquote>
+<p class="cal piege"> <strong>Le numéraire est un « CD ROULÉ ».</strong> *« Un CD roulé est celui où l'on <strong>part de 1 dollar, achète une obligation maturant en $t_1$, réinvestit le produit en $t_1$ dans une obligation maturant en $t_2$, réinvestit en $t_2$ dans une obligation maturant en $t_3$</strong>, et ainsi de suite. »  <em><strong>« Strictement parlant, LES ARBRES DE TAUX CONSTRUITS AU CHAPITRE 30 SONT DANS UN MONDE FORWARD RISQUE-NEUTRE ROULANT plutôt que dans le monde risque-neutre traditionnel. »</strong></em></p>
+<details class="cor">
+<summary><strong>La dérivation du drift du LMM</strong></summary><div class="in">
+
+<p><em>Étape 1 — le changement de numéraire.</em> En $t$, le monde roulant est forward risque-neutre par rapport à $P(t,t_{m(t)})$. Par le §27.8 (fiche 99), le processus de $F_k(t)$ dans ce monde est :
+$$\boxed{dF_k(t)=\zeta_k(t)\big[v_{m(t)}(t)-v_{k+1}(t)\big]F_k(t)\,dt+\zeta_k(t)F_k(t)\,dz}\;\text{(31.8)}$$
+où $v_k(t)$ est la volatilité de $P(t,t_k)$ —  <strong>négative, car prix d'obligations et taux sont négativement reliés</strong>.</p>
+<p><em>Étape 2 — relier $v$ et $\zeta$.</em> De $\dfrac{P(t,t_i)}{P(t,t_{i+1})}=1+\delta_iF_i(t)$, donc
+$$\ln P(t,t_i)-\ln P(t,t_{i+1})=\ln\big[1+\delta_iF_i(t)\big]$$
+Itô appliqué aux deux membres, puis <strong>égalisation des coefficients de $dz$</strong> :
+$$\boxed{v_i(t)-v_{i+1}(t)=\frac{\delta_iF_i(t)\zeta_i(t)}{1+\delta_iF_i(t)}}\;\text{(31.9)}$$</p>
+<p><em>Étape 3 — télescoper de $m(t)$ à $k+1$ et substituer dans (31.8) :</em></p>
+<p>$$\boxed{\frac{dF_k(t)}{F_k(t)}=\sum_{i=m(t)}^{k}\frac{\delta_iF_i(t)\zeta_i(t)\zeta_k(t)}{1+\delta_iF_i(t)}\,dt+\zeta_k(t)\,dz}\;\text{(31.10)}$$</p>
+<blockquote>
+<p class="cal piege"> <em><strong>Le résultat HJM (31.4) est LE CAS LIMITE de (31.10) quand les $\delta_i$ tendent vers zéro.</strong></em></p>
+<p class="cal piege"> <em>Note de Hull : <strong>comme les $v$ et les $\zeta$ ont des signes OPPOSÉS, la volatilité du prix d'obligation devient plus grande (en valeur absolue) quand la maturité augmente. C'est bien ce qu'on attend.</strong></em></p>
+</blockquote>
+</div></details>
+
+<h3>2.3 Les volatilités de taux forward</h3>
+<p><strong>La simplification.</strong> *Le modèle se simplifie en supposant que $\zeta_k(t)$ est <strong>fonction UNIQUEMENT du nombre de périodes ENTIÈRES entre la prochaine date de réinitialisation et $t_k$</strong>.* En notant $\Lambda_i$ la valeur de $\zeta_k(t)$ quand il y a $i$ telles périodes :</p>
+<p>$$\boxed{\zeta_k(t)=\Lambda_{k-m(t)}\qquad\text{— une FONCTION EN ESCALIER}}$$</p>
+<p><strong>Le lien avec les volatilités de Black.</strong> <em>Les $\Lambda_i$ peuvent (au moins en théorie) être estimés des volatilités servant à valoriser les caplets dans le modèle de Black — c'est-à-dire des <strong>volatilités SPOT</strong> de la figure 28.3 (fiche 100).</em> En <strong>égalisant les variances</strong> :</p>
+<p>$$\boxed{\sigma_k^2\,t_k=\sum_{i=1}^{k}\Lambda_{k-i}^2\,\delta_{i-1}}\;\text{(31.11)}$$</p>
+<p><em>Cette équation permet d'obtenir les $\Lambda$ <strong>ITÉRATIVEMENT</strong>.</em></p>
+<details class="cor">
+<summary><strong>Exemples 31.1 et 31.2 — extraire les $\Lambda$ des volatilités de caplets</strong></summary><div class="in">
+
+<p><strong>Exemple 31.1.</strong> *Les $\delta_i$ sont tous égaux et les volatilités de Black des trois premiers caplets sont <strong>24 %, 22 %, 20 %</strong>.*</p>
+<p><em>Étape 1 :</em> $\Lambda_0=\mathbf{24\,\%}$ <em>(il n'y a qu'un terme)</em></p>
+<p><em>Étape 2 :</em> $\Lambda_0^2+\Lambda_1^2=2\times0{,}22^2=0{,}0968$, donc
+$$\Lambda_1=\sqrt{0{,}0968-0{,}0576}=\sqrt{0{,}0392}=\mathbf{19{,}80\,\%}$$</p>
+<p><em>Étape 3 :</em> $\Lambda_0^2+\Lambda_1^2+\Lambda_2^2=3\times0{,}20^2=0{,}12$, donc
+$$\Lambda_2=\sqrt{0{,}12-0{,}0968}=\sqrt{0{,}0232}=\mathbf{15{,}23\,\%}$$</p>
+<blockquote>
+<p class="cal piege"> <strong>Le mécanisme :</strong> <em>les volatilités de caplets sont des <strong>moyennes quadratiques CUMULÉES</strong> des $\Lambda$ ; une baisse modérée des $\sigma_k$ impose donc une baisse <strong>BEAUCOUP PLUS FORTE</strong> des $\Lambda$.</em></p>
+</blockquote>
+<hr>
+<p><strong>Exemple 31.2 — Table 31.1</strong> (période d'accroissement = <strong>1 an</strong>) :</p>
+<table>
+<thead>
+<tr>
+<th>Année $k$</th>
+<th>1</th>
+<th>2</th>
+<th>3</th>
+<th>4</th>
+<th>5</th>
+<th>6</th>
+<th>7</th>
+<th>8</th>
+<th>9</th>
+<th>10</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>$\sigma_k$ (%)</strong></td>
+<td>15,50</td>
+<td><strong>18,25</strong></td>
+<td>17,91</td>
+<td>17,74</td>
+<td>17,27</td>
+<td>16,79</td>
+<td>16,30</td>
+<td>16,01</td>
+<td>15,76</td>
+<td>15,54</td>
+</tr>
+<tr>
+<td><strong>$\Lambda_{k-1}$ (%)</strong></td>
+<td>15,50</td>
+<td><strong>20,64</strong></td>
+<td>17,21</td>
+<td>17,22</td>
+<td>15,25</td>
+<td>14,15</td>
+<td>12,98</td>
+<td>13,81</td>
+<td>13,60</td>
+<td>13,40</td>
+</tr>
+</tbody></table>
+<p><em>Les $\sigma_k$ présentent <strong>la bosse</strong> discutée au §28.2.</em>  <em><strong>« Noter que LA BOSSE DES $\Lambda$ EST PLUS PRONONCÉE que la bosse des $\sigma$. »</strong></em></p>
+</div></details>
+
+<h3>2.4 L'implémentation par Monte-Carlo</h3>
+<details class="cor">
+<summary><strong>De (31.10) à la formule de simulation (31.14)</strong></summary><div class="in">
+
+<p><em>Étape 1 — réécrire (31.10) avec les $\Lambda$ :</em>
+$$\frac{dF_k(t)}{F_k(t)}=\sum_{i=m(t)}^{k}\frac{\delta_iF_i(t)\Lambda_{i-m(t)}\Lambda_{k-m(t)}}{1+\delta_iF_i(t)}\,dt+\Lambda_{k-m(t)}\,dz\;\text{(31.12)}$$</p>
+<p><em>Étape 2 — passer au logarithme par Itô :</em>
+$$d\ln F_k(t)=\left[\sum_{i=m(t)}^{k}\frac{\delta_iF_i(t)\Lambda_{i-m(t)}\Lambda_{k-m(t)}}{1+\delta_iF_i(t)}-\frac{\Lambda_{k-m(t)}^2}{2}\right]dt+\Lambda_{k-m(t)}\,dz\;\text{(31.13)}$$</p>
+<p><em>Étape 3 — L'APPROXIMATION DE DRIFT.</em>  <strong>On suppose, dans le calcul du drift, que $F_i(t)=F_i(t_j)$ pour $t_j&lt;t&lt;t_{j+1}$</strong> :</p>
+<p>$$\boxed{F_k(t_{j+1})=F_k(t_j)\exp\left[\left(\sum_{i=j+1}^{k}\frac{\delta_iF_i(t_j)\Lambda_{i-j-1}\Lambda_{k-j-1}}{1+\delta_iF_i(t_j)}-\frac{\Lambda_{k-j-1}^2}{2}\right)\delta_j+\Lambda_{k-j-1}\varepsilon\sqrt{\delta_j}\right]}\;\text{(31.14)}$$</p>
+<p>où $\varepsilon$ est un tirage normal centré réduit.</p>
+<blockquote>
+<p><em>Dans la simulation, cette équation sert à calculer les taux forward en $t_1$ depuis ceux en 0, puis ceux en $t_2$ depuis ceux en $t_1$, et ainsi de suite.</em></p>
+</blockquote>
+<p><strong>L'extension à $p$ facteurs indépendants</strong> <em>(en notant $\lambda_{i,q}$ la $q$-ième composante)</em> :
+$$\frac{dF_k(t)}{F_k(t)}=\sum_{i=m(t)}^{k}\frac{\delta_iF_i(t)\sum_{q=1}^p\zeta_{i,q}\zeta_{k,q}}{1+\delta_iF_i(t)}\,dt+\sum_{q=1}^{p}\zeta_{k,q}(t)\,dz_q\;\text{(31.15)}$$</p>
+<p>$$\boxed{F_k(t_{j+1})=F_k(t_j)\exp\left[\left(\sum_{i=j+1}^{k}\frac{\delta_iF_i(t_j)\sum_q\lambda_{i-j-1,q}\lambda_{k-j-1,q}}{1+\delta_iF_i(t_j)}-\frac{\sum_q\lambda_{k-j-1,q}^2}{2}\right)\delta_j+\sum_{q=1}^{p}\lambda_{k-j-1,q}\varepsilon_q\sqrt{\delta_j}\right]}\;\text{(31.16)}$$</p>
+<p><strong>Le déroulement de la simulation.</strong> <em>On part de $F_0(0),F_1(0),\dots,F_{N-1}(0)$ (calculés de la courbe initiale) ; (31.16) donne $F_1(t_1),\dots,F_{N-1}(t_1)$ ; puis $F_2(t_2),\dots,F_{N-1}(t_2)$ ; et ainsi jusqu'à $F_{N-1}(t_{N-1})$.</em></p>
+<blockquote>
+<p class="cal piege"> <em><strong>« Noter qu'à mesure qu'on avance dans le temps, LA COURBE ZÉRO DEVIENT DE PLUS EN PLUS COURTE. »</strong></em> <em>Exemple : avec des périodes trimestrielles et $N=40$, on part d'une courbe à <strong>10 ans</strong> ; <strong>au point 6 ans (en $t_{24}$), la simulation ne donne plus d'information que sur une courbe à 4 ans</strong>.</em></p>
+</blockquote>
+<p><strong>Le test de l'approximation de drift.</strong> <em>On valorise des caplets par (31.16) et on compare aux prix de Black.  <em><strong>« Les résultats montrent que les valeurs de caps issues de Monte-Carlo NE SONT PAS SIGNIFICATIVEMENT DIFFÉRENTES de celles données par le modèle de Black. C'est vrai MÊME quand les périodes durent 1 AN et qu'un très grand nombre d'essais est utilisé. Cela suggère que L'APPROXIMATION DE DRIFT EST INOFFENSIVE dans la plupart des situations. »</strong></em> (La seule exception : <strong>quand les volatilités de caps sont très élevées</strong>.)</em></p>
+</div></details>
+
+<h2 data-prio="high">Concept 3 — Les caps non standard</h2>
+<h3>3.1 Les trois familles</h3>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Règle de fixation du taux du cap</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Cap <em>RATCHET</em></strong></td>
+<td><em>le taux du cap <strong>égale le LIBOR de la date de réinitialisation PRÉCÉDENTE plus un spread</strong></em> : $\boxed{K_{j+1}=R_j+s}$</td>
+</tr>
+<tr>
+<td><strong>Cap <em>STICKY</em></strong></td>
+<td><em>le taux du cap <strong>égale le taux PLAFONNÉ précédent plus un spread</strong></em> : $\boxed{K_{j+1}=\min(R_j,K_j)+s}$</td>
+</tr>
+<tr>
+<td><em><strong>FLEXI CAP</strong></em></td>
+<td><em>comme un cap ordinaire, sauf qu'il y a <strong>une LIMITE sur le NOMBRE TOTAL de caplets exerçables</strong></em></td>
+</tr>
+</tbody></table>
+<details class="cor">
+<summary><strong>Les valorisations à un, deux et trois facteurs</strong></summary><div class="in">
+
+<p><strong>Le cadre commun.</strong> Principal <strong>100 dollars</strong> ; structure par terme plate à <strong>5 %</strong> ; volatilités de caplets de la table 31.1 ; réinitialisation <strong>annuelle</strong> ; spread <strong>25 points de base</strong> ; <strong>100 000 simulations</strong> avec <strong>variables antithétiques</strong> (fiche 92) ; <strong>erreur type d'environ 0,001</strong>.</p>
+<p><strong>Table 31.2 — cap RATCHET</strong> :</p>
+<table>
+<thead>
+<tr>
+<th>Début du caplet (ans)</th>
+<th>1 facteur</th>
+<th>2 facteurs</th>
+<th>3 facteurs</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>0,196</td>
+<td>0,194</td>
+<td>0,195</td>
+</tr>
+<tr>
+<td>2</td>
+<td>0,207</td>
+<td>0,207</td>
+<td>0,209</td>
+</tr>
+<tr>
+<td>3</td>
+<td>0,201</td>
+<td>0,205</td>
+<td>0,210</td>
+</tr>
+<tr>
+<td>5</td>
+<td>0,187</td>
+<td>0,193</td>
+<td>0,201</td>
+</tr>
+<tr>
+<td>7</td>
+<td>0,172</td>
+<td>0,180</td>
+<td>0,188</td>
+</tr>
+<tr>
+<td><strong>10</strong></td>
+<td><strong>0,153</strong></td>
+<td><strong>0,162</strong></td>
+<td><strong>0,169</strong></td>
+</tr>
+</tbody></table>
+<p><strong>Table 31.3 — cap STICKY</strong> :</p>
+<table>
+<thead>
+<tr>
+<th>Début du caplet (ans)</th>
+<th>1 facteur</th>
+<th>2 facteurs</th>
+<th>3 facteurs</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>0,196</td>
+<td>0,194</td>
+<td>0,195</td>
+</tr>
+<tr>
+<td>2</td>
+<td>0,336</td>
+<td>0,334</td>
+<td>0,336</td>
+</tr>
+<tr>
+<td>5</td>
+<td>0,484</td>
+<td>0,492</td>
+<td>0,506</td>
+</tr>
+<tr>
+<td>7</td>
+<td>0,502</td>
+<td>0,520</td>
+<td>0,533</td>
+</tr>
+<tr>
+<td><strong>10</strong></td>
+<td><strong>0,488</strong></td>
+<td><strong>0,519</strong></td>
+<td><strong>0,534</strong></td>
+</tr>
+</tbody></table>
+<p class="cal piege"> <strong>Le sticky vaut BEAUCOUP plus que le ratchet aux maturités longues</strong> — le plafond y est <strong>cliqueté vers le bas</strong>, donc l'option est bien plus souvent dans la monnaie.</p>
+<p><strong>Table 31.4 — décomposition à DEUX facteurs</strong> :</p>
+<table>
+<thead>
+<tr>
+<th>Année $k$</th>
+<th>1</th>
+<th>2</th>
+<th>3</th>
+<th>4</th>
+<th>5</th>
+<th>6</th>
+<th>7</th>
+<th>8</th>
+<th>9</th>
+<th>10</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$\lambda_{k-1,1}$ (%)</td>
+<td>14,10</td>
+<td>19,52</td>
+<td>16,78</td>
+<td>17,11</td>
+<td>15,25</td>
+<td>14,06</td>
+<td>12,65</td>
+<td>13,06</td>
+<td>12,36</td>
+<td>11,63</td>
+</tr>
+<tr>
+<td>$\lambda_{k-1,2}$ (%)</td>
+<td>$-6{,}45$</td>
+<td>$-6{,}70$</td>
+<td>$-3{,}84$</td>
+<td>$-1{,}96$</td>
+<td><strong>0,00</strong></td>
+<td>1,61</td>
+<td>2,89</td>
+<td>4,48</td>
+<td>5,65</td>
+<td>6,65</td>
+</tr>
+<tr>
+<td><strong>Volatilité totale</strong></td>
+<td>15,50</td>
+<td>20,64</td>
+<td>17,21</td>
+<td>17,22</td>
+<td>15,25</td>
+<td>14,15</td>
+<td>12,98</td>
+<td>13,81</td>
+<td>13,60</td>
+<td>13,40</td>
+</tr>
+</tbody></table>
+<p><strong>Table 31.5 — décomposition à TROIS facteurs</strong> :</p>
+<table>
+<thead>
+<tr>
+<th>Année $k$</th>
+<th>1</th>
+<th>2</th>
+<th>3</th>
+<th>4</th>
+<th>5</th>
+<th>6</th>
+<th>7</th>
+<th>8</th>
+<th>9</th>
+<th>10</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$\lambda_{k-1,1}$ (%)</td>
+<td>13,65</td>
+<td>19,28</td>
+<td>16,72</td>
+<td>16,98</td>
+<td>14,85</td>
+<td>13,95</td>
+<td>12,61</td>
+<td>12,90</td>
+<td>11,97</td>
+<td>10,97</td>
+</tr>
+<tr>
+<td>$\lambda_{k-1,2}$ (%)</td>
+<td>$-6{,}62$</td>
+<td>$-7{,}02$</td>
+<td>$-4{,}06$</td>
+<td>$-2{,}06$</td>
+<td>0,00</td>
+<td>1,69</td>
+<td>3,06</td>
+<td>4,70</td>
+<td>5,81</td>
+<td>6,66</td>
+</tr>
+<tr>
+<td>$\lambda_{k-1,3}$ (%)</td>
+<td>3,19</td>
+<td>2,25</td>
+<td>0,00</td>
+<td>$-1{,}98$</td>
+<td>$-3{,}47$</td>
+<td>$-1{,}63$</td>
+<td>0,00</td>
+<td>1,51</td>
+<td>2,80</td>
+<td>3,84</td>
+</tr>
+<tr>
+<td><strong>Volatilité totale</strong></td>
+<td>15,50</td>
+<td>20,64</td>
+<td>17,21</td>
+<td>17,22</td>
+<td>15,25</td>
+<td>14,15</td>
+<td>12,98</td>
+<td>13,81</td>
+<td>13,60</td>
+<td>13,40</td>
+</tr>
+</tbody></table>
+<div class="cal intu"><span class="lab">Contrôle : la volatilité totale est $\sqrt{\sum_q\lambda_{k-1,q}^2}$ — elle reproduit EXACTEMENT les $\Lambda$ de la table 31.1.</span>
+<p class="cal piege">  <em>Les facteurs 2 et 3 sont les <strong>twists</strong> et <strong>courbures</strong> habituels : ils changent de signe au milieu de la plage.</em></p>
+</div>
+<p><strong>Le flexi cap.</strong> <em>Principal 100, courbe plate à 5 %, mêmes volatilités, <strong>tous les caplets dans la monnaie exercés jusqu'à un maximum de CINQ</strong>. Le LMM donne :</em></p>
+<table>
+<thead>
+<tr>
+<th>Facteurs</th>
+<th>1</th>
+<th>2</th>
+<th>3</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Prix</strong></td>
+<td><strong>3,43</strong></td>
+<td><strong>3,58</strong></td>
+<td><strong>3,61</strong></td>
+</tr>
+</tbody></table>
+</div></details>
+
+<h3>3.2 Pourquoi le nombre de facteurs compte</h3>
+<blockquote>
+<p class="cal piege"> <strong>LE POINT CONCEPTUEL DE LA SECTION.</strong></p>
+<p><em><strong>« La valorisation d'un cap PLAIN VANILLA dépend UNIQUEMENT de la volatilité TOTALE et est INDÉPENDANTE du nombre de facteurs. C'est parce que le prix d'un caplet vanille dépend du comportement D'UN SEUL taux forward. »</strong></em></p>
+<p><em><strong>« Les prix des caplets dans les instruments NON STANDARD sont différents : ils dépendent de LA LOI DE PROBABILITÉ JOINTE de PLUSIEURS taux forward. En conséquence, ILS DÉPENDENT DU NOMBRE DE FACTEURS. »</strong></em></p>
+</blockquote>
+<h2 data-prio="must">Concept 4 — Les swaptions européennes dans le LMM</h2>
+<details class="cor">
+<summary><strong>L'approximation analytique de Hull et White</strong></summary><div class="in">
+
+<p><strong>Le cadre.</strong> $T_0$ = maturité de la swaption ; dates de paiement du swap $T_1,\dots,T_N$ ; $\tau_i=T_{i+1}-T_i$ ; $G_j(t)$ = taux forward en $t$ pour $[T_j,T_{j+1}]$.</p>
+<p><em>Étape 1 — les deux relations.</em> Par (27.23) (fiche 99) :
+$$s(t)=\frac{P(t,T_0)-P(t,T_N)}{\sum_{i=0}^{N-1}\tau_iP(t,T_{i+1})}\qquad\text{et}\qquad\frac{P(t,T_i)}{P(t,T_0)}=\prod_{j=0}^{i-1}\frac{1}{1+\tau_jG_j(t)}$$</p>
+<p><em>Étape 2 — appliquer Itô.</em> La variance $V(t)$ du taux de swap :</p>
+<p>$$\boxed{V(t)=\sum_{q=1}^{p}\left[\sum_{k=0}^{N-1}\frac{\tau_k\gamma_{k,q}(t)G_k(t)\beta_k(t)}{1+\tau_kG_k(t)}\right]^2}\;\text{(31.17)}$$</p>
+<p>avec
+$$\beta_k(t)=\frac{\prod_{j=0}^{N-1}\big[1+\tau_jG_j(t)\big]}{\prod_{j=0}^{N-1}\big[1+\tau_jG_j(t)\big]-1}-\frac{\sum_{i=0}^{k-1}\tau_i\prod_{j=i+1}^{N-1}\big[1+\tau_jG_j(t)\big]}{\sum_{i=0}^{N-1}\tau_i\prod_{j=i+1}^{N-1}\big[1+\tau_jG_j(t)\big]}$$</p>
+<p><em>Étape 3 — L'APPROXIMATION.</em>  <strong>On approche $V(t)$ en posant $G_j(t)=G_j(0)$ pour tout $j$ et $t$.</strong> La volatilité de swap à substituer dans le modèle de marché standard est :</p>
+<p>$$\boxed{\sqrt{\frac{1}{T_0}\int_0^{T_0}V(t)\,dt}=\sqrt{\frac{1}{T_0}\int_0^{T_0}\sum_{q=1}^{p}\left[\sum_{k=0}^{N-1}\frac{\tau_k\gamma_{k,q}(t)G_k(0)\beta_k(0)}{1+\tau_kG_k(0)}\right]^2dt}}\;\text{(31.18)}$$</p>
+<blockquote>
+<p><em>Quand la période d'accroissement du swap <strong>égale</strong> celle d'un cap, $\gamma_{k,q}(t)$ est <strong>la $q$-ième composante de volatilité d'un taux forward de cap à maturité $T_k-t$</strong> — <strong>on la lit directement dans une table comme la 31.5</strong>.</em></p>
+</blockquote>
+<p><strong>L'extension aux périodes DIFFÉRENTES.</strong>  <em>« Les périodes d'accroissement des swaps sous-jacents aux cotations de swaptions <strong>ne correspondent pas toujours</strong> à celles des caps. <strong>Aux États-Unis, les caps de référence ont des réinitialisations TRIMESTRIELLES, tandis que les swaps sous les swaptions de référence ont des réinitialisations SEMESTRIELLES. »</strong></em> Avec $M$ sous-périodes par période d'accroissement et $\tau_j=\sum_{m=1}^M\tau_{j,m}$, comme
+$$1+\tau_jG_j(t)=\prod_{m=1}^{M}\big[1+\tau_{j,m}G_{j,m}(t)\big]$$
+la volatilité de swap devient :
+$$\boxed{\sqrt{\frac{1}{T_0}\int_0^{T_0}\sum_{q=1}^{p}\left[\sum_{k=n}^{N-1}\sum_{m=1}^{M}\frac{\tau_{k,m}\gamma_{k,m,q}(t)G_{k,m}(0)\beta_k(0)}{1+\tau_{k,m}G_{k,m}(0)}\right]^2dt}}\;\text{(31.19)}$$</p>
+<p><strong>Le verdict.</strong> <em>« Hull et White ont comparé les prix de swaptions calculés par (31.18) et (31.19) aux prix issus d'une simulation Monte-Carlo et <strong>les ont trouvés TRÈS PROCHES</strong>.  <strong>Une fois le LMM calibré, ces équations fournissent donc un MOYEN RAPIDE de valoriser les swaptions européennes.</strong> Les analystes peuvent déterminer <strong>si les swaptions sont sur- ou sous-évaluées PAR RAPPORT AUX CAPS</strong> — et s'en servir pour <strong>calibrer le modèle aux prix de swaptions</strong>. »</em></p>
+</div></details>
+
+<h2 data-prio="high">Concept 5 — Calibrer, les skews, et les bermudiennes</h2>
+<h3>5.1 La calibration en deux temps</h3>
+<blockquote>
+<p>*$\Lambda_j$ est la volatilité en $t$ du taux forward $F_j$ <strong>quand il y a $j$ périodes entières entre $t$ et $t_k$</strong>. Calibrer = déterminer <strong>les $\Lambda_j$</strong> ET <strong>leur découpage en $\lambda_{j,q}$</strong>.*</p>
+<p class="cal piege"> <em><strong>« Les $\Lambda$ sont habituellement déterminés à partir de DONNÉES DE MARCHÉ COURANTES, tandis que le découpage en $\lambda$ est déterminé à partir de DONNÉES HISTORIQUES. »</strong></em></p>
+</blockquote>
+<details class="cor">
+<summary><strong>Le découpage par ACP, et la calibration des $\Lambda$</strong></summary><div class="in">
+
+<p><strong>Le découpage — une analyse en composantes principales</strong> (fiche 93, §21.9) sur les données de taux forward :
+$$\Delta F_j=\sum_{q=1}^{M}\alpha_{j,q}x_q$$
+où $M$ est <strong>le nombre TOTAL de facteurs</strong> (égal au nombre de taux forward différents), $\alpha_{j,q}$ <strong>le chargement factoriel</strong> et $x_q$ <strong>le factor score</strong>. Soit $s_q$ l'écart-type du $q$-ième score.</p>
+<table>
+<thead>
+<tr>
+<th>Cas</th>
+<th>Formule</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$p=M$ (tous les facteurs)</td>
+<td>$\lambda_{j,q}=\alpha_{j,q}s_q$</td>
+</tr>
+<tr>
+<td>$p&lt;M$</td>
+<td> <strong>il faut RECALIBRER</strong> pour que $\Lambda_j=\sqrt{\sum_{q=1}^p\lambda_{j,q}^2}$, soit $$\boxed{\lambda_{j,q}=\frac{\Lambda_j\,\alpha_{j,q}s_q}{\sqrt{\sum_{q=1}^{p}s_q^2\alpha_{j,q}^2}}}\;\text{(31.20)}$$</td>
+</tr>
+</tbody></table>
+<p><strong>L'estimation des $\Lambda$.</strong>  <em>« (31.11) fournit une façon théorique de les déterminer de manière cohérente avec les prix de caplets. <strong>EN PRATIQUE, CE N'EST PAS HABITUELLEMENT UTILISÉ, parce que cela conduit souvent à des OSCILLATIONS SAUVAGES des $\Lambda$, et que parfois AUCUN ensemble de $\Lambda$ n'est exactement cohérent avec les cotations de caps. »</strong></em></p>
+<p><strong>La procédure usuelle</strong>, analogue au §30.8 :
+$$\boxed{\min\ \sum_i(U_i-V_i)^2+P}\qquad\text{avec}\qquad P=\sum_iw_{1,i}(\Lambda_{i+1}-\Lambda_i)^2+\sum_iw_{2,i}(\Lambda_{i+1}+\Lambda_{i-1}-2\Lambda_i)^2$$</p>
+<p><em>Quand l'instrument de calibration est <strong>une swaption européenne</strong>,  <strong>(31.18) et (31.19) rendent la minimisation FAISABLE</strong> par la procédure de <strong>Levenberg-Marquardt</strong>. (31.20) détermine ensuite les $\lambda$ à partir des $\Lambda$.</em></p>
+</div></details>
+
+<h3>5.2 Les skews de volatilité</h3>
+<p><em>Les courtiers cotent aussi des caps <strong>hors de la monnaie</strong>. Dans certains marchés on observe <strong>un SKEW de volatilité</strong> :  <strong>la volatilité de Black cotée est une fonction DÉCROISSANTE du strike</strong>. Cela se traite avec le <strong>modèle CEV</strong> (fiche 98, §26.1) :</em></p>
+<p>$$\boxed{dF_i(t)=\cdots+\sum_{q=1}^{p}\zeta_{i,q}(t)F_i(t)^\alpha\,dz_q}\;\text{(31.21)}\qquad0&lt;\alpha&lt;1$$</p>
+<blockquote>
+<p class="cal piege"> <em>« Ce modèle <strong>se traite très similairement au modèle lognormal</strong>. Caps et floors se valorisent <strong>analytiquement par la loi du KHI-DEUX NON CENTRÉE</strong> cumulée. Il existe des approximations analytiques similaires pour les swaptions. »</em></p>
+</blockquote>
+<h3>5.3 Les swaptions bermudiennes</h3>
+<p><em>Une <strong>swaption bermudienne</strong> est exerçable <strong>à certaines ou toutes les dates de paiement</strong> du swap sous-jacent.</em></p>
+<blockquote>
+<p class="cal piege"> <em><strong>« Les bermudiennes sont DIFFICILES à valoriser avec le LMM parce que le LMM repose sur MONTE-CARLO, et qu'il est difficile d'évaluer les décisions d'exercice anticipé en Monte-Carlo. »</strong></em></p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>Approche</th>
+<th>Détail</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Longstaff-Schwartz</strong></td>
+<td><em>appliquent l'approche des <strong>MOINDRES CARRÉS</strong> quand il y a beaucoup de facteurs. <strong>La valeur de ne pas exercer est supposée être une fonction POLYNOMIALE des valeurs des facteurs</strong></em> (fiche 98, §26.8)</td>
+</tr>
+<tr>
+<td><strong>Andersen</strong></td>
+<td><em>utilise l'approche de la <strong>frontière d'exercice paramétrée</strong>. Il expérimente plusieurs paramétrisations et <strong>trouve de bons résultats quand la décision est supposée ne dépendre QUE de la VALEUR INTRINSÈQUE de l'option</strong></em></td>
+</tr>
+<tr>
+<td><strong>En pratique</strong></td>
+<td> <em>« <strong>La plupart des traders valorisent les bermudiennes avec l'un des modèles à UN facteur du chapitre 30.</strong> Cependant, <strong>l'exactitude des modèles à un facteur pour les bermudiennes A ÉTÉ UNE QUESTION CONTROVERSÉE</strong> »</em> — voir les articles opposés d'Andersen-Andreasen et de Longstaff-Santa Clara-Schwartz, <em>Journal of Financial Economics</em>, 2001</td>
+</tr>
+</tbody></table>
+<h2 data-prio="must">Concept 6 — Les titres hypothécaires d'agence</h2>
+<h3>6.1 Le produit et le prépaiement</h3>
+<p><em>Un <strong>MBS d'agence</strong> est similaire à l'ABS du chapitre 8 (fiche 81), <strong>sauf que les paiements sont GARANTIS par une agence liée au gouvernement</strong> comme <strong>GNMA</strong> ou <strong>FNMA</strong>, ce qui protège les investisseurs contre les défauts. <strong>Cela le fait ressembler à un titre à revenu fixe ordinaire émis par le gouvernement.</strong></em></p>
+<blockquote>
+<p class="cal piege"> <em><strong>« EN FAIT, IL Y A UNE DIFFÉRENCE CRITIQUE : les crédits hypothécaires du pool ont des PRIVILÈGES DE PRÉPAIEMENT. Aux États-Unis, les crédits durent typiquement 30 ANS et peuvent être prépayés À TOUT MOMENT. CELA SIGNIFIE QUE LE PROPRIÉTAIRE A UNE OPTION PUT AMÉRICAINE À 30 ANS DE RENDRE SON CRÉDIT AU PRÊTEUR À SA VALEUR FACIALE. »</strong></em></p>
+</blockquote>
+<p><strong>Les raisons du prépaiement.</strong> <em>Parfois <strong>les taux baissent</strong> et le propriétaire <strong>refinance à un taux plus bas</strong>. D'autres fois, un crédit est prépayé <strong>simplement parce que la maison est vendue</strong>.</em></p>
+<p><strong>La fonction de prépaiement.</strong> <em>« Un élément critique de la valorisation est la détermination de la <strong>FONCTION DE PRÉPAIEMENT</strong> : une fonction décrivant <strong>les prépaiements attendus sur le pool à un instant $t$ en fonction de LA COURBE DES TAUX en $t$ et d'autres variables pertinentes</strong>. »</em></p>
+<blockquote>
+<p class="cal piege"> <em>« Une fonction de prépaiement est <strong>TRÈS PEU FIABLE comme prédicteur pour un crédit INDIVIDUEL. Quand de nombreux crédits similaires sont combinés dans le même pool, il y a un effet de « LOI DES GRANDS NOMBRES » à l'œuvre</strong> et les prépaiements se prédisent plus précisément par analyse de données historiques. »</em></p>
+<p class="cal piege"> <em><strong>« Néanmoins, il y a une TENDANCE des prépaiements à être PLUS PROBABLES QUAND LES TAUX SONT BAS. Cela signifie que LES INVESTISSEURS EXIGENT UN TAUX D'INTÉRÊT PLUS ÉLEVÉ sur un MBS d'agence que sur d'autres titres à revenu fixe, POUR COMPENSER LES OPTIONS DE PRÉPAIEMENT QU'ILS ONT VENDUES. »</strong></em></p>
+</blockquote>
+<h3>6.2 Les CMO, IO et PO</h3>
+<p><strong>Le <em>pass-through</em></strong> est le type le plus simple : <em>tous les investisseurs reçoivent <strong>le même rendement</strong> et portent <strong>le même risque de prépaiement</strong>.</em></p>
+<details class="cor">
+<summary><strong>Le CMO à trois classes, et les IO/PO</strong></summary><div class="in">
+
+<p><strong>Le CMO.</strong> <em>Dans un <em><strong>collateralized mortgage obligation</strong></em>, les investisseurs sont divisés en classes et <strong>des règles déterminent comment les REMBOURSEMENTS DE PRINCIPAL sont canalisés</strong>.</em>  <em><strong>« Un CMO crée des classes portant DES MONTANTS DIFFÉRENTS DE RISQUE DE PRÉPAIEMENT, de la même façon que l'ABS du chapitre 8 crée des classes portant des montants différents de RISQUE DE CRÉDIT. »</strong></em></p>
+<p><strong>L'exemple à trois classes.</strong> <em>Tous les remboursements de principal (<strong>programmés ET prépaiements</strong>) vont d'abord à la <strong>classe A</strong> jusqu'à extinction, puis à la <strong>classe B</strong>, puis à la <strong>classe C</strong>.</em></p>
+<table>
+<thead>
+<tr>
+<th>Classe</th>
+<th>Risque de prépaiement</th>
+<th>Durée attendue</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>A</strong></td>
+<td> <strong>le PLUS élevé</strong></td>
+<td>la <strong>plus courte</strong></td>
+</tr>
+<tr>
+<td><strong>B</strong></td>
+<td>intermédiaire</td>
+<td>intermédiaire</td>
+</tr>
+<tr>
+<td><strong>C</strong></td>
+<td>le plus faible</td>
+<td>la <strong>plus longue</strong></td>
+</tr>
+</tbody></table>
+<p><strong>L'effet des valeurs nominales, à savoir raisonner :</strong></p>
+<table>
+<thead>
+<tr>
+<th>Répartition A / B / C</th>
+<th>Position de la classe C</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>400 / 300 / 100</strong></td>
+<td><em>elle porte <strong>TRÈS PEU</strong> de risque de prépaiement</em></td>
+</tr>
+<tr>
+<td><strong>100 / 200 / 500</strong></td>
+<td><em>elle porte <strong>BEAUCOUP PLUS</strong> de risque</em></td>
+</tr>
+</tbody></table>
+<p><strong>L'objectif :</strong> <em>« créer des classes de titres <strong>PLUS ATTRACTIFS pour les investisseurs institutionnels</strong> que ceux créés par un simple pass-through. »</em></p>
+<hr>
+<p><strong>Business Snapshot 31.1 — les IO et les PO.</strong></p>
+<p><em>Dans un <em><strong>stripped MBS</strong></em>, les paiements de principal sont <strong>SÉPARÉS</strong> des paiements d'intérêts :</em></p>
+<table>
+<thead>
+<tr>
+<th>Titre</th>
+<th>Reçoit</th>
+<th>Effet d'une HAUSSE des prépaiements</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>PO</strong> (<em>principal only</em>)</td>
+<td><strong>tous les paiements de PRINCIPAL</strong></td>
+<td> <strong>il devient PLUS PRÉCIEUX</strong></td>
+</tr>
+<tr>
+<td><strong>IO</strong> (<em>interest only</em>)</td>
+<td><strong>tous les paiements d'INTÉRÊTS</strong></td>
+<td> <strong>il devient MOINS PRÉCIEUX</strong></td>
+</tr>
+</tbody></table>
+<p class="cal piege"><em> <strong>Les deux sont des investissements RISQUÉS.</strong></em></p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th><strong>PO</strong></th>
+<th><strong>IO</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Ce qui est certain</td>
+<td><em>un <strong>montant FIXE de principal</strong> est rendu…</em></td>
+<td>—</td>
+</tr>
+<tr>
+<td>Ce qui est incertain</td>
+<td><em>…mais <strong>LE TIMING</strong> l'est</em></td>
+<td><em> <strong>LE TOTAL des flux reçus</strong> est incertain</em></td>
+</tr>
+<tr>
+<td>Prépaiements élevés</td>
+<td><em>le principal est <strong>reçu tôt</strong> — <strong>bonne nouvelle</strong></em></td>
+<td><em> <strong>plus les prépaiements sont élevés, PLUS FAIBLES sont les flux totaux</strong></em></td>
+</tr>
+<tr>
+<td>Prépaiements faibles</td>
+<td><em>le retour du principal est <strong>retardé</strong>, le rendement <strong>réduit</strong></em></td>
+<td>—</td>
+</tr>
+</tbody></table>
+</div></details>
+
+<h3>6.3 Valorisation et <em>option-adjusted spread</em></h3>
+<p><strong>La valorisation.</strong> <em>« Les MBS d'agence se valorisent habituellement par <strong>MONTE-CARLO</strong>. <strong>HJM ou LMM</strong> peuvent servir à simuler le comportement des taux <strong>MOIS PAR MOIS</strong> sur toute la vie du titre. »</em></p>
+<table>
+<thead>
+<tr>
+<th>Étape (par essai de simulation)</th>
+<th>Contenu</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>1</strong></td>
+<td><strong>chaque mois</strong>, les prépaiements attendus se calculent <strong>de la courbe courante ET DE L'HISTORIQUE des mouvements de courbe</strong></td>
+</tr>
+<tr>
+<td><strong>2</strong></td>
+<td>ces prépaiements déterminent les <strong>flux attendus</strong> au détenteur</td>
+</tr>
+<tr>
+<td><strong>3</strong></td>
+<td>les flux sont <strong>actualisés à la date 0</strong> pour obtenir une valeur échantillon</td>
+</tr>
+<tr>
+<td><strong>4</strong></td>
+<td>l'estimation est <strong>la MOYENNE</strong> sur de nombreux essais</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p class="cal piege"> <em>C'est <strong>précisément parce qu'ils sont fortement DÉPENDANTS DU CHEMIN</strong> que les MBS d'agence sont <strong>des candidats idéaux pour HJM et LMM</strong>.</em></p>
+</blockquote>
+<details class="cor">
+<summary><strong>L'option-adjusted spread — la procédure itérative complète</strong></summary><div class="in">
+
+<blockquote>
+<p><em><strong>L'OAS est UNE MESURE DU SPREAD SUR LES RENDEMENTS DES OBLIGATIONS D'ÉTAT fourni par l'instrument QUAND TOUTES LES OPTIONS ONT ÉTÉ PRISES EN COMPTE.</strong></em></p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>Étape</th>
+<th>Contenu</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>1</strong></td>
+<td> <em>l'entrée habituelle d'un modèle de structure par terme est <strong>la courbe LIBOR</strong>. <strong>Mais pour calculer un OAS, on valorise D'ABORD avec la courbe zéro des OBLIGATIONS D'ÉTAT</strong></em></td>
+</tr>
+<tr>
+<td><strong>2</strong></td>
+<td>comparer le prix du modèle au <strong>prix de marché</strong></td>
+</tr>
+<tr>
+<td><strong>3</strong></td>
+<td><strong>itérer</strong> pour trouver <strong>le DÉPLACEMENT PARALLÈLE de la courbe d'État</strong> qui rend le prix du modèle égal au prix de marché</td>
+</tr>
+<tr>
+<td><strong>4</strong></td>
+<td> <strong>ce déplacement parallèle EST l'OAS</strong></td>
+</tr>
+</tbody></table>
+<p><strong>L'exemple chiffré, à reproduire.</strong> <em>Prix de marché <strong>102,00</strong> ; prix calculé avec la courbe d'État <strong>103,27</strong>.</em></p>
+<p><em>Essai 1 — un déplacement de <strong>60 points de base</strong> donne un prix de <strong>101,20</strong>.</em> C'est <strong>inférieur</strong> à 102,00, donc l'OAS est <strong>entre 0 et 60 pb</strong>. Par interpolation linéaire :
+$$60\times\frac{103{,}27-102{,}00}{103{,}27-101{,}20}=60\times\frac{1{,}27}{2{,}07}=\mathbf{36{,}81\ \text{pb}}$$</p>
+<p><em>Essai 2 — 36,81 pb donne <strong>101,95</strong>.</em> C'est <strong>légèrement inférieur</strong> à 102,00, donc l'OAS est <strong>un peu moins de 36,81</strong>. Nouvelle interpolation :
+$$36{,}81\times\frac{103{,}27-102{,}00}{103{,}27-101{,}95}=36{,}81\times\frac{1{,}27}{1{,}32}=\mathbf{35{,}41\ \text{pb}}$$</p>
+<p><em>Et ainsi de suite jusqu'à convergence.</em></p>
+</div></details>
+
+<h2>Comment reconnaître le type d'exercice</h2>
+<table>
+<thead>
+<tr>
+<th>Indice dans l'énoncé</th>
+<th>Méthode à déclencher</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>« taux forward <strong>INSTANTANÉS</strong> »</td>
+<td><strong>HJM</strong> : (31.4) et le résultat (31.5)</td>
+</tr>
+<tr>
+<td>« quel est le drift ? » avec des volatilités données</td>
+<td> le drift est <strong>DICTÉ</strong> par les volatilités</td>
+</tr>
+<tr>
+<td>« pourquoi ne peut-on pas utiliser un arbre ? »</td>
+<td>processus <strong>NON MARKOVIEN</strong> → arbre <strong>non recombinant</strong></td>
+</tr>
+<tr>
+<td>« taux forward de caps », « réinitialisations »</td>
+<td><strong>LMM</strong></td>
+</tr>
+<tr>
+<td>« monde forward risque-neutre roulant »</td>
+<td>numéraire = <strong>CD roulé</strong></td>
+</tr>
+<tr>
+<td>Volatilités de caplets données, $\Lambda$ demandés</td>
+<td>$\sigma_k^2t_k=\sum\Lambda_{k-i}^2\delta_{i-1}$, <strong>itérativement</strong></td>
+</tr>
+<tr>
+<td>Simulation de taux forward</td>
+<td>(31.14) ou (31.16), avec <strong>l'approximation de drift</strong></td>
+</tr>
+<tr>
+<td>Cap <em>ratchet</em></td>
+<td>$K_{j+1}=R_j+s$</td>
+</tr>
+<tr>
+<td>Cap <em>sticky</em></td>
+<td>$K_{j+1}=\min(R_j,K_j)+s$</td>
+</tr>
+<tr>
+<td>« le nombre de facteurs importe-t-il ? »</td>
+<td> <strong>non</strong> pour un cap vanille, <strong>oui</strong> pour les exotiques</td>
+</tr>
+<tr>
+<td>Volatilité de swap dans le LMM</td>
+<td>(31.18), ou (31.19) si les périodes diffèrent</td>
+</tr>
+<tr>
+<td>Découper $\Lambda$ en $\lambda_q$</td>
+<td><strong>ACP</strong> + la renormalisation (31.20)</td>
+</tr>
+<tr>
+<td>Skew de volatilité de caps</td>
+<td>le modèle <strong>CEV</strong> (31.21)</td>
+</tr>
+<tr>
+<td>Swaption <strong>bermudienne</strong></td>
+<td>Longstaff-Schwartz ou frontière paramétrée ; en pratique <strong>un modèle à un facteur</strong></td>
+</tr>
+<tr>
+<td>« fonction de prépaiement », « pool »</td>
+<td><strong>MBS d'agence</strong>, valorisation <strong>Monte-Carlo</strong></td>
+</tr>
+<tr>
+<td>Prix de marché ≠ prix modèle sur la courbe d'État</td>
+<td>l'<strong>OAS</strong> par interpolation</td>
+</tr>
+</tbody></table>
+<h2>Comment résoudre ce type d'exercice</h2>
+<p><strong>A — Extraire les $\Lambda$ de volatilités de caplets.</strong></p>
+<ol>
+<li>Écrire $\sigma_k^2t_k=\sum_{i=1}^{k}\Lambda_{k-i}^2\delta_{i-1}$.</li>
+<li>$k=1$ : $\Lambda_0=\sigma_1$.</li>
+<li>$k=2$ : $\Lambda_1=\sqrt{2\sigma_2^2\ -\Lambda_0^2}$ (si $\delta$ constant $=1$).</li>
+<li>Continuer : $\Lambda_{k-1}=\sqrt{k\sigma_k^2-\sum_{j&lt;k-1}\Lambda_j^2}$.</li>
+<li> Contrôle : la <strong>bosse</strong> des $\Lambda$ doit être <strong>plus prononcée</strong> que celle des $\sigma$ ; si un radicande est <strong>négatif</strong>, aucun jeu de $\Lambda$ n'est cohérent.</li>
+</ol>
+<p><strong>B — Simuler un pas du LMM.</strong></p>
+<ol>
+<li>Partir des $F_i(t_j)$ courants.</li>
+<li>Pour chaque $k&gt;j$, calculer le drift $\sum_{i=j+1}^{k}\dfrac{\delta_iF_i\Lambda_{i-j-1}\Lambda_{k-j-1}}{1+\delta_iF_i}$ —  <strong>la somme commence à $j+1$</strong>.</li>
+<li>Retrancher $\Lambda_{k-j-1}^2/2$, multiplier par $\delta_j$.</li>
+<li>Ajouter $\Lambda_{k-j-1}\varepsilon\sqrt{\delta_j}$ et exponentier.</li>
+<li> Contrôle : <strong>la courbe raccourcit</strong> d'une période à chaque pas.</li>
+</ol>
+<p><strong>C — Calculer un OAS.</strong></p>
+<ol>
+<li>Valoriser avec la courbe <strong>d'État</strong>, obtenir $V_0$.</li>
+<li>Comparer au prix de marché $M$ ; si $V_0&gt;M$, l'OAS est <strong>positif</strong>.</li>
+<li>Essayer un déplacement $x_1$, obtenir $V_1$.</li>
+<li>Interpoler : $x_2=x_1\dfrac{V_0-M}{V_0-V_1}$.</li>
+<li>Itérer jusqu'à convergence.</li>
+</ol>
+<h2 data-prio="must">Common mistakes</h2>
+<table>
+<thead>
+<tr>
+<th>Erreur</th>
+<th>Correction</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Croire les modèles du ch. 30 sans limite</td>
+<td> <strong>un facteur</strong> et <strong>volatilité non stationnaire</strong></td>
+</tr>
+<tr>
+<td>Oublier $v(t,t,\Omega_t)=0$</td>
+<td>sans elle, le prix ne convergerait pas vers la faciale</td>
+</tr>
+<tr>
+<td>Croire qu'on peut choisir le drift dans HJM</td>
+<td> <strong>il est ENTIÈREMENT DICTÉ par les volatilités</strong></td>
+</tr>
+<tr>
+<td>Croire HJM markovien</td>
+<td> <strong>non</strong> — d'où l'arbre <strong>non recombinant</strong> et $2^{30}\approx10^9$ nœuds</td>
+</tr>
+<tr>
+<td>Croire qu'aucun taux forward n'est markovien dans HJM</td>
+<td> <strong>un taux PARTICULIER l'est souvent</strong> — mais <strong>pas tous sur le même arbre</strong></td>
+</tr>
+<tr>
+<td>Utiliser des taux forward instantanés dans le LMM</td>
+<td> le LMM utilise <strong>les taux OBSERVABLES des caps</strong></td>
+</tr>
+<tr>
+<td>Oublier que $F_k$ n'est martingale que sous $P(t,t_{k+1})$</td>
+<td>sous le monde <strong>roulant</strong>, il y a un <strong>drift</strong></td>
+</tr>
+<tr>
+<td>Faire commencer la somme du drift à $i=0$</td>
+<td> elle commence à $\mathbf{m(t)}$, la <strong>prochaine</strong> réinitialisation</td>
+</tr>
+<tr>
+<td>Oublier le $-\Lambda^2/2$ dans (31.14)</td>
+<td>c'est la <strong>correction d'Itô</strong> du passage au log</td>
+</tr>
+<tr>
+<td>Croire l'approximation de drift dangereuse</td>
+<td> Hull la juge <strong>inoffensive</strong>, sauf si les volatilités de caps sont <strong>très élevées</strong></td>
+</tr>
+<tr>
+<td>Croire que le nombre de facteurs change le prix d'un cap vanille</td>
+<td> <strong>non</strong> — un <strong>seul</strong> taux forward est impliqué</td>
+</tr>
+<tr>
+<td>Croire qu'il ne change rien pour un ratchet</td>
+<td> <strong>si</strong> — la loi <strong>JOINTE</strong> de plusieurs taux intervient</td>
+</tr>
+<tr>
+<td>Utiliser (31.11) telle quelle pour calibrer</td>
+<td> <strong>oscillations sauvages</strong>, parfois <strong>aucune</strong> solution</td>
+</tr>
+<tr>
+<td>Oublier de renormaliser les $\lambda_{j,q}$ quand $p&lt;M$</td>
+<td>il faut (31.20), sinon $\sqrt{\sum\lambda^2}\ne\Lambda_j$</td>
+</tr>
+<tr>
+<td>Croire que le prépaiement est purement lié aux taux</td>
+<td> <strong>une vente de maison</strong> en cause aussi</td>
+</tr>
+<tr>
+<td>Croire un MBS d'agence sans risque</td>
+<td> le <strong>défaut</strong> est garanti, <strong>PAS le prépaiement</strong></td>
+</tr>
+<tr>
+<td>Croire que la classe C d'un CMO est toujours protégée</td>
+<td>cela dépend <strong>des valeurs nominales relatives</strong></td>
+</tr>
+<tr>
+<td>Croire qu'un IO gagne quand les prépaiements montent</td>
+<td> <strong>c'est l'inverse</strong> — il perd</td>
+</tr>
+<tr>
+<td>Calculer l'OAS sur la courbe <strong>LIBOR</strong></td>
+<td> il se calcule sur la courbe des <strong>obligations d'ÉTAT</strong></td>
+</tr>
+</tbody></table>
+<h2>Ultimate Review</h2>
+<table>
+<thead>
+<tr>
+<th>Élément</th>
+<th>Formule / valeur</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Les deux limites du ch. 30</strong></td>
+<td><strong>un facteur</strong> · <strong>liberté de volatilité limitée</strong></td>
+</tr>
+<tr>
+<td><strong>Le prix de la flexibilité</strong></td>
+<td>volatilité <strong>NON STATIONNAIRE</strong></td>
+</tr>
+<tr>
+<td><strong>Usage de HJM et LMM</strong></td>
+<td>plutôt <strong>recherche et développement</strong> que routine</td>
+</tr>
+<tr>
+<td><strong>Auteurs de HJM</strong></td>
+<td><strong>Heath, Jarrow et Morton</strong>, 1990-1992</td>
+</tr>
+<tr>
+<td><strong>Ce que HJM décrit</strong></td>
+<td> les <strong>conditions de NON-ARBITRAGE</strong> de la courbe</td>
+</tr>
+<tr>
+<td><strong>Processus du zéro-coupon</strong></td>
+<td>$dP=rP\,dt+vP\,dz$</td>
+</tr>
+<tr>
+<td><strong>La condition de bord</strong></td>
+<td>$v(t,t,\Omega_t)=0$</td>
+</tr>
+<tr>
+<td><strong>Le processus du taux forward</strong></td>
+<td>$dF=v\,v_T\,dt-v_T\,dz$</td>
+</tr>
+<tr>
+<td><strong>Le résultat HJM</strong></td>
+<td>$m(t,T)=s(t,T)\int_t^Ts(t,\tau)d\tau$</td>
+</tr>
+<tr>
+<td><strong>Sa portée</strong></td>
+<td> <strong>le drift est DICTÉ par les volatilités</strong></td>
+</tr>
+<tr>
+<td><strong>Multi-facteurs</strong></td>
+<td>$m=\sum_ks_k\int_t^Ts_k\,d\tau$</td>
+</tr>
+<tr>
+<td><strong>Le problème clé</strong></td>
+<td>le taux court est <strong>NON MARKOVIEN</strong></td>
+</tr>
+<tr>
+<td><strong>La conséquence</strong></td>
+<td>arbre <strong>non recombinant</strong> : $2^{30}\approx\mathbf{10^9}$ nœuds</td>
+</tr>
+<tr>
+<td><strong>La méthode obligée</strong></td>
+<td><strong>MONTE-CARLO</strong></td>
+</tr>
+<tr>
+<td><strong>La nuance</strong></td>
+<td>un taux forward <strong>particulier</strong> est markovien, <strong>pas tous ensemble</strong></td>
+</tr>
+<tr>
+<td><strong>Les deux défauts de HJM</strong></td>
+<td>taux <strong>non observables</strong> · <strong>difficile à calibrer</strong></td>
+</tr>
+<tr>
+<td><strong>Auteurs du LMM</strong></td>
+<td><strong>Brace, Gatarek, Musiela</strong> ; <strong>Jamshidian</strong> ; <strong>Miltersen, Sandmann, Sondermann</strong></td>
+</tr>
+<tr>
+<td><strong>Autre nom</strong></td>
+<td>le modèle <strong>BGM</strong></td>
+</tr>
+<tr>
+<td><strong>$m(t)$</strong></td>
+<td>l'indice de la <strong>prochaine réinitialisation</strong></td>
+</tr>
+<tr>
+<td><strong>Sous $P(t,t_{k+1})$</strong></td>
+<td>$F_k$ est une <strong>MARTINGALE</strong></td>
+</tr>
+<tr>
+<td><strong>Le monde roulant</strong></td>
+<td>forward risque-neutre par rapport à <strong>$P(t,t_{m(t)})$</strong></td>
+</tr>
+<tr>
+<td><strong>Son numéraire</strong></td>
+<td>un <strong>CD ROULÉ</strong></td>
+</tr>
+<tr>
+<td><strong>La remarque de Hull</strong></td>
+<td>les <strong>arbres du ch. 30 sont dans ce monde</strong>, pas le traditionnel</td>
+</tr>
+<tr>
+<td><strong>Le lien $v$-$\zeta$</strong></td>
+<td>$v_i-v_{i+1}=\dfrac{\delta_iF_i\zeta_i}{1+\delta_iF_i}$</td>
+</tr>
+<tr>
+<td><strong>Le drift du LMM</strong></td>
+<td>$\displaystyle\sum_{i=m(t)}^{k}\frac{\delta_iF_i\zeta_i\zeta_k}{1+\delta_iF_i}$</td>
+</tr>
+<tr>
+<td><strong>Cas limite</strong></td>
+<td>HJM quand $\delta_i\to0$</td>
+</tr>
+<tr>
+<td><strong>La simplification</strong></td>
+<td>$\zeta_k(t)=\Lambda_{k-m(t)}$, <strong>fonction escalier</strong></td>
+</tr>
+<tr>
+<td><strong>Le lien aux caplets</strong></td>
+<td>$\sigma_k^2t_k=\sum_{i=1}^{k}\Lambda_{k-i}^2\delta_{i-1}$</td>
+</tr>
+<tr>
+<td><strong>Exemple 31.1</strong></td>
+<td>24 / 22 / 20 % → $\Lambda=$ <strong>24 · 19,80 · 15,23 %</strong></td>
+</tr>
+<tr>
+<td><strong>Table 31.1</strong></td>
+<td>$\sigma$ de 15,50 à 15,54 → $\Lambda$ de 15,50 à 13,40, <strong>pic à 20,64</strong></td>
+</tr>
+<tr>
+<td><strong>La bosse des $\Lambda$</strong></td>
+<td> <strong>PLUS PRONONCÉE</strong> que celle des $\sigma$</td>
+</tr>
+<tr>
+<td><strong>L'approximation de drift</strong></td>
+<td>$F_i(t)=F_i(t_j)$ sur chaque période</td>
+</tr>
+<tr>
+<td><strong>Son verdict</strong></td>
+<td><strong>INOFFENSIVE</strong>, sauf volatilités très élevées</td>
+</tr>
+<tr>
+<td><strong>Ce qui raccourcit</strong></td>
+<td> <strong>la courbe zéro</strong>, à chaque pas</td>
+</tr>
+<tr>
+<td><strong>Cap ratchet</strong></td>
+<td>$K_{j+1}=R_j+s$</td>
+</tr>
+<tr>
+<td><strong>Cap sticky</strong></td>
+<td>$K_{j+1}=\min(R_j,K_j)+s$</td>
+</tr>
+<tr>
+<td><strong>Flexi cap</strong></td>
+<td> <strong>limite sur le NOMBRE de caplets exerçables</strong></td>
+</tr>
+<tr>
+<td><strong>Flexi cap, 1/2/3 facteurs</strong></td>
+<td><strong>3,43 · 3,58 · 3,61</strong></td>
+</tr>
+<tr>
+<td><strong>Cap vanille et facteurs</strong></td>
+<td> <strong>INDÉPENDANT</strong> — un seul taux forward</td>
+</tr>
+<tr>
+<td><strong>Caps exotiques et facteurs</strong></td>
+<td> <strong>DÉPENDANT</strong> — loi <strong>JOINTE</strong></td>
+</tr>
+<tr>
+<td><strong>Volatilité de swap (LMM)</strong></td>
+<td>(31.18), et (31.19) si les périodes diffèrent</td>
+</tr>
+<tr>
+<td><strong>Le décalage américain</strong></td>
+<td>caps <strong>trimestriels</strong> contre swaps <strong>semestriels</strong></td>
+</tr>
+<tr>
+<td><strong>Le verdict de Hull-White</strong></td>
+<td>(31.18)-(31.19) <strong>très proches</strong> de Monte-Carlo</td>
+</tr>
+<tr>
+<td><strong>Calibration : les $\Lambda$</strong></td>
+<td>des <strong>données de marché courantes</strong></td>
+</tr>
+<tr>
+<td><strong>Calibration : le découpage</strong></td>
+<td>des <strong>données HISTORIQUES</strong>, par <strong>ACP</strong></td>
+</tr>
+<tr>
+<td><strong>La renormalisation</strong></td>
+<td>$\lambda_{j,q}=\dfrac{\Lambda_j\alpha_{j,q}s_q}{\sqrt{\sum_qs_q^2\alpha_{j,q}^2}}$</td>
+</tr>
+<tr>
+<td><strong>Pourquoi pas (31.11)</strong></td>
+<td><strong>oscillations sauvages</strong> ; parfois aucune solution</td>
+</tr>
+<tr>
+<td><strong>Skew de volatilité</strong></td>
+<td>volatilité <strong>décroissante</strong> en strike → modèle <strong>CEV</strong></td>
+</tr>
+<tr>
+<td><strong>Loi de valorisation CEV</strong></td>
+<td>le <strong>khi-deux NON CENTRÉ</strong></td>
+</tr>
+<tr>
+<td><strong>Bermudiennes en LMM</strong></td>
+<td>difficiles : Monte-Carlo + exercice anticipé</td>
+</tr>
+<tr>
+<td><strong>Les deux remèdes</strong></td>
+<td><strong>Longstaff-Schwartz</strong> · <strong>frontière paramétrée</strong> (Andersen)</td>
+</tr>
+<tr>
+<td><strong>La pratique</strong></td>
+<td>la plupart des traders utilisent <strong>un modèle à UN facteur</strong></td>
+</tr>
+<tr>
+<td><strong>MBS d'agence</strong></td>
+<td>garanti contre le <strong>défaut</strong> par GNMA ou FNMA</td>
+</tr>
+<tr>
+<td><strong>La différence critique</strong></td>
+<td> les <strong>PRIVILÈGES DE PRÉPAIEMENT</strong></td>
+</tr>
+<tr>
+<td><strong>Ce que c'est</strong></td>
+<td>un <strong>PUT AMÉRICAIN à 30 ANS</strong> donné à l'emprunteur</td>
+</tr>
+<tr>
+<td><strong>La fonction de prépaiement</strong></td>
+<td>prépaiements attendus <strong>fonction de la courbe et d'autres variables</strong></td>
+</tr>
+<tr>
+<td><strong>Sa fiabilité</strong></td>
+<td> <strong>nulle</strong> individuellement, <strong>bonne sur un POOL</strong></td>
+</tr>
+<tr>
+<td><strong>La conséquence sur les taux</strong></td>
+<td>les investisseurs <strong>exigent un taux PLUS ÉLEVÉ</strong></td>
+</tr>
+<tr>
+<td><strong>Pass-through</strong></td>
+<td>tous les investisseurs, <strong>même risque</strong></td>
+</tr>
+<tr>
+<td><strong>CMO</strong></td>
+<td>classes <strong>A/B/C</strong>, principal canalisé <strong>dans l'ordre</strong></td>
+</tr>
+<tr>
+<td><strong>Qui porte le plus de risque</strong></td>
+<td> la <strong>classe A</strong></td>
+</tr>
+<tr>
+<td><strong>PO</strong></td>
+<td>reçoit le <strong>principal</strong> ; <strong>gagne</strong> si les prépaiements montent</td>
+</tr>
+<tr>
+<td><strong>IO</strong></td>
+<td>reçoit les <strong>intérêts</strong> ;  <strong>PERD</strong> si les prépaiements montent</td>
+</tr>
+<tr>
+<td><strong>Ce qui est incertain sur un PO</strong></td>
+<td>le <strong>TIMING</strong></td>
+</tr>
+<tr>
+<td><strong>Sur un IO</strong></td>
+<td> le <strong>TOTAL</strong> des flux</td>
+</tr>
+<tr>
+<td><strong>Valorisation d'un MBS</strong></td>
+<td><strong>Monte-Carlo</strong>, mois par mois, HJM ou LMM</td>
+</tr>
+<tr>
+<td><strong>Pourquoi ces modèles</strong></td>
+<td>ils sont <strong>fortement dépendants du chemin</strong></td>
+</tr>
+<tr>
+<td><strong>L'OAS</strong></td>
+<td>le <strong>spread sur les rendements d'État</strong>, options prises en compte</td>
+</tr>
+<tr>
+<td><strong>La courbe utilisée</strong></td>
+<td> celle des <strong>obligations d'ÉTAT</strong></td>
+</tr>
+<tr>
+<td><strong>L'exemple</strong></td>
+<td>$60\times\frac{1{,}27}{2{,}07}=\mathbf{36{,}81}$ puis $36{,}81\times\frac{1{,}27}{1{,}32}=\mathbf{35{,}41}$ pb</td>
+</tr>
+</tbody></table>
+<div class="rec"><h2>Active Recall</h2><ol>
+<li>Citer les deux limites des modèles du chapitre 30.</li>
+<li>Quel est le prix de rendre $a$ et $\sigma$ fonctions du temps ?</li>
+<li>À quoi les modèles HJM et LMM servent-ils surtout en pratique ?</li>
+<li>Qui sont les auteurs de HJM et que décrit leur article ?</li>
+<li>Écrire le processus du prix d'un zéro-coupon dans le monde risque-neutre.</li>
+<li>Pourquoi $v(t,t,\Omega_t)=0$ ? Quelle en est l'interprétation ?</li>
+<li>Écrire (31.2) et appliquer Itô aux deux logarithmes.</li>
+<li>Dériver (31.3) et commenter sa dépendance.</li>
+<li>Passer à la limite pour obtenir (31.4).</li>
+<li>Quel est le résultat clé de HJM ?</li>
+<li>Dériver (31.5) en utilisant la condition de bord.</li>
+<li>Écrire l'extension multi-facteurs.</li>
+<li>Pourquoi le processus du taux court est-il non markovien ? Quelle en est la conséquence ?</li>
+<li>Combien de nœuds après 30 pas ? Quelle méthode s'impose ?</li>
+<li>En quel sens HJM est-il « trompeusement complexe » ?</li>
+<li>Citer les deux défauts de HJM qui ont motivé le LMM.</li>
+<li>Qui a proposé le LMM ? Quel est son autre nom ?</li>
+<li>Définir $t_k$, $\delta_k$, $F_k(t)$, $m(t)$ et $\zeta_k(t)$.</li>
+<li>Sous quel numéraire $F_k$ est-il une martingale ?</li>
+<li>Définir le monde forward risque-neutre roulant. Que permet-il ?</li>
+<li>Qu'est-ce qu'un CD roulé ?</li>
+<li>Quelle remarque Hull fait-il sur les arbres du chapitre 30 ?</li>
+<li>Écrire (31.8) et dire pourquoi $v_k$ est négative.</li>
+<li>Dériver (31.9) à partir de la relation prix-taux forward.</li>
+<li>Écrire le drift complet (31.10).</li>
+<li>Quel est le cas limite de (31.10) ?</li>
+<li>Quelle simplification transforme $\zeta_k(t)$ en fonction escalier ?</li>
+<li>Écrire (31.11) et expliquer son origine.</li>
+<li>Refaire l'exemple 31.1 en entier.</li>
+<li>Lire la table 31.1. Que remarque-t-on sur les deux bosses ?</li>
+<li>Écrire (31.13) puis (31.14). Quelle approximation est faite ?</li>
+<li>Écrire l'extension multi-facteurs (31.16).</li>
+<li>Décrire le déroulement d'une simulation. Que devient la courbe ?</li>
+<li>Comment teste-t-on l'approximation de drift ? Quel est le verdict ?</li>
+<li>Quelle est la seule exception ?</li>
+<li>Définir cap ratchet, cap sticky, flexi cap.</li>
+<li>Écrire les deux règles de fixation du taux.</li>
+<li>Quel est le cadre commun des tables 31.2 et 31.3 ?</li>
+<li>Comment se comparent ratchet et sticky aux maturités longues ?</li>
+<li>Lire les tables 31.4 et 31.5 : comment vérifie-t-on la volatilité totale ?</li>
+<li>Quelles valeurs le flexi cap prend-il avec 1, 2, 3 facteurs ?</li>
+<li>Pourquoi un cap vanille est-il indépendant du nombre de facteurs ?</li>
+<li>Pourquoi les exotiques ne le sont-ils pas ?</li>
+<li>Écrire les deux relations liant $s(t)$ et les $G_j(t)$.</li>
+<li>Écrire (31.17) et l'approximation faite sur les $G_j$.</li>
+<li>Écrire (31.18). Où lit-on les $\gamma_{k,q}$ ?</li>
+<li>Quel décalage existe entre caps et swaptions aux États-Unis ?</li>
+<li>Écrire (31.19) et son motif.</li>
+<li>Quel est le verdict de Hull et White sur ces approximations ? À quoi servent-elles ?</li>
+<li>Comment détermine-t-on les $\Lambda$ et les $\lambda$ respectivement ?</li>
+<li>Décrire l'ACP employée et le cas $p=M$.</li>
+<li>Écrire (31.20) et dire pourquoi elle est nécessaire.</li>
+<li>Pourquoi (31.11) n'est-elle pas utilisée en pratique ?</li>
+<li>Écrire la fonction objectif de calibration et sa pénalité.</li>
+<li>Quel algorithme utilise-t-on ?</li>
+<li>Qu'est-ce qu'un skew de volatilité de caps ? Comment le traite-t-on ?</li>
+<li>Écrire (31.21) et dire quelle loi sert à la valorisation.</li>
+<li>Qu'est-ce qu'une swaption bermudienne ? Pourquoi est-elle difficile en LMM ?</li>
+<li>Citer les deux approches et ce que fait chacune.</li>
+<li>Que font la plupart des traders ? Est-ce consensuel ?</li>
+<li>Qu'est-ce qu'un MBS d'agence ? Qui garantit ?</li>
+<li>Quelle est la différence critique avec un titre d'État ?</li>
+<li>Décrire l'option détenue par le propriétaire.</li>
+<li>Citer deux raisons de prépaiement.</li>
+<li>Qu'est-ce que la fonction de prépaiement ? Quelle est sa fiabilité ?</li>
+<li>Pourquoi les investisseurs exigent-ils un taux plus élevé ?</li>
+<li>Qu'est-ce qu'un pass-through ?</li>
+<li>Décrire le CMO à trois classes. Qui porte le plus de risque ?</li>
+<li>Comparer les répartitions 400/300/100 et 100/200/500.</li>
+<li>Quel est l'objectif de ce type de structure ?</li>
+<li>Qu'est-ce qu'un stripped MBS ? Distinguer IO et PO.</li>
+<li>Que se passe-t-il pour chacun quand les prépaiements montent ?</li>
+<li>Qu'est-ce qui est incertain sur un PO ? Sur un IO ?</li>
+<li>Décrire les quatre étapes de la valorisation Monte-Carlo d'un MBS.</li>
+<li>Pourquoi HJM et LMM y sont-ils adaptés ?</li>
+<li>Définir l'OAS. Sur quelle courbe se calcule-t-il ?</li>
+<li>Décrire les quatre étapes de son calcul.</li>
+<li>Refaire les deux itérations de l'exemple.</li>
+</ol></div>
+
+<h2>Flashcards</h2>
+<table>
+<thead>
+<tr>
+<th>Question</th>
+<th>Réponse</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Les deux limites du ch. 30 ?</td>
+<td><strong>Un facteur</strong> · liberté de <strong>volatilité limitée</strong></td>
+</tr>
+<tr>
+<td>Prix de la flexibilité ?</td>
+<td>Volatilité <strong>NON STATIONNAIRE</strong></td>
+</tr>
+<tr>
+<td>Usage réel de HJM et LMM ?</td>
+<td><strong>Recherche et développement</strong></td>
+</tr>
+<tr>
+<td>Auteurs de HJM ?</td>
+<td><strong>Heath, Jarrow, Morton</strong> (1990-1992)</td>
+</tr>
+<tr>
+<td>Ce que HJM décrit ?</td>
+<td>Les conditions de <strong>NON-ARBITRAGE</strong></td>
+</tr>
+<tr>
+<td>Processus du zéro-coupon ?</td>
+<td>$dP=rP\,dt+vP\,dz$</td>
+</tr>
+<tr>
+<td>La condition de bord ?</td>
+<td>$v(t,t,\Omega_t)=\mathbf0$</td>
+</tr>
+<tr>
+<td>Sa justification ?</td>
+<td>Sinon un <strong>drift INFINI</strong> serait nécessaire</td>
+</tr>
+<tr>
+<td>Processus du taux forward instantané ?</td>
+<td>$dF=v\,v_T\,dt-v_T\,dz$</td>
+</tr>
+<tr>
+<td>Le résultat clé de HJM ?</td>
+<td>Un <strong>LIEN entre drift et écart-type</strong></td>
+</tr>
+<tr>
+<td>Sa formule ?</td>
+<td>$m(t,T)=s(t,T)\int_t^Ts(t,\tau)d\tau$</td>
+</tr>
+<tr>
+<td>Ce que cela signifie ?</td>
+<td> Le drift est <strong>DICTÉ</strong> par les volatilités</td>
+</tr>
+<tr>
+<td>Multi-facteurs ?</td>
+<td>$m=\sum_ks_k\int_t^Ts_k\,d\tau$</td>
+</tr>
+<tr>
+<td>Le problème clé de HJM ?</td>
+<td>Processus <strong>NON MARKOVIEN</strong></td>
+</tr>
+<tr>
+<td>Ce que cela veut dire ?</td>
+<td>$r$ en $t$ dépend <strong>DU CHEMIN</strong></td>
+</tr>
+<tr>
+<td>La conséquence sur l'arbre ?</td>
+<td>Il <strong>NE RECOMBINE PAS</strong></td>
+</tr>
+<tr>
+<td>Combien de nœuds à 30 pas ?</td>
+<td>$2^{30}\approx$ <strong>1 milliard</strong></td>
+</tr>
+<tr>
+<td>La méthode obligée ?</td>
+<td><strong>MONTE-CARLO</strong></td>
+</tr>
+<tr>
+<td>La nuance de Hull ?</td>
+<td>Un taux <strong>particulier</strong> est markovien, <strong>pas tous ensemble</strong></td>
+</tr>
+<tr>
+<td>Défaut 1 de HJM ?</td>
+<td>Taux forward <strong>non observables</strong></td>
+</tr>
+<tr>
+<td>Défaut 2 ?</td>
+<td><strong>Difficile à calibrer</strong></td>
+</tr>
+<tr>
+<td>Auteurs du LMM ?</td>
+<td><strong>Brace, Gatarek, Musiela</strong> ; Jamshidian ; Miltersen-Sandmann-Sondermann</td>
+</tr>
+<tr>
+<td>Autre nom ?</td>
+<td>Le modèle <strong>BGM</strong></td>
+</tr>
+<tr>
+<td>En quoi est-il exprimé ?</td>
+<td>Les taux forward <strong>des CAPS</strong></td>
+</tr>
+<tr>
+<td>Que vaut $m(t)$ ?</td>
+<td>L'indice de la <strong>prochaine réinitialisation</strong></td>
+</tr>
+<tr>
+<td>$F_k$ est martingale sous ?</td>
+<td>$P(t,t_{k+1})$</td>
+</tr>
+<tr>
+<td>Monde roulant ?</td>
+<td>Forward RN par rapport à $P(t,t_{m(t)})$</td>
+</tr>
+<tr>
+<td>Ce qu'il permet ?</td>
+<td>Actualiser <strong>d'une réinitialisation à la suivante</strong></td>
+</tr>
+<tr>
+<td>Son numéraire ?</td>
+<td>Un <strong>CD ROULÉ</strong></td>
+</tr>
+<tr>
+<td>La remarque sur le ch. 30 ?</td>
+<td>Les <strong>arbres y sont</strong>, pas dans le traditionnel</td>
+</tr>
+<tr>
+<td>Signe de $v_k$ ?</td>
+<td> <strong>NÉGATIF</strong></td>
+</tr>
+<tr>
+<td>Pourquoi ?</td>
+<td>Prix et taux sont <strong>négativement reliés</strong></td>
+</tr>
+<tr>
+<td>Le lien $v$-$\zeta$ ?</td>
+<td>$v_i-v_{i+1}=\dfrac{\delta_iF_i\zeta_i}{1+\delta_iF_i}$</td>
+</tr>
+<tr>
+<td>Le drift du LMM ?</td>
+<td>$\sum_{i=m(t)}^{k}\dfrac{\delta_iF_i\zeta_i\zeta_k}{1+\delta_iF_i}$</td>
+</tr>
+<tr>
+<td>Où commence la somme ?</td>
+<td> À <strong>$m(t)$</strong></td>
+</tr>
+<tr>
+<td>Cas limite quand $\delta\to0$ ?</td>
+<td>Le résultat <strong>HJM</strong></td>
+</tr>
+<tr>
+<td>La simplification de $\zeta$ ?</td>
+<td>$\zeta_k(t)=\Lambda_{k-m(t)}$</td>
+</tr>
+<tr>
+<td>Sa nature ?</td>
+<td>Une <strong>fonction ESCALIER</strong></td>
+</tr>
+<tr>
+<td>Lien avec les caplets ?</td>
+<td>$\sigma_k^2t_k=\sum_{i=1}^{k}\Lambda_{k-i}^2\delta_{i-1}$</td>
+</tr>
+<tr>
+<td>Comment obtenir les $\Lambda$ ?</td>
+<td><strong>ITÉRATIVEMENT</strong></td>
+</tr>
+<tr>
+<td>Ex. 31.1 : $\Lambda_0$ ?</td>
+<td><strong>24 %</strong></td>
+</tr>
+<tr>
+<td>$\Lambda_1$ ?</td>
+<td><strong>19,80 %</strong></td>
+</tr>
+<tr>
+<td>$\Lambda_2$ ?</td>
+<td><strong>15,23 %</strong></td>
+</tr>
+<tr>
+<td>Table 31.1 : $\Lambda$ maximal ?</td>
+<td><strong>20,64 %</strong> (année 2)</td>
+</tr>
+<tr>
+<td>Comparaison des bosses ?</td>
+<td> Celle des $\Lambda$ est <strong>PLUS PRONONCÉE</strong></td>
+</tr>
+<tr>
+<td>L'approximation de drift ?</td>
+<td>$F_i(t)=F_i(t_j)$ sur chaque période</td>
+</tr>
+<tr>
+<td>Son verdict ?</td>
+<td><strong>INOFFENSIVE</strong></td>
+</tr>
+<tr>
+<td>L'exception ?</td>
+<td>Volatilités de caps <strong>très élevées</strong></td>
+</tr>
+<tr>
+<td>Ce qui raccourcit dans la simulation ?</td>
+<td> La <strong>courbe zéro</strong></td>
+</tr>
+<tr>
+<td>Exemple : 10 ans, au point 6 ans ?</td>
+<td>Il reste une courbe à <strong>4 ans</strong></td>
+</tr>
+<tr>
+<td>Cap ratchet ?</td>
+<td>$K_{j+1}=R_j+s$</td>
+</tr>
+<tr>
+<td>Cap sticky ?</td>
+<td>$K_{j+1}=\min(R_j,K_j)+s$</td>
+</tr>
+<tr>
+<td>Flexi cap ?</td>
+<td><strong>Limite</strong> sur le nombre de caplets exerçables</td>
+</tr>
+<tr>
+<td>Flexi cap 1/2/3 facteurs ?</td>
+<td><strong>3,43 · 3,58 · 3,61</strong></td>
+</tr>
+<tr>
+<td>Nombre de simulations des tables ?</td>
+<td><strong>100 000</strong>, avec <strong>variables antithétiques</strong></td>
+</tr>
+<tr>
+<td>Erreur type ?</td>
+<td>Environ <strong>0,001</strong></td>
+</tr>
+<tr>
+<td>Cap vanille et nombre de facteurs ?</td>
+<td> <strong>INDÉPENDANT</strong></td>
+</tr>
+<tr>
+<td>Pourquoi ?</td>
+<td>Un <strong>SEUL</strong> taux forward intervient</td>
+</tr>
+<tr>
+<td>Caps exotiques ?</td>
+<td> <strong>DÉPENDANTS</strong> — loi <strong>JOINTE</strong></td>
+</tr>
+<tr>
+<td>Volatilité de swap dans le LMM ?</td>
+<td>La formule <strong>(31.18)</strong></td>
+</tr>
+<tr>
+<td>Si les périodes diffèrent ?</td>
+<td>La formule <strong>(31.19)</strong></td>
+</tr>
+<tr>
+<td>Le décalage américain ?</td>
+<td>Caps <strong>trimestriels</strong>, swaps <strong>semestriels</strong></td>
+</tr>
+<tr>
+<td>Verdict sur ces formules ?</td>
+<td><strong>Très proches</strong> de Monte-Carlo</td>
+</tr>
+<tr>
+<td>Leur usage ?</td>
+<td>Valoriser <strong>vite</strong> et <strong>calibrer</strong></td>
+</tr>
+<tr>
+<td>Les $\Lambda$ viennent de ?</td>
+<td><strong>Données de marché courantes</strong></td>
+</tr>
+<tr>
+<td>Le découpage en $\lambda$ vient de ?</td>
+<td><strong>Données HISTORIQUES</strong></td>
+</tr>
+<tr>
+<td>Par quelle méthode ?</td>
+<td>Une <strong>ACP</strong></td>
+</tr>
+<tr>
+<td>Si $p=M$ ?</td>
+<td>$\lambda_{j,q}=\alpha_{j,q}s_q$</td>
+</tr>
+<tr>
+<td>Si $p&lt;M$ ?</td>
+<td> Il faut <strong>RENORMALISER</strong> par (31.20)</td>
+</tr>
+<tr>
+<td>Pourquoi ne pas utiliser (31.11) ?</td>
+<td><strong>Oscillations sauvages</strong>, parfois <strong>aucune</strong> solution</td>
+</tr>
+<tr>
+<td>L'objectif de calibration ?</td>
+<td>$\sum(U_i-V_i)^2+P$</td>
+</tr>
+<tr>
+<td>L'algorithme ?</td>
+<td><strong>Levenberg-Marquardt</strong></td>
+</tr>
+<tr>
+<td>Skew de volatilité de caps ?</td>
+<td>Volatilité <strong>décroissante</strong> en strike</td>
+</tr>
+<tr>
+<td>Le modèle qui le traite ?</td>
+<td>Le <strong>CEV</strong> avec $0&lt;\alpha&lt;1$</td>
+</tr>
+<tr>
+<td>Loi de valorisation ?</td>
+<td>Le <strong>khi-deux NON CENTRÉ</strong></td>
+</tr>
+<tr>
+<td>Swaption bermudienne ?</td>
+<td>Exerçable à <strong>plusieurs dates</strong> du swap</td>
+</tr>
+<tr>
+<td>Pourquoi difficile en LMM ?</td>
+<td><strong>Monte-Carlo</strong> + <strong>exercice anticipé</strong></td>
+</tr>
+<tr>
+<td>Remède 1 ?</td>
+<td><strong>Longstaff-Schwartz</strong> (moindres carrés)</td>
+</tr>
+<tr>
+<td>Remède 2 ?</td>
+<td>La <strong>frontière d'exercice paramétrée</strong> (Andersen)</td>
+</tr>
+<tr>
+<td>Sur quoi la frontière repose-t-elle ?</td>
+<td>La <strong>valeur INTRINSÈQUE</strong> de l'option</td>
+</tr>
+<tr>
+<td>Ce que font les traders ?</td>
+<td>Un modèle à <strong>UN facteur</strong> du ch. 30</td>
+</tr>
+<tr>
+<td>Est-ce consensuel ?</td>
+<td> <strong>NON</strong> — question <strong>controversée</strong></td>
+</tr>
+<tr>
+<td>MBS d'agence : garanti par ?</td>
+<td><strong>GNMA</strong> ou <strong>FNMA</strong></td>
+</tr>
+<tr>
+<td>Contre quoi ?</td>
+<td>Les <strong>DÉFAUTS</strong></td>
+</tr>
+<tr>
+<td>La différence critique ?</td>
+<td>Les <strong>PRIVILÈGES DE PRÉPAIEMENT</strong></td>
+</tr>
+<tr>
+<td>L'option du propriétaire ?</td>
+<td>Un <strong>PUT AMÉRICAIN à 30 ANS</strong> à la <strong>valeur faciale</strong></td>
+</tr>
+<tr>
+<td>Deux raisons de prépaiement ?</td>
+<td><strong>Refinancement</strong> · <strong>vente de la maison</strong></td>
+</tr>
+<tr>
+<td>Fonction de prépaiement ?</td>
+<td>Prépaiements attendus <strong>en fonction de la courbe</strong></td>
+</tr>
+<tr>
+<td>Fiable pour un crédit unique ?</td>
+<td> <strong>TRÈS PEU</strong></td>
+</tr>
+<tr>
+<td>Sur un pool ?</td>
+<td>Oui — <strong>loi des grands nombres</strong></td>
+</tr>
+<tr>
+<td>Quand les prépaiements sont-ils plus probables ?</td>
+<td>Quand les <strong>TAUX SONT BAS</strong></td>
+</tr>
+<tr>
+<td>La conséquence ?</td>
+<td>Les investisseurs exigent un taux <strong>PLUS ÉLEVÉ</strong></td>
+</tr>
+<tr>
+<td>Pass-through ?</td>
+<td><strong>Même rendement, même risque</strong> pour tous</td>
+</tr>
+<tr>
+<td>CMO ?</td>
+<td>Des <strong>classes</strong> avec des règles de canalisation du principal</td>
+</tr>
+<tr>
+<td>Analogie avec l'ABS ?</td>
+<td>Risque de <strong>PRÉPAIEMENT</strong> au lieu de <strong>CRÉDIT</strong></td>
+</tr>
+<tr>
+<td>Qui porte le plus de risque ?</td>
+<td>La <strong>classe A</strong></td>
+</tr>
+<tr>
+<td>Qui dure le plus longtemps ?</td>
+<td>La <strong>classe C</strong></td>
+</tr>
+<tr>
+<td>400/300/100 : la classe C ?</td>
+<td>Porte <strong>TRÈS PEU</strong> de risque</td>
+</tr>
+<tr>
+<td>100/200/500 : la classe C ?</td>
+<td>Porte <strong>BEAUCOUP PLUS</strong></td>
+</tr>
+<tr>
+<td>Stripped MBS ?</td>
+<td>Principal et intérêts <strong>séparés</strong></td>
+</tr>
+<tr>
+<td>PO ?</td>
+<td>Reçoit le <strong>PRINCIPAL</strong></td>
+</tr>
+<tr>
+<td>IO ?</td>
+<td>Reçoit les <strong>INTÉRÊTS</strong></td>
+</tr>
+<tr>
+<td>Prépaiements ↑ : le PO ?</td>
+<td> <strong>PLUS précieux</strong></td>
+</tr>
+<tr>
+<td>Prépaiements ↑ : l'IO ?</td>
+<td> <strong>MOINS précieux</strong></td>
+</tr>
+<tr>
+<td>Incertain sur un PO ?</td>
+<td>Le <strong>TIMING</strong></td>
+</tr>
+<tr>
+<td>Incertain sur un IO ?</td>
+<td>Le <strong>TOTAL</strong> des flux</td>
+</tr>
+<tr>
+<td>Valorisation d'un MBS ?</td>
+<td><strong>Monte-Carlo</strong>, mois par mois</td>
+</tr>
+<tr>
+<td>Quels modèles ?</td>
+<td><strong>HJM</strong> ou <strong>LMM</strong></td>
+</tr>
+<tr>
+<td>Pourquoi ?</td>
+<td>Ils sont <strong>fortement dépendants du chemin</strong></td>
+</tr>
+<tr>
+<td>Ce qu'on utilise chaque mois ?</td>
+<td>La courbe courante <strong>ET l'HISTORIQUE</strong></td>
+</tr>
+<tr>
+<td>Qu'est-ce que l'OAS ?</td>
+<td>Le <strong>spread sur les rendements d'ÉTAT</strong>, options incluses</td>
+</tr>
+<tr>
+<td>Quelle courbe pour le calculer ?</td>
+<td> Celle des <strong>obligations d'ÉTAT</strong></td>
+</tr>
+<tr>
+<td>Que cherche-t-on ?</td>
+<td>Le <strong>déplacement PARALLÈLE</strong> qui égalise les prix</td>
+</tr>
+<tr>
+<td>Exemple : essai 1 ?</td>
+<td>$60\times\frac{1{,}27}{2{,}07}=\mathbf{36{,}81}$ pb</td>
+</tr>
+<tr>
+<td>Essai 2 ?</td>
+<td>$36{,}81\times\frac{1{,}27}{1{,}32}=\mathbf{35{,}41}$ pb</td>
+</tr>
+</tbody></table>
+</main>
+
+
+
+
+</body></html>

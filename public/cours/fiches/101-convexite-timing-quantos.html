@@ -1,0 +1,1217 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fiche 101 — Ajustements de convexité, de timing et quantos</title>
+<script>
+window.MathJax={tex:{inlineMath:[["$","$"]],displayMath:[["$$","$$"]],processEscapes:true},
+ options:{skipHtmlTags:["script","noscript","style","textarea","pre","code"]},
+ svg:{fontCache:"global"},
+ startup:{pageReady:()=>MathJax.startup.defaultPageReady().then(()=>{document.body.classList.add("ready")})}};
+setTimeout(function(){document.body.classList.add("ready")},2500);
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+/* ============================================================
+   MathiasLearn — feuille de style des fiches
+   Reprise intégrale des tokens de 00_PARCOURS/*.html
+   + blocs pédagogiques (callouts, méthode, essentiels, recall)
+   ============================================================ */
+:root{--bg:#faf9f7;--card:#fff;--ink:#1a1a1a;--muted:#6b6b6b;--line:#e5e2dd;--accent:#8b5e34;
+ --hl:#fdf8ef;--ok:#2d7d4f;--okbg:#f0f7f3;--warn:#b3402f;--warnbg:#fdf3f1;--blue:#2f5d8b;--bluebg:#f1f5fa}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+ font:17px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;padding:0 16px 100px}
+.nav{position:sticky;top:0;background:rgba(250,249,247,.96);backdrop-filter:blur(8px);
+ border-bottom:1px solid var(--line);margin:0 -16px 30px;padding:11px 16px;z-index:50;
+ display:flex;gap:6px;flex-wrap:wrap;font-size:13px}
+.nav a{color:var(--muted);text-decoration:none;padding:4px 9px;border-radius:5px;white-space:nowrap}
+.nav a:hover{background:var(--line);color:var(--ink)}
+.nav a.on{background:var(--accent);color:#fff}
+main{max-width:780px;margin:0 auto}
+h1{font-size:31px;letter-spacing:-.02em;margin:.4em 0 .5em;line-height:1.25}
+h2{font-size:23px;margin:2.2em 0 .7em;padding-bottom:.3em;border-bottom:1px solid var(--line)}
+h3{font-size:19px;margin:1.9em 0 .5em;color:var(--accent)}
+h4{font-size:17px;margin:1.5em 0 .4em}
+p{margin:.8em 0} a{color:var(--accent)} hr{border:0;border-top:1px solid var(--line);margin:2.6em 0}
+table{border-collapse:collapse;width:100%;margin:1.3em 0;font-size:15.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+th{background:#f3f0eb;font-weight:600}
+tr:nth-child(even) td{background:#fcfbfa}
+code{font-family:"SF Mono",Menlo,Consolas,monospace;font-size:.88em;background:#f2efea;padding:2px 6px;border-radius:4px;overflow-wrap:break-word}
+pre{background:#f2efea;padding:14px 16px;border-radius:8px;overflow-x:auto}
+pre code{background:none;padding:0;white-space:pre}
+blockquote{border-left:3px solid var(--accent);background:var(--hl);margin:1.4em 0;padding:14px 20px;border-radius:0 8px 8px 0}
+blockquote p:first-child{margin-top:0} blockquote p:last-child{margin-bottom:0}
+ul,ol{padding-left:1.5em} li{margin:.35em 0} em{color:#4a4a4a}
+mjx-container[display="true"]{margin:1.1em 0!important;overflow-x:auto;overflow-y:hidden;padding:2px 0}
+mjx-container svg{max-width:100%}
+body:not(.ready) main{opacity:0} main{opacity:1;transition:opacity .25s}
+
+/* --- bandeau de tête de fiche --- */
+.cours{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--accent);
+ border-radius:0 10px 10px 0;padding:18px 22px;margin:0 0 34px}
+.cours h4{margin:0 0 4px;font-size:14px;text-transform:uppercase;letter-spacing:.07em;color:var(--accent)}
+.cours .cs{color:var(--muted);font-size:14.5px;margin:0 0 14px}
+
+/* --- exercices / corrigés --- */
+.ex{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:6px 24px 20px;margin:18px 0}
+.ex>h3:first-child{margin-top:14px}
+details.cor{margin-top:18px;border:1px solid var(--line);border-radius:8px;background:#fcfbfa;overflow:hidden}
+details.cor>summary{cursor:pointer;padding:12px 16px;font-weight:600;font-size:15px;color:var(--accent);
+ list-style:none;display:flex;align-items:center;gap:9px;user-select:none;transition:.15s;min-height:44px}
+details.cor>summary::-webkit-details-marker{display:none}
+details.cor>summary:hover{background:var(--hl)}
+details.cor>summary::before{content:"\25B6";font-size:10px;transition:transform .18s;display:inline-block}
+details.cor[open]>summary::before{transform:rotate(90deg)}
+details.cor[open]>summary{background:var(--okbg);color:var(--ok);border-bottom:1px solid var(--line)}
+.cor .in{padding:4px 20px 16px}
+.cor .in>*:first-child{margin-top:.9em}
+
+/* --- blocs pédagogiques (callouts) ---
+   Générés depuis une citation Markdown dont le premier **gras** commence
+   par un mot-clé : DÉFINITION, THÉORÈME, MÉTHODE, PIÈGE, INTUITION… */
+.cal{border:1px solid var(--line);border-left:4px solid var(--accent);background:var(--card);
+ border-radius:0 10px 10px 0;padding:15px 20px;margin:1.5em 0}
+.cal>p:first-child{margin-top:0}.cal>p:last-child,.cal>ul:last-child,.cal>ol:last-child{margin-bottom:0}
+.cal .lab{display:block;font-size:12.5px;text-transform:uppercase;letter-spacing:.08em;
+ font-weight:700;color:var(--accent);margin-bottom:6px}
+.cal.formel{background:var(--hl)}
+.cal.piege{border-left-color:var(--warn);background:var(--warnbg)}
+.cal.piege .lab{color:var(--warn)}
+.cal.methode{border-left-color:var(--ok);background:var(--okbg)}
+.cal.methode .lab{color:var(--ok)}
+.cal.intu{border-left-color:var(--blue);background:var(--bluebg)}
+.cal.intu .lab{color:var(--blue)}
+.cal.plus{border-left-style:dashed;background:#faf9f7}
+.cal.plus .lab{color:var(--muted)}
+
+/* --- révision express --- */
+.ess{background:var(--card);border:1px solid var(--accent);border-radius:10px;padding:4px 24px 20px;margin:1.6em 0}
+.ess h3{margin-top:1.3em}
+.rec{background:var(--card);border:1px dashed var(--accent);border-radius:10px;padding:4px 24px 18px;margin:1.6em 0}
+.rec ol{counter-reset:none}
+
+/* --- impression / PDF --- */
+@media print{
+ .nav{display:none}
+ body{padding:0;background:#fff;font-size:11.2pt;line-height:1.55}
+ main{max-width:none}
+ h1{font-size:23pt}h2{font-size:15pt;margin-top:1.5em}h3{font-size:12.6pt}
+ h2,h3,h4{break-after:avoid;page-break-after:avoid}
+ table,.cal,blockquote{break-inside:avoid;page-break-inside:avoid}
+ table{display:table;font-size:9.6pt}
+ details.cor{border:1px solid var(--line);background:#fcfbfa}
+ details.cor>summary{display:none}
+ details.cor .in{padding-top:10px}
+ .cal,.ex,.ess,.rec{box-shadow:none}
+ a{color:var(--ink);text-decoration:none}
+}
+@page{margin:16mm 15mm 18mm}
+
+/* --- exemples travaillés --- */
+.exm{background:#fcfbfa;border:1px solid var(--line);border-radius:10px;padding:2px 20px 14px;margin:1.5em 0}
+.exm>h4:first-child{margin:14px 0 .5em;color:var(--accent);font-size:13px;text-transform:uppercase;letter-spacing:.07em}
+
+
+/* --- pastilles de priorité (conventions des fiches de l'app) --- */
+h2[data-prio], h3[data-prio], h4[data-prio]{position:relative}
+h2[data-prio]::before,h3[data-prio]::before,h4[data-prio]::before{
+ content:"";display:inline-block;width:9px;height:9px;border-radius:50%;
+ margin-right:9px;vertical-align:middle;background:var(--muted)}
+[data-prio="must"]::before{background:var(--warn)}
+[data-prio="high"]::before{background:#d98324}
+[data-prio="mid"]::before{background:#c9a227}
+[data-prio="low"]::before{background:var(--ok)}
+/* corrigés des fiches de l'app : même traitement que les corrigés des séries */
+details.cor>summary::after{content:""}
+</style></head><body>
+<div class="nav"><a href="00_COMMENCER_ICI.html">Commencer ici</a><a href="01_NOTATIONS_le-decodeur.html">Notations</a><a href="02_EXERCICES_Serie-0.html">Série 0 — Remise en route</a><a href="03_EXERCICES_Serie-1.html">Série 1 — Convexité</a><a href="04_EXERCICES_Serie-2.html">Série 2 — KKT</a><a href="05_AUTO-EVALUATION.html">Auto-évaluation (quiz)</a><a href="06_FICHE_Optimisation-deux-variables.html">Fiche — Optimisation à 2 variables</a></div>
+<main><h1>Fiche 101 — Ajustements de convexité, de timing et quantos</h1>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Matière</strong></td>
+<td>Maths · Finance de marché · Produits de taux</td>
+</tr>
+<tr>
+<td><strong>Cours source</strong></td>
+<td>John C. Hull, <em>Options, Futures, and Other Derivatives</em>, 8ᵉ éd., Pearson — chapitre 29 « Convexity, Timing, and Quanto Adjustments »</td>
+</tr>
+<tr>
+<td><strong>Difficulté</strong></td>
+<td> Must know — les trois corrections qui sauvent la procédure en deux étapes</td>
+</tr>
+<tr>
+<td><strong>Temps d'étude estimé</strong></td>
+<td>1 h 20</td>
+</tr>
+<tr>
+<td><strong>Prérequis</strong></td>
+<td>Fiches 99 (martingales, changement de numéraire), 100 (modèles standard de taux), 77 (taux et duration)</td>
+</tr>
+<tr>
+<td><strong>Concepts clés</strong></td>
+<td>Procédure en deux étapes, rendement forward d'obligation, ajustement de convexité, rendement au pair, ajustement de timing, ratio de numéraire, quanto, dérivé <em>cross-currency</em>, mesure risque-neutre traditionnelle, paradoxe de Siegel</td>
+</tr>
+<tr>
+<td><strong>Poids à l'examen</strong></td>
+<td>$E_T(y_T)=y_0-\frac12y_0^2\sigma_y^2T\dfrac{G''(y_0)}{G'(y_0)}$ · $E_T(R_T)=R_0+\dfrac{R_0^2\sigma_R^2T\tau}{1+R_0\tau}$ · $E_{T^\ast}(V_T)=E_T(V_T)\exp\!\left[-\dfrac{\rho_{VR}\sigma_V\sigma_RR_0(T^\ast-T)}{1+R_0/m}T\right]$ · $E_X(V_T)=E_Y(V_T)e^{\rho\sigma_V\sigma_WT}$.</td>
+</tr>
+</tbody></table>
+<h2>Vue d'ensemble</h2>
+<pre><code>LA PROCÉDURE EN DEUX ÉTAPES (celle qu'on a utilisée partout jusqu'ici)
+  1. calculer le payoff espéré EN SUPPOSANT que chaque variable égale SA VALEUR FORWARD
+  2. actualiser au taux sans risque de la date d'évaluation à la DATE DE PAIEMENT
+  ⚠️ EST-ELLE TOUJOURS CORRECTE ?   « THE ANSWER IS NO! »
+
+TROIS AJUSTEMENTS À LA VALEUR FORWARD DE L'ÉTAPE 1
+
+  CONVEXITÉ   le payoff dépend d'un RENDEMENT observé À LA DATE DU PAIEMENT
+     B = G(y) est NON LINÉAIRE ⇒ E(prix) = prix forward  N'IMPLIQUE PAS  E(y) = y forward
+     E_T(y_T) = y₀ − ½ y₀² σ_y² T · G''(y₀)/G'(y₀)      ⚠️ TOUJOURS POSITIF
+
+  TIMING      la variable est observée en T mais le payoff est en T* &gt; T
+     ratio de numéraire W = P(t,T*)/P(t,T)  =  prix forward d'obligation
+     α_V = ρ_VW σ_V σ_W        →  E_{T*}(V_T) = E_T(V_T) · exp[…]
+
+  QUANTO      variable mesurée en devise Y, payoff versé en devise X
+     ratio de numéraire W = CHANGE FORWARD (unités de Y par unité de X)
+     E_X(V_T) = E_Y(V_T) · e^{ρ σ_V σ_W T}
+
+MESURE TRADITIONNELLE (payoffs à PLUSIEURS dates)   croissance de V augmentée de ρ σ_V σ_S
+     → résout le PARADOXE DE SIEGEL
+</code></pre>
+<p><strong>Le rappel des lieux où la procédure en deux étapes a servi.</strong> <em>On l'a utilisée pour les <strong>FRA</strong> (chapitre 4), pour les <strong>swaps</strong> (chapitre 7 : calculer les flux en supposant les taux forward réalisés et actualiser aux taux sans risque), pour le <strong>modèle de Black</strong> (chapitres 17 et 27), et pour les <strong>options sur obligations, caps/floors et swaptions</strong> (chapitre 28).</em></p>
+<blockquote>
+<p class="cal piege"> <em><strong>« Cela soulève la question de savoir s'il est TOUJOURS correct de valoriser les dérivés de taux européens par la procédure en deux étapes. LA RÉPONSE EST NON ! Pour les dérivés de taux NON STANDARD, il est parfois nécessaire de modifier la procédure de sorte qu'un AJUSTEMENT soit fait à la valeur forward de la variable, à la première étape. »</strong></em></p>
+</blockquote>
+<h2 data-prio="must">Concept 1 — Les ajustements de convexité</h2>
+<h3>1.1 D'où vient le problème</h3>
+<p><strong>La définition asymétrique des forwards.</strong> <em>Habituellement la valeur forward d'une variable $S$ se calcule par référence à <strong>un contrat forward versant $S_T-K$ en $T$</strong> : c'est la valeur de $K$ qui annule le contrat.  <strong>Mais les TAUX forward et les RENDEMENTS forward sont définis DIFFÉREMMENT</strong> : un taux forward est <strong>le taux impliqué par une obligation zéro-coupon forward</strong>, et plus généralement <strong>un rendement forward d'obligation est le rendement impliqué par le PRIX FORWARD de l'obligation</strong>.</em></p>
+<p>Soit $B_T$ le prix de l'obligation en $T$, $y_T$ son rendement, et la relation de valorisation :
+$$\boxed{B_T=G(y_T)}\qquad\text{et par définition du rendement forward}\qquad\boxed{F_0=G(y_0)}$$</p>
+<blockquote>
+<p class="cal piege"> <em><strong>La fonction $G$ est NON LINÉAIRE. Cela signifie que, lorsque le prix futur ESPÉRÉ égale le prix forward (c'est-à-dire dans un monde forward risque-neutre par rapport à $P(t,T)$), LE RENDEMENT FUTUR ESPÉRÉ N'ÉGALE PAS LE RENDEMENT FORWARD.</strong></em></p>
+</blockquote>
+<details class="cor">
+<summary><strong>La figure 29.1 — la démonstration en trois points</strong></summary><div class="in">
+
+<p><em>Supposons qu'il n'y ait que <strong>trois prix possibles</strong> $B_1$, $B_2$, $B_3$, <strong>également probables</strong> dans le monde forward risque-neutre par rapport à $P(t,T)$, et <strong>également espacés</strong> :</em>
+$$B_2-B_1=B_3-B_2$$</p>
+<table>
+<thead>
+<tr>
+<th>Étape</th>
+<th>Conséquence</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>1</strong></td>
+<td>Le <strong>prix forward</strong> est le prix espéré, donc $\mathbf{B_2}$</td>
+</tr>
+<tr>
+<td><strong>2</strong></td>
+<td>Les trois prix se traduisent en trois rendements $y_1$, $y_2$, $y_3$ également probables —  <strong>mais ils ne sont PAS également espacés</strong>, car $G$ est <strong>convexe décroissante</strong></td>
+</tr>
+<tr>
+<td><strong>3</strong></td>
+<td>$y_2$ est <strong>le rendement FORWARD</strong>, puisque c'est le rendement correspondant au prix forward</td>
+</tr>
+<tr>
+<td><strong>4</strong></td>
+<td> <strong>Le rendement ESPÉRÉ est la moyenne de $y_1$, $y_2$, $y_3$ — et il est CLAIREMENT SUPÉRIEUR à $y_2$</strong></td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>La géométrie :</strong> la convexité de la courbe prix-rendement fait que <strong>l'écart de rendement du côté des prix bas ($y_1$) est PLUS GRAND</strong> que du côté des prix hauts ($y_3$) — la moyenne est donc <strong>tirée vers le haut</strong>.</p>
+</blockquote>
+</div></details>
+
+<h3>1.2 La formule</h3>
+<p>$$\boxed{E_T(y_T)=y_0-\frac12\,y_0^2\,\sigma_y^2\,T\,\frac{G''(y_0)}{G'(y_0)}}\;\text{(29.1)}$$</p>
+<p>où $G'$ et $G''$ sont les dérivées première et seconde de $G$, $E_T$ l'espérance dans le monde forward risque-neutre par rapport à $P(t,T)$, et $\sigma_y$ <strong>la volatilité du rendement FORWARD</strong>.</p>
+<p>$$\boxed{\text{Ajustement de convexité}=-\frac12\,y_0^2\,\sigma_y^2\,T\,\frac{G''(y_0)}{G'(y_0)}}$$</p>
+<blockquote>
+<p class="cal piege"> <em><strong>L'ajustement de convexité est TOUJOURS POSITIF, parce que $G'(y_0)&lt;0$ et $G''(y_0)&gt;0$.</strong></em></p>
+<p><em>Il correspond exactement à <strong>la différence entre $y_2$ et le rendement espéré</strong> de la figure 29.1.</em></p>
+</blockquote>
+<p><strong>Ce qu'on fait ensuite :</strong> *le payoff espéré peut être actualisé au taux sans risque courant de maturité $T$ <strong>pourvu qu'on suppose le rendement espéré égal à $y_0-\frac12y_0^2\sigma_y^2T\dfrac{G''(y_0)}{G'(y_0)}$ PLUTÔT QUE $y_0$</strong>.*</p>
+<h3>1.3 Application 1 — les taux d'intérêt</h3>
+<p><strong>Le cadre.</strong> *Un instrument versant en $T$ un flux égal au <strong>taux d'intérêt entre $T$ et $T^\ast$</strong>, appliqué à un principal $L$.*  <em><strong>Le taux applicable à $[T,T^\ast]$ est NORMALEMENT payé en $T^\ast$ ; ici on suppose qu'il est payé EN AVANCE, en $T$.</strong></em> <em>(Cet exemple servira pour les swaps <strong>LIBOR-in-arrears</strong> du chapitre 32.)</em></p>
+<details class="cor">
+<summary><strong>La dérivation de (29.2)</strong></summary><div class="in">
+
+<p><em>Étape 1 — le flux en $T$ vaut $L\tau R_T$ avec $\tau=T^\ast-T$</em>, où $R_T$ est le taux zéro-coupon pour $[T,T^\ast]$, exprimé avec une période de composition $\tau$.</p>
+<p><em>Étape 2 — $R_T$ est le RENDEMENT en $T$ d'une obligation zéro-coupon maturant en $T^\ast$.</em> La relation prix-rendement est donc :
+$$\boxed{G(y)=\frac{1}{1+\tau y}}$$</p>
+<p><em>Étape 3 — les dérivées :</em>
+$$G'(y)=-\frac{\tau}{(1+\tau y)^2}\qquad G''(y)=\frac{2\tau^2}{(1+\tau y)^3}$$
+$$\frac{G''}{G'}=\frac{2\tau^2/(1+\tau y)^3}{-\tau/(1+\tau y)^2}=-\frac{2\tau}{1+\tau y}$$</p>
+<p><em>Étape 4 — substituer dans (29.1) :</em>
+$$E_T(R_T)=R_0-\frac12R_0^2\sigma_R^2T\left(-\frac{2\tau}{1+R_0\tau}\right)$$</p>
+<p>$$\boxed{E_T(R_T)=R_0+\frac{R_0^2\,\sigma_R^2\,T\,\tau}{1+R_0\tau}}\;\text{(29.2)}$$</p>
+<p><em>Étape 5 — la valeur de l'instrument :</em>
+$$\boxed{P(0,T)\,L\,\tau\left[R_0+\frac{R_0^2\sigma_R^2T\tau}{1+R_0\tau}\right]}$$</p>
+</div></details>
+
+<details class="cor">
+<summary><strong>Exemple 29.1 — le taux payé en avance, recalculé</strong></summary><div class="in">
+
+<p><strong>Données.</strong> Un dérivé versant <strong>dans 3 ans</strong> le <strong>taux zéro-coupon à 1 an</strong> (composition annuelle) de ce moment-là, multiplié par <strong>1 000 dollars</strong>. Courbe zéro plate à <strong>10 %</strong> en composition annuelle ; volatilité du taux forward entre l'année 3 et l'année 4 : <strong>20 %</strong>.</p>
+<p><em>Étape 1 — les paramètres.</em> $R_0=0{,}10$, $\sigma_R=0{,}20$, $T=3$, $\tau=1$ et
+$$P(0,3)=\frac{1}{1{,}10^3}=\mathbf{0{,}7513}$$</p>
+<p><em>Étape 2 — l'ajustement de convexité :</em>
+$$\frac{R_0^2\sigma_R^2T\tau}{1+R_0\tau}=\frac{0{,}10^2\times0{,}20^2\times3\times1}{1{,}10}=\frac{0{,}0012}{1{,}10}=\mathbf{0{,}001091}$$</p>
+<p><em>Étape 3 — le rendement espéré ajusté :</em>
+$$E_T(R_T)=0{,}10+0{,}001091=\mathbf{0{,}101091}$$</p>
+<p><em>Étape 4 — la valeur :</em>
+$$0{,}7513\times1\,000\times1\times0{,}101091=\boxed{\mathbf{75{,}95\ \text{dollars}}}$$</p>
+<p class="cal piege"> <em><strong>À comparer à 75,13 dollars quand AUCUN ajustement de convexité n'est fait</strong></em> — un écart de <strong>1,1 %</strong>.</p>
+</div></details>
+
+<h3>1.4 Application 2 — les taux de swap</h3>
+<p><strong>L'approximation.</strong> <em>Un taux de swap est <strong>un RENDEMENT AU PAIR</strong>. Pour calculer un ajustement de convexité, <strong>on peut faire l'approximation que le taux de swap $N$ ans en $T$ égale LE RENDEMENT en $T$ d'une obligation à $N$ ans dont le coupon vaut le taux de swap FORWARD d'aujourd'hui</strong>. Cela permet d'utiliser (29.1).</em></p>
+<details class="cor">
+<summary><strong>Exemple 29.2 — le taux de swap payé à l'observation</strong></summary><div class="in">
+
+<p><strong>Données.</strong> Instrument versant <strong>dans 3 ans</strong> le <strong>taux de swap à 3 ans</strong> de ce moment-là × <strong>100 dollars</strong>. Paiements <strong>annuels</strong> sur le swap ; courbe zéro plate à <strong>12 %</strong> en composition annuelle ; volatilité du taux de swap forward 3 ans dans 3 ans (implicite des prix de swaptions) : <strong>22 %</strong>.</p>
+<p><em>Étape 1 — construire $G$</em>, le taux de swap étant approximé par le rendement d'une obligation à coupon 12 % :
+$$G(y)=\frac{0{,}12}{1+y}+\frac{0{,}12}{(1+y)^2}+\frac{1{,}12}{(1+y)^3}$$</p>
+<p><em>Étape 2 — les dérivées :</em>
+$$G'(y)=-\frac{0{,}12}{(1+y)^2}-\frac{0{,}24}{(1+y)^3}-\frac{3{,}36}{(1+y)^4}$$
+$$G''(y)=\frac{0{,}24}{(1+y)^3}+\frac{0{,}72}{(1+y)^4}+\frac{13{,}44}{(1+y)^5}$$</p>
+<p><em>Étape 3 — évaluer en $y_0=0{,}12$ :</em>
+$$G'(0{,}12)=\mathbf{-2{,}4018}\qquad G''(0{,}12)=\mathbf{8{,}2546}$$
+<em>(contrôle : $G(0{,}12)=1{,}0000$ — l'obligation cote <strong>au pair</strong>, comme il se doit)</em></p>
+<p><em>Étape 4 — appliquer (29.1) :</em>
+$$E_T(y_T)=0{,}12+\tfrac12\times0{,}12^2\times0{,}22^2\times3\times\frac{8{,}2546}{2{,}4018}=0{,}12+0{,}00359=\mathbf{0{,}1236}$$</p>
+<blockquote>
+<p class="cal piege"> <em><strong>Un taux de swap forward de 12,36 % — et non 12 % — doit donc être supposé pour valoriser l'instrument.</strong></em></p>
+</blockquote>
+<p><em>Étape 5 — la valeur :</em>
+$$\frac{100\times0{,}1236}{1{,}12^3}=\boxed{\mathbf{8{,}80\ \text{dollars}}}$$</p>
+<p class="cal piege"> <em><strong>À comparer à 8,54 sans ajustement</strong></em> — un écart de <strong>3 %</strong>.</p>
+</div></details>
+
+<h2 data-prio="must">Concept 2 — Les ajustements de timing</h2>
+<h3>2.1 Le cadre et la formule</h3>
+<p><strong>La situation.</strong> *Une variable de marché $V$ est <strong>observée en $T$</strong> et sa valeur sert à calculer <strong>un payoff qui survient PLUS TARD, en $T^\ast$</strong>.*</p>
+<table>
+<thead>
+<tr>
+<th>Notation</th>
+<th>Signification</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$E_T(V_T)$</td>
+<td>espérance de $V_T$ dans le monde forward risque-neutre par rapport à $P(t,T)$</td>
+</tr>
+<tr>
+<td>$E_{T^\ast}(V_T)$</td>
+<td>espérance de $V_T$ dans le monde forward risque-neutre par rapport à $P(t,T^\ast)$</td>
+</tr>
+</tbody></table>
+<p><strong>Le ratio de numéraire</strong> en passant de $P(t,T)$ à $P(t,T^\ast)$ :</p>
+<p>$$\boxed{W=\frac{P(t,T^\ast)}{P(t,T)}}\qquad\text{— c'est le PRIX FORWARD d'une obligation zéro-coupon entre }T\text{ et }T^\ast$$</p>
+<p>Par (27.35) <em>(fiche 99)</em>, le changement de numéraire <strong>augmente le taux de croissance de $V$</strong> de :</p>
+<p>$$\boxed{\alpha_V=\rho_{VW}\,\sigma_V\,\sigma_W}\;\text{(29.3)}$$</p>
+<details class="cor">
+<summary><strong>Exprimer le résultat avec le TAUX forward — la dérivation de (29.4)</strong></summary><div class="in">
+
+<p><em>Étape 1 — la relation entre $W$ et le taux forward $R$</em> (exprimé avec une fréquence de composition $m$) :
+$$W=\frac{1}{(1+R/m)^{m(T^\ast-T)}}$$</p>
+<p><em>Étape 2 — la volatilité de $W$, par le lemme d'Itô :</em>
+$$\boxed{\sigma_W=-\frac{\sigma_RR(T^\ast-T)}{1+R/m}}$$</p>
+<blockquote>
+<p class="cal piege"> <strong>Le signe négatif est essentiel :</strong> <em>$R$ et $W$ sont <strong>négativement corrélés</strong> — quand les taux montent, le prix forward de l'obligation baisse.</em></p>
+</blockquote>
+<p><em>Étape 3 — substituer dans (29.3), avec $\rho_{VR}=-\rho_{VW}$ :</em>
+$$\alpha_V=-\frac{\rho_{VR}\,\sigma_V\,\sigma_R\,R\,(T^\ast-T)}{1+R/m}$$</p>
+<p class="cal piege"> <em>Note de Hull sur les signes : on peut soit poser $\sigma_W$ <strong>négatif</strong> et $\rho_{VW}=\rho_{VR}$, soit changer le signe de $\sigma_W$ pour le rendre positif et poser $\rho_{VW}=-\rho_{VR}$. <strong>Dans les deux cas on aboutit à la MÊME formule pour $\alpha_V$.</strong></em></p>
+<p><em>Étape 4 — en approximant $R$ constant à sa valeur initiale $R_0$ et les volatilités/corrélation constantes :</em></p>
+<p>$$\boxed{E_{T^\ast}(V_T)=E_T(V_T)\exp\!\left[-\frac{\rho_{VR}\,\sigma_V\,\sigma_R\,R_0\,(T^\ast-T)}{1+R_0/m}\,T\right]}\;\text{(29.4)}$$</p>
+<blockquote>
+<p><strong>Le sens économique :</strong> si $V$ est <strong>positivement</strong> corrélée aux taux ($\rho_{VR}&gt;0$), reporter le paiement de $T$ à $T^\ast$ <strong>pénalise</strong> — l'exposant est négatif — parce que les états où $V$ est grande sont ceux où <strong>l'actualisation supplémentaire est la plus forte</strong>.</p>
+</blockquote>
+</div></details>
+
+<details class="cor">
+<summary><strong>Exemple 29.3 — un indice observé en 5 ans, payé en 6 ans</strong></summary><div class="in">
+
+<p><strong>Données.</strong> Dérivé versant <strong>dans 6 ans</strong> la valeur d'un indice boursier <strong>observée dans 5 ans</strong>. La valeur <strong>forward</strong> de l'indice à 5 ans est <strong>1 200</strong>. Volatilité de l'indice <strong>20 %</strong> ; volatilité du taux forward entre l'année 5 et l'année 6 : <strong>18 %</strong> ; corrélation entre les deux : $\mathbf{-0{,}4}$. Courbe zéro plate à <strong>8 %</strong> en composition annuelle.</p>
+<p><em>Étape 1 — les paramètres.</em> $T=5$, $T^\ast=6$, $m=1$, $R_0=0{,}08$, $\rho_{VR}=-0{,}4$, $\sigma_V=0{,}20$, $\sigma_R=0{,}18$.</p>
+<p><em>Étape 2 — l'ajustement :</em>
+$$\exp\!\left[-\frac{(-0{,}4)\times0{,}20\times0{,}18\times0{,}08\times1}{1+0{,}08}\times5\right]=\exp(0{,}005333)=\mathbf{1{,}00535}$$</p>
+<p><em>Étape 3 — appliquer.</em> Par le chapitre 27, $E_T(V_T)$ <strong>est le prix forward de l'indice</strong>, soit <strong>1 200</strong> :
+$$E_{T^\ast}(V_T)=1\,200\times1{,}00535=\mathbf{1\,206{,}42}$$</p>
+<p><em>Étape 4 — actualiser à la date du PAIEMENT.</em> Par (27.20), la valeur du dérivé est $1\,206{,}42\times P(0,6)$ avec
+$$P(0,6)=\frac{1}{1{,}08^6}=\mathbf{0{,}6302}$$
+$$\boxed{\text{valeur}=1\,206{,}42\times0{,}6302=\mathbf{760{,}25}}$$</p>
+<blockquote>
+<p><strong>La lecture du signe :</strong> la corrélation est <strong>négative</strong> ⇒ l'ajustement est <strong>positif</strong> (1,00535 &gt; 1) : quand l'indice est haut, les taux sont bas, donc <strong>le report de paiement coûte moins cher qu'en moyenne</strong>.</p>
+</blockquote>
+</div></details>
+
+<h3>2.2 Application 1 revisitée — la cohérence des deux approches</h3>
+<details class="cor">
+<summary><strong>Retrouver (29.2) par l'ajustement de timing</strong></summary><div class="in">
+
+<blockquote>
+<p class="cal piege"> <em><strong>L'analyse par le timing fournit une AUTRE façon de produire le résultat de l'application 1 — et c'est un excellent contrôle de cohérence.</strong></em></p>
+</blockquote>
+<p><em>Étape 1 — le point de départ.</em> $R_T$ est le taux entre $T$ et $T^\ast$, $R_0$ le taux forward correspondant. Par <strong>(27.22)</strong> <em>(fiche 99)</em> :
+$$\boxed{E_{T^\ast}(R_T)=R_0}$$
+<em>(le taux forward <strong>est</strong> une martingale sous $P(t,T^\ast)$)</em></p>
+<p><em>Étape 2 — appliquer (29.4) avec $V=R$</em>, donc $\rho_{VR}=1$, $\sigma_V=\sigma_R$, $m=1/\tau$ :
+$$E_{T^\ast}(R_T)=E_T(R_T)\exp\!\left[-\frac{\sigma_R^2R_0\tau}{1+R_0\tau}\,T\right]$$</p>
+<p><em>Étape 3 — égaler et inverser :</em>
+$$R_0=E_T(R_T)\exp\!\left[-\frac{\sigma_R^2R_0\tau T}{1+R_0\tau}\right]\quad\Longrightarrow\quad E_T(R_T)=R_0\exp\!\left[\frac{\sigma_R^2R_0\tau T}{1+R_0\tau}\right]$$</p>
+<p><em>Étape 4 — approcher l'exponentielle par $e^x\approx1+x$ :</em>
+$$E_T(R_T)=R_0+\frac{R_0^2\sigma_R^2T\tau}{1+R_0\tau}$$</p>
+<blockquote>
+<p class="cal piege"> <em><strong>C'est EXACTEMENT (29.2). Les deux ajustements — convexité et timing — sont deux faces du même changement de mesure.</strong></em></p>
+</blockquote>
+</div></details>
+
+<h2 data-prio="must">Concept 3 — Les quantos</h2>
+<h3>3.1 Le produit et l'ajustement</h3>
+<blockquote>
+<p><em><strong>Un QUANTO, ou dérivé CROSS-CURRENCY, est un instrument où DEUX DEVISES sont impliquées : le payoff est défini en termes d'une variable MESURÉE DANS UNE DEVISE, et le payoff est VERSÉ DANS L'AUTRE.</strong></em></p>
+</blockquote>
+<p><strong>L'exemple canonique</strong> <em>(Business Snapshot 5.3)</em> : *le <strong>contrat futures du CME sur le Nikkei</strong>. La variable sous-jacente est <strong>l'indice Nikkei 225 (mesuré en yens)</strong>, mais <strong>le contrat est réglé en DOLLARS américains</strong>.*</p>
+<table>
+<thead>
+<tr>
+<th>Notation</th>
+<th>Signification</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$P_X(t,T)$</td>
+<td>valeur en $t$, <strong>en devise X</strong>, d'une obligation zéro-coupon versant 1 unité de X en $T$</td>
+</tr>
+<tr>
+<td>$P_Y(t,T)$</td>
+<td>idem en devise Y</td>
+</tr>
+<tr>
+<td>$E_X(V_T)$</td>
+<td>espérance dans le monde forward risque-neutre par rapport à $P_X(t,T)$</td>
+</tr>
+<tr>
+<td>$E_Y(V_T)$</td>
+<td>idem par rapport à $P_Y(t,T)$</td>
+</tr>
+</tbody></table>
+<p><strong>Le ratio de numéraire</strong> en passant de $P_Y(t,T)$ à $P_X(t,T)$ :</p>
+<p>$$\boxed{W(t)=\frac{P_X(t,T)\,S(t)}{P_Y(t,T)}}$$</p>
+<p>où $S(t)$ est <strong>le change spot (unités de Y par unité de X)</strong>.</p>
+<blockquote>
+<p class="cal piege"> <em><strong>Il s'ensuit que le ratio de numéraire $W(t)$ EST LE TAUX DE CHANGE FORWARD (unités de Y par unité de X) pour un contrat maturant en $T$.</strong></em></p>
+</blockquote>
+<p>$$\boxed{\alpha_V=\rho_{VW}\,\sigma_V\,\sigma_W}\;\text{(29.5)}$$
+$$\boxed{E_X(V_T)=E_Y(V_T)\,e^{\rho_{VW}\sigma_V\sigma_WT}\ \approx\ E_Y(V_T)\big(1+\rho_{VW}\sigma_V\sigma_WT\big)}\;\text{(29.6)}$$</p>
+<p class="cal piege"><em> Cette équation servira pour la valorisation des <em><strong>diff swaps</strong></em> au chapitre 32.</em></p>
+<details class="cor">
+<summary><strong>Exemple 29.4 — le Nikkei réglé en dollars</strong></summary><div class="in">
+
+<p><strong>Données.</strong> Nikkei courant <strong>15 000 yens</strong>. Taux sans risque à 1 an : <strong>5 % en dollars</strong>, <strong>2 % en yens</strong>. Rendement de dividende du Nikkei : <strong>1 %</strong>. Volatilité de l'indice <strong>20 %</strong> ; volatilité du change forward <strong>yen par dollar</strong> à 1 an : <strong>12 %</strong> ; corrélation entre les deux : <strong>0,3</strong>.</p>
+<p><em>Étape 1 — le prix forward du Nikkei EN YENS</em>, par la formule usuelle (5.8) :
+$$15\,000\,e^{(0{,}02-0{,}01)\times1}=\mathbf{15\,150{,}75\ \text{yens}}$$
+<em>(le taux sans risque <strong>en yens</strong> moins le rendement de dividende — l'actif est libellé en yens)</em></p>
+<p><em>Étape 2 — l'ajustement quanto :</em>
+$$E_X(V_T)=15\,150{,}75\times e^{0{,}3\times0{,}2\times0{,}12\times1}=15\,150{,}75\times e^{0{,}0072}=\boxed{\mathbf{15\,260{,}23}}$$</p>
+<p><em>Étape 3 — l'interprétation.</em> <em><strong>C'est le prix FORWARD du Nikkei pour un contrat versant un payoff en DOLLARS plutôt qu'en yens.</strong></em> <em>(En approximation, c'est aussi le <strong>prix FUTURES</strong> d'un tel contrat.)</em></p>
+<blockquote>
+<p><strong>La lecture du signe :</strong> la corrélation est <strong>positive</strong> (le Nikkei monte quand le yen se déprécie contre le dollar, c'est-à-dire quand $W$ = yens par dollar monte) ⇒ <strong>l'ajustement est POSITIF</strong> : le forward quanto vaut <strong>plus</strong> que le forward en yens.</p>
+</blockquote>
+</div></details>
+
+<h3>3.2 Passer par la mesure risque-neutre traditionnelle</h3>
+<blockquote>
+<p class="cal piege"> <em><strong>La mesure forward risque-neutre marche bien quand les payoffs surviennent à UN SEUL instant. Dans les autres situations, il est souvent PLUS APPROPRIÉ d'utiliser la mesure risque-neutre TRADITIONNELLE.</strong></em></p>
+</blockquote>
+<details class="cor">
+<summary><strong>La dérivation de (29.7)</strong></summary><div class="in">
+
+<p><strong>Le cadre.</strong> On connaît le processus de $V$ dans le monde risque-neutre traditionnel de <strong>devise Y</strong> et on veut son processus dans celui de <strong>devise X</strong>.</p>
+<table>
+<thead>
+<tr>
+<th>Notation</th>
+<th>Signification</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$S$</td>
+<td>change spot (<strong>unités de Y par unité de X</strong>)</td>
+</tr>
+<tr>
+<td>$\sigma_S$</td>
+<td>volatilité de $S$</td>
+</tr>
+<tr>
+<td>$\sigma_V$</td>
+<td>volatilité de $V$</td>
+</tr>
+<tr>
+<td>$\rho$</td>
+<td>corrélation instantanée entre $S$ et $V$</td>
+</tr>
+</tbody></table>
+<p><em>Étape 1 — les numéraires.</em> On passe du <strong>compte de marché monétaire en Y</strong> au <strong>compte de marché monétaire en X</strong> (les deux étant libellés en devise X). Avec $g_X$ et $g_Y$ leurs valeurs, le ratio de numéraire est :
+$$\boxed{\frac{g_XS}{g_Y}}$$</p>
+<p><em>Étape 2 — sa volatilité.</em>  <em>$g_X(t)$ et $g_Y(t)$ ont un <strong>drift stochastique mais une volatilité NULLE</strong> (fiche 99, §27.4).</em> Par Itô, <strong>la volatilité du ratio de numéraire est donc simplement $\sigma_S$</strong>.</p>
+<p><em>Étape 3 — l'ajustement :</em>
+$$\boxed{\alpha_V=\rho\,\sigma_V\,\sigma_S}\;\text{(29.7)}$$</p>
+<blockquote>
+<p><em><strong>Le prix de marché du risque passe de zéro à $\sigma_S$.</strong></em></p>
+</blockquote>
+</div></details>
+
+<details class="cor">
+<summary><strong>Business Snapshot 29.1 — le paradoxe de Siegel, et sa résolution</strong></summary><div class="in">
+
+<p><strong>Le paradoxe.</strong> Deux devises X et Y de taux <strong>constants</strong> $r_X$ et $r_Y$ ; $S$ = unités de Y par unité de X. <em>Comme une devise est <strong>un actif procurant un rendement au taux sans risque étranger</strong> (chapitre 5), le processus risque-neutre traditionnel de $S$ est :</em>
+$$dS=(r_Y-r_X)S\,dt+\sigma_SS\,dz$$</p>
+<p><em>Par le lemme d'Itô, le processus de $1/S$ est :</em>
+$$d(1/S)=\big(r_X-r_Y+\sigma_S^2\big)(1/S)\,dt-\sigma_S(1/S)\,dz$$</p>
+<blockquote>
+<p class="cal piege"> <em><strong>LE PARADOXE : puisque le taux de croissance espéré de $S$ est $r_Y-r_X$ dans un monde risque-neutre, LA SYMÉTRIE suggère que celui de $1/S$ devrait être $r_X-r_Y$ — et NON $r_X-r_Y+\sigma_S^2$.</strong></em></p>
+</blockquote>
+<p><strong>La résolution, étape par étape.</strong></p>
+<p><em>Étape 1 — identifier le numéraire caché.</em> *Le processus donné pour $S$ est le processus risque-neutre <strong>dans un monde où le numéraire est le compte monétaire en devise Y</strong>. Le processus de $1/S$, <strong>étant DÉDUIT de celui de $S$</strong>, suppose donc <strong>AUSSI ce numéraire</strong>.*</p>
+<p><em>Étape 2 — le bon cadre.</em> <em>Comme $1/S$ est <strong>le nombre d'unités de X par unité de Y</strong>, <strong>pour être symétrique on devrait mesurer son processus dans un monde où le numéraire est le compte monétaire en devise X</strong>.</em></p>
+<p><em>Étape 3 — appliquer (29.7).</em> En passant du compte monétaire Y au compte monétaire X, la croissance de $V$ augmente de $\rho\sigma_V\sigma_S$. Ici $V=1/S$, donc :
+$$\rho=-1\qquad\sigma_V=\sigma_S\qquad\Longrightarrow\qquad\alpha_V=-\sigma_S^2$$</p>
+<p><em>Étape 4 — la neutralisation.</em>  <em><strong>Cela ANNULE exactement le $+\sigma_S^2$ du processus ci-dessus :</strong></em>
+$$\boxed{d(1/S)=(r_X-r_Y)(1/S)\,dt-\sigma_S(1/S)\,dz}$$</p>
+<blockquote>
+<p><em><strong>« C'est symétrique avec le processus dont nous sommes partis pour $S$. LE PARADOXE EST RÉSOLU ! »</strong></em></p>
+</blockquote>
+</div></details>
+
+<details class="cor">
+<summary><strong>Exemple 29.5 — une américaine quanto sur le S&amp;P 500 réglée en livres</strong></summary><div class="in">
+
+<p><strong>Données.</strong> Option <strong>américaine</strong> à 2 ans versant $S-K$ <strong>en livres sterling</strong>, où $S$ est le niveau du <strong>S&amp;P 500</strong> à l'exercice. $S_0=1\,200$, $K=1\,200$. Taux sans risque : <strong>5 % en sterling</strong>, <strong>3 % en dollars</strong>. Corrélation entre le change dollars/sterling et le S&amp;P 500 : <strong>0,2</strong>. Volatilité du S&amp;P 500 <strong>25 %</strong> ; volatilité du change <strong>12 %</strong>. Rendement de dividende du S&amp;P 500 <strong>1,5 %</strong>.</p>
+<div class="cal intu"><span class="lab">Pourquoi la mesure traditionnelle ici :</span>
+<p class="cal piege">  l'option est <strong>AMÉRICAINE</strong> — le payoff peut survenir à <strong>n'importe quelle</strong> date, donc la mesure forward risque-neutre à <strong>une</strong> date ne convient pas.</p>
+</div>
+<p><em>Étape 1 — l'ajustement de numéraire, par (29.7) :</em>
+$$\alpha_V=0{,}2\times0{,}25\times0{,}12=0{,}006=\mathbf{0{,}6\,\%}$$</p>
+<p><em>Étape 2 — le taux de croissance sous numéraire DOLLAR :</em>
+$$3\,\%-1{,}5\,\%=\mathbf{1{,}5\,\%}$$</p>
+<p><em>Étape 3 — le taux de croissance sous numéraire STERLING :</em>
+$$1{,}5\,\%+0{,}6\,\%=\mathbf{2{,}1\,\%}$$</p>
+<p><em>Étape 4 — traduire en rendement de dividende équivalent.</em> Le taux sans risque <strong>en sterling</strong> est 5 %.  <em><strong>Le S&amp;P 500 se comporte donc comme un actif procurant un rendement de dividende de</strong></em>
+$$5\,\%-2{,}1\,\%=\boxed{\mathbf{2{,}9\,\%}}$$
+<em><strong>sous le numéraire sterling.</strong></em></p>
+<p><em>Étape 5 — valoriser.</em> Avec $S=1\,200$, $K=1\,200$, $r=0{,}05$, $q=0{,}029$, $\sigma=0{,}25$, $T=2$ et <strong>100 pas</strong> sur un arbre binomial, DerivaGem donne :
+$$\boxed{\mathbf{179{,}83\ \text{livres sterling}}}$$</p>
+</div></details>
+
+<h2>Comment reconnaître le type d'exercice</h2>
+<table>
+<thead>
+<tr>
+<th>Indice dans l'énoncé</th>
+<th>Ajustement à faire</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Le payoff dépend d'un <strong>RENDEMENT</strong> ou d'un <strong>TAUX</strong> observé <strong>à la date du paiement</strong></td>
+<td> <strong>CONVEXITÉ</strong> — (29.1)</td>
+</tr>
+<tr>
+<td>« le taux entre $T$ et $T^\ast$ est payé <strong>en $T$</strong> »</td>
+<td><strong>convexité</strong> — (29.2)</td>
+</tr>
+<tr>
+<td>Le payoff dépend du <strong>taux de SWAP</strong></td>
+<td>convexité, en approximant par le <strong>rendement d'une obligation à coupon = taux de swap forward</strong></td>
+</tr>
+<tr>
+<td>La variable est observée en $T$ mais <strong>payée en $T^\ast&gt;T$</strong></td>
+<td> <strong>TIMING</strong> — (29.4)</td>
+</tr>
+<tr>
+<td>Variable mesurée en <strong>devise Y</strong>, payoff versé en <strong>devise X</strong></td>
+<td> <strong>QUANTO</strong> — (29.6)</td>
+</tr>
+<tr>
+<td>Payoff à <strong>une seule</strong> date</td>
+<td>mesure <strong>forward risque-neutre</strong></td>
+</tr>
+<tr>
+<td>Payoff à <strong>plusieurs</strong> dates, ou option <strong>américaine</strong></td>
+<td>mesure <strong>risque-neutre TRADITIONNELLE</strong> — (29.7)</td>
+</tr>
+<tr>
+<td>« pourquoi $1/S$ ne croît-il pas à $r_X-r_Y$ ? »</td>
+<td>le <strong>paradoxe de Siegel</strong></td>
+</tr>
+<tr>
+<td>Payoff standard, taux observé et payé aux dates normales</td>
+<td> <strong>AUCUN ajustement</strong> — la procédure en deux étapes suffit</td>
+</tr>
+</tbody></table>
+<h2>Comment résoudre ce type d'exercice</h2>
+<p><strong>A — Un ajustement de convexité.</strong></p>
+<ol>
+<li>Écrire la relation prix-rendement $B=G(y)$ <strong>explicitement</strong>, avec les vrais coupons.</li>
+<li>Dériver $G'$ et $G''$ <strong>analytiquement</strong> ; contrôler que $G'&lt;0$ et $G''&gt;0$.</li>
+<li>Évaluer en $y_0$ ; contrôler que $G(y_0)$ égale bien le prix forward.</li>
+<li>$E_T(y_T)=y_0-\frac12y_0^2\sigma_y^2T\dfrac{G''(y_0)}{G'(y_0)}$ — le second terme est <strong>positif</strong>.</li>
+<li>Actualiser au taux de maturité $T$ en utilisant <strong>le rendement ajusté</strong>.</li>
+</ol>
+<p><strong>B — Un ajustement de timing.</strong></p>
+<ol>
+<li>Identifier $T$ (<strong>observation</strong>) et $T^\ast$ (<strong>paiement</strong>).</li>
+<li>Identifier le <strong>taux forward</strong> $R_0$ pour $[T,T^\ast]$, sa volatilité $\sigma_R$ et sa fréquence $m$.</li>
+<li>$E_{T^\ast}(V_T)=E_T(V_T)\exp\!\left[-\dfrac{\rho_{VR}\sigma_V\sigma_RR_0(T^\ast-T)}{1+R_0/m}T\right]$.</li>
+<li>Rappel : $E_T(V_T)$ est simplement <strong>le prix forward</strong> de $V$ pour l'échéance $T$.</li>
+<li>Multiplier par $P(0,T^\ast)$ —  <strong>la maturité du PAIEMENT</strong>.</li>
+<li>Contrôle du signe : $\rho_{VR}&gt;0$ ⇒ ajustement <strong>à la baisse</strong>.</li>
+</ol>
+<p><strong>C — Un quanto.</strong></p>
+<ol>
+<li>Calculer le forward de $V$ <strong>dans sa PROPRE devise</strong> (donc avec le taux sans risque <strong>de cette devise</strong>).</li>
+<li>Identifier $W$ = le <strong>change forward</strong> en unités de la devise de $V$ par unité de la devise de paiement.</li>
+<li>$E_X(V_T)=E_Y(V_T)e^{\rho\sigma_V\sigma_WT}$.</li>
+<li>Actualiser au taux <strong>de la devise de PAIEMENT</strong>.</li>
+<li>Si l'option est <strong>américaine</strong> ou multi-dates, passer par (29.7) : ajouter $\rho\sigma_V\sigma_S$ au drift, puis convertir en <strong>rendement de dividende équivalent</strong>.</li>
+</ol>
+<h2 data-prio="must">Common mistakes</h2>
+<table>
+<thead>
+<tr>
+<th>Erreur</th>
+<th>Correction</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Croire que la procédure en deux étapes est toujours valide</td>
+<td> <em><strong>« The answer is no! »</strong></em> — trois familles d'exceptions</td>
+</tr>
+<tr>
+<td>Croire que $E(\text{prix})=$ forward implique $E(\text{rendement})=$ rendement forward</td>
+<td> <strong>non</strong> — $G$ est <strong>non linéaire</strong></td>
+</tr>
+<tr>
+<td>Prendre l'ajustement de convexité négatif</td>
+<td>il est  <strong>toujours POSITIF</strong> ($G'&lt;0$, $G''&gt;0$)</td>
+</tr>
+<tr>
+<td>Utiliser $\sigma_y$ = volatilité du rendement <strong>spot</strong></td>
+<td>c'est la volatilité du rendement <strong>FORWARD</strong></td>
+</tr>
+<tr>
+<td>Oublier le facteur $\frac12$ dans (29.1)</td>
+<td>il vient du développement de Taylor à l'ordre 2</td>
+</tr>
+<tr>
+<td>Appliquer un ajustement de convexité à un taux payé <strong>normalement</strong></td>
+<td> un taux observé en $T$ et payé en $T^\ast$ <strong>ne demande AUCUN ajustement</strong> — il est martingale sous $P(t,T^\ast)$</td>
+</tr>
+<tr>
+<td>Confondre convexité et timing</td>
+<td><strong>convexité</strong> : rendement payé <strong>tôt</strong> · <strong>timing</strong> : variable payée <strong>tard</strong></td>
+</tr>
+<tr>
+<td>Oublier le signe négatif de $\sigma_W$</td>
+<td>$R$ et $W$ sont <strong>négativement</strong> corrélés</td>
+</tr>
+<tr>
+<td>Se tromper de sens de la corrélation</td>
+<td>vérifier si $\rho$ est donnée entre $V$ et <strong>$R$</strong> ou entre $V$ et <strong>$W$</strong></td>
+</tr>
+<tr>
+<td>Actualiser à $P(0,T)$ dans un ajustement de timing</td>
+<td> c'est $P(0,T^\ast)$, la date du <strong>PAIEMENT</strong></td>
+</tr>
+<tr>
+<td>Calculer le forward du quanto avec le taux de la devise de <strong>paiement</strong></td>
+<td> il se calcule avec le taux de <strong>SA PROPRE devise</strong> (ici, le yen)</td>
+</tr>
+<tr>
+<td>Se tromper de sens du change</td>
+<td> $W$ = <strong>unités de Y par unité de X</strong>, Y étant la devise de la variable</td>
+</tr>
+<tr>
+<td>Utiliser la mesure forward pour une américaine</td>
+<td> passer par la mesure <strong>traditionnelle</strong> et (29.7)</td>
+</tr>
+<tr>
+<td>Croire que $1/S$ croît à $r_X-r_Y$ dans le monde de $S$</td>
+<td> <strong>paradoxe de Siegel</strong> : il faut <strong>changer de numéraire</strong></td>
+</tr>
+<tr>
+<td>Oublier de convertir l'ajustement en rendement de dividende</td>
+<td>dans l'exemple 29.5 : $q=5\,\%-2{,}1\,\%=\mathbf{2{,}9\,\%}$</td>
+</tr>
+</tbody></table>
+<h2>Ultimate Review</h2>
+<table>
+<thead>
+<tr>
+<th>Élément</th>
+<th>Formule / valeur</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>La procédure en deux étapes</strong></td>
+<td>espérance <strong>aux valeurs forward</strong> · actualiser au taux de la <strong>date de paiement</strong></td>
+</tr>
+<tr>
+<td><strong>Est-elle toujours correcte ?</strong></td>
+<td> <em><strong>NON</strong></em></td>
+</tr>
+<tr>
+<td><strong>Où on l'a déjà utilisée</strong></td>
+<td>FRA · swaps · modèle de Black · options sur obligations · caps · swaptions</td>
+</tr>
+<tr>
+<td><strong>La relation prix-rendement</strong></td>
+<td>$B_T=G(y_T)$, avec $F_0=G(y_0)$</td>
+</tr>
+<tr>
+<td><strong>Le problème</strong></td>
+<td>$G$ <strong>non linéaire</strong> ⇒ $E(\text{prix})$ correct <strong>mais</strong> $E(\text{rendement})&gt;y_0$</td>
+</tr>
+<tr>
+<td><strong>La figure 29.1</strong></td>
+<td>prix également espacés ⇒ rendements <strong>PAS</strong> également espacés</td>
+</tr>
+<tr>
+<td><strong>Ajustement de convexité</strong></td>
+<td>$-\frac12y_0^2\sigma_y^2T\dfrac{G''(y_0)}{G'(y_0)}$</td>
+</tr>
+<tr>
+<td><strong>Son signe</strong></td>
+<td> <strong>TOUJOURS POSITIF</strong></td>
+</tr>
+<tr>
+<td><strong>Pourquoi</strong></td>
+<td>$G'(y_0)&lt;0$ et $G''(y_0)&gt;0$</td>
+</tr>
+<tr>
+<td><strong>Application 1 : $G$</strong></td>
+<td>$G(y)=\dfrac{1}{1+\tau y}$</td>
+</tr>
+<tr>
+<td><strong>Le résultat</strong></td>
+<td>$E_T(R_T)=R_0+\dfrac{R_0^2\sigma_R^2T\tau}{1+R_0\tau}$</td>
+</tr>
+<tr>
+<td><strong>La valeur</strong></td>
+<td>$P(0,T)L\tau\left[R_0+\dfrac{R_0^2\sigma_R^2T\tau}{1+R_0\tau}\right]$</td>
+</tr>
+<tr>
+<td><strong>Exemple 29.1</strong></td>
+<td>$P(0,3)=0{,}7513$, ajustement $0{,}001091$ → <strong>75,95</strong> (contre <strong>75,13</strong>)</td>
+</tr>
+<tr>
+<td><strong>Application 2</strong></td>
+<td>un taux de swap est un <strong>rendement AU PAIR</strong></td>
+</tr>
+<tr>
+<td><strong>L'approximation</strong></td>
+<td>rendement d'une obligation de coupon = <strong>taux de swap forward</strong></td>
+</tr>
+<tr>
+<td><strong>Exemple 29.2</strong></td>
+<td>$G'=-2{,}4018$, $G''=8{,}2546$ → $E_T(y_T)=\mathbf{12{,}36\,\%}$</td>
+</tr>
+<tr>
+<td><strong>Sa valeur</strong></td>
+<td><strong>8,80</strong> (contre <strong>8,54</strong>)</td>
+</tr>
+<tr>
+<td><strong>Ratio de numéraire (timing)</strong></td>
+<td>$W=\dfrac{P(t,T^\ast)}{P(t,T)}$ = <strong>prix forward d'obligation</strong></td>
+</tr>
+<tr>
+<td><strong>L'ajustement générique</strong></td>
+<td>$\alpha_V=\rho_{VW}\sigma_V\sigma_W$</td>
+</tr>
+<tr>
+<td><strong>Volatilité de $W$</strong></td>
+<td>$\sigma_W=-\dfrac{\sigma_RR(T^\ast-T)}{1+R/m}$</td>
+</tr>
+<tr>
+<td><strong>La formule de timing</strong></td>
+<td>$E_{T^\ast}(V_T)=E_T(V_T)\exp\!\left[-\dfrac{\rho_{VR}\sigma_V\sigma_RR_0(T^\ast-T)}{1+R_0/m}T\right]$</td>
+</tr>
+<tr>
+<td><strong>Exemple 29.3</strong></td>
+<td>facteur <strong>1,00535</strong> → $1\,206{,}42$ → valeur <strong>760,25</strong></td>
+</tr>
+<tr>
+<td><strong>La cohérence</strong></td>
+<td>l'ajustement de <strong>timing appliqué à $R$</strong> redonne exactement <strong>(29.2)</strong></td>
+</tr>
+<tr>
+<td><strong>Le résultat pivot</strong></td>
+<td>$E_{T^\ast}(R_T)=R_0$ — le taux forward est <strong>martingale</strong> sous $P(t,T^\ast)$</td>
+</tr>
+<tr>
+<td><strong>Quanto</strong></td>
+<td>variable en <strong>devise Y</strong>, payoff en <strong>devise X</strong></td>
+</tr>
+<tr>
+<td><strong>L'exemple canonique</strong></td>
+<td>le <strong>futures CME sur le Nikkei</strong>, réglé en <strong>dollars</strong></td>
+</tr>
+<tr>
+<td><strong>Ratio de numéraire (quanto)</strong></td>
+<td>$W(t)=\dfrac{P_X(t,T)S(t)}{P_Y(t,T)}$ = <strong>le CHANGE FORWARD</strong></td>
+</tr>
+<tr>
+<td><strong>La formule quanto</strong></td>
+<td>$E_X(V_T)=E_Y(V_T)e^{\rho\sigma_V\sigma_WT}$</td>
+</tr>
+<tr>
+<td><strong>Son approximation</strong></td>
+<td>$E_Y(V_T)(1+\rho\sigma_V\sigma_WT)$</td>
+</tr>
+<tr>
+<td><strong>Exemple 29.4</strong></td>
+<td>forward yen <strong>15 150,75</strong> → forward quanto <strong>15 260,23</strong></td>
+</tr>
+<tr>
+<td><strong>Son usage futur</strong></td>
+<td>les <em><strong>diff swaps</strong></em> (chapitre 32)</td>
+</tr>
+<tr>
+<td><strong>Quand la mesure traditionnelle ?</strong></td>
+<td>payoffs à <strong>plusieurs</strong> dates, ou options <strong>américaines</strong></td>
+</tr>
+<tr>
+<td><strong>Volatilité du ratio de numéraire</strong></td>
+<td> simplement $\sigma_S$ (les comptes monétaires ont une volatilité <strong>nulle</strong>)</td>
+</tr>
+<tr>
+<td><strong>L'ajustement traditionnel</strong></td>
+<td>$\alpha_V=\rho\,\sigma_V\,\sigma_S$</td>
+</tr>
+<tr>
+<td><strong>Le prix du risque</strong></td>
+<td>passe de <strong>0</strong> à <strong>$\sigma_S$</strong></td>
+</tr>
+<tr>
+<td><strong>Processus de $S$</strong></td>
+<td>$dS=(r_Y-r_X)S\,dt+\sigma_SS\,dz$</td>
+</tr>
+<tr>
+<td><strong>Processus déduit de $1/S$</strong></td>
+<td>$d(1/S)=(r_X-r_Y+\sigma_S^2)(1/S)dt-\sigma_S(1/S)dz$</td>
+</tr>
+<tr>
+<td><strong>Le paradoxe</strong></td>
+<td>pourquoi le $+\sigma_S^2$ ?</td>
+</tr>
+<tr>
+<td><strong>La résolution</strong></td>
+<td>$\rho=-1$, $\sigma_V=\sigma_S$ ⇒ $\alpha_V=-\sigma_S^2$, <strong>qui l'annule</strong></td>
+</tr>
+<tr>
+<td><strong>Exemple 29.5</strong></td>
+<td>$\alpha=0{,}006$ ; croissance $1{,}5\to2{,}1\,\%$ ; $q=\mathbf{2{,}9\,\%}$ ; option <strong>179,83 £</strong></td>
+</tr>
+</tbody></table>
+<div class="rec"><h2>Active Recall</h2><ol>
+<li>Écrire les deux étapes de la procédure standard. Dans quels chapitres l'a-t-on utilisée ?</li>
+<li>Est-elle toujours correcte ? Quelles sont les trois familles d'exceptions ?</li>
+<li>Comment se définit habituellement une valeur forward ?</li>
+<li>En quoi un taux forward et un rendement forward se définissent-ils différemment ?</li>
+<li>Écrire $B_T=G(y_T)$ et $F_0=G(y_0)$.</li>
+<li>Pourquoi la non-linéarité de $G$ pose-t-elle problème ?</li>
+<li>Décrire la figure 29.1 avec ses trois prix et trois rendements.</li>
+<li>Pourquoi le rendement espéré dépasse-t-il $y_2$ ?</li>
+<li>Écrire (29.1) et nommer chacun de ses termes.</li>
+<li>Écrire l'ajustement de convexité et justifier son signe.</li>
+<li>Que fait-on ensuite du rendement ajusté ?</li>
+<li>Dans l'application 1, quand le taux est-il normalement payé ? Et ici ?</li>
+<li>Écrire $G(y)$ pour un zéro-coupon et dériver $G'$, $G''$ et leur rapport.</li>
+<li>Dériver (29.2).</li>
+<li>Écrire la valeur complète de l'instrument.</li>
+<li>Refaire l'exemple 29.1 en entier, avec et sans ajustement.</li>
+<li>Qu'est-ce qu'un rendement au pair ?</li>
+<li>Quelle approximation permet d'appliquer (29.1) à un taux de swap ?</li>
+<li>Écrire $G$, $G'$ et $G''$ de l'exemple 29.2.</li>
+<li>Que valent $G'(0{,}12)$ et $G''(0{,}12)$ ? Que vaut $G(0{,}12)$ et pourquoi ?</li>
+<li>Calculer $E_T(y_T)$ et la valeur de l'instrument.</li>
+<li>De combien l'ajustement change-t-il le prix, en pourcentage ?</li>
+<li>Décrire la situation qui appelle un ajustement de timing.</li>
+<li>Écrire le ratio de numéraire et l'interpréter.</li>
+<li>Écrire (29.3).</li>
+<li>Écrire la relation entre $W$ et le taux forward $R$.</li>
+<li>Dériver $\sigma_W$ par Itô. Pourquoi est-elle négative ?</li>
+<li>Comment Hull traite-t-il l'ambiguïté de signe ?</li>
+<li>Écrire (29.4).</li>
+<li>Interpréter économiquement le signe de $\rho_{VR}$.</li>
+<li>Refaire l'exemple 29.3 en entier.</li>
+<li>Que vaut $E_T(V_T)$ dans cet exemple, et pourquoi ?</li>
+<li>À quelle maturité actualise-t-on ?</li>
+<li>Redériver (29.2) par l'ajustement de timing, en quatre étapes.</li>
+<li>Quel résultat du chapitre 27 sert de point de départ ?</li>
+<li>Que montre cette redérivation sur les deux ajustements ?</li>
+<li>Définir un quanto. Donner l'exemple du CME.</li>
+<li>Écrire le ratio de numéraire d'un quanto et l'identifier.</li>
+<li>Écrire (29.5) et (29.6).</li>
+<li>Refaire l'exemple 29.4 en entier.</li>
+<li>Avec quel taux calcule-t-on le forward du Nikkei en yens ? Pourquoi ?</li>
+<li>Interpréter le signe de l'ajustement.</li>
+<li>Quand la mesure forward risque-neutre ne convient-elle plus ?</li>
+<li>Quel est le ratio de numéraire quand on passe d'un compte monétaire à l'autre ?</li>
+<li>Pourquoi sa volatilité vaut-elle simplement $\sigma_S$ ?</li>
+<li>Écrire (29.7). De combien le prix du risque change-t-il ?</li>
+<li>Énoncer le paradoxe de Siegel.</li>
+<li>Écrire les processus de $S$ puis de $1/S$.</li>
+<li>Quelle est la première étape de la résolution ?</li>
+<li>Que valent $\rho$ et $\sigma_V$ quand $V=1/S$ ?</li>
+<li>Comment le $+\sigma_S^2$ est-il neutralisé ?</li>
+<li>Écrire le processus final de $1/S$ et conclure.</li>
+<li>Pourquoi l'exemple 29.5 exige-t-il la mesure traditionnelle ?</li>
+<li>Calculer l'ajustement de croissance, puis le rendement de dividende équivalent.</li>
+<li>Quels paramètres entre-t-on finalement dans l'arbre binomial ?</li>
+</ol></div>
+
+<h2>Flashcards</h2>
+<table>
+<thead>
+<tr>
+<th>Question</th>
+<th>Réponse</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Les deux étapes de la procédure standard ?</td>
+<td>Espérance <strong>aux valeurs forward</strong> · actualiser à la <strong>date de paiement</strong></td>
+</tr>
+<tr>
+<td>Est-elle toujours correcte ?</td>
+<td> <em><strong>« The answer is NO! »</strong></em></td>
+</tr>
+<tr>
+<td>Les trois ajustements ?</td>
+<td><strong>Convexité</strong> · <strong>timing</strong> · <strong>quanto</strong></td>
+</tr>
+<tr>
+<td>Comment se définit un forward ordinaire ?</td>
+<td>Le $K$ qui annule un contrat versant $S_T-K$</td>
+</tr>
+<tr>
+<td>Comment se définit un taux forward ?</td>
+<td>Le taux <strong>impliqué par un zéro-coupon forward</strong></td>
+</tr>
+<tr>
+<td>Un rendement forward d'obligation ?</td>
+<td>Le rendement <strong>impliqué par le PRIX FORWARD</strong></td>
+</tr>
+<tr>
+<td>La relation prix-rendement ?</td>
+<td>$B_T=G(y_T)$</td>
+</tr>
+<tr>
+<td>Le lien avec le forward ?</td>
+<td>$F_0=G(y_0)$</td>
+</tr>
+<tr>
+<td>Pourquoi un problème ?</td>
+<td>$G$ est <strong>NON LINÉAIRE</strong></td>
+</tr>
+<tr>
+<td>Dans la figure 29.1, que vaut le prix forward ?</td>
+<td>$B_2$, le prix <strong>espéré</strong></td>
+</tr>
+<tr>
+<td>Les rendements sont-ils également espacés ?</td>
+<td> <strong>NON</strong></td>
+</tr>
+<tr>
+<td>Le rendement espéré contre $y_2$ ?</td>
+<td>Il est <strong>SUPÉRIEUR</strong></td>
+</tr>
+<tr>
+<td>Formule de l'ajustement ?</td>
+<td>$-\frac12y_0^2\sigma_y^2T\dfrac{G''(y_0)}{G'(y_0)}$</td>
+</tr>
+<tr>
+<td>Son signe ?</td>
+<td> <strong>TOUJOURS POSITIF</strong></td>
+</tr>
+<tr>
+<td>Pourquoi ?</td>
+<td>$G'&lt;0$ et $G''&gt;0$</td>
+</tr>
+<tr>
+<td>Que vaut $\sigma_y$ ?</td>
+<td>La volatilité du rendement <strong>FORWARD</strong></td>
+</tr>
+<tr>
+<td>Application 1 : quand le taux est-il payé ?</td>
+<td> <strong>EN AVANCE</strong>, en $T$ au lieu de $T^\ast$</td>
+</tr>
+<tr>
+<td>Sa $G$ ?</td>
+<td>$G(y)=\dfrac{1}{1+\tau y}$</td>
+</tr>
+<tr>
+<td>Son $G''/G'$ ?</td>
+<td>$-\dfrac{2\tau}{1+\tau y}$</td>
+</tr>
+<tr>
+<td>Le résultat (29.2) ?</td>
+<td>$R_0+\dfrac{R_0^2\sigma_R^2T\tau}{1+R_0\tau}$</td>
+</tr>
+<tr>
+<td>Ex. 29.1 : $P(0,3)$ ?</td>
+<td><strong>0,7513</strong></td>
+</tr>
+<tr>
+<td>Ex. 29.1 : l'ajustement ?</td>
+<td><strong>0,001091</strong></td>
+</tr>
+<tr>
+<td>Ex. 29.1 : la valeur ?</td>
+<td><strong>75,95 dollars</strong></td>
+</tr>
+<tr>
+<td>Sans ajustement ?</td>
+<td><strong>75,13 dollars</strong></td>
+</tr>
+<tr>
+<td>Un taux de swap est un ?</td>
+<td><strong>Rendement AU PAIR</strong></td>
+</tr>
+<tr>
+<td>L'approximation employée ?</td>
+<td>Le rendement d'une obligation de coupon = <strong>taux de swap forward</strong></td>
+</tr>
+<tr>
+<td>Ex. 29.2 : $G'(0{,}12)$ ?</td>
+<td>$\mathbf{-2{,}4018}$</td>
+</tr>
+<tr>
+<td>Ex. 29.2 : $G''(0{,}12)$ ?</td>
+<td>$\mathbf{8{,}2546}$</td>
+</tr>
+<tr>
+<td>Ex. 29.2 : $G(0{,}12)$ ?</td>
+<td><strong>1,0000</strong> — l'obligation est <strong>au pair</strong></td>
+</tr>
+<tr>
+<td>Ex. 29.2 : $E_T(y_T)$ ?</td>
+<td><strong>12,36 %</strong> au lieu de 12 %</td>
+</tr>
+<tr>
+<td>Ex. 29.2 : la valeur ?</td>
+<td><strong>8,80</strong> (contre <strong>8,54</strong>)</td>
+</tr>
+<tr>
+<td>Situation appelant un timing ?</td>
+<td>Variable observée en $T$, payoff en $T^\ast&gt;T$</td>
+</tr>
+<tr>
+<td>Le ratio de numéraire ?</td>
+<td>$W=\dfrac{P(t,T^\ast)}{P(t,T)}$</td>
+</tr>
+<tr>
+<td>Que représente-t-il ?</td>
+<td>Le <strong>prix FORWARD d'obligation</strong> entre $T$ et $T^\ast$</td>
+</tr>
+<tr>
+<td>L'ajustement générique ?</td>
+<td>$\alpha_V=\rho_{VW}\sigma_V\sigma_W$</td>
+</tr>
+<tr>
+<td>Relation entre $W$ et $R$ ?</td>
+<td>$W=(1+R/m)^{-m(T^\ast-T)}$</td>
+</tr>
+<tr>
+<td>Volatilité de $W$ ?</td>
+<td>$-\dfrac{\sigma_RR(T^\ast-T)}{1+R/m}$</td>
+</tr>
+<tr>
+<td>Pourquoi négative ?</td>
+<td>$R$ et $W$ sont <strong>négativement corrélés</strong></td>
+</tr>
+<tr>
+<td>La formule de timing ?</td>
+<td>$E_T(V_T)\exp\!\left[-\dfrac{\rho_{VR}\sigma_V\sigma_RR_0(T^\ast-T)}{1+R_0/m}T\right]$</td>
+</tr>
+<tr>
+<td>Si $\rho_{VR}&gt;0$ ?</td>
+<td>Ajustement <strong>à la baisse</strong></td>
+</tr>
+<tr>
+<td>Ex. 29.3 : le facteur ?</td>
+<td><strong>1,00535</strong></td>
+</tr>
+<tr>
+<td>Ex. 29.3 : $E_T(V_T)$ ?</td>
+<td><strong>1 200</strong> — le <strong>prix forward</strong></td>
+</tr>
+<tr>
+<td>Ex. 29.3 : $E_{T^\ast}(V_T)$ ?</td>
+<td><strong>1 206,42</strong></td>
+</tr>
+<tr>
+<td>Ex. 29.3 : $P(0,6)$ ?</td>
+<td><strong>0,6302</strong></td>
+</tr>
+<tr>
+<td>Ex. 29.3 : la valeur ?</td>
+<td><strong>760,25</strong></td>
+</tr>
+<tr>
+<td>Le résultat pivot de la redérivation ?</td>
+<td>$E_{T^\ast}(R_T)=R_0$</td>
+</tr>
+<tr>
+<td>Ce que la redérivation montre ?</td>
+<td>Convexité et timing sont <strong>le même changement de mesure</strong></td>
+</tr>
+<tr>
+<td>Qu'est-ce qu'un quanto ?</td>
+<td>Variable en <strong>devise Y</strong>, payoff en <strong>devise X</strong></td>
+</tr>
+<tr>
+<td>Autre nom ?</td>
+<td>Dérivé <em><strong>cross-currency</strong></em></td>
+</tr>
+<tr>
+<td>L'exemple canonique ?</td>
+<td>Le <strong>futures CME sur le Nikkei</strong></td>
+</tr>
+<tr>
+<td>Le ratio de numéraire ?</td>
+<td>$\dfrac{P_X(t,T)S(t)}{P_Y(t,T)}$</td>
+</tr>
+<tr>
+<td>Que vaut-il ?</td>
+<td> Le <strong>CHANGE FORWARD</strong> (Y par X)</td>
+</tr>
+<tr>
+<td>La formule quanto ?</td>
+<td>$E_X(V_T)=E_Y(V_T)e^{\rho\sigma_V\sigma_WT}$</td>
+</tr>
+<tr>
+<td>Son approximation linéaire ?</td>
+<td>$E_Y(V_T)(1+\rho\sigma_V\sigma_WT)$</td>
+</tr>
+<tr>
+<td>Ex. 29.4 : forward en yens ?</td>
+<td>$15\,000e^{0{,}01}=\mathbf{15\,150{,}75}$</td>
+</tr>
+<tr>
+<td>Avec quel taux ?</td>
+<td> Le taux <strong>YEN</strong> moins le dividende</td>
+</tr>
+<tr>
+<td>Ex. 29.4 : forward quanto ?</td>
+<td><strong>15 260,23</strong></td>
+</tr>
+<tr>
+<td>Que représente-t-il ?</td>
+<td>Le forward pour un contrat versant <strong>en dollars</strong></td>
+</tr>
+<tr>
+<td>Son usage futur ?</td>
+<td>Les <em><strong>diff swaps</strong></em></td>
+</tr>
+<tr>
+<td>Quand la mesure traditionnelle ?</td>
+<td>Payoffs à <strong>plusieurs dates</strong> ou <strong>américaines</strong></td>
+</tr>
+<tr>
+<td>Le ratio de numéraire alors ?</td>
+<td>$g_XS/g_Y$</td>
+</tr>
+<tr>
+<td>Sa volatilité ?</td>
+<td> Simplement $\sigma_S$</td>
+</tr>
+<tr>
+<td>Pourquoi ?</td>
+<td>Les comptes monétaires ont une volatilité <strong>NULLE</strong></td>
+</tr>
+<tr>
+<td>L'ajustement (29.7) ?</td>
+<td>$\alpha_V=\rho\,\sigma_V\,\sigma_S$</td>
+</tr>
+<tr>
+<td>Le prix du risque ?</td>
+<td>Passe de <strong>0</strong> à <strong>$\sigma_S$</strong></td>
+</tr>
+<tr>
+<td>Processus risque-neutre de $S$ ?</td>
+<td>$(r_Y-r_X)S\,dt+\sigma_SS\,dz$</td>
+</tr>
+<tr>
+<td>Processus déduit de $1/S$ ?</td>
+<td>$(r_X-r_Y+\sigma_S^2)(1/S)dt-\sigma_S(1/S)dz$</td>
+</tr>
+<tr>
+<td>Le paradoxe ?</td>
+<td>Pourquoi le terme $+\sigma_S^2$ ?</td>
+</tr>
+<tr>
+<td>La clé de la résolution ?</td>
+<td>Le processus de $1/S$ suppose <strong>le numéraire de $S$</strong></td>
+</tr>
+<tr>
+<td>$\rho$ entre $1/S$ et $S$ ?</td>
+<td>$\mathbf{-1}$</td>
+</tr>
+<tr>
+<td>$\sigma_V$ pour $V=1/S$ ?</td>
+<td>$\sigma_S$</td>
+</tr>
+<tr>
+<td>L'ajustement obtenu ?</td>
+<td>$\mathbf{-\sigma_S^2}$</td>
+</tr>
+<tr>
+<td>Le processus final ?</td>
+<td>$(r_X-r_Y)(1/S)dt-\sigma_S(1/S)dz$</td>
+</tr>
+<tr>
+<td>Ex. 29.5 : pourquoi la traditionnelle ?</td>
+<td>L'option est <strong>AMÉRICAINE</strong></td>
+</tr>
+<tr>
+<td>Ex. 29.5 : l'ajustement ?</td>
+<td>$0{,}2\times0{,}25\times0{,}12=\mathbf{0{,}6\,\%}$</td>
+</tr>
+<tr>
+<td>Croissance sous numéraire dollar ?</td>
+<td>$3\,\%-1{,}5\,\%=\mathbf{1{,}5\,\%}$</td>
+</tr>
+<tr>
+<td>Sous numéraire sterling ?</td>
+<td><strong>2,1 %</strong></td>
+</tr>
+<tr>
+<td>Rendement de dividende équivalent ?</td>
+<td>$5\,\%-2{,}1\,\%=\mathbf{2{,}9\,\%}$</td>
+</tr>
+<tr>
+<td>La valeur de l'option ?</td>
+<td><strong>179,83 livres sterling</strong></td>
+</tr>
+</tbody></table>
+</main>
+
+
+
+
+</body></html>

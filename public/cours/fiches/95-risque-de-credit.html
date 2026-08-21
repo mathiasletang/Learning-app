@@ -1,0 +1,2547 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fiche 95 — Risque de crédit : taux de hasard, modèle de Merton, CVA et copule gaussienne</title>
+<script>
+window.MathJax={tex:{inlineMath:[["$","$"]],displayMath:[["$$","$$"]],processEscapes:true},
+ options:{skipHtmlTags:["script","noscript","style","textarea","pre","code"]},
+ svg:{fontCache:"global"},
+ startup:{pageReady:()=>MathJax.startup.defaultPageReady().then(()=>{document.body.classList.add("ready")})}};
+setTimeout(function(){document.body.classList.add("ready")},2500);
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+/* ============================================================
+   MathiasLearn — feuille de style des fiches
+   Reprise intégrale des tokens de 00_PARCOURS/*.html
+   + blocs pédagogiques (callouts, méthode, essentiels, recall)
+   ============================================================ */
+:root{--bg:#faf9f7;--card:#fff;--ink:#1a1a1a;--muted:#6b6b6b;--line:#e5e2dd;--accent:#8b5e34;
+ --hl:#fdf8ef;--ok:#2d7d4f;--okbg:#f0f7f3;--warn:#b3402f;--warnbg:#fdf3f1;--blue:#2f5d8b;--bluebg:#f1f5fa}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+ font:17px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;padding:0 16px 100px}
+.nav{position:sticky;top:0;background:rgba(250,249,247,.96);backdrop-filter:blur(8px);
+ border-bottom:1px solid var(--line);margin:0 -16px 30px;padding:11px 16px;z-index:50;
+ display:flex;gap:6px;flex-wrap:wrap;font-size:13px}
+.nav a{color:var(--muted);text-decoration:none;padding:4px 9px;border-radius:5px;white-space:nowrap}
+.nav a:hover{background:var(--line);color:var(--ink)}
+.nav a.on{background:var(--accent);color:#fff}
+main{max-width:780px;margin:0 auto}
+h1{font-size:31px;letter-spacing:-.02em;margin:.4em 0 .5em;line-height:1.25}
+h2{font-size:23px;margin:2.2em 0 .7em;padding-bottom:.3em;border-bottom:1px solid var(--line)}
+h3{font-size:19px;margin:1.9em 0 .5em;color:var(--accent)}
+h4{font-size:17px;margin:1.5em 0 .4em}
+p{margin:.8em 0} a{color:var(--accent)} hr{border:0;border-top:1px solid var(--line);margin:2.6em 0}
+table{border-collapse:collapse;width:100%;margin:1.3em 0;font-size:15.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+th{background:#f3f0eb;font-weight:600}
+tr:nth-child(even) td{background:#fcfbfa}
+code{font-family:"SF Mono",Menlo,Consolas,monospace;font-size:.88em;background:#f2efea;padding:2px 6px;border-radius:4px;overflow-wrap:break-word}
+pre{background:#f2efea;padding:14px 16px;border-radius:8px;overflow-x:auto}
+pre code{background:none;padding:0;white-space:pre}
+blockquote{border-left:3px solid var(--accent);background:var(--hl);margin:1.4em 0;padding:14px 20px;border-radius:0 8px 8px 0}
+blockquote p:first-child{margin-top:0} blockquote p:last-child{margin-bottom:0}
+ul,ol{padding-left:1.5em} li{margin:.35em 0} em{color:#4a4a4a}
+mjx-container[display="true"]{margin:1.1em 0!important;overflow-x:auto;overflow-y:hidden;padding:2px 0}
+mjx-container svg{max-width:100%}
+body:not(.ready) main{opacity:0} main{opacity:1;transition:opacity .25s}
+
+/* --- bandeau de tête de fiche --- */
+.cours{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--accent);
+ border-radius:0 10px 10px 0;padding:18px 22px;margin:0 0 34px}
+.cours h4{margin:0 0 4px;font-size:14px;text-transform:uppercase;letter-spacing:.07em;color:var(--accent)}
+.cours .cs{color:var(--muted);font-size:14.5px;margin:0 0 14px}
+
+/* --- exercices / corrigés --- */
+.ex{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:6px 24px 20px;margin:18px 0}
+.ex>h3:first-child{margin-top:14px}
+details.cor{margin-top:18px;border:1px solid var(--line);border-radius:8px;background:#fcfbfa;overflow:hidden}
+details.cor>summary{cursor:pointer;padding:12px 16px;font-weight:600;font-size:15px;color:var(--accent);
+ list-style:none;display:flex;align-items:center;gap:9px;user-select:none;transition:.15s;min-height:44px}
+details.cor>summary::-webkit-details-marker{display:none}
+details.cor>summary:hover{background:var(--hl)}
+details.cor>summary::before{content:"\25B6";font-size:10px;transition:transform .18s;display:inline-block}
+details.cor[open]>summary::before{transform:rotate(90deg)}
+details.cor[open]>summary{background:var(--okbg);color:var(--ok);border-bottom:1px solid var(--line)}
+.cor .in{padding:4px 20px 16px}
+.cor .in>*:first-child{margin-top:.9em}
+
+/* --- blocs pédagogiques (callouts) ---
+   Générés depuis une citation Markdown dont le premier **gras** commence
+   par un mot-clé : DÉFINITION, THÉORÈME, MÉTHODE, PIÈGE, INTUITION… */
+.cal{border:1px solid var(--line);border-left:4px solid var(--accent);background:var(--card);
+ border-radius:0 10px 10px 0;padding:15px 20px;margin:1.5em 0}
+.cal>p:first-child{margin-top:0}.cal>p:last-child,.cal>ul:last-child,.cal>ol:last-child{margin-bottom:0}
+.cal .lab{display:block;font-size:12.5px;text-transform:uppercase;letter-spacing:.08em;
+ font-weight:700;color:var(--accent);margin-bottom:6px}
+.cal.formel{background:var(--hl)}
+.cal.piege{border-left-color:var(--warn);background:var(--warnbg)}
+.cal.piege .lab{color:var(--warn)}
+.cal.methode{border-left-color:var(--ok);background:var(--okbg)}
+.cal.methode .lab{color:var(--ok)}
+.cal.intu{border-left-color:var(--blue);background:var(--bluebg)}
+.cal.intu .lab{color:var(--blue)}
+.cal.plus{border-left-style:dashed;background:#faf9f7}
+.cal.plus .lab{color:var(--muted)}
+
+/* --- révision express --- */
+.ess{background:var(--card);border:1px solid var(--accent);border-radius:10px;padding:4px 24px 20px;margin:1.6em 0}
+.ess h3{margin-top:1.3em}
+.rec{background:var(--card);border:1px dashed var(--accent);border-radius:10px;padding:4px 24px 18px;margin:1.6em 0}
+.rec ol{counter-reset:none}
+
+/* --- impression / PDF --- */
+@media print{
+ .nav{display:none}
+ body{padding:0;background:#fff;font-size:11.2pt;line-height:1.55}
+ main{max-width:none}
+ h1{font-size:23pt}h2{font-size:15pt;margin-top:1.5em}h3{font-size:12.6pt}
+ h2,h3,h4{break-after:avoid;page-break-after:avoid}
+ table,.cal,blockquote{break-inside:avoid;page-break-inside:avoid}
+ table{display:table;font-size:9.6pt}
+ details.cor{border:1px solid var(--line);background:#fcfbfa}
+ details.cor>summary{display:none}
+ details.cor .in{padding-top:10px}
+ .cal,.ex,.ess,.rec{box-shadow:none}
+ a{color:var(--ink);text-decoration:none}
+}
+@page{margin:16mm 15mm 18mm}
+
+/* --- exemples travaillés --- */
+.exm{background:#fcfbfa;border:1px solid var(--line);border-radius:10px;padding:2px 20px 14px;margin:1.5em 0}
+.exm>h4:first-child{margin:14px 0 .5em;color:var(--accent);font-size:13px;text-transform:uppercase;letter-spacing:.07em}
+
+
+/* --- pastilles de priorité (conventions des fiches de l'app) --- */
+h2[data-prio], h3[data-prio], h4[data-prio]{position:relative}
+h2[data-prio]::before,h3[data-prio]::before,h4[data-prio]::before{
+ content:"";display:inline-block;width:9px;height:9px;border-radius:50%;
+ margin-right:9px;vertical-align:middle;background:var(--muted)}
+[data-prio="must"]::before{background:var(--warn)}
+[data-prio="high"]::before{background:#d98324}
+[data-prio="mid"]::before{background:#c9a227}
+[data-prio="low"]::before{background:var(--ok)}
+/* corrigés des fiches de l'app : même traitement que les corrigés des séries */
+details.cor>summary::after{content:""}
+</style></head><body>
+<div class="nav"><a href="00_COMMENCER_ICI.html">Commencer ici</a><a href="01_NOTATIONS_le-decodeur.html">Notations</a><a href="02_EXERCICES_Serie-0.html">Série 0 — Remise en route</a><a href="03_EXERCICES_Serie-1.html">Série 1 — Convexité</a><a href="04_EXERCICES_Serie-2.html">Série 2 — KKT</a><a href="05_AUTO-EVALUATION.html">Auto-évaluation (quiz)</a><a href="06_FICHE_Optimisation-deux-variables.html">Fiche — Optimisation à 2 variables</a></div>
+<main><h1>Fiche 95 — Risque de crédit : taux de hasard, modèle de Merton, CVA et copule gaussienne</h1>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Matière</strong></td>
+<td>Maths · Finance de marché · Gestion des risques</td>
+</tr>
+<tr>
+<td><strong>Cours source</strong></td>
+<td>John C. Hull, <em>Options, Futures, and Other Derivatives</em>, 8ᵉ éd., Pearson — chapitre 23 « Credit Risk »</td>
+</tr>
+<tr>
+<td><strong>Difficulté</strong></td>
+<td> Must know — le second grand risque des institutions financières, après le risque de marché</td>
+</tr>
+<tr>
+<td><strong>Temps d'étude estimé</strong></td>
+<td>2 h</td>
+</tr>
+<tr>
+<td><strong>Prérequis</strong></td>
+<td>Fiches 77 (obligations), 87 (Black-Scholes), 93 (VaR), 94 (corrélations)</td>
+</tr>
+<tr>
+<td><strong>Concepts clés</strong></td>
+<td>Notations de crédit, probabilité de défaut cumulée, taux de hasard, intensité de défaut, taux de recouvrement, extraction depuis les prix d'obligations, <em>asset swap spread</em>, probabilités réelles contre risque-neutres, modèle de Merton, ajustement de valeur de crédit (CVA), <em>netting</em>, collatéralisation, <em>downgrade trigger</em>, corrélation de défaut, copule gaussienne, modèle à un facteur, Credit VaR, formule de Vasicek, CreditMetrics</td>
+</tr>
+<tr>
+<td><strong>Poids à l'examen</strong></td>
+<td>$\bar\lambda=\dfrac{s}{1-R}$ · $Q(t)=1-e^{-\bar\lambda(t)t}$ · la table de perte actualisée en fonction de $Q$ · $E_0=V_0N(d_1)-De^{-rT}N(d_2)$ avec $\sigma_EE_0=N(d_1)\sigma_VV_0$ · la formule de <strong>Vasicek</strong>.</td>
+</tr>
+</tbody></table>
+<h2>Vue d'ensemble</h2>
+<pre><code>LE RISQUE DE CRÉDIT   possibilité que les emprunteurs et contreparties FASSENT DÉFAUT
+
+TROIS SOURCES D'ESTIMATION DE LA PROBABILITÉ DE DÉFAUT
+  DONNÉES HISTORIQUES (agences)  → probabilités RÉELLES     Q(t) = 1 − e^{−λ̄t}
+  PRIX D'OBLIGATIONS             → probabilités RISQUE-NEUTRES   λ̄ = s/(1−R)
+  PRIX DES ACTIONS (Merton)      → N(−d₂), à recalibrer
+
+USAGE      valoriser un instrument sensible au crédit  →  RISQUE-NEUTRES
+           analyse de scénarios, Credit VaR            →  RÉELLES
+
+DÉRIVÉS    3 catégories : toujours passif (aucun risque) · toujours actif · les deux
+           CVA = Σ uᵢvᵢ   avec uᵢ = qᵢ(1−R)          f₀* = f₀ e^{−(y*−y)T}
+ATTÉNUATION   netting · collatéralisation · downgrade triggers
+
+CORRÉLATION  xᵢ = N⁻¹[Qᵢ(tᵢ)]  puis loi normale multivariée = COPULE GAUSSIENNE
+UN FACTEUR   xᵢ = aᵢF + √(1−aᵢ²) Zᵢ      Q(T|F) = N[ (N⁻¹[Q(T)] − √ρ F) / √(1−ρ) ]
+VASICEK      V(X,T) = N[ (N⁻¹[Q(T)] + √ρ N⁻¹(X)) / √(1−ρ) ]
+</code></pre>
+<p><strong>Le cadrage d'ouverture.</strong> <em>La VaR du chapitre 21 et les lettres grecques du chapitre 18 visent à quantifier le <strong>risque de marché</strong>. Ce chapitre considère un autre risque important : le <strong>risque de crédit</strong>. <strong>La plupart des institutions financières consacrent des ressources considérables à sa mesure et à sa gestion.</strong> Les régulateurs exigent depuis de nombreuses années que les banques détiennent du capital pour refléter les risques de crédit qu'elles portent — <strong>ce capital s'AJOUTE au capital exigé pour le risque de marché</strong>.</em></p>
+<h2 data-prio="high">Concept 1 — Les notations de crédit</h2>
+<table>
+<thead>
+<tr>
+<th>Rang</th>
+<th>Moody's</th>
+<th>S&amp;P / Fitch</th>
+<th>Statut</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td><strong>Aaa</strong></td>
+<td><strong>AAA</strong></td>
+<td><em>considérées comme n'ayant <strong>presque aucune chance</strong> de faire défaut</em></td>
+</tr>
+<tr>
+<td>2</td>
+<td>Aa</td>
+<td>AA</td>
+<td><strong>investment grade</strong></td>
+</tr>
+<tr>
+<td>3</td>
+<td>A</td>
+<td>A</td>
+<td><strong>investment grade</strong></td>
+</tr>
+<tr>
+<td>4</td>
+<td><strong>Baa</strong></td>
+<td><strong>BBB</strong></td>
+<td><strong>dernier échelon <em>investment grade</em></strong></td>
+</tr>
+<tr>
+<td>5</td>
+<td>Ba</td>
+<td>BB</td>
+<td>spéculatif</td>
+</tr>
+<tr>
+<td>6</td>
+<td>B</td>
+<td>B</td>
+<td>spéculatif</td>
+</tr>
+<tr>
+<td>7</td>
+<td>Caa</td>
+<td>CCC</td>
+<td>spéculatif</td>
+</tr>
+<tr>
+<td>8</td>
+<td>Ca</td>
+<td>CC</td>
+<td>spéculatif</td>
+</tr>
+<tr>
+<td>9</td>
+<td>C</td>
+<td>C</td>
+<td>spéculatif</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p class="cal piege"> <em><strong>Seules les obligations notées Baa (BBB) ou au-dessus sont considérées comme « investment grade ».</strong></em></p>
+</blockquote>
+<p><strong>Les crans fins.</strong> Moody's divise Aa en <strong>Aa1, Aa2, Aa3</strong>, A en <strong>A1, A2, A3</strong>, etc. S&amp;P et Fitch divisent AA en <strong>AA+, AA, AA−</strong>, A en <strong>A+, A, A−</strong>, etc.  <em>Les catégories <strong>Aaa/AAA ne sont PAS subdivisées</strong>, ni habituellement les deux catégories les plus basses.</em></p>
+<h2 data-prio="must">Concept 2 — Probabilités de défaut historiques et taux de hasard</h2>
+<h3>2.1 La table des agences</h3>
+<p><strong>Table 23.1 — taux de défaut cumulés moyens (%), 1970-2009, source Moody's</strong> :</p>
+<table>
+<thead>
+<tr>
+<th>Notation</th>
+<th>1 an</th>
+<th>2</th>
+<th>3</th>
+<th>4</th>
+<th>5</th>
+<th>7</th>
+<th>10</th>
+<th>15</th>
+<th>20</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Aaa</strong></td>
+<td>0,000</td>
+<td>0,012</td>
+<td>0,012</td>
+<td>0,037</td>
+<td>0,105</td>
+<td>0,245</td>
+<td>0,497</td>
+<td>0,927</td>
+<td>1,102</td>
+</tr>
+<tr>
+<td><strong>Aa</strong></td>
+<td>0,022</td>
+<td>0,059</td>
+<td>0,091</td>
+<td>0,159</td>
+<td>0,234</td>
+<td>0,384</td>
+<td>0,542</td>
+<td>1,150</td>
+<td>2,465</td>
+</tr>
+<tr>
+<td><strong>A</strong></td>
+<td>0,051</td>
+<td>0,165</td>
+<td>0,341</td>
+<td>0,520</td>
+<td>0,717</td>
+<td>1,179</td>
+<td>2,046</td>
+<td>3,572</td>
+<td>5,934</td>
+</tr>
+<tr>
+<td><strong>Baa</strong></td>
+<td>0,176</td>
+<td>0,494</td>
+<td>0,912</td>
+<td>1,404</td>
+<td>1,926</td>
+<td>2,996</td>
+<td>4,851</td>
+<td>8,751</td>
+<td>12,327</td>
+</tr>
+<tr>
+<td><strong>Ba</strong></td>
+<td>1,166</td>
+<td>3,186</td>
+<td>5,583</td>
+<td>8,123</td>
+<td>10,397</td>
+<td>14,318</td>
+<td>19,964</td>
+<td>29,703</td>
+<td>37,173</td>
+</tr>
+<tr>
+<td><strong>B</strong></td>
+<td>4,546</td>
+<td>10,426</td>
+<td>16,188</td>
+<td>21,256</td>
+<td>25,895</td>
+<td>34,473</td>
+<td>44,377</td>
+<td>56,098</td>
+<td>62,478</td>
+</tr>
+<tr>
+<td><strong>Caa-C</strong></td>
+<td>17,723</td>
+<td>29,384</td>
+<td>38,682</td>
+<td>46,094</td>
+<td>52,286</td>
+<td>59,771</td>
+<td>71,376</td>
+<td>77,545</td>
+<td>80,211</td>
+</tr>
+</tbody></table>
+<p><strong>Comment la lire.</strong> <em>Une obligation notée Baa a <strong>0,176 %</strong> de chances de faire défaut avant la fin de la première année, <strong>0,494 %</strong> avant la fin de la deuxième, etc.</em> La probabilité de défaut <strong>pendant</strong> une année particulière se déduit par <strong>différence</strong> :
+$$P(\text{défaut de Baa pendant la 2ᵉ année})=0{,}494-0{,}176=\mathbf{0{,}318\,\%}$$</p>
+<p><strong>Le renversement de tendance, à connaître par cœur</strong> :</p>
+<table>
+<thead>
+<tr>
+<th>Qualité</th>
+<th>Forme de la probabilité de défaut annuelle</th>
+<th>Exemple chiffré</th>
+<th>Raison donnée par Hull</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Investment grade</strong></td>
+<td><strong>croissante</strong> dans le temps</td>
+<td>A-rated, années 0-5 / 5-10 / 10-15 / 15-20 : <strong>0,717 % · 1,329 % · 1,526 % · 2,362 %</strong></td>
+<td><em>l'émetteur est <strong>initialement</strong> jugé solvable ; <strong>plus le temps passe, plus grande est la possibilité que sa santé financière décline</strong></em></td>
+</tr>
+<tr>
+<td><strong>Mauvaise notation</strong></td>
+<td><strong>décroissante</strong> dans le temps</td>
+<td>B-rated, mêmes tranches : <strong>25,895 % · 18,482 % · 11,721 % · 6,380 %</strong></td>
+<td><em>pour une obligation mal notée, <strong>les une ou deux prochaines années peuvent être critiques</strong>. <strong>Plus l'émetteur survit longtemps, plus grande est la chance que sa santé financière s'améliore</strong></em></td>
+</tr>
+</tbody></table>
+<h3>2.2 Le taux de hasard (intensité de défaut)</h3>
+<details class="cor">
+<summary><strong>Probabilité inconditionnelle contre taux de hasard — le calcul de référence</strong></summary><div class="in">
+
+<p><strong>Question :</strong> quelle est, pour une obligation notée <strong>Caa ou moins</strong>, la probabilité de défaut <strong>pendant la 3ᵉ année</strong> ?</p>
+<p><em>Étape 1 — la probabilité INCONDITIONNELLE</em> (vue <strong>à la date 0</strong>) :
+$$38{,}682-29{,}384=\mathbf{9{,}298\,\%}$$</p>
+<p><em>Étape 2 — la probabilité de SURVIE jusqu'à la fin de l'année 2 :</em>
+$$100-29{,}384=\mathbf{70{,}616\,\%}$$</p>
+<p><em>Étape 3 — la probabilité de défaut pendant la 3ᵉ année <strong>conditionnellement à l'absence de défaut antérieur</strong> :</em>
+$$\frac{0{,}09298}{0{,}70616}=\mathbf{13{,}17\,\%}$$</p>
+<blockquote>
+<p class="cal piege"> <em><strong>Les probabilités de défaut CONDITIONNELLES s'appellent des TAUX DE HASARD (hazard rates) ou INTENSITÉS DE DÉFAUT.</strong></em></p>
+</blockquote>
+</div></details>
+
+<p><strong>La version en temps continu.</strong> Le taux de hasard $\lambda(t)$ est défini de sorte que $\lambda(t)\Delta t$ soit la probabilité de défaut entre $t$ et $t+\Delta t$ <strong>conditionnellement à l'absence de défaut antérieur</strong>. Si $V(t)$ est la probabilité cumulée de survie jusqu'à $t$ :</p>
+<p>$$\frac{V(t)-V(t+\Delta t)}{V(t)}=\lambda(t)\,\Delta t\quad\Longrightarrow\quad V(t+\Delta t)-V(t)=-\lambda(t)V(t)\,\Delta t$$</p>
+<p>$$\text{à la limite}\quad\frac{dV(t)}{dt}=-\lambda(t)V(t)\quad\Longrightarrow\quad\boxed{V(t)=e^{-\int_0^t\lambda(\tau)\,d\tau}}$$</p>
+<p>En définissant $Q(t)=1-V(t)$ comme la probabilité de défaut avant $t$ :</p>
+<p>$$\boxed{Q(t)=1-e^{-\int_0^t\lambda(\tau)\,d\tau}=1-e^{-\bar\lambda(t)\,t}}\;\text{(23.1)}$$</p>
+<p>où $\bar\lambda(t)$ est le <strong>taux de hasard MOYEN</strong> (intensité de défaut moyenne) entre 0 et $t$. La forme inverse, celle qu'on utilise le plus :</p>
+<p>$$\boxed{\bar\lambda(t)=-\frac1t\ln\big[1-Q(t)\big]}$$</p>
+<h2 data-prio="high">Concept 3 — Les taux de recouvrement</h2>
+<p><strong>La définition.</strong> <em>Le taux de recouvrement d'une obligation est normalement défini comme <strong>la valeur de marché de l'obligation quelques jours après un défaut, en pourcentage de sa valeur faciale</strong>.</em> (Aux États-Unis, la créance d'un porteur d'obligation est <strong>la valeur faciale plus les intérêts courus</strong>.)</p>
+<p><strong>Table 23.2 — taux de recouvrement moyens, 1982-2009, source Moody's</strong> :</p>
+<table>
+<thead>
+<tr>
+<th>Classe</th>
+<th>Taux de recouvrement moyen (%)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Prêt bancaire avec privilège de premier rang</strong> (<em>first lien</em>)</td>
+<td><strong>65,6</strong> ← <em>le meilleur</em></td>
+</tr>
+<tr>
+<td>Prêt bancaire de second rang</td>
+<td>32,8</td>
+</tr>
+<tr>
+<td>Prêt bancaire senior non garanti</td>
+<td>48,7</td>
+</tr>
+<tr>
+<td><strong>Obligation senior garantie</strong></td>
+<td><strong>49,8</strong></td>
+</tr>
+<tr>
+<td>Obligation senior non garantie</td>
+<td>36,6</td>
+</tr>
+<tr>
+<td>Obligation senior subordonnée</td>
+<td>30,7</td>
+</tr>
+<tr>
+<td>Obligation subordonnée</td>
+<td>31,3</td>
+</tr>
+<tr>
+<td><strong>Obligation junior subordonnée</strong></td>
+<td><strong>24,7</strong> ← <em>le pire</em></td>
+</tr>
+</tbody></table>
+<p><em>Pour les obligations, le taux de recouvrement moyen va de <strong>49,8 %</strong> pour celles qui sont <strong>à la fois senior et garanties</strong> à <strong>24,7 %</strong> pour celles qui <strong>passent après les autres prêteurs</strong> avec un intérêt de sûreté subordonné.</em></p>
+<blockquote>
+<p class="cal piege"> <strong>Le fait le plus important de la section.</strong> <em>Les taux de recouvrement sont <strong>significativement NÉGATIVEMENT corrélés aux taux de défaut</strong>. Cela signifie qu'<strong>une mauvaise année pour le taux de défaut est généralement DOUBLEMENT mauvaise, parce qu'elle s'accompagne d'un faible taux de recouvrement</strong>.</em></p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>Taux de défaut annuel (obligations non <em>investment grade</em>)</th>
+<th>Taux de recouvrement moyen</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>0,1 %</strong></td>
+<td>relativement <strong>élevé, ≈ 60 %</strong></td>
+</tr>
+<tr>
+<td><strong>3 %</strong></td>
+<td>seulement <strong>≈ 35 %</strong></td>
+</tr>
+</tbody></table>
+<p><em>(Altman, Brady, Resti et Sironi, « The Link between Default and Recovery Rates », Journal of Business, 2005.)</em></p>
+<h2 data-prio="must">Concept 4 — Estimer les probabilités de défaut à partir des prix d'obligations</h2>
+<p><strong>L'hypothèse fondatrice :</strong> <em>la <strong>seule</strong> raison pour laquelle une obligation d'entreprise se vend moins cher qu'une obligation sans risque similaire est <strong>la possibilité de défaut</strong>.</em>  <em>Cette hypothèse n'est pas parfaite : en pratique le prix d'une obligation d'entreprise est affecté par sa <strong>liquidité</strong> — plus la liquidité est faible, plus le prix est bas.</em></p>
+<h3>4.1 Le calcul approché</h3>
+<p><strong>Le raisonnement en une phrase.</strong> Une obligation rapporte 200 points de base de plus qu'une obligation sans risque similaire, et le taux de recouvrement attendu est 40 %. <em>Le détenteur doit s'attendre à <strong>perdre 200 points de base</strong> (soit 2 % par an) du fait des défauts. Étant donné le taux de recouvrement de 40 %, cela conduit à une probabilité de défaut par an, conditionnelle à l'absence de défaut antérieur, de $0{,}02/(1-0{,}4)=\mathbf{3{,}33\,\%}$.</em></p>
+<p>$$\boxed{\bar\lambda=\frac{s}{1-R}}\;\text{(23.2)}$$</p>
+<table>
+<thead>
+<tr>
+<th>Symbole</th>
+<th>Signification</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$\bar\lambda$</td>
+<td>taux de hasard <strong>moyen</strong> (intensité de défaut) par an</td>
+</tr>
+<tr>
+<td>$s$</td>
+<td><strong>spread</strong> du rendement de l'obligation d'entreprise <strong>au-dessus du taux sans risque</strong></td>
+</tr>
+<tr>
+<td>$R$</td>
+<td>taux de <strong>recouvrement</strong> attendu</td>
+</tr>
+</tbody></table>
+<h3>4.2 Le calcul exact</h3>
+<details class="cor">
+<summary><strong>Table 23.3 reconstruite entièrement — l'exercice canonique</strong></summary><div class="in">
+
+<p><strong>Données.</strong> Obligation d'entreprise de <strong>5 ans</strong>, coupon <strong>6 % par an payé semestriellement</strong>, rendement <strong>7 %</strong> (composition continue). Obligation sans risque similaire : rendement <strong>5 %</strong> (composition continue). Nominal 100. Recouvrement 40.</p>
+<p><em>Étape 1 — les deux prix.</em>
+$$P_{\text{corp}}=\sum_{k=1}^{10}3e^{-0{,}07\times k/2}+100e^{-0{,}07\times5}=\mathbf{95{,}34}$$
+$$P_{\text{sans risque}}=\sum_{k=1}^{10}3e^{-0{,}05\times k/2}+100e^{-0{,}05\times5}=\mathbf{104{,}09}$$</p>
+<p><em>Étape 2 — la perte espérée totale sur 5 ans :</em>
+$$104{,}09-95{,}34=\mathbf{8{,}75\ \text{dollars}}$$</p>
+<p><em>Étape 3 — le calendrier des défauts.</em> On suppose que les défauts peuvent survenir aux dates <strong>0,5 · 1,5 · 2,5 · 3,5 · 4,5</strong> ans,  <em><strong>immédiatement AVANT les dates de paiement de coupon</strong></em>, et que la probabilité <strong>inconditionnelle</strong> de défaut par an vaut $Q$, <strong>la même chaque année</strong>. Les taux sans risque de toutes maturités valent 5 %.</p>
+<p><em>Étape 4 — la ligne 3,5 ans, détaillée.</em> La valeur espérée de l'obligation à 3,5 ans (calculée avec les taux forward et <strong>en supposant aucune possibilité de défaut</strong>) inclut le coupon de 3 <strong>dû à 3,5 et non encore versé</strong> :
+$$3+3e^{-0{,}05\times0{,}5}+3e^{-0{,}05\times1{,}0}+103e^{-0{,}05\times1{,}5}=\mathbf{104{,}34}$$
+Le montant recouvré étant 40, la <strong>perte en cas de défaut</strong> vaut $104{,}34-40=\mathbf{64{,}34}$. Sa valeur actuelle : $64{,}34\times e^{-0{,}05\times3{,}5}=64{,}34\times0{,}8395=\mathbf{54{,}01}$. La perte espérée est donc $54{,}01\,Q$.</p>
+<p><em>Étape 5 — la table complète :</em></p>
+<table>
+<thead>
+<tr>
+<th>Date (ans)</th>
+<th>Prob. de défaut</th>
+<th>Recouvrement</th>
+<th>Valeur sans risque</th>
+<th>Perte en cas de défaut</th>
+<th>Facteur d'actualisation</th>
+<th>VA de la perte espérée</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>0,5</td>
+<td>$Q$</td>
+<td>40</td>
+<td>106,73</td>
+<td>66,73</td>
+<td>0,9753</td>
+<td>$65{,}08\,Q$</td>
+</tr>
+<tr>
+<td>1,5</td>
+<td>$Q$</td>
+<td>40</td>
+<td>105,97</td>
+<td>65,97</td>
+<td>0,9277</td>
+<td>$61{,}20\,Q$</td>
+</tr>
+<tr>
+<td>2,5</td>
+<td>$Q$</td>
+<td>40</td>
+<td>105,17</td>
+<td>65,17</td>
+<td>0,8825</td>
+<td>$57{,}52\,Q$</td>
+</tr>
+<tr>
+<td>3,5</td>
+<td>$Q$</td>
+<td>40</td>
+<td>104,34</td>
+<td>64,34</td>
+<td>0,8395</td>
+<td>$54{,}01\,Q$</td>
+</tr>
+<tr>
+<td>4,5</td>
+<td>$Q$</td>
+<td>40</td>
+<td>103,46</td>
+<td>63,46</td>
+<td>0,7985</td>
+<td>$50{,}67\,Q$</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td><strong>Total</strong></td>
+<td>$\mathbf{288{,}48\,Q}$</td>
+</tr>
+</tbody></table>
+<p><em>Étape 6 — résoudre :</em>
+$$288{,}48\,Q=8{,}75\quad\Longrightarrow\quad\boxed{Q=\frac{8{,}75}{288{,}48}=\mathbf{3{,}03\,\%}}$$</p>
+<p class="cal piege"> <strong>Les hypothèses simplificatrices, à énoncer.</strong> <em>Le calcul suppose que la probabilité de défaut est <strong>la même chaque année</strong> et que <strong>les défauts n'ont lieu qu'à un seul instant par an</strong>. On peut étendre le calcul à des défauts plus fréquents ; au lieu d'une probabilité inconditionnelle constante on peut supposer un <strong>taux de hasard constant</strong> ou un profil particulier de variation.</em></p>
+<p><strong>L'extension multi-obligations, la « structure par terme des probabilités de défaut ».</strong> Avec des obligations de maturités <strong>3, 5, 7 et 10 ans</strong>, on utilise :</p>
+<table>
+<thead>
+<tr>
+<th>Obligation</th>
+<th>Sert à estimer</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>3 ans</td>
+<td>la probabilité de défaut annuelle des <strong>années 1 à 3</strong></td>
+</tr>
+<tr>
+<td>5 ans</td>
+<td>celle des <strong>années 4 et 5</strong></td>
+</tr>
+<tr>
+<td>7 ans</td>
+<td>celle des <strong>années 6 et 7</strong></td>
+</tr>
+<tr>
+<td>10 ans</td>
+<td>celle des <strong>années 8, 9 et 10</strong></td>
+</tr>
+</tbody></table>
+</div></details>
+
+<h3>4.3 Quel « taux sans risque » ?</h3>
+<blockquote>
+<p class="cal piege"> <em><strong>Un enjeu clé, quand on utilise les prix d'obligations, est le SENS des termes « taux sans risque » et « obligation sans risque ».</strong></em></p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>Référence</th>
+<th>Qui l'utilise</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Rendement des Treasuries</strong> similaires</td>
+<td>le <em>benchmark</em> habituel pour <strong>coter</strong> les rendements d'obligations d'entreprise (<em>« un spread de 250 points de base au-dessus des Treasuries »</em>)</td>
+</tr>
+<tr>
+<td><strong>Taux LIBOR/swap</strong></td>
+<td>ce que les traders utilisent comme proxy sans risque <strong>pour valoriser les dérivés</strong> — et souvent aussi pour calculer les probabilités de défaut</td>
+</tr>
+<tr>
+<td><strong>LIBOR/swap moins 10 points de base</strong></td>
+<td>le taux sans risque <strong>implicite</strong> dans les CDS, en moyenne</td>
+</tr>
+</tbody></table>
+<p><em>Pourquoi 10 points de base est plausible : le risque de crédit dans un taux de swap est celui d'une <strong>série de prêts à court terme à des contreparties notées AA</strong>, et <strong>10 points de base est une prime de risque de défaut raisonnable pour un instrument court terme AA</strong>.</em></p>
+<h3>4.4 Les <em>asset swaps</em></h3>
+<p><em>En pratique, les traders utilisent souvent les <strong>asset swap spreads</strong> pour extraire les probabilités de défaut, <strong>parce qu'ils fournissent une estimation DIRECTE du spread des rendements obligataires au-dessus de la courbe LIBOR/swap</strong>.</em></p>
+<p><strong>Les trois configurations, pour un spread coté à 150 points de base</strong> :</p>
+<table>
+<thead>
+<tr>
+<th>Cas</th>
+<th>Prix de l'obligation</th>
+<th>Structure du swap</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>1</strong></td>
+<td><strong>au pair (100)</strong></td>
+<td>A paie le <strong>coupon de l'obligation</strong> ; B paie <strong>LIBOR + 150 pb</strong></td>
+</tr>
+<tr>
+<td><strong>2</strong></td>
+<td><strong>sous le pair (95)</strong></td>
+<td><strong>en plus des coupons</strong>, A paie <strong>5 dollars par 100 de nominal au départ</strong> ; B paie LIBOR + 150 pb</td>
+</tr>
+<tr>
+<td><strong>3</strong></td>
+<td><strong>au-dessus du pair (108)</strong></td>
+<td><strong>en plus de LIBOR + 150 pb</strong>, B paie <strong>8 dollars par 100 de nominal au départ</strong> ; A paie les coupons</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p class="cal piege"> <em><strong>Ce sont les coupons PROMIS qui sont échangés. Les échanges ont lieu que l'obligation fasse défaut ou non.</strong></em></p>
+</blockquote>
+<p><strong>L'effet net :</strong> <em>la valeur actuelle de l'asset swap spread <strong>est le montant par lequel le prix de l'obligation d'entreprise est dépassé par le prix d'une obligation sans risque similaire</strong>, le taux sans risque étant donné par la courbe LIBOR/swap.</em></p>
+<details class="cor">
+<summary><strong>Reprendre la table 23.3 avec un asset swap spread de 150 pb</strong></summary><div class="in">
+
+<p><em>Étape 1.</em> La courbe LIBOR/swap zéro est plate à 5 %. On ne connaît plus le prix de l'obligation, mais on sait que <strong>l'asset swap spread est 150 points de base</strong>.</p>
+<p><em>Étape 2.</em> L'écart entre valeur sans risque et valeur de l'obligation d'entreprise est <strong>la valeur actuelle de 150 pb par an pendant 5 ans</strong>. Avec des paiements semestriels (0,75 par semestre) :
+$$\sum_{k=1}^{10}0{,}75\,e^{-0{,}05\times k/2}=\mathbf{6{,}55\ \text{dollars pour 100 de nominal}}$$</p>
+<p><em>Étape 3.</em> La perte totale de la table 23.3 est donc fixée à <strong>6,55</strong> au lieu de 8,75 :
+$$Q=\frac{6{,}55}{288{,}48}=\mathbf{2{,}27\,\%\ \text{par an}}$$</p>
+</div></details>
+
+<h2 data-prio="must">Concept 5 — Réel contre risque-neutre : la comparaison qui structure tout le chapitre</h2>
+<h3>5.1 Les deux tables de comparaison</h3>
+<p><em>Les probabilités de défaut estimées à partir des données historiques sont <strong>habituellement bien inférieures</strong> à celles dérivées des prix d'obligations. <strong>L'écart était particulièrement grand pendant la crise du crédit démarrée mi-2007</strong>, à cause de ce qu'on appelle une <strong>« fuite vers la qualité » (flight to quality)</strong> : tous les investisseurs voulaient détenir des titres sûrs comme les Treasuries. Les prix des obligations d'entreprise ont chuté, leurs rendements ont augmenté, le spread $s$ a augmenté, et (23.2) a donné des estimations de probabilité de défaut <strong>très élevées</strong>.</em></p>
+<details class="cor">
+<summary><strong>Le calcul des deux colonnes de la table 23.4 — méthode complète</strong></summary><div class="in">
+
+<p><strong>Côté historique.</strong> On utilise la <strong>colonne 7 ans</strong> de la table 23.1 (<em>parce que les obligations Merrill Lynch examinées ont une durée de vie d'environ 7 ans</em>), avec</p>
+<p>$$\bar\lambda(7)=-\frac17\ln\big[1-Q(7)\big]$$</p>
+<p><em>Exemple pour une entreprise notée A</em> : $Q(7)=0{,}01179$, donc
+$$\bar\lambda(7)=-\frac17\ln(1-0{,}01179)=0{,}0017=\mathbf{0{,}17\,\%}$$</p>
+<p><strong>Côté obligations.</strong> On utilise (23.2) avec les rendements publiés par <strong>Merrill Lynch</strong>, moyennes entre <strong>décembre 1996 et juin 2007</strong>, recouvrement supposé <strong>40 %</strong>, et taux sans risque $=$ <strong>taux de swap 7 ans moins 10 points de base</strong>.</p>
+<p><em>Exemple pour A</em> : rendement moyen Merrill Lynch <strong>5,995 %</strong> ; taux de swap 7 ans moyen <strong>5,408 %</strong>, donc taux sans risque <strong>5,308 %</strong> :
+$$\bar\lambda(7)=\frac{0{,}05995-0{,}05308}{1-0{,}4}=0{,}0115=\mathbf{1{,}15\,\%}$$</p>
+</div></details>
+
+<p><strong>Table 23.4 — taux de hasard moyens à 7 ans (% par an)</strong> :</p>
+<table>
+<thead>
+<tr>
+<th>Notation</th>
+<th>Taux historique</th>
+<th>Taux depuis les obligations</th>
+<th><strong>Ratio</strong></th>
+<th><strong>Différence</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Aaa</strong></td>
+<td>0,04</td>
+<td>0,60</td>
+<td><strong>17,0</strong></td>
+<td>0,56</td>
+</tr>
+<tr>
+<td><strong>Aa</strong></td>
+<td>0,05</td>
+<td>0,73</td>
+<td><strong>13,2</strong></td>
+<td>0,67</td>
+</tr>
+<tr>
+<td><strong>A</strong></td>
+<td>0,17</td>
+<td>1,15</td>
+<td><strong>6,8</strong></td>
+<td>0,98</td>
+</tr>
+<tr>
+<td><strong>Baa</strong></td>
+<td>0,43</td>
+<td>2,13</td>
+<td><strong>4,9</strong></td>
+<td>1,69</td>
+</tr>
+<tr>
+<td><strong>Ba</strong></td>
+<td>2,21</td>
+<td>4,67</td>
+<td><strong>2,1</strong></td>
+<td>2,46</td>
+</tr>
+<tr>
+<td><strong>B</strong></td>
+<td>6,04</td>
+<td>8,02</td>
+<td><strong>1,3</strong></td>
+<td>1,98</td>
+</tr>
+<tr>
+<td><strong>Caa et moins</strong></td>
+<td>13,01</td>
+<td>18,39</td>
+<td><strong>1,4</strong></td>
+<td>5,39</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p class="cal piege"> <strong>Les deux tendances OPPOSÉES, qu'il faut savoir énoncer :</strong></p>
+<ul>
+<li><strong>le RATIO</strong> des deux taux est <strong>très élevé</strong> pour les émetteurs <em>investment grade</em> et <strong>DÉCLINE</strong> quand la notation se dégrade ;</li>
+<li><strong>la DIFFÉRENCE</strong> entre les deux taux, elle, <strong>AUGMENTE</strong> quand la notation se dégrade.</li>
+</ul>
+<p><em>(Les résultats pour les obligations notées B vont à l'encontre du schéma d'ensemble.)</em></p>
+</blockquote>
+<p><strong>Table 23.5 — rendement excédentaire espéré sur les obligations (points de base)</strong> :</p>
+<table>
+<thead>
+<tr>
+<th>Notation</th>
+<th>Spread obligataire sur Treasuries</th>
+<th>Spread du taux sans risque sur Treasuries</th>
+<th>Spread pour défauts historiques</th>
+<th><strong>Rendement excédentaire</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Aaa</td>
+<td>78</td>
+<td>42</td>
+<td>2</td>
+<td><strong>34</strong></td>
+</tr>
+<tr>
+<td>Aa</td>
+<td>86</td>
+<td>42</td>
+<td>3</td>
+<td><strong>41</strong></td>
+</tr>
+<tr>
+<td>A</td>
+<td>111</td>
+<td>42</td>
+<td>10</td>
+<td><strong>59</strong></td>
+</tr>
+<tr>
+<td>Baa</td>
+<td>169</td>
+<td>42</td>
+<td>26</td>
+<td><strong>101</strong></td>
+</tr>
+<tr>
+<td>Ba</td>
+<td>322</td>
+<td>42</td>
+<td>132</td>
+<td><strong>148</strong></td>
+</tr>
+<tr>
+<td>B</td>
+<td>523</td>
+<td>42</td>
+<td>362</td>
+<td><strong>119</strong></td>
+</tr>
+<tr>
+<td>Caa</td>
+<td>1 146</td>
+<td>42</td>
+<td>781</td>
+<td><strong>323</strong></td>
+</tr>
+</tbody></table>
+<details class="cor">
+<summary><strong>La ligne A, décomposée — 111 = 42 + 10 + 59</strong></summary><div class="in">
+
+<p><em>Étape 1.</em> Le spread moyen sur les Treasuries 7 ans est <strong>111 points de base</strong>.</p>
+<p><em>Étape 2.</em> Sur ces 111, <strong>42 points de base</strong> sont expliqués par le spread moyen entre les Treasuries 7 ans et <strong>notre proxy du taux sans risque</strong> (le swap moins 10 pb).</p>
+<p><em>Étape 3.</em> <strong>10 points de base</strong> sont nécessaires pour couvrir les défauts espérés. <em>C'est le taux de hasard historique de la table 23.4 <strong>multiplié par 0,6</strong> pour tenir compte des recouvrements :</em> $0{,}17\,\%\times0{,}6=0{,}102\,\%\approx\mathbf{10}$ pb.</p>
+<p><em>Étape 4.</em> Il reste un <strong>rendement excédentaire</strong> (après prise en compte des défauts espérés) de
+$$111-42-10=\mathbf{59\ \text{points de base}}$$</p>
+<blockquote>
+<p class="cal piege"> <strong>Le message des deux tables réunies.</strong> <em>Une <strong>grande différence en POURCENTAGE</strong> entre les estimations de probabilité de défaut se traduit par un <strong>PETIT (mais significatif) rendement excédentaire</strong> sur l'obligation. Pour les Aaa, le ratio des taux de hasard est <strong>17,0</strong>, mais le rendement excédentaire espéré n'est que de <strong>34 points de base</strong>. <strong>Le rendement excédentaire tend à augmenter quand la qualité de crédit décline.</strong></em></p>
+</blockquote>
+<p class="cal piege"> <em>Le rendement excédentaire <strong>ne reste pas constant dans le temps</strong>. Les spreads de crédit, et donc les rendements excédentaires, étaient <strong>élevés en 2001, 2002 et au premier semestre 2003</strong>. Ensuite ils sont restés <strong>assez faibles jusqu'à la crise du crédit</strong>.</em></p>
+</div></details>
+
+<h3>5.2 Pourquoi l'écart ? Les quatre explications, classées</h3>
+<blockquote>
+<p><em><strong>Les probabilités de défaut implicites dans les rendements obligataires sont des probabilités RISQUE-NEUTRES.</strong></em> Pourquoi ? <em>Parce que le calcul de la table 23.3 suppose que <strong>les pertes de défaut espérées peuvent être actualisées au taux sans risque</strong>. Le principe de valorisation risque-neutre montre que c'est une procédure valide <strong>pourvu que les pertes espérées soient calculées dans un monde risque-neutre</strong>.</em></p>
+<p><em><strong>Par contraste, les probabilités implicites dans les données historiques sont des probabilités RÉELLES (parfois appelées « physiques »). Le rendement excédentaire de la table 23.5 provient DIRECTEMENT de la différence entre les deux.</strong></em> <em>S'il n'y avait pas de rendement excédentaire espéré, les probabilités réelles et risque-neutres seraient les mêmes, et réciproquement.</em></p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Explication</th>
+<th>Verdict de Hull</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>Les obligations d'entreprise sont <strong>relativement illiquides</strong> et leurs rendements sont plus élevés pour compenser</td>
+<td><em>c'est vrai, <strong>mais la recherche montre que cela n'explique PAS entièrement les résultats</strong></em> (Dick-Nielsen, Feldhütter, Lando, 2010 : la composante de liquidité est <strong>relativement petite</strong>)</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Les <strong>probabilités subjectives</strong> des traders sont bien plus hautes que la table 23.1 (scénarios de dépression)</td>
+<td><em>il est <strong>difficile de voir comment cela peut expliquer une grande partie</strong> du rendement excédentaire observé</em></td>
+</tr>
+<tr>
+<td>3</td>
+<td><strong>DE LOIN LA RAISON LA PLUS IMPORTANTE : les obligations ne font PAS défaut indépendamment les unes des autres</strong></td>
+<td> <strong>c'est l'explication centrale</strong></td>
+</tr>
+<tr>
+<td>4</td>
+<td>Le risque <strong>non systématique (idiosyncratique)</strong> est difficile à diversifier pour les obligations</td>
+<td>contribue aussi</td>
+</tr>
+</tbody></table>
+<details class="cor">
+<summary><strong>L'explication 3 en détail — le risque systématique du crédit</strong></summary><div class="in">
+
+<p><em>Il y a des périodes où les taux de défaut sont <strong>très faibles</strong> et des périodes où ils sont <strong>très élevés</strong>. Les statistiques de Moody's montrent qu'entre <strong>1970 et 2009</strong>, le taux de défaut annuel est allé d'un minimum de <strong>0,09 % en 1979</strong> à des maximums de <strong>3,97 % en 2001</strong> et <strong>5,35 % en 2009</strong>.</em></p>
+<p><strong>La variation d'une année sur l'autre engendre un RISQUE SYSTÉMATIQUE</strong> (c'est-à-dire un risque <strong>qui ne peut pas être diversifié</strong>), et les traders obligataires perçoivent un <strong>rendement espéré excédentaire pour le porter</strong>. <em>(C'est analogue au rendement excédentaire des actionnaires calculé par le MEDAF.)</em></p>
+<p>Deux causes de la variation :</p>
+<ul>
+<li>les <strong>conditions économiques d'ensemble</strong> ;</li>
+<li><strong>le défaut d'une entreprise peut avoir un effet d'entraînement</strong> provoquant les défauts d'autres entreprises — la <em><strong>contagion de crédit</strong></em>.</li>
+</ul>
+<p><strong>Et l'explication 4.</strong> *S'il s'agissait d'actions, on dirait que les investisseurs peuvent diversifier le risque non systématique avec un portefeuille de 30 titres, et ne devraient donc pas exiger de prime pour ce risque. <strong>Pour les obligations, l'argument est moins net.</strong> Les rendements obligataires sont <strong>fortement asymétriques avec un potentiel de hausse limité</strong> : sur une obligation individuelle il peut y avoir <strong>99,75 % de chances d'un rendement de 7 %</strong> dans l'année et <strong>0,25 % de chances d'un rendement de −60 %</strong>, le premier correspondant à l'absence de défaut et le second au défaut. <strong>Ce type de risque est difficile à « diversifier » : il faudrait des dizaines de milliers d'obligations différentes.</strong> En pratique, beaucoup de portefeuilles obligataires sont loin d'être pleinement diversifiés.*</p>
+</div></details>
+
+<h3>5.3 Quelle probabilité utiliser ?</h3>
+<p>$$\boxed{\begin{array}{ll}\textbf{Valoriser des dérivés de crédit, ajuster un prix pour le risque de défaut} &amp; \Rightarrow\ \textbf{RISQUE-NEUTRES}\\[2pt] \textbf{Analyses de scénarios, pertes futures potentielles, Credit VaR} &amp; \Rightarrow\ \textbf{RÉELLES}\end{array}}$$</p>
+<p><em>Raison : la valorisation calcule la <strong>valeur actuelle de flux futurs espérés</strong> et implique presque invariablement (implicitement ou explicitement) la <strong>valorisation risque-neutre</strong>.</em></p>
+<h2 data-prio="must">Concept 6 — Le modèle de Merton : les actions pour estimer le défaut</h2>
+<p><strong>La motivation.</strong> <em>Quand on utilise une table comme la 23.1, on s'appuie sur la <strong>notation de crédit</strong> de l'entreprise. Malheureusement, <strong>les notations sont révisées relativement peu souvent</strong>. D'où l'argument que <strong>les prix des actions fournissent une information plus à jour</strong>.</em></p>
+<p><strong>L'idée de Merton (1974) : les capitaux propres sont une OPTION sur les actifs de l'entreprise.</strong></p>
+<table>
+<thead>
+<tr>
+<th>Symbole</th>
+<th>Signification</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$V_0$, $V_T$</td>
+<td>valeur des actifs de l'entreprise aujourd'hui / en $T$</td>
+</tr>
+<tr>
+<td>$E_0$, $E_T$</td>
+<td>valeur des capitaux propres aujourd'hui / en $T$</td>
+</tr>
+<tr>
+<td>$D$</td>
+<td>remboursement de dette dû en $T$</td>
+</tr>
+<tr>
+<td>$\sigma_V$</td>
+<td>volatilité des <strong>actifs</strong> (supposée constante)</td>
+</tr>
+<tr>
+<td>$\sigma_E$</td>
+<td>volatilité <strong>instantanée</strong> des capitaux propres</td>
+</tr>
+</tbody></table>
+<p><em>Si $V_T&lt;D$, il est (au moins en théorie) <strong>rationnel</strong> pour l'entreprise de faire défaut sur la dette en $T$ ; la valeur des capitaux propres est alors <strong>nulle</strong>. Si $V_T&gt;D$, l'entreprise doit rembourser et la valeur des capitaux propres vaut $V_T-D$ :</em></p>
+<p>$$\boxed{E_T=\max(V_T-D,\ 0)}$$</p>
+<blockquote>
+<p><em><strong>Les capitaux propres sont donc un CALL sur la valeur des actifs, de prix d'exercice égal au remboursement exigé sur la dette.</strong></em></p>
+</blockquote>
+<p>$$\boxed{E_0=V_0N(d_1)-De^{-rT}N(d_2)}\;\text{(23.3)}$$
+$$d_1=\frac{\ln(V_0/D)+(r+\sigma_V^2/2)T}{\sigma_V\sqrt T}\qquad d_2=d_1-\sigma_V\sqrt T$$</p>
+<p>$$\boxed{\text{Valeur de la dette aujourd'hui}=V_0-E_0}\qquad\boxed{\text{Probabilité risque-neutre de défaut}=N(-d_2)}$$</p>
+<p><strong>Le problème pratique, et sa solution.</strong> <em>Pour calculer $N(-d_2)$ il faut $V_0$ et $\sigma_V$. <strong>Ni l'un ni l'autre n'est directement observable.</strong> Mais si l'entreprise est cotée, <strong>on observe $E_0$</strong> : (23.3) fournit <strong>une</strong> condition. On peut aussi <strong>estimer $\sigma_E$</strong> à partir de données historiques ou d'options. Le lemme d'Itô donne la <strong>seconde</strong> condition :</em></p>
+<p>$$\sigma_EE_0=\frac{\partial E}{\partial V}\,\sigma_VV_0\qquad\Longrightarrow\qquad\boxed{\sigma_EE_0=N(d_1)\,\sigma_VV_0}\;\text{(23.4)}$$</p>
+<blockquote>
+<p><strong>(23.3) et (23.4) forment un système de deux équations à deux inconnues $V_0$ et $\sigma_V$.</strong> *Pour résoudre deux équations non linéaires $F(x,y)=0$ et $G(x,y)=0$, on peut demander à Solver de <strong>minimiser $[F(x,y)]^2+[G(x,y)]^2$</strong>.*</p>
+</blockquote>
+<details class="cor">
+<summary><strong>Exemple 23.1 — le modèle de Merton, entièrement déroulé</strong></summary><div class="in">
+
+<p><strong>Données :</strong> $E_0=3$ M, $\sigma_E=0{,}80$, $D=10$ M dû dans 1 an, $r=0{,}05$, $T=1$.</p>
+<p><em>Étape 1 — résoudre le système (23.3)-(23.4) :</em>
+$$\boxed{V_0=12{,}40\ \text{M}\qquad\sigma_V=0{,}2123}$$
+<em>(Vérification : $d_1=\frac{\ln(12{,}40/10)+(0{,}05+0{,}2123^2/2)}{0{,}2123}=1{,}3549$, d'où $E_0=12{,}40\,N(1{,}3549)-10e^{-0{,}05}N(1{,}1426)=3{,}00$  et $\sigma_E=N(1{,}3549)\times0{,}2123\times12{,}40/3=0{,}80$ )</em></p>
+<p><em>Étape 2 — la probabilité de défaut.</em> $d_2=1{,}1408$ (valeur de Hull), donc
+$$\boxed{N(-d_2)=N(-1{,}1408)=0{,}127=\mathbf{12{,}7\,\%}}$$</p>
+<p><em>Étape 3 — la valeur de marché de la dette :</em>
+$$V_0-E_0=12{,}40-3=\mathbf{9{,}40\ \text{M}}$$</p>
+<p><em>Étape 4 — la valeur actuelle du paiement promis :</em>
+$$10e^{-0{,}05\times1}=\mathbf{9{,}51\ \text{M}}$$</p>
+<p><em>Étape 5 — la perte espérée sur la dette :</em>
+$$\text{EL}=\frac{9{,}51-9{,}40}{9{,}51}=\mathbf{1{,}2\,\%}\ \text{de sa valeur sans défaut}$$</p>
+<p><em>Étape 6 — remonter au taux de recouvrement.</em> Comme $\text{EL}=\text{PD}\times(1-\text{recouvrement})$ :
+$$\boxed{\text{recouvrement}=1-\frac{\text{EL}}{\text{PD}}=1-\frac{1{,}2}{12{,}7}=\mathbf{91\,\%}}\ \text{de la valeur sans défaut de la dette}$$</p>
+</div></details>
+
+<p><strong>Les extensions et le verdict empirique.</strong> <em>Le modèle de base a été étendu : une version suppose qu'un défaut survient <strong>dès que la valeur des actifs passe sous un niveau barrière</strong> ; une autre autorise des <strong>paiements de dette à plusieurs dates</strong>.</em></p>
+<blockquote>
+<p class="cal piege"> <em><strong>Le modèle de Merton et ses extensions produisent un BON CLASSEMENT des probabilités de défaut</strong></em> (risque-neutres ou réelles). <em>Cela signifie qu'une <strong>transformation monotone</strong> peut convertir la sortie du modèle en une bonne estimation de l'une ou l'autre. Il peut sembler étrange de prendre $N(-d_2)$, qui est en théorie une probabilité risque-neutre (puisqu'elle sort d'un modèle de valorisation d'options), pour estimer une probabilité <strong>réelle</strong> : <strong>l'hypothèse sous-jacente est que le CLASSEMENT des probabilités risque-neutres des différentes entreprises est le même que celui de leurs probabilités réelles.</strong></em></p>
+</blockquote>
+<p><em>(Moody's KMV transforme la probabilité de Merton en probabilité réelle qu'elle appelle <strong>EDF</strong>, <em>expected default frequency</em> ; <strong>CreditGrades</strong> utilise Merton pour estimer des spreads de crédit.)</em></p>
+<h2 data-prio="must">Concept 7 — Le risque de crédit dans les opérations sur dérivés</h2>
+<h3>7.1 Les trois catégories</h3>
+<p><em>L'exposition de crédit sur une opération de dérivés est <strong>plus compliquée</strong> que sur un prêt, <strong>parce que la créance qui sera présentée en cas de défaut est plus incertaine</strong>.</em></p>
+<table>
+<thead>
+<tr>
+<th>Catégorie</th>
+<th>Le contrat est…</th>
+<th>Exemple</th>
+<th>Risque de crédit ?</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>1</strong></td>
+<td><strong>toujours un PASSIF</strong> pour l'institution</td>
+<td>une <strong>option vendue</strong></td>
+<td> <em><strong>AUCUN</strong></em>. Si la contrepartie fait faillite, il n'y a pas de perte : le dérivé est un <strong>actif</strong> de la contrepartie, il sera <strong>conservé, dénoué, ou vendu à un tiers</strong>. Résultat : <strong>ni perte ni gain</strong></td>
+</tr>
+<tr>
+<td><strong>2</strong></td>
+<td><strong>toujours un ACTIF</strong> pour l'institution</td>
+<td>une <strong>option achetée</strong></td>
+<td> <em><strong>TOUJOURS</strong></em>. Le dérivé est un <strong>passif</strong> de la contrepartie ; l'institution doit faire valoir une créance sur les actifs et <strong>peut ne recevoir qu'un pourcentage</strong>. <em>Typiquement, une créance née d'une opération sur dérivés est <strong>non garantie et junior</strong></em></td>
+</tr>
+<tr>
+<td><strong>3</strong></td>
+<td><strong>peut devenir l'un ou l'autre</strong></td>
+<td>un <strong>contrat forward</strong></td>
+<td><strong>peut-être</strong>. Perte si la contrepartie fait défaut quand la valeur est <strong>positive</strong> pour l'institution ; <strong>aucune perte</strong> si elle fait défaut quand la valeur est <strong>négative</strong></td>
+</tr>
+</tbody></table>
+<p><em>Note : <strong>une entreprise fait généralement défaut à cause d'une détérioration de sa santé financière globale, pas à cause de la valeur d'une transaction particulière</strong>.</em></p>
+<h3>7.2 Le CVA — <em>credit value adjustment</em></h3>
+<p>Un dérivé dure jusqu'à $T$ et vaut $f_0$ aujourd'hui <strong>en supposant aucun défaut</strong>. Les défauts peuvent survenir aux dates $t_1,\dots,t_n$ (avec $t_n=T$) ; la valeur du dérivé (sans défaut) en $t_i$ est $f_i$ ; $q_i$ est la probabilité <strong>risque-neutre</strong> de défaut en $t_i$ ; $R$ le taux de recouvrement attendu.</p>
+<p><strong>L'exposition</strong> en $t_i$ est la perte potentielle : $\boxed{\max(f_i,0)}$. La perte espérée risque-neutre en $t_i$ vaut $q_i(1-R)\hat E[\max(f_i,0)]$, d'où :</p>
+<p>$$\boxed{\text{CVA}=\sum_{i=1}^{n}u_iv_i}\;\text{(23.5)}\qquad\text{avec}\qquad\boxed{u_i=q_i(1-R)}$$</p>
+<p>et $v_i$ = <strong>la valeur aujourd'hui d'un instrument qui verse l'exposition du dérivé en $t_i$</strong>.</p>
+<p class="cal piege"> <em>Hypothèses : le recouvrement espéré vaut $R$ fois l'exposition, et <strong>le taux de recouvrement et la probabilité de défaut sont INDÉPENDANTS de la valeur du dérivé</strong>.</em></p>
+<p><strong>Le CVA catégorie par catégorie</strong> :</p>
+<table>
+<thead>
+<tr>
+<th>Catégorie</th>
+<th>Traitement</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>1</strong> ($f_i$ toujours négatif)</td>
+<td>$\max(f_i,0)=0$ : <strong>le CVA est toujours NUL</strong>, aucun ajustement à faire. <em>(Bien sûr, la contrepartie peut vouloir tenir compte de la possibilité que <strong>l'institution</strong> fasse défaut dans son propre prix.)</em></td>
+</tr>
+<tr>
+<td><strong>2</strong> ($f_i$ toujours positif)</td>
+<td>$\max(f_i,0)=f_i$ ; si le seul flux est en $T$, alors $f_0$ est la valeur actuelle de $f_i$, donc $v_i=f_0$ pour tout $i$ (voir ci-dessous)</td>
+</tr>
+<tr>
+<td><strong>3</strong> (signe incertain)</td>
+<td> <em><strong>$v_i$ est un CALL sur $f_i$ de prix d'exercice ZÉRO.</strong></em> On le calcule par <strong>simulation</strong> des variables de marché sous-jacentes ; parfois des calculs analytiques approchés sont possibles</td>
+</tr>
+</tbody></table>
+<details class="cor">
+<summary><strong>La catégorie 2 : de (23.5) à la formule d'actualisation au taux risqué</strong></summary><div class="in">
+
+<p><em>Étape 1 — le coût des défauts :</em>
+$$\text{CVA}=\sum_{i=1}^{n}f_0\,q_i(1-R)$$</p>
+<p><em>Étape 2 — la valeur réelle $f_0^\ast$ (après prise en compte des défauts) :</em>
+$$f_0^\ast=f_0-f_0\sum_{i=1}^{n}q_i(1-R)=f_0\left[1-\sum_{i=1}^{n}q_i(1-R)\right]\;\text{(23.6)}$$</p>
+<p><em>Étape 3 — le parallèle avec une obligation.</em> Soit une <strong>obligation zéro-coupon non garantie</strong> promettant 1 dollar en $T$, <strong>émise par la contrepartie</strong>. Avec $B_0$ sa valeur sans possibilité de défaut et $B_0^\ast$ sa valeur réelle, <strong>en supposant le même taux de recouvrement en pourcentage de la valeur sans défaut</strong> :
+$$B_0^\ast=B_0\left[1-\sum_{i=1}^{n}q_i(1-R)\right]\;\text{(23.7)}$$</p>
+<p><em>Étape 4 — diviser (23.6) par (23.7) :</em>
+$$\boxed{\frac{f_0^\ast}{f_0}=\frac{B_0^\ast}{B_0}}\;\text{(23.8)}$$</p>
+<p><em>Étape 5 — passer aux rendements.</em> Avec $y$ le rendement d'un zéro-coupon <strong>sans risque</strong> de maturité $T$ et $y^\ast$ celui du zéro-coupon <strong>émis par la contrepartie</strong>, $B_0=e^{-yT}$ et $B_0^\ast=e^{-y^\ast T}$ :
+$$\boxed{f_0^\ast=f_0\,e^{-(y^\ast-y)T}}\;\text{(23.9)}$$</p>
+<blockquote>
+<p><em><strong>Tout dérivé promettant un payoff en $T$ peut être valorisé en AUGMENTANT le taux d'actualisation appliqué au payoff espéré risque-neutre, du taux sans risque $y$ au taux risqué $y^\ast$.</strong></em></p>
+</blockquote>
+<p><strong>Exemple 23.2.</strong> <em>Une option de gré à gré à 2 ans vendue par la société X vaut <strong>3 dollars</strong> en supposant aucune possibilité de défaut. Les zéro-coupon à 2 ans émis par X ont un rendement <strong>1,5 % supérieur</strong> à un zéro-coupon sans risque similaire :</em>
+$$f_0^\ast=3\,e^{-0{,}015\times2}=\mathbf{2{,}91\ \text{dollars}}$$</p>
+</div></details>
+
+<h3>7.3 Right-way risk et wrong-way risk</h3>
+<p class="cal piege"> <strong>La limite de l'hypothèse d'indépendance.</strong> <em>Elle est raisonnable quand le dérivé est <strong>une petite partie du portefeuille de la contrepartie</strong> ou quand la contrepartie l'utilise <strong>pour se couvrir</strong>. <strong>Quand une contrepartie veut entrer dans une grosse opération de dérivés à des fins SPÉCULATIVES, une institution financière doit se méfier</strong> : quand l'opération a une grosse valeur négative pour la contrepartie (et positive pour l'institution), <strong>la probabilité de faillite de la contrepartie peut être bien plus élevée</strong> que dans la situation inverse.</em></p>
+<table>
+<thead>
+<tr>
+<th>Terme</th>
+<th>Définition</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><em><strong>Right-way risk</strong></em></td>
+<td>la contrepartie a le plus de chances de faire défaut quand l'institution a une exposition <strong>nulle ou très faible</strong></td>
+</tr>
+<tr>
+<td><em><strong>Wrong-way risk</strong></em></td>
+<td> la contrepartie a le plus de chances de faire défaut quand l'institution a une <strong>grosse exposition</strong></td>
+</tr>
+</tbody></table>
+<h2 data-prio="high">Concept 8 — L'atténuation du risque de crédit</h2>
+<blockquote>
+<p><em>Dans beaucoup de cas, l'analyse précédente <strong>SURESTIME</strong> le risque de crédit d'une opération de dérivés, parce qu'il existe un certain nombre de clauses que les dealers incluent dans leurs contrats pour l'atténuer.</em></p>
+</blockquote>
+<h3>8.1 Le <em>netting</em> (compensation)</h3>
+<p><strong>La clause</strong>, devenue standard dans les <em>Master Agreements</em> du marché de gré à gré : <em><strong>si une entreprise fait défaut sur UNE transaction avec une contrepartie, elle doit faire défaut sur TOUTES les transactions en cours avec cette contrepartie.</strong></em> <em>Le netting a été testé avec succès devant les tribunaux dans la plupart des juridictions.</em></p>
+<details class="cor">
+<summary><strong>L'exemple chiffré du netting — 40 M contre 15 M</strong></summary><div class="in">
+
+<p><strong>Situation.</strong> Trois transactions en cours avec une contrepartie, valant pour l'institution <strong>+10 M</strong>, <strong>+30 M</strong> et <strong>−25 M</strong>. Pour la contrepartie, elles valent respectivement <strong>−10 M</strong>, <strong>−30 M</strong> et <strong>+25 M</strong>.</p>
+<p><em>Sans netting.</em> La contrepartie fait défaut sur les deux premières (qui sont pour elle des passifs) et <strong>conserve la troisième</strong> (qui est pour elle un actif) :
+$$\text{perte pour l'institution}=10+30=\mathbf{40\ \text{millions}}$$</p>
+<p><em>Avec netting.</em> Elle est <strong>contrainte de faire défaut sur les trois</strong> :
+$$\text{perte}=10+30-25=\mathbf{15\ \text{millions}}$$</p>
+<p class="cal piege"> <strong>La nuance de la note de bas de page.</strong> <em>Si la troisième transaction valait <strong>−45 M</strong> au lieu de −25 M pour l'institution, <strong>la contrepartie choisirait de ne PAS faire défaut du tout</strong> et il n'y aurait aucune perte</em> (le solde net $10+30-45=-5$ lui est favorable).</p>
+<p><em>Étape formelle.</em> Avec $N$ transactions de valeurs sans défaut $V_i$ :</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Perte de l'institution</th>
+<th>Interprétation optionnelle</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Sans netting</strong></td>
+<td>$(1-R)\displaystyle\sum_{i=1}^{N}\max(V_i,0)$</td>
+<td>le payoff d'un <strong>PORTEFEUILLE d'options</strong> d'exercice zéro</td>
+</tr>
+<tr>
+<td><strong>Avec netting</strong></td>
+<td>$(1-R)\max\Big(\displaystyle\sum_{i=1}^{N}V_i,\ 0\Big)$</td>
+<td>le payoff d'une <strong>OPTION UNIQUE sur le portefeuille</strong>, d'exercice zéro</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p class="cal piege"> <em><strong>La valeur d'une OPTION SUR UN PORTEFEUILLE n'est JAMAIS supérieure — et est souvent considérablement inférieure — à la valeur du PORTEFEUILLE D'OPTIONS correspondant.</strong></em></p>
+</blockquote>
+<p><strong>L'extension du CVA.</strong> L'équation (23.5) donne la valeur actuelle de la perte espérée sur <strong>toutes</strong> les transactions avec une contrepartie <strong>lorsqu'un accord de netting est en place</strong>, en <strong>redéfinissant $v_i$</strong> comme la valeur actuelle d'un dérivé qui verse l'exposition en $t_i$ <strong>sur le PORTEFEUILLE de toutes les transactions</strong>.</p>
+<p class="cal piege"> <strong>Le point contre-intuitif à retenir.</strong> <em>Une tâche difficile est de calculer <strong>l'effet INCRÉMENTAL</strong> d'une nouvelle transaction sur les pertes de crédit espérées : on applique (23.5) <strong>avec et sans</strong> la transaction. <strong>Du fait du netting, l'effet incrémental d'une nouvelle transaction peut être NÉGATIF</strong> — cela arrive quand la valeur de la nouvelle transaction est <strong>négativement corrélée</strong> à la valeur des transactions existantes.</em></p>
+</div></details>
+
+<h3>8.2 La collatéralisation</h3>
+<p><strong>Le mécanisme.</strong> <em>Un accord type spécifie que les transactions sont <strong>valorisées périodiquement</strong>. Si la valeur totale des transactions pour l'institution est <strong>au-dessus d'un niveau seuil</strong>, l'accord exige que <strong>le collatéral cumulé déposé par l'entreprise égale la différence entre cette valeur et le seuil</strong>. Si ensuite la valeur bouge en faveur de l'entreprise, <strong>elle peut réclamer une partie de la marge</strong>. En cas de défaut, <strong>l'institution peut saisir le collatéral</strong> ; si l'entreprise ne dépose pas le collatéral demandé, <strong>l'institution peut dénouer les transactions</strong>.</em></p>
+<details class="cor">
+<summary><strong>L'exemple à trois jours — seuil de 10 millions</strong></summary><div class="in">
+
+<table>
+<thead>
+<tr>
+<th>Jour</th>
+<th>Valeur des transactions pour l'institution</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>1</strong></td>
+<td>passe de 9 M à <strong>10,5 M</strong></td>
+<td>l'institution peut demander <strong>0,5 M</strong> de collatéral</td>
+</tr>
+<tr>
+<td><strong>2</strong></td>
+<td>monte à <strong>11,4 M</strong></td>
+<td>elle peut demander <strong>0,9 M supplémentaires</strong></td>
+</tr>
+<tr>
+<td><strong>3</strong></td>
+<td>retombe à <strong>10,9 M</strong></td>
+<td><strong>l'entreprise peut demander la restitution de 0,5 M</strong></td>
+</tr>
+</tbody></table>
+<blockquote>
+<p class="cal piege"> <em><strong>Le seuil (ici 10 millions) peut être vu comme une LIGNE DE CRÉDIT que l'institution est prête à accorder à l'entreprise.</strong></em></p>
+</blockquote>
+<p><strong>Les détails opérationnels :</strong></p>
+<ul>
+<li>la marge est déposée <strong>en espèces ou en titres acceptables</strong> comme des obligations ;</li>
+<li>les titres subissent une décote appelée <em><strong>haircut</strong></em> appliquée à leur valeur de marché ;</li>
+<li><strong>des intérêts sont normalement versés sur les espèces</strong> ;</li>
+<li>si l'accord est <strong>bilatéral</strong>, un seuil est aussi fixé <strong>pour l'institution financière</strong>, et l'entreprise peut lui demander de déposer du collatéral.</li>
+</ul>
+<p class="cal piege"> <strong>Les deux limites de la protection.</strong></p>
+<ol>
+<li><strong>Le montant du seuil n'est PAS protégé.</strong></li>
+<li><em>Même quand le seuil est <strong>zéro</strong>, la protection <strong>n'est pas totale</strong> : quand une entreprise entre en difficulté, <strong>elle a tendance à cesser de répondre aux appels de collatéral</strong>. Le temps que la contrepartie exerce son droit de dénouer les contrats, <strong>leur valeur peut avoir encore bougé en sa défaveur</strong>.</em></li></ol></div></details>
+
+<h3>8.3 Les <em>downgrade triggers</em></h3>
+<p><strong>La clause :</strong> <em>si la notation de la contrepartie <strong>tombe sous un certain niveau</strong>, disons Baa, <strong>l'institution a l'option de dénouer la transaction à sa valeur de marché</strong>.</em></p>
+<table>
+<thead>
+<tr>
+<th>Limite</th>
+<th>Explication</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Saut brutal</strong></td>
+<td><em>ils <strong>ne protègent pas</strong> d'un grand saut de notation (par exemple <strong>de A au défaut</strong>)</em></td>
+</tr>
+<tr>
+<td><strong>Usage massif</strong></td>
+<td> <em>ils <strong>ne fonctionnent bien que si on en fait relativement peu usage</strong>. Si une entreprise a de nombreux downgrade triggers en cours avec ses contreparties, <strong>ils risquent de n'offrir que peu de protection à aucune d'entre elles</strong></em></td>
+</tr>
+</tbody></table>
+<details class="cor">
+<summary><strong>Business Snapshot 23.1 — les downgrade triggers et la faillite d'Enron</strong></summary><div class="in">
+
+<p>*En <strong>décembre 2001</strong>, <strong>Enron</strong>, l'une des plus grandes entreprises des États-Unis, fait faillite. <strong>Jusqu'aux tout derniers jours, elle avait une notation investment grade</strong> : la note Moody's immédiatement avant le défaut était <strong>Baa3</strong> et la note S&amp;P <strong>BBB−</strong>. <strong>Le défaut était cependant anticipé dans une certaine mesure par le marché actions</strong>, car le cours d'Enron avait fortement chuté dans la période précédant la faillite : la probabilité de défaut estimée par des modèles comme celui de Merton <strong>avait fortement augmenté</strong> pendant cette période.*</p>
+<p><strong>Le mécanisme fatal.</strong> <em>Enron avait conclu <strong>un nombre énorme d'opérations de dérivés avec downgrade triggers</strong> stipulant que si sa notation tombait sous investment grade (sous Baa3/BBB−), <strong>ses contreparties auraient l'option de dénouer les transactions</strong>. Supposons qu'Enron ait été dégradée sous investment grade en octobre 2001 : <strong>les transactions que les contreparties auraient choisi de dénouer sont celles à valeur NÉGATIVE pour Enron</strong> (et positive pour elles). <strong>Enron aurait donc dû verser d'énormes paiements en espèces. Elle n'aurait pas pu le faire, et la faillite immédiate en aurait résulté.</strong></em></p>
+<blockquote>
+<p class="cal piege"> <em><strong>Quand une entreprise conclut un nombre énorme de contrats avec downgrade triggers, ils peuvent en réalité PROVOQUER sa faillite prématurément.</strong></em></p>
+</blockquote>
+<p><strong>Le dilemme des agences.</strong> <em>On pourrait arguer qu'Enron allait faire faillite de toute façon et qu'accélérer l'événement de deux mois n'aurait pas fait de mal. <strong>En fait, Enron avait une chance de survie en octobre 2001</strong> : des tentatives étaient en cours pour monter un accord avec une autre entreprise énergétique, <strong>Dynegy</strong>, et forcer la faillite en octobre 2001 n'était <strong>dans l'intérêt ni des créanciers ni des actionnaires</strong>.</em></p>
+<p><em>Les agences de notation se trouvaient dans une position difficile : <strong>si elles dégradaient Enron pour reconnaître sa position financière détériorée, elles signaient son arrêt de mort. Si elles ne le faisaient pas, Enron avait une chance de survivre.</strong></em></p>
+</div></details>
+
+<h2 data-prio="must">Concept 9 — La corrélation de défaut et la copule gaussienne</h2>
+<h3>9.1 Pourquoi elle existe, et les deux familles de modèles</h3>
+<p><strong>Les quatre causes.</strong></p>
+<ol>
+<li>Les entreprises <strong>du même secteur ou de la même région</strong> sont affectées de manière similaire par les événements externes.</li>
+<li>Les <strong>conditions économiques</strong> font que les taux de défaut moyens sont plus élevés certaines années.</li>
+<li><strong>Le défaut d'une entreprise peut en provoquer un autre</strong> — l'effet de <em><strong>contagion de crédit</strong></em>.</li>
+<li>La conséquence :  <em><strong>la corrélation de défaut signifie que le risque de crédit ne peut PAS être complètement diversifié — c'est la raison majeure pour laquelle les probabilités risque-neutres dépassent les probabilités réelles.</strong></em></li>
+</ol>
+<table>
+<thead>
+<tr>
+<th></th>
+<th><strong>Modèles à forme réduite</strong> (<em>reduced form</em>)</th>
+<th><strong>Modèles structurels</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Principe</strong></td>
+<td>les <strong>taux de hasard</strong> suivent des processus stochastiques <strong>corrélés aux variables macroéconomiques</strong>. Quand le taux de A est élevé, celui de B tend à l'être</td>
+<td>fondés sur un modèle à la <strong>Merton</strong> : une entreprise fait défaut si la valeur de ses actifs passe sous un certain niveau. La corrélation vient de la <strong>corrélation entre les processus suivis par les actifs</strong></td>
+</tr>
+<tr>
+<td><strong>Avantages</strong></td>
+<td>mathématiquement séduisants ; reflètent la génération de corrélation par les <strong>cycles économiques</strong></td>
+<td><strong>la corrélation peut être rendue aussi élevée qu'on veut</strong></td>
+</tr>
+<tr>
+<td><strong>Inconvénient</strong></td>
+<td> <em><strong>la gamme de corrélations atteignables est LIMITÉE</strong></em> : même avec une corrélation parfaite entre les taux de hasard, la probabilité que les deux fassent défaut <strong>dans la même courte période</strong> reste très faible</td>
+<td> ils sont <em><strong>susceptibles d'être assez lents en calcul</strong></em></td>
+</tr>
+<tr>
+<td><strong>Remède</strong></td>
+<td>étendre le modèle pour que le taux de hasard présente de <strong>grands sauts</strong></td>
+<td>—</td>
+</tr>
+</tbody></table>
+<p><em>Le problème du premier est réel : <strong>quand deux entreprises opèrent dans le même secteur et le même pays, ou quand la santé financière de l'une dépend fortement de celle de l'autre, une corrélation de défaut relativement élevée peut être justifiée</strong>.</em></p>
+<h3>9.2 Le modèle de copule gaussienne pour le temps jusqu'au défaut</h3>
+<p><em>Un modèle devenu <strong>un outil pratique populaire</strong>. On peut le caractériser comme <strong>un modèle structurel simplifié</strong>. <strong>Il suppose que toutes les entreprises finiront par faire défaut</strong> et tente de quantifier la corrélation entre les lois des temps jusqu'au défaut.</em></p>
+<table>
+<thead>
+<tr>
+<th>Version</th>
+<th>Source de la queue gauche de la loi</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Réelle</strong></td>
+<td>les données des agences (table 23.1)</td>
+</tr>
+<tr>
+<td><strong>Risque-neutre</strong></td>
+<td>les prix d'obligations (§4)</td>
+</tr>
+</tbody></table>
+<p><strong>Le problème :</strong> <em>la loi du temps jusqu'au défaut d'une entreprise <strong>n'est même pas approximativement normale</strong>. C'est là qu'intervient la copule gaussienne.</em> On transforme $t_1$ et $t_2$ en :</p>
+<p>$$\boxed{x_1=N^{-1}\big[Q_1(t_1)\big]\qquad x_2=N^{-1}\big[Q_2(t_2)\big]}$$</p>
+<p>où $Q_1$ et $Q_2$ sont les <strong>lois cumulées</strong> de $t_1$ et $t_2$ et $N^{-1}$ l'inverse de la loi normale cumulée.</p>
+<blockquote>
+<p><em><strong>Ce sont des transformations « PERCENTILE À PERCENTILE ».</strong></em> <em>Le point du 5ᵉ percentile de la loi de $t_1$ est transformé en $x_1=-1{,}645$, qui est le 5ᵉ percentile de la loi normale centrée réduite ; le 10ᵉ percentile est transformé en $x_1=-1{,}282$, qui est le 10ᵉ percentile de la normale ; et ainsi de suite.</em></p>
+</blockquote>
+<p><strong>Par construction, $x_1$ et $x_2$ suivent des lois normales de moyenne 0 et d'écart-type 1.</strong> <em>Le modèle <strong>suppose que leur loi jointe est normale bivariée</strong> : c'est ce qu'on appelle <strong>utiliser une copule gaussienne</strong>. L'hypothèse est commode car elle signifie que <strong>la loi jointe de $t_1$ et $t_2$ est entièrement définie par les lois cumulées $Q_1$ et $Q_2$ PLUS UN SEUL paramètre de corrélation</strong>.</em></p>
+<p><strong>L'extension à $n$ entreprises :</strong> $x_i=N^{-1}[Q_i(t_i)]$ pour chaque $i$, puis on suppose les $x_i$ <strong>normaux multivariés</strong>. La corrélation de défaut entre $t_i$ et $t_j$ <strong>se mesure comme la corrélation entre $x_i$ et $x_j$</strong> : c'est la <em><strong>corrélation de copule</strong></em>.</p>
+<blockquote>
+<p class="cal piege"> <em><strong>La copule gaussienne est une façon utile de représenter la structure de corrélation entre des variables qui ne sont PAS normalement distribuées. Elle permet d'estimer la structure de corrélation SÉPARÉMENT des lois marginales.</strong></em></p>
+<p><em>En approximation, la corrélation de copule entre $t_i$ et $t_j$ est <strong>souvent supposée égale à la corrélation entre les rendements des ACTIONS</strong> des entreprises $i$ et $j$.</em></p>
+</blockquote>
+<details class="cor">
+<summary><strong>Exemple 23.3 — simuler les défauts de 10 entreprises sur 5 ans</strong></summary><div class="in">
+
+<p><strong>Données.</strong> Corrélation de copule <strong>0,2</strong> entre chaque paire. Pour chaque entreprise, la probabilité <strong>cumulée</strong> de défaut sur 1, 2, 3, 4, 5 ans vaut <strong>1 %, 3 %, 6 %, 10 %, 15 %</strong>.</p>
+<p><em>Étape 1 — le tirage.</em> On tire dans une loi <strong>normale multivariée</strong> pour obtenir les $x_i$ ($1\leqslant i\leqslant10$), avec une corrélation par paire de <strong>0,2</strong>.</p>
+<p><em>Étape 2 — les seuils.</em> On convertit chaque $x_i$ en un temps de défaut $t_i$ :</p>
+<table>
+<thead>
+<tr>
+<th>Valeur tirée $x_i$</th>
+<th>Défaut</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$x_i&lt;N^{-1}(0{,}01)=\mathbf{-2{,}33}$</td>
+<td>pendant la <strong>1ʳᵉ année</strong></td>
+</tr>
+<tr>
+<td>$-2{,}33\leqslant x_i&lt;N^{-1}(0{,}03)=\mathbf{-1{,}88}$</td>
+<td>pendant la <strong>2ᵉ année</strong></td>
+</tr>
+<tr>
+<td>$-1{,}88\leqslant x_i&lt;N^{-1}(0{,}06)=\mathbf{-1{,}55}$</td>
+<td>pendant la <strong>3ᵉ année</strong></td>
+</tr>
+<tr>
+<td>$-1{,}55\leqslant x_i&lt;N^{-1}(0{,}10)=\mathbf{-1{,}28}$</td>
+<td>pendant la <strong>4ᵉ année</strong></td>
+</tr>
+<tr>
+<td>$-1{,}28\leqslant x_i&lt;N^{-1}(0{,}15)=\mathbf{-1{,}04}$</td>
+<td>pendant la <strong>5ᵉ année</strong></td>
+</tr>
+<tr>
+<td>$x_i&gt;-1{,}04$</td>
+<td><strong>aucun défaut</strong> pendant les 5 ans</td>
+</tr>
+</tbody></table>
+<p><em>Étape 3 — la mécanique.</em> Les seuils sont <strong>les mêmes pour toutes les entreprises</strong> (les $Q_i$ sont identiques) ; <strong>c'est la corrélation entre les tirages qui crée le regroupement des défauts</strong>.</p>
+</div></details>
+
+<h3>9.3 La structure de corrélation à un facteur</h3>
+<p><em>Pour éviter de définir une corrélation différente pour <strong>chaque paire</strong> d'entreprises, on utilise souvent un <strong>modèle à un facteur</strong> :</em></p>
+<p>$$\boxed{x_i=a_iF+\sqrt{1-a_i^2}\,Z_i}\;\text{(23.10)}$$</p>
+<table>
+<thead>
+<tr>
+<th>Symbole</th>
+<th>Rôle</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$F$</td>
+<td>un <strong>facteur commun</strong> affectant les défauts de <strong>toutes</strong> les entreprises</td>
+</tr>
+<tr>
+<td>$Z_i$</td>
+<td>un facteur affectant <strong>seulement</strong> l'entreprise $i$</td>
+</tr>
+<tr>
+<td>$F$ et $Z_i$</td>
+<td>lois normales centrées réduites <strong>indépendantes</strong></td>
+</tr>
+<tr>
+<td>$a_i$</td>
+<td>paramètres constants entre $-1$ et $+1$ ; <em>souvent approximé par la corrélation des rendements de l'action $i$ avec un <strong>indice de marché bien diversifié</strong></em></td>
+</tr>
+</tbody></table>
+<p>$$\boxed{\text{corrélation}(x_i,x_j)=a_ia_j}$$</p>
+<details class="cor">
+<summary><strong>La dérivation de la probabilité conditionnelle (23.11)</strong></summary><div class="in">
+
+<p><em>Étape 1 — la condition de défaut.</em> Sous la copule gaussienne, un défaut survient avant $T$ quand $N(x_i)&lt;Q_i(T)$, c'est-à-dire quand
+$$x_i&lt;N^{-1}\big[Q_i(T)\big]$$</p>
+<p><em>Étape 2 — substituer (23.10) :</em>
+$$a_iF+\sqrt{1-a_i^2}\,Z_i&lt;N^{-1}\big[Q_i(T)\big]$$</p>
+<p><em>Étape 3 — isoler $Z_i$ :</em>
+$$Z_i&lt;\frac{N^{-1}\big[Q_i(T)\big]-a_iF}{\sqrt{1-a_i^2}}$$</p>
+<p><em>Étape 4 — $Z_i$ étant normale centrée réduite, conditionnellement à $F$ :</em>
+$$\boxed{Q_i(T\mid F)=N\!\left(\frac{N^{-1}\big[Q_i(T)\big]-a_iF}{\sqrt{1-a_i^2}}\right)}\;\text{(23.11)}$$</p>
+<p><em>Étape 5 — le cas homogène.</em> Si $Q_i(T)=Q(T)$ pour tout $i$ et si la corrélation commune vaut $\rho$, alors $a_i=\sqrt\rho$ pour tout $i$ et :
+$$\boxed{Q(T\mid F)=N\!\left(\frac{N^{-1}\big[Q(T)\big]-\sqrt\rho\,F}{\sqrt{1-\rho}}\right)}\;\text{(23.12)}$$</p>
+<blockquote>
+<p><strong>La lecture économique :</strong> $F$ est <strong>l'état du monde</strong>. Un $F$ <strong>très négatif</strong> = mauvaise conjoncture ⇒ $Q(T\mid F)$ <strong>grande</strong> ⇒ beaucoup de défauts simultanés. <strong>C'est exactement le mécanisme qui rend le risque de crédit non diversifiable.</strong></p>
+</blockquote>
+</div></details>
+
+<h2 data-prio="must">Concept 10 — Le Credit VaR</h2>
+<h3>10.1 La formule de Vasicek</h3>
+<p><strong>La définition.</strong> <em>Le Credit VaR se définit <strong>analogiquement</strong> à la VaR de marché. Par exemple, un Credit VaR à <strong>99,9 %</strong> sur <strong>1 an</strong> est la perte de crédit dont on est certain à 99,9 % qu'elle ne sera pas dépassée en un an.</em></p>
+<details class="cor">
+<summary><strong>La dérivation de (23.13) — de la probabilité conditionnelle au quantile</strong></summary><div class="in">
+
+<p><strong>Cadre.</strong> Une banque avec un <strong>très grand portefeuille de prêts similaires</strong>. En approximation : <strong>même probabilité de défaut</strong> pour chaque prêt, <strong>même corrélation</strong> entre chaque paire.</p>
+<p><em>Étape 1.</em> Sous la copule gaussienne, le membre de droite de (23.12) est, <strong>en très bonne approximation, le POURCENTAGE de défauts avant $T$ en fonction de $F$</strong>.</p>
+<p><em>Étape 2.</em> $F$ suit une loi normale centrée réduite. On est certain à $X\%$ que sa valeur sera <strong>supérieure</strong> à
+$$N^{-1}(1-X)=-N^{-1}(X)$$</p>
+<p><em>Étape 3.</em> Comme $Q(T\mid F)$ est <strong>décroissante</strong> en $F$, on est donc certain à $X\%$ que le pourcentage de pertes sur $T$ années sera <strong>inférieur</strong> à $V(X,T)$ obtenu en remplaçant $F$ par $-N^{-1}(X)$ dans (23.12) :</p>
+<p>$$\boxed{V(X,T)=N\!\left(\frac{N^{-1}\big[Q(T)\big]+\sqrt\rho\,N^{-1}(X)}{\sqrt{1-\rho}}\right)}\;\text{(23.13)}$$</p>
+<p><em>(Résultat produit pour la première fois par <strong>Vasicek</strong>, working paper KMV 1987, publié dans <em>Risk</em> en décembre 2002 sous le titre « Loan Portfolio Value ».)</em></p>
+<p><em>Étape 4 — passer du taux de défaut à la perte :</em>
+$$\boxed{\text{Credit VaR}\approx L(1-R)\,V(X,T)}\qquad\text{contribution d'un prêt }i:\ \ L_i(1-R)\,V(X,T)$$</p>
+<p>où $L$ est la taille du portefeuille de prêts et $R$ le taux de recouvrement.  <em><strong>Ce modèle sous-tend certaines des formules que les régulateurs utilisent pour le capital de risque de crédit.</strong></em></p>
+</div></details>
+
+<details class="cor">
+<summary><strong>Exemple 23.4 — un Credit VaR de bout en bout</strong></summary><div class="in">
+
+<p><strong>Données.</strong> Une banque a <strong>100 millions de dollars</strong> d'expositions de détail. Probabilité de défaut à 1 an : <strong>2 %</strong> en moyenne. Taux de recouvrement : <strong>60 %</strong>. Corrélation de copule : $\rho=\mathbf{0{,}1}$. Niveau de confiance <strong>99,9 %</strong>.</p>
+<p><em>Étape 1 — les deux quantiles :</em>
+$$N^{-1}(0{,}02)=-2{,}0537\qquad N^{-1}(0{,}999)=3{,}0902$$</p>
+<p><em>Étape 2 — appliquer (23.13) :</em>
+$$V(0{,}999;1)=N\!\left(\frac{-2{,}0537+\sqrt{0{,}1}\times3{,}0902}{\sqrt{0{,}9}}\right)=N\!\left(\frac{-2{,}0537+0{,}9772}{0{,}9487}\right)=N(-1{,}1348)=\mathbf{0{,}128}$$</p>
+<p><em>Étape 3 — la lecture :</em> <strong>le taux de défaut du pire cas à 99,9 % est 12,8 %</strong>.</p>
+<p><em>Étape 4 — le Credit VaR :</em>
+$$100\times0{,}128\times(1-0{,}6)=\mathbf{5{,}13\ \text{millions de dollars}}$$</p>
+<p class="cal piege"> <strong>Le point à mesurer.</strong> Le taux de défaut <strong>moyen</strong> est de 2 %, mais le taux de défaut <strong>du pire cas à 99,9 %</strong> vaut <strong>12,8 %</strong> — plus de <strong>six fois</strong> plus. <strong>C'est tout l'effet de la corrélation</strong> : avec $\rho=0$, (23.13) donnerait exactement 2 %.</p>
+</div></details>
+
+<h3>10.2 CreditMetrics</h3>
+<p><strong>Le principe.</strong> <em>Estimer une loi de probabilité des pertes de crédit en menant une <strong>simulation de Monte-Carlo des CHANGEMENTS DE NOTATION de toutes les contreparties</strong>.</em> Sur chaque essai : on tire les changements de notation et les défauts de toutes les contreparties pendant l'année, puis <strong>on revalorise les contrats en cours</strong> pour obtenir le total des pertes de crédit de l'année.</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Verdict</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Inconvénient</strong></td>
+<td><em>susceptible d'être <strong>assez intensif en calcul</strong></em></td>
+</tr>
+<tr>
+<td><strong>Avantage 1</strong></td>
+<td> <em><strong>les pertes de crédit incluent celles qui proviennent des DÉGRADATIONS de notation, pas seulement des défauts</strong></em></td>
+</tr>
+<tr>
+<td><strong>Avantage 2</strong></td>
+<td>l'impact des clauses d'atténuation du §8 peut être <strong>approximativement intégré</strong></td>
+</tr>
+</tbody></table>
+<p><strong>Table 23.6 — matrice de transition à 1 an, 1970-2009 (%), source Moody's</strong> <em>(ajustée des transitions vers la catégorie WR, « sans notation »)</em> :</p>
+<table>
+<thead>
+<tr>
+<th>Notation initiale</th>
+<th>Aaa</th>
+<th>Aa</th>
+<th>A</th>
+<th>Baa</th>
+<th>Ba</th>
+<th>B</th>
+<th>Caa</th>
+<th>Ca-C</th>
+<th><strong>Défaut</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Aaa</strong></td>
+<td>90,57</td>
+<td>8,76</td>
+<td>0,63</td>
+<td>0,01</td>
+<td>0,03</td>
+<td>0,00</td>
+<td>0,00</td>
+<td>0,00</td>
+<td><strong>0,00</strong></td>
+</tr>
+<tr>
+<td><strong>Aa</strong></td>
+<td>1,06</td>
+<td>90,30</td>
+<td>8,19</td>
+<td>0,36</td>
+<td>0,05</td>
+<td>0,02</td>
+<td>0,01</td>
+<td>0,00</td>
+<td><strong>0,02</strong></td>
+</tr>
+<tr>
+<td><strong>A</strong></td>
+<td>0,06</td>
+<td>2,90</td>
+<td><strong>90,91</strong></td>
+<td>5,44</td>
+<td>0,50</td>
+<td>0,09</td>
+<td>0,03</td>
+<td>0,00</td>
+<td><strong>0,05</strong></td>
+</tr>
+<tr>
+<td><strong>Baa</strong></td>
+<td>0,04</td>
+<td>0,20</td>
+<td>4,91</td>
+<td>89,18</td>
+<td>4,44</td>
+<td>0,83</td>
+<td>0,19</td>
+<td>0,02</td>
+<td><strong>0,17</strong></td>
+</tr>
+<tr>
+<td><strong>Ba</strong></td>
+<td>0,01</td>
+<td>0,07</td>
+<td>0,42</td>
+<td>6,24</td>
+<td>83,47</td>
+<td>7,99</td>
+<td>0,58</td>
+<td>0,09</td>
+<td><strong>1,13</strong></td>
+</tr>
+<tr>
+<td><strong>B</strong></td>
+<td>0,01</td>
+<td>0,04</td>
+<td>0,15</td>
+<td>0,39</td>
+<td>5,40</td>
+<td>82,50</td>
+<td>6,35</td>
+<td>0,79</td>
+<td><strong>4,37</strong></td>
+</tr>
+<tr>
+<td><strong>Caa</strong></td>
+<td>0,00</td>
+<td>0,02</td>
+<td>0,02</td>
+<td>0,19</td>
+<td>0,51</td>
+<td>9,55</td>
+<td>70,01</td>
+<td>4,97</td>
+<td><strong>14,72</strong></td>
+</tr>
+<tr>
+<td><strong>Ca-C</strong></td>
+<td>0,00</td>
+<td>0,00</td>
+<td>0,00</td>
+<td>0,00</td>
+<td>0,43</td>
+<td>3,01</td>
+<td>11,61</td>
+<td>51,67</td>
+<td><strong>33,28</strong></td>
+</tr>
+<tr>
+<td><strong>Défaut</strong></td>
+<td>0,00</td>
+<td>0,00</td>
+<td>0,00</td>
+<td>0,00</td>
+<td>0,00</td>
+<td>0,00</td>
+<td>0,00</td>
+<td>0,00</td>
+<td><strong>100,00</strong></td>
+</tr>
+</tbody></table>
+<p><em>Lecture : une obligation notée <strong>A</strong> a <strong>90,91 %</strong> de chances d'être encore A dans un an, <strong>0,05 %</strong> de faire défaut pendant l'année, <strong>0,09 %</strong> de tomber en B, etc.</em></p>
+<details class="cor">
+<summary><strong>Les seuils de simulation CreditMetrics — Aaa et Baa, corrélation 0,2</strong></summary><div class="in">
+
+<p><em>Principe.</em>  <em><strong>Les changements de notation de contreparties différentes ne doivent PAS être supposés indépendants.</strong></em> On utilise typiquement une <strong>copule gaussienne</strong> pour construire la loi jointe des changements de notation, la corrélation de copule étant <em>habituellement fixée égale à la corrélation entre les rendements des actions</em> via un modèle à facteur.</p>
+<p><em>Le montage.</em> On tire deux variables $x_A$ et $x_B$ de lois normales <strong>de corrélation 0,2</strong>. $x_A$ détermine la nouvelle notation de la Aaa, $x_B$ celle de la Baa. <strong>On cumule les probabilités de la ligne correspondante en partant du bas (le défaut) vers le haut, et on inverse la normale.</strong></p>
+<p><em>Les seuils de la Aaa</em> (on cumule depuis Aaa vers le bas car il n'y a pas de défaut) :</p>
+<table>
+<thead>
+<tr>
+<th>Condition</th>
+<th>Résultat</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$x_A&lt;N^{-1}(0{,}9057)=\mathbf{1{,}3147}$</td>
+<td>reste <strong>Aaa</strong></td>
+</tr>
+<tr>
+<td>$1{,}3147\leqslant x_A&lt;N^{-1}(0{,}9057+0{,}0876)=N^{-1}(0{,}9933)=\mathbf{2{,}4730}$</td>
+<td>devient <strong>Aa</strong></td>
+</tr>
+<tr>
+<td>$2{,}4730\leqslant x_A&lt;N^{-1}(0{,}9057+0{,}0876+0{,}0063)=N^{-1}(0{,}9996)=\mathbf{3{,}3528}$</td>
+<td>devient <strong>A</strong></td>
+</tr>
+<tr>
+<td>…</td>
+<td>…</td>
+</tr>
+</tbody></table>
+<p class="cal piege"> <em>La Aaa <strong>ne fait jamais défaut</strong> pendant l'année</em> (probabilité 0,00 dans la table).</p>
+<p><em>Les seuils de la Baa</em> (on cumule cette fois depuis le HAUT, Aaa d'abord) :</p>
+<table>
+<thead>
+<tr>
+<th>Condition</th>
+<th>Résultat</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$x_B&lt;N^{-1}(0{,}0004)=\mathbf{-3{,}3528}$</td>
+<td>devient <strong>Aaa</strong></td>
+</tr>
+<tr>
+<td>$-3{,}3528\leqslant x_B&lt;N^{-1}(0{,}0004+0{,}0020)=N^{-1}(0{,}0024)=\mathbf{-2{,}8202}$</td>
+<td>devient <strong>Aa</strong></td>
+</tr>
+<tr>
+<td>$-2{,}8202\leqslant x_B&lt;N^{-1}(0{,}0004+0{,}0020+0{,}0491)=N^{-1}(0{,}0515)=\mathbf{-1{,}6305}$</td>
+<td>devient <strong>A</strong></td>
+</tr>
+<tr>
+<td>…</td>
+<td>…</td>
+</tr>
+<tr>
+<td>$x_B&gt;N^{-1}(0{,}9983)=\mathbf{2{,}9290}$</td>
+<td><strong>fait DÉFAUT</strong></td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>La logique du sens de cumul :</strong> on ordonne les états <strong>du meilleur au pire</strong> (ou l'inverse) et on découpe l'axe normal en intervalles dont les <strong>largeurs en probabilité</strong> reproduisent la ligne de la matrice de transition. Un $x$ <strong>très grand</strong> correspond au <strong>pire</strong> état ici (le défaut), car la ligne Baa a été cumulée en partant de Aaa.</p>
+</blockquote>
+<p><em>(La Technical Note 11 de Hull explique comment obtenir des matrices de transition pour des périodes autres qu'un an.)</em></p>
+</div></details>
+
+<h2>Comment reconnaître le type d'exercice</h2>
+<table>
+<thead>
+<tr>
+<th>Indice dans l'énoncé</th>
+<th>Méthode à déclencher</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Table de taux de défaut cumulés</td>
+<td><strong>différences</strong> pour la probabilité inconditionnelle ; <strong>division par la survie</strong> pour le taux de hasard</td>
+</tr>
+<tr>
+<td>« probabilité conditionnelle à l'absence de défaut antérieur »</td>
+<td><strong>taux de hasard</strong></td>
+</tr>
+<tr>
+<td>« spread de $s$ points de base », « recouvrement $R$ »</td>
+<td>$\bar\lambda=s/(1-R)$</td>
+</tr>
+<tr>
+<td>Prix d'obligation d'entreprise <strong>et</strong> sans risque donnés</td>
+<td>la <strong>table de perte en $Q$</strong> : valeur sans risque à chaque date, moins recouvrement, actualiser, sommer, égaler à la perte totale</td>
+</tr>
+<tr>
+<td>« asset swap spread de $x$ pb »</td>
+<td>la perte totale est la <strong>VA de $x$ pb sur la durée</strong>, puis $Q=\text{perte}/\text{total}$</td>
+</tr>
+<tr>
+<td>« valoriser un dérivé de crédit »</td>
+<td>probabilités <strong>risque-neutres</strong></td>
+</tr>
+<tr>
+<td>« analyse de scénarios », « Credit VaR »</td>
+<td>probabilités <strong>réelles</strong></td>
+</tr>
+<tr>
+<td>Valeur et volatilité des <strong>capitaux propres</strong> données</td>
+<td><strong>modèle de Merton</strong> : système (23.3)-(23.4), puis $N(-d_2)$</td>
+</tr>
+<tr>
+<td>« rendement de la contrepartie supérieur de $x$ % »</td>
+<td>$f_0^\ast=f_0e^{-(y^\ast-y)T}$</td>
+</tr>
+<tr>
+<td>Plusieurs transactions de signes opposés</td>
+<td><strong>netting</strong> : $\max(\sum V_i,0)$ et non $\sum\max(V_i,0)$</td>
+</tr>
+<tr>
+<td>Corrélation de copule + probabilités cumulées</td>
+<td><strong>copule gaussienne</strong> : seuils $N^{-1}[Q(t)]$</td>
+</tr>
+<tr>
+<td>« grand portefeuille de prêts homogènes »</td>
+<td>la formule de <strong>Vasicek</strong> (23.13)</td>
+</tr>
+<tr>
+<td>Matrice de transition</td>
+<td><strong>CreditMetrics</strong> : cumuler la ligne, inverser la normale</td>
+</tr>
+</tbody></table>
+<h2>Comment résoudre ce type d'exercice</h2>
+<p><strong>A — Extraire un taux de hasard d'un spread.</strong></p>
+<ol>
+<li>Exprimer le spread <strong>en décimal</strong> ($s=0{,}0050$ pour 50 pb).</li>
+<li>$\bar\lambda=s/(1-R)$.</li>
+<li>Si on veut la probabilité cumulée : $Q(t)=1-e^{-\bar\lambda t}$.</li>
+<li>Pour un taux <strong>forward</strong> entre deux maturités : $\bar\lambda_1t_1$ et $\bar\lambda_2t_2$ donnent $\lambda_{[t_1,t_2]}=\dfrac{\bar\lambda_2t_2-\bar\lambda_1t_1}{t_2-t_1}$.</li>
+</ol>
+<p><strong>B — La table de perte en $Q$.</strong></p>
+<ol>
+<li>Prix de l'obligation d'entreprise, prix de l'obligation sans risque, <strong>différence = perte espérée totale</strong>.</li>
+<li>Pour chaque date de défaut $t$ : valeur sans risque $=$ somme des flux <strong>restants ET du flux dû en $t$</strong>, actualisés au taux sans risque <strong>depuis $t$</strong>.</li>
+<li>Perte en cas de défaut $=$ cette valeur <strong>moins le recouvrement</strong>.</li>
+<li>Multiplier par $e^{-rt}$ et sommer → coefficient de $Q$.</li>
+<li>$Q=\text{perte totale}/\text{coefficient}$.</li>
+</ol>
+<p><strong>C — Le modèle de Merton.</strong></p>
+<ol>
+<li>Inconnues : $V_0$ et $\sigma_V$. Données : $E_0$, $\sigma_E$, $D$, $r$, $T$.</li>
+<li>Poser $F=V_0N(d_1)-De^{-rT}N(d_2)-E_0$ et $G=N(d_1)\sigma_VV_0-\sigma_EE_0$.</li>
+<li>Minimiser $F^2+G^2$ (Solver).</li>
+<li>Probabilité de défaut $=N(-d_2)$ ; dette $=V_0-E_0$ ; $\text{EL}=1-\dfrac{V_0-E_0}{De^{-rT}}$ ; recouvrement $=1-\text{EL}/\text{PD}$.</li>
+</ol>
+<p><strong>D — Le Credit VaR de Vasicek.</strong></p>
+<ol>
+<li>Calculer $N^{-1}[Q(T)]$ et $N^{-1}(X)$.</li>
+<li>$V(X,T)=N\!\left(\dfrac{N^{-1}[Q(T)]+\sqrt\rho\,N^{-1}(X)}{\sqrt{1-\rho}}\right)$.</li>
+<li>Credit VaR $=L(1-R)V(X,T)$.</li>
+<li>Contrôle : avec $\rho\to0$, $V(X,T)\to Q(T)$ ; avec $\rho\to1$, $V(X,T)\to1$.</li>
+</ol>
+<h2 data-prio="must">Common mistakes</h2>
+<table>
+<thead>
+<tr>
+<th>Erreur</th>
+<th>Correction</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Confondre probabilité <strong>inconditionnelle</strong> et <strong>taux de hasard</strong></td>
+<td>l'inconditionnelle est vue <strong>à la date 0</strong> ; le hasard est <strong>conditionnel à la survie</strong> : diviser par $V(t)$</td>
+</tr>
+<tr>
+<td>Utiliser $Q(t)$ comme si c'était $\bar\lambda t$</td>
+<td>$Q(t)=1-e^{-\bar\lambda t}$ ; les deux ne coïncident que pour de petites valeurs</td>
+</tr>
+<tr>
+<td>Oublier le $(1-R)$ dans $\bar\lambda=s/(1-R)$</td>
+<td>le spread compense la <strong>perte NETTE de recouvrement</strong></td>
+</tr>
+<tr>
+<td>Oublier le coupon dû <strong>à l'instant du défaut</strong> dans la table 23.3</td>
+<td>les défauts sont <strong>immédiatement AVANT</strong> les dates de coupon : le flux de la date est <strong>inclus, non actualisé</strong></td>
+</tr>
+<tr>
+<td>Actualiser au taux <strong>de l'entreprise</strong> dans la table 23.3</td>
+<td> tous les calculs de la table utilisent le taux <strong>SANS RISQUE</strong> — c'est précisément ce qui fait de $Q$ une probabilité <strong>risque-neutre</strong></td>
+</tr>
+<tr>
+<td>Utiliser des probabilités historiques pour valoriser un dérivé de crédit</td>
+<td> il faut les <strong>risque-neutres</strong> — souvent <strong>plusieurs fois</strong> plus élevées</td>
+</tr>
+<tr>
+<td>Utiliser des probabilités risque-neutres pour un Credit VaR</td>
+<td>il faut les probabilités <strong>réelles</strong></td>
+</tr>
+<tr>
+<td>Croire que le ratio et la différence des deux taux évoluent dans le même sens</td>
+<td> <strong>le RATIO décroît, la DIFFÉRENCE croît</strong> quand la notation se dégrade</td>
+</tr>
+<tr>
+<td>Croire que le modèle de Merton donne directement la bonne probabilité</td>
+<td>il donne un <strong>bon CLASSEMENT</strong> ; il faut une <strong>transformation monotone</strong> calibrée</td>
+</tr>
+<tr>
+<td>Traiter une option <strong>vendue</strong> comme portant du risque de crédit</td>
+<td>catégorie 1 : <strong>aucun</strong> risque de crédit pour l'institution</td>
+</tr>
+<tr>
+<td>Sommer $\max(V_i,0)$ quand il y a netting</td>
+<td>avec netting c'est $\max(\sum V_i,0)$ — <strong>toujours plus petit ou égal</strong></td>
+</tr>
+<tr>
+<td>Croire que le collatéral protège intégralement</td>
+<td> <strong>le seuil n'est pas protégé</strong>, et une entreprise en difficulté <strong>cesse de répondre aux appels</strong></td>
+</tr>
+<tr>
+<td>Croire que les <em>downgrade triggers</em> sont sans danger</td>
+<td>Enron :  un usage massif peut <strong>provoquer</strong> la faillite</td>
+</tr>
+<tr>
+<td>Croire que la copule rend les $t_i$ normaux</td>
+<td><strong>non</strong> — elle rend normaux les $x_i=N^{-1}[Q_i(t_i)]$ ; les $t_i$ gardent leur loi marginale</td>
+</tr>
+<tr>
+<td>Oublier le signe de $F$ dans (23.12) et (23.13)</td>
+<td>$-\sqrt\rho F$ dans la conditionnelle, mais $+\sqrt\rho N^{-1}(X)$ dans Vasicek, car on substitue $F=-N^{-1}(X)$</td>
+</tr>
+<tr>
+<td>Ignorer la corrélation dans un Credit VaR</td>
+<td>avec $\rho=0{,}1$, un taux moyen de 2 % devient <strong>12,8 %</strong> dans le pire cas à 99,9 %</td>
+</tr>
+<tr>
+<td>Traiter les changements de notation comme indépendants dans CreditMetrics</td>
+<td> ils doivent être liés par une <strong>copule gaussienne</strong></td>
+</tr>
+</tbody></table>
+<h2>Ultimate Review</h2>
+<table>
+<thead>
+<tr>
+<th>Élément</th>
+<th>Formule / valeur</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Investment grade</strong></td>
+<td><strong>Baa/BBB</strong> et au-dessus</td>
+</tr>
+<tr>
+<td><strong>Probabilité inconditionnelle</strong></td>
+<td>$Q(t_2)-Q(t_1)$</td>
+</tr>
+<tr>
+<td><strong>Taux de hasard</strong></td>
+<td>probabilité <strong>conditionnelle</strong> à la survie</td>
+</tr>
+<tr>
+<td><strong>Exemple de référence</strong></td>
+<td>Caa 3ᵉ année : $\frac{0{,}09298}{0{,}70616}=\mathbf{13{,}17\,\%}$</td>
+</tr>
+<tr>
+<td><strong>Survie</strong></td>
+<td>$V(t)=e^{-\int_0^t\lambda(\tau)d\tau}$</td>
+</tr>
+<tr>
+<td><strong>Probabilité cumulée</strong></td>
+<td>$Q(t)=1-e^{-\bar\lambda(t)t}$</td>
+</tr>
+<tr>
+<td><strong>Forme inverse</strong></td>
+<td>$\bar\lambda(t)=-\frac1t\ln[1-Q(t)]$</td>
+</tr>
+<tr>
+<td><strong>Investment grade</strong></td>
+<td>défaut annuel <strong>croissant</strong> dans le temps</td>
+</tr>
+<tr>
+<td><strong>Junk</strong></td>
+<td>défaut annuel <strong>décroissant</strong> dans le temps</td>
+</tr>
+<tr>
+<td><strong>Meilleur recouvrement</strong></td>
+<td>prêt bancaire <em>first lien</em> : <strong>65,6 %</strong></td>
+</tr>
+<tr>
+<td><strong>Pire recouvrement</strong></td>
+<td>obligation junior subordonnée : <strong>24,7 %</strong></td>
+</tr>
+<tr>
+<td><strong>Recouvrement et défaut</strong></td>
+<td><strong>négativement corrélés</strong> — une mauvaise année est <strong>doublement</strong> mauvaise</td>
+</tr>
+<tr>
+<td><strong>Formule approchée</strong></td>
+<td>$\bar\lambda=s/(1-R)$</td>
+</tr>
+<tr>
+<td><strong>Taux sans risque des traders</strong></td>
+<td><strong>LIBOR/swap moins 10 points de base</strong></td>
+</tr>
+<tr>
+<td><strong>Table 23.3</strong></td>
+<td>total $=288{,}48\,Q$, perte $=8{,}75$ → $Q=\mathbf{3{,}03\,\%}$</td>
+</tr>
+<tr>
+<td><strong>Version asset swap</strong></td>
+<td>perte $=6{,}55$ → $Q=\mathbf{2{,}27\,\%}$</td>
+</tr>
+<tr>
+<td><strong>Depuis les obligations</strong></td>
+<td>probabilités <strong>RISQUE-NEUTRES</strong></td>
+</tr>
+<tr>
+<td><strong>Depuis l'historique</strong></td>
+<td>probabilités <strong>RÉELLES</strong> (« physiques »)</td>
+</tr>
+<tr>
+<td><strong>Aaa</strong></td>
+<td>ratio <strong>17,0</strong>, différence 0,56, excédent <strong>34 pb</strong></td>
+</tr>
+<tr>
+<td><strong>Caa</strong></td>
+<td>ratio <strong>1,4</strong>, différence 5,39, excédent <strong>323 pb</strong></td>
+</tr>
+<tr>
+<td><strong>Raison principale de l'écart</strong></td>
+<td> <strong>les obligations ne font pas défaut indépendamment</strong> → risque <strong>systématique</strong></td>
+</tr>
+<tr>
+<td><strong>Taux de défaut extrêmes</strong></td>
+<td><strong>0,09 % (1979)</strong> · <strong>3,97 % (2001)</strong> · <strong>5,35 % (2009)</strong></td>
+</tr>
+<tr>
+<td><strong>Merton</strong></td>
+<td>$E_T=\max(V_T-D,0)$ : les capitaux propres sont un <strong>call sur les actifs</strong></td>
+</tr>
+<tr>
+<td><strong>Équation 1</strong></td>
+<td>$E_0=V_0N(d_1)-De^{-rT}N(d_2)$</td>
+</tr>
+<tr>
+<td><strong>Équation 2</strong></td>
+<td>$\sigma_EE_0=N(d_1)\sigma_VV_0$</td>
+</tr>
+<tr>
+<td><strong>Probabilité de défaut</strong></td>
+<td>$N(-d_2)$</td>
+</tr>
+<tr>
+<td><strong>Exemple 23.1</strong></td>
+<td>$V_0=12{,}40$, $\sigma_V=0{,}2123$, $\text{PD}=\mathbf{12{,}7\,\%}$, recouvrement $\mathbf{91\,\%}$</td>
+</tr>
+<tr>
+<td><strong>Verdict sur Merton</strong></td>
+<td>bon <strong>CLASSEMENT</strong> ; calibrer par transformation monotone (EDF de KMV)</td>
+</tr>
+<tr>
+<td><strong>Catégorie 1</strong></td>
+<td>toujours passif → <strong>aucun</strong> risque de crédit</td>
+</tr>
+<tr>
+<td><strong>Catégorie 2</strong></td>
+<td>toujours actif → risque <strong>systématique</strong></td>
+</tr>
+<tr>
+<td><strong>Catégorie 3</strong></td>
+<td>les deux → $v_i$ est un <strong>call d'exercice zéro</strong></td>
+</tr>
+<tr>
+<td><strong>CVA</strong></td>
+<td>$\sum u_iv_i$ avec $u_i=q_i(1-R)$</td>
+</tr>
+<tr>
+<td><strong>Formule d'actualisation risquée</strong></td>
+<td>$f_0^\ast=f_0e^{-(y^\ast-y)T}$</td>
+</tr>
+<tr>
+<td><strong>Exemple 23.2</strong></td>
+<td>$3e^{-0{,}03}=\mathbf{2{,}91}$ dollars</td>
+</tr>
+<tr>
+<td><strong>Wrong-way risk</strong></td>
+<td>défaut le plus probable quand l'exposition est <strong>grande</strong></td>
+</tr>
+<tr>
+<td><strong>Netting</strong></td>
+<td>$\max(\sum V_i,0)$ au lieu de $\sum\max(V_i,0)$</td>
+</tr>
+<tr>
+<td><strong>Exemple du netting</strong></td>
+<td>40 M sans, <strong>15 M</strong> avec</td>
+</tr>
+<tr>
+<td><strong>Effet incrémental</strong></td>
+<td>peut être <strong>négatif</strong> grâce au netting</td>
+</tr>
+<tr>
+<td><strong>Collatéral</strong></td>
+<td>seuil $=$ <strong>ligne de crédit</strong> ; décote $=$ <em><strong>haircut</strong></em></td>
+</tr>
+<tr>
+<td><strong>Downgrade trigger</strong></td>
+<td>option de <strong>dénouer</strong> à la valeur de marché ;  cas <strong>Enron</strong></td>
+</tr>
+<tr>
+<td><strong>Reduced form</strong></td>
+<td>taux de hasard stochastiques ;  corrélations <strong>limitées</strong></td>
+</tr>
+<tr>
+<td><strong>Structural</strong></td>
+<td>actifs corrélés ;  <strong>lent</strong></td>
+</tr>
+<tr>
+<td><strong>Copule gaussienne</strong></td>
+<td>$x_i=N^{-1}[Q_i(t_i)]$, $x_i$ <strong>normaux multivariés</strong></td>
+</tr>
+<tr>
+<td><strong>Un facteur</strong></td>
+<td>$x_i=a_iF+\sqrt{1-a_i^2}Z_i$, corrélation $a_ia_j$</td>
+</tr>
+<tr>
+<td><strong>Conditionnelle</strong></td>
+<td>$Q(T\mid F)=N\!\left(\frac{N^{-1}[Q(T)]-\sqrt\rho F}{\sqrt{1-\rho}}\right)$</td>
+</tr>
+<tr>
+<td><strong>Vasicek</strong></td>
+<td>$V(X,T)=N\!\left(\frac{N^{-1}[Q(T)]+\sqrt\rho N^{-1}(X)}{\sqrt{1-\rho}}\right)$</td>
+</tr>
+<tr>
+<td><strong>Credit VaR</strong></td>
+<td>$L(1-R)V(X,T)$</td>
+</tr>
+<tr>
+<td><strong>Exemple 23.4</strong></td>
+<td>$V=\mathbf{0{,}128}$ → <strong>5,13 millions</strong></td>
+</tr>
+<tr>
+<td><strong>CreditMetrics</strong></td>
+<td>Monte-Carlo des <strong>changements de notation</strong> ; inclut les <strong>dégradations</strong></td>
+</tr>
+<tr>
+<td><strong>Seuils CreditMetrics</strong></td>
+<td>cumuler la ligne de la matrice, appliquer $N^{-1}$</td>
+</tr>
+</tbody></table>
+<div class="rec"><h2>Active Recall</h2><ol>
+<li>Quelle est la note la plus élevée de Moody's, et son équivalent S&amp;P ?</li>
+<li>Où passe la frontière <em>investment grade</em> ?</li>
+<li>Quelles catégories ne sont pas subdivisées en crans ?</li>
+<li>Calculer la probabilité qu'une Baa fasse défaut pendant sa deuxième année.</li>
+<li>Pourquoi la probabilité de défaut annuelle croît-elle pour les <em>investment grade</em> ?</li>
+<li>Pourquoi décroît-elle pour les mal notées ?</li>
+<li>Distinguer probabilité inconditionnelle et taux de hasard sur l'exemple Caa 3ᵉ année.</li>
+<li>Dériver $V(t)=e^{-\int\lambda}$ à partir de la définition de $\lambda(t)$.</li>
+<li>Écrire $Q(t)$ et sa forme inverse.</li>
+<li>Comment définit-on le taux de recouvrement d'une obligation ?</li>
+<li>Quelle classe a le meilleur recouvrement ? la pire ?</li>
+<li>Quel est le signe de la corrélation entre taux de recouvrement et taux de défaut ? Pourquoi est-ce grave ?</li>
+<li>Quelle hypothèse fondatrice permet d'extraire les défauts des prix d'obligations ? Quelle est sa limite ?</li>
+<li>Dériver $\bar\lambda=s/(1-R)$ par le raisonnement en mots.</li>
+<li>Dans la table 23.3, à quelles dates les défauts sont-ils supposés survenir, et pourquoi ce choix ?</li>
+<li>Recalculer la valeur sans risque à 3,5 ans dans la table 23.3.</li>
+<li>Pourquoi actualise-t-on au taux sans risque et pas au taux de l'entreprise ?</li>
+<li>Quelle valeur de $Q$ obtient-on, et à partir de quelle perte totale ?</li>
+<li>Quelles hypothèses simplificatrices le calcul fait-il ?</li>
+<li>Comment utiliserait-on quatre obligations de maturités 3, 5, 7 et 10 ans ?</li>
+<li>Quel taux sans risque les traders utilisent-ils, et quel écart avec LIBOR/swap les CDS impliquent-ils ?</li>
+<li>Pourquoi 10 points de base est-il un chiffre plausible ?</li>
+<li>Décrire les trois configurations d'un asset swap.</li>
+<li>Que représente la valeur actuelle de l'asset swap spread ?</li>
+<li>Refaire le calcul de $Q$ avec un spread de 150 pb.</li>
+<li>Calculer le taux de hasard historique à 7 ans d'une entreprise notée A.</li>
+<li>Calculer son taux de hasard implicite dans les obligations.</li>
+<li>Comment évoluent le ratio et la différence quand la notation se dégrade ?</li>
+<li>Décomposer les 111 points de base de spread d'une obligation A.</li>
+<li>D'où viennent les 42 points de base ?</li>
+<li>Pourquoi les probabilités extraites des prix sont-elles risque-neutres ?</li>
+<li>Citer les quatre explications de l'écart, et dire laquelle domine.</li>
+<li>Quels ont été les taux de défaut minimal et maximaux entre 1970 et 2009 ?</li>
+<li>Qu'est-ce que la contagion de crédit ?</li>
+<li>Pourquoi le risque idiosyncratique obligataire est-il difficile à diversifier ?</li>
+<li>Quelle probabilité utiliser pour valoriser ? pour un Credit VaR ?</li>
+<li>Pourquoi utiliser les prix des actions plutôt que les notations ?</li>
+<li>Écrire le payoff des capitaux propres selon Merton et l'interpréter.</li>
+<li>Écrire les deux équations du système de Merton.</li>
+<li>D'où vient la seconde équation ?</li>
+<li>Refaire l'exemple 23.1 en entier, jusqu'au taux de recouvrement.</li>
+<li>Comment résout-on numériquement le système ?</li>
+<li>Citer deux extensions du modèle de Merton.</li>
+<li>Quel est le verdict empirique sur Merton ? Quelle hypothèse sous-tend la calibration ?</li>
+<li>Décrire les trois catégories de dérivés et leur risque de crédit.</li>
+<li>Écrire la formule du CVA et dire ce que valent $u_i$ et $v_i$.</li>
+<li>Quelles hypothèses le CVA fait-il ?</li>
+<li>Dériver $f_0^\ast=f_0e^{-(y^\ast-y)T}$ à partir de (23.5).</li>
+<li>Refaire l'exemple 23.2.</li>
+<li>Qu'est-ce que $v_i$ pour un dérivé de catégorie 3 ?</li>
+<li>Distinguer <em>right-way</em> et <em>wrong-way risk</em>.</li>
+<li>Énoncer la clause de netting.</li>
+<li>Refaire l'exemple 40 M / 15 M, y compris la variante à −45 M.</li>
+<li>Écrire les deux formules de perte, avec et sans netting, et l'argument optionnel.</li>
+<li>Pourquoi l'effet incrémental d'une nouvelle transaction peut-il être négatif ?</li>
+<li>Décrire le mécanisme de collatéralisation sur les trois jours de l'exemple.</li>
+<li>Qu'est-ce qu'un <em>haircut</em> ? Que représente le seuil ?</li>
+<li>Citer les deux limites de la protection par collatéral.</li>
+<li>Qu'est-ce qu'un <em>downgrade trigger</em>, et quelles sont ses deux limites ?</li>
+<li>Raconter le mécanisme des downgrade triggers dans le cas Enron.</li>
+<li>Quelles étaient les notations d'Enron juste avant le défaut ?</li>
+<li>Citer les causes de la corrélation de défaut.</li>
+<li>Comparer modèles à forme réduite et modèles structurels.</li>
+<li>Quel est le défaut principal des modèles à forme réduite, et son remède ?</li>
+<li>Qu'est-ce que la transformation percentile à percentile ?</li>
+<li>Qu'est-ce qu'on suppose exactement en « utilisant une copule gaussienne » ?</li>
+<li>Quel avantage la copule offre-t-elle sur la modélisation directe ?</li>
+<li>Refaire l'exemple 23.3 : quels seuils pour 1 %, 3 %, 6 %, 10 %, 15 % ?</li>
+<li>Écrire le modèle à un facteur et la corrélation qu'il implique.</li>
+<li>Dériver $Q(T\mid F)$ étape par étape.</li>
+<li>Écrire le cas homogène (23.12).</li>
+<li>Dériver la formule de Vasicek à partir de (23.12).</li>
+<li>Refaire l'exemple 23.4 en entier.</li>
+<li>Quel taux de défaut du pire cas obtient-on, contre quelle moyenne ?</li>
+<li>Que devient $V(X,T)$ si $\rho\to0$ ? si $\rho\to1$ ?</li>
+<li>Décrire le principe de CreditMetrics et son avantage clé.</li>
+<li>Lire la ligne A de la matrice de transition.</li>
+<li>Calculer les seuils de la Aaa dans la simulation.</li>
+<li>Calculer les seuils de la Baa, et le seuil de défaut.</li>
+<li>Pourquoi les changements de notation ne doivent-ils pas être tirés indépendamment ?</li>
+</ol></div>
+
+<h2>Flashcards</h2>
+<table>
+<thead>
+<tr>
+<th>Question</th>
+<th>Réponse</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Meilleure note Moody's ?</td>
+<td><strong>Aaa</strong> (S&amp;P : <strong>AAA</strong>)</td>
+</tr>
+<tr>
+<td>Frontière investment grade ?</td>
+<td><strong>Baa</strong> / <strong>BBB</strong></td>
+</tr>
+<tr>
+<td>Catégories non subdivisées ?</td>
+<td><strong>Aaa/AAA</strong> et les deux plus basses</td>
+</tr>
+<tr>
+<td>Probabilité inconditionnelle ?</td>
+<td>La <strong>différence</strong> de deux probabilités cumulées</td>
+</tr>
+<tr>
+<td>Baa, 2ᵉ année ?</td>
+<td>$0{,}494-0{,}176=\mathbf{0{,}318\,\%}$</td>
+</tr>
+<tr>
+<td>Autre nom du taux de hasard ?</td>
+<td><strong>Intensité de défaut</strong></td>
+</tr>
+<tr>
+<td>Caa, 3ᵉ année, conditionnel ?</td>
+<td>$0{,}09298/0{,}70616=\mathbf{13{,}17\,\%}$</td>
+</tr>
+<tr>
+<td>Formule de survie ?</td>
+<td>$V(t)=e^{-\int_0^t\lambda(\tau)d\tau}$</td>
+</tr>
+<tr>
+<td>Formule de $Q(t)$ ?</td>
+<td>$1-e^{-\bar\lambda(t)t}$</td>
+</tr>
+<tr>
+<td>Forme inverse ?</td>
+<td>$\bar\lambda(t)=-\frac1t\ln[1-Q(t)]$</td>
+</tr>
+<tr>
+<td>Investment grade dans le temps ?</td>
+<td>Probabilité de défaut annuelle <strong>croissante</strong></td>
+</tr>
+<tr>
+<td>Junk dans le temps ?</td>
+<td><strong>Décroissante</strong></td>
+</tr>
+<tr>
+<td>Définition du recouvrement ?</td>
+<td>Valeur de marché <strong>quelques jours après le défaut</strong>, en % du <strong>nominal</strong></td>
+</tr>
+<tr>
+<td>Meilleure classe ?</td>
+<td>Prêt bancaire <em>first lien</em>, <strong>65,6 %</strong></td>
+</tr>
+<tr>
+<td>Pire classe ?</td>
+<td>Obligation <strong>junior subordonnée</strong>, <strong>24,7 %</strong></td>
+</tr>
+<tr>
+<td>Corrélation recouvrement / défaut ?</td>
+<td><strong>Négative</strong> — année <strong>doublement</strong> mauvaise</td>
+</tr>
+<tr>
+<td>Recouvrement si défaut à 0,1 % ? à 3 % ?</td>
+<td>≈ <strong>60 %</strong> · ≈ <strong>35 %</strong></td>
+</tr>
+<tr>
+<td>Hypothèse fondatrice ?</td>
+<td>La <strong>seule</strong> cause de l'écart de prix est <strong>la possibilité de défaut</strong></td>
+</tr>
+<tr>
+<td>Sa limite ?</td>
+<td>La <strong>liquidité</strong> affecte aussi le prix</td>
+</tr>
+<tr>
+<td>Formule approchée ?</td>
+<td>$\bar\lambda=s/(1-R)$</td>
+</tr>
+<tr>
+<td>Spread 200 pb, $R=40\,\%$ ?</td>
+<td>$0{,}02/0{,}6=\mathbf{3{,}33\,\%}$</td>
+</tr>
+<tr>
+<td>Quand les défauts surviennent-ils dans la table 23.3 ?</td>
+<td><strong>Immédiatement AVANT</strong> les dates de coupon</td>
+</tr>
+<tr>
+<td>Valeur sans risque à 3,5 ans ?</td>
+<td>$3+3e^{-0{,}025}+3e^{-0{,}05}+103e^{-0{,}075}=\mathbf{104{,}34}$</td>
+</tr>
+<tr>
+<td>Prix des deux obligations ?</td>
+<td><strong>95,34</strong> et <strong>104,09</strong></td>
+</tr>
+<tr>
+<td>Perte espérée totale ?</td>
+<td><strong>8,75 dollars</strong></td>
+</tr>
+<tr>
+<td>Coefficient total ?</td>
+<td>$\mathbf{288{,}48\,Q}$</td>
+</tr>
+<tr>
+<td>Valeur de $Q$ ?</td>
+<td><strong>3,03 %</strong></td>
+</tr>
+<tr>
+<td>Avec un asset swap à 150 pb ?</td>
+<td>Perte $=6{,}55$ → $Q=\mathbf{2{,}27\,\%}$</td>
+</tr>
+<tr>
+<td>Taux sans risque des traders ?</td>
+<td><strong>LIBOR/swap − 10 pb</strong></td>
+</tr>
+<tr>
+<td>Pourquoi 10 pb ?</td>
+<td>Prime de défaut raisonnable pour du <strong>court terme AA</strong></td>
+</tr>
+<tr>
+<td>Que représente l'asset swap spread ?</td>
+<td>L'écart entre prix <strong>sans risque</strong> et prix <strong>d'entreprise</strong></td>
+</tr>
+<tr>
+<td>Sont-ils échangés en cas de défaut ?</td>
+<td><strong>Oui</strong> — ce sont les coupons <strong>PROMIS</strong></td>
+</tr>
+<tr>
+<td>Hazard historique 7 ans pour A ?</td>
+<td>$-\frac17\ln(1-0{,}01179)=\mathbf{0{,}17\,\%}$</td>
+</tr>
+<tr>
+<td>Hazard obligataire pour A ?</td>
+<td>$(0{,}05995-0{,}05308)/0{,}6=\mathbf{1{,}15\,\%}$</td>
+</tr>
+<tr>
+<td>Ratio pour Aaa ?</td>
+<td><strong>17,0</strong></td>
+</tr>
+<tr>
+<td>Ratio pour Caa ?</td>
+<td><strong>1,4</strong></td>
+</tr>
+<tr>
+<td>Le ratio quand la note baisse ?</td>
+<td>Il <strong>DÉCROÎT</strong></td>
+</tr>
+<tr>
+<td>La différence quand la note baisse ?</td>
+<td>Elle <strong>CROÎT</strong></td>
+</tr>
+<tr>
+<td>Excédent de rendement Aaa ?</td>
+<td><strong>34 pb</strong></td>
+</tr>
+<tr>
+<td>Excédent Caa ?</td>
+<td><strong>323 pb</strong></td>
+</tr>
+<tr>
+<td>Décomposition du A ?</td>
+<td>$111=42+10+59$</td>
+</tr>
+<tr>
+<td>D'où viennent les 10 pb ?</td>
+<td>Hazard historique <strong>× 0,6</strong></td>
+</tr>
+<tr>
+<td>Probabilités depuis les prix ?</td>
+<td><strong>RISQUE-NEUTRES</strong></td>
+</tr>
+<tr>
+<td>Probabilités depuis l'historique ?</td>
+<td><strong>RÉELLES</strong> (physiques)</td>
+</tr>
+<tr>
+<td>Raison dominante de l'écart ?</td>
+<td> <strong>Les défauts ne sont pas indépendants</strong> → risque <strong>systématique</strong></td>
+</tr>
+<tr>
+<td>Taux de défaut le plus bas (1970-2009) ?</td>
+<td><strong>0,09 % en 1979</strong></td>
+</tr>
+<tr>
+<td>Les plus hauts ?</td>
+<td><strong>3,97 % (2001)</strong> et <strong>5,35 % (2009)</strong></td>
+</tr>
+<tr>
+<td>Contagion de crédit ?</td>
+<td>Le défaut d'une entreprise <strong>en provoque</strong> d'autres</td>
+</tr>
+<tr>
+<td>Pourquoi le risque obligataire est-il dur à diversifier ?</td>
+<td>Rendements <strong>très asymétriques</strong> : 99,75 % de $+7\,\%$, 0,25 % de $-60\,\%$</td>
+</tr>
+<tr>
+<td>Pour valoriser ?</td>
+<td><strong>Risque-neutres</strong></td>
+</tr>
+<tr>
+<td>Pour un Credit VaR ?</td>
+<td><strong>Réelles</strong></td>
+</tr>
+<tr>
+<td>Problème des notations ?</td>
+<td><strong>Révisées peu souvent</strong></td>
+</tr>
+<tr>
+<td>Idée de Merton (1974) ?</td>
+<td>Les <strong>capitaux propres</strong> sont un <strong>CALL sur les actifs</strong></td>
+</tr>
+<tr>
+<td>Payoff ?</td>
+<td>$E_T=\max(V_T-D,0)$</td>
+</tr>
+<tr>
+<td>Prix d'exercice ?</td>
+<td>Le <strong>remboursement de dette</strong> $D$</td>
+</tr>
+<tr>
+<td>Équation 1 ?</td>
+<td>$E_0=V_0N(d_1)-De^{-rT}N(d_2)$</td>
+</tr>
+<tr>
+<td>Équation 2 ?</td>
+<td>$\sigma_EE_0=N(d_1)\sigma_VV_0$</td>
+</tr>
+<tr>
+<td>Sa source ?</td>
+<td>Le <strong>lemme d'Itô</strong></td>
+</tr>
+<tr>
+<td>Valeur de la dette ?</td>
+<td>$V_0-E_0$</td>
+</tr>
+<tr>
+<td>Probabilité de défaut ?</td>
+<td>$N(-d_2)$</td>
+</tr>
+<tr>
+<td>Ex. 23.1 : $V_0$ et $\sigma_V$ ?</td>
+<td><strong>12,40</strong> et <strong>0,2123</strong></td>
+</tr>
+<tr>
+<td>Ex. 23.1 : $\text{PD}$ ?</td>
+<td><strong>12,7 %</strong></td>
+</tr>
+<tr>
+<td>Ex. 23.1 : recouvrement ?</td>
+<td><strong>91 %</strong></td>
+</tr>
+<tr>
+<td>Relation EL / PD / recouvrement ?</td>
+<td>$\text{recouvrement}=1-\text{EL}/\text{PD}$</td>
+</tr>
+<tr>
+<td>Résolution numérique ?</td>
+<td>Minimiser $F^2+G^2$ avec Solver</td>
+</tr>
+<tr>
+<td>Verdict sur Merton ?</td>
+<td>Bon <strong>classement</strong> ; <strong>transformation monotone</strong> à calibrer</td>
+</tr>
+<tr>
+<td>Nom du produit KMV ?</td>
+<td>L'<strong>EDF</strong> (<em>expected default frequency</em>)</td>
+</tr>
+<tr>
+<td>Catégorie 1 ?</td>
+<td>Toujours <strong>passif</strong> — option <strong>vendue</strong> — <strong>aucun</strong> risque</td>
+</tr>
+<tr>
+<td>Catégorie 2 ?</td>
+<td>Toujours <strong>actif</strong> — option <strong>achetée</strong> — <strong>toujours</strong> du risque</td>
+</tr>
+<tr>
+<td>Catégorie 3 ?</td>
+<td>Les <strong>deux</strong> — un <strong>forward</strong></td>
+</tr>
+<tr>
+<td>Rang d'une créance sur dérivé ?</td>
+<td><strong>Non garantie et junior</strong></td>
+</tr>
+<tr>
+<td>Formule du CVA ?</td>
+<td>$\sum u_iv_i$</td>
+</tr>
+<tr>
+<td>Que vaut $u_i$ ?</td>
+<td>$q_i(1-R)$</td>
+</tr>
+<tr>
+<td>Que vaut $v_i$ ?</td>
+<td>La VA d'un instrument versant <strong>l'exposition</strong> en $t_i$</td>
+</tr>
+<tr>
+<td>Exposition ?</td>
+<td>$\max(f_i,0)$</td>
+</tr>
+<tr>
+<td>$v_i$ en catégorie 3 ?</td>
+<td>Un <strong>call d'exercice ZÉRO</strong> sur $f_i$</td>
+</tr>
+<tr>
+<td>Formule d'actualisation risquée ?</td>
+<td>$f_0^\ast=f_0e^{-(y^\ast-y)T}$</td>
+</tr>
+<tr>
+<td>Ex. 23.2 ?</td>
+<td>$3e^{-0{,}015\times2}=\mathbf{2{,}91}$</td>
+</tr>
+<tr>
+<td>Wrong-way risk ?</td>
+<td>Défaut probable <strong>quand l'exposition est grande</strong></td>
+</tr>
+<tr>
+<td>Right-way risk ?</td>
+<td>Défaut probable quand l'exposition est <strong>nulle</strong></td>
+</tr>
+<tr>
+<td>Clause de netting ?</td>
+<td>Défaut sur une transaction → défaut sur <strong>toutes</strong></td>
+</tr>
+<tr>
+<td>Exemple : sans netting ?</td>
+<td><strong>40 millions</strong></td>
+</tr>
+<tr>
+<td>Avec netting ?</td>
+<td><strong>15 millions</strong></td>
+</tr>
+<tr>
+<td>Perte sans netting ?</td>
+<td>$(1-R)\sum\max(V_i,0)$</td>
+</tr>
+<tr>
+<td>Avec netting ?</td>
+<td>$(1-R)\max(\sum V_i,0)$</td>
+</tr>
+<tr>
+<td>L'argument optionnel ?</td>
+<td>Une <strong>option sur portefeuille</strong> ≤ un <strong>portefeuille d'options</strong></td>
+</tr>
+<tr>
+<td>Effet incrémental négatif ?</td>
+<td>Quand la nouvelle transaction est <strong>négativement corrélée</strong> aux existantes</td>
+</tr>
+<tr>
+<td>Que représente le seuil de collatéral ?</td>
+<td>Une <strong>ligne de crédit</strong></td>
+</tr>
+<tr>
+<td>Décote sur titres déposés ?</td>
+<td>Un <em><strong>haircut</strong></em></td>
+</tr>
+<tr>
+<td>Les deux limites du collatéral ?</td>
+<td>Le <strong>seuil</strong> n'est pas protégé · l'entreprise <strong>cesse de répondre</strong></td>
+</tr>
+<tr>
+<td>Downgrade trigger ?</td>
+<td>Option de <strong>dénouer à la valeur de marché</strong> si la note tombe</td>
+</tr>
+<tr>
+<td>Ses deux limites ?</td>
+<td>Pas de protection contre un <strong>saut</strong> · inefficace s'il est <strong>massivement utilisé</strong></td>
+</tr>
+<tr>
+<td>Notes d'Enron avant défaut ?</td>
+<td><strong>Baa3</strong> (Moody's) et <strong>BBB−</strong> (S&amp;P)</td>
+</tr>
+<tr>
+<td>Date de la faillite ?</td>
+<td><strong>Décembre 2001</strong></td>
+</tr>
+<tr>
+<td>Le mécanisme fatal ?</td>
+<td>Dénouements → <strong>paiements en espèces massifs</strong> impossibles</td>
+</tr>
+<tr>
+<td>Modèles à forme réduite ?</td>
+<td>Taux de hasard <strong>stochastiques corrélés</strong> au macro</td>
+</tr>
+<tr>
+<td>Leur défaut ?</td>
+<td>Gamme de corrélations <strong>limitée</strong></td>
+</tr>
+<tr>
+<td>Leur remède ?</td>
+<td>Des <strong>sauts</strong> dans le taux de hasard</td>
+</tr>
+<tr>
+<td>Modèles structurels ?</td>
+<td><strong>Actifs corrélés</strong>, à la Merton</td>
+</tr>
+<tr>
+<td>Leur défaut ?</td>
+<td><strong>Lenteur</strong> de calcul</td>
+</tr>
+<tr>
+<td>Transformation de copule ?</td>
+<td>$x_i=N^{-1}[Q_i(t_i)]$</td>
+</tr>
+<tr>
+<td>Son nom ?</td>
+<td><strong>Percentile à percentile</strong></td>
+</tr>
+<tr>
+<td>Ce qu'on suppose ?</td>
+<td>Les $x_i$ sont <strong>normaux multivariés</strong></td>
+</tr>
+<tr>
+<td>Ce que la copule permet ?</td>
+<td>Estimer la <strong>corrélation séparément</strong> des lois marginales</td>
+</tr>
+<tr>
+<td>Corrélation de copule ≈ ?</td>
+<td>La corrélation des <strong>rendements des actions</strong></td>
+</tr>
+<tr>
+<td>Seuil de 1 % ?</td>
+<td>$N^{-1}(0{,}01)=\mathbf{-2{,}33}$</td>
+</tr>
+<tr>
+<td>Seuil de 15 % ?</td>
+<td>$N^{-1}(0{,}15)=\mathbf{-1{,}04}$</td>
+</tr>
+<tr>
+<td>Modèle à un facteur ?</td>
+<td>$x_i=a_iF+\sqrt{1-a_i^2}Z_i$</td>
+</tr>
+<tr>
+<td>Corrélation induite ?</td>
+<td>$a_ia_j$</td>
+</tr>
+<tr>
+<td>$Q(T\mid F)$ ?</td>
+<td>$N\!\left(\frac{N^{-1}[Q(T)]-a_iF}{\sqrt{1-a_i^2}}\right)$</td>
+</tr>
+<tr>
+<td>Cas homogène ?</td>
+<td>$a_i=\sqrt\rho$ pour tout $i$</td>
+</tr>
+<tr>
+<td>Définition du Credit VaR ?</td>
+<td>La perte de crédit non dépassée avec confiance $X$ sur $T$</td>
+</tr>
+<tr>
+<td>Formule de Vasicek ?</td>
+<td>$V(X,T)=N\!\left(\frac{N^{-1}[Q(T)]+\sqrt\rho N^{-1}(X)}{\sqrt{1-\rho}}\right)$</td>
+</tr>
+<tr>
+<td>Auteur et année ?</td>
+<td><strong>Vasicek</strong>, KMV <strong>1987</strong> (publié <em>Risk</em>, déc. 2002)</td>
+</tr>
+<tr>
+<td>Credit VaR en montant ?</td>
+<td>$L(1-R)V(X,T)$</td>
+</tr>
+<tr>
+<td>Ex. 23.4 : $V(0{,}999;1)$ ?</td>
+<td><strong>0,128</strong></td>
+</tr>
+<tr>
+<td>Ex. 23.4 : Credit VaR ?</td>
+<td><strong>5,13 millions de dollars</strong></td>
+</tr>
+<tr>
+<td>Taux moyen contre pire cas ?</td>
+<td><strong>2 %</strong> contre <strong>12,8 %</strong></td>
+</tr>
+<tr>
+<td>Si $\rho\to0$ ?</td>
+<td>$V(X,T)\to Q(T)$</td>
+</tr>
+<tr>
+<td>Principe de CreditMetrics ?</td>
+<td>Monte-Carlo des <strong>changements de notation</strong></td>
+</tr>
+<tr>
+<td>Son avantage clé ?</td>
+<td>Inclut les pertes dues aux <strong>DÉGRADATIONS</strong>, pas seulement aux défauts</td>
+</tr>
+<tr>
+<td>Son inconvénient ?</td>
+<td><strong>Intensif en calcul</strong></td>
+</tr>
+<tr>
+<td>A reste A à 1 an ?</td>
+<td><strong>90,91 %</strong></td>
+</tr>
+<tr>
+<td>A fait défaut à 1 an ?</td>
+<td><strong>0,05 %</strong></td>
+</tr>
+<tr>
+<td>Seuil « reste Aaa » ?</td>
+<td>$N^{-1}(0{,}9057)=\mathbf{1{,}3147}$</td>
+</tr>
+<tr>
+<td>Seuil de défaut de la Baa ?</td>
+<td>$N^{-1}(0{,}9983)=\mathbf{2{,}9290}$</td>
+</tr>
+<tr>
+<td>Lien entre notations tirées ?</td>
+<td>Une <strong>copule gaussienne</strong></td>
+</tr>
+</tbody></table>
+</main>
+
+
+
+
+</body></html>

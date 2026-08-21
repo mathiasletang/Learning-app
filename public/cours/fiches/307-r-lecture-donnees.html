@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fiche 307 — Lire des données : read.table(), scan(), jeux intégrés</title>
+<script>
+window.MathJax={tex:{inlineMath:[["$","$"]],displayMath:[["$$","$$"]],processEscapes:true},
+ options:{skipHtmlTags:["script","noscript","style","textarea","pre","code"]},
+ svg:{fontCache:"global"},
+ startup:{pageReady:()=>MathJax.startup.defaultPageReady().then(()=>{document.body.classList.add("ready")})}};
+setTimeout(function(){document.body.classList.add("ready")},2500);
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+/* ============================================================
+   MathiasLearn — feuille de style des fiches
+   Reprise intégrale des tokens de 00_PARCOURS/*.html
+   + blocs pédagogiques (callouts, méthode, essentiels, recall)
+   ============================================================ */
+:root{--bg:#faf9f7;--card:#fff;--ink:#1a1a1a;--muted:#6b6b6b;--line:#e5e2dd;--accent:#8b5e34;
+ --hl:#fdf8ef;--ok:#2d7d4f;--okbg:#f0f7f3;--warn:#b3402f;--warnbg:#fdf3f1;--blue:#2f5d8b;--bluebg:#f1f5fa}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+ font:17px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;padding:0 16px 100px}
+.nav{position:sticky;top:0;background:rgba(250,249,247,.96);backdrop-filter:blur(8px);
+ border-bottom:1px solid var(--line);margin:0 -16px 30px;padding:11px 16px;z-index:50;
+ display:flex;gap:6px;flex-wrap:wrap;font-size:13px}
+.nav a{color:var(--muted);text-decoration:none;padding:4px 9px;border-radius:5px;white-space:nowrap}
+.nav a:hover{background:var(--line);color:var(--ink)}
+.nav a.on{background:var(--accent);color:#fff}
+main{max-width:780px;margin:0 auto}
+h1{font-size:31px;letter-spacing:-.02em;margin:.4em 0 .5em;line-height:1.25}
+h2{font-size:23px;margin:2.2em 0 .7em;padding-bottom:.3em;border-bottom:1px solid var(--line)}
+h3{font-size:19px;margin:1.9em 0 .5em;color:var(--accent)}
+h4{font-size:17px;margin:1.5em 0 .4em}
+p{margin:.8em 0} a{color:var(--accent)} hr{border:0;border-top:1px solid var(--line);margin:2.6em 0}
+table{border-collapse:collapse;width:100%;margin:1.3em 0;font-size:15.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+th{background:#f3f0eb;font-weight:600}
+tr:nth-child(even) td{background:#fcfbfa}
+code{font-family:"SF Mono",Menlo,Consolas,monospace;font-size:.88em;background:#f2efea;padding:2px 6px;border-radius:4px;overflow-wrap:break-word}
+pre{background:#f2efea;padding:14px 16px;border-radius:8px;overflow-x:auto}
+pre code{background:none;padding:0;white-space:pre}
+blockquote{border-left:3px solid var(--accent);background:var(--hl);margin:1.4em 0;padding:14px 20px;border-radius:0 8px 8px 0}
+blockquote p:first-child{margin-top:0} blockquote p:last-child{margin-bottom:0}
+ul,ol{padding-left:1.5em} li{margin:.35em 0} em{color:#4a4a4a}
+mjx-container[display="true"]{margin:1.1em 0!important;overflow-x:auto;overflow-y:hidden;padding:2px 0}
+mjx-container svg{max-width:100%}
+body:not(.ready) main{opacity:0} main{opacity:1;transition:opacity .25s}
+
+/* --- bandeau de tête de fiche --- */
+.cours{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--accent);
+ border-radius:0 10px 10px 0;padding:18px 22px;margin:0 0 34px}
+.cours h4{margin:0 0 4px;font-size:14px;text-transform:uppercase;letter-spacing:.07em;color:var(--accent)}
+.cours .cs{color:var(--muted);font-size:14.5px;margin:0 0 14px}
+
+/* --- exercices / corrigés --- */
+.ex{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:6px 24px 20px;margin:18px 0}
+.ex>h3:first-child{margin-top:14px}
+details.cor{margin-top:18px;border:1px solid var(--line);border-radius:8px;background:#fcfbfa;overflow:hidden}
+details.cor>summary{cursor:pointer;padding:12px 16px;font-weight:600;font-size:15px;color:var(--accent);
+ list-style:none;display:flex;align-items:center;gap:9px;user-select:none;transition:.15s;min-height:44px}
+details.cor>summary::-webkit-details-marker{display:none}
+details.cor>summary:hover{background:var(--hl)}
+details.cor>summary::before{content:"\25B6";font-size:10px;transition:transform .18s;display:inline-block}
+details.cor[open]>summary::before{transform:rotate(90deg)}
+details.cor[open]>summary{background:var(--okbg);color:var(--ok);border-bottom:1px solid var(--line)}
+.cor .in{padding:4px 20px 16px}
+.cor .in>*:first-child{margin-top:.9em}
+
+/* --- blocs pédagogiques (callouts) ---
+   Générés depuis une citation Markdown dont le premier **gras** commence
+   par un mot-clé : DÉFINITION, THÉORÈME, MÉTHODE, PIÈGE, INTUITION… */
+.cal{border:1px solid var(--line);border-left:4px solid var(--accent);background:var(--card);
+ border-radius:0 10px 10px 0;padding:15px 20px;margin:1.5em 0}
+.cal>p:first-child{margin-top:0}.cal>p:last-child,.cal>ul:last-child,.cal>ol:last-child{margin-bottom:0}
+.cal .lab{display:block;font-size:12.5px;text-transform:uppercase;letter-spacing:.08em;
+ font-weight:700;color:var(--accent);margin-bottom:6px}
+.cal.formel{background:var(--hl)}
+.cal.piege{border-left-color:var(--warn);background:var(--warnbg)}
+.cal.piege .lab{color:var(--warn)}
+.cal.methode{border-left-color:var(--ok);background:var(--okbg)}
+.cal.methode .lab{color:var(--ok)}
+.cal.intu{border-left-color:var(--blue);background:var(--bluebg)}
+.cal.intu .lab{color:var(--blue)}
+.cal.plus{border-left-style:dashed;background:#faf9f7}
+.cal.plus .lab{color:var(--muted)}
+
+/* --- révision express --- */
+.ess{background:var(--card);border:1px solid var(--accent);border-radius:10px;padding:4px 24px 20px;margin:1.6em 0}
+.ess h3{margin-top:1.3em}
+.rec{background:var(--card);border:1px dashed var(--accent);border-radius:10px;padding:4px 24px 18px;margin:1.6em 0}
+.rec ol{counter-reset:none}
+
+/* --- impression / PDF --- */
+@media print{
+ .nav{display:none}
+ body{padding:0;background:#fff;font-size:11.2pt;line-height:1.55}
+ main{max-width:none}
+ h1{font-size:23pt}h2{font-size:15pt;margin-top:1.5em}h3{font-size:12.6pt}
+ h2,h3,h4{break-after:avoid;page-break-after:avoid}
+ table,.cal,blockquote{break-inside:avoid;page-break-inside:avoid}
+ table{display:table;font-size:9.6pt}
+ details.cor{border:1px solid var(--line);background:#fcfbfa}
+ details.cor>summary{display:none}
+ details.cor .in{padding-top:10px}
+ .cal,.ex,.ess,.rec{box-shadow:none}
+ a{color:var(--ink);text-decoration:none}
+}
+@page{margin:16mm 15mm 18mm}
+
+/* --- exemples travaillés --- */
+.exm{background:#fcfbfa;border:1px solid var(--line);border-radius:10px;padding:2px 20px 14px;margin:1.5em 0}
+.exm>h4:first-child{margin:14px 0 .5em;color:var(--accent);font-size:13px;text-transform:uppercase;letter-spacing:.07em}
+
+
+/* --- pastilles de priorité (conventions des fiches de l'app) --- */
+h2[data-prio], h3[data-prio], h4[data-prio]{position:relative}
+h2[data-prio]::before,h3[data-prio]::before,h4[data-prio]::before{
+ content:"";display:inline-block;width:9px;height:9px;border-radius:50%;
+ margin-right:9px;vertical-align:middle;background:var(--muted)}
+[data-prio="must"]::before{background:var(--warn)}
+[data-prio="high"]::before{background:#d98324}
+[data-prio="mid"]::before{background:#c9a227}
+[data-prio="low"]::before{background:var(--ok)}
+/* corrigés des fiches de l'app : même traitement que les corrigés des séries */
+details.cor>summary::after{content:""}
+</style></head><body>
+<div class="nav"><a href="00_COMMENCER_ICI.html">Commencer ici</a><a href="01_NOTATIONS_le-decodeur.html">Notations</a><a href="02_EXERCICES_Serie-0.html">Série 0 — Remise en route</a><a href="03_EXERCICES_Serie-1.html">Série 1 — Convexité</a><a href="04_EXERCICES_Serie-2.html">Série 2 — KKT</a><a href="05_AUTO-EVALUATION.html">Auto-évaluation (quiz)</a><a href="06_FICHE_Optimisation-deux-variables.html">Fiche — Optimisation à 2 variables</a></div>
+<main><h1>Fiche 307 — Lire des données : <code>read.table()</code>, <code>scan()</code>, jeux intégrés</h1>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Matière</strong></td>
+<td>Code · Langage R</td>
+</tr>
+<tr>
+<td><strong>Cours source</strong></td>
+<td>R Core Team, <em>An Introduction to R</em> 4.6.1 — chapitre 7 « Reading data from files » (§7.1 <code>read.table()</code>, §7.2 <code>scan()</code>, §7.3 jeux de données intégrés, §7.3.1 données d'autres paquets, §7.4 édition)</td>
+</tr>
+<tr>
+<td><strong>Sources d'appoint</strong></td>
+<td>R Core Team, <em>R Data Import/Export</em> (renvoi explicite du §7) ; <em>An Introduction to R</em> §3.2 (ajustement automatique des longueurs)</td>
+</tr>
+<tr>
+<td><strong>Difficulté</strong></td>
+<td> Intermédiaire — court, mais c'est la porte d'entrée de toute analyse réelle</td>
+</tr>
+<tr>
+<td><strong>Temps d'étude estimé</strong></td>
+<td>45 min</td>
+</tr>
+<tr>
+<td><strong>Prérequis</strong></td>
+<td>Fiches 301, 303, 306 (vecteurs, modes, listes et data frames)</td>
+</tr>
+<tr>
+<td><strong>Concepts clés</strong></td>
+<td>forme attendue du fichier, <strong>étiquettes de ligne implicites</strong>, <code>read.table()</code>, <code>header = TRUE</code>, lecture par défaut des types, <code>scan()</code>, <strong>liste fictive</strong> qui fixe les modes, <code>scan()</code> à valeur unique, <code>matrix(scan(...), ncol =, byrow = TRUE)</code>, <code>data()</code>, <code>data(package = )</code>, <code>edit()</code>, <code>fix()</code></td>
+</tr>
+<tr>
+<td><strong>À retenir en priorité</strong></td>
+<td><strong>La règle « un item de moins sur la première ligne »</strong> · <strong><code>header = TRUE</code></strong> · <strong>la liste fictive de <code>scan()</code></strong> · <code>fix(x)</code> = <code>x &lt;- edit(x)</code>.</td>
+</tr>
+</tbody></table>
+<h2>Vue d'ensemble</h2>
+<pre><code>LA PHILOSOPHIE   « R input facilities are SIMPLE and their requirements are
+                   FAIRLY STRICT and even RATHER INFLEXIBLE »
+                 -&gt; on nettoie le fichier AVANT, avec d'autres outils
+
+DEUX PORTES      read.table()   lit un DATA FRAME ENTIER   &lt;- la voie normale
+                 scan()         plus primitif, lit des VECTEURS
+
+LA REGLE DU FICHIER
+                 1re ligne : UN NOM PAR VARIABLE
+                 lignes suivantes : ETIQUETTE DE LIGNE puis les valeurs
+                 « If the file has ONE FEWER ITEM in its first line than in its
+                   second, this arrangement is PRESUMED to be in force. »
+
+SANS ETIQUETTES  read.table("f.data", header = TRUE)
+
+TYPES PAR DEFAUT  numerique -&gt; variable numerique
+                  non numerique -&gt; variable CARACTERE
+
+scan()           inp &lt;- scan("input.dat", list("", 0, 0))
+                 le 2e argument est une LISTE FICTIVE qui FIXE LES MODES
+                 nommee -&gt; inp$id, inp$x, inp$y
+                 valeur unique -&gt; UN SEUL vecteur, tout du meme mode
+
+JEUX INTEGRES    ~100 dans le paquet datasets ; data() les liste
+                 data(package = "rpart")   data(Puromycin, package = "datasets")
+
+EDITER           xnew &lt;- edit(xold)      fix(xold)  ==  xold &lt;- edit(xold)
+                 edit(data.frame())      pour saisir de zero
+</code></pre>
+<p><strong>Le problème posé.</strong> <em>« <strong>Large data objects will usually be read as values from external files</strong> rather than entered during an R session at the keyboard. »</em> (§7) Jusqu'ici, toutes les données ont été tapées à la main. Aucune analyse réelle ne fonctionne ainsi.</p>
+<blockquote>
+<p class="cal piege"> <strong>La mise en garde qui ouvre le chapitre, et qu'il faut prendre au sérieux.</strong> <em>« <strong>R input facilities are simple and their requirements are fairly strict and even rather inflexible.</strong> There is <strong>a clear presumption by the designers of R that you will be able to modify your input files using other tools, such as file editors or Perl, to fit in with the requirements of R.</strong> Generally this is very simple. »</em></p>
+<p>R <strong>n'essaie pas de deviner</strong> un fichier mal formé. C'est un choix de conception, pas une lacune : le nettoyage se fait <strong>avant</strong>, avec l'outil approprié — un éditeur, <code>sed</code>, <code>awk</code> (note 1 : <em>« Under UNIX, the utilities <code>sed</code> or <code>awk</code> can be used »</em>), Perl.</p>
+</blockquote>
+<blockquote>
+<p><strong>Le renvoi (§7).</strong> <em>« For more details on <strong>importing data into R and also exporting data</strong>, see <strong>R Data Import/Export</strong>. »</em> — un manuel officiel distinct, non couvert par ce chapitre.</p>
+</blockquote>
+<h2 data-prio="must">Concept 1 — La forme attendue du fichier</h2>
+<blockquote>
+<p><strong>Règle (§7.1).</strong> <em>« To read an entire data frame directly, <strong>the external file will normally have a special form</strong> :</em></p>
+<ul>
+<li><em>« <strong>The first line of the file should have a name for each variable</strong> in the data frame. »</em></li>
+<li><em>« <strong>Each additional line of the file has as its first item a row label</strong> and the values for each variable. »</em></li>
+</ul>
+</blockquote>
+<blockquote>
+<p class="cal piege"> <strong>La règle de détection, à connaître par cœur (§7.1).</strong> <em>« <strong>If the file has one fewer item in its first line than in its second, this arrangement is presumed to be in force.</strong> »</em></p>
+<p><strong>R compte les items.</strong> Si la ligne d'en-tête en a <strong>un de moins</strong> que la première ligne de données, R en conclut que la colonne supplémentaire des lignes de données est <strong>une colonne d'étiquettes</strong>. Aucune option n'a été donnée : <strong>la structure du fichier a suffi</strong>.</p>
+</blockquote>
+<p><strong>La forme avec étiquettes de ligne (§7.1) :</strong></p>
+<pre><code>        Price    Floor    Area  Rooms   Age  Cent.heat
+01      52.00    111.0     830      5   6.2         no
+02      54.75    128.0     710      5   7.5         no
+03      57.50    101.0    1000      5   4.2         no
+04      57.50    131.0     690      6   8.8         no
+05      59.75     93.0     900      5   1.9        yes
+</code></pre>
+<p>Six noms sur la première ligne, sept items sur les suivantes : <strong>la règle s'applique</strong>, et <code>01</code>, <code>02</code>… deviennent les <strong>étiquettes de ligne</strong> (<code>row.names</code>, fiche 306).</p>
+<pre><code class="language-r">HousePrice &lt;- read.table("houses.data")
+</code></pre>
+<blockquote>
+<p><strong>Règle — les types lus par défaut (§7.1).</strong> <em>« <strong>By default numeric items (except row labels) are read as numeric variables</strong> and <strong>non-numeric variables, such as <code>Cent.heat</code> in the example, as character variables</strong>. <strong>This can be changed if necessary.</strong> »</em></p>
+</blockquote>
+<p class="cal piege"> <strong>« Except row labels ».</strong> Les étiquettes <code>01</code>, <code>02</code> <strong>ne deviennent pas</strong> une variable numérique : ce sont des <code>row.names</code>, donc des chaînes. C'est ce qui préserve le zéro initial.</p>
+<p><strong>La forme sans étiquettes (§7.1) :</strong></p>
+<pre><code>Price    Floor    Area  Rooms   Age  Cent.heat
+52.00    111.0     830      5   6.2         no
+54.75    128.0     710      5   7.5         no
+57.50    101.0    1000      5   4.2         no
+57.50    131.0     690      6   8.8         no
+59.75     93.0     900      5   1.9        yes
+</code></pre>
+<pre><code class="language-r">HousePrice &lt;- read.table("houses.data", header = TRUE)
+</code></pre>
+<div class="cal formel"><span class="lab">Définition (§7.1).</span>
+<p> <em>« where <strong>the <code>header=TRUE</code> option specifies that the first line is a line of headings</strong>, and hence, <strong>by implication from the form of the file, that no explicit row labels are given</strong> »</em>.</p>
+</div>
+<p><strong>Les deux formes sont symétriques</strong>, et c'est le décompte des items qui les sépare :</p>
+<table>
+<thead>
+<tr>
+<th>Fichier</th>
+<th>Items ligne 1</th>
+<th>Items ligne 2</th>
+<th>Appel</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>avec</strong> étiquettes</td>
+<td>$p$</td>
+<td>$p+1$</td>
+<td><code>read.table("f")</code> — détection automatique</td>
+</tr>
+<tr>
+<td><strong>sans</strong> étiquettes</td>
+<td>$p$</td>
+<td>$p$</td>
+<td><code>read.table("f", header = TRUE)</code></td>
+</tr>
+</tbody></table>
+<p class="cal piege"> <strong>Le cas mortel est celui où l'on oublie <code>header = TRUE</code> sur un fichier sans étiquettes.</strong> Les items s'équilibrent, R ne présume rien, et <strong>la ligne de noms devient la première ligne de données</strong>. Toutes les colonnes passent alors en <strong>caractère</strong> (puisqu'elles contiennent un nom), et l'analyse échoue plus loin sur un message qui ne parle pas de lecture.</p>
+<h2 data-prio="high">Concept 2 — <code>scan()</code> : la voie primitive</h2>
+<blockquote>
+<p><strong>Cadrage (§7).</strong> <em>« There is also <strong>a more primitive input function, <code>scan()</code>, that can be called directly</strong>. »</em></p>
+</blockquote>
+<div class="cal methode"><span class="lab">Méthode (§7.2).</span>
+<p> <em>« Suppose the data vectors are <strong>of equal length and are to be read in parallel</strong>. Further suppose that there are <strong>three vectors, the first of mode character and the remaining two of mode numeric</strong>, and the file is <code>input.dat</code>. <strong>The first step is to use <code>scan()</code> to read in the three vectors as a list</strong> »</em> :</p>
+</div>
+<pre><code class="language-r">inp &lt;- scan("input.dat", list("", 0, 0))
+</code></pre>
+<div class="cal formel"><span class="lab">Définition — la liste fictive (§7.2).</span>
+<p> <em>« <strong>The second argument is a dummy list structure that establishes the mode of the three vectors to be read.</strong> The result, held in <code>inp</code>, is <strong>a list whose components are the three vectors read in</strong>. »</em></p>
+</div>
+<p><strong>C'est l'idée centrale du paragraphe.</strong> On ne dit pas à <code>scan()</code> <em>combien</em> de lignes lire, ni <em>quel</em> séparateur : on lui donne <strong>un exemplaire vide de ce qu'on attend</strong>. <code>""</code> annonce du caractère, <code>0</code> du numérique. La forme de l'argument <strong>est</strong> la spécification.</p>
+<p><strong>Récupérer les vecteurs (§7.2) :</strong></p>
+<pre><code class="language-r">label &lt;- inp[[1]]; x &lt;- inp[[2]]; y &lt;- inp[[3]]
+</code></pre>
+<p><em>« <strong>More conveniently, the dummy list can have named components</strong>, in which case the names can be used to access the vectors read in »</em> :</p>
+<pre><code class="language-r">inp &lt;- scan("input.dat", list(id = "", x = 0, y = 0))
+label &lt;- inp$id; x &lt;- inp$x; y &lt;- inp$y
+</code></pre>
+<p><em>« or <strong>the list may be attached at position 2 of the search path</strong> »</em> — l'usage direct de <code>attach()</code> sur une liste quelconque (§6.3.4, fiche 306).</p>
+<blockquote>
+<p><strong>Règle — le cas du vecteur unique (§7.2).</strong> <em>« <strong>If the second argument is a single value and not a list, a single vector is read in, all components of which must be of the same mode as the dummy value.</strong> »</em></p>
+</blockquote>
+<pre><code class="language-r">X &lt;- matrix(scan("light.dat", 0), ncol = 5, byrow = TRUE)
+</code></pre>
+<p><strong>Trois choses en une ligne</strong> : <code>scan("light.dat", 0)</code> lit <strong>un long vecteur numérique</strong> ; <code>matrix(..., ncol = 5)</code> lui pose un <code>dim</code> (fiche 305) ; <strong><code>byrow = TRUE</code></strong> dit que le fichier est écrit <strong>ligne par ligne</strong>, alors que R remplit <strong>en colonne-majeur</strong>. Sans lui, la matrice serait <strong>transposée et mélangée</strong>.</p>
+<p><em>« There are <strong>more elaborate input facilities</strong> available and these are detailed in the manuals. »</em></p>
+<details class="cor">
+<summary><strong>Exercice résolu — choisir entre <code>read.table()</code> et <code>scan()</code></strong></summary><div class="in">
+
+<p><strong>Énoncé.</strong> Trois fichiers à lire. Lequel des deux outils pour chacun, et avec quels arguments ?</p>
+<ol>
+<li><code>houses.data</code> — en-tête de 6 noms, 7 items par ligne de données.</li>
+<li><code>input.dat</code> — trois colonnes sans en-tête : un identifiant textuel, deux nombres.</li>
+<li><code>light.dat</code> — une longue suite de nombres, à lire comme une matrice à 5 colonnes.</li>
+</ol>
+<p><em>Étape 1 — cas 1, compter les items.</em> En-tête : 6. Données : 7. <strong>Un de moins</strong> sur la première ligne : <em>« this arrangement is <strong>presumed</strong> to be in force »</em>. La colonne supplémentaire est donc une colonne d'étiquettes.</p>
+<pre><code class="language-r">HousePrice &lt;- read.table("houses.data")
+</code></pre>
+<p><strong>Aucun argument nécessaire</strong> — c'est tout l'intérêt de la règle de détection.</p>
+<p><em>Étape 2 — vérifier ce qu'on a obtenu.</em> <code>Cent.heat</code> contient <code>no</code>/<code>yes</code> : <em>« <strong>non-numeric variables … as character variables</strong> »</em>. Pour en faire un facteur (fiche 304), il faudra une conversion explicite — le cours dit seulement <em>« this can be changed if necessary »</em>.</p>
+<p><em>Étape 3 — cas 2 : pas d'en-tête du tout.</em> <code>read.table()</code> <strong>suppose</strong> un en-tête ou des étiquettes ; ici il n'y a ni l'un ni l'autre. C'est le terrain de <code>scan()</code>, et il faut lui <strong>déclarer les modes</strong> :</p>
+<pre><code class="language-r">inp &lt;- scan("input.dat", list(id = "", x = 0, y = 0))
+</code></pre>
+<p><code>""</code> pour le caractère, <code>0</code> pour les deux numériques. Nommer la liste fictive rend l'accès lisible : <code>inp$id</code>, <code>inp$x</code>, <code>inp$y</code>.</p>
+<p><em>Étape 4 — pourquoi ne pas nommer par <code>[[ ]]</code>.</em> On <strong>peut</strong> : <code>inp[[1]]</code>, <code>inp[[2]]</code>, <code>inp[[3]]</code> (§7.2). Mais les noms <em>« can be used to access the vectors read in »</em> — et le cours qualifie cette voie de <strong>« more conveniently »</strong>. C'est aussi plus robuste : ajouter une colonne ne décale pas les indices.</p>
+<p><em>Étape 5 — cas 3 : un seul mode, une forme matricielle.</em> Le deuxième argument devient <strong>une valeur unique</strong> : <em>« a single vector is read in, all components of which <strong>must be of the same mode as the dummy value</strong> »</em>.</p>
+<pre><code class="language-r">X &lt;- matrix(scan("light.dat", 0), ncol = 5, byrow = TRUE)
+</code></pre>
+<p><em>Étape 6 — pourquoi <code>byrow = TRUE</code> est obligatoire ici.</em> <code>scan()</code> rend les nombres <strong>dans l'ordre du fichier</strong>, c'est-à-dire ligne par ligne. <code>matrix()</code> remplit <strong>en colonne-majeur</strong> (fiche 305). Sans <code>byrow = TRUE</code>, la première colonne de <code>X</code> recevrait les cinq premiers nombres <strong>du fichier</strong>, qui en sont la première <strong>ligne</strong>. Le résultat aurait la bonne dimension et serait <strong>entièrement faux</strong>.</p>
+<p><em>Étape 7 — la règle de choix.</em> <strong>Un data frame</strong> → <code>read.table()</code>. <strong>Des vecteurs parallèles de modes différents</strong> → <code>scan()</code> avec une liste fictive nommée. <strong>Un bloc homogène</strong> → <code>scan()</code> avec une valeur unique, plus une mise en forme. Et dans le doute, le cours a une préférence : <em>« <strong>If variables are to be held mainly in data frames, as we strongly suggest they should be</strong>, an entire data frame can be read directly with <code>read.table()</code>. »</em></p>
+</div></details>
+
+<h2 data-prio="mid">Concept 3 — Les jeux de données intégrés</h2>
+<blockquote>
+<p><strong>Règle (§7.3).</strong> *« <strong>Around 100 datasets are supplied with R (in package <code>datasets</code>)</strong>, and others are available in packages (<strong>including the recommended packages supplied with R</strong>). To see the list of datasets currently available use <code>data()</code>. »*</p>
+<p><em>« <strong>All the datasets supplied with R are available directly by name.</strong> However, <strong>many packages still use the obsolete convention in which <code>data</code> was also used to load datasets into R</strong> »</em> — comme <code>data(infert)</code>, <em>« and this can still be used with the standard packages »</em>.</p>
+<p class="cal piege"> <em>« In most cases this will <strong>load an R object of the same name</strong>. However, <strong>in a few cases it loads several objects</strong>, so <strong>see the on-line help for the object to see what to expect</strong>. »</em></p>
+</blockquote>
+<p><strong>Ce qu'il faut en retenir.</strong> <code>data(infert)</code> n'est plus nécessaire — les jeux du paquet <code>datasets</code> <strong>sont directement disponibles par leur nom</strong>. La forme <code>data(...)</code> reste utile pour les paquets qui n'ont pas migré, et <strong>elle peut charger plusieurs objets d'un coup</strong> : l'aide de l'objet dit lesquels.</p>
+<div class="cal methode"><span class="lab">Méthode (§7.3.1).</span>
+<p> <em>« To access data from a particular package, <strong>use the <code>package</code> argument</strong> »</em> :</p>
+</div>
+<pre><code class="language-r">data(package = "rpart")                 # LISTER les jeux de rpart
+data(Puromycin, package = "datasets")   # CHARGER un jeu precis
+</code></pre>
+<p><em>« <strong>If a package has been attached by <code>library</code>, its datasets are automatically included in the search.</strong> »</em> — cohérent avec le chemin de recherche de la fiche 306 : <code>library()</code> place le paquet <strong>sur le chemin</strong>, et ses données avec.</p>
+<p><em>« <strong>User-contributed packages can be a rich source of datasets.</strong> »</em></p>
+<h2 data-prio="low">Concept 4 — Éditer</h2>
+<div class="cal formel"><span class="lab">Définition (§7.4).</span>
+<p> <em>« When invoked on <strong>a data frame or matrix</strong>, <strong><code>edit</code> brings up a separate spreadsheet-like environment for editing</strong>. This is useful for <strong>making small changes once a data set has been read</strong>. »</em></p>
+</div>
+<pre><code class="language-r">xnew &lt;- edit(xold)          # edite xold, RANGE LE RESULTAT DANS xnew
+fix(xold)                   # « equivalent to xold &lt;- edit(xold) »
+xnew &lt;- edit(data.frame())  # saisir de NOUVELLES donnees
+</code></pre>
+<blockquote>
+<p class="cal piege"> <strong>La subtilité de <code>edit()</code> (§7.4).</strong> <em>« The command <code>xnew &lt;- edit(xold)</code> will allow you to edit your data set <code>xold</code>, and <strong>on completion the changed object is assigned to <code>xnew</code></strong> »</em>. <strong><code>xold</code> n'est pas modifié</strong> — c'est la sémantique de copie de R (fiche 302), une fois de plus.</p>
+<p><em>« <strong>If you want to alter the original dataset <code>xold</code>, the simplest way is to use <code>fix(xold)</code>, which is equivalent to <code>xold &lt;- edit(xold)</code>.</strong> »</em></p>
+</blockquote>
+<p><strong>Et l'usage de saisie à froid</strong> : <em>« Use <code>xnew &lt;- edit(data.frame())</code> <strong>to enter new data via the spreadsheet interface</strong>. »</em> — <code>data.frame()</code> sans argument crée un data frame <strong>vide</strong>, que l'éditeur remplit.</p>
+<p class="cal piege"> <strong>Ce chemin est réservé aux petites retouches.</strong> Le cours le dit : <em>« useful for <strong>making small changes once a data set has been read</strong> »</em>. Une modification faite à la souris <strong>ne laisse aucune trace reproductible</strong> — elle ne figure ni dans un script, ni dans <code>.Rhistory</code> de façon exploitable. Tout ce qui doit être refait doit être <strong>écrit</strong>.</p>
+<h2>Comment reconnaître le type d'exercice</h2>
+<table>
+<thead>
+<tr>
+<th>Le signal dans l'énoncé</th>
+<th>Ce qu'il faut mobiliser</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>« lire un tableau de données »</td>
+<td><strong><code>read.table()</code></strong> — la voie normale</td>
+</tr>
+<tr>
+<td>« la première ligne contient les noms »</td>
+<td>compter les items ; sinon <strong><code>header = TRUE</code></strong></td>
+</tr>
+<tr>
+<td>« il y a une colonne d'identifiants en tête de ligne »</td>
+<td><strong>étiquettes de ligne</strong> — détection automatique</td>
+</tr>
+<tr>
+<td>« mes colonnes sont toutes du texte »</td>
+<td><code>header = TRUE</code> <strong>oublié</strong> : la ligne de noms est passée en données</td>
+</tr>
+<tr>
+<td>« ma variable <code>oui/non</code> n'est pas un facteur »</td>
+<td><em>« non-numeric … <strong>as character variables</strong> »</em> — à convertir</td>
+</tr>
+<tr>
+<td>« des vecteurs parallèles de modes différents »</td>
+<td><strong><code>scan()</code></strong> avec une <strong>liste fictive</strong></td>
+</tr>
+<tr>
+<td>« comment <code>scan</code> connaît-il les types ? »</td>
+<td>par <strong>la liste fictive</strong> — <code>""</code> caractère, <code>0</code> numérique</td>
+</tr>
+<tr>
+<td>« je veux accéder aux vecteurs par leur nom »</td>
+<td><strong>nommer la liste fictive</strong></td>
+</tr>
+<tr>
+<td>« un bloc de nombres à mettre en matrice »</td>
+<td><code>matrix(scan(f, 0), ncol = k, **byrow = TRUE**)</code></td>
+</tr>
+<tr>
+<td>« ma matrice est mélangée »</td>
+<td><strong><code>byrow = TRUE</code></strong> manquant — R remplit en colonne</td>
+</tr>
+<tr>
+<td>« quels jeux de données ai-je ? »</td>
+<td><strong><code>data()</code></strong></td>
+</tr>
+<tr>
+<td>« un jeu d'un paquet précis »</td>
+<td><strong><code>data(nom, package = "…")</code></strong></td>
+</tr>
+<tr>
+<td>« corriger deux valeurs à la main »</td>
+<td><strong><code>fix(x)</code></strong> — et non <code>edit(x)</code> seul</td>
+</tr>
+<tr>
+<td>« saisir un petit jeu de zéro »</td>
+<td><strong><code>edit(data.frame())</code></strong></td>
+</tr>
+<tr>
+<td>« mon fichier est mal formé »</td>
+<td>le nettoyer <strong>avant</strong> — R est <em>« rather inflexible »</em></td>
+</tr>
+</tbody></table>
+<h2>Comment résoudre ce type d'exercice</h2>
+<p><strong>Protocole « lire un fichier de données » — 5 étapes.</strong></p>
+<ol>
+<li><strong>Regarder le fichier</strong> — <code>file.show()</code> ou un éditeur. Compter les items de la première et de la deuxième ligne.</li>
+<li><strong>Choisir la forme</strong> : un de moins sur la première → <code>read.table(f)</code> ; autant → <code>read.table(f, header = TRUE)</code>.</li>
+<li><strong>Vérifier immédiatement</strong> ce qui a été lu : <code>str()</code>, <code>names()</code>, <code>nrow()</code>, et surtout <strong>le mode de chaque colonne</strong>.</li>
+<li><strong>Convertir ce qui doit l'être</strong> — les variables catégorielles en facteurs (fiche 304), avec l'ordre de niveaux voulu.</li>
+<li>Si le fichier résiste, <strong>le corriger hors de R</strong> plutôt que de chercher l'argument magique.</li>
+</ol>
+<p><strong>Protocole « <code>scan()</code> proprement » — 4 étapes.</strong></p>
+<ol>
+<li>Déterminer <strong>combien de vecteurs</strong> et <strong>de quels modes</strong>.</li>
+<li>Écrire <strong>la liste fictive nommée</strong> : <code>list(id = "", x = 0, y = 0)</code>.</li>
+<li>Récupérer par <code>inp$nom</code> — ou <strong>attacher la liste</strong> en position 2.</li>
+<li>Si un seul mode : deuxième argument <strong>scalaire</strong>, puis mise en forme (<code>matrix</code>, <code>dim</code>) <strong>sans oublier <code>byrow</code></strong>.</li>
+</ol>
+<h2 data-prio="must">Common mistakes</h2>
+<table>
+<thead>
+<tr>
+<th>Erreur</th>
+<th>Correction</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Oublier <code>header = TRUE</code> sur un fichier sans étiquettes</td>
+<td>la ligne de noms devient <strong>une ligne de données</strong></td>
+</tr>
+<tr>
+<td>Ajouter <code>header = TRUE</code> sur un fichier <strong>avec</strong> étiquettes</td>
+<td>la détection automatique suffisait ; on décale tout</td>
+</tr>
+<tr>
+<td>Croire que R devine n'importe quel format</td>
+<td><em>« <strong>fairly strict and even rather inflexible</strong> »</em></td>
+</tr>
+<tr>
+<td>Attendre un facteur d'une colonne <code>oui/non</code></td>
+<td>elle est lue <strong>en caractère</strong></td>
+</tr>
+<tr>
+<td>Croire les étiquettes de ligne lues comme une variable</td>
+<td><em>« <strong>except row labels</strong> »</em> — ce sont des <code>row.names</code></td>
+</tr>
+<tr>
+<td>Utiliser <code>read.table()</code> sur un fichier sans en-tête ni étiquettes</td>
+<td>c'est le terrain de <strong><code>scan()</code></strong></td>
+</tr>
+<tr>
+<td>Croire que <code>scan()</code> devine les modes</td>
+<td>c'est <strong>la liste fictive</strong> qui les fixe</td>
+</tr>
+<tr>
+<td>Mélanger les modes dans un <code>scan()</code> à valeur unique</td>
+<td><em>« <strong>all components … must be of the same mode</strong> »</em></td>
+</tr>
+<tr>
+<td>Oublier <code>byrow = TRUE</code> après un <code>scan()</code></td>
+<td>R remplit <strong>en colonne-majeur</strong> → matrice fausse</td>
+</tr>
+<tr>
+<td>Croire <code>data(x)</code> nécessaire</td>
+<td>les jeux de <code>datasets</code> sont <strong>directement disponibles</strong></td>
+</tr>
+<tr>
+<td>Croire que <code>data()</code> charge toujours un seul objet</td>
+<td><em>« <strong>in a few cases it loads several objects</strong> »</em></td>
+</tr>
+<tr>
+<td>Croire que <code>edit(x)</code> modifie <code>x</code></td>
+<td>il <strong>assigne le résultat</strong> — utiliser <strong><code>fix(x)</code></strong></td>
+</tr>
+<tr>
+<td>Corriger des données à la souris dans un travail sérieux</td>
+<td><strong>aucune trace reproductible</strong></td>
+</tr>
+</tbody></table>
+<h2>Ultimate Review</h2>
+<p><strong>La philosophie.</strong> <em>« R input facilities are <strong>simple</strong> and their requirements are <strong>fairly strict and even rather inflexible</strong>. There is a clear presumption … that <strong>you will be able to modify your input files using other tools</strong> »</em> — éditeur, <code>sed</code>, <code>awk</code>, Perl. Renvoi au manuel <strong>R Data Import/Export</strong>.</p>
+<p><strong>Deux outils.</strong> <strong><code>read.table()</code></strong> lit <strong>un data frame entier</strong> — <em>« if variables are to be held mainly in data frames, <strong>as we strongly suggest they should be</strong> »</em>. <strong><code>scan()</code></strong> est <em>« <strong>a more primitive input function</strong> »</em>.</p>
+<p><strong>La forme du fichier.</strong> (1) <em>« The first line of the file <strong>should have a name for each variable</strong> »</em> ; (2) <em>« Each additional line has <strong>as its first item a row label</strong> and the values »</em>.  <strong>La règle de détection</strong> : <em>« <strong>If the file has one fewer item in its first line than in its second, this arrangement is presumed to be in force.</strong> »</em></p>
+<p><strong>Sans étiquettes de ligne</strong> : <strong><code>header = TRUE</code></strong>, qui <em>« specifies that the first line is a line of headings, and hence, <strong>by implication from the form of the file, that no explicit row labels are given</strong> »</em>.</p>
+<p><strong>Types par défaut.</strong> <em>« <strong>numeric items (except row labels) are read as numeric variables</strong> and <strong>non-numeric variables … as character variables</strong>. <strong>This can be changed if necessary.</strong> »</em></p>
+<p><strong><code>scan()</code>.</strong> Deuxième argument = <strong>une liste fictive</strong> <em>« that <strong>establishes the mode</strong> of the … vectors to be read »</em> — <code>""</code> caractère, <code>0</code> numérique · résultat : <strong>une liste</strong> dont les composantes sont les vecteurs · nommer la liste fictive est <strong>« more conveniently »</strong> · la liste peut être <strong>attachée en position 2</strong> ·  <strong>valeur unique au lieu d'une liste</strong> → <em>« a single vector … <strong>all components of which must be of the same mode as the dummy value</strong> »</em> · <code>X &lt;- matrix(scan("light.dat", 0), ncol = 5, **byrow = TRUE**)</code>.</p>
+<p><strong>Jeux intégrés.</strong> <strong>~100</strong> dans le paquet <strong><code>datasets</code></strong>, d'autres dans les paquets recommandés · <strong><code>data()</code></strong> les liste · <em>« <strong>All the datasets supplied with R are available directly by name</strong> »</em> · <code>data(infert)</code> est <strong>la convention obsolète</strong>, encore acceptée ·  <em>« <strong>in a few cases it loads several objects</strong> »</em> · <strong><code>data(package = "rpart")</code></strong> liste, <strong><code>data(Puromycin, package = "datasets")</code></strong> charge · *« If a package has been attached by <strong><code>library</code></strong>, <strong>its datasets are automatically included in the search</strong> »*.</p>
+<p><strong>Éditer.</strong> <strong><code>edit(x)</code></strong> ouvre un tableur — <em>« for <strong>making small changes once a data set has been read</strong> »</em> — et <strong>assigne le résultat</strong> : <code>xnew &lt;- edit(xold)</code> <strong>laisse <code>xold</code> intact</strong> · <strong><code>fix(xold)</code></strong> <em>« is equivalent to <code>xold &lt;- edit(xold)</code> »</em> · <strong><code>edit(data.frame())</code></strong> pour saisir de zéro.</p>
+<div class="rec"><h2>Active Recall</h2><details class="cor">
+<summary>Quelle est la règle qui permet à R de savoir qu'un fichier contient des étiquettes de ligne ?</summary><div class="in">
+
+<p><em>« <strong>If the file has one fewer item in its first line than in its second, this arrangement is presumed to be in force.</strong> »</em> (§7.1)</p>
+<p>R <strong>compte les items</strong>. Si l'en-tête en a <strong>un de moins</strong> que la première ligne de données, la colonne supplémentaire est prise pour <strong>une colonne d'étiquettes de ligne</strong> — sans qu'aucun argument n'ait été donné.</p>
+<p>C'est pourquoi <code>read.table("houses.data")</code> suffit sur le premier exemple du cours (6 noms, 7 items), tandis que le second (6 noms, 6 items) exige <strong><code>header = TRUE</code></strong>.</p>
+</div></details><details class="cor">
+<summary>Que se passe-t-il si l'on oublie <code>header = TRUE</code> sur un fichier sans étiquettes de ligne ?</summary><div class="in">
+
+<p>Les items s'équilibrent — autant sur la première ligne que sur les suivantes — donc <strong>la règle de détection ne s'applique pas</strong> et R ne présume rien. <strong>La ligne de noms est lue comme une ligne de données.</strong></p>
+<p>Conséquence : chaque colonne contient désormais un nom de variable parmi ses valeurs, donc <strong>toutes les colonnes deviennent des caractères</strong> (<em>« non-numeric variables … as character variables »</em>). Aucune erreur n'est levée à la lecture ; la panne survient plus loin, sur une opération arithmétique, avec un message sans rapport avec la lecture.</p>
+<p><strong>Le réflexe</strong> : après tout <code>read.table()</code>, vérifier <code>str()</code> — le mode de chaque colonne.</p>
+</div></details><details class="cor">
+<summary>Comment <code>scan()</code> sait-il de quels modes sont les vecteurs à lire ?</summary><div class="in">
+
+<p>Par <strong>la liste fictive</strong> passée en deuxième argument :</p>
+<pre><code class="language-r">inp &lt;- scan("input.dat", list("", 0, 0))
+</code></pre>
+<p><em>« <strong>The second argument is a dummy list structure that establishes the mode of the three vectors to be read.</strong> The result … is <strong>a list whose components are the three vectors read in</strong>. »</em> (§7.2)</p>
+<p><code>""</code> annonce du <strong>caractère</strong>, <code>0</code> du <strong>numérique</strong>. On ne décrit pas le format, <strong>on donne un exemplaire vide de ce qu'on attend</strong>.</p>
+<p>Et <em>« <strong>more conveniently, the dummy list can have named components</strong> »</em> : <code>list(id = "", x = 0, y = 0)</code> permet <code>inp$id</code>, <code>inp$x</code>, <code>inp$y</code>.</p>
+</div></details><details class="cor">
+<summary>Que fait <code>scan()</code> si le deuxième argument n'est pas une liste ?</summary><div class="in">
+
+<p><em>« <strong>If the second argument is a single value and not a list, a single vector is read in, all components of which must be of the same mode as the dummy value.</strong> »</em> (§7.2)</p>
+<p>C'est la voie du bloc homogène :</p>
+<pre><code class="language-r">X &lt;- matrix(scan("light.dat", 0), ncol = 5, byrow = TRUE)
+</code></pre>
+<p class="cal piege"> <strong><code>byrow = TRUE</code> n'est pas décoratif.</strong> <code>scan()</code> rend les nombres <strong>dans l'ordre du fichier</strong> — ligne par ligne — alors que <code>matrix()</code> remplit <strong>en colonne-majeur</strong> (fiche 305). Sans lui, la première colonne recevrait la première <strong>ligne</strong> du fichier : dimension correcte, contenu entièrement faux.</p>
+</div></details><details class="cor">
+<summary>Quelles sont les trois façons de récupérer les vecteurs lus par <code>scan()</code> ?</summary><div class="in">
+
+<ol>
+<li><strong>Par numéro</strong> : <code>label &lt;- inp[[1]]; x &lt;- inp[[2]]; y &lt;- inp[[3]]</code>.</li>
+<li><strong>Par nom</strong>, si la liste fictive est nommée : <code>label &lt;- inp$id; x &lt;- inp$x; y &lt;- inp$y</code> — <em>« more conveniently »</em>.</li>
+<li><strong>En attachant la liste</strong> : <em>« the list may be <strong>attached at position 2 of the search path</strong> »</em> (§7.2), ce qui rend <code>id</code>, <code>x</code>, <code>y</code> visibles directement (fiche 306, §6.3.4 — <code>attach()</code> accepte <em>« any object of mode "list" »</em>).</li>
+</ol>
+<p>La deuxième est la plus robuste : ajouter une colonne ne décale pas les indices.</p>
+</div></details><details class="cor">
+<summary>Comment accède-t-on aux jeux de données fournis avec R ?</summary><div class="in">
+
+<p>*« <strong>Around 100 datasets are supplied with R (in package <code>datasets</code>)</strong> … To see the list of datasets currently available use <strong><code>data()</code></strong>. »* (§7.3)</p>
+<p><em>« <strong>All the datasets supplied with R are available directly by name.</strong> However, <strong>many packages still use the obsolete convention in which <code>data</code> was also used to load datasets</strong> »</em> — <code>data(infert)</code> fonctionne encore avec les paquets standard.</p>
+<p class="cal piege"> <em>« In most cases this will load <strong>an R object of the same name</strong>. However, <strong>in a few cases it loads several objects</strong>, so <strong>see the on-line help</strong> »</em>.</p>
+<p>Pour un paquet précis (§7.3.1) : <code>data(package = "rpart")</code> <strong>liste</strong>, <code>data(Puromycin, package = "datasets")</code> <strong>charge</strong>. Et *« if a package has been attached by <strong><code>library</code></strong>, <strong>its datasets are automatically included in the search</strong> »*.</p>
+</div></details><details class="cor">
+<summary>Quelle est la différence entre <code>edit(x)</code> et <code>fix(x)</code> ?</summary><div class="in">
+
+<p>*« The command <code>xnew &lt;- edit(xold)</code> will allow you to edit your data set <code>xold</code>, and <strong>on completion the changed object is assigned to <code>xnew</code></strong> — <strong>if you want to alter the original dataset <code>xold</code>, the simplest way is to use <code>fix(xold)</code>, which is equivalent to <code>xold &lt;- edit(xold)</code></strong>. »* (§7.4)</p>
+<p><strong><code>edit()</code> rend un objet ; il ne modifie rien</strong> — c'est la sémantique de copie de R (fiche 302). <strong><code>fix()</code> est exactement l'aller-retour</strong> : éditer, puis réassigner au même nom.</p>
+<p>Et <code>edit(data.frame())</code> — un data frame <strong>vide</strong> — sert <em>« <strong>to enter new data via the spreadsheet interface</strong> »</em>.</p>
+<p class="cal piege"> <em>« useful for <strong>making small changes</strong> »</em> : une correction à la souris <strong>ne laisse aucune trace reproductible</strong>.</p>
+</div></details><details class="cor">
+<summary>Pourquoi le cours dit-il que les facilités d'entrée de R sont « rather inflexible » ? Est-ce un défaut ?</summary><div class="in">
+
+<p><em>« <strong>R input facilities are simple and their requirements are fairly strict and even rather inflexible.</strong> There is <strong>a clear presumption by the designers of R that you will be able to modify your input files using other tools, such as file editors or Perl, to fit in with the requirements of R.</strong> Generally this is very simple. »</em> (§7)</p>
+<p>C'est <strong>un choix de conception explicite</strong>, pas une lacune : R ne cherche pas à deviner un fichier mal formé, parce que deviner produit des lectures <strong>silencieusement fausses</strong>. Le nettoyage revient à l'outil qui sait le faire — un éditeur, <code>sed</code> ou <code>awk</code> sous UNIX (note 1), Perl.</p>
+<p>Le corollaire pratique : devant un fichier récalcitrant, <strong>corriger le fichier</strong> plutôt que de chercher l'argument qui fera plier <code>read.table()</code>.</p>
+</div></details></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h2>Flashcards</h2>
+<table>
+<thead>
+<tr>
+<th>Question</th>
+<th>Réponse</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Comment R qualifie-t-il ses facilités d'entrée ?</td>
+<td><em>« simples … <strong>strictes et même plutôt inflexibles</strong> »</em></td>
+</tr>
+<tr>
+<td>Que présument ses concepteurs ?</td>
+<td>Que vous <strong>nettoierez le fichier avec d'autres outils</strong></td>
+</tr>
+<tr>
+<td>Deux utilitaires cités sous UNIX ?</td>
+<td><strong><code>sed</code></strong> et <strong><code>awk</code></strong></td>
+</tr>
+<tr>
+<td>Quel manuel pour aller plus loin ?</td>
+<td><strong>R Data Import/Export</strong></td>
+</tr>
+<tr>
+<td>La fonction pour lire un data frame entier ?</td>
+<td><strong><code>read.table()</code></strong></td>
+</tr>
+<tr>
+<td>La fonction plus primitive ?</td>
+<td><strong><code>scan()</code></strong></td>
+</tr>
+<tr>
+<td>Que doit contenir la première ligne du fichier ?</td>
+<td><strong>Un nom par variable</strong></td>
+</tr>
+<tr>
+<td>Et les lignes suivantes ?</td>
+<td>Une <strong>étiquette de ligne</strong> puis les valeurs</td>
+</tr>
+<tr>
+<td>La règle de détection des étiquettes ?</td>
+<td><strong>Un item de moins</strong> sur la première ligne</td>
+</tr>
+<tr>
+<td>L'option quand il n'y a pas d'étiquettes ?</td>
+<td><strong><code>header = TRUE</code></strong></td>
+</tr>
+<tr>
+<td>Que déduit R de <code>header = TRUE</code> ?</td>
+<td>Qu'<strong>aucune étiquette de ligne</strong> n'est donnée</td>
+</tr>
+<tr>
+<td>Comment sont lus les items numériques ?</td>
+<td>En <strong>variables numériques</strong></td>
+</tr>
+<tr>
+<td>Sauf lesquels ?</td>
+<td>Les <strong>étiquettes de ligne</strong></td>
+</tr>
+<tr>
+<td>Comment sont lus les items non numériques ?</td>
+<td>En <strong>variables caractères</strong></td>
+</tr>
+<tr>
+<td>Peut-on changer ce comportement ?</td>
+<td><em>« <strong>This can be changed if necessary</strong> »</em></td>
+</tr>
+<tr>
+<td>Quel est le 2ᵉ argument de <code>scan()</code> ?</td>
+<td>Une <strong>liste fictive</strong></td>
+</tr>
+<tr>
+<td>Que fixe-t-elle ?</td>
+<td><strong>Le mode</strong> des vecteurs à lire</td>
+</tr>
+<tr>
+<td>Que signifie <code>""</code> dans la liste fictive ?</td>
+<td>Du <strong>caractère</strong></td>
+</tr>
+<tr>
+<td>Et <code>0</code> ?</td>
+<td>Du <strong>numérique</strong></td>
+</tr>
+<tr>
+<td>Que rend <code>scan()</code> avec une liste ?</td>
+<td><strong>Une liste</strong> de vecteurs</td>
+</tr>
+<tr>
+<td>Comment y accéder par numéro ?</td>
+<td><strong><code>inp[[1]]</code></strong>, <code>inp[[2]]</code>…</td>
+</tr>
+<tr>
+<td>Comment rendre l'accès plus commode ?</td>
+<td><strong>Nommer</strong> la liste fictive</td>
+</tr>
+<tr>
+<td>Troisième voie d'accès ?</td>
+<td><strong>Attacher</strong> la liste en position 2</td>
+</tr>
+<tr>
+<td>Si le 2ᵉ argument est une valeur unique ?</td>
+<td><strong>Un seul vecteur</strong>, tout du <strong>même mode</strong></td>
+</tr>
+<tr>
+<td>Lire une matrice de 5 colonnes ?</td>
+<td><code>matrix(scan(f, 0), ncol = 5, byrow = TRUE)</code></td>
+</tr>
+<tr>
+<td>Pourquoi <code>byrow = TRUE</code> ?</td>
+<td><code>scan</code> lit <strong>par ligne</strong>, <code>matrix</code> remplit <strong>par colonne</strong></td>
+</tr>
+<tr>
+<td>Combien de jeux fournis avec R ?</td>
+<td><strong>Environ 100</strong></td>
+</tr>
+<tr>
+<td>Dans quel paquet ?</td>
+<td><strong><code>datasets</code></strong></td>
+</tr>
+<tr>
+<td>Comment les lister ?</td>
+<td><strong><code>data()</code></strong></td>
+</tr>
+<tr>
+<td>Sont-ils disponibles par leur nom ?</td>
+<td><strong>Oui, directement</strong></td>
+</tr>
+<tr>
+<td>Que vaut alors <code>data(infert)</code> ?</td>
+<td>La <strong>convention obsolète</strong>, encore acceptée</td>
+</tr>
+<tr>
+<td>Combien d'objets <code>data()</code> charge-t-il ?</td>
+<td>Un, <strong>mais parfois plusieurs</strong></td>
+</tr>
+<tr>
+<td>Lister les jeux d'un paquet ?</td>
+<td><strong><code>data(package = "rpart")</code></strong></td>
+</tr>
+<tr>
+<td>Charger un jeu précis ?</td>
+<td><code>data(Puromycin, package = "datasets")</code></td>
+</tr>
+<tr>
+<td>Après un <code>library()</code> ?</td>
+<td>Les jeux du paquet sont <strong>automatiquement dans la recherche</strong></td>
+</tr>
+<tr>
+<td>Que fait <code>edit()</code> sur un data frame ?</td>
+<td>Ouvre un <strong>environnement de type tableur</strong></td>
+</tr>
+<tr>
+<td>À quoi est-ce destiné ?</td>
+<td>Des <strong>petites corrections</strong> après lecture</td>
+</tr>
+<tr>
+<td><code>xnew &lt;- edit(xold)</code> modifie-t-il <code>xold</code> ?</td>
+<td><strong>Non</strong></td>
+</tr>
+<tr>
+<td>Comment modifier l'original ?</td>
+<td><strong><code>fix(xold)</code></strong></td>
+</tr>
+<tr>
+<td>À quoi <code>fix(x)</code> équivaut-il ?</td>
+<td><strong><code>x &lt;- edit(x)</code></strong></td>
+</tr>
+<tr>
+<td>Saisir des données de zéro ?</td>
+<td><strong><code>edit(data.frame())</code></strong></td>
+</tr>
+<tr>
+<td>Le principal reproche à l'édition manuelle ?</td>
+<td><strong>Aucune trace reproductible</strong></td>
+</tr>
+</tbody></table>
+</main>
+
+
+
+
+</body></html>

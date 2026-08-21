@@ -1,0 +1,1399 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fiche 316 — Calcul sur le langage : quote, substitute, eval, match.call</title>
+<script>
+window.MathJax={tex:{inlineMath:[["$","$"]],displayMath:[["$$","$$"]],processEscapes:true},
+ options:{skipHtmlTags:["script","noscript","style","textarea","pre","code"]},
+ svg:{fontCache:"global"},
+ startup:{pageReady:()=>MathJax.startup.defaultPageReady().then(()=>{document.body.classList.add("ready")})}};
+setTimeout(function(){document.body.classList.add("ready")},2500);
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+/* ============================================================
+   MathiasLearn — feuille de style des fiches
+   Reprise intégrale des tokens de 00_PARCOURS/*.html
+   + blocs pédagogiques (callouts, méthode, essentiels, recall)
+   ============================================================ */
+:root{--bg:#faf9f7;--card:#fff;--ink:#1a1a1a;--muted:#6b6b6b;--line:#e5e2dd;--accent:#8b5e34;
+ --hl:#fdf8ef;--ok:#2d7d4f;--okbg:#f0f7f3;--warn:#b3402f;--warnbg:#fdf3f1;--blue:#2f5d8b;--bluebg:#f1f5fa}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+ font:17px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;padding:0 16px 100px}
+.nav{position:sticky;top:0;background:rgba(250,249,247,.96);backdrop-filter:blur(8px);
+ border-bottom:1px solid var(--line);margin:0 -16px 30px;padding:11px 16px;z-index:50;
+ display:flex;gap:6px;flex-wrap:wrap;font-size:13px}
+.nav a{color:var(--muted);text-decoration:none;padding:4px 9px;border-radius:5px;white-space:nowrap}
+.nav a:hover{background:var(--line);color:var(--ink)}
+.nav a.on{background:var(--accent);color:#fff}
+main{max-width:780px;margin:0 auto}
+h1{font-size:31px;letter-spacing:-.02em;margin:.4em 0 .5em;line-height:1.25}
+h2{font-size:23px;margin:2.2em 0 .7em;padding-bottom:.3em;border-bottom:1px solid var(--line)}
+h3{font-size:19px;margin:1.9em 0 .5em;color:var(--accent)}
+h4{font-size:17px;margin:1.5em 0 .4em}
+p{margin:.8em 0} a{color:var(--accent)} hr{border:0;border-top:1px solid var(--line);margin:2.6em 0}
+table{border-collapse:collapse;width:100%;margin:1.3em 0;font-size:15.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+th{background:#f3f0eb;font-weight:600}
+tr:nth-child(even) td{background:#fcfbfa}
+code{font-family:"SF Mono",Menlo,Consolas,monospace;font-size:.88em;background:#f2efea;padding:2px 6px;border-radius:4px;overflow-wrap:break-word}
+pre{background:#f2efea;padding:14px 16px;border-radius:8px;overflow-x:auto}
+pre code{background:none;padding:0;white-space:pre}
+blockquote{border-left:3px solid var(--accent);background:var(--hl);margin:1.4em 0;padding:14px 20px;border-radius:0 8px 8px 0}
+blockquote p:first-child{margin-top:0} blockquote p:last-child{margin-bottom:0}
+ul,ol{padding-left:1.5em} li{margin:.35em 0} em{color:#4a4a4a}
+mjx-container[display="true"]{margin:1.1em 0!important;overflow-x:auto;overflow-y:hidden;padding:2px 0}
+mjx-container svg{max-width:100%}
+body:not(.ready) main{opacity:0} main{opacity:1;transition:opacity .25s}
+
+/* --- bandeau de tête de fiche --- */
+.cours{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--accent);
+ border-radius:0 10px 10px 0;padding:18px 22px;margin:0 0 34px}
+.cours h4{margin:0 0 4px;font-size:14px;text-transform:uppercase;letter-spacing:.07em;color:var(--accent)}
+.cours .cs{color:var(--muted);font-size:14.5px;margin:0 0 14px}
+
+/* --- exercices / corrigés --- */
+.ex{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:6px 24px 20px;margin:18px 0}
+.ex>h3:first-child{margin-top:14px}
+details.cor{margin-top:18px;border:1px solid var(--line);border-radius:8px;background:#fcfbfa;overflow:hidden}
+details.cor>summary{cursor:pointer;padding:12px 16px;font-weight:600;font-size:15px;color:var(--accent);
+ list-style:none;display:flex;align-items:center;gap:9px;user-select:none;transition:.15s;min-height:44px}
+details.cor>summary::-webkit-details-marker{display:none}
+details.cor>summary:hover{background:var(--hl)}
+details.cor>summary::before{content:"\25B6";font-size:10px;transition:transform .18s;display:inline-block}
+details.cor[open]>summary::before{transform:rotate(90deg)}
+details.cor[open]>summary{background:var(--okbg);color:var(--ok);border-bottom:1px solid var(--line)}
+.cor .in{padding:4px 20px 16px}
+.cor .in>*:first-child{margin-top:.9em}
+
+/* --- blocs pédagogiques (callouts) ---
+   Générés depuis une citation Markdown dont le premier **gras** commence
+   par un mot-clé : DÉFINITION, THÉORÈME, MÉTHODE, PIÈGE, INTUITION… */
+.cal{border:1px solid var(--line);border-left:4px solid var(--accent);background:var(--card);
+ border-radius:0 10px 10px 0;padding:15px 20px;margin:1.5em 0}
+.cal>p:first-child{margin-top:0}.cal>p:last-child,.cal>ul:last-child,.cal>ol:last-child{margin-bottom:0}
+.cal .lab{display:block;font-size:12.5px;text-transform:uppercase;letter-spacing:.08em;
+ font-weight:700;color:var(--accent);margin-bottom:6px}
+.cal.formel{background:var(--hl)}
+.cal.piege{border-left-color:var(--warn);background:var(--warnbg)}
+.cal.piege .lab{color:var(--warn)}
+.cal.methode{border-left-color:var(--ok);background:var(--okbg)}
+.cal.methode .lab{color:var(--ok)}
+.cal.intu{border-left-color:var(--blue);background:var(--bluebg)}
+.cal.intu .lab{color:var(--blue)}
+.cal.plus{border-left-style:dashed;background:#faf9f7}
+.cal.plus .lab{color:var(--muted)}
+
+/* --- révision express --- */
+.ess{background:var(--card);border:1px solid var(--accent);border-radius:10px;padding:4px 24px 20px;margin:1.6em 0}
+.ess h3{margin-top:1.3em}
+.rec{background:var(--card);border:1px dashed var(--accent);border-radius:10px;padding:4px 24px 18px;margin:1.6em 0}
+.rec ol{counter-reset:none}
+
+/* --- impression / PDF --- */
+@media print{
+ .nav{display:none}
+ body{padding:0;background:#fff;font-size:11.2pt;line-height:1.55}
+ main{max-width:none}
+ h1{font-size:23pt}h2{font-size:15pt;margin-top:1.5em}h3{font-size:12.6pt}
+ h2,h3,h4{break-after:avoid;page-break-after:avoid}
+ table,.cal,blockquote{break-inside:avoid;page-break-inside:avoid}
+ table{display:table;font-size:9.6pt}
+ details.cor{border:1px solid var(--line);background:#fcfbfa}
+ details.cor>summary{display:none}
+ details.cor .in{padding-top:10px}
+ .cal,.ex,.ess,.rec{box-shadow:none}
+ a{color:var(--ink);text-decoration:none}
+}
+@page{margin:16mm 15mm 18mm}
+
+/* --- exemples travaillés --- */
+.exm{background:#fcfbfa;border:1px solid var(--line);border-radius:10px;padding:2px 20px 14px;margin:1.5em 0}
+.exm>h4:first-child{margin:14px 0 .5em;color:var(--accent);font-size:13px;text-transform:uppercase;letter-spacing:.07em}
+
+
+/* --- pastilles de priorité (conventions des fiches de l'app) --- */
+h2[data-prio], h3[data-prio], h4[data-prio]{position:relative}
+h2[data-prio]::before,h3[data-prio]::before,h4[data-prio]::before{
+ content:"";display:inline-block;width:9px;height:9px;border-radius:50%;
+ margin-right:9px;vertical-align:middle;background:var(--muted)}
+[data-prio="must"]::before{background:var(--warn)}
+[data-prio="high"]::before{background:#d98324}
+[data-prio="mid"]::before{background:#c9a227}
+[data-prio="low"]::before{background:var(--ok)}
+/* corrigés des fiches de l'app : même traitement que les corrigés des séries */
+details.cor>summary::after{content:""}
+</style></head><body>
+<div class="nav"><a href="00_COMMENCER_ICI.html">Commencer ici</a><a href="01_NOTATIONS_le-decodeur.html">Notations</a><a href="02_EXERCICES_Serie-0.html">Série 0 — Remise en route</a><a href="03_EXERCICES_Serie-1.html">Série 1 — Convexité</a><a href="04_EXERCICES_Serie-2.html">Série 2 — KKT</a><a href="05_AUTO-EVALUATION.html">Auto-évaluation (quiz)</a><a href="06_FICHE_Optimisation-deux-variables.html">Fiche — Optimisation à 2 variables</a></div>
+<main><h1>Fiche 316 — Calcul sur le langage : <code>quote</code>, <code>substitute</code>, <code>eval</code>, <code>match.call</code></h1>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Matière</strong></td>
+<td>Code · Langage R</td>
+</tr>
+<tr>
+<td><strong>Cours source</strong></td>
+<td>R Core Team, <em>R Language Definition</em> 4.6.1 — chapitre 6 « Computing on the language » (§6.1 manipulation directe, §6.2 substitutions, §6.3 évaluation, §6.4 objets expression, §6.5 manipulation des appels, §6.6 manipulation des fonctions)</td>
+</tr>
+<tr>
+<td><strong>Sources d'appoint</strong></td>
+<td><em>R Language Definition</em> §1 « Introduction », §2.1.3 « Language objects », §2.1.4 « Expression objects », §2.1.8 « Promise objects »</td>
+</tr>
+<tr>
+<td><strong>Difficulté</strong></td>
+<td> Avancé — la partie la plus « Lisp » de R</td>
+</tr>
+<tr>
+<td><strong>Temps d'étude estimé</strong></td>
+<td>1 h 45</td>
+</tr>
+<tr>
+<td><strong>Prérequis</strong></td>
+<td>Fiches 303, 306, 309, 310 (types, listes, promesses, environnements)</td>
+</tr>
+<tr>
+<td><strong>Concepts clés</strong></td>
+<td>objet <strong><code>call</code></strong>, <code>quote()</code>, accès <strong>façon liste</strong>, <code>as.list</code> / <code>as.call</code>, <code>as.name</code>, <strong>parenthèses conservées</strong>, <code>deparse()</code>, <code>substitute()</code> et les <strong>promesses</strong>, substitution <strong>purement lexicale</strong>, <code>bquote()</code> et <code>.()</code>, <code>eval()</code> et son environnement, <strong><code>eval.parent</code></strong>, objets <strong><code>expression</code></strong>, <code>sys.call()</code>, <strong><code>match.call()</code></strong>, <code>expand.dots</code>, <code>call()</code>, <strong><code>do.call()</code></strong>, <code>body</code> / <code>formals</code> / <code>environment</code></td>
+</tr>
+<tr>
+<td><strong>À retenir en priorité</strong></td>
+<td><strong>Un appel est une liste dont le premier élément est la fonction</strong> · <strong><code>substitute</code> lit la fente expression d'une promesse</strong> · <strong>la substitution est purement lexicale</strong> · <strong><code>match.call()</code> puis <code>mf[[1]] &lt;- as.name(...)</code></strong> · <strong><code>do.call</code></strong>.</td>
+</tr>
+</tbody></table>
+<h2>Vue d'ensemble</h2>
+<pre><code>LE PRINCIPE  « R belongs to a class of programming languages in which
+               SUBROUTINES HAVE THE ABILITY TO MODIFY OR CONSTRUCT OTHER
+               SUBROUTINES and EVALUATE THE RESULT as an integral part
+               of the language itself. »
+             « the engine is really VERY LISP-LIKE »
+
+TROIS OBJETS DE LANGAGE   les CALLS, les EXPRESSIONS, les FONCTIONS
+
+CAPTURER     e1 &lt;- quote(2 + 2)        e2 &lt;- quote(plot(x, y))
+             « The arguments are NOT EVALUATED, the result is simply
+               the PARSED ARGUMENT. »
+
+UN APPEL EST UNE LISTE
+   e2[[1]]  plot     &lt;- la FONCTION
+   e2[[2]]  x        &lt;- le 1er argument
+   e2[[3]]  y
+   e3$x               &lt;- si l'argument etait NOMME
+   as.list / as.call pour convertir dans les deux sens
+   as.name("+") pour fabriquer un symbole
+
+SUBSTITUER   substitute(x)  dans une fonction -&gt; L'EXPRESSION PASSEE
+             deparse(substitute(x))  -&gt; son TEXTE   (etiquettes d'axes !)
+             substitute(a + b, list(a = 1, b = quote(x)))  -&gt;  1 + x
+             !! « the substitutions are PURELY LEXICAL ; there is NO CHECKING
+                 that the resulting call objects MAKE SENSE »
+             bquote( x[.(i)] == .(pnorm(i)) )   -- tout est quote SAUF .()
+
+EVALUER      eval(e)                    dans le cadre courant
+             eval.parent(e)             = eval(expr, sys.frame(sys.parent()))
+             eval(expr, data, enclos)   dans une liste, avec un ENCLOS
+
+L'APPEL COURANT   sys.call()    tel qu'il a ete ecrit
+                  match.call()  AVEC LES ARGUMENTS APPARIES  &lt;- le bon outil
+                  mf$arg &lt;- NULL      retirer un argument
+                  mf$arg &lt;- valeur    en ajouter un
+                  mf[[1]] &lt;- as.name("model.frame")   CHANGER LA FONCTION
+
+CONSTRUIRE   call("round", x)   -- la VALEUR de x est inseree
+             do.call(cbind, lapply(x, is.na))   -- construit ET evalue
+
+DISSEQUER UNE FONCTION   body()  formals()  environment()  et leurs &lt;-
+</code></pre>
+<p><strong>Le problème posé.</strong> <em>« <strong>R belongs to a class of programming languages in which subroutines have the ability to modify or construct other subroutines and evaluate the result as an integral part of the language itself.</strong> This is <strong>similar to Lisp and Scheme</strong> … <strong>but in contrast to FORTRAN and the ALGOL family</strong>. »</em> (§6)</p>
+<div class="cal intu"><span class="lab">Intuition — la phrase qui situe R.</span>
+<p> <em>« <strong>R presents a friendlier interface to programming than Lisp does</strong>, at least to someone used to mathematical formulas and C-like control structures, <strong>but the engine is really very Lisp-like.</strong> <strong>R allows direct access to parsed expressions and functions and allows you to alter and subsequently execute them, or create entirely new functions from scratch.</strong> »</em></p>
+<p>L'introduction du manuel (§1) le dit autrement : <em>« the semantics are of the FPL (functional programming language) variety <strong>with stronger affinities with Lisp and APL</strong>. In particular, <strong>it allows "computing on the language", which in turn makes it possible to write functions that take expressions as input, something that is often useful for statistical modeling and graphics</strong>. »</em></p>
+</div>
+<blockquote>
+<p><strong>À quoi cela sert (§6).</strong> *« There is a number of <strong>standard applications</strong> of this facility, such as <strong>calculation of analytical derivatives of expressions</strong>, or <strong>the generation of polynomial functions from a vector of coefficients</strong>. <strong>However, there are also uses that are much more fundamental to the workings of the interpreted part of R.</strong> <strong>Some of these are essential to the reuse of functions as components in other functions</strong>, as the (<strong>admittedly not very pretty</strong>) calls to <strong><code>model.frame</code></strong> that are constructed in several modeling and plotting routines. <strong>Other uses simply allow elegant interfaces to useful functionality</strong> — as an example, consider the <strong><code>curve</code></strong> function, which allows you to <strong>draw the graph of a function given as an expression like <code>sin(x)</code></strong>. »*</p>
+</blockquote>
+<p><strong>Ce chapitre explique donc trois choses déjà rencontrées</strong> : pourquoi <code>plot(x, y)</code> sait écrire « x » et « y » sur les axes (fiche 314), comment <code>lm(y ~ x, data = df)</code> évalue sa formule chez l'appelant (fiche 313), et ce qu'est vraiment la <strong>portée dynamique simulée</strong> (fiche 310).</p>
+<h2 data-prio="must">Concept 1 — Capturer une expression</h2>
+<div class="cal formel"><span class="lab">Définition (§6.1).</span>
+<p> <em>« <strong>There are three kinds of language objects that are available for modification : calls, expressions, and functions.</strong> At this point, we shall concentrate on the <strong>call</strong> objects. <strong>These are sometimes referred to as "unevaluated expressions", although this terminology is somewhat confusing.</strong> <strong>The most direct method of obtaining a call object is to use <code>quote</code> with an expression argument.</strong> »</em></p>
+</div>
+<pre><code class="language-r">e1 &lt;- quote(2 + 2)
+e2 &lt;- quote(plot(x, y))
+</code></pre>
+<p>*« <strong>The arguments are not evaluated, the result is simply the parsed argument.</strong> The objects <code>e1</code> and <code>e2</code> may be <strong>evaluated later using <code>eval</code></strong>, or <strong>simply manipulated as data</strong>. »*</p>
+<blockquote>
+<p><strong>La révélation du §6.1.</strong> <em>« It is perhaps most immediately obvious why the <code>e2</code> object has mode <code>"call"</code>, since it involves a call to the <code>plot</code> function. <strong>However, <code>e1</code> actually has exactly the same structure as a call to the binary operator <code>+</code> with two arguments</strong> »</em> :</p>
+<pre><code class="language-r">&gt; quote("+"(2, 2))
+2 + 2
+</code></pre>
+<p><strong><code>2 + 2</code> <em>est</em> un appel de fonction.</strong> C'est la mise en pratique de la règle de la fiche 301 : <em>« except for the syntax, there is no difference between applying an operator and calling a function »</em>.</p>
+</blockquote>
+<h2 data-prio="must">Concept 2 — Un appel est une liste</h2>
+<blockquote>
+<p><strong>Règle (§6.1).</strong> <em>« <strong>The components of a call object are accessed using a list-like syntax, and may in fact be converted to and from lists using <code>as.list</code> and <code>as.call</code>.</strong> »</em></p>
+</blockquote>
+<pre><code class="language-r">&gt; e2[[1]]
+plot
+&gt; e2[[2]]
+x
+&gt; e2[[3]]
+y
+</code></pre>
+<p><strong>Le premier élément est la fonction, les suivants sont les arguments.</strong> C'est exactement la structure d'une liste (fiche 306), avec <code>[[</code> pour l'accès.</p>
+<blockquote>
+<p><strong>Règle — les arguments nommés (§6.1).</strong> <em>« <strong>When keyword argument matching is used, the keywords can be used as list tags.</strong> »</em></p>
+</blockquote>
+<pre><code class="language-r">&gt; e3 &lt;- quote(plot(x = age, y = weight))
+&gt; e3$x
+age
+&gt; e3$y
+weight
+</code></pre>
+<blockquote>
+<p><strong>Règle — de quoi sont faits les composants (§6.1).</strong> <em>« <strong>All the components of the call object have mode <code>"name"</code> in the preceding examples. This is true for identifiers in calls</strong>, but the components of a call <strong>can also be constants</strong> — which can be of any type, <strong>although the first component had better be a function if the call is to be evaluated successfully</strong> — <strong>or other call objects, corresponding to subexpressions</strong>. »</em></p>
+<p><em>« <strong>Objects of mode <code>name</code> can be constructed from character strings using <code>as.name</code></strong> »</em> :</p>
+</blockquote>
+<pre><code class="language-r">&gt; e2[[1]] &lt;- as.name("+")
+&gt; e2
+x + y
+</code></pre>
+<p><strong>On vient de transformer un appel à <code>plot</code> en une addition, en changeant un seul élément.</strong></p>
+<blockquote>
+<p><strong>Et l'imbrication (§6.1).</strong> <em>« To illustrate the fact that <strong>subexpressions are simply components that are themselves calls</strong>, consider »</em> :</p>
+</blockquote>
+<pre><code class="language-r">&gt; e1[[2]] &lt;- e2
+&gt; e1
+x + y + 2
+</code></pre>
+<div class="cal intu"><span class="lab">Contrôle — vérifier ce résultat.</span>
+<p> <code>e1</code> était <code>quote(2 + 2)</code>, c'est-à-dire l'appel <code>`+`(2, 2)</code>. Remplacer son <strong>deuxième</strong> élément — le premier opérande, <code>2</code> — par <code>e2</code>, devenu <code>x + y</code>, donne <code>`+`(x + y, 2)</code>, que le dépareur écrit <strong><code>x + y + 2</code></strong>. </p>
+<p><strong>L'arbre syntaxique est un objet R ordinaire</strong>, modifiable à la pince.</p>
+</div>
+<h3>2.1 Les parenthèses, et l'inversibilité imparfaite</h3>
+<blockquote>
+<p class="cal piege"> <strong>Règle (§6.1).</strong> <em>« <strong>All grouping parentheses in input are preserved in parsed expressions. They are represented as a function call with one argument</strong>, so that <strong><code>4 - (2 - 2)</code> becomes <code>"-"(4, "(" ("-"(2, 2)))</code> in prefix notation.</strong> <strong>In evaluations, the <code>(</code> operator just returns its argument.</strong> »</em></p>
+<p><em>« <strong>This is a bit unfortunate, but it is not easy to write a parser/deparser combination that both preserves user input, stores it in minimal form and ensures that parsing a deparsed expression gives the same expression back.</strong> »</em></p>
+</blockquote>
+<blockquote>
+<p class="cal piege"> <strong>Règle (§6.1).</strong> <em>« <strong>As it happens, R's parser is not perfectly invertible, nor is its deparser</strong>, as the following examples show »</em> :</p>
+</blockquote>
+<pre><code class="language-r">&gt; str(quote(c(1,2)))
+ language c(1, 2)
+&gt; str(c(1,2))
+ num [1:2] 1 2
+
+&gt; deparse(quote(c(1,2)))
+[1] "c(1, 2)"
+&gt; deparse(c(1,2))
+[1] "c(1, 2)"
+
+&gt; quote("-"(2, 2))
+2 - 2
+&gt; quote(2 - 2)
+2 - 2
+</code></pre>
+<p><strong>Deux objets radicalement différents — un appel et un vecteur numérique — ont le même dépareillage.</strong> Et deux écritures différentes se déparent identiquement.</p>
+<p><em>« <strong>Deparsed expressions should, however, evaluate to an equivalent value to the original expression (up to rounding error).</strong> »</em></p>
+<div class="cal intu"><span class="lab">En clair.</span>
+<p> Le dépareillage est <strong>une représentation, pas une identité</strong>. On ne peut pas conclure de <code>deparse(a) == deparse(b)</code> que <code>a</code> et <code>b</code> sont le même objet. Pour comparer des expressions, <code>identical()</code> est le bon outil.</p>
+</div>
+<h2 data-prio="must">Concept 3 — <code>substitute()</code></h2>
+<blockquote>
+<p><strong>L'exemple qui motive tout (§6.2).</strong> <em>« <strong>It is in fact not often that one wants to modify the innards of an expression like in the previous section. More frequently, one wants to simply get at an expression in order to deparse it and use it for labeling plots.</strong> An example of this is seen <strong>at the beginning of <code>plot.default</code></strong> »</em> :</p>
+</blockquote>
+<pre><code class="language-r">xlabel &lt;- if (!missing(x))
+  deparse(substitute(x))
+</code></pre>
+<p><em>« <strong>This causes the variable or expression given as the <code>x</code> argument to <code>plot</code> to be used for labeling the x-axis later on.</strong> »</em></p>
+<p><strong>Voilà pourquoi <code>plot(poids, taille)</code> étiquette les axes « poids » et « taille ».</strong> La fonction ne reçoit pas ces noms : elle <strong>les retrouve</strong>.</p>
+<div class="cal formel"><span class="lab">Définition (§6.2).</span>
+<p> *« The function used to achieve this is <strong><code>substitute</code></strong>, which <strong>takes the expression <code>x</code> and substitutes the expression that was passed through the formal argument <code>x</code></strong>. <strong>Notice that for this to happen, <code>x</code> must carry information about the expression that creates its value. This is related to the lazy evaluation scheme of R.</strong> <strong>A formal argument is really a promise, an object with three slots</strong> — one for <strong>the expression that defines it</strong>, one for <strong>the environment in which to evaluate that expression</strong>, and one for <strong>the value</strong> once evaluated. <strong><code>substitute</code> will recognize a promise variable and substitute the value of its expression slot.</strong>  <strong>If <code>substitute</code> is invoked inside a function, the local variables of the function are also subject to substitution.</strong> »*</p>
+</div>
+<p><strong>C'est le mécanisme des promesses de la fiche 309, vu du côté de l'utilisateur.</strong></p>
+<h3>3.1 Substituer dans une expression quelconque</h3>
+<blockquote>
+<p><strong>Règle (§6.2).</strong> <em>« <strong>The argument to <code>substitute</code> does not have to be a simple identifier</strong>, it can be <strong>an expression involving several variables</strong> and <strong>substitution will occur for each of these</strong>. Also, <strong><code>substitute</code> has an additional argument which can be an environment or a list in which the variables are looked up</strong>. »</em></p>
+</blockquote>
+<pre><code class="language-r">&gt; substitute(a + b, list(a = 1, b = quote(x)))
+1 + x
+</code></pre>
+<p class="cal piege"> <em>« <strong>Notice that quoting was necessary to substitute the <code>x</code>.</strong> »</em> Sans <code>quote(x)</code>, R chercherait <strong>la valeur</strong> de <code>x</code> ; avec, il substitue <strong>le symbole</strong>.</p>
+<p><strong>L'usage en graphique (§6.2)</strong> — <em>« This kind of construction comes in handy in connection with the facilities for putting math expression in graphs »</em> :</p>
+<pre><code class="language-r">plot(0)
+for (i in 1:4)
+  text(1, 0.2 * i,
+       substitute(x[ix] == y, list(ix = i, y = pnorm(i))))
+</code></pre>
+<h3>3.2 Purement lexical</h3>
+<blockquote>
+<p class="cal piege"> <strong>Règle (§6.2).</strong> <em>« <strong>It is important to realize that the substitutions are purely lexical ; there is no checking that the resulting call objects make sense if they are evaluated.</strong> <strong><code>substitute(x &lt;- x + 1, list(x = 2))</code> will happily return <code>2 &lt;- 2 + 1</code>.</strong> »</em></p>
+<p><em>« However, <strong>some parts of R make up their own rules for what makes sense and what does not and might actually have a use for such ill-formed expressions</strong>. For example, <strong>using the "math in graphs" feature often involves constructions that are syntactically correct, but which would be meaningless to evaluate</strong>, like <code>{}&gt;=40*" years"</code>. »</em></p>
+</blockquote>
+<p><strong>Ce n'est pas un défaut mais une propriété</strong> : <code>substitute</code> construit <strong>de la syntaxe</strong>, pas du sens. Et l'annotation mathématique (fiche 314) <strong>exploite</strong> cette liberté — une expression destinée à être <strong>dessinée</strong> n'a pas à être évaluable.</p>
+<h3>3.3 L'énigme de la double substitution</h3>
+<div class="cal formel"><span class="lab">Problème (§6.2).</span>
+<p class="cal piege">  <em>« <strong><code>substitute</code> will not evaluate its first argument.</strong> <strong>This leads to the puzzle of how to do substitutions on an object that is contained in a variable.</strong> <strong>The solution is to use <code>substitute</code> once more</strong> »</em> :</p>
+</div>
+<pre><code class="language-r">&gt; expr &lt;- quote(x + y)
+&gt; substitute(substitute(e, list(x = 3)), list(e = expr))
+substitute(x + y, list(x = 3))
+&gt; eval(substitute(substitute(e, list(x = 3)), list(e = expr)))
+3 + y
+</code></pre>
+<div class="cal methode"><span class="lab">Comment lire cette construction.</span>
+<p> Le <code>substitute</code> <strong>extérieur</strong> remplace <code>e</code> par <strong>le contenu de <code>expr</code></strong> — il produit donc <strong>l'appel</strong> <code>substitute(x + y, list(x = 3))</code>, non encore évalué. Le <strong><code>eval</code></strong> déclenche alors ce second <code>substitute</code>, qui remplace <code>x</code> par <code>3</code>. <strong>Deux substitutions en cascade</strong>, la première fabriquant l'appel que la seconde exécute.</p>
+</div>
+<h3>3.4 Les règles exactes</h3>
+<blockquote>
+<p><strong>Règle (§6.2).</strong> <em>« <strong>The exact rules for substitutions are as follows</strong> : <strong>each symbol in the parse tree for the first is matched against the second argument</strong>, which can be <strong>a tagged list or an environment frame</strong>. »</em></p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>Cas</th>
+<th>Ce qui se passe</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>un objet local simple</strong></td>
+<td><em>« <strong>its value is inserted</strong>, <strong>except if matching against the global environment</strong> »</em></td>
+</tr>
+<tr>
+<td><strong>une promesse</strong> (typiquement un argument)</td>
+<td><em>« <strong>the promise expression is substituted</strong> »</em></td>
+</tr>
+<tr>
+<td><strong>le symbole n'est pas apparié</strong></td>
+<td><em>« <strong>it is left untouched</strong> »</em></td>
+</tr>
+</tbody></table>
+<p class="cal piege"> *« <strong>The special exception for substituting at the top level is admittedly peculiar. It has been inherited from S</strong> and the rationale is most likely that <strong>there is no control over which variables might be bound at that level so that it would be better to just make <code>substitute</code> act as <code>quote</code></strong>. »*</p>
+<p><strong>Conséquence pratique</strong> : <code>substitute(x)</code> tapé <strong>à la console</strong> rend <code>x</code>, pas sa valeur. Le mécanisme <strong>ne fonctionne que dans une fonction</strong>.</p>
+<h3>3.5 Le piège de l'évaluation paresseuse</h3>
+<div class="cal formel"><span class="lab">Problème (§6.2).</span>
+<p class="cal piege">  <em>« <strong>The rule of promise substitution is slightly different from that of S if the local variable is modified before <code>substitute</code> is used. R will then use the new value of the variable, whereas S will unconditionally use the argument expression</strong> — unless it was a constant, <strong>which has the curious consequence that <code>f((1))</code> may be very different from <code>f(1)</code> in S</strong>. <strong>The R rule is considerably cleaner, although it does have consequences in connection with lazy evaluation that comes as a surprise to some.</strong> »</em></p>
+</div>
+<pre><code class="language-r">logplot &lt;- function(y, ylab = deparse(substitute(y))) {
+  y &lt;- log(y)
+  plot(y, ylab = ylab)
+}
+</code></pre>
+<p><em>« <strong>This looks straightforward, but one will discover that the y label becomes an ugly <code>c(...)</code> expression. It happens because the rules of lazy evaluation cause the evaluation of the <code>ylab</code> expression to happen after <code>y</code> has been modified.</strong> <strong>The solution is to force <code>ylab</code> to be evaluated first</strong> »</em> :</p>
+<pre><code class="language-r">logplot &lt;- function(y, ylab = deparse(substitute(y))) {
+  ylab                     # &lt;- FORCE la promesse AVANT la modification
+  y &lt;- log(y)
+  plot(y, ylab = ylab)
+}
+</code></pre>
+<blockquote>
+<p class="cal piege"> <strong>Et l'erreur à ne pas commettre (§6.2).</strong> <em>« <strong>Notice that one should not use <code>eval(ylab)</code> in this situation. If <code>ylab</code> is a language or expression object, then that would cause the object to be evaluated as well, which would not at all be desirable if a math expression like <code>quote(log[e](y))</code> was being passed.</strong> »</em></p>
+<p><strong>Mentionner l'argument suffit</strong> à forcer la promesse ; <code>eval()</code> irait <strong>un cran trop loin</strong> et détruirait une étiquette mathématique. C'est l'idiome du forçage déjà rencontré en fiche 309 avec <code>label = deparse(x)</code>.</p>
+</blockquote>
+<h3>3.6 <code>bquote()</code> — la variante compacte</h3>
+<div class="cal formel"><span class="lab">Définition (§6.2).</span>
+<p> <em>« <strong>A variant on <code>substitute</code> is <code>bquote</code>, which is used to replace some subexpressions with their values.</strong> »</em> L'exemple du §3.1 s'écrit alors plus brièvement :</p>
+</div>
+<pre><code class="language-r">plot(0)
+for (i in 1:4)
+  text(1, 0.2*i, bquote( x[.(i)] == .(pnorm(i)) ))
+</code></pre>
+<p><em>« <strong>The expression is quoted except for the contents of <code>.()</code> subexpressions, which are replaced</strong> [par leur valeur]. »</em></p>
+<p><strong>La différence de lecture</strong> : <code>substitute</code> demande <strong>une liste de correspondances</strong> ; <code>bquote</code> <strong>marque les trous directement dans l'expression</strong>, par <code>.()</code>. Sur une expression longue avec deux ou trois substitutions, <code>bquote</code> est nettement plus lisible.</p>
+<h2 data-prio="must">Concept 4 — <code>eval()</code> et son environnement</h2>
+<blockquote>
+<p><strong>Règle (§6.3).</strong> <em>« The <code>eval</code> function was introduced earlier … <strong>However, this is not the full story. It is also possible to specify the environment in which the evaluation is to take place. By default this is the evaluation frame from which <code>eval</code> is called, but quite frequently it needs to be set to something else.</strong> »</em></p>
+</blockquote>
+<blockquote>
+<p><strong>Cas 1 — le cadre de l'appelant (§6.3).</strong> <em>« <strong>Very often, the relevant evaluation frame is that of the parent of the current frame.</strong> In particular, <strong>when the object to evaluate is the result of a <code>substitute</code> operation of the function arguments, it will contain variables that make sense to the caller only</strong> (notice that <strong>there is no reason to expect that the variables of the caller are in the lexical scope of the callee</strong>). <strong>Since evaluation in the parent frame occurs frequently, an <code>eval.parent</code> function exists as a shorthand for <code>eval(expr, sys.frame(sys.parent()))</code>.</strong> »</em></p>
+</blockquote>
+<p><strong>La parenthèse est décisive</strong> et renvoie à la fiche 310 : la portée est <strong>lexicale</strong>, donc les variables de l'appelant ne sont <strong>pas</strong> visibles depuis la fonction appelée. Évaluer explicitement dans le cadre parent est <strong>la simulation de portée dynamique</strong> dont parlait le §3.5.3.</p>
+<blockquote>
+<p><strong>Cas 2 — une liste ou un data frame (§6.3).</strong> <em>« Another case that occurs frequently is <strong>evaluation in a list or a data frame</strong>. For instance, this happens <strong>in connection with the <code>model.frame</code> function when a <code>data</code> argument is given</strong>. <strong>Generally, the terms of the model formula need to be evaluated in <code>data</code>, but they may occasionally also contain references to items in the caller of <code>model.frame</code>.</strong> … So for this purpose <strong>one needs not only to evaluate an expression in a list, but also to specify an enclosure into which the search continues if the variable is not in the list</strong>. »</em></p>
+</blockquote>
+<pre><code class="language-r">eval(expr, data, sys.frame(sys.parent()))
+</code></pre>
+<p><strong>C'est l'explication technique du <code>data =</code> de <code>lm()</code></strong> (fiche 313) : <em>« any variables needed to construct the model should <strong>come first</strong> from the data frame »</em> — et <strong>ensuite</strong> chez l'appelant. Les trois arguments d'<code>eval</code> sont exactement cette phrase.</p>
+<blockquote>
+<p class="cal piege"> <strong>Règle (§6.3).</strong> <em>« <strong>Notice that evaluation in a given environment may actually change that environment</strong>, most obviously in cases involving the assignment operator »</em> :</p>
+<pre><code class="language-r">eval(quote(total &lt;- 0), environment(robert$balance))   # rob Rob
+</code></pre>
+<p><em>« <strong>This is also true when evaluating in lists, but the original list does not change because one is really working on a copy.</strong> »</em></p>
+<p><strong>La plaisanterie du manuel — « rob Rob » — est instructive</strong> : elle vide le compte en banque de la fiche 310 <strong>de l'extérieur</strong>, en évaluant une assignation dans l'environnement capturé par la fermeture. Les environnements <strong>ne sont pas copiés</strong> (fiche 303) ; <strong>les listes le sont</strong>.</p>
+</blockquote>
+<h2 data-prio="high">Concept 5 — Les objets <code>expression</code></h2>
+<div class="cal formel"><span class="lab">Définition (§6.4).</span>
+<p> <em>« Objects of mode <code>"expression"</code> … <strong>are very similar to lists of call objects</strong>. »</em></p>
+</div>
+<pre><code class="language-r">&gt; ex &lt;- expression(2 + 2, 3 + 4)
+&gt; ex[[1]]
+2 + 2
+&gt; ex[[2]]
+3 + 4
+&gt; eval(ex)
+[1] 7
+</code></pre>
+<p>*« <strong>Notice that evaluating an expression object evaluates each call in turn, but the final value is that of the last call.</strong> In this respect <strong>it behaves almost identically to the compound language object <code>quote({2 + 2; 3 + 4})</code></strong>. »*</p>
+<blockquote>
+<p class="cal piege"> <strong>La différence subtile (§6.4).</strong> <em>« <strong>Call objects are indistinguishable from subexpressions in a parse tree. This means that they are automatically evaluated in the same way a subexpression would be. Expression objects can be recognized during evaluation and in a sense retain their quotedness. The evaluator will not evaluate an expression object recursively, only when it is passed directly to <code>eval</code>.</strong> »</em></p>
+</blockquote>
+<pre><code class="language-r">&gt; eval(substitute(mode(x), list(x = quote(2 + 2))))
+[1] "numeric"
+&gt; eval(substitute(mode(x), list(x = expression(2 + 2))))
+[1] "expression"
+</code></pre>
+<p><strong>Le premier a été évalué en chemin, le second non.</strong> Un objet <code>expression</code> <strong>résiste</strong> à l'évaluation ; un <code>call</code> <strong>s'y fond</strong>.</p>
+<blockquote>
+<p class="cal piege"> <strong>La confusion du dépareur (§6.4).</strong> <em>« <strong>The deparser represents an expression object by the call that creates it.</strong> … <strong>However, it does lead to the following bit of confusion</strong> »</em> :</p>
+</blockquote>
+<pre><code class="language-r">&gt; e &lt;- quote(expression(2 + 2));  e            # expression(2 + 2)
+&gt; mode(e)                                      # [1] "call"
+&gt; ee &lt;- expression(2 + 2);        ee           # expression(2 + 2)
+&gt; mode(ee)                                     # [1] "expression"
+</code></pre>
+<p><em>« I.e., <strong><code>e</code> and <code>ee</code> look identical when printed, but one is a call that generates an expression object and the other is the object itself</strong>. »</em> — <strong>une raison de plus de ne jamais se fier à l'affichage</strong> pour identifier un objet de langage (concept 2.1).</p>
+<h2 data-prio="must">Concept 6 — Manipuler l'appel courant</h2>
+<div class="cal formel"><span class="lab">Définition (§6.5).</span>
+<p> <em>« <strong>It is possible for a function to find out how it has been called by looking at the result of <code>sys.call</code></strong> »</em> :</p>
+</div>
+<pre><code class="language-r">&gt; f &lt;- function(x, y, ...) sys.call()
+&gt; f(y = 1, 2, z = 3, 4)
+f(y = 1, 2, z = 3, 4)
+</code></pre>
+<blockquote>
+<p class="cal piege"> <em>« <strong>However, this is not really useful except for debugging because it requires the function to keep track of argument matching in order to interpret the call.</strong> For instance, <strong>it must be able to see that the 2nd actual argument gets matched to the first formal one</strong>. »</em></p>
+</blockquote>
+<div class="cal formel"><span class="lab">Définition (§6.5).</span>
+<p> <em>« <strong>More often one requires the call with all actual arguments bound to the corresponding formals. To this end, the function <code>match.call</code> is used.</strong> »</em></p>
+</div>
+<pre><code class="language-r">&gt; f &lt;- function(x, y, ...) match.call()
+&gt; f(y = 1, 2, z = 3, 4)
+f(x = 2, y = 1, z = 3, 4)
+</code></pre>
+<p><em>« <strong>Notice that the second argument now gets matched to <code>x</code> and appears in the corresponding position in the result.</strong> »</em> — l'appariement en trois passes de la fiche 309, <strong>rendu visible</strong>.</p>
+<h3>6.1 Le patron de <code>lm</code></h3>
+<div class="cal methode"><span class="lab">Méthode (§6.5).</span>
+<p> <em>« <strong>The primary use of this technique is to call another function with the same arguments, possibly deleting some and adding others.</strong> A typical application is seen at the start of the <code>lm</code> function »</em> :</p>
+</div>
+<pre><code class="language-r">mf &lt;- cl &lt;- match.call()
+mf$singular.ok &lt;- mf$model &lt;- mf$method &lt;- NULL
+mf$x &lt;- mf$y &lt;- mf$qr &lt;- mf$contrasts &lt;- NULL
+mf$drop.unused.levels &lt;- TRUE
+mf[[1]] &lt;- as.name("model.frame")
+mf &lt;- eval(mf, sys.frame(sys.parent()))
+</code></pre>
+<blockquote>
+<p><strong>Décodage, ligne par ligne (§6.5).</strong>
+<em>« <strong>The call can be treated as a list object where the first element is the name of the function and the remaining elements are the actual argument expressions, with the corresponding formal argument names as tags.</strong> »</em></p>
+<table>
+<thead>
+<tr>
+<th>Ligne</th>
+<th>Ce qu'elle fait</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>capture l'appel <strong>avec arguments appariés</strong>, en <strong>deux copies</strong> (<code>mf</code> à transformer, <code>cl</code> à conserver)</td>
+</tr>
+<tr>
+<td>2-3</td>
+<td><em>« <strong>the technique to eliminate undesired arguments is to assign <code>NULL</code></strong> »</em></td>
+</tr>
+<tr>
+<td>4</td>
+<td><em>« <strong>to add an argument one uses tagged list assignment</strong> »</em></td>
+</tr>
+<tr>
+<td>5</td>
+<td><em>« <strong>To change the name of the function called, assign to the first element of the list and make sure that the value is a name</strong> — either using <strong><code>as.name("model.frame")</code></strong> or <strong><code>quote(model.frame)</code></strong> »</em></td>
+</tr>
+<tr>
+<td>6</td>
+<td><em>« <strong>the resulting call is evaluated in the parent frame, in which one can be certain that the involved expressions make sense</strong> »</em></td>
+</tr>
+</tbody></table>
+<p><strong><code>lm</code> transforme son propre appel en un appel à <code>model.frame</code></strong>, puis l'exécute chez l'appelant. C'est le <em>« admittedly not very pretty »</em> annoncé au §6 — et c'est ce qui fait fonctionner <code>lm(y ~ x, data = df)</code>.</p>
+</blockquote>
+<h3>6.2 <code>expand.dots</code></h3>
+<blockquote>
+<p><strong>Règle (§6.5).</strong> <em>« <strong>The <code>match.call</code> function has an <code>expand.dots</code> argument, a switch which if set to <code>FALSE</code> lets all <code>...</code> arguments be collected as a single argument with the tag <code>...</code>.</strong> »</em></p>
+</blockquote>
+<pre><code class="language-r">&gt; f &lt;- function(x, y, ...) match.call(expand.dots = FALSE)
+&gt; f(y = 1, 2, z = 3, 4)
+f(x = 2, y = 1, ... = list(z = 3, 4))
+</code></pre>
+<p class="cal piege"> <em>« <strong>The <code>...</code> argument is a list (a pairlist to be precise), not a call to <code>list</code> like it is in S</strong> »</em> :</p>
+<pre><code class="language-r">&gt; e1 &lt;- f(y = 1, 2, z = 3, 4)$...
+&gt; e1
+$z
+[1] 3
+
+[[2]]
+[1] 4
+</code></pre>
+<blockquote>
+<p><strong>Deux usages, du plus simple au plus élaboré (§6.5).</strong></p>
+<p><strong>1. Se débarrasser des <code>...</code>.</strong> <em>« <strong>One reason for using this form of <code>match.call</code> is simply to get rid of any <code>...</code> arguments in order not to be passing unspecified arguments on to functions that may not know them.</strong> »</em> — paraphrasé de <code>plot.formula</code> :</p>
+<pre><code class="language-r">m &lt;- match.call(expand.dots = FALSE)
+m$... &lt;- NULL
+m[[1]] &lt;- "model.frame"
+</code></pre>
+<p><strong>2. Fusionner des arguments.</strong> <em>« <strong>A more elaborate application is in <code>update.default</code> where a set of optional extra arguments can add to, replace, or cancel those of the original call</strong> »</em> :</p>
+<pre><code class="language-r">extras &lt;- match.call(expand.dots = FALSE)$...
+if (length(extras) &gt; 0) {
+  existing &lt;- !is.na(match(names(extras), names(call)))
+  for (a in names(extras)[existing]) call[[a]] &lt;- extras[[a]]
+  if (any(!existing)) {
+    call &lt;- c(as.list(call), extras[!existing])
+    call &lt;- as.call(call)
+  }
+}
+</code></pre>
+<p class="cal piege"> <em>« <strong>Notice that care is taken to modify existing arguments individually in case <code>extras[[a]] == NULL</code>.</strong> <strong>Concatenation does not work on call objects without the coercion as shown ; this is arguably a bug.</strong> »</em></p>
+<p><strong>C'est le moteur d'<code>update()</code></strong> (fiche 313) : les arguments existants sont <strong>remplacés un par un</strong>, les nouveaux <strong>concaténés</strong> après passage par <code>as.list</code> puis <code>as.call</code>.</p>
+</blockquote>
+<h3>6.3 Construire un appel</h3>
+<div class="cal formel"><span class="lab">Définition (§6.5).</span>
+<p> <em>« <strong>Two further functions exist for the construction of function calls, namely <code>call</code> and <code>do.call</code>.</strong> »</em></p>
+<p><strong><code>call</code></strong> <em>« allows creation of a call object <strong>from the function name and the list of arguments</strong> »</em> :</p>
+</div>
+<pre><code class="language-r">&gt; x &lt;- 10.5
+&gt; call("round", x)
+round(10.5)
+</code></pre>
+<p class="cal piege"> <em>« <strong>As seen, the value of <code>x</code> rather than the symbol is inserted in the call, so it is distinctly different from <code>round(x)</code>.</strong> <strong>The form is used rather rarely, but is occasionally useful where the name of a function is available as a character variable.</strong> »</em></p>
+<blockquote>
+<p><strong><code>do.call</code></strong> <em>« is related, but <strong>evaluates the call immediately</strong> and <strong>takes the arguments from an object of mode <code>"list"</code> containing all the arguments</strong>. <strong>A natural use of this is when one wants to apply a function like <code>cbind</code> to all elements of a list or data frame.</strong> »</em></p>
+</blockquote>
+<pre><code class="language-r">is.na.data.frame &lt;- function (x) {
+  y &lt;- do.call(cbind, lapply(x, is.na))
+  rownames(y) &lt;- row.names(x)
+  y
+}
+</code></pre>
+<div class="cal intu"><span class="lab">Contrôle — lire cette fonction.</span>
+<p> <code>lapply(x, is.na)</code> rend <strong>une liste</strong> de vecteurs logiques, un par colonne (fiche 306). <code>cbind</code> accepte un nombre <strong>quelconque</strong> d'arguments, mais <strong>pas une liste</strong> : <code>cbind(liste)</code> ne ferait pas ce qu'on veut. <strong><code>do.call</code> déplie la liste en arguments séparés</strong> — c'est exactement ce dont on a besoin.</p>
+<p>*« Other uses include variations over constructions like <strong><code>do.call("f", list(...))</code></strong>. »*</p>
+</div>
+<h2 data-prio="high">Concept 7 — Disséquer une fonction</h2>
+<div class="cal formel"><span class="lab">Définition (§6.6).</span>
+<p> <em>« <strong>It is often useful to be able to manipulate the components of a function or closure. R provides a set of interface functions for this purpose.</strong> »</em></p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Fonction</th>
+<th>Ce qu'elle rend / fait</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong><code>body</code></strong></td>
+<td><em>« Returns <strong>the expression that is the body</strong> of the function »</em></td>
+</tr>
+<tr>
+<td><strong><code>formals</code></strong></td>
+<td><em>« Returns <strong>a list of the formal arguments</strong>. <strong>This is a pairlist.</strong> »</em></td>
+</tr>
+<tr>
+<td><strong><code>environment</code></strong></td>
+<td><em>« Returns <strong>the environment associated with the function</strong> »</em></td>
+</tr>
+<tr>
+<td><strong><code>body&lt;-</code></strong></td>
+<td><em>« <strong>sets the body</strong> of the function to the supplied expression »</em></td>
+</tr>
+<tr>
+<td><strong><code>formals&lt;-</code></strong></td>
+<td><em>« <strong>Sets the formal arguments</strong> … to the supplied list »</em></td>
+</tr>
+<tr>
+<td><strong><code>environment&lt;-</code></strong></td>
+<td><em>« <strong>Sets the environment</strong> of the function to the specified environment »</em></td>
+</tr>
+</tbody></table>
+<p>Ce sont les <strong>trois composantes d'une fermeture</strong> de la fiche 310 — <em>« a formal argument list, a body and an environment »</em> — chacune <strong>lisible et modifiable</strong>.</p>
+<div class="cal plus"><span class="lab">Complément (§6.6).</span>
+<p> *« <strong>It is also possible to alter the bindings of different variables in the environment of the function</strong>, using code along the lines of <strong><code>evalq(x &lt;- 5, environment(f))</code></strong>. »*</p>
+<p>*« <strong>It is also possible to convert a function to a list using <code>as.list</code>.</strong> <strong>The result is the concatenation of the list of formal arguments with the function body.</strong> Conversely such a list can be converted to a function using <strong><code>as.function</code></strong>.  <strong>This functionality is mainly included for S compatibility.</strong> <strong>Notice that environment information is lost when <code>as.list</code> is used, whereas <code>as.function</code> has an argument that allows the environment to be set.</strong> »*</p>
+</div>
+<details class="cor">
+<summary><strong>Exercice résolu — écrire une fonction qui étiquette ses graphiques comme <code>plot()</code></strong></summary><div class="in">
+
+<p><strong>Énoncé.</strong> Écrire <code>moncarre(v)</code> qui trace <code>v^2</code> contre <code>v</code> en étiquetant les axes avec <strong>l'expression passée</strong>, exactement comme le fait <code>plot</code>.</p>
+<p><em>Étape 1 — le modèle à imiter.</em> Le §6.2 donne la ligne de <code>plot.default</code> :</p>
+<pre><code class="language-r">xlabel &lt;- if (!missing(x)) deparse(substitute(x))
+</code></pre>
+<p><strong><code>substitute(x)</code> rend l'expression passée</strong>, <code>deparse()</code> en fait <strong>du texte</strong>.</p>
+<p><em>Étape 2 — pourquoi cela fonctionne.</em> <em>« <strong><code>x</code> must carry information about the expression that creates its value. This is related to the lazy evaluation scheme of R.</strong> <strong>A formal argument is really a promise</strong> … <strong><code>substitute</code> will recognize a promise variable and substitute the value of its expression slot.</strong> »</em> La promesse (fiche 309) <strong>conserve le texte</strong> de ce qui a été écrit.</p>
+<p><em>Étape 3 — première version, et son défaut.</em></p>
+<pre><code class="language-r">moncarre &lt;- function(v, xl = deparse(substitute(v))) {
+  v &lt;- v[!is.na(v)]                 # on modifie v...
+  plot(v, v^2, xlab = xl, ylab = paste0(xl, "^2"))
+}
+</code></pre>
+<p class="cal piege"> <strong>Le piège du §6.2 est exactement là</strong> : <em>« <strong>the rules of lazy evaluation cause the evaluation of the <code>ylab</code> expression to happen after <code>y</code> has been modified</strong> »</em>. La promesse <code>xl</code> ne sera forcée qu'au <code>plot</code>, <strong>après</strong> le filtrage — et <code>deparse(substitute(v))</code> décrirait alors <strong><code>v[!is.na(v)]</code></strong>, pas l'expression d'origine.</p>
+<p><em>Étape 4 — la correction du cours.</em> <em>« <strong>The solution is to force <code>ylab</code> to be evaluated first</strong> »</em> — mentionner l'argument sur une ligne seule :</p>
+<pre><code class="language-r">moncarre &lt;- function(v, xl = deparse(substitute(v))) {
+  xl                                # FORCE la promesse MAINTENANT
+  v &lt;- v[!is.na(v)]
+  plot(v, v^2, xlab = xl, ylab = paste0(xl, "^2"))
+}
+</code></pre>
+<p><em>Étape 5 — ce qu'il ne faut pas écrire.</em>  <em>« <strong>one should not use <code>eval(ylab)</code> in this situation. If <code>ylab</code> is a language or expression object, then that would cause the object to be evaluated as well, which would not at all be desirable if a math expression like <code>quote(log[e](y))</code> was being passed.</strong> »</em> <strong>Mentionner suffit ; évaluer détruit.</strong></p>
+<p><em>Étape 6 — vérifier le cas de l'argument manquant.</em> La ligne de <code>plot.default</code> est protégée par <strong><code>if (!missing(x))</code></strong> — l'idiome de <code>missing()</code> (fiche 309), qui <em>« <strong>does not force evaluation of the argument</strong> »</em>. Sans lui, <code>substitute</code> sur un argument absent donnerait un résultat inutilisable.</p>
+<p><em>Étape 7 — la variante mathématique.</em> Pour composer une étiquette <strong>dessinée</strong>, <code>bquote</code> est plus lisible que <code>substitute</code> :</p>
+<pre><code class="language-r">  ylab = bquote(.(as.name(xl))^2)
+</code></pre>
+<p>Et cela reste valide même si l'expression n'a <strong>aucun sens à l'évaluation</strong> — <em>« there is <strong>no checking</strong> that the resulting call objects make sense »</em> —, ce que l'annotation mathématique (fiche 314) exploite délibérément.</p>
+<p><em>Étape 8 — la leçon.</em> Trois mécanismes se combinent : <strong>la promesse</strong> garde le texte, <strong><code>substitute</code></strong> l'extrait, <strong>le forçage explicite</strong> fixe le moment. Aucun des trois n'est visible dans le code de l'appelant — c'est ce que le §6 appelle <em>« elegant interfaces to useful functionality »</em>.</p>
+</div></details>
+
+<h2>Comment reconnaître le type d'exercice</h2>
+<table>
+<thead>
+<tr>
+<th>Le signal dans l'énoncé</th>
+<th>Ce qu'il faut mobiliser</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>« garder une expression sans l'évaluer »</td>
+<td><strong><code>quote()</code></strong></td>
+</tr>
+<tr>
+<td>« récupérer ce que l'utilisateur a écrit »</td>
+<td><strong><code>substitute()</code></strong> dans une fonction</td>
+</tr>
+<tr>
+<td>« en faire une étiquette »</td>
+<td><strong><code>deparse(substitute(x))</code></strong></td>
+</tr>
+<tr>
+<td>« remplacer des morceaux d'expression »</td>
+<td><strong><code>substitute(e, list(...))</code></strong> ou <strong><code>bquote(.())</code></strong></td>
+</tr>
+<tr>
+<td>« mon étiquette décrit la valeur modifiée »</td>
+<td><strong>forcer la promesse</strong> en la mentionnant</td>
+</tr>
+<tr>
+<td>« évaluer chez l'appelant »</td>
+<td><strong><code>eval.parent()</code></strong></td>
+</tr>
+<tr>
+<td>« évaluer dans un data frame, puis chez l'appelant »</td>
+<td><code>eval(expr, data, sys.frame(sys.parent()))</code></td>
+</tr>
+<tr>
+<td>« modifier un élément d'un appel »</td>
+<td>l'appel est <strong>une liste</strong> — <code>[[1]]</code> est la fonction</td>
+</tr>
+<tr>
+<td>« changer la fonction appelée »</td>
+<td><code>appel[[1]] &lt;- as.name("autre")</code></td>
+</tr>
+<tr>
+<td>« retirer un argument d'un appel »</td>
+<td>lui assigner <strong><code>NULL</code></strong></td>
+</tr>
+<tr>
+<td>« ajouter un argument »</td>
+<td><strong>assignation avec étiquette</strong></td>
+</tr>
+<tr>
+<td>« voir comment ma fonction a été appelée »</td>
+<td><strong><code>sys.call()</code></strong> (brut) ou <strong><code>match.call()</code></strong> (apparié)</td>
+</tr>
+<tr>
+<td>« ne pas transmettre les <code>...</code> »</td>
+<td><strong><code>match.call(expand.dots = FALSE)</code></strong> puis <code>m$... &lt;- NULL</code></td>
+</tr>
+<tr>
+<td>« appliquer une fonction à tous les éléments d'une liste comme arguments »</td>
+<td><strong><code>do.call()</code></strong></td>
+</tr>
+<tr>
+<td>« le nom de la fonction est dans une variable »</td>
+<td><strong><code>call()</code></strong> ou <code>do.call("f", ...)</code></td>
+</tr>
+<tr>
+<td>« lire ou changer le corps d'une fonction »</td>
+<td><strong><code>body()</code></strong>, <code>body&lt;-</code></td>
+</tr>
+<tr>
+<td>« changer l'environnement d'une fermeture »</td>
+<td><strong><code>environment&lt;-</code></strong></td>
+</tr>
+<tr>
+<td>« comparer deux expressions »</td>
+<td> <strong>pas par <code>deparse</code></strong> — le dépareur n'est pas injectif</td>
+</tr>
+</tbody></table>
+<h2>Comment résoudre ce type d'exercice</h2>
+<p><strong>Protocole « capturer et transformer un appel » — 5 étapes.</strong></p>
+<ol>
+<li><strong><code>match.call()</code></strong> plutôt que <code>sys.call()</code> — les arguments sont <strong>appariés</strong>.</li>
+<li>Traiter l'objet <strong>comme une liste</strong> : <code>[[1]]</code> la fonction, le reste les arguments <strong>étiquetés</strong>.</li>
+<li><strong>Retirer</strong> par <code>NULL</code>, <strong>ajouter</strong> par assignation étiquetée, <strong>renommer la fonction</strong> par <code>as.name()</code>.</li>
+<li><strong>Évaluer dans le bon cadre</strong> — presque toujours <strong><code>eval.parent()</code></strong> ou <code>sys.frame(sys.parent())</code>.</li>
+<li>Pour concaténer, passer par <strong><code>as.list()</code> puis <code>as.call()</code></strong> — <em>« concatenation does not work on call objects »</em>.</li>
+</ol>
+<p><strong>Protocole « faire parler un argument » — 4 étapes.</strong></p>
+<ol>
+<li><strong><code>substitute(arg)</code></strong> dans la fonction — jamais à la console (au sommet, il agit comme <code>quote</code>).</li>
+<li><strong><code>deparse()</code></strong> pour du texte ; laisser tel quel pour une annotation mathématique.</li>
+<li><strong>Protéger</strong> par <code>if (!missing(arg))</code>.</li>
+<li> <strong>Forcer la promesse</strong> avant toute modification de l'argument — <strong>en mentionnant le nom</strong>, jamais par <code>eval()</code>.</li>
+</ol>
+<p><strong>Protocole « construire une expression » — 3 étapes.</strong></p>
+<ol>
+<li>Peu de trous → <strong><code>bquote()</code></strong> avec <code>.()</code>.</li>
+<li>Correspondances nombreuses ou calculées → <strong><code>substitute(e, list(...))</code></strong>, en <strong><code>quote</code>ant</strong> les symboles à insérer.</li>
+<li>Se rappeler que la construction est <strong>purement lexicale</strong> : rien ne vérifie que le résultat a un sens.</li>
+</ol>
+<h2 data-prio="must">Common mistakes</h2>
+<table>
+<thead>
+<tr>
+<th>Erreur</th>
+<th>Correction</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Croire que <code>2 + 2</code> n'est pas un appel</td>
+<td>c'est <code>`+`(2, 2)</code></td>
+</tr>
+<tr>
+<td>Croire <code>[[1]]</code> être le premier argument</td>
+<td>c'est <strong>la fonction</strong></td>
+</tr>
+<tr>
+<td>Utiliser <code>substitute</code> à la console</td>
+<td>au sommet, il <strong>agit comme <code>quote</code></strong></td>
+</tr>
+<tr>
+<td>Oublier <code>quote()</code> dans la liste de substitution</td>
+<td>on insère <strong>la valeur</strong>, pas le symbole</td>
+</tr>
+<tr>
+<td>Attendre de <code>substitute</code> une vérification</td>
+<td> <em>« <strong>purely lexical</strong> … <strong>no checking</strong> »</em></td>
+</tr>
+<tr>
+<td>Modifier l'argument avant de forcer l'étiquette</td>
+<td>l'étiquette décrira <strong>la valeur modifiée</strong></td>
+</tr>
+<tr>
+<td>Forcer par <code>eval(ylab)</code></td>
+<td> <strong>détruit</strong> une expression mathématique</td>
+</tr>
+<tr>
+<td>Comparer des expressions par <code>deparse</code></td>
+<td>le dépareur <strong>n'est pas injectif</strong></td>
+</tr>
+<tr>
+<td>Croire un objet <code>expression</code> et un <code>call</code> interchangeables</td>
+<td>l'un <strong>résiste</strong> à l'évaluation, l'autre non</td>
+</tr>
+<tr>
+<td>Se fier à l'affichage pour reconnaître un objet de langage</td>
+<td><code>e</code> et <code>ee</code> <strong>s'affichent pareil</strong></td>
+</tr>
+<tr>
+<td>Utiliser <code>sys.call()</code> pour transformer un appel</td>
+<td>il <strong>n'apparie pas</strong> les arguments</td>
+</tr>
+<tr>
+<td>Concaténer des objets <code>call</code> directement</td>
+<td>passer par <strong><code>as.list</code></strong> puis <strong><code>as.call</code></strong></td>
+</tr>
+<tr>
+<td>Croire que <code>call("round", x)</code> insère le symbole</td>
+<td>il insère <strong>la valeur</strong></td>
+</tr>
+<tr>
+<td>Passer une liste à <code>cbind</code></td>
+<td>il faut <strong><code>do.call(cbind, liste)</code></strong></td>
+</tr>
+<tr>
+<td>Croire <code>...</code> être un appel à <code>list</code></td>
+<td>c'est <strong>une pairlist</strong> — <em>« not a call to <code>list</code> like it is in S »</em></td>
+</tr>
+<tr>
+<td>Évaluer un appel construit dans le mauvais cadre</td>
+<td>les variables <strong>n'ont de sens que chez l'appelant</strong></td>
+</tr>
+<tr>
+<td>Croire qu'évaluer dans un environnement est sans effet</td>
+<td> <em>« <strong>may actually change that environment</strong> »</em></td>
+</tr>
+<tr>
+<td>Utiliser <code>as.list</code>/<code>as.function</code> par confort</td>
+<td><em>« <strong>mainly included for S compatibility</strong> »</em>, et <strong>l'environnement est perdu</strong></td>
+</tr>
+</tbody></table>
+<h2>Ultimate Review</h2>
+<p><strong>Le principe.</strong> <em>« <strong>subroutines have the ability to modify or construct other subroutines and evaluate the result as an integral part of the language itself</strong> »</em> — <em>« similar to <strong>Lisp and Scheme</strong> … <strong>the engine is really very Lisp-like</strong> »</em>. Applications : <strong>dérivées analytiques</strong>, <strong>génération de fonctions polynomiales</strong>, <strong><code>model.frame</code></strong> dans les routines de modélisation, <strong><code>curve</code></strong>.</p>
+<p><strong>Trois objets de langage.</strong> <strong>calls</strong>, <strong>expressions</strong>, <strong>functions</strong>. <strong><code>quote()</code></strong> capture : <em>« <strong>The arguments are not evaluated, the result is simply the parsed argument.</strong> »</em> Et <code>2 + 2</code> <strong>est</strong> <code>`+`(2, 2)</code>.</p>
+<p><strong>Un appel est une liste.</strong> <code>e[[1]]</code> <strong>la fonction</strong>, <code>e[[2]]</code>, <code>e[[3]]</code> <strong>les arguments</strong> ; <strong>les mots-clés servent d'étiquettes</strong> (<code>e3$x</code>) · <strong><code>as.list</code></strong> / <strong><code>as.call</code></strong> convertissent · composants de mode <strong><code>"name"</code></strong>, ou <strong>constantes</strong>, ou <strong>autres appels</strong> (sous-expressions) · <strong><code>as.name("+")</code></strong> fabrique un symbole.</p>
+<p><strong>Parenthèses et dépareillage.</strong> <em>« <strong>All grouping parentheses in input are preserved</strong> … <strong>represented as a function call with one argument</strong> »</em> ; <code>4 - (2 - 2)</code> devient <code>"-"(4, "("("-"(2, 2)))</code> ·  <em>« <strong>R's parser is not perfectly invertible, nor is its deparser</strong> »</em> — <code>deparse(quote(c(1,2)))</code> et <code>deparse(c(1,2))</code> donnent <strong>la même chaîne</strong> · mais <em>« <strong>deparsed expressions should evaluate to an equivalent value</strong> »</em>.</p>
+<p><strong><code>substitute()</code>.</strong> L'usage type : <strong><code>deparse(substitute(x))</code></strong> au début de <code>plot.default</code> · fonctionne parce qu'<em>« <strong>a formal argument is really a promise</strong> »</em> à <strong>trois fentes</strong> et que <em>« <strong><code>substitute</code> will recognize a promise variable and substitute the value of its expression slot</strong> »</em> ·  <strong>les variables locales sont aussi substituées</strong> · deuxième argument : <strong>une liste étiquetée ou un environnement</strong> ;  <strong><code>quote()</code> nécessaire</strong> pour insérer un symbole.</p>
+<p><strong>Les règles exactes.</strong> Objet local simple → <strong>sa valeur</strong>, <em>« <strong>except if matching against the global environment</strong> »</em> · promesse → <strong>son expression</strong> · non apparié → <strong>inchangé</strong>. L'exception du sommet est <em>« <strong>admittedly peculiar</strong> … <strong>inherited from S</strong> »</em> : au niveau global, <code>substitute</code> <strong>agit comme <code>quote</code></strong>.</p>
+<p class="cal piege"><strong> Purement lexical.</strong> <em>« <strong>the substitutions are purely lexical ; there is no checking that the resulting call objects make sense</strong> »</em> — <code>substitute(x &lt;- x + 1, list(x = 2))</code> rend <strong><code>2 &lt;- 2 + 1</code></strong>. Et certaines parties de R <strong>exploitent</strong> cette liberté, comme les maths en graphique.</p>
+<p><strong>La double substitution.</strong> <em>« <strong><code>substitute</code> will not evaluate its first argument</strong> »</em> → <code>eval(substitute(substitute(e, list(x = 3)), list(e = expr)))</code> rend <strong><code>3 + y</code></strong>.</p>
+<p class="cal piege"><strong> Le piège de la paresse.</strong> <code>logplot</code> avec <code>ylab = deparse(substitute(y))</code> produit <em>« an <strong>ugly <code>c(...)</code> expression</strong> »</em> si <code>y</code> est modifié avant. <strong>La solution : mentionner <code>ylab</code> seul.</strong> Et  <em>« <strong>one should not use <code>eval(ylab)</code></strong> … <strong>not at all be desirable if a math expression</strong> … was being passed »</em>.</p>
+<p><strong><code>bquote()</code>.</strong> <em>« <strong>The expression is quoted except for the contents of <code>.()</code> subexpressions, which are replaced</strong> »</em> — plus compact que <code>substitute</code> sur peu de trous.</p>
+<p><strong><code>eval()</code>.</strong> Par défaut <em>« <strong>the evaluation frame from which <code>eval</code> is called</strong> »</em> · <strong><code>eval.parent(expr)</code></strong> = <code>eval(expr, sys.frame(sys.parent()))</code> · <strong><code>eval(expr, data, sys.frame(sys.parent()))</code></strong> = évaluer dans une liste <strong>avec un enclos</strong> — c'est le <code>data =</code> de <code>lm</code> ·  <em>« <strong>evaluation in a given environment may actually change that environment</strong> »</em>, mais <em>« <strong>the original list does not change because one is really working on a copy</strong> »</em>.</p>
+<p><strong>Objets <code>expression</code>.</strong> <em>« <strong>very similar to lists of call objects</strong> »</em> · <code>eval(ex)</code> évalue <strong>chacun</strong>, la valeur est <strong>celle du dernier</strong> ·  <em>« <strong>Expression objects … in a sense retain their quotedness. The evaluator will not evaluate an expression object recursively, only when it is passed directly to <code>eval</code>.</strong> »</em> ·  le dépareur <strong>les représente par l'appel qui les crée</strong>, d'où <code>e</code> et <code>ee</code> <strong>identiques à l'affichage</strong>, l'un de mode <code>"call"</code>, l'autre <code>"expression"</code>.</p>
+<p><strong>L'appel courant.</strong> <strong><code>sys.call()</code></strong> — tel qu'écrit, <em>« not really useful except for debugging »</em> · <strong><code>match.call()</code></strong> — <em>« <strong>with all actual arguments bound to the corresponding formals</strong> »</em>.</p>
+<p><strong>Le patron de <code>lm</code>.</strong> <code>match.call()</code> → <strong><code>NULL</code></strong> pour retirer → <strong>assignation étiquetée</strong> pour ajouter → <strong><code>[[1]] &lt;- as.name("model.frame")</code></strong> pour renommer → <strong><code>eval(mf, sys.frame(sys.parent()))</code></strong>.</p>
+<p><strong><code>expand.dots = FALSE</code>.</strong> <em>« lets all <code>...</code> arguments <strong>be collected as a single argument with the tag <code>...</code></strong> »</em> ·  <em>« <strong>The <code>...</code> argument is a list (a pairlist to be precise), not a call to <code>list</code> like it is in S</strong> »</em> · usages : <strong>supprimer les <code>...</code></strong> (<code>plot.formula</code>) et <strong>fusionner des arguments</strong> (<code>update.default</code>) ·  <em>« <strong>Concatenation does not work on call objects without the coercion</strong> »</em> — <code>as.list</code> puis <code>as.call</code>.</p>
+<p><strong>Construire.</strong> <strong><code>call("round", x)</code></strong> —  <em>« <strong>the value of <code>x</code> rather than the symbol is inserted</strong> »</em>, utile <em>« where <strong>the name of a function is available as a character variable</strong> »</em> · <strong><code>do.call(f, liste)</code></strong> — <em>« <strong>evaluates the call immediately</strong> and <strong>takes the arguments from an object of mode <code>"list"</code></strong> »</em> ; usage naturel : <code>do.call(cbind, lapply(x, is.na))</code>.</p>
+<p><strong>Disséquer une fonction.</strong> <strong><code>body</code></strong>, <strong><code>formals</code></strong> (<em>« This is a <strong>pairlist</strong> »</em>), <strong><code>environment</code></strong> — et leurs versions de remplacement · <strong><code>evalq(x &lt;- 5, environment(f))</code></strong> pour changer une liaison · <strong><code>as.list</code></strong> / <strong><code>as.function</code></strong> : <em>« <strong>mainly included for S compatibility</strong> »</em>, et  <strong><code>as.list</code> perd l'environnement</strong>.</p>
+<div class="rec"><h2>Active Recall</h2><details class="cor">
+<summary>Que signifie « calculer sur le langage », et à quelle famille de langages cela rattache-t-il R ?</summary><div class="in">
+
+<p><em>« <strong>R belongs to a class of programming languages in which subroutines have the ability to modify or construct other subroutines and evaluate the result as an integral part of the language itself.</strong> This is <strong>similar to Lisp and Scheme</strong> … <strong>but in contrast to FORTRAN and the ALGOL family</strong>. »</em> (§6)</p>
+<p><em>« <strong>R presents a friendlier interface to programming than Lisp does</strong> … <strong>but the engine is really very Lisp-like.</strong> <strong>R allows direct access to parsed expressions and functions and allows you to alter and subsequently execute them, or create entirely new functions from scratch.</strong> »</em></p>
+<p><strong>Les usages cités</strong> : dérivées analytiques, génération de fonctions polynomiales, les appels <em>« admittedly not very pretty »</em> à <strong><code>model.frame</code></strong>, et <strong><code>curve</code></strong> — <em>« <strong>elegant interfaces to useful functionality</strong> »</em>.</p>
+</div></details><details class="cor">
+<summary>Comment capture-t-on une expression, et pourquoi <code>2 + 2</code> est-il un appel ?</summary><div class="in">
+
+<p><em>« <strong>The most direct method of obtaining a call object is to use <code>quote</code></strong> … <strong>The arguments are not evaluated, the result is simply the parsed argument.</strong> »</em> (§6.1)</p>
+<pre><code class="language-r">e1 &lt;- quote(2 + 2)
+e2 &lt;- quote(plot(x, y))
+</code></pre>
+<p><em>« It is perhaps most immediately obvious why the <code>e2</code> object has mode <code>"call"</code> … <strong>However, <code>e1</code> actually has exactly the same structure as a call to the binary operator <code>+</code> with two arguments</strong> »</em> :</p>
+<pre><code class="language-r">&gt; quote("+"(2, 2))
+2 + 2
+</code></pre>
+<p>C'est la règle du §3.1.4 (fiche 301) : <em>« <strong>except for the syntax, there is no difference between applying an operator and calling a function</strong> »</em>. <strong>Tout est appel.</strong></p>
+</div></details><details class="cor">
+<summary>Comment accède-t-on aux composants d'un appel ?</summary><div class="in">
+
+<p><em>« <strong>The components of a call object are accessed using a list-like syntax, and may in fact be converted to and from lists using <code>as.list</code> and <code>as.call</code>.</strong> »</em> (§6.1)</p>
+<pre><code class="language-r">&gt; e2[[1]]   # plot   &lt;- LA FONCTION
+&gt; e2[[2]]   # x
+&gt; e2[[3]]   # y
+</code></pre>
+<p><em>« <strong>When keyword argument matching is used, the keywords can be used as list tags</strong> »</em> : <code>e3$x</code> rend <code>age</code> pour <code>e3 &lt;- quote(plot(x = age, y = weight))</code>.</p>
+<p>Les composants sont de mode <strong><code>"name"</code></strong> pour les identifiants, mais peuvent aussi être <strong>des constantes</strong> ou <strong>d'autres appels</strong> — <em>« <strong>subexpressions are simply components that are themselves calls</strong> »</em>.</p>
+<p>Et <strong><code>as.name("+")</code></strong> fabrique un symbole : <code>e2[[1]] &lt;- as.name("+")</code> transforme <code>plot(x, y)</code> en <strong><code>x + y</code></strong>.</p>
+</div></details><details class="cor">
+<summary>Pourquoi le dépareur de R n'est-il pas fiable pour comparer deux objets ?</summary><div class="in">
+
+<p><em>«  <strong>As it happens, R's parser is not perfectly invertible, nor is its deparser</strong> »</em> (§6.1) :</p>
+<pre><code class="language-r">&gt; str(quote(c(1,2)))     #  language c(1, 2)
+&gt; str(c(1,2))            #  num [1:2] 1 2
+&gt; deparse(quote(c(1,2))) # "c(1, 2)"
+&gt; deparse(c(1,2))        # "c(1, 2)"
+</code></pre>
+<p><strong>Deux objets de nature totalement différente</strong> — un appel et un vecteur numérique — ont <strong>le même dépareillage</strong>. De même, <code>quote("-"(2, 2))</code> et <code>quote(2 - 2)</code> s'affichent tous deux <code>2 - 2</code>.</p>
+<p><em>« <strong>Deparsed expressions should, however, evaluate to an equivalent value to the original expression (up to rounding error).</strong> »</em> — le dépareillage préserve <strong>le sens</strong>, pas <strong>l'identité</strong>. Pour comparer, utiliser <code>identical()</code>.</p>
+<p>Même leçon au §6.4 : <code>e &lt;- quote(expression(2+2))</code> et <code>ee &lt;- expression(2+2)</code> <em>« <strong>look identical when printed</strong> »</em> mais sont de modes différents.</p>
+</div></details><details class="cor">
+<summary>Comment <code>plot()</code> sait-il étiqueter ses axes, et quel mécanisme rend cela possible ?</summary><div class="in">
+
+<p>La ligne du début de <code>plot.default</code> (§6.2) :</p>
+<pre><code class="language-r">xlabel &lt;- if (!missing(x)) deparse(substitute(x))
+</code></pre>
+<p><em>« <strong>This causes the variable or expression given as the <code>x</code> argument to <code>plot</code> to be used for labeling the x-axis.</strong> »</em></p>
+<p><strong>Le mécanisme est la promesse</strong> : <em>« <strong>for this to happen, <code>x</code> must carry information about the expression that creates its value. This is related to the lazy evaluation scheme of R.</strong> <strong>A formal argument is really a promise, an object with three slots</strong> — l'expression, l'environnement, la valeur. <strong><code>substitute</code> will recognize a promise variable and substitute the value of its expression slot.</strong> »</em></p>
+<p><strong>La fonction ne reçoit pas le nom « poids » — elle le retrouve</strong> dans la fente expression de la promesse (fiche 309).</p>
+<p class="cal piege"> Et <em>« <strong>if <code>substitute</code> is invoked inside a function, the local variables of the function are also subject to substitution</strong> »</em>.</p>
+</div></details><details class="cor">
+<summary>Que signifie « les substitutions sont purement lexicales » ?</summary><div class="in">
+
+<p><em>« <strong>It is important to realize that the substitutions are purely lexical ; there is no checking that the resulting call objects make sense if they are evaluated.</strong> <strong><code>substitute(x &lt;- x + 1, list(x = 2))</code> will happily return <code>2 &lt;- 2 + 1</code>.</strong> »</em> (§6.2)</p>
+<p><strong><code>substitute</code> fabrique de la syntaxe, pas du sens.</strong> Le résultat peut être parfaitement inévaluable.</p>
+<p class="cal piege"> <strong>Et ce n'est pas un défaut</strong> : <em>« <strong>some parts of R make up their own rules for what makes sense and what does not and might actually have a use for such ill-formed expressions</strong>. For example, using <strong>the "math in graphs" feature</strong> often involves <strong>constructions that are syntactically correct, but which would be meaningless to evaluate</strong>, like <code>{}&gt;=40*" years"</code>. »</em></p>
+<p>Une expression destinée à être <strong>dessinée</strong> (fiche 314) n'a aucune raison d'être évaluable.</p>
+</div></details><details class="cor">
+<summary>Pourquoi l'étiquette de <code>logplot</code> devient-elle une « ugly <code>c(...)</code> expression », et comment corriger ?</summary><div class="in">
+
+<pre><code class="language-r">logplot &lt;- function(y, ylab = deparse(substitute(y))) {
+  y &lt;- log(y)
+  plot(y, ylab = ylab)
+}
+</code></pre>
+<p><em>« <strong>This looks straightforward, but one will discover that the y label becomes an ugly <code>c(...)</code> expression. It happens because the rules of lazy evaluation cause the evaluation of the <code>ylab</code> expression to happen after <code>y</code> has been modified.</strong> »</em> (§6.2)</p>
+<p>La promesse de <code>ylab</code> n'est forcée qu'au <code>plot</code> — <strong>après</strong> <code>y &lt;- log(y)</code>. <code>substitute(y)</code> décrit alors la <strong>nouvelle</strong> valeur.</p>
+<p><strong>La correction</strong> : <em>« <strong>force <code>ylab</code> to be evaluated first</strong> »</em> — le mentionner sur une ligne seule.</p>
+<p class="cal piege"> <strong>Et pas par <code>eval</code></strong> : <em>« <strong>one should not use <code>eval(ylab)</code> in this situation. If <code>ylab</code> is a language or expression object, then that would cause the object to be evaluated as well, which would not at all be desirable if a math expression like <code>quote(log[e](y))</code> was being passed.</strong> »</em></p>
+</div></details><details class="cor">
+<summary>Quelle est la différence entre <code>substitute()</code> et <code>bquote()</code> ?</summary><div class="in">
+
+<p><em>« <strong>A variant on <code>substitute</code> is <code>bquote</code>, which is used to replace some subexpressions with their values.</strong> »</em> (§6.2)</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Écriture</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>substitute</code></td>
+<td><code>substitute(x[ix] == y, list(ix = i, y = pnorm(i)))</code></td>
+</tr>
+<tr>
+<td><code>bquote</code></td>
+<td><code>bquote( x[.(i)] == .(pnorm(i)) )</code></td>
+</tr>
+</tbody></table>
+<p><em>« <strong>The expression is quoted except for the contents of <code>.()</code> subexpressions, which are replaced.</strong> »</em></p>
+<p><strong>La différence est la lisibilité</strong> : <code>substitute</code> demande <strong>une liste de correspondances</strong> séparée de l'expression ; <code>bquote</code> <strong>marque les trous là où ils sont</strong>. Sur deux ou trois substitutions, <code>bquote</code> est nettement plus clair — c'est d'ailleurs ainsi que le cours réécrit son propre exemple, <em>« more compactly »</em>.</p>
+</div></details><details class="cor">
+<summary>Dans quels environnements <code>eval()</code> peut-il évaluer, et pourquoi cela compte ?</summary><div class="in">
+
+<p><em>« <strong>It is also possible to specify the environment in which the evaluation is to take place. By default this is the evaluation frame from which <code>eval</code> is called, but quite frequently it needs to be set to something else.</strong> »</em> (§6.3)</p>
+<p><strong>Cas 1 — chez l'appelant.</strong> <em>« when the object to evaluate is the result of a <code>substitute</code> operation … <strong>it will contain variables that make sense to the caller only</strong> (notice that <strong>there is no reason to expect that the variables of the caller are in the lexical scope of the callee</strong>) »</em>. D'où <strong><code>eval.parent(expr)</code></strong>, raccourci de <code>eval(expr, sys.frame(sys.parent()))</code>.</p>
+<p><strong>Cas 2 — dans une liste, avec enclos.</strong> <code>eval(expr, data, sys.frame(sys.parent()))</code> : <em>« <strong>one needs not only to evaluate an expression in a list, but also to specify an enclosure into which the search continues if the variable is not in the list</strong> »</em>.</p>
+<p><strong>C'est exactement le <code>data =</code> de <code>lm</code></strong> (fiche 313) : d'abord le data frame, ensuite l'appelant.</p>
+</div></details><details class="cor">
+<summary>Quelle est la différence entre un objet <code>call</code> et un objet <code>expression</code> ?</summary><div class="in">
+
+<p><em>« Objects of mode <code>"expression"</code> … are <strong>very similar to lists of call objects</strong> … <strong>evaluating an expression object evaluates each call in turn, but the final value is that of the last call</strong> »</em> (§6.4).</p>
+<p class="cal piege"> <strong>La différence subtile</strong> : <em>« <strong>Call objects are indistinguishable from subexpressions in a parse tree. This means that they are automatically evaluated in the same way a subexpression would be. Expression objects can be recognized during evaluation and in a sense retain their quotedness. The evaluator will not evaluate an expression object recursively, only when it is passed directly to <code>eval</code>.</strong> »</em></p>
+<pre><code class="language-r">&gt; eval(substitute(mode(x), list(x = quote(2 + 2))))       # "numeric"
+&gt; eval(substitute(mode(x), list(x = expression(2 + 2))))  # "expression"
+</code></pre>
+<p><strong>Le <code>call</code> s'est évalué en chemin ; l'objet <code>expression</code> a résisté.</strong></p>
+</div></details><details class="cor">
+<summary>Quelle est la différence entre <code>sys.call()</code> et <code>match.call()</code> ?</summary><div class="in">
+
+<pre><code class="language-r">&gt; f &lt;- function(x, y, ...) sys.call()
+&gt; f(y = 1, 2, z = 3, 4)
+f(y = 1, 2, z = 3, 4)
+
+&gt; f &lt;- function(x, y, ...) match.call()
+&gt; f(y = 1, 2, z = 3, 4)
+f(x = 2, y = 1, z = 3, 4)
+</code></pre>
+<p><em>« <strong><code>sys.call</code></strong> … <strong>is not really useful except for debugging because it requires the function to keep track of argument matching in order to interpret the call. For instance, it must be able to see that the 2nd actual argument gets matched to the first formal one.</strong> »</em></p>
+<p><em>« <strong>More often one requires the call with all actual arguments bound to the corresponding formals. To this end, the function <code>match.call</code> is used.</strong> »</em> (§6.5)</p>
+<p><strong><code>match.call()</code> a fait le travail d'appariement</strong> (fiche 309, trois passes) : le <code>2</code> est maintenant étiqueté <code>x =</code> et placé en tête.</p>
+</div></details><details class="cor">
+<summary>Décrire le patron de <code>lm</code> pour transformer son propre appel.</summary><div class="in">
+
+<pre><code class="language-r">mf &lt;- cl &lt;- match.call()
+mf$singular.ok &lt;- mf$model &lt;- mf$method &lt;- NULL
+mf$drop.unused.levels &lt;- TRUE
+mf[[1]] &lt;- as.name("model.frame")
+mf &lt;- eval(mf, sys.frame(sys.parent()))
+</code></pre>
+<p><em>« <strong>The call can be treated as a list object where the first element is the name of the function and the remaining elements are the actual argument expressions, with the corresponding formal argument names as tags.</strong> »</em> (§6.5)</p>
+<table>
+<thead>
+<tr>
+<th>Opération</th>
+<th>Technique</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>retirer</strong> un argument</td>
+<td><em>« <strong>assign <code>NULL</code></strong> »</em></td>
+</tr>
+<tr>
+<td><strong>ajouter</strong> un argument</td>
+<td><em>« <strong>tagged list assignment</strong> »</em></td>
+</tr>
+<tr>
+<td><strong>changer la fonction</strong></td>
+<td><em>« assign to the first element … <strong>make sure that the value is a name</strong> »</em> — <code>as.name()</code> ou <code>quote()</code></td>
+</tr>
+<tr>
+<td><strong>exécuter</strong></td>
+<td><em>« <strong>evaluated in the parent frame, in which one can be certain that the involved expressions make sense</strong> »</em></td>
+</tr>
+</tbody></table>
+<p><strong><code>lm</code> réécrit son appel en un appel à <code>model.frame</code>.</strong></p>
+</div></details><details class="cor">
+<summary>Que fait <code>expand.dots = FALSE</code>, et quels usages le cours en donne-t-il ?</summary><div class="in">
+
+<p><em>« <strong>a switch which if set to <code>FALSE</code> lets all <code>...</code> arguments be collected as a single argument with the tag <code>...</code></strong> »</em> (§6.5) :</p>
+<pre><code class="language-r">&gt; f(y = 1, 2, z = 3, 4)
+f(x = 2, y = 1, ... = list(z = 3, 4))
+</code></pre>
+<p class="cal piege"> <em>« <strong>The <code>...</code> argument is a list (a pairlist to be precise), not a call to <code>list</code> like it is in S.</strong> »</em></p>
+<p><strong>Deux usages.</strong> (1) <em>« simply <strong>to get rid of any <code>...</code> arguments in order not to be passing unspecified arguments on to functions that may not know them</strong> »</em> — <code>plot.formula</code> fait <code>m$... &lt;- NULL</code>. (2) <code>update.default</code>, où <em>« a set of optional extra arguments can <strong>add to, replace, or cancel</strong> those of the original call »</em>.</p>
+<p class="cal piege"> <em>« <strong>Concatenation does not work on call objects without the coercion</strong> … <strong>this is arguably a bug</strong> »</em> — d'où <code>as.call(c(as.list(call), extras))</code>.</p>
+</div></details><details class="cor">
+<summary>Quelle est la différence entre <code>call()</code> et <code>do.call()</code> ?</summary><div class="in">
+
+<p><em>« <strong>The function <code>call</code> allows creation of a call object from the function name and the list of arguments</strong> »</em> (§6.5) :</p>
+<pre><code class="language-r">&gt; x &lt;- 10.5
+&gt; call("round", x)
+round(10.5)
+</code></pre>
+<p class="cal piege"> <em>« <strong>the value of <code>x</code> rather than the symbol is inserted in the call, so it is distinctly different from <code>round(x)</code></strong> … <strong>occasionally useful where the name of a function is available as a character variable</strong> »</em>.</p>
+<p><em>« <strong>The function <code>do.call</code> is related, but evaluates the call immediately and takes the arguments from an object of mode <code>"list"</code> containing all the arguments.</strong> »</em></p>
+<pre><code class="language-r">y &lt;- do.call(cbind, lapply(x, is.na))
+</code></pre>
+<p><strong><code>lapply</code> rend une liste ; <code>cbind</code> veut des arguments séparés ; <code>do.call</code> déplie la liste en arguments.</strong> <em>« A natural use of this is when one wants to <strong>apply a function like <code>cbind</code> to all elements of a list or data frame</strong> »</em>.</p>
+</div></details><details class="cor">
+<summary>Comment lit-on et modifie-t-on les trois composantes d'une fonction ?</summary><div class="in">
+
+<p><em>« <strong>It is often useful to be able to manipulate the components of a function or closure. R provides a set of interface functions for this purpose.</strong> »</em> (§6.6)</p>
+<table>
+<thead>
+<tr>
+<th>Lire</th>
+<th>Écrire</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong><code>body(f)</code></strong> — <em>« the expression that is the body »</em></td>
+<td><strong><code>body(f) &lt;- </code></strong></td>
+</tr>
+<tr>
+<td><strong><code>formals(f)</code></strong> — <em>« a list … <strong>This is a pairlist</strong> »</em></td>
+<td><strong><code>formals(f) &lt;- </code></strong></td>
+</tr>
+<tr>
+<td><strong><code>environment(f)</code></strong></td>
+<td><strong><code>environment(f) &lt;- </code></strong></td>
+</tr>
+</tbody></table>
+<p>Ce sont les <strong>trois composantes d'une fermeture</strong> (fiche 310).</p>
+<p>*« It is also possible to <strong>alter the bindings of different variables in the environment of the function</strong>, using <strong><code>evalq(x &lt;- 5, environment(f))</code></strong>. »*</p>
+<p class="cal piege"> Sur <code>as.list</code> / <code>as.function</code> : <em>« <strong>This functionality is mainly included for S compatibility.</strong> <strong>Notice that environment information is lost when <code>as.list</code> is used</strong>, whereas <code>as.function</code> has an argument that allows the environment to be set. »</em></p>
+</div></details></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h2>Flashcards</h2>
+<table>
+<thead>
+<tr>
+<th>Question</th>
+<th>Réponse</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>À quelle famille de langages R se rattache-t-il ici ?</td>
+<td><strong>Lisp et Scheme</strong></td>
+</tr>
+<tr>
+<td>Que peut faire un sous-programme en R ?</td>
+<td><strong>Modifier ou construire</strong> d'autres sous-programmes</td>
+</tr>
+<tr>
+<td>Comment le manuel qualifie-t-il le moteur ?</td>
+<td><em>« <strong>very Lisp-like</strong> »</em></td>
+</tr>
+<tr>
+<td>Deux applications standard citées ?</td>
+<td><strong>Dérivées analytiques</strong>, <strong>génération de polynômes</strong></td>
+</tr>
+<tr>
+<td>Une fonction qui prend une expression ?</td>
+<td><strong><code>curve</code></strong></td>
+</tr>
+<tr>
+<td>Les trois sortes d'objets de langage ?</td>
+<td><strong>Calls</strong>, <strong>expressions</strong>, <strong>functions</strong></td>
+</tr>
+<tr>
+<td>Comment capturer une expression ?</td>
+<td><strong><code>quote()</code></strong></td>
+</tr>
+<tr>
+<td>Ses arguments sont-ils évalués ?</td>
+<td><strong>Non</strong></td>
+</tr>
+<tr>
+<td>Que vaut <code>quote("+"(2, 2))</code> ?</td>
+<td><strong><code>2 + 2</code></strong></td>
+</tr>
+<tr>
+<td>Que contient <code>e[[1]]</code> d'un appel ?</td>
+<td><strong>La fonction</strong></td>
+</tr>
+<tr>
+<td>Et <code>e[[2]]</code> ?</td>
+<td>Le <strong>premier argument</strong></td>
+</tr>
+<tr>
+<td>Comment convertir un appel en liste ?</td>
+<td><strong><code>as.list</code></strong> — et retour par <strong><code>as.call</code></strong></td>
+</tr>
+<tr>
+<td>Comment accéder à un argument nommé ?</td>
+<td>Par <strong><code>$</code></strong>, le mot-clé sert d'<strong>étiquette</strong></td>
+</tr>
+<tr>
+<td>Le mode des identifiants dans un appel ?</td>
+<td><strong><code>"name"</code></strong></td>
+</tr>
+<tr>
+<td>Comment fabriquer un symbole ?</td>
+<td><strong><code>as.name("...")</code></strong></td>
+</tr>
+<tr>
+<td>Que deviennent les parenthèses de groupement ?</td>
+<td><strong>Conservées</strong>, comme un <strong>appel à un argument</strong></td>
+</tr>
+<tr>
+<td>Que fait l'opérateur <code>(</code> à l'évaluation ?</td>
+<td>Il <strong>rend son argument</strong></td>
+</tr>
+<tr>
+<td>Le parseur est-il inversible ?</td>
+<td> <strong>Non</strong> — ni le dépareur</td>
+</tr>
+<tr>
+<td>Que valent <code>deparse(quote(c(1,2)))</code> et <code>deparse(c(1,2))</code> ?</td>
+<td><strong>La même chaîne</strong></td>
+</tr>
+<tr>
+<td>Que garantit le dépareillage ?</td>
+<td>Une <strong>valeur équivalente</strong> à l'évaluation</td>
+</tr>
+<tr>
+<td>Comment récupérer l'expression d'un argument ?</td>
+<td><strong><code>substitute(arg)</code></strong></td>
+</tr>
+<tr>
+<td>Comment en faire du texte ?</td>
+<td><strong><code>deparse(substitute(arg))</code></strong></td>
+</tr>
+<tr>
+<td>Où voit-on cet idiome ?</td>
+<td>Au début de <strong><code>plot.default</code></strong></td>
+</tr>
+<tr>
+<td>Pourquoi cela fonctionne-t-il ?</td>
+<td>L'argument est <strong>une promesse</strong></td>
+</tr>
+<tr>
+<td>Que lit <code>substitute</code> dans la promesse ?</td>
+<td>Sa <strong>fente expression</strong></td>
+</tr>
+<tr>
+<td>Les variables locales sont-elles substituées ?</td>
+<td> <strong>Oui</strong></td>
+</tr>
+<tr>
+<td>Le second argument de <code>substitute</code> ?</td>
+<td>Une <strong>liste étiquetée</strong> ou un <strong>environnement</strong></td>
+</tr>
+<tr>
+<td>Pourquoi <code>quote(x)</code> dans cette liste ?</td>
+<td>Pour insérer <strong>le symbole</strong>, pas la valeur</td>
+</tr>
+<tr>
+<td>Les substitutions vérifient-elles le sens ?</td>
+<td> <strong>Non</strong> — <em>« purely lexical »</em></td>
+</tr>
+<tr>
+<td>Que rend <code>substitute(x &lt;- x+1, list(x=2))</code> ?</td>
+<td><strong><code>2 &lt;- 2 + 1</code></strong></td>
+</tr>
+<tr>
+<td>Qui exploite cette liberté ?</td>
+<td>Les <strong>maths en graphique</strong></td>
+</tr>
+<tr>
+<td><code>substitute</code> évalue-t-il son 1ᵉʳ argument ?</td>
+<td><strong>Non</strong> — d'où la <strong>double substitution</strong></td>
+</tr>
+<tr>
+<td>Que fait <code>substitute</code> au niveau global ?</td>
+<td>Il <strong>agit comme <code>quote</code></strong></td>
+</tr>
+<tr>
+<td>D'où vient cette exception ?</td>
+<td>De <strong>S</strong> — <em>« admittedly peculiar »</em></td>
+</tr>
+<tr>
+<td>Le piège de <code>logplot</code> ?</td>
+<td>L'étiquette décrit la valeur <strong>modifiée</strong></td>
+</tr>
+<tr>
+<td>La solution ?</td>
+<td><strong>Mentionner</strong> l'argument sur une ligne seule</td>
+</tr>
+<tr>
+<td>Pourquoi pas <code>eval(ylab)</code> ?</td>
+<td>Cela <strong>évaluerait</strong> une expression mathématique</td>
+</tr>
+<tr>
+<td>La variante compacte de <code>substitute</code> ?</td>
+<td><strong><code>bquote()</code></strong></td>
+</tr>
+<tr>
+<td>Que marque <code>.()</code> ?</td>
+<td>Le sous-terme <strong>à remplacer</strong></td>
+</tr>
+<tr>
+<td>Où <code>eval</code> évalue-t-il par défaut ?</td>
+<td>Dans le <strong>cadre appelant <code>eval</code></strong></td>
+</tr>
+<tr>
+<td>Le raccourci pour le cadre parent ?</td>
+<td><strong><code>eval.parent()</code></strong></td>
+</tr>
+<tr>
+<td>Son équivalent complet ?</td>
+<td><code>eval(expr, sys.frame(sys.parent()))</code></td>
+</tr>
+<tr>
+<td>Comment évaluer dans un data frame ?</td>
+<td><code>eval(expr, data, enclos)</code></td>
+</tr>
+<tr>
+<td>À quoi sert l'enclos ?</td>
+<td>La recherche <strong>continue</strong> si la variable manque</td>
+</tr>
+<tr>
+<td>Évaluer peut-il modifier l'environnement ?</td>
+<td> <strong>Oui</strong></td>
+</tr>
+<tr>
+<td>Et une liste ?</td>
+<td><strong>Non</strong> — on travaille sur <strong>une copie</strong></td>
+</tr>
+<tr>
+<td>Que vaut <code>eval(expression(2+2, 3+4))</code> ?</td>
+<td><strong>7</strong> — la valeur <strong>du dernier</strong></td>
+</tr>
+<tr>
+<td>Qu'ont de particulier les objets <code>expression</code> ?</td>
+<td>Ils <strong>conservent leur quotation</strong></td>
+</tr>
+<tr>
+<td>Quand sont-ils évalués ?</td>
+<td><strong>Seulement</strong> passés directement à <code>eval</code></td>
+</tr>
+<tr>
+<td>Comment le dépareur les représente-t-il ?</td>
+<td>Par <strong>l'appel qui les crée</strong></td>
+</tr>
+<tr>
+<td>Que rend <code>sys.call()</code> ?</td>
+<td>L'appel <strong>tel qu'écrit</strong></td>
+</tr>
+<tr>
+<td>Est-ce utile ?</td>
+<td>Surtout pour <strong>déboguer</strong></td>
+</tr>
+<tr>
+<td>Que rend <code>match.call()</code> ?</td>
+<td>L'appel <strong>avec arguments appariés</strong></td>
+</tr>
+<tr>
+<td>Comment retirer un argument d'un appel ?</td>
+<td>Lui assigner <strong><code>NULL</code></strong></td>
+</tr>
+<tr>
+<td>Comment en ajouter un ?</td>
+<td><strong>Assignation étiquetée</strong></td>
+</tr>
+<tr>
+<td>Comment changer la fonction appelée ?</td>
+<td><code>appel[[1]] &lt;- as.name("...")</code></td>
+</tr>
+<tr>
+<td>Où évaluer l'appel reconstruit ?</td>
+<td>Dans le <strong>cadre parent</strong></td>
+</tr>
+<tr>
+<td>Que fait <code>expand.dots = FALSE</code> ?</td>
+<td>Regroupe les <code>...</code> en <strong>un seul argument</strong></td>
+</tr>
+<tr>
+<td>Quelle est la nature de <code>...</code> ?</td>
+<td>Une <strong>pairlist</strong> — pas un appel à <code>list</code></td>
+</tr>
+<tr>
+<td>Comment concaténer des appels ?</td>
+<td><strong><code>as.list</code></strong> puis <strong><code>as.call</code></strong></td>
+</tr>
+<tr>
+<td>Que fait <code>call("round", x)</code> ?</td>
+<td>Crée l'appel avec <strong>la valeur</strong> de <code>x</code></td>
+</tr>
+<tr>
+<td>Quand est-ce utile ?</td>
+<td>Quand <strong>le nom de la fonction est une chaîne</strong></td>
+</tr>
+<tr>
+<td>Que fait <code>do.call</code> ?</td>
+<td>Il <strong>construit et évalue</strong> aussitôt</td>
+</tr>
+<tr>
+<td>D'où prend-il les arguments ?</td>
+<td>D'une <strong>liste</strong></td>
+</tr>
+<tr>
+<td>Son usage naturel ?</td>
+<td><code>do.call(cbind, lapply(x, is.na))</code></td>
+</tr>
+<tr>
+<td>Lire le corps d'une fonction ?</td>
+<td><strong><code>body()</code></strong></td>
+</tr>
+<tr>
+<td>Ses arguments formels ?</td>
+<td><strong><code>formals()</code></strong> — une <strong>pairlist</strong></td>
+</tr>
+<tr>
+<td>Son environnement ?</td>
+<td><strong><code>environment()</code></strong></td>
+</tr>
+<tr>
+<td>Sont-ils modifiables ?</td>
+<td><strong>Oui</strong>, par les versions <code>&lt;-</code></td>
+</tr>
+<tr>
+<td>Changer une liaison dans son environnement ?</td>
+<td><strong><code>evalq(x &lt;- 5, environment(f))</code></strong></td>
+</tr>
+<tr>
+<td>Pourquoi <code>as.list</code>/<code>as.function</code> existent-elles ?</td>
+<td>Pour la <strong>compatibilité S</strong></td>
+</tr>
+<tr>
+<td>Que perd <code>as.list</code> ?</td>
+<td>L'<strong>environnement</strong></td>
+</tr>
+</tbody></table>
+</main>
+
+
+
+
+</body></html>

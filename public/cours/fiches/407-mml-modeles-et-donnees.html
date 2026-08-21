@@ -1,0 +1,1672 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fiche 407 — Quand les modèles rencontrent les données : risque empirique, MLE, MAP, sélection de modèle</title>
+<script>
+window.MathJax={tex:{inlineMath:[["$","$"]],displayMath:[["$$","$$"]],processEscapes:true},
+ options:{skipHtmlTags:["script","noscript","style","textarea","pre","code"]},
+ svg:{fontCache:"global"},
+ startup:{pageReady:()=>MathJax.startup.defaultPageReady().then(()=>{document.body.classList.add("ready")})}};
+setTimeout(function(){document.body.classList.add("ready")},2500);
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+/* ============================================================
+   MathiasLearn — feuille de style des fiches
+   Reprise intégrale des tokens de 00_PARCOURS/*.html
+   + blocs pédagogiques (callouts, méthode, essentiels, recall)
+   ============================================================ */
+:root{--bg:#faf9f7;--card:#fff;--ink:#1a1a1a;--muted:#6b6b6b;--line:#e5e2dd;--accent:#8b5e34;
+ --hl:#fdf8ef;--ok:#2d7d4f;--okbg:#f0f7f3;--warn:#b3402f;--warnbg:#fdf3f1;--blue:#2f5d8b;--bluebg:#f1f5fa}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+ font:17px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;padding:0 16px 100px}
+.nav{position:sticky;top:0;background:rgba(250,249,247,.96);backdrop-filter:blur(8px);
+ border-bottom:1px solid var(--line);margin:0 -16px 30px;padding:11px 16px;z-index:50;
+ display:flex;gap:6px;flex-wrap:wrap;font-size:13px}
+.nav a{color:var(--muted);text-decoration:none;padding:4px 9px;border-radius:5px;white-space:nowrap}
+.nav a:hover{background:var(--line);color:var(--ink)}
+.nav a.on{background:var(--accent);color:#fff}
+main{max-width:780px;margin:0 auto}
+h1{font-size:31px;letter-spacing:-.02em;margin:.4em 0 .5em;line-height:1.25}
+h2{font-size:23px;margin:2.2em 0 .7em;padding-bottom:.3em;border-bottom:1px solid var(--line)}
+h3{font-size:19px;margin:1.9em 0 .5em;color:var(--accent)}
+h4{font-size:17px;margin:1.5em 0 .4em}
+p{margin:.8em 0} a{color:var(--accent)} hr{border:0;border-top:1px solid var(--line);margin:2.6em 0}
+table{border-collapse:collapse;width:100%;margin:1.3em 0;font-size:15.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+th{background:#f3f0eb;font-weight:600}
+tr:nth-child(even) td{background:#fcfbfa}
+code{font-family:"SF Mono",Menlo,Consolas,monospace;font-size:.88em;background:#f2efea;padding:2px 6px;border-radius:4px;overflow-wrap:break-word}
+pre{background:#f2efea;padding:14px 16px;border-radius:8px;overflow-x:auto}
+pre code{background:none;padding:0;white-space:pre}
+blockquote{border-left:3px solid var(--accent);background:var(--hl);margin:1.4em 0;padding:14px 20px;border-radius:0 8px 8px 0}
+blockquote p:first-child{margin-top:0} blockquote p:last-child{margin-bottom:0}
+ul,ol{padding-left:1.5em} li{margin:.35em 0} em{color:#4a4a4a}
+mjx-container[display="true"]{margin:1.1em 0!important;overflow-x:auto;overflow-y:hidden;padding:2px 0}
+mjx-container svg{max-width:100%}
+body:not(.ready) main{opacity:0} main{opacity:1;transition:opacity .25s}
+
+/* --- bandeau de tête de fiche --- */
+.cours{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--accent);
+ border-radius:0 10px 10px 0;padding:18px 22px;margin:0 0 34px}
+.cours h4{margin:0 0 4px;font-size:14px;text-transform:uppercase;letter-spacing:.07em;color:var(--accent)}
+.cours .cs{color:var(--muted);font-size:14.5px;margin:0 0 14px}
+
+/* --- exercices / corrigés --- */
+.ex{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:6px 24px 20px;margin:18px 0}
+.ex>h3:first-child{margin-top:14px}
+details.cor{margin-top:18px;border:1px solid var(--line);border-radius:8px;background:#fcfbfa;overflow:hidden}
+details.cor>summary{cursor:pointer;padding:12px 16px;font-weight:600;font-size:15px;color:var(--accent);
+ list-style:none;display:flex;align-items:center;gap:9px;user-select:none;transition:.15s;min-height:44px}
+details.cor>summary::-webkit-details-marker{display:none}
+details.cor>summary:hover{background:var(--hl)}
+details.cor>summary::before{content:"\25B6";font-size:10px;transition:transform .18s;display:inline-block}
+details.cor[open]>summary::before{transform:rotate(90deg)}
+details.cor[open]>summary{background:var(--okbg);color:var(--ok);border-bottom:1px solid var(--line)}
+.cor .in{padding:4px 20px 16px}
+.cor .in>*:first-child{margin-top:.9em}
+
+/* --- blocs pédagogiques (callouts) ---
+   Générés depuis une citation Markdown dont le premier **gras** commence
+   par un mot-clé : DÉFINITION, THÉORÈME, MÉTHODE, PIÈGE, INTUITION… */
+.cal{border:1px solid var(--line);border-left:4px solid var(--accent);background:var(--card);
+ border-radius:0 10px 10px 0;padding:15px 20px;margin:1.5em 0}
+.cal>p:first-child{margin-top:0}.cal>p:last-child,.cal>ul:last-child,.cal>ol:last-child{margin-bottom:0}
+.cal .lab{display:block;font-size:12.5px;text-transform:uppercase;letter-spacing:.08em;
+ font-weight:700;color:var(--accent);margin-bottom:6px}
+.cal.formel{background:var(--hl)}
+.cal.piege{border-left-color:var(--warn);background:var(--warnbg)}
+.cal.piege .lab{color:var(--warn)}
+.cal.methode{border-left-color:var(--ok);background:var(--okbg)}
+.cal.methode .lab{color:var(--ok)}
+.cal.intu{border-left-color:var(--blue);background:var(--bluebg)}
+.cal.intu .lab{color:var(--blue)}
+.cal.plus{border-left-style:dashed;background:#faf9f7}
+.cal.plus .lab{color:var(--muted)}
+
+/* --- révision express --- */
+.ess{background:var(--card);border:1px solid var(--accent);border-radius:10px;padding:4px 24px 20px;margin:1.6em 0}
+.ess h3{margin-top:1.3em}
+.rec{background:var(--card);border:1px dashed var(--accent);border-radius:10px;padding:4px 24px 18px;margin:1.6em 0}
+.rec ol{counter-reset:none}
+
+/* --- impression / PDF --- */
+@media print{
+ .nav{display:none}
+ body{padding:0;background:#fff;font-size:11.2pt;line-height:1.55}
+ main{max-width:none}
+ h1{font-size:23pt}h2{font-size:15pt;margin-top:1.5em}h3{font-size:12.6pt}
+ h2,h3,h4{break-after:avoid;page-break-after:avoid}
+ table,.cal,blockquote{break-inside:avoid;page-break-inside:avoid}
+ table{display:table;font-size:9.6pt}
+ details.cor{border:1px solid var(--line);background:#fcfbfa}
+ details.cor>summary{display:none}
+ details.cor .in{padding-top:10px}
+ .cal,.ex,.ess,.rec{box-shadow:none}
+ a{color:var(--ink);text-decoration:none}
+}
+@page{margin:16mm 15mm 18mm}
+
+/* --- exemples travaillés --- */
+.exm{background:#fcfbfa;border:1px solid var(--line);border-radius:10px;padding:2px 20px 14px;margin:1.5em 0}
+.exm>h4:first-child{margin:14px 0 .5em;color:var(--accent);font-size:13px;text-transform:uppercase;letter-spacing:.07em}
+
+
+/* --- pastilles de priorité (conventions des fiches de l'app) --- */
+h2[data-prio], h3[data-prio], h4[data-prio]{position:relative}
+h2[data-prio]::before,h3[data-prio]::before,h4[data-prio]::before{
+ content:"";display:inline-block;width:9px;height:9px;border-radius:50%;
+ margin-right:9px;vertical-align:middle;background:var(--muted)}
+[data-prio="must"]::before{background:var(--warn)}
+[data-prio="high"]::before{background:#d98324}
+[data-prio="mid"]::before{background:#c9a227}
+[data-prio="low"]::before{background:var(--ok)}
+/* corrigés des fiches de l'app : même traitement que les corrigés des séries */
+details.cor>summary::after{content:""}
+</style></head><body>
+<div class="nav"><a href="00_COMMENCER_ICI.html">Commencer ici</a><a href="01_NOTATIONS_le-decodeur.html">Notations</a><a href="02_EXERCICES_Serie-0.html">Série 0 — Remise en route</a><a href="03_EXERCICES_Serie-1.html">Série 1 — Convexité</a><a href="04_EXERCICES_Serie-2.html">Série 2 — KKT</a><a href="05_AUTO-EVALUATION.html">Auto-évaluation (quiz)</a><a href="06_FICHE_Optimisation-deux-variables.html">Fiche — Optimisation à 2 variables</a></div>
+<main><h1>Fiche 407 — Quand les modèles rencontrent les données : risque empirique, MLE, MAP, sélection de modèle</h1>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Matière</strong></td>
+<td>Maths · Apprentissage automatique</td>
+</tr>
+<tr>
+<td><strong>Cours source</strong></td>
+<td>Deisenroth, Faisal &amp; Ong, <em>Mathematics for Machine Learning</em>, Cambridge University Press — chapitre 8 « When Models Meet Data » (p. 251-292)</td>
+</tr>
+<tr>
+<td><strong>Difficulté</strong></td>
+<td> Intermédiaire — le PONT entre les six fondations et les quatre piliers</td>
+</tr>
+<tr>
+<td><strong>Temps d'étude estimé</strong></td>
+<td>130 min</td>
+</tr>
+<tr>
+<td><strong>Prérequis</strong></td>
+<td>Fiche 405 (Bayes, gaussienne, conjugaison) · Fiche 406 (descente de gradient) · Fiche 401 (algèbre linéaire)</td>
+</tr>
+<tr>
+<td><strong>Concepts clés</strong></td>
+<td>Donnée tabulaire, exemple, attribut, étiquette, prédicteur comme fonction, prédicteur comme loi de probabilité, trois phases algorithmiques, minimisation du risque empirique, classe d'hypothèses, fonction de perte, risque empirique, risque espéré, surapprentissage, régularisation, régularisateur de Tikhonov, validation croisée à $K$ plis, maximum de vraisemblance, log-vraisemblance négative, maximum a posteriori, sur-ajustement et sous-ajustement, modélisation probabiliste, inférence bayésienne, variables latentes, modèle graphique orienté, notation en plaques, $d$-séparation, sélection de modèle, validation croisée imbriquée, évidence, rasoir d'Occam, facteur de Bayes, paradoxe de Jeffreys-Lindley</td>
+</tr>
+<tr>
+<td><strong>Poids à l'examen</strong></td>
+<td>Les <strong>trois phases</strong> (prédiction, entraînement, sélection) · le <strong>risque empirique</strong> $\frac1N\sum\ell(y_n,\hat y_n)$ contre le <strong>risque espéré</strong> $\mathbb E_{x,y}[\ell]$ · la <strong>correspondance perte ↔ vraisemblance</strong> et <strong>régularisation ↔ a priori</strong> · $L(\theta)=-\sum_n\log p(y_n\mid x_n,\theta)$ · la <strong>factorisation</strong> $p(x)=\prod_kp(x_k\mid\text{Pa}_k)$ · l'<strong>évidence</strong> $p(\mathcal D\mid M)=\int p(\mathcal D\mid\theta)p(\theta\mid M)d\theta$ et le <strong>rasoir d'Occam</strong>.</td>
+</tr>
+</tbody></table>
+<h2>Vue d'ensemble</h2>
+<pre><code>LE PONT : la partie I (maths) rejoint la partie II (les quatre piliers)
+
+  §8.1 DONNÉES, MODÈLES, APPRENTISSAGE
+        DONNÉES tabulaires   N exemples (lignes) × D attributs (colonnes)  →  X ∈ R^(N×D)
+        ⚠️ standardiser : moyenne empirique 0, variance empirique 1
+        MODÈLE, deux visions :  (a) une FONCTION f : R^D → R
+                                (b) une LOI DE PROBABILITÉ (elle exprime l'INCERTITUDE)
+        TROIS PHASES   1. PRÉDICTION / inférence   2. ENTRAÎNEMENT   3. SÉLECTION de modèle
+  §8.2 MINIMISATION DU RISQUE EMPIRIQUE — la voie NON probabiliste
+        4 choix de conception  classe d'hypothèses · perte · régularisation · recherche
+        RISQUE EMPIRIQUE   Remp(f,X,y) = (1/N) Σn ℓ(yn, ŷn)
+        RISQUE ESPÉRÉ      Rtrue(f) = E_{x,y}[ℓ(y, f(x))]      ← ce qu'on VEUT vraiment
+        RÉGULARISATION     min (1/N)‖y − Xθ‖² + λ‖θ‖²          ← contre le SURAPPRENTISSAGE
+        VALIDATION CROISÉE à K plis   K−1 morceaux d'entraînement, 1 de validation
+  §8.3 ESTIMATION DE PARAMÈTRES — la voie probabiliste
+        MLE   L(θ) = −log p(Y|X,θ) = −Σn log p(yn|xn,θ)
+              ⚠️ vraisemblance GAUSSIENNE  ⟺  MOINDRES CARRÉS
+        MAP   p(θ|x) ∝ p(x|θ) p(θ)          ⚠️ A PRIORI  ⟺  RÉGULARISATION
+        AJUSTEMENT   sur-ajustement · sous-ajustement · bon ajustement
+  §8.4 MODÉLISATION PROBABILISTE ET INFÉRENCE
+        ⚠️ un modèle probabiliste EST la LOI JOINTE p(x,θ) de TOUTES ses variables
+        INFÉRENCE BAYÉSIENNE : on garde la loi a posteriori ENTIÈRE, pas un point
+        p(x) = ∫ p(x|θ) p(θ) dθ = Eθ[p(x|θ)]
+        VARIABLES LATENTES z   p(x|θ) = ∫ p(x|z,θ) p(z) dz     (algorithme EM)
+  §8.5 MODÈLES GRAPHIQUES ORIENTÉS (réseaux bayésiens)
+        nœuds = variables aléatoires  ·  flèches = probabilités conditionnelles
+        p(x) = Π_k p(xk | Pa_k)        Pa_k = les nœuds PARENTS de xk
+        PLAQUE = boîte qui répète son contenu N fois  ·  nœud GRISÉ = variable OBSERVÉE
+        d-SÉPARATION → lire l'indépendance conditionnelle SUR LE GRAPHE
+  §8.6 SÉLECTION DE MODÈLE
+        VALIDATION CROISÉE IMBRIQUÉE   boucle interne = choix ; externe = généralisation
+        BAYÉSIENNE   p(Mk | D) ∝ p(Mk) p(D | Mk)
+        ÉVIDENCE     p(D | Mk) = ∫ p(D | θk) p(θk | Mk) dθk    ← RASOIR D'OCCAM automatique
+        FACTEUR DE BAYES   p(D|M1)/p(D|M2)
+
+LES DEUX MONDES, TERME À TERME
+  NON PROBABILISTE            PROBABILISTE
+  fonction de PERTE      ⟷    VRAISEMBLANCE
+  RÉGULARISATION         ⟷    A PRIORI
+  min du risque empirique ⟷   max de vraisemblance / MAP
+</code></pre>
+<blockquote>
+<p><strong>La question centrale.</strong> <em>« La question principale de l'apprentissage automatique est : <strong>"Qu'entend-on par de BONS modèles ?"</strong> L'un des principes directeurs est que <strong>de bons modèles doivent bien se comporter sur des données NON VUES</strong>. »</em></p>
+</blockquote>
+<h2 data-prio="high">Concept 1 — Données, modèles, apprentissage (§8.1)</h2>
+<h3>1.1 Les données comme vecteurs</h3>
+<p><strong>Le format de travail.</strong> Les données sont supposées <strong>TABULAIRES</strong> : chaque <strong>ligne</strong> est un <strong>exemple</strong> (une instance), chaque <strong>colonne</strong> un <strong>attribut</strong>.</p>
+<table>
+<thead>
+<tr>
+<th>Terme</th>
+<th>Synonymes donnés par le livre</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Un <strong>exemple</strong> $x_n$</td>
+<td><strong>point de donnée</strong> (<em>data point</em>)</td>
+</tr>
+<tr>
+<td>Un <strong>attribut</strong></td>
+<td><strong>caractéristique</strong> (<em>feature</em>), <strong>covariable</strong> (<em>covariate</em>)</td>
+</tr>
+<tr>
+<td>Une <strong>étiquette</strong> $y_n$</td>
+<td><strong>cible</strong> (<em>target</em>), <strong>variable de réponse</strong>, <strong>annotation</strong></td>
+</tr>
+</tbody></table>
+<p><strong>Les notations à fixer :</strong></p>
+<p>$$\boxed{\;N=\text{nombre d'exemples},\quad n=1,\dots,N\qquad D=\text{nombre d'attributs},\quad d=1,\dots,D\;}$$
+$$\boxed{\;\text{Jeu de données} : \{(x_1,y_1),\dots,(x_N,y_N)\}\qquad X\in\mathbb R^{N\times D}\;}$$</p>
+<p><strong>L'exemple de la base de données RH.</strong> Le livre part d'une table <strong>non numérique</strong> (nom, genre, diplôme, code postal, âge, salaire) et montre les <strong>choix de conversion</strong> :</p>
+<ul>
+<li>Le <strong>genre</strong> (variable <strong>catégorielle</strong>) peut devenir $\{0,1\}$ <strong>ou</strong> $\{-1,+1\}$.</li>
+<li> <em>« Il est souvent important d'utiliser la <strong>CONNAISSANCE DU DOMAINE</strong> : savoir que les diplômes universitaires progressent de la licence au master au doctorat, ou réaliser que le code postal n'est pas juste une chaîne de caractères mais <strong>encode une zone de Londres</strong> »</em> — d'où sa conversion en <strong>latitude et longitude</strong>.</li>
+<li>La colonne <strong>Nom</strong> est <strong>supprimée</strong>, pour deux raisons : <em>« (1) on ne s'attend pas à ce que l'identifiant soit informatif ; (2) on peut vouloir <strong>ANONYMISER</strong> les données pour protéger la vie privée des employés. »</em></li>
+</ul>
+<blockquote>
+<p class="cal piege"> <strong>La règle par défaut.</strong> <em>« Sans information supplémentaire, on devrait <strong>DÉCALER et METTRE À L'ÉCHELLE toutes les colonnes</strong> du jeu de données de sorte qu'elles aient une <strong>moyenne empirique de 0 et une variance empirique de 1</strong>. »</em></p>
+</blockquote>
+<blockquote>
+<p> <strong>La chaîne des chapitres.</strong> Représenter les données comme vecteurs $\Rightarrow$ <strong>algèbre linéaire</strong> (ch. 2). Comparer deux vecteurs $\Rightarrow$ <strong>géométrie</strong> (ch. 3). Optimiser le problème résultant $\Rightarrow$ <strong>ch. 7</strong>. Approximation de basse dimension $\Rightarrow$ <strong>ACP</strong> (ch. 10, via ch. 4). Représentation non linéaire de plus haute dimension $\Rightarrow$ <strong>application d'attributs</strong> $\phi(\cdot)$ (§9.2) puis <strong>NOYAU</strong> (§12.4).</p>
+</blockquote>
+<h3>1.2 Les deux visions du modèle</h3>
+<p><strong>Vision A — le PRÉDICTEUR comme FONCTION.</strong></p>
+<p>$$f:\mathbb R^D\to\mathbb R$$</p>
+<p class="cal piege"> Le livre se restreint aux <strong>fonctions LINÉAIRES</strong> :</p>
+<p>$$\boxed{\;f(x)=\theta^\top x+\theta_0\;}$$</p>
+<p><em>« Les fonctions linéaires trouvent un bon équilibre entre la <strong>généralité des problèmes solubles</strong> et la <strong>quantité de mathématiques de fond nécessaire</strong>. »</em></p>
+<p><strong>Vision B — le PRÉDICTEUR comme LOI DE PROBABILITÉ.</strong></p>
+<blockquote>
+<p> <strong>La motivation.</strong> <em>« On considère souvent les données comme des <strong>observations BRUITÉES</strong> d'un vrai effet sous-jacent... On aimerait aussi des prédicteurs qui expriment une <strong>sorte d'INCERTITUDE</strong>, par exemple pour quantifier la <strong>CONFIANCE</strong> qu'on a dans la valeur de la prédiction pour un point de test particulier. »</em></p>
+</blockquote>
+<p>Le livre se limite aux <strong>lois à paramètres de dimension FINIE</strong>, <em>« ce qui permet de décrire les modèles probabilistes sans avoir besoin de processus stochastiques ni de mesures aléatoires ».</em></p>
+<h3>1.3 Apprendre, c'est trouver des paramètres</h3>
+<blockquote>
+<p><strong>Les TROIS phases algorithmiques, distinctes :</strong></p>
+<ol>
+<li><strong>PRÉDICTION</strong> ou <strong>inférence</strong></li>
+<li><strong>ENTRAÎNEMENT</strong> ou <strong>estimation de paramètres</strong></li>
+<li><strong>RÉGLAGE DES HYPERPARAMÈTRES</strong> ou <strong>sélection de modèle</strong></li>
+</ol>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>Phase</th>
+<th>Ce qui s'y passe</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Prédiction</strong></td>
+<td>Les paramètres et le choix de modèle sont <strong>déjà fixés</strong> ; on applique le prédicteur à de nouveaux points. Pour un modèle probabiliste, on parle d'<strong>INFÉRENCE</strong></td>
+</tr>
+<tr>
+<td><strong>Entraînement</strong></td>
+<td>On <strong>ajuste</strong> le modèle sur les données d'entraînement. Deux stratégies : <strong>une estimation ponctuelle</strong> (applicable aux deux types de prédicteurs) ou l'<strong>INFÉRENCE BAYÉSIENNE</strong> ( qui exige un modèle probabiliste)</td>
+</tr>
+<tr>
+<td><strong>Sélection</strong></td>
+<td>Choix des <strong>hyperparamètres</strong> et de la structure du modèle</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p class="cal piege"> <strong>L'avertissement terminologique.</strong> <em>« Il n'y a <strong>PAS de nommage consensuel</strong> pour les différentes phases algorithmiques. Le mot "<strong>inférence</strong>" est parfois aussi utilisé pour désigner l'<strong>ESTIMATION DE PARAMÈTRES</strong> d'un modèle probabiliste, et plus rarement la <strong>PRÉDICTION</strong> pour des modèles non probabilistes. »</em></p>
+</blockquote>
+<p><strong>Les deux principes correspondants :</strong></p>
+<p>$$\boxed{\;\text{Modèle NON probabiliste}\ \to\ \text{MINIMISATION DU RISQUE EMPIRIQUE (§8.2)}\;}$$
+$$\boxed{\;\text{Modèle statistique}\ \to\ \text{MAXIMUM DE VRAISEMBLANCE (§8.3)}\;}$$</p>
+<blockquote>
+<p class="cal piege"> <strong>Le signe moins expliqué.</strong> <em>« La convention en OPTIMISATION est de <strong>MINIMISER</strong> les objectifs. D'où le <strong>signe MOINS supplémentaire</strong> souvent présent dans les objectifs d'apprentissage automatique. »</em></p>
+</blockquote>
+<blockquote>
+<p> <strong>L'ABDUCTION.</strong> <em>« Pour bien se comporter sur des données non vues, il faudra <strong>équilibrer</strong> un bon ajustement aux données d'entraînement et la recherche d'explications "<strong>SIMPLES</strong>" du phénomène. Ce compromis s'obtient par la <strong>RÉGULARISATION</strong> (§8.2.3) ou en ajoutant un <strong>A PRIORI</strong> (§8.3.2). En philosophie, ce n'est considéré ni comme de l'<strong>induction</strong> ni comme de la <strong>déduction</strong>, mais comme de l'<strong>ABDUCTION</strong> — le processus d'inférence vers <strong>la MEILLEURE EXPLICATION</strong>. »</em></p>
+</blockquote>
+<blockquote>
+<p class="cal piege"> <strong>Paramètre contre hyperparamètre.</strong> <em>« La distinction est <strong>quelque peu ARBITRAIRE</strong>, et surtout guidée par la distinction entre <strong>ce qui peut être NUMÉRIQUEMENT OPTIMISÉ</strong> et <strong>ce qui doit passer par des techniques de RECHERCHE</strong>. »</em> Autre façon de voir : les <strong>paramètres</strong> sont ceux du modèle probabiliste ; les <strong>hyperparamètres</strong> (paramètres de niveau supérieur) <strong>contrôlent la loi de ces paramètres</strong>.</p>
+</blockquote>
+<h2 data-prio="must">Concept 2 — Minimisation du risque empirique (§8.2)</h2>
+<blockquote>
+<p><strong>L'origine.</strong> <em>« Popularisée à l'origine par la proposition de la <strong>MACHINE À VECTEURS DE SUPPORT</strong> (ch. 12). Mais ses principes généraux sont <strong>largement applicables</strong> et permettent de poser la question de ce qu'est l'apprentissage <strong>SANS construire explicitement de modèles probabilistes</strong>. »</em></p>
+</blockquote>
+<p><strong>Les QUATRE choix de conception :</strong></p>
+<table>
+<thead>
+<tr>
+<th>§</th>
+<th>Question</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>8.2.1</strong></td>
+<td><em>« Quel est l'<strong>ensemble de FONCTIONS</strong> qu'on autorise pour le prédicteur ? »</em></td>
+</tr>
+<tr>
+<td><strong>8.2.2</strong></td>
+<td><em>« Comment <strong>MESURE-T-ON</strong> la performance du prédicteur sur les données d'entraînement ? »</em></td>
+</tr>
+<tr>
+<td><strong>8.2.3</strong></td>
+<td><em>« Comment construire, <strong>à partir des seules données d'entraînement</strong>, des prédicteurs qui se comportent bien sur des <strong>données de TEST non vues</strong> ? »</em></td>
+</tr>
+<tr>
+<td><strong>8.2.4</strong></td>
+<td><em>« Quelle est la <strong>PROCÉDURE de recherche</strong> dans l'espace des modèles ? »</em></td>
+</tr>
+</tbody></table>
+<h3>2.1 La classe d'hypothèses</h3>
+<p>On cherche un prédicteur $f(\cdot,\theta):\mathbb R^D\to\mathbb R$ tel que</p>
+<p>$$f(x_n,\theta^*)\approx y_n\quad\text{pour tout }n=1,\dots,N$$</p>
+<p>en notant $\hat y_n=f(x_n,\theta^*)$.</p>
+<p><strong>Exemple 8.1 — les moindres carrés ordinaires.</strong> L'astuce de notation compacte : <strong>concaténer un attribut unité</strong> $x^{(0)}=1$ à $x_n$, soit $x_n=[1,x_n^{(1)},\dots,x_n^{(D)}]^\top$ et $\theta=[\theta_0,\theta_1,\dots,\theta_D]^\top$ :</p>
+<p>$$\boxed{\;f(x_n,\theta)=\theta^\top x_n\quad\Longleftrightarrow\quad f(x_n,\theta)=\theta_0+\sum_{d=1}^{D}\theta_dx_n^{(d)}\;}$$</p>
+<p class="cal piege"> Le prédicteur devient $f:\mathbb R^{D+1}\to\mathbb R$.</p>
+<blockquote>
+<p class="cal piege"> <strong>Le glissement de vocabulaire.</strong> <em>« Les fonctions <strong>AFFINES</strong> sont souvent appelées <strong>fonctions LINÉAIRES</strong> en apprentissage automatique. »</em> (Voir la fiche 401 : $\phi(x)=a+\Phi(x)$ n'est linéaire que si $a=0$.)</p>
+</blockquote>
+<h3>2.2 La fonction de perte et le risque</h3>
+<blockquote>
+<p><strong>La fonction de perte</strong> $\ell(y_n,\hat y_n)$ prend l'étiquette <strong>vraie</strong> et la <strong>prédiction</strong>, et produit un <strong>nombre NON NÉGATIF</strong> représentant l'erreur commise. <em>« L'expression "<strong>erreur</strong>" est souvent utilisée pour dire perte. »</em></p>
+</blockquote>
+<p>$$\boxed{\;R_{\text{emp}}(f,X,y)=\frac1N\sum_{n=1}^{N}\ell(y_n,\hat y_n)\;}$$</p>
+<p>C'est le <strong>RISQUE EMPIRIQUE</strong>, qui dépend de <strong>trois arguments</strong> : le prédicteur $f$ et les données $X$, $y$. Le minimiser est la <strong>MINIMISATION DU RISQUE EMPIRIQUE</strong>.</p>
+<p><strong>Exemple 8.2 — la perte quadratique.</strong> Avec $\ell(y_n,\hat y_n)=(y_n-\hat y_n)^2$ :</p>
+<p>$$\min_{\theta\in\mathbb R^D}\frac1N\sum_{n=1}^{N}\big(y_n-f(x_n,\theta)\big)^2\ \overset{f=\theta^\top x_n}{\Longrightarrow}\ \min_{\theta\in\mathbb R^D}\frac1N\sum_{n=1}^{N}\big(y_n-\theta^\top x_n\big)^2$$</p>
+<p>$$\boxed{\;\min_{\theta\in\mathbb R^D}\frac1N\lVert y-X\theta\rVert^2\;}$$</p>
+<p>C'est le <strong>PROBLÈME DES MOINDRES CARRÉS</strong>, qui a <em>« une solution analytique en forme fermée, obtenue en résolvant les <strong>ÉQUATIONS NORMALES</strong> »</em> (§9.2 et fiche 402).</p>
+<blockquote>
+<p><strong>Le RISQUE ESPÉRÉ</strong> — ce qu'on veut vraiment :
+$$\boxed{\;R_{\text{true}}(f)=\mathbb E_{x,y}\big[\ell\big(y,f(x)\big)\big]\;}$$
+<em>« La notation $R_{\text{true}}$ indique que c'est le <strong>VRAI risque</strong> si l'on avait accès à une <strong>quantité INFINIE de données</strong>. L'espérance porte sur l'ensemble (infini) de toutes les données et étiquettes possibles. »</em> Autre nom : le <strong>risque de POPULATION</strong>.</p>
+</blockquote>
+<p><strong>Les deux questions pratiques qui en découlent :</strong> (i) <em>« Comment changer la procédure d'entraînement pour <strong>BIEN GÉNÉRALISER</strong> ? »</em> (ii) <em>« Comment <strong>ESTIMER</strong> le risque espéré à partir de données <strong>FINIES</strong> ? »</em></p>
+<blockquote>
+<p class="cal piege"> <strong>Le décalage perte / métrique.</strong> <em>« En principe, la conception de la fonction de perte devrait correspondre <strong>DIRECTEMENT</strong> à la mesure de performance spécifiée par la tâche. En pratique, il y a <strong>souvent un DÉCALAGE</strong> — dû à la <strong>facilité d'implémentation</strong> ou à l'<strong>efficacité de l'optimisation</strong>. »</em></p>
+</blockquote>
+<h3>2.3 La régularisation</h3>
+<blockquote>
+<p><strong>L'idée.</strong> <em>« La régularisation <strong>DÉCOURAGE les solutions COMPLEXES ou EXTRÊMES</strong> d'un problème d'optimisation. »</em></p>
+</blockquote>
+<p>$$\boxed{\;\min_\theta\frac1N\lVert y-X\theta\rVert^2+\lambda\lVert\theta\rVert^2\;}$$</p>
+<table>
+<thead>
+<tr>
+<th>Terme</th>
+<th>Nom</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$\lVert\theta\rVert^2$</td>
+<td>Le <strong>RÉGULARISATEUR</strong> (aussi appelé <strong>terme de PÉNALITÉ</strong>)</td>
+</tr>
+<tr>
+<td>$\lambda$</td>
+<td>Le <strong>PARAMÈTRE DE RÉGULARISATION</strong></td>
+</tr>
+</tbody></table>
+<blockquote>
+<p> <strong>Le compromis.</strong> <em>« Le paramètre de régularisation <strong>arbitre</strong> entre minimiser la perte sur l'ensemble d'entraînement et la <strong>MAGNITUDE des paramètres</strong> $\theta$. Il arrive souvent que la magnitude des valeurs des paramètres devienne <strong>relativement GRANDE en cas de SURAPPRENTISSAGE</strong>. »</em></p>
+</blockquote>
+<blockquote>
+<p> <strong>Les TROIS visages de la même idée</strong> — le livre les relie explicitement :
+$$\boxed{\;\text{RÉGULARISATEUR}\ \equiv\ \text{A PRIORI sur les paramètres (§8.3.2)}\ \equiv\ \text{GRANDE MARGE (ch. 12)}\;}$$
+Et <em>« le terme de pénalité <strong>BIAISE le vecteur $\theta$ vers l'ORIGINE</strong> »</em>.</p>
+</blockquote>
+<p><em>L'approche présentée est la <strong>régularisation de TIKHONOV</strong> ; il existe une version contrainte proche, la <strong>régularisation d'IVANOV</strong>. Racine historique : la <strong>résolution de problèmes inverses MAL POSÉS</strong> (Neumaier, 1998).</em></p>
+<h3>2.4 La validation croisée</h3>
+<blockquote>
+<p><strong>Le dilemme.</strong> <em>« La quantité de données est <strong>LIMITÉE</strong>, et idéalement on utiliserait autant de données que possible pour entraîner. Cela nous obligerait à garder un ensemble de validation <strong>PETIT</strong> — ce qui conduirait alors à une estimation <strong>BRUITÉE (à forte variance)</strong> de la performance prédictive. »</em></p>
+</blockquote>
+<p><strong>La validation croisée à $K$ plis.</strong> <em>« Elle partitionne les données en $K$ morceaux, dont $K-1$ forment l'ensemble d'entraînement $\mathcal R$, et le dernier sert d'ensemble de validation $\mathcal V$. Elle <strong>itère à travers TOUTES les combinaisons</strong> d'affectations, et la performance des $K$ passages est <strong>MOYENNÉE</strong>. »</em></p>
+<p>$$\mathcal D=\mathcal R\cup\mathcal V,\qquad\mathcal R\cap\mathcal V=\varnothing$$</p>
+<p>$$\boxed{\;\mathbb E_{\mathcal V}\big[R(f,\mathcal V)\big]\approx\frac1K\sum_{k=1}^{K}R\big(f^{(k)},\mathcal V^{(k)}\big)\;}$$</p>
+<blockquote>
+<p> <strong>Le bon côté du coût.</strong> <em>« La validation croisée est un problème <strong>EMBARRASSAMMENT PARALLÈLE</strong> : peu d'effort est nécessaire pour le séparer en tâches parallèles. Avec des ressources de calcul suffisantes, elle <strong>ne prend pas plus longtemps qu'une SEULE évaluation de performance</strong>. »</em></p>
+</blockquote>
+<blockquote>
+<p class="cal piege"> <strong>Une remarque de sécurité du livre.</strong> <em>« Même connaître <strong>seulement la performance</strong> du prédicteur sur l'ensemble de test <strong>FAIT FUITER de l'information</strong> »</em> (Blum &amp; Hardt, 2015).</p>
+</blockquote>
+<blockquote>
+<p class="cal piege"> <strong>Le « sans probabilité » est une erreur.</strong> <em>« Penser à la minimisation du risque empirique comme "<strong>exempte de probabilité</strong>" est <strong>INCORRECT</strong>. Il y a une loi de probabilité inconnue sous-jacente $p(x,y)$ qui gouverne la génération des données. Mais l'approche est <strong>AGNOSTIQUE</strong> quant à ce choix de loi — en contraste avec les approches statistiques standard qui exigent <strong>explicitement</strong> la connaissance de $p(x,y)$. Comme la loi est jointe sur $x$ <strong>et</strong> $y$, les étiquettes peuvent être <strong>NON DÉTERMINISTES</strong> : on n'a <strong>PAS besoin de spécifier la loi du BRUIT</strong> sur les étiquettes. »</em></p>
+</blockquote>
+<h2 data-prio="must">Concept 3 — Estimation de paramètres : MLE et MAP (§8.3)</h2>
+<blockquote>
+<p> <strong>La correspondance annoncée.</strong> <em>« La <strong>VRAISEMBLANCE</strong> (§8.3.1) est <strong>analogue</strong> au concept de <strong>FONCTION DE PERTE</strong> (§8.2.2). Le concept d'<strong>A PRIORI</strong> (§8.3.2) est <strong>analogue</strong> au concept de <strong>RÉGULARISATION</strong> (§8.2.3). »</em></p>
+</blockquote>
+<h3>3.1 Le maximum de vraisemblance</h3>
+<p>$$\boxed{\;\mathcal L_x(\theta)=-\log p(x\mid\theta)\;}$$</p>
+<p>C'est la <strong>LOG-VRAISEMBLANCE NÉGATIVE</strong>.  <em>« La notation $\mathcal L_x(\theta)$ souligne que <strong>le paramètre $\theta$ VARIE et que la donnée $x$ est FIXÉE</strong>. »</em></p>
+<p><strong>Les deux lectures, complémentaires :</strong></p>
+<table>
+<thead>
+<tr>
+<th>Vue</th>
+<th>Ce que dit $p(x\mid\theta)$</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>$\theta$ fixé</strong></td>
+<td><em>« Une loi qui modélise l'<strong>INCERTITUDE DES DONNÉES</strong> pour un réglage donné du paramètre. »</em></td>
+</tr>
+<tr>
+<td><strong>$x$ fixé (observé), $\theta$ varie</strong></td>
+<td><em>« Elle nous dit <strong>à quel point un réglage particulier de $\theta$ est PROBABLE</strong> pour les observations $x$. »</em></td>
+</tr>
+</tbody></table>
+<blockquote>
+<p class="cal piege"> <strong>Le piège d'interprétation, signalé mot pour mot.</strong> *« Bien qu'il soit tentant d'interpréter le fait que $\theta$ soit à droite du conditionnement dans $p(y_n\mid x_n,\theta)$ — et donc qu'il faudrait l'interpréter comme <strong>observé et fixé</strong> —, <strong>cette interprétation est INCORRECTE</strong>. La log-vraisemblance négative $L(\theta)$ est une <strong>FONCTION DE $\theta$</strong>. »*</p>
+</blockquote>
+<p><strong>Exemple 8.4 — la vraisemblance gaussienne.</strong> <em>« On suppose qu'on peut expliquer notre incertitude d'observation par un <strong>BRUIT GAUSSIEN INDÉPENDANT de moyenne nulle</strong>, $\varepsilon_n\sim\mathcal N(0,\sigma^2)$, et que le modèle linéaire $x_n^\top\theta$ sert à la prédiction »</em> :</p>
+<p>$$p(y_n\mid x_n,\theta)=\mathcal N\big(y_n\mid x_n^\top\theta,\ \sigma^2\big)$$</p>
+<p><strong>L'hypothèse i.i.d.</strong> <em>« Le mot <strong>INDÉPENDANT</strong> implique que la vraisemblance sur tout le jeu de données <strong>SE FACTORISE</strong> en un produit des vraisemblances individuelles »</em> :</p>
+<p>$$p(\mathcal Y\mid\mathcal X,\theta)=\prod_{n=1}^{N}p(y_n\mid x_n,\theta)$$</p>
+<p><em>« <strong>IDENTIQUEMENT DISTRIBUÉES</strong> signifie que chaque terme du produit est de <strong>la MÊME loi</strong> et que <strong>tous PARTAGENT les mêmes paramètres</strong>. »</em></p>
+<div class="cal intu"><span class="lab">Pourquoi le logarithme.</span>
+<p>  <em>« Il est souvent plus facile, du point de vue de l'optimisation, de calculer des fonctions <strong>DÉCOMPOSABLES EN SOMMES</strong> de fonctions plus simples. »</em></p>
+</div>
+<p>$$\boxed{\;L(\theta)=-\log p(\mathcal Y\mid\mathcal X,\theta)=-\sum_{n=1}^{N}\log p(y_n\mid x_n,\theta)\;}$$</p>
+<blockquote>
+<p class="cal piege"> <strong>L'origine du signe moins.</strong> <em>« Un <strong>ARTEFACT HISTORIQUE</strong> : par convention on veut <strong>MAXIMISER</strong> la vraisemblance, mais la littérature d'optimisation numérique tend à étudier la <strong>MINIMISATION</strong> de fonctions. »</em></p>
+</blockquote>
+<p><strong>Exemple 8.5 — LE RÉSULTAT CENTRAL DU CHAPITRE.</strong> En développant la vraisemblance gaussienne :</p>
+<p>$$L(\theta)=-\sum_{n=1}^{N}\log\frac{1}{\sqrt{2\pi\sigma^2}}\exp\left(-\frac{(y_n-x_n^\top\theta)^2}{2\sigma^2}\right)$$</p>
+<p>$$\boxed{\;L(\theta)=\underbrace{\frac{1}{2\sigma^2}\sum_{n=1}^{N}(y_n-x_n^\top\theta)^2}_{\text{le problème des MOINDRES CARRÉS}}\ \underbrace{-\ \sum_{n=1}^{N}\log\frac{1}{\sqrt{2\pi\sigma^2}}}_{\text{CONSTANTE si }\sigma\text{ est donné}}\;}$$</p>
+<blockquote>
+<p> <strong>LA CORRESPONDANCE À RETENIR.</strong>
+$$\boxed{\;\text{VRAISEMBLANCE GAUSSIENNE}\ \Longleftrightarrow\ \text{MOINDRES CARRÉS}\;}$$
+<em>« Comme $\sigma$ est donné, le second terme est <strong>CONSTANT</strong>, et minimiser $L(\theta)$ <strong>revient à résoudre le problème des moindres carrés</strong> exprimé dans le premier terme »</em> — exactement l'équation (8.8) de l'exemple 8.2.</p>
+</blockquote>
+<details class="cor">
+<summary> Le détail de la dérivation</summary><div class="in">
+
+<p>$-\log\prod_n\frac{1}{\sqrt{2\pi\sigma^2}}e^{-(y_n-x_n^\top\theta)^2/(2\sigma^2)}$</p>
+<p>$=-\sum_n\left[\log\frac{1}{\sqrt{2\pi\sigma^2}}-\frac{(y_n-x_n^\top\theta)^2}{2\sigma^2}\right]$ (car $\log(ab)=\log a+\log b$)</p>
+<p>$=\frac{1}{2\sigma^2}\sum_n(y_n-x_n^\top\theta)^2-N\log\frac{1}{\sqrt{2\pi\sigma^2}}$ </p>
+<p class="cal piege"> Le facteur $\frac{1}{2\sigma^2}$ est une <strong>constante positive</strong> : il ne change pas l'argmin. La minimisation de $L(\theta)$ et celle de $\sum_n(y_n-x_n^\top\theta)^2$ ont <strong>exactement la même solution</strong>.</p>
+</div></details>
+
+<p class="cal piege"> <em>« Pour d'autres fonctions de vraisemblance — si l'on modélise le bruit par des lois <strong>NON gaussiennes</strong> — l'estimation du maximum de vraisemblance peut <strong>ne pas avoir de solution analytique fermée</strong>. On recourt alors aux <strong>méthodes numériques du chapitre 7</strong>. »</em></p>
+<p><strong>Les deux propriétés asymptotiques de $\theta_{\text{ML}}$</strong> (Lehmann &amp; Casella 1998 ; Efron &amp; Hastie 2016) :</p>
+<ol>
+<li><strong>CONSISTANCE ASYMPTOTIQUE</strong> : <em>« l'estimateur converge vers la <strong>vraie valeur</strong> à la limite d'une infinité d'observations, plus une erreur aléatoire <strong>approximativement normale</strong> »</em>.  <em>« La taille d'échantillon nécessaire peut être <strong>assez GRANDE</strong>. »</em></li>
+<li>La <strong>variance de l'erreur décroît en $1/N$</strong>.  <em>« Surtout dans le régime des "<strong>PETITES</strong>" données, le maximum de vraisemblance peut mener au <strong>SURAPPRENTISSAGE</strong>. »</em></li>
+</ol>
+<h3>3.2 Le maximum a posteriori</h3>
+<p>$$p(\theta\mid x)=\frac{p(x\mid\theta)p(\theta)}{p(x)}\quad\Longrightarrow\quad\boxed{\;p(\theta\mid x)\propto p(x\mid\theta)\,p(\theta)\;}$$</p>
+<p class="cal piege"> *« Comme $p(x)$ <strong>ne dépend pas de $\theta$</strong>, on peut ignorer la valeur du dénominateur pour l'optimisation. »* On minimise alors la <strong>log-a-posteriori NÉGATIVE</strong> : c'est l'<strong>ESTIMATION DU MAXIMUM A POSTERIORI (MAP)</strong>.</p>
+<p><strong>Exemple 8.6 — l'a priori gaussien.</strong> En plus de la vraisemblance gaussienne, <em>« on suppose que le vecteur de paramètres est distribué comme une gaussienne multivariée de moyenne nulle, $p(\theta)=\mathcal N(0,\Sigma)$. Le <strong>conjugué d'une gaussienne étant une gaussienne</strong> (§6.6.1), on <strong>s'attend donc à ce que l'a posteriori soit aussi une gaussienne</strong>. »</em></p>
+<blockquote>
+<p> <strong>L'effet de l'a priori, vu sur la figure 8.6.</strong> <em>« L'a priori <strong>BIAISE la PENTE à être MOINS RAIDE</strong> et l'<strong>ORDONNÉE À L'ORIGINE à être plus PROCHE DE ZÉRO</strong>. »</em>  <em>« Dans cet exemple, le biais qui rapproche l'ordonnée de zéro <strong>AUGMENTE en fait la PENTE</strong>. »</em></p>
+</blockquote>
+<blockquote>
+<p> <strong>La position du MAP.</strong> <em>« Le maximum a posteriori peut être considéré comme <strong>faisant le PONT entre les mondes NON PROBABILISTE et PROBABILISTE</strong> : il reconnaît explicitement le besoin d'une loi a priori, <strong>mais il ne produit encore qu'une ESTIMATION PONCTUELLE</strong> des paramètres. »</em></p>
+</blockquote>
+<h3>3.3 L'ajustement de modèle : les trois régimes</h3>
+<p><strong>Le cadre.</strong> La paramétrisation définit une <strong>classe de modèles</strong> $M_\theta$. Les données viennent d'un modèle $M^*$ <strong>inconnu</strong>. On part de $M_{\theta_0}$ et on optimise pour approcher $M^*$, la « proximité » étant définie par l'objectif optimisé.</p>
+<table>
+<thead>
+<tr>
+<th>Régime</th>
+<th>Diagnostic</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>SUR-AJUSTEMENT</strong> (<em>overfitting</em>)</td>
+<td><em>« La classe de modèles est <strong>TROP RICHE</strong> : $M_\theta$ pourrait modéliser des jeux de données bien plus compliqués. »</em> Exemple : données linéaires, modèle <strong>polynomial de degré 7</strong>.  <em>« Les modèles qui sur-ajustent ont typiquement un <strong>grand NOMBRE DE PARAMÈTRES</strong>... la classe trop flexible <strong>utilise TOUTE sa puissance de modélisation pour réduire l'erreur d'ENTRAÎNEMENT</strong>. Si les données sont bruitées, elle <strong>trouvera donc un signal utile DANS LE BRUIT lui-même</strong> — ce qui causera d'énormes problèmes en prédiction loin des données. »</em></td>
+</tr>
+<tr>
+<td><strong>SOUS-AJUSTEMENT</strong> (<em>underfitting</em>)</td>
+<td><em>« Le problème OPPOSÉ : la classe $M_\theta$ <strong>n'est PAS assez riche</strong>. »</em> Exemple : données <strong>sinusoïdales</strong>, modèle <strong>linéaire</strong></td>
+</tr>
+<tr>
+<td><strong>BON AJUSTEMENT</strong></td>
+<td>La classe est <strong>adaptée</strong> à $M^*$</td>
+</tr>
+</tbody></table>
+<h2 data-prio="high">Concept 4 — Modélisation probabiliste et inférence (§8.4)</h2>
+<h3>4.1 Ce qu'est un modèle probabiliste</h3>
+<blockquote>
+<p> <strong>LA DÉFINITION.</strong> <em>« En modélisation probabiliste, la <strong>LOI JOINTE $p(x,\theta)$</strong> des variables observées $x$ et des paramètres cachés $\theta$ est <strong>d'importance CENTRALE</strong>. »</em></p>
+</blockquote>
+<p>Elle <strong>encapsule</strong> à elle seule :</p>
+<table>
+<thead>
+<tr>
+<th>Objet</th>
+<th>Comment on l'obtient de la jointe</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>L'a priori et la vraisemblance</strong></td>
+<td>Par la <strong>RÈGLE DU PRODUIT</strong> (§6.3)</td>
+</tr>
+<tr>
+<td><strong>La vraisemblance marginale $p(x)$</strong></td>
+<td>En <strong>INTÉGRANT les paramètres</strong> — la <strong>règle de la SOMME</strong></td>
+</tr>
+<tr>
+<td><strong>L'a posteriori</strong></td>
+<td>En <strong>divisant</strong> la jointe par la vraisemblance marginale</td>
+</tr>
+</tbody></table>
+<p>$$\boxed{\;\text{SEULE la loi JOINTE a cette propriété. Un modèle probabiliste EST donc la loi jointe de TOUTES ses variables aléatoires.}\;}$$</p>
+<h3>4.2 L'inférence bayésienne</h3>
+<p>$$\boxed{\;p(\theta\mid\mathcal X)=\frac{p(\mathcal X\mid\theta)p(\theta)}{p(\mathcal X)},\qquad p(\mathcal X)=\int p(\mathcal X\mid\theta)p(\theta)\,d\theta\;}$$</p>
+<blockquote>
+<p> <strong>La différence avec MLE/MAP.</strong> <em>« Dans les deux cas, on obtient une <strong>valeur UNIQUE, la meilleure</strong> pour $\theta$ : le problème algorithmique clé est de résoudre un <strong>problème d'OPTIMISATION</strong>. »</em> L'inférence bayésienne, elle, <em>« est <strong>l'apprentissage de la LOI</strong> des variables aléatoires »</em>.</p>
+</blockquote>
+<blockquote>
+<p class="cal piege"> <strong>Le coût de l'estimation ponctuelle.</strong> <em>« Se concentrer uniquement sur une statistique de l'a posteriori conduit à une <strong>PERTE D'INFORMATION</strong>, ce qui peut être <strong>CRITIQUE</strong> dans un système qui utilise la prédiction $p(x\mid\theta^*)$ pour <strong>prendre des DÉCISIONS</strong>. Ces systèmes ont typiquement des <strong>fonctions objectifs DIFFÉRENTES</strong> de la vraisemblance, d'une perte quadratique ou d'une erreur de mauvaise classification. Avoir la <strong>loi a posteriori COMPLÈTE</strong> peut donc être <strong>extrêmement utile et mène à des décisions PLUS ROBUSTES</strong>. »</em></p>
+</blockquote>
+<p><strong>La prédiction bayésienne</strong> — la propagation de l'incertitude :</p>
+<p>$$\boxed{\;p(x)=\int p(x\mid\theta)p(\theta)\,d\theta=\mathbb E_\theta\big[p(x\mid\theta)\big]\;}$$</p>
+<p><em>« L'a posteriori sur les paramètres <strong>PROPAGE l'incertitude des paramètres vers les données</strong>. »</em></p>
+<h3>4.3 Les modèles à variables latentes</h3>
+<blockquote>
+<p><strong>Les variables latentes $z$</strong> <em>« sont <strong>DIFFÉRENTES des paramètres $\theta$</strong> car elles <strong>ne paramétrisent PAS le modèle explicitement</strong>. »</em></p>
+</blockquote>
+<p><strong>Leurs trois vertus :</strong></p>
+<ol>
+<li>Elles peuvent <strong>décrire le processus générateur</strong>, contribuant à l'<strong>INTERPRÉTABILITÉ</strong>.</li>
+<li>Elles <strong>simplifient souvent la structure</strong> du modèle et permettent des structures <strong>plus simples ET plus riches</strong>.</li>
+<li><em>« La simplification de la structure va souvent de pair avec un <strong>plus PETIT nombre de paramètres</strong>. »</em></li>
+</ol>
+<p><strong>L'algorithme dédié :</strong> l'<strong>ESPÉRANCE-MAXIMISATION (EM)</strong> (Dempster <em>et al.</em>, 1977).</p>
+<p><strong>Les exemples cités :</strong> <strong>ACP</strong> pour la réduction de dimension (ch. 10), <strong>mélanges gaussiens</strong> pour l'estimation de densité (ch. 11), <strong>modèles de Markov cachés</strong>, <strong>systèmes dynamiques</strong> pour les séries temporelles, <strong>méta-apprentissage</strong>.</p>
+<p><strong>La procédure en deux temps :</strong></p>
+<p><strong>Étape 1 — la vraisemblance, en marginalisant les latentes :</strong></p>
+<p>$$\boxed{\;p(x\mid\theta)=\int p(x\mid z,\theta)\,p(z)\,dz\;}$$</p>
+<p class="cal piege"> <em>« La vraisemblance est une fonction <strong>des données et des paramètres</strong>, mais elle est <strong>INDÉPENDANTE des variables latentes</strong>. »</em></p>
+<p><strong>Étape 2 — l'estimation ou l'inférence</strong>, exactement comme aux §8.3 et §8.4.2 :</p>
+<p>$$p(\theta\mid\mathcal X)=\frac{p(\mathcal X\mid\theta)p(\theta)}{p(\mathcal X)}$$</p>
+<blockquote>
+<p class="cal piege"> <strong>LE DÉFI.</strong> <em>« Sauf si l'on choisit un a priori <strong>CONJUGUÉ</strong> $p(z)$ pour $p(x\mid z,\theta)$, la <strong>marginalisation n'est PAS ANALYTIQUEMENT TRAITABLE</strong>, et il faut recourir à des <strong>APPROXIMATIONS</strong>. »</em> Et : <em>« l'apprentissage dans les modèles à variables latentes est <strong>généralement DIFFICILE</strong>, comme on le verra au chapitre 11. »</em></p>
+</blockquote>
+<h2 data-prio="high">Concept 5 — Les modèles graphiques orientés (§8.5)</h2>
+<h3>5.1 La sémantique du graphe</h3>
+<div class="cal intu"><span class="lab">Ce que c'est.</span>
+<p> <em>« Une façon <strong>COMPACTE et SUCCINCTE</strong> de spécifier des modèles probabilistes, qui permet de <strong>parser VISUELLEMENT les dépendances</strong> entre variables aléatoires. »</em></p>
+</div>
+<p>$$\boxed{\;\text{NŒUDS}=\text{variables aléatoires}\qquad\text{FLÈCHES}=\text{probabilités conditionnelles}\;}$$</p>
+<p>Une flèche de $a$ vers $b$ donne la <strong>probabilité conditionnelle $p(b\mid a)$</strong>. <em>« Avec des hypothèses supplémentaires, les flèches peuvent indiquer des <strong>relations CAUSALES</strong> (Pearl, 2009). »</em></p>
+<blockquote>
+<p> <strong>La motivation.</strong> <em>« La loi jointe <strong>en elle-même</strong> peut être assez compliquée et <strong>ne nous dit RIEN des propriétés STRUCTURELLES</strong> du modèle. Par exemple, $p(a,b,c)$ ne nous dit rien sur les <strong>relations d'INDÉPENDANCE</strong>. C'est là qu'interviennent les modèles graphiques. »</em></p>
+</blockquote>
+<p><strong>Les quatre propriétés commodes :</strong></p>
+<ol>
+<li>Une façon <strong>simple de VISUALISER</strong> la structure.</li>
+<li>Ils servent à <strong>concevoir ou motiver de NOUVEAUX modèles</strong> statistiques.</li>
+<li><em>« L'<strong>INSPECTION du graphe SEUL</strong> donne un aperçu de propriétés comme l'<strong>indépendance conditionnelle</strong>. »</em></li>
+<li><em>« Des calculs complexes d'inférence et d'apprentissage s'expriment en termes de <strong>MANIPULATIONS GRAPHIQUES</strong>. »</em></li>
+</ol>
+<blockquote>
+<p class="cal piege"> <strong>La limite.</strong> <em>« <strong>Toute loi ne peut PAS être représentée</strong> dans un choix particulier de modèle graphique. »</em></p>
+</blockquote>
+<h3>5.2 Les deux sens de traduction</h3>
+<p><strong>De la FACTORISATION vers le GRAPHE (exemple 8.7).</strong> Pour</p>
+<p>$$p(a,b,c)=p(c\mid a,b)\,p(b\mid a)\,p(a)$$</p>
+<p>la factorisation dit que : $c$ dépend <strong>directement</strong> de $a$ et $b$ ; $b$ dépend directement de $a$ ; $a$ ne dépend <strong>ni de $b$ ni de $c$</strong>.</p>
+<p><strong>La recette :</strong></p>
+<ol>
+<li><strong>Créer un nœud</strong> pour chaque variable aléatoire.</li>
+<li>Pour chaque loi conditionnelle, <strong>ajouter une flèche</strong> depuis les nœuds <strong>sur lesquels on conditionne</strong>.</li>
+</ol>
+<p class="cal piege"> <em>« La disposition du graphe <strong>DÉPEND du choix de FACTORISATION</strong> de la loi jointe. »</em></p>
+<p><strong>Du GRAPHE vers la FACTORISATION (exemple 8.8).</strong> Deux propriétés :</p>
+<ul>
+<li><em>« La loi jointe est le <strong>produit d'un ensemble de conditionnelles, UNE PAR NŒUD</strong> du graphe. »</em></li>
+<li><em>« Chaque conditionnelle ne dépend <strong>QUE des PARENTS</strong> du nœud correspondant. »</em></li>
+</ul>
+<p>Pour la figure 8.9(b) :</p>
+<p>$$p(x_1,x_2,x_3,x_4,x_5)=p(x_1)\,p(x_5)\,p(x_2\mid x_5)\,p(x_3\mid x_1,x_2)\,p(x_4\mid x_2)$$</p>
+<p>$$\boxed{\;p(x)=p(x_1,\dots,x_K)=\prod_{k=1}^{K}p\big(x_k\mid\text{Pa}_k\big)\;}$$</p>
+<p>où $\text{Pa}_k$ désigne <em>« les nœuds <strong>PARENTS</strong> de $x_k$ »</em>, c'est-à-dire <em>« les nœuds qui ont des flèches pointant vers $x_k$ »</em>.</p>
+<h3>5.3 Les conventions graphiques</h3>
+<p><strong>L'exemple canonique — le lancer de pièce répété.</strong> Avec $p(x\mid\mu)=\text{Ber}(\mu)$ répété $N$ fois :</p>
+<p>$$p(x_1,\dots,x_N\mid\mu)=\prod_{n=1}^{N}p(x_n\mid\mu)$$</p>
+<p><em>« Le membre de droite est un <strong>produit de lois de Bernoulli</strong> parce que les expériences sont <strong>INDÉPENDANTES</strong> — l'indépendance statistique signifie que la loi <strong>SE FACTORISE</strong>. »</em></p>
+<table>
+<thead>
+<tr>
+<th>Convention</th>
+<th>Signification</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Nœud GRISÉ / ombré</strong></td>
+<td> Variable <strong>OBSERVÉE</strong></td>
+</tr>
+<tr>
+<td><strong>Nœud blanc</strong></td>
+<td>Variable <strong>latente / non observée</strong></td>
+</tr>
+<tr>
+<td><strong>PLAQUE</strong> (une boîte)</td>
+<td><em>« Elle <strong>RÉPÈTE tout ce qui est à l'intérieur $N$ fois</strong> »</em> — les deux graphiques sont <strong>équivalents</strong>, mais la plaque est <strong>plus compacte</strong></td>
+</tr>
+</tbody></table>
+<blockquote>
+<p> <strong>L'HYPER-A-PRIORI.</strong> <em>« Les modèles graphiques permettent immédiatement de placer un <strong>HYPER-A-PRIORI</strong> sur $\mu$ : une <strong>SECONDE COUCHE de lois a priori sur les paramètres de la première couche</strong> »</em> — c'est la figure 8.10(c), avec $\alpha$ et $\beta$ au-dessus de $\mu$.</p>
+</blockquote>
+<p class="cal piege"> Le livre observe : <em>« le <strong>paramètre UNIQUE $\mu$ est LE MÊME</strong> pour tous les $x_n$, puisque les résultats sont <strong>identiquement distribués</strong>. »</em></p>
+<h3>5.4 La $d$-séparation</h3>
+<blockquote>
+<p><strong>Le but.</strong> Déterminer si l'énoncé $A\perp\!\!\!\perp B\mid C$ (« $A$ est conditionnellement indépendant de $B$ sachant $C$ ») est <strong>impliqué par le graphe orienté acyclique</strong>, pour des ensembles de nœuds $A,B,C$ <strong>disjoints</strong>.</p>
+</blockquote>
+<p><strong>La procédure.</strong> Considérer <strong>toutes les traînes</strong> (<em>trails</em>) — les chemins <strong>ignorant le sens des flèches</strong> — de tout nœud de $A$ vers tout nœud de $B$. Une traîne est <strong>BLOQUÉE</strong> si elle inclut un nœud tel que l'une des conditions suivantes est vraie :</p>
+<p>$$\boxed{\;\textbf{1.}\ \text{Les flèches se rencontrent TÊTE-À-QUEUE ou QUEUE-À-QUEUE au nœud, ET le nœud est DANS }C\;}$$</p>
+<p>$$\boxed{\;\textbf{2.}\ \text{Les flèches se rencontrent TÊTE-À-TÊTE au nœud, ET NI le nœud NI AUCUN de ses DESCENDANTS n'est dans }C\;}$$</p>
+<p>$$\boxed{\;\text{Si TOUTES les traînes sont bloquées, }A\text{ est }d\text{-SÉPARÉ de }B\text{ par }C,\text{ et }A\perp\!\!\!\perp B\mid C\;}$$</p>
+<p class="cal piege"> <strong>Noter l'asymétrie du cas 2</strong> : pour une rencontre <strong>tête-à-tête</strong> (une « collision »), c'est <strong>l'ABSENCE</strong> du nœud et de ses descendants dans $C$ qui bloque — l'inverse des deux autres configurations.</p>
+<p><strong>Exemple 8.9 — la lecture visuelle</strong> sur le graphe $a\to b$, $a\to c$, ... de la figure 8.11 :</p>
+<p>$$b\perp\!\!\!\perp d\mid a,c\qquad a\perp\!\!\!\perp c\mid b$$
+$$b\not\perp\!\!\!\perp d\mid c\qquad a\not\perp\!\!\!\perp c\mid b,e$$</p>
+<p class="cal piege"> Les <strong>deux dernières lignes montrent la sensibilité</strong> : ajouter $e$ à l'ensemble conditionnant <strong>DÉTRUIT</strong> l'indépendance $a\perp\!\!\!\perp c\mid b$ — signature d'une <strong>collision</strong> dont $e$ est un descendant.</p>
+<blockquote>
+<p> <strong>Les trois familles de modèles graphiques (figure 8.12) :</strong> les <strong>ORIENTÉS</strong> (réseaux bayésiens), les <strong>NON ORIENTÉS</strong> (champs de Markov aléatoires), et les <strong>GRAPHES DE FACTEURS</strong>.</p>
+</blockquote>
+<h2 data-prio="must">Concept 6 — La sélection de modèle (§8.6)</h2>
+<h3>6.1 Le problème</h3>
+<blockquote>
+<p><strong>Le dilemme d'expressivité.</strong> <em>« Un polynôme de degré 1 ne peut décrire que des relations linéaires ; un polynôme de degré 2 peut aussi décrire des relations quadratiques. »</em>  <em>« Un polynôme $y=a_0+a_1x+a_2x^2$ peut <strong>AUSSI</strong> décrire des fonctions linéaires en posant $a_2=0$ : il est <strong>STRICTEMENT PLUS EXPRESSIF</strong> qu'un polynôme d'ordre 1. »</em></p>
+</blockquote>
+<div class="cal intu"><span class="lab">Pourquoi ne pas toujours prendre le plus flexible.</span>
+<p class="cal piege">  <em>« À l'entraînement, on ne peut utiliser que l'ensemble d'entraînement pour évaluer la performance. Mais <strong>la performance sur l'ensemble d'entraînement n'est PAS ce qui nous intéresse vraiment</strong>. »</em></p>
+</div>
+<h3>6.2 La validation croisée imbriquée</h3>
+<p><strong>L'idée :</strong> appliquer la validation croisée <strong>UNE FOIS DE PLUS</strong> — pour chaque découpe, effectuer un <strong>autre tour</strong> de validation croisée.</p>
+<table>
+<thead>
+<tr>
+<th>Boucle</th>
+<th>Rôle</th>
+<th>Nom de l'ensemble</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>INTERNE</strong></td>
+<td><em>« Estimer la performance d'un <strong>choix particulier de MODÈLE ou d'HYPERPARAMÈTRE</strong> »</em></td>
+<td><strong>Ensemble de VALIDATION</strong></td>
+</tr>
+<tr>
+<td><strong>EXTERNE</strong></td>
+<td><em>« Estimer la performance de <strong>GÉNÉRALISATION</strong> pour le meilleur choix issu de la boucle interne »</em></td>
+<td><strong>Ensemble de TEST</strong></td>
+</tr>
+</tbody></table>
+<p>$$\boxed{\;\mathbb E_{\mathcal V}\big[R(\mathcal V\mid M)\big]\approx\frac1K\sum_{k=1}^{K}R\big(\mathcal V^{(k)}\mid M\big)\;}$$</p>
+<blockquote>
+<p> <strong>Un bonus.</strong> <em>« La validation croisée ne donne pas seulement l'erreur de généralisation espérée : on peut aussi obtenir des <strong>statistiques d'ordre SUPÉRIEUR</strong>, par exemple l'<strong>ERREUR-TYPE</strong> »</em> :
+$$\boxed{\;\text{erreur-type}=\frac{\sigma}{\sqrt K}\;}$$
+où $K$ est le nombre d'expériences et $\sigma$ l'écart-type du risque de chaque expérience.</p>
+</blockquote>
+<h3>6.3 La sélection bayésienne et le rasoir d'Occam</h3>
+<blockquote>
+<p><strong>Le principe commun.</strong> <em>« Toutes les approches tentent d'<strong>ARBITRER entre COMPLEXITÉ du modèle et AJUSTEMENT aux données</strong>. On suppose que les modèles plus simples sont <strong>moins sujets au surapprentissage</strong>, et l'objectif est donc de trouver <strong>le modèle LE PLUS SIMPLE qui explique raisonnablement bien les données</strong> — c'est le <strong>RASOIR D'OCCAM</strong>. »</em></p>
+</blockquote>
+<blockquote>
+<p> <strong>LE POINT REMARQUABLE.</strong> <em>« On pourrait envisager de placer un a priori sur les modèles qui favorise les modèles simples. <strong>CE N'EST PAS NÉCESSAIRE</strong> : un "<strong>RASOIR D'OCCAM AUTOMATIQUE</strong>" est quantitativement <strong>incorporé dans l'application de la probabilité BAYÉSIENNE</strong>. »</em></p>
+</blockquote>
+<p><strong>L'intuition de la figure 8.14</strong> (adaptée de MacKay, 2003) — l'axe horizontal représente <strong>l'espace de tous les jeux de données possibles</strong> $\mathcal D$ :</p>
+<ul>
+<li>Un modèle <strong>SIMPLE</strong> $M_1$ ne peut prédire qu'un <strong>petit nombre</strong> de jeux de données : $p(\mathcal D\mid M_1)$ est <strong>concentrée</strong>.</li>
+<li>Un modèle <strong>PUISSANT</strong> $M_2$ (plus de paramètres libres) prédit une <strong>plus grande variété</strong> de jeux —  <em>« mais cela signifie que $M_2$ <strong>ne prédit PAS aussi bien</strong> les jeux de la région $C$ que $M_1$. »</em></li>
+<li> <strong>La contrainte cachée</strong> : <em>« ces prédictions sont quantifiées par une <strong>loi de probabilité NORMALISÉE sur $\mathcal D$</strong> : elle doit <strong>intégrer/sommer à 1</strong>. »</em> C'est cette normalisation qui <strong>pénalise automatiquement</strong> la complexité.</li>
+<li><strong>Conclusion</strong> : <em>« si le jeu de données tombe dans la région $C$, le modèle <strong>MOINS puissant $M_1$ est le PLUS PROBABLE</strong>. »</em></li>
+</ul>
+<p><strong>Le processus génératif hiérarchique.</strong> Pour un ensemble fini de modèles $\mathcal M=\{M_1,\dots,M_K\}$ :</p>
+<p>$$M_k\sim p(M),\qquad\theta_k\sim p(\theta\mid M_k),\qquad\mathcal D\sim p(\mathcal D\mid\theta_k)$$</p>
+<p>$$\boxed{\;p(M_k\mid\mathcal D)\propto p(M_k)\,p(\mathcal D\mid M_k)\;}$$</p>
+<blockquote>
+<p class="cal piege"> <strong>Le point clé.</strong> *« Cet a posteriori <strong>NE DÉPEND PLUS des paramètres $\theta_k$</strong>, car ils ont été <strong>INTÉGRÉS</strong> dans le cadre bayésien »* :</p>
+</blockquote>
+<p>$$\boxed{\;p(\mathcal D\mid M_k)=\int p(\mathcal D\mid\theta_k)\,p(\theta_k\mid M_k)\,d\theta_k\;}$$</p>
+<p>C'est l'<strong>ÉVIDENCE DU MODÈLE</strong> (ou <strong>vraisemblance marginale</strong>), et l'on choisit $M^*=\arg\max_{M_k}p(M_k\mid\mathcal D)$.</p>
+<blockquote>
+<p> <strong>VRAISEMBLANCE contre VRAISEMBLANCE MARGINALE — la différence décisive.</strong> <em>« Alors que la <strong>vraisemblance est SUJETTE AU SURAPPRENTISSAGE</strong>, la <strong>vraisemblance MARGINALE ne l'est typiquement PAS</strong>, puisque les paramètres du modèle ont été <strong>MARGINALISÉS</strong> (on n'a plus à les ajuster). De plus, la vraisemblance marginale <strong>incorpore AUTOMATIQUEMENT un compromis</strong> entre complexité du modèle et ajustement aux données — le <strong>rasoir d'Occam</strong>. »</em></p>
+</blockquote>
+<h3>6.4 Les facteurs de Bayes</h3>
+<p>Pour comparer deux modèles $M_1$ et $M_2$ :</p>
+<p>$$\frac{p(M_1\mid\mathcal D)}{p(M_2\mid\mathcal D)}=\underbrace{\frac{p(M_1)}{p(M_2)}}_{\text{RAPPORT A PRIORI}}\cdot\underbrace{\frac{p(\mathcal D\mid M_1)}{p(\mathcal D\mid M_2)}}_{\text{FACTEUR DE BAYES}}$$</p>
+<table>
+<thead>
+<tr>
+<th>Terme</th>
+<th>Ce qu'il mesure</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Rapport A POSTERIORI</strong> (<em>posterior odds</em>)</td>
+<td>Le rapport des a posteriori</td>
+</tr>
+<tr>
+<td><strong>Rapport A PRIORI</strong> (<em>prior odds</em>)</td>
+<td><em>« À quel point nos <strong>croyances initiales</strong> favorisent $M_1$ sur $M_2$ »</em></td>
+</tr>
+<tr>
+<td><strong>FACTEUR DE BAYES</strong></td>
+<td><em>« À quel point les données $\mathcal D$ sont <strong>bien PRÉDITES</strong> par $M_1$ comparé à $M_2$ »</em></td>
+</tr>
+</tbody></table>
+<p><strong>Avec un a priori UNIFORME sur les modèles</strong>, le rapport a priori vaut $1$ :</p>
+<p>$$\boxed{\;\text{rapport a posteriori}=\frac{p(\mathcal D\mid M_1)}{p(\mathcal D\mid M_2)}\;}$$</p>
+<p>$$\boxed{\;\text{Facteur de Bayes}&gt;1\ \Rightarrow\ \text{choisir }M_1\ ;\quad\text{sinon }M_2\;}$$</p>
+<p><em>« De façon similaire aux statistiques fréquentistes, il existe des <strong>lignes directrices sur la TAILLE du rapport</strong> à considérer avant de parler de "significativité" (Jeffreys, 1961). »</em></p>
+<blockquote>
+<p class="cal piege"> <strong>LE PARADOXE DE JEFFREYS-LINDLEY.</strong> <em>« Le facteur de Bayes <strong>FAVORISE TOUJOURS le modèle PLUS SIMPLE</strong>, puisque la probabilité des données sous un <strong>modèle complexe avec un a priori DIFFUS sera très PETITE</strong> »</em> (Murphy, 2012). Un <strong>a priori diffus</strong> est un a priori qui <strong>ne favorise aucun modèle</strong> en particulier — <strong>beaucoup de modèles sont a priori plausibles</strong>.</p>
+</blockquote>
+<h2>Comment reconnaître le type d'exercice</h2>
+<table>
+<thead>
+<tr>
+<th>L'énoncé dit...</th>
+<th>Le type</th>
+<th>La méthode</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>« Convertir cette table en format numérique »</td>
+<td><strong>§8.1.1</strong></td>
+<td>Encoder les catégorielles ; utiliser la <strong>connaissance du domaine</strong> ; <strong>standardiser</strong> (moyenne 0, variance 1) ; supprimer les identifiants</td>
+</tr>
+<tr>
+<td>« Écrire le prédicteur affine »</td>
+<td><strong>Ex. 8.1</strong></td>
+<td>Concaténer $x^{(0)}=1$, écrire $f(x_n,\theta)=\theta^\top x_n$</td>
+</tr>
+<tr>
+<td>« Écrire le risque empirique »</td>
+<td><strong>§8.2.2</strong></td>
+<td>$\frac1N\sum_n\ell(y_n,\hat y_n)$</td>
+</tr>
+<tr>
+<td>« Quelle est la différence avec le risque espéré ? »</td>
+<td><strong>§8.2.2</strong></td>
+<td>Empirique : <strong>moyenne sur $N$ points</strong>. Espéré : <strong>espérance sur la vraie loi</strong> (infinie)</td>
+</tr>
+<tr>
+<td>« Le modèle sur-apprend »</td>
+<td><strong>§8.2.3</strong></td>
+<td>Ajouter $\lambda\lVert\theta\rVert^2$ ;  les <strong>magnitudes des paramètres deviennent grandes</strong> en surapprentissage</td>
+</tr>
+<tr>
+<td>« Estimer l'erreur de généralisation »</td>
+<td><strong>§8.2.4</strong></td>
+<td><strong>Validation croisée à $K$ plis</strong> ; moyenner les $K$ risques empiriques</td>
+</tr>
+<tr>
+<td>« Écrire la log-vraisemblance négative »</td>
+<td><strong>§8.3.1</strong></td>
+<td>$L(\theta)=-\sum_n\log p(y_n\mid x_n,\theta)$</td>
+</tr>
+<tr>
+<td>« Bruit gaussien, modèle linéaire »</td>
+<td><strong>Ex. 8.5</strong></td>
+<td> Le MLE <strong>SE RAMÈNE aux moindres carrés</strong></td>
+</tr>
+<tr>
+<td>« On a une connaissance a priori sur $\theta$ »</td>
+<td><strong>§8.3.2</strong></td>
+<td>MAP : $p(\theta\mid x)\propto p(x\mid\theta)p(\theta)$ ;  l'a priori <strong>est</strong> la régularisation</td>
+</tr>
+<tr>
+<td>« Le modèle sur-ajuste ou sous-ajuste ? »</td>
+<td><strong>§8.3.3</strong></td>
+<td>Classe <strong>trop riche</strong> $\Rightarrow$ sur-ajustement ; <strong>pas assez riche</strong> $\Rightarrow$ sous-ajustement</td>
+</tr>
+<tr>
+<td>« Spécifier un modèle probabiliste »</td>
+<td><strong>§8.4.1</strong></td>
+<td> Donner la <strong>LOI JOINTE</strong> de <strong>toutes</strong> les variables</td>
+</tr>
+<tr>
+<td>« Faire une prédiction bayésienne »</td>
+<td><strong>§8.4.2</strong></td>
+<td>$p(x)=\int p(x\mid\theta)p(\theta)d\theta$ —  <strong>intégrer</strong>, ne pas brancher $\theta^*$</td>
+</tr>
+<tr>
+<td>« Le modèle a des variables latentes »</td>
+<td><strong>§8.4.3</strong></td>
+<td>$p(x\mid\theta)=\int p(x\mid z,\theta)p(z)dz$ ; algorithme <strong>EM</strong></td>
+</tr>
+<tr>
+<td>« Dessiner le modèle graphique »</td>
+<td><strong>§8.5.1</strong></td>
+<td>Un nœud par variable ; une flèche depuis chaque variable <strong>conditionnante</strong></td>
+</tr>
+<tr>
+<td>« Lire la loi jointe sur le graphe »</td>
+<td><strong>Ex. 8.8</strong></td>
+<td>$\prod_kp(x_k\mid\text{Pa}_k)$</td>
+</tr>
+<tr>
+<td>« $N$ observations i.i.d. »</td>
+<td><strong>§8.5.1</strong></td>
+<td>Utiliser une <strong>PLAQUE</strong> ; <strong>griser</strong> les nœuds observés</td>
+</tr>
+<tr>
+<td>« $A$ et $B$ sont-elles indépendantes sachant $C$ ? »</td>
+<td><strong>$d$-séparation</strong></td>
+<td>Examiner <strong>toutes les traînes</strong> ; appliquer les deux règles de blocage</td>
+</tr>
+<tr>
+<td>« Choisir entre plusieurs modèles »</td>
+<td><strong>§8.6</strong></td>
+<td>Validation croisée <strong>imbriquée</strong> ou <strong>évidence</strong> bayésienne</td>
+</tr>
+<tr>
+<td>« Comparer deux modèles bayésiennement »</td>
+<td><strong>§8.6.3</strong></td>
+<td>Le <strong>facteur de Bayes</strong> $p(\mathcal D\mid M_1)/p(\mathcal D\mid M_2)$</td>
+</tr>
+</tbody></table>
+<h2>Comment résoudre : les quatre méthodes pas-à-pas</h2>
+<p><strong>Méthode A — Poser un problème de minimisation du risque empirique.</strong></p>
+<ol>
+<li>Fixer la <strong>classe d'hypothèses</strong> (affine, polynomiale…) et sa paramétrisation.</li>
+<li>Choisir la <strong>fonction de perte</strong> $\ell$ ;  elle doit <strong>correspondre à la métrique de performance</strong> de la tâche.</li>
+<li>Écrire $R_{\text{emp}}=\frac1N\sum_n\ell(y_n,f(x_n,\theta))$.</li>
+<li>Ajouter un <strong>régularisateur</strong> $\lambda\lVert\theta\rVert^2$ si le modèle risque de sur-apprendre.</li>
+<li>Optimiser (fermé si moindres carrés, sinon ch. 7).</li>
+<li><strong>Estimer la généralisation</strong> par validation croisée.</li>
+</ol>
+<p><strong>Méthode B — Dériver un estimateur du maximum de vraisemblance.</strong></p>
+<ol>
+<li>Spécifier $p(y_n\mid x_n,\theta)$ — la loi du <strong>bruit</strong>.</li>
+<li>Invoquer l'<strong>i.i.d.</strong> pour <strong>factoriser</strong> : $\prod_np(y_n\mid x_n,\theta)$.</li>
+<li>Prendre le <strong>logarithme négatif</strong> : $-\sum_n\log p(y_n\mid x_n,\theta)$.</li>
+<li><strong>Développer</strong> et <strong>écarter les constantes</strong> en $\theta$.</li>
+<li><strong>Reconnaître</strong> l'objectif classique obtenu (moindres carrés pour un bruit gaussien).</li>
+<li>Minimiser ;  vérifier si une <strong>solution fermée</strong> existe.</li>
+</ol>
+<p><strong>Méthode C — Passer de MLE à MAP.</strong></p>
+<ol>
+<li>Choisir un <strong>a priori</strong> $p(\theta)$ ;  le prendre <strong>CONJUGUÉ</strong> de la vraisemblance rend l'a posteriori de même forme.</li>
+<li>Écrire $p(\theta\mid x)\propto p(x\mid\theta)p(\theta)$ — <strong>ignorer $p(x)$</strong>.</li>
+<li>Prendre le <strong>logarithme négatif</strong> des <strong>deux</strong> termes.</li>
+<li>Le terme issu de l'a priori <strong>EST</strong> le régularisateur ; l'identifier.</li>
+<li>Minimiser.</li>
+<li><strong>Contrôle qualitatif</strong> : l'a priori doit <strong>biaiser les paramètres vers l'origine</strong>.</li>
+</ol>
+<p><strong>Méthode D — Lire un modèle graphique.</strong></p>
+<ol>
+<li><strong>Lister les nœuds</strong> ; distinguer <strong>observés (grisés)</strong> et <strong>latents (blancs)</strong>.</li>
+<li><strong>Dérouler les plaques</strong> mentalement.</li>
+<li>Pour chaque nœud, identifier ses <strong>PARENTS</strong>.</li>
+<li>Écrire $p(x)=\prod_kp(x_k\mid\text{Pa}_k)$.</li>
+<li>Pour une question d'indépendance : lister <strong>toutes les traînes</strong>, tester le <strong>blocage</strong> de chacune.</li>
+<li> Attention aux <strong>collisions</strong> (tête-à-tête) : elles bloquent <strong>par défaut</strong> et se <strong>débloquent</strong> en conditionnant.</li>
+</ol>
+<h2 data-prio="must">Common mistakes</h2>
+<table>
+<thead>
+<tr>
+<th>Erreur</th>
+<th>Correction</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Oublier de standardiser les colonnes</td>
+<td> <em>« Sans information supplémentaire »</em>, viser <strong>moyenne 0 et variance 1</strong></td>
+</tr>
+<tr>
+<td>Garder un identifiant comme attribut</td>
+<td> Non informatif <strong>et</strong> problème de <strong>vie privée</strong></td>
+</tr>
+<tr>
+<td>Croire qu'« affine » et « linéaire » sont interchangeables</td>
+<td> Le livre le signale : en ML on dit « linéaire » pour « affine » — c'est un <strong>abus</strong></td>
+</tr>
+<tr>
+<td>Confondre les trois phases</td>
+<td><strong>Prédiction</strong> (paramètres fixés) · <strong>entraînement</strong> (on les ajuste) · <strong>sélection</strong> (on choisit les hyperparamètres)</td>
+</tr>
+<tr>
+<td>Croire que « inférence » a un sens unique</td>
+<td> <em>« Pas de nommage consensuel »</em> — le mot désigne parfois la <strong>prédiction</strong>, parfois l'<strong>estimation de paramètres</strong></td>
+</tr>
+<tr>
+<td>Optimiser le risque empirique et s'en satisfaire</td>
+<td> Ce qui compte est le <strong>risque ESPÉRÉ</strong> sur des données <strong>non vues</strong></td>
+</tr>
+<tr>
+<td>Croire que la MRE est « exempte de probabilité »</td>
+<td> <strong>Incorrect</strong> : il y a une $p(x,y)$ sous-jacente ; l'approche y est seulement <strong>AGNOSTIQUE</strong></td>
+</tr>
+<tr>
+<td>Concevoir la perte sans regarder la métrique de la tâche</td>
+<td> Le décalage est fréquent mais reste un <strong>défaut</strong></td>
+</tr>
+<tr>
+<td>Prendre $\lambda$ trop grand</td>
+<td>Le prédicteur est <strong>biaisé vers l'origine</strong> et <strong>sous-ajuste</strong></td>
+</tr>
+<tr>
+<td>Prendre un ensemble de validation trop petit</td>
+<td> Estimation <strong>BRUITÉE, à forte variance</strong> — d'où la validation croisée</td>
+</tr>
+<tr>
+<td>Croire la validation croisée trop coûteuse</td>
+<td> Elle est <strong>EMBARRASSAMMENT PARALLÈLE</strong></td>
+</tr>
+<tr>
+<td>Regarder la performance sur le test « juste pour voir »</td>
+<td> <strong>Même cela fait fuiter de l'information</strong> (Blum &amp; Hardt, 2015)</td>
+</tr>
+<tr>
+<td>Interpréter $\theta$ comme observé dans $p(y_n\mid x_n,\theta)$</td>
+<td> <em>« Cette interprétation est INCORRECTE »</em> — $L(\theta)$ est une <strong>fonction de $\theta$</strong></td>
+</tr>
+<tr>
+<td>Chercher un sens profond au signe moins</td>
+<td> C'est un <strong>artefact HISTORIQUE</strong> : on maximise la vraisemblance mais on minimise en optimisation</td>
+</tr>
+<tr>
+<td>Croire que le MLE a toujours une solution fermée</td>
+<td> <strong>Seulement</strong> pour certaines vraisemblances (gaussienne) ; sinon, méthodes <strong>numériques</strong></td>
+</tr>
+<tr>
+<td>Faire confiance au MLE sur peu de données</td>
+<td> <em>« Surtout dans le régime des PETITES données, il peut mener au SURAPPRENTISSAGE »</em> — la variance décroît en $1/N$</td>
+</tr>
+<tr>
+<td>Croire que le MAP donne une loi</td>
+<td> <strong>NON</strong> : il ne produit encore qu'une <strong>ESTIMATION PONCTUELLE</strong></td>
+</tr>
+<tr>
+<td>Croire régularisation et a priori sans rapport</td>
+<td> Ce sont <strong>la même idée</strong> dans deux langages</td>
+</tr>
+<tr>
+<td>Croire qu'un modèle plus flexible est toujours meilleur</td>
+<td> Il <strong>utilise sa puissance à trouver du signal DANS LE BRUIT</strong></td>
+</tr>
+<tr>
+<td>Spécifier un modèle probabiliste par sa seule vraisemblance</td>
+<td> Un modèle probabiliste <strong>EST la LOI JOINTE</strong> de toutes ses variables</td>
+</tr>
+<tr>
+<td>Prédire avec $p(x\mid\theta^*)$ en contexte bayésien</td>
+<td> Prédire avec $\int p(x\mid\theta)p(\theta)d\theta$ — <strong>propager l'incertitude</strong></td>
+</tr>
+<tr>
+<td>Confondre paramètres et variables latentes</td>
+<td> Les latentes <strong>ne paramétrisent PAS le modèle explicitement</strong></td>
+</tr>
+<tr>
+<td>Croire la marginalisation des latentes toujours faisable</td>
+<td> <strong>Analytiquement intraitable</strong> sauf a priori <strong>conjugué</strong></td>
+</tr>
+<tr>
+<td>Oublier un parent en lisant un graphe</td>
+<td> $p(x_k\mid\text{Pa}_k)$ demande <strong>TOUS</strong> les parents</td>
+</tr>
+<tr>
+<td>Croire que le graphe est unique</td>
+<td> <em>« La disposition dépend du CHOIX de FACTORISATION »</em></td>
+</tr>
+<tr>
+<td>Croire que toute loi a un modèle graphique</td>
+<td> <strong>NON</strong> — le livre le signale</td>
+</tr>
+<tr>
+<td>Appliquer la $d$-séparation en suivant le sens des flèches</td>
+<td> On considère les <strong>TRAÎNES</strong> — des chemins <strong>ignorant le sens</strong></td>
+</tr>
+<tr>
+<td>Traiter la collision comme les autres configurations</td>
+<td> <strong>Tête-à-tête</strong> : bloquée <strong>SI le nœud ET ses descendants sont HORS de $C$</strong> — la règle est <strong>inversée</strong></td>
+</tr>
+<tr>
+<td>Sélectionner un modèle sur l'ensemble de test</td>
+<td> La sélection se fait sur la <strong>VALIDATION</strong> (boucle interne) ; le test estime la <strong>généralisation</strong></td>
+</tr>
+<tr>
+<td>Croire qu'il faut un a priori favorisant la simplicité</td>
+<td> <strong>NON</strong> : le rasoir d'Occam est <strong>AUTOMATIQUE</strong> dans l'évidence</td>
+</tr>
+<tr>
+<td>Confondre vraisemblance et vraisemblance marginale</td>
+<td> La marginale <strong>intègre les paramètres</strong> et <strong>ne sur-apprend typiquement pas</strong></td>
+</tr>
+<tr>
+<td>Oublier le paradoxe de Jeffreys-Lindley</td>
+<td> Avec un a priori <strong>DIFFUS</strong>, le facteur de Bayes favorise <strong>toujours</strong> le modèle simple</td>
+</tr>
+</tbody></table>
+<h2>Ultimate Review</h2>
+<pre><code>════════ LES SEPT FORMULES À SAVOIR SANS HÉSITER ════════
+  1.  RISQUE EMPIRIQUE   Remp(f, X, y) = (1/N) Σn ℓ(yn, ŷn)
+  2.  RISQUE ESPÉRÉ      Rtrue(f) = E_{x,y}[ℓ(y, f(x))]
+  3.  RÉGULARISÉ         min (1/N)‖y − Xθ‖² + λ‖θ‖²
+  4.  LOG-VRAISEMBLANCE NÉGATIVE  L(θ) = −Σn log p(yn | xn, θ)
+      ⚠️ bruit GAUSSIEN  ⟹  L(θ) = (1/2σ²) Σn (yn − xnᵀθ)² + const
+  5.  MAP                p(θ | x) ∝ p(x | θ) p(θ)
+  6.  PRÉDICTION BAYÉSIENNE   p(x) = ∫ p(x|θ) p(θ) dθ = Eθ[p(x|θ)]
+      LATENTES                p(x|θ) = ∫ p(x|z,θ) p(z) dz
+  7.  GRAPHE             p(x) = Π_k p(xk | Pa_k)
+      ÉVIDENCE           p(D | Mk) = ∫ p(D | θk) p(θk | Mk) dθk
+      FACTEUR DE BAYES   p(D|M1) / p(D|M2)
+═════════════════════════════════════════════════════════
+</code></pre>
+<p><strong>LE TABLEAU DE CORRESPONDANCE — le cœur du chapitre :</strong></p>
+<table>
+<thead>
+<tr>
+<th>Monde <strong>NON PROBABILISTE</strong> (§8.2)</th>
+<th>Monde <strong>PROBABILISTE</strong> (§8.3-8.4)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Fonction de <strong>PERTE</strong> $\ell$</td>
+<td><strong>VRAISEMBLANCE</strong> $p(y\mid x,\theta)$</td>
+</tr>
+<tr>
+<td><strong>Perte QUADRATIQUE</strong></td>
+<td> <strong>Vraisemblance GAUSSIENNE</strong></td>
+</tr>
+<tr>
+<td><strong>RÉGULARISATEUR</strong> $\lambda\lVert\theta\rVert^2$</td>
+<td> <strong>A PRIORI</strong> $p(\theta)=\mathcal N(0,\Sigma)$</td>
+</tr>
+<tr>
+<td>Minimiser le <strong>RISQUE EMPIRIQUE</strong></td>
+<td>Minimiser la <strong>LOG-VRAISEMBLANCE NÉGATIVE</strong></td>
+</tr>
+<tr>
+<td>Risque empirique <strong>RÉGULARISÉ</strong></td>
+<td><strong>MAP</strong></td>
+</tr>
+<tr>
+<td><strong>Validation croisée</strong> pour la généralisation</td>
+<td><strong>ÉVIDENCE</strong> / vraisemblance marginale</td>
+</tr>
+<tr>
+<td>Estimation <strong>ponctuelle</strong></td>
+<td><strong>Loi a posteriori COMPLÈTE</strong> (inférence bayésienne)</td>
+</tr>
+</tbody></table>
+<p><strong>Les trois régimes d'ajustement :</strong></p>
+<table>
+<thead>
+<tr>
+<th>Régime</th>
+<th>Classe $M_\theta$</th>
+<th>Erreur d'entraînement</th>
+<th>Erreur de test</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Sur-ajustement</strong></td>
+<td><strong>Trop riche</strong></td>
+<td> <strong>Très faible</strong> — le modèle apprend le <strong>bruit</strong></td>
+<td><strong>Élevée</strong></td>
+</tr>
+<tr>
+<td><strong>Sous-ajustement</strong></td>
+<td><strong>Pas assez riche</strong></td>
+<td>Élevée</td>
+<td>Élevée</td>
+</tr>
+<tr>
+<td><strong>Bon ajustement</strong></td>
+<td>Adaptée</td>
+<td>Modérée</td>
+<td><strong>Faible</strong></td>
+</tr>
+</tbody></table>
+<p><strong>Les trois niveaux de « prendre en compte l'incertitude » :</strong></p>
+<table>
+<thead>
+<tr>
+<th>Niveau</th>
+<th>Ce qu'on obtient</th>
+<th>Coût</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>MLE</strong></td>
+<td>Une <strong>estimation ponctuelle</strong></td>
+<td>Optimisation</td>
+</tr>
+<tr>
+<td><strong>MAP</strong></td>
+<td>Une <strong>estimation ponctuelle biaisée par un a priori</strong></td>
+<td>Optimisation</td>
+</tr>
+<tr>
+<td><strong>Bayésien complet</strong></td>
+<td>La <strong>LOI a posteriori entière</strong></td>
+<td> <strong>Intégration</strong> (souvent intraitable)</td>
+</tr>
+</tbody></table>
+<p><strong>Où chaque notion resservira dans le livre :</strong></p>
+<table>
+<thead>
+<tr>
+<th>Notion du ch. 8</th>
+<th>Suite</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Moindres carrés, MLE, MAP</td>
+<td><strong>Régression linéaire</strong> (ch. 9)</td>
+</tr>
+<tr>
+<td>Application d'attributs $\phi(\cdot)$</td>
+<td>§9.2, puis <strong>NOYAUX</strong> (§12.4)</td>
+</tr>
+<tr>
+<td>Variables latentes, EM</td>
+<td><strong>ACP</strong> (ch. 10), <strong>mélanges gaussiens</strong> (ch. 11)</td>
+</tr>
+<tr>
+<td>Modèles graphiques</td>
+<td>Chapitres <strong>9, 10 et 11</strong></td>
+</tr>
+<tr>
+<td>Régularisation</td>
+<td> <strong>GRANDE MARGE</strong> des SVM (ch. 12)</td>
+</tr>
+<tr>
+<td>Évidence, sélection de modèle</td>
+<td>Choix du <strong>degré du polynôme</strong> (§9.3)</td>
+</tr>
+</tbody></table>
+<div class="rec"><h2>Active Recall</h2><p><strong>Données et modèles</strong></p><ol>
+<li>Quelle est la question centrale de l'apprentissage automatique ?</li>
+<li>Quels sont les synonymes d'« attribut » ? d'« étiquette » ?</li>
+<li>Que valent $N$, $D$ et $X$ ?</li>
+<li>Quelle règle par défaut le livre donne-t-il sur la mise à l'échelle ?</li>
+<li>Pourquoi supprimer la colonne Nom ? Deux raisons.</li>
+<li>Donner les deux visions du modèle.</li>
+<li>Pourquoi le livre se restreint-il aux fonctions linéaires ?</li>
+<li>Quelles sont les trois phases algorithmiques ? Quel est l'avertissement terminologique ?</li>
+<li>Quelles sont les deux stratégies d'entraînement ? Laquelle exige un modèle probabiliste ?</li>
+<li>D'où vient le signe moins dans les objectifs ?</li>
+<li>Qu'est-ce que l'abduction ? Pourquoi le mot ici ?</li>
+<li>Comment distinguer paramètre et hyperparamètre ?</li>
+</ol><p><strong>Minimisation du risque empirique</strong>
+13. Citer les quatre choix de conception.
+14. Écrire le prédicteur affine avec l'astuce de l'attribut unité.
+15. Écrire le risque empirique et le risque espéré. Quelle est la différence essentielle ?
+16. Détailler l'exemple 8.2 jusqu'à la forme matricielle.
+17. Quelles sont les deux questions pratiques posées par le risque espéré ?
+18. Quel décalage le livre signale-t-il entre perte et métrique ?
+19. Écrire le problème des moindres carrés régularisé. Nommer les deux termes ajoutés.
+20. Quel signe empirique accompagne le surapprentissage ?
+21. Citer les trois formes équivalentes de l'idée de régularisation.
+22. Décrire la validation croisée à $K$ plis et écrire son estimateur.
+23. Pourquoi le coût n'est-il pas un obstacle ?
+24. Pourquoi « exempt de probabilité » est-il incorrect ?</p><p><strong>MLE et MAP</strong>
+25. Écrire la log-vraisemblance négative. Que souligne la notation ?
+26. Donner les deux lectures de $p(x\mid\theta)$.
+27. Quel piège d'interprétation le livre signale-t-il ?
+28. Écrire la vraisemblance gaussienne de l'exemple 8.4.
+29. Que signifient « indépendantes » et « identiquement distribuées » ici ?
+30. Dériver l'exemple 8.5. Quelle est la conclusion ?
+31. Écrire le MAP. Pourquoi peut-on ignorer $p(x)$ ?
+32. Quel a priori choisit l'exemple 8.6 ? Quelle est sa vertu ?
+33. Quel effet l'a priori a-t-il sur la pente et l'ordonnée à l'origine ?
+34. Quelle est la position intermédiaire du MAP ?
+35. Donner les deux propriétés asymptotiques du MLE.
+36. Distinguer sur-ajustement, sous-ajustement, bon ajustement.</p><p><strong>Modélisation probabiliste</strong>
+37. Qu'est-ce qui spécifie un modèle probabiliste ?
+38. Comment obtenir a priori, vraisemblance marginale et a posteriori de la jointe ?
+39. Quelle est la différence entre inférence bayésienne et estimation ponctuelle ?
+40. Écrire la prédiction bayésienne.
+41. Qu'est-ce qu'une variable latente ? En quoi diffère-t-elle d'un paramètre ?
+42. Citer trois vertus des variables latentes et trois modèles qui en utilisent.
+43. Écrire la vraisemblance marginalisée. Quel est le défi ?</p><p><strong>Modèles graphiques</strong>
+44. Que représentent nœuds et flèches ?
+45. Citer les quatre propriétés commodes.
+46. Donner la recette factorisation → graphe.
+47. Donner les deux propriétés graphe → factorisation. Écrire la formule générale.
+48. Que signifie un nœud grisé ? une plaque ?
+49. Qu'est-ce qu'un hyper-a-priori ?
+50. Énoncer les deux règles de blocage de la $d$-séparation.
+51. Pourquoi la règle de la collision est-elle inversée ?
+52. Citer les trois familles de modèles graphiques.</p><p><strong>Sélection de modèle</strong>
+53. Pourquoi un modèle plus expressif n'est-il pas toujours préférable ?
+54. Décrire la validation croisée imbriquée. Quel rôle a chaque boucle ?
+55. Écrire l'erreur-type.
+56. Qu'est-ce que le rasoir d'Occam ?
+57. Expliquer la figure 8.14. Quelle contrainte rend le rasoir automatique ?
+58. Écrire le processus génératif hiérarchique et l'évidence.
+59. Quelle est la différence essentielle entre vraisemblance et vraisemblance marginale ?
+60. Écrire le rapport a posteriori et nommer ses deux facteurs.
+61. Énoncer le paradoxe de Jeffreys-Lindley. Qu'est-ce qu'un a priori diffus ?</p></div>
+
+
+
+
+
+
+
+<h2>Flashcards</h2>
+<table>
+<thead>
+<tr>
+<th>Question</th>
+<th>Réponse</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>La question centrale de l'apprentissage automatique ?</td>
+<td><em>« <strong>Qu'entend-on par de BONS modèles ?</strong> »</em></td>
+</tr>
+<tr>
+<td>Le principe directeur ?</td>
+<td> Bien se comporter sur des <strong>données NON VUES</strong></td>
+</tr>
+<tr>
+<td>Synonymes d'attribut ?</td>
+<td><strong>Caractéristique</strong> (<em>feature</em>) · <strong>covariable</strong></td>
+</tr>
+<tr>
+<td>Synonymes d'étiquette ?</td>
+<td><strong>Cible</strong> · <strong>variable de réponse</strong> · <strong>annotation</strong></td>
+</tr>
+<tr>
+<td>Notation du jeu de données ?</td>
+<td>$\{(x_1,y_1),\dots,(x_N,y_N)\}$ et $X\in\mathbb R^{N\times D}$</td>
+</tr>
+<tr>
+<td>Règle de mise à l'échelle par défaut ?</td>
+<td> <strong>Moyenne empirique 0, variance empirique 1</strong> sur chaque colonne</td>
+</tr>
+<tr>
+<td>Pourquoi supprimer les noms ?</td>
+<td>Non <strong>informatifs</strong> ·  <strong>ANONYMISATION</strong></td>
+</tr>
+<tr>
+<td>Les deux visions du modèle ?</td>
+<td>Une <strong>FONCTION</strong> $f:\mathbb R^D\to\mathbb R$ · une <strong>LOI DE PROBABILITÉ</strong></td>
+</tr>
+<tr>
+<td>Le prédicteur linéaire ?</td>
+<td>$f(x)=\theta^\top x+\theta_0$</td>
+</tr>
+<tr>
+<td>Pourquoi les fonctions linéaires ?</td>
+<td> Bon <strong>équilibre</strong> entre généralité et mathématiques nécessaires</td>
+</tr>
+<tr>
+<td>Pourquoi la vision probabiliste ?</td>
+<td> Pour exprimer l'<strong>INCERTITUDE</strong> et la <strong>CONFIANCE</strong> dans une prédiction</td>
+</tr>
+<tr>
+<td>Les trois phases ?</td>
+<td><strong>Prédiction/inférence</strong> · <strong>Entraînement</strong> · <strong>Sélection de modèle</strong></td>
+</tr>
+<tr>
+<td>L'avertissement terminologique ?</td>
+<td> <em>« Pas de nommage consensuel »</em> — « inférence » a <strong>plusieurs sens</strong></td>
+</tr>
+<tr>
+<td>Les deux stratégies d'entraînement ?</td>
+<td><strong>Estimation ponctuelle</strong> · <strong>Inférence bayésienne</strong> ( modèle probabiliste <strong>requis</strong>)</td>
+</tr>
+<tr>
+<td>Le principe non probabiliste ?</td>
+<td>La <strong>minimisation du RISQUE EMPIRIQUE</strong></td>
+</tr>
+<tr>
+<td>Le principe probabiliste ?</td>
+<td>Le <strong>MAXIMUM DE VRAISEMBLANCE</strong></td>
+</tr>
+<tr>
+<td>D'où vient le signe moins ?</td>
+<td> On <strong>MINIMISE</strong> en optimisation, mais on <strong>MAXIMISE</strong> la vraisemblance</td>
+</tr>
+<tr>
+<td>Qu'est-ce que l'abduction ?</td>
+<td> Ni induction ni déduction — l'<strong>inférence vers la MEILLEURE EXPLICATION</strong></td>
+</tr>
+<tr>
+<td>Paramètre contre hyperparamètre ?</td>
+<td> Ce qui est <strong>numériquement optimisable</strong> contre ce qui exige une <strong>RECHERCHE</strong></td>
+</tr>
+<tr>
+<td>Les quatre choix de la MRE ?</td>
+<td><strong>Classe d'hypothèses</strong> · <strong>perte</strong> · <strong>régularisation</strong> · <strong>procédure de recherche</strong></td>
+</tr>
+<tr>
+<td>L'astuce de l'attribut unité ?</td>
+<td>Concaténer $x^{(0)}=1$ pour écrire l'affine comme $\theta^\top x_n$</td>
+</tr>
+<tr>
+<td>« Affine » en ML ?</td>
+<td> Souvent appelé « <strong>linéaire</strong> » — abus signalé par le livre</td>
+</tr>
+<tr>
+<td>Risque empirique ?</td>
+<td>$R_{\text{emp}}=\frac1N\sum_n\ell(y_n,\hat y_n)$</td>
+</tr>
+<tr>
+<td>Ses trois arguments ?</td>
+<td>Le <strong>prédicteur $f$</strong>, les données $X$, $y$</td>
+</tr>
+<tr>
+<td>Risque espéré ?</td>
+<td>$R_{\text{true}}(f)=\mathbb E_{x,y}[\ell(y,f(x))]$</td>
+</tr>
+<tr>
+<td>Son autre nom ?</td>
+<td>Le risque de <strong>POPULATION</strong></td>
+</tr>
+<tr>
+<td>La différence essentielle ?</td>
+<td> Le risque espéré suppose une <strong>quantité INFINIE de données</strong></td>
+</tr>
+<tr>
+<td>La perte quadratique en forme matricielle ?</td>
+<td>$\min_\theta\frac1N\lVert y-X\theta\rVert^2$</td>
+</tr>
+<tr>
+<td>Comment se résout-il ?</td>
+<td>Par les <strong>ÉQUATIONS NORMALES</strong>, en forme <strong>fermée</strong></td>
+</tr>
+<tr>
+<td>Le décalage signalé ?</td>
+<td> La perte devrait correspondre à la <strong>métrique de performance</strong> ; en pratique elle <strong>diverge</strong></td>
+</tr>
+<tr>
+<td>Le problème régularisé ?</td>
+<td>$\min_\theta\frac1N\lVert y-X\theta\rVert^2+\lambda\lVert\theta\rVert^2$</td>
+</tr>
+<tr>
+<td>Les deux noms des termes ?</td>
+<td>Le <strong>RÉGULARISATEUR</strong> (ou terme de <strong>pénalité</strong>) · le <strong>paramètre de régularisation</strong> $\lambda$</td>
+</tr>
+<tr>
+<td>Que fait le terme de pénalité ?</td>
+<td> Il <strong>BIAISE $\theta$ vers l'ORIGINE</strong></td>
+</tr>
+<tr>
+<td>Le signe empirique du surapprentissage ?</td>
+<td> La <strong>magnitude des paramètres devient GRANDE</strong></td>
+</tr>
+<tr>
+<td>Les trois visages de la régularisation ?</td>
+<td><strong>Régularisateur</strong> · <strong>A PRIORI</strong> ·  <strong>GRANDE MARGE</strong> (SVM)</td>
+</tr>
+<tr>
+<td>Le nom de cette régularisation ?</td>
+<td>La régularisation de <strong>TIKHONOV</strong> (variante contrainte : <strong>IVANOV</strong>)</td>
+</tr>
+<tr>
+<td>Validation croisée à $K$ plis ?</td>
+<td>$K-1$ morceaux d'entraînement, $1$ de validation, <strong>$K$ passages moyennés</strong></td>
+</tr>
+<tr>
+<td>Le dilemme qu'elle résout ?</td>
+<td>Grand ensemble d'entraînement <strong>contre</strong> grand ensemble de validation</td>
+</tr>
+<tr>
+<td>Son coût ?</td>
+<td> <strong>Embarrassamment PARALLÈLE</strong> — pas plus long qu'une seule évaluation</td>
+</tr>
+<tr>
+<td>Le risque de regarder le test ?</td>
+<td> <em>« Même connaître la performance sur le test <strong>FAIT FUITER de l'information</strong> »</em></td>
+</tr>
+<tr>
+<td>La MRE est-elle « sans probabilité » ?</td>
+<td> <strong>NON</strong> — elle est seulement <strong>AGNOSTIQUE</strong> à $p(x,y)$</td>
+</tr>
+<tr>
+<td>Log-vraisemblance négative ?</td>
+<td>$\mathcal L_x(\theta)=-\log p(x\mid\theta)$</td>
+</tr>
+<tr>
+<td>Ce que souligne la notation $\mathcal L_x(\theta)$ ?</td>
+<td> <strong>$\theta$ VARIE, $x$ est FIXÉE</strong></td>
+</tr>
+<tr>
+<td>Lecture avec $\theta$ fixé ?</td>
+<td>L'<strong>incertitude des DONNÉES</strong> pour ce réglage</td>
+</tr>
+<tr>
+<td>Lecture avec $x$ fixé ?</td>
+<td> <strong>À quel point ce $\theta$ est PROBABLE</strong> pour ces observations</td>
+</tr>
+<tr>
+<td>Le piège d'interprétation ?</td>
+<td> Croire $\theta$ <strong>observé</strong> parce qu'il est à droite du conditionnement — <strong>INCORRECT</strong></td>
+</tr>
+<tr>
+<td>La vraisemblance de l'exemple 8.4 ?</td>
+<td>$\mathcal N(y_n\mid x_n^\top\theta,\ \sigma^2)$, bruit $\varepsilon_n\sim\mathcal N(0,\sigma^2)$</td>
+</tr>
+<tr>
+<td>Que donne « indépendantes » ?</td>
+<td> La vraisemblance <strong>SE FACTORISE</strong> en un produit</td>
+</tr>
+<tr>
+<td>Que donne « identiquement distribuées » ?</td>
+<td>Chaque terme est de la <strong>MÊME loi</strong> et <strong>partage les mêmes paramètres</strong></td>
+</tr>
+<tr>
+<td>Pourquoi le logarithme ?</td>
+<td> Transformer un <strong>PRODUIT en SOMME</strong> — plus facile à optimiser</td>
+</tr>
+<tr>
+<td>Le résultat de l'exemple 8.5 ?</td>
+<td> <strong>Vraisemblance GAUSSIENNE $\Longleftrightarrow$ MOINDRES CARRÉS</strong></td>
+</tr>
+<tr>
+<td>La forme obtenue ?</td>
+<td>$L(\theta)=\frac{1}{2\sigma^2}\sum_n(y_n-x_n^\top\theta)^2-N\log\frac{1}{\sqrt{2\pi\sigma^2}}$</td>
+</tr>
+<tr>
+<td>Pourquoi le second terme disparaît-il ?</td>
+<td> Il est <strong>CONSTANT</strong> en $\theta$ (si $\sigma$ est donné)</td>
+</tr>
+<tr>
+<td>Le MLE a-t-il toujours une solution fermée ?</td>
+<td> <strong>NON</strong> — seulement pour certaines vraisemblances</td>
+</tr>
+<tr>
+<td>Consistance asymptotique ?</td>
+<td> Le MLE <strong>converge vers la vraie valeur</strong> à la limite infinie, avec une erreur <strong>approximativement normale</strong></td>
+</tr>
+<tr>
+<td>Décroissance de la variance ?</td>
+<td>En <strong>$1/N$</strong></td>
+</tr>
+<tr>
+<td>Le danger sur peu de données ?</td>
+<td> <strong>SURAPPRENTISSAGE</strong></td>
+</tr>
+<tr>
+<td>L'estimation MAP ?</td>
+<td>$p(\theta\mid x)\propto p(x\mid\theta)p(\theta)$</td>
+</tr>
+<tr>
+<td>Pourquoi ignorer $p(x)$ ?</td>
+<td> Elle <strong>ne dépend pas de $\theta$</strong></td>
+</tr>
+<tr>
+<td>L'a priori de l'exemple 8.6 ?</td>
+<td>$p(\theta)=\mathcal N(0,\Sigma)$ —  <strong>conjugué</strong>, donc a posteriori <strong>gaussien</strong></td>
+</tr>
+<tr>
+<td>Son effet visible ?</td>
+<td><strong>Pente moins raide</strong> · <strong>ordonnée plus proche de zéro</strong></td>
+</tr>
+<tr>
+<td>La position du MAP ?</td>
+<td> Un <strong>PONT</strong> : il reconnaît l'a priori mais <strong>ne donne qu'une ESTIMATION PONCTUELLE</strong></td>
+</tr>
+<tr>
+<td>Sur-ajustement ?</td>
+<td>Classe <strong>TROP RICHE</strong> ;  elle <strong>trouve du signal DANS LE BRUIT</strong></td>
+</tr>
+<tr>
+<td>Sous-ajustement ?</td>
+<td>Classe <strong>PAS ASSEZ RICHE</strong> (données sinusoïdales, modèle linéaire)</td>
+</tr>
+<tr>
+<td>Qu'est-ce qui spécifie un modèle probabiliste ?</td>
+<td> La <strong>LOI JOINTE $p(x,\theta)$</strong> de <strong>toutes</strong> ses variables</td>
+</tr>
+<tr>
+<td>Comment obtenir la vraisemblance marginale ?</td>
+<td>En <strong>INTÉGRANT les paramètres</strong> (règle de la <strong>somme</strong>)</td>
+</tr>
+<tr>
+<td>Comment obtenir l'a posteriori ?</td>
+<td>En <strong>divisant la jointe</strong> par la vraisemblance marginale</td>
+</tr>
+<tr>
+<td>Inférence bayésienne ?</td>
+<td> <strong>Apprendre la LOI</strong> des variables, pas une valeur</td>
+</tr>
+<tr>
+<td>Le coût de l'estimation ponctuelle ?</td>
+<td> <strong>Perte d'information</strong> — critique pour la <strong>prise de DÉCISION</strong></td>
+</tr>
+<tr>
+<td>La prédiction bayésienne ?</td>
+<td>$p(x)=\int p(x\mid\theta)p(\theta)d\theta=\mathbb E_\theta[p(x\mid\theta)]$</td>
+</tr>
+<tr>
+<td>Variable latente ?</td>
+<td> Une variable qui <strong>NE paramétrise PAS le modèle explicitement</strong></td>
+</tr>
+<tr>
+<td>Ses trois vertus ?</td>
+<td><strong>Interprétabilité</strong> du processus générateur · <strong>structures plus simples et plus riches</strong> · <strong>moins de paramètres</strong></td>
+</tr>
+<tr>
+<td>L'algorithme dédié ?</td>
+<td>L'<strong>ESPÉRANCE-MAXIMISATION (EM)</strong></td>
+</tr>
+<tr>
+<td>La vraisemblance marginalisée ?</td>
+<td>$p(x\mid\theta)=\int p(x\mid z,\theta)p(z)dz$</td>
+</tr>
+<tr>
+<td>Dépend-elle des latentes ?</td>
+<td> <strong>NON</strong> — c'est tout l'intérêt</td>
+</tr>
+<tr>
+<td>Le défi ?</td>
+<td> <strong>Analytiquement INTRAITABLE</strong> sauf a priori <strong>CONJUGUÉ</strong></td>
+</tr>
+<tr>
+<td>Nœuds et flèches d'un modèle graphique ?</td>
+<td>Nœuds = <strong>variables aléatoires</strong> · flèches = <strong>probabilités conditionnelles</strong></td>
+</tr>
+<tr>
+<td>Autre nom des modèles orientés ?</td>
+<td>Les <strong>RÉSEAUX BAYÉSIENS</strong></td>
+</tr>
+<tr>
+<td>Recette factorisation → graphe ?</td>
+<td><strong>1.</strong> un nœud par variable <strong>2.</strong> une flèche depuis chaque variable <strong>conditionnante</strong></td>
+</tr>
+<tr>
+<td>Formule graphe → factorisation ?</td>
+<td>$p(x)=\prod_{k=1}^{K}p(x_k\mid\text{Pa}_k)$</td>
+</tr>
+<tr>
+<td>Que signifie $\text{Pa}_k$ ?</td>
+<td>Les nœuds <strong>PARENTS</strong> de $x_k$ — ceux dont les flèches <strong>pointent vers</strong> $x_k$</td>
+</tr>
+<tr>
+<td>Le graphe est-il unique ?</td>
+<td> <strong>NON</strong> — il dépend du <strong>choix de factorisation</strong></td>
+</tr>
+<tr>
+<td>Toute loi a-t-elle un graphe ?</td>
+<td> <strong>NON</strong></td>
+</tr>
+<tr>
+<td>Nœud grisé ?</td>
+<td>Variable <strong>OBSERVÉE</strong></td>
+</tr>
+<tr>
+<td>Plaque ?</td>
+<td>Une boîte qui <strong>RÉPÈTE son contenu $N$ fois</strong></td>
+</tr>
+<tr>
+<td>Hyper-a-priori ?</td>
+<td> Une <strong>SECONDE COUCHE</strong> d'a priori sur les paramètres de la première</td>
+</tr>
+<tr>
+<td>$d$-séparation, règle 1 ?</td>
+<td>Flèches <strong>tête-à-queue ou queue-à-queue</strong>, et le nœud <strong>EST DANS $C$</strong></td>
+</tr>
+<tr>
+<td>$d$-séparation, règle 2 ?</td>
+<td> Flèches <strong>TÊTE-À-TÊTE</strong>, et <strong>NI le nœud NI aucun descendant</strong> n'est dans $C$</td>
+</tr>
+<tr>
+<td>Que sont les traînes ?</td>
+<td> Des chemins qui <strong>IGNORENT le sens des flèches</strong></td>
+</tr>
+<tr>
+<td>Conclusion si toutes les traînes sont bloquées ?</td>
+<td>$A\perp\!\!\!\perp B\mid C$</td>
+</tr>
+<tr>
+<td>Les trois familles de modèles graphiques ?</td>
+<td><strong>Orientés</strong> (bayésiens) · <strong>non orientés</strong> (champs de Markov) · <strong>graphes de FACTEURS</strong></td>
+</tr>
+<tr>
+<td>Un polynôme de degré 2 contient-il les linéaires ?</td>
+<td> <strong>OUI</strong> — poser $a_2=0$ ; il est <strong>strictement plus expressif</strong></td>
+</tr>
+<tr>
+<td>Validation croisée imbriquée, boucle interne ?</td>
+<td>Estimer la performance d'un <strong>choix de modèle / hyperparamètre</strong> — ensemble de <strong>VALIDATION</strong></td>
+</tr>
+<tr>
+<td>Boucle externe ?</td>
+<td>Estimer la <strong>GÉNÉRALISATION</strong> du meilleur choix — ensemble de <strong>TEST</strong></td>
+</tr>
+<tr>
+<td>Erreur-type ?</td>
+<td>$\sigma/\sqrt K$</td>
+</tr>
+<tr>
+<td>Rasoir d'Occam ?</td>
+<td>Chercher le <strong>modèle le plus SIMPLE</strong> qui explique raisonnablement les données</td>
+</tr>
+<tr>
+<td>Faut-il un a priori favorisant la simplicité ?</td>
+<td> <strong>NON</strong> — le rasoir est <strong>AUTOMATIQUE</strong> dans l'évidence bayésienne</td>
+</tr>
+<tr>
+<td>Pourquoi ?</td>
+<td> Parce que $p(\mathcal D\mid M_i)$ doit <strong>INTÉGRER À 1</strong> sur l'espace des jeux de données</td>
+</tr>
+<tr>
+<td>Le processus génératif hiérarchique ?</td>
+<td>$M_k\sim p(M)$, $\theta_k\sim p(\theta\mid M_k)$, $\mathcal D\sim p(\mathcal D\mid\theta_k)$</td>
+</tr>
+<tr>
+<td>L'a posteriori sur les modèles ?</td>
+<td>$p(M_k\mid\mathcal D)\propto p(M_k)p(\mathcal D\mid M_k)$</td>
+</tr>
+<tr>
+<td>L'évidence ?</td>
+<td>$p(\mathcal D\mid M_k)=\int p(\mathcal D\mid\theta_k)p(\theta_k\mid M_k)d\theta_k$</td>
+</tr>
+<tr>
+<td>Son autre nom ?</td>
+<td>La <strong>VRAISEMBLANCE MARGINALE</strong></td>
+</tr>
+<tr>
+<td>Vraisemblance contre marginale ?</td>
+<td> La vraisemblance <strong>SUR-APPREND</strong> ; la marginale <strong>NON</strong> (paramètres marginalisés)</td>
+</tr>
+<tr>
+<td>Rapport a posteriori ?</td>
+<td>$\dfrac{p(M_1)}{p(M_2)}\cdot\dfrac{p(\mathcal D\mid M_1)}{p(\mathcal D\mid M_2)}$</td>
+</tr>
+<tr>
+<td>Ses deux facteurs ?</td>
+<td>Le <strong>rapport A PRIORI</strong> · le <strong>FACTEUR DE BAYES</strong></td>
+</tr>
+<tr>
+<td>Que mesure le facteur de Bayes ?</td>
+<td>À quel point <strong>les données sont PRÉDITES</strong> par $M_1$ comparé à $M_2$</td>
+</tr>
+<tr>
+<td>Facteur de Bayes $&gt;1$ ?</td>
+<td>On choisit <strong>$M_1$</strong></td>
+</tr>
+<tr>
+<td>Paradoxe de Jeffreys-Lindley ?</td>
+<td> Avec un a priori <strong>DIFFUS</strong>, le facteur de Bayes <strong>favorise TOUJOURS le modèle simple</strong></td>
+</tr>
+<tr>
+<td>A priori diffus ?</td>
+<td>Un a priori qui <strong>ne favorise aucun modèle</strong> — beaucoup sont a priori plausibles</td>
+</tr>
+</tbody></table>
+</main>
+
+
+
+
+</body></html>

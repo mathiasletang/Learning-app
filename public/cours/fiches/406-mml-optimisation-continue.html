@@ -1,0 +1,1496 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fiche 406 — Optimisation continue : descente de gradient, Lagrange, convexité, dualité</title>
+<script>
+window.MathJax={tex:{inlineMath:[["$","$"]],displayMath:[["$$","$$"]],processEscapes:true},
+ options:{skipHtmlTags:["script","noscript","style","textarea","pre","code"]},
+ svg:{fontCache:"global"},
+ startup:{pageReady:()=>MathJax.startup.defaultPageReady().then(()=>{document.body.classList.add("ready")})}};
+setTimeout(function(){document.body.classList.add("ready")},2500);
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+/* ============================================================
+   MathiasLearn — feuille de style des fiches
+   Reprise intégrale des tokens de 00_PARCOURS/*.html
+   + blocs pédagogiques (callouts, méthode, essentiels, recall)
+   ============================================================ */
+:root{--bg:#faf9f7;--card:#fff;--ink:#1a1a1a;--muted:#6b6b6b;--line:#e5e2dd;--accent:#8b5e34;
+ --hl:#fdf8ef;--ok:#2d7d4f;--okbg:#f0f7f3;--warn:#b3402f;--warnbg:#fdf3f1;--blue:#2f5d8b;--bluebg:#f1f5fa}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+ font:17px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;padding:0 16px 100px}
+.nav{position:sticky;top:0;background:rgba(250,249,247,.96);backdrop-filter:blur(8px);
+ border-bottom:1px solid var(--line);margin:0 -16px 30px;padding:11px 16px;z-index:50;
+ display:flex;gap:6px;flex-wrap:wrap;font-size:13px}
+.nav a{color:var(--muted);text-decoration:none;padding:4px 9px;border-radius:5px;white-space:nowrap}
+.nav a:hover{background:var(--line);color:var(--ink)}
+.nav a.on{background:var(--accent);color:#fff}
+main{max-width:780px;margin:0 auto}
+h1{font-size:31px;letter-spacing:-.02em;margin:.4em 0 .5em;line-height:1.25}
+h2{font-size:23px;margin:2.2em 0 .7em;padding-bottom:.3em;border-bottom:1px solid var(--line)}
+h3{font-size:19px;margin:1.9em 0 .5em;color:var(--accent)}
+h4{font-size:17px;margin:1.5em 0 .4em}
+p{margin:.8em 0} a{color:var(--accent)} hr{border:0;border-top:1px solid var(--line);margin:2.6em 0}
+table{border-collapse:collapse;width:100%;margin:1.3em 0;font-size:15.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+th{background:#f3f0eb;font-weight:600}
+tr:nth-child(even) td{background:#fcfbfa}
+code{font-family:"SF Mono",Menlo,Consolas,monospace;font-size:.88em;background:#f2efea;padding:2px 6px;border-radius:4px;overflow-wrap:break-word}
+pre{background:#f2efea;padding:14px 16px;border-radius:8px;overflow-x:auto}
+pre code{background:none;padding:0;white-space:pre}
+blockquote{border-left:3px solid var(--accent);background:var(--hl);margin:1.4em 0;padding:14px 20px;border-radius:0 8px 8px 0}
+blockquote p:first-child{margin-top:0} blockquote p:last-child{margin-bottom:0}
+ul,ol{padding-left:1.5em} li{margin:.35em 0} em{color:#4a4a4a}
+mjx-container[display="true"]{margin:1.1em 0!important;overflow-x:auto;overflow-y:hidden;padding:2px 0}
+mjx-container svg{max-width:100%}
+body:not(.ready) main{opacity:0} main{opacity:1;transition:opacity .25s}
+
+/* --- bandeau de tête de fiche --- */
+.cours{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--accent);
+ border-radius:0 10px 10px 0;padding:18px 22px;margin:0 0 34px}
+.cours h4{margin:0 0 4px;font-size:14px;text-transform:uppercase;letter-spacing:.07em;color:var(--accent)}
+.cours .cs{color:var(--muted);font-size:14.5px;margin:0 0 14px}
+
+/* --- exercices / corrigés --- */
+.ex{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:6px 24px 20px;margin:18px 0}
+.ex>h3:first-child{margin-top:14px}
+details.cor{margin-top:18px;border:1px solid var(--line);border-radius:8px;background:#fcfbfa;overflow:hidden}
+details.cor>summary{cursor:pointer;padding:12px 16px;font-weight:600;font-size:15px;color:var(--accent);
+ list-style:none;display:flex;align-items:center;gap:9px;user-select:none;transition:.15s;min-height:44px}
+details.cor>summary::-webkit-details-marker{display:none}
+details.cor>summary:hover{background:var(--hl)}
+details.cor>summary::before{content:"\25B6";font-size:10px;transition:transform .18s;display:inline-block}
+details.cor[open]>summary::before{transform:rotate(90deg)}
+details.cor[open]>summary{background:var(--okbg);color:var(--ok);border-bottom:1px solid var(--line)}
+.cor .in{padding:4px 20px 16px}
+.cor .in>*:first-child{margin-top:.9em}
+
+/* --- blocs pédagogiques (callouts) ---
+   Générés depuis une citation Markdown dont le premier **gras** commence
+   par un mot-clé : DÉFINITION, THÉORÈME, MÉTHODE, PIÈGE, INTUITION… */
+.cal{border:1px solid var(--line);border-left:4px solid var(--accent);background:var(--card);
+ border-radius:0 10px 10px 0;padding:15px 20px;margin:1.5em 0}
+.cal>p:first-child{margin-top:0}.cal>p:last-child,.cal>ul:last-child,.cal>ol:last-child{margin-bottom:0}
+.cal .lab{display:block;font-size:12.5px;text-transform:uppercase;letter-spacing:.08em;
+ font-weight:700;color:var(--accent);margin-bottom:6px}
+.cal.formel{background:var(--hl)}
+.cal.piege{border-left-color:var(--warn);background:var(--warnbg)}
+.cal.piege .lab{color:var(--warn)}
+.cal.methode{border-left-color:var(--ok);background:var(--okbg)}
+.cal.methode .lab{color:var(--ok)}
+.cal.intu{border-left-color:var(--blue);background:var(--bluebg)}
+.cal.intu .lab{color:var(--blue)}
+.cal.plus{border-left-style:dashed;background:#faf9f7}
+.cal.plus .lab{color:var(--muted)}
+
+/* --- révision express --- */
+.ess{background:var(--card);border:1px solid var(--accent);border-radius:10px;padding:4px 24px 20px;margin:1.6em 0}
+.ess h3{margin-top:1.3em}
+.rec{background:var(--card);border:1px dashed var(--accent);border-radius:10px;padding:4px 24px 18px;margin:1.6em 0}
+.rec ol{counter-reset:none}
+
+/* --- impression / PDF --- */
+@media print{
+ .nav{display:none}
+ body{padding:0;background:#fff;font-size:11.2pt;line-height:1.55}
+ main{max-width:none}
+ h1{font-size:23pt}h2{font-size:15pt;margin-top:1.5em}h3{font-size:12.6pt}
+ h2,h3,h4{break-after:avoid;page-break-after:avoid}
+ table,.cal,blockquote{break-inside:avoid;page-break-inside:avoid}
+ table{display:table;font-size:9.6pt}
+ details.cor{border:1px solid var(--line);background:#fcfbfa}
+ details.cor>summary{display:none}
+ details.cor .in{padding-top:10px}
+ .cal,.ex,.ess,.rec{box-shadow:none}
+ a{color:var(--ink);text-decoration:none}
+}
+@page{margin:16mm 15mm 18mm}
+
+/* --- exemples travaillés --- */
+.exm{background:#fcfbfa;border:1px solid var(--line);border-radius:10px;padding:2px 20px 14px;margin:1.5em 0}
+.exm>h4:first-child{margin:14px 0 .5em;color:var(--accent);font-size:13px;text-transform:uppercase;letter-spacing:.07em}
+
+
+/* --- pastilles de priorité (conventions des fiches de l'app) --- */
+h2[data-prio], h3[data-prio], h4[data-prio]{position:relative}
+h2[data-prio]::before,h3[data-prio]::before,h4[data-prio]::before{
+ content:"";display:inline-block;width:9px;height:9px;border-radius:50%;
+ margin-right:9px;vertical-align:middle;background:var(--muted)}
+[data-prio="must"]::before{background:var(--warn)}
+[data-prio="high"]::before{background:#d98324}
+[data-prio="mid"]::before{background:#c9a227}
+[data-prio="low"]::before{background:var(--ok)}
+/* corrigés des fiches de l'app : même traitement que les corrigés des séries */
+details.cor>summary::after{content:""}
+</style></head><body>
+<div class="nav"><a href="00_COMMENCER_ICI.html">Commencer ici</a><a href="01_NOTATIONS_le-decodeur.html">Notations</a><a href="02_EXERCICES_Serie-0.html">Série 0 — Remise en route</a><a href="03_EXERCICES_Serie-1.html">Série 1 — Convexité</a><a href="04_EXERCICES_Serie-2.html">Série 2 — KKT</a><a href="05_AUTO-EVALUATION.html">Auto-évaluation (quiz)</a><a href="06_FICHE_Optimisation-deux-variables.html">Fiche — Optimisation à 2 variables</a></div>
+<main><h1>Fiche 406 — Optimisation continue : descente de gradient, Lagrange, convexité, dualité</h1>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Matière</strong></td>
+<td>Maths · Apprentissage automatique</td>
+</tr>
+<tr>
+<td><strong>Cours source</strong></td>
+<td>Deisenroth, Faisal &amp; Ong, <em>Mathematics for Machine Learning</em>, Cambridge University Press — chapitre 7 « Continuous Optimization » (p. 225-246)</td>
+</tr>
+<tr>
+<td><strong>Difficulté</strong></td>
+<td> Avancé — la dernière des six fondations, celle qui fait tourner l'apprentissage</td>
+</tr>
+<tr>
+<td><strong>Temps d'étude estimé</strong></td>
+<td>120 min</td>
+</tr>
+<tr>
+<td><strong>Prérequis</strong></td>
+<td>Fiche 403 (matrices définies positives, valeurs singulières) · Fiche 404 (gradient, hessienne)</td>
+</tr>
+<tr>
+<td><strong>Concepts clés</strong></td>
+<td>Point stationnaire, minimum global et local, descente de gradient, pas / taux d'apprentissage, conditionnement, préconditionneur, momentum, descente de gradient stochastique, mini-lot, optimisation sous contraintes, multiplicateurs de Lagrange, lagrangien, problème primal et dual, inégalité minimax, dualité faible, dualité forte, ensemble convexe, fonction convexe, épigraphe, inégalité de Jensen, programme linéaire, programme quadratique, transformée de Legendre-Fenchel, conjugué convexe, hyperplan d'appui</td>
+</tr>
+<tr>
+<td><strong>Poids à l'examen</strong></td>
+<td>$x_{i+1}=x_i-\gamma_i\big((\nabla f)(x_i)\big)^\top$ · le <strong>conditionnement</strong> $\kappa=\sigma_{\max}/\sigma_{\min}$ · le <strong>lagrangien</strong> $\mathfrak L(x,\lambda)=f(x)+\lambda^\top g(x)$ · l'<strong>inégalité minimax</strong> et la <strong>dualité faible</strong> · les <strong>trois caractérisations</strong> de la convexité · les duaux du <strong>PL</strong> et du <strong>PQ</strong> · le <strong>conjugué convexe</strong> $f^*(s)=\sup_x(\langle s,x\rangle-f(x))$.</td>
+</tr>
+</tbody></table>
+<h2>Vue d'ensemble</h2>
+<pre><code>LE FIL DU CHAPITRE : trouver le MINIMUM d'une fonction objectif
+
+  DEUX BRANCHES     optimisation SANS contraintes  ·  optimisation SOUS contraintes
+  CONVENTION        en apprentissage on MINIMISE ; le gradient pointe VERS LE HAUT,
+                    donc on descend dans la direction du gradient NÉGATIF
+
+  §7.1 DESCENTE DE GRADIENT      xi+1 = xi − γi ((∇f)(xi))ᵀ
+        algorithme du PREMIER ORDRE  ·  le gradient est ORTHOGONAL aux lignes de niveau
+        PAS γ   trop petit → lent  ·  trop grand → dépassement, divergence
+                deux heuristiques ADAPTATIVES : annuler et réduire / augmenter
+        CONDITIONNEMENT  κ = σmax/σmin  → vallées longues et minces → ZIGZAG
+        MOMENTUM   xi+1 = xi − γi((∇f)(xi))ᵀ + α Δxi     ← une MÉMOIRE, α ∈ [0,1]
+        SGD        L(θ) = Σn Ln(θ)  →  MINI-LOT au lieu du lot complet
+                   grands lots : précis, stable, coûteux ; petits lots : bruités,
+                   rapides, ⚠️ le BRUIT aide à SORTIR des mauvais minima locaux
+  §7.2 CONTRAINTES ET LAGRANGE
+        min f(x)  s.c.  gi(x) ≤ 0
+        LAGRANGIEN  L(x,λ) = f(x) + λᵀ g(x)  ,  λ ≥ 0
+        l'idée : remplacer la fonction INDICATRICE (marche infinie) par une LINÉAIRE
+        PRIMAL  min_x max_{λ≥0} L      DUAL  max_{λ≥0} min_x L = max D(λ)
+        MINIMAX  max min φ ≤ min max φ    ⟹  DUALITÉ FAIBLE
+        ⚠️ D(λ) est CONCAVE même si f et gi sont non convexes
+        ÉGALITÉS  hj(x) = 0  →  deux inégalités  →  multiplicateurs NON CONTRAINTS
+  §7.3 OPTIMISATION CONVEXE      f convexe + contraintes convexes → DUALITÉ FORTE
+        ENSEMBLE convexe   θx + (1−θ)y ∈ C
+        FONCTION convexe   f(θx + (1−θ)y) ≤ θf(x) + (1−θ)f(y)      = JENSEN
+        au 1er ordre  f(y) ≥ f(x) + ∇f(x)ᵀ(y − x)       (la tangente est SOUS f)
+        au 2e ordre   ∇²f(x) SEMI-DÉFINIE POSITIVE
+        ÉPIGRAPHE : le convexe « rempli d'eau »
+        PL   min cᵀx  s.c. Ax ≤ b        dual : max −bᵀλ  s.c. c + Aᵀλ = 0, λ ≥ 0
+        PQ   min ½xᵀQx + cᵀx  s.c. Ax ≤ b   dual : max −½(c+Aᵀλ)ᵀQ⁻¹(c+Aᵀλ) − λᵀb
+        LEGENDRE-FENCHEL  f*(s) = sup_x (⟨s,x⟩ − f(x))       ← le CONJUGUÉ CONVEXE
+                          min_x f(Ax) + g(x) = max_u −f*(u) − g*(−Aᵀu)
+
+LE MESSAGE CENTRAL   ⚠️ POUR LES FONCTIONS CONVEXES, TOUS LES MINIMA LOCAUX
+                     SONT DES MINIMA GLOBAUX
+</code></pre>
+<blockquote>
+<p><strong>La phrase-programme.</strong> <em>« Entraîner un modèle d'apprentissage automatique revient souvent à <strong>trouver un bon jeu de paramètres</strong>. La notion de « bon » est déterminée par la fonction objectif ou le modèle probabiliste. Étant donnée une fonction objectif, trouver la meilleure valeur se fait par des <strong>algorithmes d'optimisation</strong>. »</em></p>
+</blockquote>
+<blockquote>
+<p> <strong>L'image directrice.</strong> <em>« Trouver la meilleure valeur, c'est comme <strong>trouver les VALLÉES</strong> de la fonction objectif — et les gradients nous indiquent la montée. L'idée est de <strong>descendre</strong> (à l'opposé du gradient) en espérant trouver le point le plus profond. »</em></p>
+</blockquote>
+<h2 data-prio="must">Concept 1 — Le problème et l'exemple d'ouverture</h2>
+<h3>1.1 Points stationnaires</h3>
+<div class="cal formel"><span class="lab">Définition.</span>
+<p> Les <strong>points stationnaires</strong> sont les <strong>racines réelles de la dérivée</strong>, c'est-à-dire les points de <strong>gradient nul</strong>.</p>
+</div>
+<p><strong>Le polynôme de la figure 7.2 :</strong></p>
+<p>$$\ell(x)=x^4+7x^3+5x^2-17x+3,\qquad\frac{d\ell(x)}{dx}=4x^3+21x^2+10x-17$$</p>
+<p><em>« Cubique, elle a en général <strong>trois solutions</strong> quand on l'annule. Dans l'exemple, <strong>deux sont des minima et une est un maximum</strong> (vers $x=-1{,}4$). »</em> Pour trancher, on <strong>dérive une seconde fois</strong> et on regarde le signe.</p>
+<p>$$\frac{d^2\ell(x)}{dx^2}=12x^2+42x+10$$</p>
+<details class="cor">
+<summary> Les trois points stationnaires, calculés exactement</summary><div class="in">
+
+<p>Racines de $\ell'$ par bissection sur $[-8,4]$ :</p>
+<table>
+<thead>
+<tr>
+<th>$x$</th>
+<th>$\ell(x)$</th>
+<th>$\ell''(x)$</th>
+<th>Nature</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$-4{,}4803$</td>
+<td>$-47{,}0748$</td>
+<td>$+62{,}70$</td>
+<td><strong>MINIMUM GLOBAL</strong></td>
+</tr>
+<tr>
+<td>$-1{,}4321$</td>
+<td>$+21{,}2467$</td>
+<td>$-25{,}54$</td>
+<td><strong>MAXIMUM</strong></td>
+</tr>
+<tr>
+<td>$+0{,}6624$</td>
+<td>$-3{,}8399$</td>
+<td>$+43{,}09$</td>
+<td><strong>minimum local</strong></td>
+</tr>
+</tbody></table>
+<p class="cal piege"> Cohérent avec le livre : <em>« un minimum global vers $x=-4{,}5$, de valeur environ $-47$ »</em>  ; <em>« un autre minimum local vers $x=0{,}7$ »</em>  ; <em>« un maximum vers $x=-1{,}4$ »</em> </p>
+</div></details>
+
+<blockquote>
+<p class="cal piege"> <strong>Le piège du point de départ.</strong> <em>« Pour $x&gt;-1$, le gradient négatif pointe vers le minimum <strong>DE DROITE</strong>, qui a une <strong>valeur objectif PLUS GRANDE</strong>. »</em> Si l'on démarre à $x_0=0$, on aboutit donc au <strong>mauvais minimum</strong>.</p>
+</blockquote>
+<blockquote>
+<p> <strong>La limite algébrique.</strong> <em>« Selon le <strong>théorème d'ABEL-RUFFINI</strong>, il n'existe <strong>en général PAS de solution ALGÉBRIQUE</strong> pour les polynômes de degré $\geqslant5$ (Abel, 1826). »</em> D'où l'obligation de méthodes <strong>numériques</strong>.</p>
+</blockquote>
+<blockquote>
+<p> <strong>LE MESSAGE DU CHAPITRE.</strong> <em>« Pour les FONCTIONS CONVEXES, <strong>tous les minima locaux SONT des minima globaux</strong>. Il se trouve que beaucoup de fonctions objectifs en apprentissage automatique sont <strong>conçues pour être convexes</strong>. »</em></p>
+</blockquote>
+<h2 data-prio="must">Concept 2 — La descente de gradient (§7.1)</h2>
+<h3>2.1 L'algorithme</h3>
+<p><strong>Le problème :</strong> $\displaystyle\min_x f(x)$ avec $f:\mathbb R^d\to\mathbb R$ <strong>différentiable</strong>, sans solution analytique.</p>
+<blockquote>
+<p><strong>La descente de gradient</strong> est un <strong>algorithme du PREMIER ORDRE</strong> : <em>« pour trouver un minimum local, on fait des pas <strong>proportionnels au gradient NÉGATIF</strong> de la fonction au point courant. »</em></p>
+</blockquote>
+<blockquote>
+<p> <strong>La lecture par les lignes de niveau.</strong> <em>« Le gradient pointe dans une direction <strong>ORTHOGONALE aux LIGNES DE NIVEAU</strong> »</em> — les courbes $f(x)=c$.</p>
+</blockquote>
+<p><strong>Le fait fondateur :</strong> $f(x_0)$ <strong>décroît le plus vite</strong> si l'on part de $x_0$ dans la direction $-\big((\nabla f)(x_0)\big)^\top$. Donc pour $\gamma\geqslant0$ petit :</p>
+<p>$$x_1=x_0-\gamma\big((\nabla f)(x_0)\big)^\top\quad\Longrightarrow\quad f(x_1)\leqslant f(x_0)$$</p>
+<p><strong>L'algorithme :</strong></p>
+<p>$$\boxed{\;x_{i+1}=x_i-\gamma_i\big((\nabla f)(x_i)\big)^\top\;}$$</p>
+<p class="cal piege"> <strong>La transposition n'est pas décorative</strong> : le gradient est un <strong>vecteur LIGNE</strong> (convention du ch. 5), et $x$ un vecteur <strong>colonne</strong> — <em>« sinon les dimensions ne marchent pas ».</em></p>
+<p>Pour un pas $\gamma_i$ convenable, la suite $f(x_0)\geqslant f(x_1)\geqslant\dots$ <strong>converge vers un minimum LOCAL</strong>.</p>
+<p><strong>Exemple 7.1 — la quadratique bidimensionnelle.</strong></p>
+<p>$$f\!\begin{bmatrix}x_1\\x_2\end{bmatrix}=\frac12\begin{bmatrix}x_1\\x_2\end{bmatrix}^\top\begin{bmatrix}2&amp;1\\1&amp;20\end{bmatrix}\begin{bmatrix}x_1\\x_2\end{bmatrix}-\begin{bmatrix}5\\3\end{bmatrix}^\top\begin{bmatrix}x_1\\x_2\end{bmatrix}$$</p>
+<p>$$\nabla f\!\begin{bmatrix}x_1\\x_2\end{bmatrix}=\begin{bmatrix}x_1\\x_2\end{bmatrix}^\top\begin{bmatrix}2&amp;1\\1&amp;20\end{bmatrix}-\begin{bmatrix}5\\3\end{bmatrix}^\top$$</p>
+<p>Partant de $x_0=[-3,-1]^\top$ avec $\gamma=0{,}085$, <em>« le gradient négatif en $x_0$ pointe <strong>au NORD et à l'EST</strong> »</em>, menant à</p>
+<p>$$x_1=[-1{,}98\ ;\ 1{,}21]^\top,\qquad x_2=[-1{,}32\ ;\ -0{,}42]^\top,\ \dots$$</p>
+<details class="cor">
+<summary> Recalcul de l'itération et du conditionnement</summary><div class="in">
+
+<p>$\nabla f(x_0)^\top=Qx_0-c=[2(-3)+1(-1)-5,\ 1(-3)+20(-1)-3]^\top=[-12,\ -26]^\top$</p>
+<p class="cal piege"> Les <strong>deux composantes du gradient négatif sont positives</strong> ($+12$, $+26$) : cela confirme « <strong>nord et est</strong> » </p>
+<p>$x_1=[-3+0{,}085\cdot12,\ -1+0{,}085\cdot26]^\top=[-1{,}98\ ;\ 1{,}21]^\top$  <strong>exactement</strong> les valeurs du livre.</p>
+<p>Itérations suivantes : $x_2=[-1{,}3213\ ;\ -0{,}4237]$  (le livre écrit $[-1{,}32;-0{,}42]$), $x_3=[-0{,}6356\ ;\ 0{,}6639]$, $x_4=[-0{,}1590\ ;\ -0{,}1557]$.</p>
+<p><strong>Le minimum exact</strong> est la solution de $Qx=c$ : $x^*=[2{,}487179\ ;\ 0{,}025641]^\top$.</p>
+<p><strong>Le conditionnement de $Q$</strong> : valeurs propres $20{,}055$ et $1{,}945$, donc $\kappa=10{,}31$.  C'est <strong>exactement</strong> ce qui produit le zigzag visible sur la figure 7.3 : la surface est <strong>dix fois plus courbée</strong> dans une direction que dans l'autre.</p>
+</div></details>
+
+<blockquote>
+<p class="cal piege"> <strong>La faiblesse de la méthode.</strong> <em>« La descente de gradient peut être relativement <strong>LENTE près du minimum</strong> : son taux de convergence asymptotique est <strong>inférieur à beaucoup d'autres méthodes</strong>. Quand la surface est une <strong>vallée LONGUE et MINCE</strong>, le problème est <strong>mal conditionné</strong>. Pour ces problèmes, la descente de gradient <strong>ZIGZAGUE de plus en plus</strong>, les gradients pointant presque <strong>orthogonalement</strong> à la direction la plus courte vers le minimum. »</em></p>
+</blockquote>
+<h3>2.2 Le choix du pas</h3>
+<blockquote>
+<p class="cal piege"> <strong>Le dilemme.</strong> <em>« Si le pas est <strong>trop PETIT</strong>, la descente est <strong>lente</strong>. S'il est <strong>trop GRAND</strong>, la descente peut <strong>DÉPASSER (overshoot), ne pas converger, voire DIVERGER</strong>. »</em> Le pas est aussi appelé le <strong>TAUX D'APPRENTISSAGE</strong>.</p>
+</blockquote>
+<p><strong>Les deux heuristiques adaptatives</strong> (Toussaint, 2012) :</p>
+<ol>
+<li><strong>La valeur de la fonction AUGMENTE après un pas</strong> $\Rightarrow$ le pas était <strong>trop grand</strong>. <strong>ANNULER le pas</strong> et <strong>diminuer</strong> le pas.</li>
+<li><strong>La valeur DIMINUE</strong> $\Rightarrow$ le pas aurait pu être <strong>plus grand</strong>. Essayer de l'<strong>augmenter</strong>.</li>
+</ol>
+<div class="cal intu"><span class="lab">Pourquoi le « annuler » n'est pas un gaspillage.</span>
+<p>  <em>« Bien que l'étape d'annulation semble un gaspillage de ressources, cette heuristique <strong>GARANTIT une convergence MONOTONE</strong>. »</em></p>
+</div>
+<p><strong>Exemple 7.2 — résoudre $Ax=b$ par descente.</strong> En pratique on minimise l'erreur quadratique</p>
+<p>$$\lVert Ax-b\rVert^2=(Ax-b)^\top(Ax-b),\qquad\nabla_x=2(Ax-b)^\top A$$</p>
+<p class="cal piege"> Pour ce cas particulier, <em>« il existe une <strong>solution ANALYTIQUE</strong>, qu'on trouve en annulant le gradient »</em> (chapitre 9).</p>
+<blockquote>
+<p><strong>Le conditionnement — la clé de la vitesse.</strong>
+$$\boxed{\;\kappa=\frac{\sigma(A)_{\max}}{\sigma(A)_{\min}}\;}$$
+<em>« Le rapport de la plus grande à la plus petite <strong>valeur SINGULIÈRE</strong> de $A$. Le conditionnement mesure essentiellement le rapport de la <strong>direction la plus courbée</strong> à la <strong>moins courbée</strong> — ce qui correspond à notre image des problèmes mal conditionnés comme des <strong>vallées longues et minces : très courbées dans une direction, très plates dans l'autre</strong>. »</em></p>
+</blockquote>
+<p><strong>Le remède — le préconditionnement.</strong> Au lieu de résoudre $Ax=b$, résoudre</p>
+<p>$$\boxed{\;P^{-1}(Ax-b)=0\;}$$</p>
+<p>où $P$ est le <strong>PRÉCONDITIONNEUR</strong>. <em>« Le but est de concevoir $P^{-1}$ tel que $P^{-1}A$ ait un <strong>MEILLEUR conditionnement</strong>, tout en restant <strong>FACILE à calculer</strong>. »</em>  C'est un compromis : le préconditionneur idéal serait $P=A$, mais alors $P^{-1}$ coûte autant que le problème initial.</p>
+<h3>2.3 Le momentum</h3>
+<blockquote>
+<p><strong>Le diagnostic.</strong> <em>« La convergence peut être très lente si la courbure est telle qu'il y a des régions <strong>mal ÉCHELONNÉES</strong>. Les pas <strong>sautent d'un mur à l'autre de la vallée</strong> et approchent l'optimum par petits pas. Le remède proposé est de <strong>DONNER À LA DESCENTE DE GRADIENT UNE MÉMOIRE</strong>. »</em></p>
+</blockquote>
+<p>$$\boxed{\;x_{i+1}=x_i-\gamma_i\big((\nabla f)(x_i)\big)^\top+\alpha\,\Delta x_i\;}$$
+$$\boxed{\;\Delta x_i=x_i-x_{i-1}=\alpha\,\Delta x_{i-1}-\gamma_{i-1}\big((\nabla f)(x_{i-1})\big)^\top\;}$$</p>
+<p>avec $\alpha\in[0,1]$.</p>
+<blockquote>
+<p> <strong>L'analogie physique.</strong> <em>« Le terme de momentum <strong>émule le phénomène d'une BALLE LOURDE, réticente à changer de direction</strong>. L'idée est d'avoir une mise à jour de gradient avec mémoire, qui implémente une <strong>MOYENNE MOBILE</strong>. »</em> Cela <strong>amortit les oscillations</strong> et <strong>lisse</strong> les mises à jour.</p>
+</blockquote>
+<blockquote>
+<p> <strong>Le second usage.</strong> <em>« Parfois on ne connaît le gradient qu'<strong>APPROXIMATIVEMENT</strong>. Dans ces cas, le terme de momentum est utile car il <strong>MOYENNE différentes estimations BRUITÉES</strong> du gradient. »</em> — la transition vers le SGD.</p>
+</blockquote>
+<p><em>Référence : Rumelhart</em> et al. <em>(1986).</em></p>
+<h3>2.4 La descente de gradient stochastique (SGD)</h3>
+<blockquote>
+<p><strong>La définition.</strong> <em>« Une <strong>APPROXIMATION STOCHASTIQUE</strong> de la descente de gradient pour minimiser une fonction objectif écrite comme une <strong>SOMME de fonctions différentiables</strong>. Le mot « stochastique » reconnaît qu'on <strong>ne connaît pas le gradient précisément</strong>, mais seulement une <strong>approximation BRUITÉE</strong>. »</em></p>
+</blockquote>
+<p><strong>La structure exploitée.</strong> Avec $N$ points de données :</p>
+<p>$$\boxed{\;L(\theta)=\sum_{n=1}^{N}L_n(\theta)\;}$$</p>
+<p>Exemple en régression (ch. 9) — la <strong>log-vraisemblance négative</strong> :</p>
+<p>$$L(\theta)=-\sum_{n=1}^{N}\log p(y_n\mid x_n,\theta)$$</p>
+<p class="cal piege"> La descente de gradient standard est une méthode <strong>« PAR LOT » (<em>batch</em>)</strong> : l'optimisation utilise <strong>l'ensemble complet</strong> d'entraînement à chaque mise à jour.</p>
+<blockquote>
+<p> <strong>La garantie théorique.</strong> <em>« Quand le taux d'apprentissage décroît à un rythme approprié, et sous des hypothèses relativement douces, la descente de gradient stochastique converge <strong>PRESQUE SÛREMENT</strong> vers un minimum local (Bottou, 1998). »</em></p>
+</blockquote>
+<p><strong>Le compromis de la taille de mini-lot — le tableau décisif :</strong></p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th><strong>GRANDS mini-lots</strong></th>
+<th><strong>PETITS mini-lots</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Précision du gradient</td>
+<td><strong>Estimations précises</strong>, variance réduite</td>
+<td> <strong>Bruitées</strong></td>
+</tr>
+<tr>
+<td>Convergence</td>
+<td>Plus <strong>STABLE</strong></td>
+<td>Plus erratique</td>
+</tr>
+<tr>
+<td>Coût par pas</td>
+<td> <strong>Plus cher</strong></td>
+<td><strong>Rapide</strong> à estimer</td>
+</tr>
+<tr>
+<td>Vectorisation</td>
+<td> Profite des <strong>opérations matricielles hautement optimisées</strong></td>
+<td>Moins</td>
+</tr>
+<tr>
+<td>Minima locaux</td>
+<td>Peut <strong>rester coincé</strong></td>
+<td> <strong>Le BRUIT permet de SORTIR de mauvais optima locaux</strong></td>
+</tr>
+</tbody></table>
+<blockquote>
+<p> <strong>La justification profonde.</strong> <em>« En apprentissage automatique, les méthodes d'optimisation servent à minimiser une objectif <strong>sur les données d'ENTRAÎNEMENT</strong>, mais le but global est d'améliorer la performance de <strong>GÉNÉRALISATION</strong> (ch. 8). Puisque le but ne requiert pas nécessairement une estimation <strong>précise</strong> du minimum, les gradients approchés par mini-lots ont été <strong>largement adoptés</strong>. »</em></p>
+</blockquote>
+<p><strong>Les raisons pratiques :</strong> les contraintes d'implémentation — <em>« la taille de la mémoire CPU/GPU ou les limites de temps de calcul »</em>. Le livre note l'analogie avec l'estimation de <strong>moyennes empiriques</strong> (§6.4.1) : la taille du sous-échantillon joue le même rôle.</p>
+<p><strong>Les domaines d'application cités :</strong> réseaux profonds sur des <strong>millions d'images</strong> (Dean <em>et al.</em>, 2012), <strong>modèles de sujets</strong> (Hoffman <em>et al.</em>, 2013), <strong>apprentissage par renforcement</strong> (Mnih <em>et al.</em>, 2015), <strong>processus gaussiens à grande échelle</strong> (Hensman <em>et al.</em>, 2013 ; Gal <em>et al.</em>, 2014).</p>
+<h2 data-prio="must">Concept 3 — Contraintes et multiplicateurs de Lagrange (§7.2)</h2>
+<h3>3.1 Le problème et l'idée</h3>
+<p>$$\boxed{\;\min_x f(x)\quad\text{sous contrainte}\quad g_i(x)\leqslant0\ \text{ pour } i=1,\dots,m\;}$$</p>
+<p class="cal piege"> <em>« $f$ et les $g_i$ peuvent être <strong>NON CONVEXES en général</strong> »</em> — la convexité vient au §7.3.</p>
+<p><strong>La solution naïve, impraticable.</strong> Transformer en un problème sans contraintes avec une <strong>fonction INDICATRICE</strong> valant $0$ si la contrainte est satisfaite et $+\infty$ sinon.  <em>« Cela donne une <strong>pénalité INFINIE</strong> si la contrainte n'est pas satisfaite, et donnerait donc la même solution. Mais cette <strong>fonction en MARCHE INFINIE est tout aussi difficile à optimiser</strong>. »</em></p>
+<blockquote>
+<p> <strong>L'IDÉE DES MULTIPLICATEURS DE LAGRANGE : REMPLACER LA FONCTION EN MARCHE PAR UNE FONCTION LINÉAIRE.</strong></p>
+</blockquote>
+<p>$$\boxed{\;\mathfrak L(x,\lambda)=f(x)+\sum_{i=1}^{m}\lambda_ig_i(x)=f(x)+\lambda^\top g(x),\qquad\lambda_i\geqslant0\;}$$</p>
+<h3>3.2 La dualité lagrangienne</h3>
+<blockquote>
+<p><strong>La dualité en général.</strong> <em>« En optimisation, la <strong>DUALITÉ</strong> est l'idée de <strong>CONVERTIR</strong> un problème d'optimisation en un ensemble de variables $x$ (les <strong>variables PRIMALES</strong>) en un autre problème en des variables différentes $\lambda$ (les <strong>variables DUALES</strong>). »</em> Le livre présente <strong>deux</strong> dualités : la <strong>lagrangienne</strong> (§7.2) et la <strong>Legendre-Fenchel</strong> (§7.3.3).</p>
+</blockquote>
+<div class="cal formel"><span class="lab">Définition 7.1.</span>
+<p> Le problème
+$$\min_x f(x)\quad\text{s.c.}\quad g_i(x)\leqslant0$$
+est le <strong>PROBLÈME PRIMAL</strong>. Le <strong>PROBLÈME DUAL LAGRANGIEN</strong> associé est
+$$\boxed{\;\max_{\lambda\in\mathbb R^m}D(\lambda)\quad\text{s.c.}\quad\lambda\geqslant0,\qquad\text{où}\quad D(\lambda)=\min_{x\in\mathbb R^d}\mathfrak L(x,\lambda)\;}$$</p>
+</div>
+<p><strong>L'INÉGALITÉ MINIMAX</strong> — le résultat général sous-jacent : pour <strong>toute</strong> fonction à deux arguments $\varphi(x,y)$,</p>
+<p>$$\boxed{\;\max_y\min_x\varphi(x,y)\ \leqslant\ \min_x\max_y\varphi(x,y)\;}$$</p>
+<p><em>« Le <strong>MAXIMIN est inférieur au MINIMAX</strong>. »</em></p>
+<details class="cor">
+<summary> La preuve en deux lignes (celle du livre)</summary><div class="in">
+
+<p>Pour <strong>tous</strong> $x,y$ : $\displaystyle\min_x\varphi(x,y)\leqslant\max_y\varphi(x,y)$.</p>
+<p>Prendre le <strong>maximum sur $y$</strong> du membre de gauche préserve l'inégalité (elle est vraie pour tout $y$). Prendre ensuite le <strong>minimum sur $x$</strong> du membre de droite donne l'inégalité minimax </p>
+</div></details>
+
+<p><strong>LA DUALITÉ FAIBLE.</strong> Comme $\mathfrak L$ <strong>relâche l'indicatrice en une fonction linéaire</strong>, pour $\lambda\geqslant0$ le lagrangien est une <strong>BORNE INFÉRIEURE</strong> de $J(x)$. Le maximum de $\mathfrak L$ par rapport à $\lambda$ redonne le primal, et par minimax :</p>
+<p>$$\boxed{\;\underbrace{\min_{x\in\mathbb R^d}\max_{\lambda\geqslant0}\mathfrak L(x,\lambda)}_{\text{PRIMAL}}\ \geqslant\ \underbrace{\max_{\lambda\geqslant0}\min_{x\in\mathbb R^d}\mathfrak L(x,\lambda)}_{\text{DUAL}}\;}$$</p>
+<p><em>« Les valeurs primales sont <strong>toujours supérieures ou égales</strong> aux valeurs duales. »</em></p>
+<h3>3.3 Pourquoi le dual est facile</h3>
+<p><strong>Trois faits en cascade :</strong></p>
+<ol>
+<li>Pour un $\lambda$ donné, $\min_x\mathfrak L(x,\lambda)$ est un problème <strong>SANS CONTRAINTES</strong>. <em>« Si le résoudre est facile, alors le problème global est facile. »</em></li>
+<li> $\mathfrak L(x,\lambda)$ est <strong>AFFINE en $\lambda$</strong>. Donc $\min_x\mathfrak L(x,\lambda)$ est un <strong>minimum ponctuel de fonctions affines de $\lambda$</strong>, et <strong>$D(\lambda)$ est CONCAVE — même si $f$ et les $g_i$ sont NON CONVEXES</strong>.</li>
+<li>Le problème externe, maximiser $\lambda$, est le <strong>maximum d'une fonction concave</strong> : il <strong>se calcule efficacement</strong>.</li>
+</ol>
+<p><strong>La recette</strong> (si $f$ et $g_i$ sont différentiables) : <em>« dériver le lagrangien par rapport à $x$, annuler la différentielle, et résoudre pour la valeur optimale. »</em></p>
+<h3>3.4 Les contraintes d'égalité</h3>
+<p>$$\min_xf(x)\quad\text{s.c.}\quad g_i(x)\leqslant0\ (i=1,\dots,m)\quad\text{et}\quad h_j(x)=0\ (j=1,\dots,n)$$</p>
+<blockquote>
+<p> <strong>L'astuce.</strong> <em>« On modélise les contraintes d'égalité en les <strong>remplaçant par DEUX inégalités</strong> : pour chaque $h_j(x)=0$, on met $h_j(x)\leqslant0$ <strong>ET</strong> $h_j(x)\geqslant0$. Il se trouve que les multiplicateurs de Lagrange résultants sont alors <strong>NON CONTRAINTS</strong>. »</em></p>
+</blockquote>
+<p>$$\boxed{\;\lambda_i\geqslant0\text{ pour les INÉGALITÉS}\qquad\text{multiplicateurs LIBRES pour les ÉGALITÉS}\;}$$</p>
+<h2 data-prio="must">Concept 4 — L'optimisation convexe (§7.3)</h2>
+<h3>4.1 Ensembles et fonctions convexes</h3>
+<div class="cal formel"><span class="lab">Définition 7.2 (Ensemble convexe).</span>
+<p> $\mathcal C$ est <strong>convexe</strong> si pour tous $x,y\in\mathcal C$ et tout scalaire $\theta$ avec $0\leqslant\theta\leqslant1$ :
+$$\boxed{\;\theta x+(1-\theta)y\in\mathcal C\;}$$</p>
+</div>
+<p><em>« Les ensembles convexes sont ceux tels que <strong>la ligne droite reliant deux éléments de l'ensemble reste À L'INTÉRIEUR</strong> de l'ensemble. »</em></p>
+<div class="cal formel"><span class="lab">Définition 7.3 (Fonction convexe).</span>
+<p> $f:\mathbb R^D\to\mathbb R$ de domaine convexe est <strong>CONVEXE</strong> si pour tous $x,y$ du domaine et tout $\theta\in[0,1]$ :
+$$\boxed{\;f\big(\theta x+(1-\theta)y\big)\leqslant\theta f(x)+(1-\theta)f(y)\;}$$</p>
+</div>
+<p><em>« Les fonctions convexes sont celles telles qu'une <strong>ligne droite entre deux points de la fonction reste AU-DESSUS</strong> de la fonction. »</em>  Une fonction <strong>CONCAVE</strong> est <strong>l'opposée</strong> d'une convexe.</p>
+<blockquote>
+<p> <strong>L'ÉPIGRAPHE — le pont entre les deux notions.</strong> <em>« Une fonction convexe est un objet <strong>en forme de BOL</strong>, et on imagine y <strong>verser de l'eau</strong> pour le remplir. Cet ensemble rempli est appelé l'<strong>ÉPIGRAPHE</strong> de la fonction convexe, et c'est un <strong>ENSEMBLE CONVEXE</strong>. »</em></p>
+</blockquote>
+<h3>4.2 Les trois caractérisations</h3>
+<table>
+<thead>
+<tr>
+<th>Ordre</th>
+<th>Condition</th>
+<th>Hypothèse</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>0</strong></td>
+<td>$f(\theta x+(1-\theta)y)\leqslant\theta f(x)+(1-\theta)f(y)$</td>
+<td>aucune</td>
+</tr>
+<tr>
+<td><strong>1</strong></td>
+<td>$\boxed{f(y)\geqslant f(x)+\nabla_xf(x)^\top(y-x)}$</td>
+<td>$f$ <strong>différentiable</strong></td>
+</tr>
+<tr>
+<td><strong>2</strong></td>
+<td>$\boxed{\nabla_x^2f(x)\ \text{SEMI-DÉFINIE POSITIVE}}$</td>
+<td>$f$ <strong>deux fois différentiable</strong></td>
+</tr>
+</tbody></table>
+<blockquote>
+<p> <strong>La lecture de la condition d'ordre 1.</strong> La <strong>TANGENTE</strong> en $x$ reste <strong>SOUS</strong> la fonction, partout. C'est ce qui garantit qu'un point de gradient nul est un <strong>minimum GLOBAL</strong>.</p>
+</blockquote>
+<p><strong>Exemple 7.3 — l'entropie négative $f(x)=x\log_2x$, convexe pour $x&gt;0$.</strong></p>
+<p><strong>Test par la définition 7.3</strong>, avec $x=2$, $y=4$, $\theta=0{,}5$ :</p>
+<p>$$\text{gauche : }f(0{,}5\cdot2+0{,}5\cdot4)=f(3)=3\log_23\approx4{,}75$$
+$$\text{droite : }0{,}5(2\log_22)+0{,}5(4\log_24)=1+4=5$$</p>
+<p class="cal piege"> $4{,}75\leqslant5$  la définition est satisfaite.</p>
+<p><strong>Test par la condition d'ordre 1.</strong> La dérivée :</p>
+<p>$$\nabla_x(x\log_2x)=1\cdot\log_2x+x\cdot\frac{1}{x\log_e2}=\log_2x+\frac{1}{\log_e2}$$</p>
+<p>Avec $x=2$, $y=4$ :</p>
+<p>$$\text{gauche : }f(4)=8$$
+$$\text{droite : }f(2)+\nabla f(2)\cdot(4-2)=2+\left(1+\frac{1}{\log_e2}\right)\cdot2\approx6{,}9$$</p>
+<p class="cal piege"> $8\geqslant6{,}9$ </p>
+<blockquote>
+<p class="cal piege"> <strong>La mise en garde du livre.</strong> <em>« Pour PROUVER la convexité de $f(x)$, il faudrait vérifier <strong>pour TOUS les points</strong> $x\in\mathbb R$. »</em> Deux points ne font qu'<strong>illustrer</strong>.</p>
+</blockquote>
+<details class="cor">
+<summary> Recalcul exact des quatre quantités</summary><div class="in">
+
+<p>$f(3)=3\log_23=4{,}754888$  (le livre : « $\approx4{,}75$ »)</p>
+<p>$0{,}5f(2)+0{,}5f(4)=0{,}5\cdot2+0{,}5\cdot8=1+4=5{,}0$ </p>
+<p>$f(4)=4\log_24=8{,}0$ </p>
+<p>$f(2)+f'(2)\cdot2=2+(1+1/\ln2)\cdot2=2+(1+1{,}442695)\cdot2=6{,}885390$  (le livre : « $\approx6{,}9$ »)</p>
+<p>Les deux inégalités sont vérifiées </p>
+</div></details>
+
+<h3>4.3 Les opérations qui préservent la convexité</h3>
+<blockquote>
+<p> <strong>La stratégie pratique.</strong> <em>« On peut vérifier qu'une fonction ou un ensemble est convexe <strong>depuis les premiers principes</strong>. En pratique, on s'appuie souvent sur des <strong>OPÉRATIONS QUI PRÉSERVENT LA CONVEXITÉ</strong>. Bien que les détails soient très différents, c'est de nouveau l'idée de <strong>CLÔTURE</strong> introduite au chapitre 2 pour les espaces vectoriels. »</em></p>
+</blockquote>
+<p><strong>Exemple 7.4 — une somme pondérée NON NÉGATIVE de fonctions convexes est convexe.</strong></p>
+<p><strong>Étape 1 — la multiplication scalaire.</strong> Si $f$ est convexe et $\alpha\geqslant0$, alors $\alpha f$ est convexe : on <strong>multiplie $\alpha$ des deux côtés</strong> de la définition 7.3, et <em>« multiplier par un nombre <strong>NON NÉGATIF</strong> ne change pas l'inégalité »</em>.  C'est là qu'intervient la <strong>non-négativité</strong>.</p>
+<p><strong>Étape 2 — la somme.</strong> Pour $f_1,f_2$ convexes :</p>
+<p>$$f_1(\theta x+(1-\theta)y)\leqslant\theta f_1(x)+(1-\theta)f_1(y)$$
+$$f_2(\theta x+(1-\theta)y)\leqslant\theta f_2(x)+(1-\theta)f_2(y)$$</p>
+<p>En <strong>sommant</strong> puis en <strong>réarrangeant</strong> le membre de droite :</p>
+<p>$$\theta\big(f_1(x)+f_2(x)\big)+(1-\theta)\big(f_1(y)+f_2(y)\big)$$</p>
+<p>ce qui <strong>achève la preuve</strong>.</p>
+<p><strong>Conclusion :</strong> $\alpha f_1(x)+\beta f_2(x)$ est convexe pour $\alpha,\beta\geqslant0$.</p>
+<blockquote>
+<p> <strong>L'INÉGALITÉ DE JENSEN.</strong> <em>« Les inégalités de ce type — les résultats obtenus en prenant des <strong>combinaisons convexes de fonctions convexes</strong> — sont toutes appelées <strong>inégalité de JENSEN</strong>. »</em></p>
+</blockquote>
+<h3>4.4 La définition du problème convexe</h3>
+<p>$$\boxed{\;\min_xf(x)\quad\text{s.c.}\quad g_i(x)\leqslant0,\quad h_j(x)=0\;}$$</p>
+<p>où <strong>toutes</strong> les $f$ et $g_i$ sont <strong>convexes</strong> et tous les $h_j(x)=0$ sont des <strong>ensembles convexes</strong>.</p>
+<blockquote>
+<p> <strong>LA PROPRIÉTÉ QUI CHANGE TOUT — LA DUALITÉ FORTE.</strong> <em>« Dans ce cadre, on a la <strong>DUALITÉ FORTE</strong> : la solution optimale du problème DUAL est <strong>LA MÊME</strong> que la solution optimale du problème PRIMAL. »</em></p>
+</blockquote>
+<blockquote>
+<p class="cal piege"> <strong>Le flou terminologique.</strong> <em>« La distinction entre <strong>fonctions convexes</strong> et <strong>ensembles convexes</strong> n'est souvent pas présentée strictement dans la littérature d'apprentissage automatique, mais on peut souvent inférer le sens du contexte. »</em></p>
+</blockquote>
+<h2 data-prio="high">Concept 5 — Programmation linéaire et quadratique</h2>
+<h3>5.1 Le programme linéaire</h3>
+<p>$$\boxed{\;\min_{x\in\mathbb R^d}c^\top x\quad\text{s.c.}\quad Ax\leqslant b\;}$$</p>
+<p>avec $A\in\mathbb R^{m\times d}$, $b\in\mathbb R^m$ : <strong>$d$ variables</strong> et <strong>$m$ contraintes linéaires</strong>.</p>
+<blockquote>
+<p> <em>« Les programmes linéaires sont <strong>l'une des approches les plus utilisées dans l'industrie</strong>. »</em></p>
+</blockquote>
+<p><strong>La dérivation du dual, en quatre pas.</strong></p>
+<p><strong>Étape 1 — le lagrangien.</strong> $\mathfrak L(x,\lambda)=c^\top x+\lambda^\top(Ax-b)$</p>
+<p><strong>Étape 2 — réarranger en $x$.</strong> $\mathfrak L(x,\lambda)=(c+A^\top\lambda)^\top x-\lambda^\top b$</p>
+<p><strong>Étape 3 — annuler la dérivée en $x$.</strong> $c+A^\top\lambda=0$</p>
+<p><strong>Étape 4 — le lagrangien dual.</strong> $D(\lambda)=-\lambda^\top b$, d'où</p>
+<p>$$\boxed{\;\max_{\lambda\in\mathbb R^m}-b^\top\lambda\quad\text{s.c.}\quad c+A^\top\lambda=0,\ \ \lambda\geqslant0\;}$$</p>
+<blockquote>
+<p> <strong>Le choix stratégique.</strong> <em>« C'est <strong>AUSSI un programme linéaire, mais avec $m$ variables</strong>. On a le choix de résoudre le primal ou le dual <strong>selon que $m$ ou $d$ est plus grand</strong> »</em> — $d$ = nombre de variables, $m$ = nombre de contraintes du primal.</p>
+</blockquote>
+<p class="cal piege"> <strong>La convention</strong> : <em>« on MINIMISE le primal et on MAXIMISE le dual. »</em></p>
+<p><strong>Exemple 7.5.</strong></p>
+<p>$$\min_{x\in\mathbb R^2}-\begin{bmatrix}5\\3\end{bmatrix}^\top\begin{bmatrix}x_1\\x_2\end{bmatrix}\quad\text{s.c.}\quad\begin{bmatrix}2&amp;2\\2&amp;-4\\-2&amp;1\\0&amp;-1\\0&amp;1\end{bmatrix}\begin{bmatrix}x_1\\x_2\end{bmatrix}\leqslant\begin{bmatrix}33\\8\\-5\\-1\\8\end{bmatrix}$$</p>
+<p>Traduites en langage lisible (la légende de la figure 7.9) :</p>
+<p>$$2x_2\leqslant33-2x_1,\qquad4x_2\geqslant2x_1-8,\qquad x_2\leqslant2x_1-5,\qquad x_2\geqslant1,\qquad x_2\leqslant8$$</p>
+<blockquote>
+<p> <em>« La fonction objectif est <strong>linéaire</strong>, ce qui donne des <strong>lignes de niveau LINÉAIRES</strong>. La valeur optimale doit se trouver dans la région <strong>RÉALISABLE</strong> (ombrée). »</em></p>
+</blockquote>
+<details class="cor">
+<summary> Résolution par énumération des sommets (le livre ne donne pas la valeur)</summary><div class="in">
+
+<p>En intersectant les contraintes deux à deux et en gardant les points <strong>réalisables</strong>, le polygone a <strong>cinq sommets</strong> :</p>
+<p>$$(3;1),\quad(6;1),\quad(6{,}5;8),\quad(8{,}5;8),\quad\left(\tfrac{37}{3};\tfrac{25}{6}\right)=(12{,}3\overline3\ ;\ 4{,}1\overline6)$$</p>
+<p class="cal piege"> <strong>L'optimum d'un PL est TOUJOURS atteint en un SOMMET</strong> (l'objectif étant linéaire). En évaluant $-5x_1-3x_2$ :</p>
+<p>$$f\left(\tfrac{37}{3},\tfrac{25}{6}\right)=-5\cdot\tfrac{37}{3}-3\cdot\tfrac{25}{6}=-\tfrac{185}{3}-\tfrac{25}{2}=-\tfrac{445}{6}\approx-74{,}1\overline6$$</p>
+<p>C'est le minimum sur les cinq sommets. Ce sommet est l'intersection de $2x_1+2x_2=33$ et $2x_1-4x_2=8$, <strong>les deux contraintes ACTIVES</strong> à l'optimum.  Ce point est <strong>hors du cadre $[0,8]^2$</strong> dessiné dans l'extrait de la figure 7.9.</p>
+</div></details>
+
+<h3>5.2 Le programme quadratique</h3>
+<p>$$\boxed{\;\min_{x\in\mathbb R^d}\frac12x^\top Qx+c^\top x\quad\text{s.c.}\quad Ax\leqslant b\;}$$</p>
+<p>avec $A\in\mathbb R^{m\times d}$, $b\in\mathbb R^m$, $c\in\mathbb R^d$, et $Q\in\mathbb R^{d\times d}$ <strong>symétrique DÉFINIE POSITIVE</strong> — <em>« et donc la fonction objectif est CONVEXE ».</em></p>
+<p><strong>La dérivation du dual, en quatre pas.</strong></p>
+<p><strong>Étape 1 — le lagrangien.</strong> $\mathfrak L(x,\lambda)=\frac12x^\top Qx+(c+A^\top\lambda)^\top x-\lambda^\top b$</p>
+<p><strong>Étape 2 — annuler la dérivée.</strong> $Qx+(c+A^\top\lambda)=0$</p>
+<p><strong>Étape 3 — $Q$ est définie positive, DONC INVERSIBLE :</strong></p>
+<p>$$\boxed{\;x=-Q^{-1}(c+A^\top\lambda)\;}$$</p>
+<p><strong>Étape 4 — substituer dans $\mathfrak L$ :</strong></p>
+<p>$$\boxed{\;D(\lambda)=-\frac12(c+A^\top\lambda)^\top Q^{-1}(c+A^\top\lambda)-\lambda^\top b\;}$$</p>
+<p>$$\boxed{\;\max_{\lambda\in\mathbb R^m}\ -\frac12(c+A^\top\lambda)^\top Q^{-1}(c+A^\top\lambda)-\lambda^\top b\quad\text{s.c.}\quad\lambda\geqslant0\;}$$</p>
+<p class="cal piege"> Le dual d'un PQ est <strong>encore un PQ</strong>, en $\lambda$.</p>
+<p><strong>Exemple 7.6.</strong></p>
+<p>$$\min_{x\in\mathbb R^2}\frac12\begin{bmatrix}x_1\\x_2\end{bmatrix}^\top\begin{bmatrix}2&amp;1\\1&amp;4\end{bmatrix}\begin{bmatrix}x_1\\x_2\end{bmatrix}+\begin{bmatrix}5\\3\end{bmatrix}^\top\begin{bmatrix}x_1\\x_2\end{bmatrix}\quad\text{s.c.}\quad\begin{bmatrix}1&amp;0\\-1&amp;0\\0&amp;1\\0&amp;-1\end{bmatrix}\begin{bmatrix}x_1\\x_2\end{bmatrix}\leqslant\begin{bmatrix}1\\1\\1\\1\end{bmatrix}$$</p>
+<p>Les quatre contraintes forment la <strong>boîte</strong> $-1\leqslant x_1\leqslant1$, $-1\leqslant x_2\leqslant1$. <em>« L'objectif est quadratique, ce qui donne des <strong>lignes de niveau ELLIPTIQUES</strong>. »</em></p>
+<details class="cor">
+<summary> Résolution exacte (le livre ne donne pas la valeur)</summary><div class="in">
+
+<p><strong>Le minimum SANS contraintes</strong> est la solution de $Qx=-c$ :</p>
+<p>$$x_{\text{libre}}=[-2{,}428571\ ;\ -0{,}142857]^\top=\left[-\tfrac{17}{7};-\tfrac17\right]^\top$$</p>
+<p class="cal piege"> Il est <strong>HORS de la boîte</strong> ($x_1&lt;-1$), donc l'optimum contraint est <strong>sur le bord</strong>.</p>
+<p><strong>Sur la face $x_1=-1$</strong>, l'objectif devient $2x_2^2+2x_2-4$, de dérivée $4x_2+2=0$, d'où $x_2=-\tfrac12$ — <strong>intérieur</strong> à $[-1,1]$ </p>
+<p>$$\boxed{\;x^*=\left[-1\ ;\ -\tfrac12\right]^\top,\qquad f(x^*)=-\tfrac92=-4{,}5\;}$$</p>
+<p><strong>Contrôle :</strong> $\frac12\big(2\cdot1+2\cdot(-1)(-\tfrac12)+4\cdot\tfrac14\big)+5(-1)+3(-\tfrac12)=\frac12(2+1+1)-5-1{,}5=2-6{,}5=-4{,}5$ </p>
+<p><strong>Contrôle de convexité :</strong> valeurs propres de $Q$ : $3\pm\sqrt2$, soit $4{,}414$ et $1{,}586$ — <strong>toutes deux $&gt;0$</strong>, donc $Q$ est <strong>définie positive</strong> </p>
+</div></details>
+
+<blockquote>
+<p class="cal piege"> <strong>Une inexactitude de rédaction dans le livre.</strong> L'exemple 7.6 décrit $Q$ comme <em>« semi-définie positive »</em>, alors que le §7.3.2 exige explicitement <strong>définie positive</strong> — et $Q=\begin{bmatrix}2&amp;1\\1&amp;4\end{bmatrix}$ <strong>est bien définie positive</strong> ($3\pm\sqrt2&gt;0$). C'est la version définie positive qui compte : elle seule garantit l'inversibilité de $Q$ utilisée à l'étape 3 de la dérivation du dual.</p>
+</blockquote>
+<h2 data-prio="high">Concept 6 — Legendre-Fenchel et le conjugué convexe (§7.3.3)</h2>
+<h3>6.1 L'idée géométrique</h3>
+<p><strong>La chaîne de raisonnement du livre, en cinq maillons :</strong></p>
+<ol>
+<li>Un <strong>ensemble convexe</strong> peut être décrit de façon équivalente par ses <strong>HYPERPLANS D'APPUI</strong> (<em>supporting hyperplanes</em>).</li>
+<li>Un <strong>hyperplan d'appui</strong> d'un ensemble convexe <strong>l'intersecte</strong> et laisse l'ensemble <strong>entièrement d'un seul côté</strong>.</li>
+<li>L'<strong>épigraphe</strong> d'une fonction convexe est un ensemble convexe.</li>
+<li>Donc les <strong>fonctions convexes</strong> se décrivent aussi par leurs hyperplans d'appui.</li>
+<li>Or <em>« l'hyperplan d'appui <strong>touche juste</strong> la fonction convexe : c'est en fait la <strong>TANGENTE</strong> en ce point. »</em></li>
+</ol>
+<p>$$\boxed{\;\text{Une fonction convexe peut être décrite de façon ÉQUIVALENTE par une FONCTION DE SON GRADIENT.}\;}$$</p>
+<blockquote>
+<p><strong>La transformée de Legendre-Fenchel</strong> est <em>« une transformation (au sens d'une transformée de Fourier) d'une fonction convexe différentiable $f(x)$ vers une fonction qui dépend des <strong>TANGENTES</strong> $s(x)=\nabla_xf(x)$. »</em>  *« C'est une transformation <strong>DE LA FONCTION</strong> $f(\cdot)$ — <strong>PAS de la variable $x$</strong>, ni de la fonction évaluée en $x$. »*</p>
+</blockquote>
+<h3>6.2 La définition</h3>
+<div class="cal formel"><span class="lab">Définition 7.4 (Conjugué convexe).</span>
+<p>
+$$\boxed{\;f^*(s)=\sup_{x\in\mathbb R^D}\big(\langle s,x\rangle-f(x)\big)\;}$$</p>
+</div>
+<p class="cal piege"> <em>« Cette définition <strong>ne requiert PAS</strong> que $f$ soit convexe <strong>ni différentiable</strong>. »</em></p>
+<p><strong>La construction géométrique en une dimension.</strong> Pour $f(x)=x^2$ (un hyperplan devient une <strong>droite</strong>) :</p>
+<ul>
+<li>Fixer la pente $s\in\mathbb R$ et considérer la droite $y=sx+c$.</li>
+<li>Pour chaque point $(x_0,f(x_0))$, trouver <strong>la valeur MINIMALE de $c$</strong> telle que la droite intersecte encore $(x_0,f(x_0))$ — c'est là où une droite de pente $s$ « <strong>touche juste</strong> » la fonction.</li>
+<li>La droite passant par $(x_0,f(x_0))$ de pente $s$ est $y-f(x_0)=s(x-x_0)$, d'<strong>ordonnée à l'origine</strong> $-sx_0+f(x_0)$.</li>
+<li>Le minimum de $c$ est donc $\displaystyle\inf_{x_0}\big(-sx_0+f(x_0)\big)$.</li>
+</ul>
+<p>$$\boxed{\;\text{Le conjugué convexe est, PAR CONVENTION, l'OPPOSÉ de cette quantité}\;}$$</p>
+<p class="cal piege"> Ce raisonnement <em>« ne reposait pas sur le fait que la fonction soit unidimensionnelle, convexe et différentiable : il vaut pour $f:\mathbb R^D\to\mathbb R$ <strong>non convexes et non différentiables</strong> ».</em></p>
+<h3>6.3 Deux exemples de machine learning</h3>
+<p><strong>Exemple 7.7 — la forme quadratique à noyau.</strong> Pour $K\in\mathbb R^{n\times n}$ <strong>définie positive</strong>, variable primale $y\in\mathbb R^n$, duale $\alpha\in\mathbb R^n$ :</p>
+<p>$$f(y)=\frac\lambda2y^\top K^{-1}y$$</p>
+<p>$$f^*(\alpha)=\sup_{y\in\mathbb R^n}\left(\langle y,\alpha\rangle-\frac\lambda2y^\top K^{-1}y\right)$$</p>
+<p><strong>Étape 1 — annuler la dérivée.</strong> $\dfrac{\partial}{\partial y}\left(\langle y,\alpha\rangle-\frac\lambda2y^\top K^{-1}y\right)=(\alpha-\lambda K^{-1}y)^\top=0$, d'où $y=\dfrac1\lambda K\alpha$.</p>
+<p><strong>Étape 2 — substituer.</strong></p>
+<p>$$f^*(\alpha)=\frac1\lambda\alpha^\top K\alpha-\frac\lambda2\left(\frac1\lambda K\alpha\right)^\top K^{-1}\left(\frac1\lambda K\alpha\right)$$</p>
+<p>$$\boxed{\;f^*(\alpha)=\frac{1}{2\lambda}\alpha^\top K\alpha\;}$$</p>
+<details class="cor">
+<summary> Contrôle numérique</summary><div class="in">
+
+<p>Avec $\lambda=2$, $K=\begin{bmatrix}3&amp;1\\1&amp;2\end{bmatrix}$ et $\alpha=[1;-0{,}5]^\top$ :</p>
+<p>$y^*=\tfrac12K\alpha=\tfrac12[2{,}5\ ;\ 0]^\top=[1{,}25\ ;\ 0]^\top$</p>
+<p>Valeur du supremum : $\langle y^*,\alpha\rangle-\tfrac\lambda2(y^*)^\top K^{-1}y^*=\mathbf{0{,}625}$</p>
+<p>Formule (7.62) : $\tfrac{1}{2\lambda}\alpha^\top K\alpha=\tfrac14(3-1-0{,}5+0{,}5)=\mathbf{0{,}625}$  <strong>Identiques.</strong></p>
+</div></details>
+
+<p><strong>Exemple 7.8 — le conjugué d'une SOMME de pertes.</strong> <em>« En apprentissage automatique on utilise souvent des sommes de fonctions : l'objectif d'entraînement inclut une somme des pertes pour chaque exemple. »</em> Avec $L(t)=\sum_{i=1}^{n}\ell_i(t_i)$ :</p>
+<p>$$L^*(z)=\sup_{t\in\mathbb R^n}\left(\langle z,t\rangle-\sum_{i=1}^{n}\ell_i(t_i)\right)=\sup_{t\in\mathbb R^n}\sum_{i=1}^{n}\big(z_it_i-\ell_i(t_i)\big)$$</p>
+<p class="cal piege"> <strong>Le pas clé</strong> : chaque terme ne dépend que de $t_i$, donc le supremum <strong>se décompose terme à terme</strong> :</p>
+<p>$$\boxed{\;L^*(z)=\sum_{i=1}^{n}\ell_i^*(z_i)\;}$$</p>
+<p><em>« Le conjugué d'une somme séparable est la <strong>SOMME des conjugués</strong>. »</em></p>
+<h3>6.4 La dualité de Fenchel</h3>
+<p><strong>Exemple 7.9.</strong> Pour $f(y)$ et $g(x)$ <strong>convexes</strong> et $A$ une matrice réelle telle que $Ax=y$ :</p>
+<p>$$\min_xf(Ax)+g(x)=\min_{Ax=y}f(y)+g(x)$$</p>
+<p><strong>Étape 1 — introduire le multiplicateur $u$ :</strong></p>
+<p>$$\min_{Ax=y}f(y)+g(x)=\min_{x,y}\max_uf(y)+g(x)+(Ax-y)^\top u$$</p>
+<p><strong>Étape 2 — échanger max et min.</strong>  <em>« Cette dernière étape est due au fait que $f(y)$ et $g(x)$ sont des fonctions CONVEXES »</em> — c'est la <strong>dualité FORTE</strong> :</p>
+<p>$$=\max_u\min_{x,y}f(y)+g(x)+(Ax-y)^\top u$$</p>
+<p><strong>Étape 3 — séparer le produit scalaire et regrouper :</strong></p>
+<p>$$=\max_u\left[\min_y\big(-y^\top u+f(y)\big)+\min_x\big(x^\top A^\top u+g(x)\big)\right]$$</p>
+<p><strong>Étape 4 — reconnaître les conjugués</strong> (les produits scalaires sont symétriques) :</p>
+<p>$$\boxed{\;\min_xf(Ax)+g(x)=\max_u\ -f^*(u)-g^*(-A^\top u)\;}$$</p>
+<blockquote>
+<p> <strong>L'usage.</strong> <em>« Le conjugué de Legendre-Fenchel se révèle très utile pour les problèmes d'apprentissage exprimables comme des problèmes d'optimisation convexe. En particulier, <strong>pour des fonctions de PERTE CONVEXES appliquées INDÉPENDAMMENT à chaque exemple, la PERTE CONJUGUÉE est une façon commode de dériver un problème DUAL</strong>. »</em></p>
+</blockquote>
+<blockquote>
+<p class="cal piege"> <strong>La généralisation.</strong> *« Pour des produits intérieurs généraux, $A^\top$ est remplacé par l'<strong>ADJOINT $A^*$</strong>. »*</p>
+</blockquote>
+<h2>Comment reconnaître le type d'exercice</h2>
+<table>
+<thead>
+<tr>
+<th>L'énoncé dit...</th>
+<th>Le type</th>
+<th>La méthode</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>« Trouver les points stationnaires »</td>
+<td><strong>§7.0</strong></td>
+<td>Annuler $f'$ ; classer par le <strong>signe de $f''$</strong></td>
+</tr>
+<tr>
+<td>« Minimiser $f$, pas de contraintes »</td>
+<td><strong>§7.1</strong></td>
+<td>$x_{i+1}=x_i-\gamma_i(\nabla f(x_i))^\top$</td>
+</tr>
+<tr>
+<td>« Le pas est-il bon ? »</td>
+<td><strong>§7.1.1</strong></td>
+<td>Si $f$ <strong>augmente</strong> : annuler et <strong>réduire</strong>. Si $f$ diminue : essayer d'<strong>augmenter</strong></td>
+</tr>
+<tr>
+<td>« Pourquoi la convergence est-elle lente ? »</td>
+<td><strong>Conditionnement</strong></td>
+<td>Calculer $\kappa=\sigma_{\max}/\sigma_{\min}$ ; grand $\kappa$ $\Rightarrow$ <strong>vallée longue et mince</strong> $\Rightarrow$ zigzag</td>
+</tr>
+<tr>
+<td>« Comment accélérer ? »</td>
+<td><strong>Momentum</strong></td>
+<td>Ajouter $\alpha\Delta x_i$ avec $\alpha\in[0,1]$</td>
+</tr>
+<tr>
+<td>« L'objectif est une somme sur $N$ exemples »</td>
+<td><strong>SGD</strong></td>
+<td>Estimer le gradient sur un <strong>mini-lot</strong></td>
+</tr>
+<tr>
+<td>« Minimiser sous contraintes $g_i\leqslant0$ »</td>
+<td><strong>§7.2</strong></td>
+<td>Lagrangien $f(x)+\lambda^\top g(x)$ avec $\lambda\geqslant0$</td>
+</tr>
+<tr>
+<td>« Contrainte d'égalité $h_j=0$ »</td>
+<td><strong>§7.2</strong></td>
+<td>La scinder en $h_j\leqslant0$ et $h_j\geqslant0$ ;  multiplicateur <strong>NON contraint</strong></td>
+</tr>
+<tr>
+<td>« Écrire le problème dual »</td>
+<td><strong>Déf. 7.1</strong></td>
+<td>$\max_\lambda D(\lambda)$ avec $D(\lambda)=\min_x\mathfrak L(x,\lambda)$ ; contrainte $\lambda\geqslant0$</td>
+</tr>
+<tr>
+<td>« Comparer primal et dual »</td>
+<td><strong>Dualité faible</strong></td>
+<td>$\min\max\geqslant\max\min$ — le dual <strong>minore</strong> toujours le primal</td>
+</tr>
+<tr>
+<td>« Y a-t-il un écart de dualité ? »</td>
+<td><strong>§7.3</strong></td>
+<td> <strong>NON</strong> si le problème est <strong>convexe</strong> — dualité <strong>FORTE</strong></td>
+</tr>
+<tr>
+<td>« Cet ensemble est-il convexe ? »</td>
+<td><strong>Déf. 7.2</strong></td>
+<td>$\theta x+(1-\theta)y\in\mathcal C$ pour tout $\theta\in[0,1]$</td>
+</tr>
+<tr>
+<td>« Cette fonction est-elle convexe ? »</td>
+<td><strong>Déf. 7.3</strong></td>
+<td>Trois options : la définition · la <strong>tangente sous $f$</strong> · la <strong>hessienne SDP</strong></td>
+</tr>
+<tr>
+<td>« Montrer qu'une combinaison est convexe »</td>
+<td><strong>Ex. 7.4</strong></td>
+<td>Somme pondérée <strong>NON NÉGATIVE</strong> de convexes ;  le signe de $\alpha$ compte</td>
+</tr>
+<tr>
+<td>« Objectif et contraintes linéaires »</td>
+<td><strong>PL</strong></td>
+<td>$\min c^\top x$ s.c. $Ax\leqslant b$ ;  l'optimum est en un <strong>SOMMET</strong></td>
+</tr>
+<tr>
+<td>« Objectif quadratique, contraintes affines »</td>
+<td><strong>PQ</strong></td>
+<td>Vérifier $Q$ définie positive ; dual : $-\frac12(c+A^\top\lambda)^\top Q^{-1}(c+A^\top\lambda)-\lambda^\top b$</td>
+</tr>
+<tr>
+<td>« Calculer le conjugué convexe »</td>
+<td><strong>Déf. 7.4</strong></td>
+<td>$f^*(s)=\sup_x(\langle s,x\rangle-f(x))$ : dériver, annuler, substituer</td>
+</tr>
+<tr>
+<td>« Conjugué d'une somme de pertes »</td>
+<td><strong>Ex. 7.8</strong></td>
+<td> <strong>Somme des conjugués</strong> — le supremum se décompose</td>
+</tr>
+</tbody></table>
+<h2>Comment résoudre : les cinq méthodes pas-à-pas</h2>
+<p><strong>Méthode A — Descente de gradient à la main.</strong></p>
+<ol>
+<li>Écrire $\nabla f$ explicitement.</li>
+<li>Vérifier ses <strong>dimensions</strong> (vecteur ligne $1\times d$) et <strong>transposer</strong> pour la mise à jour.</li>
+<li>Évaluer $\nabla f(x_0)$ ;  la direction de descente est <strong>l'OPPOSÉE</strong>.</li>
+<li>$x_1=x_0-\gamma\nabla f(x_0)^\top$.</li>
+<li><strong>Contrôle</strong> : $f(x_1)\leqslant f(x_0)$ ? Sinon, <strong>le pas est trop grand</strong>.</li>
+<li>Pour une quadratique, le minimum exact est la solution de $Qx=c$ — comparer.</li>
+</ol>
+<p><strong>Méthode B — Écrire un problème dual.</strong></p>
+<ol>
+<li>Mettre le primal sous forme standard : $\min f(x)$ s.c. $g_i(x)\leqslant0$.</li>
+<li>Scinder les <strong>égalités</strong> en deux inégalités (multiplicateurs libres).</li>
+<li>$\mathfrak L(x,\lambda)=f(x)+\lambda^\top g(x)$.</li>
+<li><strong>Regrouper les termes en $x$</strong>.</li>
+<li>$\partial\mathfrak L/\partial x=0$ ; résoudre pour $x^*(\lambda)$.</li>
+<li><strong>Substituer</strong> dans $\mathfrak L$ pour obtenir $D(\lambda)$.</li>
+<li>Le dual : $\max_\lambda D(\lambda)$ s.c. $\lambda\geqslant0$ <strong>plus</strong> les équations issues de l'étape 5.</li>
+<li><strong>Contrôle</strong> : $D$ doit être <strong>CONCAVE</strong>.</li>
+</ol>
+<p><strong>Méthode C — Prouver la convexité.</strong></p>
+<ol>
+<li>Le domaine est-il un <strong>ensemble convexe</strong> ?</li>
+<li>Si $f$ est deux fois différentiable : calculer $\nabla^2f$ et tester la <strong>semi-définie positivité</strong> (le plus rapide).</li>
+<li>Sinon, si différentiable : vérifier $f(y)\geqslant f(x)+\nabla f(x)^\top(y-x)$.</li>
+<li>Sinon : la définition 7.3 directement.</li>
+<li><strong>Alternative</strong> : décomposer $f$ en briques convexes connues et invoquer les <strong>opérations qui préservent la convexité</strong>.</li>
+</ol>
+<p><strong>Méthode D — Résoudre un PL à deux variables.</strong></p>
+<ol>
+<li>Tracer les demi-plans ; identifier la <strong>région réalisable</strong>.</li>
+<li><strong>Énumérer les SOMMETS</strong> en intersectant les contraintes <strong>deux à deux</strong>.</li>
+<li>Écarter les intersections <strong>non réalisables</strong>.</li>
+<li>Évaluer $c^\top x$ en chaque sommet ;  l'optimum est <strong>toujours en un sommet</strong>.</li>
+<li><strong>Contrôle</strong> : identifier les contraintes <strong>ACTIVES</strong> à l'optimum.</li>
+</ol>
+<p><strong>Méthode E — Résoudre un PQ à contraintes de boîte.</strong></p>
+<ol>
+<li>Vérifier que $Q$ est <strong>définie positive</strong> (valeurs propres $&gt;0$).</li>
+<li>Calculer le <strong>minimum libre</strong> : $Qx=-c$.</li>
+<li>S'il est <strong>dans</strong> la boîte, c'est fini.</li>
+<li>Sinon, minimiser sur chaque <strong>face</strong> (fixer une variable à sa borne, optimiser l'autre).</li>
+<li>Retenir la meilleure face ;  vérifier que la variable libre reste <strong>dans ses bornes</strong>.</li>
+<li><strong>Contrôle</strong> : recalculer $f(x^*)$ directement.</li>
+</ol>
+<h2 data-prio="must">Common mistakes</h2>
+<table>
+<thead>
+<tr>
+<th>Erreur</th>
+<th>Correction</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Monter dans la direction du gradient</td>
+<td> Le gradient pointe vers la <strong>MONTÉE</strong> — pour minimiser, prendre son <strong>OPPOSÉ</strong></td>
+</tr>
+<tr>
+<td>Oublier la transposition dans la mise à jour</td>
+<td> Le gradient est un <strong>vecteur LIGNE</strong> ; sans $^\top$ <em>« les dimensions ne marchent pas »</em></td>
+</tr>
+<tr>
+<td>Croire que la descente trouve le minimum global</td>
+<td> Elle trouve un minimum <strong>LOCAL</strong> — sauf si $f$ est <strong>convexe</strong></td>
+</tr>
+<tr>
+<td>Ignorer le point de départ</td>
+<td> Figure 7.2 : partir de $x_0=0$ mène au <strong>mauvais minimum</strong></td>
+</tr>
+<tr>
+<td>Chercher une solution algébrique pour un polynôme de degré $\geqslant5$</td>
+<td> <strong>Théorème d'ABEL-RUFFINI</strong> : il n'y en a <strong>pas en général</strong></td>
+</tr>
+<tr>
+<td>Prendre un pas trop grand pour aller plus vite</td>
+<td> Risque de <strong>dépassement, non-convergence, DIVERGENCE</strong></td>
+</tr>
+<tr>
+<td>Utiliser un pas fixe sur un problème mal conditionné</td>
+<td> Grand $\kappa$ $\Rightarrow$ <strong>ZIGZAG</strong> ; recourir au <strong>momentum</strong> ou au <strong>préconditionnement</strong></td>
+</tr>
+<tr>
+<td>Confondre conditionnement et déterminant</td>
+<td> $\kappa=\sigma_{\max}/\sigma_{\min}$ — un rapport de <strong>valeurs SINGULIÈRES</strong></td>
+</tr>
+<tr>
+<td>Choisir $P=A$ comme préconditionneur</td>
+<td> Le conditionnement serait parfait mais $P^{-1}$ <strong>coûte autant que le problème</strong></td>
+</tr>
+<tr>
+<td>Croire que $\alpha&gt;1$ accélère le momentum</td>
+<td> $\alpha\in[0,1]$</td>
+</tr>
+<tr>
+<td>Croire que les grands mini-lots sont toujours meilleurs</td>
+<td> Le <strong>BRUIT</strong> des petits lots aide à <strong>sortir des mauvais minima locaux</strong></td>
+</tr>
+<tr>
+<td>Chercher une estimation très précise du minimum</td>
+<td> Le but réel est la <strong>GÉNÉRALISATION</strong> — d'où l'acceptabilité des gradients approchés</td>
+</tr>
+<tr>
+<td>Utiliser la fonction indicatrice comme pénalité</td>
+<td> La <strong>marche infinie est tout aussi difficile à optimiser</strong> — c'est pourquoi on la <strong>relâche en une LINÉAIRE</strong></td>
+</tr>
+<tr>
+<td>Autoriser $\lambda&lt;0$ pour une inégalité</td>
+<td> $\lambda_i\geqslant0$ est <strong>obligatoire</strong> pour les inégalités</td>
+</tr>
+<tr>
+<td>Contraindre les multiplicateurs des égalités</td>
+<td> Ils sont <strong>LIBRES</strong> (résultat des deux inégalités opposées)</td>
+</tr>
+<tr>
+<td>Écrire la dualité faible dans le mauvais sens</td>
+<td> $\min\max\geqslant\max\min$ : le <strong>PRIMAL MAJORE le DUAL</strong></td>
+</tr>
+<tr>
+<td>Croire que $D(\lambda)$ hérite de la non-convexité de $f$</td>
+<td> $D$ est <strong>TOUJOURS CONCAVE</strong> — c'est un minimum ponctuel de fonctions <strong>affines</strong> en $\lambda$</td>
+</tr>
+<tr>
+<td>Supposer la dualité forte en général</td>
+<td> Elle exige un problème <strong>CONVEXE</strong></td>
+</tr>
+<tr>
+<td>Confondre ensemble convexe et fonction convexe</td>
+<td>Ensemble : la <strong>corde reste dedans</strong>. Fonction : la <strong>corde reste AU-DESSUS</strong></td>
+</tr>
+<tr>
+<td>Croire une somme de convexes toujours convexe</td>
+<td> Seulement pour des <strong>poids NON NÉGATIFS</strong></td>
+</tr>
+<tr>
+<td>Prouver la convexité sur deux points</td>
+<td> Il faut <strong>tous</strong> les points — deux points ne font qu'<strong>illustrer</strong></td>
+</tr>
+<tr>
+<td>Exiger $\nabla^2f\succ0$</td>
+<td> La convexité demande seulement $\nabla^2f\succeq0$ (<strong>semi</strong>-définie positive)</td>
+</tr>
+<tr>
+<td>Chercher l'optimum d'un PL à l'intérieur</td>
+<td> Il est <strong>toujours atteint en un SOMMET</strong></td>
+</tr>
+<tr>
+<td>Inverser $Q$ sans vérifier sa définie positivité</td>
+<td> C'est <strong>elle</strong> qui garantit l'inversibilité à l'étape 3 du dual du PQ</td>
+</tr>
+<tr>
+<td>Résoudre systématiquement le primal</td>
+<td> Choisir <strong>selon que $m$ ou $d$ est plus grand</strong></td>
+</tr>
+<tr>
+<td>Croire que le conjugué exige la convexité</td>
+<td> La définition 7.4 ne requiert <strong>ni convexité ni différentiabilité</strong></td>
+</tr>
+<tr>
+<td>Croire que Legendre-Fenchel transforme la variable</td>
+<td> C'est une transformation <strong>DE LA FONCTION</strong>, pas de $x$ ni de $f(x)$</td>
+</tr>
+<tr>
+<td>Oublier le signe dans $g^*(-A^\top u)$</td>
+<td> Le <strong>moins</strong> vient du regroupement de l'étape 3 de l'exemple 7.9</td>
+</tr>
+</tbody></table>
+<h2>Ultimate Review</h2>
+<pre><code>════════ LES HUIT FORMULES À SAVOIR SANS HÉSITER ════════
+  1.  xi+1 = xi − γi ((∇f)(xi))ᵀ              descente de gradient
+  2.  κ = σmax / σmin                          CONDITIONNEMENT
+  3.  MOMENTUM  xi+1 = xi − γi(∇f)ᵀ + α Δxi ,  α ∈ [0,1]
+  4.  SGD       L(θ) = Σn Ln(θ)  →  gradient sur un MINI-LOT
+  5.  LAGRANGIEN  L(x,λ) = f(x) + λᵀ g(x) ,  λ ≥ 0
+      DUAL        D(λ) = min_x L(x,λ)      max_{λ≥0} D(λ)
+  6.  MINIMAX / DUALITÉ FAIBLE   min max L ≥ max min L
+  7.  CONVEXITÉ   f(θx+(1−θ)y) ≤ θf(x)+(1−θ)f(y)
+                  f(y) ≥ f(x) + ∇f(x)ᵀ(y−x)         (tangente SOUS f)
+                  ∇²f ⪰ 0                            (hessienne SDP)
+  8.  CONJUGUÉ    f*(s) = sup_x (⟨s,x⟩ − f(x))
+                  min_x f(Ax)+g(x) = max_u −f*(u) − g*(−Aᵀu)
+═════════════════════════════════════════════════════════
+</code></pre>
+<p><strong>Le tableau des trois variantes de descente :</strong></p>
+<table>
+<thead>
+<tr>
+<th>Méthode</th>
+<th>Mise à jour</th>
+<th>Ce qu'elle apporte</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Descente simple</strong></td>
+<td>$x_i-\gamma(\nabla f)^\top$</td>
+<td>La base ;  <strong>zigzague</strong> si mal conditionné</td>
+</tr>
+<tr>
+<td><strong>Momentum</strong></td>
+<td>$+\ \alpha\Delta x_i$</td>
+<td>Une <strong>MÉMOIRE</strong> : amortit les oscillations, moyenne les gradients bruités</td>
+</tr>
+<tr>
+<td><strong>SGD</strong></td>
+<td>Gradient sur un <strong>mini-lot</strong></td>
+<td><strong>Passage à l'échelle</strong> ; le bruit aide à s'échapper des minima locaux</td>
+</tr>
+</tbody></table>
+<p><strong>Le tableau primal / dual :</strong></p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th><strong>PRIMAL</strong></th>
+<th><strong>DUAL</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Variables</td>
+<td>$x\in\mathbb R^d$</td>
+<td>$\lambda\in\mathbb R^m$</td>
+</tr>
+<tr>
+<td>Sens</td>
+<td><strong>MIN</strong></td>
+<td><strong>MAX</strong></td>
+</tr>
+<tr>
+<td>Contraintes</td>
+<td>$g_i(x)\leqslant0$</td>
+<td>$\lambda\geqslant0$</td>
+</tr>
+<tr>
+<td>Nature de l'objectif</td>
+<td>quelconque</td>
+<td> <strong>TOUJOURS CONCAVE</strong></td>
+</tr>
+<tr>
+<td>Relation</td>
+<td>$\geqslant$</td>
+<td>dualité <strong>FAIBLE</strong> en général, <strong>FORTE</strong> si convexe</td>
+</tr>
+<tr>
+<td><strong>PL</strong> $\min c^\top x$ s.c. $Ax\leqslant b$</td>
+<td>$d$ variables, $m$ contraintes</td>
+<td>$\max-b^\top\lambda$ s.c. $c+A^\top\lambda=0$, $\lambda\geqslant0$</td>
+</tr>
+<tr>
+<td><strong>PQ</strong> $\min\frac12x^\top Qx+c^\top x$</td>
+<td>$Q\succ0$</td>
+<td>$\max-\frac12(c+A^\top\lambda)^\top Q^{-1}(c+A^\top\lambda)-\lambda^\top b$</td>
+</tr>
+</tbody></table>
+<p><strong>Les deux dualités du chapitre :</strong></p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th><strong>Lagrangienne</strong> (§7.2)</th>
+<th><strong>Legendre-Fenchel</strong> (§7.3.3)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Point de départ</td>
+<td>Le problème <strong>AVEC contraintes</strong></td>
+<td>La fonction, <strong>SANS contraintes</strong></td>
+</tr>
+<tr>
+<td>Mécanisme</td>
+<td>Relâcher l'indicatrice en une <strong>linéaire</strong></td>
+<td>Décrire $f$ par ses <strong>hyperplans d'appui</strong></td>
+</tr>
+<tr>
+<td>Objet dual</td>
+<td>Les multiplicateurs $\lambda$</td>
+<td>Le conjugué $f^*$ dépendant du <strong>gradient</strong></td>
+</tr>
+<tr>
+<td>Résultat</td>
+<td>$\max_\lambda\min_x\mathfrak L$</td>
+<td>$\min_xf(Ax)+g(x)=\max_u-f^*(u)-g^*(-A^\top u)$</td>
+</tr>
+</tbody></table>
+<p><strong>Où chaque notion resservira dans le livre :</strong></p>
+<table>
+<thead>
+<tr>
+<th>Notion du ch. 7</th>
+<th>Suite</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Descente de gradient, SGD</td>
+<td>Entraînement de <strong>tous</strong> les modèles (ch. 9-12)</td>
+</tr>
+<tr>
+<td>Moindres carrés et gradient</td>
+<td><strong>Régression linéaire</strong> (ch. 9)</td>
+</tr>
+<tr>
+<td>Optimisation convexe, dualité</td>
+<td><strong>Réduction de dimension</strong> (ch. 10)</td>
+</tr>
+<tr>
+<td>Multiplicateurs de Lagrange</td>
+<td><strong>ACP</strong> (ch. 10), <strong>estimation de densité</strong> (ch. 11)</td>
+</tr>
+<tr>
+<td>Programme quadratique, dual</td>
+<td> <strong>SVM</strong> (ch. 12) — le PQ dual <strong>est</strong> le SVM</td>
+</tr>
+<tr>
+<td>Conjugué convexe des pertes</td>
+<td>Dérivation des <strong>problèmes duaux</strong> de classification</td>
+</tr>
+</tbody></table>
+<div class="rec"><h2>Active Recall</h2><p><strong>Cadre et descente de gradient</strong></p><ol>
+<li>Quelles sont les deux branches de l'optimisation continue ?</li>
+<li>Quelle est la convention de sens en apprentissage automatique ?</li>
+<li>Qu'est-ce qu'un point stationnaire ? Comment le classer ?</li>
+<li>Combien de points stationnaires a $\ell(x)=x^4+7x^3+5x^2-17x+3$, et de quelle nature ?</li>
+<li>Que dit le théorème d'Abel-Ruffini et pourquoi est-ce pertinent ?</li>
+<li>Quelle est LA propriété des fonctions convexes qui motive tout le chapitre ?</li>
+<li>Écrire l'algorithme de descente de gradient. Pourquoi la transposition ?</li>
+<li>Comment le gradient se situe-t-il par rapport aux lignes de niveau ?</li>
+<li>Détailler la première itération de l'exemple 7.1.</li>
+<li>Pourquoi la descente zigzague-t-elle ? Quelle grandeur mesure ce phénomène ?</li>
+<li>Quels sont les deux dangers du mauvais choix de pas ?</li>
+<li>Donner les deux heuristiques adaptatives. Que garantit l'étape d'annulation ?</li>
+<li>Écrire le conditionnement. Que mesure-t-il ?</li>
+<li>Qu'est-ce qu'un préconditionneur ? Quel est le double objectif ?</li>
+<li>Écrire la mise à jour avec momentum. Quel est l'intervalle de $\alpha$ ?</li>
+<li>Donner les deux justifications du momentum.</li>
+<li>Qu'est-ce que le SGD ? Que signifie « stochastique » ici ?</li>
+<li>Écrire la forme de l'objectif exploitée. Donner l'exemple de la régression.</li>
+<li>Comparer grands et petits mini-lots sur cinq critères.</li>
+<li>Pourquoi une estimation imprécise du minimum est-elle acceptable ?</li>
+</ol><p><strong>Contraintes et dualité</strong>
+21. Écrire le problème contraint standard.
+22. Pourquoi la fonction indicatrice est-elle impraticable ? Quelle est l'idée de Lagrange ?
+23. Écrire le lagrangien. Quelle contrainte pèse sur $\lambda$ ?
+24. Définir le problème dual lagrangien.
+25. Énoncer l'inégalité minimax et la démontrer.
+26. Qu'est-ce que la dualité faible ? Dans quel sens va l'inégalité ?
+27. Pourquoi $D(\lambda)$ est-elle toujours concave ?
+28. Comment traiter les contraintes d'égalité ? Que deviennent leurs multiplicateurs ?</p><p><strong>Convexité</strong>
+29. Définir un ensemble convexe et une fonction convexe.
+30. Qu'est-ce que l'épigraphe ? Quel lien fait-il ?
+31. Donner les caractérisations d'ordre 1 et d'ordre 2.
+32. Vérifier la convexité de $x\log_2x$ sur $x=2$ et $x=4$, par les deux méthodes.
+33. Montrer qu'une somme pondérée non négative de convexes est convexe.
+34. Qu'est-ce que l'inégalité de Jensen ?
+35. Définir un problème d'optimisation convexe. Que garantit-il ?</p><p><strong>PL, PQ, conjugué</strong>
+36. Écrire le PL standard. Dériver son dual en quatre pas.
+37. Comment choisir entre primal et dual ?
+38. Écrire le PQ standard. Quelle condition sur $Q$ et pourquoi ?
+39. Dériver le dual du PQ.
+40. Où se situe l'optimum d'un PL ?
+41. Qu'est-ce qu'un hyperplan d'appui ?
+42. Expliquer la chaîne de raisonnement menant à Legendre-Fenchel.
+43. Écrire la définition 7.4. Quelles hypothèses sont requises ?
+44. Détailler la construction géométrique en une dimension.
+45. Calculer le conjugué de $\frac\lambda2y^\top K^{-1}y$.
+46. Que vaut le conjugué d'une somme séparable de pertes ?
+47. Énoncer la dualité de Fenchel de l'exemple 7.9. Où intervient la convexité ?</p></div>
+
+
+
+
+
+<h2>Flashcards</h2>
+<table>
+<thead>
+<tr>
+<th>Question</th>
+<th>Réponse</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Les deux branches de l'optimisation continue ?</td>
+<td><strong>Sans contraintes</strong> et <strong>sous contraintes</strong></td>
+</tr>
+<tr>
+<td>Convention en apprentissage automatique ?</td>
+<td>On <strong>MINIMISE</strong> — le meilleur est le <strong>minimum</strong></td>
+</tr>
+<tr>
+<td>Direction du gradient ?</td>
+<td> Vers la <strong>MONTÉE</strong> — on descend dans son <strong>opposé</strong></td>
+</tr>
+<tr>
+<td>Point stationnaire ?</td>
+<td>Une <strong>racine réelle de la dérivée</strong> — gradient <strong>nul</strong></td>
+</tr>
+<tr>
+<td>Comment classer un point stationnaire ?</td>
+<td>Le <strong>signe de la dérivée SECONDE</strong></td>
+</tr>
+<tr>
+<td>Le polynôme de la figure 7.2 ?</td>
+<td>$x^4+7x^3+5x^2-17x+3$ : min global $\approx-4{,}5$ (valeur $\approx-47$), max $\approx-1{,}4$, min local $\approx0{,}7$</td>
+</tr>
+<tr>
+<td>Théorème d'Abel-Ruffini ?</td>
+<td> <strong>Pas de solution ALGÉBRIQUE</strong> en général pour les polynômes de degré $\geqslant5$ (Abel, 1826)</td>
+</tr>
+<tr>
+<td>LA propriété des fonctions convexes ?</td>
+<td> <strong>Tous les minima LOCAUX sont GLOBAUX</strong></td>
+</tr>
+<tr>
+<td>Algorithme de descente de gradient ?</td>
+<td>$x_{i+1}=x_i-\gamma_i\big((\nabla f)(x_i)\big)^\top$</td>
+</tr>
+<tr>
+<td>Pourquoi la transposition ?</td>
+<td>Le gradient est un <strong>vecteur LIGNE</strong> — sinon les dimensions ne marchent pas</td>
+</tr>
+<tr>
+<td>Ordre de l'algorithme ?</td>
+<td><strong>PREMIER ordre</strong> — il n'utilise pas la courbure</td>
+</tr>
+<tr>
+<td>Le gradient et les lignes de niveau ?</td>
+<td> Il leur est <strong>ORTHOGONAL</strong></td>
+</tr>
+<tr>
+<td>$x_1$ dans l'exemple 7.1 ?</td>
+<td>$[-1{,}98\ ;\ 1{,}21]^\top$, depuis $x_0=[-3,-1]$ avec $\gamma=0{,}085$</td>
+</tr>
+<tr>
+<td>Direction du gradient négatif en $x_0$ ?</td>
+<td><strong>Nord et est</strong> (les deux composantes sont positives)</td>
+</tr>
+<tr>
+<td>Pourquoi le zigzag ?</td>
+<td> Problème <strong>MAL CONDITIONNÉ</strong> : vallée <strong>longue et mince</strong></td>
+</tr>
+<tr>
+<td>Conditionnement ?</td>
+<td>$\kappa=\dfrac{\sigma_{\max}}{\sigma_{\min}}$ — rapport des <strong>valeurs SINGULIÈRES</strong></td>
+</tr>
+<tr>
+<td>Ce qu'il mesure ?</td>
+<td>Le rapport <strong>direction la plus courbée / la moins courbée</strong></td>
+</tr>
+<tr>
+<td>$\kappa$ dans l'exemple 7.1 ?</td>
+<td>$\approx10{,}31$ (valeurs propres $20{,}06$ et $1{,}94$)</td>
+</tr>
+<tr>
+<td>Pas trop petit ?</td>
+<td>La descente est <strong>LENTE</strong></td>
+</tr>
+<tr>
+<td>Pas trop grand ?</td>
+<td> <strong>Dépassement, non-convergence, DIVERGENCE</strong></td>
+</tr>
+<tr>
+<td>Autre nom du pas ?</td>
+<td>Le <strong>TAUX D'APPRENTISSAGE</strong></td>
+</tr>
+<tr>
+<td>Heuristique 1 ?</td>
+<td>$f$ <strong>augmente</strong> $\Rightarrow$ <strong>ANNULER</strong> le pas et le <strong>réduire</strong></td>
+</tr>
+<tr>
+<td>Heuristique 2 ?</td>
+<td>$f$ <strong>diminue</strong> $\Rightarrow$ essayer de l'<strong>augmenter</strong></td>
+</tr>
+<tr>
+<td>Ce que garantit l'annulation ?</td>
+<td> Une convergence <strong>MONOTONE</strong></td>
+</tr>
+<tr>
+<td>Préconditionneur ?</td>
+<td>$P$ tel qu'on résolve $P^{-1}(Ax-b)=0$</td>
+</tr>
+<tr>
+<td>Son double objectif ?</td>
+<td>$P^{-1}A$ <strong>mieux conditionnée</strong> <strong>ET</strong> $P^{-1}$ <strong>facile à calculer</strong></td>
+</tr>
+<tr>
+<td>Mise à jour avec momentum ?</td>
+<td>$x_{i+1}=x_i-\gamma_i(\nabla f(x_i))^\top+\alpha\Delta x_i$</td>
+</tr>
+<tr>
+<td>Intervalle de $\alpha$ ?</td>
+<td> $[0,1]$</td>
+</tr>
+<tr>
+<td>L'analogie physique ?</td>
+<td>Une <strong>BALLE LOURDE</strong>, réticente à changer de direction</td>
+</tr>
+<tr>
+<td>Ce qu'implémente le momentum ?</td>
+<td>Une <strong>MOYENNE MOBILE</strong> — une mémoire</td>
+</tr>
+<tr>
+<td>Son second usage ?</td>
+<td><strong>MOYENNER des estimations BRUITÉES</strong> du gradient</td>
+</tr>
+<tr>
+<td>SGD ?</td>
+<td>Approximation <strong>stochastique</strong> du gradient, sur un <strong>MINI-LOT</strong></td>
+</tr>
+<tr>
+<td>La forme d'objectif exploitée ?</td>
+<td>$L(\theta)=\sum_{n=1}^{N}L_n(\theta)$</td>
+</tr>
+<tr>
+<td>Exemple en régression ?</td>
+<td>$L(\theta)=-\sum_n\log p(y_n\mid x_n,\theta)$ — la <strong>log-vraisemblance négative</strong></td>
+</tr>
+<tr>
+<td>Descente standard = quelle méthode ?</td>
+<td>Une méthode <strong>PAR LOT</strong> (<em>batch</em>)</td>
+</tr>
+<tr>
+<td>Garantie de convergence du SGD ?</td>
+<td> <strong>Presque sûrement</strong> vers un minimum local, si le taux décroît convenablement (Bottou, 1998)</td>
+</tr>
+<tr>
+<td>Avantages des grands mini-lots ?</td>
+<td>Gradient <strong>précis</strong>, convergence <strong>stable</strong>, <strong>vectorisation</strong> optimisée</td>
+</tr>
+<tr>
+<td>Avantages des petits mini-lots ?</td>
+<td><strong>Rapides</strong> ;  le <strong>BRUIT</strong> aide à <strong>SORTIR de mauvais minima locaux</strong></td>
+</tr>
+<tr>
+<td>Pourquoi tolérer l'imprécision ?</td>
+<td> Le but réel est la <strong>GÉNÉRALISATION</strong>, pas le minimum exact</td>
+</tr>
+<tr>
+<td>Problème contraint standard ?</td>
+<td>$\min_xf(x)$ s.c. $g_i(x)\leqslant0$</td>
+</tr>
+<tr>
+<td>Pourquoi pas la fonction indicatrice ?</td>
+<td> La <strong>MARCHE INFINIE est tout aussi difficile à optimiser</strong></td>
+</tr>
+<tr>
+<td>L'idée de Lagrange ?</td>
+<td> <strong>Remplacer la marche par une fonction LINÉAIRE</strong></td>
+</tr>
+<tr>
+<td>Le lagrangien ?</td>
+<td>$\mathfrak L(x,\lambda)=f(x)+\lambda^\top g(x)$ avec $\lambda\geqslant0$</td>
+</tr>
+<tr>
+<td>Variables primales / duales ?</td>
+<td>$x$ / $\lambda$</td>
+</tr>
+<tr>
+<td>Le problème dual ?</td>
+<td>$\max_{\lambda\geqslant0}D(\lambda)$ avec $D(\lambda)=\min_x\mathfrak L(x,\lambda)$</td>
+</tr>
+<tr>
+<td>Inégalité minimax ?</td>
+<td>$\max_y\min_x\varphi\leqslant\min_x\max_y\varphi$ — le <strong>maximin $\leqslant$ minimax</strong></td>
+</tr>
+<tr>
+<td>Dualité faible ?</td>
+<td> $\min_x\max_\lambda\mathfrak L\geqslant\max_\lambda\min_x\mathfrak L$ — <strong>le primal MAJORE le dual</strong></td>
+</tr>
+<tr>
+<td>$D(\lambda)$ est-elle concave ?</td>
+<td> <strong>TOUJOURS</strong> — minimum ponctuel de fonctions <strong>AFFINES</strong> en $\lambda$</td>
+</tr>
+<tr>
+<td>Même si $f$ est non convexe ?</td>
+<td> <strong>OUI</strong></td>
+</tr>
+<tr>
+<td>Traiter une égalité $h_j=0$ ?</td>
+<td>La scinder en $h_j\leqslant0$ <strong>et</strong> $h_j\geqslant0$</td>
+</tr>
+<tr>
+<td>Le multiplicateur qui en résulte ?</td>
+<td> <strong>NON CONTRAINT</strong> (libre)</td>
+</tr>
+<tr>
+<td>Ensemble convexe ?</td>
+<td>$\theta x+(1-\theta)y\in\mathcal C$ — la <strong>corde reste DEDANS</strong></td>
+</tr>
+<tr>
+<td>Fonction convexe ?</td>
+<td>$f(\theta x+(1-\theta)y)\leqslant\theta f(x)+(1-\theta)f(y)$ — la <strong>corde reste AU-DESSUS</strong></td>
+</tr>
+<tr>
+<td>Fonction concave ?</td>
+<td>L'<strong>opposée</strong> d'une convexe</td>
+</tr>
+<tr>
+<td>Épigraphe ?</td>
+<td>La fonction convexe « <strong>remplie d'eau</strong> » — un <strong>ENSEMBLE convexe</strong></td>
+</tr>
+<tr>
+<td>Convexité d'ordre 1 ?</td>
+<td>$f(y)\geqslant f(x)+\nabla_xf(x)^\top(y-x)$ — la <strong>TANGENTE reste SOUS $f$</strong></td>
+</tr>
+<tr>
+<td>Convexité d'ordre 2 ?</td>
+<td> $\nabla_x^2f(x)$ <strong>SEMI-définie positive</strong></td>
+</tr>
+<tr>
+<td>$x\log_2x$ en $x=2,4$, $\theta=0{,}5$ ?</td>
+<td>Gauche $=3\log_23\approx4{,}75$ ; droite $=5$ ; $4{,}75\leqslant5$ </td>
+</tr>
+<tr>
+<td>Sa dérivée ?</td>
+<td>$\log_2x+\dfrac{1}{\log_e2}$</td>
+</tr>
+<tr>
+<td>Test d'ordre 1 en $x=2,y=4$ ?</td>
+<td>$f(4)=8\geqslant f(2)+f'(2)\cdot2\approx6{,}9$ </td>
+</tr>
+<tr>
+<td>Suffit-il de tester deux points ?</td>
+<td> <strong>NON</strong> — il faut <strong>tous</strong> les points</td>
+</tr>
+<tr>
+<td>Somme pondérée de convexes ?</td>
+<td>Convexe  <strong>si les poids sont NON NÉGATIFS</strong></td>
+</tr>
+<tr>
+<td>Le nom de ces inégalités ?</td>
+<td>L'<strong>inégalité de JENSEN</strong></td>
+</tr>
+<tr>
+<td>Ce que garantit un problème convexe ?</td>
+<td> La <strong>DUALITÉ FORTE</strong> : primal et dual ont <strong>la même</strong> solution optimale</td>
+</tr>
+<tr>
+<td>Programme linéaire ?</td>
+<td>$\min c^\top x$ s.c. $Ax\leqslant b$</td>
+</tr>
+<tr>
+<td>Son lagrangien réarrangé ?</td>
+<td>$(c+A^\top\lambda)^\top x-\lambda^\top b$</td>
+</tr>
+<tr>
+<td>La condition d'optimalité en $x$ ?</td>
+<td>$c+A^\top\lambda=0$</td>
+</tr>
+<tr>
+<td>Le dual du PL ?</td>
+<td>$\max-b^\top\lambda$ s.c. $c+A^\top\lambda=0$, $\lambda\geqslant0$</td>
+</tr>
+<tr>
+<td>Combien de variables au dual ?</td>
+<td> <strong>$m$</strong> (le nombre de contraintes du primal)</td>
+</tr>
+<tr>
+<td>Comment choisir primal ou dual ?</td>
+<td> Selon que <strong>$m$ ou $d$ est plus grand</strong></td>
+</tr>
+<tr>
+<td>Où est l'optimum d'un PL ?</td>
+<td> Toujours en un <strong>SOMMET</strong> du polyèdre réalisable</td>
+</tr>
+<tr>
+<td>Programme quadratique ?</td>
+<td>$\min\frac12x^\top Qx+c^\top x$ s.c. $Ax\leqslant b$, avec $Q$ <strong>définie positive</strong></td>
+</tr>
+<tr>
+<td>Pourquoi $Q\succ0$ ?</td>
+<td>L'objectif est <strong>CONVEXE</strong> et  $Q$ est <strong>INVERSIBLE</strong> (nécessaire au dual)</td>
+</tr>
+<tr>
+<td>$x$ optimal du lagrangien ?</td>
+<td>$x=-Q^{-1}(c+A^\top\lambda)$</td>
+</tr>
+<tr>
+<td>Le dual du PQ ?</td>
+<td>$\max-\frac12(c+A^\top\lambda)^\top Q^{-1}(c+A^\top\lambda)-\lambda^\top b$ s.c. $\lambda\geqslant0$</td>
+</tr>
+<tr>
+<td>Hyperplan d'appui ?</td>
+<td>Il <strong>intersecte</strong> le convexe et le laisse <strong>entièrement d'un côté</strong></td>
+</tr>
+<tr>
+<td>Que touche-t-il exactement ?</td>
+<td> Il <strong>est la TANGENTE</strong> en ce point</td>
+</tr>
+<tr>
+<td>L'idée de Legendre-Fenchel ?</td>
+<td> Décrire une fonction convexe par une <strong>FONCTION DE SON GRADIENT</strong></td>
+</tr>
+<tr>
+<td>Conjugué convexe ?</td>
+<td>$f^*(s)=\sup_x\big(\langle s,x\rangle-f(x)\big)$</td>
+</tr>
+<tr>
+<td>Ses hypothèses ?</td>
+<td> <strong>AUCUNE</strong> — ni convexité ni différentiabilité requises</td>
+</tr>
+<tr>
+<td>De quoi est-ce une transformation ?</td>
+<td> De la <strong>FONCTION</strong> $f$ — pas de $x$ ni de $f(x)$</td>
+</tr>
+<tr>
+<td>L'ordonnée à l'origine de la tangente ?</td>
+<td>$-sx_0+f(x_0)$ ; le conjugué est <strong>l'OPPOSÉ</strong> de son infimum</td>
+</tr>
+<tr>
+<td>Conjugué de $\frac\lambda2y^\top K^{-1}y$ ?</td>
+<td>$\dfrac{1}{2\lambda}\alpha^\top K\alpha$</td>
+</tr>
+<tr>
+<td>Le $y$ qui atteint le supremum ?</td>
+<td>$y=\dfrac1\lambda K\alpha$</td>
+</tr>
+<tr>
+<td>Conjugué d'une somme séparable ?</td>
+<td> $L^*(z)=\sum_i\ell_i^*(z_i)$ — la <strong>SOMME des conjugués</strong></td>
+</tr>
+<tr>
+<td>Dualité de Fenchel ?</td>
+<td>$\min_xf(Ax)+g(x)=\max_u-f^*(u)-g^*(-A^\top u)$</td>
+</tr>
+<tr>
+<td>Où intervient la convexité ?</td>
+<td> Dans l'<strong>échange de max et min</strong> (dualité forte)</td>
+</tr>
+<tr>
+<td>Pour un produit intérieur général ?</td>
+<td> $A^\top$ devient l'<strong>ADJOINT $A^*$</strong></td>
+</tr>
+<tr>
+<td>L'usage en apprentissage ?</td>
+<td>Pour des <strong>pertes convexes appliquées indépendamment</strong>, la <strong>perte conjuguée</strong> donne le <strong>problème DUAL</strong></td>
+</tr>
+</tbody></table>
+</main>
+
+
+
+
+</body></html>

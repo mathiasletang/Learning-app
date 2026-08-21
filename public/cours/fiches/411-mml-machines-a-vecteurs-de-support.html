@@ -1,0 +1,1532 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fiche 411 — Classification par machines à vecteurs de support : marge, dualité, noyaux</title>
+<script>
+window.MathJax={tex:{inlineMath:[["$","$"]],displayMath:[["$$","$$"]],processEscapes:true},
+ options:{skipHtmlTags:["script","noscript","style","textarea","pre","code"]},
+ svg:{fontCache:"global"},
+ startup:{pageReady:()=>MathJax.startup.defaultPageReady().then(()=>{document.body.classList.add("ready")})}};
+setTimeout(function(){document.body.classList.add("ready")},2500);
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+/* ============================================================
+   MathiasLearn — feuille de style des fiches
+   Reprise intégrale des tokens de 00_PARCOURS/*.html
+   + blocs pédagogiques (callouts, méthode, essentiels, recall)
+   ============================================================ */
+:root{--bg:#faf9f7;--card:#fff;--ink:#1a1a1a;--muted:#6b6b6b;--line:#e5e2dd;--accent:#8b5e34;
+ --hl:#fdf8ef;--ok:#2d7d4f;--okbg:#f0f7f3;--warn:#b3402f;--warnbg:#fdf3f1;--blue:#2f5d8b;--bluebg:#f1f5fa}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+ font:17px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;padding:0 16px 100px}
+.nav{position:sticky;top:0;background:rgba(250,249,247,.96);backdrop-filter:blur(8px);
+ border-bottom:1px solid var(--line);margin:0 -16px 30px;padding:11px 16px;z-index:50;
+ display:flex;gap:6px;flex-wrap:wrap;font-size:13px}
+.nav a{color:var(--muted);text-decoration:none;padding:4px 9px;border-radius:5px;white-space:nowrap}
+.nav a:hover{background:var(--line);color:var(--ink)}
+.nav a.on{background:var(--accent);color:#fff}
+main{max-width:780px;margin:0 auto}
+h1{font-size:31px;letter-spacing:-.02em;margin:.4em 0 .5em;line-height:1.25}
+h2{font-size:23px;margin:2.2em 0 .7em;padding-bottom:.3em;border-bottom:1px solid var(--line)}
+h3{font-size:19px;margin:1.9em 0 .5em;color:var(--accent)}
+h4{font-size:17px;margin:1.5em 0 .4em}
+p{margin:.8em 0} a{color:var(--accent)} hr{border:0;border-top:1px solid var(--line);margin:2.6em 0}
+table{border-collapse:collapse;width:100%;margin:1.3em 0;font-size:15.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+th{background:#f3f0eb;font-weight:600}
+tr:nth-child(even) td{background:#fcfbfa}
+code{font-family:"SF Mono",Menlo,Consolas,monospace;font-size:.88em;background:#f2efea;padding:2px 6px;border-radius:4px;overflow-wrap:break-word}
+pre{background:#f2efea;padding:14px 16px;border-radius:8px;overflow-x:auto}
+pre code{background:none;padding:0;white-space:pre}
+blockquote{border-left:3px solid var(--accent);background:var(--hl);margin:1.4em 0;padding:14px 20px;border-radius:0 8px 8px 0}
+blockquote p:first-child{margin-top:0} blockquote p:last-child{margin-bottom:0}
+ul,ol{padding-left:1.5em} li{margin:.35em 0} em{color:#4a4a4a}
+mjx-container[display="true"]{margin:1.1em 0!important;overflow-x:auto;overflow-y:hidden;padding:2px 0}
+mjx-container svg{max-width:100%}
+body:not(.ready) main{opacity:0} main{opacity:1;transition:opacity .25s}
+
+/* --- bandeau de tête de fiche --- */
+.cours{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--accent);
+ border-radius:0 10px 10px 0;padding:18px 22px;margin:0 0 34px}
+.cours h4{margin:0 0 4px;font-size:14px;text-transform:uppercase;letter-spacing:.07em;color:var(--accent)}
+.cours .cs{color:var(--muted);font-size:14.5px;margin:0 0 14px}
+
+/* --- exercices / corrigés --- */
+.ex{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:6px 24px 20px;margin:18px 0}
+.ex>h3:first-child{margin-top:14px}
+details.cor{margin-top:18px;border:1px solid var(--line);border-radius:8px;background:#fcfbfa;overflow:hidden}
+details.cor>summary{cursor:pointer;padding:12px 16px;font-weight:600;font-size:15px;color:var(--accent);
+ list-style:none;display:flex;align-items:center;gap:9px;user-select:none;transition:.15s;min-height:44px}
+details.cor>summary::-webkit-details-marker{display:none}
+details.cor>summary:hover{background:var(--hl)}
+details.cor>summary::before{content:"\25B6";font-size:10px;transition:transform .18s;display:inline-block}
+details.cor[open]>summary::before{transform:rotate(90deg)}
+details.cor[open]>summary{background:var(--okbg);color:var(--ok);border-bottom:1px solid var(--line)}
+.cor .in{padding:4px 20px 16px}
+.cor .in>*:first-child{margin-top:.9em}
+
+/* --- blocs pédagogiques (callouts) ---
+   Générés depuis une citation Markdown dont le premier **gras** commence
+   par un mot-clé : DÉFINITION, THÉORÈME, MÉTHODE, PIÈGE, INTUITION… */
+.cal{border:1px solid var(--line);border-left:4px solid var(--accent);background:var(--card);
+ border-radius:0 10px 10px 0;padding:15px 20px;margin:1.5em 0}
+.cal>p:first-child{margin-top:0}.cal>p:last-child,.cal>ul:last-child,.cal>ol:last-child{margin-bottom:0}
+.cal .lab{display:block;font-size:12.5px;text-transform:uppercase;letter-spacing:.08em;
+ font-weight:700;color:var(--accent);margin-bottom:6px}
+.cal.formel{background:var(--hl)}
+.cal.piege{border-left-color:var(--warn);background:var(--warnbg)}
+.cal.piege .lab{color:var(--warn)}
+.cal.methode{border-left-color:var(--ok);background:var(--okbg)}
+.cal.methode .lab{color:var(--ok)}
+.cal.intu{border-left-color:var(--blue);background:var(--bluebg)}
+.cal.intu .lab{color:var(--blue)}
+.cal.plus{border-left-style:dashed;background:#faf9f7}
+.cal.plus .lab{color:var(--muted)}
+
+/* --- révision express --- */
+.ess{background:var(--card);border:1px solid var(--accent);border-radius:10px;padding:4px 24px 20px;margin:1.6em 0}
+.ess h3{margin-top:1.3em}
+.rec{background:var(--card);border:1px dashed var(--accent);border-radius:10px;padding:4px 24px 18px;margin:1.6em 0}
+.rec ol{counter-reset:none}
+
+/* --- impression / PDF --- */
+@media print{
+ .nav{display:none}
+ body{padding:0;background:#fff;font-size:11.2pt;line-height:1.55}
+ main{max-width:none}
+ h1{font-size:23pt}h2{font-size:15pt;margin-top:1.5em}h3{font-size:12.6pt}
+ h2,h3,h4{break-after:avoid;page-break-after:avoid}
+ table,.cal,blockquote{break-inside:avoid;page-break-inside:avoid}
+ table{display:table;font-size:9.6pt}
+ details.cor{border:1px solid var(--line);background:#fcfbfa}
+ details.cor>summary{display:none}
+ details.cor .in{padding-top:10px}
+ .cal,.ex,.ess,.rec{box-shadow:none}
+ a{color:var(--ink);text-decoration:none}
+}
+@page{margin:16mm 15mm 18mm}
+
+/* --- exemples travaillés --- */
+.exm{background:#fcfbfa;border:1px solid var(--line);border-radius:10px;padding:2px 20px 14px;margin:1.5em 0}
+.exm>h4:first-child{margin:14px 0 .5em;color:var(--accent);font-size:13px;text-transform:uppercase;letter-spacing:.07em}
+
+
+/* --- pastilles de priorité (conventions des fiches de l'app) --- */
+h2[data-prio], h3[data-prio], h4[data-prio]{position:relative}
+h2[data-prio]::before,h3[data-prio]::before,h4[data-prio]::before{
+ content:"";display:inline-block;width:9px;height:9px;border-radius:50%;
+ margin-right:9px;vertical-align:middle;background:var(--muted)}
+[data-prio="must"]::before{background:var(--warn)}
+[data-prio="high"]::before{background:#d98324}
+[data-prio="mid"]::before{background:#c9a227}
+[data-prio="low"]::before{background:var(--ok)}
+/* corrigés des fiches de l'app : même traitement que les corrigés des séries */
+details.cor>summary::after{content:""}
+</style></head><body>
+<div class="nav"><a href="00_COMMENCER_ICI.html">Commencer ici</a><a href="01_NOTATIONS_le-decodeur.html">Notations</a><a href="02_EXERCICES_Serie-0.html">Série 0 — Remise en route</a><a href="03_EXERCICES_Serie-1.html">Série 1 — Convexité</a><a href="04_EXERCICES_Serie-2.html">Série 2 — KKT</a><a href="05_AUTO-EVALUATION.html">Auto-évaluation (quiz)</a><a href="06_FICHE_Optimisation-deux-variables.html">Fiche — Optimisation à 2 variables</a></div>
+<main><h1>Fiche 411 — Classification par machines à vecteurs de support : marge, dualité, noyaux</h1>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Matière</strong></td>
+<td>Maths · Apprentissage automatique</td>
+</tr>
+<tr>
+<td><strong>Cours source</strong></td>
+<td>Deisenroth, Faisal &amp; Ong, <em>Mathematics for Machine Learning</em>, Cambridge University Press — chapitre 12 « Classification with Support Vector Machines » (p. 370-396)</td>
+</tr>
+<tr>
+<td><strong>Difficulté</strong></td>
+<td> Avancé — le <strong>quatrième et dernier pilier</strong>, et le point de convergence de tout le livre</td>
+</tr>
+<tr>
+<td><strong>Temps d'étude estimé</strong></td>
+<td>140 min</td>
+</tr>
+<tr>
+<td><strong>Prérequis</strong></td>
+<td>Fiche 401 (hyperplan affine) · Fiche 402 (produit intérieur, projection orthogonale) · Fiche 406 (Lagrange, dualité, programmation quadratique) · Fiche 407 (minimisation du risque empirique)</td>
+</tr>
+<tr>
+<td><strong>Concepts clés</strong></td>
+<td>Classification binaire, hyperplan séparateur, vecteur normal, règle de décision, marge, SVM à marge dure, échelle de la marge, théorème 12.1, SVM à marge souple, variable d'écart, paramètre de régularisation $C$, perte $0$-$1$, perte charnière, sous-gradient, SVM dual, multiplicateurs $\alpha$ et $\gamma$, théorème du représentant, vecteurs de support, contraintes de boîte, enveloppe convexe, noyau, application d'attributs canonique, astuce du noyau, matrice de Gram, programmation quadratique</td>
+</tr>
+<tr>
+<td><strong>Poids à l'examen</strong></td>
+<td>$y_n(\langle w,x_n\rangle+b)\geqslant1$ · $r=\frac{1}{\lVert w\rVert}$ · la <strong>marge dure</strong> $\min\frac12\lVert w\rVert^2$ · la <strong>marge souple</strong> avec $C\sum_n\xi_n$ · la <strong>perte CHARNIÈRE</strong> $\max\{0,1-t\}$ · le <strong>DUAL</strong> et ses <strong>contraintes de boîte</strong> · le <strong>THÉORÈME DU REPRÉSENTANT</strong> $w=\sum_n\alpha_ny_nx_n$ · l'<strong>astuce du noyau</strong>.</td>
+</tr>
+</tbody></table>
+<h2>Vue d'ensemble</h2>
+<pre><code>LE FIL DU CHAPITRE : classer en RAISONNANT GÉOMÉTRIQUEMENT
+
+  §12.1 HYPERPLAN SÉPARATEUR    f(x) = ⟨w, x⟩ + b ,  hyperplan = {x : f(x) = 0}
+        ⚠️ w est le VECTEUR NORMAL — orthogonal à tout vecteur de l'hyperplan
+        RÈGLE  ⟨w,xn⟩+b ≥ 0 si yn = +1  ·  &lt; 0 si yn = −1   →   yn(⟨w,xn⟩+b) ≥ 0
+  §12.2 SVM PRIMAL
+        MARGE = distance de l'hyperplan aux exemples LES PLUS PROCHES
+        ⚠️ il faut CHOISIR UNE ÉCHELLE — deux conventions ÉQUIVALENTES :
+           (a) ‖w‖ = 1  →  max r  s.c. yn(⟨w,xn⟩+b) ≥ r
+           (b) marge = 1 →  min ½‖w‖²  s.c. yn(⟨w,xn⟩+b) ≥ 1        (Th. 12.1)
+        car  ⚠️ r = 1/‖w‖
+        MARGE SOUPLE  min ½‖w‖² + C Σn ξn   s.c. yn(⟨w,xn⟩+b) ≥ 1 − ξn ,  ξn ≥ 0
+              ⚠️ GRAND C = FAIBLE régularisation
+        VUE PERTE   min ½‖w‖² + C Σn max{0, 1 − yn f(xn)}     ← PERTE CHARNIÈRE
+              ⚠️ la MARGE EST le RÉGULARISATEUR
+  §12.3 SVM DUAL      (Lagrange : α pour la marge, γ pour ξn ≥ 0)
+        min_α  ½ ΣiΣj yi yj αi αj ⟨xi,xj⟩ − Σi αi
+        s.c.   Σi yi αi = 0    et    0 ≤ αi ≤ C          ← CONTRAINTES DE BOÎTE
+        THÉORÈME DU REPRÉSENTANT   w* = Σn αn yn xn
+        ⚠️ les xn avec αn &gt; 0 sont les VECTEURS DE SUPPORT — les seuls qui comptent
+        b* = yn − ⟨w*, xn⟩  pour un xn exactement sur la marge (0 &lt; αn &lt; C)
+        VUE ENVELOPPE CONVEXE : l'hyperplan BISSECTE le segment entre les deux enveloppes
+  §12.4 NOYAUX     ⚠️ le dual ne contient QUE des produits intérieurs ⟨xi, xj⟩
+        k(xi, xj) = ⟨φ(xi), φ(xj)⟩_H         ← ASTUCE DU NOYAU
+        MATRICE DE GRAM K, SYMÉTRIQUE SEMI-DÉFINIE POSITIVE
+        ⚠️ la frontière devient NON LINÉAIRE, mais on résout TOUJOURS un hyperplan
+  §12.5 RÉSOLUTION NUMÉRIQUE
+        vue perte → SOUS-GRADIENT (la charnière n'est pas différentiable en t = 1)
+        primal et dual → PROGRAMMES QUADRATIQUES CONVEXES
+
+LA DIFFÉRENCE DE PHILOSOPHIE AVEC LE CHAPITRE 9
+  Vraisemblance max : on part d'un MODÈLE PROBABILISTE, on en dérive une optimisation.
+  SVM              : on CONÇOIT D'ABORD une fonction à optimiser, par INTUITION GÉOMÉTRIQUE.
+</code></pre>
+<blockquote>
+<p><strong>Les deux raisons du choix des SVM par les auteurs.</strong> <em>« Premièrement, le SVM permet une <strong>façon GÉOMÉTRIQUE de penser</strong> l'apprentissage supervisé... il s'appuie fortement sur les <strong>produits intérieurs et les PROJECTIONS</strong> (ch. 3). Deuxièmement, contrairement au chapitre 9, <strong>le problème d'optimisation du SVM N'ADMET PAS de solution ANALYTIQUE</strong> : il faut recourir à la variété d'outils d'optimisation du chapitre 7. »</em></p>
+</blockquote>
+<h2 data-prio="high">Concept 1 — Classification binaire et hyperplan séparateur (§12.1)</h2>
+<p><strong>Le cadre.</strong> Un prédicteur $f:\mathbb R^D\to\{+1,-1\}$, à partir de paires exemple-étiquette $\{(x_1,y_1),\dots,(x_N,y_N)\}$.</p>
+<blockquote>
+<p class="cal piege"> <strong>Une mise en garde sur les signes.</strong> *« Il faut prendre garde à <strong>ne PAS inférer des attributs intuitifs de "positivité"</strong> de la classe $+1$. Par exemple, dans une tâche de détection de cancer, <strong>un patient ATTEINT est souvent étiqueté $+1$</strong>. »* En principe, deux valeurs distinctes quelconques conviennent : $\{$vrai, faux$\}$, $\{0,1\}$, $\{$rouge, bleu$\}$.  <em>« Pour les modèles PROBABILISTES, il est mathématiquement commode d'utiliser $\{0,1\}$. »</em></p>
+</blockquote>
+<p><strong>L'hyperplan.</strong></p>
+<p>$$f:\mathbb R^D\to\mathbb R,\qquad x\mapsto f(x):=\langle w,x\rangle+b$$</p>
+<p>$$\boxed{\;\text{L'hyperplan séparateur}=\{x\in\mathbb R^D:f(x)=0\}\;}$$</p>
+<p>paramétré par $w\in\mathbb R^D$ (le <strong>vecteur NORMAL</strong>) et $b\in\mathbb R$ (l'<strong>ordonnée à l'origine</strong>).</p>
+<p><strong>La preuve que $w$ est normal.</strong> Pour deux exemples $x_a,x_b$ <strong>sur</strong> l'hyperplan :</p>
+<p>$$f(x_a)-f(x_b)=\langle w,x_a\rangle+b-\big(\langle w,x_b\rangle+b\big)=\langle w,\ x_a-x_b\rangle$$</p>
+<p>Comme $f(x_a)=f(x_b)=0$, on obtient $\langle w,x_a-x_b\rangle=0$.  <em>« $w$ est <strong>orthogonal à TOUT vecteur DE l'hyperplan</strong>. »</em></p>
+<details class="cor">
+<summary> Vérification numérique de l'orthogonalité</summary><div class="in">
+
+<p>Avec $w=[2;-1;0{,}5]$, $b=-1$, et deux points construits sur l'hyperplan :</p>
+<p>$$f(x_a)=0{,}0\qquad f(x_b)=0{,}0\qquad\langle w,\ x_a-x_b\rangle=0{,}0$$</p>
+<p class="cal piege"> <strong>Exactement zéro</strong> — la démonstration en deux lignes du livre est confirmée.</p>
+</div></details>
+
+<blockquote>
+<p class="cal piege"> <strong>La remarque sur les deux natures de vecteur.</strong> <em>« Dans ce chapitre, on pense au vecteur de paramètres $w$ comme à une <strong>FLÈCHE indiquant une DIRECTION</strong> — un <strong>vecteur GÉOMÉTRIQUE</strong>. En revanche, on pense au vecteur d'exemple $x$ comme à un <strong>POINT de donnée</strong> — les <strong>COORDONNÉES</strong> d'un vecteur dans la base standard. »</em></p>
+</blockquote>
+<p><strong>La règle de décision, en trois écritures :</strong></p>
+<p>$$\langle w,x_n\rangle+b\geqslant0\ \text{ si }y_n=+1\qquad\langle w,x_n\rangle+b&lt;0\ \text{ si }y_n=-1$$</p>
+<p>$$\boxed{\;y_n\big(\langle w,x_n\rangle+b\big)\geqslant0\;}$$</p>
+<p><em>« Les deux conditions sont souvent présentées en <strong>UNE SEULE équation</strong> »</em> — on multiplie chacune par $y_n=\pm1$.</p>
+<h2 data-prio="must">Concept 2 — Le SVM primal : la marge (§12.2)</h2>
+<h3>2.1 Pourquoi la marge</h3>
+<blockquote>
+<p><strong>Le problème.</strong> <em>« Pour un jeu <strong>linéairement séparable</strong>, on a une <strong>INFINITÉ d'hyperplans candidats</strong> (figure 12.3). Pour trouver une solution <strong>UNIQUE</strong>, une idée est de choisir l'hyperplan séparateur qui <strong>MAXIMISE la MARGE</strong> entre exemples positifs et négatifs. »</em></p>
+</blockquote>
+<blockquote>
+<p> <strong>La justification théorique.</strong> <em>« Un classifieur à <strong>GRANDE MARGE</strong> se révèle <strong>BIEN GÉNÉRALISER</strong> »</em> (Steinwart &amp; Christmann, 2008).</p>
+</blockquote>
+<blockquote>
+<p><strong>La marge.</strong> <em>« La <strong>DISTANCE de l'hyperplan séparateur aux exemples LES PLUS PROCHES</strong> du jeu de données, en supposant celui-ci linéairement séparable. »</em> Le point le plus proche de l'hyperplan s'obtient par <strong>PROJECTION ORTHOGONALE</strong> (§3.8).</p>
+</blockquote>
+<blockquote>
+<p class="cal piege"> <strong>LE PIÈGE TECHNIQUE, signalé explicitement.</strong> <em>« En essayant de formaliser cette distance, il y a une <strong>SUBTILITÉ TECHNIQUE qui peut prêter à confusion</strong> : il faut définir <strong>UNE ÉCHELLE à laquelle mesurer la distance</strong>. Une échelle possible serait celle des données, c'est-à-dire les valeurs brutes de $x_n$. <strong>Il y a des problèmes avec cela</strong> : on pourrait <strong>CHANGER LES UNITÉS de mesure</strong> de $x_n$, changer ses valeurs et donc <strong>changer la distance</strong> à l'hyperplan. On définit l'échelle <strong>à partir de l'ÉQUATION DE L'HYPERPLAN elle-même</strong>. »</em></p>
+</blockquote>
+<h3>2.2 Première convention : $\lVert w\rVert=1$</h3>
+<p>Par <strong>addition vectorielle</strong> (§2.4), avec $x_a'$ la projection orthogonale de $x_a$ :</p>
+<p>$$\boxed{\;x_a=x_a'+r\,\frac{w}{\lVert w\rVert}\;}$$</p>
+<p class="cal piege"> *« Une autre façon de penser à $r$ : c'est <strong>LA COORDONNÉE de $x_a$ dans le sous-espace engendré par $w/\lVert w\rVert$</strong>. »*</p>
+<p>En imposant $\lVert w\rVert=1$ — <em>« puisque seule la DIRECTION nous intéresse »</em>, et <em>« cela permet une interprétation plus intuitive de $r$, qui est alors le <strong>facteur d'échelle d'un vecteur de longueur 1</strong> »</em> :</p>
+<p>$$\boxed{\;\max_{w,b,r}\ \underbrace{r}_{\text{marge}}\quad\text{s.c.}\quad\underbrace{y_n(\langle w,x_n\rangle+b)\geqslant r}_{\text{ajustement aux données}},\quad\underbrace{\lVert w\rVert=1}_{\text{normalisation}},\quad r&gt;0\;}$$</p>
+<h3>2.3 Seconde convention : la marge vaut 1</h3>
+<blockquote>
+<p><strong>Le changement d'hypothèse.</strong> <em>« Au lieu de choisir que le vecteur de paramètres est <strong>NORMALISÉ</strong>, on choisit une <strong>ÉCHELLE POUR LES DONNÉES</strong> : telle que la valeur du prédicteur $\langle w,x\rangle+b$ <strong>vaille 1 à l'exemple le plus proche</strong>. »</em></p>
+</blockquote>
+<p><strong>La dérivation de $r$.</strong> Comme $x_a'$ est sur l'hyperplan, $\langle w,x_a'\rangle+b=0$. En substituant $x_a'=x_a-r\frac{w}{\lVert w\rVert}$ :</p>
+<p>$$\left\langle w,\ x_a-r\frac{w}{\lVert w\rVert}\right\rangle+b=0\ \overset{\text{bilinéarité}}{\Longrightarrow}\ \underbrace{\langle w,x_a\rangle+b}_{=1\text{ par hypothèse d'échelle}}-\underbrace{r\frac{\langle w,w\rangle}{\lVert w\rVert}}_{=r\lVert w\rVert}=0$$</p>
+<p>$$\boxed{\;r=\frac{1}{\lVert w\rVert}\;}$$</p>
+<blockquote>
+<p class="cal piege"> <strong>La remarque du livre sur le caractère contre-intuitif.</strong> *« À première vue cette équation est <strong>contre-intuitive</strong>, car on semble avoir dérivé la distance en termes de la <strong>LONGUEUR du vecteur $w$</strong>, qu'on <strong>ne connaît pas encore</strong>. Une façon d'y penser : considérer $r$ comme une <strong>VARIABLE TEMPORAIRE</strong> qui ne sert qu'à cette dérivation. »*</p>
+<p> On peut aussi <em>« penser à la distance comme à l'<strong>ERREUR DE PROJECTION</strong> encourue en projetant $x_a$ sur l'hyperplan »</em>.</p>
+</blockquote>
+<details class="cor">
+<summary> Vérification numérique de $r=1/\lVert w\rVert$</summary><div class="in">
+
+<p>Avec $w=[2;-1;0{,}5]$, $b=-1$ et $x_a$ construit tel que $\langle w,x_a\rangle+b=1$ :</p>
+<table>
+<thead>
+<tr>
+<th>Quantité</th>
+<th>Valeur</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$\langle w,x_a\rangle+b$</td>
+<td>$1{,}0$ </td>
+</tr>
+<tr>
+<td>$\langle w,x_a'\rangle+b$ (projection)</td>
+<td>$0{,}0$ </td>
+</tr>
+<tr>
+<td>$\lVert x_a-x_a'\rVert$</td>
+<td>$0{,}4364357805$</td>
+</tr>
+<tr>
+<td>$1/\lVert w\rVert$</td>
+<td>$0{,}4364357805$</td>
+</tr>
+</tbody></table>
+<p class="cal piege"> <strong>Écart : $5{,}6\cdot10^{-17}$</strong> — l'identité est exacte.</p>
+</div></details>
+
+<p><strong>Le SVM à MARGE DURE :</strong></p>
+<p>$$\max_{w,b}\ \frac{1}{\lVert w\rVert}\quad\text{s.c.}\quad y_n(\langle w,x_n\rangle+b)\geqslant1$$</p>
+<p>$$\boxed{\;\min_{w,b}\ \frac12\lVert w\rVert^2\quad\text{s.c.}\quad y_n\big(\langle w,x_n\rangle+b\big)\geqslant1\quad\text{pour tout }n\;}$$</p>
+<blockquote>
+<p> <strong>Trois justifications de cette forme.</strong> (i) On <strong>minimise le carré</strong> plutôt que de maximiser l'inverse. (ii) On inclut le facteur $\frac12$ <em>« qui <strong>n'affecte pas</strong> le $w,b$ optimal mais donne une forme <strong>plus propre</strong> quand on calcule le gradient »</em>. (iii)  <em>« La norme au carré donne un <strong>problème de PROGRAMMATION QUADRATIQUE CONVEXE</strong> »</em> (§12.5).</p>
+</blockquote>
+<div class="cal intu"><span class="lab">Pourquoi « DURE ».</span>
+<p class="cal piege">  <em>« Parce que la formulation <strong>N'AUTORISE AUCUNE violation</strong> de la condition de marge. »</em></p>
+</div>
+<h3>2.4 L'équivalence — Théorème 12.1</h3>
+<div class="cal formel"><span class="lab">Théorème 12.1.</span>
+<p> Maximiser la marge $r$ avec <strong>poids normalisés</strong>
+$$\max_{w,b,r}\ r\quad\text{s.c.}\quad y_n(\langle w,x_n\rangle+b)\geqslant r,\quad\lVert w\rVert=1,\quad r&gt;0$$
+<strong>est ÉQUIVALENT à</strong> mettre les données à l'échelle telle que <strong>la marge vaille l'unité</strong> :
+$$\min_{w,b}\ \frac12\lVert w\rVert^2\quad\text{s.c.}\quad y_n(\langle w,x_n\rangle+b)\geqslant1$$</p>
+</div>
+<p><strong>Les trois pas de la preuve :</strong></p>
+<ol>
+<li><em>« Le <strong>CARRÉ est une transformation strictement monotone</strong> pour des arguments non négatifs : le maximum reste le même si l'on considère $r^2$. »</em></li>
+<li><em>« Puisque $\lVert w\rVert=1$, on peut <strong>REPARAMÉTRISER</strong> avec un nouveau vecteur $w'$ <strong>non normalisé</strong> en utilisant explicitement $\frac{w'}{\lVert w'\rVert}$. »</em></li>
+<li> <em>« $r$ est <strong>strictement positif</strong> (on a supposé la séparabilité linéaire), donc on peut <strong>DIVISER la première contrainte par $r$</strong> »</em> — ce qui donne $\lVert w'\rVert=1/r$ et transforme le max en min.</li>
+</ol>
+<details class="cor">
+<summary> Vérification de l'équivalence sur un jeu séparable</summary><div class="in">
+
+<p>Sur 8 points de $\mathbb R^2$ (4 positifs, 4 négatifs, linéairement séparables), recherche exhaustive sur $3\,600$ directions unitaires :</p>
+<p><strong>Formulation (a), $\lVert w\rVert=1$</strong> : $r^*=2{,}49999965$, $w=[0{,}799685\ ;\ 0{,}600420]$, $b=-0{,}300210$</p>
+<p><strong>Formulation (b)</strong>, en posant $w'=w/r$ et $b'=b/r$ :</p>
+<table>
+<thead>
+<tr>
+<th>Contrôle</th>
+<th>Valeur</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$w'$</td>
+<td>$[0{,}319874\ ;\ 0{,}240168]$</td>
+</tr>
+<tr>
+<td>$\lVert w'\rVert$</td>
+<td>$0{,}40000006$</td>
+</tr>
+<tr>
+<td>$1/r^*$</td>
+<td>$0{,}40000006$ </td>
+</tr>
+<tr>
+<td>$\min_ny_n(\langle w',x_n\rangle+b')$</td>
+<td> <strong>$1{,}00000000$</strong> </td>
+</tr>
+<tr>
+<td>$\frac12\lVert w'\rVert^2$</td>
+<td>$0{,}08000002$</td>
+</tr>
+</tbody></table>
+<p class="cal piege"> <strong>La contrainte devient exactement $\geqslant1$</strong> et $\lVert w'\rVert=1/r$ : les deux formulations décrivent <strong>le même hyperplan</strong>.</p>
+</div></details>
+
+<h2 data-prio="must">Concept 3 — La marge souple (§12.2.4-12.2.5)</h2>
+<h3>3.1 La vue géométrique</h3>
+<blockquote>
+<p><strong>Le besoin.</strong> <em>« Quand les données <strong>ne sont PAS linéairement séparables</strong>, on peut vouloir permettre à certains exemples de tomber <strong>DANS la région de marge</strong>, ou même <strong>du MAUVAIS CÔTÉ</strong> de l'hyperplan. »</em></p>
+</blockquote>
+<blockquote>
+<p><strong>L'idée clé.</strong> <em>« Introduire une <strong>VARIABLE D'ÉCART</strong> (<em>slack variable</em>) $\xi_n$ pour <strong>chaque</strong> paire $(x_n,y_n)$. On <strong>SOUSTRAIT $\xi_n$ de la marge</strong>, en contraignant $\xi_n$ à être <strong>non négative</strong>. Pour <strong>encourager la classification correcte</strong>, on <strong>AJOUTE $\xi_n$ à l'objectif</strong>. »</em></p>
+</blockquote>
+<p>$$\boxed{\;\min_{w,b,\xi}\ \frac12\lVert w\rVert^2+C\sum_{n=1}^{N}\xi_n\quad\text{s.c.}\quad y_n(\langle w,x_n\rangle+b)\geqslant1-\xi_n,\quad\xi_n\geqslant0\;}$$</p>
+<blockquote>
+<p class="cal piege"> <strong>LE SENS DE $C$, contre-intuitif.</strong> <em>« Le paramètre $C&gt;0$ <strong>ARBITRE entre la TAILLE de la marge et la quantité totale d'écart</strong>. On l'appelle le <strong>PARAMÈTRE DE RÉGULARISATION</strong> puisque le terme de marge <strong>EST un terme de régularisation</strong>. Le terme $\lVert w\rVert^2$ est le <strong>RÉGULARISATEUR</strong>, et dans beaucoup de livres d'optimisation numérique le paramètre de régularisation <strong>MULTIPLIE CE TERME-LÀ</strong> — c'est en contraste avec notre formulation. Ici, une <strong>GRANDE valeur de $C$ implique une FAIBLE régularisation</strong>, puisqu'on donne <strong>plus de poids aux variables d'écart</strong>, donnant plus de priorité aux exemples qui ne sont pas du bon côté de la marge. »</em></p>
+</blockquote>
+<p class="cal piege"> <em>« Cette formulation est aussi souvent appelée le <strong>$C$-SVM</strong>. »</em></p>
+<h3>3.2 La vue fonction de perte</h3>
+<blockquote>
+<p><strong>La perspective.</strong> On suit le <strong>principe de MINIMISATION DU RISQUE EMPIRIQUE</strong> (§8.2), avec les <strong>hyperplans comme classe d'hypothèses</strong>.  <em>« On verra que <strong>LA MARGE CORRESPOND AU TERME DE RÉGULARISATION</strong>. Reste la question : quelle est la <strong>fonction de PERTE</strong> ? »</em></p>
+</blockquote>
+<div class="cal intu"><span class="lab">Pourquoi pas la perte quadratique.</span>
+<p class="cal piege">  <em>« La perte quadratique utilisée en régression <strong>n'est PAS appropriée</strong> à la classification binaire. »</em></p>
+</div>
+<p><strong>La perte idéale — et pourquoi on ne l'utilise pas.</strong></p>
+<p>$$\boxed{\;\text{PERTE }0\text{-}1\ :\ \mathbb 1\big(f(x_n)\neq y_n\big)\;}$$</p>
+<p class="cal piege"> <em>« Malheureusement, la perte $0$-$1$ donne un problème d'<strong>OPTIMISATION COMBINATOIRE</strong> pour trouver les meilleurs $w,b$. Les problèmes combinatoires sont en général <strong>PLUS DIFFICILES à résoudre</strong> que les problèmes continus. »</em></p>
+<p><strong>LA PERTE CHARNIÈRE (<em>hinge loss</em>) :</strong></p>
+<p>$$\boxed{\;\ell(t)=\max\{0,\ 1-t\}\qquad\text{où}\qquad t=y\,f(x)=y\big(\langle w,x\rangle+b\big)\;}$$</p>
+<p><strong>Sa lecture en trois régimes :</strong></p>
+<table>
+<thead>
+<tr>
+<th>Régime</th>
+<th>Situation</th>
+<th>Perte</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$t\geqslant1$</td>
+<td>Du <strong>bon côté</strong> et <strong>plus loin que la distance 1</strong></td>
+<td> <strong>$0$</strong></td>
+</tr>
+<tr>
+<td>$0&lt;t&lt;1$</td>
+<td>Du bon côté mais  <strong>DANS la marge</strong></td>
+<td>Positive</td>
+</tr>
+<tr>
+<td>$t&lt;0$</td>
+<td> Du <strong>MAUVAIS côté</strong></td>
+<td>Encore plus grande, <strong>croissance LINÉAIRE</strong></td>
+</tr>
+</tbody></table>
+<blockquote>
+<p> <em>« On <strong>PAIE une pénalité dès qu'on est plus proche que la marge</strong>, <strong>MÊME SI la prédiction est CORRECTE</strong>, et la pénalité croît <strong>linéairement</strong>. »</em></p>
+</blockquote>
+<p><strong>L'écriture en deux morceaux linéaires :</strong></p>
+<p>$$\ell(t)=\begin{cases}0&amp;\text{si }t\geqslant1\\1-t&amp;\text{si }t&lt;1\end{cases}\qquad\qquad\underbrace{\ell(t)=\begin{cases}0&amp;\text{si }t\geqslant1\\\infty&amp;\text{si }t&lt;1\end{cases}}_{\text{la perte de la MARGE DURE}}$$</p>
+<blockquote>
+<p> <strong>La propriété qui justifie tout.</strong> *« La perte charnière est un <strong>MAJORANT CONVEXE de la perte $0$-$1$</strong>. »*</p>
+</blockquote>
+<details class="cor">
+<summary> Vérification que la charnière majore la perte $0$-$1$</summary><div class="in">
+
+<table>
+<thead>
+<tr>
+<th>$t$</th>
+<th>Perte $0$-$1$</th>
+<th>Charnière</th>
+<th>Majoration</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$-2{,}0$</td>
+<td>$1{,}0$</td>
+<td>$3{,}000$</td>
+<td></td>
+</tr>
+<tr>
+<td>$-0{,}5$</td>
+<td>$1{,}0$</td>
+<td>$1{,}500$</td>
+<td></td>
+</tr>
+<tr>
+<td>$0{,}0$</td>
+<td>$1{,}0$</td>
+<td>$1{,}000$</td>
+<td> (égalité)</td>
+</tr>
+<tr>
+<td>$0{,}5$</td>
+<td>$0{,}0$</td>
+<td>$0{,}500$</td>
+<td> ( <strong>pénalité alors que la prédiction est CORRECTE</strong>)</td>
+</tr>
+<tr>
+<td>$1{,}0$</td>
+<td>$0{,}0$</td>
+<td>$0{,}000$</td>
+<td> (égalité)</td>
+</tr>
+<tr>
+<td>$1{,}5$</td>
+<td>$0{,}0$</td>
+<td>$0{,}000$</td>
+<td></td>
+</tr>
+<tr>
+<td>$3{,}0$</td>
+<td>$0{,}0$</td>
+<td>$0{,}000$</td>
+<td></td>
+</tr>
+</tbody></table>
+<p class="cal piege"> La ligne $t=0{,}5$ montre l'essentiel : la charnière <strong>pénalise une prédiction correcte mais peu confiante</strong> — c'est ce qui <strong>crée</strong> la marge.</p>
+</div></details>
+
+<p><strong>Le problème SANS contraintes :</strong></p>
+<p>$$\boxed{\;\min_{w,b}\ \underbrace{\frac12\lVert w\rVert^2}_{\text{RÉGULARISATEUR}}+C\sum_{n=1}^{N}\underbrace{\max\big\{0,\ 1-y_n(\langle w,x_n\rangle+b)\big\}}_{\text{PERTE}}\;}$$</p>
+<blockquote>
+<p> <strong>LA LECTURE.</strong> <em>« Le terme $\frac12\lVert w\rVert^2$ <strong>provient DIRECTEMENT de la MARGE</strong>. Autrement dit, <strong>la MAXIMISATION de la MARGE peut être interprétée comme une RÉGULARISATION</strong>. »</em></p>
+</blockquote>
+<p><strong>L'équivalence avec la forme contrainte</strong> — le pas de traduction :</p>
+<p>$$\min_t\max\{0,1-t\}\qquad\Longleftrightarrow\qquad\min_{\xi,t}\ \xi\quad\text{s.c.}\quad\xi\geqslant0,\ \ \xi\geqslant1-t$$</p>
+<p class="cal piege"> <em>« En substituant cette expression et en réarrangeant une des contraintes, on obtient <strong>EXACTEMENT le SVM à marge souple</strong>. »</em></p>
+<h2 data-prio="must">Concept 4 — Le SVM dual (§12.3)</h2>
+<h3>4.1 Pourquoi le dual</h3>
+<blockquote>
+<p><strong>Le problème de dimension.</strong> *« Puisque $w$ est de la <strong>même dimension que $x$</strong>, le nombre de paramètres <strong>croît LINÉAIREMENT avec le nombre d'ATTRIBUTS</strong>. »*</p>
+</blockquote>
+<blockquote>
+<p> <strong>Les trois avantages du dual.</strong></p>
+<ol>
+<li>Il est <strong>INDÉPENDANT du nombre d'ATTRIBUTS</strong> ; le nombre de paramètres croît avec le <strong>nombre d'EXEMPLES</strong>.</li>
+<li><em>« Utile pour les problèmes où l'on a <strong>plus d'attributs que d'exemples</strong>. »</em></li>
+<li> <em>« Il permet <strong>FACILEMENT d'appliquer les NOYAUX</strong>. »</em></li>
+</ol>
+</blockquote>
+<h3>4.2 La dérivation</h3>
+<p class="cal piege"> <strong>Deux multiplicateurs</strong>, avec la notation usuelle de la littérature SVM (et non $\lambda$) :</p>
+<table>
+<thead>
+<tr>
+<th>Multiplicateur</th>
+<th>Contrainte associée</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$\alpha_n\geqslant0$</td>
+<td>La classification correcte : $y_n(\langle w,x_n\rangle+b)\geqslant1-\xi_n$</td>
+</tr>
+<tr>
+<td>$\gamma_n\geqslant0$</td>
+<td>La non-négativité de l'écart : $\xi_n\geqslant0$</td>
+</tr>
+</tbody></table>
+<p>$$\mathfrak L(w,b,\xi,\alpha,\gamma)=\frac12\lVert w\rVert^2+C\sum_n\xi_n-\sum_n\alpha_n\big(y_n(\langle w,x_n\rangle+b)-1+\xi_n\big)-\sum_n\gamma_n\xi_n$$</p>
+<p><strong>Les trois dérivées, annulées :</strong></p>
+<p>$$\frac{\partial\mathfrak L}{\partial w}=w^\top-\sum_n\alpha_ny_nx_n^\top=0\quad\Longrightarrow\quad\boxed{\;w=\sum_{n=1}^{N}\alpha_ny_nx_n\;}$$</p>
+<p>$$\frac{\partial\mathfrak L}{\partial b}=-\sum_n\alpha_ny_n=0\quad\Longrightarrow\quad\boxed{\;\sum_{n=1}^{N}y_n\alpha_n=0\;}$$</p>
+<p>$$\frac{\partial\mathfrak L}{\partial\xi_n}=C-\alpha_n-\gamma_n=0\quad\overset{\gamma_n\geqslant0}{\Longrightarrow}\quad\boxed{\;\alpha_n\leqslant C\;}$$</p>
+<blockquote>
+<p> <strong>LE THÉORÈME DU REPRÉSENTANT.</strong> La première équation dit que <strong>$w$ est une COMBINAISON LINÉAIRE DES DONNÉES</strong>. C'est la clé qui rend les noyaux possibles.</p>
+</blockquote>
+<p><strong>Le dual obtenu :</strong></p>
+<p>$$\boxed{\;\min_\alpha\ \frac12\sum_{i=1}^{N}\sum_{j=1}^{N}y_iy_j\alpha_i\alpha_j\langle x_i,x_j\rangle-\sum_{i=1}^{N}\alpha_i\;}$$
+$$\boxed{\;\text{s.c.}\quad\sum_{i=1}^{N}y_i\alpha_i=0\quad\text{et}\quad0\leqslant\alpha_i\leqslant C\;}$$</p>
+<p class="cal piege"> <em>« On <strong>MAXIMISE le problème dual</strong>, ce qui <strong>équivaut à MINIMISER le dual NÉGATIF</strong> — d'où la forme ci-dessus. »</em></p>
+<blockquote>
+<p> <strong>Les CONTRAINTES DE BOÎTE.</strong> <em>« Ces inégalités sont appelées "<strong>contraintes de BOÎTE</strong>" parce qu'elles limitent le vecteur $\alpha\in\mathbb R^N$ à être <strong>dans la boîte définie par $0$ et $C$ sur chaque axe</strong>. Ces boîtes <strong>alignées sur les axes</strong> sont <strong>particulièrement efficaces</strong> à implémenter dans les solveurs numériques »</em> (Dostál, 2009).</p>
+</blockquote>
+<h3>4.3 Récupérer les paramètres primaux</h3>
+<p>$$w^*=\sum_n\alpha_ny_nx_n$$</p>
+<p>Pour $b^*$ : <em>« considérer un exemple $x_n$ qui se trouve <strong>EXACTEMENT sur la frontière de la marge</strong> »</em>, c'est-à-dire $\langle w^*,x_n\rangle+b=y_n$ :</p>
+<p>$$\boxed{\;b^*=y_n-\langle w^*,x_n\rangle\;}$$</p>
+<blockquote>
+<p class="cal piege"> <strong>Le cas où aucun exemple n'est exactement sur la marge.</strong> <em>« En principe, il peut n'y avoir <strong>aucun</strong> exemple exactement sur la marge. Dans ce cas, on devrait calculer $|y_n-\langle w^*,x_n\rangle|$ pour <strong>tous les vecteurs de support</strong> et prendre la <strong>MÉDIANE</strong> de cette différence absolue. »</em></p>
+</blockquote>
+<div class="cal methode"><span class="lab">Comment reconnaître ces exemples.</span>
+<p>  <em>« Les exemples qui se trouvent exactement sur la marge sont ceux dont les paramètres duaux sont <strong>STRICTEMENT à l'INTÉRIEUR</strong> des contraintes de boîte : $0&lt;\alpha_i&lt;C$. Cela se dérive des conditions de <strong>KARUSH-KUHN-TUCKER</strong>. »</em></p>
+</div>
+<details class="cor">
+<summary> Résolution complète du dual par SMO et retour au primal</summary><div class="in">
+
+<p>Sur le même jeu de 8 points, dual à marge dure ($C$ très grand), résolu par <strong>mises à jour par PAIRES</strong> (SMO simplifié — ce qui préserve exactement $\sum_iy_i\alpha_i=0$) :</p>
+<p>$$\alpha=[0{,}08\ ;\ 0\ ;\ 0\ ;\ 0\ ;\ 0{,}08\ ;\ 0\ ;\ 0\ ;\ 0]$$</p>
+<table>
+<thead>
+<tr>
+<th>Contrôle</th>
+<th>Valeur</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$\sum_iy_i\alpha_i$</td>
+<td>$0{,}000000000000$ </td>
+</tr>
+<tr>
+<td>Objectif dual</td>
+<td>$-0{,}08000000$</td>
+</tr>
+<tr>
+<td><strong>Vecteurs de support</strong></td>
+<td> <strong>indices 0 et 4 seulement</strong> : $[2;2]$ ($y=+1$) et $[-2;-1]$ ($y=-1$)</td>
+</tr>
+<tr>
+<td>Les <strong>6 autres</strong></td>
+<td>$\alpha=0$ —  <strong>ils n'influencent PAS la solution</strong></td>
+</tr>
+<tr>
+<td>$w^*=\sum\alpha_ny_nx_n$</td>
+<td>$[0{,}320000\ ;\ 0{,}240000]$</td>
+</tr>
+<tr>
+<td>$b^*$</td>
+<td>$-0{,}120000$</td>
+</tr>
+<tr>
+<td>$\lVert w^*\rVert$</td>
+<td>$0{,}400000$</td>
+</tr>
+<tr>
+<td>Marge $1/\lVert w^*\rVert$</td>
+<td> <strong>$2{,}500000$</strong></td>
+</tr>
+<tr>
+<td>$y_n(\langle w^*,x_n\rangle+b^*)$ aux deux SV</td>
+<td>$1{,}00000000$ et $1{,}00000000$ </td>
+</tr>
+</tbody></table>
+<p><strong>LA DUALITÉ FORTE, vérifiée numériquement</strong> — comparaison avec la recherche exhaustive du primal :</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>$w$</th>
+<th>$b$</th>
+<th>Marge</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Primal</strong> (grille de $3\,600$ directions)</td>
+<td>$[0{,}319874\ ;\ 0{,}240168]$</td>
+<td>$-0{,}120084$</td>
+<td>$2{,}500000$</td>
+</tr>
+<tr>
+<td><strong>Dual</strong> (SMO)</td>
+<td>$[0{,}320000\ ;\ 0{,}240000]$</td>
+<td>$-0{,}120000$</td>
+<td>$2{,}500000$</td>
+</tr>
+</tbody></table>
+<p class="cal piege"> <strong>Écart relatif sur $w$ : $5\cdot10^{-4}$</strong> — imputable à la résolution de $0{,}1^\circ$ de la grille du primal. Et l'objectif dual $-0{,}08$ est <strong>exactement l'opposé</strong> du primal $\frac12\lVert w\rVert^2=\frac12(0{,}4)^2=0{,}08$ : <strong>les deux problèmes ont la même valeur optimale</strong> (dualité forte, §7.3).</p>
+</div></details>
+
+<h3>4.4 La vue enveloppe convexe</h3>
+<blockquote>
+<p><strong>L'idée.</strong> <em>« Considérer l'ensemble des exemples de même étiquette et construire un <strong>ENSEMBLE CONVEXE les contenant tous, LE PLUS PETIT possible</strong> — c'est l'<strong>ENVELOPPE CONVEXE</strong>. »</em></p>
+</blockquote>
+<p><strong>La construction, en montant en dimension :</strong></p>
+<table>
+<thead>
+<tr>
+<th>Points</th>
+<th>Objet engendré</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$x_1,x_2$ avec $\alpha_1+\alpha_2=1$, $\alpha_i\geqslant0$</td>
+<td><em>« Chaque point sur <strong>une LIGNE</strong> entre $x_1$ et $x_2$ »</em></td>
+</tr>
+<tr>
+<td>$x_1,x_2,x_3$</td>
+<td><em>« Une <strong>AIRE bidimensionnelle</strong> ; l'enveloppe est le <strong>TRIANGLE</strong> formé par les arêtes »</em></td>
+</tr>
+<tr>
+<td>Plus de points que de dimensions</td>
+<td> <em>« <strong>Certains points seront À L'INTÉRIEUR</strong> de l'enveloppe »</em></td>
+</tr>
+</tbody></table>
+<p>$$\boxed{\;\operatorname{conv}(X)=\left\{\sum_{n=1}^{N}\alpha_nx_n\ :\ \sum_{n=1}^{N}\alpha_n=1\ \text{ et }\ \alpha_n\geqslant0\right\}\;}$$</p>
+<blockquote>
+<p> <strong>La troisième interprétation du SVM.</strong> <em>« Un hyperplan qui <strong>BISSECTE le SEGMENT entre les ENVELOPPES CONVEXES</strong> correspondant aux exemples positifs et négatifs. »</em></p>
+</blockquote>
+<h2 data-prio="must">Concept 5 — Les noyaux (§12.4)</h2>
+<h3>5.1 L'observation qui rend tout possible</h3>
+<blockquote>
+<p class="cal piege"> <strong>LE POINT DE DÉPART.</strong> *« Remarquer que <strong>le produit intérieur dans l'objectif n'apparaît QU'ENTRE exemples $x_i$ et $x_j$</strong>. Il n'y a <strong>AUCUN produit intérieur entre les exemples et les PARAMÈTRES</strong>. Donc, si l'on considère un ensemble d'attributs $\phi(x_i)$, <strong>le SEUL changement dans le SVM dual sera de REMPLACER le produit intérieur</strong>. »*</p>
+</blockquote>
+<blockquote>
+<p> <strong>La modularité.</strong> <em>« Cette <strong>MODULARITÉ</strong> — où le choix de la <strong>méthode de classification</strong> (le SVM) et le choix de la <strong>représentation d'attributs</strong> $\phi(x)$ peuvent être considérés <strong>SÉPARÉMENT</strong> — offre la flexibilité d'<strong>explorer les deux problèmes INDÉPENDAMMENT</strong>. »</em></p>
+</blockquote>
+<h3>5.2 La définition</h3>
+<blockquote>
+<p><strong>Un NOYAU</strong> est une fonction $k:\mathcal X\times\mathcal X\to\mathbb R$ <em>« pour laquelle il <strong>EXISTE un espace de HILBERT $\mathcal H$</strong> et une application d'attributs $\phi:\mathcal X\to\mathcal H$ telle que »</em>
+$$\boxed{\;k(x_i,x_j)=\big\langle\phi(x_i),\ \phi(x_j)\big\rangle_{\mathcal H}\;}$$</p>
+</blockquote>
+<p><em>« Au lieu de définir explicitement une application non linéaire $\phi(\cdot)$ <strong>et</strong> de calculer le produit intérieur résultant, on définit une <strong>FONCTION DE SIMILARITÉ</strong> $k(x_i,x_j)$. Pour une certaine classe de fonctions de similarité — les <strong>NOYAUX</strong> — la fonction de similarité <strong>définit IMPLICITEMENT une application d'attributs NON LINÉAIRE</strong>. »</em></p>
+<p><strong>Le vocabulaire :</strong></p>
+<table>
+<thead>
+<tr>
+<th>Terme</th>
+<th>Définition</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Application d'attributs CANONIQUE</strong></td>
+<td>$\phi(x)=k(\cdot,x)$ — <em>« il existe un <strong>espace de Hilbert à noyau REPRODUISANT (RKHS) UNIQUE</strong> associé à chaque noyau »</em> (Aronszajn, 1950)</td>
+</tr>
+<tr>
+<td><strong>ASTUCE DU NOYAU</strong> (<em>kernel trick</em>)</td>
+<td>La généralisation du produit intérieur à $k$, <em>« car elle <strong>CACHE l'application non linéaire EXPLICITE</strong> »</em></td>
+</tr>
+<tr>
+<td><strong>Matrice de GRAM</strong> (ou matrice de noyau)</td>
+<td>$K\in\mathbb R^{N\times N}$ résultant de l'application de $k(\cdot,\cdot)$ au jeu de données</td>
+</tr>
+</tbody></table>
+<p><strong>La condition sur les noyaux :</strong></p>
+<p>$$\boxed{\;\text{Les noyaux doivent être SYMÉTRIQUES et SEMI-DÉFINIS POSITIFS}\ :\ \forall z\in\mathbb R^N,\ z^\top Kz\geqslant0\;}$$</p>
+<details class="cor">
+<summary> Vérification des deux propriétés de la matrice de Gram</summary><div class="in">
+
+<p>Avec le noyau linéaire $k(x_i,x_j)=\langle x_i,x_j\rangle$ sur les 8 points :</p>
+<table>
+<thead>
+<tr>
+<th>Propriété</th>
+<th>Test</th>
+<th>Résultat</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Symétrie</strong></td>
+<td>$\max_{i,j}\lvert K_{ij}-K_{ji}\rvert$</td>
+<td> <strong>exactement $0$</strong> </td>
+</tr>
+<tr>
+<td><strong>Semi-définie positivité</strong></td>
+<td>$\min z^\top Kz$ sur $20\,000$ tirages gaussiens</td>
+<td>$+0{,}000112&gt;0$ </td>
+</tr>
+</tbody></table>
+<p class="cal piege"> Ce n'est pas un hasard : $K=X^\top X$ est <strong>toujours</strong> symétrique semi-définie positive (théorème 4.14, fiche 403).</p>
+</div></details>
+
+<p><strong>Les noyaux usuels cités</strong> pour $x_i\in\mathbb R^D$ : le <strong>noyau POLYNOMIAL</strong>, le <strong>noyau GAUSSIEN à base radiale (RBF)</strong>, le <strong>noyau QUADRATIQUE RATIONNEL</strong>.</p>
+<blockquote>
+<p class="cal piege"> <strong>LA MISE EN GARDE ESSENTIELLE.</strong> <em>« <strong>Note that we are still solving for HYPERPLANES</strong> : la classe d'hypothèses de fonctions <strong>reste LINÉAIRE</strong>. <strong>Les surfaces NON LINÉAIRES sont dues à la FONCTION NOYAU.</strong> »</em></p>
+</blockquote>
+<blockquote>
+<p class="cal piege"> <strong>Les TROIS sens du mot « noyau », signalés par le livre.</strong></p>
+<ol>
+<li>Ici : le <strong>RKHS</strong> (Aronszajn 1950 ; Saitoh 1988).</li>
+<li>En <strong>algèbre linéaire</strong> (§2.7.3) :  un <strong>autre mot pour l'ESPACE NUL</strong> (fiche 401).</li>
+<li>En <strong>estimation de densité à noyau</strong> (§11.5) : le <strong>noyau LISSANT</strong>.</li>
+</ol>
+</blockquote>
+<blockquote>
+<p> <strong>Le choix du noyau.</strong> <em>« Le choix du noyau, ainsi que ses paramètres, est souvent fait par <strong>VALIDATION CROISÉE IMBRIQUÉE</strong> (§8.6.1). »</em> Et : <em>« un praticien conçoit souvent la fonction noyau de sorte qu'elle puisse être <strong>calculée PLUS EFFICACEMENT</strong> que le produit intérieur entre applications d'attributs explicites. »</em></p>
+</blockquote>
+<h2 data-prio="high">Concept 6 — La résolution numérique (§12.5)</h2>
+<h3>6.1 La vue perte : le sous-gradient</h3>
+<blockquote>
+<p><strong>Le problème.</strong> <em>« La vue fonction de perte est un problème d'optimisation <strong>CONVEXE SANS contraintes</strong>, mais la <strong>perte charnière N'EST PAS DIFFÉRENTIABLE</strong>. On applique donc une approche par <strong>SOUS-GRADIENT</strong>. »</em></p>
+</blockquote>
+<p class="cal piege"> *« La charnière est différentiable <strong>PRESQUE PARTOUT, sauf en UN SEUL point : la charnière $t=1$</strong>. En ce point, le gradient est un <strong>ENSEMBLE de valeurs possibles entre $0$ et $-1$</strong>. »*</p>
+<p>$$\boxed{\;g(t)=\begin{cases}-1&amp;t&lt;1\\ [-1,\ 0]&amp;t=1\\ 0&amp;t&gt;1\end{cases}\;}$$</p>
+<p>Avec ce sous-gradient, on applique les <strong>méthodes du §7.1</strong> (descente de gradient, momentum, SGD).</p>
+<h3>6.2 Les programmes quadratiques</h3>
+<blockquote>
+<p> <strong>Le choix stratégique.</strong> <em>« Le SVM <strong>PRIMAL</strong> a des variables d'optimisation de la taille de la <strong>DIMENSION $D$</strong> des exemples. Le SVM <strong>DUAL</strong> a des variables de la taille du <strong>NOMBRE $N$ d'exemples</strong>. »</em> — on choisit selon lequel est le plus petit.</p>
+</blockquote>
+<p><strong>La mise en forme standard du primal</strong> (§7.3.2), avec le produit scalaire :</p>
+<p>$$\min_{w,b,\xi}\ \frac12\lVert w\rVert^2+C\sum_n\xi_n\quad\text{s.c.}\quad-y_nx_n^\top w-y_nb-\xi_n\leqslant-1,\quad-\xi_n\leqslant0$$</p>
+<p class="cal piege"> <em>« En <strong>CONCATÉNANT</strong> les variables $w$, $b$, $\xi_n$ en un <strong>SEUL vecteur</strong> et en collectant soigneusement les termes, on obtient la forme matricielle. »</em> Les deux problèmes sont des <strong>programmes quadratiques CONVEXES</strong>.</p>
+<h2>Comment reconnaître le type d'exercice</h2>
+<table>
+<thead>
+<tr>
+<th>L'énoncé dit...</th>
+<th>Le type</th>
+<th>La méthode</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>« Montrer que $w$ est normal à l'hyperplan »</td>
+<td><strong>§12.1</strong></td>
+<td>Prendre $x_a,x_b$ sur l'hyperplan, calculer $f(x_a)-f(x_b)=\langle w,x_a-x_b\rangle=0$</td>
+</tr>
+<tr>
+<td>« Écrire la règle de décision »</td>
+<td><strong>§12.1</strong></td>
+<td> En <strong>une seule</strong> inégalité : $y_n(\langle w,x_n\rangle+b)\geqslant0$</td>
+</tr>
+<tr>
+<td>« Calculer la distance d'un point à l'hyperplan »</td>
+<td><strong>§12.2.1</strong></td>
+<td> <strong>Projection orthogonale</strong> ; $r=\dfrac{\lvert\langle w,x\rangle+b\rvert}{\lVert w\rVert}$</td>
+</tr>
+<tr>
+<td>« Pourquoi faut-il fixer une échelle ? »</td>
+<td><strong>§12.2.1</strong></td>
+<td> Changer les <strong>UNITÉS de $x_n$</strong> changerait la distance</td>
+</tr>
+<tr>
+<td>« Écrire le SVM à marge dure »</td>
+<td><strong>§12.2.2</strong></td>
+<td>$\min\frac12\lVert w\rVert^2$ s.c. $y_n(\langle w,x_n\rangle+b)\geqslant1$</td>
+</tr>
+<tr>
+<td>« Montrer l'équivalence des deux formulations »</td>
+<td><strong>Th. 12.1</strong></td>
+<td>Carré monotone · reparamétriser par $w'/\lVert w'\rVert$ · <strong>diviser par $r&gt;0$</strong></td>
+</tr>
+<tr>
+<td>« Les données ne sont pas séparables »</td>
+<td><strong>§12.2.4</strong></td>
+<td><strong>Marge souple</strong> : ajouter $\xi_n\geqslant0$ et $C\sum_n\xi_n$</td>
+</tr>
+<tr>
+<td>« Quel est l'effet d'un grand $C$ ? »</td>
+<td><strong>§12.2.4</strong></td>
+<td> <strong>FAIBLE régularisation</strong> — plus de poids aux écarts</td>
+</tr>
+<tr>
+<td>« Écrire la perte du SVM »</td>
+<td><strong>§12.2.5</strong></td>
+<td> <strong>CHARNIÈRE</strong> : $\max\{0,1-yf(x)\}$</td>
+</tr>
+<tr>
+<td>« Pourquoi pas la perte $0$-$1$ ? »</td>
+<td><strong>§12.2.5</strong></td>
+<td> Problème <strong>COMBINATOIRE</strong></td>
+</tr>
+<tr>
+<td>« Dériver le dual »</td>
+<td><strong>§12.3.1</strong></td>
+<td>Lagrangien avec $\alpha$ <strong>et</strong> $\gamma$ ; annuler en $w$, $b$, $\xi$ ; substituer</td>
+</tr>
+<tr>
+<td>« Que valent les contraintes du dual ? »</td>
+<td><strong>§12.3.1</strong></td>
+<td>$\sum_iy_i\alpha_i=0$ (de $\partial b$) et $0\leqslant\alpha_i\leqslant C$ (de $\partial\xi$ plus $\gamma_i\geqslant0$)</td>
+</tr>
+<tr>
+<td>« Retrouver $w$ à partir de $\alpha$ »</td>
+<td><strong>Représentant</strong></td>
+<td>$w^*=\sum_n\alpha_ny_nx_n$</td>
+</tr>
+<tr>
+<td>« Retrouver $b$ »</td>
+<td><strong>§12.3.1</strong></td>
+<td>$b^*=y_n-\langle w^*,x_n\rangle$ pour un $n$ avec $0&lt;\alpha_n&lt;C$</td>
+</tr>
+<tr>
+<td>« Identifier les vecteurs de support »</td>
+<td><strong>§12.3.1</strong></td>
+<td> Ceux avec $\alpha_n&gt;0$ ; les autres <strong>n'influencent pas</strong> la solution</td>
+</tr>
+<tr>
+<td>« Rendre le classifieur non linéaire »</td>
+<td><strong>§12.4</strong></td>
+<td> Remplacer $\langle x_i,x_j\rangle$ par $k(x_i,x_j)$ — <strong>rien d'autre à changer</strong></td>
+</tr>
+<tr>
+<td>« Cette fonction est-elle un noyau valide ? »</td>
+<td><strong>§12.4</strong></td>
+<td><strong>Symétrique</strong> et <strong>semi-définie positive</strong> : $z^\top Kz\geqslant0$</td>
+</tr>
+<tr>
+<td>« Comment optimiser la perte charnière ? »</td>
+<td><strong>§12.5</strong></td>
+<td> <strong>SOUS-GRADIENT</strong> (non différentiable en $t=1$)</td>
+</tr>
+<tr>
+<td>« Primal ou dual ? »</td>
+<td><strong>§12.5</strong></td>
+<td>Primal : $D$ variables. Dual : $N$ variables. <strong>Choisir le plus petit</strong></td>
+</tr>
+</tbody></table>
+<h2>Comment résoudre : les cinq méthodes pas-à-pas</h2>
+<p><strong>Méthode A — Calculer une marge.</strong></p>
+<ol>
+<li>Vérifier que les données sont <strong>linéairement séparables</strong>.</li>
+<li>Choisir une convention d'échelle : $\lVert w\rVert=1$ <strong>ou</strong> marge $=1$.</li>
+<li>Projeter orthogonalement le point le plus proche : $x_a'=x_a-\frac{\langle w,x_a\rangle+b}{\lVert w\rVert^2}w$.</li>
+<li>$r=\lVert x_a-x_a'\rVert$.</li>
+<li><strong>Contrôle</strong> : $r=\frac{1}{\lVert w\rVert}$ si l'on a normalisé les données ; $r=\frac{\lvert\langle w,x_a\rangle+b\rvert}{\lVert w\rVert}$ en général.</li>
+</ol>
+<p><strong>Méthode B — Passer du primal au dual.</strong></p>
+<ol>
+<li>Écrire le lagrangien avec <strong>UN multiplicateur par contrainte</strong> ($\alpha_n$ <strong>et</strong> $\gamma_n$).</li>
+<li>Dériver par rapport à <strong>chaque</strong> variable primale : $w$, $b$, $\xi$.</li>
+<li><strong>Annuler</strong> les trois : on obtient le <strong>représentant</strong>, la contrainte $\sum y_n\alpha_n=0$, et $\alpha_n+\gamma_n=C$.</li>
+<li><strong>Substituer</strong> dans le lagrangien ; les termes en $b$ et en $\xi$ <strong>disparaissent</strong>.</li>
+<li>Traduire « maximiser le dual » en « minimiser son opposé ».</li>
+<li><strong>Contrôles</strong> : le dual ne contient <strong>que des produits intérieurs entre exemples</strong> ; les contraintes forment une <strong>boîte</strong>.</li>
+</ol>
+<p><strong>Méthode C — Résoudre le dual et revenir au primal.</strong></p>
+<ol>
+<li>Construire la <strong>matrice de Gram</strong> $K_{ij}=\langle x_i,x_j\rangle$ (ou $k(x_i,x_j)$).</li>
+<li>Résoudre le PQ sous $\sum_iy_i\alpha_i=0$ et $0\leqslant\alpha_i\leqslant C$.  Les mises à jour <strong>par PAIRES</strong> préservent la contrainte d'égalité.</li>
+<li>Identifier les <strong>vecteurs de support</strong> : $\alpha_n&gt;0$.</li>
+<li>$w^*=\sum_n\alpha_ny_nx_n$.</li>
+<li>$b^*$ depuis un SV <strong>strictement intérieur</strong> ($0&lt;\alpha_n&lt;C$), ou la <strong>médiane</strong> sinon.</li>
+<li><strong>Contrôles</strong> : $\sum_iy_i\alpha_i=0$ ; $y_n(\langle w^*,x_n\rangle+b^*)=1$ aux SV ;  objectif dual $=-\frac12\lVert w^*\rVert^2$ (dualité forte).</li>
+</ol>
+<p><strong>Méthode D — Appliquer un noyau.</strong></p>
+<ol>
+<li>Vérifier que $k$ est <strong>symétrique</strong>.</li>
+<li>Vérifier que la matrice de Gram est <strong>semi-définie positive</strong>.</li>
+<li>Remplacer $\langle x_i,x_j\rangle$ par $k(x_i,x_j)$ <strong>dans le dual</strong> —  <strong>rien d'autre à modifier</strong>.</li>
+<li> <strong>Le prédicteur s'écrit alors</strong> $f(x)=\sum_n\alpha_ny_nk(x_n,x)+b$ — on <strong>n'a jamais besoin de $w$ explicitement</strong>.</li>
+<li>Choisir noyau et hyperparamètres par <strong>validation croisée imbriquée</strong>.</li>
+</ol>
+<p><strong>Méthode E — Diagnostiquer un SVM entraîné.</strong></p>
+<ol>
+<li>Compter les <strong>vecteurs de support</strong> : beaucoup $\Rightarrow$ problème difficile ou $C$ trop petit.</li>
+<li>Regarder les $\alpha_n=C$ : ce sont les points <strong>dans la marge ou mal classés</strong>.</li>
+<li>Regarder les $0&lt;\alpha_n&lt;C$ :  ceux <strong>exactement sur la marge</strong> — ils donnent $b$.</li>
+<li>Regarder les $\alpha_n=0$ : <strong>sans influence</strong>, on pourrait les supprimer du jeu.</li>
+<li>Calculer la marge $1/\lVert w\rVert$.</li>
+</ol>
+<h2 data-prio="must">Common mistakes</h2>
+<table>
+<thead>
+<tr>
+<th>Erreur</th>
+<th>Correction</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Croire que la classe $+1$ est « la bonne »</td>
+<td> En détection de cancer, <strong>le patient ATTEINT est étiqueté $+1$</strong></td>
+</tr>
+<tr>
+<td>Utiliser $\{0,1\}$ dans les formules du SVM</td>
+<td> Le SVM exige $\{+1,-1\}$ pour que $y_n(\cdots)\geqslant1$ fonctionne ; $\{0,1\}$ est pour les modèles <strong>probabilistes</strong></td>
+</tr>
+<tr>
+<td>Croire que $w$ est un point de données</td>
+<td> $w$ est une <strong>FLÈCHE</strong> (vecteur géométrique) ; $x$ est un <strong>POINT</strong> (coordonnées)</td>
+</tr>
+<tr>
+<td>Mesurer la marge à l'échelle des données</td>
+<td> Changer les <strong>UNITÉS</strong> changerait la marge — il faut l'échelle de <strong>l'ÉQUATION de l'hyperplan</strong></td>
+</tr>
+<tr>
+<td>Croire les deux conventions différentes</td>
+<td> <strong>Théorème 12.1</strong> : elles sont <strong>ÉQUIVALENTES</strong></td>
+</tr>
+<tr>
+<td>Oublier $r&gt;0$ dans la preuve du théorème 12.1</td>
+<td> C'est ce qui <strong>autorise la division par $r$</strong> ; garanti par la séparabilité</td>
+</tr>
+<tr>
+<td>Croire que le $\frac12$ change la solution</td>
+<td> Il <strong>n'affecte pas</strong> l'optimum — il rend seulement le gradient plus propre</td>
+</tr>
+<tr>
+<td>Croire qu'un grand $C$ régularise fort</td>
+<td> <strong>L'INVERSE</strong> : grand $C$ = <strong>FAIBLE</strong> régularisation</td>
+</tr>
+<tr>
+<td>Placer $C$ sur $\lVert w\rVert^2$</td>
+<td> Ici $C$ multiplie <strong>les ÉCARTS</strong> — c'est l'inverse de la convention des livres d'optimisation</td>
+</tr>
+<tr>
+<td>Oublier $\xi_n\geqslant0$</td>
+<td> Sans elle, on pourrait « gagner » de la marge avec des $\xi$ négatifs</td>
+</tr>
+<tr>
+<td>Utiliser la perte quadratique</td>
+<td> <strong>Inadaptée</strong> à la classification binaire</td>
+</tr>
+<tr>
+<td>Utiliser la perte $0$-$1$</td>
+<td> Problème <strong>COMBINATOIRE</strong>, beaucoup plus difficile</td>
+</tr>
+<tr>
+<td>Croire que la charnière ne pénalise que les erreurs</td>
+<td> Elle pénalise <strong>DÈS $t&lt;1$</strong>, même quand la prédiction est <strong>correcte</strong></td>
+</tr>
+<tr>
+<td>Oublier que la charnière majore la perte $0$-$1$</td>
+<td>C'est un <strong>majorant CONVEXE</strong> — c'est ce qui rend l'optimisation traitable</td>
+</tr>
+<tr>
+<td>Oublier que la marge <strong>est</strong> la régularisation</td>
+<td> $\frac12\lVert w\rVert^2$ <strong>provient de la marge</strong> et <strong>joue le rôle</strong> de régularisateur</td>
+</tr>
+<tr>
+<td>N'utiliser qu'un multiplicateur dans le dual</td>
+<td> Il en faut <strong>DEUX</strong> : $\alpha_n$ <strong>et</strong> $\gamma_n$</td>
+</tr>
+<tr>
+<td>Oublier d'où vient $\alpha_i\leqslant C$</td>
+<td> De $C-\alpha_n-\gamma_n=0$ <strong>avec</strong> $\gamma_n\geqslant0$</td>
+</tr>
+<tr>
+<td>Oublier la contrainte $\sum_iy_i\alpha_i=0$</td>
+<td> Elle vient de $\partial\mathfrak L/\partial b=0$ ; c'est elle qui impose des mises à jour <strong>par PAIRES</strong></td>
+</tr>
+<tr>
+<td>Croire que tous les points contribuent à $w$</td>
+<td> <strong>Seuls les VECTEURS DE SUPPORT</strong> ($\alpha_n&gt;0$) — les autres ont $\alpha_n=0$</td>
+</tr>
+<tr>
+<td>Prendre $b$ depuis n'importe quel SV</td>
+<td> Il faut $0&lt;\alpha_n&lt;C$ ; sinon <strong>médiane</strong> sur tous les SV</td>
+</tr>
+<tr>
+<td>Croire que le dual a autant de variables que le primal</td>
+<td> Primal : <strong>$D$</strong> (attributs). Dual : <strong>$N$</strong> (exemples)</td>
+</tr>
+<tr>
+<td>Croire que le noyau rend le modèle non linéaire</td>
+<td> <em>« On résout <strong>TOUJOURS</strong> un hyperplan »</em> — c'est la <strong>frontière</strong> qui devient non linéaire</td>
+</tr>
+<tr>
+<td>Confondre les trois sens de « noyau »</td>
+<td> <strong>RKHS</strong> (ici) · <strong>espace nul</strong> (algèbre linéaire) · <strong>noyau lissant</strong> (estimation de densité)</td>
+</tr>
+<tr>
+<td>Utiliser une fonction de similarité arbitraire</td>
+<td> Un noyau doit être <strong>symétrique ET semi-défini positif</strong></td>
+</tr>
+<tr>
+<td>Calculer $\phi(x)$ explicitement</td>
+<td> Tout l'intérêt de <strong>l'astuce du noyau</strong> est de <strong>ne jamais le faire</strong></td>
+</tr>
+<tr>
+<td>Appliquer une descente de gradient à la charnière</td>
+<td> Elle <strong>n'est pas différentiable en $t=1$</strong> — utiliser le <strong>SOUS-GRADIENT</strong></td>
+</tr>
+<tr>
+<td>Croire que la charnière n'est différentiable nulle part</td>
+<td> Elle l'est <strong>presque partout</strong>, sauf en <strong>UN point</strong></td>
+</tr>
+</tbody></table>
+<h2>Ultimate Review</h2>
+<pre><code>════════ LES HUIT FORMULES À SAVOIR SANS HÉSITER ════════
+  1.  HYPERPLAN   {x : ⟨w,x⟩ + b = 0} ,  w = VECTEUR NORMAL
+      RÈGLE       yn(⟨w,xn⟩ + b) ≥ 0
+  2.  DISTANCE    xa = xa' + r w/‖w‖    →    r = 1/‖w‖
+  3.  MARGE DURE  min ½‖w‖²   s.c.  yn(⟨w,xn⟩+b) ≥ 1
+  4.  MARGE SOUPLE min ½‖w‖² + C Σn ξn  s.c. yn(⟨w,xn⟩+b) ≥ 1 − ξn , ξn ≥ 0
+      ⚠️ GRAND C = FAIBLE régularisation
+  5.  PERTE CHARNIÈRE  ℓ(t) = max{0, 1 − t} ,  t = y f(x)
+      min ½‖w‖² + C Σn max{0, 1 − yn f(xn)}       ← MARGE = RÉGULARISATEUR
+  6.  DUAL   min_α ½ ΣiΣj yi yj αi αj ⟨xi,xj⟩ − Σi αi
+             s.c.  Σi yi αi = 0  ,  0 ≤ αi ≤ C     ← BOÎTE
+  7.  REPRÉSENTANT   w* = Σn αn yn xn      b* = yn − ⟨w*, xn⟩  (0 &lt; αn &lt; C)
+      VECTEURS DE SUPPORT : les xn avec αn &gt; 0
+  8.  NOYAU   k(xi,xj) = ⟨φ(xi), φ(xj)⟩_H   ·   K symétrique semi-déf. positive
+      PRÉDICTEUR À NOYAU  f(x) = Σn αn yn k(xn, x) + b
+═════════════════════════════════════════════════════════
+</code></pre>
+<p><strong>LES TROIS VUES DU MÊME SVM :</strong></p>
+<table>
+<thead>
+<tr>
+<th>Vue</th>
+<th>Point de départ</th>
+<th>Ce qu'elle éclaire</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>GÉOMÉTRIQUE</strong> (§12.2.4)</td>
+<td>Variables d'écart $\xi_n$</td>
+<td>L'<strong>intuition</strong> : distance, marge, violations</td>
+</tr>
+<tr>
+<td><strong>PERTE</strong> (§12.2.5)</td>
+<td>Minimisation du risque empirique</td>
+<td> La <strong>marge EST la régularisation</strong> ; connexion au chapitre 8</td>
+</tr>
+<tr>
+<td><strong>ENVELOPPE CONVEXE</strong> (§12.3.2)</td>
+<td>Le dual</td>
+<td>L'hyperplan <strong>BISSECTE</strong> le segment entre enveloppes</td>
+</tr>
+</tbody></table>
+<p><strong>PRIMAL contre DUAL :</strong></p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th><strong>PRIMAL</strong></th>
+<th><strong>DUAL</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Variables</td>
+<td>$w\in\mathbb R^D$, $b$, $\xi\in\mathbb R^N$</td>
+<td>$\alpha\in\mathbb R^N$</td>
+</tr>
+<tr>
+<td>Taille</td>
+<td>Croît avec les <strong>ATTRIBUTS</strong></td>
+<td>Croît avec les <strong>EXEMPLES</strong></td>
+</tr>
+<tr>
+<td>Contraintes</td>
+<td>$2N$ inégalités</td>
+<td>$1$ égalité $+$ <strong>boîte</strong></td>
+</tr>
+<tr>
+<td>Bon quand</td>
+<td>$D&lt;N$</td>
+<td> $D&gt;N$</td>
+</tr>
+<tr>
+<td>Noyaux</td>
+<td> <strong>Impossible</strong> directement</td>
+<td> <strong>Immédiat</strong></td>
+</tr>
+<tr>
+<td>Nature</td>
+<td>PQ convexe</td>
+<td>PQ convexe</td>
+</tr>
+</tbody></table>
+<p><strong>Les correspondances avec les chapitres antérieurs :</strong></p>
+<table>
+<thead>
+<tr>
+<th>Chapitre</th>
+<th>Ce qu'il fournit</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>2</strong> — hyperplan affine</td>
+<td> La <strong>définition même</strong> de l'objet à trouver</td>
+</tr>
+<tr>
+<td><strong>3</strong> — produit intérieur, projection</td>
+<td> La <strong>marge</strong>, le vecteur normal, la distance</td>
+</tr>
+<tr>
+<td><strong>4</strong> — matrices SDP</td>
+<td>La condition sur la <strong>matrice de Gram</strong></td>
+</tr>
+<tr>
+<td><strong>5</strong> — gradients</td>
+<td>Les trois dérivées du lagrangien</td>
+</tr>
+<tr>
+<td><strong>7</strong> — Lagrange, dualité, PQ</td>
+<td> <strong>Toute la §12.3</strong> ; sous-gradient ; forme standard</td>
+</tr>
+<tr>
+<td><strong>8</strong> — risque empirique, régularisation</td>
+<td> La <strong>vue perte</strong> ; validation croisée imbriquée</td>
+</tr>
+<tr>
+<td><strong>9</strong> — application d'attributs $\phi$</td>
+<td>Le pont vers les <strong>noyaux</strong></td>
+</tr>
+</tbody></table>
+<p><strong>Le classement des points par leur $\alpha_n$ :</strong></p>
+<table>
+<thead>
+<tr>
+<th>$\alpha_n$</th>
+<th>Position du point</th>
+<th>Rôle</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$\alpha_n=0$</td>
+<td> <strong>Au-delà</strong> de la marge, bien classé</td>
+<td><strong>AUCUNE influence</strong> — supprimable</td>
+</tr>
+<tr>
+<td>$0&lt;\alpha_n&lt;C$</td>
+<td> <strong>Exactement SUR</strong> la marge</td>
+<td>Vecteur de support ;  <strong>sert à calculer $b$</strong></td>
+</tr>
+<tr>
+<td>$\alpha_n=C$</td>
+<td><strong>Dans</strong> la marge ou <strong>mal classé</strong></td>
+<td>Vecteur de support ; $\xi_n&gt;0$</td>
+</tr>
+</tbody></table>
+<div class="rec"><h2>Active Recall</h2><p><strong>Hyperplan</strong></p><ol>
+<li>Quelle mise en garde le livre donne-t-il sur l'étiquette $+1$ ?</li>
+<li>Écrire $f$ et définir l'hyperplan séparateur.</li>
+<li>Démontrer que $w$ est orthogonal à tout vecteur de l'hyperplan.</li>
+<li>Quelle distinction le livre fait-il entre $w$ et $x$ ?</li>
+<li>Écrire la règle de décision en une seule inégalité.</li>
+</ol><p><strong>Marge</strong>
+6. Pourquoi maximiser la marge ? Que garantit-elle ?
+7. Quelle est la subtilité technique de la définition de la marge ?
+8. Écrire la décomposition $x_a=x_a'+r\frac{w}{\lVert w\rVert}$ et interpréter $r$.
+9. Écrire la formulation avec $\lVert w\rVert=1$.
+10. Dériver $r=1/\lVert w\rVert$ sous l'hypothèse d'échelle.
+11. Pourquoi cette équation est-elle contre-intuitive ? Comment le livre la justifie-t-il ?
+12. Écrire le SVM à marge dure et justifier ses trois choix de forme.
+13. Énoncer le théorème 12.1 et donner les trois pas de sa preuve.
+14. Pourquoi « dure » ?</p><p><strong>Marge souple</strong>
+15. Quel est le besoin ? Quelle est l'idée clé ?
+16. Écrire le SVM à marge souple.
+17. Que fait le paramètre $C$ ?  Un grand $C$ régularise-t-il fort ?
+18. Pourquoi appelle-t-on la marge un régularisateur ?
+19. Pourquoi la perte quadratique est-elle inadaptée ?
+20. Qu'est-ce que la perte $0$-$1$ ? Pourquoi ne l'utilise-t-on pas ?
+21. Écrire la perte charnière et ses trois régimes.
+22. Quelle est sa propriété par rapport à la perte $0$-$1$ ?
+23. Écrire le problème sans contraintes et identifier ses deux termes.
+24. Comment montre-t-on l'équivalence avec la forme contrainte ?</p><p><strong>Dual</strong>
+25. Donner les trois avantages du dual.
+26. Quels sont les deux multiplicateurs et à quelles contraintes correspondent-ils ?
+27. Écrire les trois dérivées annulées et ce que chacune donne.
+28. Écrire le dual complet.
+29. Pourquoi « contraintes de boîte » ? Quel avantage numérique ?
+30. Énoncer le théorème du représentant.
+31. Comment calcule-t-on $b^*$ ? Que faire si aucun point n'est sur la marge ?
+32. Comment reconnaît-on les points exactement sur la marge ?
+33. Qu'est-ce qu'une enveloppe convexe ? Quelle troisième interprétation donne-t-elle ?</p><p><strong>Noyaux et numérique</strong>
+34. Quelle observation sur le dual rend les noyaux possibles ?
+35. Qu'est-ce que la modularité évoquée par le livre ?
+36. Définir un noyau. Qu'est-ce que l'application d'attributs canonique ?
+37. Qu'est-ce que l'astuce du noyau ? la matrice de Gram ?
+38. Quelles sont les deux conditions sur un noyau ?
+39. La frontière devient non linéaire — que résout-on toujours ?
+40. Citer les trois sens du mot « noyau ».
+41. Comment choisir le noyau et ses paramètres ?
+42. Pourquoi faut-il un sous-gradient ? Écrire $g(t)$.
+43. Comment choisir entre primal et dual pour la résolution ?</p></div>
+
+
+
+
+
+
+<h2>Flashcards</h2>
+<table>
+<thead>
+<tr>
+<th>Question</th>
+<th>Réponse</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Le quatrième pilier ?</td>
+<td>La <strong>CLASSIFICATION</strong></td>
+</tr>
+<tr>
+<td>Les valeurs d'étiquette ?</td>
+<td>$\{+1,-1\}$ —  $\{0,1\}$ est réservé aux modèles <strong>probabilistes</strong></td>
+</tr>
+<tr>
+<td>La mise en garde sur $+1$ ?</td>
+<td> En détection de cancer, <strong>le patient ATTEINT est $+1$</strong> — ne rien inférer de « positif »</td>
+</tr>
+<tr>
+<td>L'hyperplan séparateur ?</td>
+<td>$\{x\in\mathbb R^D:\langle w,x\rangle+b=0\}$</td>
+</tr>
+<tr>
+<td>Que représente $w$ ?</td>
+<td>Le <strong>VECTEUR NORMAL</strong> à l'hyperplan</td>
+</tr>
+<tr>
+<td>La preuve de l'orthogonalité ?</td>
+<td>$f(x_a)-f(x_b)=\langle w,x_a-x_b\rangle=0$ pour $x_a,x_b$ sur l'hyperplan</td>
+</tr>
+<tr>
+<td>$w$ et $x$, deux natures ?</td>
+<td> $w$ = <strong>FLÈCHE</strong> (vecteur géométrique) · $x$ = <strong>POINT</strong> (coordonnées)</td>
+</tr>
+<tr>
+<td>La règle de décision ?</td>
+<td>$y_n(\langle w,x_n\rangle+b)\geqslant0$</td>
+</tr>
+<tr>
+<td>La marge ?</td>
+<td>La <strong>distance de l'hyperplan aux exemples LES PLUS PROCHES</strong></td>
+</tr>
+<tr>
+<td>Pourquoi la maximiser ?</td>
+<td> Un classifieur à <strong>grande marge GÉNÉRALISE bien</strong> (Steinwart &amp; Christmann)</td>
+</tr>
+<tr>
+<td>La subtilité technique ?</td>
+<td> Il faut <strong>DÉFINIR UNE ÉCHELLE</strong> — sinon changer les <strong>unités</strong> changerait la marge</td>
+</tr>
+<tr>
+<td>La décomposition vectorielle ?</td>
+<td>$x_a=x_a'+r\dfrac{w}{\lVert w\rVert}$</td>
+</tr>
+<tr>
+<td>Que représente $r$ ?</td>
+<td> La <strong>COORDONNÉE de $x_a$</strong> dans le sous-espace engendré par $w/\lVert w\rVert$</td>
+</tr>
+<tr>
+<td>La formulation avec $\lVert w\rVert=1$ ?</td>
+<td>$\max_{w,b,r}r$ s.c. $y_n(\langle w,x_n\rangle+b)\geqslant r$, $\lVert w\rVert=1$, $r&gt;0$</td>
+</tr>
+<tr>
+<td>L'autre convention d'échelle ?</td>
+<td>Le prédicteur vaut <strong>1 à l'exemple le plus proche</strong></td>
+</tr>
+<tr>
+<td>Le résultat qui les relie ?</td>
+<td> $r=\dfrac{1}{\lVert w\rVert}$</td>
+</tr>
+<tr>
+<td>Pourquoi contre-intuitif ?</td>
+<td>On dérive la distance en fonction de $\lVert w\rVert$, <strong>qu'on ne connaît pas encore</strong></td>
+</tr>
+<tr>
+<td>La justification du livre ?</td>
+<td>Voir $r$ comme une <strong>VARIABLE TEMPORAIRE</strong> de la dérivation</td>
+</tr>
+<tr>
+<td>Autre lecture de la distance ?</td>
+<td>L'<strong>ERREUR DE PROJECTION</strong> sur l'hyperplan</td>
+</tr>
+<tr>
+<td>Le SVM à marge dure ?</td>
+<td>$\min\frac12\lVert w\rVert^2$ s.c. $y_n(\langle w,x_n\rangle+b)\geqslant1$</td>
+</tr>
+<tr>
+<td>Pourquoi le carré ?</td>
+<td>Il donne un  <strong>programme quadratique CONVEXE</strong></td>
+</tr>
+<tr>
+<td>Pourquoi le $\frac12$ ?</td>
+<td> Il <strong>n'affecte pas</strong> l'optimum — il rend le <strong>gradient plus propre</strong></td>
+</tr>
+<tr>
+<td>Pourquoi « dure » ?</td>
+<td> <strong>Aucune violation</strong> de la condition de marge n'est autorisée</td>
+</tr>
+<tr>
+<td>Théorème 12.1 ?</td>
+<td>Les deux formulations (<strong>$\lVert w\rVert=1$</strong> et <strong>marge $=1$</strong>) sont <strong>ÉQUIVALENTES</strong></td>
+</tr>
+<tr>
+<td>Ses trois pas de preuve ?</td>
+<td>Le <strong>carré</strong> est monotone · <strong>reparamétriser</strong> par $w'/\lVert w'\rVert$ · <strong>diviser par $r&gt;0$</strong></td>
+</tr>
+<tr>
+<td>Où sert la séparabilité linéaire ?</td>
+<td> Elle garantit $r&gt;0$, donc la <strong>division licite</strong></td>
+</tr>
+<tr>
+<td>Le besoin de la marge souple ?</td>
+<td>Données <strong>non linéairement séparables</strong></td>
+</tr>
+<tr>
+<td>L'idée clé ?</td>
+<td>Une <strong>VARIABLE D'ÉCART $\xi_n$</strong> par exemple, <strong>soustraite de la marge</strong></td>
+</tr>
+<tr>
+<td>Le SVM à marge souple ?</td>
+<td>$\min\frac12\lVert w\rVert^2+C\sum_n\xi_n$ s.c. $y_n(\cdots)\geqslant1-\xi_n$, $\xi_n\geqslant0$</td>
+</tr>
+<tr>
+<td>Que fait $C$ ?</td>
+<td>Il <strong>arbitre</strong> entre taille de la marge et quantité totale d'écart</td>
+</tr>
+<tr>
+<td>Grand $C$ ?</td>
+<td> <strong>FAIBLE régularisation</strong> — plus de poids aux écarts</td>
+</tr>
+<tr>
+<td>Où $C$ est-il placé ?</td>
+<td> Sur <strong>les ÉCARTS</strong> — l'inverse de la convention des livres d'optimisation</td>
+</tr>
+<tr>
+<td>Autre nom de cette formulation ?</td>
+<td>Le <strong>$C$-SVM</strong></td>
+</tr>
+<tr>
+<td>Le régularisateur ?</td>
+<td>$\lVert w\rVert^2$ —  <strong>le terme de MARGE</strong></td>
+</tr>
+<tr>
+<td>Pourquoi pas la perte quadratique ?</td>
+<td> <strong>Inadaptée</strong> à la classification binaire</td>
+</tr>
+<tr>
+<td>La perte $0$-$1$ ?</td>
+<td>$\mathbb 1(f(x_n)\neq y_n)$</td>
+</tr>
+<tr>
+<td>Pourquoi l'éviter ?</td>
+<td> Elle donne un problème d'optimisation <strong>COMBINATOIRE</strong></td>
+</tr>
+<tr>
+<td>La perte charnière ?</td>
+<td>$\ell(t)=\max\{0,1-t\}$ avec $t=y f(x)$</td>
+</tr>
+<tr>
+<td>Régime $t\geqslant1$ ?</td>
+<td>Perte <strong>nulle</strong></td>
+</tr>
+<tr>
+<td>Régime $0&lt;t&lt;1$ ?</td>
+<td> Perte <strong>positive alors que la prédiction est CORRECTE</strong> — on est <strong>dans la marge</strong></td>
+</tr>
+<tr>
+<td>Régime $t&lt;0$ ?</td>
+<td>Perte <strong>croissant linéairement</strong> — mauvais côté</td>
+</tr>
+<tr>
+<td>Sa propriété-clé ?</td>
+<td> C'est un <strong>MAJORANT CONVEXE de la perte $0$-$1$</strong></td>
+</tr>
+<tr>
+<td>La perte de la marge dure ?</td>
+<td>$0$ si $t\geqslant1$, <strong>$\infty$</strong> si $t&lt;1$</td>
+</tr>
+<tr>
+<td>Le problème sans contraintes ?</td>
+<td>$\min\frac12\lVert w\rVert^2+C\sum_n\max\{0,1-y_nf(x_n)\}$</td>
+</tr>
+<tr>
+<td>Sa lecture ?</td>
+<td> <strong>Maximiser la marge = RÉGULARISER</strong></td>
+</tr>
+<tr>
+<td>L'équivalence avec la forme contrainte ?</td>
+<td>$\min_t\max\{0,1-t\}\iff\min_\xi\xi$ s.c. $\xi\geqslant0$, $\xi\geqslant1-t$</td>
+</tr>
+<tr>
+<td>Les trois avantages du dual ?</td>
+<td>Indépendant du <strong>nombre d'attributs</strong> · bon si <strong>$D&gt;N$</strong> ·  permet les <strong>NOYAUX</strong></td>
+</tr>
+<tr>
+<td>Les deux multiplicateurs ?</td>
+<td>$\alpha_n$ (classification correcte) et $\gamma_n$ (non-négativité de $\xi_n$)</td>
+</tr>
+<tr>
+<td>Ce que donne $\partial\mathfrak L/\partial w=0$ ?</td>
+<td> Le <strong>THÉORÈME DU REPRÉSENTANT</strong> $w=\sum_n\alpha_ny_nx_n$</td>
+</tr>
+<tr>
+<td>Ce que donne $\partial\mathfrak L/\partial b=0$ ?</td>
+<td>$\sum_ny_n\alpha_n=0$</td>
+</tr>
+<tr>
+<td>Ce que donne $\partial\mathfrak L/\partial\xi_n=0$ ?</td>
+<td>$C-\alpha_n-\gamma_n=0$, donc  $\alpha_n\leqslant C$</td>
+</tr>
+<tr>
+<td>Le SVM dual ?</td>
+<td>$\min_\alpha\frac12\sum_i\sum_jy_iy_j\alpha_i\alpha_j\langle x_i,x_j\rangle-\sum_i\alpha_i$</td>
+</tr>
+<tr>
+<td>Ses contraintes ?</td>
+<td>$\sum_iy_i\alpha_i=0$ et $0\leqslant\alpha_i\leqslant C$</td>
+</tr>
+<tr>
+<td>Leur nom ?</td>
+<td>Les <strong>CONTRAINTES DE BOÎTE</strong></td>
+</tr>
+<tr>
+<td>Leur avantage ?</td>
+<td> Boîtes <strong>alignées sur les axes</strong> — très efficaces dans les solveurs</td>
+</tr>
+<tr>
+<td>Pourquoi minimiser et non maximiser ?</td>
+<td>On minimise le <strong>dual NÉGATIF</strong> — équivalent</td>
+</tr>
+<tr>
+<td>Les vecteurs de support ?</td>
+<td> Les $x_n$ avec <strong>$\alpha_n&gt;0$</strong></td>
+</tr>
+<tr>
+<td>Les autres points ?</td>
+<td>$\alpha_n=0$ —  ils <strong>n'influencent PAS</strong> la solution</td>
+</tr>
+<tr>
+<td>Comment calculer $b^*$ ?</td>
+<td>$b^*=y_n-\langle w^*,x_n\rangle$ pour un $x_n$ <strong>sur la marge</strong></td>
+</tr>
+<tr>
+<td>Si aucun n'y est exactement ?</td>
+<td> Prendre la <strong>MÉDIANE</strong> de $\lvert y_n-\langle w^*,x_n\rangle\rvert$ sur les SV</td>
+</tr>
+<tr>
+<td>Comment reconnaître les points sur la marge ?</td>
+<td> $0&lt;\alpha_n&lt;C$ (<strong>strictement à l'intérieur</strong> de la boîte), par les conditions <strong>KKT</strong></td>
+</tr>
+<tr>
+<td>L'enveloppe convexe ?</td>
+<td>$\big\{\sum_n\alpha_nx_n:\sum_n\alpha_n=1,\ \alpha_n\geqslant0\big\}$</td>
+</tr>
+<tr>
+<td>La troisième interprétation du SVM ?</td>
+<td> L'hyperplan <strong>BISSECTE le segment</strong> entre les deux enveloppes convexes</td>
+</tr>
+<tr>
+<td>L'observation qui rend les noyaux possibles ?</td>
+<td> Le dual ne contient <strong>QUE des produits intérieurs ENTRE EXEMPLES</strong></td>
+</tr>
+<tr>
+<td>La modularité ?</td>
+<td>Choix du <strong>classifieur</strong> et choix de la <strong>représentation</strong> sont <strong>SÉPARABLES</strong></td>
+</tr>
+<tr>
+<td>Définition d'un noyau ?</td>
+<td>$k(x_i,x_j)=\langle\phi(x_i),\phi(x_j)\rangle_{\mathcal H}$ pour un espace de <strong>HILBERT</strong> $\mathcal H$</td>
+</tr>
+<tr>
+<td>L'application d'attributs canonique ?</td>
+<td>$\phi(x)=k(\cdot,x)$, dans le <strong>RKHS unique</strong> associé</td>
+</tr>
+<tr>
+<td>L'astuce du noyau ?</td>
+<td> Elle <strong>CACHE l'application non linéaire explicite</strong></td>
+</tr>
+<tr>
+<td>La matrice de Gram ?</td>
+<td>$K\in\mathbb R^{N\times N}$ des $k(x_i,x_j)$ ; aussi « matrice de noyau »</td>
+</tr>
+<tr>
+<td>Les deux conditions sur un noyau ?</td>
+<td> <strong>SYMÉTRIQUE</strong> et <strong>SEMI-DÉFINI POSITIF</strong> ($z^\top Kz\geqslant0$)</td>
+</tr>
+<tr>
+<td>Trois noyaux usuels ?</td>
+<td><strong>Polynomial</strong> · <strong>gaussien RBF</strong> · <strong>quadratique rationnel</strong></td>
+</tr>
+<tr>
+<td>Que résout-on avec un noyau ?</td>
+<td> <strong>TOUJOURS un HYPERPLAN</strong> — c'est la <strong>frontière</strong> qui devient non linéaire</td>
+</tr>
+<tr>
+<td>Les trois sens de « noyau » ?</td>
+<td> <strong>RKHS</strong> (ici) · <strong>ESPACE NUL</strong> (algèbre linéaire) · <strong>noyau LISSANT</strong> (densité)</td>
+</tr>
+<tr>
+<td>Comment choisir le noyau ?</td>
+<td>Par <strong>VALIDATION CROISÉE IMBRIQUÉE</strong> (§8.6.1)</td>
+</tr>
+<tr>
+<td>Le prédicteur à noyau ?</td>
+<td>$f(x)=\sum_n\alpha_ny_nk(x_n,x)+b$ —  <strong>$w$ n'est jamais formé explicitement</strong></td>
+</tr>
+<tr>
+<td>Pourquoi un sous-gradient ?</td>
+<td> La charnière <strong>n'est pas différentiable en $t=1$</strong></td>
+</tr>
+<tr>
+<td>Le sous-gradient ?</td>
+<td>$-1$ si $t&lt;1$ · $[-1,0]$ si $t=1$ · $0$ si $t&gt;1$</td>
+</tr>
+<tr>
+<td>Où est-elle différentiable ?</td>
+<td> <strong>PRESQUE PARTOUT</strong> — un seul point pose problème</td>
+</tr>
+<tr>
+<td>Taille du primal ?</td>
+<td>La <strong>dimension $D$</strong> des exemples</td>
+</tr>
+<tr>
+<td>Taille du dual ?</td>
+<td>Le <strong>nombre $N$</strong> d'exemples</td>
+</tr>
+<tr>
+<td>Nature des deux problèmes ?</td>
+<td>Des <strong>programmes quadratiques CONVEXES</strong></td>
+</tr>
+<tr>
+<td>La différence de philosophie avec le ch. 9 ?</td>
+<td> Vraisemblance : partir d'un <strong>modèle probabiliste</strong>. SVM : <strong>CONCEVOIR d'abord</strong> l'objectif par <strong>intuition géométrique</strong></td>
+</tr>
+</tbody></table>
+</main>
+
+
+
+
+</body></html>

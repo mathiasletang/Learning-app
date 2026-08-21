@@ -1,0 +1,2010 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fiche 300 — Prendre R en main : environnement, session, espace de travail</title>
+<script>
+window.MathJax={tex:{inlineMath:[["$","$"]],displayMath:[["$$","$$"]],processEscapes:true},
+ options:{skipHtmlTags:["script","noscript","style","textarea","pre","code"]},
+ svg:{fontCache:"global"},
+ startup:{pageReady:()=>MathJax.startup.defaultPageReady().then(()=>{document.body.classList.add("ready")})}};
+setTimeout(function(){document.body.classList.add("ready")},2500);
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+/* ============================================================
+   MathiasLearn — feuille de style des fiches
+   Reprise intégrale des tokens de 00_PARCOURS/*.html
+   + blocs pédagogiques (callouts, méthode, essentiels, recall)
+   ============================================================ */
+:root{--bg:#faf9f7;--card:#fff;--ink:#1a1a1a;--muted:#6b6b6b;--line:#e5e2dd;--accent:#8b5e34;
+ --hl:#fdf8ef;--ok:#2d7d4f;--okbg:#f0f7f3;--warn:#b3402f;--warnbg:#fdf3f1;--blue:#2f5d8b;--bluebg:#f1f5fa}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+ font:17px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;padding:0 16px 100px}
+.nav{position:sticky;top:0;background:rgba(250,249,247,.96);backdrop-filter:blur(8px);
+ border-bottom:1px solid var(--line);margin:0 -16px 30px;padding:11px 16px;z-index:50;
+ display:flex;gap:6px;flex-wrap:wrap;font-size:13px}
+.nav a{color:var(--muted);text-decoration:none;padding:4px 9px;border-radius:5px;white-space:nowrap}
+.nav a:hover{background:var(--line);color:var(--ink)}
+.nav a.on{background:var(--accent);color:#fff}
+main{max-width:780px;margin:0 auto}
+h1{font-size:31px;letter-spacing:-.02em;margin:.4em 0 .5em;line-height:1.25}
+h2{font-size:23px;margin:2.2em 0 .7em;padding-bottom:.3em;border-bottom:1px solid var(--line)}
+h3{font-size:19px;margin:1.9em 0 .5em;color:var(--accent)}
+h4{font-size:17px;margin:1.5em 0 .4em}
+p{margin:.8em 0} a{color:var(--accent)} hr{border:0;border-top:1px solid var(--line);margin:2.6em 0}
+table{border-collapse:collapse;width:100%;margin:1.3em 0;font-size:15.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+th{background:#f3f0eb;font-weight:600}
+tr:nth-child(even) td{background:#fcfbfa}
+code{font-family:"SF Mono",Menlo,Consolas,monospace;font-size:.88em;background:#f2efea;padding:2px 6px;border-radius:4px;overflow-wrap:break-word}
+pre{background:#f2efea;padding:14px 16px;border-radius:8px;overflow-x:auto}
+pre code{background:none;padding:0;white-space:pre}
+blockquote{border-left:3px solid var(--accent);background:var(--hl);margin:1.4em 0;padding:14px 20px;border-radius:0 8px 8px 0}
+blockquote p:first-child{margin-top:0} blockquote p:last-child{margin-bottom:0}
+ul,ol{padding-left:1.5em} li{margin:.35em 0} em{color:#4a4a4a}
+mjx-container[display="true"]{margin:1.1em 0!important;overflow-x:auto;overflow-y:hidden;padding:2px 0}
+mjx-container svg{max-width:100%}
+body:not(.ready) main{opacity:0} main{opacity:1;transition:opacity .25s}
+
+/* --- bandeau de tête de fiche --- */
+.cours{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--accent);
+ border-radius:0 10px 10px 0;padding:18px 22px;margin:0 0 34px}
+.cours h4{margin:0 0 4px;font-size:14px;text-transform:uppercase;letter-spacing:.07em;color:var(--accent)}
+.cours .cs{color:var(--muted);font-size:14.5px;margin:0 0 14px}
+
+/* --- exercices / corrigés --- */
+.ex{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:6px 24px 20px;margin:18px 0}
+.ex>h3:first-child{margin-top:14px}
+details.cor{margin-top:18px;border:1px solid var(--line);border-radius:8px;background:#fcfbfa;overflow:hidden}
+details.cor>summary{cursor:pointer;padding:12px 16px;font-weight:600;font-size:15px;color:var(--accent);
+ list-style:none;display:flex;align-items:center;gap:9px;user-select:none;transition:.15s;min-height:44px}
+details.cor>summary::-webkit-details-marker{display:none}
+details.cor>summary:hover{background:var(--hl)}
+details.cor>summary::before{content:"\25B6";font-size:10px;transition:transform .18s;display:inline-block}
+details.cor[open]>summary::before{transform:rotate(90deg)}
+details.cor[open]>summary{background:var(--okbg);color:var(--ok);border-bottom:1px solid var(--line)}
+.cor .in{padding:4px 20px 16px}
+.cor .in>*:first-child{margin-top:.9em}
+
+/* --- blocs pédagogiques (callouts) ---
+   Générés depuis une citation Markdown dont le premier **gras** commence
+   par un mot-clé : DÉFINITION, THÉORÈME, MÉTHODE, PIÈGE, INTUITION… */
+.cal{border:1px solid var(--line);border-left:4px solid var(--accent);background:var(--card);
+ border-radius:0 10px 10px 0;padding:15px 20px;margin:1.5em 0}
+.cal>p:first-child{margin-top:0}.cal>p:last-child,.cal>ul:last-child,.cal>ol:last-child{margin-bottom:0}
+.cal .lab{display:block;font-size:12.5px;text-transform:uppercase;letter-spacing:.08em;
+ font-weight:700;color:var(--accent);margin-bottom:6px}
+.cal.formel{background:var(--hl)}
+.cal.piege{border-left-color:var(--warn);background:var(--warnbg)}
+.cal.piege .lab{color:var(--warn)}
+.cal.methode{border-left-color:var(--ok);background:var(--okbg)}
+.cal.methode .lab{color:var(--ok)}
+.cal.intu{border-left-color:var(--blue);background:var(--bluebg)}
+.cal.intu .lab{color:var(--blue)}
+.cal.plus{border-left-style:dashed;background:#faf9f7}
+.cal.plus .lab{color:var(--muted)}
+
+/* --- révision express --- */
+.ess{background:var(--card);border:1px solid var(--accent);border-radius:10px;padding:4px 24px 20px;margin:1.6em 0}
+.ess h3{margin-top:1.3em}
+.rec{background:var(--card);border:1px dashed var(--accent);border-radius:10px;padding:4px 24px 18px;margin:1.6em 0}
+.rec ol{counter-reset:none}
+
+/* --- impression / PDF --- */
+@media print{
+ .nav{display:none}
+ body{padding:0;background:#fff;font-size:11.2pt;line-height:1.55}
+ main{max-width:none}
+ h1{font-size:23pt}h2{font-size:15pt;margin-top:1.5em}h3{font-size:12.6pt}
+ h2,h3,h4{break-after:avoid;page-break-after:avoid}
+ table,.cal,blockquote{break-inside:avoid;page-break-inside:avoid}
+ table{display:table;font-size:9.6pt}
+ details.cor{border:1px solid var(--line);background:#fcfbfa}
+ details.cor>summary{display:none}
+ details.cor .in{padding-top:10px}
+ .cal,.ex,.ess,.rec{box-shadow:none}
+ a{color:var(--ink);text-decoration:none}
+}
+@page{margin:16mm 15mm 18mm}
+
+/* --- exemples travaillés --- */
+.exm{background:#fcfbfa;border:1px solid var(--line);border-radius:10px;padding:2px 20px 14px;margin:1.5em 0}
+.exm>h4:first-child{margin:14px 0 .5em;color:var(--accent);font-size:13px;text-transform:uppercase;letter-spacing:.07em}
+
+
+/* --- pastilles de priorité (conventions des fiches de l'app) --- */
+h2[data-prio], h3[data-prio], h4[data-prio]{position:relative}
+h2[data-prio]::before,h3[data-prio]::before,h4[data-prio]::before{
+ content:"";display:inline-block;width:9px;height:9px;border-radius:50%;
+ margin-right:9px;vertical-align:middle;background:var(--muted)}
+[data-prio="must"]::before{background:var(--warn)}
+[data-prio="high"]::before{background:#d98324}
+[data-prio="mid"]::before{background:#c9a227}
+[data-prio="low"]::before{background:var(--ok)}
+/* corrigés des fiches de l'app : même traitement que les corrigés des séries */
+details.cor>summary::after{content:""}
+</style></head><body>
+<div class="nav"><a href="00_COMMENCER_ICI.html">Commencer ici</a><a href="01_NOTATIONS_le-decodeur.html">Notations</a><a href="02_EXERCICES_Serie-0.html">Série 0 — Remise en route</a><a href="03_EXERCICES_Serie-1.html">Série 1 — Convexité</a><a href="04_EXERCICES_Serie-2.html">Série 2 — KKT</a><a href="05_AUTO-EVALUATION.html">Auto-évaluation (quiz)</a><a href="06_FICHE_Optimisation-deux-variables.html">Fiche — Optimisation à 2 variables</a></div>
+<main><h1>Fiche 300 — Prendre R en main : environnement, session, espace de travail</h1>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Matière</strong></td>
+<td>Code · Langage R</td>
+</tr>
+<tr>
+<td><strong>Cours source</strong></td>
+<td>R Core Team, <em>An Introduction to R</em> — Notes on R: A Programming Environment for Data Analysis and Graphics, version 4.6.1 (2026-06-24) — préface, chapitre 1 « Introduction and preliminaries », annexe A « A sample session », annexe B « Invoking R », annexe C « The command-line editor »</td>
+</tr>
+<tr>
+<td><strong>Sources d'appoint</strong></td>
+<td><em>R Language Definition</em> 4.6.1, §10.3.2 « Identifiers », §10.3.3 « Reserved words », §10.3.5 « Separators »</td>
+</tr>
+<tr>
+<td><strong>Difficulté</strong></td>
+<td> Fondamental — la première heure de R, celle qui conditionne toutes les autres</td>
+</tr>
+<tr>
+<td><strong>Temps d'étude estimé</strong></td>
+<td>1 h 15</td>
+</tr>
+<tr>
+<td><strong>Prérequis</strong></td>
+<td>Aucun. Savoir ouvrir un terminal aide pour les parties « ligne de commande » et « scripts ».</td>
+</tr>
+<tr>
+<td><strong>Concepts clés</strong></td>
+<td>environnement contre logiciel de statistique, objet de résultat, session, <code>q()</code>, espace de travail, <code>.RData</code>, <code>.Rhistory</code>, <code>ls()</code>, <code>rm()</code>, expression contre assignation, <code>&lt;-</code>, sensibilité à la casse, mots réservés, <code>help()</code>, <code>??</code>, <code>example()</code>, <code>source()</code>, <code>sink()</code>, séquence de démarrage, <code>.Rprofile</code>, <code>.First()</code>, <code>--vanilla</code>, <code>R CMD</code>, <code>Rscript</code>, <code>commandArgs()</code></td>
+</tr>
+<tr>
+<td><strong>À retenir en priorité</strong></td>
+<td>La <strong>distinction expression / assignation</strong> · le <strong>cycle de vie de l'espace de travail</strong> · les <strong>quatre formes de l'aide</strong> · <code>--vanilla</code> et <strong>la séquence de démarrage</strong> · <code>Rscript</code> + <code>commandArgs(TRUE)</code>.</td>
+</tr>
+</tbody></table>
+<h2>Vue d'ensemble</h2>
+<pre><code>CE QU'EST R        un ENVIRONNEMENT integre (donnees, calcul, graphiques, langage S)
+                   pas un logiciel qui « sort un listing » : il STOCKE le resultat
+
+LA BOUCLE          $ cd work ; R  -&gt;  &gt; commandes  -&gt;  &gt; q()  -&gt;  sauver ? oui/non
+                                          |
+ESPACE DE TRAVAIL  objets nommes ; ls() les liste ; rm() les efface
+                   a la sortie -&gt; .RData (objets) + .Rhistory (commandes)
+                   au demarrage suivant DANS LE MEME DOSSIER -&gt; tout revient
+
+DEUX COMMANDES     expression   1/x        evaluee, AFFICHEE, valeur PERDUE
+                   assignation  x &lt;- 1/y   evaluee, RANGEE, rien d'affiche
+
+L'AIDE             ?solve     help("[[")     ??solve     example(solve)
+                   ^ nom        ^ caracteres  ^ recherche  ^ faire tourner
+
+DEMARRAGE          Renviron -&gt; Rprofile.site -&gt; .Rprofile -&gt; .RData -&gt; .First()
+                   --vanilla coupe TOUT cela
+
+HORS SESSION       source("f.R")   R CMD BATCH f.R   Rscript f.R arg1 arg2
+</code></pre>
+<p><strong>Le problème posé.</strong> <em>R est « an integrated suite of software facilities for data manipulation, calculation and graphical display »</em> — une <strong>suite intégrée</strong>, et non une collection d'outils juxtaposés. Toute la difficulté du débutant vient de là : il cherche un logiciel qui <strong>produit un rapport</strong>, alors qu'il a devant lui un <strong>langage qui produit des objets</strong>.</p>
+<div class="cal intu"><span class="lab">Intuition — la phrase qui explique tout le reste.</span>
+<p> <em>« There is an important difference in philosophy between S (and hence R) and the other main statistical systems. In S a statistical analysis is normally done as a series of steps, with intermediate results being stored in objects. Thus whereas SAS and SPSS will give copious output from a regression or discriminant analysis, R will give minimal output and store the results in a fit object for subsequent interrogation by further R functions. »</em> Autrement dit : <strong>R vous rend peu de texte et beaucoup d'objet.</strong> Ce qui ressemble à de l'avarice est en réalité de la générosité — le résultat reste <strong>interrogeable</strong>.</p>
+</div>
+<h2 data-prio="must">Concept 1 — Ce qu'est R : un environnement, pas un outil</h2>
+<div class="cal formel"><span class="lab">Définition (§1.1).</span>
+<p> <em>R est une <strong>suite intégrée</strong> de moyens logiciels pour la <strong>manipulation de données</strong>, le <strong>calcul</strong> et l'<strong>affichage graphique</strong>.</em></p>
+</div>
+<p>Le cours en donne cinq composantes, à connaître comme telles :</p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Composante (§1.1)</th>
+<th>Ce que cela veut dire concrètement</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td><em>an effective data handling and storage facility</em></td>
+<td>les données vivent <strong>dans la session</strong>, sous forme d'objets nommés</td>
+</tr>
+<tr>
+<td>2</td>
+<td><em>a suite of operators for calculations on arrays, in particular matrices</em></td>
+<td>l'algèbre linéaire est <strong>native</strong>, pas une extension</td>
+</tr>
+<tr>
+<td>3</td>
+<td><em>a large, coherent, integrated collection of intermediate tools for data analysis</em></td>
+<td>des outils <strong>intermédiaires</strong> : ils se composent entre eux</td>
+</tr>
+<tr>
+<td>4</td>
+<td><em>graphical facilities for data analysis and display</em></td>
+<td>à l'écran <strong>ou</strong> sur fichier (<em>hardcopy</em>)</td>
+</tr>
+<tr>
+<td>5</td>
+<td><em>a well developed, simple and effective programming language (called « S »)</em></td>
+<td>conditionnelles, boucles, fonctions <strong>récursives</strong> définies par l'utilisateur, entrées-sorties</td>
+</tr>
+</tbody></table>
+<div class="cal intu"><span class="lab">En clair — pourquoi le mot « environnement » (§1.1).</span>
+<p> <em>Le terme « environment » vise à le caractériser comme <strong>un système entièrement planifié et cohérent</strong>, plutôt que comme <strong>une accrétion incrémentale d'outils très spécifiques et inflexibles</strong>, comme c'est fréquemment le cas dans d'autres logiciels d'analyse de données.</em> La conséquence pratique est immédiate : <strong>ce que vous apprenez sur un objet vaut pour tous les autres</strong>. <code>length()</code>, <code>names()</code>, <code>[</code>, <code>summary()</code> ne sont pas des commandes propres à un type de données — ce sont des mécanismes généraux.</p>
+</div>
+<p><strong>La cinquième composante est celle qui vous intéresse.</strong> <em>« Indeed most of the system supplied functions are themselves written in the S language. »</em> Les fonctions de R sont écrites <strong>en R</strong>. Cela signifie qu'il n'y a <strong>aucune frontière</strong> entre « utiliser R » et « programmer en R » : taper le nom d'une fonction sans parenthèses affiche son code source, et ce code est du R ordinaire que vous pouvez lire, copier, modifier.</p>
+<h3>1.1 D'où vient R : la filiation S</h3>
+<div class="cal formel"><span class="lab">Notation et vocabulaire (§1.2).</span>
+<p> <em>R peut être vu comme <strong>une implémentation du langage S</strong>, développé aux <strong>Bell Laboratories</strong> par <strong>Rick Becker, John Chambers et Allan Wilks</strong>, et qui sert aussi de base aux systèmes <strong>S-Plus</strong>.</em></p>
+</div>
+<p>L'évolution du langage S est caractérisée par quatre livres de John Chambers et de ses coauteurs. Trois comptent, et le cours les nomme explicitement :</p>
+<table>
+<thead>
+<tr>
+<th>Ouvrage</th>
+<th>Auteurs</th>
+<th>Ce qu'il fonde</th>
+<th>Surnom (Références, p. 92)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><em>The New S Language: A Programming Environment for Data Analysis and Graphics</em> (1988)</td>
+<td>Becker, Chambers &amp; Wilks</td>
+<td><strong>la référence de base pour R</strong></td>
+<td>le « <strong>Blue Book</strong> »</td>
+</tr>
+<tr>
+<td><em>Statistical Models in S</em> (1992)</td>
+<td>Chambers &amp; Hastie (éd.)</td>
+<td>les nouveautés de la version 1991 : les <strong>modèles statistiques</strong> (voir fiche 313)</td>
+<td>le « <strong>White Book</strong> »</td>
+</tr>
+<tr>
+<td><em>Programming with Data</em> (1998)</td>
+<td>Chambers</td>
+<td>les <strong>méthodes et classes formelles</strong> du paquet <code>methods</code> (S4)</td>
+<td>le « <strong>Green Book</strong> »</td>
+</tr>
+</tbody></table>
+<p class="cal piege"> <em>La documentation de S/S-Plus peut généralement être utilisée avec R, <strong>en gardant à l'esprit les différences entre les implémentations de S</strong>.</em> Ce n'est donc pas une équivalence, mais une proximité.</p>
+<h3>1.2 R et la statistique — une nuance importante</h3>
+<div class="cal intu"><span class="lab">Ce que le cours prend soin de dire (§1.3).</span>
+<p> <em>Notre présentation de l'environnement R <strong>n'a pas mentionné la statistique</strong>, alors que beaucoup de gens utilisent R <strong>comme un système de statistique</strong>. Nous préférons y voir <strong>un environnement dans lequel de nombreuses techniques statistiques classiques et modernes ont été implémentées</strong>.</em></p>
+</div>
+<ul>
+<li><strong>Quelques-unes</strong> de ces techniques sont <strong>dans R lui-même</strong> (la base).</li>
+<li><strong>Beaucoup</strong> sont fournies <strong>sous forme de paquets</strong> (<em>packages</em>).</li>
+<li>Environ <strong>25 paquets</strong> sont livrés avec R — les paquets dits « <strong>standard</strong> » et « <strong>recommended</strong> ».</li>
+<li>Beaucoup d'autres viennent de la famille de sites <strong>CRAN</strong> (<code>https://CRAN.R-project.org</code>) et d'ailleurs. Voir fiche 315.</li>
+</ul>
+<p class="cal piege"> <em>« Most classical statistics and much of the latest methodology is available for use with R, <strong>but users may need to be prepared to do a little work to find it</strong>. »</em> Le cours vous prévient : <strong>la difficulté n'est pas la disponibilité, c'est la découvrabilité</strong>. D'où l'importance disproportionnée de la section « aide » plus bas.</p>
+<div class="cal formel"><span class="lab">Remarque — la durée de vie du code R (§1.1).</span>
+<p> <em>« However, most programs written in R are essentially <strong>ephemeral</strong>, written for a single piece of data analysis. »</em> C'est une observation du cours, pas un jugement : <strong>la plupart du code R est jetable</strong>. Elle a une conséquence méthodologique — le jour où un script cesse d'être jetable, il faut le transformer en <strong>fonctions</strong> (fiche 309), puis en <strong>paquet</strong> (fiche 319).</p>
+</div>
+<h2 data-prio="must">Concept 2 — La session : ouvrir, travailler, fermer</h2>
+<div class="cal formel"><span class="lab">Définition.</span>
+<p> Une <strong>session R</strong> est l'intervalle entre le lancement du programme et l'appel de <code>q()</code>. Tout ce que vous créez entre les deux vit dans une zone de mémoire nommée l'<strong>espace de travail</strong> (<em>workspace</em>).</p>
+</div>
+<p><strong>L'invite (§1.5).</strong> <em>Quand vous utilisez le programme R, il émet une <strong>invite</strong> (<em>prompt</em>) lorsqu'il attend des commandes. L'invite par défaut est <code>&gt;</code>, qui sous UNIX peut être la même que celle du shell, si bien qu'on peut avoir l'impression <strong>qu'il ne se passe rien</strong>.</em> Le cours convient que l'invite du shell UNIX est notée <code>$</code>.</p>
+<h3>2.1 La procédure recommandée, pas à pas</h3>
+<p>Le cours donne une procédure en quatre étapes pour la <strong>première</strong> utilisation (§1.5). Elle paraît triviale : elle ne l'est pas, parce que l'<strong>étape 1 détermine tout le comportement de sauvegarde</strong> décrit au concept 3.</p>
+<p><em>Étape 1 — créer un sous-dossier dédié.</em> Il deviendra le <strong>répertoire de travail</strong> pour ce problème-là, et <strong>pour lui seul</strong>.</p>
+<pre><code class="language-sh">$ mkdir work
+$ cd work
+</code></pre>
+<p><em>Étape 2 — lancer R depuis ce dossier.</em></p>
+<pre><code class="language-sh">$ R
+</code></pre>
+<p><em>Étape 3 — travailler.</em> R émet <code>&gt;</code>, vous tapez des commandes.</p>
+<p><em>Étape 4 — quitter.</em></p>
+<pre><code class="language-r">q()
+</code></pre>
+<p><em>« At this point you will be asked whether you want to save the data from your R session. »</em> Sur certains systèmes une <strong>boîte de dialogue</strong> apparaît, sur d'autres une invite textuelle à laquelle on répond <strong><code>yes</code>, <code>no</code> ou <code>cancel</code></strong> — <em>une abréviation d'une seule lettre suffit</em> — pour respectivement <strong>sauvegarder puis quitter</strong>, <strong>quitter sans sauvegarder</strong>, ou <strong>revenir dans la session</strong>.</p>
+<p class="cal piege"> <strong><code>cancel</code> n'est pas « annuler la sauvegarde »</strong> : c'est <em>« return to the R session »</em>. Vous ne quittez pas. C'est le premier réflexe faux du débutant.</p>
+<p><em>Les sessions suivantes sont simples</em> (§1.5) : <code>cd work</code>, <code>R</code>, travailler, <code>q()</code>.</p>
+<p><strong>Sous Windows (§1.5).</strong> <em>La procédure à suivre est fondamentalement la même. Créer un dossier comme répertoire de travail, et le renseigner dans le champ <strong>Start In</strong> de votre raccourci R. Puis lancer R en double-cliquant sur l'icône.</em></p>
+<blockquote>
+<p class="cal piege"> <strong>Le piège du raccourci Windows.</strong> Le champ <em>Start In</em> <strong>est</strong> l'étape 1 de la procédure UNIX. Si vous l'ignorez, tous vos projets partagent le même répertoire de travail, donc <strong>le même <code>.RData</code></strong> — et le concept 3 devient un piège au lieu d'un confort.</p>
+</blockquote>
+<h2 data-prio="must">Concept 3 — L'espace de travail : ce qui survit, ce qui disparaît</h2>
+<div class="cal formel"><span class="lab">Définition (§1.11).</span>
+<p> <em>Les entités que R crée et manipule sont appelées des <strong>objets</strong> (<em>objects</em>). Ce peuvent être des variables, des tableaux de nombres, des chaînes de caractères, des fonctions, ou des structures plus générales construites à partir de ces composants.</em></p>
+<p><em>La collection d'objets actuellement stockés s'appelle <strong>l'espace de travail</strong> (<em>workspace</em>).</em></p>
+</div>
+<h3>3.1 Voir et effacer</h3>
+<pre><code class="language-r">objects()          # les noms de (la plupart des) objets stockes
+ls()               # strictement equivalent
+rm(x, y, z, ink, junk, temp, foo, bar)   # effacement
+</code></pre>
+<p class="cal piege"> <strong>Le « la plupart » n'est pas une coquetterie.</strong> Le cours écrit <em>« (most of) the objects »</em>. La raison est donnée par la <em>R Language Definition</em> (§10.3.2) : <em>les identifiants <strong>commençant par un point</strong> ne sont pas listés par défaut par <code>ls</code></em>. C'est ainsi que <code>.RData</code> peut contenir un <code>.First</code> que <code>ls()</code> ne montre pas.</p>
+<div class="cal plus"><span class="lab">Enrichissement pédagogique (hors cours) — voir aussi les objets cachés.</span>
+<p> <code>ls(all.names = TRUE)</code> lève ce filtre. Le manuel <em>An Introduction to R</em> ne le mentionne pas ici ; l'argument est documenté dans la page d'aide de <code>ls</code> (<em>Reference Index</em>, paquet <code>base</code>).</p>
+</div>
+<h3>3.2 Le cycle de sauvegarde — le mécanisme complet</h3>
+<blockquote>
+<p><strong>Le mécanisme (§1.11).</strong> <em>Tous les objets créés pendant une session R peuvent être stockés <strong>de façon permanente</strong> dans un fichier, pour un usage dans de futures sessions. À la fin de chaque session R, on vous donne la possibilité de sauvegarder tous les objets disponibles.</em></p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>Ce qui est écrit</th>
+<th>Contenu</th>
+<th>Quand</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong><code>.RData</code></strong></td>
+<td><strong>les objets</strong> de l'espace de travail</td>
+<td>à la sortie, si vous répondez <code>yes</code></td>
+</tr>
+<tr>
+<td><strong><code>.Rhistory</code></strong></td>
+<td><strong>les lignes de commande</strong> utilisées dans la session</td>
+<td>à la sortie, en même temps</td>
+</tr>
+</tbody></table>
+<p><em>« When R is started at later time <strong>from the same directory</strong> it <strong>reloads the workspace from this file</strong>. At the same time the associated commands history is reloaded. »</em></p>
+<p><strong>Les trois conditions pour que la reprise fonctionne</strong>, dans l'ordre où elles échouent en pratique :</p>
+<ol>
+<li>vous avez répondu <strong><code>yes</code></strong> à la question de sortie ;</li>
+<li>vous relancez R <strong>depuis le même répertoire</strong> ;</li>
+<li>R n'a pas été lancé avec une option qui coupe la restauration (<code>--no-restore</code>, <code>--vanilla</code> — concept 8).</li>
+</ol>
+<p class="cal piege"> <em>« The leading "dot" in this file name makes it <strong>invisible</strong> in normal file listings in UNIX, and in default GUI file listings on macOS and Windows. »</em> (note 5, §1.11) Les deux fichiers <strong>existent et ne se voient pas</strong>. Un débutant qui « ne retrouve plus ses données » les a presque toujours sous les yeux.</p>
+<h3>3.3 Pourquoi un dossier par analyse — l'argument du cours</h3>
+<div class="cal methode"><span class="lab">Méthode — la recommandation, et sa justification (§1.11).</span>
+<p> <em>« It is recommended that you should use <strong>separate working directories</strong> for analyses conducted with R. It is quite common for objects with names <code>x</code> and <code>y</code> to be created during an analysis. Names like this are often meaningful in the context of <strong>a single analysis</strong>, but it can be quite hard to decide what they might be when <strong>several analyses have been conducted in the same directory</strong>. »</em></p>
+</div>
+<p>L'argument n'est pas l'hygiène : c'est que <strong><code>x</code> est un nom parfaitement bon tant qu'il n'y en a qu'un</strong>. La séparation des dossiers est ce qui rend les <strong>noms courts</strong> utilisables — et donc le travail interactif agréable.</p>
+<details class="cor">
+<summary><strong>Exercice résolu — reconstituer ce qui se passe entre deux sessions</strong></summary><div class="in">
+
+<p><strong>Énoncé.</strong> Dans <code>~/work</code>, une session crée <code>x</code>, <code>y</code> et <code>fm</code>. L'utilisateur quitte avec <code>q()</code> et répond <code>y</code>. Le lendemain il lance R depuis son dossier personnel <code>~</code>, tape <code>ls()</code> et ne voit rien. Que s'est-il passé, et que doit-il faire ?</p>
+<p><em>Étape 1 — ce qui a été écrit.</em> La réponse <code>y</code> a produit <strong><code>~/work/.RData</code></strong> (contenant <code>x</code>, <code>y</code>, <code>fm</code>) et <strong><code>~/work/.Rhistory</code></strong>. L'écriture a bien eu lieu.</p>
+<p><em>Étape 2 — ce qui est relu.</em> R relit <code>.RData</code> <strong>du répertoire courant</strong>. Lancé depuis <code>~</code>, il cherche <code>~/.RData</code> — un autre fichier, probablement inexistant. Il démarre donc sur un espace de travail vide, et <code>ls()</code> renvoie <code>character(0)</code>.</p>
+<p><em>Étape 3 — pourquoi c'est invisible.</em> Aucune erreur n'est levée : l'absence de <code>.RData</code> est le cas <strong>normal</strong> d'une première session dans un dossier. Le silence de R est ici légitime, et c'est ce qui rend la situation déroutante.</p>
+<p><em>Étape 4 — le remède immédiat.</em> Quitter, retourner dans le bon dossier, relancer :</p>
+<pre><code class="language-sh">$ cd ~/work
+$ R
+</code></pre>
+<p><em>Étape 5 — vérifier.</em> <code>ls()</code> doit maintenant renvoyer <code>"fm" "x" "y"</code>, et les flèches du clavier doivent faire remonter l'historique de la veille (§1.9).</p>
+<p><em>Étape 6 — la leçon.</em> Le répertoire de lancement <strong>est</strong> l'identité du projet. Sous Windows, cela se règle une fois pour toutes dans le champ <strong>Start In</strong> du raccourci.</p>
+</div></details>
+
+<h2 data-prio="must">Concept 4 — Deux sortes de commandes, et rien d'autre</h2>
+<div class="cal formel"><span class="lab">Définition (§1.8).</span>
+<p> <em>Techniquement, R est un <strong>langage d'expressions</strong> (<em>expression language</em>) à la syntaxe très simple. Les <strong>commandes élémentaires</strong> consistent soit en des <strong>expressions</strong>, soit en des <strong>assignations</strong>.</em></p>
+</div>
+<table>
+<thead>
+<tr>
+<th></th>
+<th><strong>Expression</strong></th>
+<th><strong>Assignation</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Exemple</td>
+<td><code>1/x</code></td>
+<td><code>y &lt;- 1/x</code></td>
+</tr>
+<tr>
+<td>Est évaluée</td>
+<td>oui</td>
+<td>oui</td>
+</tr>
+<tr>
+<td>Est affichée</td>
+<td><strong>oui</strong>, <em>sauf si rendue explicitement invisible</em></td>
+<td><strong>non</strong></td>
+</tr>
+<tr>
+<td>La valeur</td>
+<td>est <strong>perdue</strong></td>
+<td>est <strong>passée à une variable</strong></td>
+</tr>
+</tbody></table>
+<p>C'est la distinction structurante de toute la pratique de R : <strong>si rien ne s'affiche, c'est probablement que vous avez assigné</strong>. Et réciproquement, un débutant qui « perd » son résultat a tapé une expression au lieu d'une assignation.</p>
+<blockquote>
+<p class="cal piege"> <strong>Le « sauf si » n'est pas anodin.</strong> <em>« it is evaluated, printed (<strong>unless specifically made invisible</strong>), and the value is lost. »</em> Certaines fonctions renvoient leur valeur de façon invisible — c'est pourquoi <code>library(stats)</code> n'affiche rien tout en renvoyant quelque chose.</p>
+</blockquote>
+<div class="cal plus"><span class="lab">Enrichissement pédagogique (hors cours) — la valeur n'est pas tout à fait perdue.</span>
+<p> La note 2 du §2.1 précise : <em>« Actually, it is still available as <code>.Last.value</code> <strong>before any other statements are executed</strong>. »</em> Une expression dont vous avez oublié de garder le résultat est donc récupérable, <strong>une fois</strong>, par <code>.Last.value</code>.</p>
+</div>
+<h3>4.1 Noms : ce qui est permis, ce qui est interdit</h3>
+<blockquote>
+<p><strong>Règle (§1.8).</strong> <em>R est <strong>sensible à la casse</strong>, comme la plupart des paquets fondés sur UNIX : <code>A</code> et <code>a</code> sont <strong>des symboles différents</strong> et renverraient à des variables différentes.</em></p>
+</blockquote>
+<p><em>L'ensemble des symboles utilisables dans un nom R <strong>dépend du système d'exploitation et du pays</strong> dans lequel R tourne (techniquement, de la <strong>locale</strong> en usage).</em></p>
+<table>
+<thead>
+<tr>
+<th>Règle (§1.8)</th>
+<th>Détail</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Caractères permis</td>
+<td><strong>tous les alphanumériques</strong> (dans certains pays, y compris les <strong>lettres accentuées</strong>) plus <strong><code>.</code></strong> et <strong><code>_</code></strong></td>
+</tr>
+<tr>
+<td>Premier caractère</td>
+<td>doit être <strong><code>.</code> ou une lettre</strong></td>
+</tr>
+<tr>
+<td>Si le nom commence par <code>.</code></td>
+<td>le <strong>deuxième caractère ne doit pas être un chiffre</strong></td>
+</tr>
+<tr>
+<td>Longueur</td>
+<td><em>effectively unlimited</em></td>
+</tr>
+<tr>
+<td>Code <strong>portable</strong> (note 1)</td>
+<td><em>« For portable R code (including that to be used in R packages) <strong>only A–Z, a–z, and 0–9 should be used</strong>. »</em></td>
+</tr>
+</tbody></table>
+<div class="cal plus"><span class="lab">Complément — la formulation exacte de la R Language Definition (§10.3.2).</span>
+<p> <em>Les identifiants ne doivent pas commencer <strong>par un chiffre</strong>, <strong>par un tiret bas</strong>, ni <strong>par un point suivi d'un chiffre</strong>. L'ensemble précis des caractères permis est donné par l'expression C <code>(isalnum(c) || c == '.' || c == '_')</code>.</em> Elle ajoute deux faits utiles : les identifiants <strong>commençant par un point ne sont pas listés par <code>ls</code></strong>, et <strong><code>...</code>, <code>..1</code>, <code>..2</code>, etc. sont spéciaux</strong> (voir fiche 309).</p>
+</div>
+<p class="cal piege"> <strong>Un objet peut porter un nom qui n'est pas un identifiant</strong> (<em>R Language Definition</em> §10.3.2) : on y accède alors par <code>get</code> et <code>assign</code>. Mais <strong><code>get</code> et <code>assign</code> ne comprennent ni l'indexation ni les fonctions de remplacement</strong>. Les paires suivantes ne sont <strong>pas</strong> équivalentes :</p>
+<table>
+<thead>
+<tr>
+<th>Écriture correcte</th>
+<th>Ce que <code>assign</code>/<code>get</code> fait <strong>à la place</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>x$a &lt;- 1</code></td>
+<td><code>assign("x$a", 1)</code> crée un objet <strong>nommé</strong> <code>x$a</code></td>
+</tr>
+<tr>
+<td><code>x[[1]]</code></td>
+<td><code>get("x[[1]]")</code> cherche un objet <strong>nommé</strong> <code>x[[1]]</code></td>
+</tr>
+<tr>
+<td><code>names(x) &lt;- nm</code></td>
+<td><code>assign("names(x)", nm)</code> crée un objet <strong>nommé</strong> <code>names(x)</code></td>
+</tr>
+</tbody></table>
+<h3>4.2 Les mots réservés</h3>
+<div class="cal formel"><span class="lab">Formule — la liste complète (R Language Definition §10.3.3).</span>
+<p> <em>Les identifiants suivants ont une signification spéciale et <strong>ne peuvent pas être utilisés comme noms d'objets</strong> :</em></p>
+</div>
+<pre><code>if   else   repeat   while   function   for   in   next   break
+TRUE   FALSE   NULL   Inf   NaN
+NA   NA_integer_   NA_real_   NA_complex_   NA_character_
+...   ..1   ..2   etc.
+</code></pre>
+<p class="cal piege"> <strong><code>T</code> et <code>F</code> ne sont PAS dans cette liste</strong> — et c'est exactement le problème. Le cours y revient au §2.4 : *<code>TRUE</code> et <code>FALSE</code> sont souvent abrégés en <code>T</code> et <code>F</code>. Notez cependant que <strong><code>T</code> et <code>F</code> sont juste des variables</strong> initialisées à <code>TRUE</code> et <code>FALSE</code> par défaut, mais <strong>ne sont pas des mots réservés</strong> et peuvent donc être <strong>écrasées par l'utilisateur</strong>. Par conséquent, <strong>vous devriez toujours utiliser <code>TRUE</code> et <code>FALSE</code></strong>.* Voir fiche 301.</p>
+<h3>4.3 Séparer, grouper, commenter, continuer</h3>
+<table>
+<thead>
+<tr>
+<th>Élément (§1.8)</th>
+<th>Règle</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Séparateur de commandes</td>
+<td>un <strong>point-virgule</strong> <code>;</code> ou un <strong>saut de ligne</strong></td>
+</tr>
+<tr>
+<td>Groupement</td>
+<td>des <strong>accolades</strong> <code>{</code> et <code>}</code> réunissent des commandes élémentaires en une <strong>expression composée</strong></td>
+</tr>
+<tr>
+<td>Commentaire</td>
+<td>commence par un <strong><code>#</code></strong> ; <em>tout ce qui suit jusqu'à la fin de la ligne est un commentaire</em></td>
+</tr>
+<tr>
+<td>Commentaire — où c'est interdit (note 2)</td>
+<td><strong>pas à l'intérieur d'une chaîne</strong>, ni <strong>dans la liste d'arguments d'une définition de fonction</strong></td>
+</tr>
+<tr>
+<td>Commande incomplète</td>
+<td>R affiche une <strong>invite différente</strong>, par défaut <strong><code>+</code></strong>, et continue à lire jusqu'à ce que la commande soit <strong>syntaxiquement complète</strong></td>
+</tr>
+<tr>
+<td>Longueur d'une ligne à la console</td>
+<td>limitée à <strong>environ 4 095 octets</strong> (pas caractères)</td>
+</tr>
+</tbody></table>
+<p class="cal piege"> <strong>Le comportement des consoles au-delà de 4 095 octets n'est pas uniforme</strong> (note 3, §1.8) : <em>certaines ne vous laisseront pas en saisir davantage ; parmi celles qui le permettent, <strong>certaines jettent silencieusement l'excédent</strong> et <strong>d'autres l'utilisent comme début de la ligne suivante</strong>.</em> Trois comportements incompatibles — d'où la règle : <strong>les commandes longues vont dans un fichier</strong>, pas dans la console (concept 6, où la note 4 précise que les commandes d'un fichier sont <em>of unlimited length</em>).</p>
+<blockquote>
+<p class="cal piege"> <strong>Le piège d'espacement le plus célèbre de R</strong> (<em>R Language Definition</em> §10.3.5). <em>Des suites de caractères d'espacement servent à <strong>délimiter les jetons en cas d'ambiguïté</strong> — comparez <code>x&lt;-5</code> et <code>x &lt; -5</code>.</em> Le premier <strong>assigne 5 à <code>x</code></strong>. Le second <strong>teste si <code>x</code> est inférieur à −5</strong>. Un seul espace sépare une écriture de l'autre.</p>
+</blockquote>
+<blockquote>
+<p class="cal piege"> <strong>La règle spéciale du <code>else</code></strong> (<em>R Language Definition</em> §10.3.5). <em>À l'intérieur d'une expression composée, un saut de ligne <strong>avant <code>else</code> est ignoré</strong> ; <strong>au niveau le plus externe</strong>, le saut de ligne <strong>termine la construction <code>if</code></strong> et un <code>else</code> qui suit provoque une <strong>erreur de syntaxe</strong>.</em> Ce comportement « quelque peu anormal » — le mot est du cours — existe <em>parce que R doit être utilisable en mode interactif</em> : le parseur doit décider <strong>dès la frappe de RET</strong> si l'expression est complète, incomplète ou invalide. Conséquence pratique : à la console, écrivez <strong><code>} else {</code> sur la même ligne</strong>. Voir fiche 308.</p>
+</blockquote>
+<h2 data-prio="must">Concept 5 — L'aide : quatre portes, une par situation</h2>
+<p>C'est la section la plus rentable de la fiche. Le §1.3 a prévenu : <em>« users may need to be prepared to do a little work to find it »</em>. Voici l'outillage exact.</p>
+<table>
+<thead>
+<tr>
+<th>Situation</th>
+<th>Commande</th>
+<th>Détail du cours (§1.7)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Je connais le nom</strong></td>
+<td><code>help(solve)</code> ou <code>?solve</code></td>
+<td><em>« To get more information on any specific named function »</em></td>
+</tr>
+<tr>
+<td><strong>Le nom contient des caractères spéciaux</strong></td>
+<td><code>help("[[")</code></td>
+<td><em>l'argument <strong>doit être entouré de guillemets</strong> doubles ou simples, ce qui en fait une <strong>chaîne de caractères</strong></em></td>
+</tr>
+<tr>
+<td><strong>Le nom est un mot à sens syntaxique</strong></td>
+<td><code>help("if")</code>, <code>help("for")</code>, <code>help("function")</code></td>
+<td><em>« This is also necessary for a few words with syntactic meaning including <code>if</code>, <code>for</code> and <code>function</code> »</em></td>
+</tr>
+<tr>
+<td><strong>Je cherche par sujet</strong></td>
+<td><code>??solve</code>, ou <code>help.search(...)</code></td>
+<td><em>« allows searching for help in various ways »</em> — <code>?help.search</code> pour les détails et d'autres exemples</td>
+</tr>
+<tr>
+<td><strong>Je veux voir tourner</strong></td>
+<td><code>example(topic)</code></td>
+<td><em>« The examples on a help topic can normally be run by »</em></td>
+</tr>
+<tr>
+<td><strong>Je veux naviguer</strong></td>
+<td><code>help.start()</code></td>
+<td>lance un <strong>navigateur web</strong> ; les pages d'aide se parcourent <strong>par hyperliens</strong></td>
+</tr>
+</tbody></table>
+<div class="cal methode"><span class="lab">Méthode — comment se repérer dans un domaine inconnu (§1.7).</span>
+<p> <em>Le lien « <strong>Search Engine and Keywords</strong> » de la page chargée par <code>help.start()</code> est <strong>particulièrement utile</strong>, car il contient une <strong>liste de concepts de haut niveau</strong> qui cherche parmi les fonctions disponibles. <strong>« It can be a great way to get your bearings quickly and to understand the breadth of what R has to offer. »</strong></em></p>
+</div>
+<p class="cal piege"> <strong>Sous UNIX, <code>help.start()</code> change le canal de l'aide</strong> : <em>« On UNIX, <strong>subsequent help requests are sent to the HTML-based help system</strong> »</em>. Après un <code>help.start()</code>, un <code>?solve</code> ne répond plus dans la console mais <strong>dans le navigateur</strong>. Ce n'est pas une panne.</p>
+<p><strong>Les guillemets (§1.7).</strong> <em>L'une ou l'autre forme de guillemet peut être utilisée <strong>pour échapper l'autre</strong>, comme dans la chaîne <code>"It's important"</code>. <strong>Notre convention est d'utiliser de préférence les guillemets doubles.</strong></em></p>
+<p><strong>Windows (§1.7).</strong> <em>Les versions Windows de R ont d'autres systèmes d'aide optionnels : utilisez <code>?help</code> pour plus de détails.</em></p>
+<details class="cor">
+<summary><strong>Exercice résolu — obtenir l'aide de l'opérateur d'indexation double</strong></summary><div class="in">
+
+<p><strong>Énoncé.</strong> Vous voulez comprendre la différence entre <code>[</code> et <code>[[</code>. Vous tapez <code>?[[</code> et R proteste. Pourquoi, et comment faire ?</p>
+<p><em>Étape 1 — pourquoi ça casse.</em> <code>?[[</code> n'est pas une expression R valide : <code>[[</code> est un <strong>opérateur</strong>, pas un identifiant. Le parseur (§10.3.8 de la <em>R Language Definition</em>) le lit comme un <strong>jeton d'indexation</strong>, et attend un objet à indexer.</p>
+<p><em>Étape 2 — la règle du cours.</em> <em>« For a feature specified by <strong>special characters</strong>, the argument <strong>must be enclosed in double or single quotes</strong>, making it a "character string" »</em>.</p>
+<p><em>Étape 3 — l'écriture correcte.</em></p>
+<pre><code class="language-r">help("[[")
+</code></pre>
+<p><em>Étape 4 — la variante.</em> <code>?"[["</code> fonctionne aussi : c'est la même chaîne, passée par l'autre forme.</p>
+<p><em>Étape 5 — généraliser.</em> La même règle s'applique aux mots à sens syntaxique : <code>help("if")</code>, <code>help("for")</code>, <code>help("function")</code>, <code>help("repeat")</code>. <strong><code>?if</code> est une erreur de syntaxe, pas une absence de documentation.</strong></p>
+<p><em>Étape 6 — voir tourner.</em> <code>example("[[")</code> exécute les exemples de la page.</p>
+</div></details>
+
+<h2 data-prio="high">Concept 6 — Sortir de la console : <code>source()</code> et <code>sink()</code></h2>
+<div class="cal formel"><span class="lab">Définition (§1.10).</span>
+<p> <em>Si des <strong>commandes</strong> sont stockées dans un <strong>fichier externe</strong>, disons <code>commands.R</code> dans le répertoire de travail <code>work</code>, elles peuvent être exécutées <strong>à tout moment</strong> dans une session R par :</em></p>
+</div>
+<pre><code class="language-r">source("commands.R")
+</code></pre>
+<p><em>Sous Windows, <strong>Source</strong> est aussi disponible dans le menu <strong>File</strong>.</em></p>
+<div class="cal formel"><span class="lab">Définition (§1.10).</span>
+<p> <em>La fonction <code>sink</code> <strong>détourne toute la sortie ultérieure</strong> de la console vers un fichier externe.</em></p>
+</div>
+<pre><code class="language-r">sink("record.lis")   # tout ce qui s'afficherait part dans record.lis
+# ... commandes ...
+sink()               # retour a la console
+</code></pre>
+<p><strong>La symétrie à retenir.</strong> <code>source()</code> fait <strong>entrer</strong> du texte dans R ; <code>sink()</code> fait <strong>sortir</strong> du texte de R. Ce sont les deux moitiés du même besoin : <strong>ne pas dépendre de ce qui a été tapé à la main</strong>.</p>
+<p class="cal piege"> <strong>Un <code>sink()</code> non refermé donne l'impression que R est muet.</strong> Toute la sortie continue de partir dans le fichier — y compris les messages qui vous diraient ce qui ne va pas. Le <strong><code>sink()</code> sans argument</strong> est le remède, et il doit être écrit <strong>au moment même</strong> où on ouvre le premier.</p>
+<div class="cal intu"><span class="lab">Contrôle — la raison technique de préférer un fichier.</span>
+<p> La note 4 du §1.10 précise que les commandes stockées dans un fichier sont <em>« of unlimited length »</em>, là où une ligne de console est <strong>limitée à ~4 095 octets</strong> (§1.8). Le fichier n'est donc pas seulement plus propre : il lève <strong>une limite réelle</strong>.</p>
+</div>
+<h2 data-prio="high">Concept 7 — Le démarrage de R : cinq étapes, dans cet ordre</h2>
+<p>C'est la partie que personne ne lit et que tout le monde finit par avoir besoin de connaître — parce qu'elle explique <strong>pourquoi R ne se comporte pas pareil sur deux machines</strong>.</p>
+<div class="cal methode"><span class="lab">Méthode — la séquence complète (annexe B.1).</span>
+<p> <em>Le mécanisme de démarrage est le suivant.</em></p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Ordre</th>
+<th>Étape</th>
+<th>Fichier cherché</th>
+<th>Option qui la coupe</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>1</strong></td>
+<td>variables d'environnement, <strong>site</strong></td>
+<td><code>R_ENVIRON</code>, sinon <strong><code>R_HOME/etc/Renviron.site</code></strong> (s'il existe)</td>
+<td><code>--no-environ</code></td>
+</tr>
+<tr>
+<td><strong>1 bis</strong></td>
+<td>variables d'environnement, <strong>utilisateur</strong></td>
+<td><code>R_ENVIRON_USER</code>, sinon <strong><code>.Renviron</code></strong> dans le <strong>répertoire courant</strong> puis dans le <strong>répertoire personnel</strong>, <em>dans cet ordre</em></td>
+<td><code>--no-environ</code></td>
+</tr>
+<tr>
+<td><strong>2</strong></td>
+<td>profil de <strong>site</strong></td>
+<td><code>R_PROFILE</code>, sinon <strong><code>R_HOME/etc/Rprofile.site</code></strong></td>
+<td><code>--no-site-file</code></td>
+</tr>
+<tr>
+<td><strong>3</strong></td>
+<td>profil <strong>utilisateur</strong></td>
+<td><code>R_PROFILE_USER</code>, sinon <strong><code>.Rprofile</code></strong> dans le <strong>répertoire courant</strong> puis dans le <strong>répertoire personnel</strong></td>
+<td><code>--no-init-file</code></td>
+</tr>
+<tr>
+<td><strong>4</strong></td>
+<td><strong>espace de travail</strong> sauvegardé</td>
+<td><strong><code>.RData</code></strong> du répertoire courant, <em>s'il y en a un</em></td>
+<td><code>--no-restore</code>, <code>--no-restore-data</code></td>
+</tr>
+<tr>
+<td><strong>5</strong></td>
+<td><strong><code>.First()</code></strong></td>
+<td>la fonction, <strong>si elle existe</strong></td>
+<td>— (dépend de 3 et 4)</td>
+</tr>
+</tbody></table>
+<p><em>Les fichiers <code>.Renviron</code> doivent contenir des lignes de la forme <code>name=value</code>.</em> Les variables que <em>« you might want to set »</em>, nommément citées : <strong><code>R_PAPERSIZE</code></strong> (format de papier par défaut), <strong><code>R_PRINTCMD</code></strong> (commande d'impression par défaut), <strong><code>R_LIBS</code></strong> (<em>« specifies the list of R library trees searched for add-on packages »</em>).</p>
+<div class="cal formel"><span class="lab">Définition — .First() et .Last() (annexe B.1).</span>
+<p> *Enfin, <strong>si une fonction <code>.First()</code> existe, elle est exécutée</strong>. Cette fonction — comme <strong><code>.Last()</code>, exécutée à la fin de la session R</strong> — peut être définie dans les profils de démarrage appropriés, ou <strong>résider dans <code>.RData</code></strong>.*</p>
+</div>
+<p class="cal piege"> <em><strong><code>.First()</code> peut venir de <code>.RData</code>.</strong></em> C'est la conséquence la plus surprenante du tableau : l'étape 4 précède l'étape 5. Un espace de travail sauvegardé peut donc <strong>injecter du code exécuté au démarrage</strong>. Combiné au fait que <code>ls()</code> ne montre pas les noms commençant par un point (§1.11), cela donne un comportement <strong>invisible et persistant</strong>.</p>
+<div class="cal methode"><span class="lab">Méthode — le réflexe de diagnostic.</span>
+<p> Devant un comportement inexpliqué au démarrage, <strong>relancez R avec <code>--vanilla</code></strong> : l'option combine <em><code>--no-save</code>, <code>--no-environ</code>, <code>--no-site-file</code>, <code>--no-init-file</code> et <code>--no-restore</code></em> (et, sous Windows, <code>--no-Rconsole</code>). Elle <strong>désactive les cinq étapes d'un coup</strong>. Si le problème disparaît, il vient d'un fichier de démarrage ; s'il persiste, il vient de R ou du paquet.</p>
+</div>
+<p><em>Voir aussi l'aide en ligne du sujet <strong><code>Startup</code></strong></em> : <code>help("Startup")</code> en donne <em>« a precise description »</em>.</p>
+<p><strong>Une dernière contrainte, avant tout le reste (annexe B.1).</strong> <em>« You need to ensure that either the environment variable <strong><code>TMPDIR</code></strong> is <strong>unset</strong> or it <strong>points to a valid place to create temporary files and directories</strong>. »</em></p>
+<h2 data-prio="high">Concept 8 — Invoquer R depuis la ligne de commande</h2>
+<div class="cal formel"><span class="lab">Notation (annexe B.1).</span>
+<p> <em>En travaillant en ligne de commande sous UNIX ou Windows, la commande <code>R</code> peut servir à la fois à lancer le programme principal, sous la forme</em></p>
+</div>
+<pre><code>R [options] [&lt;infile] [&gt;outfile]
+</code></pre>
+<p>*ou, via l'interface <strong><code>R CMD</code></strong>, comme enveloppe autour de divers outils R (par exemple pour traiter des fichiers au format de documentation R ou manipuler des paquets additionnels) <strong>qui ne sont pas destinés à être appelés « directement »</strong>.*</p>
+<p class="cal piege"> <em><strong>« At the Windows command-line, <code>Rterm.exe</code> is preferred to <code>R</code>. »</strong></em> C'est explicite dans le cours.</p>
+<h3>8.1 Les options — regroupées par ce qu'elles servent</h3>
+<p><strong>Information, puis sortie immédiate</strong></p>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Effet</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>--help</code>, <code>-h</code></td>
+<td><em>print short help message to standard output and exit successfully</em></td>
+</tr>
+<tr>
+<td><code>--version</code></td>
+<td>information de version, puis sortie</td>
+</tr>
+<tr>
+<td><code>RHOME</code></td>
+<td>affiche le chemin du <strong>« home directory »</strong> de R. <em>L'installation de R y met <strong>tout</strong> (exécutables, paquets, etc.), à part le script shell de façade et la page de manuel</em></td>
+</tr>
+</tbody></table>
+<p><strong>Ce qui est lu au démarrage et écrit à la sortie</strong> — voir concept 7</p>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Effet</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>--save</code> / <code>--no-save</code></td>
+<td>contrôlent la sauvegarde en fin de session. <em>Si <strong>aucune</strong> n'est donnée <strong>en session interactive</strong>, <strong>l'utilisateur est interrogé</strong> ; <strong>en usage non interactif, l'une des deux doit être spécifiée</strong> ou impliquée par une autre option</em></td>
+</tr>
+<tr>
+<td><code>--no-environ</code></td>
+<td>ne lit <strong>aucun</strong> fichier utilisateur de variables d'environnement</td>
+</tr>
+<tr>
+<td><code>--no-site-file</code></td>
+<td>ne lit pas le profil de site</td>
+</tr>
+<tr>
+<td><code>--no-init-file</code></td>
+<td>ne lit pas le profil utilisateur</td>
+</tr>
+<tr>
+<td><code>--restore</code> / <code>--no-restore</code> / <code>--no-restore-data</code></td>
+<td>restauration de <code>.RData</code>. <strong>Le défaut est de restaurer.</strong> <em><code>--no-restore</code> implique toutes les options <code>--no-restore-*</code> spécifiques</em></td>
+</tr>
+<tr>
+<td><code>--no-restore-history</code></td>
+<td>l'historique (<code>.Rhistory</code>, ou <code>R_HISTFILE</code>). <strong>Le défaut est de restaurer</strong></td>
+</tr>
+<tr>
+<td><code>--no-Rconsole</code></td>
+<td><em>(Windows)</em> empêche le chargement du fichier <code>Rconsole</code></td>
+</tr>
+<tr>
+<td><strong><code>--vanilla</code></strong></td>
+<td><strong>combine</strong> <code>--no-save</code>, <code>--no-environ</code>, <code>--no-site-file</code>, <code>--no-init-file</code>, <code>--no-restore</code> (+ <code>--no-Rconsole</code> sous Windows)</td>
+</tr>
+</tbody></table>
+<p><strong>D'où vient le code</strong></p>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Effet</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-f fichier</code>, <code>--file=fichier</code></td>
+<td><em>(pas <code>Rgui.exe</code>)</em> prend l'entrée dans le fichier ; <strong><code>-</code> signifie l'entrée standard</strong>. <strong>Implique <code>--no-save</code></strong> sauf si <code>--save</code> a été posé. <em>Sur système Unix, <strong>éviter les métacaractères du shell</strong> dans le nom (les espaces sont permis)</em></td>
+</tr>
+<tr>
+<td><code>-e expression</code></td>
+<td><em>(pas <code>Rgui.exe</code>)</em> utilise l'expression comme ligne d'entrée. <strong>Plusieurs <code>-e</code> possibles, mais pas avec <code>-f</code>/<code>--file</code></strong>. <strong>Implique <code>--no-save</code></strong> sauf <code>--save</code>. <em>Limite de <strong>10 000 octets</strong> sur la longueur totale des expressions</em></td>
+</tr>
+<tr>
+<td><code>--encoding=enc</code></td>
+<td>encodage supposé pour l'entrée depuis la console ou <code>stdin</code> ; <em>doit être un encodage connu de <code>iconv</code></em></td>
+</tr>
+</tbody></table>
+<p><strong>Verbosité</strong></p>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Effet</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>--quiet</code>, <code>--silent</code>, <code>-q</code></td>
+<td>pas de message initial de copyright et de bienvenue ; en outre <strong>pose <code>options("quiet")</code> à <code>TRUE</code></strong> — que d'autres fonctions R peuvent consulter</td>
+</tr>
+<tr>
+<td><code>--no-echo</code>, <code>-s</code></td>
+<td><em>« make R run as quietly as possible »</em>. <strong>Implique <code>--quiet</code> et <code>--no-save</code>.</strong> <em>Destinée aux programmes qui utilisent R pour calculer des résultats pour eux</em></td>
+</tr>
+<tr>
+<td><code>--verbose</code></td>
+<td>plus d'informations sur la progression ; <strong>pose l'option <code>verbose</code> de R à <code>TRUE</code></strong> — <em>le code R utilise cette option pour contrôler l'affichage des messages de diagnostic</em></td>
+</tr>
+</tbody></table>
+<p><strong>Cas particuliers</strong></p>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Effet</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>--interactive</code></td>
+<td><em>(UNIX)</em> <strong>affirmer</strong> que R tourne bien de façon interactive <strong>même si l'entrée a été redirigée</strong>. <em>Le défaut est de déduire l'interactivité <strong>si et seulement si <code>stdin</code> est connecté à un terminal ou à un pty</strong>.</em>  <em><code>-e</code>, <code>-f</code> ou <code>--file</code> affirment un usage <strong>non interactif</strong> même si <code>--interactive</code> est donné</em> — et <em>cela <strong>n'active pas</strong> l'édition de ligne de commande</em></td>
+</tr>
+<tr>
+<td><code>--no-readline</code></td>
+<td><em>(UNIX)</em> coupe l'édition de ligne via <strong>readline</strong>. Utile depuis Emacs avec <strong>ESS</strong>. <em>Affecte aussi l'expansion du tilde : voir l'aide de <code>path.expand</code></em></td>
+</tr>
+<tr>
+<td><code>--ess</code></td>
+<td><em>(Windows)</em> prépare <code>Rterm</code> pour <code>R-inferior-mode</code> d'ESS : affirme l'interactivité (<strong>sans</strong> l'éditeur de ligne) et <strong>pas de tampon sur <code>stdout</code></strong></td>
+</tr>
+<tr>
+<td><code>--gui=type</code>, <code>-g type</code></td>
+<td><em>(UNIX)</em> interface graphique : <strong><code>X11</code></strong> (défaut) et <strong><code>Tk</code></strong> si le support Tcl/Tk est disponible. <em>Par rétrocompatibilité, <code>x11</code> et <code>tk</code> sont acceptés</em></td>
+</tr>
+<tr>
+<td><code>--arch=nom</code></td>
+<td><em>(UNIX)</em> lance la sous-architecture indiquée</td>
+</tr>
+<tr>
+<td><code>--debugger=nom</code>, <code>-d nom</code></td>
+<td><em>(UNIX)</em> lance R sous le débogueur. <em>Pour la plupart des débogueurs — <strong>les exceptions sont <code>valgrind</code> et les versions récentes de <code>gdb</code></strong> — les options de ligne de commande suivantes sont <strong>ignorées</strong> et doivent être données au lancement de l'exécutable <strong>depuis l'intérieur du débogueur</strong></em></td>
+</tr>
+<tr>
+<td><strong><code>--args</code></strong></td>
+<td><em>« does nothing except cause the rest of the command line to be <strong>skipped</strong> »</em> — pour récupérer les valeurs avec <strong><code>commandArgs(TRUE)</code></strong></td>
+</tr>
+</tbody></table>
+<p><strong>Mémoire — « for expert use only »</strong></p>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Défaut</th>
+<th>Variable d'environnement</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>--min-vsize=N</code> (tas de vecteurs, en octets)</td>
+<td><strong>6 Mo</strong></td>
+<td><code>R_VSIZE</code></td>
+</tr>
+<tr>
+<td><code>--min-nsize=N</code> (cellules cons, en nombre)</td>
+<td><strong>350 k</strong></td>
+<td><code>R_NSIZE</code></td>
+</tr>
+<tr>
+<td><code>--max-ppsize=N</code> (pile de protection des pointeurs)</td>
+<td><strong>10 000</strong>, maximum accepté <strong>100 000</strong></td>
+<td>—</td>
+</tr>
+</tbody></table>
+<p><em>Le suffixe <code>M</code> spécifie des mégaoctets ou des millions de cellules respectivement.</em> Voir l'aide du sujet <code>Memory</code>. <em>« Users will not normally need to use these unless they are trying to limit the amount of memory used by R. »</em></p>
+<p class="cal piege"> <strong>La redirection ne lève pas la limite de ligne.</strong> <em>« Note that input and output can be redirected in the usual way (using <code>&lt;</code> and <code>&gt;</code>), but <strong>the line length limit of 4 095 bytes still applies</strong>. »</em> Et : <em>« Warning and error messages are sent to the <strong>error channel (<code>stderr</code>)</strong> »</em> — ce qui explique qu'un <code>&gt; sortie.txt</code> ne capture <strong>pas</strong> les erreurs.</p>
+<h2 data-prio="mid">Concept 9 — <code>R CMD</code> : la boîte à outils hors session</h2>
+<div class="cal formel"><span class="lab">Notation (annexe B.1).</span>
+<p> *La commande <code>R CMD</code> permet d'invoquer divers outils utiles avec R, <strong>mais non destinés à être appelés « directement »</strong>. La forme générale est :*</p>
+</div>
+<pre><code>R CMD commande args
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>Outil</th>
+<th>Ce qu'il fait</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>BATCH</code></td>
+<td><em>run R in batch mode.</em> Lance <strong><code>R --restore --save</code></strong> avec éventuellement d'autres options (voir <code>?BATCH</code>)</td>
+</tr>
+<tr>
+<td><code>COMPILE</code></td>
+<td><em>(UNIX)</em> compile des fichiers C, C++, Fortran… pour usage avec R</td>
+</tr>
+<tr>
+<td><code>SHLIB</code></td>
+<td>construit une <strong>bibliothèque partagée</strong> pour le chargement dynamique</td>
+</tr>
+<tr>
+<td><code>INSTALL</code> / <code>REMOVE</code></td>
+<td>installe / supprime des paquets additionnels</td>
+</tr>
+<tr>
+<td><code>build</code></td>
+<td><strong>empaquette</strong> un paquet additionnel</td>
+</tr>
+<tr>
+<td><code>check</code></td>
+<td><strong>vérifie</strong> un paquet additionnel</td>
+</tr>
+<tr>
+<td><code>LINK</code></td>
+<td><em>(UNIX)</em> façade pour créer des programmes exécutables</td>
+</tr>
+<tr>
+<td><code>Rprof</code></td>
+<td>post-traite les fichiers de <strong>profilage</strong> R (voir fiche 317)</td>
+</tr>
+<tr>
+<td><code>Rdconv</code>, <code>Rd2txt</code></td>
+<td>convertit le format <strong>Rd</strong> vers HTML, LaTeX, texte brut, et en <strong>extrait les exemples</strong>. <em><code>Rd2txt</code> est un raccourci pour <code>Rd2conv -t txt</code></em></td>
+</tr>
+<tr>
+<td><code>Rd2pdf</code></td>
+<td>convertit du Rd en <strong>PDF</strong></td>
+</tr>
+<tr>
+<td><code>Stangle</code> / <code>Sweave</code></td>
+<td><strong>extrait</strong> le code S/R d'une vignette / <strong>traite</strong> une vignette</td>
+</tr>
+<tr>
+<td><code>Rdiff</code></td>
+<td><em>diff</em> de sortie R <strong>en ignorant les en-têtes</strong></td>
+</tr>
+<tr>
+<td><code>config</code></td>
+<td>obtient l'information de configuration</td>
+</tr>
+<tr>
+<td><code>javareconf</code></td>
+<td><em>(UNIX)</em> met à jour les variables de configuration Java</td>
+</tr>
+<tr>
+<td><code>rtags</code></td>
+<td><em>(UNIX)</em> crée des fichiers de tags style Emacs à partir de fichiers C, R et Rd</td>
+</tr>
+<tr>
+<td><code>open</code></td>
+<td><em>(Windows)</em> ouvre un fichier via les associations Windows</td>
+</tr>
+<tr>
+<td><code>texify</code></td>
+<td><em>(Windows)</em> traite des fichiers (La)TeX avec les styles de R</td>
+</tr>
+</tbody></table>
+<p><em><code>R CMD commande --help</code> donne les informations d'usage de chaque outil.</em></p>
+<blockquote>
+<p class="cal piege"> <strong>Deux règles d'or de <code>R CMD</code>, faciles à manquer.</strong></p>
+<ol>
+<li><em>Vous pouvez placer <code>--arch=</code>, <code>--no-environ</code>, <code>--no-init-file</code>, <code>--no-site-file</code> et <code>--vanilla</code> <strong>entre <code>R</code> et <code>CMD</code></strong> : elles affectent tous les processus R lancés par les outils.</em> Ici <strong><code>--vanilla</code> équivaut à <code>--no-environ --no-site-file --no-init-file</code></strong> (les deux autres composantes n'ont pas de sens hors session).</li>
+<li><em><code>R CMD</code> <strong>n'utilise de lui-même aucun fichier de démarrage de R</strong></em> (en particulier ni les <code>Renviron</code> utilisateur ni ceux de site), *et <strong>tous les processus R lancés par ces outils — sauf <code>BATCH</code> — utilisent <code>--no-restore</code></strong>.*</li>
+</ol>
+<p>Autrement dit : <strong>ce qui marche dans votre session ne marche pas forcément sous <code>R CMD check</code></strong>, précisément parce que votre <code>.Rprofile</code> n'y est pas lu. C'est la cause n° 1 des « ça marche chez moi » en développement de paquets.</p>
+</blockquote>
+<h2 data-prio="high">Concept 10 — Scripter : <code>BATCH</code>, <code>Rscript</code>, et la question de <code>stdin</code></h2>
+<div class="cal methode"><span class="lab">Méthode — la recommandation du cours (annexe B.4).</span>
+<p> *Si vous voulez simplement exécuter un fichier <code>foo.R</code> de commandes R, <strong>la façon recommandée est <code>R CMD BATCH foo.R</code></strong>. Pour le lancer en arrière-plan ou comme travail par lot, utilisez les facilités du système : par exemple, dans la plupart des shells Unix, <code>R CMD BATCH foo.R &amp;</code> lance un travail d'arrière-plan.*</p>
+</div>
+<h3>10.1 Passer des arguments — les deux voies</h3>
+<p><strong>Voie 1 — <code>R CMD BATCH</code>.</strong> <em>On peut passer des paramètres via des arguments supplémentaires sur la ligne de commande (le quotage exact dépend du shell utilisé) :</em></p>
+<pre><code class="language-sh">R CMD BATCH "--args arg1 arg2" foo.R &amp;
+</code></pre>
+<p><em>ce qui passe des arguments à un script, récupérables comme <strong>vecteur de caractères</strong> par :</em></p>
+<pre><code class="language-r">args &lt;- commandArgs(TRUE)
+</code></pre>
+<p><strong>Voie 2 — <code>Rscript</code>, « this is made simpler by ».</strong> <em>La façade alternative <code>Rscript</code> s'invoque par :</em></p>
+<pre><code class="language-sh">Rscript foo.R arg1 arg2
+</code></pre>
+<h3>10.2 Écrire un script exécutable</h3>
+<p><em>Cela peut aussi servir à écrire des fichiers de script exécutables comme celui-ci (au moins sur systèmes Unix, et dans certains shells Windows) :</em></p>
+<pre><code class="language-r">#! /path/to/Rscript
+args &lt;- commandArgs(TRUE)
+...
+q(status = &lt;exit status code&gt;)
+</code></pre>
+<p><em>Si ceci est saisi dans un fichier texte <code>runfoo</code> <strong>rendu exécutable</strong> (par <code>chmod 755 runfoo</code>), il peut être invoqué avec différents arguments par <code>runfoo arg1 arg2</code>.</em></p>
+<p><em>Si vous ne voulez pas coder en dur le chemin de <code>Rscript</code> mais qu'il est dans votre <code>PATH</code> — <strong>ce qui est normalement le cas pour une installation R, sauf sous Windows</strong>, mais les utilisateurs macOS peuvent avoir à ajouter <code>/usr/local/bin</code> — utilisez :</em></p>
+<pre><code class="language-r">#! /usr/bin/env Rscript
+...
+</code></pre>
+<p class="cal piege"> <em><strong>« At least in Bourne and bash shells, the <code>#!</code> mechanism does not allow extra arguments like <code>#! /usr/bin/env Rscript --vanilla</code>. »</strong></em> Le shebang n'accepte <strong>pas</strong> d'argument supplémentaire après <code>env Rscript</code>. C'est une limitation du shell, pas de R.</p>
+<p><em>« This writes R output to <code>stdout</code> and <code>stderr</code>, and this can be redirected in the usual way for the shell running the command. »</em></p>
+<h3>10.3 Le piège de <code>stdin()</code> — la subtilité qui fait échouer les scripts</h3>
+<div class="cal formel"><span class="lab">Problème.</span>
+<p class="cal piege">  <em>« One thing to consider is what <code>stdin()</code> refers to. »</em></p>
+</div>
+<p><em>Il est courant d'écrire des scripts R avec des segments comme :</em></p>
+<pre><code class="language-r">chem &lt;- scan(n = 24)
+2.90 3.10 3.40 3.40 3.70 3.70 2.80 2.50 2.40 2.40 2.70 2.20
+5.28 3.37 3.03 3.03 28.95 3.77 3.40 2.20 3.50 3.60 3.70 3.70
+</code></pre>
+<p><em>et <strong><code>stdin()</code> renvoie au fichier de script</strong>, pour permettre cet usage traditionnel. Si vous voulez désigner l'<strong>entrée standard du processus</strong>, utilisez <code>"stdin"</code> comme <strong>connexion de fichier</strong>, par exemple <code>scan("stdin", ...)</code>.</em></p>
+<table>
+<thead>
+<tr>
+<th>Écriture</th>
+<th>Ce qu'elle lit</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>scan(n = 24)</code> / <code>stdin()</code></td>
+<td><strong>les lignes suivantes du fichier de script lui-même</strong></td>
+</tr>
+<tr>
+<td><code>scan("stdin", ...)</code></td>
+<td><strong>l'entrée standard du processus</strong> (le tube, le clavier)</td>
+</tr>
+</tbody></table>
+<p><em>Une autre façon d'écrire des scripts exécutables (suggérée par François Pinard) est d'utiliser un <strong>document en ligne</strong> (<em>here document</em>) :</em></p>
+<pre><code class="language-sh">#!/bin/sh
+# des variables d'environnement peuvent etre posees ici
+R --no-echo [autres options] &lt;&lt;EOF
+
+  le programme R vient ici...
+
+EOF
+</code></pre>
+<p class="cal piege"> <em>mais <strong>ici <code>stdin()</code> renvoie à la source du programme</strong> et <strong><code>"stdin"</code> ne sera pas utilisable</strong>.</em> Les deux techniques ont donc des sémantiques d'entrée <strong>opposées</strong> : c'est le point à vérifier avant de porter un script d'une forme à l'autre.</p>
+<p><strong>Deux dernières notes (annexe B.4).</strong> <em>Les scripts courts peuvent être passés à <code>Rscript</code> en ligne de commande via le drapeau <code>-e</code>. <strong>Les scripts vides ne sont pas acceptés.</strong></em> Et : <em>sur un système Unix, le nom du fichier d'entrée (tel que <code>foo.R</code>) <strong>ne devrait contenir ni espaces ni métacaractères du shell</strong>.</em></p>
+<h2 data-prio="low">Concept 11 — L'éditeur de ligne de commande</h2>
+<div class="cal formel"><span class="lab">Définition (annexe C.1).</span>
+<p> <em>Quand la bibliothèque <strong>GNU readline</strong> est disponible au moment où R est configuré pour la compilation sous UNIX, <strong>un éditeur de ligne de commande intégré</strong> permettant le rappel, l'édition et la resoumission des commandes antérieures est utilisé.</em></p>
+</div>
+<ul>
+<li>D'autres versions de readline existent et peuvent être utilisées — <em>« this is most common on macOS »</em>.</li>
+<li><strong>Savoir laquelle vous avez</strong> : <code>extSoftVersion()</code> dans une session R.</li>
+<li><strong>Le désactiver</strong> (utile avec ESS) : option de démarrage <code>--no-readline</code>.</li>
+<li><strong>Windows</strong> : édition <em>« somewhat simpler »</em> — voir <code>Console</code> dans le menu <code>Help</code> de l'interface, et le fichier <code>README.Rterm</code> pour <code>Rterm.exe</code>.</li>
+</ul>
+<p><strong>Notation (annexe C.1).</strong> *Les caractères <strong>Control</strong>, comme Control-m, s'obtiennent en maintenant CTRL pendant qu'on presse <code>m</code> ; on les écrit <strong><code>C-m</code></strong>. Les caractères <strong>Meta</strong>, comme Meta-b, se tapent en maintenant META et en pressant <code>b</code> ; on les écrit <strong><code>M-b</code></strong>. Si votre terminal n'a pas de touche META activée, vous pouvez taper les caractères Meta par une <strong>séquence de deux caractères commençant par ESC</strong> — ainsi <code>M-b</code> peut se taper <code>ESC b</code>.*</p>
+<p class="cal piege"> <em><strong>« Note that case is significant for Meta characters. »</strong></em> <code>M-l</code> et <code>M-L</code> ne sont pas la même chose.</p>
+<p class="cal piege"> <em>« Some but not all versions of readline will recognize <strong>resizing of the terminal window</strong> so this <strong>is best avoided</strong>. »</em></p>
+<p><strong>Le fonctionnement (annexe C.2).</strong> <em>R garde un historique des lignes de commande que vous tapez, <strong>y compris les lignes erronées</strong>. En édition à la Emacs, <strong>toute frappe ordinaire insère les caractères</strong> dans la commande en cours, en décalant vers la droite. En mode <code>vi</code>, le mode insertion se démarre par <code>M-i</code> ou <code>M-a</code> et se termine par un nouveau <code>ESC</code>. <strong>Le défaut est le style Emacs</strong>, et c'est le seul décrit. <strong>Presser RET à tout moment resoumet la commande.</strong></em></p>
+<h3>11.1 Le tableau complet des raccourcis (annexe C.3)</h3>
+<p><strong>Rappel de commandes et déplacement vertical</strong></p>
+<table>
+<thead>
+<tr>
+<th>Raccourci</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>C-p</code></td>
+<td>commande <strong>précédente</strong> (en arrière dans l'historique)</td>
+</tr>
+<tr>
+<td><code>C-n</code></td>
+<td>commande <strong>suivante</strong></td>
+</tr>
+<tr>
+<td><code>C-r texte</code></td>
+<td>trouve la <strong>dernière</strong> commande contenant la chaîne. <em>Annulable par <code>C-g</code>, et sur certaines versions de R par <code>C-c</code></em></td>
+</tr>
+</tbody></table>
+<p><em>Sur la plupart des terminaux, les <strong>flèches haut et bas</strong> remplacent <code>C-p</code> et <code>C-n</code>.</em></p>
+<p><strong>Déplacement horizontal du curseur</strong></p>
+<table>
+<thead>
+<tr>
+<th>Raccourci</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>C-a</code></td>
+<td>aller au <strong>début</strong> de la commande</td>
+</tr>
+<tr>
+<td><code>C-e</code></td>
+<td>aller à la <strong>fin</strong> de la ligne</td>
+</tr>
+<tr>
+<td><code>M-b</code> / <code>M-f</code></td>
+<td>reculer / avancer <strong>d'un mot</strong></td>
+</tr>
+<tr>
+<td><code>C-b</code> / <code>C-f</code></td>
+<td>reculer / avancer <strong>d'un caractère</strong></td>
+</tr>
+</tbody></table>
+<p><em>Sur la plupart des terminaux, les <strong>flèches gauche et droite</strong> remplacent <code>C-b</code> et <code>C-f</code>.</em></p>
+<p><strong>Édition et resoumission</strong></p>
+<table>
+<thead>
+<tr>
+<th>Raccourci</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><em>texte</em></td>
+<td>insérer le texte <strong>au curseur</strong></td>
+</tr>
+<tr>
+<td><code>C-f texte</code></td>
+<td>ajouter le texte <strong>après</strong> le curseur</td>
+</tr>
+<tr>
+<td><code>DEL</code></td>
+<td>effacer le caractère <strong>précédent</strong> (à gauche du curseur)</td>
+</tr>
+<tr>
+<td><code>C-d</code></td>
+<td>effacer le caractère <strong>sous</strong> le curseur</td>
+</tr>
+<tr>
+<td><code>M-d</code></td>
+<td>effacer <strong>le reste du mot</strong> sous le curseur, <strong>et le « sauver »</strong></td>
+</tr>
+<tr>
+<td><code>C-k</code></td>
+<td>effacer <strong>du curseur à la fin</strong> de la commande, <strong>et le « sauver »</strong></td>
+</tr>
+<tr>
+<td><code>C-y</code></td>
+<td>insérer (<em>yank</em>) <strong>le dernier texte « sauvé »</strong> ici</td>
+</tr>
+<tr>
+<td><code>C-t</code></td>
+<td><strong>transposer</strong> le caractère sous le curseur avec le suivant</td>
+</tr>
+<tr>
+<td><code>M-l</code></td>
+<td>passer <strong>le reste du mot en minuscules</strong></td>
+</tr>
+<tr>
+<td><code>M-c</code></td>
+<td>passer <strong>le reste du mot en majuscules</strong></td>
+</tr>
+<tr>
+<td><code>RET</code></td>
+<td><strong>resoumettre</strong> la commande à R</td>
+</tr>
+</tbody></table>
+<p><em>« The final RET terminates the command line editing sequence. »</em></p>
+<p><strong>Personnalisation (annexe C.3).</strong> *Les associations de touches de readline peuvent être personnalisées de la façon habituelle via un fichier <strong><code>~/.inputrc</code></strong>. Ces personnalisations peuvent être <strong>conditionnées à l'application <code>R</code></strong>, en incluant une section comme :*</p>
+<pre><code>$if R
+    "\C-xd": "q('no')\n"
+
+$endif
+</code></pre>
+<div class="cal intu"><span class="lab">Ce que fait cet exemple.</span>
+<p> Il associe <code>C-x d</code> à la frappe littérale de <code>q('no')</code> suivie d'un retour chariot — <strong>quitter sans sauvegarder, en deux touches</strong>. Et le bloc <code>$if R … $endif</code> garantit que cette association <strong>n'existe que dans R</strong>, pas dans les autres programmes qui utilisent readline.</p>
+</div>
+<p><strong>Le trio à mémoriser en premier</strong>, parce qu'il représente 90 % de l'usage réel : <strong><code>C-r</code></strong> (retrouver une commande par son contenu), <strong><code>C-a</code></strong> (revenir au début pour corriger un nom de fonction), <strong><code>C-k</code></strong> (couper la fin d'une ligne à refaire).</p>
+<h2 data-prio="must">La session de l'annexe A, expliquée pas à pas</h2>
+<p>L'annexe A est la seule partie du cours qui soit un <strong>script à taper</strong>. <em>« Many features of the system will be unfamiliar and puzzling at first, but this puzzlement will soon disappear. »</em> Elle est reproduite ici découpée en actes, avec <strong>ce que chaque ligne enseigne</strong>. Les fiches 301 à 314 y reviendront ; l'objectif ici est de <strong>reconnaître la forme d'une session R</strong>.</p>
+<details class="cor">
+<summary><strong>Acte 1 — régression linéaire simple sur données simulées (annexe A, p. 80)</strong></summary><div class="in">
+
+<pre><code class="language-r">help.start()          # interface HTML de l'aide, dans un navigateur
+x &lt;- rnorm(50)
+y &lt;- rnorm(x)         # deux vecteurs pseudo-aleatoires normaux
+plot(x, y)            # nuage de points ; une fenetre graphique apparait
+ls()                  # quels objets sont dans l'espace de travail ?
+rm(x, y)              # nettoyage
+</code></pre>
+<p class="cal piege"> <strong><code>rnorm(x)</code> n'est pas une faute de frappe.</strong> <code>rnorm(50)</code> tire 50 valeurs ; <code>rnorm(x)</code> en tire <strong>autant que <code>x</code> a d'éléments</strong>. C'est un idiome R : beaucoup de fonctions acceptent <strong>un vecteur là où on attend une longueur</strong>. Le cours ne le commente pas — il le fait.</p>
+<pre><code class="language-r">x &lt;- 1:20                              # x = (1, 2, ..., 20)
+w &lt;- 1 + sqrt(x)/2                     # un vecteur de POIDS : des ecarts-types
+dummy &lt;- data.frame(x = x, y = x + rnorm(x)*w)
+dummy                                  # un data frame a deux colonnes ; le regarder
+</code></pre>
+<p><em>Étape — lire le modèle simulé.</em> La colonne <code>y</code> vaut $x$ <strong>plus</strong> un bruit normal <strong>d'écart-type <code>w</code></strong>, lui-même croissant en $\sqrt x$. Les données sont donc <strong>hétéroscédastiques par construction</strong> — ce qui va être le sujet de tout l'acte.</p>
+<pre><code class="language-r">fm &lt;- lm(y ~ x, data = dummy)
+summary(fm)
+</code></pre>
+<p>*« Fit a simple linear regression and look at the analysis. <strong>With <code>y</code> to the left of the tilde, we are modelling <code>y</code> dependent on <code>x</code></strong>. »* Voir fiche 313 pour la syntaxe des formules.</p>
+<pre><code class="language-r">fm1 &lt;- lm(y ~ x, data = dummy, weight = 1/w^2)
+summary(fm1)
+</code></pre>
+<p><em>« <strong>Since we know the standard deviations</strong>, we can do a weighted regression. »</em> Le poids est <strong>l'inverse de la variance</strong> — c'est la définition des moindres carrés pondérés.</p>
+<pre><code class="language-r">attach(dummy)          # rend les colonnes du data frame visibles comme variables
+lrf &lt;- lowess(x, y)    # une regression locale non parametrique
+plot(x, y)             # nuage standard
+lines(x, lrf$y)        # y ajouter la regression locale
+abline(0, 1, lty = 3)  # LA VRAIE droite : ordonnee 0, pente 1
+abline(coef(fm))               # droite non ponderee
+abline(coef(fm1), col = "red") # droite ponderee
+detach()               # retirer le data frame du chemin de recherche
+</code></pre>
+<p><strong>Ce que cet acte démontre.</strong> Trois estimations de la même relation sont superposées <strong>au vrai modèle</strong> (<code>abline(0, 1)</code>), qu'on ne connaît que parce que les données sont simulées. C'est la manière la plus économique de voir <strong>ce que la pondération apporte</strong>.</p>
+<pre><code class="language-r">plot(fitted(fm), resid(fm),
+     xlab = "Fitted values",
+     ylab = "Residuals",
+     main = "Residuals vs Fitted")
+</code></pre>
+<p><em>« A standard regression diagnostic plot <strong>to check for heteroscedasticity. Can you see it?</strong> »</em> La question du cours est rhétorique : <strong>oui</strong>, puisque <code>w</code> croît avec <code>x</code>.</p>
+<pre><code class="language-r">qqnorm(resid(fm), main = "Residuals Rankit Plot")
+</code></pre>
+<p>*« A normal scores plot to check for <strong>skewness, kurtosis and outliers</strong>. (<strong>Not very useful here.</strong>) »*</p>
+<pre><code class="language-r">rm(fm, fm1, lrf, x, dummy)   # nettoyage
+</code></pre>
+</div></details>
+
+<details class="cor">
+<summary><strong>Acte 2 — les données de Michelson : facteurs, blocs et comparaison de modèles</strong></summary><div class="in">
+
+<p><em>« The next section will look at data from the classical experiment of <strong>Michelson to measure the speed of light</strong>. This dataset is available in the <code>morley</code> object, <strong>but we will read it to illustrate the <code>read.table</code> function</strong>. »</em></p>
+<pre><code class="language-r">filepath &lt;- system.file("data", "morley.tab", package = "datasets")
+filepath              # le chemin du fichier de donnees
+file.show(filepath)   # optionnel : regarder le fichier
+mm &lt;- read.table(filepath)
+mm
+</code></pre>
+<p><em>« There are <strong>five experiments</strong> (column <code>Expt</code>) and each has <strong>20 runs</strong> (column <code>Run</code>) and <code>sl</code> is the recorded speed of light, suitably coded. »</em></p>
+<pre><code class="language-r">mm$Expt &lt;- factor(mm$Expt)
+mm$Run  &lt;- factor(mm$Run)     # transformer Expt et Run en FACTEURS
+</code></pre>
+<p class="cal piege"> <strong>C'est l'étape décisive.</strong> <code>Expt</code> contient les nombres 1 à 5, mais ce sont des <strong>étiquettes</strong>, pas des quantités. Sans <code>factor()</code>, R traiterait « expérience 4 » comme « deux fois expérience 2 ». Voir fiche 304.</p>
+<pre><code class="language-r">attach(mm)                    # rend le data frame visible en position 2 (le defaut)
+plot(Expt, Speed, main = "Speed of Light Data", xlab = "Experiment No.")
+</code></pre>
+<p><em>« Compare the five experiments with <strong>simple boxplots</strong>. »</em> Remarquez qu'on a appelé <strong><code>plot</code></strong>, pas <code>boxplot</code> : parce que <code>Expt</code> <strong>est un facteur</strong>, <code>plot</code> produit des boîtes à moustaches. C'est le <strong>dispatch S3</strong> en action (fiche 311).</p>
+<pre><code class="language-r">fm &lt;- aov(Speed ~ Run + Expt, data = mm)
+summary(fm)                     # analyse en BLOCS ALEATOIRES
+fm0 &lt;- update(fm, . ~ . - Run)  # le sous-modele sans « runs »
+anova(fm0, fm)                  # les comparer par une analyse de variance formelle
+detach()
+rm(fm, fm0)
+</code></pre>
+<p><strong>Ce que cet acte démontre.</strong> <code>update()</code> construit un modèle <strong>à partir d'un autre</strong>, par différence : <code>. ~ . - Run</code> signifie « même réponse, mêmes prédicteurs, <strong>moins <code>Run</code></strong> ». C'est la traduction directe de la philosophie du §1.3 : le résultat est un <strong>objet</strong>, donc il est <strong>modifiable</strong>.</p>
+</div></details>
+
+<details class="cor">
+<summary><strong>Acte 3 — surfaces : <code>outer</code>, <code>contour</code>, <code>image</code></strong></summary><div class="in">
+
+<pre><code class="language-r">x &lt;- seq(-pi, pi, len = 50)   # 50 valeurs equidistantes sur [-pi, pi]
+y &lt;- x                        # y est le meme
+f &lt;- outer(x, y, function(x, y) cos(y)/(1 + x^2))
+</code></pre>
+<p><em>« <code>f</code> is a <strong>square matrix</strong>, with rows and columns indexed by <code>x</code> and <code>y</code> respectively, of values of the function $\cos(y)/(1+x^2)$. »</em> <code>outer</code> évalue la fonction sur <strong>toutes les paires</strong> — voir fiche 305.</p>
+<pre><code class="language-r">oldpar &lt;- par(no.readonly = TRUE)   # SAUVER les parametres graphiques
+par(pty = "s")                      # region de trace « carree »
+contour(x, y, f)
+contour(x, y, f, nlevels = 15, add = TRUE)   # plus de lignes pour plus de detail
+fa &lt;- (f - t(f))/2                  # la partie « antisymetrique » de f ; t() = transposee
+contour(x, y, fa, nlevels = 15)
+par(oldpar)                         # RESTAURER les anciens parametres
+image(x, y, f)
+image(x, y, fa)
+objects(); rm(x, y, f, fa)
+</code></pre>
+<div class="cal methode"><span class="lab">Méthode — l'idiome oldpar.</span>
+<p> <code>par(no.readonly = TRUE)</code> renvoie <strong>les paramètres modifiables</strong>, qu'on range ; <code>par(oldpar)</code> les remet. <strong>Modifier <code>par()</code> sans le sauver contamine toutes les figures suivantes de la session.</strong> Voir fiche 314.</p>
+</div>
+</div></details>
+
+<details class="cor">
+<summary><strong>Acte 4 — arithmétique complexe et deux façons de tirer dans le disque unité</strong></summary><div class="in">
+
+<p><em>« R can do complex arithmetic, also. »</em></p>
+<pre><code class="language-r">th &lt;- seq(-pi, pi, len = 100)
+z &lt;- exp(1i*th)          # 1i est le nombre complexe i
+par(pty = "s")
+plot(z, type = "l")      # tracer des arguments complexes = imaginaire contre reel
+</code></pre>
+<p><em>« This should be <strong>a circle</strong>. »</em></p>
+<pre><code class="language-r">w &lt;- rnorm(100) + rnorm(100)*1i
+</code></pre>
+<p><em>« Suppose we want to <strong>sample points within the unit circle</strong>. One method would be to take complex numbers with <strong>standard normal real and imaginary parts</strong>… »</em></p>
+<pre><code class="language-r">w &lt;- ifelse(Mod(w) &gt; 1, 1/w, w)
+</code></pre>
+<p><em>« …and to <strong>map any outside the circle onto their reciprocal</strong>. »</em></p>
+<pre><code class="language-r">plot(w, xlim = c(-1,1), ylim = c(-1,1), pch = "+", xlab = "x", ylab = "y")
+lines(z)
+</code></pre>
+<p><em>« <strong>All points are inside the unit circle, but the distribution is not uniform.</strong> »</em></p>
+<pre><code class="language-r">w &lt;- sqrt(runif(100))*exp(2*pi*runif(100)*1i)
+plot(w, xlim = c(-1,1), ylim = c(-1,1), pch = "+", xlab = "x", ylab = "y")
+lines(z)
+</code></pre>
+<p><em>« The second method uses the uniform distribution. <strong>The points should now look more evenly spaced over the disc.</strong> »</em></p>
+<div class="cal plus"><span class="lab">Enrichissement pédagogique (hors cours) — pourquoi la racine carrée.</span>
+<p> Le cours donne les deux méthodes sans les démontrer. La raison est géométrique : l'aire d'un disque de rayon $r$ croît comme $r^2$, donc pour une densité <strong>uniforme en aire</strong>, le rayon doit suivre la loi de fonction de répartition $F(r)=r^2$ sur $[0,1]$. Par inversion, $r=\sqrt U$ avec $U$ uniforme — d'où le <code>sqrt(runif(100))</code>. <strong>Sans la racine, les points s'accumuleraient au centre.</strong> Ce raisonnement n'est pas dans <em>An Introduction to R</em> ; il explique le résultat que le cours se contente de constater.</p>
+</div>
+<pre><code class="language-r">rm(th, w, z)
+q()
+</code></pre>
+<p><em>« Quit the R program. You will be asked if you want to save the R workspace, and <strong>for an exploratory session like this, you probably do not want to save it</strong>. »</em></p>
+<p><strong>La leçon finale de l'annexe A</strong> : la session se termine par la <strong>réponse <code>no</code></strong>. La sauvegarde de l'espace de travail n'est <strong>pas</strong> le comportement par défaut souhaitable — elle sert à interrompre un travail long, pas à archiver une exploration.</p>
+</div></details>
+
+<h2>Comment reconnaître le type d'exercice</h2>
+<table>
+<thead>
+<tr>
+<th>Le signal dans l'énoncé</th>
+<th>Ce qu'il faut mobiliser</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>« pourquoi rien ne s'affiche ? »</td>
+<td><strong>assignation contre expression</strong> (§1.8) — une assignation n'imprime pas</td>
+</tr>
+<tr>
+<td>« pourquoi le <code>+</code> au lieu du <code>&gt;</code> ? »</td>
+<td><strong>commande incomplète</strong> : parenthèse, guillemet ou accolade non fermée</td>
+</tr>
+<tr>
+<td>« mes objets ont disparu »</td>
+<td><strong>répertoire de lancement</strong> et <code>.RData</code> (§1.11), ou <code>--no-restore</code> / <code>--vanilla</code></td>
+</tr>
+<tr>
+<td>« ça marche chez moi, pas chez lui »</td>
+<td><strong>séquence de démarrage</strong> (annexe B.1) — tester avec <code>--vanilla</code></td>
+</tr>
+<tr>
+<td>« ça marche en session, pas sous <code>R CMD check</code> »</td>
+<td><code>R CMD</code> <strong>n'utilise aucun fichier de démarrage</strong> et impose <code>--no-restore</code></td>
+</tr>
+<tr>
+<td>« <code>?</code> renvoie une erreur de syntaxe »</td>
+<td>nom à <strong>caractères spéciaux</strong> ou <strong>mot à sens syntaxique</strong> → <code>help("…")</code></td>
+</tr>
+<tr>
+<td>« comment récupérer les arguments du script ? »</td>
+<td><code>commandArgs(TRUE)</code>, précédé de <strong><code>--args</code></strong> en <code>BATCH</code>, direct avec <code>Rscript</code></td>
+</tr>
+<tr>
+<td>« le script lit les mauvaises données »</td>
+<td><strong><code>stdin()</code> = le fichier de script</strong> ; l'entrée du processus est <code>"stdin"</code></td>
+</tr>
+<tr>
+<td>« le fichier de sortie ne contient pas l'erreur »</td>
+<td><em>warning and error messages are sent to <strong><code>stderr</code></strong></em></td>
+</tr>
+<tr>
+<td>« <code>x&lt;-5</code> ou <code>x &lt; -5</code> ? »</td>
+<td><strong>espacement</strong> (<em>R Language Definition</em> §10.3.5)</td>
+</tr>
+<tr>
+<td>« <code>T</code> a été redéfini »</td>
+<td><code>T</code>/<code>F</code> sont <strong>des variables</strong>, pas des mots réservés → écrire <code>TRUE</code>/<code>FALSE</code></td>
+</tr>
+</tbody></table>
+<h2>Comment résoudre ce type d'exercice</h2>
+<p><strong>Protocole « démarrer un nouveau projet » — 5 étapes.</strong></p>
+<ol>
+<li><strong>Créer un répertoire dédié</strong> et s'y placer (<code>mkdir work</code> ; <code>cd work</code>). Sous Windows : champ <strong>Start In</strong> du raccourci.</li>
+<li>Lancer R <strong>depuis ce répertoire</strong> — c'est ce qui lie le projet à son <code>.RData</code>.</li>
+<li>Travailler ; <strong>vérifier périodiquement <code>ls()</code></strong> pour savoir ce que contient l'espace de travail.</li>
+<li><strong>Nettoyer avec <code>rm()</code></strong> ce qui est intermédiaire, <em>avant</em> de quitter — ce qu'on ne nettoie pas sera rechargé demain.</li>
+<li><code>q()</code>, puis décider <strong>consciemment</strong> : <code>yes</code> si le travail est à reprendre, <code>no</code> si c'était exploratoire.</li>
+</ol>
+<p><strong>Protocole « R se comporte anormalement » — 4 étapes.</strong></p>
+<ol>
+<li>Relancer avec <strong><code>--vanilla</code></strong>. Le problème disparaît → il vient d'un fichier de démarrage ; il persiste → il vient de R ou d'un paquet.</li>
+<li>Si c'est un fichier de démarrage, remonter <strong>la séquence dans l'ordre</strong> : <code>.Renviron</code> (site puis utilisateur), <code>Rprofile.site</code>, <code>.Rprofile</code>, <code>.RData</code>, <code>.First()</code>.</li>
+<li>Ne pas oublier que <code>.RData</code> <strong>peut contenir <code>.First()</code></strong> et que <code>ls()</code> <strong>ne montre pas</strong> les noms commençant par un point → <code>ls(all.names = TRUE)</code>.</li>
+<li>Consulter <code>help("Startup")</code> pour la description précise.</li>
+</ol>
+<p><strong>Protocole « transformer une session en script » — 5 étapes.</strong></p>
+<ol>
+<li>Sortir les commandes de la console vers un fichier <code>.R</code> — la limite de 4 095 octets par ligne <strong>disparaît</strong>.</li>
+<li>Le tester dans une session propre par <strong><code>source("script.R")</code></strong>.</li>
+<li>Le passer hors session : <strong><code>R CMD BATCH script.R</code></strong> (recommandé par le cours) ou <strong><code>Rscript script.R</code></strong>.</li>
+<li>Paramétrer : <strong><code>commandArgs(TRUE)</code></strong>, avec <code>"--args a b"</code> en <code>BATCH</code>, ou directement <code>Rscript script.R a b</code>.</li>
+<li>Rendre exécutable si besoin : shebang <code>#! /usr/bin/env Rscript</code>, <code>chmod 755</code>, sortie par <strong><code>q(status = …)</code></strong> pour que le shell connaisse le code de retour.</li>
+</ol>
+<h2 data-prio="must">Common mistakes</h2>
+<table>
+<thead>
+<tr>
+<th>Erreur</th>
+<th>Correction</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Croire que <code>cancel</code> annule la sauvegarde</td>
+<td><code>cancel</code> <strong>revient dans la session</strong> — on ne quitte pas</td>
+</tr>
+<tr>
+<td>Lancer R depuis n'importe où et s'étonner de ne pas retrouver ses objets</td>
+<td><code>.RData</code> est relu <strong>du répertoire courant</strong> ; un projet = un dossier</td>
+</tr>
+<tr>
+<td>Chercher <code>.RData</code> dans l'explorateur</td>
+<td>le <strong>point initial</strong> le rend invisible sur UNIX, macOS <strong>et</strong> Windows</td>
+</tr>
+<tr>
+<td>Attendre un affichage après une assignation</td>
+<td>une assignation <strong>n'imprime rien</strong> ; c'est le comportement correct</td>
+</tr>
+<tr>
+<td>Croire la valeur d'une expression définitivement perdue</td>
+<td><code>.Last.value</code> la garde — <strong>avant toute autre instruction</strong></td>
+</tr>
+<tr>
+<td>Écrire <code>x&lt;-5</code> en pensant comparer</td>
+<td>c'est une <strong>assignation</strong> ; la comparaison est <code>x &lt; -5</code></td>
+</tr>
+<tr>
+<td>Utiliser <code>T</code> et <code>F</code></td>
+<td>ce sont <strong>des variables réassignables</strong> : écrire <code>TRUE</code> et <code>FALSE</code></td>
+</tr>
+<tr>
+<td>Taper <code>?[[</code> ou <code>?if</code></td>
+<td>caractères spéciaux et mots syntaxiques → <strong><code>help("[[")</code></strong>, <code>help("if")</code></td>
+</tr>
+<tr>
+<td>Croire que <code>?</code> est cassé après <code>help.start()</code></td>
+<td>sous UNIX, l'aide part désormais <strong>dans le navigateur</strong></td>
+</tr>
+<tr>
+<td>Coller une commande de plus de 4 095 octets dans la console</td>
+<td>selon la console : refus, <strong>troncature silencieuse</strong>, ou report sur la ligne suivante → passer par un <strong>fichier</strong></td>
+</tr>
+<tr>
+<td>Oublier de refermer <code>sink()</code></td>
+<td>R paraît muet ; <strong>tout</strong> part dans le fichier, erreurs comprises</td>
+</tr>
+<tr>
+<td>Attendre les erreurs dans <code>&gt; sortie.txt</code></td>
+<td>avertissements et erreurs vont sur <strong><code>stderr</code></strong></td>
+</tr>
+<tr>
+<td>Croire que <code>R CMD check</code> lit votre <code>.Rprofile</code></td>
+<td><em>« <code>R CMD</code> does not of itself use any R startup files »</em> — et impose <code>--no-restore</code></td>
+</tr>
+<tr>
+<td>Écrire <code>#! /usr/bin/env Rscript --vanilla</code></td>
+<td>le mécanisme <code>#!</code> <strong>n'accepte pas</strong> cet argument supplémentaire</td>
+</tr>
+<tr>
+<td>Utiliser <code>scan(n = 24)</code> en attendant l'entrée du tube</td>
+<td><code>stdin()</code> désigne <strong>le fichier de script</strong> ; pour le processus, <code>scan("stdin", …)</code></td>
+</tr>
+<tr>
+<td>Utiliser <code>"stdin"</code> dans la forme <em>here document</em></td>
+<td>il <strong>n'y est pas utilisable</strong> ; <code>stdin()</code> y désigne la source du programme</td>
+</tr>
+<tr>
+<td>Modifier <code>par()</code> sans sauvegarder</td>
+<td>contamine <strong>toute la session</strong> → <code>oldpar &lt;- par(no.readonly = TRUE)</code></td>
+</tr>
+<tr>
+<td>Traiter une colonne d'étiquettes numériques comme une quantité</td>
+<td><code>factor()</code> — sinon « expérience 4 » vaut deux fois « expérience 2 »</td>
+</tr>
+<tr>
+<td>Passer <code>assign("x$a", 1)</code> pour <code>x$a &lt;- 1</code></td>
+<td><code>assign</code>/<code>get</code> <strong>ne reconnaissent ni l'indexation ni les fonctions de remplacement</strong></td>
+</tr>
+<tr>
+<td>Redimensionner la fenêtre du terminal en cours d'édition</td>
+<td><em>some but not all versions of readline</em> le gèrent — <strong>à éviter</strong></td>
+</tr>
+</tbody></table>
+<h2>Ultimate Review</h2>
+<p><strong>La phrase qui résume la philosophie.</strong> <em>« R will give <strong>minimal output</strong> and <strong>store the results in a fit object</strong> for subsequent interrogation by further R functions. »</em> Peu de texte, beaucoup d'objet.</p>
+<p><strong>Deux sortes de commandes.</strong> <strong>Expression</strong> → évaluée, <strong>affichée</strong> (sauf invisible), valeur <strong>perdue</strong> (récupérable une fois par <code>.Last.value</code>). <strong>Assignation</strong> → évaluée, <strong>rangée</strong>, <strong>rien d'affiché</strong>.</p>
+<p><strong>Le cycle de l'espace de travail.</strong> <code>ls()</code> / <code>objects()</code> listent (<strong>pas</strong> les noms commençant par un point) · <code>rm()</code> efface · à la sortie <code>yes</code> écrit <strong><code>.RData</code></strong> (objets) et <strong><code>.Rhistory</code></strong> (commandes) · au démarrage suivant <strong>dans le même répertoire</strong>, les deux sont relus. <strong>Un dossier par analyse.</strong></p>
+<p><strong>Noms.</strong> Sensibles à la casse · alphanumériques + <code>.</code> + <code>_</code> · commencent par une lettre ou <code>.</code> · si <code>.</code>, le 2ᵉ caractère <strong>n'est pas un chiffre</strong> · code portable : <strong>A–Z a–z 0–9 seulement</strong>. <strong>Mots réservés</strong>, en trois groupes : <code>if else repeat while function for in next break</code> · <code>TRUE FALSE NULL Inf NaN</code> · <code>NA NA_integer_ NA_real_ NA_complex_ NA_character_</code> · plus <code>...</code> <code>..1</code> <code>..2</code>. <strong><code>T</code> et <code>F</code> n'en sont pas.</strong></p>
+<p><strong>Syntaxe.</strong> Séparateurs <code>;</code> ou saut de ligne · groupement <code>{ }</code> · commentaire <code>#</code> (jamais dans une chaîne ni dans la liste d'arguments d'une définition de fonction) · continuation <code>+</code> · <strong>4 095 octets</strong> par ligne de console · <code>x&lt;-5</code> ≠ <code>x &lt; -5</code> · <code>} else {</code> sur la même ligne au niveau externe.</p>
+<p><strong>Les quatre portes de l'aide.</strong> <code>?nom</code> / <code>help(nom)</code> · <strong><code>help("[[")</code></strong> pour les caractères spéciaux et les mots syntaxiques · <strong><code>??</code></strong> / <code>help.search()</code> pour chercher · <strong><code>example(topic)</code></strong> pour faire tourner · <code>help.start()</code> pour naviguer, avec le lien <strong>Search Engine and Keywords</strong>.</p>
+<p><strong>Entrées-sorties hors console.</strong> <code>source("f.R")</code> fait entrer (<strong>longueur illimitée</strong>) · <code>sink("f")</code> / <code>sink()</code> fait sortir.</p>
+<p><strong>La séquence de démarrage.</strong> <code>Renviron</code> (site : <code>R_ENVIRON</code> sinon <code>R_HOME/etc/Renviron.site</code> ; utilisateur : <code>R_ENVIRON_USER</code> sinon <code>.Renviron</code> <strong>courant puis personnel</strong>) → <strong><code>Rprofile.site</code></strong> (<code>R_PROFILE</code>) → <strong><code>.Rprofile</code></strong> (<code>R_PROFILE_USER</code>) → <strong><code>.RData</code></strong> → <strong><code>.First()</code></strong>. Fin de session : <strong><code>.Last()</code></strong>. Variables utiles : <code>R_PAPERSIZE</code>, <code>R_PRINTCMD</code>, <code>R_LIBS</code>. <strong><code>TMPDIR</code> doit être non défini ou valide.</strong></p>
+<p><strong>L'option de diagnostic.</strong> <strong><code>--vanilla</code></strong> = <code>--no-save</code> + <code>--no-environ</code> + <code>--no-site-file</code> + <code>--no-init-file</code> + <code>--no-restore</code> (+ <code>--no-Rconsole</code> sous Windows). Entre <code>R</code> et <code>CMD</code>, elle vaut <code>--no-environ --no-site-file --no-init-file</code>.</p>
+<p><strong>Options à connaître.</strong> <code>-f</code>/<code>--file</code> et <code>-e</code> <strong>impliquent <code>--no-save</code></strong> (<code>-e</code> : 10 000 octets max, incompatible avec <code>-f</code>) · <code>--no-echo</code>/<code>-s</code> implique <code>--quiet</code> et <code>--no-save</code> · défauts mémoire <strong>6 Mo</strong> / <strong>350 k</strong> / <code>--max-ppsize</code> <strong>10 000</strong> (max 100 000) · <code>--args</code> fait <strong>ignorer le reste de la ligne</strong>.</p>
+<p><strong><code>R CMD</code>.</strong> <code>BATCH</code> (= <code>R --restore --save</code>), <code>INSTALL</code>, <code>REMOVE</code>, <code>build</code>, <code>check</code>, <code>SHLIB</code>, <code>COMPILE</code>, <code>LINK</code>, <code>Rprof</code>, <code>Rdconv</code>/<code>Rd2txt</code>/<code>Rd2pdf</code>, <code>Sweave</code>/<code>Stangle</code>, <code>Rdiff</code>, <code>config</code>. <strong>Aucun fichier de démarrage n'est lu ; <code>--no-restore</code> partout sauf <code>BATCH</code>.</strong></p>
+<p><strong>Scripter.</strong> <code>R CMD BATCH foo.R</code> (recommandé) · <code>R CMD BATCH "--args a b" foo.R &amp;</code> · <code>Rscript foo.R a b</code> · <code>commandArgs(TRUE)</code> → vecteur de caractères · shebang <code>#! /usr/bin/env Rscript</code> (<strong>pas d'argument supplémentaire</strong>) · <code>chmod 755</code> · <code>q(status = …)</code> · <strong><code>stdin()</code> = le fichier de script</strong>, <code>"stdin"</code> = l'entrée du processus, <strong>sauf en <em>here document</em></strong> où c'est l'inverse · pas de script vide, pas d'espace ni de métacaractère dans le nom de fichier.</p>
+<p><strong>Éditeur de ligne.</strong> <code>extSoftVersion()</code> pour la version · <code>--no-readline</code> pour couper · <strong><code>C-p</code>/<code>C-n</code></strong> historique, <strong><code>C-r texte</code></strong> recherche (annulée par <code>C-g</code>), <strong><code>C-a</code>/<code>C-e</code></strong> début/fin, <strong><code>M-b</code>/<code>M-f</code></strong> par mot, <strong><code>C-k</code></strong> couper la fin, <strong><code>C-y</code></strong> coller, <strong><code>M-d</code></strong> couper le mot, <strong><code>C-t</code></strong> transposer, <strong><code>M-l</code>/<code>M-c</code></strong> casse, <code>RET</code> resoumettre. Personnalisation : <code>~/.inputrc</code>, section <code>$if R … $endif</code>. <strong>La casse compte pour les Meta.</strong></p>
+<p><strong>Les chiffres du chapitre.</strong> ~<strong>25</strong> paquets standard et recommandés livrés avec R · <strong>4 095</strong> octets par ligne de console · <strong>10 000</strong> octets pour les <code>-e</code> cumulés · défauts de GC <strong>6 Mo</strong> et <strong>350 k</strong> · <code>--max-ppsize</code> <strong>10 000</strong>, maximum <strong>100 000</strong> · annexe A : <strong>50</strong> points simulés, <strong>5</strong> expériences × <strong>20</strong> essais de Michelson, grilles de <strong>50</strong> et <strong>100</strong> points, <code>nlevels = 15</code>.</p>
+<div class="rec"><h2>Active Recall</h2><details class="cor">
+<summary>Quelle est la différence de philosophie entre R et SAS ou SPSS, et quelle conséquence pratique en tire-t-on ?</summary><div class="in">
+
+<p><em>« In S a statistical analysis is normally done as <strong>a series of steps, with intermediate results being stored in objects</strong>. Thus whereas <strong>SAS and SPSS will give copious output</strong> from a regression or discriminant analysis, <strong>R will give minimal output and store the results in a fit object</strong> for subsequent interrogation by further R functions. »</em></p>
+<p><strong>La conséquence pratique</strong> : ce que R vous montre n'est pas ce qu'il a calculé. Le résultat d'un <code>lm()</code> est un <strong>objet</strong> qu'on interroge ensuite par <code>summary()</code>, <code>coef()</code>, <code>resid()</code>, <code>fitted()</code>, <code>anova()</code>, <code>update()</code>. Un débutant qui cherche « le listing » cherche la mauvaise chose.</p>
+</div></details><details class="cor">
+<summary>Pourquoi le cours insiste-t-il sur le mot « environnement » plutôt que « logiciel » ?</summary><div class="in">
+
+<p><em>« The term "environment" is intended to characterize it as <strong>a fully planned and coherent system</strong>, rather than <strong>an incremental accretion of very specific and inflexible tools</strong>, as is frequently the case with other data analysis software. »</em></p>
+<p>La conséquence est la <strong>transférabilité</strong> : <code>length()</code>, <code>names()</code>, <code>[</code>, <code>summary()</code> ne sont pas des commandes attachées à un type de données, ce sont des mécanismes généraux. Ce qu'on apprend sur un objet vaut pour les autres.</p>
+</div></details><details class="cor">
+<summary>Que se passe-t-il exactement quand on tape <code>1/x</code>, et quand on tape <code>y &lt;- 1/x</code> ?</summary><div class="in">
+
+<p><em>« If an expression is given as a command, it is <strong>evaluated, printed (unless specifically made invisible), and the value is lost</strong>. An assignment <strong>also evaluates an expression and passes the value to a variable but the result is not automatically printed</strong>. »</em></p>
+<p>Donc : <code>1/x</code> <strong>affiche</strong> les inverses et <strong>ne les garde pas</strong> ; <code>y &lt;- 1/x</code> <strong>ne montre rien</strong> et <strong>les garde</strong>.  La valeur d'une expression reste accessible <strong>une fois</strong> via <strong><code>.Last.value</code></strong>, <em>« before any other statements are executed »</em> (note 2, §2.1).</p>
+</div></details><details class="cor">
+<summary>Un utilisateur a quitté R en répondant « yes », et le lendemain <code>ls()</code> ne renvoie rien. Trois causes possibles ?</summary><div class="in">
+
+<ol>
+<li><strong>Mauvais répertoire.</strong> <em>« When R is started at later time <strong>from the same directory</strong> it reloads the workspace from this file. »</em> Le <code>.RData</code> est lié au dossier de lancement.</li>
+<li><strong>Restauration désactivée.</strong> <code>--no-restore</code>, <code>--no-restore-data</code> ou <strong><code>--vanilla</code></strong> au démarrage.</li>
+<li><strong>Objets cachés.</strong> Si les objets recherchés ont un nom <strong>commençant par un point</strong>, <code>ls()</code> ne les montre pas (<em>R Language Definition</em> §10.3.2) — utiliser <code>ls(all.names = TRUE)</code>.</li>
+</ol>
+<p class="cal piege"> Et dans les trois cas, <strong>aucune erreur n'est levée</strong> : l'absence de <code>.RData</code> est le cas normal d'une première session.</p>
+</div></details><details class="cor">
+<summary>Écrire l'aide de l'opérateur <code>[[</code>, du mot-clé <code>for</code>, et lancer les exemples de <code>solve</code>.</summary><div class="in">
+
+<pre><code class="language-r">help("[[")        # ou ?"[["
+help("for")       # mot a sens syntaxique : les guillemets sont OBLIGATOIRES
+example(solve)    # execute les exemples de la page d'aide
+</code></pre>
+<p>*« For a feature specified by <strong>special characters</strong>, the argument must be enclosed in double or single quotes, making it a "character string". This is also necessary for <strong>a few words with syntactic meaning including <code>if</code>, <code>for</code> and <code>function</code></strong>. »*</p>
+</div></details><details class="cor">
+<summary>Donner la séquence de démarrage de R dans l'ordre, avec l'option qui coupe chaque étape.</summary><div class="in">
+
+<table>
+<thead>
+<tr>
+<th>Ordre</th>
+<th>Étape</th>
+<th>Coupée par</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td><code>Renviron</code> de <strong>site</strong> (<code>R_ENVIRON</code>, sinon <code>R_HOME/etc/Renviron.site</code>) puis <strong>utilisateur</strong> (<code>R_ENVIRON_USER</code>, sinon <code>.Renviron</code> courant puis personnel)</td>
+<td><code>--no-environ</code></td>
+</tr>
+<tr>
+<td>2</td>
+<td>profil de <strong>site</strong> (<code>R_PROFILE</code>, sinon <code>R_HOME/etc/Rprofile.site</code>)</td>
+<td><code>--no-site-file</code></td>
+</tr>
+<tr>
+<td>3</td>
+<td>profil <strong>utilisateur</strong> (<code>R_PROFILE_USER</code>, sinon <code>.Rprofile</code> courant puis personnel)</td>
+<td><code>--no-init-file</code></td>
+</tr>
+<tr>
+<td>4</td>
+<td><strong><code>.RData</code></strong> du répertoire courant</td>
+<td><code>--no-restore</code>, <code>--no-restore-data</code></td>
+</tr>
+<tr>
+<td>5</td>
+<td><strong><code>.First()</code></strong>, si elle existe</td>
+<td>—</td>
+</tr>
+</tbody></table>
+<p class="cal piege"> <strong><code>.First()</code> peut résider dans <code>.RData</code></strong> — donc l'étape 4 peut <strong>fournir</strong> l'étape 5. Fin de session : <strong><code>.Last()</code></strong>.</p>
+</div></details><details class="cor">
+<summary>Pourquoi <code>--vanilla</code> est-il le premier réflexe de diagnostic ?</summary><div class="in">
+
+<p>Parce qu'il <strong>coupe la séquence entière d'un seul coup</strong> : <em>« Combine <code>--no-save</code>, <code>--no-environ</code>, <code>--no-site-file</code>, <code>--no-init-file</code> and <code>--no-restore</code>. Under Windows, this also includes <code>--no-Rconsole</code>. »</em></p>
+<p>Le test est <strong>discriminant</strong> : le problème disparaît → il vient d'un fichier de démarrage, qu'on remonte alors dans l'ordre ; il persiste → il vient de R ou d'un paquet, et les fichiers de démarrage sont hors de cause.</p>
+</div></details><details class="cor">
+<summary>Un paquet fonctionne en session mais échoue sous <code>R CMD check</code>. Quelle explication le cours donne-t-il ?</summary><div class="in">
+
+<p>*« Note that <strong><code>R CMD</code> does not of itself use any R startup files</strong> (in particular, <strong>neither user nor site <code>Renviron</code> files</strong>), and <strong>all of the R processes run by these tools (except <code>BATCH</code>) use <code>--no-restore</code></strong>. »*</p>
+<p>Votre session lit <code>.Renviron</code> et <code>.Rprofile</code> ; <code>R CMD check</code> <strong>ne les lit pas</strong>. Tout ce qui dépend d'un <code>R_LIBS</code> personnalisé, d'un <code>library()</code> posé dans <code>.Rprofile</code> ou d'un objet venant de <code>.RData</code> <strong>n'existe pas</strong> dans le processus de vérification. C'est le mécanisme exact du « ça marche chez moi ».</p>
+</div></details><details class="cor">
+<summary>Écrire un script R exécutable qui reçoit deux arguments et renvoie un code de sortie.</summary><div class="in">
+
+<pre><code class="language-r">#! /usr/bin/env Rscript
+args &lt;- commandArgs(TRUE)
+if (length(args) != 2L) q(status = 1)
+# ... traitement ...
+q(status = 0)
+</code></pre>
+<p>Puis <code>chmod 755 runfoo</code>, et <code>runfoo arg1 arg2</code>.</p>
+<p class="cal piege"> <em>« At least in Bourne and bash shells, the <code>#!</code> mechanism <strong>does not allow extra arguments</strong> like <code>#! /usr/bin/env Rscript --vanilla</code>. »</em></p>
+<p><strong>En <code>R CMD BATCH</code></strong>, la même chose s'écrit <code>R CMD BATCH "--args arg1 arg2" foo.R &amp;</code> — les arguments passent par <strong><code>--args</code></strong>, dont le rôle est précisément de <em>« cause the rest of the command line to be skipped »</em>.</p>
+</div></details><details class="cor">
+<summary>À quoi renvoie <code>stdin()</code> dans un script, et pourquoi est-ce un piège ?</summary><div class="in">
+
+<p><em>« <code>stdin()</code> refers to <strong>the script file</strong> to allow such traditional usage »</em> — c'est-à-dire l'idiome <code>chem &lt;- scan(n = 24)</code> suivi des données <strong>écrites dans le script lui-même</strong>.</p>
+<p>*« If you want to refer to <strong>the process's <code>stdin</code></strong>, use <code>"stdin"</code> as a file connection, e.g. <code>scan("stdin", ...)</code>. »*</p>
+<p class="cal piege"> <strong>Et l'inverse en <em>here document</em></strong> (<code>R --no-echo &lt;&lt;EOF</code>) : <em>« here <code>stdin()</code> refers to <strong>the program source</strong> and <code>"stdin"</code> <strong>will not be usable</strong> »</em>. Les deux formes ont donc des sémantiques d'entrée opposées.</p>
+</div></details><details class="cor">
+<summary>Quelle est la différence entre <code>x&lt;-5</code> et <code>x &lt; -5</code>, et pourquoi le langage l'autorise-t-il ?</summary><div class="in">
+
+<p><code>x&lt;-5</code> <strong>assigne 5 à <code>x</code></strong>. <code>x &lt; -5</code> <strong>teste si <code>x</code> est inférieur à −5</strong>.</p>
+<p><em>R Language Definition</em> §10.3.5 : <em>« stretches of whitespace characters serve to <strong>delimit tokens in case of ambiguity</strong>, (compare <code>x&lt;-5</code> and <code>x &lt; -5</code>) »</em>. L'espace <strong>est</strong> significatif ici, non pas en général, mais parce que <code>&lt;-</code> et <code>&lt;</code> <code>-</code> sont deux découpages en jetons du même texte, et que <strong>le parseur choisit le plus long</strong>.</p>
+<p><strong>Le remède</strong> : mettre des espaces autour de <code>&lt;-</code> <strong>toujours</strong>.</p>
+</div></details><details class="cor">
+<summary>Pourquoi le cours dit-il d'écrire <code>TRUE</code> et <code>FALSE</code> plutôt que <code>T</code> et <code>F</code> ?</summary><div class="in">
+
+<p>*« The first two are often abbreviated as <code>T</code> and <code>F</code>, respectively. Note however that <strong><code>T</code> and <code>F</code> are just variables which are set to <code>TRUE</code> and <code>FALSE</code> by default, but are not reserved words and hence can be overwritten by the user</strong>. Hence, <strong>you should always use <code>TRUE</code> and <code>FALSE</code></strong>. »* (§2.4)</p>
+<p>La preuve par la liste des mots réservés (<em>R Language Definition</em> §10.3.3) : <code>TRUE</code> et <code>FALSE</code> y figurent, <strong><code>T</code> et <code>F</code> non</strong>. Un <code>T &lt;- 0</code> quelque part dans un script rend tout <code>if (x == T)</code> silencieusement faux.</p>
+</div></details><details class="cor">
+<summary>Dans l'annexe A, pourquoi <code>mm$Expt &amp;lt;- factor(mm$Expt)</code> est-il indispensable, et que change <code>plot(Expt, Speed)</code> ensuite ?</summary><div class="in">
+
+<p><code>Expt</code> contient les entiers 1 à 5, mais ce sont des <strong>étiquettes d'expérience</strong>, pas des quantités. Sans <code>factor()</code>, tout modèle traiterait la différence entre l'expérience 4 et l'expérience 2 comme une différence <strong>numérique de 2 unités</strong> — ce qui n'a aucun sens.</p>
+<p>Et <strong><code>plot</code> change de comportement</strong> : parce que son premier argument <strong>est un facteur</strong>, il produit des <strong>boîtes à moustaches</strong> (<em>« Compare the five experiments with simple boxplots »</em>) au lieu d'un nuage de points. C'est le dispatch S3 : la fonction générique choisit sa méthode <strong>d'après la classe</strong> de l'argument.</p>
+</div></details><details class="cor">
+<summary>Quelle est la limite de longueur d'une ligne de console, et pourquoi est-elle dangereuse ?</summary><div class="in">
+
+<p><strong>Environ 4 095 octets</strong> — <em>« not characters »</em> (§1.8). Elle reste en vigueur <strong>même avec redirection</strong> <code>&lt;</code> <code>&gt;</code> (annexe B.1).</p>
+<p>Le danger n'est pas la limite mais <strong>l'absence d'uniformité</strong> (note 3) : <em>« some of the consoles will not allow you to enter more, and amongst those which do <strong>some will silently discard the excess</strong> and some will use it as <strong>the start of the next line</strong> »</em>. Trois comportements : refus, <strong>troncature silencieuse</strong>, ou report. Le second est le pire — le calcul se fait sur une commande mutilée sans qu'aucune erreur ne le signale.</p>
+<p><strong>Le remède</strong> : <code>source()</code> un fichier, dont les commandes sont <em>« of unlimited length »</em> (note 4, §1.10).</p>
+</div></details><details class="cor">
+<summary>Pourquoi <code>par(no.readonly = TRUE)</code> dans l'acte 3 de l'annexe A ?</summary><div class="in">
+
+<pre><code class="language-r">oldpar &lt;- par(no.readonly = TRUE)   # sauver
+par(pty = "s")                      # modifier
+# ... traces ...
+par(oldpar)                         # restaurer
+</code></pre>
+<p><em>« Save the plotting parameters and set the plotting region to "square" »</em> puis <em>« …and restore the old graphics parameters »</em>.</p>
+<p><strong><code>par()</code> est global et persistant</strong> : un <code>par(pty = "s")</code> non annulé rend <strong>carrées toutes les figures suivantes de la session</strong>. L'argument <code>no.readonly = TRUE</code> sélectionne les paramètres <strong>modifiables</strong>, seuls repassables à <code>par()</code>.</p>
+</div></details></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h2>Flashcards</h2>
+<table>
+<thead>
+<tr>
+<th>Question</th>
+<th>Réponse</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>R en une phrase ?</td>
+<td>Une <strong>suite intégrée</strong> pour manipulation de données, calcul et graphiques</td>
+</tr>
+<tr>
+<td>Pourquoi « environnement » ?</td>
+<td>Système <strong>planifié et cohérent</strong>, pas une <strong>accrétion d'outils inflexibles</strong></td>
+</tr>
+<tr>
+<td>Le langage de R ?</td>
+<td><strong>S</strong>, développé aux <strong>Bell Labs</strong> (Becker, Chambers, Wilks)</td>
+</tr>
+<tr>
+<td>Le « Blue Book » ?</td>
+<td><em>The New S Language</em> — la référence de base pour R</td>
+</tr>
+<tr>
+<td>Le « White Book » ?</td>
+<td><em>Statistical Models in S</em> — les modèles</td>
+</tr>
+<tr>
+<td>Le « Green Book » ?</td>
+<td><em>Programming with Data</em> — les classes formelles (S4)</td>
+</tr>
+<tr>
+<td>Différence R / SAS-SPSS ?</td>
+<td>R donne <strong>peu de sortie</strong> et <strong>stocke le résultat dans un objet</strong></td>
+</tr>
+<tr>
+<td>Combien de paquets livrés avec R ?</td>
+<td>Environ <strong>25</strong> (standard + recommended)</td>
+</tr>
+<tr>
+<td>L'invite par défaut ?</td>
+<td><strong><code>&gt;</code></strong> ; continuation <strong><code>+</code></strong></td>
+</tr>
+<tr>
+<td>Comment quitter ?</td>
+<td><strong><code>q()</code></strong></td>
+</tr>
+<tr>
+<td>Les trois réponses à la question de sortie ?</td>
+<td><code>yes</code> (sauver et quitter) · <code>no</code> (quitter) · <strong><code>cancel</code> (revenir dans la session)</strong></td>
+</tr>
+<tr>
+<td>Qu'est-ce que l'espace de travail ?</td>
+<td>La <strong>collection d'objets actuellement stockés</strong></td>
+</tr>
+<tr>
+<td>Lister les objets ?</td>
+<td><strong><code>ls()</code></strong> ou <strong><code>objects()</code></strong></td>
+</tr>
+<tr>
+<td>Les effacer ?</td>
+<td><strong><code>rm(x, y, …)</code></strong></td>
+</tr>
+<tr>
+<td>Ce que <code>ls()</code> ne montre pas ?</td>
+<td>Les noms <strong>commençant par un point</strong></td>
+</tr>
+<tr>
+<td>Les deux fichiers écrits à la sortie ?</td>
+<td><strong><code>.RData</code></strong> (objets) et <strong><code>.Rhistory</code></strong> (commandes)</td>
+</tr>
+<tr>
+<td>Quand sont-ils relus ?</td>
+<td>Au démarrage <strong>depuis le même répertoire</strong></td>
+</tr>
+<tr>
+<td>Pourquoi sont-ils invisibles ?</td>
+<td>Le <strong>point initial</strong>, sur UNIX, macOS <strong>et</strong> Windows</td>
+</tr>
+<tr>
+<td>Pourquoi un dossier par analyse ?</td>
+<td>Pour que des noms comme <strong><code>x</code> et <code>y</code> restent utilisables</strong></td>
+</tr>
+<tr>
+<td>Les deux sortes de commandes ?</td>
+<td><strong>Expression</strong> et <strong>assignation</strong></td>
+</tr>
+<tr>
+<td>Une expression ?</td>
+<td>Évaluée, <strong>affichée</strong>, valeur <strong>perdue</strong></td>
+</tr>
+<tr>
+<td>Une assignation ?</td>
+<td>Évaluée, <strong>rangée</strong>, <strong>rien d'affiché</strong></td>
+</tr>
+<tr>
+<td>Récupérer la dernière valeur ?</td>
+<td><strong><code>.Last.value</code></strong>, avant toute autre instruction</td>
+</tr>
+<tr>
+<td>R est-il sensible à la casse ?</td>
+<td><strong>Oui</strong> — <code>A</code> et <code>a</code> sont deux symboles</td>
+</tr>
+<tr>
+<td>Caractères permis dans un nom ?</td>
+<td>Alphanumériques + <strong><code>.</code></strong> + <strong><code>_</code></strong></td>
+</tr>
+<tr>
+<td>Premier caractère d'un nom ?</td>
+<td>Une <strong>lettre</strong> ou un <strong>point</strong> (non suivi d'un chiffre)</td>
+</tr>
+<tr>
+<td>Noms pour du code <strong>portable</strong> ?</td>
+<td><strong>A–Z, a–z, 0–9</strong> seulement</td>
+</tr>
+<tr>
+<td>Combien de mots réservés ?</td>
+<td><code>if else repeat while function for in next break</code> + <code>TRUE FALSE NULL Inf NaN</code> + les cinq <code>NA…</code> + <code>...</code> <code>..1</code> <code>..2</code></td>
+</tr>
+<tr>
+<td><code>T</code> et <code>F</code> sont-ils réservés ?</td>
+<td><strong>Non</strong> — ce sont des variables réassignables</td>
+</tr>
+<tr>
+<td>Séparateurs de commandes ?</td>
+<td><strong><code>;</code></strong> ou saut de ligne</td>
+</tr>
+<tr>
+<td>Groupement ?</td>
+<td>Les <strong>accolades</strong> <code>{ }</code></td>
+</tr>
+<tr>
+<td>Commentaire ?</td>
+<td><strong><code>#</code></strong> jusqu'à la fin de la ligne</td>
+</tr>
+<tr>
+<td>Où <code>#</code> est-il interdit ?</td>
+<td>Dans une <strong>chaîne</strong> et dans la <strong>liste d'arguments d'une définition de fonction</strong></td>
+</tr>
+<tr>
+<td>Limite d'une ligne de console ?</td>
+<td>Environ <strong>4 095 octets</strong></td>
+</tr>
+<tr>
+<td>Les trois comportements au-delà ?</td>
+<td>Refus · <strong>troncature silencieuse</strong> · report sur la ligne suivante</td>
+</tr>
+<tr>
+<td><code>x&lt;-5</code> contre <code>x &lt; -5</code> ?</td>
+<td><strong>Assignation</strong> contre <strong>comparaison à −5</strong></td>
+</tr>
+<tr>
+<td>Où mettre <code>else</code> à la console ?</td>
+<td>Sur la <strong>même ligne</strong> que <code>}</code></td>
+</tr>
+<tr>
+<td>Aide sur un nom ?</td>
+<td><strong><code>?solve</code></strong> ou <code>help(solve)</code></td>
+</tr>
+<tr>
+<td>Aide sur <code>[[</code> ?</td>
+<td><strong><code>help("[[")</code></strong> — guillemets obligatoires</td>
+</tr>
+<tr>
+<td>Aide sur <code>if</code> ?</td>
+<td><strong><code>help("if")</code></strong> — mot à sens syntaxique</td>
+</tr>
+<tr>
+<td>Chercher dans l'aide ?</td>
+<td><strong><code>??</code></strong> ou <code>help.search()</code></td>
+</tr>
+<tr>
+<td>Faire tourner les exemples ?</td>
+<td><strong><code>example(topic)</code></strong></td>
+</tr>
+<tr>
+<td>Aide en HTML ?</td>
+<td><strong><code>help.start()</code></strong></td>
+</tr>
+<tr>
+<td>Le lien le plus utile de <code>help.start()</code> ?</td>
+<td><strong>Search Engine and Keywords</strong></td>
+</tr>
+<tr>
+<td>Effet de <code>help.start()</code> sous UNIX ?</td>
+<td>Les requêtes suivantes partent <strong>dans le navigateur</strong></td>
+</tr>
+<tr>
+<td>Exécuter un fichier de commandes ?</td>
+<td><strong><code>source("commands.R")</code></strong></td>
+</tr>
+<tr>
+<td>Détourner la sortie ?</td>
+<td><strong><code>sink("record.lis")</code></strong> ; <strong><code>sink()</code></strong> pour revenir</td>
+</tr>
+<tr>
+<td>Longueur des commandes dans un fichier ?</td>
+<td><strong>Illimitée</strong></td>
+</tr>
+<tr>
+<td>Étape 1 du démarrage ?</td>
+<td>Les fichiers <strong><code>Renviron</code></strong> (site puis utilisateur)</td>
+</tr>
+<tr>
+<td>Étape 2 ?</td>
+<td><strong><code>Rprofile.site</code></strong></td>
+</tr>
+<tr>
+<td>Étape 3 ?</td>
+<td><strong><code>.Rprofile</code></strong> (courant puis personnel)</td>
+</tr>
+<tr>
+<td>Étape 4 ?</td>
+<td><strong><code>.RData</code></strong></td>
+</tr>
+<tr>
+<td>Étape 5 ?</td>
+<td><strong><code>.First()</code></strong></td>
+</tr>
+<tr>
+<td>Fin de session ?</td>
+<td><strong><code>.Last()</code></strong></td>
+</tr>
+<tr>
+<td>Où peut résider <code>.First()</code> ?</td>
+<td>Dans un profil <strong>ou dans <code>.RData</code></strong></td>
+</tr>
+<tr>
+<td>Trois variables de <code>Renviron</code> ?</td>
+<td><code>R_PAPERSIZE</code>, <code>R_PRINTCMD</code>, <strong><code>R_LIBS</code></strong></td>
+</tr>
+<tr>
+<td>Contrainte sur <code>TMPDIR</code> ?</td>
+<td><strong>Non défini</strong>, ou pointant vers un endroit <strong>valide</strong></td>
+</tr>
+<tr>
+<td>Que combine <code>--vanilla</code> ?</td>
+<td><code>--no-save</code> <code>--no-environ</code> <code>--no-site-file</code> <code>--no-init-file</code> <code>--no-restore</code> (+ <code>--no-Rconsole</code>)</td>
+</tr>
+<tr>
+<td>Sous Windows, quel exécutable en ligne de commande ?</td>
+<td><strong><code>Rterm.exe</code></strong>, préféré à <code>R</code></td>
+</tr>
+<tr>
+<td>Que fait <code>RHOME</code> ?</td>
+<td>Affiche le <strong>répertoire d'installation</strong> de R</td>
+</tr>
+<tr>
+<td>Défaut de restauration de <code>.RData</code> ?</td>
+<td><strong>Restaurer</strong></td>
+</tr>
+<tr>
+<td><code>-f</code> et <code>-e</code> impliquent quoi ?</td>
+<td><strong><code>--no-save</code></strong></td>
+</tr>
+<tr>
+<td>Limite des expressions <code>-e</code> ?</td>
+<td><strong>10 000 octets</strong> au total</td>
+</tr>
+<tr>
+<td>Peut-on mêler <code>-e</code> et <code>-f</code> ?</td>
+<td><strong>Non</strong></td>
+</tr>
+<tr>
+<td>Que fait <code>--no-echo</code> / <code>-s</code> ?</td>
+<td>R <strong>aussi silencieux que possible</strong> ; implique <code>--quiet</code> et <code>--no-save</code></td>
+</tr>
+<tr>
+<td>Que fait <code>--args</code> ?</td>
+<td>Fait <strong>ignorer le reste de la ligne</strong>, à lire par <code>commandArgs(TRUE)</code></td>
+</tr>
+<tr>
+<td>Défauts de déclenchement du GC ?</td>
+<td><strong>6 Mo</strong> (vecteurs) et <strong>350 k</strong> (cellules cons)</td>
+</tr>
+<tr>
+<td>Défaut et maximum de <code>--max-ppsize</code> ?</td>
+<td><strong>10 000</strong>, maximum <strong>100 000</strong></td>
+</tr>
+<tr>
+<td>Où vont avertissements et erreurs ?</td>
+<td>Sur <strong><code>stderr</code></strong></td>
+</tr>
+<tr>
+<td>Que lance <code>R CMD BATCH</code> ?</td>
+<td><strong><code>R --restore --save</code></strong></td>
+</tr>
+<tr>
+<td>Deux outils <code>R CMD</code> pour les paquets ?</td>
+<td><strong><code>build</code></strong> et <strong><code>check</code></strong> (+ <code>INSTALL</code>, <code>REMOVE</code>)</td>
+</tr>
+<tr>
+<td><code>R CMD</code> lit-il vos fichiers de démarrage ?</td>
+<td><strong>Non</strong> — et impose <code>--no-restore</code> sauf pour <code>BATCH</code></td>
+</tr>
+<tr>
+<td>La façade simple pour les scripts ?</td>
+<td><strong><code>Rscript</code></strong></td>
+</tr>
+<tr>
+<td>Récupérer les arguments d'un script ?</td>
+<td><strong><code>commandArgs(TRUE)</code></strong> → vecteur de caractères</td>
+</tr>
+<tr>
+<td>Shebang portable ?</td>
+<td><strong><code>#! /usr/bin/env Rscript</code></strong></td>
+</tr>
+<tr>
+<td>Peut-on y ajouter <code>--vanilla</code> ?</td>
+<td><strong>Non</strong> en Bourne/bash</td>
+</tr>
+<tr>
+<td>Rendre le script exécutable ?</td>
+<td><strong><code>chmod 755</code></strong></td>
+</tr>
+<tr>
+<td>Renvoyer un code de sortie ?</td>
+<td><strong><code>q(status = …)</code></strong></td>
+</tr>
+<tr>
+<td>À quoi renvoie <code>stdin()</code> dans un script ?</td>
+<td><strong>Au fichier de script lui-même</strong></td>
+</tr>
+<tr>
+<td>Et l'entrée du processus ?</td>
+<td>La connexion <strong><code>"stdin"</code></strong>, ex. <code>scan("stdin", …)</code></td>
+</tr>
+<tr>
+<td>Et en <em>here document</em> ?</td>
+<td><code>stdin()</code> = la <strong>source du programme</strong> ; <code>"stdin"</code> <strong>inutilisable</strong></td>
+</tr>
+<tr>
+<td>Rscript accepte-t-il un script vide ?</td>
+<td><strong>Non</strong></td>
+</tr>
+<tr>
+<td>Quelle bibliothèque pour l'édition de ligne ?</td>
+<td><strong>GNU readline</strong></td>
+</tr>
+<tr>
+<td>Savoir laquelle on a ?</td>
+<td><strong><code>extSoftVersion()</code></strong></td>
+</tr>
+<tr>
+<td>La désactiver ?</td>
+<td><strong><code>--no-readline</code></strong></td>
+</tr>
+<tr>
+<td>Chercher dans l'historique ?</td>
+<td><strong><code>C-r texte</code></strong> (annuler par <code>C-g</code>)</td>
+</tr>
+<tr>
+<td>Début / fin de ligne ?</td>
+<td><strong><code>C-a</code></strong> / <strong><code>C-e</code></strong></td>
+</tr>
+<tr>
+<td>Reculer d'un mot ?</td>
+<td><strong><code>M-b</code></strong> (ou <code>ESC b</code>)</td>
+</tr>
+<tr>
+<td>Couper jusqu'à la fin ?</td>
+<td><strong><code>C-k</code></strong> ; coller : <strong><code>C-y</code></strong></td>
+</tr>
+<tr>
+<td>Transposer deux caractères ?</td>
+<td><strong><code>C-t</code></strong></td>
+</tr>
+<tr>
+<td>La casse compte-t-elle pour Meta ?</td>
+<td><strong>Oui</strong></td>
+</tr>
+<tr>
+<td>Personnaliser les touches ?</td>
+<td><strong><code>~/.inputrc</code></strong>, section <strong><code>$if R … $endif</code></strong></td>
+</tr>
+<tr>
+<td>Idiome de sauvegarde des paramètres graphiques ?</td>
+<td><code>oldpar &lt;- par(no.readonly = TRUE)</code> … <code>par(oldpar)</code></td>
+</tr>
+<tr>
+<td>Pourquoi <code>factor(mm$Expt)</code> dans l'annexe A ?</td>
+<td><code>Expt</code> est une <strong>étiquette</strong>, pas une quantité</td>
+</tr>
+<tr>
+<td>Que devient <code>plot(Expt, Speed)</code> alors ?</td>
+<td>Des <strong>boîtes à moustaches</strong> — dispatch S3</td>
+</tr>
+<tr>
+<td>Que fait <code>update(fm, . ~ . - Run)</code> ?</td>
+<td>Le <strong>même modèle sans <code>Run</code></strong></td>
+</tr>
+<tr>
+<td>Que vaut <code>rnorm(x)</code> ?</td>
+<td>Autant de tirages que <code>x</code> a <strong>d'éléments</strong></td>
+</tr>
+<tr>
+<td>Pourquoi <code>sqrt(runif(100))</code> pour le disque ?</td>
+<td>L'aire croît en $r^2$ — sans la racine, les points s'entassent au centre</td>
+</tr>
+</tbody></table>
+</main>
+
+
+
+
+</body></html>

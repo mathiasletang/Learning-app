@@ -1,0 +1,1091 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fiche 318 — Système d'exploitation : fichiers, chemins, commandes et archives</title>
+<script>
+window.MathJax={tex:{inlineMath:[["$","$"]],displayMath:[["$$","$$"]],processEscapes:true},
+ options:{skipHtmlTags:["script","noscript","style","textarea","pre","code"]},
+ svg:{fontCache:"global"},
+ startup:{pageReady:()=>MathJax.startup.defaultPageReady().then(()=>{document.body.classList.add("ready")})}};
+setTimeout(function(){document.body.classList.add("ready")},2500);
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+/* ============================================================
+   MathiasLearn — feuille de style des fiches
+   Reprise intégrale des tokens de 00_PARCOURS/*.html
+   + blocs pédagogiques (callouts, méthode, essentiels, recall)
+   ============================================================ */
+:root{--bg:#faf9f7;--card:#fff;--ink:#1a1a1a;--muted:#6b6b6b;--line:#e5e2dd;--accent:#8b5e34;
+ --hl:#fdf8ef;--ok:#2d7d4f;--okbg:#f0f7f3;--warn:#b3402f;--warnbg:#fdf3f1;--blue:#2f5d8b;--bluebg:#f1f5fa}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+ font:17px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;padding:0 16px 100px}
+.nav{position:sticky;top:0;background:rgba(250,249,247,.96);backdrop-filter:blur(8px);
+ border-bottom:1px solid var(--line);margin:0 -16px 30px;padding:11px 16px;z-index:50;
+ display:flex;gap:6px;flex-wrap:wrap;font-size:13px}
+.nav a{color:var(--muted);text-decoration:none;padding:4px 9px;border-radius:5px;white-space:nowrap}
+.nav a:hover{background:var(--line);color:var(--ink)}
+.nav a.on{background:var(--accent);color:#fff}
+main{max-width:780px;margin:0 auto}
+h1{font-size:31px;letter-spacing:-.02em;margin:.4em 0 .5em;line-height:1.25}
+h2{font-size:23px;margin:2.2em 0 .7em;padding-bottom:.3em;border-bottom:1px solid var(--line)}
+h3{font-size:19px;margin:1.9em 0 .5em;color:var(--accent)}
+h4{font-size:17px;margin:1.5em 0 .4em}
+p{margin:.8em 0} a{color:var(--accent)} hr{border:0;border-top:1px solid var(--line);margin:2.6em 0}
+table{border-collapse:collapse;width:100%;margin:1.3em 0;font-size:15.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+th{background:#f3f0eb;font-weight:600}
+tr:nth-child(even) td{background:#fcfbfa}
+code{font-family:"SF Mono",Menlo,Consolas,monospace;font-size:.88em;background:#f2efea;padding:2px 6px;border-radius:4px;overflow-wrap:break-word}
+pre{background:#f2efea;padding:14px 16px;border-radius:8px;overflow-x:auto}
+pre code{background:none;padding:0;white-space:pre}
+blockquote{border-left:3px solid var(--accent);background:var(--hl);margin:1.4em 0;padding:14px 20px;border-radius:0 8px 8px 0}
+blockquote p:first-child{margin-top:0} blockquote p:last-child{margin-bottom:0}
+ul,ol{padding-left:1.5em} li{margin:.35em 0} em{color:#4a4a4a}
+mjx-container[display="true"]{margin:1.1em 0!important;overflow-x:auto;overflow-y:hidden;padding:2px 0}
+mjx-container svg{max-width:100%}
+body:not(.ready) main{opacity:0} main{opacity:1;transition:opacity .25s}
+
+/* --- bandeau de tête de fiche --- */
+.cours{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--accent);
+ border-radius:0 10px 10px 0;padding:18px 22px;margin:0 0 34px}
+.cours h4{margin:0 0 4px;font-size:14px;text-transform:uppercase;letter-spacing:.07em;color:var(--accent)}
+.cours .cs{color:var(--muted);font-size:14.5px;margin:0 0 14px}
+
+/* --- exercices / corrigés --- */
+.ex{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:6px 24px 20px;margin:18px 0}
+.ex>h3:first-child{margin-top:14px}
+details.cor{margin-top:18px;border:1px solid var(--line);border-radius:8px;background:#fcfbfa;overflow:hidden}
+details.cor>summary{cursor:pointer;padding:12px 16px;font-weight:600;font-size:15px;color:var(--accent);
+ list-style:none;display:flex;align-items:center;gap:9px;user-select:none;transition:.15s;min-height:44px}
+details.cor>summary::-webkit-details-marker{display:none}
+details.cor>summary:hover{background:var(--hl)}
+details.cor>summary::before{content:"\25B6";font-size:10px;transition:transform .18s;display:inline-block}
+details.cor[open]>summary::before{transform:rotate(90deg)}
+details.cor[open]>summary{background:var(--okbg);color:var(--ok);border-bottom:1px solid var(--line)}
+.cor .in{padding:4px 20px 16px}
+.cor .in>*:first-child{margin-top:.9em}
+
+/* --- blocs pédagogiques (callouts) ---
+   Générés depuis une citation Markdown dont le premier **gras** commence
+   par un mot-clé : DÉFINITION, THÉORÈME, MÉTHODE, PIÈGE, INTUITION… */
+.cal{border:1px solid var(--line);border-left:4px solid var(--accent);background:var(--card);
+ border-radius:0 10px 10px 0;padding:15px 20px;margin:1.5em 0}
+.cal>p:first-child{margin-top:0}.cal>p:last-child,.cal>ul:last-child,.cal>ol:last-child{margin-bottom:0}
+.cal .lab{display:block;font-size:12.5px;text-transform:uppercase;letter-spacing:.08em;
+ font-weight:700;color:var(--accent);margin-bottom:6px}
+.cal.formel{background:var(--hl)}
+.cal.piege{border-left-color:var(--warn);background:var(--warnbg)}
+.cal.piege .lab{color:var(--warn)}
+.cal.methode{border-left-color:var(--ok);background:var(--okbg)}
+.cal.methode .lab{color:var(--ok)}
+.cal.intu{border-left-color:var(--blue);background:var(--bluebg)}
+.cal.intu .lab{color:var(--blue)}
+.cal.plus{border-left-style:dashed;background:#faf9f7}
+.cal.plus .lab{color:var(--muted)}
+
+/* --- révision express --- */
+.ess{background:var(--card);border:1px solid var(--accent);border-radius:10px;padding:4px 24px 20px;margin:1.6em 0}
+.ess h3{margin-top:1.3em}
+.rec{background:var(--card);border:1px dashed var(--accent);border-radius:10px;padding:4px 24px 18px;margin:1.6em 0}
+.rec ol{counter-reset:none}
+
+/* --- impression / PDF --- */
+@media print{
+ .nav{display:none}
+ body{padding:0;background:#fff;font-size:11.2pt;line-height:1.55}
+ main{max-width:none}
+ h1{font-size:23pt}h2{font-size:15pt;margin-top:1.5em}h3{font-size:12.6pt}
+ h2,h3,h4{break-after:avoid;page-break-after:avoid}
+ table,.cal,blockquote{break-inside:avoid;page-break-inside:avoid}
+ table{display:table;font-size:9.6pt}
+ details.cor{border:1px solid var(--line);background:#fcfbfa}
+ details.cor>summary{display:none}
+ details.cor .in{padding-top:10px}
+ .cal,.ex,.ess,.rec{box-shadow:none}
+ a{color:var(--ink);text-decoration:none}
+}
+@page{margin:16mm 15mm 18mm}
+
+/* --- exemples travaillés --- */
+.exm{background:#fcfbfa;border:1px solid var(--line);border-radius:10px;padding:2px 20px 14px;margin:1.5em 0}
+.exm>h4:first-child{margin:14px 0 .5em;color:var(--accent);font-size:13px;text-transform:uppercase;letter-spacing:.07em}
+
+
+/* --- pastilles de priorité (conventions des fiches de l'app) --- */
+h2[data-prio], h3[data-prio], h4[data-prio]{position:relative}
+h2[data-prio]::before,h3[data-prio]::before,h4[data-prio]::before{
+ content:"";display:inline-block;width:9px;height:9px;border-radius:50%;
+ margin-right:9px;vertical-align:middle;background:var(--muted)}
+[data-prio="must"]::before{background:var(--warn)}
+[data-prio="high"]::before{background:#d98324}
+[data-prio="mid"]::before{background:#c9a227}
+[data-prio="low"]::before{background:var(--ok)}
+/* corrigés des fiches de l'app : même traitement que les corrigés des séries */
+details.cor>summary::after{content:""}
+</style></head><body>
+<div class="nav"><a href="00_COMMENCER_ICI.html">Commencer ici</a><a href="01_NOTATIONS_le-decodeur.html">Notations</a><a href="02_EXERCICES_Serie-0.html">Série 0 — Remise en route</a><a href="03_EXERCICES_Serie-1.html">Série 1 — Convexité</a><a href="04_EXERCICES_Serie-2.html">Série 2 — KKT</a><a href="05_AUTO-EVALUATION.html">Auto-évaluation (quiz)</a><a href="06_FICHE_Optimisation-deux-variables.html">Fiche — Optimisation à 2 variables</a></div>
+<main><h1>Fiche 318 — Système d'exploitation : fichiers, chemins, commandes et archives</h1>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Matière</strong></td>
+<td>Code · Langage R</td>
+</tr>
+<tr>
+<td><strong>Cours source</strong></td>
+<td>R Core Team, <em>An Introduction to R</em> 4.6.1 — chapitre 14 « OS facilities » (§14.1 fichiers et répertoires, §14.2 chemins, §14.3 commandes système, §14.4 compression et archives)</td>
+</tr>
+<tr>
+<td><strong>Difficulté</strong></td>
+<td> Intermédiaire — peu de théorie, beaucoup de fonctions et de pièges de portabilité</td>
+</tr>
+<tr>
+<td><strong>Temps d'étude estimé</strong></td>
+<td>45 min</td>
+</tr>
+<tr>
+<td><strong>Prérequis</strong></td>
+<td>Fiches 300 et 307 (session, répertoire de travail, lecture de fichiers)</td>
+</tr>
+<tr>
+<td><strong>Concepts clés</strong></td>
+<td>R comme <strong>langage de script</strong>, <code>file.create</code> / <code>dir.create</code>, <code>tempfile</code>, <code>file.remove</code> / <code>unlink</code>, <code>list.files</code> / <code>dir</code> / <code>list.dirs</code>, <code>Sys.glob</code>, <code>file.info</code>, <code>file.exists</code> / <code>file.access</code> / <code>file_test</code>, <code>file.copy</code>, <code>file.choose</code>, <code>file.show</code> / <code>file.edit</code>, <code>basename</code> / <code>dirname</code> / <strong><code>file.path</code></strong>, <code>path.expand</code>, <strong><code>normalizePath</code></strong>, <code>shortPathName</code>, <code>Sys.chmod</code>, <strong><code>system</code></strong> / <strong><code>system2</code></strong>, <code>Sys.which</code>, <strong><code>shQuote</code></strong>, <strong>connexions</strong> et détection de compression, gzip / bzip2 / xz, <code>untar</code> / <code>unzip</code></td>
+</tr>
+<tr>
+<td><strong>À retenir en priorité</strong></td>
+<td><strong><code>file.path()</code> pour assembler un chemin</strong> · <strong><code>system2</code> pour du code portable</strong> · <strong><code>shQuote</code> avant toute commande</strong> · <strong>la sensibilité à la casse dépend du système</strong> · <strong><code>file</code> détecte la compression toute seule</strong>.</td>
+</tr>
+</tbody></table>
+<h2>Vue d'ensemble</h2>
+<pre><code>POURQUOI      « R has quite extensive facilities to access the OS ... this allows
+                it to be USED AS A SCRIPTING LANGUAGE and that ability is
+                MUCH USED BY R ITSELF, for example TO INSTALL PACKAGES. »
+              « considerable effort has gone into make the scripting facilities
+                AS PLATFORM-INDEPENDENT AS IS FEASIBLE »
+
+CREER         file.create   dir.create     (= touch et mkdir)
+              tempfile      pour le repertoire de session
+SUPPRIMER     file.remove   unlink         (unlink enleve des ARBORESCENCES)
+LISTER        list.files / dir   list.dirs   -&gt; par EXPRESSION REGULIERE
+              Sys.glob                        -&gt; par JOKERS
+INFORMER      file.info     file.exists / file.access / file_test
+COPIER        file.copy     (= cp)
+CHOISIR       file.choose   choose.files / choose.dir (Windows)
+              tk_choose.files / tk_choose.dir (paquet tcltk)
+AFFICHER      file.show     file.edit
+LIENS         file.link     Sys.readlink
+
+CHEMINS       basename  dirname  -&gt;  file.path POUR ASSEMBLER
+              path.expand  (le tilde)     normalizePath (chemin canonique)
+              shortPathName (Windows, noms « 8.3 », sans espaces)
+              Sys.chmod pour les permissions
+
+PIEGES DE PORTABILITE
+   casse            POSIX sensible ; Windows et macOS INSENSIBLES par defaut
+   separateur       Windows accepte / et \ ; R convertit les exceptions
+   slash final      NON VALIDE sous Windows -- a EVITER
+   slashs multiples /abc//def valide en POSIX ; double slash INITIAL special
+   UNC              \\server\... NON SUPPORTE
+   d:foo/bar        relatif au repertoire courant DU LECTEUR -- eviter
+
+COMMANDES     system   system2   -- « system2 ... EASIER TO WRITE
+                                    CROSS-PLATFORM CODE »
+              Sys.which  (la commande existe-t-elle ?)   shQuote  (quoter)
+
+COMPRESSION   file() identifie la compression par L'EN-TETE « MAGIC »
+              gzip (bon compromis) · compress (ancien) · bzip2 · xz
+              untar   unzip
+</code></pre>
+<p><strong>Le problème posé.</strong> <em>« <strong>R has quite extensive facilities to access the OS under which it is running : this allows it to be used as a scripting language and that ability is much used by R itself, for example to install packages.</strong> »</em> (§14)</p>
+<div class="cal intu"><span class="lab">Intuition — pourquoi ce chapitre existe.</span>
+<p> R n'est pas seulement un langage d'analyse : <strong>il s'administre lui-même en R</strong>. <code>install.packages()</code> (fiche 315), <code>R CMD build</code> (fiche 300) — ces outils <strong>sont écrits en R</strong> et manipulent des fichiers, lancent des commandes, dépaquettent des archives. Le chapitre 14 est <strong>l'outillage qui rend cela possible</strong>.</p>
+<p><em>« <strong>Because R's own scripts need to work across all platforms, considerable effort has gone into make the scripting facilities as platform-independent as is feasible.</strong> »</em> — le mot <strong>« as is feasible »</strong> est important : le §14.2 énumère tout ce qui <strong>n'a pas pu</strong> être uniformisé.</p>
+</div>
+<h2 data-prio="high">Concept 1 — Fichiers et répertoires</h2>
+<blockquote>
+<p><strong>Cadrage (§14.1).</strong> <em>« There are <strong>many functions to manipulate files and directories</strong>. Here are <strong>pointers to some of the more commonly used ones</strong>. »</em> — le chapitre est <strong>un index commenté</strong>, pas une documentation exhaustive.</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>Besoin</th>
+<th>Fonctions (§14.1)</th>
+<th>Équivalent cité</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Créer</strong></td>
+<td><strong><code>file.create</code></strong>, <strong><code>dir.create</code></strong></td>
+<td><em>« the analogues of the POSIX utilities <strong><code>touch</code> and <code>mkdir</code></strong> »</em></td>
+</tr>
+<tr>
+<td>Fichiers <strong>temporaires</strong></td>
+<td><strong><code>tempfile</code></strong></td>
+<td><em>« for temporary files and directories <strong>in the R session directory</strong> »</em></td>
+</tr>
+<tr>
+<td><strong>Supprimer</strong></td>
+<td><strong><code>file.remove</code></strong>, <strong><code>unlink</code></strong></td>
+<td> <em>« <strong>the latter can remove directory trees</strong> »</em></td>
+</tr>
+<tr>
+<td><strong>Lister</strong></td>
+<td><strong><code>list.files</code></strong> (aussi <strong><code>dir</code></strong>), <strong><code>list.dirs</code></strong></td>
+<td><em>« These can <strong>select files using a regular expression</strong> »</em></td>
+</tr>
+<tr>
+<td>Lister <strong>par jokers</strong></td>
+<td><strong><code>Sys.glob</code></strong></td>
+<td><em>« <strong>to select by wildcards</strong> »</em></td>
+</tr>
+<tr>
+<td><strong>S'informer</strong></td>
+<td><strong><code>file.info</code></strong></td>
+<td><em>« Many types of information on a filepath (<strong>including for example if it is a file or directory</strong>) »</em></td>
+</tr>
+<tr>
+<td><strong>Tester l'existence</strong></td>
+<td><strong><code>file.exists</code></strong>, <strong><code>file.access</code></strong>, <strong><code>file_test</code></strong></td>
+<td><em>« <strong><code>file_test</code> is a version of the POSIX <code>test</code> command</strong> for those familiar with shell scripting »</em></td>
+</tr>
+<tr>
+<td><strong>Copier</strong></td>
+<td><strong><code>file.copy</code></strong></td>
+<td><em>« the R analogue of the POSIX command <strong><code>cp</code></strong> »</em></td>
+</tr>
+<tr>
+<td><strong>Choisir</strong></td>
+<td><strong><code>file.choose</code></strong></td>
+<td>Windows : <strong><code>choose.files</code></strong>, <strong><code>choose.dir</code></strong> ; paquet <code>tcltk</code> : <strong><code>tk_choose.files</code></strong>, <strong><code>tk_choose.dir</code></strong></td>
+</tr>
+<tr>
+<td><strong>Afficher / éditer</strong></td>
+<td><strong><code>file.show</code></strong>, <strong><code>file.edit</code></strong></td>
+<td><em>« in a way appropriate to the R port, <strong>using the facilities of a console</strong> (such as RGui on Windows or R.app on macOS) »</em></td>
+</tr>
+<tr>
+<td><strong>Liens</strong></td>
+<td><strong><code>file.link</code></strong>, <strong><code>Sys.readlink</code></strong></td>
+<td><em>« There is <strong>some support for links in the filesystem</strong> »</em></td>
+</tr>
+</tbody></table>
+<blockquote>
+<p class="cal piege"> <strong>Deux distinctions à ne pas manquer.</strong></p>
+<ul>
+<li><strong><code>file.remove</code> contre <code>unlink</code></strong> : le second <em>« <strong>can remove directory trees</strong> »</em>. C'est <strong>plus puissant et plus dangereux</strong> — l'équivalent d'un <code>rm -r</code>.</li>
+<li><strong>Trois fonctions pour « le fichier existe-t-il ? »</strong> : <em>« <strong>There are several ways to find out if a file "exists"</strong> ( <strong>a file can exist on the filesystem and not be visible to the current user</strong>). There are functions <strong><code>file.exists</code>, <code>file.access</code> and <code>file_test</code></strong> with <strong>various versions of this test</strong>. »</em></li>
+</ul>
+<p><strong>La parenthèse est le cœur du problème</strong> : « exister » et « être accessible » sont <strong>deux questions différentes</strong>. <code>file.exists</code> répond à la première, <code>file.access</code> à la seconde.</p>
+</blockquote>
+<blockquote>
+<p><strong>Rappel — le lien avec la fiche 307.</strong> <code>list.files()</code> <strong>sélectionne par expression régulière</strong>, <code>Sys.glob()</code> <strong>par jokers</strong> (<code>*.csv</code>). Deux langages différents pour deux habitudes différentes : celle de R, celle du shell.</p>
+</blockquote>
+<h2 data-prio="must">Concept 2 — Les chemins et leurs pièges</h2>
+<blockquote>
+<p><strong>Cadrage (§14.2).</strong> <em>« <strong>With a few exceptions, R relies on the underlying OS functions to manipulate filepaths.</strong> <strong>Some aspects of this are allowed to depend on the OS, and do, even down to the version of the OS.</strong> <strong>There are POSIX standards for how OSes should interpret filepaths and many R users assume POSIX compliance : but Windows does not claim to be compliant and other OSes may be less than completely compliant.</strong> »</em></p>
+</blockquote>
+<h3>2.1 Les six pièges énumérés par le cours</h3>
+<blockquote>
+<p class="cal piege"> <strong>Règle (§14.2).</strong> <em>« <strong>The following are some issues which have been encountered with filepaths.</strong> »</em></p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Piège</th>
+<th>Ce que dit le cours</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>1</strong></td>
+<td><strong>La casse</strong></td>
+<td><em>« <strong>POSIX filesystems are case-sensitive</strong>, so <code>foo.png</code> and <code>Foo.PNG</code> are different files. <strong>However, the defaults on Windows and macOS are to be case-insensitive</strong>, and <strong>FAT filesystems</strong> (commonly used on removable storage) <strong>are not normally case-sensitive</strong> (and <strong>all filepaths may be mapped to lower case</strong>). »</em></td>
+</tr>
+<tr>
+<td><strong>2</strong></td>
+<td><strong>Le séparateur</strong></td>
+<td><em>« <strong>Almost all the Windows' OS services support the use of slash or backslash</strong> as the filepath separator, <strong>and R converts the known exceptions to the form required by Windows</strong>. »</em></td>
+</tr>
+<tr>
+<td><strong>3</strong></td>
+<td><strong>Le slash final</strong></td>
+<td><em>« <strong>The behaviour of filepaths with a trailing slash is OS-dependent. Such paths are not valid on Windows and should not be expected to work.</strong> <strong>POSIX-2008 requires such paths to match only directories, but earlier versions allowed them to also match files. So they are best avoided.</strong> »</em></td>
+</tr>
+<tr>
+<td><strong>4</strong></td>
+<td><strong>Les slashs multiples</strong></td>
+<td><em>« <strong>Multiple slashes in filepaths such as <code>/abc//def</code> are valid on POSIX filesystems and treated as if there was only one slash.</strong> They are usually accepted by Windows' OS functions.  <strong>However, leading double slashes may have a different meaning.</strong> »</em></td>
+</tr>
+<tr>
+<td><strong>5</strong></td>
+<td><strong>Les chemins UNC</strong></td>
+<td><em>« <strong>Windows' UNC filepaths (such as <code>\\server\dir1\dir2\file</code>) are not supported, but they may work in some R functions.</strong> <strong>POSIX filesystems are allowed to treat a leading double slash specially.</strong> »</em></td>
+</tr>
+<tr>
+<td><strong>6</strong></td>
+<td><strong>Les chemins relatifs à un lecteur</strong></td>
+<td><em>« <strong>Windows allows filepaths containing drives and relative to the current directory on a drive</strong>, e.g. <code>d:foo/bar</code> refers to <code>d:/a/b/c/foo/bar</code> if the current directory on drive <code>d:</code> is <code>/a/b/c</code>. <strong>It is intended that these work, but the use of absolute paths is safer.</strong> »</em></td>
+</tr>
+</tbody></table>
+<div class="cal intu"><span class="lab">En clair — ce que ces six points ont en commun.</span>
+<p> Chacun décrit un endroit où <strong>l'intuition du programmeur ne correspond pas à ce que fait le système</strong>. Le premier surprend le plus : un script développé sur macOS, où <code>Data.csv</code> et <code>data.csv</code> désignent le même fichier, <strong>échoue sous Linux</strong> où ce sont deux fichiers.</p>
+<p><strong>La règle de survie tient en une ligne</strong> : ne construire des chemins <strong>qu'avec les fonctions dédiées</strong>, et préférer <strong>les chemins absolus</strong>.</p>
+</div>
+<h3>2.2 Les fonctions de chemin</h3>
+<blockquote>
+<p><strong>Règle (§14.2).</strong> <em>« <strong>Functions <code>basename</code> and <code>dirname</code> select parts of a file path : the recommended way to assemble a file path from components is <code>file.path</code>.</strong> »</em></p>
+</blockquote>
+<pre><code class="language-r">file.path("data", "brut", "mesures.csv")   # le separateur est choisi par R
+</code></pre>
+<p><strong>C'est la fonction la plus importante du chapitre.</strong> Concaténer à la main — <code>paste0(dossier, "/", nom)</code> — c'est <strong>coder en dur un séparateur</strong> et se heurter au piège 2. <code>file.path()</code> <strong>fait le bon choix pour le système courant</strong>.</p>
+<blockquote>
+<p><strong>Les autres (§14.2).</strong></p>
+<ul>
+<li><strong><code>path.expand</code></strong> — <em>« does "<strong>tilde expansion</strong>", substituting values for home directories (<strong>the current user's, and perhaps those of other users</strong>) »</em>.</li>
+<li><strong><code>normalizePath</code></strong> — <em>« <strong>On filesystems with links, a single file can be referred to by many filepaths.</strong> <code>normalizePath</code> <strong>will find a canonical filepath</strong>. »</em></li>
+<li><strong><code>shortPathName</code></strong> — <em>« <strong>Windows has the concepts of short ("8.3") and long file names</strong> : <code>normalizePath</code> will <strong>return an absolute path using long file names</strong> and <code>shortPathName</code> <strong>will return a version using short names</strong>.  <strong>The latter does not contain spaces and uses backslash as the separator, so is sometimes useful for exporting names from R.</strong> »</em></li>
+</ul>
+</blockquote>
+<div class="cal methode"><span class="lab">Méthode — le cas des espaces.</span>
+<p> Un chemin contenant des espaces casse la plupart des commandes système. Deux réponses selon le contexte : <strong><code>shQuote</code></strong> (concept 3) pour passer par un shell, et <strong><code>shortPathName</code></strong> sous Windows — <em>« <strong>does not contain spaces</strong> »</em> — pour transmettre un nom à un programme extérieur.</p>
+</div>
+<blockquote>
+<p><strong>Les permissions (§14.2).</strong> <em>« <strong>File permissions are a related topic. R has support for the POSIX concepts of read/write/execute permission for owner/group/all but this may be only partially supported on the filesystem</strong> — so for example <strong>on Windows only read-only files (for the account running the R session) are recognized</strong>.  <strong>Access Control Lists (ACLs) are employed on several filesystems, but do not have an agreed standard and R has no facilities to control them.</strong> <strong>Use <code>Sys.chmod</code> to change permissions.</strong> »</em></p>
+</blockquote>
+<h2 data-prio="high">Concept 3 — Lancer une commande système</h2>
+<div class="cal formel"><span class="lab">Définition (§14.3).</span>
+<p> <em>« <strong>Functions <code>system</code> and <code>system2</code> are used to invoke a system command and optionally collect its output.</strong> <strong><code>system2</code> is a little more general but its main advantage is that it is easier to write cross-platform code using it.</strong> »</em></p>
+</div>
+<div class="cal intu"><span class="lab">Pourquoi system diffère selon le système (§14.3).</span>
+<p class="cal piege">  <em>« <strong><code>system</code> behaves differently on Windows from other OSes (because the API C call of that name does).</strong> <strong>Elsewhere it invokes a shell to run the command : the Windows port of R has a function <code>shell</code> to do that.</strong> »</em></p>
+<p><strong>Ailleurs qu'à Windows, <code>system</code> passe par un shell</strong> — donc l'expansion des jokers, les redirections, les pipes fonctionnent. <strong>Sous Windows, non</strong> : il faut <code>shell()</code>. <code>system2</code> sépare l'exécutable de ses arguments et <strong>contourne la question</strong>.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Besoin</th>
+<th>Fonction</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Lancer une commande, <strong>code portable</strong></td>
+<td><strong><code>system2</code></strong></td>
+</tr>
+<tr>
+<td>Lancer via un <strong>shell</strong></td>
+<td><code>system</code> (hors Windows) · <strong><code>shell</code></strong> (Windows)</td>
+</tr>
+<tr>
+<td><strong>La commande existe-t-elle ?</strong></td>
+<td><strong><code>Sys.which</code></strong></td>
+</tr>
+<tr>
+<td><strong>Protéger</strong> un chemin ou un argument</td>
+<td><strong><code>shQuote</code></strong></td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>Règle (§14.3).</strong> <em>« <strong>To find out if the OS includes a command, use <code>Sys.which</code>, which attempts to do this in a cross-platform way</strong> ( <strong>unfortunately it is not a standard OS service</strong>). »</em></p>
+<p><em>« <strong>Function <code>shQuote</code> will quote filepaths as needed for commands in the current OS.</strong> »</em></p>
+</blockquote>
+<p><strong><code>shQuote</code> est le pendant de <code>file.path</code></strong> : l'un assemble un chemin correctement, l'autre le <strong>protège</strong> correctement avant de le confier à un shell. Les deux évitent d'écrire soi-même des règles qui diffèrent d'un système à l'autre.</p>
+<h2 data-prio="high">Concept 4 — Compression et archives</h2>
+<div class="cal formel"><span class="lab">Définition (§14.4).</span>
+<p> <em>« <strong>Recent versions of R have extensive facilities to read and write compressed files, often transparently.</strong> <strong>Reading of files in R is to a very large extent done by connections, and the <code>file</code> function which is used to open a connection to a file (or a URL) and is able to identify the compression used from the "magic" header of the file.</strong> »</em></p>
+</div>
+<p><strong>C'est la phrase à retenir</strong> : on n'a <strong>rien à déclarer</strong>. Ouvrir un fichier compressé se fait comme ouvrir un fichier ordinaire — <strong><code>file()</code> lit l'en-tête et décide</strong>.</p>
+<blockquote>
+<p><strong>Les quatre formats (§14.4).</strong></p>
+<table>
+<thead>
+<tr>
+<th>Format</th>
+<th>Ce que dit le cours</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>gzip</strong></td>
+<td><em>« <strong>The type of compression which has been supported for longest</strong> … and <strong>that remains a good general compromise</strong> »</em></td>
+</tr>
+<tr>
+<td><strong>compress</strong></td>
+<td><em>« Files compressed by the <strong>earlier Unix <code>compress</code> utility</strong> can also be read, but <strong>these are becoming rare</strong> »</em></td>
+</tr>
+<tr>
+<td><strong>bzip2</strong> et <strong>xz</strong></td>
+<td><em>« These generally <strong>achieve higher rates of compression (depending on the file, much higher)</strong> <strong>at the expense of slower decompression and much slower compression</strong> »</em></td>
+</tr>
+</tbody></table>
+<p class="cal piege"> <em>« <strong>There is some confusion between <code>xz</code> and <code>lzma</code> compression</strong> … <strong>R can read files compressed by most versions of either.</strong> »</em></p>
+</blockquote>
+<blockquote>
+<p><strong>Le compromis, énoncé par le cours.</strong> <strong>gzip</strong> = <em>« a good general compromise »</em> ; <strong>bzip2/xz</strong> = <strong>meilleure compression</strong>, mais <strong>décompression plus lente</strong> et <strong>compression bien plus lente</strong>. Le choix dépend donc de ce qu'on fait le plus souvent : <strong>écrire une fois et lire souvent</strong> favorise <code>xz</code> ; <strong>écrire souvent</strong> favorise <code>gzip</code>.</p>
+</blockquote>
+<blockquote>
+<p><strong>Les archives (§14.4).</strong> <em>« <strong>File archives are single files which contain a collection of files, the most common ones being "tarballs" and zip files as used to distribute R packages.</strong> <strong>R can list and unpack both (see functions <code>untar</code> and <code>unzip</code>) and create both (for zip with the help of an external program).</strong> »</em></p>
+</blockquote>
+<p class="cal piege"> <strong>L'asymétrie de la dernière phrase</strong> : R <strong>lit et écrit</strong> les deux, mais <strong>la création d'un zip demande un programme externe</strong>. C'est cohérent avec le §14.3 — d'où l'intérêt de <code>Sys.which</code> pour vérifier sa présence.</p>
+<details class="cor">
+<summary><strong>Exercice résolu — écrire un script de préparation de données portable</strong></summary><div class="in">
+
+<p><strong>Énoncé.</strong> Écrire un script qui, à partir d'un dossier, dépaquette une archive, liste les fichiers <code>.csv</code> compressés qu'elle contient, les lit, et écrit un fichier de synthèse — le tout devant fonctionner sous Windows comme sous Linux.</p>
+<p><em>Étape 1 — ne jamais concaténer un chemin à la main.</em> <em>« <strong>the recommended way to assemble a file path from components is <code>file.path</code></strong> »</em> (§14.2).</p>
+<pre><code class="language-r">racine  &lt;- normalizePath(".")
+archive &lt;- file.path(racine, "donnees.tar.gz")
+</code></pre>
+<p><strong><code>normalizePath</code></strong> parce que <em>« <strong>on filesystems with links, a single file can be referred to by many filepaths</strong> »</em> — on veut <strong>un chemin canonique</strong>, pas une des formes possibles.</p>
+<p><em>Étape 2 — préparer un espace de travail temporaire.</em> <em>« For temporary files and directories <strong>in the R session directory</strong> see <strong><code>tempfile</code></strong> »</em> (§14.1) :</p>
+<pre><code class="language-r">travail &lt;- tempfile()
+dir.create(travail)
+on.exit(unlink(travail, recursive = TRUE))
+</code></pre>
+<p class="cal piege"> <strong>Deux points.</strong> <code>unlink</code> est choisi parce que <em>« <strong>the latter can remove directory trees</strong> »</em> — <code>file.remove</code> ne suffirait pas. Et <strong><code>on.exit</code></strong> (fiche 317) garantit le nettoyage <em>« <strong>either directly or as the result of a warning</strong> »</em>.</p>
+<p><em>Étape 3 — dépaqueter.</em> <em>« <strong>R can list and unpack both (see functions <code>untar</code> and <code>unzip</code>)</strong> »</em> (§14.4) :</p>
+<pre><code class="language-r">untar(archive, exdir = travail)
+</code></pre>
+<p><em>Étape 4 — lister.</em> Deux langages au choix (§14.1) : <strong>expression régulière</strong> avec <code>list.files</code>, <strong>jokers</strong> avec <code>Sys.glob</code>.</p>
+<pre><code class="language-r">fichiers &lt;- list.files(travail, pattern = "\\.csv\\.gz$", full.names = TRUE)
+# ou : Sys.glob(file.path(travail, "*.csv.gz"))
+</code></pre>
+<p class="cal piege"> <strong>Le point est échappé</strong> dans l'expression régulière : <code>\\.</code> — sinon il apparie n'importe quel caractère.</p>
+<p><em>Étape 5 — lire, sans se soucier de la compression.</em> C'est le point le plus reposant du chapitre :</p>
+<pre><code class="language-r">donnees &lt;- lapply(fichiers, read.csv)
+</code></pre>
+<p><em>« <strong><code>file</code> … is able to identify the compression used from the "magic" header of the file</strong> »</em> — <strong>aucun argument à passer</strong>. <code>read.csv</code> (fiche 307) ouvre une connexion, et la connexion décide.</p>
+<p><em>Étape 6 — vérifier avant d'agir.</em> Si une étape doit appeler un programme extérieur — créer un zip, par exemple, ce que R ne fait <em>« with the help of an external program »</em> —, vérifier d'abord :</p>
+<pre><code class="language-r">if (nzchar(Sys.which("zip"))) { ... }
+</code></pre>
+<p><em>« <strong>To find out if the OS includes a command, use <code>Sys.which</code>, which attempts to do this in a cross-platform way.</strong> »</em></p>
+<p><em>Étape 7 — protéger les arguments.</em> Si l'on passe par <code>system2</code>, tout chemin susceptible de contenir un espace doit être <strong>protégé</strong> :</p>
+<pre><code class="language-r">system2("zip", c("-r", shQuote(sortie), shQuote(travail)))
+</code></pre>
+<p><em>« <strong>Function <code>shQuote</code> will quote filepaths as needed for commands in the current OS.</strong> »</em> Et <strong><code>system2</code></strong> plutôt que <code>system</code>, parce qu'<em>« <strong>its main advantage is that it is easier to write cross-platform code using it</strong> »</em>.</p>
+<p><em>Étape 8 — la casse.</em>  Développé sous Windows ou macOS, ce script marchera avec <code>Donnees.CSV</code> ; <strong>sous Linux, non</strong> — <em>« <strong>POSIX filesystems are case-sensitive</strong> »</em>. Le remède : <strong>ne jamais compter sur l'insensibilité</strong>, et si l'entrée est incertaine, lister puis filtrer avec <code>ignore.case = TRUE</code>.</p>
+<p><em>Étape 9 — les chemins absolus.</em> Le cours conclut son point 6 par <em>« <strong>the use of absolute paths is safer</strong> »</em>. Un script qui dépend du répertoire courant dépend de <strong>la manière dont il a été lancé</strong> (fiche 300) — c'est une fragilité gratuite.</p>
+</div></details>
+
+<h2>Comment reconnaître le type d'exercice</h2>
+<table>
+<thead>
+<tr>
+<th>Le signal dans l'énoncé</th>
+<th>Ce qu'il faut mobiliser</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>« créer un dossier »</td>
+<td><strong><code>dir.create</code></strong></td>
+</tr>
+<tr>
+<td>« un fichier temporaire »</td>
+<td><strong><code>tempfile</code></strong></td>
+</tr>
+<tr>
+<td>« effacer une arborescence »</td>
+<td><strong><code>unlink</code></strong>, pas <code>file.remove</code></td>
+</tr>
+<tr>
+<td>« tous les fichiers <code>.csv</code> »</td>
+<td><strong><code>list.files(pattern=)</code></strong> ou <strong><code>Sys.glob</code></strong></td>
+</tr>
+<tr>
+<td>« est-ce un dossier ? »</td>
+<td><strong><code>file.info</code></strong></td>
+</tr>
+<tr>
+<td>« le fichier existe-t-il ? »</td>
+<td><strong><code>file.exists</code></strong> — et <strong><code>file.access</code></strong> pour l'accès</td>
+</tr>
+<tr>
+<td>« comme la commande <code>test</code> du shell »</td>
+<td><strong><code>file_test</code></strong></td>
+</tr>
+<tr>
+<td>« copier un fichier »</td>
+<td><strong><code>file.copy</code></strong></td>
+</tr>
+<tr>
+<td>« demander un fichier à l'utilisateur »</td>
+<td><strong><code>file.choose</code></strong> (ou <code>choose.files</code> sous Windows)</td>
+</tr>
+<tr>
+<td>« assembler un chemin »</td>
+<td> <strong><code>file.path</code></strong>, jamais <code>paste0</code></td>
+</tr>
+<tr>
+<td>« le nom seul, le dossier seul »</td>
+<td><strong><code>basename</code></strong>, <strong><code>dirname</code></strong></td>
+</tr>
+<tr>
+<td>« le tilde n'est pas résolu »</td>
+<td><strong><code>path.expand</code></strong></td>
+</tr>
+<tr>
+<td>« plusieurs chemins pour le même fichier »</td>
+<td><strong><code>normalizePath</code></strong></td>
+</tr>
+<tr>
+<td>« le chemin contient des espaces »</td>
+<td><strong><code>shQuote</code></strong>, ou <strong><code>shortPathName</code></strong> sous Windows</td>
+</tr>
+<tr>
+<td>« changer les permissions »</td>
+<td><strong><code>Sys.chmod</code></strong></td>
+</tr>
+<tr>
+<td>« ça marche chez moi, pas sous Linux »</td>
+<td> <strong>la casse</strong></td>
+</tr>
+<tr>
+<td>« lancer une commande système »</td>
+<td><strong><code>system2</code></strong> pour du code portable</td>
+</tr>
+<tr>
+<td>« avec des jokers ou des redirections »</td>
+<td>un <strong>shell</strong> : <code>system</code> (hors Windows), <strong><code>shell</code></strong> (Windows)</td>
+</tr>
+<tr>
+<td>« la commande est-elle installée ? »</td>
+<td><strong><code>Sys.which</code></strong></td>
+</tr>
+<tr>
+<td>« lire un fichier compressé »</td>
+<td><strong>rien à faire</strong> — la connexion le détecte</td>
+</tr>
+<tr>
+<td>« quel format de compression choisir ? »</td>
+<td><strong>gzip</strong> par défaut ; <strong>xz/bzip2</strong> si l'on écrit rarement</td>
+</tr>
+<tr>
+<td>« dépaqueter une archive »</td>
+<td><strong><code>untar</code></strong>, <strong><code>unzip</code></strong></td>
+</tr>
+<tr>
+<td>« créer un zip »</td>
+<td> <strong>un programme externe</strong> est nécessaire</td>
+</tr>
+</tbody></table>
+<h2>Comment résoudre ce type d'exercice</h2>
+<p><strong>Protocole « écrire un script de fichiers portable » — 5 étapes.</strong></p>
+<ol>
+<li><strong>Assembler tous les chemins par <code>file.path()</code></strong> — jamais de séparateur écrit à la main.</li>
+<li><strong>Préférer les chemins absolus</strong>, obtenus par <strong><code>normalizePath()</code></strong>.</li>
+<li><strong>Ne jamais compter sur l'insensibilité à la casse</strong> ni sur un <strong>slash final</strong>.</li>
+<li>Pour le travail intermédiaire, <strong><code>tempfile()</code> + <code>dir.create()</code></strong>, nettoyé par <strong><code>on.exit(unlink(..., recursive = TRUE))</code></strong>.</li>
+<li>Vérifier l'existence <strong>et</strong> l'accès : <code>file.exists</code> <strong>puis</strong> <code>file.access</code>.</li>
+</ol>
+<p><strong>Protocole « appeler un programme extérieur » — 4 étapes.</strong></p>
+<ol>
+<li><strong><code>Sys.which("prog")</code></strong> d'abord — la commande peut ne pas exister.</li>
+<li><strong><code>system2</code></strong> plutôt que <code>system</code> : <em>« easier to write cross-platform code »</em>.</li>
+<li><strong><code>shQuote()</code></strong> sur tout argument susceptible de contenir un espace.</li>
+<li>Si l'on a besoin d'un shell (jokers, tubes) : <code>system</code> hors Windows, <strong><code>shell</code></strong> sous Windows.</li>
+</ol>
+<h2 data-prio="must">Common mistakes</h2>
+<table>
+<thead>
+<tr>
+<th>Erreur</th>
+<th>Correction</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Construire un chemin par <code>paste0(dir, "/", f)</code></td>
+<td><strong><code>file.path()</code></strong> choisit le bon séparateur</td>
+</tr>
+<tr>
+<td>Utiliser <code>file.remove</code> sur un dossier plein</td>
+<td><strong><code>unlink</code></strong> retire les <strong>arborescences</strong></td>
+</tr>
+<tr>
+<td>Confondre « existe » et « accessible »</td>
+<td><em>« a file <strong>can exist … and not be visible to the current user</strong> »</em></td>
+</tr>
+<tr>
+<td>Confondre expression régulière et jokers</td>
+<td><code>list.files(pattern=)</code> contre <strong><code>Sys.glob</code></strong></td>
+</tr>
+<tr>
+<td>Oublier d'échapper le point dans un motif</td>
+<td><code>"\\.csv$"</code>, sinon il apparie <strong>tout caractère</strong></td>
+</tr>
+<tr>
+<td>Compter sur l'insensibilité à la casse</td>
+<td> <strong>POSIX est sensible</strong></td>
+</tr>
+<tr>
+<td>Terminer un chemin par un slash</td>
+<td> <em>« <strong>not valid on Windows</strong> … <strong>best avoided</strong> »</em></td>
+</tr>
+<tr>
+<td>Utiliser un chemin UNC</td>
+<td> <em>« <strong>not supported</strong> »</em></td>
+</tr>
+<tr>
+<td>Utiliser <code>d:foo/bar</code></td>
+<td><em>« <strong>the use of absolute paths is safer</strong> »</em></td>
+</tr>
+<tr>
+<td>Croire un double slash initial anodin</td>
+<td><em>« <strong>leading double slashes may have a different meaning</strong> »</em></td>
+</tr>
+<tr>
+<td>Oublier <code>path.expand</code> sur un <code>~</code></td>
+<td>le tilde n'est pas toujours résolu</td>
+</tr>
+<tr>
+<td>Passer un chemin à espaces sans protection</td>
+<td><strong><code>shQuote</code></strong> — ou <code>shortPathName</code> sous Windows</td>
+</tr>
+<tr>
+<td>Utiliser <code>system</code> en croyant écrire du portable</td>
+<td><strong><code>system2</code></strong> est fait pour cela</td>
+</tr>
+<tr>
+<td>Attendre un shell de <code>system</code> sous Windows</td>
+<td>il faut <strong><code>shell</code></strong></td>
+</tr>
+<tr>
+<td>Appeler un programme sans vérifier sa présence</td>
+<td><strong><code>Sys.which</code></strong></td>
+</tr>
+<tr>
+<td>Décompresser à la main avant de lire</td>
+<td><strong>la connexion détecte l'en-tête magique</strong></td>
+</tr>
+<tr>
+<td>Choisir <code>xz</code> pour des écritures fréquentes</td>
+<td><em>« <strong>much slower compression</strong> »</em></td>
+</tr>
+<tr>
+<td>Croire R capable de créer un zip seul</td>
+<td> <em>« <strong>with the help of an external program</strong> »</em></td>
+</tr>
+<tr>
+<td>Croire R capable de gérer les ACL</td>
+<td> <em>« <strong>R has no facilities to control them</strong> »</em></td>
+</tr>
+</tbody></table>
+<h2>Ultimate Review</h2>
+<p><strong>Pourquoi ce chapitre.</strong> <em>« <strong>R has quite extensive facilities to access the OS</strong> … <strong>this allows it to be used as a scripting language and that ability is much used by R itself, for example to install packages.</strong> »</em> Et : <em>« <strong>considerable effort has gone into make the scripting facilities as platform-independent as is feasible</strong> »</em>.</p>
+<p><strong>Créer.</strong> <strong><code>file.create</code></strong>, <strong><code>dir.create</code></strong> — <em>« the analogues of the POSIX utilities <strong><code>touch</code> and <code>mkdir</code></strong> »</em> · <strong><code>tempfile</code></strong> pour le répertoire de session.</p>
+<p><strong>Supprimer.</strong> <strong><code>file.remove</code></strong> et <strong><code>unlink</code></strong> —  <em>« <strong>the latter can remove directory trees</strong> »</em>.</p>
+<p><strong>Lister.</strong> <strong><code>list.files</code></strong> (= <strong><code>dir</code></strong>) et <strong><code>list.dirs</code></strong> — <em>« can <strong>select files using a regular expression</strong> »</em> · <strong><code>Sys.glob</code></strong> — <em>« <strong>to select by wildcards</strong> »</em>.</p>
+<p><strong>S'informer.</strong> <strong><code>file.info</code></strong> — <em>« many types of information … <strong>including for example if it is a file or directory</strong> »</em> · <strong><code>file.exists</code></strong>, <strong><code>file.access</code></strong>, <strong><code>file_test</code></strong> (<em>« a version of the POSIX <strong><code>test</code></strong> command »</em>) —  <em>« <strong>a file can exist on the filesystem and not be visible to the current user</strong> »</em>.</p>
+<p><strong>Autres.</strong> <strong><code>file.copy</code></strong> (= <code>cp</code>) · <strong><code>file.choose</code></strong>, et sous Windows <strong><code>choose.files</code></strong> / <strong><code>choose.dir</code></strong>, dans <code>tcltk</code> <strong><code>tk_choose.files</code></strong> / <strong><code>tk_choose.dir</code></strong> · <strong><code>file.show</code></strong> et <strong><code>file.edit</code></strong>, <em>« in a way appropriate to the R port »</em> · <strong><code>file.link</code></strong>, <strong><code>Sys.readlink</code></strong>.</p>
+<p><strong>Les six pièges de chemin (§14.2).</strong> (1) <strong>la casse</strong> — POSIX <strong>sensible</strong>, Windows et macOS <strong>insensibles par défaut</strong>, FAT <strong>insensible et parfois tout en minuscules</strong> ; (2) <strong>le séparateur</strong> — Windows accepte <strong>les deux</strong>, <em>« R converts the known exceptions »</em> ; (3) <strong>le slash final</strong> — <em>« <strong>not valid on Windows</strong> … <strong>best avoided</strong> »</em> ; (4) <strong>les slashs multiples</strong> — valides en POSIX, mais  <em>« <strong>leading double slashes may have a different meaning</strong> »</em> ; (5) <strong>UNC</strong> — <em>« <strong>not supported</strong> »</em> ; (6) <strong><code>d:foo/bar</code></strong> — <em>« <strong>the use of absolute paths is safer</strong> »</em>.</p>
+<p><strong>Fonctions de chemin.</strong> <strong><code>basename</code></strong>, <strong><code>dirname</code></strong> — et <em>« <strong>the recommended way to assemble a file path from components is <code>file.path</code></strong> »</em> · <strong><code>path.expand</code></strong> pour le tilde · <strong><code>normalizePath</code></strong> pour un <strong>chemin canonique</strong> · <strong><code>shortPathName</code></strong> (Windows, noms <strong>8.3</strong>) — <em>« <strong>does not contain spaces and uses backslash as the separator, so is sometimes useful for exporting names from R</strong> »</em>.</p>
+<p><strong>Permissions.</strong> POSIX lecture/écriture/exécution pour propriétaire/groupe/tous,  <em>« <strong>may be only partially supported</strong> »</em> — sous Windows, <strong>seul le lecture seule</strong> est reconnu · <strong>ACL</strong> : <em>« <strong>do not have an agreed standard and R has no facilities to control them</strong> »</em> · <strong><code>Sys.chmod</code></strong>.</p>
+<p><strong>Commandes système.</strong> <strong><code>system</code></strong> et <strong><code>system2</code></strong> — <em>« <strong><code>system2</code> is a little more general but its main advantage is that it is easier to write cross-platform code using it</strong> »</em> ·  <em>« <strong><code>system</code> behaves differently on Windows</strong> … <strong>Elsewhere it invokes a shell</strong> … the Windows port has <strong><code>shell</code></strong> »</em> · <strong><code>Sys.which</code></strong> — <em>« <strong>attempts to do this in a cross-platform way</strong> (<strong>unfortunately it is not a standard OS service</strong>) »</em> · <strong><code>shQuote</code></strong> — <em>« <strong>will quote filepaths as needed for commands in the current OS</strong> »</em>.</p>
+<p><strong>Compression.</strong> <em>« <strong>Reading of files in R is to a very large extent done by connections</strong>, and <strong>the <code>file</code> function</strong> … <strong>is able to identify the compression used from the "magic" header of the file</strong> »</em> — donc <strong>transparente</strong> · <strong>gzip</strong> <em>« remains <strong>a good general compromise</strong> »</em> · <strong>compress</strong> — <em>« becoming rare »</em> · <strong>bzip2</strong> et <strong>xz</strong> — <em>« <strong>higher rates of compression</strong> … <strong>at the expense of slower decompression and much slower compression</strong> »</em> ·  <em>« some confusion between <code>xz</code> and <code>lzma</code> … <strong>R can read files compressed by most versions of either</strong> »</em>.</p>
+<p><strong>Archives.</strong> <em>« the most common ones being <strong>"tarballs" and zip files</strong> as used to distribute R packages »</em> · <strong><code>untar</code></strong> et <strong><code>unzip</code></strong> pour lister et dépaqueter ·  créer un zip demande <strong>un programme externe</strong>.</p>
+<div class="rec"><h2>Active Recall</h2><details class="cor">
+<summary>Pourquoi R dispose-t-il d'un accès aussi complet au système d'exploitation ?</summary><div class="in">
+
+<p><em>« <strong>R has quite extensive facilities to access the OS under which it is running : this allows it to be used as a scripting language and that ability is much used by R itself, for example to install packages.</strong> »</em> (§14)</p>
+<p><strong>R s'administre en R.</strong> <code>install.packages()</code> (fiche 315) et les outils <code>R CMD</code> (fiche 300) manipulent des fichiers, lancent des commandes, dépaquettent des archives — <strong>en R</strong>.</p>
+<p>Et c'est ce qui explique l'effort de portabilité : <em>« <strong>Because R's own scripts need to work across all platforms, considerable effort has gone into make the scripting facilities as platform-independent as is feasible.</strong> »</em></p>
+<p class="cal piege"> <strong>« As is feasible »</strong> — le §14.2 énumère précisément ce qui <strong>n'a pas pu</strong> être uniformisé.</p>
+</div></details><details class="cor">
+<summary>Quelle différence entre <code>file.remove</code> et <code>unlink</code> ?</summary><div class="in">
+
+<p><em>« <strong>Files can be removed by either <code>file.remove</code> or <code>unlink</code> : the latter can remove directory trees.</strong> »</em> (§14.1)</p>
+<p><strong><code>unlink</code> est l'équivalent d'un <code>rm -r</code></strong> : il descend dans les sous-dossiers. <code>file.remove</code> ne traite que des fichiers.</p>
+<p><strong>Conséquence pratique</strong> : pour nettoyer un répertoire temporaire créé par <code>tempfile()</code> + <code>dir.create()</code>, c'est <strong><code>unlink(dir, recursive = TRUE)</code></strong> qu'il faut — de préférence dans un <strong><code>on.exit()</code></strong> (fiche 317) pour que le nettoyage ait lieu même en cas d'erreur.</p>
+<p><strong>Et la contrepartie</strong> : c'est aussi la fonction avec laquelle on efface le plus de choses par accident.</p>
+</div></details><details class="cor">
+<summary>Pourquoi trois fonctions pour savoir si un fichier existe ?</summary><div class="in">
+
+<p><em>« <strong>There are several ways to find out if a file "exists"</strong> ( <strong>a file can exist on the filesystem and not be visible to the current user</strong>). <strong>There are functions <code>file.exists</code>, <code>file.access</code> and <code>file_test</code> with various versions of this test : <code>file_test</code> is a version of the POSIX <code>test</code> command for those familiar with shell scripting.</strong> »</em> (§14.1)</p>
+<p><strong>La parenthèse est le cœur du problème</strong> : « exister » et « être accessible » sont <strong>deux questions différentes</strong>. Un fichier peut être présent sur le disque sans que le compte courant ait le droit de le lire.</p>
+<ul>
+<li><strong><code>file.exists</code></strong> — existe-t-il ?</li>
+<li><strong><code>file.access</code></strong> — puis-je y accéder, et comment ?</li>
+<li><strong><code>file_test</code></strong> — la syntaxe du <code>test</code> du shell, pour ceux qui la connaissent.</li></ul></div></details><details class="cor">
+<summary>Comment sélectionne-t-on des fichiers, et selon quels deux langages ?</summary><div class="in">
+
+<p><em>« <strong>For directory listings use <code>list.files</code> (also available as <code>dir</code>) or <code>list.dirs</code>. These can select files using a regular expression : to select by wildcards use <code>Sys.glob</code>.</strong> »</em> (§14.1)</p>
+<table>
+<thead>
+<tr>
+<th>Fonction</th>
+<th>Langage de sélection</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong><code>list.files(pattern=)</code></strong></td>
+<td>une <strong>expression régulière</strong></td>
+</tr>
+<tr>
+<td><strong><code>Sys.glob()</code></strong></td>
+<td>des <strong>jokers</strong> de shell</td>
+</tr>
+</tbody></table>
+<p><strong>Deux habitudes différentes</strong> : <code>"\\.csv$"</code> d'un côté, <code>"*.csv"</code> de l'autre.</p>
+<p class="cal piege"> <strong>Le piège classique</strong> dans le premier cas : <strong>échapper le point</strong>. <code>"\\.csv$"</code> apparie l'extension ; <code>".csv$"</code> apparierait aussi <code>xcsv</code> — le point non échappé signifiant « n'importe quel caractère ».</p>
+</div></details><details class="cor">
+<summary>Quel est le premier piège de portabilité des chemins, et pourquoi est-il le plus coûteux ?</summary><div class="in">
+
+<p><em>« <strong>POSIX filesystems are case-sensitive</strong>, so <strong><code>foo.png</code> and <code>Foo.PNG</code> are different files</strong>. <strong>However, the defaults on Windows and macOS are to be case-insensitive</strong>, and <strong>FAT filesystems</strong> (commonly used on removable storage) <strong>are not normally case-sensitive</strong> (and <strong>all filepaths may be mapped to lower case</strong>). »</em> (§14.2)</p>
+<p><strong>Il est coûteux parce qu'il ne se manifeste qu'au déploiement.</strong> Un script développé sous Windows ou macOS, où <code>Donnees.CSV</code> et <code>donnees.csv</code> désignent le même fichier, <strong>échoue sous Linux</strong> — et le message d'erreur dit simplement que le fichier n'existe pas.</p>
+<p><strong>La règle</strong> : ne jamais compter sur l'insensibilité, et écrire les noms <strong>exactement</strong> comme ils sont sur le disque.</p>
+</div></details><details class="cor">
+<summary>Énoncer les cinq autres pièges de chemin du §14.2.</summary><div class="in">
+
+<ol start="2">
+<li><strong>Le séparateur</strong> — <em>« <strong>Almost all the Windows' OS services support the use of slash or backslash</strong> … <strong>and R converts the known exceptions to the form required by Windows.</strong> »</em></li>
+<li><strong>Le slash final</strong> — <em>« <strong>The behaviour … is OS-dependent. Such paths are not valid on Windows</strong> … <strong>POSIX-2008 requires such paths to match only directories, but earlier versions allowed them to also match files. So they are best avoided.</strong> »</em></li>
+<li><strong>Les slashs multiples</strong> — <code>/abc//def</code> est valide en POSIX et <em>« treated as if there was only one slash »</em>, mais  <em>« <strong>leading double slashes may have a different meaning</strong> »</em>.</li>
+<li><strong>UNC</strong> — <em>« <strong>Windows' UNC filepaths … are not supported, but they may work in some R functions.</strong> <strong>POSIX filesystems are allowed to treat a leading double slash specially.</strong> »</em></li>
+<li><strong>Relatif à un lecteur</strong> — <code>d:foo/bar</code> ; <em>« <strong>It is intended that these work, but the use of absolute paths is safer.</strong> »</em></li></ol></div></details><details class="cor">
+<summary>Comment assemble-t-on un chemin, et pourquoi pas <code>paste0</code> ?</summary><div class="in">
+
+<p><em>« <strong>Functions <code>basename</code> and <code>dirname</code> select parts of a file path : the recommended way to assemble a file path from components is <code>file.path</code>.</strong> »</em> (§14.2)</p>
+<pre><code class="language-r">file.path("data", "brut", "mesures.csv")
+</code></pre>
+<p><strong><code>paste0(dir, "/", nom)</code> code en dur un séparateur.</strong> Cela fonctionne souvent — <em>« <strong>almost all the Windows' OS services support the use of slash or backslash</strong> »</em> — mais pas partout : le cours précise que <strong>R convertit lui-même les exceptions connues</strong>, ce qu'un <code>paste0</code> ne fait pas.</p>
+<p><strong><code>file.path</code> fait le bon choix pour le système courant</strong>, et c'est la fonction que le cours qualifie de <em>« recommended way »</em> — la seule formulation aussi nette du chapitre.</p>
+</div></details><details class="cor">
+<summary>À quoi servent <code>normalizePath</code> et <code>shortPathName</code> ?</summary><div class="in">
+
+<p><strong><code>normalizePath</code></strong> : <em>« <strong>On filesystems with links, a single file can be referred to by many filepaths.</strong> <code>normalizePath</code> <strong>will find a canonical filepath</strong>. »</em> (§14.2) — un fichier, <strong>un</strong> nom de référence.</p>
+<p><strong><code>shortPathName</code></strong> : <em>« <strong>Windows has the concepts of short ("8.3") and long file names</strong> : <code>normalizePath</code> will return <strong>an absolute path using long file names</strong> and <code>shortPathName</code> <strong>will return a version using short names</strong>.  <strong>The latter does not contain spaces and uses backslash as the separator, so is sometimes useful for exporting names from R.</strong> »</em></p>
+<p><strong>La raison d'être de <code>shortPathName</code> est dans la mise en garde</strong> : un nom court <strong>ne contient pas d'espace</strong>, ce qui le rend transmissible à un programme extérieur sans protection supplémentaire.</p>
+<p>Et <strong><code>path.expand</code></strong> fait <em>« <strong>tilde expansion</strong> »</em> — la substitution des répertoires personnels.</p>
+</div></details><details class="cor">
+<summary>Quelle est la différence entre <code>system</code> et <code>system2</code> ?</summary><div class="in">
+
+<p><em>« <strong>Functions <code>system</code> and <code>system2</code> are used to invoke a system command and optionally collect its output. <code>system2</code> is a little more general but its main advantage is that it is easier to write cross-platform code using it.</strong> »</em> (§14.3)</p>
+<p class="cal piege"> <em>« <strong><code>system</code> behaves differently on Windows from other OSes (because the API C call of that name does). Elsewhere it invokes a shell to run the command : the Windows port of R has a function <code>shell</code> to do that.</strong> »</em></p>
+<p><strong>Le point décisif</strong> : hors Windows, <code>system</code> passe par <strong>un shell</strong> — donc jokers, redirections et tubes fonctionnent. <strong>Sous Windows, non.</strong> Un script qui s'appuie sur ce comportement n'est pas portable.</p>
+<p><strong><code>system2</code> sépare l'exécutable de ses arguments</strong> et évite le problème. C'est celui qu'il faut utiliser par défaut.</p>
+</div></details><details class="cor">
+<summary>Quelles précautions avant de lancer une commande extérieure ?</summary><div class="in">
+
+<p><strong>Deux, données par le §14.3.</strong></p>
+<ol>
+<li><em>« <strong>To find out if the OS includes a command, use <code>Sys.which</code>, which attempts to do this in a cross-platform way</strong> ( <strong>unfortunately it is not a standard OS service</strong>). »</em> — <strong>la commande peut ne pas exister</strong>.</li>
+<li><em>« <strong>Function <code>shQuote</code> will quote filepaths as needed for commands in the current OS.</strong> »</em> — <strong>protéger les arguments</strong>, en particulier les chemins contenant des espaces.</li>
+</ol>
+<p><strong><code>shQuote</code> est à la ligne de commande ce que <code>file.path</code> est au chemin</strong> : une fonction qui applique <strong>les règles du système courant</strong> à votre place.</p>
+<p>Et sous Windows, <code>shortPathName</code> offre une seconde parade — un nom <strong>sans espace</strong> par construction.</p>
+</div></details><details class="cor">
+<summary>Comment lit-on un fichier compressé en R ?</summary><div class="in">
+
+<p><strong>Sans rien faire de particulier.</strong></p>
+<p><em>« <strong>Recent versions of R have extensive facilities to read and write compressed files, often transparently. Reading of files in R is to a very large extent done by connections, and the <code>file</code> function</strong> … <strong>is able to identify the compression used from the "magic" header of the file.</strong> »</em> (§14.4)</p>
+<p><strong>La connexion lit l'en-tête et décide.</strong> <code>read.csv("f.csv.gz")</code> fonctionne exactement comme <code>read.csv("f.csv")</code>.</p>
+<p><strong>Les formats reconnus</strong> : <strong>gzip</strong> — <em>« the type of compression which has been supported for longest … <strong>remains a good general compromise</strong> »</em> ; <strong>compress</strong> — <em>« becoming rare »</em> ; <strong>bzip2</strong> et <strong>xz</strong> — <em>« <strong>higher rates of compression (depending on the file, much higher)</strong> at the expense of <strong>slower decompression and much slower compression</strong> »</em>.</p>
+<p class="cal piege"> <em>« some confusion between <code>xz</code> and <code>lzma</code> … <strong>R can read files compressed by most versions of either</strong> »</em>.</p>
+</div></details><details class="cor">
+<summary>Que peut faire R avec les archives, et où s'arrête-t-il ?</summary><div class="in">
+
+<p><em>« <strong>File archives are single files which contain a collection of files, the most common ones being "tarballs" and zip files as used to distribute R packages.</strong> <strong>R can list and unpack both (see functions <code>untar</code> and <code>unzip</code>) and create both (for zip with the help of an external program).</strong> »</em> (§14.4)</p>
+<table>
+<thead>
+<tr>
+<th>Opération</th>
+<th>tar</th>
+<th>zip</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Lister</strong></td>
+<td> <code>untar</code></td>
+<td> <code>unzip</code></td>
+</tr>
+<tr>
+<td><strong>Dépaqueter</strong></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><strong>Créer</strong></td>
+<td></td>
+<td> <strong>avec un programme externe</strong></td>
+</tr>
+</tbody></table>
+<p><strong>L'asymétrie est dans la parenthèse finale.</strong> Créer un zip suppose qu'un utilitaire soit installé — d'où l'intérêt de <strong><code>Sys.which("zip")</code></strong> avant de tenter l'opération, et d'un message clair si la commande manque.</p>
+</div></details></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h2>Flashcards</h2>
+<table>
+<thead>
+<tr>
+<th>Question</th>
+<th>Réponse</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Pourquoi R accède-t-il au système ?</td>
+<td>Pour servir de <strong>langage de script</strong></td>
+</tr>
+<tr>
+<td>Qui s'en sert le plus ?</td>
+<td><strong>R lui-même</strong> — par exemple pour installer des paquets</td>
+</tr>
+<tr>
+<td>Quel objectif de conception ?</td>
+<td>Être <strong>aussi indépendant de la plateforme que faisable</strong></td>
+</tr>
+<tr>
+<td>Créer un fichier, un dossier ?</td>
+<td><strong><code>file.create</code></strong>, <strong><code>dir.create</code></strong></td>
+</tr>
+<tr>
+<td>Leurs équivalents POSIX ?</td>
+<td><strong><code>touch</code></strong> et <strong><code>mkdir</code></strong></td>
+</tr>
+<tr>
+<td>Un fichier temporaire ?</td>
+<td><strong><code>tempfile</code></strong></td>
+</tr>
+<tr>
+<td>Supprimer un fichier ?</td>
+<td><strong><code>file.remove</code></strong></td>
+</tr>
+<tr>
+<td>Supprimer une arborescence ?</td>
+<td><strong><code>unlink</code></strong></td>
+</tr>
+<tr>
+<td>Lister un répertoire ?</td>
+<td><strong><code>list.files</code></strong>, alias <strong><code>dir</code></strong></td>
+</tr>
+<tr>
+<td>Lister des sous-dossiers ?</td>
+<td><strong><code>list.dirs</code></strong></td>
+</tr>
+<tr>
+<td>Selon quel langage sélectionnent-ils ?</td>
+<td>Une <strong>expression régulière</strong></td>
+</tr>
+<tr>
+<td>Et pour des jokers ?</td>
+<td><strong><code>Sys.glob</code></strong></td>
+</tr>
+<tr>
+<td>Savoir si c'est un dossier ?</td>
+<td><strong><code>file.info</code></strong></td>
+</tr>
+<tr>
+<td>Les trois tests d'existence ?</td>
+<td><code>file.exists</code> · <code>file.access</code> · <code>file_test</code></td>
+</tr>
+<tr>
+<td>Que rappelle le cours à ce sujet ?</td>
+<td>Un fichier peut <strong>exister sans être visible</strong></td>
+</tr>
+<tr>
+<td>Lequel imite <code>test</code> du shell ?</td>
+<td><strong><code>file_test</code></strong></td>
+</tr>
+<tr>
+<td>Copier un fichier ?</td>
+<td><strong><code>file.copy</code></strong> — l'analogue de <strong><code>cp</code></strong></td>
+</tr>
+<tr>
+<td>Choisir un fichier interactivement ?</td>
+<td><strong><code>file.choose</code></strong></td>
+</tr>
+<tr>
+<td>Les variantes Windows ?</td>
+<td><strong><code>choose.files</code></strong>, <strong><code>choose.dir</code></strong></td>
+</tr>
+<tr>
+<td>Et dans <code>tcltk</code> ?</td>
+<td><code>tk_choose.files</code>, <code>tk_choose.dir</code></td>
+</tr>
+<tr>
+<td>Afficher, éditer un fichier ?</td>
+<td><strong><code>file.show</code></strong>, <strong><code>file.edit</code></strong></td>
+</tr>
+<tr>
+<td>Deux fonctions de liens ?</td>
+<td><strong><code>file.link</code></strong>, <strong><code>Sys.readlink</code></strong></td>
+</tr>
+<tr>
+<td>Les systèmes POSIX sont-ils sensibles à la casse ?</td>
+<td><strong>Oui</strong></td>
+</tr>
+<tr>
+<td>Et Windows, macOS ?</td>
+<td><strong>Insensibles par défaut</strong></td>
+</tr>
+<tr>
+<td>Et FAT ?</td>
+<td>Insensible, parfois <strong>tout en minuscules</strong></td>
+</tr>
+<tr>
+<td>Windows accepte quel séparateur ?</td>
+<td><strong>Les deux</strong> — R convertit les exceptions</td>
+</tr>
+<tr>
+<td>Un chemin terminé par un slash ?</td>
+<td> <strong>Non valide sous Windows</strong> — à éviter</td>
+</tr>
+<tr>
+<td><code>/abc//def</code> en POSIX ?</td>
+<td><strong>Valide</strong>, traité comme un seul slash</td>
+</tr>
+<tr>
+<td>Un double slash <strong>initial</strong> ?</td>
+<td> Peut avoir <strong>un sens différent</strong></td>
+</tr>
+<tr>
+<td>Les chemins UNC ?</td>
+<td> <strong>Non supportés</strong></td>
+</tr>
+<tr>
+<td><code>d:foo/bar</code> ?</td>
+<td>Relatif au répertoire courant <strong>du lecteur</strong></td>
+</tr>
+<tr>
+<td>Que recommande le cours ?</td>
+<td>Les <strong>chemins absolus</strong></td>
+</tr>
+<tr>
+<td>Extraire le nom d'un fichier ?</td>
+<td><strong><code>basename</code></strong></td>
+</tr>
+<tr>
+<td>Extraire son dossier ?</td>
+<td><strong><code>dirname</code></strong></td>
+</tr>
+<tr>
+<td>Assembler un chemin ?</td>
+<td> <strong><code>file.path</code></strong> — <em>« the recommended way »</em></td>
+</tr>
+<tr>
+<td>Résoudre un <code>~</code> ?</td>
+<td><strong><code>path.expand</code></strong></td>
+</tr>
+<tr>
+<td>Obtenir un chemin canonique ?</td>
+<td><strong><code>normalizePath</code></strong></td>
+</tr>
+<tr>
+<td>Les noms courts de Windows ?</td>
+<td><strong><code>shortPathName</code></strong> — format <strong>8.3</strong></td>
+</tr>
+<tr>
+<td>Leur avantage ?</td>
+<td><strong>Pas d'espace</strong></td>
+</tr>
+<tr>
+<td>Changer les permissions ?</td>
+<td><strong><code>Sys.chmod</code></strong></td>
+</tr>
+<tr>
+<td>Que reconnaît Windows en permissions ?</td>
+<td>Seulement le <strong>lecture seule</strong></td>
+</tr>
+<tr>
+<td>R gère-t-il les ACL ?</td>
+<td> <strong>Non</strong></td>
+</tr>
+<tr>
+<td>Les deux fonctions de commande système ?</td>
+<td><strong><code>system</code></strong> et <strong><code>system2</code></strong></td>
+</tr>
+<tr>
+<td>Laquelle pour du code portable ?</td>
+<td><strong><code>system2</code></strong></td>
+</tr>
+<tr>
+<td>Que fait <code>system</code> hors Windows ?</td>
+<td>Il <strong>invoque un shell</strong></td>
+</tr>
+<tr>
+<td>Et sous Windows ?</td>
+<td>Il faut <strong><code>shell</code></strong></td>
+</tr>
+<tr>
+<td>Vérifier qu'une commande existe ?</td>
+<td><strong><code>Sys.which</code></strong></td>
+</tr>
+<tr>
+<td>Est-ce un service standard du système ?</td>
+<td> <strong>Non</strong></td>
+</tr>
+<tr>
+<td>Protéger un chemin pour le shell ?</td>
+<td><strong><code>shQuote</code></strong></td>
+</tr>
+<tr>
+<td>Comment R lit-il un fichier compressé ?</td>
+<td>Par une <strong>connexion</strong></td>
+</tr>
+<tr>
+<td>Qui identifie la compression ?</td>
+<td>La fonction <strong><code>file</code></strong>, par l'<strong>en-tête magique</strong></td>
+</tr>
+<tr>
+<td>Le format le mieux équilibré ?</td>
+<td><strong>gzip</strong></td>
+</tr>
+<tr>
+<td>Le format ancien et rare ?</td>
+<td><strong>compress</strong></td>
+</tr>
+<tr>
+<td>Les deux formats à forte compression ?</td>
+<td><strong>bzip2</strong> et <strong>xz</strong></td>
+</tr>
+<tr>
+<td>Leur inconvénient ?</td>
+<td>Compression <strong>bien plus lente</strong></td>
+</tr>
+<tr>
+<td><code>xz</code> et <code>lzma</code> ?</td>
+<td>R lit <strong>la plupart des versions des deux</strong></td>
+</tr>
+<tr>
+<td>Les deux archives les plus courantes ?</td>
+<td>Les <strong>tarballs</strong> et les <strong>zip</strong></td>
+</tr>
+<tr>
+<td>Comment les dépaqueter ?</td>
+<td><strong><code>untar</code></strong>, <strong><code>unzip</code></strong></td>
+</tr>
+<tr>
+<td>R peut-il créer un zip seul ?</td>
+<td> <strong>Non</strong> — programme externe requis</td>
+</tr>
+</tbody></table>
+</main>
+
+
+
+
+</body></html>

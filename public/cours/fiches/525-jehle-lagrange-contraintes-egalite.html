@@ -1,0 +1,1792 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fiche 525 — Optimisation sous contraintes d'égalité : la méthode de Lagrange</title>
+<script>
+window.MathJax={tex:{inlineMath:[["$","$"]],displayMath:[["$$","$$"]],processEscapes:true},
+ options:{skipHtmlTags:["script","noscript","style","textarea","pre","code"]},
+ svg:{fontCache:"global"},
+ startup:{pageReady:()=>MathJax.startup.defaultPageReady().then(()=>{document.body.classList.add("ready")})}};
+setTimeout(function(){document.body.classList.add("ready")},2500);
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+/* ============================================================
+   MathiasLearn — feuille de style des fiches
+   Reprise intégrale des tokens de 00_PARCOURS/*.html
+   + blocs pédagogiques (callouts, méthode, essentiels, recall)
+   ============================================================ */
+:root{--bg:#faf9f7;--card:#fff;--ink:#1a1a1a;--muted:#6b6b6b;--line:#e5e2dd;--accent:#8b5e34;
+ --hl:#fdf8ef;--ok:#2d7d4f;--okbg:#f0f7f3;--warn:#b3402f;--warnbg:#fdf3f1;--blue:#2f5d8b;--bluebg:#f1f5fa}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+ font:17px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;padding:0 16px 100px}
+.nav{position:sticky;top:0;background:rgba(250,249,247,.96);backdrop-filter:blur(8px);
+ border-bottom:1px solid var(--line);margin:0 -16px 30px;padding:11px 16px;z-index:50;
+ display:flex;gap:6px;flex-wrap:wrap;font-size:13px}
+.nav a{color:var(--muted);text-decoration:none;padding:4px 9px;border-radius:5px;white-space:nowrap}
+.nav a:hover{background:var(--line);color:var(--ink)}
+.nav a.on{background:var(--accent);color:#fff}
+main{max-width:780px;margin:0 auto}
+h1{font-size:31px;letter-spacing:-.02em;margin:.4em 0 .5em;line-height:1.25}
+h2{font-size:23px;margin:2.2em 0 .7em;padding-bottom:.3em;border-bottom:1px solid var(--line)}
+h3{font-size:19px;margin:1.9em 0 .5em;color:var(--accent)}
+h4{font-size:17px;margin:1.5em 0 .4em}
+p{margin:.8em 0} a{color:var(--accent)} hr{border:0;border-top:1px solid var(--line);margin:2.6em 0}
+table{border-collapse:collapse;width:100%;margin:1.3em 0;font-size:15.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+th{background:#f3f0eb;font-weight:600}
+tr:nth-child(even) td{background:#fcfbfa}
+code{font-family:"SF Mono",Menlo,Consolas,monospace;font-size:.88em;background:#f2efea;padding:2px 6px;border-radius:4px;overflow-wrap:break-word}
+pre{background:#f2efea;padding:14px 16px;border-radius:8px;overflow-x:auto}
+pre code{background:none;padding:0;white-space:pre}
+blockquote{border-left:3px solid var(--accent);background:var(--hl);margin:1.4em 0;padding:14px 20px;border-radius:0 8px 8px 0}
+blockquote p:first-child{margin-top:0} blockquote p:last-child{margin-bottom:0}
+ul,ol{padding-left:1.5em} li{margin:.35em 0} em{color:#4a4a4a}
+mjx-container[display="true"]{margin:1.1em 0!important;overflow-x:auto;overflow-y:hidden;padding:2px 0}
+mjx-container svg{max-width:100%}
+body:not(.ready) main{opacity:0} main{opacity:1;transition:opacity .25s}
+
+/* --- bandeau de tête de fiche --- */
+.cours{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--accent);
+ border-radius:0 10px 10px 0;padding:18px 22px;margin:0 0 34px}
+.cours h4{margin:0 0 4px;font-size:14px;text-transform:uppercase;letter-spacing:.07em;color:var(--accent)}
+.cours .cs{color:var(--muted);font-size:14.5px;margin:0 0 14px}
+
+/* --- exercices / corrigés --- */
+.ex{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:6px 24px 20px;margin:18px 0}
+.ex>h3:first-child{margin-top:14px}
+details.cor{margin-top:18px;border:1px solid var(--line);border-radius:8px;background:#fcfbfa;overflow:hidden}
+details.cor>summary{cursor:pointer;padding:12px 16px;font-weight:600;font-size:15px;color:var(--accent);
+ list-style:none;display:flex;align-items:center;gap:9px;user-select:none;transition:.15s;min-height:44px}
+details.cor>summary::-webkit-details-marker{display:none}
+details.cor>summary:hover{background:var(--hl)}
+details.cor>summary::before{content:"\25B6";font-size:10px;transition:transform .18s;display:inline-block}
+details.cor[open]>summary::before{transform:rotate(90deg)}
+details.cor[open]>summary{background:var(--okbg);color:var(--ok);border-bottom:1px solid var(--line)}
+.cor .in{padding:4px 20px 16px}
+.cor .in>*:first-child{margin-top:.9em}
+
+/* --- blocs pédagogiques (callouts) ---
+   Générés depuis une citation Markdown dont le premier **gras** commence
+   par un mot-clé : DÉFINITION, THÉORÈME, MÉTHODE, PIÈGE, INTUITION… */
+.cal{border:1px solid var(--line);border-left:4px solid var(--accent);background:var(--card);
+ border-radius:0 10px 10px 0;padding:15px 20px;margin:1.5em 0}
+.cal>p:first-child{margin-top:0}.cal>p:last-child,.cal>ul:last-child,.cal>ol:last-child{margin-bottom:0}
+.cal .lab{display:block;font-size:12.5px;text-transform:uppercase;letter-spacing:.08em;
+ font-weight:700;color:var(--accent);margin-bottom:6px}
+.cal.formel{background:var(--hl)}
+.cal.piege{border-left-color:var(--warn);background:var(--warnbg)}
+.cal.piege .lab{color:var(--warn)}
+.cal.methode{border-left-color:var(--ok);background:var(--okbg)}
+.cal.methode .lab{color:var(--ok)}
+.cal.intu{border-left-color:var(--blue);background:var(--bluebg)}
+.cal.intu .lab{color:var(--blue)}
+.cal.plus{border-left-style:dashed;background:#faf9f7}
+.cal.plus .lab{color:var(--muted)}
+
+/* --- révision express --- */
+.ess{background:var(--card);border:1px solid var(--accent);border-radius:10px;padding:4px 24px 20px;margin:1.6em 0}
+.ess h3{margin-top:1.3em}
+.rec{background:var(--card);border:1px dashed var(--accent);border-radius:10px;padding:4px 24px 18px;margin:1.6em 0}
+.rec ol{counter-reset:none}
+
+/* --- impression / PDF --- */
+@media print{
+ .nav{display:none}
+ body{padding:0;background:#fff;font-size:11.2pt;line-height:1.55}
+ main{max-width:none}
+ h1{font-size:23pt}h2{font-size:15pt;margin-top:1.5em}h3{font-size:12.6pt}
+ h2,h3,h4{break-after:avoid;page-break-after:avoid}
+ table,.cal,blockquote{break-inside:avoid;page-break-inside:avoid}
+ table{display:table;font-size:9.6pt}
+ details.cor{border:1px solid var(--line);background:#fcfbfa}
+ details.cor>summary{display:none}
+ details.cor .in{padding-top:10px}
+ .cal,.ex,.ess,.rec{box-shadow:none}
+ a{color:var(--ink);text-decoration:none}
+}
+@page{margin:16mm 15mm 18mm}
+
+/* --- exemples travaillés --- */
+.exm{background:#fcfbfa;border:1px solid var(--line);border-radius:10px;padding:2px 20px 14px;margin:1.5em 0}
+.exm>h4:first-child{margin:14px 0 .5em;color:var(--accent);font-size:13px;text-transform:uppercase;letter-spacing:.07em}
+
+
+/* --- pastilles de priorité (conventions des fiches de l'app) --- */
+h2[data-prio], h3[data-prio], h4[data-prio]{position:relative}
+h2[data-prio]::before,h3[data-prio]::before,h4[data-prio]::before{
+ content:"";display:inline-block;width:9px;height:9px;border-radius:50%;
+ margin-right:9px;vertical-align:middle;background:var(--muted)}
+[data-prio="must"]::before{background:var(--warn)}
+[data-prio="high"]::before{background:#d98324}
+[data-prio="mid"]::before{background:#c9a227}
+[data-prio="low"]::before{background:var(--ok)}
+/* corrigés des fiches de l'app : même traitement que les corrigés des séries */
+details.cor>summary::after{content:""}
+</style></head><body>
+<div class="nav"><a href="00_COMMENCER_ICI.html">Commencer ici</a><a href="01_NOTATIONS_le-decodeur.html">Notations</a><a href="02_EXERCICES_Serie-0.html">Série 0 — Remise en route</a><a href="03_EXERCICES_Serie-1.html">Série 1 — Convexité</a><a href="04_EXERCICES_Serie-2.html">Série 2 — KKT</a><a href="05_AUTO-EVALUATION.html">Auto-évaluation (quiz)</a><a href="06_FICHE_Optimisation-deux-variables.html">Fiche — Optimisation à 2 variables</a></div>
+<main><h1>Fiche 525 — Optimisation sous contraintes d'égalité : la méthode de Lagrange</h1>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Matière</strong></td>
+<td>Maths · Microéconomie avancée</td>
+</tr>
+<tr>
+<td><strong>Cours source</strong></td>
+<td>Jehle &amp; Reny, <em>Advanced Microeconomic Theory</em>, 3ᵉ éd., Pearson 2011 — appendice mathématique, §A2.3.1 à §A2.3.4 (p. 577-591)</td>
+</tr>
+<tr>
+<td><strong>Difficulté</strong></td>
+<td> Avancé — la technique centrale de toute la microéconomie</td>
+</tr>
+<tr>
+<td><strong>Temps d'étude estimé</strong></td>
+<td>130 min</td>
+</tr>
+<tr>
+<td><strong>Prérequis</strong></td>
+<td><a href="524-jehle-optimisation-libre.md">Fiche 524</a> — conditions du premier et du second ordre, mineurs principaux · <a href="523-jehle-calcul-differentiel-homogeneite.md">Fiche 523</a> — gradient, différentielle totale · <a href="521-jehle-ensembles-applications.md">Fiche 521</a> — théorème de Weierstrass</td>
+</tr>
+<tr>
+<td><strong>Concepts clés</strong></td>
+<td>Rareté, contrainte d'égalité, fonction objectif, maximande, variables de choix, ensemble réalisable, méthode de substitution, fonction lagrangienne, multiplicateur de Lagrange, différentielle totale, changements admissibles, indépendance linéaire des gradients, tangence, pente d'un ensemble de niveau, hessienne bordée, mineurs principaux bordés</td>
+</tr>
+<tr>
+<td><strong>Poids à l'examen</strong></td>
+<td>Le vocabulaire du programme (A2.4) · la <strong>méthode de SUBSTITUTION</strong> et ses limites · <strong>la construction du LAGRANGIEN</strong> et les conditions (A2.7)-(A2.9) ·  <strong>l'argument de plausibilité par les différentielles totales</strong> · l'<strong>exemple A2.8</strong> · le <strong>cas général (A2.13)-(A2.15)</strong> · le <strong>THÉORÈME A2.16 de LAGRANGE</strong> et sa condition d'<strong>INDÉPENDANCE LINÉAIRE</strong> ·  <strong>l'interprétation par la TANGENCE (A2.19)-(A2.20)</strong> · la <strong>HESSIENNE BORDÉE</strong>, la formule (A2.27) et le <strong>théorème A2.17</strong> · le <strong>théorème A2.18</strong> et son patron de signes.</td>
+</tr>
+</tbody></table>
+<h2>Vue d'ensemble</h2>
+<pre><code>LE FIL DU §A2.3.1 - §A2.3.4 : la METHODE DE LAGRANGE
+
+  §A2.3  POURQUOI DES CONTRAINTES ?
+
+     « LA RARETE est un fait OMNIPRESENT de la vie economique --
+       on pourrait meme DEFINIR L'ECONOMIE comme L'ETUDE DU
+       COMPORTEMENT FACE A LA RARETE. »
+
+     TROIS types de contraintes :  EGALITE · NON-NEGATIVITE ·
+                                   INEGALITE quelconque
+
+  §A2.3.1  LE PROBLEME  (A2.4)
+
+     max f(x1, x2)   sous contrainte   g(x1, x2) = 0
+
+     f  =  FONCTION OBJECTIF  ou  MAXIMANDE
+     x1, x2  =  VARIABLES DE CHOIX
+     g  =  CONTRAINTE ;  l'ensemble des x admissibles =
+           ENSEMBLE DE CONTRAINTE  ou  ENSEMBLE REALISABLE
+
+     LA METHODE DE SUBSTITUTION :  isoler  x2 = g~(x1)
+     puis maximiser  f(x1, g~(x1))  SANS CONTRAINTE
+     -&gt;  MAIS elle echoue des que la contrainte est compliquee,
+         ou qu'il y a PLUS DE DEUX variables ou PLUS D'UNE
+         contrainte.
+
+  §A2.3.2  L'IDEE DE LAGRANGE
+
+     « Il existe TOUJOURS UN PROBLEME SANS CONTRAINTE que nous
+       pouvons resoudre avec nos methodes habituelles et qui
+       nous donne, COMME SOUS-PRODUIT, la solution cherchee. »
+
+     LE LAGRANGIEN :   L(x1, x2, lambda) = f - lambda * g
+
+     LES TROIS CONDITIONS DU PREMIER ORDRE  (A2.7) - (A2.9) :
+        dL/dx1 = f1 - lambda g1 = 0
+        dL/dx2 = f2 - lambda g2 = 0
+        dL/dlambda = - g = 0     -&gt;  LA CONTRAINTE ELLE-MEME
+
+     LE CAS GENERAL :  n variables, m &lt; n contraintes
+        L(x, lambda) = f(x) - SOMME_j lambda_j g_j(x)
+        -&gt;  un systeme de  n + m  equations
+
+  THEOREME A2.16 (LAGRANGE) : si les GRADIENTS des contraintes
+  sont LINEAIREMENT INDEPENDANTS a l'optimum, alors les
+  multiplicateurs EXISTENT et sont UNIQUES.
+
+  §A2.3.3  LA LECTURE GEOMETRIQUE
+
+     pente d'un niveau de f  =  - f1 / f2       (A2.17)
+     pente de la contrainte  =  - g1 / g2       (A2.18)
+
+     LES CPO DISENT :    f1 / f2  =  g1 / g2    (A2.19)
+                         g(x1, x2) = 0          (A2.20)
+
+     « Un point QUI EST SUR LA CONTRAINTE et OU LES PENTES SONT
+       EGALES est, PAR DEFINITION, UN POINT DE TANGENCE. »
+
+  §A2.3.4  LES CONDITIONS DU SECOND ORDRE
+
+     « Nous pouvons REDUIRE LA DIMENSIONNALITE des exigences de
+       courbure EN EXPLOITANT L'INTERDEPENDANCE entre les x
+       imposee par les contraintes. »
+
+     LA HESSIENNE BORDEE du lagrangien :
+
+              |  0   g1   g2  |
+        Hbar =| g1  L11  L12  |
+              | g2  L21  L22  |
+
+     d2y/dx1^2  =  (-1) / (g2)^2  *  DET(Hbar)       (A2.27)
+
+     THEOREME A2.17  DET(Hbar) &gt; 0  -&gt;  MAXIMUM local
+                     DET(Hbar) &lt; 0  -&gt;  MINIMUM local
+                     ( ATTENTION : LES SIGNES SONT INVERSES )
+
+     THEOREME A2.18  cas general : les  n - m  mineurs
+        MAXIMUM  -&gt;  ils ALTERNENT en commencant par POSITIF
+        MINIMUM  -&gt;  ils sont TOUS NEGATIFS
+</code></pre>
+<blockquote>
+<p class="cal piege"> <strong>Note de transcription — spécifique à cette section.</strong> Le PDF  <strong>BROUILLE COMPLÈTEMENT DEUX PARAGRAPHES</strong> du §A2.3.2 <em>(les lettres de deux colonnes s'y entremêlent et donnent une bouillie illisible)</em> ; leur contenu est <strong>restitué à partir du raisonnement encadrant, et signalé comme tel à chaque fois</strong>. Il  <strong>PERD LE BARRÉ DE $\neq$</strong> <em>(« supposons $\lambda^*=0$ » signifie $\lambda^*\neq0$, et « en supposant que $g_2=0$ » signifie $g_2\neq0$)</em>, perd $\sum$, et <strong>place l'énoncé du théorème A2.17 en désordre</strong> <em>(les fragments « $&gt;0$ » et « $(&lt;0)$ » y sont rejetés en tête de ligne)</em>. Les figures utilisent l'encodage Symbol Mac <em>(<code>ϭ</code> = « = », <code>Ϫ</code> = « − »)</em>. <strong>Réparation de transcription, non ajout de contenu.</strong></p>
+</blockquote>
+<h2 data-prio="high">Concept 1 — §A2.3 : pourquoi des contraintes ?</h2>
+<h3>1.1 Le motif économique</h3>
+<blockquote>
+<p><em>« Auparavant, nous cherchions simplement à caractériser des points où une fonction atteint un optimum local <strong>quand nous étions LIBRES de choisir les variables $\mathbf{x}$ COMME BON NOUS SEMBLAIT. En économie, NOUS N'AVONS HABITUELLEMENT PAS CE LUXE.</strong> »</em></p>
+</blockquote>
+<blockquote>
+<p class="cal piege"> <em>« <strong>LA RARETÉ est un fait OMNIPRÉSENT de la vie économique — ON POURRAIT MÊME DÉFINIR L'ÉCONOMIE COMME L'ÉTUDE DU COMPORTEMENT FACE À LA RARETÉ. La rareté s'exprime le plus communément comme DES CONTRAINTES sur les valeurs admissibles des variables économiques. Les agents sont alors représentés comme cherchant À FAIRE DE LEUR MIEUX (en quelque sens pertinent à la question traitée) À L'INTÉRIEUR DES CONTRAINTES QU'ILS AFFRONTENT.</strong> »</em></p>
+</blockquote>
+<h3>1.2 Les trois types de contraintes</h3>
+<blockquote>
+<p><em>« Il y a <strong>TROIS TYPES DE BASE de contraintes</strong> que nous rencontrerons. Ce sont <strong>les contraintes d'ÉGALITÉ, les contraintes de NON-NÉGATIVITÉ, et, plus généralement, TOUTE FORME DE CONTRAINTE D'INÉGALITÉ.</strong> »</em></p>
+</blockquote>
+<blockquote>
+<p class="cal piege"> <em>« <strong>Nous confinerons la discussion aux problèmes de MAXIMISATION, en notant simplement les modifications (s'il y en a) pour les problèmes de minimisation.</strong> »</em></p>
+</blockquote>
+<p><em>(Cette fiche traite <strong>les contraintes d'ÉGALITÉ</strong> ; les deux autres types relèvent de §A2.3.5-A2.3.6.)</em></p>
+<h2 data-prio="high">Concept 2 — §A2.3.1 : le problème et la méthode de substitution</h2>
+<h3>2.1 L'écriture formelle</h3>
+<blockquote>
+<p><em>« Considérez le choix de $x_1$ et $x_2$ pour maximiser $f(x_1,x_2)$, <strong>quand $x_1$ et $x_2$ doivent satisfaire une relation particulière entre eux que nous écrivons SOUS FORME IMPLICITE $g(x_1,x_2)=0$.</strong> »</em></p>
+</blockquote>
+<p>$$\max_{x_1,x_2}\ f(x_1,x_2)\qquad\text{sous contrainte}\qquad g(x_1,x_2)=0 \tag{A2.4}$$</p>
+<h3 data-prio="must">2.2  Le vocabulaire, mot pour mot</h3>
+<table>
+<thead>
+<tr>
+<th>Le terme</th>
+<th>Sa définition</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>$f(x_1,x_2)$</strong></td>
+<td><em>« la <strong>FONCTION OBJECTIF</strong>, ou <strong>MAXIMANDE</strong> »</em></td>
+</tr>
+<tr>
+<td><strong>$x_1$, $x_2$</strong></td>
+<td><em>« les <strong>VARIABLES DE CHOIX</strong> […] <strong>habituellement écrites SOUS l'opérateur « max » pour NOUS RAPPELER QUE CE SONT DES VALEURS DE $x_1$ ET $x_2$ QUE NOUS CHERCHONS</strong> »</em></td>
+</tr>
+<tr>
+<td><strong>$g(x_1,x_2)$</strong></td>
+<td><em>« <strong>LA CONTRAINTE</strong>, et elle spécifie conjointement <strong>les valeurs des variables de choix que nous sommes AUTORISÉS à considérer comme RÉALISABLES ou ADMISSIBLES</strong> »</em></td>
+</tr>
+<tr>
+<td><strong>L'ensemble des $(x_1,x_2)$ admissibles</strong></td>
+<td><em>« <strong>L'ENSEMBLE DE CONTRAINTE</strong> ou <strong>L'ENSEMBLE RÉALISABLE</strong> »</em></td>
+</tr>
+</tbody></table>
+<h3>2.3 La méthode de substitution</h3>
+<blockquote>
+<p><em>« <strong>Une manière de résoudre ce problème est PAR SUBSTITUTION. Si la fonction de contrainte nous permet de résoudre pour l'un des $x_i$ en fonction de l'autre, nous pouvons RÉDUIRE le problème contraint à deux variables en un problème SANS CONTRAINTE, ET AVEC UNE VARIABLE DE MOINS.</strong> »</em></p>
+</blockquote>
+<p><strong>Si $g(x_1,x_2)=0$ peut s'écrire</strong> $\ x_2=\tilde{g}(x_1)$ <strong>(A2.5)</strong>, on substitue directement :</p>
+<p>$$\max_{x_1}\ f\big(x_1,\ \tilde{g}(x_1)\big) \tag{A2.6}$$</p>
+<p class="cal piege"> <strong>LE PIÈGE DU CALCUL</strong> : <em>« nous devons garder à l'esprit que <strong>$x_1$ influence maintenant $f$ DE DEUX FAÇONS : « DIRECTEMENT » par sa PROPRE position dans $f$, et « INDIRECTEMENT » par la position d'origine de $x_2$. Ainsi, quand nous différentions (A2.6), nous devons nous souvenir que $f$ a DEUX dérivées partielles, et NOUS DEVONS NOUS SOUVENIR D'UTILISER LA RÈGLE DE COMPOSITION.</strong> »</em></p>
+<p>$$\frac{\partial f\big(x_1^*,\tilde{g}(x_1^*)\big)}{\partial x_1}+\underbrace{\frac{\partial f\big(x_1^*,\tilde{g}(x_1^*)\big)}{\partial x_2}\cdot\frac{d\tilde{g}(x_1^*)}{dx_1}}_{\textbf{la règle de COMPOSITION}}=0$$</p>
+<blockquote>
+<p><em>« Quand nous avons trouvé $x_1^*$, <strong>nous le réinjectons dans la contrainte (A2.5) et trouvons $x_2^*=\tilde{g}(x_1^*)$. La paire $(x_1^*,x_2^*)$ résout alors le problème contraint, POURVU QUE LA CONDITION DU SECOND ORDRE APPROPRIÉE SOIT AUSSI REMPLIE.</strong> »</em></p>
+</blockquote>
+<h3 data-prio="must">2.4  Pourquoi la substitution ne suffit pas</h3>
+<blockquote>
+<p><em>« <strong>Malheureusement, IL EST FACILE D'IMAGINER DES CAS où la relation de contrainte est COMPLIQUÉE et où il n'est PAS SI FACILE de résoudre pour une variable en fonction de l'autre. QUI PLUS EST, de nombreux problèmes intéressants impliquent PLUS DE DEUX variables de choix et PLUS D'UNE contrainte. LA MÉTHODE DE SUBSTITUTION N'EST PAS BIEN ADAPTÉE à ces problèmes plus compliqués. Dans certains cas, la substitution serait INUTILEMENT LOURDE. Dans d'autres, elle serait SIMPLEMENT IMPOSSIBLE.</strong> »</em></p>
+</blockquote>
+<blockquote>
+<p><em>« <strong>Heureusement, il y a UNE MEILLEURE FAÇON — capable de traiter UNE CLASSE DE PROBLÈMES BEAUCOUP PLUS LARGE.</strong> »</em></p>
+</blockquote>
+<h2 data-prio="must">Concept 3 — §A2.3.2 : la méthode de Lagrange</h2>
+<h3 data-prio="must">3.1  L'intuition fondatrice</h3>
+<blockquote>
+<p><em>« La méthode de Lagrange <strong>jaillit d'UNE QUESTION SIMPLE : COMMENT POUVONS-NOUS UTILISER CE QUE NOUS SAVONS DÉJÀ sur l'optimisation des fonctions de plusieurs variables QUAND IL N'Y A PAS DE CONTRAINTES pour nous aider à résoudre les problèmes QUAND IL Y EN A ?</strong> »</em></p>
+</blockquote>
+<blockquote>
+<p><em>« Nous savons que résoudre un problème sans contraintes <strong>est une affaire FACILE. Nous trouvons simplement les partielles premières, les posons égales à zéro, et résolvons le système.</strong> »</em></p>
+</blockquote>
+<p>$$\boxed{\;\textbf{« L'INTUITION DE LAGRANGE fut de voir qu'IL EXISTE TOUJOURS UN PROBLÈME}\\\textbf{SANS CONTRAINTE que nous pouvons résoudre avec nos méthodes habituelles}\\\textbf{et QUI NOUS DONNE, COMME SOUS-PRODUIT, LA SOLUTION QUE NOUS CHERCHONS}\\\textbf{au problème d'optimisation CONTRAINT. »}\;}$$</p>
+<h3>3.2 La construction du lagrangien</h3>
+<blockquote>
+<p><em>« Supposons que nous <strong>multipliions l'équation de contrainte par une NOUVELLE VARIABLE, appelons-la $\lambda$ (lambda), QUE NOUS TIRONS SIMPLEMENT DU CHAPEAU parce qu'elle se révélera UTILE. Si nous SOUSTRAYONS ce produit de la fonction objectif</strong>, nous aurons construit une nouvelle fonction, appelée <strong>LA FONCTION LAGRANGIENNE</strong>, ou <strong>LAGRANGIEN</strong> pour faire court, et notée $\mathcal{L}(\cdot)$. »</em></p>
+</blockquote>
+<p>$$\boxed{\;\mathcal{L}(x_1,x_2,\lambda)\ \equiv\ f(x_1,x_2)\ -\ \lambda\,g(x_1,x_2)\;}$$</p>
+<p class="cal piege"> *« Cette nouvelle fonction a <strong>TROIS variables au lieu de deux</strong> : à savoir $x_1$, $x_2$ <strong>ET $\lambda$</strong>. »*</p>
+<h3>3.3 Les trois conditions du premier ordre</h3>
+<div class="cal methode"><span class="lab">comment déterminerions-nous les points critiques de $\mathcal{L}(\cdot)$ SI C'ÉTAIT UNE FONCTION ORDINAIRE (NON CONTRAINTE) DE TROIS VARIABLES ? NOUS PRENDRIONS SES TROIS DÉRIVÉES PARTIELLES ET LES POSERIONS ÉGALES À ZÉRO.</span>
+<p><em>« Maintenant,  »</em></p>
+</div>
+<p>$$\frac{\partial\mathcal{L}}{\partial x_1}=\frac{\partial f(x_1^*,x_2^*)}{\partial x_1}-\lambda^*\frac{\partial g(x_1^*,x_2^*)}{\partial x_1}=0 \tag{A2.7}$$</p>
+<p>$$\frac{\partial\mathcal{L}}{\partial x_2}=\frac{\partial f(x_1^*,x_2^*)}{\partial x_2}-\lambda^*\frac{\partial g(x_1^*,x_2^*)}{\partial x_2}=0 \tag{A2.8}$$</p>
+<p>$$\frac{\partial\mathcal{L}}{\partial\lambda}=-\,g(x_1^*,x_2^*)=0 \tag{A2.9}$$</p>
+<p class="cal piege"> <strong>La troisième condition N'EST RIEN D'AUTRE QUE LA CONTRAINTE ELLE-MÊME.</strong> C'est ce qui garantit que la solution est <strong>réalisable</strong>.</p>
+<blockquote>
+<p><em>« Ce sont <strong>TROIS ÉQUATIONS À TROIS INCONNUES</strong>, $x_1$, $x_2$ et $\lambda$. <strong>La méthode de Lagrange AFFIRME que si nous pouvons trouver des valeurs $x_1^*$, $x_2^*$ et $\lambda^*$ qui résolvent ces trois équations SIMULTANÉMENT, alors nous aurons UN POINT CRITIQUE DE $f(x_1,x_2)$ LE LONG DE LA CONTRAINTE $g(x_1,x_2)=0$.</strong> »</em></p>
+</blockquote>
+<h2 data-prio="must">Concept 4 — L'argument de plausibilité</h2>
+<h3>4.1 Ce qu'il faut démontrer</h3>
+<blockquote>
+<p class="cal piege"> <strong>Note de transcription.</strong> Le paragraphe du livre qui introduit cet argument <strong>est illisible dans le PDF</strong> <em>(deux colonnes de texte s'y entremêlent lettre par lettre)</em>. <strong>Ce qui en subsiste</strong>, et que le raisonnement qui suit confirme mot pour mot, est : <em>« … <strong>à cette contrainte est UN PEU PLUS DIFFICILE, MAIS CELA PEUT ÊTRE FAIT</strong> »</em>, à propos du fait que la solution des conditions (A2.7)-(A2.9) <strong>maximise effectivement $f$ SOUS LA CONTRAINTE</strong> — la condition (A2.9) garantissant déjà, à elle seule, que <strong>la contrainte est satisfaite</strong>.</p>
+</blockquote>
+<h3>4.2 La différentielle totale du lagrangien</h3>
+<blockquote>
+<p><em>« Considérez notre fonction <strong>« BRICOLÉE »</strong> $\mathcal{L}(\cdot)$ et prenez <strong>sa DIFFÉRENTIELLE TOTALE, en vous souvenant que $\lambda$ est UNE VARIABLE À PART ENTIÈRE de la fonction</strong> »</em> :</p>
+</blockquote>
+<p>$$d\mathcal{L}=\frac{\partial\mathcal{L}}{\partial x_1}dx_1+\frac{\partial\mathcal{L}}{\partial x_2}dx_2+\frac{\partial\mathcal{L}}{\partial\lambda}d\lambda$$</p>
+<blockquote>
+<p><em>« <strong>Par hypothèse, $x_1^*$, $x_2^*$ et $\lambda^*$ satisfont les conditions du premier ordre (A2.7) à (A2.9) pour un optimum de $\mathcal{L}$, donc $d\mathcal{L}$ évaluée là DOIT ÊTRE ÉGALE À ZÉRO.</strong> »</em> En substituant :</p>
+</blockquote>
+<p>$$d\mathcal{L}=f_1\,dx_1+f_2\,dx_2-g(x_1^*,x_2^*)\,d\lambda-\lambda^*\big[g_1\,dx_1+g_2\,dx_2\big]=0 \tag{A2.10}$$</p>
+<p><strong>pour tous $dx_1$, $dx_2$ et $d\lambda$.</strong></p>
+<h3 data-prio="must">4.3  Les deux simplifications</h3>
+<details class="cor">
+<summary><strong>Simplification 1 — le terme en $d\lambda$ disparaît</strong></summary><div class="in">
+
+<blockquote>
+<p><em>« Une chose que nous pouvons faire <strong>IMMÉDIATEMENT</strong> pour simplifier est de remarquer à nouveau que <strong>(A2.9) nous dit que LA CONTRAINTE EST SATISFAITE en $x_1^*$ et $x_2^*$, donc $g(x_1^*,x_2^*)=0$. Ceci signifie que LE TROISIÈME TERME DE (A2.10) EST NUL</strong> »</em> ⟹ le problème se réduit à montrer que</p>
+</blockquote>
+<p>$$d\mathcal{L}=f_1\,dx_1+f_2\,dx_2-\lambda^*\big[g_1\,dx_1+g_2\,dx_2\big]=0 \tag{A2.11}$$</p>
+<p><em>pour tous les $dx_i$</em> <strong>implique</strong> <em>$df=0$ pour ceux des $dx_i$ qui satisfont la contrainte $g$.</em></p>
+</div></details>
+
+<details class="cor">
+<summary><strong> Simplification 2 — quels sont les changements ADMISSIBLES ?</strong></summary><div class="in">
+
+<blockquote>
+<p><em>« Ensuite, <strong>nous devons déterminer QUELLES SONT ces valeurs ADMISSIBLES de $dx_1$ et $dx_2$. Regardez à nouveau l'équation de contrainte. CLAIREMENT, SI $g(x_1,x_2)$ DOIT TOUJOURS ÉGALER ZÉRO, ALORS APRÈS QUE $x_1$ ET $x_2$ ONT CHANGÉ, ELLE DOIT DE NOUVEAU ÊTRE ÉGALE À ZÉRO.</strong> »</em></p>
+</blockquote>
+<blockquote>
+<p class="cal piege"> <em>« Dit autrement, <strong>les changements ADMISSIBLES de $x_1$ et $x_2$ sont CEUX QUI NE CONDUISENT À AUCUN CHANGEMENT dans la valeur de la fonction de contrainte.</strong> »</em></p>
+</blockquote>
+<p><strong>Dire qu'il n'y a aucun changement de $g$, c'est dire que $dg=0$</strong> :</p>
+<p>$$dg=\frac{\partial g(x_1^*,x_2^*)}{\partial x_1}dx_1+\frac{\partial g(x_1^*,x_2^*)}{\partial x_2}dx_2=0 \tag{A2.12}$$</p>
+</div></details>
+
+<h3 data-prio="must">4.4  La conclusion</h3>
+<blockquote>
+<p><em>« <strong>En mettant (A2.11) et (A2.12) ENSEMBLE, nous obtenons LE RÉSULTAT. Si nous ne considérons que des changements des variables qui satisfont (A2.12), alors LE TROISIÈME TERME DE (A2.11) DOIT ÊTRE NUL.</strong> »</em> ⟹ en $(x_1^*,x_2^*)$, (A2.11) se réduit à</p>
+</blockquote>
+<p>$$d\mathcal{L}=\frac{\partial f(x_1^*,x_2^*)}{\partial x_1}dx_1+\frac{\partial f(x_1^*,x_2^*)}{\partial x_2}dx_2=0$$</p>
+<p><strong>pour tous $dx_1$ et $dx_2$ satisfaisant la contrainte.</strong></p>
+<blockquote>
+<p class="cal piege"> <em>« <strong>Mais C'EST PRÉCISÉMENT CE QUE NOUS VOULONS. Cela dit que les solutions $(x_1^*,x_2^*,\lambda^*)$ aux conditions du premier ordre pour un optimum NON CONTRAINT de la fonction de Lagrange GARANTISSENT QUE LA VALEUR DE LA FONCTION OBJECTIF $f$ NE PEUT ÊTRE NI AUGMENTÉE NI DIMINUÉE pour de petits changements de $x_1^*$ et $x_2^*$ QUI SATISFONT LA CONTRAINTE. Par conséquent, NOUS DEVONS ÊTRE À UN MAXIMUM OU À UN MINIMUM de la fonction objectif LE LONG DE LA CONTRAINTE.</strong> »</em></p>
+</blockquote>
+<blockquote>
+<p class="cal piege"> <strong>Note de transcription.</strong> Le paragraphe suivant du livre <strong>est lui aussi brouillé dans le PDF</strong>. <strong>Ce qui en reste lisible</strong> et clôt l'argument est : <em>« <strong>Les conditions du premier ordre (A2.7) à (A2.9) CARACTÉRISENT donc LES POINTS CRITIQUES de la fonction objectif LE LONG DE LA CONTRAINTE.</strong> »</em></p>
+</blockquote>
+<h3 data-prio="must">4.5  La limite des conditions du premier ordre</h3>
+<blockquote>
+<p><em>« <strong>Que ces points critiques soient des MAXIMA ou des MINIMA contraints NE PEUT PAS ÊTRE DÉTERMINÉ À PARTIR DES SEULES CONDITIONS DU PREMIER ORDRE. Distinguer entre les deux exige que nous connaissions LA « COURBURE » des relations objectif et contrainte au point critique en question. Nous examinerons ces questions PLUS TARD.</strong> »</em> <em>(⟹ §A2.3.4.)</em></p>
+</blockquote>
+<details class="cor">
+<summary><strong>EXEMPLE A2.8 — la méthode de Lagrange au travail</strong></summary><div class="in">
+
+<p>$$\max_{x_1,x_2}\ -ax_1^2-bx_2^2 \qquad\text{sous contrainte}\qquad x_1+x_2-1=0,\qquad a&gt;0,\ b&gt;0 \tag{E.1}$$</p>
+<p><strong>Le lagrangien</strong> :</p>
+<p>$$\mathcal{L}(x_1,x_2,\lambda)\equiv -ax_1^2-bx_2^2-\lambda\big(x_1+x_2-1\big)$$</p>
+<p><strong>Les trois conditions du premier ordre</strong> :</p>
+<p>$$\frac{\partial\mathcal{L}}{\partial x_1}=-2ax_1-\lambda=0 \tag{E.2}$$
+$$\frac{\partial\mathcal{L}}{\partial x_2}=-2bx_2-\lambda=0 \tag{E.3}$$
+$$\frac{\partial\mathcal{L}}{\partial\lambda}=-(x_1+x_2-1)=0 \tag{E.4}$$</p>
+<table>
+<thead>
+<tr>
+<th>Pas</th>
+<th>Le calcul</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>1</strong></td>
+<td> <strong>(E.2) et (E.3) impliquent</strong> $\ 2ax_1=2bx_2$, ou $\ x_1=\dfrac{b}{a}x_2$ <strong>(E.5)</strong></td>
+</tr>
+<tr>
+<td><strong>2</strong></td>
+<td><strong>En substituant (E.5) dans (E.4)</strong> : $\ x_2+\dfrac{b}{a}x_2=1$, ou $\ x_2=\dfrac{a}{a+b}$ <strong>(E.6)</strong></td>
+</tr>
+<tr>
+<td><strong>3</strong></td>
+<td><strong>En reportant (E.6) dans (E.5)</strong> : $\ x_1=\dfrac{b}{a+b}$ <strong>(E.7)</strong></td>
+</tr>
+<tr>
+<td><strong>4</strong></td>
+<td><strong>En reportant dans (E.3)</strong> : $\ -2b\dfrac{a}{a+b}-\lambda=0$, ou $\ \lambda=\dfrac{-2ab}{a+b}$ <strong>(E.8)</strong></td>
+</tr>
+</tbody></table>
+<p>$$\boxed{\;x_1^*=\frac{b}{a+b},\qquad x_2^*=\frac{a}{a+b},\qquad \lambda^*=\frac{-2ab}{a+b}\;} \tag{E.9}$$</p>
+<blockquote>
+<p class="cal piege"> <em>« <strong>SEULS $x_1$ et $x_2$ dans (E.9) sont des solutions CANDIDATES au problème (E.1). Le renseignement supplémentaire que nous avons acquis — la valeur du multiplicateur de Lagrange — n'est QU'« INCIDENT ».</strong> »</em></p>
+</blockquote>
+<p><strong>La valeur atteinte</strong> :</p>
+<p>$$y^*=-a\left(\frac{b}{a+b}\right)^2-b\left(\frac{a}{a+b}\right)^2=\frac{-\big(ab^2+ba^2\big)}{(a+b)^2} \tag{E.10}$$</p>
+<blockquote>
+<p class="cal piege"> <em>« <strong>SOUVENEZ-VOUS : à partir des SEULES conditions du premier ordre, NOUS SOMMES INCAPABLES DE DIRE si c'est une valeur MAXIMALE OU MINIMALE.</strong> »</em></p>
+</blockquote>
+</div></details>
+
+<h2 data-prio="must">Concept 5 — Le cas général : $n$ variables, $m$ contraintes</h2>
+<h3>5.1 Le programme</h3>
+<blockquote>
+<p><em>« <strong>La méthode lagrangienne « MARCHE » pour des fonctions avec N'IMPORTE QUEL NOMBRE de variables, et dans des problèmes avec N'IMPORTE QUEL NOMBRE de contraintes, TANT QUE LE NOMBRE DE CONTRAINTES EST INFÉRIEUR AU NOMBRE DE VARIABLES CHOISIES.</strong> »</em></p>
+</blockquote>
+<p>$$\max_{x_1,\dots,x_n}\ f(x_1,\dots,x_n)\qquad\text{s.c.}\qquad g^1(\mathbf{x})=0,\ \dots,\ g^m(\mathbf{x})=0,\qquad m&lt;n \tag{A2.13}$$</p>
+<h3>5.2 Le lagrangien général</h3>
+<blockquote>
+<p><em>« <strong>Formez le lagrangien en multipliant CHAQUE équation de contrainte $g^j$ par UN MULTIPLICATEUR DE LAGRANGE DIFFÉRENT $\lambda_j$ et en les soustrayant TOUS de la fonction objectif $f$.</strong> »</em></p>
+</blockquote>
+<p>$$\boxed{\;\mathcal{L}(\mathbf{x},\boldsymbol{\lambda})=f(\mathbf{x})-\sum_{j=1}^{m}\lambda_j\,g^j(\mathbf{x})\;} \tag{A2.14}$$</p>
+<p class="cal piege"> <strong>C'est une fonction de $n+m$ variables.</strong></p>
+<h3>5.3 Le système de $n+m$ équations</h3>
+<p>$$\frac{\partial\mathcal{L}}{\partial x_i}=\frac{\partial f(\mathbf{x}^*)}{\partial x_i}-\sum_{j=1}^{m}\lambda_j^*\frac{\partial g^j(\mathbf{x}^*)}{\partial x_i}=0,\qquad i=1,\dots,n$$
+$$\frac{\partial\mathcal{L}}{\partial\lambda_j}=-\,g^j(\mathbf{x}^*)=0,\qquad j=1,\dots,m \tag{A2.15}$$</p>
+<blockquote>
+<p><em>« En principe, celles-ci peuvent être résolues pour les $n+m$ valeurs $\mathbf{x}^*$ et $\boldsymbol{\lambda}^*$. <strong>Tous les vecteurs solution $\mathbf{x}^*$ seront alors des CANDIDATS à la solution.</strong> »</em></p>
+</blockquote>
+<h3 data-prio="must">5.4  Les deux questions laissées ouvertes</h3>
+<blockquote>
+<p><em>« La méthode de Lagrange est <strong>TRÈS INGÉNIEUSE et TRÈS UTILE. En effet, elle nous offre UN ALGORITHME pour identifier les optima contraints dans une vaste classe de problèmes pratiques. POURTANT, L'EXPOSÉ QUELQUE PEU DÉSINVOLTE donné ici PRÉSUPPOSE BEAUCOUP.</strong> »</em></p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>La question</th>
+<th>La réponse du livre</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>1. L'EXISTENCE d'une solution</strong></td>
+<td> <em>« Si la fonction objectif est <strong>RÉELLE et CONTINUE</strong> (ce qu'elle doit être pour être différentiable), et si <strong>l'ENSEMBLE DE CONTRAINTE défini par les équations de contrainte est COMPACT, nous sommes assurés PAR LE THÉORÈME DE WEIERSTRASS (théorème A1.10) que des optima EXISTENT</strong> »</em></td>
+</tr>
+<tr>
+<td><strong>2. L'EXISTENCE des multiplicateurs</strong></td>
+<td> <em>« <strong>Comment savons-nous que les multiplicateurs que nous venons de « TIRER DU CHAPEAU » EXISTENT MÊME ? Plus précisément, comment savons-nous qu'il existe $\lambda^*$ tel que LES POINTS CRITIQUES DE $\mathcal{L}(\cdot,\lambda^*)$ COÏNCIDENT avec les optima contraints ? SÛREMENT, IL DOIT Y AVOIR DES CONDITIONS.</strong> »</em></td>
+</tr>
+</tbody></table>
+<h3>5.5 La condition sur l'ensemble de contrainte</h3>
+<blockquote>
+<p><em>« En fait, <strong>il y a de telles conditions, et elles ont PRINCIPALEMENT À VOIR AVEC DES EXIGENCES SUR L'ENSEMBLE DE CONTRAINTE.</strong> »</em></p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>Le cas</th>
+<th>La condition</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Deux variables, une contrainte</strong></td>
+<td> <em>« ces conditions <strong>SE RAMÈNENT à l'exigence QU'AU MOINS UNE des dérivées partielles de l'équation de contrainte soit STRICTEMENT NON NULLE</strong> »</em></td>
+</tr>
+<tr>
+<td><strong>Le cas général</strong></td>
+<td> <em>« ceci s'élargit à l'exigence que <strong>LES VECTEURS GRADIENTS DES $m$ ÉQUATIONS DE CONTRAINTE, $\nabla g^j$, $j=1,\dots,m$, SOIENT LINÉAIREMENT INDÉPENDANTS</strong> »</em></td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><em>« <strong>La plausibilité de cette restriction deviendra plus claire quand nous examinerons LA GÉOMÉTRIE de ce problème simple dans la prochaine section.</strong> »</em></p>
+</blockquote>
+<h3>5.6 Le théorème A2.16</h3>
+<blockquote>
+<p><em>« <strong>Par souci de complétude et pour faciliter les références — SI CE N'EST PAR SOUCI D'ÉCLAIRCISSEMENT — nous énoncerons le théorème de Lagrange. La preuve exige des méthodes PLUS AVANCÉES que celles que nous avons tentées ici, et sera donc OMISE. Le lecteur intéressé la trouvera dans TOUT BON TEXTE de calcul multivarié.</strong> »</em></p>
+</blockquote>
+<div class="cal formel"><span class="lab">THÉORÈME A2.16 — Théorème de Lagrange</span>
+<p>
+Soient $f(\mathbf{x})$ et $g^j(\mathbf{x})$, $j=1,\dots,m$, des fonctions réelles <strong>continûment différentiables</strong> sur $D\subset\mathbb{R}^n$. Soit $\mathbf{x}^*$ <strong>un point INTÉRIEUR de $D$</strong> et supposons que $\mathbf{x}^*$ est <strong>un optimum (maximum ou minimum) de $f$ sous les contraintes $g^j(\mathbf{x}^*)=0$</strong>.  <strong>Si les vecteurs gradients $\nabla g^j(\mathbf{x}^*)$, $j=1,\dots,m$, sont LINÉAIREMENT INDÉPENDANTS</strong>, alors <strong>il existe $m$ nombres UNIQUES $\lambda_j^*$</strong> tels que
+$$\frac{\partial\mathcal{L}(\mathbf{x}^*,\boldsymbol{\lambda}^*)}{\partial x_i}=\frac{\partial f(\mathbf{x}^*)}{\partial x_i}-\sum_{j=1}^{m}\lambda_j^*\frac{\partial g^j(\mathbf{x}^*)}{\partial x_i}=0,\qquad i=1,\dots,n$$</p>
+</div>
+<p class="cal piege"> <strong>L'indépendance linéaire des gradients est ce qu'on appelle la QUALIFICATION DES CONTRAINTES</strong> — sans elle, <strong>les multiplicateurs peuvent tout simplement ne pas exister.</strong></p>
+<h2 data-prio="must">Concept 6 — §A2.3.3 : l'interprétation géométrique</h2>
+<h3>6.1 La pente d'un ensemble de niveau</h3>
+<blockquote>
+<p><em>« Les conditions caractérisant la solution lagrangienne ont <strong>une interprétation géométrique QUI DEVRAIT VOUS ÊTRE FAMILIÈRE DEPUIS VOS COURS D'ÉCONOMIE INTERMÉDIAIRE.</strong> »</em></p>
+</blockquote>
+<p><strong>Sur un ensemble de niveau</strong> $L(y^0)\equiv\{(x_1,x_2)\mid f(x_1,x_2)=y^0\}$, les changements admissibles vérifient</p>
+<p>$$\frac{\partial f}{\partial x_1}dx_1+\frac{\partial f}{\partial x_2}dx_2=0 \tag{A2.16}$$</p>
+<p><em>« obtenu <strong>en différentiant TOTALEMENT chaque membre de l'équation du niveau et en se souvenant que LA DIFFÉRENTIELLE TOTALE DE LA CONSTANTE $y^0$ EST NULLE</strong> »</em>.</p>
+<p><strong>En résolvant pour la pente « rise over run »</strong> :</p>
+<p>$$\boxed{\;\left.\frac{dx_2}{dx_1}\right|_{\text{le long de }L(y^0)}=(-1)\,\frac{f_1(x_1,x_2)}{f_2(x_1,x_2)}\;} \tag{A2.17}$$</p>
+<p class="cal piege"> <em>« La notation $|_{\text{le long de}\dots}$ est utilisée <strong>pour vous rappeler LE TYPE TRÈS PARTICULIER de changements $dx_1$ et $dx_2$ que nous considérons.</strong> »</em></p>
+<h3>6.2 La pente de la contrainte</h3>
+<blockquote>
+<p><em>« Par le même jeton, <strong>nous pouvons penser LA FONCTION DE CONTRAINTE, ELLE AUSSI, COMME UNE SORTE D'ENSEMBLE DE NIVEAU</strong> — l'ensemble de tous les $(x_1,x_2)$ tels que $g(x_1,x_2)=0$. »</em></p>
+</blockquote>
+<p><strong>Le même calcul</strong> — <em>« en se souvenant que <strong>la différentielle de (la constante) ZÉRO EST ZÉRO</strong> »</em> — donne</p>
+<p>$$\left.\frac{dx_2}{dx_1}\right|_{\text{le long de }g(\cdot)=0}=(-1)\,\frac{g_1(x_1,x_2)}{g_2(x_1,x_2)} \tag{A2.18}$$</p>
+<h3 data-prio="must">6.3  L'élimination de $\lambda$</h3>
+<blockquote>
+<p><em>« Parce que <strong>nous cherchons les valeurs solution des SEULES variables de choix, et n'avons AUCUN INTÉRÊT DIRECT pour la valeur du multiplicateur, nous pouvons réécrire (A2.7) à (A2.9) POUR ÉLIMINER $\lambda^*$.</strong> »</em></p>
+</blockquote>
+<p>En réarrangeant : $\ f_1=\lambda^*g_1$, $\ f_2=\lambda^*g_2$, $\ g=0$.</p>
+<blockquote>
+<p><em>« Pour les besoins de cette discussion, <strong>supposons $\lambda^*\neq0$. En DIVISANT la première équation par la seconde, on élimine $\lambda^*$ COMPLÈTEMENT et il ne reste que DEUX conditions pour déterminer les DEUX variables</strong> »</em> :</p>
+</blockquote>
+<p>$$\boxed{\;\frac{f_1(x_1^*,x_2^*)}{f_2(x_1^*,x_2^*)}=\frac{g_1(x_1^*,x_2^*)}{g_2(x_1^*,x_2^*)}\;} \tag{A2.19}$$
+$$g(x_1^*,x_2^*)=0 \tag{A2.20}$$</p>
+<h3 data-prio="must">6.4  LA LECTURE : un point de TANGENCE</h3>
+<blockquote>
+<p><em>« <strong>Que disent ces deux conditions ?</strong> Le membre de gauche de (A2.19) est <strong>$-1$ fois LA PENTE de l'ensemble de niveau DE LA FONCTION OBJECTIF</strong> au point $(x_1^*,x_2^*)$. Le membre de droite est <strong>$-1$ fois LA PENTE de l'ensemble de niveau DE LA FONCTION DE CONTRAINTE.</strong> »</em></p>
+</blockquote>
+<blockquote>
+<p><em>« La condition dit que <strong>les valeurs solution seront EN UN POINT OÙ LA PENTE DU NIVEAU DE L'OBJECTIF ET LA PENTE DU NIVEAU DE LA CONTRAINTE SONT ÉGALES. CE N'EST PAS TOUT, CEPENDANT. La SECONDE condition (A2.20) nous dit que NOUS DEVONS AUSSI ÊTRE SUR le niveau de l'équation de contrainte.</strong> »</em></p>
+</blockquote>
+<p>$$\boxed{\;\textbf{« Un point QUI EST SUR LA CONTRAINTE et OÙ LA PENTE DU NIVEAU DE}\\\textbf{L'OBJECTIF ET LA PENTE DE LA CONTRAINTE SONT ÉGALES est, PAR DÉFINITION,}\\\textbf{UN POINT DE TANGENCE entre la contrainte et l'ensemble de niveau. »}\;}$$</p>
+<blockquote>
+<p><em>« La situation pour un <strong>MAXIMUM</strong> est représentée en <strong>fig. A2.8(a). CLAIREMENT, la plus haute valeur de $f$ le long de la contrainte est celle atteinte AU POINT DE TANGENCE choisi par (A2.19) et (A2.20)</strong> […] <strong>Les mêmes principes s'appliquent dans le cas des problèmes de MINIMISATION</strong>, comme en fig. A2.8(b). »</em></p>
+</blockquote>
+<p class="cal piege"> <strong>La condition de tangente, sous la forme du livre</strong> :</p>
+<p>$$\text{en un MAXIMUM :}\quad -\frac{f_1(\mathbf{x}^*)}{f_2(\mathbf{x}^*)}=-\frac{g_1(\mathbf{x}^*)}{g_2(\mathbf{x}^*)} \qquad\qquad \text{en un MINIMUM :}\quad -\frac{f_1(\tilde{\mathbf{x}})}{f_2(\tilde{\mathbf{x}})}=-\frac{g_1(\tilde{\mathbf{x}})}{g_2(\tilde{\mathbf{x}})}$$</p>
+<p><em>( <strong>C'est ici que se voit la nécessité de la « qualification des contraintes »</strong> : si <strong>les deux</strong> partielles $g_1$ et $g_2$ étaient nulles, <strong>la contrainte n'aurait pas de pente définie</strong> et la condition de tangence n'aurait aucun sens.)</em></p>
+<h2 data-prio="must">Concept 7 — §A2.3.4 : les conditions du second ordre</h2>
+<h3 data-prio="must">7.1  La réduction de dimensionnalité</h3>
+<blockquote>
+<p><em>« Les conditions du second ordre pour les problèmes lagrangiens sont <strong>tout à fait dans le même esprit</strong> que celles du premier ordre. <strong>Au départ, on est TENTÉ de raisonner ainsi : si $(\mathbf{x}^*,\boldsymbol{\lambda}^*)$ satisfait les conditions du second ordre pour un maximum de la fonction NON CONTRAINTE $\mathcal{L}$, alors nous savons que nous avons un maximum local de $f$ sous les contraintes.</strong> »</em></p>
+</blockquote>
+<blockquote>
+<p class="cal piege"> <em>« <strong>C'est en fait UNE CONJECTURE CORRECTE, MAIS il s'avère que c'est une EXIGENCE BEAUCOUP PLUS STRINGENTE que ce dont nous avons RÉELLEMENT BESOIN pour savoir que nous avons localisé un optimum contraint.</strong> »</em></p>
+</blockquote>
+<p>$$\boxed{\;\textbf{« En effet, nous pouvons RÉDUIRE LA « DIMENSIONNALITÉ » des exigences}\\\textbf{de courbure EN EXPLOITANT L'INTERDÉPENDANCE entre les $x$ imposée}\\\textbf{au problème PAR LES RELATIONS DE CONTRAINTE. »}\;}$$</p>
+<blockquote>
+<p><em>« <strong>Pour savoir que nous avons un maximum, TOUT CE DONT NOUS AVONS RÉELLEMENT BESOIN est que LA SECONDE DIFFÉRENTIELLE DE LA FONCTION OBJECTIF au point qui résout les conditions du premier ordre SOIT DÉCROISSANTE LE LONG DE LA CONTRAINTE.</strong> »</em></p>
+</blockquote>
+<h3>7.2 La dérivation, pas à pas</h3>
+<details class="cor">
+<summary><strong>Étape 1 — la contrainte comme fonction implicite</strong></summary><div class="in">
+
+<blockquote>
+<p><em>« Supposons que nous voyions <strong>ARBITRAIREMENT $x_1$ comme LIBRE de prendre n'importe quelle valeur</strong> et pensions $x_2(x_1)$ comme <strong>la valeur de $x_2$ IMPOSÉE PAR LA CONTRAINTE</strong>. Nous pouvons alors penser la contrainte comme <strong>L'IDENTITÉ</strong> »</em></p>
+</blockquote>
+<p>$$g\big(x_1,\ x_2(x_1)\big)\equiv0$$</p>
+<blockquote>
+<p><em>« Ici, <strong>nous voyons l'équation de contrainte comme DÉFINISSANT $x_2$ COMME UNE FONCTION IMPLICITE DE $x_1$.</strong> »</em> En différentiant par rapport à $x_1$ et en résolvant :</p>
+</blockquote>
+<p>$$\frac{dx_2}{dx_1}=-\frac{g_1}{g_2} \tag{A2.21}$$</p>
+<p class="cal piege"> <strong>C'est exactement la pente (A2.18) de la contrainte.</strong></p>
+</div></details>
+
+<details class="cor">
+<summary><strong>Étape 2 — la dérivée première le long de la contrainte</strong></summary><div class="in">
+
+<p><strong>Poser</strong> $\ y=f\big(x_1,x_2(x_1)\big)$ — <em>« la valeur de la fonction objectif <strong>SOUS LA CONTRAINTE</strong> »</em> —  <strong>une fonction de LA SEULE variable $x_1$</strong>.</p>
+<p>$$\frac{dy}{dx_1}=f_1+f_2\frac{dx_2}{dx_1} \qquad\xrightarrow{\ \text{(A2.21)}\ }\qquad \boxed{\;\frac{dy}{dx_1}=f_1-f_2\frac{g_1}{g_2}\;} \tag{A2.22}$$</p>
+</div></details>
+
+<details class="cor">
+<summary><strong> Étape 3 — la dérivée seconde, et sa réécriture</strong></summary><div class="in">
+
+<blockquote>
+<p><em>« <strong>En différentiant à nouveau, EN SE SOUVENANT TOUJOURS QUE $x_2$ EST UNE FONCTION DE $x_1$, ET QUE LES $f_i$ ET LES $g_i$ DÉPENDENT TOUS DE $x_1$ À LA FOIS DIRECTEMENT ET PAR SON INFLUENCE SUR $x_2$</strong> »</em> :</p>
+</blockquote>
+<p>$$\frac{d^2y}{dx_1^2}=\left[f_{11}+f_{12}\frac{dx_2}{dx_1}\right]-\left[f_{21}+f_{22}\frac{dx_2}{dx_1}\right]\frac{g_1}{g_2}-f_2\,\frac{g_2\big[g_{11}+g_{12}\tfrac{dx_2}{dx_1}\big]-g_1\big[g_{21}+g_{22}\tfrac{dx_2}{dx_1}\big]}{g_2^2} \tag{A2.23}$$</p>
+<p class="cal piege"> <strong>LES TROIS SUBSTITUTIONS QUI SIMPLIFIENT TOUT</strong> :</p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Ce qu'on utilise</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>1</strong></td>
+<td> <strong>Les conditions du premier ordre (A2.7)-(A2.9)</strong> : $\ f_1=\lambda g_1$ <strong>et</strong> $f_2=\lambda g_2$</td>
+</tr>
+<tr>
+<td><strong>2</strong></td>
+<td> <strong>Le théorème de YOUNG</strong> : $\ f_{12}=f_{21}$ <strong>et</strong> $g_{12}=g_{21}$</td>
+</tr>
+<tr>
+<td><strong>3</strong></td>
+<td> <strong>La relation (A2.21)</strong>, plus <em>« un peu d'ALGÈBRE »</em></td>
+</tr>
+</tbody></table>
+<p>$$\frac{d^2y}{dx_1^2}=\frac{1}{(g_2)^2}\Big[\big(f_{11}-\lambda g_{11}\big)(g_2)^2-2\big(f_{12}-\lambda g_{12}\big)g_1g_2+\big(f_{22}-\lambda g_{22}\big)(g_1)^2\Big] \tag{A2.24}$$</p>
+</div></details>
+
+<details class="cor">
+<summary><strong> Étape 4 — reconnaître les partielles du LAGRANGIEN</strong></summary><div class="in">
+
+<blockquote>
+<p><em>« <strong>Regardez ATTENTIVEMENT les termes impliquant $\lambda$ à l'intérieur des crochets.</strong> »</em> Rappelons que les partielles premières du lagrangien sont $\ \mathcal{L}_i=f_i-\lambda g_i$. <strong>Donc les partielles SECONDES sont</strong> :</p>
+</blockquote>
+<p>$$\mathcal{L}_{11}=f_{11}-\lambda g_{11} \qquad \mathcal{L}_{12}=f_{12}-\lambda g_{12} \qquad \mathcal{L}_{22}=f_{22}-\lambda g_{22} \tag{A2.25}$$</p>
+<blockquote>
+<p class="cal piege"> <em>« <strong>Il est CLAIR que les termes impliquant $\lambda$ dans les crochets NE SONT QUE LES PARTIELLES SECONDES DU LAGRANGIEN par rapport aux $x_i$. Le terme entre crochets tout entier peut maintenant être vu comme impliquant ces partielles secondes PLUS LES PARTIELLES PREMIÈRES DE LA CONTRAINTE.</strong> »</em></p>
+</blockquote>
+<blockquote>
+<p class="cal piege"> <em>« <strong>À L'ŒIL EXERCÉ, l'expression QUADRATIQUE entre crochets peut être RECONNUE COMME LE DÉTERMINANT D'UNE MATRICE SYMÉTRIQUE.</strong> »</em></p>
+</blockquote>
+</div></details>
+
+<h3 data-prio="must">7.3  La hessienne bordée</h3>
+<p>$$\boxed{\;\bar{H}\equiv\begin{pmatrix}0&amp;g_1&amp;g_2\\g_1&amp;\mathcal{L}_{11}&amp;\mathcal{L}_{12}\\g_2&amp;\mathcal{L}_{21}&amp;\mathcal{L}_{22}\end{pmatrix}\;}$$</p>
+<blockquote>
+<p><em>« Cette matrice est appelée <strong>LA HESSIENNE BORDÉE de la fonction lagrangienne, parce qu'elle implique LES PARTIELLES SECONDES DE $\mathcal{L}$ BORDÉES PAR LES PARTIELLES PREMIÈRES DE L'ÉQUATION DE CONTRAINTE ET UN ZÉRO.</strong> »</em></p>
+</blockquote>
+<p><strong>Son déterminant</strong> <em>(« par exemple en développant le long de la dernière colonne »)</em> :</p>
+<p>$$\bar{D}\equiv\begin{vmatrix}0&amp;g_1&amp;g_2\\g_1&amp;\mathcal{L}_{11}&amp;\mathcal{L}_{12}\\g_2&amp;\mathcal{L}_{21}&amp;\mathcal{L}_{22}\end{vmatrix}=-\Big[\mathcal{L}_{11}(g_2)^2-2\mathcal{L}_{12}g_1g_2+\mathcal{L}_{22}(g_1)^2\Big] \tag{A2.26}$$</p>
+<h3 data-prio="must">7.4  LA FORMULE CENTRALE</h3>
+<p><strong>En combinant (A2.24), (A2.25) et (A2.26)</strong> :</p>
+<p>$$\boxed{\;\frac{d^2y}{dx_1^2}=\frac{(-1)}{(g_2)^2}\,\bar{D}\;} \tag{A2.27}$$</p>
+<blockquote>
+<p><em>« Ainsi, <strong>LA COURBURE DE LA FONCTION OBJECTIF LE LONG DE LA CONTRAINTE, indiquée par le SIGNE de $d^2y/dx_1^2$, PEUT ÊTRE DÉDUITE DIRECTEMENT DU SIGNE DU DÉTERMINANT DE LA HESSIENNE BORDÉE du lagrangien</strong> (en supposant que $g_2\neq0$). »</em></p>
+</blockquote>
+<blockquote>
+<p class="cal piege"> <em>« <strong>LA PRUDENCE S'IMPOSE parce que LE SIGNE DE L'UN SERA TOUJOURS OPPOSÉ AU SIGNE DE L'AUTRE, puisque le déterminant dans (A2.27) est MULTIPLIÉ PAR $-1$.</strong> »</em></p>
+</blockquote>
+<h3>7.5 Le théorème A2.17</h3>
+<div class="cal formel"><span class="lab">THÉORÈME A2.17 — Une condition suffisante pour un optimum local dans le problème à deux variables et une contrainte</span>
+<p>
+Si $(x_1^*,x_2^*,\lambda^*)$ résout les conditions du premier ordre (A2.7)-(A2.9), et si
+$$\bar{D}&gt;0 \quad\textbf{(resp. } \bar{D}&lt;0\textbf{)} \quad\text{dans (A2.26), évalué en } (x_1^*,x_2^*,\lambda^*),$$
+alors $(x_1^*,x_2^*)$ est <strong>un MAXIMUM local (resp. un MINIMUM local)</strong> de $f(x_1,x_2)$ sous la contrainte $g(x_1,x_2)=0$.</p>
+</div>
+<p class="cal piege"> <strong>LE PIÈGE DE SIGNE</strong> : <strong>$\bar{D}&gt;0$ signifie un MAXIMUM</strong> — c'est <strong>l'inverse</strong> de l'intuition du cas non contraint, et cela vient précisément du <strong>$(-1)$ de la formule (A2.27)</strong>.</p>
+<details class="cor">
+<summary><strong>EXEMPLE A2.9 — trancher l'exemple A2.8</strong></summary><div class="in">
+
+<blockquote>
+<p><em>« Considérons <strong>si le point critique obtenu à l'exemple A2.8 est un MINIMUM ou un MAXIMUM.</strong> »</em></p>
+</blockquote>
+<p><strong>Les partielles secondes du lagrangien</strong> <em>(qui était $\mathcal{L}=-ax_1^2-bx_2^2-\lambda(x_1+x_2-1)$)</em> :</p>
+<p>$$\mathcal{L}_{11}=-2a \qquad \mathcal{L}_{12}=0 \qquad \mathcal{L}_{21}=0 \qquad \mathcal{L}_{22}=-2b$$</p>
+<p><strong>Les partielles de la contrainte</strong> : $\ g_1=1$ et $g_2=1$.</p>
+<p><strong>Le déterminant de la hessienne bordée</strong> :</p>
+<p>$$\bar{D}=\begin{vmatrix}-2a&amp;0&amp;1\\0&amp;-2b&amp;1\\1&amp;1&amp;0\end{vmatrix}=2(a+b)&gt;0 \tag{A2.28}$$</p>
+<blockquote>
+<p class="cal piege"> <em>« <strong>Parce qu'ici $\bar{D}&gt;0$ POUR TOUTES les valeurs de $x_1$, $x_2$ et $\lambda$, il doit en être ainsi À LA SOLUTION (E.9). La valeur de la fonction objectif en (E.10) doit donc être UN MAXIMUM SOUS LA CONTRAINTE.</strong> »</em> </p>
+</blockquote>
+<p><em>( <strong>Note</strong> : le livre écrit ici la matrice <strong>avec le zéro en bas à droite</strong> plutôt qu'en haut à gauche. <strong>Le déterminant est le même</strong> — c'est <strong>une permutation PAIRE</strong> des lignes et des colonnes. En reprenant l'ordre de la définition, $\begin{vmatrix}0&amp;1&amp;1\\1&amp;-2a&amp;0\\1&amp;0&amp;-2b\end{vmatrix}=2a+2b$ )</em></p>
+</div></details>
+
+<h2 data-prio="must">Concept 8 — Le théorème A2.18 : le cas général</h2>
+<h3>8.1 La hessienne bordée générale</h3>
+<blockquote>
+<p><em>« Avec $n$ variables et $m&lt;n$ contraintes, <strong>les conditions suffisantes du second ordre nous disent à nouveau que nous aurons un MAXIMUM (MINIMUM) si LA SECONDE DIFFÉRENTIELLE DE LA FONCTION OBJECTIF EST INFÉRIEURE À ZÉRO (supérieure à zéro) au point où les conditions du premier ordre sont satisfaites.</strong> »</em></p>
+</blockquote>
+<blockquote>
+<p><em>« Dans le cas multivarié et multicontraint, <strong>LA HESSIENNE BORDÉE est à nouveau formée EN BORDANT LA MATRICE DES PARTIELLES SECONDES DE $\mathcal{L}$ PAR TOUTES LES PARTIELLES PREMIÈRES DES CONTRAINTES ET ASSEZ DE ZÉROS POUR FORMER UNE MATRICE SYMÉTRIQUE.</strong> »</em></p>
+</blockquote>
+<p>$$\bar{H}=\begin{pmatrix} 0&amp;\cdots&amp;0&amp;g_1^1&amp;\cdots&amp;g_n^1\\ \vdots&amp;\ddots&amp;\vdots&amp;\vdots&amp;\ddots&amp;\vdots\\ 0&amp;\cdots&amp;0&amp;g_1^m&amp;\cdots&amp;g_n^m\\ g_1^1&amp;\cdots&amp;g_1^m&amp;\mathcal{L}_{11}&amp;\cdots&amp;\mathcal{L}_{1n}\\ \vdots&amp;\ddots&amp;\vdots&amp;\vdots&amp;\ddots&amp;\vdots\\ g_n^1&amp;\cdots&amp;g_n^m&amp;\mathcal{L}_{n1}&amp;\cdots&amp;\mathcal{L}_{nn} \end{pmatrix}$$</p>
+<blockquote>
+<p><em>« Le test de définitude implique alors de vérifier le patron de signes sur <strong>les mineurs principaux appropriés de cette matrice bordée (D'ASPECT MONSTRUEUX).</strong> »</em></p>
+</blockquote>
+<h3 data-prio="must">8.2  QUELS mineurs regarder</h3>
+<blockquote>
+<p><em>« Ses mineurs principaux sont les déterminants des sous-matrices obtenues <strong>en descendant la diagonale principale. LES $n-m$ MINEURS PRINCIPAUX QUI NOUS INTÉRESSENT ICI SONT CEUX QUI COMMENCENT AU $(2m+1)$-IÈME ET FINISSENT AU $(n+m)$-IÈME, c'est-à-dire LE DÉTERMINANT DE $\bar{H}$ TOUT ENTIER.</strong> »</em></p>
+</blockquote>
+<p>$$\bar{D}_k=\begin{vmatrix} 0&amp;\cdots&amp;0&amp;g_1^1&amp;\cdots&amp;g_k^1\\ \vdots&amp;\ddots&amp;\vdots&amp;\vdots&amp;\ddots&amp;\vdots\\ 0&amp;\cdots&amp;0&amp;g_1^m&amp;\cdots&amp;g_k^m\\ g_1^1&amp;\cdots&amp;g_1^m&amp;\mathcal{L}_{11}&amp;\cdots&amp;\mathcal{L}_{1k}\\ \vdots&amp;\ddots&amp;\vdots&amp;\vdots&amp;\ddots&amp;\vdots\\ g_k^1&amp;\cdots&amp;g_k^m&amp;\mathcal{L}_{k1}&amp;\cdots&amp;\mathcal{L}_{kk} \end{vmatrix},\qquad k=m+1,\dots,n \tag{A2.29}$$</p>
+<p class="cal piege"> <strong>Il y en a exactement $n-m$</strong> — <strong>autant que de « degrés de liberté » qui restent une fois les $m$ contraintes imposées aux $n$ variables.</strong></p>
+<h3>8.3 L'énoncé</h3>
+<div class="cal formel"><span class="lab">THÉORÈME A2.18 — Conditions suffisantes pour les optima locaux avec contraintes d'égalité</span>
+<p>
+Soit la fonction objectif $f(\mathbf{x})$ et les $m&lt;n$ contraintes $g^j(\mathbf{x})=0$. Soit le lagrangien donné par (A2.14) et $(\mathbf{x}^*,\boldsymbol{\lambda}^*)$ solution des conditions (A2.15). Alors :
+<strong>1.</strong>  <strong>$\mathbf{x}^*$ est un MAXIMUM local de $f$ sous les contraintes si les $n-m$ mineurs de (A2.29) ALTERNENT EN SIGNE EN COMMENÇANT PAR POSITIF</strong> : $\bar{D}_{m+1}&gt;0$, $\bar{D}_{m+2}&lt;0$, …, évalués en $(\mathbf{x}^*,\boldsymbol{\lambda}^*)$.
+<strong>2.</strong>  <strong>$\mathbf{x}^*$ est un MINIMUM local si les $n-m$ mineurs sont TOUS NÉGATIFS</strong> : $\bar{D}_{m+1}&lt;0$, $\bar{D}_{m+2}&lt;0$, ….</p>
+</div>
+<p class="cal piege"> <strong>À COMPARER AU CAS NON CONTRAINT</strong> <em>(<a href="524-jehle-optimisation-libre.md">fiche 524</a>, théorème A2.12)</em> :</p>
+<table>
+<thead>
+<tr>
+<th>Le cas</th>
+<th>MAXIMUM</th>
+<th>MINIMUM</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>NON CONTRAINT</strong> <em>(mineurs de $H$)</em></td>
+<td><strong>alternent dès NÉGATIF</strong></td>
+<td><strong>tous POSITIFS</strong></td>
+</tr>
+<tr>
+<td> <strong>CONTRAINT</strong> <em>(mineurs bordés de $\bar{H}$)</em></td>
+<td> <strong>alternent dès POSITIF</strong></td>
+<td> <strong>tous NÉGATIFS</strong></td>
+</tr>
+</tbody></table>
+<p class="cal piege"> <strong>TOUT EST INVERSÉ</strong> — c'est la conséquence directe du $(-1)$ de la formule (A2.27).</p>
+<p><em>(Vérification sur le cas $n=2$, $m=1$ : il y a $n-m=1$ mineur, celui d'ordre $k=2$, c'est-à-dire <strong>$\bar{D}$ tout entier</strong> ; le théorème A2.18(1) exige $\bar{D}_2&gt;0$ — <strong>exactement le théorème A2.17</strong>. )</em></p>
+<h2>Comment reconnaître le type d'exercice</h2>
+<table>
+<thead>
+<tr>
+<th>Signal dans l'énoncé</th>
+<th>Famille</th>
+<th>Marche à suivre</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>« max … sous contrainte … $=0$ »</td>
+<td><strong>(A2.4)</strong></td>
+<td> <strong>Former le LAGRANGIEN</strong></td>
+</tr>
+<tr>
+<td>Une contrainte facile à isoler</td>
+<td><strong>§A2.3.1</strong></td>
+<td> La <strong>SUBSTITUTION</strong> peut suffire — mais  <strong>penser à la règle de COMPOSITION</strong></td>
+</tr>
+<tr>
+<td>Plus de deux variables, plusieurs contraintes</td>
+<td><strong>(A2.13)</strong></td>
+<td> <strong>Un $\lambda_j$ par contrainte</strong>, $n+m$ équations</td>
+</tr>
+<tr>
+<td>« la solution existe-t-elle ? »</td>
+<td><strong>§A2.3.2</strong></td>
+<td> <strong>WEIERSTRASS</strong> : objectif continu $+$ ensemble de contrainte COMPACT</td>
+</tr>
+<tr>
+<td>« les multiplicateurs existent-ils ? »</td>
+<td><strong>Théorème A2.16</strong></td>
+<td> <strong>Les gradients $\nabla g^j$ doivent être LINÉAIREMENT INDÉPENDANTS</strong></td>
+</tr>
+<tr>
+<td>« interprétez graphiquement »</td>
+<td><strong>§A2.3.3</strong></td>
+<td> <strong>UN POINT DE TANGENCE</strong></td>
+</tr>
+<tr>
+<td>« max ou min ? » <em>(contraint)</em></td>
+<td><strong>Théorème A2.17/A2.18</strong></td>
+<td> <strong>La HESSIENNE BORDÉE — ATTENTION, LES SIGNES SONT INVERSÉS</strong></td>
+</tr>
+<tr>
+<td>« le TMS égale le rapport des prix »</td>
+<td><strong>(A2.19)</strong></td>
+<td>C'est <strong>la condition de tangence</strong></td>
+</tr>
+<tr>
+<td>« que vaut $\lambda$ ? »</td>
+<td><strong>§A2.3.2</strong></td>
+<td> <em>« seulement « INCIDENT » »</em> ici — <em>(son sens vient du théorème de l'enveloppe, §A2.4)</em></td>
+</tr>
+</tbody></table>
+<p><strong>Les trois réflexes de cadrage :</strong></p>
+<ol>
+<li><strong>Écrire le lagrangien avec un SIGNE MOINS devant chaque contrainte</strong>, et <strong>poser TOUTES les partielles à zéro</strong> —  <strong>y compris celles par rapport aux $\lambda_j$</strong>, qui restituent les contraintes.</li>
+<li><strong>Éliminer les $\lambda$ en divisant deux conditions.</strong>  C'est ce qui fait apparaître <strong>la condition de TANGENCE</strong> $f_1/f_2=g_1/g_2$, la forme économiquement lisible.</li>
+<li><strong>Devant les conditions du second ordre contraintes, MÉMORISER L'INVERSION DES SIGNES.</strong> <em>« Le signe de l'un sera TOUJOURS OPPOSÉ au signe de l'autre. »</em></li>
+</ol>
+<h2>Comment résoudre ce type d'exercice — les cinq méthodes</h2>
+<h3>Méthode 1 — La substitution</h3>
+<table>
+<thead>
+<tr>
+<th>Pas</th>
+<th>L'action</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>1</strong></td>
+<td><strong>Isoler une variable</strong> dans la contrainte : $x_2=\tilde{g}(x_1)$</td>
+</tr>
+<tr>
+<td><strong>2</strong></td>
+<td><strong>La substituer dans l'objectif</strong> ⟹ un problème <strong>SANS contrainte</strong> à une variable</td>
+</tr>
+<tr>
+<td><strong>3</strong></td>
+<td> <strong>Dériver EN UTILISANT LA RÈGLE DE COMPOSITION</strong> — $x_1$ agit <strong>directement ET indirectement</strong></td>
+</tr>
+<tr>
+<td><strong>4</strong></td>
+<td><strong>Résoudre pour $x_1^*$, puis retrouver $x_2^*=\tilde{g}(x_1^*)$</strong></td>
+</tr>
+<tr>
+<td><strong>5</strong></td>
+<td> <strong>Ne pas oublier la condition du second ordre</strong></td>
+</tr>
+</tbody></table>
+<h3>Méthode 2 — La méthode de Lagrange, en cinq gestes</h3>
+<ol>
+<li><strong>Écrire la contrainte sous forme implicite</strong> $g(\mathbf{x})=0$.</li>
+<li><strong>Former</strong> $\ \mathcal{L}=f(\mathbf{x})-\sum_j\lambda_j g^j(\mathbf{x})$.</li>
+<li><strong>Poser les $n+m$ partielles égales à zéro.</strong></li>
+<li><strong>Résoudre le système</strong> —  <strong>souvent en DIVISANT deux conditions pour éliminer $\lambda$</strong>.</li>
+<li><strong>Reporter dans les contraintes</strong> pour achever la résolution, puis <strong>calculer la valeur optimale</strong>.</li>
+</ol>
+<h3>Méthode 3 — Trancher par la hessienne bordée (2 variables, 1 contrainte)</h3>
+<table>
+<thead>
+<tr>
+<th>Pas</th>
+<th>L'action</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>1</strong></td>
+<td><strong>Calculer $\mathcal{L}_{11}$, $\mathcal{L}_{12}$, $\mathcal{L}_{22}$</strong> —  <strong>ce sont les partielles du LAGRANGIEN, pas de $f$</strong> : $\mathcal{L}_{ij}=f_{ij}-\lambda g_{ij}$</td>
+</tr>
+<tr>
+<td><strong>2</strong></td>
+<td><strong>Calculer $g_1$ et $g_2$</strong></td>
+</tr>
+<tr>
+<td><strong>3</strong></td>
+<td><strong>Former $\bar{H}=\begin{pmatrix}0&amp;g_1&amp;g_2\\g_1&amp;\mathcal{L}_{11}&amp;\mathcal{L}_{12}\\g_2&amp;\mathcal{L}_{21}&amp;\mathcal{L}_{22}\end{pmatrix}$ et calculer $\bar{D}$</strong></td>
+</tr>
+<tr>
+<td><strong>4</strong></td>
+<td> <strong>$\bar{D}&gt;0$ ⟹ MAXIMUM · $\bar{D}&lt;0$ ⟹ MINIMUM</strong></td>
+</tr>
+</tbody></table>
+<h3>Méthode 4 — Le cas général</h3>
+<ol>
+<li><strong>Compter</strong> : $n$ variables, $m$ contraintes ⟹  <strong>$n-m$ mineurs à examiner</strong>.</li>
+<li><strong>Les former</strong> : $\bar{D}_k$ pour $k=m+1,\dots,n$ — du <strong>$(2m+1)$-ième</strong> au <strong>$(n+m)$-ième</strong> mineur principal de $\bar{H}$.</li>
+<li><strong>Lire le patron</strong> :</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th>Le patron</th>
+<th>La conclusion</th>
+</tr>
+</thead>
+<tbody><tr>
+<td> <strong>Alternent DÈS POSITIF</strong> : $\bar{D}_{m+1}&gt;0$, $\bar{D}_{m+2}&lt;0$, …</td>
+<td><strong>MAXIMUM local</strong></td>
+</tr>
+<tr>
+<td> <strong>TOUS NÉGATIFS</strong></td>
+<td><strong>MINIMUM local</strong></td>
+</tr>
+</tbody></table>
+<h3>Méthode 5 — Lire économiquement la condition de tangence</h3>
+<p>$$\underbrace{\frac{f_1(\mathbf{x}^*)}{f_2(\mathbf{x}^*)}}_{\textbf{le TAUX MARGINAL DE SUBSTITUTION}}=\underbrace{\frac{g_1(\mathbf{x}^*)}{g_2(\mathbf{x}^*)}}_{\textbf{la PENTE de la contrainte}}$$</p>
+<p class="cal piege"> <strong>Dans le programme du consommateur</strong> <em>(contrainte $p_1x_1+p_2x_2-y=0$)</em>, $g_1/g_2=p_1/p_2$ ⟹ <strong>le TMS égale le rapport des prix</strong>. <strong>C'est le même calcul, écrit en langage économique.</strong></p>
+<h2>L'exercice A2.25 du livre</h2>
+<blockquote>
+<p class="cal piege"> <strong>Le livre NE FOURNIT PAS de corrigé.</strong> L'énoncé est <strong>celui de Jehle &amp; Reny</strong> ; <strong>les résolutions sont un ENRICHISSEMENT PÉDAGOGIQUE.</strong></p>
+</blockquote>
+<blockquote>
+<p><em>« <strong>Résolvez les problèmes suivants. INDIQUEZ LA VALEUR OPTIMISÉE DE LA FONCTION à la solution.</strong> »</em></p>
+</blockquote>
+<details class="cor">
+<summary><strong>(a) $\min\ x_1^2+x_2^2$ sous contrainte $x_1x_2=1$</strong></summary><div class="in">
+
+<p>$\mathcal{L}=x_1^2+x_2^2-\lambda(x_1x_2-1)$ ⟹ $\ 2x_1-\lambda x_2=0$, $\ 2x_2-\lambda x_1=0$, $\ x_1x_2=1$.</p>
+<p class="cal piege"> <strong>En multipliant les deux premières</strong> : $\ 4x_1x_2=\lambda^2x_1x_2$ ⟹ <strong>$\lambda^2=4$</strong> ⟹ $\lambda=\pm2$.</p>
+<table>
+<thead>
+<tr>
+<th>$\lambda$</th>
+<th>La conséquence</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$+2$</td>
+<td>$x_1=x_2$ ⟹ $x_1^2=1$ ⟹  <strong>$(1,1)$ et $(-1,-1)$</strong></td>
+</tr>
+<tr>
+<td>$-2$</td>
+<td>$x_1=-x_2$ ⟹ $-x_1^2=1$  <strong>impossible en réels</strong></td>
+</tr>
+</tbody></table>
+<p>$$\boxed{\;\text{La valeur minimale est } \ 1^2+1^2=\mathbf{2}\;}$$</p>
+</div></details>
+
+<details class="cor">
+<summary><strong>(b) $\min\ x_1x_2$ sous contrainte $x_1^2+x_2^2=1$</strong></summary><div class="in">
+
+<p>$\mathcal{L}=x_1x_2-\lambda(x_1^2+x_2^2-1)$ ⟹ $\ x_2=2\lambda x_1$, $\ x_1=2\lambda x_2$ ⟹ $x_1=4\lambda^2x_1$ ⟹  <strong>$\lambda=\pm\tfrac12$</strong>.</p>
+<table>
+<thead>
+<tr>
+<th>$\lambda$</th>
+<th>Le point</th>
+<th>La valeur</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$+\tfrac12$</td>
+<td>$x_2=x_1=\pm\tfrac{1}{\sqrt2}$</td>
+<td>$x_1x_2=+\tfrac12$</td>
+</tr>
+<tr>
+<td> $-\tfrac12$</td>
+<td>$x_2=-x_1$, $x_1=\pm\tfrac{1}{\sqrt2}$</td>
+<td> $x_1x_2=-\tfrac12$</td>
+</tr>
+</tbody></table>
+<p>$$\boxed{\;\text{La valeur MINIMALE est } \ \mathbf{-\tfrac12}, \text{ atteinte en } \left(\tfrac{1}{\sqrt2},-\tfrac{1}{\sqrt2}\right) \text{ et } \left(-\tfrac{1}{\sqrt2},\tfrac{1}{\sqrt2}\right)\;}$$</p>
+<p class="cal piege"> <strong>Les DEUX valeurs de $\lambda$ correspondent l'une au MAXIMUM, l'autre au MINIMUM</strong> — c'est l'illustration parfaite de <em>« à partir des seules conditions du premier ordre, nous sommes incapables de dire »</em>.</p>
+</div></details>
+
+<details class="cor">
+<summary><strong>(c) $\max\ x_1x_2^2$ sous contrainte $\dfrac{x_1^2}{a^2}+\dfrac{x_2^2}{b^2}=1$</strong></summary><div class="in">
+
+<p>$\mathcal{L}=x_1x_2^2-\lambda\left(\dfrac{x_1^2}{a^2}+\dfrac{x_2^2}{b^2}-1\right)$ ⟹</p>
+<p>$$x_2^2-\frac{2\lambda x_1}{a^2}=0 \qquad\qquad 2x_1x_2-\frac{2\lambda x_2}{b^2}=0$$</p>
+<p><strong>La seconde se factorise</strong> : $\ 2x_2\left(x_1-\dfrac{\lambda}{b^2}\right)=0$ ⟹  <strong>$x_2=0$</strong> <em>(objectif nul — écarté)</em> <strong>ou $\lambda=x_1b^2$</strong>.</p>
+<p><strong>Avec $\lambda=x_1b^2$</strong>, la première donne $\ x_2^2=\dfrac{2x_1^2b^2}{a^2}$. <strong>En reportant dans la contrainte</strong> :</p>
+<p>$$\frac{x_1^2}{a^2}+\frac{2x_1^2}{a^2}=1 \ \Longrightarrow\ \frac{3x_1^2}{a^2}=1 \ \Longrightarrow\ x_1^*=\frac{a}{\sqrt3},\qquad x_2^{*2}=\frac{2b^2}{3}$$</p>
+<p>$$\boxed{\;y^*=x_1^*\,x_2^{*2}=\frac{a}{\sqrt3}\cdot\frac{2b^2}{3}=\frac{2ab^2}{3\sqrt3}=\frac{2\sqrt3\,ab^2}{9}\;}$$</p>
+</div></details>
+
+<details class="cor">
+<summary><strong>(d) $\max\ x_1+x_2$ sous contrainte $x_1^4+x_2^4=1$</strong></summary><div class="in">
+
+<p>$\mathcal{L}=x_1+x_2-\lambda(x_1^4+x_2^4-1)$ ⟹ $\ 1-4\lambda x_1^3=0$ et $\ 1-4\lambda x_2^3=0$ ⟹  <strong>$x_1^3=x_2^3$ ⟹ $x_1=x_2$</strong>.</p>
+<p><strong>La contrainte</strong> : $\ 2x_1^4=1$ ⟹ $x_1=x_2=2^{-1/4}$.</p>
+<p>$$\boxed{\;y^*=2\cdot2^{-1/4}=2^{3/4}\approx1{,}682\;}$$</p>
+</div></details>
+
+<details class="cor">
+<summary><strong>(e) $\max\ x_1x_2^2x_3^3$ sous contrainte $x_1+x_2+x_3=1$</strong></summary><div class="in">
+
+<p>$\mathcal{L}=x_1x_2^2x_3^3-\lambda(x_1+x_2+x_3-1)$ ⟹</p>
+<p>$$x_2^2x_3^3=\lambda \qquad 2x_1x_2x_3^3=\lambda \qquad 3x_1x_2^2x_3^2=\lambda$$</p>
+<table>
+<thead>
+<tr>
+<th>La comparaison</th>
+<th>Le résultat</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>1ʳᵉ $=$ 2ᵉ</strong></td>
+<td>$x_2^2x_3^3=2x_1x_2x_3^3$ ⟹  <strong>$x_2=2x_1$</strong></td>
+</tr>
+<tr>
+<td><strong>1ʳᵉ $=$ 3ᵉ</strong></td>
+<td>$x_2^2x_3^3=3x_1x_2^2x_3^2$ ⟹  <strong>$x_3=3x_1$</strong></td>
+</tr>
+</tbody></table>
+<p><strong>La contrainte</strong> : $\ x_1+2x_1+3x_1=1$ ⟹ $\ 6x_1=1$ ⟹</p>
+<p>$$x_1^*=\frac16,\qquad x_2^*=\frac13,\qquad x_3^*=\frac12$$</p>
+<p>$$\boxed{\;y^*=\frac16\cdot\frac19\cdot\frac18=\frac{1}{432}\;}$$</p>
+<p class="cal piege"> <strong>Le patron est remarquable</strong> :  <strong>les parts optimales sont PROPORTIONNELLES AUX EXPOSANTS $(1,2,3)$</strong> — c'est exactement le résultat Cobb-Douglas familier du chapitre 1.</p>
+</div></details>
+
+<h2 data-prio="must">Common mistakes</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>L'erreur</th>
+<th>Pourquoi c'est faux</th>
+<th>Ce qu'il faut écrire</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>Croire que la contrainte est une simple gêne</td>
+<td> <em>« <strong>on pourrait DÉFINIR L'ÉCONOMIE comme l'étude du comportement FACE À LA RARETÉ</strong> »</em></td>
+<td>C'est <strong>le cœur du sujet</strong></td>
+</tr>
+<tr>
+<td>2</td>
+<td>Écrire la contrainte sous forme explicite</td>
+<td> Le livre l'écrit <strong>SOUS FORME IMPLICITE $g(x_1,x_2)=0$</strong></td>
+<td>Toute la méthode en dépend</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Confondre objectif et contrainte</td>
+<td> <strong>$f$ est la MAXIMANDE · $g$ délimite l'ENSEMBLE RÉALISABLE</strong></td>
+<td></td>
+</tr>
+<tr>
+<td>4</td>
+<td>Oublier la règle de composition dans la substitution</td>
+<td> <em>« <strong>$x_1$ influence $f$ DE DEUX FAÇONS : DIRECTEMENT et INDIRECTEMENT par $x_2$</strong> »</em></td>
+<td>$f_1+f_2\tfrac{d\tilde g}{dx_1}=0$</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Croire la substitution toujours applicable</td>
+<td> <em>« dans certains cas <strong>INUTILEMENT LOURDE</strong>, dans d'autres <strong>SIMPLEMENT IMPOSSIBLE</strong> »</em></td>
+<td></td>
+</tr>
+<tr>
+<td>6</td>
+<td>Écrire le lagrangien avec un $+$</td>
+<td> <strong>Le livre SOUSTRAIT</strong> : $\mathcal{L}=f-\lambda g$</td>
+<td><em>(Un $+$ marche aussi, mais change le signe de $\lambda$)</em></td>
+</tr>
+<tr>
+<td>7</td>
+<td>Oublier que $\lambda$ est une variable</td>
+<td> <em>« $\lambda$ est <strong>UNE VARIABLE À PART ENTIÈRE</strong> de la fonction »</em></td>
+<td>D'où <strong>$n+m$</strong> équations</td>
+</tr>
+<tr>
+<td>8</td>
+<td>Oublier la condition $\partial\mathcal{L}/\partial\lambda=0$</td>
+<td> <strong>C'est LA CONTRAINTE ELLE-MÊME</strong></td>
+<td>Sans elle, rien ne garantit la réalisabilité</td>
+</tr>
+<tr>
+<td>9</td>
+<td>Croire que le lagrangien est maximisé</td>
+<td> On cherche <strong>UN POINT CRITIQUE de $\mathcal{L}$</strong>, pas son maximum</td>
+<td><em>(En $\lambda$, c'est même un minimum)</em></td>
+</tr>
+<tr>
+<td>10</td>
+<td>Croire que les CPO donnent un maximum</td>
+<td> <em>« <strong>QUE ces points critiques soient des MAXIMA ou des MINIMA NE PEUT PAS ÊTRE DÉTERMINÉ à partir des SEULES conditions du premier ordre</strong> »</em></td>
+<td></td>
+</tr>
+<tr>
+<td>11</td>
+<td>Oublier pourquoi le terme en $d\lambda$ disparaît</td>
+<td> <strong>Parce que (A2.9) donne $g(x_1^*,x_2^*)=0$</strong></td>
+<td></td>
+</tr>
+<tr>
+<td>12</td>
+<td>Mal identifier les changements admissibles</td>
+<td> <em>« <strong>ceux qui NE CONDUISENT À AUCUN CHANGEMENT de la fonction de contrainte</strong> »</em>, soit $dg=0$</td>
+<td>(A2.12)</td>
+</tr>
+<tr>
+<td>13</td>
+<td>Croire $df=0$ pour TOUS les $dx_i$</td>
+<td> <strong>Seulement pour ceux qui SATISFONT LA CONTRAINTE</strong></td>
+<td></td>
+</tr>
+<tr>
+<td>14</td>
+<td>Utiliser plus de contraintes que de variables</td>
+<td> <em>« <strong>tant que le nombre de contraintes est INFÉRIEUR au nombre de variables</strong> »</em> — $m&lt;n$</td>
+<td></td>
+</tr>
+<tr>
+<td>15</td>
+<td>Utiliser le même $\lambda$ pour toutes les contraintes</td>
+<td> <strong>UN MULTIPLICATEUR DIFFÉRENT $\lambda_j$ par contrainte</strong></td>
+<td>(A2.14)</td>
+</tr>
+<tr>
+<td>16</td>
+<td>Croire que l'existence de la solution va de soi</td>
+<td> <strong>Il faut WEIERSTRASS</strong> : objectif continu $+$ ensemble de contrainte <strong>COMPACT</strong></td>
+<td>Thm A1.10</td>
+</tr>
+<tr>
+<td>17</td>
+<td>Croire que les multiplicateurs existent toujours</td>
+<td> <em>« <strong>comment savons-nous qu'ils EXISTENT MÊME ?</strong> »</em></td>
+<td>Il faut <strong>le théorème A2.16</strong></td>
+</tr>
+<tr>
+<td>18</td>
+<td>Oublier la qualification des contraintes</td>
+<td> <strong>Les $\nabla g^j(\mathbf{x}^*)$ doivent être LINÉAIREMENT INDÉPENDANTS</strong></td>
+<td></td>
+</tr>
+<tr>
+<td>19</td>
+<td>Croire qu'une seule partielle nulle suffit à ruiner Lagrange</td>
+<td> <strong>Il faut qu'AU MOINS UNE soit NON nulle</strong> — ce sont <strong>toutes</strong> qui doivent s'annuler pour poser problème</td>
+<td>Cas à 2 variables</td>
+</tr>
+<tr>
+<td>20</td>
+<td>Se tromper de signe dans (A2.17)</td>
+<td> <strong>La pente est $(-1)\,f_1/f_2$</strong></td>
+<td></td>
+</tr>
+<tr>
+<td>21</td>
+<td>Oublier pourquoi la différentielle vaut zéro</td>
+<td> <strong>La différentielle totale d'une CONSTANTE est NULLE</strong></td>
+<td>(A2.16) et (A2.18)</td>
+</tr>
+<tr>
+<td>22</td>
+<td>Diviser par $\lambda^*$ sans précaution</td>
+<td> <strong>Le livre suppose explicitement $\lambda^*\neq0$</strong></td>
+<td></td>
+</tr>
+<tr>
+<td>23</td>
+<td>Ne retenir que l'égalité des pentes</td>
+<td> <strong>Il faut AUSSI être SUR la contrainte</strong> <em>(A2.20)</em></td>
+<td><em>« Ce n'est pas tout, cependant »</em></td>
+</tr>
+<tr>
+<td>24</td>
+<td>Croire que $\lambda$ est un artefact inutile</td>
+<td> Ici <em>« seulement <strong>INCIDENT</strong> »</em> — mais <strong>le théorème de l'enveloppe lui donnera un sens économique</strong></td>
+<td>§A2.4</td>
+</tr>
+<tr>
+<td>25</td>
+<td>Appliquer les SOC non contraintes à $\mathcal{L}$</td>
+<td> <em>« <strong>une exigence BEAUCOUP PLUS STRINGENTE que ce dont nous avons réellement besoin</strong> »</em></td>
+<td>Il faut <strong>réduire la dimensionnalité</strong></td>
+</tr>
+<tr>
+<td>26</td>
+<td>Oublier que $x_2$ dépend de $x_1$ dans (A2.23)</td>
+<td> <em>« <strong>les $f_i$ et les $g_i$ dépendent tous de $x_1$ À LA FOIS DIRECTEMENT ET par son influence sur $x_2$</strong> »</em></td>
+<td></td>
+</tr>
+<tr>
+<td>27</td>
+<td>Utiliser $f_{ij}$ au lieu de $\mathcal{L}_{ij}$</td>
+<td> $\mathcal{L}_{ij}=f_{ij}-\lambda g_{ij}$</td>
+<td>(A2.25)</td>
+</tr>
+<tr>
+<td>28</td>
+<td>Border la hessienne par les mauvaises quantités</td>
+<td> <strong>Par les PARTIELLES PREMIÈRES DE LA CONTRAINTE et un ZÉRO</strong></td>
+<td></td>
+</tr>
+<tr>
+<td>29</td>
+<td>Confondre avec la bordée d'Arrow-Enthoven</td>
+<td> <strong>Celle-là borde $f$ par SES PROPRES partielles</strong> <em>(test de QUASICONCAVITÉ, exercice A2.18)</em></td>
+<td>Deux objets distincts</td>
+</tr>
+<tr>
+<td>30</td>
+<td>Oublier le $(-1)$ de (A2.27)</td>
+<td> <em>« <strong>LE SIGNE DE L'UN SERA TOUJOURS OPPOSÉ AU SIGNE DE L'AUTRE</strong> »</em></td>
+<td>C'est <strong>la source de tous les pièges de signe</strong></td>
+</tr>
+<tr>
+<td>31</td>
+<td>Croire que $\bar{D}&lt;0$ signale un maximum</td>
+<td> <strong>NON — $\bar{D}&gt;0$ ⟹ MAXIMUM</strong></td>
+<td>Thm A2.17</td>
+</tr>
+<tr>
+<td>32</td>
+<td>Oublier l'hypothèse $g_2\neq0$</td>
+<td> <strong>La formule (A2.27) divise par $(g_2)^2$</strong></td>
+<td></td>
+</tr>
+<tr>
+<td>33</td>
+<td>Regarder tous les mineurs bordés</td>
+<td> <strong>Seulement les $n-m$ qui vont du $(2m+1)$-ième au $(n+m)$-ième</strong></td>
+<td>(A2.29)</td>
+</tr>
+<tr>
+<td>34</td>
+<td>Compter le mauvais nombre de mineurs</td>
+<td> <strong>$n-m$</strong>, autant que de degrés de liberté restants</td>
+<td></td>
+</tr>
+<tr>
+<td>35</td>
+<td>Inverser les patrons du théorème A2.18</td>
+<td> <strong>MAX : alternent DÈS POSITIF · MIN : TOUS NÉGATIFS</strong></td>
+<td><strong>L'inverse du cas non contraint</strong></td>
+</tr>
+<tr>
+<td>36</td>
+<td>Croire que les mineurs bordés commencent à $\bar{D}_1$</td>
+<td> <strong>Ils commencent à $\bar{D}_{m+1}$</strong></td>
+<td></td>
+</tr>
+<tr>
+<td>37</td>
+<td>Oublier de vérifier les deux racines de $\lambda$</td>
+<td> <strong>Les deux valeurs correspondent souvent l'une au MAX, l'autre au MIN</strong></td>
+<td>Exercice A2.25(b)</td>
+</tr>
+<tr>
+<td>38</td>
+<td>Oublier les solutions de bord dans les factorisations</td>
+<td> $2x_2(x_1-\lambda/b^2)=0$ <strong>a DEUX branches</strong></td>
+<td>Exercice A2.25(c)</td>
+</tr>
+<tr>
+<td>39</td>
+<td>Croire qu'une contrainte d'égalité peut être ignorée</td>
+<td> <strong>Elle lie les variables — c'est exactement ce qu'exploite la réduction de dimensionnalité</strong></td>
+<td></td>
+</tr>
+<tr>
+<td>40</td>
+<td>Confondre $\bar{D}$ et $D$</td>
+<td> <strong>$\bar{D}$ est BORDÉ, $D$ ne l'est pas</strong> — et <strong>leurs règles de signe sont OPPOSÉES</strong></td>
+<td></td>
+</tr>
+</tbody></table>
+<h2>Ultimate Review</h2>
+<p><strong>§A2.3 — POURQUOI DES CONTRAINTES.</strong></p>
+<p class="cal piege"> <em>« <strong>LA RARETÉ est un fait OMNIPRÉSENT — on pourrait même DÉFINIR L'ÉCONOMIE comme L'ÉTUDE DU COMPORTEMENT FACE À LA RARETÉ.</strong> »</em> <strong>Trois types</strong> : <strong>égalité · non-négativité · inégalité quelconque</strong>.</p>
+<p><strong>§A2.3.1 — LE PROBLÈME.</strong></p>
+<p>$$\max_{x_1,x_2}\ f(x_1,x_2) \qquad\text{s.c.}\qquad g(x_1,x_2)=0 \tag{A2.4}$$</p>
+<p><strong>$f$ = OBJECTIF/MAXIMANDE · $x_i$ = VARIABLES DE CHOIX · $g$ = CONTRAINTE · l'ensemble admissible = ENSEMBLE RÉALISABLE.</strong></p>
+<p><strong>LA SUBSTITUTION</strong> : isoler $x_2=\tilde{g}(x_1)$, puis $\max_{x_1}f(x_1,\tilde{g}(x_1))$ —  <strong>en N'OUBLIANT PAS LA RÈGLE DE COMPOSITION</strong> <em>(« $x_1$ influence $f$ DE DEUX FAÇONS »)</em>.  <strong>Elle échoue dès que la contrainte est compliquée, ou qu'il y a plus de deux variables ou plus d'une contrainte.</strong></p>
+<p><strong>§A2.3.2 — LAGRANGE.</strong></p>
+<p>$$\boxed{\;\textbf{« Il existe TOUJOURS UN PROBLÈME SANS CONTRAINTE que nous pouvons résoudre}\\\textbf{avec nos méthodes habituelles ET QUI NOUS DONNE, COMME SOUS-PRODUIT,}\\\textbf{LA SOLUTION QUE NOUS CHERCHONS. »}\;}$$</p>
+<p>$$\mathcal{L}(x_1,x_2,\lambda)\equiv f(x_1,x_2)-\lambda\,g(x_1,x_2)$$</p>
+<p>$$f_1-\lambda^*g_1=0 \quad\text{(A2.7)} \qquad f_2-\lambda^*g_2=0 \quad\text{(A2.8)} \qquad \underbrace{-g(x_1^*,x_2^*)=0}_{\ \textbf{LA CONTRAINTE}} \quad\text{(A2.9)}$$</p>
+<p><strong>L'ARGUMENT DE PLAUSIBILITÉ</strong> : $d\mathcal{L}=0$ <strong>(A2.10)</strong> ⟹  <strong>le terme en $d\lambda$ disparaît par (A2.9)</strong> ⟹ <strong>(A2.11)</strong> ; les <strong>changements ADMISSIBLES</strong> sont ceux avec $dg=0$ <strong>(A2.12)</strong> ⟹  <strong>le terme en $\lambda^*$ disparaît aussi</strong> ⟹ $df=0$ le long de la contrainte.</p>
+<p class="cal piege"> <em>« <strong>QUE ces points critiques soient des maxima ou des minima NE PEUT PAS être déterminé à partir des SEULES conditions du premier ordre.</strong> »</em></p>
+<p><strong>LE CAS GÉNÉRAL</strong> <em>($n$ variables, $m&lt;n$ contraintes)</em> :</p>
+<p>$$\mathcal{L}(\mathbf{x},\boldsymbol{\lambda})=f(\mathbf{x})-\sum_{j=1}^{m}\lambda_j g^j(\mathbf{x}) \tag{A2.14}$$</p>
+<p>⟹ <strong>un système de $n+m$ équations</strong> <em>(A2.15)</em>.</p>
+<p><strong>LES DEUX QUESTIONS OUVERTES</strong> :  <strong>l'EXISTENCE de l'optimum</strong> <em>(⟹ <strong>WEIERSTRASS</strong> : continu $+$ compact)</em> et  <strong>l'EXISTENCE des multiplicateurs</strong>.</p>
+<p><strong>THÉORÈME A2.16 (LAGRANGE)</strong> :  <strong>si les $\nabla g^j(\mathbf{x}^*)$ sont LINÉAIREMENT INDÉPENDANTS</strong>, alors <strong>il existe $m$ nombres UNIQUES $\lambda_j^*$</strong> tels que $\partial\mathcal{L}/\partial x_i=0$.</p>
+<p><strong>§A2.3.3 — LA GÉOMÉTRIE.</strong></p>
+<p>$$\left.\frac{dx_2}{dx_1}\right|_{L(y^0)}=(-1)\frac{f_1}{f_2} \quad\text{(A2.17)} \qquad\qquad \left.\frac{dx_2}{dx_1}\right|_{g=0}=(-1)\frac{g_1}{g_2} \quad\text{(A2.18)}$$</p>
+<p><strong>En divisant (A2.7) par (A2.8)</strong> <em>(avec $\lambda^*\neq0$)</em> :</p>
+<p>$$\boxed{\;\frac{f_1(\mathbf{x}^*)}{f_2(\mathbf{x}^*)}=\frac{g_1(\mathbf{x}^*)}{g_2(\mathbf{x}^*)} \quad\text{(A2.19)} \qquad\qquad g(\mathbf{x}^*)=0 \quad\text{(A2.20)}\;}$$</p>
+<p class="cal piege"> <em>« Un point <strong>QUI EST SUR LA CONTRAINTE et OÙ LES PENTES SONT ÉGALES est, PAR DÉFINITION, UN POINT DE TANGENCE</strong> »</em>.</p>
+<p><strong>§A2.3.4 — LE SECOND ORDRE.</strong></p>
+<p class="cal piege"> <em>« Nous pouvons <strong>RÉDUIRE LA « DIMENSIONNALITÉ » des exigences de courbure EN EXPLOITANT L'INTERDÉPENDANCE entre les $x$ imposée par les contraintes</strong> »</em> — il suffit que <strong>la seconde différentielle soit décroissante LE LONG DE LA CONTRAINTE</strong>.</p>
+<p><em>La chaîne</em> : $\dfrac{dx_2}{dx_1}=-\dfrac{g_1}{g_2}$ <strong>(A2.21)</strong> ⟹ $\dfrac{dy}{dx_1}=f_1-f_2\dfrac{g_1}{g_2}$ <strong>(A2.22)</strong> ⟹ <strong>(A2.23)</strong> ⟹ <em>(via les CPO $f_i=\lambda g_i$, <strong>YOUNG</strong>, et (A2.21))</em> ⟹ <strong>(A2.24)</strong>, où  <strong>les crochets font apparaître $\mathcal{L}_{ij}=f_{ij}-\lambda g_{ij}$</strong> <strong>(A2.25)</strong>.</p>
+<p><strong>LA HESSIENNE BORDÉE</strong> — <em>« les partielles secondes de $\mathcal{L}$ <strong>BORDÉES par les partielles PREMIÈRES de la CONTRAINTE et UN ZÉRO</strong> »</em> :</p>
+<p>$$\bar{H}=\begin{pmatrix}0&amp;g_1&amp;g_2\\g_1&amp;\mathcal{L}_{11}&amp;\mathcal{L}_{12}\\g_2&amp;\mathcal{L}_{21}&amp;\mathcal{L}_{22}\end{pmatrix} \qquad\qquad \bar{D}=-\Big[\mathcal{L}_{11}g_2^2-2\mathcal{L}_{12}g_1g_2+\mathcal{L}_{22}g_1^2\Big] \tag{A2.26}$$</p>
+<p>$$\boxed{\;\frac{d^2y}{dx_1^2}=\frac{(-1)}{(g_2)^2}\,\bar{D} \tag{A2.27}\;}$$</p>
+<p class="cal piege"> <em>« <strong>LA PRUDENCE S'IMPOSE parce que LE SIGNE DE L'UN SERA TOUJOURS OPPOSÉ AU SIGNE DE L'AUTRE.</strong> »</em></p>
+<p><strong>THÉORÈME A2.17</strong> : $\ \bar{D}&gt;0$ ⟹  <strong>MAXIMUM local</strong> · $\ \bar{D}&lt;0$ ⟹ <strong>MINIMUM local</strong>.</p>
+<p><em>(<strong>Exemple A2.9</strong> : $\mathcal{L}_{11}=-2a$, $\mathcal{L}_{22}=-2b$, $\mathcal{L}_{12}=0$, $g_1=g_2=1$ ⟹ $\bar{D}=2(a+b)&gt;0$ ⟹ <strong>MAXIMUM</strong>,  <strong>et ce pour TOUTES les valeurs des variables</strong>.)</em></p>
+<p><strong>THÉORÈME A2.18</strong> — <strong>$n-m$ mineurs</strong> $\bar{D}_k$, $k=m+1,\dots,n$ <em>(du $(2m+1)$-ième au $(n+m)$-ième)</em> :</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Le patron</th>
+</tr>
+</thead>
+<tbody><tr>
+<td> <strong>MAXIMUM</strong></td>
+<td><strong>ALTERNENT en commençant par POSITIF</strong> : $\bar{D}_{m+1}&gt;0$, $\bar{D}_{m+2}&lt;0$, …</td>
+</tr>
+<tr>
+<td> <strong>MINIMUM</strong></td>
+<td><strong>TOUS NÉGATIFS</strong></td>
+</tr>
+</tbody></table>
+<p class="cal piege"> <strong>C'est L'INVERSE du cas non contraint</strong> <em>(où max ⟹ alternance dès NÉGATIF, min ⟹ tous POSITIFS)</em> — <strong>conséquence directe du $(-1)$ de (A2.27)</strong>.</p>
+<div class="rec"><h2>Active Recall</h2><details class="cor">
+<summary><strong>1.  Pourquoi l'économie impose-t-elle des contraintes ?</strong></summary><div class="in">
+
+<blockquote>
+<p><em>« <strong>LA RARETÉ est un fait OMNIPRÉSENT de la vie économique — ON POURRAIT MÊME DÉFINIR L'ÉCONOMIE COMME L'ÉTUDE DU COMPORTEMENT FACE À LA RARETÉ. La rareté s'exprime le plus communément comme DES CONTRAINTES sur les valeurs admissibles des variables économiques. Les agents sont alors représentés comme cherchant À FAIRE DE LEUR MIEUX À L'INTÉRIEUR DES CONTRAINTES QU'ILS AFFRONTENT.</strong> »</em></p>
+</blockquote>
+<p><strong>Les trois types</strong> : <strong>ÉGALITÉ · NON-NÉGATIVITÉ · INÉGALITÉ quelconque</strong>. <em>(Le livre se confine aux problèmes de MAXIMISATION.)</em></p>
+</div></details><details class="cor">
+<summary><strong>2. Écrire le problème (A2.4) et nommer chaque élément.</strong></summary><div class="in">
+
+<p>$$\max_{x_1,x_2}\ f(x_1,x_2)\qquad\text{s.c.}\qquad g(x_1,x_2)=0$$</p>
+<table>
+<thead>
+<tr>
+<th>L'élément</th>
+<th>Le nom</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$f$</td>
+<td> <strong>FONCTION OBJECTIF ou MAXIMANDE</strong></td>
+</tr>
+<tr>
+<td>$x_1,x_2$</td>
+<td><strong>VARIABLES DE CHOIX</strong> — <em>« écrites sous « max » pour <strong>nous rappeler que ce sont des valeurs de $x_1$ et $x_2$ que nous cherchons</strong> »</em></td>
+</tr>
+<tr>
+<td>$g$</td>
+<td><strong>LA CONTRAINTE</strong></td>
+</tr>
+<tr>
+<td>$\{(x_1,x_2)\mid g=0\}$</td>
+<td> <strong>L'ENSEMBLE DE CONTRAINTE ou ENSEMBLE RÉALISABLE</strong></td>
+</tr>
+</tbody></table>
+</div></details><details class="cor">
+<summary><strong>3.  Exposer la méthode de substitution et son piège.</strong></summary><div class="in">
+
+<p>Si $g=0$ permet d'écrire $x_2=\tilde{g}(x_1)$ <strong>(A2.5)</strong>, on substitue et on résout $\max_{x_1}f(x_1,\tilde{g}(x_1))$ <strong>(A2.6)</strong>, <strong>sans contrainte et avec une variable de moins</strong>.</p>
+<p class="cal piege"> <strong>LE PIÈGE</strong> : <em>« <strong>$x_1$ influence maintenant $f$ DE DEUX FAÇONS : « DIRECTEMENT » par sa propre position dans $f$, et « INDIRECTEMENT » par la position d'origine de $x_2$</strong> »</em> ⟹</p>
+<p>$$\frac{\partial f}{\partial x_1}+\underbrace{\frac{\partial f}{\partial x_2}\cdot\frac{d\tilde{g}}{dx_1}}_{\textbf{règle de COMPOSITION}}=0$$</p>
+</div></details><details class="cor">
+<summary><strong>4. Pourquoi la substitution ne suffit-elle pas ?</strong></summary><div class="in">
+
+<blockquote>
+<p><em>« <strong>IL EST FACILE D'IMAGINER DES CAS où la relation de contrainte est COMPLIQUÉE</strong> […] <strong>QUI PLUS EST, de nombreux problèmes intéressants impliquent PLUS DE DEUX variables et PLUS D'UNE contrainte.</strong> […] Dans certains cas, la substitution serait <strong>INUTILEMENT LOURDE</strong>. Dans d'autres, elle serait <strong>SIMPLEMENT IMPOSSIBLE</strong>. »</em></p>
+</blockquote>
+</div></details><details class="cor">
+<summary><strong>5.  Énoncer l'intuition de Lagrange.</strong></summary><div class="in">
+
+<blockquote>
+<p><em>« La méthode jaillit d'<strong>UNE QUESTION SIMPLE : COMMENT UTILISER CE QUE NOUS SAVONS DÉJÀ sur l'optimisation SANS contraintes pour résoudre les problèmes AVEC contraintes ?</strong> »</em></p>
+</blockquote>
+<blockquote>
+<p class="cal piege"> <em>« <strong>L'INTUITION DE LAGRANGE fut de voir qu'IL EXISTE TOUJOURS UN PROBLÈME SANS CONTRAINTE que nous pouvons résoudre avec nos méthodes habituelles ET QUI NOUS DONNE, COMME SOUS-PRODUIT, LA SOLUTION QUE NOUS CHERCHONS.</strong> »</em></p>
+</blockquote>
+</div></details><details class="cor">
+<summary><strong>6. Construire le lagrangien et écrire les trois CPO.</strong></summary><div class="in">
+
+<blockquote>
+<p><em>« Multiplions la contrainte par <strong>UNE NOUVELLE VARIABLE $\lambda$ QUE NOUS TIRONS SIMPLEMENT DU CHAPEAU parce qu'elle se révélera UTILE</strong>, et SOUSTRAYONS ce produit de la fonction objectif. »</em></p>
+</blockquote>
+<p>$$\mathcal{L}(x_1,x_2,\lambda)\equiv f(x_1,x_2)-\lambda g(x_1,x_2)$$</p>
+<p>$$f_1-\lambda^*g_1=0 \ \text{(A2.7)} \qquad f_2-\lambda^*g_2=0 \ \text{(A2.8)} \qquad -g(x_1^*,x_2^*)=0 \ \text{(A2.9)}$$</p>
+<p class="cal piege"> <strong>(A2.9) N'EST RIEN D'AUTRE QUE LA CONTRAINTE.</strong></p>
+</div></details><details class="cor">
+<summary><strong>7.  Reconstituer l'argument de plausibilité.</strong></summary><div class="in">
+
+<table>
+<thead>
+<tr>
+<th>Pas</th>
+<th>L'argument</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>1</strong></td>
+<td>$d\mathcal{L}=0$ en $(x_1^*,x_2^*,\lambda^*)$ <strong>pour tous $dx_1$, $dx_2$, $d\lambda$</strong> <strong>(A2.10)</strong></td>
+</tr>
+<tr>
+<td><strong>2</strong></td>
+<td> <strong>(A2.9) donne $g=0$</strong> ⟹ <strong>le terme en $d\lambda$ DISPARAÎT</strong> ⟹ <strong>(A2.11)</strong></td>
+</tr>
+<tr>
+<td><strong>3</strong></td>
+<td> Les changements <strong>ADMISSIBLES</strong> sont <em>« <strong>ceux qui NE CONDUISENT À AUCUN CHANGEMENT de la contrainte</strong> »</em>, soit $dg=g_1dx_1+g_2dx_2=0$ <strong>(A2.12)</strong></td>
+</tr>
+<tr>
+<td><strong>4</strong></td>
+<td>⟹  <strong>le terme multiplié par $\lambda^*$ DISPARAÎT AUSSI</strong></td>
+</tr>
+<tr>
+<td><strong>5</strong></td>
+<td>⟹ $f_1dx_1+f_2dx_2=0$ <strong>pour tous les changements admissibles</strong> </td>
+</tr>
+</tbody></table>
+<blockquote>
+<p class="cal piege"> <em>« <strong>La valeur de la fonction objectif NE PEUT ÊTRE NI AUGMENTÉE NI DIMINUÉE pour de petits changements QUI SATISFONT LA CONTRAINTE. Par conséquent, NOUS DEVONS ÊTRE À UN MAXIMUM OU À UN MINIMUM LE LONG DE LA CONTRAINTE.</strong> »</em></p>
+</blockquote>
+</div></details><details class="cor">
+<summary><strong>8. Refaire l'exemple A2.8.</strong></summary><div class="in">
+
+<p>$\max -ax_1^2-bx_2^2$ s.c. $x_1+x_2-1=0$, avec $a,b&gt;0$.</p>
+<p>$\mathcal{L}=-ax_1^2-bx_2^2-\lambda(x_1+x_2-1)$ ⟹ $-2ax_1-\lambda=0$, $-2bx_2-\lambda=0$, $x_1+x_2=1$.</p>
+<p><strong>(E.2) et (E.3)</strong> ⟹ $2ax_1=2bx_2$ ⟹ $x_1=\tfrac{b}{a}x_2$ <strong>(E.5)</strong> ⟹ <strong>en reportant dans la contrainte</strong> :</p>
+<p>$$\boxed{\;x_1^*=\frac{b}{a+b},\qquad x_2^*=\frac{a}{a+b},\qquad \lambda^*=\frac{-2ab}{a+b},\qquad y^*=\frac{-(ab^2+ba^2)}{(a+b)^2}\;}$$</p>
+<p class="cal piege"> <em>« <strong>SEULS $x_1$ et $x_2$ sont des solutions CANDIDATES. La valeur du multiplicateur n'est QU'« INCIDENT ».</strong> »</em></p>
+</div></details><details class="cor">
+<summary><strong>9. Écrire le lagrangien général et compter les équations.</strong></summary><div class="in">
+
+<p>$$\mathcal{L}(\mathbf{x},\boldsymbol{\lambda})=f(\mathbf{x})-\sum_{j=1}^{m}\lambda_j\,g^j(\mathbf{x}) \tag{A2.14}$$</p>
+<p class="cal piege"> <strong>UN MULTIPLICATEUR DIFFÉRENT PAR CONTRAINTE</strong> ⟹ <strong>$n+m$ variables</strong>, donc <strong>$n+m$ équations</strong> :</p>
+<p>$$\frac{\partial f}{\partial x_i}-\sum_j\lambda_j^*\frac{\partial g^j}{\partial x_i}=0\ (i=1,\dots,n) \qquad -g^j(\mathbf{x}^*)=0\ (j=1,\dots,m)$$</p>
+<p class="cal piege"> <strong>La méthode marche <em>« tant que LE NOMBRE DE CONTRAINTES EST INFÉRIEUR AU NOMBRE DE VARIABLES »</em></strong> — $m&lt;n$.</p>
+</div></details><details class="cor">
+<summary><strong>10.  Quelles sont les deux questions laissées ouvertes ?</strong></summary><div class="in">
+
+<blockquote>
+<p><em>« <strong>L'EXPOSÉ QUELQUE PEU DÉSINVOLTE donné ici PRÉSUPPOSE BEAUCOUP.</strong> »</em></p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>La question et sa réponse</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>1</strong></td>
+<td><strong>L'optimum EXISTE-t-il ?</strong>  <em>« si la fonction objectif est <strong>RÉELLE et CONTINUE</strong> et si <strong>l'ensemble de contrainte est COMPACT, nous sommes assurés PAR LE THÉORÈME DE WEIERSTRASS</strong> »</em></td>
+</tr>
+<tr>
+<td><strong>2</strong></td>
+<td><strong>Les multiplicateurs EXISTENT-ils ?</strong>  <em>« comment savons-nous que les multiplicateurs <strong>que nous venons de « TIRER DU CHAPEAU » EXISTENT MÊME</strong> ? »</em></td>
+</tr>
+</tbody></table>
+</div></details><details class="cor">
+<summary><strong>11.  Énoncer le théorème A2.16 et sa condition.</strong></summary><div class="in">
+
+<p>$f$ et les $g^j$ <strong>continûment différentiables</strong>, $\mathbf{x}^*$ <strong>intérieur</strong> et <strong>optimum de $f$ sous $g^j(\mathbf{x}^*)=0$</strong>.  <strong>Si les $\nabla g^j(\mathbf{x}^*)$ sont LINÉAIREMENT INDÉPENDANTS</strong>, alors <strong>il existe $m$ nombres UNIQUES $\lambda_j^*$</strong> avec $\partial\mathcal{L}(\mathbf{x}^*,\boldsymbol{\lambda}^*)/\partial x_i=0$.</p>
+<table>
+<thead>
+<tr>
+<th>Le cas</th>
+<th>La condition</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>2 variables, 1 contrainte</strong></td>
+<td> <em>« <strong>AU MOINS UNE des partielles de la contrainte STRICTEMENT NON NULLE</strong> »</em></td>
+</tr>
+<tr>
+<td><strong>Général</strong></td>
+<td> <strong>INDÉPENDANCE LINÉAIRE des $m$ gradients</strong></td>
+</tr>
+</tbody></table>
+<p><em>(La preuve <em>« exige des méthodes <strong>PLUS AVANCÉES</strong> »</em> et <strong>est omise</strong>.)</em></p>
+</div></details><details class="cor">
+<summary><strong>12. Dériver la pente d'un ensemble de niveau et de la contrainte.</strong></summary><div class="in">
+
+<p><strong>En différentiant totalement</strong> $f=y^0$ <em>( <strong>la différentielle de la constante $y^0$ est NULLE</strong>)</em> :</p>
+<p>$$f_1\,dx_1+f_2\,dx_2=0 \ \text{(A2.16)} \qquad\Longrightarrow\qquad \left.\frac{dx_2}{dx_1}\right|_{L(y^0)}=(-1)\frac{f_1}{f_2} \ \text{(A2.17)}$$</p>
+<p><strong>Le même calcul sur $g=0$</strong> —  <em>« nous pouvons penser <strong>LA CONTRAINTE, ELLE AUSSI, COMME UNE SORTE D'ENSEMBLE DE NIVEAU</strong> »</em> :</p>
+<p>$$\left.\frac{dx_2}{dx_1}\right|_{g=0}=(-1)\frac{g_1}{g_2} \tag{A2.18}$$</p>
+</div></details><details class="cor">
+<summary><strong>13.  Éliminer $\lambda$ et interpréter.</strong></summary><div class="in">
+
+<p>En réarrangeant les CPO : $f_1=\lambda^*g_1$, $f_2=\lambda^*g_2$.  <strong>En supposant $\lambda^*\neq0$ et en DIVISANT</strong> :</p>
+<p>$$\frac{f_1(\mathbf{x}^*)}{f_2(\mathbf{x}^*)}=\frac{g_1(\mathbf{x}^*)}{g_2(\mathbf{x}^*)} \ \text{(A2.19)} \qquad\qquad g(\mathbf{x}^*)=0 \ \text{(A2.20)}$$</p>
+<blockquote>
+<p class="cal piege"> <em>« Le membre de gauche est <strong>$-1$ fois LA PENTE du niveau de L'OBJECTIF</strong> ; le droit, <strong>$-1$ fois la pente du niveau de LA CONTRAINTE</strong>. […] <strong>CE N'EST PAS TOUT : (A2.20) nous dit que NOUS DEVONS AUSSI ÊTRE SUR le niveau de la contrainte.</strong> »</em></p>
+</blockquote>
+<p>$$\textbf{« Un point sur la contrainte où les pentes sont égales est, PAR DÉFINITION, UN POINT DE TANGENCE. »}$$</p>
+</div></details><details class="cor">
+<summary><strong>14.  Pourquoi RÉDUIRE la dimensionnalité au second ordre ?</strong></summary><div class="in">
+
+<blockquote>
+<p><em>« <strong>Au départ, on est TENTÉ de raisonner ainsi : si $(\mathbf{x}^*,\boldsymbol{\lambda}^*)$ satisfait les conditions du second ordre pour un maximum de la fonction NON CONTRAINTE $\mathcal{L}$, alors nous avons un maximum contraint. C'est UNE CONJECTURE CORRECTE, MAIS c'est une exigence BEAUCOUP PLUS STRINGENTE que ce dont nous avons RÉELLEMENT BESOIN.</strong> »</em></p>
+</blockquote>
+<blockquote>
+<p class="cal piege"> <em>« <strong>Nous pouvons RÉDUIRE LA « DIMENSIONNALITÉ » des exigences de courbure EN EXPLOITANT L'INTERDÉPENDANCE entre les $x$ imposée par les contraintes. […] Tout ce dont nous avons besoin est que LA SECONDE DIFFÉRENTIELLE DE L'OBJECTIF SOIT DÉCROISSANTE LE LONG DE LA CONTRAINTE.</strong> »</em></p>
+</blockquote>
+</div></details><details class="cor">
+<summary><strong>15. Dérouler la chaîne (A2.21) → (A2.24).</strong></summary><div class="in">
+
+<p><strong>Voir la contrainte comme l'identité $g(x_1,x_2(x_1))\equiv0$</strong> ⟹</p>
+<p>$$\frac{dx_2}{dx_1}=-\frac{g_1}{g_2} \ \text{(A2.21)} \qquad \frac{dy}{dx_1}=f_1-f_2\frac{g_1}{g_2} \ \text{(A2.22)}$$</p>
+<p><strong>En différentiant à nouveau</strong> *( <strong>les $f_i$ et $g_i$ dépendent de $x_1$ DIRECTEMENT ET par $x_2$</strong>)* on obtient <strong>(A2.23)</strong>, puis, en substituant  <strong>les CPO ($f_i=\lambda g_i$)</strong>,  <strong>YOUNG ($f_{12}=f_{21}$, $g_{12}=g_{21}$)</strong> et <strong>(A2.21)</strong> :</p>
+<p>$$\frac{d^2y}{dx_1^2}=\frac{1}{(g_2)^2}\Big[(f_{11}-\lambda g_{11})g_2^2-2(f_{12}-\lambda g_{12})g_1g_2+(f_{22}-\lambda g_{22})g_1^2\Big] \tag{A2.24}$$</p>
+</div></details><details class="cor">
+<summary><strong>16.  Reconnaître les $\mathcal{L}_{ij}$ et construire la hessienne bordée.</strong></summary><div class="in">
+
+<blockquote>
+<p><em>« <strong>Regardez ATTENTIVEMENT les termes impliquant $\lambda$ dans les crochets</strong> […] <strong>ce ne sont que LES PARTIELLES SECONDES DU LAGRANGIEN</strong> »</em> :</p>
+</blockquote>
+<p>$$\mathcal{L}_{11}=f_{11}-\lambda g_{11}\qquad \mathcal{L}_{12}=f_{12}-\lambda g_{12}\qquad \mathcal{L}_{22}=f_{22}-\lambda g_{22} \tag{A2.25}$$</p>
+<blockquote>
+<p class="cal piege"> <em>« <strong>À L'ŒIL EXERCÉ, l'expression QUADRATIQUE entre crochets peut être RECONNUE COMME LE DÉTERMINANT D'UNE MATRICE SYMÉTRIQUE.</strong> »</em></p>
+</blockquote>
+<p>$$\bar{H}=\begin{pmatrix}0&amp;g_1&amp;g_2\\g_1&amp;\mathcal{L}_{11}&amp;\mathcal{L}_{12}\\g_2&amp;\mathcal{L}_{21}&amp;\mathcal{L}_{22}\end{pmatrix} \qquad\qquad \bar{D}=-\big[\mathcal{L}_{11}g_2^2-2\mathcal{L}_{12}g_1g_2+\mathcal{L}_{22}g_1^2\big]$$</p>
+<p class="cal piege"> <strong>Elle est bordée par LES PARTIELLES PREMIÈRES DE LA CONTRAINTE ET UN ZÉRO.</strong></p>
+</div></details><details class="cor">
+<summary><strong>17.  Écrire la formule (A2.27) et son piège de signe.</strong></summary><div class="in">
+
+<p>$$\frac{d^2y}{dx_1^2}=\frac{(-1)}{(g_2)^2}\,\bar{D} \qquad\qquad (\text{en supposant } g_2\neq0)$$</p>
+<blockquote>
+<p class="cal piege"> <em>« <strong>LA PRUDENCE S'IMPOSE parce que LE SIGNE DE L'UN SERA TOUJOURS OPPOSÉ AU SIGNE DE L'AUTRE, puisque le déterminant est MULTIPLIÉ PAR $-1$.</strong> »</em></p>
+</blockquote>
+<p><strong>THÉORÈME A2.17</strong> : $\bar{D}&gt;0$ ⟹  <strong>MAXIMUM local</strong> · $\bar{D}&lt;0$ ⟹ <strong>MINIMUM local</strong>.</p>
+</div></details><details class="cor">
+<summary><strong>18. Refaire l'exemple A2.9.</strong></summary><div class="in">
+
+<p>Depuis l'exemple A2.8 : $\ \mathcal{L}_{11}=-2a$, $\mathcal{L}_{12}=\mathcal{L}_{21}=0$, $\mathcal{L}_{22}=-2b$, $g_1=g_2=1$.</p>
+<p>$$\bar{D}=\begin{vmatrix}0&amp;1&amp;1\\1&amp;-2a&amp;0\\1&amp;0&amp;-2b\end{vmatrix}=2(a+b)&gt;0$$</p>
+<blockquote>
+<p class="cal piege"> <em>« <strong>Parce qu'ici $\bar{D}&gt;0$ POUR TOUTES les valeurs de $x_1$, $x_2$ et $\lambda$, il doit en être ainsi À LA SOLUTION. La valeur de la fonction objectif doit donc être UN MAXIMUM SOUS LA CONTRAINTE.</strong> »</em> </p>
+</blockquote>
+</div></details><details class="cor">
+<summary><strong>19.  Construire la hessienne bordée générale et dire QUELS mineurs regarder.</strong></summary><div class="in">
+
+<blockquote>
+<p><em>« <strong>La HESSIENNE BORDÉE est formée EN BORDANT LA MATRICE DES PARTIELLES SECONDES DE $\mathcal{L}$ PAR TOUTES LES PARTIELLES PREMIÈRES DES CONTRAINTES ET ASSEZ DE ZÉROS pour former une matrice SYMÉTRIQUE.</strong> »</em> *(D'aspect <strong>« MONSTRUEUX »</strong>.)*</p>
+</blockquote>
+<blockquote>
+<p class="cal piege"> <em>« <strong>LES $n-m$ MINEURS PRINCIPAUX QUI NOUS INTÉRESSENT sont ceux qui commencent au $(2m+1)$-IÈME et finissent au $(n+m)$-IÈME, c'est-à-dire LE DÉTERMINANT DE $\bar{H}$ TOUT ENTIER.</strong> »</em></p>
+</blockquote>
+<p>$$\bar{D}_k,\qquad k=m+1,\dots,n \tag{A2.29}$$</p>
+<p class="cal piege"> <strong>Il y en a exactement $n-m$</strong> — le nombre de <strong>degrés de liberté restants</strong>.</p>
+</div></details><details class="cor">
+<summary><strong>20.  Énoncer le théorème A2.18 et le comparer au cas non contraint.</strong></summary><div class="in">
+
+<p><strong>1.</strong> <strong>MAXIMUM local</strong> si les $n-m$ mineurs  <strong>ALTERNENT EN SIGNE EN COMMENÇANT PAR POSITIF</strong> : $\bar{D}_{m+1}&gt;0$, $\bar{D}_{m+2}&lt;0$, …
+<strong>2.</strong> <strong>MINIMUM local</strong> si  <strong>ils sont TOUS NÉGATIFS</strong>.</p>
+<table>
+<thead>
+<tr>
+<th>Le cas</th>
+<th>MAXIMUM</th>
+<th>MINIMUM</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>NON CONTRAINT</strong> <em>(thm A2.12)</em></td>
+<td>alternent dès <strong>NÉGATIF</strong></td>
+<td>tous <strong>POSITIFS</strong></td>
+</tr>
+<tr>
+<td> <strong>CONTRAINT</strong> <em>(thm A2.18)</em></td>
+<td> alternent dès <strong>POSITIF</strong></td>
+<td> tous <strong>NÉGATIFS</strong></td>
+</tr>
+</tbody></table>
+<p class="cal piege"> <strong>TOUT EST INVERSÉ — conséquence du $(-1)$ de (A2.27).</strong></p>
+<p><em>(Vérification : pour $n=2$, $m=1$, il n'y a <strong>qu'un</strong> mineur, $\bar{D}_2=\bar{D}$, et la condition « $&gt;0$ » <strong>redonne exactement le théorème A2.17</strong>.)</em></p>
+</div></details></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h2>Flashcards</h2>
+<table>
+<thead>
+<tr>
+<th>Question</th>
+<th>Réponse</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Comment le livre définit-il l'économie ?</td>
+<td> <em>« <strong>l'étude du comportement FACE À LA RARETÉ</strong> »</em></td>
+</tr>
+<tr>
+<td>Les trois types de contraintes ?</td>
+<td><strong>Égalité · non-négativité · inégalité quelconque</strong></td>
+</tr>
+<tr>
+<td>La forme du problème (A2.4) ?</td>
+<td>$\max f(x_1,x_2)$ s.c.  <strong>$g(x_1,x_2)=0$ (forme IMPLICITE)</strong></td>
+</tr>
+<tr>
+<td>$f$ s'appelle ?</td>
+<td> <strong>La MAXIMANDE</strong></td>
+</tr>
+<tr>
+<td>L'ensemble admissible ?</td>
+<td> <strong>L'ENSEMBLE RÉALISABLE</strong></td>
+</tr>
+<tr>
+<td>La méthode de substitution ?</td>
+<td>Isoler $x_2=\tilde{g}(x_1)$ puis maximiser <strong>sans contrainte</strong></td>
+</tr>
+<tr>
+<td> Son piège ?</td>
+<td> <strong>La RÈGLE DE COMPOSITION</strong> — $x_1$ agit <strong>deux fois</strong></td>
+</tr>
+<tr>
+<td>Ses limites ?</td>
+<td> <em>« <strong>inutilement lourde</strong> ou <strong>simplement IMPOSSIBLE</strong> »</em></td>
+</tr>
+<tr>
+<td> L'intuition de Lagrange ?</td>
+<td> <em>« il existe <strong>TOUJOURS un problème SANS contrainte</strong> qui donne la solution <strong>COMME SOUS-PRODUIT</strong> »</em></td>
+</tr>
+<tr>
+<td>Le lagrangien ?</td>
+<td>$\mathcal{L}=f-\lambda g$</td>
+</tr>
+<tr>
+<td>D'où vient $\lambda$ ?</td>
+<td> <em>« <strong>tirée du chapeau parce qu'elle se révélera UTILE</strong> »</em></td>
+</tr>
+<tr>
+<td>Combien de variables a $\mathcal{L}$ ?</td>
+<td> <strong>TROIS</strong> <em>(dans le cas simple)</em></td>
+</tr>
+<tr>
+<td> Que dit (A2.9) ?</td>
+<td> <strong>LA CONTRAINTE ELLE-MÊME</strong></td>
+</tr>
+<tr>
+<td>Pourquoi le terme en $d\lambda$ disparaît-il ?</td>
+<td> <strong>Parce que $g(x_1^*,x_2^*)=0$</strong></td>
+</tr>
+<tr>
+<td>Les changements ADMISSIBLES ?</td>
+<td> <strong>Ceux avec $dg=0$</strong></td>
+</tr>
+<tr>
+<td>Ce que les CPO ne disent PAS ?</td>
+<td> <strong>Si c'est un MAX ou un MIN</strong></td>
+</tr>
+<tr>
+<td>Le lagrangien général ?</td>
+<td>$f(\mathbf{x})-\sum_j\lambda_j g^j(\mathbf{x})$</td>
+</tr>
+<tr>
+<td>Combien de multiplicateurs ?</td>
+<td> <strong>UN PAR CONTRAINTE</strong></td>
+</tr>
+<tr>
+<td>Combien d'équations ?</td>
+<td> <strong>$n+m$</strong></td>
+</tr>
+<tr>
+<td>La condition sur $m$ ?</td>
+<td> <strong>$m&lt;n$</strong></td>
+</tr>
+<tr>
+<td>Qui garantit l'existence de l'optimum ?</td>
+<td> <strong>WEIERSTRASS</strong> <em>(continu $+$ compact)</em></td>
+</tr>
+<tr>
+<td>Théorème A2.16 ?</td>
+<td> <strong>Gradients LINÉAIREMENT INDÉPENDANTS ⟹ $\lambda_j^*$ existent et sont UNIQUES</strong></td>
+</tr>
+<tr>
+<td>Le cas 2 variables, 1 contrainte ?</td>
+<td> <strong>Au moins une partielle de $g$ non nulle</strong></td>
+</tr>
+<tr>
+<td>La preuve du théorème A2.16 ?</td>
+<td> <strong>OMISE</strong> — <em>« méthodes plus avancées »</em></td>
+</tr>
+<tr>
+<td>Pente d'un ensemble de niveau ?</td>
+<td>$(-1)f_1/f_2$</td>
+</tr>
+<tr>
+<td>Pente de la contrainte ?</td>
+<td>$(-1)g_1/g_2$</td>
+</tr>
+<tr>
+<td>Pourquoi la différentielle vaut 0 ?</td>
+<td> <strong>La différentielle d'une CONSTANTE est nulle</strong></td>
+</tr>
+<tr>
+<td> Ce que disent (A2.19)-(A2.20) ?</td>
+<td> <strong>UN POINT DE TANGENCE</strong></td>
+</tr>
+<tr>
+<td>L'hypothèse pour diviser ?</td>
+<td> <strong>$\lambda^*\neq0$</strong></td>
+</tr>
+<tr>
+<td>Le statut de $\lambda$ ici ?</td>
+<td> <em>« <strong>seulement INCIDENT</strong> »</em></td>
+</tr>
+<tr>
+<td>Pourquoi ne pas appliquer les SOC à $\mathcal{L}$ ?</td>
+<td> <em>« <strong>BEAUCOUP PLUS STRINGENT</strong> que nécessaire »</em></td>
+</tr>
+<tr>
+<td>Ce qu'on exploite à la place ?</td>
+<td> <strong>L'INTERDÉPENDANCE entre les $x$ imposée par la contrainte</strong></td>
+</tr>
+<tr>
+<td>Ce qu'il faut vraiment ?</td>
+<td> <strong>Que la seconde différentielle décroisse LE LONG DE LA CONTRAINTE</strong></td>
+</tr>
+<tr>
+<td>$dx_2/dx_1$ le long de $g$ ?</td>
+<td>$-g_1/g_2$</td>
+</tr>
+<tr>
+<td>$dy/dx_1$ ?</td>
+<td>$f_1-f_2\,g_1/g_2$</td>
+</tr>
+<tr>
+<td>Les trois substitutions de (A2.24) ?</td>
+<td> <strong>Les CPO · YOUNG · (A2.21)</strong></td>
+</tr>
+<tr>
+<td>$\mathcal{L}_{11}$ ?</td>
+<td> <strong>$f_{11}-\lambda g_{11}$</strong></td>
+</tr>
+<tr>
+<td>La hessienne bordée ?</td>
+<td> <strong>$\mathcal{L}_{ij}$ bordées par $g_1,g_2$ et un ZÉRO</strong></td>
+</tr>
+<tr>
+<td> La formule (A2.27) ?</td>
+<td> $\dfrac{d^2y}{dx_1^2}=\dfrac{(-1)}{(g_2)^2}\bar{D}$</td>
+</tr>
+<tr>
+<td>Sa conséquence ?</td>
+<td> <strong>LES SIGNES SONT TOUJOURS OPPOSÉS</strong></td>
+</tr>
+<tr>
+<td>Théorème A2.17, $\bar{D}&gt;0$ ?</td>
+<td> <strong>MAXIMUM local</strong></td>
+</tr>
+<tr>
+<td>$\bar{D}&lt;0$ ?</td>
+<td><strong>MINIMUM local</strong></td>
+</tr>
+<tr>
+<td>L'hypothèse cachée ?</td>
+<td> <strong>$g_2\neq0$</strong></td>
+</tr>
+<tr>
+<td>$\bar{D}$ de l'exemple A2.9 ?</td>
+<td> <strong>$2(a+b)&gt;0$ ⟹ MAXIMUM</strong></td>
+</tr>
+<tr>
+<td>Combien de mineurs bordés examiner ?</td>
+<td> <strong>$n-m$</strong></td>
+</tr>
+<tr>
+<td>Du quel au quel ?</td>
+<td> <strong>Du $(2m+1)$-ième au $(n+m)$-ième</strong></td>
+</tr>
+<tr>
+<td>Théorème A2.18, MAXIMUM ?</td>
+<td> <strong>Alternent en commençant par POSITIF</strong></td>
+</tr>
+<tr>
+<td>MINIMUM ?</td>
+<td> <strong>TOUS NÉGATIFS</strong></td>
+</tr>
+<tr>
+<td> Comparé au cas non contraint ?</td>
+<td> <strong>TOUT EST INVERSÉ</strong></td>
+</tr>
+<tr>
+<td>La solution de A2.25(e) ?</td>
+<td> $\left(\tfrac16,\tfrac13,\tfrac12\right)$, $y^*=\tfrac{1}{432}$</td>
+</tr>
+<tr>
+<td>Le patron qu'elle révèle ?</td>
+<td> <strong>Les parts sont PROPORTIONNELLES AUX EXPOSANTS</strong></td>
+</tr>
+<tr>
+<td>Ce que révèlent les deux $\lambda$ de A2.25(b) ?</td>
+<td> <strong>L'un donne le MAX, l'autre le MIN</strong></td>
+</tr>
+</tbody></table>
+</main>
+
+
+
+
+</body></html>

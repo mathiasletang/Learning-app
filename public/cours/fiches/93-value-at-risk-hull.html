@@ -1,0 +1,2188 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fiche 93 — Value at Risk : simulation historique, modèle linéaire, modèle quadratique, ACP</title>
+<script>
+window.MathJax={tex:{inlineMath:[["$","$"]],displayMath:[["$$","$$"]],processEscapes:true},
+ options:{skipHtmlTags:["script","noscript","style","textarea","pre","code"]},
+ svg:{fontCache:"global"},
+ startup:{pageReady:()=>MathJax.startup.defaultPageReady().then(()=>{document.body.classList.add("ready")})}};
+setTimeout(function(){document.body.classList.add("ready")},2500);
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+/* ============================================================
+   MathiasLearn — feuille de style des fiches
+   Reprise intégrale des tokens de 00_PARCOURS/*.html
+   + blocs pédagogiques (callouts, méthode, essentiels, recall)
+   ============================================================ */
+:root{--bg:#faf9f7;--card:#fff;--ink:#1a1a1a;--muted:#6b6b6b;--line:#e5e2dd;--accent:#8b5e34;
+ --hl:#fdf8ef;--ok:#2d7d4f;--okbg:#f0f7f3;--warn:#b3402f;--warnbg:#fdf3f1;--blue:#2f5d8b;--bluebg:#f1f5fa}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+ font:17px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;padding:0 16px 100px}
+.nav{position:sticky;top:0;background:rgba(250,249,247,.96);backdrop-filter:blur(8px);
+ border-bottom:1px solid var(--line);margin:0 -16px 30px;padding:11px 16px;z-index:50;
+ display:flex;gap:6px;flex-wrap:wrap;font-size:13px}
+.nav a{color:var(--muted);text-decoration:none;padding:4px 9px;border-radius:5px;white-space:nowrap}
+.nav a:hover{background:var(--line);color:var(--ink)}
+.nav a.on{background:var(--accent);color:#fff}
+main{max-width:780px;margin:0 auto}
+h1{font-size:31px;letter-spacing:-.02em;margin:.4em 0 .5em;line-height:1.25}
+h2{font-size:23px;margin:2.2em 0 .7em;padding-bottom:.3em;border-bottom:1px solid var(--line)}
+h3{font-size:19px;margin:1.9em 0 .5em;color:var(--accent)}
+h4{font-size:17px;margin:1.5em 0 .4em}
+p{margin:.8em 0} a{color:var(--accent)} hr{border:0;border-top:1px solid var(--line);margin:2.6em 0}
+table{border-collapse:collapse;width:100%;margin:1.3em 0;font-size:15.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+th{background:#f3f0eb;font-weight:600}
+tr:nth-child(even) td{background:#fcfbfa}
+code{font-family:"SF Mono",Menlo,Consolas,monospace;font-size:.88em;background:#f2efea;padding:2px 6px;border-radius:4px;overflow-wrap:break-word}
+pre{background:#f2efea;padding:14px 16px;border-radius:8px;overflow-x:auto}
+pre code{background:none;padding:0;white-space:pre}
+blockquote{border-left:3px solid var(--accent);background:var(--hl);margin:1.4em 0;padding:14px 20px;border-radius:0 8px 8px 0}
+blockquote p:first-child{margin-top:0} blockquote p:last-child{margin-bottom:0}
+ul,ol{padding-left:1.5em} li{margin:.35em 0} em{color:#4a4a4a}
+mjx-container[display="true"]{margin:1.1em 0!important;overflow-x:auto;overflow-y:hidden;padding:2px 0}
+mjx-container svg{max-width:100%}
+body:not(.ready) main{opacity:0} main{opacity:1;transition:opacity .25s}
+
+/* --- bandeau de tête de fiche --- */
+.cours{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--accent);
+ border-radius:0 10px 10px 0;padding:18px 22px;margin:0 0 34px}
+.cours h4{margin:0 0 4px;font-size:14px;text-transform:uppercase;letter-spacing:.07em;color:var(--accent)}
+.cours .cs{color:var(--muted);font-size:14.5px;margin:0 0 14px}
+
+/* --- exercices / corrigés --- */
+.ex{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:6px 24px 20px;margin:18px 0}
+.ex>h3:first-child{margin-top:14px}
+details.cor{margin-top:18px;border:1px solid var(--line);border-radius:8px;background:#fcfbfa;overflow:hidden}
+details.cor>summary{cursor:pointer;padding:12px 16px;font-weight:600;font-size:15px;color:var(--accent);
+ list-style:none;display:flex;align-items:center;gap:9px;user-select:none;transition:.15s;min-height:44px}
+details.cor>summary::-webkit-details-marker{display:none}
+details.cor>summary:hover{background:var(--hl)}
+details.cor>summary::before{content:"\25B6";font-size:10px;transition:transform .18s;display:inline-block}
+details.cor[open]>summary::before{transform:rotate(90deg)}
+details.cor[open]>summary{background:var(--okbg);color:var(--ok);border-bottom:1px solid var(--line)}
+.cor .in{padding:4px 20px 16px}
+.cor .in>*:first-child{margin-top:.9em}
+
+/* --- blocs pédagogiques (callouts) ---
+   Générés depuis une citation Markdown dont le premier **gras** commence
+   par un mot-clé : DÉFINITION, THÉORÈME, MÉTHODE, PIÈGE, INTUITION… */
+.cal{border:1px solid var(--line);border-left:4px solid var(--accent);background:var(--card);
+ border-radius:0 10px 10px 0;padding:15px 20px;margin:1.5em 0}
+.cal>p:first-child{margin-top:0}.cal>p:last-child,.cal>ul:last-child,.cal>ol:last-child{margin-bottom:0}
+.cal .lab{display:block;font-size:12.5px;text-transform:uppercase;letter-spacing:.08em;
+ font-weight:700;color:var(--accent);margin-bottom:6px}
+.cal.formel{background:var(--hl)}
+.cal.piege{border-left-color:var(--warn);background:var(--warnbg)}
+.cal.piege .lab{color:var(--warn)}
+.cal.methode{border-left-color:var(--ok);background:var(--okbg)}
+.cal.methode .lab{color:var(--ok)}
+.cal.intu{border-left-color:var(--blue);background:var(--bluebg)}
+.cal.intu .lab{color:var(--blue)}
+.cal.plus{border-left-style:dashed;background:#faf9f7}
+.cal.plus .lab{color:var(--muted)}
+
+/* --- révision express --- */
+.ess{background:var(--card);border:1px solid var(--accent);border-radius:10px;padding:4px 24px 20px;margin:1.6em 0}
+.ess h3{margin-top:1.3em}
+.rec{background:var(--card);border:1px dashed var(--accent);border-radius:10px;padding:4px 24px 18px;margin:1.6em 0}
+.rec ol{counter-reset:none}
+
+/* --- impression / PDF --- */
+@media print{
+ .nav{display:none}
+ body{padding:0;background:#fff;font-size:11.2pt;line-height:1.55}
+ main{max-width:none}
+ h1{font-size:23pt}h2{font-size:15pt;margin-top:1.5em}h3{font-size:12.6pt}
+ h2,h3,h4{break-after:avoid;page-break-after:avoid}
+ table,.cal,blockquote{break-inside:avoid;page-break-inside:avoid}
+ table{display:table;font-size:9.6pt}
+ details.cor{border:1px solid var(--line);background:#fcfbfa}
+ details.cor>summary{display:none}
+ details.cor .in{padding-top:10px}
+ .cal,.ex,.ess,.rec{box-shadow:none}
+ a{color:var(--ink);text-decoration:none}
+}
+@page{margin:16mm 15mm 18mm}
+
+/* --- exemples travaillés --- */
+.exm{background:#fcfbfa;border:1px solid var(--line);border-radius:10px;padding:2px 20px 14px;margin:1.5em 0}
+.exm>h4:first-child{margin:14px 0 .5em;color:var(--accent);font-size:13px;text-transform:uppercase;letter-spacing:.07em}
+
+
+/* --- pastilles de priorité (conventions des fiches de l'app) --- */
+h2[data-prio], h3[data-prio], h4[data-prio]{position:relative}
+h2[data-prio]::before,h3[data-prio]::before,h4[data-prio]::before{
+ content:"";display:inline-block;width:9px;height:9px;border-radius:50%;
+ margin-right:9px;vertical-align:middle;background:var(--muted)}
+[data-prio="must"]::before{background:var(--warn)}
+[data-prio="high"]::before{background:#d98324}
+[data-prio="mid"]::before{background:#c9a227}
+[data-prio="low"]::before{background:var(--ok)}
+/* corrigés des fiches de l'app : même traitement que les corrigés des séries */
+details.cor>summary::after{content:""}
+</style></head><body>
+<div class="nav"><a href="00_COMMENCER_ICI.html">Commencer ici</a><a href="01_NOTATIONS_le-decodeur.html">Notations</a><a href="02_EXERCICES_Serie-0.html">Série 0 — Remise en route</a><a href="03_EXERCICES_Serie-1.html">Série 1 — Convexité</a><a href="04_EXERCICES_Serie-2.html">Série 2 — KKT</a><a href="05_AUTO-EVALUATION.html">Auto-évaluation (quiz)</a><a href="06_FICHE_Optimisation-deux-variables.html">Fiche — Optimisation à 2 variables</a></div>
+<main><h1>Fiche 93 — Value at Risk : simulation historique, modèle linéaire, modèle quadratique, ACP</h1>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Matière</strong></td>
+<td>Maths · Finance de marché · Gestion des risques</td>
+</tr>
+<tr>
+<td><strong>Cours source</strong></td>
+<td>John C. Hull, <em>Options, Futures, and Other Derivatives</em>, 8ᵉ éd., Pearson — chapitre 21 « Value at Risk »</td>
+</tr>
+<tr>
+<td><strong>Difficulté</strong></td>
+<td> Must know — la mesure de risque des régulateurs et des salles de marché</td>
+</tr>
+<tr>
+<td><strong>Temps d'étude estimé</strong></td>
+<td>1 h 50</td>
+</tr>
+<tr>
+<td><strong>Prérequis</strong></td>
+<td>Fiches 77 (taux, duration), 87 (Black-Scholes), 90 (grecques), 92 (Monte-Carlo) — et fiche 55 (VaR vue par MIT 15.450, complémentaire)</td>
+</tr>
+<tr>
+<td><strong>Concepts clés</strong></td>
+<td>Mesure VaR, horizon et niveau de confiance, règle en $\sqrt{N}$, expected shortfall, simulation historique, volatilité quotidienne, modèle linéaire, matrice de variance-covariance, <em>cash-flow mapping</em>, modèle quadratique, expansion de Cornish-Fisher, Monte-Carlo, stress testing, back testing, analyse en composantes principales</td>
+</tr>
+<tr>
+<td><strong>Poids à l'examen</strong></td>
+<td>La <strong>règle $\text{VaR}_N=\text{VaR}_1\sqrt N$</strong> · le <strong>5ᵉ pire scénario</strong> sur 500 · $\sigma_P^2=\sum\sum\rho_{ij}\alpha_i\alpha_j\sigma_i\sigma_j$ · $\alpha_i=S_i\delta_i$ pour les options · l'<strong>exposition aux facteurs</strong> de l'ACP.</td>
+</tr>
+</tbody></table>
+<h2>Vue d'ensemble</h2>
+<pre><code>LA PHRASE À PRODUIRE
+  « Je suis certain à X % qu'il n'y aura pas de perte supérieure à V dollars
+    dans les N prochains jours. »       V = VaR      (N, X) = les deux paramètres
+  VaR = perte du (100−X)-ième PERCENTILE de la distribution du GAIN
+
+DEUX FAMILLES DE MÉTHODES
+  SIMULATION HISTORIQUE   le passé fournit la loi jointe — 501 jours → 500 scénarios
+  APPROCHE MODÈLE         on POSTULE une loi normale multivariée + une relation ΔP(Δx)
+        └ linéaire     ΔP = Σ αᵢΔxᵢ            → σ_P analytique
+        └ quadratique  + ½ΣΣ SᵢSⱼγᵢⱼΔxᵢΔxⱼ     → Cornish-Fisher ou Monte-Carlo
+        └ Monte-Carlo  revalorisation complète  → n'importe quel percentile
+
+LES CONSTANTES À CONNAÎTRE
+  N(−2,33) = 0,01 → 99 %      N(−1,65) = 0,05 → 95 %      σ_jour = σ_an/√252
+  VaR à N jours = VaR à 1 jour × √N          Bâle : capital = k × VaR 10j 99 %, k ≥ 3
+  3 × √10 = 9,49 × VaR 1 jour 99 %
+
+ACP SUR LA COURBE DES TAUX   PC1 translation 83,1 % · PC2 pentification · PC3 courbure
+</code></pre>
+<p><strong>Le problème que la VaR résout, énoncé d'entrée.</strong> <em>Une institution financière calcule chaque jour delta, gamma et vega pour <strong>chacune</strong> des variables de marché auxquelles elle est exposée. Il y en a souvent des <strong>centaines, voire des milliers</strong>. Une analyse delta-gamma-vega produit donc chaque jour un très grand nombre de mesures de risque différentes. Ces mesures sont précieuses pour les traders, <strong>mais elles ne fournissent aucun moyen de mesurer le risque TOTAL</strong> auquel l'institution est exposée.</em> La VaR est <strong>une tentative de fournir un nombre unique résumant le risque total</strong> d'un portefeuille d'actifs financiers.</p>
+<h2 data-prio="must">Concept 1 — La mesure VaR : définition, horizon, faiblesse</h2>
+<h3>1.1 La définition exacte</h3>
+<blockquote>
+<p><em><strong>Je suis certain à $X$ pour cent qu'il n'y aura pas de perte supérieure à $V$ dollars dans les $N$ prochains jours.</strong></em></p>
+</blockquote>
+<p>La variable $V$ <strong>est</strong> la VaR du portefeuille. C'est une fonction de <strong>deux paramètres</strong> : l'horizon temporel ($N$ jours) et le niveau de confiance ($X$ %). C'est <strong>le niveau de perte sur $N$ jours qui a une probabilité de seulement $(100-X)\%$ d'être dépassé</strong>.</p>
+<p>$$\boxed{\text{VaR}=\text{la perte correspondant au }(100-X)\text{-ième percentile de la loi du GAIN du portefeuille sur }N\text{ jours}}$$</p>
+<p class="cal piege"> <strong>Le piège de signe, écrit noir sur blanc par Hull.</strong> <em>Quand on regarde la <strong>loi du gain</strong>, une perte est un gain <strong>négatif</strong> et la VaR concerne la <strong>queue GAUCHE</strong> de la distribution. Quand on regarde la <strong>loi de la perte</strong>, un gain est une perte <strong>négative</strong> et la VaR concerne la queue <strong>DROITE</strong>.</em> Les deux lectures sont équivalentes ; il faut seulement savoir laquelle on utilise avant de chercher un percentile.</p>
+<table>
+<thead>
+<tr>
+<th>Paramètres</th>
+<th>Ce qu'on cherche</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$N=5$, $X=97$</td>
+<td>le <strong>3ᵉ percentile</strong> de la loi du gain sur 5 jours</td>
+</tr>
+<tr>
+<td>$N=10$, $X=99$</td>
+<td>le <strong>1ᵉʳ percentile</strong> sur 10 jours — <strong>l'exigence des régulateurs bancaires</strong></td>
+</tr>
+<tr>
+<td>$N=1$, $X=99$</td>
+<td>le point de départ pratique de tout calcul (voir §1.2)</td>
+</tr>
+</tbody></table>
+<p><strong>Pourquoi la VaR a gagné.</strong> <em>C'est une mesure séduisante parce qu'elle est <strong>facile à comprendre</strong>. Au fond, elle pose la question simple « <strong>jusqu'où les choses peuvent-elles mal tourner ?</strong> ». C'est la question à laquelle tous les dirigeants veulent une réponse. Ils sont très à l'aise avec l'idée de <strong>compresser toutes les lettres grecques de toutes les variables de marché sous-jacentes en un nombre unique</strong>.</em></p>
+<h3>1.2 L'horizon temporel et la règle en racine</h3>
+<p><em>En pratique, les analystes posent presque toujours $N=1$ <strong>en premier lieu</strong>. La raison : <strong>il n'y a pas assez de données pour estimer directement le comportement des variables de marché sur des périodes plus longues qu'un jour</strong>.</em> L'hypothèse usuelle est alors :</p>
+<p>$$\boxed{\text{VaR à }N\text{ jours}=\text{VaR à 1 jour}\times\sqrt N}$$</p>
+<blockquote>
+<p class="cal piege"> <em><strong>Cette formule est exactement vraie lorsque les variations de la valeur du portefeuille sur des jours successifs suivent des lois normales indépendantes et identiques de moyenne nulle. Dans les autres cas, c'est une approximation.</strong></em></p>
+</blockquote>
+<p><strong>L'application réglementaire.</strong> L'amendement de 1996 à Bâle I exigeait que le capital d'une banque au titre du risque de marché soit au moins <strong>trois fois la VaR à 10 jours à 99 %</strong>. Vu la façon dont la VaR à 10 jours est calculée, cela revient à :
+$$3\times\sqrt{10}=9{,}49\ \text{fois la VaR à 1 jour à 99 \%}$$</p>
+<details class="cor">
+<summary><strong>Business Snapshot 21.1 — comment les régulateurs utilisent la VaR</strong></summary><div class="in">
+
+<p>Le <strong>Comité de Bâle sur le contrôle bancaire</strong> réunit régulièrement les régulateurs bancaires du monde à Bâle, en Suisse.</p>
+<table>
+<thead>
+<tr>
+<th>Date</th>
+<th>Texte</th>
+<th>Contenu</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>1988</strong></td>
+<td><strong>Bâle I</strong></td>
+<td>accord sur le calcul du capital exigé pour le <strong>risque de crédit</strong></td>
+</tr>
+<tr>
+<td><strong>1996</strong> (appliqué <strong>1998</strong>)</td>
+<td><strong>The 1996 Amendment</strong></td>
+<td>exige du capital pour le <strong>risque de marché</strong> aussi</td>
+</tr>
+<tr>
+<td>après <strong>2007</strong></td>
+<td>révision</td>
+<td>les règles sont révisées à la suite de la crise du crédit</td>
+</tr>
+</tbody></table>
+<p>L'amendement distingue deux livres :</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th><strong>Banking book</strong></th>
+<th><strong>Trading book</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Contenu</td>
+<td>principalement des <strong>prêts</strong></td>
+<td>la myriade d'instruments <strong>négociés</strong> par la banque (actions, obligations, swaps, forwards, options…)</td>
+</tr>
+<tr>
+<td>Revalorisation</td>
+<td><strong>pas</strong> revalorisé régulièrement pour des besoins de gestion et de comptabilité</td>
+<td>revalorisé <strong>quotidiennement</strong></td>
+</tr>
+</tbody></table>
+<p>Le capital du trading book se calcule avec $N=10$ et $X=99$ : la perte de revalorisation sur 10 jours <strong>qui n'est censée être dépassée que 1 % du temps</strong>. Le capital exigé est $k$ fois cette VaR (avec un ajustement pour ce qu'on appelle les <em>risques spécifiques</em>). <em>Le multiplicateur $k$ était choisi <strong>banque par banque</strong> par les régulateurs et doit valoir <strong>au moins 3,0</strong>. Pour une banque dotée d'excellentes procédures d'estimation de VaR bien éprouvées, il était probable que $k$ soit fixé à la <strong>valeur minimale 3,0</strong>. Pour d'autres banques, il pouvait être plus élevé.</em></p>
+</div></details>
+
+<h3>1.3 La faiblesse de la VaR et l'<em>expected shortfall</em></h3>
+<p><em>Certains chercheurs ont soutenu que la VaR peut <strong>inciter les traders à choisir un portefeuille</strong> dont la distribution de rendement ressemble à celle de la figure 21.2.</em> Deux portefeuilles peuvent avoir <strong>exactement la même VaR</strong> alors que l'un est <strong>beaucoup plus risqué</strong>, parce que ses pertes potentielles <strong>au-delà</strong> du seuil sont bien plus grandes. La VaR ne dit rien de ce qui se passe <strong>dans</strong> la queue.</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th><strong>VaR</strong></th>
+<th><strong>Expected shortfall</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Question posée</td>
+<td>« <strong>Jusqu'où</strong> les choses peuvent-elles mal tourner ? »</td>
+<td>« <strong>Si</strong> les choses tournent mal, <strong>combien</strong> l'entreprise peut-elle s'attendre à perdre ? »</td>
+</tr>
+<tr>
+<td>Définition</td>
+<td>le $(100-X)$-ième percentile</td>
+<td>la <strong>perte espérée</strong> sur $N$ jours <strong>conditionnellement</strong> à ce que l'issue tombe dans la queue gauche de $(100-X)\%$</td>
+</tr>
+<tr>
+<td>Exemple $X=99$, $N=10$</td>
+<td>la perte dépassée 1 % du temps</td>
+<td>la perte <strong>moyenne</strong> sur 10 jours <strong>quand</strong> la perte est dans le 1 % de queue</td>
+</tr>
+<tr>
+<td>Autres noms</td>
+<td>—</td>
+<td><strong>C-VaR</strong>, <em>tail loss</em></td>
+</tr>
+</tbody></table>
+<p><strong>La référence.</strong> Artzner, Delbaen, Eber et Heath, « <em>Coherent Measures of Risk</em> », <em>Mathematical Finance</em>, 9 (1999) : 203-28. <em>Ces auteurs <strong>définissent certaines propriétés qu'une bonne mesure de risque devrait avoir</strong> et montrent que <strong>la mesure VaR standard ne les possède pas toutes</strong>.</em></p>
+<p class="cal piege"> <strong>Et pourtant.</strong> <em>Malgré ses faiblesses, c'est <strong>la VaR (et non l'expected shortfall) qui est la mesure de risque la plus populaire</strong>, tant chez les régulateurs que chez les gestionnaires de risque.</em></p>
+<h2 data-prio="must">Concept 2 — La simulation historique</h2>
+<h3>2.1 Le principe et l'algorithme</h3>
+<p><strong>L'idée en une phrase :</strong> <em>utiliser les données passées comme guide de ce qui se passera dans le futur.</em></p>
+<p>Cadre standard : horizon <strong>1 jour</strong>, confiance <strong>99 %</strong>, <strong>501 jours</strong> de données. <em>(L'horizon et le niveau de confiance sont ceux typiquement utilisés pour une VaR de risque de marché ; 501 est un choix populaire pour le nombre de jours de données car il conduit à la création de <strong>500 scénarios</strong>.)</em></p>
+<table>
+<thead>
+<tr>
+<th>Étape</th>
+<th>Contenu</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>1</strong></td>
+<td>Identifier les <strong>variables de marché</strong> affectant le portefeuille : taux d'intérêt, prix d'actions, prix de matières premières… <strong>Tous les prix sont mesurés en devise domestique.</strong> <em>Par exemple, une variable de marché pour une banque allemande sera probablement le S&amp;P 500 <strong>mesuré en euros</strong>.</em></td>
+</tr>
+<tr>
+<td><strong>2</strong></td>
+<td>Collecter les mouvements des variables sur les <strong>501 derniers jours</strong> → <strong>500 scénarios</strong> alternatifs de ce qui peut arriver entre aujourd'hui et demain</td>
+</tr>
+<tr>
+<td><strong>3</strong></td>
+<td>Scénario $i$ = les variations <strong>en pourcentage</strong> de toutes les variables sont les mêmes qu'entre le jour $i-1$ et le jour $i$</td>
+</tr>
+<tr>
+<td><strong>4</strong></td>
+<td>Pour chaque scénario, calculer la <strong>variation en dollars</strong> de la valeur du portefeuille entre aujourd'hui et demain</td>
+</tr>
+<tr>
+<td><strong>5</strong></td>
+<td>Cela définit une <strong>loi de probabilité de la perte quotidienne</strong> (les gains sont des pertes négatives)</td>
+</tr>
+<tr>
+<td><strong>6</strong></td>
+<td>Le 99ᵉ percentile s'estime comme la <strong>5ᵉ plus grande perte</strong>. La VaR est la perte à ce point</td>
+</tr>
+</tbody></table>
+<p><strong>La formule algébrique.</strong> Soit $v_i$ la valeur d'une variable de marché au jour $i$, et supposons qu'aujourd'hui soit le jour $n$. Le $i$-ème scénario suppose que la valeur de la variable <strong>demain</strong> sera :</p>
+<p>$$\boxed{\text{Valeur sous le scénario }i=v_n\,\frac{v_i}{v_{i-1}}}$$</p>
+<p><em>On est certain à 99 % qu'on ne subira pas de perte supérieure à l'estimation de VaR <strong>si les variations des variables de marché des 501 derniers jours sont représentatives</strong> de ce qui se passera entre aujourd'hui et demain.</em></p>
+<details class="cor">
+<summary><strong>La convention de percentile — pourquoi la 5ᵉ pire perte ?</strong></summary><div class="in">
+
+<p>*Il y a des alternatives ici. On peut plaider pour la <strong>5ᵉ</strong> plus grande perte, la <strong>6ᵉ</strong>, ou une <strong>moyenne des deux</strong>. Dans la fonction PERCENTILE d'Excel, avec $n$ observations et $k$ entier, le percentile $k/(n-1)$ est <strong>l'observation de rang $k+1$</strong>. Les autres percentiles sont calculés par <strong>interpolation linéaire</strong>.*</p>
+<p>Avec $n=500$ scénarios : le percentile $\frac{4}{499}=0{,}80\,\%$ est l'observation de rang 5. C'est la justification de la 5ᵉ pire perte comme approximation du 1ᵉʳ percentile.</p>
+</div></details>
+
+<h3>2.2 L'illustration complète : quatre indices boursiers, 25 septembre 2008</h3>
+<p><strong>Le portefeuille (Table 21.1)</strong> — un investisseur américain détient le 25 septembre 2008 un portefeuille de <strong>10 millions de dollars</strong> :</p>
+<table>
+<thead>
+<tr>
+<th>Indice</th>
+<th>Valeur (milliers de dollars)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>DJIA (États-Unis)</td>
+<td>4 000</td>
+</tr>
+<tr>
+<td>FTSE 100 (Royaume-Uni)</td>
+<td>3 000</td>
+</tr>
+<tr>
+<td>CAC 40 (France)</td>
+<td>1 000</td>
+</tr>
+<tr>
+<td>Nikkei 225 (Japon)</td>
+<td>2 000</td>
+</tr>
+<tr>
+<td><strong>Total</strong></td>
+<td><strong>10 000</strong></td>
+</tr>
+</tbody></table>
+<p><strong>L'ajustement de change, indispensable.</strong> <em>Les valeurs cotées du FTSE 100, du CAC 40 et du Nikkei 225 sont <strong>ajustées des variations de change</strong> de manière à être mesurées en dollars américains.</em></p>
+<details class="cor">
+<summary><strong>L'ajustement du FTSE 100 — le calcul détaillé</strong></summary><div class="in">
+
+<p><em>Étape 1 — les données.</em> Le FTSE 100 valait <strong>5 197,00</strong> le 25 septembre 2008, quand le change était <strong>1,8472 USD par GBP</strong>. Il valait <strong>5 823,40</strong> le 10 août 2006, quand le change était <strong>1,8918 USD par GBP</strong>.</p>
+<p><em>Étape 2 — le principe.</em> On veut une série mesurée en dollars <strong>calée</strong> sur 5 197,00 au 25 septembre 2008. Il faut donc multiplier les niveaux passés par le <strong>rapport des taux de change</strong>.</p>
+<p><em>Étape 3 — le calcul.</em> Le 10 août 2006, le niveau ajusté vaut :
+$$5\,823{,}40\times\frac{1{,}8918}{1{,}8472}=5\,964{,}00$$</p>
+<p><em>Étape 4 — la lecture.</em> La livre était <strong>plus forte</strong> en 2006 (1,8918 contre 1,8472) : mesuré en dollars, l'indice de 2006 est donc <strong>relevé</strong> de 5 823,40 à 5 964,00.</p>
+</div></details>
+
+<p><strong>Les données ajustées (Table 21.2)</strong> :</p>
+<table>
+<thead>
+<tr>
+<th>Jour</th>
+<th>Date</th>
+<th>DJIA</th>
+<th>FTSE 100</th>
+<th>CAC 40</th>
+<th>Nikkei 225</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>0</td>
+<td>7 août 2006</td>
+<td>11 219,38</td>
+<td>6 026,33</td>
+<td>4 345,08</td>
+<td>14 023,44</td>
+</tr>
+<tr>
+<td>1</td>
+<td>8 août 2006</td>
+<td>11 173,59</td>
+<td>6 007,08</td>
+<td>4 347,99</td>
+<td>14 300,91</td>
+</tr>
+<tr>
+<td>2</td>
+<td>9 août 2006</td>
+<td>11 076,18</td>
+<td>6 055,30</td>
+<td>4 413,35</td>
+<td>14 467,09</td>
+</tr>
+<tr>
+<td>3</td>
+<td>10 août 2006</td>
+<td>11 124,37</td>
+<td><strong>5 964,00</strong></td>
+<td>4 333,90</td>
+<td>14 413,32</td>
+</tr>
+<tr>
+<td>⋮</td>
+<td>⋮</td>
+<td>⋮</td>
+<td>⋮</td>
+<td>⋮</td>
+<td>⋮</td>
+</tr>
+<tr>
+<td>499</td>
+<td>24 sept. 2008</td>
+<td>10 825,17</td>
+<td>5 109,67</td>
+<td>4 113,33</td>
+<td>12 159,59</td>
+</tr>
+<tr>
+<td><strong>500</strong></td>
+<td><strong>25 sept. 2008</strong></td>
+<td><strong>11 022,06</strong></td>
+<td><strong>5 197,00</strong></td>
+<td><strong>4 226,81</strong></td>
+<td><strong>12 006,53</strong></td>
+</tr>
+</tbody></table>
+<p class="cal piege"> <strong>Pourquoi cette date.</strong> <em>Le 25 septembre 2008 est une date intéressante pour évaluer un investissement en actions. La tourmente des marchés du crédit, commencée en août 2007, avait <strong>plus d'un an</strong>. Les prix des actions <strong>baissaient depuis plusieurs mois</strong>. Les volatilités <strong>augmentaient</strong>. <strong>Lehman Brothers avait déposé son bilan dix jours plus tôt</strong>. Le programme TARP de 700 milliards de dollars du secrétaire au Trésor <strong>n'avait pas encore été voté</strong> par le Congrès.</em></p>
+<p class="cal piege"> <strong>Une remarque méthodologique.</strong> <em>Pour garder l'exemple aussi simple que possible, <strong>seuls les jours où les quatre indices ont coté</strong> ont été inclus. C'est pourquoi les 501 données s'étendent du 7 août 2006 au 25 septembre 2008. En pratique, si l'analyse était menée par une institution financière américaine, <strong>on tenterait probablement de combler les données des jours qui n'étaient pas des jours fériés américains</strong>.</em></p>
+<details class="cor">
+<summary><strong>Scénario 1, entièrement recalculé — les cinq lignes de l'exercice type</strong></summary><div class="in">
+
+<p><em>Étape 1 — quelle variation reproduit-on ?</em> Le scénario 1 suppose que les variations en pourcentage entre le 25 et le 26 septembre 2008 sont les mêmes qu'entre le <strong>7 et le 8 août 2006</strong> (jours 0 et 1).</p>
+<p><em>Étape 2 — le DJIA.</em> Il valait 11 022,06 le 25 septembre 2008. Le 8 août 2006 il valait 11 173,59, <strong>en baisse</strong> depuis 11 219,38 le 7 août :
+$$11\,022{,}06\times\frac{11\,173{,}59}{11\,219{,}38}=10\,977{,}08$$</p>
+<p><em>Étape 3 — les trois autres indices, même mécanique :</em></p>
+<table>
+<thead>
+<tr>
+<th>Indice</th>
+<th>Calcul</th>
+<th>Scénario 1</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>FTSE 100</td>
+<td>$5\,197{,}00\times\dfrac{6\,007{,}08}{6\,026{,}33}$</td>
+<td><strong>5 180,40</strong></td>
+</tr>
+<tr>
+<td>CAC 40</td>
+<td>$4\,226{,}81\times\dfrac{4\,347{,}99}{4\,345{,}08}$</td>
+<td><strong>4 229,64</strong></td>
+</tr>
+<tr>
+<td>Nikkei 225</td>
+<td>$12\,006{,}53\times\dfrac{14\,300{,}91}{14\,023{,}44}$</td>
+<td><strong>12 244,10</strong></td>
+</tr>
+</tbody></table>
+<p><em>Étape 4 — la valeur du portefeuille</em> (en milliers de dollars). Chaque poche est multipliée par le <strong>rapport de l'indice simulé à l'indice d'aujourd'hui</strong> :
+$$4\,000\times\frac{10\,977{,}08}{11\,022{,}06}+3\,000\times\frac{5\,180{,}40}{5\,197{,}00}+1\,000\times\frac{4\,229{,}64}{4\,226{,}81}+2\,000\times\frac{12\,244{,}10}{12\,006{,}53}=10\,014{,}334$$</p>
+<p><em>Étape 5 — la perte.</em> Le portefeuille passe de 10 000 à 10 014,334 : il réalise donc un <strong>gain de 14 334 dollars</strong>, soit une perte de $-14{,}334$ milliers de dollars.</p>
+<p class="cal piege"> <strong>Coquille du texte de Hull.</strong> Dans le développement de la valeur du portefeuille, le manuel imprime « 12 224,10 » au numérateur du dernier terme, alors que la table 21.3 donne bien <strong>12 244,10</strong> pour le Nikkei sous le scénario 1. C'est 12 244,10 qui est correct : il redonne exactement 10 014,334, tandis que 12 224,10 donnerait 10 011,003.</p>
+</div></details>
+
+<p><strong>Les scénarios générés (Table 21.3)</strong> :</p>
+<table>
+<thead>
+<tr>
+<th>Scénario</th>
+<th>DJIA</th>
+<th>FTSE 100</th>
+<th>CAC 40</th>
+<th>Nikkei 225</th>
+<th>Valeur (milliers)</th>
+<th>Perte (milliers)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>10 977,08</td>
+<td>5 180,40</td>
+<td>4 229,64</td>
+<td>12 244,10</td>
+<td>10 014,334</td>
+<td>$-14{,}334$</td>
+</tr>
+<tr>
+<td>2</td>
+<td>10 925,97</td>
+<td>5 238,72</td>
+<td>4 290,35</td>
+<td>12 146,04</td>
+<td>10 027,481</td>
+<td>$-27{,}481$</td>
+</tr>
+<tr>
+<td>3</td>
+<td>11 070,01</td>
+<td>5 118,64</td>
+<td>4 150,71</td>
+<td>11 961,91</td>
+<td>9 946,736</td>
+<td>$+53{,}264$</td>
+</tr>
+<tr>
+<td>⋮</td>
+<td>⋮</td>
+<td>⋮</td>
+<td>⋮</td>
+<td>⋮</td>
+<td>⋮</td>
+<td>⋮</td>
+</tr>
+<tr>
+<td>499</td>
+<td>10 831,43</td>
+<td>5 079,84</td>
+<td>4 125,61</td>
+<td>12 115,90</td>
+<td>9 857,465</td>
+<td>$+142{,}535$</td>
+</tr>
+<tr>
+<td>500</td>
+<td>11 222,53</td>
+<td>5 285,82</td>
+<td>4 343,42</td>
+<td>11 855,40</td>
+<td>10 126,439</td>
+<td>$-126{,}439$</td>
+</tr>
+</tbody></table>
+<p><strong>Le classement (Table 21.4)</strong> — les pertes des 500 scénarios sont rangées de la plus grande à la plus petite :</p>
+<table>
+<thead>
+<tr>
+<th>Rang</th>
+<th>Scénario</th>
+<th>Perte (milliers de dollars)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>1</strong></td>
+<td><strong>494</strong></td>
+<td><strong>477,841</strong> ← <em>les indices bougent comme au moment de la faillite de Lehman Brothers</em></td>
+</tr>
+<tr>
+<td>2</td>
+<td>339</td>
+<td>345,435</td>
+</tr>
+<tr>
+<td>3</td>
+<td>349</td>
+<td>282,204</td>
+</tr>
+<tr>
+<td>4</td>
+<td>329</td>
+<td>277,041</td>
+</tr>
+<tr>
+<td><strong>5</strong></td>
+<td><strong>487</strong></td>
+<td><strong>253,385</strong> ← <strong>la VaR à 1 jour à 99 %</strong></td>
+</tr>
+<tr>
+<td>6</td>
+<td>227</td>
+<td>217,974</td>
+</tr>
+<tr>
+<td>7</td>
+<td>131</td>
+<td>205,256</td>
+</tr>
+<tr>
+<td>8</td>
+<td>238</td>
+<td>201,389</td>
+</tr>
+<tr>
+<td>9</td>
+<td>473</td>
+<td>191,269</td>
+</tr>
+<tr>
+<td>10</td>
+<td>306</td>
+<td>191,050</td>
+</tr>
+<tr>
+<td>11</td>
+<td>477</td>
+<td>185,127</td>
+</tr>
+<tr>
+<td>12</td>
+<td>495</td>
+<td>184,450</td>
+</tr>
+<tr>
+<td>13</td>
+<td>376</td>
+<td>182,707</td>
+</tr>
+<tr>
+<td>14</td>
+<td>237</td>
+<td>180,105</td>
+</tr>
+<tr>
+<td>15</td>
+<td>365</td>
+<td>172,224</td>
+</tr>
+</tbody></table>
+<p>$$\boxed{\text{VaR à 1 jour à 99 \%}=253\,385\ \text{dollars}}\qquad\boxed{\text{VaR à 10 jours}=\sqrt{10}\times253\,385=801\,274\ \text{dollars}}$$</p>
+<p><em>(L'histogramme de la figure 21.3 regroupe les pertes par tranches de 100 milliers : 450 à 550, 350 à 450, 250 à 350, etc.)</em></p>
+<h3>2.3 La fenêtre glissante et les portefeuilles réels</h3>
+<p><em>Chaque jour, l'estimation de VaR serait mise à jour avec les <strong>501 jours de données les plus récents</strong>.</em></p>
+<table>
+<thead>
+<tr>
+<th>Jour de calcul</th>
+<th>Fenêtre de données utilisée</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>25 sept. 2008 (jour 500)</td>
+<td>7 août 2006 → 25 sept. 2008 (<strong>jours 0 à 500</strong>)</td>
+</tr>
+<tr>
+<td>26 sept. 2008 (jour 501)</td>
+<td>8 août 2006 → 26 sept. 2008 (<strong>jours 1 à 501</strong>) — <em>les valeurs du 7 août 2006 ne servent plus</em></td>
+</tr>
+<tr>
+<td>29 sept. 2008 (jour 502)</td>
+<td>9 août 2006 → 29 sept. 2008 (<strong>jours 2 à 502</strong>)</td>
+</tr>
+</tbody></table>
+<p><em>En pratique, le portefeuille d'une institution financière est bien sûr considérablement plus compliqué que celui considéré ici. Il consiste probablement en <strong>des milliers ou des dizaines de milliers de positions</strong>, dont certaines en forwards, options et autres dérivés. <strong>La VaR est calculée à la fin de chaque jour en supposant que le portefeuille restera inchangé au cours du jour ouvré suivant.</strong> Si le trading d'une banque au cours d'une journée rend le portefeuille plus risqué (moins risqué), la VaR à 10 jours à 99 % <strong>augmente (diminue)</strong> par rapport à la valeur de la veille.</em></p>
+<p class="cal piege"> <strong>L'ordre de grandeur du nombre de variables.</strong> <em>Il est souvent nécessaire de considérer <strong>des centaines voire des milliers de variables de marché</strong>. Pour les taux d'intérêt, une banque a typiquement besoin de la structure par terme des taux zéro-coupon <strong>Treasury et LIBOR/swap dans plusieurs devises</strong>. Il peut y avoir <strong>jusqu'à dix variables de marché pour chaque courbe zéro</strong> à laquelle la banque est exposée.</em></p>
+<h2 data-prio="must">Concept 3 — L'approche modèle : volatilités quotidiennes et cas simples</h2>
+<h3>3.1 Volatilité annuelle contre volatilité quotidienne</h3>
+<p><em>En valorisation d'options, le temps se mesure en <strong>années</strong> et la volatilité est cotée comme une « volatilité par an ». Dans l'approche modèle pour la VaR, le temps se mesure en <strong>jours</strong> et la volatilité est cotée comme une « volatilité par jour ».</em></p>
+<p>Avec <strong>252 jours de bourse</strong> par an, l'écart-type du rendement composé en continu sur un an vaut soit $\sigma_{\text{an}}$, soit $\sigma_{\text{jour}}\sqrt{252}$ :</p>
+<p>$$\boxed{\sigma_{\text{an}}=\sigma_{\text{jour}}\sqrt{252}\qquad\Longleftrightarrow\qquad\sigma_{\text{jour}}=\frac{\sigma_{\text{an}}}{\sqrt{252}}}$$</p>
+<p>$$\text{soit }\frac{1}{\sqrt{252}}=0{,}0630\;:\;\textbf{la volatilité quotidienne vaut environ 6 \% de la volatilité annuelle.}$$</p>
+<blockquote>
+<p class="cal piege"> <em><strong>La volatilité quotidienne d'un prix d'actif (ou de toute autre variable) est DÉFINIE, pour les besoins du calcul de VaR, comme égale à l'écart-type de la variation en pourcentage sur un jour.</strong></em> Ce n'est qu'<strong>approximativement</strong> vrai en toute rigueur ; on suppose l'égalité <strong>exacte</strong>.</p>
+</blockquote>
+<h3>3.2 Un seul actif</h3>
+<p><strong>Position :</strong> 10 millions de dollars d'actions Microsoft. <strong>Volatilité quotidienne : 2 %</strong> (soit environ <strong>32 % par an</strong>, car $0{,}02\times\sqrt{252}=0{,}3175$).</p>
+<table>
+<thead>
+<tr>
+<th>Étape</th>
+<th>Calcul</th>
+<th>Résultat</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Écart-type de la variation quotidienne de valeur</td>
+<td>$2\%\times10\,000\,000$</td>
+<td><strong>200 000 dollars</strong></td>
+</tr>
+<tr>
+<td>Espérance de la variation</td>
+<td><strong>supposée nulle</strong> (voir encadré)</td>
+<td>0</td>
+</tr>
+<tr>
+<td>Loi supposée</td>
+<td><strong>normale</strong></td>
+<td>—</td>
+</tr>
+<tr>
+<td>Quantile</td>
+<td>$N(-2{,}33)=0{,}01$</td>
+<td>$-2{,}33$ écarts-types</td>
+</tr>
+<tr>
+<td><strong>VaR à 1 jour à 99 %</strong></td>
+<td>$2{,}33\times200\,000$</td>
+<td><strong>466 000 dollars</strong></td>
+</tr>
+<tr>
+<td><strong>VaR à 10 jours à 99 %</strong></td>
+<td>$466\,000\times\sqrt{10}$</td>
+<td><strong>1 473 621 dollars</strong></td>
+</tr>
+</tbody></table>
+<details class="cor">
+<summary><strong>Pourquoi supposer l'espérance nulle — la justification chiffrée</strong></summary><div class="in">
+
+<p><em>Il est habituel dans l'approche modèle de supposer que <strong>la variation espérée d'une variable de marché sur la période considérée est nulle</strong>. Ce n'est pas strictement vrai, mais c'est une hypothèse raisonnable : <strong>la variation espérée sur une courte période est généralement petite comparée à l'écart-type de la variation.</strong></em></p>
+<p>Supposons que Microsoft ait un rendement espéré de <strong>20 % par an</strong> :</p>
+<table>
+<thead>
+<tr>
+<th>Horizon</th>
+<th>Rendement espéré</th>
+<th>Écart-type</th>
+<th>Rapport</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>1 jour</strong></td>
+<td>$0{,}20/252=0{,}08\,\%$</td>
+<td>$2\,\%$</td>
+<td>l'espérance est <strong>25 fois plus petite</strong></td>
+</tr>
+<tr>
+<td><strong>10 jours</strong></td>
+<td>$0{,}08\times10=0{,}8\,\%$</td>
+<td>$2\times\sqrt{10}=6{,}3\,\%$</td>
+<td>l'espérance est <strong>8 fois plus petite</strong></td>
+</tr>
+</tbody></table>
+<p class="cal piege"> <strong>Sur la loi retenue.</strong> <em>Pour être cohérent avec l'hypothèse de valorisation d'options du chapitre 14, on pourrait supposer que le prix de Microsoft est <strong>lognormal</strong> demain. Comme un jour est une période si courte, <strong>c'est presque indiscernable de l'hypothèse que nous faisons</strong> — que la variation du prix entre aujourd'hui et demain est <strong>normale</strong>.</em></p>
+</div></details>
+
+<p><strong>Deuxième position, seule :</strong> 5 millions de dollars d'AT&amp;T, volatilité quotidienne <strong>1 %</strong> (environ 16 % par an).</p>
+<p>$$\sigma=5\,000\,000\times0{,}01=50\,000\quad\Rightarrow\quad\text{VaR}_{1j}=50\,000\times2{,}33=116\,500\quad\Rightarrow\quad\text{VaR}_{10j}=116\,500\sqrt{10}=368\,405$$</p>
+<h3>3.3 Deux actifs et le bénéfice de la diversification</h3>
+<p>Portefeuille : 10 M de Microsoft <strong>et</strong> 5 M d'AT&amp;T ; les rendements suivent une loi <strong>normale bivariée</strong> de corrélation $\rho=0{,}3$.</p>
+<p><strong>Le résultat statistique standard :</strong> si $X$ et $Y$ ont des écarts-types $\sigma_X$ et $\sigma_Y$ et une corrélation $\rho$, alors</p>
+<p>$$\boxed{\sigma_{X+Y}=\sqrt{\sigma_X^2+\sigma_Y^2+2\rho\sigma_X\sigma_Y}}$$</p>
+<p>Avec $\sigma_X=200\,000$ et $\sigma_Y=50\,000$ :</p>
+<p>$$\sigma_{X+Y}=\sqrt{200\,000^2+50\,000^2+2\times0{,}3\times200\,000\times50\,000}=220\,227$$</p>
+<p>$$\text{VaR}_{1j,99\%}=220\,227\times2{,}33=513\,129\ \text{dollars}\qquad\text{VaR}_{10j,99\%}=513\,129\times\sqrt{10}=1\,622\,657\ \text{dollars}$$</p>
+<p><strong>Le bénéfice de la diversification :</strong></p>
+<table>
+<thead>
+<tr>
+<th>VaR 10 jours 99 %</th>
+<th>Montant (dollars)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Portefeuille Microsoft seul</td>
+<td>1 473 621</td>
+</tr>
+<tr>
+<td>Portefeuille AT&amp;T seul</td>
+<td>368 405</td>
+</tr>
+<tr>
+<td><strong>Somme</strong></td>
+<td><strong>1 842 026</strong></td>
+</tr>
+<tr>
+<td>Portefeuille <strong>des deux</strong></td>
+<td><strong>1 622 657</strong></td>
+</tr>
+<tr>
+<td><strong>Bénéfice de la diversification</strong></td>
+<td>$(1\,473\,621+368\,405)-1\,622\,657=\textbf{219 369}$</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p class="cal piege"> <em><strong>Si Microsoft et AT&amp;T étaient PARFAITEMENT corrélés, la VaR du portefeuille des deux ÉGALERAIT la somme des deux VaR individuelles. Une corrélation imparfaite conduit à ce qu'une partie du risque soit « diversifiée ».</strong></em></p>
+</blockquote>
+<p><em>(Harry Markowitz fut l'un des premiers chercheurs à étudier les bénéfices de la diversification pour un gérant de portefeuille ; prix Nobel 1990 — « Portfolio Selection », <em>Journal of Finance</em>, 7, 1 (mars 1952) : 77-91.)</em></p>
+<h2 data-prio="must">Concept 4 — Le modèle linéaire</h2>
+<h3>4.1 Les équations générales</h3>
+<p>Portefeuille de valeur $P$ composé de $n$ actifs, avec un montant $\alpha_i$ investi dans l'actif $i$. Soit $\Delta x_i$ le <strong>rendement</strong> de l'actif $i$ sur un jour. La variation en dollars de l'investissement dans l'actif $i$ vaut $\alpha_i\Delta x_i$, d'où :</p>
+<p>$$\boxed{\Delta P=\sum_{i=1}^{n}\alpha_i\,\Delta x_i}\;\text{(21.1)}$$</p>
+<p>Dans l'exemple précédent, $\alpha_1=10$ et $\alpha_2=5$ (en millions), donc $\Delta P=10\Delta x_1+5\Delta x_2$.</p>
+<blockquote>
+<p><strong>L'hypothèse clé :</strong> *si l'on suppose que les $\Delta x_i$ sont <strong>normaux multivariés</strong>, alors $\Delta P$ est <strong>normal</strong>. Pour calculer la VaR, il suffit donc de calculer <strong>la moyenne et l'écart-type de $\Delta P$</strong>.* La moyenne est nulle par l'hypothèse de §3.2.</p>
+</blockquote>
+<p>Soit $\sigma_i$ la volatilité quotidienne de l'actif $i$ et $\rho_{ij}$ la corrélation entre les rendements de $i$ et $j$. La variance de $\Delta P$, notée $\sigma_P^2$ :</p>
+<p>$$\boxed{\sigma_P^2=\sum_{i=1}^{n}\sum_{j=1}^{n}\rho_{ij}\,\alpha_i\alpha_j\,\sigma_i\sigma_j}\;\text{(21.2)}$$</p>
+<p>$$\text{ou, en séparant la diagonale :}\qquad\sigma_P^2=\sum_{i=1}^{n}\alpha_i^2\sigma_i^2+2\sum_{i=1}^{n}\sum_{j&lt;i}\rho_{ij}\,\alpha_i\alpha_j\,\sigma_i\sigma_j$$</p>
+<p>$$\boxed{\text{Écart-type sur }N\text{ jours}=\sigma_P\sqrt N\qquad\text{VaR à 99 \% sur }N\text{ jours}=2{,}33\,\sigma_P\sqrt N}$$</p>
+<p><strong>La version des gérants de portefeuille.</strong> Le rendement du portefeuille sur un jour est $\Delta P/P$ ; sa variance vaut</p>
+<p>$$\sum_{i=1}^{n}\sum_{j=1}^{n}\rho_{ij}\,w_iw_j\,\sigma_i\sigma_j\qquad\text{où }w_i=\frac{\alpha_i}{P}\text{ est le POIDS du }i\text{-ème investissement.}$$</p>
+<details class="cor">
+<summary><strong>Vérification : le portefeuille Microsoft-AT&amp;T par la formule (21.2)</strong></summary><div class="in">
+
+<p><em>Étape 1 — les paramètres.</em> $\sigma_1=0{,}02$, $\sigma_2=0{,}01$, $\rho_{12}=0{,}3$, $\alpha_1=10$, $\alpha_2=5$ (millions de dollars).</p>
+<p><em>Étape 2 — la variance :</em>
+$$\sigma_P^2=10^2\times0{,}02^2+5^2\times0{,}01^2+2\times10\times5\times0{,}3\times0{,}02\times0{,}01$$
+$$=0{,}04+0{,}0025+0{,}006=\mathbf{0{,}0485}$$</p>
+<p><em>Étape 3 — l'écart-type :</em> $\sigma_P=\sqrt{0{,}0485}=0{,}220$ million de dollars par jour.</p>
+<p><em>Étape 4 — la VaR à 10 jours à 99 % :</em>
+$$2{,}33\times0{,}220\times\sqrt{10}=1{,}623\ \text{million de dollars}$$</p>
+<p><strong>Ce qui coïncide exactement avec le calcul « à la main » de §3.3 (1 622 657 dollars).</strong></p>
+</div></details>
+
+<h3>4.2 Matrices de corrélation et de variance-covariance</h3>
+<p>$$\mathbf{R}=\begin{pmatrix}1&amp;\rho_{12}&amp;\rho_{13}&amp;\cdots&amp;\rho_{1n}\\ \rho_{21}&amp;1&amp;\rho_{23}&amp;\cdots&amp;\rho_{2n}\\ \rho_{31}&amp;\rho_{32}&amp;1&amp;\cdots&amp;\rho_{3n}\\ \vdots&amp;\vdots&amp;\vdots&amp;\ddots&amp;\vdots\\ \rho_{n1}&amp;\rho_{n2}&amp;\rho_{n3}&amp;\cdots&amp;1\end{pmatrix}\qquad\mathbf{C}=\begin{pmatrix}\text{var}_1&amp;\text{cov}_{12}&amp;\cdots&amp;\text{cov}_{1n}\\ \text{cov}_{21}&amp;\text{var}_2&amp;\cdots&amp;\text{cov}_{2n}\\ \vdots&amp;\vdots&amp;\ddots&amp;\vdots\\ \text{cov}_{n1}&amp;\text{cov}_{n2}&amp;\cdots&amp;\text{var}_n\end{pmatrix}$$</p>
+<table>
+<thead>
+<tr>
+<th>Fait</th>
+<th>Énoncé</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Diagonale de $\mathbf R$</td>
+<td><strong>1</strong> — une variable est toujours parfaitement corrélée avec elle-même</td>
+</tr>
+<tr>
+<td>Symétrie</td>
+<td>$\rho_{ij}=\rho_{ji}$, donc $\mathbf R$ <strong>et</strong> $\mathbf C$ sont <strong>symétriques</strong></td>
+</tr>
+<tr>
+<td>Variance quotidienne</td>
+<td>$\boxed{\text{var}_i=\sigma_i^2}$</td>
+</tr>
+<tr>
+<td>Covariance</td>
+<td>$\boxed{\text{cov}_{ij}=\sigma_i\sigma_j\rho_{ij}}$</td>
+</tr>
+<tr>
+<td>Diagonale de $\mathbf C$</td>
+<td>ce sont des <strong>variances</strong> : $\text{cov}_{ii}=\text{var}_i$ — d'où le nom <strong>matrice de variance-covariance</strong></td>
+</tr>
+</tbody></table>
+<p>$$\boxed{\sigma_P^2=\sum_{i=1}^{n}\sum_{j=1}^{n}\text{cov}_{ij}\,\alpha_i\alpha_j\;\text{(21.3)}\qquad\text{soit, en notation matricielle,}\qquad\sigma_P^2=\mathbf a^{\mathsf T}\mathbf C\,\mathbf a}$$</p>
+<p>où $\mathbf a$ est le vecteur <strong>colonne</strong> dont le $i$-ème élément est $\alpha_i$. <em>Les variances et covariances sont généralement calculées à partir de <strong>données historiques</strong> (chapitre 22).</em></p>
+<h3>4.3 Traiter les taux d'intérêt : duration et <em>cash-flow mapping</em></h3>
+<blockquote>
+<p class="cal piege"> <em><strong>Il est hors de question, dans l'approche modèle, de définir une variable de marché séparée pour CHAQUE prix d'obligation ou taux d'intérêt auquel une entreprise est exposée. Des simplifications sont nécessaires.</strong></em></p>
+</blockquote>
+<p><strong>Solution 1 — les déplacements parallèles seuls.</strong> On ne définit <strong>qu'une</strong> variable de marché : la taille du déplacement parallèle. On utilise alors la relation de duration :</p>
+<p>$$\boxed{\Delta P=-D\,P\,\Delta y}$$</p>
+<p>où $P$ est la valeur du portefeuille, $D$ sa <strong>duration modifiée</strong>, et $\Delta y$ le déplacement parallèle sur un jour.  <em>Cette approche <strong>ne donne habituellement pas assez de précision</strong>.</em></p>
+<p><strong>Solution 2 — la procédure habituelle : les maturités standard.</strong> On choisit comme variables de marché les prix d'obligations zéro-coupon de maturités standard :</p>
+<p>$$\boxed{1\text{ mois},\ 3\text{ mois},\ 6\text{ mois},\ 1\text{ an},\ 2\text{ ans},\ 5\text{ ans},\ 7\text{ ans},\ 10\text{ ans},\ 30\text{ ans}}$$</p>
+<p>Les flux des instruments du portefeuille sont ensuite <strong>projetés</strong> sur ces dates standard : c'est le <em><strong>cash-flow mapping</strong></em>.</p>
+<details class="cor">
+<summary><strong>Le cash-flow mapping d'une obligation à 1,2 an — l'exemple complet</strong></summary><div class="in">
+
+<p><strong>Position :</strong> 1 million de dollars sur une obligation du Trésor de maturité <strong>1,2 an</strong> payant un coupon de <strong>6 % semestriel</strong>.</p>
+<p><em>Étape 1 — le calendrier des flux.</em> Les coupons tombent en <strong>0,2</strong>, <strong>0,7</strong> et <strong>1,2 an</strong> ; le principal est remboursé en <strong>1,2 an</strong>. Un coupon semestriel de 6 % sur 1 M vaut $0{,}03\times1\,000\,000=30\,000$.</p>
+<p><em>Étape 2 — la décomposition en zéro-coupon.</em> L'obligation est <strong>en première instance</strong> regardée comme :</p>
+<table>
+<thead>
+<tr>
+<th>Échéance</th>
+<th>Montant</th>
+<th>Instrument</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>0,2 an</td>
+<td>30 000 dollars</td>
+<td>zéro-coupon 0,2 an</td>
+</tr>
+<tr>
+<td>0,7 an</td>
+<td>30 000 dollars</td>
+<td>zéro-coupon 0,7 an</td>
+</tr>
+<tr>
+<td>1,2 an</td>
+<td><strong>1,03 million</strong> de dollars</td>
+<td>zéro-coupon 1,2 an (coupon <strong>+ principal</strong>)</td>
+</tr>
+</tbody></table>
+<p><em>Étape 3 — la projection sur les maturités standard.</em> Aucune de ces trois maturités n'est standard : chacune est remplacée par une position <strong>équivalente</strong> encadrant sa date.</p>
+<table>
+<thead>
+<tr>
+<th>Position d'origine</th>
+<th>Remplacée par</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>0,2 an</td>
+<td><strong>1 mois</strong> et <strong>3 mois</strong></td>
+</tr>
+<tr>
+<td>0,7 an</td>
+<td><strong>6 mois</strong> et <strong>1 an</strong></td>
+</tr>
+<tr>
+<td>1,2 an</td>
+<td><strong>1 an</strong> et <strong>2 ans</strong></td>
+</tr>
+</tbody></table>
+<p><em>Étape 4 — le résultat.</em> La position dans l'obligation à coupon à 1,2 an est, <strong>pour les besoins de la VaR</strong>, regardée comme une position en zéro-coupon de maturités <strong>1 mois, 3 mois, 6 mois, 1 an et 2 ans</strong>.</p>
+<p><em>(La méthode précise est expliquée dans la Technical Note 25 de Hull.)</em></p>
+<p class="cal piege"> <strong>À retenir absolument :</strong> <em>le cash-flow mapping <strong>n'est pas nécessaire</strong> quand on utilise la <strong>simulation historique</strong> — parce que <strong>la structure par terme complète des taux peut être calculée pour chacun des scénarios considérés</strong>.</em></p>
+</div></details>
+
+<h3>4.4 Où le modèle linéaire s'applique</h3>
+<table>
+<thead>
+<tr>
+<th>Portefeuille</th>
+<th>Traitement</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Actions, obligations, change, matières premières, sans dérivés</strong></td>
+<td>l'application la plus simple : $\Delta P$ dépend <strong>linéairement</strong> des variations en pourcentage des prix.  Tous les prix mesurés <strong>en devise domestique</strong> : pour une grande banque américaine, la valeur du Nikkei 225 <strong>en dollars</strong>, le prix d'un zéro-coupon sterling à 10 ans <strong>en dollars</strong>, etc.</td>
+</tr>
+<tr>
+<td><strong>Forward de change</strong> (échéance $T$)</td>
+<td>l'<strong>échange d'une obligation zéro-coupon étrangère</strong> de maturité $T$ <strong>contre une obligation zéro-coupon domestique</strong> de maturité $T$ → position <strong>longue</strong> sur l'obligation étrangère + <strong>courte</strong> sur la domestique ; chacune traitée par cash-flow mapping</td>
+</tr>
+<tr>
+<td><strong>Swap de taux</strong></td>
+<td>l'<strong>échange d'une obligation à taux variable contre une obligation à taux fixe</strong>. La jambe fixe est une obligation à coupon ordinaire. <strong>La jambe variable vaut le pair juste après la prochaine date de paiement</strong> : elle se réduit à un <strong>zéro-coupon de maturité la prochaine date de paiement</strong>. Le swap se ramène donc à un portefeuille de positions longues et courtes en obligations</td>
+</tr>
+</tbody></table>
+<h3>4.5 Le modèle linéaire et les options</h3>
+<p>Portefeuille d'options sur une action de prix $S$, de <strong>delta</strong> $\delta$. Comme $\delta$ est le taux de variation de la valeur du portefeuille par rapport à $S$ :</p>
+<p>$$\frac{\Delta P}{\Delta S}=\delta\qquad\Longrightarrow\qquad\boxed{\Delta P=\delta\,\Delta S}\;\text{(21.4)}$$</p>
+<p>En posant $\Delta x=\Delta S/S$ (variation en <strong>pourcentage</strong>) :</p>
+<p>$$\boxed{\Delta P=S\delta\,\Delta x}\qquad\text{et en général}\qquad\boxed{\Delta P=\sum_{i=1}^{n}S_i\delta_i\,\Delta x_i}\;\text{(21.5)}$$</p>
+<blockquote>
+<p><strong>Le pont avec (21.1) :</strong> c'est exactement $\Delta P=\sum\alpha_i\Delta x_i$ <strong>avec $\boxed{\alpha_i=S_i\delta_i}$</strong>. On peut donc réutiliser (21.2) ou (21.3) telles quelles.</p>
+</blockquote>
+<p class="cal piege"> <strong>Notation.</strong> <em>Normalement on note delta et gamma d'un portefeuille $\Delta$ et $\Gamma$. Dans cette section et la suivante, on utilise les minuscules $\delta$ et $\gamma$ <strong>pour ne pas surcharger $\Delta$</strong></em>, qui sert déjà à noter les variations.</p>
+<details class="cor">
+<summary><strong>Exemple 21.1 — un portefeuille d'options sur Microsoft et AT&amp;T</strong></summary><div class="in">
+
+<p><strong>Données :</strong> delta des options Microsoft = <strong>1 000</strong> ; delta des options AT&amp;T = <strong>20 000</strong> ; $S_1=120$ dollars (Microsoft), $S_2=30$ dollars (AT&amp;T) ; $\sigma_1=2\,\%$, $\sigma_2=1\,\%$, $\rho=0{,}3$.</p>
+<p><em>Étape 1 — les équivalents en montant, par (21.5) :</em>
+$$\Delta P=120\times1\,000\times\Delta x_1+30\times20\,000\times\Delta x_2=120\,000\,\Delta x_1+600\,000\,\Delta x_2$$
+<em>Le portefeuille est donc supposé <strong>équivalent à un investissement de 120 000 dollars en Microsoft et de 600 000 dollars en AT&amp;T</strong>.</em></p>
+<p><em>Étape 2 — l'écart-type de $\Delta P$</em> (en milliers de dollars, donc $\alpha_1=120$, $\alpha_2=600$) :
+$$\sigma_P=\sqrt{(120\times0{,}02)^2+(600\times0{,}01)^2+2\times120\times0{,}02\times600\times0{,}01\times0{,}3}$$
+$$=\sqrt{2{,}4^2+6^2+2\times2{,}4\times6\times0{,}3}=\sqrt{5{,}76+36+8{,}64}=\sqrt{50{,}40}=\mathbf{7{,}099}$$</p>
+<p><em>Étape 3 — le quantile.</em> Ici on demande <strong>95 %</strong> : $N(-1{,}65)=0{,}05$.</p>
+<p><em>Étape 4 — la VaR à 5 jours à 95 % :</em>
+$$1{,}65\times\sqrt5\times7\,099=\mathbf{26\,193\ \text{dollars}}$$</p>
+</div></details>
+
+<h2 data-prio="high">Concept 5 — Le modèle quadratique</h2>
+<h3>5.1 Pourquoi le linéaire ne suffit pas</h3>
+<p><em>Quand un portefeuille contient des options, le modèle linéaire est <strong>une approximation</strong>. Il ne tient pas compte du <strong>gamma</strong> du portefeuille.</em> Rappel : le delta est le taux de variation de la valeur du portefeuille par rapport à la variable de marché ; le gamma est le taux de variation <strong>du delta</strong> par rapport à cette variable. <strong>Le gamma mesure la COURBURE</strong> de la relation entre valeur du portefeuille et variable sous-jacente.</p>
+<table>
+<thead>
+<tr>
+<th>Signe du gamma</th>
+<th>Position type</th>
+<th>Effet sur la loi de $\Delta P$</th>
+<th>Conséquence sur la VaR normale</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>$\gamma&gt;0$</strong></td>
+<td><strong>call long</strong></td>
+<td>loi <strong>asymétrique à droite</strong> (<em>positively skewed</em>) — queue gauche <strong>moins lourde</strong> que la normale</td>
+<td>la VaR calculée est <strong>TROP ÉLEVÉE</strong></td>
+</tr>
+<tr>
+<td><strong>$\gamma&lt;0$</strong></td>
+<td><strong>call court</strong></td>
+<td>loi <strong>asymétrique à gauche</strong> (<em>negatively skewed</em>) — queue gauche <strong>plus lourde</strong> que la normale</td>
+<td>la VaR calculée est <strong>TROP FAIBLE</strong> </td>
+</tr>
+</tbody></table>
+<p><strong>Le mécanisme (figures 21.5 et 21.6).</strong> Une loi <strong>normale</strong> pour le prix du sous-jacent à un jour, passée à travers la relation <strong>convexe</strong> valeur-du-call / prix-du-sous-jacent, ressort <strong>asymétrique positive</strong> ; passée à travers la relation <strong>concave</strong> du call vendu, elle ressort <strong>asymétrique négative</strong>.</p>
+<blockquote>
+<p class="cal piege"> <em><strong>La VaR d'un portefeuille dépend de façon CRITIQUE de la queue gauche de la loi.</strong></em> Avec 99 %, c'est la valeur sous laquelle il n'y a que 1 % de la distribution : une erreur d'asymétrie s'y paie directement.</p>
+</blockquote>
+<h3>5.2 Les équations quadratiques</h3>
+<p>$$\boxed{\Delta P=\delta\,\Delta S+\tfrac12\gamma\,(\Delta S)^2}\qquad\text{(amélioration de (21.4))}$$</p>
+<p>En posant $\Delta x=\Delta S/S$ :</p>
+<p>$$\boxed{\Delta P=S\delta\,\Delta x+\tfrac12 S^2\gamma\,(\Delta x)^2}\;\text{(21.6)}$$</p>
+<p>Pour $n$ variables, chaque instrument ne dépendant que d'<strong>une</strong> variable :</p>
+<p>$$\Delta P=\sum_{i=1}^{n}S_i\delta_i\,\Delta x_i+\sum_{i=1}^{n}\tfrac12 S_i^2\gamma_i\,(\Delta x_i)^2$$</p>
+<p>Quand les instruments dépendent de <strong>plusieurs</strong> variables, la forme générale fait apparaître les <strong>gammas croisés</strong> :</p>
+<p>$$\boxed{\Delta P=\sum_{i=1}^{n}S_i\delta_i\,\Delta x_i+\sum_{i=1}^{n}\sum_{j=1}^{n}\tfrac12 S_iS_j\gamma_{ij}\,\Delta x_i\,\Delta x_j}\;\text{(21.7)}\qquad\text{avec}\qquad\boxed{\gamma_{ij}=\frac{\partial^2P}{\partial S_i\,\partial S_j}}$$</p>
+<p class="cal piege"> <strong>Le terme oublié volontairement.</strong> <em>Le développement de Taylor suggère l'approximation $\Delta P=\Theta\,\Delta t+\delta\,\Delta S+\frac12\gamma(\Delta S)^2$ en ignorant les termes d'ordre supérieur à $\Delta t$. <strong>En pratique, le terme $\Theta\,\Delta t$ est si petit qu'il est habituellement ignoré.</strong></em></p>
+<h3>5.3 De l'équation aux percentiles : Cornish-Fisher</h3>
+<p><em>L'équation (21.7) <strong>n'est pas aussi commode à manier</strong> que (21.1), mais elle permet de calculer les <strong>moments</strong> de $\Delta P$. Un résultat statistique connu sous le nom d'<strong>expansion de Cornish-Fisher</strong> permet d'estimer les <strong>percentiles</strong> de la loi de probabilité <strong>à partir des moments</strong>.</em></p>
+<p><strong>Les trois moments, cas d'une variable unique</strong> ($S$ = valeur de la variable, $\sigma$ = sa volatilité quotidienne) :</p>
+<p>$$\boxed{E(\Delta P)=\tfrac12 S^2\sigma^2\gamma}$$
+$$\boxed{E(\Delta P^2)=S^2\sigma^2\delta^2+\tfrac34 S^4\sigma^4\gamma^2}$$
+$$\boxed{E(\Delta P^3)=\tfrac92 S^4\sigma^4\delta^2\gamma+\tfrac{15}{8}S^6\sigma^6\gamma^3}$$</p>
+<p><em>(soit $0{,}75$ et $4{,}5$ et $1{,}875$ dans l'écriture décimale de Hull ; détails dans sa Technical Note 10. La Sample Application E de DerivaGem implémente la méthode de Cornish-Fisher pour ce cas.)</em></p>
+<blockquote>
+<p><strong>La lecture des moments :</strong> avec $\gamma=0$ on retrouve $E(\Delta P)=0$ et $E(\Delta P^2)=S^2\sigma^2\delta^2$, c'est-à-dire exactement la variance du modèle linéaire $\alpha^2\sigma^2$ avec $\alpha=S\delta$. <strong>Tous les termes supplémentaires sont pilotés par $\gamma$.</strong></p>
+</blockquote>
+<h2 data-prio="high">Concept 6 — Monte-Carlo et comparaison des trois approches</h2>
+<h3>6.1 La procédure Monte-Carlo pour la VaR</h3>
+<table>
+<thead>
+<tr>
+<th>Étape</th>
+<th>Contenu</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>1</strong></td>
+<td><strong>Valoriser le portefeuille aujourd'hui</strong> de la manière habituelle, avec les valeurs courantes des variables de marché</td>
+</tr>
+<tr>
+<td><strong>2</strong></td>
+<td><strong>Tirer une fois</strong> dans la loi <strong>normale multivariée</strong> des $\Delta x_i$ <em>(cf. la décomposition de Cholesky, fiche 92)</em></td>
+</tr>
+<tr>
+<td><strong>3</strong></td>
+<td>Utiliser les $\Delta x_i$ tirés pour déterminer la valeur de <strong>chaque variable de marché</strong> à la fin du jour</td>
+</tr>
+<tr>
+<td><strong>4</strong></td>
+<td><strong>Revaloriser le portefeuille</strong> à la fin du jour, de la manière habituelle</td>
+</tr>
+<tr>
+<td><strong>5</strong></td>
+<td>Soustraire la valeur de l'étape 1 de celle de l'étape 4 → un <strong>tirage de $\Delta P$</strong></td>
+</tr>
+<tr>
+<td><strong>6</strong></td>
+<td><strong>Répéter</strong> les étapes 2 à 5 un grand nombre de fois → une loi de probabilité de $\Delta P$</td>
+</tr>
+</tbody></table>
+<p><strong>Le percentile.</strong> Avec <strong>5 000</strong> valeurs simulées de $\Delta P$ :</p>
+<p>$$\boxed{\text{VaR 1 jour 99 \%}=\text{la }\mathbf{50}^{\text{e}}\text{ pire issue}}\qquad\boxed{\text{VaR 1 jour 95 \%}=\text{la }\mathbf{250}^{\text{e}}\text{ pire issue}}$$</p>
+<p>La VaR à $N$ jours est ensuite, comme toujours, supposée valoir la VaR à 1 jour $\times\sqrt N$.  <em>Ce n'est <strong>qu'approximativement</strong> vrai quand le portefeuille contient des options, mais <strong>c'est l'hypothèse faite en pratique par la plupart des méthodes de calcul de VaR</strong>.</em> La <strong>théorie des valeurs extrêmes</strong> peut servir à « lisser les queues » pour mieux estimer les percentiles extrêmes.</p>
+<p class="cal piege"> <strong>Le défaut, et son remède.</strong> <em>Monte-Carlo tend à être <strong>lent</strong>, parce que le portefeuille complet d'une entreprise (qui peut comporter <strong>des centaines de milliers d'instruments différents</strong>) doit être <strong>revalorisé de nombreuses fois</strong>.</em> Une façon d'accélérer : <strong>supposer que (21.7) décrit la relation</strong> entre $\Delta P$ et les $\Delta x_i$. On saute alors <strong>directement de l'étape 2 à l'étape 5</strong> et on évite la revalorisation complète. C'est l'<strong>approche par simulation partielle</strong> (<em>partial simulation</em>), parfois utilisée aussi pour la simulation historique.</p>
+<h3>6.2 Le tableau comparatif</h3>
+<table>
+<thead>
+<tr>
+<th></th>
+<th><strong>Simulation historique</strong></th>
+<th><strong>Approche modèle</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Avantage 1</strong></td>
+<td><strong>les données historiques déterminent la loi jointe</strong> des variables — aucune loi n'est postulée</td>
+<td>résultats produits <strong>très rapidement</strong></td>
+</tr>
+<tr>
+<td><strong>Avantage 2</strong></td>
+<td>évite le besoin de <strong>cash-flow mapping</strong></td>
+<td>se combine facilement avec les <strong>schémas de mise à jour de la volatilité</strong> (chapitre 22)</td>
+</tr>
+<tr>
+<td><strong>Inconvénient 1</strong></td>
+<td><strong>lente</strong> en calcul</td>
+<td>suppose une loi <strong>normale multivariée</strong> des variables de marché</td>
+</tr>
+<tr>
+<td><strong>Inconvénient 2</strong></td>
+<td>ne permet pas facilement d'utiliser les schémas de mise à jour de volatilité</td>
+<td> en pratique, les variations quotidiennes ont souvent des <strong>queues très différentes de la normale</strong> (cf. table 19.1, fiche 91)</td>
+</tr>
+<tr>
+<td><strong>Inconvénient 3</strong></td>
+<td>—</td>
+<td><strong>résultats médiocres pour les portefeuilles à faible delta</strong></td>
+</tr>
+</tbody></table>
+<p><em>(Pour adapter la simulation historique à la mise à jour de volatilité : Hull et White, « Incorporating volatility updating into the historical simulation method for value-at-risk », <em>Journal of Risk</em>, 1, 1 (1998) : 5-19.)</em></p>
+<h2 data-prio="high">Concept 7 — Stress testing et back testing</h2>
+<h3>7.1 Le stress testing</h3>
+<p><em>Beaucoup d'entreprises pratiquent, <strong>en plus</strong> du calcul de VaR, ce qu'on appelle le <strong>stress testing</strong>. Cela consiste à estimer comment le portefeuille de l'entreprise <strong>se serait comporté sous certains des mouvements de marché les plus extrêmes observés au cours des 10 à 20 dernières années</strong>.</em></p>
+<table>
+<thead>
+<tr>
+<th>Choc à tester</th>
+<th>Journée de référence</th>
+<th>Amplitude</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Mouvement extrême des <strong>actions américaines</strong></td>
+<td><strong>19 octobre 1987</strong></td>
+<td>le S&amp;P 500 bouge de <strong>22,3 écarts-types</strong></td>
+</tr>
+<tr>
+<td>Version « moins extrême »</td>
+<td><strong>8 janvier 1988</strong></td>
+<td>le S&amp;P 500 bouge de <strong>6,8 écarts-types</strong></td>
+</tr>
+<tr>
+<td>Mouvement extrême des <strong>taux britanniques</strong></td>
+<td><strong>10 avril 1992</strong></td>
+<td>les rendements des obligations à 10 ans bougent de <strong>7,7 écarts-types</strong></td>
+</tr>
+</tbody></table>
+<p><em>Les scénarios sont aussi parfois <strong>générés par la direction générale</strong>. Une technique consiste à demander aux dirigeants de se réunir périodiquement pour un <strong>brainstorming</strong> afin de développer des scénarios extrêmes plausibles compte tenu de l'environnement économique et des incertitudes globales.</em></p>
+<blockquote>
+<p class="cal piege"> <em><strong>Le stress testing est une manière de prendre en compte les événements extrêmes qui SE PRODUISENT de temps en temps mais sont virtuellement IMPOSSIBLES selon les lois de probabilité supposées.</strong></em></p>
+</blockquote>
+<p><strong>Le chiffre qui résume tout.</strong> Un mouvement quotidien de <strong>5 écarts-types</strong> : <em>sous l'hypothèse normale, il arrive <strong>environ une fois tous les 7 000 ans</strong>. En pratique, il n'est <strong>pas rare d'en voir une ou deux fois tous les 10 ans</strong>.</em></p>
+<p><strong>La VaR stressée.</strong> <em>À la suite de la crise du crédit de 2007-2008, les régulateurs ont proposé le calcul de la <strong>stressed VaR</strong> : une VaR fondée sur une simulation historique des mouvements des variables de marché <strong>pendant une période de conditions de marché tendues</strong> (comme celles de 2008).</em></p>
+<h3>7.2 Le back testing</h3>
+<blockquote>
+<p><em><strong>Quelle que soit la méthode utilisée pour calculer la VaR, un contrôle de réalité important est le back testing : tester comment les estimations de VaR se seraient comportées DANS LE PASSÉ.</strong></em></p>
+</blockquote>
+<p>Pour une VaR à 1 jour à 99 % : on regarde <strong>combien de fois la perte d'une journée a dépassé la VaR à 1 jour à 99 % qui aurait été calculée pour ce jour-là</strong>.</p>
+<table>
+<thead>
+<tr>
+<th>Fréquence de dépassement observée</th>
+<th>Verdict</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>environ 1 % des jours</strong></td>
+<td>on peut être <strong>raisonnablement à l'aise</strong> avec la méthodologie</td>
+</tr>
+<tr>
+<td><strong>7 % des jours</strong></td>
+<td>la méthodologie est <strong>suspecte</strong></td>
+</tr>
+</tbody></table>
+<h2 data-prio="must">Concept 8 — L'analyse en composantes principales</h2>
+<h3>8.1 Le principe et les données de Frye</h3>
+<p><em>Une approche pour traiter le risque provenant de <strong>groupes de variables de marché fortement corrélées</strong> est l'<strong>analyse en composantes principales</strong>. Elle prend les données historiques des mouvements des variables et tente de définir un ensemble de <strong>composantes</strong> (ou <strong>facteurs</strong>) qui expliquent ces mouvements.</em></p>
+<p><strong>Le jeu de données :</strong> 10 taux du Trésor américain de maturités 3 mois à 30 ans, <strong>1 543 observations quotidiennes entre 1989 et 1995</strong> (Frye, 1997).</p>
+<p><strong>Table 21.7 — les chargements factoriels (<em>factor loadings</em>)</strong> :</p>
+<table>
+<thead>
+<tr>
+<th>Maturité</th>
+<th>PC1</th>
+<th>PC2</th>
+<th>PC3</th>
+<th>PC4</th>
+<th>PC5</th>
+<th>PC6</th>
+<th>PC7</th>
+<th>PC8</th>
+<th>PC9</th>
+<th>PC10</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>3 m</td>
+<td>0,21</td>
+<td>$-0{,}57$</td>
+<td>0,50</td>
+<td>0,47</td>
+<td>$-0{,}39$</td>
+<td>$-0{,}02$</td>
+<td>0,01</td>
+<td>0,00</td>
+<td>0,01</td>
+<td>0,00</td>
+</tr>
+<tr>
+<td>6 m</td>
+<td>0,26</td>
+<td>$-0{,}49$</td>
+<td>0,23</td>
+<td>$-0{,}37$</td>
+<td>0,70</td>
+<td>0,01</td>
+<td>$-0{,}04$</td>
+<td>$-0{,}02$</td>
+<td>$-0{,}01$</td>
+<td>0,00</td>
+</tr>
+<tr>
+<td>12 m</td>
+<td>0,32</td>
+<td>$-0{,}32$</td>
+<td>$-0{,}37$</td>
+<td>$-0{,}58$</td>
+<td>$-0{,}52$</td>
+<td>$-0{,}23$</td>
+<td>$-0{,}04$</td>
+<td>$-0{,}05$</td>
+<td>0,00</td>
+<td>0,01</td>
+</tr>
+<tr>
+<td>2 a</td>
+<td>0,35</td>
+<td>$-0{,}10$</td>
+<td>$-0{,}38$</td>
+<td>0,17</td>
+<td>0,04</td>
+<td>0,59</td>
+<td>0,56</td>
+<td>0,12</td>
+<td>$-0{,}12$</td>
+<td>$-0{,}05$</td>
+</tr>
+<tr>
+<td>3 a</td>
+<td>0,36</td>
+<td>0,02</td>
+<td>$-0{,}30$</td>
+<td>0,27</td>
+<td>0,07</td>
+<td>0,24</td>
+<td>$-0{,}79$</td>
+<td>0,00</td>
+<td>$-0{,}09$</td>
+<td>$-0{,}00$</td>
+</tr>
+<tr>
+<td>4 a</td>
+<td>0,36</td>
+<td>0,14</td>
+<td>$-0{,}12$</td>
+<td>0,25</td>
+<td>0,16</td>
+<td>$-0{,}63$</td>
+<td>0,15</td>
+<td>0,55</td>
+<td>$-0{,}14$</td>
+<td>$-0{,}08$</td>
+</tr>
+<tr>
+<td>5 a</td>
+<td>0,36</td>
+<td>0,17</td>
+<td>$-0{,}04$</td>
+<td>0,14</td>
+<td>0,08</td>
+<td>$-0{,}10$</td>
+<td>0,09</td>
+<td>$-0{,}26$</td>
+<td>0,71</td>
+<td>0,48</td>
+</tr>
+<tr>
+<td>7 a</td>
+<td>0,34</td>
+<td>0,27</td>
+<td>0,15</td>
+<td>0,01</td>
+<td>0,00</td>
+<td>$-0{,}12$</td>
+<td>0,13</td>
+<td>$-0{,}54$</td>
+<td>0,00</td>
+<td>$-0{,}68$</td>
+</tr>
+<tr>
+<td>10 a</td>
+<td>0,31</td>
+<td>0,30</td>
+<td>0,28</td>
+<td>$-0{,}10$</td>
+<td>$-0{,}06$</td>
+<td>0,01</td>
+<td>0,03</td>
+<td>$-0{,}23$</td>
+<td>$-0{,}63$</td>
+<td>0,52</td>
+</tr>
+<tr>
+<td>30 a</td>
+<td>0,25</td>
+<td>0,33</td>
+<td>0,46</td>
+<td>$-0{,}34$</td>
+<td>$-0{,}18$</td>
+<td>0,33</td>
+<td>$-0{,}09$</td>
+<td>0,52</td>
+<td>0,26</td>
+<td>$-0{,}13$</td>
+</tr>
+</tbody></table>
+<p><strong>L'interprétation des trois premiers facteurs</strong> <em>(figure 21.7)</em> :</p>
+<table>
+<thead>
+<tr>
+<th>Facteur</th>
+<th>Nom</th>
+<th>Description exacte</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>PC1</strong></td>
+<td><strong>translation</strong> (<em>parallel shift</em>)</td>
+<td>correspond à un déplacement <strong>à peu près parallèle</strong> de la courbe des taux. Toutes les charges sont <strong>positives</strong> et du même ordre (0,21 à 0,36). <em>Quand il y a <strong>une unité</strong> de ce facteur, le taux 3 mois augmente de <strong>0,21 point de base</strong>, le taux 6 mois de <strong>0,26 point de base</strong>, etc.</em></td>
+</tr>
+<tr>
+<td><strong>PC2</strong></td>
+<td><strong>pentification</strong> (<em>twist / steepening</em>)</td>
+<td>les taux entre <strong>3 mois et 2 ans</strong> bougent dans <strong>un</strong> sens (charges négatives), les taux entre <strong>3 ans et 30 ans</strong> dans <strong>l'autre</strong> (charges positives)</td>
+</tr>
+<tr>
+<td><strong>PC3</strong></td>
+<td><strong>courbure</strong> (<em>bowing</em>)</td>
+<td>les taux du <strong>court</strong> terme et du <strong>long</strong> terme bougent dans un sens, ceux du <strong>milieu</strong> dans l'autre</td>
+</tr>
+</tbody></table>
+<p class="cal piege"> <em><strong>Les chargements factoriels ont la propriété que la somme de leurs carrés vaut 1,0 pour chaque facteur.</strong></em></p>
+<p><strong>Le <em>factor score</em>.</strong> <em>Comme il y a 10 taux et 10 facteurs, les variations de taux observées un jour donné peuvent <strong>toujours</strong> être exprimées comme une <strong>somme linéaire des facteurs</strong> en résolvant un système de 10 équations simultanées. <strong>La quantité d'un facteur particulier présente dans les variations de taux d'un jour donné s'appelle le <em>factor score</em> de ce jour</strong>.</em></p>
+<p><strong>Table 21.8 — écarts-types des factor scores</strong> (en <strong>points de base</strong>) :</p>
+<table>
+<thead>
+<tr>
+<th>PC1</th>
+<th>PC2</th>
+<th>PC3</th>
+<th>PC4</th>
+<th>PC5</th>
+<th>PC6</th>
+<th>PC7</th>
+<th>PC8</th>
+<th>PC9</th>
+<th>PC10</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>17,49</strong></td>
+<td><strong>6,05</strong></td>
+<td><strong>3,10</strong></td>
+<td>2,17</td>
+<td>1,97</td>
+<td>1,69</td>
+<td>1,27</td>
+<td>1,24</td>
+<td>0,80</td>
+<td>0,79</td>
+</tr>
+</tbody></table>
+<p><em>L'importance d'un facteur se mesure par <strong>l'écart-type de son factor score</strong> ; les facteurs sont listés par ordre d'importance.</em> Une quantité du premier facteur <strong>égale à un écart-type</strong> correspond donc à :
+$$\text{taux 3 mois} : 0{,}21\times17{,}49=\mathbf{3{,}67}\ \text{points de base}\qquad\text{taux 6 mois} : 0{,}26\times17{,}49=\mathbf{4{,}55}\ \text{points de base}$$</p>
+<h3>8.2 La décomposition de la variance</h3>
+<p><strong>La propriété fondamentale :</strong> <em>les facteurs sont choisis de sorte que <strong>les factor scores soient NON CORRÉLÉS</strong>.</em> Dans l'exemple, le premier score (quantité de translation) est non corrélé au deuxième (quantité de pentification) sur les 1 543 jours. <strong>Les variances des factor scores s'additionnent pour donner la variance totale des données.</strong></p>
+<p>$$17{,}49^2+6{,}05^2+3{,}10^2+\cdots+0{,}79^2=367{,}9$$</p>
+<table>
+<thead>
+<tr>
+<th>Facteurs retenus</th>
+<th>Part de la variance</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>PC1 seul</strong></td>
+<td>$17{,}49^2/367{,}9=\mathbf{83{,}1\,\%}$</td>
+</tr>
+<tr>
+<td><strong>PC1 + PC2</strong></td>
+<td>$(17{,}49^2+6{,}05^2)/367{,}9=\mathbf{93{,}1\,\%}$</td>
+</tr>
+<tr>
+<td><strong>+ PC3</strong></td>
+<td>environ <strong>2,8 %</strong> de plus</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p class="cal piege"> <em><strong>Cela montre que l'essentiel du risque des mouvements de taux est expliqué par les DEUX OU TROIS PREMIERS facteurs.</strong></em> On peut donc relier les risques d'un portefeuille de produits de taux <strong>aux mouvements de ces facteurs</strong> au lieu de considérer les dix taux.</p>
+</blockquote>
+<p class="cal piege"> <strong>Petit écart de la source.</strong> La somme exacte des carrés du tableau 21.8 vaut $367{,}97$, et $3{,}10^2/367{,}97=2{,}61\,\%$ ; Hull annonce « 2,8 % » pour l'apport de PC3. L'écart tient à l'arrondi des écarts-types affichés à deux décimales — retenir <strong>83 % / 93 % / ≈ 96 %</strong> cumulés, qui est le message.</p>
+<p><em>Note de Hull : des résultats similaires — nature des facteurs et part du risque expliquée — sont obtenus quand une ACP est utilisée pour expliquer les mouvements de <strong>presque n'importe quelle courbe des taux, dans n'importe quel pays</strong>.</em></p>
+<h3>8.3 Calculer une VaR par l'ACP</h3>
+<p><strong>Table 21.9 — variation de la valeur du portefeuille pour un mouvement de 1 point de base</strong> (millions de dollars) :</p>
+<table>
+<thead>
+<tr>
+<th>Taux 1 an</th>
+<th>Taux 2 ans</th>
+<th>Taux 3 ans</th>
+<th>Taux 4 ans</th>
+<th>Taux 5 ans</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$+10$</td>
+<td>$+4$</td>
+<td>$-8$</td>
+<td>$-7$</td>
+<td>$+2$</td>
+</tr>
+</tbody></table>
+<p><em>Un mouvement de 1 point de base du taux 1 an fait <strong>augmenter</strong> la valeur du portefeuille de 10 millions de dollars, un mouvement de 1 point de base du taux 2 ans la fait augmenter de 4 millions, etc.</em></p>
+<details class="cor">
+<summary><strong>Le calcul de VaR par les deux premiers facteurs — pas à pas</strong></summary><div class="in">
+
+<p><em>Étape 1 — le choix des facteurs.</em> On modélise les mouvements de taux par les <strong>deux premiers facteurs</strong> ; cela capture <strong>93,1 %</strong> de la variance.</p>
+<p><em>Étape 2 — l'exposition au premier facteur.</em> On pondère chaque sensibilité par le chargement PC1 de la maturité correspondante (colonne PC1 de la table 21.7 : 0,32 pour 12 m, 0,35 pour 2 a, 0,36 pour 3 a, 0,36 pour 4 a, 0,36 pour 5 a) :
+$$10\times0{,}32+4\times0{,}35-8\times0{,}36-7\times0{,}36+2\times0{,}36=3{,}20+1{,}40-2{,}88-2{,}52+0{,}72=\mathbf{-0{,}08}$$
+<em>(en millions de dollars par point de base de factor score)</em></p>
+<p><em>Étape 3 — l'exposition au deuxième facteur</em>, avec la colonne PC2 ($-0{,}32$ ; $-0{,}10$ ; $0{,}02$ ; $0{,}14$ ; $0{,}17$) :
+$$10\times(-0{,}32)+4\times(-0{,}10)-8\times0{,}02-7\times0{,}14+2\times0{,}17=-3{,}20-0{,}40-0{,}16-0{,}98+0{,}34=\mathbf{-4{,}40}$$</p>
+<p><em>Étape 4 — la relation.</em> Si $f_1$ et $f_2$ sont les factor scores (en points de base), alors, à une bonne approximation :
+$$\boxed{\Delta P=-0{,}08\,f_1-4{,}40\,f_2}$$</p>
+<p><em>Étape 5 — l'écart-type.</em> <strong>Les factor scores sont non corrélés</strong> : il n'y a <strong>aucun terme croisé</strong>. Avec les écarts-types de la table 21.8 :
+$$\sigma_{\Delta P}=\sqrt{0{,}08^2\times17{,}49^2+4{,}40^2\times6{,}05^2}=\sqrt{1{,}958+708{,}4}=\mathbf{26{,}66}$$</p>
+<p><em>Étape 6 — la VaR à 1 jour à 99 % :</em>
+$$26{,}66\times2{,}33=\mathbf{62{,}12}\ \text{millions de dollars}$$</p>
+<p class="cal piege"> <strong>La morale de l'exemple, explicitement soulignée par Hull.</strong> <em>Les données de la table 21.9 sont telles qu'il y a <strong>très peu d'exposition au premier facteur</strong> ($-0{,}08$) et une <strong>exposition significative au deuxième</strong> ($-4{,}40$). <strong>N'utiliser qu'un seul facteur sous-estimerait considérablement la VaR.</strong> La méthode fondée sur la duration (§4.3) la sous-estimerait aussi considérablement, car <strong>elle ne considère que les déplacements PARALLÈLES de la courbe des taux.</strong></em></p>
+</div></details>
+
+<p><strong>Au-delà des taux.</strong> <em>Une ACP peut en théorie être utilisée pour d'autres variables de marché. Si une institution est exposée à un certain nombre d'indices boursiers différents, une ACP peut identifier des facteurs décrivant leurs mouvements, et les plus importants peuvent remplacer les indices dans l'analyse de VaR. <strong>L'efficacité d'une ACP pour un groupe de variables dépend de leur degré de corrélation.</strong></em></p>
+<p class="cal piege"> <strong>Un dernier détail technique.</strong> <em>La VaR est habituellement calculée en reliant les variations effectives du portefeuille aux variations <strong>en POURCENTAGE</strong> des variables de marché (les $\Delta x_i$). Pour un calcul de VaR, il peut donc être <strong>plus approprié de conduire l'ACP sur les variations en pourcentage</strong> des variables de marché plutôt que sur les <strong>variations absolues</strong>.</em></p>
+<h2>Comment reconnaître le type d'exercice</h2>
+<table>
+<thead>
+<tr>
+<th>Indice dans l'énoncé</th>
+<th>Méthode à déclencher</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>« $n$ jours de données historiques », « scénarios »</td>
+<td><strong>simulation historique</strong> : $v_n\,v_i/v_{i-1}$, classer, prendre le $k$-ième pire</td>
+</tr>
+<tr>
+<td>Volatilités <strong>et</strong> corrélations données, pas de dérivés</td>
+<td><strong>modèle linéaire</strong> : (21.2), puis $2{,}33\,\sigma_P\sqrt N$</td>
+</tr>
+<tr>
+<td>Volatilité donnée <strong>en % par an</strong></td>
+<td>diviser par $\sqrt{252}$ <strong>avant tout</strong></td>
+</tr>
+<tr>
+<td>« delta du portefeuille = … »</td>
+<td>poser $\alpha_i=S_i\delta_i$ puis modèle linéaire</td>
+</tr>
+<tr>
+<td>« … et le gamma vaut … »</td>
+<td>passer au <strong>modèle quadratique</strong> (21.6)-(21.7), puis Cornish-Fisher ou Monte-Carlo</td>
+</tr>
+<tr>
+<td>Obligation à coupon, swap, forward de change</td>
+<td><strong>cash-flow mapping</strong> sur les maturités standard</td>
+</tr>
+<tr>
+<td>« seuls des déplacements parallèles »</td>
+<td>$\Delta P=-DP\Delta y$, <strong>une seule</strong> variable de marché</td>
+</tr>
+<tr>
+<td>Chargements factoriels + écarts-types des scores</td>
+<td><strong>ACP</strong> : exposition = $\sum(\text{sensibilité}\times\text{chargement})$, puis somme des carrés <strong>sans termes croisés</strong></td>
+</tr>
+<tr>
+<td>« niveau de confiance 95 % »</td>
+<td>$1{,}65$, <strong>pas</strong> $2{,}33$</td>
+</tr>
+<tr>
+<td>« combien perdrait-on <strong>si</strong> on est dans la queue ? »</td>
+<td>c'est l'<strong>expected shortfall</strong>, pas la VaR</td>
+</tr>
+</tbody></table>
+<h2>Comment résoudre ce type d'exercice</h2>
+<p><strong>A — VaR par le modèle linéaire (le squelette universel).</strong></p>
+<ol>
+<li>Convertir toutes les volatilités <strong>en quotidiennes</strong> : $\sigma_{\text{jour}}=\sigma_{\text{an}}/\sqrt{252}$.</li>
+<li>Écrire les <strong>montants</strong> $\alpha_i$ : montant investi pour un actif comptant, <strong>$S_i\delta_i$</strong> pour une position optionnelle.</li>
+<li>Appliquer $\sigma_P^2=\sum_i\alpha_i^2\sigma_i^2+2\sum_i\sum_{j&lt;i}\rho_{ij}\alpha_i\alpha_j\sigma_i\sigma_j$.</li>
+<li>Prendre la racine : $\sigma_P$ est la volatilité <strong>en dollars par jour</strong>.</li>
+<li>Multiplier par le quantile ($2{,}33$ à 99 %, $1{,}65$ à 95 %) <strong>et</strong> par $\sqrt N$.</li>
+<li>Vérifier l'ordre de grandeur : la VaR doit être <strong>inférieure</strong> à la somme des VaR individuelles (diversification).</li>
+</ol>
+<p><strong>B — VaR par simulation historique.</strong></p>
+<ol>
+<li>Construire, pour chaque variable, la série des <strong>rapports</strong> $v_i/v_{i-1}$ sur les 500 jours.</li>
+<li>Multiplier la valeur du jour $n$ par chaque rapport → <strong>500 valeurs simulées</strong> de chaque variable.</li>
+<li>Revaloriser <strong>le portefeuille entier</strong> dans chaque scénario (pour des positions linéaires : pondérer chaque poche par le rapport de son indice simulé à l'indice courant).</li>
+<li>Calculer $\text{perte}=\text{valeur d'aujourd'hui}-\text{valeur simulée}$.</li>
+<li><strong>Classer</strong> les pertes de la plus grande à la plus petite ; prendre la <strong>5ᵉ</strong> pour 99 % sur 500 scénarios.</li>
+<li>Passer à $N$ jours en multipliant par $\sqrt N$.</li>
+</ol>
+<p><strong>C — VaR par l'ACP.</strong></p>
+<ol>
+<li>Lister les <strong>sensibilités</strong> du portefeuille à chaque taux (variation de valeur pour 1 pb).</li>
+<li>Pour chaque facteur retenu, calculer l'<strong>exposition</strong> $=\sum_k(\text{sensibilité}_k\times\text{chargement}_k)$.</li>
+<li>Écrire $\Delta P=\sum_m(\text{exposition}_m)\,f_m$.</li>
+<li>Comme les $f_m$ sont <strong>non corrélés</strong> : $\sigma_{\Delta P}=\sqrt{\sum_m(\text{exposition}_m)^2\sigma_{f_m}^2}$ — <strong>aucun terme croisé</strong>.</li>
+<li>Multiplier par le quantile et $\sqrt N$.</li>
+</ol>
+<h2 data-prio="must">Common mistakes</h2>
+<table>
+<thead>
+<tr>
+<th>Erreur</th>
+<th>Correction</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Utiliser une volatilité <strong>annuelle</strong> dans un calcul de VaR quotidienne</td>
+<td>diviser par $\sqrt{252}$ — la volatilité quotidienne vaut <strong>≈ 6 %</strong> de l'annuelle</td>
+</tr>
+<tr>
+<td>Confondre le percentile du <strong>gain</strong> et celui de la <strong>perte</strong></td>
+<td>VaR = queue <strong>gauche</strong> de la loi du gain = queue <strong>droite</strong> de la loi de la perte</td>
+</tr>
+<tr>
+<td>Prendre la <strong>4ᵉ</strong> ou la <strong>6ᵉ</strong> pire perte sur 500 sans le dire</td>
+<td>la convention de Hull est la <strong>5ᵉ</strong> ; d'autres conventions existent, <strong>il faut l'annoncer</strong></td>
+</tr>
+<tr>
+<td>Croire que $\text{VaR}_N=\text{VaR}_1\sqrt N$ est exacte</td>
+<td>elle l'est <strong>seulement</strong> si les variations quotidiennes sont <strong>i.i.d. normales de moyenne nulle</strong></td>
+</tr>
+<tr>
+<td>Additionner les VaR des sous-portefeuilles</td>
+<td>c'est le cas <strong>corrélation parfaite</strong> ; la vraie VaR est <strong>plus petite</strong> — c'est le bénéfice de la diversification</td>
+</tr>
+<tr>
+<td>Ignorer le gamma sur un portefeuille d'options <strong>vendues</strong></td>
+<td>$\gamma&lt;0$ → queue gauche <strong>plus lourde</strong> → la VaR linéaire est <strong>sous-estimée</strong>  le pire cas</td>
+</tr>
+<tr>
+<td>Prendre $\alpha=\delta$ au lieu de $\alpha=S\delta$</td>
+<td>$\Delta x$ est une variation <strong>en pourcentage</strong> ; il faut <strong>multiplier par le prix</strong></td>
+</tr>
+<tr>
+<td>Faire du cash-flow mapping en simulation historique</td>
+<td><strong>inutile</strong> : la courbe complète est recalculable dans chaque scénario</td>
+</tr>
+<tr>
+<td>Ne retenir qu'un facteur dans l'ACP</td>
+<td>un portefeuille peut être <strong>immunisé contre la translation</strong> et très exposé à la <strong>pentification</strong> (exemple §8.3 : $-0{,}08$ contre $-4{,}40$)</td>
+</tr>
+<tr>
+<td>Ajouter des termes croisés entre factor scores</td>
+<td>par <strong>construction</strong> ils sont <strong>non corrélés</strong></td>
+</tr>
+<tr>
+<td>Croire que $k=3$ est la valeur imposée</td>
+<td>c'est le <strong>minimum</strong> ; le régulateur peut exiger plus banque par banque</td>
+</tr>
+<tr>
+<td>Utiliser $2{,}33$ à 95 %</td>
+<td>$2{,}33$ ↔ <strong>99 %</strong> ; $1{,}65$ ↔ <strong>95 %</strong></td>
+</tr>
+<tr>
+<td>Croire que la normale décrit bien les queues</td>
+<td>un mouvement à 5 écarts-types : « une fois tous les 7 000 ans » en théorie, <strong>une ou deux fois par décennie</strong> en réalité</td>
+</tr>
+</tbody></table>
+<h2>Ultimate Review</h2>
+<table>
+<thead>
+<tr>
+<th>Élément</th>
+<th>Formule / valeur</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Énoncé VaR</strong></td>
+<td>« certain à $X$ % qu'il n'y aura pas de perte $&gt;V$ dollars dans $N$ jours »</td>
+</tr>
+<tr>
+<td><strong>Définition</strong></td>
+<td>perte du $(100-X)$-ième percentile de la loi du <strong>gain</strong> sur $N$ jours</td>
+</tr>
+<tr>
+<td><strong>Passage à $N$ jours</strong></td>
+<td>$\text{VaR}_N=\text{VaR}_1\times\sqrt N$</td>
+</tr>
+<tr>
+<td><strong>Exigence de Bâle</strong></td>
+<td>capital $=k\times$ VaR 10 j 99 %, $k\ge3{,}0$, soit $\ge9{,}49\times$ VaR 1 j 99 %</td>
+</tr>
+<tr>
+<td><strong>Quantiles normaux</strong></td>
+<td>$N(-2{,}33)=0{,}01$ · $N(-1{,}65)=0{,}05$</td>
+</tr>
+<tr>
+<td><strong>Volatilité quotidienne</strong></td>
+<td>$\sigma_{\text{jour}}=\sigma_{\text{an}}/\sqrt{252}\approx0{,}06\,\sigma_{\text{an}}$</td>
+</tr>
+<tr>
+<td><strong>Scénario historique</strong></td>
+<td>$v_n\,v_i/v_{i-1}$ ; 501 jours → 500 scénarios ; <strong>5ᵉ pire</strong> perte à 99 %</td>
+</tr>
+<tr>
+<td><strong>Exemple des 4 indices</strong></td>
+<td>VaR 1 j = <strong>253 385</strong> dollars ; VaR 10 j = <strong>801 274</strong> dollars</td>
+</tr>
+<tr>
+<td><strong>Modèle linéaire</strong></td>
+<td>$\Delta P=\sum\alpha_i\Delta x_i$ ; $\sigma_P^2=\sum\sum\rho_{ij}\alpha_i\alpha_j\sigma_i\sigma_j=\mathbf a^{\mathsf T}\mathbf C\mathbf a$</td>
+</tr>
+<tr>
+<td><strong>Covariance</strong></td>
+<td>$\text{cov}_{ij}=\sigma_i\sigma_j\rho_{ij}$ ; $\text{var}_i=\sigma_i^2$</td>
+</tr>
+<tr>
+<td><strong>Deux actifs</strong></td>
+<td>$\sigma=\sqrt{\sigma_X^2+\sigma_Y^2+2\rho\sigma_X\sigma_Y}$</td>
+</tr>
+<tr>
+<td><strong>Options, modèle linéaire</strong></td>
+<td>$\alpha_i=S_i\delta_i$</td>
+</tr>
+<tr>
+<td><strong>Modèle quadratique</strong></td>
+<td>$\Delta P=\sum S_i\delta_i\Delta x_i+\frac12\sum\sum S_iS_j\gamma_{ij}\Delta x_i\Delta x_j$</td>
+</tr>
+<tr>
+<td><strong>Gamma croisé</strong></td>
+<td>$\gamma_{ij}=\partial^2P/\partial S_i\partial S_j$</td>
+</tr>
+<tr>
+<td><strong>Signe du gamma</strong></td>
+<td>$\gamma&gt;0$ → VaR normale <strong>trop haute</strong> ; $\gamma&lt;0$ → <strong>trop basse</strong></td>
+</tr>
+<tr>
+<td><strong>Percentiles depuis les moments</strong></td>
+<td>expansion de <strong>Cornish-Fisher</strong></td>
+</tr>
+<tr>
+<td><strong>Taux, méthode simple</strong></td>
+<td>$\Delta P=-DP\Delta y$ (déplacements <strong>parallèles</strong> seulement)</td>
+</tr>
+<tr>
+<td><strong>Taux, méthode standard</strong></td>
+<td><em>cash-flow mapping</em> sur 1 m, 3 m, 6 m, 1 a, 2 a, 5 a, 7 a, 10 a, 30 a</td>
+</tr>
+<tr>
+<td><strong>Monte-Carlo</strong></td>
+<td>5 000 tirages → 99 % = <strong>50ᵉ</strong> pire, 95 % = <strong>250ᵉ</strong> pire</td>
+</tr>
+<tr>
+<td><strong>Trois facteurs de la courbe</strong></td>
+<td><strong>translation</strong> (83,1 %) · <strong>pentification</strong> (→ 93,1 %) · <strong>courbure</strong></td>
+</tr>
+<tr>
+<td><strong>VaR par l'ACP</strong></td>
+<td>exposition $=\sum(\text{sensibilité}\times\text{chargement})$ ; $\sigma_{\Delta P}=\sqrt{\sum(\text{exposition})^2\sigma_f^2}$</td>
+</tr>
+<tr>
+<td><strong>Exemple ACP</strong></td>
+<td>$-0{,}08$ et $-4{,}40$ → $\sigma=26{,}66$ → VaR $=62{,}12$ M dollars</td>
+</tr>
+<tr>
+<td><strong>Back testing</strong></td>
+<td>≈ 1 % d'exceptions = méthode saine ; 7 % = <strong>suspecte</strong></td>
+</tr>
+<tr>
+<td><strong>Stress testing</strong></td>
+<td>19 oct. 1987 (22,3 σ) · 8 janv. 1988 (6,8 σ) · 10 avr. 1992 (7,7 σ)</td>
+</tr>
+<tr>
+<td><strong>Expected shortfall</strong></td>
+<td>perte <strong>moyenne conditionnelle</strong> à être dans la queue de $(100-X)\%$</td>
+</tr>
+</tbody></table>
+<div class="rec"><h2>Active Recall</h2><ol>
+<li>Écrire la phrase exacte que produit un calcul de VaR, en nommant les deux paramètres.</li>
+<li>La VaR est le percentile de quelle distribution, et de quelle queue ?</li>
+<li>Avec $N=5$ et $X=97$, quel percentile cherche-t-on ?</li>
+<li>Pourquoi les analystes calculent-ils presque toujours $N=1$ en premier lieu ?</li>
+<li>Sous quelle condition exacte la règle $\text{VaR}_N=\text{VaR}_1\sqrt N$ est-elle <strong>exacte</strong> ?</li>
+<li>Pourquoi le multiplicateur réglementaire équivaut-il à 9,49 fois la VaR à 1 jour ?</li>
+<li>Quelle est la différence entre <em>trading book</em> et <em>banking book</em> ?</li>
+<li>Quelle faiblesse de la VaR l'<em>expected shortfall</em> corrige-t-elle ? Formuler les deux questions.</li>
+<li>Qui a formalisé les « mesures cohérentes de risque », et en quelle année ?</li>
+<li>Pourquoi 501 jours de données donnent-ils 500 scénarios ?</li>
+<li>Écrire la formule donnant la valeur d'une variable sous le scénario $i$.</li>
+<li>Pourquoi faut-il ajuster le FTSE 100 des variations de change pour un investisseur américain ?</li>
+<li>Recalculer le DJIA sous le scénario 1 à partir de 11 022,06 ; 11 173,59 ; 11 219,38.</li>
+<li>Quel scénario donne la pire perte dans l'exemple des quatre indices, et à quel événement correspond-il ?</li>
+<li>Quelle perte est retenue comme VaR à 99 % sur 500 scénarios, et pourquoi ?</li>
+<li>Quelle fenêtre de données utilise-t-on le lendemain du calcul ?</li>
+<li>Quelle est la relation entre volatilité annuelle et quotidienne ? Quel pourcentage cela représente-t-il ?</li>
+<li>Justifier chiffrement l'hypothèse d'espérance nulle pour Microsoft.</li>
+<li>Calculer la VaR à 10 jours à 99 % d'une position de 10 M avec $\sigma_{\text{jour}}=2\,\%$.</li>
+<li>Donner la formule de l'écart-type de $X+Y$ avec corrélation.</li>
+<li>Comment se calcule le bénéfice de la diversification, et à quoi correspond le cas $\rho=1$ ?</li>
+<li>Écrire (21.1) et (21.2).</li>
+<li>Quelle est la version de (21.2) utilisée par les gérants de portefeuille ?</li>
+<li>Écrire $\sigma_P^2$ en notation matricielle et dire ce que contient $\mathbf a$.</li>
+<li>Quelle relation lie $\text{cov}_{ij}$, $\sigma_i$, $\sigma_j$ et $\rho_{ij}$ ?</li>
+<li>Quelles sont les deux façons de traiter les taux d'intérêt, et laquelle manque de précision ?</li>
+<li>Lister les neuf maturités standard.</li>
+<li>Décomposer l'obligation à 1,2 an à 6 % semestriel en trois zéro-coupon, puis en cinq.</li>
+<li>Pourquoi le cash-flow mapping est-il inutile en simulation historique ?</li>
+<li>Comment un forward de change se décompose-t-il ? Et un swap de taux ?</li>
+<li>Pourquoi la jambe variable d'un swap est-elle un zéro-coupon ?</li>
+<li>Quelle substitution permet de traiter les options dans le modèle linéaire ?</li>
+<li>Refaire l'exemple 21.1 : deltas 1 000 et 20 000, prix 120 et 30 — quels montants équivalents ?</li>
+<li>Quel écart-type et quelle VaR à 5 jours à 95 % obtient-on dans l'exemple 21.1 ?</li>
+<li>Que mesure le gamma, et quel effet a son signe sur l'asymétrie de $\Delta P$ ?</li>
+<li>Un portefeuille à gamma négatif : la VaR normale est-elle trop haute ou trop basse ?</li>
+<li>Écrire (21.6) et (21.7). Que vaut $\gamma_{ij}$ ?</li>
+<li>Quel terme du développement de Taylor est ignoré, et pourquoi ?</li>
+<li>À quoi sert l'expansion de Cornish-Fisher ?</li>
+<li>Donner les trois moments de $\Delta P$ dans le cas d'une variable unique.</li>
+<li>Lister les six étapes de la simulation Monte-Carlo de VaR.</li>
+<li>Avec 5 000 tirages, quelle issue donne la VaR à 99 % ? à 95 % ?</li>
+<li>Qu'est-ce que l'approche par simulation partielle, et que fait-elle gagner ?</li>
+<li>Donner deux avantages et deux inconvénients de chacune des deux grandes approches.</li>
+<li>Pour quel type de portefeuille l'approche modèle donne-t-elle de mauvais résultats ?</li>
+<li>Citer les trois journées de référence du stress testing et leurs amplitudes.</li>
+<li>Combien de fois par siècle un mouvement à 5 σ devrait-il arriver, et combien de fois arrive-t-il ?</li>
+<li>Qu'est-ce que la <em>stressed VaR</em>, et quand a-t-elle été proposée ?</li>
+<li>Quelle fréquence d'exceptions valide une méthodologie en back testing ? Laquelle la condamne ?</li>
+<li>Que représentent PC1, PC2 et PC3 sur une courbe des taux ?</li>
+<li>Que vaut la somme des carrés des chargements d'un facteur ?</li>
+<li>Qu'est-ce qu'un <em>factor score</em> ?</li>
+<li>Quelle propriété statistique cruciale les factor scores possèdent-ils, et que simplifie-t-elle ?</li>
+<li>Calculer la part de variance expliquée par PC1, puis par PC1 + PC2.</li>
+<li>De combien bouge le taux 3 mois pour un écart-type de PC1 ?</li>
+<li>Refaire le calcul des expositions $-0{,}08$ et $-4{,}40$ de la table 21.9.</li>
+<li>Pourquoi $\sigma_{\Delta P}$ n'a-t-il aucun terme croisé dans le calcul par l'ACP ?</li>
+<li>Pourquoi une méthode fondée sur la duration sous-estimerait-elle la VaR de ce portefeuille ?</li>
+<li>L'ACP fonctionne-t-elle sur autre chose que des taux ? De quoi dépend son efficacité ?</li>
+<li>Sur quelles quantités vaut-il mieux conduire l'ACP pour un calcul de VaR ?</li>
+</ol></div>
+
+<h2>Flashcards</h2>
+<table>
+<thead>
+<tr>
+<th>Question</th>
+<th>Réponse</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Les deux paramètres de la VaR ?</td>
+<td><strong>Horizon $N$</strong> et <strong>confiance $X$ %</strong></td>
+</tr>
+<tr>
+<td>VaR = percentile de quoi ?</td>
+<td>Le $(100-X)$-ième percentile de la loi du <strong>gain</strong></td>
+</tr>
+<tr>
+<td>Quelle queue ?</td>
+<td><strong>Gauche</strong> pour le gain, <strong>droite</strong> pour la perte</td>
+</tr>
+<tr>
+<td>$N=5$, $X=97$ ?</td>
+<td>Le <strong>3ᵉ</strong> percentile</td>
+</tr>
+<tr>
+<td>Norme des régulateurs ?</td>
+<td>$N=10$, $X=99$</td>
+</tr>
+<tr>
+<td>Passage à $N$ jours ?</td>
+<td>$\times\sqrt N$</td>
+</tr>
+<tr>
+<td>Quand est-elle exacte ?</td>
+<td>Variations <strong>i.i.d. normales de moyenne nulle</strong></td>
+</tr>
+<tr>
+<td>Multiplicateur de Bâle ?</td>
+<td>$k\ge3{,}0$ appliqué à la VaR 10 j 99 %</td>
+</tr>
+<tr>
+<td>Équivalent en VaR 1 jour ?</td>
+<td>$3\sqrt{10}=\mathbf{9{,}49}$</td>
+</tr>
+<tr>
+<td>Année de Bâle I ?</td>
+<td><strong>1988</strong> (risque de crédit)</td>
+</tr>
+<tr>
+<td>Année de l'amendement marché ?</td>
+<td><strong>1996</strong>, appliqué en <strong>1998</strong></td>
+</tr>
+<tr>
+<td>Banking book ?</td>
+<td>Surtout des <strong>prêts</strong>, pas revalorisé régulièrement</td>
+</tr>
+<tr>
+<td>Trading book ?</td>
+<td>Instruments <strong>négociés</strong>, revalorisé <strong>quotidiennement</strong></td>
+</tr>
+<tr>
+<td>Faiblesse de la VaR ?</td>
+<td>Deux portefeuilles de <strong>même VaR</strong> peuvent avoir des pertes de queue très différentes</td>
+</tr>
+<tr>
+<td>Question de l'expected shortfall ?</td>
+<td>« <strong>Si</strong> ça tourne mal, <strong>combien</strong> perd-on ? »</td>
+</tr>
+<tr>
+<td>Autres noms ?</td>
+<td><strong>C-VaR</strong>, <em>tail loss</em></td>
+</tr>
+<tr>
+<td>Auteurs des mesures cohérentes ?</td>
+<td><strong>Artzner, Delbaen, Eber, Heath</strong> (1999)</td>
+</tr>
+<tr>
+<td>Mesure la plus utilisée en pratique ?</td>
+<td>La <strong>VaR</strong>, pas l'expected shortfall</td>
+</tr>
+<tr>
+<td>Combien de scénarios avec 501 jours ?</td>
+<td><strong>500</strong></td>
+</tr>
+<tr>
+<td>Formule du scénario $i$ ?</td>
+<td>$v_n\,v_i/v_{i-1}$</td>
+</tr>
+<tr>
+<td>Percentile 99 % sur 500 scénarios ?</td>
+<td>La <strong>5ᵉ pire</strong> perte</td>
+</tr>
+<tr>
+<td>Justification Excel ?</td>
+<td>Le percentile $k/(n-1)$ est l'observation de rang $k+1$</td>
+</tr>
+<tr>
+<td>Devise de mesure des variables ?</td>
+<td>Toujours la <strong>devise domestique</strong></td>
+</tr>
+<tr>
+<td>VaR 1 jour de l'exemple 4 indices ?</td>
+<td><strong>253 385 dollars</strong></td>
+</tr>
+<tr>
+<td>VaR 10 jours ?</td>
+<td><strong>801 274 dollars</strong></td>
+</tr>
+<tr>
+<td>Pire scénario, et pourquoi ?</td>
+<td>Le <strong>494</strong> — la faillite de <strong>Lehman Brothers</strong></td>
+</tr>
+<tr>
+<td>Fenêtre du lendemain ?</td>
+<td>On <strong>décale d'un jour</strong> : jours 1 à 501</td>
+</tr>
+<tr>
+<td>$\sigma_{\text{jour}}$ en fonction de $\sigma_{\text{an}}$ ?</td>
+<td>$\sigma_{\text{an}}/\sqrt{252}$</td>
+</tr>
+<tr>
+<td>Quel pourcentage ?</td>
+<td>Environ <strong>6 %</strong></td>
+</tr>
+<tr>
+<td>Définition retenue de $\sigma_{\text{jour}}$ ?</td>
+<td>L'écart-type de la <strong>variation en pourcentage</strong> sur un jour</td>
+</tr>
+<tr>
+<td>Hypothèse sur l'espérance ?</td>
+<td><strong>Nulle</strong> — petite devant l'écart-type</td>
+</tr>
+<tr>
+<td>Quantile à 99 % ?</td>
+<td><strong>2,33</strong></td>
+</tr>
+<tr>
+<td>Quantile à 95 % ?</td>
+<td><strong>1,65</strong></td>
+</tr>
+<tr>
+<td>VaR 1 j de 10 M à 2 % par jour ?</td>
+<td>$2{,}33\times200\,000=\mathbf{466\,000}$</td>
+</tr>
+<tr>
+<td>Et à 10 jours ?</td>
+<td><strong>1 473 621 dollars</strong></td>
+</tr>
+<tr>
+<td>Écart-type de $X+Y$ ?</td>
+<td>$\sqrt{\sigma_X^2+\sigma_Y^2+2\rho\sigma_X\sigma_Y}$</td>
+</tr>
+<tr>
+<td>$\sigma$ du portefeuille MSFT + T ?</td>
+<td><strong>220 227 dollars</strong></td>
+</tr>
+<tr>
+<td>VaR 10 j des deux ?</td>
+<td><strong>1 622 657 dollars</strong></td>
+</tr>
+<tr>
+<td>Bénéfice de la diversification ?</td>
+<td><strong>219 369 dollars</strong></td>
+</tr>
+<tr>
+<td>Cas $\rho=1$ ?</td>
+<td>Les VaR <strong>s'additionnent</strong></td>
+</tr>
+<tr>
+<td>Équation (21.1) ?</td>
+<td>$\Delta P=\sum\alpha_i\Delta x_i$</td>
+</tr>
+<tr>
+<td>Équation (21.2) ?</td>
+<td>$\sigma_P^2=\sum\sum\rho_{ij}\alpha_i\alpha_j\sigma_i\sigma_j$</td>
+</tr>
+<tr>
+<td>Version des gérants ?</td>
+<td>Mêmes formules avec les <strong>poids</strong> $w_i=\alpha_i/P$</td>
+</tr>
+<tr>
+<td>Forme matricielle ?</td>
+<td>$\sigma_P^2=\mathbf a^{\mathsf T}\mathbf C\,\mathbf a$</td>
+</tr>
+<tr>
+<td>Que contient $\mathbf a$ ?</td>
+<td>Les <strong>montants</strong> $\alpha_i$, en <strong>colonne</strong></td>
+</tr>
+<tr>
+<td>$\text{cov}_{ij}$ ?</td>
+<td>$\sigma_i\sigma_j\rho_{ij}$</td>
+</tr>
+<tr>
+<td>Diagonale de $\mathbf C$ ?</td>
+<td>Les <strong>variances</strong> $\sigma_i^2$</td>
+</tr>
+<tr>
+<td>Méthode « déplacement parallèle » ?</td>
+<td>$\Delta P=-DP\Delta y$</td>
+</tr>
+<tr>
+<td>Son défaut ?</td>
+<td><strong>Pas assez précise</strong></td>
+</tr>
+<tr>
+<td>Les neuf maturités standard ?</td>
+<td>1 m, 3 m, 6 m, 1 a, 2 a, 5 a, 7 a, 10 a, 30 a</td>
+</tr>
+<tr>
+<td>Nom de la procédure ?</td>
+<td>Le <em><strong>cash-flow mapping</strong></em></td>
+</tr>
+<tr>
+<td>L'obligation 1,2 an à 6 % ?</td>
+<td>30 000 en 0,2 · 30 000 en 0,7 · <strong>1,03 M</strong> en 1,2</td>
+</tr>
+<tr>
+<td>Après projection ?</td>
+<td>Zéro-coupon <strong>1 m, 3 m, 6 m, 1 a, 2 a</strong></td>
+</tr>
+<tr>
+<td>Nécessaire en simulation historique ?</td>
+<td><strong>Non</strong> — la courbe entière est recalculable</td>
+</tr>
+<tr>
+<td>Forward de change ?</td>
+<td>Zéro-coupon <strong>étranger long</strong> + <strong>domestique court</strong></td>
+</tr>
+<tr>
+<td>Swap de taux ?</td>
+<td>Obligation <strong>fixe</strong> contre obligation <strong>variable</strong></td>
+</tr>
+<tr>
+<td>La jambe variable ?</td>
+<td>Vaut le <strong>pair juste après le prochain paiement</strong> → zéro-coupon à cette date</td>
+</tr>
+<tr>
+<td>Options dans le modèle linéaire ?</td>
+<td>$\alpha_i=S_i\delta_i$</td>
+</tr>
+<tr>
+<td>Équation (21.5) ?</td>
+<td>$\Delta P=\sum S_i\delta_i\Delta x_i$</td>
+</tr>
+<tr>
+<td>Exemple 21.1 : montants équivalents ?</td>
+<td><strong>120 000</strong> et <strong>600 000 dollars</strong></td>
+</tr>
+<tr>
+<td>Son écart-type ?</td>
+<td><strong>7 099 dollars</strong></td>
+</tr>
+<tr>
+<td>Sa VaR 5 j 95 % ?</td>
+<td><strong>26 193 dollars</strong></td>
+</tr>
+<tr>
+<td>Que mesure le gamma ?</td>
+<td>La <strong>courbure</strong> valeur / sous-jacent</td>
+</tr>
+<tr>
+<td>$\gamma&gt;0$ → asymétrie ?</td>
+<td><strong>Positive</strong> ; VaR normale <strong>trop haute</strong></td>
+</tr>
+<tr>
+<td>$\gamma&lt;0$ → asymétrie ?</td>
+<td><strong>Négative</strong> ; VaR normale <strong>trop basse</strong> </td>
+</tr>
+<tr>
+<td>Équation (21.6) ?</td>
+<td>$\Delta P=S\delta\Delta x+\frac12S^2\gamma(\Delta x)^2$</td>
+</tr>
+<tr>
+<td>Gamma croisé ?</td>
+<td>$\gamma_{ij}=\partial^2P/\partial S_i\partial S_j$</td>
+</tr>
+<tr>
+<td>Terme ignoré du Taylor ?</td>
+<td>$\Theta\,\Delta t$ — trop petit</td>
+</tr>
+<tr>
+<td>Des moments aux percentiles ?</td>
+<td>L'expansion de <strong>Cornish-Fisher</strong></td>
+</tr>
+<tr>
+<td>$E(\Delta P)$ à une variable ?</td>
+<td>$\frac12S^2\sigma^2\gamma$</td>
+</tr>
+<tr>
+<td>$E(\Delta P^2)$ ?</td>
+<td>$S^2\sigma^2\delta^2+0{,}75\,S^4\sigma^4\gamma^2$</td>
+</tr>
+<tr>
+<td>$E(\Delta P^3)$ ?</td>
+<td>$4{,}5\,S^4\sigma^4\delta^2\gamma+1{,}875\,S^6\sigma^6\gamma^3$</td>
+</tr>
+<tr>
+<td>Étape 1 de Monte-Carlo ?</td>
+<td>Valoriser le portefeuille <strong>aujourd'hui</strong></td>
+</tr>
+<tr>
+<td>99 % sur 5 000 tirages ?</td>
+<td>La <strong>50ᵉ</strong> pire issue</td>
+</tr>
+<tr>
+<td>95 % sur 5 000 tirages ?</td>
+<td>La <strong>250ᵉ</strong> pire issue</td>
+</tr>
+<tr>
+<td>Défaut de Monte-Carlo ?</td>
+<td><strong>Lenteur</strong> — revalorisation complète répétée</td>
+</tr>
+<tr>
+<td>Simulation partielle ?</td>
+<td>Utiliser (21.7) : sauter de l'étape 2 à l'étape 5</td>
+</tr>
+<tr>
+<td>Avantage clé de l'historique ?</td>
+<td>Les données donnent la <strong>loi jointe</strong> réelle</td>
+</tr>
+<tr>
+<td>Défaut clé de l'approche modèle ?</td>
+<td>Suppose la <strong>normalité multivariée</strong></td>
+</tr>
+<tr>
+<td>Portefeuilles mal traités par le modèle ?</td>
+<td>Ceux à <strong>faible delta</strong></td>
+</tr>
+<tr>
+<td>Journée du krach de 1987 ?</td>
+<td><strong>19 octobre 1987</strong>, S&amp;P 500 à <strong>22,3 σ</strong></td>
+</tr>
+<tr>
+<td>Alternative moins extrême ?</td>
+<td><strong>8 janvier 1988</strong>, <strong>6,8 σ</strong></td>
+</tr>
+<tr>
+<td>Taux britanniques ?</td>
+<td><strong>10 avril 1992</strong>, <strong>7,7 σ</strong></td>
+</tr>
+<tr>
+<td>Mouvement à 5 σ, théorie ?</td>
+<td>Une fois tous les <strong>7 000 ans</strong></td>
+</tr>
+<tr>
+<td>En pratique ?</td>
+<td><strong>Une ou deux fois par décennie</strong></td>
+</tr>
+<tr>
+<td>Stressed VaR ?</td>
+<td>VaR par simulation historique <strong>sur une période tendue</strong> (2008)</td>
+</tr>
+<tr>
+<td>Back testing acceptable ?</td>
+<td>Environ <strong>1 %</strong> d'exceptions</td>
+</tr>
+<tr>
+<td>Back testing suspect ?</td>
+<td><strong>7 %</strong> d'exceptions</td>
+</tr>
+<tr>
+<td>Données de l'ACP de Frye ?</td>
+<td><strong>10 taux US</strong>, <strong>1 543 jours</strong>, <strong>1989-1995</strong></td>
+</tr>
+<tr>
+<td>PC1 ?</td>
+<td><strong>Translation</strong> de la courbe</td>
+</tr>
+<tr>
+<td>PC2 ?</td>
+<td><strong>Pentification</strong> / <em>twist</em></td>
+</tr>
+<tr>
+<td>PC3 ?</td>
+<td><strong>Courbure</strong> / <em>bowing</em></td>
+</tr>
+<tr>
+<td>Somme des carrés des chargements ?</td>
+<td><strong>1,0</strong></td>
+</tr>
+<tr>
+<td>Factor score ?</td>
+<td>La <strong>quantité</strong> d'un facteur présente un jour donné</td>
+</tr>
+<tr>
+<td>Propriété des factor scores ?</td>
+<td>Ils sont <strong>non corrélés</strong></td>
+</tr>
+<tr>
+<td>Écart-type de PC1 ?</td>
+<td><strong>17,49</strong> points de base</td>
+</tr>
+<tr>
+<td>Variance totale ?</td>
+<td><strong>367,9</strong></td>
+</tr>
+<tr>
+<td>Part de PC1 ?</td>
+<td><strong>83,1 %</strong></td>
+</tr>
+<tr>
+<td>Part de PC1 + PC2 ?</td>
+<td><strong>93,1 %</strong></td>
+</tr>
+<tr>
+<td>Mouvement du 3 m pour 1 σ de PC1 ?</td>
+<td>$0{,}21\times17{,}49=\mathbf{3{,}67}$ pb</td>
+</tr>
+<tr>
+<td>Exposition à PC1 (table 21.9) ?</td>
+<td>$\mathbf{-0{,}08}$</td>
+</tr>
+<tr>
+<td>Exposition à PC2 ?</td>
+<td>$\mathbf{-4{,}40}$</td>
+</tr>
+<tr>
+<td>$\sigma_{\Delta P}$ ?</td>
+<td><strong>26,66</strong></td>
+</tr>
+<tr>
+<td>VaR 1 j 99 % par l'ACP ?</td>
+<td><strong>62,12 millions de dollars</strong></td>
+</tr>
+<tr>
+<td>Pourquoi pas de terme croisé ?</td>
+<td>Les factor scores sont <strong>non corrélés</strong></td>
+</tr>
+<tr>
+<td>Erreur d'un seul facteur ici ?</td>
+<td><strong>Sous-estimation grave</strong> — l'exposition est sur PC2</td>
+</tr>
+<tr>
+<td>Erreur de la duration ici ?</td>
+<td>Elle ne voit que les <strong>translations</strong></td>
+</tr>
+<tr>
+<td>ACP hors taux ?</td>
+<td>Possible ; dépend de la <strong>corrélation</strong> des variables</td>
+</tr>
+<tr>
+<td>Sur quoi conduire l'ACP pour la VaR ?</td>
+<td>Sur les variations <strong>en pourcentage</strong></td>
+</tr>
+</tbody></table>
+</main>
+
+
+
+
+</body></html>

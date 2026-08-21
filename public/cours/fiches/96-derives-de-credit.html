@@ -1,0 +1,2398 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fiche 96 — Dérivés de crédit : CDS, indices, CDO synthétiques et corrélation implicite</title>
+<script>
+window.MathJax={tex:{inlineMath:[["$","$"]],displayMath:[["$$","$$"]],processEscapes:true},
+ options:{skipHtmlTags:["script","noscript","style","textarea","pre","code"]},
+ svg:{fontCache:"global"},
+ startup:{pageReady:()=>MathJax.startup.defaultPageReady().then(()=>{document.body.classList.add("ready")})}};
+setTimeout(function(){document.body.classList.add("ready")},2500);
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+/* ============================================================
+   MathiasLearn — feuille de style des fiches
+   Reprise intégrale des tokens de 00_PARCOURS/*.html
+   + blocs pédagogiques (callouts, méthode, essentiels, recall)
+   ============================================================ */
+:root{--bg:#faf9f7;--card:#fff;--ink:#1a1a1a;--muted:#6b6b6b;--line:#e5e2dd;--accent:#8b5e34;
+ --hl:#fdf8ef;--ok:#2d7d4f;--okbg:#f0f7f3;--warn:#b3402f;--warnbg:#fdf3f1;--blue:#2f5d8b;--bluebg:#f1f5fa}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+ font:17px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;padding:0 16px 100px}
+.nav{position:sticky;top:0;background:rgba(250,249,247,.96);backdrop-filter:blur(8px);
+ border-bottom:1px solid var(--line);margin:0 -16px 30px;padding:11px 16px;z-index:50;
+ display:flex;gap:6px;flex-wrap:wrap;font-size:13px}
+.nav a{color:var(--muted);text-decoration:none;padding:4px 9px;border-radius:5px;white-space:nowrap}
+.nav a:hover{background:var(--line);color:var(--ink)}
+.nav a.on{background:var(--accent);color:#fff}
+main{max-width:780px;margin:0 auto}
+h1{font-size:31px;letter-spacing:-.02em;margin:.4em 0 .5em;line-height:1.25}
+h2{font-size:23px;margin:2.2em 0 .7em;padding-bottom:.3em;border-bottom:1px solid var(--line)}
+h3{font-size:19px;margin:1.9em 0 .5em;color:var(--accent)}
+h4{font-size:17px;margin:1.5em 0 .4em}
+p{margin:.8em 0} a{color:var(--accent)} hr{border:0;border-top:1px solid var(--line);margin:2.6em 0}
+table{border-collapse:collapse;width:100%;margin:1.3em 0;font-size:15.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+th{background:#f3f0eb;font-weight:600}
+tr:nth-child(even) td{background:#fcfbfa}
+code{font-family:"SF Mono",Menlo,Consolas,monospace;font-size:.88em;background:#f2efea;padding:2px 6px;border-radius:4px;overflow-wrap:break-word}
+pre{background:#f2efea;padding:14px 16px;border-radius:8px;overflow-x:auto}
+pre code{background:none;padding:0;white-space:pre}
+blockquote{border-left:3px solid var(--accent);background:var(--hl);margin:1.4em 0;padding:14px 20px;border-radius:0 8px 8px 0}
+blockquote p:first-child{margin-top:0} blockquote p:last-child{margin-bottom:0}
+ul,ol{padding-left:1.5em} li{margin:.35em 0} em{color:#4a4a4a}
+mjx-container[display="true"]{margin:1.1em 0!important;overflow-x:auto;overflow-y:hidden;padding:2px 0}
+mjx-container svg{max-width:100%}
+body:not(.ready) main{opacity:0} main{opacity:1;transition:opacity .25s}
+
+/* --- bandeau de tête de fiche --- */
+.cours{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--accent);
+ border-radius:0 10px 10px 0;padding:18px 22px;margin:0 0 34px}
+.cours h4{margin:0 0 4px;font-size:14px;text-transform:uppercase;letter-spacing:.07em;color:var(--accent)}
+.cours .cs{color:var(--muted);font-size:14.5px;margin:0 0 14px}
+
+/* --- exercices / corrigés --- */
+.ex{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:6px 24px 20px;margin:18px 0}
+.ex>h3:first-child{margin-top:14px}
+details.cor{margin-top:18px;border:1px solid var(--line);border-radius:8px;background:#fcfbfa;overflow:hidden}
+details.cor>summary{cursor:pointer;padding:12px 16px;font-weight:600;font-size:15px;color:var(--accent);
+ list-style:none;display:flex;align-items:center;gap:9px;user-select:none;transition:.15s;min-height:44px}
+details.cor>summary::-webkit-details-marker{display:none}
+details.cor>summary:hover{background:var(--hl)}
+details.cor>summary::before{content:"\25B6";font-size:10px;transition:transform .18s;display:inline-block}
+details.cor[open]>summary::before{transform:rotate(90deg)}
+details.cor[open]>summary{background:var(--okbg);color:var(--ok);border-bottom:1px solid var(--line)}
+.cor .in{padding:4px 20px 16px}
+.cor .in>*:first-child{margin-top:.9em}
+
+/* --- blocs pédagogiques (callouts) ---
+   Générés depuis une citation Markdown dont le premier **gras** commence
+   par un mot-clé : DÉFINITION, THÉORÈME, MÉTHODE, PIÈGE, INTUITION… */
+.cal{border:1px solid var(--line);border-left:4px solid var(--accent);background:var(--card);
+ border-radius:0 10px 10px 0;padding:15px 20px;margin:1.5em 0}
+.cal>p:first-child{margin-top:0}.cal>p:last-child,.cal>ul:last-child,.cal>ol:last-child{margin-bottom:0}
+.cal .lab{display:block;font-size:12.5px;text-transform:uppercase;letter-spacing:.08em;
+ font-weight:700;color:var(--accent);margin-bottom:6px}
+.cal.formel{background:var(--hl)}
+.cal.piege{border-left-color:var(--warn);background:var(--warnbg)}
+.cal.piege .lab{color:var(--warn)}
+.cal.methode{border-left-color:var(--ok);background:var(--okbg)}
+.cal.methode .lab{color:var(--ok)}
+.cal.intu{border-left-color:var(--blue);background:var(--bluebg)}
+.cal.intu .lab{color:var(--blue)}
+.cal.plus{border-left-style:dashed;background:#faf9f7}
+.cal.plus .lab{color:var(--muted)}
+
+/* --- révision express --- */
+.ess{background:var(--card);border:1px solid var(--accent);border-radius:10px;padding:4px 24px 20px;margin:1.6em 0}
+.ess h3{margin-top:1.3em}
+.rec{background:var(--card);border:1px dashed var(--accent);border-radius:10px;padding:4px 24px 18px;margin:1.6em 0}
+.rec ol{counter-reset:none}
+
+/* --- impression / PDF --- */
+@media print{
+ .nav{display:none}
+ body{padding:0;background:#fff;font-size:11.2pt;line-height:1.55}
+ main{max-width:none}
+ h1{font-size:23pt}h2{font-size:15pt;margin-top:1.5em}h3{font-size:12.6pt}
+ h2,h3,h4{break-after:avoid;page-break-after:avoid}
+ table,.cal,blockquote{break-inside:avoid;page-break-inside:avoid}
+ table{display:table;font-size:9.6pt}
+ details.cor{border:1px solid var(--line);background:#fcfbfa}
+ details.cor>summary{display:none}
+ details.cor .in{padding-top:10px}
+ .cal,.ex,.ess,.rec{box-shadow:none}
+ a{color:var(--ink);text-decoration:none}
+}
+@page{margin:16mm 15mm 18mm}
+
+/* --- exemples travaillés --- */
+.exm{background:#fcfbfa;border:1px solid var(--line);border-radius:10px;padding:2px 20px 14px;margin:1.5em 0}
+.exm>h4:first-child{margin:14px 0 .5em;color:var(--accent);font-size:13px;text-transform:uppercase;letter-spacing:.07em}
+
+
+/* --- pastilles de priorité (conventions des fiches de l'app) --- */
+h2[data-prio], h3[data-prio], h4[data-prio]{position:relative}
+h2[data-prio]::before,h3[data-prio]::before,h4[data-prio]::before{
+ content:"";display:inline-block;width:9px;height:9px;border-radius:50%;
+ margin-right:9px;vertical-align:middle;background:var(--muted)}
+[data-prio="must"]::before{background:var(--warn)}
+[data-prio="high"]::before{background:#d98324}
+[data-prio="mid"]::before{background:#c9a227}
+[data-prio="low"]::before{background:var(--ok)}
+/* corrigés des fiches de l'app : même traitement que les corrigés des séries */
+details.cor>summary::after{content:""}
+</style></head><body>
+<div class="nav"><a href="00_COMMENCER_ICI.html">Commencer ici</a><a href="01_NOTATIONS_le-decodeur.html">Notations</a><a href="02_EXERCICES_Serie-0.html">Série 0 — Remise en route</a><a href="03_EXERCICES_Serie-1.html">Série 1 — Convexité</a><a href="04_EXERCICES_Serie-2.html">Série 2 — KKT</a><a href="05_AUTO-EVALUATION.html">Auto-évaluation (quiz)</a><a href="06_FICHE_Optimisation-deux-variables.html">Fiche — Optimisation à 2 variables</a></div>
+<main><h1>Fiche 96 — Dérivés de crédit : CDS, indices, CDO synthétiques et corrélation implicite</h1>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Matière</strong></td>
+<td>Maths · Finance de marché · Dérivés de crédit</td>
+</tr>
+<tr>
+<td><strong>Cours source</strong></td>
+<td>John C. Hull, <em>Options, Futures, and Other Derivatives</em>, 8ᵉ éd., Pearson — chapitre 24 « Credit Derivatives »</td>
+</tr>
+<tr>
+<td><strong>Difficulté</strong></td>
+<td> Must know — l'instrument au cœur de la crise de 2007-2008</td>
+</tr>
+<tr>
+<td><strong>Temps d'étude estimé</strong></td>
+<td>2 h</td>
+</tr>
+<tr>
+<td><strong>Prérequis</strong></td>
+<td>Fiche 95 (risque de crédit, copule gaussienne), fiche 81 (titrisation et CDO d'ABS), fiche 80 (swaps)</td>
+</tr>
+<tr>
+<td><strong>Concepts clés</strong></td>
+<td>Credit default swap, entité de référence, événement de crédit, spread de CDS, base CDS-obligation, obligation la moins chère à livrer, valorisation par actualisation risque-neutre, CDS binaire, indices CDX et iTraxx, coupons fixes, forwards et options sur CDS, <em>basket</em> CDS, <em>total return swap</em>, CDO synthétique, tranches standard, point d'attachement et de détachement, modèle de copule gaussienne à un facteur, quadrature gaussienne, corrélation composée et corrélation de base</td>
+</tr>
+<tr>
+<td><strong>Poids à l'examen</strong></td>
+<td>La <strong>table des trois blocs</strong> (paiements, payoff, accru) → $s=\dfrac{C}{A+B}$ · le <strong>principal résiduel d'une tranche</strong> $\dfrac{H-k(1-R)/n}{H-L}$ · $n_L=\dfrac{Ln}{1-R}$ · le rôle <strong>inversé</strong> de la corrélation entre tranche equity et tranche senior.</td>
+</tr>
+</tbody></table>
+<h2>Vue d'ensemble</h2>
+<pre><code>CROISSANCE   2000 : 800 milliards de nominal notionnel → décembre 2009 : 32 000 milliards
+
+SINGLE-NAME  le CDS — payoff = L(1−R) si l'entité de référence fait défaut
+MULTI-NAME   le CDO — un portefeuille, une cascade, des tranches
+
+VALORISER UN CDS       trois blocs, tous actualisés au taux SANS RISQUE
+   A = Σ (survie) × v      paiements réguliers
+   B = Σ (défaut) × 0,5 × v    paiement accru final
+   C = Σ (défaut) × (1−R) × v  payoff
+   s = C / (A + B)        →   MtM = s_marché × (A+B) − C   pour le VENDEUR
+
+INDICES      CDX NA IG (125 noms Amérique du Nord) · iTraxx Europe (125 noms Europe)
+             mis à jour les 20 mars et 20 septembre
+
+CDO SYNTHÉTIQUE   vendre de la protection CDS sur n noms, découper les pertes en tranches
+   nL = Ln/(1−R)   nH = Hn/(1−R)   principal résiduel = [H − k(1−R)/n] / (H − L)
+   MODÈLE STANDARD  copule gaussienne à UN FACTEUR + binomiale conditionnelle + quadrature
+
+CORRÉLATION  ρ ↑  →  tranche EQUITY moins risquée · tranche SENIOR plus risquée
+             composée : SOURIRE      de base : SKEW croissant
+</code></pre>
+<p><strong>Le cadrage d'ouverture.</strong> *Les dérivés de crédit sont des contrats <strong>dont le payoff dépend de la solvabilité d'une ou plusieurs entreprises ou pays</strong>. Ils permettent aux entreprises de <strong>négocier les risques de crédit à peu près comme elles négocient les risques de marché</strong>. Les banques et autres institutions financières étaient auparavant dans la position où, une fois un risque de crédit assumé, <strong>elles ne pouvaient plus faire grand-chose sinon attendre (et espérer)</strong>. Elles peuvent maintenant <strong>gérer activement leurs portefeuilles de risques de crédit</strong>.*</p>
+<details class="cor">
+<summary><strong>Business Snapshot 24.1 — qui porte le risque de crédit ?</strong></summary><div class="in">
+
+<p><em>Traditionnellement, les banques faisaient des prêts et <strong>portaient le risque de défaut</strong>. Mais elles sont depuis un certain temps <strong>réticentes à garder les prêts au bilan</strong> : une fois pris en compte le capital exigé par les régulateurs, <strong>le rendement moyen des prêts est souvent moins attractif que celui d'autres actifs</strong>. Elles ont créé des titres adossés à des actifs pour transmettre les prêts (et leur risque) aux investisseurs, et à la fin des années 1990 et au début des années 2000 elles ont <strong>massivement utilisé les dérivés de crédit</strong> pour déplacer le risque vers d'autres parties du système financier.</em></p>
+<blockquote>
+<p><strong>Si les banques ont été acheteuses nettes de protection, qui en a été vendeur net ?</strong> <em>La réponse est <strong>les compagnies d'assurance</strong>. Elles <strong>ne sont pas régulées de la même façon</strong> que les banques et sont de ce fait parfois <strong>plus disposées à porter du risque de crédit</strong>.</em></p>
+</blockquote>
+<p class="cal piege"> <em>Le résultat de tout cela est que <strong>l'institution financière qui porte le risque de crédit d'un prêt est souvent différente de celle qui a fait les vérifications de crédit initiales</strong>. Comme la crise de 2007 l'a montré, <strong>ce n'est pas toujours bon pour la santé globale du système financier</strong>.</em></p>
+</div></details>
+
+<h2 data-prio="must">Concept 1 — Le credit default swap</h2>
+<h3>1.1 Le mécanisme</h3>
+<blockquote>
+<p><em><strong>Le CDS est un contrat qui fournit une assurance contre le risque de défaut d'une entreprise particulière.</strong></em></p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>Terme</th>
+<th>Définition</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Entité de référence</strong> (<em>reference entity</em>)</td>
+<td>l'entreprise (ou le pays) sur laquelle porte le contrat</td>
+</tr>
+<tr>
+<td><strong>Événement de crédit</strong> (<em>credit event</em>)</td>
+<td>un défaut de cette entreprise</td>
+</tr>
+<tr>
+<td><strong>Nominal notionnel</strong></td>
+<td>la valeur faciale <strong>totale</strong> des obligations qui peuvent être vendues</td>
+</tr>
+<tr>
+<td><strong>Spread de CDS</strong></td>
+<td>le montant total payé par an, <strong>en pourcentage du nominal</strong>, pour acheter la protection</td>
+</tr>
+</tbody></table>
+<p><em>L'acheteur de l'assurance obtient <strong>le droit de vendre les obligations émises par l'entreprise à leur valeur faciale</strong> quand survient un événement de crédit ; le vendeur <strong>accepte de les acheter à leur valeur faciale</strong>.</em> L'acheteur fait des <strong>paiements périodiques</strong> au vendeur jusqu'à la fin de vie du CDS <strong>ou</strong> jusqu'à l'événement de crédit. <em>Ces paiements sont typiquement faits <strong>trimestriellement à terme échu</strong>, mais des accords mensuels, semestriels ou annuels existent, et parfois les paiements sont faits d'avance.</em></p>
+<details class="cor">
+<summary><strong>L'exemple complet — un CDS 5 ans conclu le 20 mars 2012</strong></summary><div class="in">
+
+<p><strong>Données.</strong> Nominal <strong>100 millions de dollars</strong>, l'acheteur paie <strong>90 points de base par an</strong>, paiements <strong>trimestriels à terme échu</strong>.</p>
+<p><em>Cas 1 — pas de défaut.</em> L'acheteur ne reçoit <strong>aucun payoff</strong> et paie <strong>22,5 points de base</strong> (le quart de 90) sur 100 millions le 20 juin 2012 et chaque trimestre jusqu'au <strong>20 mars 2017</strong> :
+$$0{,}00225\times100\,000\,000=\mathbf{225\,000\ \text{dollars par trimestre}}$$
+<em>(Les paiements trimestriels sont susceptibles de différer légèrement de 225 000 à cause des <strong>conventions de décompte des jours</strong>.)</em></p>
+<p><em>Cas 2 — événement de crédit notifié le 20 mai 2015</em> (2 mois dans la 4ᵉ année) :</p>
+<table>
+<thead>
+<tr>
+<th>Mode de règlement</th>
+<th>Ce qui se passe</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Livraison physique</strong></td>
+<td>l'acheteur a le droit de <strong>vendre des obligations de valeur faciale 100 millions pour 100 millions</strong></td>
+</tr>
+<tr>
+<td><strong>Règlement en espèces</strong> (l'usage actuel)</td>
+<td><strong>un processus d'enchères organisé par l'ISDA</strong> détermine la valeur mid-market de <strong>l'obligation livrable la moins chère</strong> quelques jours après l'événement. Si l'enchère indique <strong>35 dollars par 100 de valeur faciale</strong>, le payoff est de <strong>65 millions</strong></td>
+</tr>
+</tbody></table>
+<p><em>Le paiement accru final.</em>  <em>Les paiements réguliers <strong>cessent</strong> quand survient un événement de crédit. <strong>Mais comme ils sont faits à terme échu, un paiement accru final est habituellement requis.</strong></em> Ici, l'acheteur devrait payer au vendeur le montant accru entre le <strong>20 mars 2015</strong> et le <strong>20 mai 2015</strong>, soit approximativement <strong>150 000 dollars</strong> — et rien de plus.</p>
+<p><strong>La cotation d'un market maker.</strong> <em>Sur un nouveau CDS à 5 ans, un teneur de marché peut coter <strong>bid 250 / offer 260 points de base</strong> : il est prêt à <strong>acheter</strong> la protection en payant 2,5 % du principal par an et à <strong>vendre</strong> la protection pour 2,6 % par an.</em></p>
+</div></details>
+
+<p><strong>Les conventions du marché</strong> :</p>
+<table>
+<thead>
+<tr>
+<th>Élément</th>
+<th>Convention</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Maturité la plus populaire</td>
+<td><strong>5 ans</strong> (1, 2, 3, 7 et 10 ans ne sont pas rares)</td>
+</tr>
+<tr>
+<td>Dates standard de maturité</td>
+<td><strong>20 mars · 20 juin · 20 septembre · 20 décembre</strong></td>
+</tr>
+<tr>
+<td>Conséquence</td>
+<td> <em>le temps réel jusqu'à maturité <strong>est proche de, mais pas nécessairement égal à</strong> ce qui est spécifié</em></td>
+</tr>
+<tr>
+<td>Exemple</td>
+<td>un appel le <strong>15 novembre 2012</strong> pour 5 ans de protection donne probablement un contrat jusqu'au <strong>20 décembre 2017</strong>, avec un premier paiement le <strong>20 décembre 2012</strong> couvrant la période 15 nov. – 20 déc. <em>(Si le délai jusqu'à la première date standard est <strong>inférieur à un mois</strong>, le premier paiement est typiquement fait à la <strong>deuxième</strong> date standard.)</em></td>
+</tr>
+<tr>
+<td>Définition d'un événement de crédit</td>
+<td><em>un <strong>défaut de paiement à échéance</strong>, une <strong>restructuration de dette</strong>, ou une <strong>faillite</strong></em></td>
+</tr>
+</tbody></table>
+<details class="cor">
+<summary><strong>Business Snapshot 24.2 — le marché des CDS</strong></summary><div class="in">
+
+<p><em>En <strong>1998 et 1999</strong>, l'<strong>ISDA</strong> (International Swaps and Derivatives Association) a développé un <strong>contrat standard</strong> pour négocier les CDS de gré à gré. Depuis, le marché a crû très vite.</em></p>
+<blockquote>
+<p class="cal piege"> <em><strong>Un CDS ressemble à un contrat d'assurance à bien des égards, mais il y a une différence CLÉ : un contrat d'assurance protège contre les pertes sur un actif QU'ON POSSÈDE. Dans le cas d'un CDS, l'actif sous-jacent N'A PAS À ÊTRE POSSÉDÉ.</strong></em></p>
+</blockquote>
+<p><strong>Les inquiétudes réglementaires.</strong> <em>Pendant la tourmente commencée en août 2007, les régulateurs se sont beaucoup inquiétés du <strong>risque systémique</strong>. <strong>Le danger : un défaut d'une institution financière pourrait entraîner de grosses pertes chez ses contreparties CDS et de nouveaux défauts d'autres institutions.</strong> Ces inquiétudes ont été alimentées par les difficultés du géant de l'assurance <strong>AIG</strong> — gros vendeur de protection sur les tranches notées AAA créées à partir de crédits hypothécaires. <strong>La protection s'est révélée très coûteuse pour AIG, qui a été renflouée par le gouvernement américain.</strong></em></p>
+<p><em>Ces inquiétudes ont conduit au développement de <strong>chambres de compensation</strong> pour les transactions CDS entre institutions financières, exigeant le <strong>dépôt de marge</strong> comme sur les contrats à terme.</em></p>
+<p><strong>La résilience du produit.</strong> <em>En 2007 et 2008, les transactions ont <strong>cessé sur beaucoup de types de dérivés de crédit, mais les CDS ont continué de se négocier activement</strong> (même si le coût de la protection a augmenté dramatiquement). <strong>L'avantage du CDS est que son fonctionnement est DIRECT</strong> ; d'autres dérivés de crédit, comme ceux créés par la titrisation de crédits hypothécaires, <strong>manquent de cette transparence</strong>.</em></p>
+<p><strong>Le chiffre à retenir.</strong> <em>Il n'est pas rare que le <strong>volume de CDS sur une entreprise dépasse sa dette</strong> — le règlement en espèces devient alors clairement nécessaire. Quand <strong>Lehman</strong> a fait défaut en septembre 2008, il y avait environ <strong>400 milliards de dollars de contrats CDS</strong> et <strong>155 milliards de dette Lehman</strong> en circulation. <strong>Le paiement aux acheteurs de protection, déterminé par enchère, a été de 91,375 % du principal.</strong></em></p>
+</div></details>
+
+<h3>1.2 CDS et rendements obligataires : la base</h3>
+<details class="cor">
+<summary><strong>L'argument d'arbitrage — pourquoi spread de CDS ≈ excès de rendement</strong></summary><div class="in">
+
+<p><em>Étape 1 — le montage.</em> Un investisseur achète au pair une obligation d'entreprise à 5 ans rendant <strong>7 % par an</strong>, et achète simultanément <strong>5 ans de protection CDS</strong> contre le défaut de l'émetteur. Le spread de CDS est <strong>200 points de base</strong>.</p>
+<p><em>Étape 2 — l'effet.</em> <em><strong>Le CDS convertit l'obligation d'entreprise en obligation sans risque</strong></em> (au moins approximativement).</p>
+<p><em>Étape 3 — les deux scénarios.</em></p>
+<table>
+<thead>
+<tr>
+<th>Scénario</th>
+<th>Résultat</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Pas de défaut</strong></td>
+<td>l'investisseur gagne $7\,\%-2\,\%=\mathbf{5\,\%}$ par an</td>
+</tr>
+<tr>
+<td><strong>Défaut</strong></td>
+<td>il gagne 5 % jusqu'au défaut ; il peut alors <strong>échanger l'obligation contre sa valeur faciale</strong>, qu'il place au taux sans risque pour le reste des 5 ans</td>
+</tr>
+</tbody></table>
+<p><em>Étape 4 — la conclusion.</em> <em><strong>L'excès du rendement d'une obligation à $n$ ans sur le taux sans risque devrait approximativement ÉGALER le spread de CDS à $n$ ans.</strong></em></p>
+<table>
+<thead>
+<tr>
+<th>Déséquilibre</th>
+<th>Arbitrage</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Excès <strong>nettement supérieur</strong> au spread</td>
+<td>acheter l'obligation <strong>et</strong> la protection → <strong>gagner plus que le taux sans risque</strong></td>
+</tr>
+<tr>
+<td>Excès <strong>nettement inférieur</strong></td>
+<td>vendre l'obligation à découvert <strong>et</strong> vendre la protection → <strong>emprunter à moins que le taux sans risque</strong></td>
+</tr>
+</tbody></table>
+<p><em>Le taux sans risque pertinent est habituellement supposé être le taux <strong>LIBOR/swap</strong>, de sorte que l'excès de rendement est <strong>l'asset swap spread</strong> (fiche 95).</em></p>
+</div></details>
+
+<p>$$\boxed{\text{Base CDS-obligation}=\text{spread de CDS}-\text{excès du rendement obligataire sur le sans risque}=\text{spread de CDS}-\text{asset swap spread}}$$</p>
+<p><em>L'argument d'arbitrage suggère que cela devrait être <strong>proche de zéro</strong>. <strong>Avant la crise de 2007, c'était en moyenne légèrement POSITIF. Pendant la crise, cela tendait à être NÉGATIF, et est devenu fortement négatif pendant une courte période en janvier 2009.</strong></em></p>
+<h3>1.3 L'obligation la moins chère à livrer</h3>
+<p>$$\boxed{\text{Payoff d'un CDS}=L(1-R)}\qquad L=\text{nominal notionnel},\ R=\text{taux de recouvrement}$$</p>
+<blockquote>
+<p class="cal piege"> <em><strong>Habituellement un CDS spécifie qu'un CERTAIN NOMBRE d'obligations différentes peuvent être livrées. Elles ont typiquement le MÊME rang de séniorité, mais elles peuvent NE PAS se vendre au même pourcentage de valeur faciale immédiatement après un défaut. Cela donne au détenteur d'un CDS une OPTION DE L'OBLIGATION LA MOINS CHÈRE À LIVRER.</strong></em></p>
+</blockquote>
+<p><em>Les raisons de cet écart :</em></p>
+<ul>
+<li><em>la créance présentée en cas de défaut égale typiquement la <strong>valeur faciale plus les intérêts courus</strong> : les obligations à <strong>fort coupon couru</strong> au moment du défaut tendent donc à avoir des <strong>prix plus élevés</strong> juste après ;</em></li>
+<li><em>le marché peut juger qu'en cas de réorganisation, <strong>certains porteurs s'en tireront mieux que d'autres</strong>.</em></li>
+</ul>
+<h2 data-prio="must">Concept 2 — La valorisation d'un CDS</h2>
+<h3>2.1 Les données de l'exemple canonique</h3>
+<p><strong>Hypothèses.</strong> Taux de hasard <strong>2 % par an</strong> (probabilité de défaut pendant une année <strong>conditionnelle à l'absence de défaut antérieur</strong>) ;  <em>c'est un taux de hasard exprimé en <strong>composition annuelle</strong> ; le taux composé en continu équivalent est $-\ln(0{,}98)=\mathbf{2{,}02\,\%}$</em>. Les défauts surviennent <strong>toujours à mi-année</strong> ; les paiements du CDS sont faits <strong>une fois par an, à la fin de chaque année</strong> ; taux sans risque (LIBOR) <strong>5 %</strong> composé en continu ; recouvrement <strong>40 %</strong>.</p>
+<p><strong>Table 24.1 — probabilités inconditionnelles et de survie</strong> :</p>
+<table>
+<thead>
+<tr>
+<th>Année</th>
+<th>Probabilité de défaut</th>
+<th>Probabilité de survie</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>0,0200</td>
+<td>0,9800</td>
+</tr>
+<tr>
+<td>2</td>
+<td>$0{,}02\times0{,}98=$ <strong>0,0196</strong></td>
+<td>$0{,}98^2=$ <strong>0,9604</strong></td>
+</tr>
+<tr>
+<td>3</td>
+<td>$0{,}02\times0{,}9604=$ <strong>0,0192</strong></td>
+<td>0,9412</td>
+</tr>
+<tr>
+<td>4</td>
+<td>0,0188</td>
+<td>0,9224</td>
+</tr>
+<tr>
+<td>5</td>
+<td>0,0184</td>
+<td>0,9039</td>
+</tr>
+</tbody></table>
+<h3>2.2 Les trois blocs</h3>
+<details class="cor">
+<summary><strong>Table 24.2 — la valeur actuelle des PAIEMENTS espérés (bloc A)</strong></summary><div class="in">
+
+<p>Le nominal est 1 dollar et le spread est $s$ par an. On paie <strong>si et seulement si l'entité a survécu</strong>.</p>
+<table>
+<thead>
+<tr>
+<th>Année</th>
+<th>Probabilité de survie</th>
+<th>Paiement espéré</th>
+<th>Facteur d'actualisation</th>
+<th>VA du paiement espéré</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>0,9800</td>
+<td>$0{,}9800\,s$</td>
+<td>$e^{-0{,}05}=0{,}9512$</td>
+<td>$0{,}9322\,s$</td>
+</tr>
+<tr>
+<td>2</td>
+<td>0,9604</td>
+<td>$0{,}9604\,s$</td>
+<td>0,9048</td>
+<td>$0{,}8690\,s$</td>
+</tr>
+<tr>
+<td>3</td>
+<td>0,9412</td>
+<td>$0{,}9412\,s$</td>
+<td>0,8607</td>
+<td>$0{,}8101\,s$</td>
+</tr>
+<tr>
+<td>4</td>
+<td>0,9224</td>
+<td>$0{,}9224\,s$</td>
+<td>0,8187</td>
+<td>$0{,}7552\,s$</td>
+</tr>
+<tr>
+<td>5</td>
+<td>0,9039</td>
+<td>$0{,}9039\,s$</td>
+<td>0,7788</td>
+<td>$0{,}7040\,s$</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+<td><strong>Total</strong></td>
+<td>$\mathbf{4{,}0704\,s}$</td>
+</tr>
+</tbody></table>
+<p><em>Détail de la ligne 3 :</em> <em>il y a une probabilité <strong>0,9412</strong> que le troisième paiement de $s$ soit fait. Le paiement espéré est donc $0{,}9412\,s$ et sa valeur actuelle $0{,}9412\,s\,e^{-0{,}05\times3}=\mathbf{0{,}8101\,s}$.</em></p>
+</div></details>
+
+<details class="cor">
+<summary><strong>Table 24.3 — la valeur actuelle du PAYOFF espéré (bloc C)</strong></summary><div class="in">
+
+<p>Les défauts surviennent <strong>à mi-année</strong> ; le payoff est $1-R=0{,}6$ par dollar de nominal.</p>
+<table>
+<thead>
+<tr>
+<th>Date (ans)</th>
+<th>Probabilité de défaut</th>
+<th>Recouvrement</th>
+<th>Payoff espéré</th>
+<th>Facteur d'actualisation</th>
+<th>VA du payoff espéré</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>0,5</td>
+<td>0,0200</td>
+<td>0,4</td>
+<td>0,0120</td>
+<td>0,9753</td>
+<td>0,0117</td>
+</tr>
+<tr>
+<td>1,5</td>
+<td>0,0196</td>
+<td>0,4</td>
+<td>0,0118</td>
+<td>0,9277</td>
+<td>0,0109</td>
+</tr>
+<tr>
+<td>2,5</td>
+<td>0,0192</td>
+<td>0,4</td>
+<td>0,0115</td>
+<td>0,8825</td>
+<td>0,0102</td>
+</tr>
+<tr>
+<td>3,5</td>
+<td>0,0188</td>
+<td>0,4</td>
+<td>0,0113</td>
+<td>0,8395</td>
+<td>0,0095</td>
+</tr>
+<tr>
+<td>4,5</td>
+<td>0,0184</td>
+<td>0,4</td>
+<td>0,0111</td>
+<td>0,7985</td>
+<td>0,0088</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td><strong>Total</strong></td>
+<td><strong>0,0511</strong></td>
+</tr>
+</tbody></table>
+<p><em>Détail de la ligne 2,5 :</em> <em>il y a une probabilité <strong>0,0192</strong> d'un payoff à mi-troisième année. Avec un recouvrement de 40 %, le payoff espéré est $0{,}0192\times0{,}6\times1=\mathbf{0{,}0115}$, dont la valeur actuelle est $0{,}0115\,e^{-0{,}05\times2{,}5}=\mathbf{0{,}0102}$.</em></p>
+</div></details>
+
+<details class="cor">
+<summary><strong>Table 24.4 — la valeur actuelle du paiement ACCRU (bloc B)</strong></summary><div class="in">
+
+<p>En cas de défaut à mi-année, l'acheteur doit <strong>un demi-paiement accru</strong>, soit $0{,}5\,s$.</p>
+<table>
+<thead>
+<tr>
+<th>Date (ans)</th>
+<th>Probabilité de défaut</th>
+<th>Paiement accru espéré</th>
+<th>Facteur d'actualisation</th>
+<th>VA</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>0,5</td>
+<td>0,0200</td>
+<td>$0{,}0100\,s$</td>
+<td>0,9753</td>
+<td>$0{,}0097\,s$</td>
+</tr>
+<tr>
+<td>1,5</td>
+<td>0,0196</td>
+<td>$0{,}0098\,s$</td>
+<td>0,9277</td>
+<td>$0{,}0091\,s$</td>
+</tr>
+<tr>
+<td>2,5</td>
+<td>0,0192</td>
+<td>$0{,}0096\,s$</td>
+<td>0,8825</td>
+<td>$0{,}0085\,s$</td>
+</tr>
+<tr>
+<td>3,5</td>
+<td>0,0188</td>
+<td>$0{,}0094\,s$</td>
+<td>0,8395</td>
+<td>$0{,}0079\,s$</td>
+</tr>
+<tr>
+<td>4,5</td>
+<td>0,0184</td>
+<td>$0{,}0092\,s$</td>
+<td>0,7985</td>
+<td>$0{,}0074\,s$</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+<td><strong>Total</strong></td>
+<td>$\mathbf{0{,}0426\,s}$</td>
+</tr>
+</tbody></table>
+</div></details>
+
+<h3>2.3 Le spread d'équilibre et le <em>mark to market</em></h3>
+<p>$$\text{VA des paiements}=4{,}0704\,s+0{,}0426\,s=\mathbf{4{,}1130\,s}\qquad\text{VA du payoff}=\mathbf{0{,}0511}$$</p>
+<p>$$\boxed{4{,}1130\,s=0{,}0511\quad\Longrightarrow\quad s=0{,}0124\ \text{soit }\mathbf{124\ \text{points de base par an}}}$$</p>
+<p class="cal piege"> <em>Les calculs supposent que <strong>les défauts n'ont lieu qu'aux points à mi-chemin entre les dates de paiement</strong>. Cette hypothèse simple peut être relâchée, mais elle <strong>donne généralement de bons résultats</strong>.</em></p>
+<details class="cor">
+<summary><strong>Le mark to market d'un CDS existant</strong></summary><div class="in">
+
+<p><em>Un CDS, comme la plupart des swaps, est <strong>marqué au marché quotidiennement</strong>. Il peut avoir une valeur positive ou négative.</em></p>
+<p><strong>Situation :</strong> le CDS avait été négocié il y a quelque temps pour un spread de <strong>150 points de base</strong>.</p>
+<p><em>Étape 1 — la VA des paiements de l'acheteur, au spread contractuel :</em>
+$$4{,}1130\times0{,}0150=\mathbf{0{,}0617}$$</p>
+<p><em>Étape 2 — la VA du payoff, aux conditions de marché actuelles :</em> <strong>0,0511</strong> (comme ci-dessus).</p>
+<p><em>Étape 3 — la valeur pour le <strong>VENDEUR</strong> de protection :</em>
+$$0{,}0617-0{,}0511=\mathbf{+0{,}0106}\times\text{le principal}$$</p>
+<p><em>Étape 4 — pour l'<strong>ACHETEUR</strong> de protection :</em> $\mathbf{-0{,}0106}\times$ le principal.</p>
+<blockquote>
+<p><strong>La logique :</strong> le spread de marché est <strong>124 pb</strong> alors que le contrat paie <strong>150 pb</strong> ; le vendeur reçoit <strong>plus que le prix courant</strong>, le contrat lui est donc <strong>favorable</strong>.</p>
+</blockquote>
+</div></details>
+
+<h3>2.4 Impliquer les probabilités de défaut, et le CDS binaire</h3>
+<blockquote>
+<p class="cal piege"> <em><strong>Les probabilités de défaut utilisées pour valoriser un CDS doivent être des probabilités RISQUE-NEUTRES, pas réelles.</strong></em></p>
+</blockquote>
+<p><em>Elles peuvent être estimées à partir des <strong>prix d'obligations</strong> ou des <strong>asset swaps</strong> (fiche 95). <strong>Une alternative est de les IMPLIQUER des cotations de CDS</strong> — approche similaire à la pratique des marchés d'options consistant à impliquer les volatilités des prix d'options activement traitées.</em></p>
+<p><strong>L'exemple inversé.</strong> Si l'on ne connaît pas les probabilités mais que le spread mid-market d'un CDS 5 ans neuf est <strong>100 points de base</strong>, on <strong>rétro-ingénierise</strong> les calculs (Excel + Solver) et on trouve une probabilité de défaut annuelle conditionnelle de :</p>
+<p>$$\boxed{1{,}61\,\%\ \text{par an (composition annuelle)}=1{,}626\,\%\ \text{en continu}}$$</p>
+<details class="cor">
+<summary><strong>Le CDS binaire — Table 24.5</strong></summary><div class="in">
+
+<p><em>Un <strong>CDS binaire</strong> est structuré comme un CDS ordinaire <strong>sauf que le payoff est un montant fixe en dollars</strong>.</em> Si le payoff est <strong>1 dollar</strong> au lieu de $1-R$, les tables 24.1, 24.2 et 24.4 sont <strong>inchangées</strong> ; seule la table 24.3 devient :</p>
+<table>
+<thead>
+<tr>
+<th>Date (ans)</th>
+<th>Probabilité de défaut</th>
+<th>Payoff espéré</th>
+<th>Facteur d'actualisation</th>
+<th>VA</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>0,5</td>
+<td>0,0200</td>
+<td>0,0200</td>
+<td>0,9753</td>
+<td>0,0195</td>
+</tr>
+<tr>
+<td>1,5</td>
+<td>0,0196</td>
+<td>0,0196</td>
+<td>0,9277</td>
+<td>0,0182</td>
+</tr>
+<tr>
+<td>2,5</td>
+<td>0,0192</td>
+<td>0,0192</td>
+<td>0,8825</td>
+<td>0,0170</td>
+</tr>
+<tr>
+<td>3,5</td>
+<td>0,0188</td>
+<td>0,0188</td>
+<td>0,8395</td>
+<td>0,0158</td>
+</tr>
+<tr>
+<td>4,5</td>
+<td>0,0184</td>
+<td>0,0184</td>
+<td>0,7985</td>
+<td>0,0147</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+<td><strong>Total</strong></td>
+<td><strong>0,0852</strong></td>
+</tr>
+</tbody></table>
+<p>$$4{,}1130\,s=0{,}0852\quad\Longrightarrow\quad s=0{,}0207=\mathbf{207\ \text{points de base}}$$</p>
+<p><em>Contrôle de cohérence : $124/0{,}6=207$ — exactement le rapport $1/(1-R)$.</em></p>
+</div></details>
+
+<h3>2.5 L'importance du taux de recouvrement</h3>
+<blockquote>
+<p class="cal piege"> <strong>Le résultat le plus contre-intuitif du chapitre.</strong> <em>Pourvu qu'on utilise <strong>le MÊME taux de recouvrement</strong> pour (a) estimer les probabilités risque-neutres et (b) valoriser le CDS, <strong>la valeur du CDS n'est PAS très sensible au taux de recouvrement</strong>.</em></p>
+</blockquote>
+<p><strong>La raison, en une ligne :</strong> <em>les probabilités de défaut implicites sont approximativement <strong>proportionnelles à $1/(1-R)$</strong> et les payoffs d'un CDS sont <strong>proportionnels à $1-R$</strong> — les deux effets s'annulent.</em></p>
+<p class="cal piege"> <strong>L'exception :</strong> *cet argument <strong>ne s'applique PAS à la valorisation d'un CDS binaire</strong>. Les probabilités implicites restent proportionnelles à $1/(1-R)$, <strong>mais les payoffs d'un CDS binaire sont INDÉPENDANTS de $R$</strong>.* Conséquence exploitable : <em>si on a le spread d'un CDS ordinaire <strong>et</strong> celui d'un CDS binaire, <strong>on peut estimer À LA FOIS le taux de recouvrement et la probabilité de défaut</strong>.</em></p>
+<h2 data-prio="high">Concept 3 — Les indices de crédit et les coupons fixes</h2>
+<h3>3.1 Les deux portefeuilles standard</h3>
+<table>
+<thead>
+<tr>
+<th>Indice</th>
+<th>Composition</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>CDX NA IG</strong></td>
+<td>un portefeuille de <strong>125 entreprises <em>investment grade</em> d'Amérique du Nord</strong></td>
+</tr>
+<tr>
+<td><strong>iTraxx Europe</strong></td>
+<td>un portefeuille de <strong>125 noms <em>investment grade</em> européens</strong></td>
+</tr>
+</tbody></table>
+<p><em>Ces portefeuilles sont <strong>mis à jour les 20 mars et 20 septembre</strong> de chaque année : les entreprises qui ne sont plus investment grade sont <strong>retirées</strong>, de nouvelles sont <strong>ajoutées</strong>.</em> (Au 20 septembre 2010 étaient définis la <strong>Series 14</strong> d'iTraxx Europe et la <strong>Series 15</strong> de CDX NA IG.)</p>
+<details class="cor">
+<summary><strong>Comment se lit une cotation d'indice</strong></summary><div class="in">
+
+<p><strong>Cotation :</strong> l'indice CDX NA IG 5 ans est coté <strong>bid 65 / offer 66 points de base</strong> (l'<em>index spread</em>).</p>
+<p><em>Grossièrement, un trader peut <strong>acheter la protection CDS sur les 125 entreprises pour 66 points de base par entreprise</strong>.</em></p>
+<p><em>Étape 1 — le coût d'achat.</em> Pour <strong>800 000 dollars</strong> de protection sur chaque nom :
+$$0{,}0066\times800\,000\times125=\mathbf{660\,000\ \text{dollars par an}}$$</p>
+<p><em>Étape 2 — la vente.</em> Il peut de même <strong>vendre</strong> 800 000 de protection sur chacun des 125 noms pour <strong>650 000 par an</strong> ($0{,}0065\times800\,000\times125$).</p>
+<p><em>Étape 3 — que se passe-t-il en cas de défaut ?</em> <em>L'acheteur de protection reçoit le payoff CDS habituel et <strong>le paiement annuel est réduit de</strong> $660\,000/125=\mathbf{5\,280\ \text{dollars}}$.</em></p>
+<p><strong>Les maturités.</strong> <em>Marché actif à 3, 5, 7 et 10 ans. Les maturités sont habituellement les <strong>20 décembre et 20 juin</strong> — ce qui veut dire qu'un contrat « 5 ans » dure en réalité entre <strong>4 ¾ et 5 ¼ ans</strong>.</em></p>
+<p class="cal piege"> <strong>La subtilité de la moyenne.</strong> <em>Grossièrement, l'indice est la <strong>moyenne</strong> des spreads de CDS des entreprises du portefeuille. <strong>Plus précisément, l'indice est légèrement INFÉRIEUR à cette moyenne.</strong></em> Considérons un portefeuille de deux entreprises, l'une à <strong>1 000 pb</strong> et l'autre à <strong>10 pb</strong> : acheter la protection sur les deux coûterait <strong>légèrement moins de 505 pb</strong> par entreprise, <em><strong>parce qu'on ne s'attend pas à payer les 1 000 pb aussi longtemps que les 10 pb : ils doivent donc porter MOINS de poids</strong></em>. <em>(Une autre complication, pour CDX NA IG mais pas iTraxx Europe : la définition du défaut applicable à l'indice <strong>inclut la restructuration</strong>, alors que celle des CDS individuels souvent non.)</em></p>
+</div></details>
+
+<h3>3.2 Le mécanisme des coupons fixes</h3>
+<p><em>Le fonctionnement précis est un peu plus compliqué. <strong>Pour chaque sous-jacent et chaque maturité, un COUPON et un TAUX DE RECOUVREMENT sont spécifiés.</strong></em> Un prix est calculé à partir du spread coté par la procédure suivante :</p>
+<table>
+<thead>
+<tr>
+<th>Étape</th>
+<th>Contenu</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>1</strong></td>
+<td>supposer <strong>quatre paiements par an, à terme échu</strong></td>
+</tr>
+<tr>
+<td><strong>2</strong></td>
+<td><strong>impliquer un taux de hasard</strong> du spread coté — calculs identiques au §2, par <strong>recherche itérative</strong></td>
+</tr>
+<tr>
+<td><strong>3</strong></td>
+<td>calculer une <strong>durée $D$</strong> pour les paiements du CDS : <em>le nombre par lequel on multiplie le spread pour obtenir la valeur actuelle des paiements</em> (dans l'exemple du §2, c'est <strong>4,1130</strong>)</td>
+</tr>
+<tr>
+<td><strong>4</strong></td>
+<td>$\boxed{P=100-100\times D\times(S-C)}$ où $S$ est le <strong>spread</strong> et $C$ le <strong>coupon</strong>, en décimal</td>
+</tr>
+</tbody></table>
+<p><strong>Les flux qui en résultent :</strong></p>
+<ul>
+<li><em>quand un trader <strong>achète</strong> la protection, il <strong>paie $100-P$</strong> par 100 de nominal résiduel total, et le vendeur reçoit ce montant. <strong>Si $100-P$ est négatif, c'est l'acheteur qui reçoit de l'argent</strong> ;</em></li>
+<li><em>l'acheteur paie ensuite <strong>le COUPON</strong> fois le nominal résiduel à chaque date de paiement ;</em></li>
+<li><em>le payoff en cas de défaut est calculé de la façon habituelle.</em></li>
+</ul>
+<blockquote>
+<p class="cal piege"> <em><strong>L'intérêt du montage : il FACILITE LES ÉCHANGES, parce que les paiements trimestriels réguliers faits par l'acheteur de protection sont INDÉPENDANTS du spread au moment où il entre dans le contrat.</strong></em></p>
+</blockquote>
+<p><strong>Le nominal résiduel</strong> : <em>pour un CDS, c'est le nominal d'origine <strong>jusqu'au défaut, et zéro après</strong>. Pour un <strong>indice</strong>, c'est <strong>le nombre de noms qui n'ont pas encore fait défaut</strong> multiplié par le principal par nom.</em></p>
+<details class="cor">
+<summary><strong>Exemple 24.1 — un contrat iTraxx Europe avec coupon fixe</strong></summary><div class="in">
+
+<p><strong>Données.</strong> Cotation iTraxx Europe : <strong>34 points de base</strong> ; coupon : <strong>40 points de base</strong> ; contrat de <strong>5 ans exactement</strong> ; les deux cotations en <strong>30/360</strong> <em>(la convention usuelle des marchés CDS et indices)</em>. Courbe des taux plate à <strong>4 %</strong> (actual/actual, continu). Recouvrement spécifié : <strong>40 %</strong>.</p>
+<p><em>Étape 1 — convertir en actual/actual :</em>
+$$0{,}34\,\%\times\frac{365}{360}=\mathbf{0{,}345\,\%}\qquad0{,}40\,\%\times\frac{365}{360}=\mathbf{0{,}406\,\%}$$</p>
+<p><em>Étape 2 — impliquer le taux de hasard</em>, avec quatre paiements par an à terme échu :
+$$\lambda=\mathbf{0{,}5717\,\%}$$</p>
+<p><em>Étape 3 — la durée :</em> $D=\mathbf{4{,}447}$ ans.</p>
+<p><em>Étape 4 — le prix :</em>
+$$P=100-100\times4{,}447\times(0{,}00345-0{,}00406)=100+0{,}271=\mathbf{100{,}27}$$</p>
+<p><em>Étape 5 — les flux, pour une protection de <strong>1 million par nom</strong>.</em> Comme $P&gt;100$, <strong>c'est le VENDEUR de protection qui paie l'acheteur au départ</strong> :
+$$1\,000\,000\times125\times0{,}0027=\mathbf{337\,500\ \text{dollars}}$$</p>
+<p><em>Étape 6 — ensuite.</em> L'acheteur fait des <strong>paiements trimestriels à terme échu</strong> au taux annuel
+$$1\,000\,000\times0{,}00406\times n\qquad n=\text{nombre d'entreprises n'ayant pas fait défaut}$$</p>
+<p><em>Étape 7 — en cas de défaut.</em> Le payoff est calculé de la façon habituelle et <strong>il y a un paiement accru de l'acheteur au vendeur, calculé au taux de 0,406 % par an sur 1 million</strong>.</p>
+<blockquote>
+<p><strong>La lecture :</strong> le spread de marché (34 pb) est <strong>inférieur</strong> au coupon (40 pb) : l'acheteur va payer <strong>trop cher</strong> chaque trimestre, il est donc <strong>compensé au départ</strong>.</p>
+</blockquote>
+</div></details>
+
+<h2 data-prio="high">Concept 4 — Forwards, options, <em>baskets</em> et <em>total return swaps</em></h2>
+<h3>4.1 Forwards et options sur CDS</h3>
+<table>
+<thead>
+<tr>
+<th>Instrument</th>
+<th>Définition</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Forward CDS</strong></td>
+<td><em>l'<strong>obligation</strong> d'acheter ou de vendre un CDS particulier sur une entité de référence particulière à une date future $T$</em>.  <em><strong>Si l'entité fait défaut AVANT $T$, le contrat forward CESSE D'EXISTER.</strong></em> Exemple : une banque s'engage à <strong>vendre</strong> 5 ans de protection sur une entreprise pour <strong>280 pb, commençant dans 1 an</strong></td>
+</tr>
+<tr>
+<td><strong>Option sur CDS — CALL</strong></td>
+<td>le <strong>droit d'ACHETER</strong> 5 ans de protection dans 1 an pour 280 pb. <em>Exercée si le spread de CDS 5 ans dans 1 an dépasse 280 pb</em></td>
+</tr>
+<tr>
+<td><strong>Option sur CDS — PUT</strong></td>
+<td>le <strong>droit de VENDRE</strong> 5 ans de protection dans 1 an pour 280 pb. <em>Exercée si le spread se révèle inférieur à 280 pb</em></td>
+</tr>
+</tbody></table>
+<p><em>Le coût de l'option est payé <strong>d'avance</strong>.  Comme les forwards, les options sur CDS sont habituellement structurées de sorte qu'elles <strong>cessent d'exister si l'entité fait défaut avant maturité de l'option</strong>.</em></p>
+<h3>4.2 Les <em>basket</em> CDS</h3>
+<p><em>Dans un <em><strong>basket credit default swap</strong></em> il y a <strong>plusieurs entités de référence</strong>.</em></p>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Payoff</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><em><strong>Add-up basket</strong></em> CDS</td>
+<td>quand <strong>N'IMPORTE LAQUELLE</strong> des entités fait défaut</td>
+</tr>
+<tr>
+<td><em><strong>First-to-default</strong></em> CDS</td>
+<td>seulement au <strong>PREMIER</strong> défaut</td>
+</tr>
+<tr>
+<td><em><strong>Second-to-default</strong></em> CDS</td>
+<td>seulement au <strong>DEUXIÈME</strong> défaut</td>
+</tr>
+<tr>
+<td><em><strong>$k$-th-to-default</strong></em> CDS</td>
+<td>seulement au <strong>$k$-ième</strong> défaut</td>
+</tr>
+</tbody></table>
+<p><em>Les payoffs sont calculés comme pour un CDS ordinaire. <strong>Après que le défaut pertinent est survenu, il y a règlement, le swap se TERMINE et il n'y a plus aucun paiement de part et d'autre.</strong></em></p>
+<h3>4.3 Le <em>total return swap</em></h3>
+<blockquote>
+<p><em><strong>Un accord d'échanger le RENDEMENT TOTAL d'une obligation (ou de tout portefeuille d'actifs) contre LIBOR plus un spread. Le rendement total inclut les coupons, les intérêts, ET le gain ou la perte sur l'actif pendant la vie du swap.</strong></em></p>
+</blockquote>
+<details class="cor">
+<summary><strong>L'exemple et les deux lectures du montage</strong></summary><div class="in">
+
+<p><strong>Le contrat.</strong> Accord de 5 ans, nominal <strong>100 millions</strong>, échangeant le rendement total d'une obligation d'entreprise contre <strong>LIBOR + 25 points de base</strong>.</p>
+<table>
+<thead>
+<tr>
+<th>Qui</th>
+<th>Paie quoi</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Le <strong>payeur</strong> (<em>total return payer</em>)</td>
+<td>aux dates de coupon, les <strong>coupons</strong> gagnés sur un investissement de 100 M dans l'obligation</td>
+</tr>
+<tr>
+<td>Le <strong>receveur</strong></td>
+<td>les intérêts à <strong>LIBOR + 25 pb</strong> sur un principal de 100 M <em>(LIBOR fixé à une date de coupon et payé à la suivante, comme dans un swap de taux ordinaire)</em></td>
+</tr>
+</tbody></table>
+<p><strong>Le paiement final.</strong></p>
+<table>
+<thead>
+<tr>
+<th>Situation</th>
+<th>Paiement</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>L'obligation <strong>monte de 10 %</strong></td>
+<td><strong>le payeur</strong> verse <strong>10 millions</strong> à la fin des 5 ans</td>
+</tr>
+<tr>
+<td>L'obligation <strong>baisse de 15 %</strong></td>
+<td><strong>le receveur</strong> verse <strong>15 millions</strong></td>
+</tr>
+<tr>
+<td><strong>Défaut sur l'obligation</strong></td>
+<td>le swap est habituellement <strong>terminé</strong> et le receveur fait un paiement final égal à <strong>l'excès de 100 M sur la valeur de marché de l'obligation</strong></td>
+</tr>
+</tbody></table>
+<p><strong>La caractérisation propre.</strong> <em>Si l'on <strong>ajoute le nominal des deux côtés</strong> à la fin : <strong>le payeur paie les flux d'un investissement de 100 M dans l'obligation d'entreprise ; le receveur paie les flux d'une obligation de 100 M rapportant LIBOR + 25 pb</strong>.</em></p>
+<table>
+<thead>
+<tr>
+<th>Situation du payeur</th>
+<th>Ce que le TRS lui permet</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Il <strong>possède</strong> l'obligation</td>
+<td><strong>transmettre le risque de crédit</strong> au receveur</td>
+</tr>
+<tr>
+<td>Il <strong>ne la possède pas</strong></td>
+<td>prendre une <strong>position courte</strong> sur l'obligation</td>
+</tr>
+</tbody></table>
+<p><strong>L'usage réel : un outil de FINANCEMENT.</strong> <em>Le receveur veut un financement pour investir 100 M dans l'obligation. Il approche le payeur (probablement une institution financière) et convient du swap. <strong>Le payeur investit alors 100 M dans l'obligation.</strong> Cela laisse le receveur <strong>dans la même position que s'il avait emprunté à LIBOR + 25 pb pour acheter l'obligation</strong>.</em></p>
+<blockquote>
+<p class="cal piege"> <strong>L'avantage clé pour le payeur.</strong> <em>Il <strong>conserve la PROPRIÉTÉ de l'obligation</strong> pendant la vie du swap et <strong>fait face à moins de risque de crédit</strong> que s'il avait prêté l'argent au receveur avec l'obligation en collatéral : <strong>si le receveur fait défaut, le payeur n'a pas le problème juridique de réaliser le collatéral</strong>.</em> Les TRS sont, comme les <strong>repos</strong>, structurés pour minimiser le risque de crédit quand des titres sont financés.</p>
+</blockquote>
+<p><strong>D'où vient le spread ?</strong> <em>Le spread sur LIBOR reçu par le payeur est la <strong>compensation du risque que le receveur fasse défaut</strong>. Le payeur perd de l'argent si le receveur fait défaut <strong>à un moment où le prix de l'obligation a baissé</strong>. Le spread dépend donc de <strong>trois choses</strong> : la qualité de crédit du <strong>receveur</strong>, celle de l'<strong>émetteur de l'obligation</strong>, et <strong>la CORRÉLATION entre les deux</strong>.</em></p>
+<p><strong>Les variantes :</strong> règlement <strong>physique</strong> (le payeur échange l'actif contre le nominal en fin de vie) ; paiements de variation de valeur <strong>périodiques</strong> plutôt qu'en une fois à la fin.</p>
+</div></details>
+
+<h2 data-prio="must">Concept 5 — Les CDO et les CDO synthétiques</h2>
+<h3>5.1 Cash CDO et CDO synthétique</h3>
+<p>*Un ABS dont les actifs sous-jacents sont des <strong>obligations</strong> est un <strong>collateralized debt obligation (CDO)</strong>. Une cascade (<em>waterfall</em>) est définie pour les paiements d'intérêts et de principal. <strong>Les règles précises sont compliquées, mais elles sont conçues pour garantir que si une tranche est plus senior qu'une autre, elle a plus de chances de recevoir les intérêts promis et les remboursements de principal.</strong>*</p>
+<p><strong>Le développement clé du marché.</strong> <em>Il a été reconnu qu'<strong>une position LONGUE sur une obligation d'entreprise a un risque similaire à une position COURTE sur un CDS</strong> quand l'entité de référence est l'entreprise émettrice. Cela a conduit à une structure alternative, le <strong>CDO SYNTHÉTIQUE</strong>, devenue très populaire.</em></p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th><strong>Cash CDO</strong></th>
+<th><strong>CDO synthétique</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Sous-jacent</td>
+<td>un <strong>portefeuille d'obligations</strong> acheté</td>
+<td>des <strong>CDS vendus</strong> sur un portefeuille d'entreprises</td>
+</tr>
+<tr>
+<td>Principal</td>
+<td>la valeur des obligations</td>
+<td><strong>le total des nominaux notionnels des CDS</strong></td>
+</tr>
+<tr>
+<td>Entrées de trésorerie</td>
+<td>les coupons</td>
+<td><strong>les spreads de CDS</strong></td>
+</tr>
+<tr>
+<td>Sorties</td>
+<td>—</td>
+<td><strong>les payoffs quand des entreprises font défaut</strong></td>
+</tr>
+<tr>
+<td>Investissement initial</td>
+<td> <strong>requis</strong> (il faut financer les obligations)</td>
+<td> <strong>non requis</strong> — les détenteurs conviennent simplement des règles. <em>En pratique, ils doivent presque invariablement <strong>déposer le principal de tranche en COLLATÉRAL</strong>. Quand la tranche doit un payoff, l'argent est <strong>prélevé sur le collatéral</strong> ; le solde du compte de collatéral rapporte <strong>LIBOR</strong></em></td>
+</tr>
+<tr>
+<td>Règles de cascade</td>
+<td>compliquées</td>
+<td><strong>plus directes</strong></td>
+</tr>
+</tbody></table>
+<details class="cor">
+<summary><strong>Le CDO synthétique à trois tranches — la mécanique complète</strong></summary><div class="in">
+
+<p><strong>Les règles.</strong></p>
+<table>
+<thead>
+<tr>
+<th>Tranche</th>
+<th>Responsable des payoffs</th>
+<th>Spread gagné (sur le principal RÉSIDUEL)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Equity</strong></td>
+<td>jusqu'à <strong>5 %</strong> du principal du CDO</td>
+<td><strong>1 000 points de base</strong> par an</td>
+</tr>
+<tr>
+<td><strong>Mezzanine</strong></td>
+<td>l'excès <strong>au-delà de 5 %, jusqu'à 20 %</strong></td>
+<td><strong>100 points de base</strong> par an</td>
+</tr>
+<tr>
+<td><strong>Senior</strong></td>
+<td>l'excès <strong>au-delà de 20 %</strong></td>
+<td><strong>10 points de base</strong> par an</td>
+</tr>
+</tbody></table>
+<p><strong>Le déroulement, pour un principal de 100 millions.</strong> Principaux de tranche initiaux : <strong>5 M</strong>, <strong>15 M</strong>, <strong>80 M</strong>.</p>
+<p><em>Étape 1.</em> Les tranches gagnent initialement les spreads spécifiés sur ces nominaux.</p>
+<p><em>Étape 2 — après 1 an, des défauts entraînent des payoffs de <strong>2 millions</strong>.</em> <strong>Les détenteurs de l'equity en sont responsables.</strong> Le principal de la tranche equity tombe à <strong>3 millions</strong>, et son spread (1 000 pb) s'applique désormais sur <strong>3 millions au lieu de 5</strong>.</p>
+<p><em>Étape 3 — plus tard, <strong>4 millions de payoffs supplémentaires</strong>.</em> Le cumul des paiements exigés de l'equity est <strong>5 millions</strong> :  <strong>son principal résiduel devient ZÉRO</strong>. Les détenteurs de la <strong>mezzanine</strong> doivent alors <strong>1 million</strong>, ce qui ramène leur principal résiduel à <strong>14 millions</strong>.</p>
+<blockquote>
+<p><strong>La règle générale :</strong> <em>chaque tranche absorbe les pertes <strong>au-delà de son point d'attachement et jusqu'à son point de détachement</strong>, et son spread s'applique toujours sur le <strong>principal RÉSIDUEL</strong>, qui décroît à mesure des pertes.</em></p>
+</blockquote>
+</div></details>
+
+<h3>5.2 Tranches standard et <em>single-tranche trading</em></h3>
+<p><em>Une innovation du marché a été <strong>la négociation d'une tranche SANS que le portefeuille sous-jacent de positions CDS courtes soit créé</strong> : le <em><strong>single-tranche trading</strong></em>. Il y a <strong>deux parties</strong> : l'acheteur et le vendeur de protection sur la tranche. <strong>Le portefeuille de positions CDS sert de point de référence pour définir les flux entre les deux, mais il n'est PAS créé.</strong></em></p>
+<p><strong>Les tranches standard</strong> :</p>
+<table>
+<thead>
+<tr>
+<th>Indice</th>
+<th>Tranches (pertes couvertes)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>CDX NA IG</strong></td>
+<td><strong>0-3 % · 3-6 % · 6-9 % · 9-12 % · 12-22 % · 22-100 %</strong></td>
+</tr>
+<tr>
+<td><strong>iTraxx Europe</strong></td>
+<td><strong>0-3 % · 3-7 % · 7-10 % · 10-15 % · 15-30 % · 30-100 %</strong></td>
+</tr>
+</tbody></table>
+<p><strong>Table 24.6 — cotations mid-market des tranches iTraxx Europe 5 ans</strong> <em>(source : Creditex Group Inc.)</em> :</p>
+<table>
+<thead>
+<tr>
+<th>Date</th>
+<th>0-3 %</th>
+<th>3-6 %</th>
+<th>6-9 %</th>
+<th>9-12 %</th>
+<th>12-22 %</th>
+<th>Indice iTraxx</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>31 janvier 2007</strong></td>
+<td><strong>10,34 %</strong></td>
+<td>41,59</td>
+<td>11,95</td>
+<td>5,60</td>
+<td>2,00</td>
+<td><strong>23</strong></td>
+</tr>
+<tr>
+<td><strong>31 janvier 2008</strong></td>
+<td><strong>30,98 %</strong></td>
+<td>316,90</td>
+<td>212,40</td>
+<td>140,00</td>
+<td>73,60</td>
+<td><strong>77</strong></td>
+</tr>
+<tr>
+<td><strong>30 janvier 2009</strong></td>
+<td><strong>64,28 %</strong></td>
+<td>1 185,63</td>
+<td>606,69</td>
+<td>315,63</td>
+<td>97,13</td>
+<td><strong>165</strong></td>
+</tr>
+</tbody></table>
+<p class="cal piege"> <strong>Comment lire cette table.</strong> <em>Les cotations sont <strong>en points de base</strong>, <strong>sauf pour la tranche 0-3 %</strong> où la cotation est le <strong>pourcentage du principal de tranche à payer D'AVANCE, EN PLUS de 500 points de base par an</strong>. Pour toutes les autres tranches, c'est le coût en points de base par an de l'achat de protection — <strong>payé sur un principal qui DÉCLINE à mesure que la tranche subit des pertes</strong>.</em></p>
+<blockquote>
+<p class="cal piege"> <em><strong>Quelle différence deux ans font sur les marchés du crédit !</strong></em> <em>L'indice iTraxx est passé de <strong>23 points de base en janvier 2007 à 165 en janvier 2009</strong>. <strong>Une raison est que l'évaluation par le marché des probabilités de défaut des entreprises investment grade a augmenté. Mais il est AUSSI vrai que les vendeurs de protection connaissaient dans beaucoup de cas des problèmes de LIQUIDITÉ : ils sont devenus plus averses au risque et ont augmenté les primes de risque exigées.</strong></em></p>
+</blockquote>
+<h3>5.3 Le rôle de la corrélation — la section conceptuelle clé</h3>
+<blockquote>
+<p><em><strong>Le coût de la protection dans un $k$-ième-à-défaut CDS ou une tranche de CDO dépend de manière CRITIQUE de la corrélation de défaut.</strong></em></p>
+</blockquote>
+<details class="cor">
+<summary><strong>L'expérience de pensée sur 100 entités — recalculée</strong></summary><div class="in">
+
+<p><strong>Cadre.</strong> 100 entités de référence, <strong>5 ans</strong>, chacune avec une probabilité <strong>risque-neutre de 2 %</strong> de faire défaut sur la période.</p>
+<p><em>Cas $\rho=0$ (indépendance)</em>, par la loi binomiale :
+$$P(\text{au moins 1 défaut})=1-0{,}98^{100}=\mathbf{86{,}74\,\%}$$
+$$P(\text{au moins 10 défauts})=\mathbf{0{,}0034\,\%}$$</p>
+<blockquote>
+<p><strong>Conséquence :</strong> <em>un <strong>first-to-default CDS est donc très précieux</strong>, alors qu'un <strong>tenth-to-default ne vaut presque rien</strong>.</em></p>
+</blockquote>
+<p><em>Cas $\rho$ croissant :</em> <strong>la probabilité d'un ou plusieurs défauts DIMINUE</strong> et <strong>la probabilité de 10 défauts ou plus AUGMENTE</strong>.</p>
+<p><em>Cas $\rho=1$ (corrélation parfaite) :</em>
+$$P(\text{au moins 1})=P(\text{au moins 10})=\mathbf{2\,\%}$$
+*parce que <strong>dans cette situation extrême les entités sont essentiellement identiques : soit elles font TOUTES défaut (probabilité 2 %), soit AUCUNE (98 %)</strong>.*</p>
+<p><strong>La transposition aux tranches de CDO</strong> :</p>
+<table>
+<thead>
+<tr>
+<th>Corrélation</th>
+<th>Tranche <strong>equity</strong></th>
+<th>Tranches <strong>senior</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>faible</strong></td>
+<td><strong>très risquée</strong></td>
+<td><strong>très sûres</strong></td>
+</tr>
+<tr>
+<td><strong>croissante</strong></td>
+<td> <strong>devient MOINS risquée</strong></td>
+<td> <strong>deviennent PLUS risquées</strong></td>
+</tr>
+<tr>
+<td><strong>parfaite</strong> (et $R=0$)</td>
+<td> <strong>toutes les tranches sont également risquées</strong></td>
+<td></td>
+</tr>
+</tbody></table>
+<p><strong>C'est le fait le plus important à retenir de tout le chapitre sur les CDO.</strong></p>
+</div></details>
+
+<h2 data-prio="must">Concept 6 — La valorisation d'un CDO synthétique</h2>
+<h3>6.1 Les trois quantités $A$, $B$, $C$</h3>
+<p>Les dates de paiement sont $\tau_1,\tau_2,\dots,\tau_m$ avec $\tau_0=0$. On note $E_j$ le <strong>principal de tranche espéré</strong> en $\tau_j$ et $v(\tau)$ la valeur actuelle d'un dollar reçu en $\tau$. Le spread de la tranche est $s$ par an, payé <strong>sur le principal résiduel</strong>.</p>
+<p>$$\boxed{A=\sum_{j=1}^{m}(\tau_j-\tau_{j-1})\,E_j\,v(\tau_j)}\;\text{(24.1)}\qquad\text{VA des paiements réguliers}=sA$$</p>
+<p>La perte espérée entre $\tau_{j-1}$ et $\tau_j$ vaut $E_{j-1}-E_j$ ; <strong>on suppose qu'elle survient au MILIEU de l'intervalle</strong>, en $0{,}5\tau_{j-1}+0{,}5\tau_j$ :</p>
+<p>$$\boxed{C=\sum_{j=1}^{m}(E_{j-1}-E_j)\,v(0{,}5\tau_{j-1}+0{,}5\tau_j)}\;\text{(24.2)}\qquad\text{VA des payoffs}$$</p>
+<p>$$\boxed{B=\sum_{j=1}^{m}0{,}5(\tau_j-\tau_{j-1})(E_{j-1}-E_j)\,v(0{,}5\tau_{j-1}+0{,}5\tau_j)}\;\text{(24.3)}\qquad\text{paiement accru}=sB$$</p>
+<p>$$\boxed{\text{Valeur pour l'acheteur de protection}=C-sA-sB}\qquad\Longrightarrow\qquad\boxed{s=\frac{C}{A+B}}\;\text{(24.4)}$$</p>
+<blockquote>
+<p class="cal piege"> <em><strong>Ces équations montrent le rôle CLÉ joué par le PRINCIPAL DE TRANCHE ESPÉRÉ. Si l'on connaît $E_j$ à toutes les dates de paiement et la courbe des taux zéro-coupon, le spread d'équilibre se calcule directement.</strong></em></p>
+</blockquote>
+<p><em>(Pour la tranche <strong>equity</strong>, la cotation est le <strong>paiement d'avance</strong> en plus de 500 pb par an ; le paiement d'avance d'équilibre vaut $\boxed{C-0{,}05(A+B)}$.)</em></p>
+<h3>6.2 Le modèle de marché standard</h3>
+<p><strong>Le modèle de copule gaussienne à un facteur</strong> (fiche 95). Toutes les entreprises ont la même probabilité $Q(t)$ de défaut avant $t$ ; conditionnellement au facteur $F$ :</p>
+<p>$$\boxed{Q(t\mid F)=N\!\left(\frac{N^{-1}[Q(t)]-\sqrt\rho\,F}{\sqrt{1-\rho}}\right)}\;\text{(24.5)}$$</p>
+<p>Le taux de hasard est supposé <strong>constant et cohérent avec le spread de l'indice</strong> — on le trouve <strong>en cherchant le $\lambda$ qui donne le spread de l'indice</strong> par la méthode du §2 :</p>
+<p>$$\boxed{Q(t)=1-e^{-\lambda t}}\;\text{(24.6)}$$</p>
+<p><strong>La loi binomiale conditionnelle</strong> — probabilité d'<strong>exactement $k$ défauts</strong> avant $t$, conditionnellement à $F$ :</p>
+<p>$$\boxed{P(k,t\mid F)=\frac{n!}{(n-k)!\,k!}\,Q(t\mid F)^k\big[1-Q(t\mid F)\big]^{n-k}}\;\text{(24.7)}$$</p>
+<h3>6.3 Le principal de tranche</h3>
+<p>La tranche couvre les pertes entre $L$ (le <strong>point d'attachement</strong>) et $H$ (le <strong>point de détachement</strong>). On définit :</p>
+<p>$$\boxed{n_L=\frac{Ln}{1-R}\qquad n_H=\frac{Hn}{1-R}}$$</p>
+<p>et $m(x)$ = le plus petit entier <strong>supérieur</strong> à $x$. Avec un principal de tranche initial de 1 :</p>
+<table>
+<thead>
+<tr>
+<th>Nombre de défauts $k$</th>
+<th>Principal de tranche</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$k&lt;m(n_L)$</td>
+<td><strong>1</strong> (aucune perte n'a encore atteint la tranche)</td>
+</tr>
+<tr>
+<td>$m(n_L)\leqslant k&lt;m(n_H)$</td>
+<td>$\boxed{\dfrac{H-k(1-R)/n}{H-L}}$</td>
+</tr>
+<tr>
+<td>$k\geqslant m(n_H)$</td>
+<td><strong>0</strong> (la tranche est entièrement consommée)</td>
+</tr>
+</tbody></table>
+<p>$$\boxed{E_j(F)=\sum_{k=0}^{m(n_L)-1}P(k,\tau_j\mid F)+\sum_{k=m(n_L)}^{m(n_H)-1}P(k,\tau_j\mid F)\,\frac{H-k(1-R)/n}{H-L}}\;\text{(24.8)}$$</p>
+<p><strong>Les versions conditionnelles de $A$, $B$, $C$</strong> <em>(équations 24.9 à 24.11)</em> : identiques à (24.1)-(24.3) avec $E_j$ remplacé par $E_j(F)$.</p>
+<h3>6.4 L'intégration : la quadrature gaussienne</h3>
+<p><em>$F$ suit une loi normale centrée réduite. <strong>Pour obtenir les valeurs INCONDITIONNELLES de $A$, $B$ et $C$, il faut intégrer $A(F)$, $B(F)$ et $C(F)$ sur cette loi.</strong></em></p>
+<p>$$\boxed{\int_{-\infty}^{+\infty}\frac{1}{\sqrt{2\pi}}e^{-F^2/2}\,g(F)\,dF\ \approx\ \sum_{k=1}^{M}w_k\,g(F_k)}\;\text{(24.12)}$$</p>
+<p><em>À mesure que $M$ augmente, la précision augmente. <strong>Les $w_k$ et $F_k$ se calculent à partir des racines des polynômes d'Hermite.</strong> Dans DerivaGem, $M$ vaut <strong>deux fois</strong> la variable « nombre de points d'intégration » ; <strong>20 points d'intégration donnent généralement de bons résultats</strong>.</em></p>
+<details class="cor">
+<summary><strong>Exemple 24.2 — la tranche mezzanine d'iTraxx Europe, de bout en bout</strong></summary><div class="in">
+
+<p><strong>Données.</strong> $\rho=0{,}15$, $R=40\,\%$, $L=0{,}03$, $H=0{,}06$, $n=125$. Courbe des taux plate à <strong>3,5 %</strong>, paiements <strong>trimestriels</strong>, spread de l'indice <strong>50 points de base</strong>, $M=60$.</p>
+<p><em>Étape 1 — les bornes en nombre de défauts :</em>
+$$n_L=\frac{0{,}03\times125}{0{,}6}=\mathbf{6{,}25}\qquad n_H=\frac{0{,}06\times125}{0{,}6}=\mathbf{12{,}5}$$
+donc $m(n_L)=7$ et $m(n_H)=13$ : <strong>la tranche commence à être touchée au 7ᵉ défaut et est entièrement consommée au 13ᵉ</strong>.</p>
+<p><em>Étape 2 — le taux de hasard.</em> Un calcul comme celui du §2 montre que le taux de hasard constant correspondant à un spread d'indice de 50 pb est
+$$\lambda=\mathbf{0{,}83\,\%}\ \text{(composition continue)}$$</p>
+<p><em>Étape 3 — les principaux conditionnels</em> (extrait de la table 24.7) :</p>
+<table>
+<thead>
+<tr>
+<th>$w_k$</th>
+<th>0,1579</th>
+<th>0,1579</th>
+<th>0,1342</th>
+<th>0,0969</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$F_k$</td>
+<td><strong>0,2020</strong></td>
+<td>$\mathbf{-0{,}2020}$</td>
+<td>$\mathbf{-0{,}6060}$</td>
+<td>$\mathbf{-1{,}0104}$</td>
+</tr>
+<tr>
+<td>$E_1(F_k)$</td>
+<td>1,0000</td>
+<td>1,0000</td>
+<td>1,0000</td>
+<td>1,0000</td>
+</tr>
+<tr>
+<td>$E_{19}(F_k)$</td>
+<td>0,9953</td>
+<td>0,9687</td>
+<td>0,8636</td>
+<td><strong>0,6134</strong></td>
+</tr>
+<tr>
+<td>$E_{20}(F_k)$</td>
+<td>0,9936</td>
+<td>0,9600</td>
+<td>0,8364</td>
+<td><strong>0,5648</strong></td>
+</tr>
+</tbody></table>
+<blockquote>
+<p class="cal piege"> <strong>Le mécanisme, visible dans cette table.</strong> <em>Plus $F_k$ est <strong>négatif</strong> (mauvais état du monde), plus <strong>le principal résiduel espéré s'effondre</strong> : $E_{20}$ passe de <strong>0,9936</strong> pour $F=0{,}2020$ à <strong>0,5648</strong> pour $F=-1{,}0104$. <strong>Toute la valeur de la tranche vient de ces états défavorables.</strong></em></p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>Quantité conditionnelle</th>
+<th>$F=0{,}2020$</th>
+<th>$F=-0{,}2020$</th>
+<th>$F=-0{,}6060$</th>
+<th>$F=-1{,}0104$</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$A(F_k)$ (total)</td>
+<td>4,5624</td>
+<td>4,5345</td>
+<td>4,4080</td>
+<td><strong>4,0361</strong></td>
+</tr>
+<tr>
+<td>$B(F_k)$ (total)</td>
+<td>0,0007</td>
+<td>0,0043</td>
+<td>0,0178</td>
+<td><strong>0,0478</strong></td>
+</tr>
+<tr>
+<td>$C(F_k)$ (total)</td>
+<td>0,0055</td>
+<td>0,0346</td>
+<td>0,1423</td>
+<td><strong>0,3823</strong></td>
+</tr>
+</tbody></table>
+<p><em>Étape 4 — intégrer.</em> En posant $g(F)$ égal tour à tour à $A(F)$, $B(F)$, $C(F)$ dans (24.12) :
+$$\boxed{A=4{,}2846\qquad B=0{,}0187\qquad C=0{,}1496}$$</p>
+<p><em>Étape 5 — le spread d'équilibre :</em>
+$$s=\frac{0{,}1496}{4{,}2846+0{,}0187}=0{,}0348=\mathbf{348\ \text{points de base}}$$</p>
+</div></details>
+
+<h3>6.5 La valorisation d'un $k$-ième-à-défaut CDS</h3>
+<p><em>La probabilité <strong>conditionnelle</strong> que le $k$-ième défaut survienne entre $\tau_{j-1}$ et $\tau_j$ est <strong>la probabilité d'avoir $k$ défauts ou plus avant $\tau_j$ MOINS la probabilité d'en avoir $k$ ou plus avant $\tau_{j-1}$</strong></em> :</p>
+<p>$$\boxed{\sum_{q=k}^{n}P(q,\tau_j\mid F)-\sum_{q=k}^{n}P(q,\tau_{j-1}\mid F)}$$</p>
+<p><em>Les défauts entre $\tau_{j-1}$ et $\tau_j$ sont supposés survenir en $0{,}5\tau_{j-1}+0{,}5\tau_j$. <strong>Cela permet de calculer les VA conditionnelles des paiements et des payoffs exactement comme pour un CDS ordinaire (§2). En intégrant sur $F$, on obtient les VA inconditionnelles.</strong></em></p>
+<details class="cor">
+<summary><strong>Exemple 24.3 — un third-to-default CDS sur 10 obligations</strong></summary><div class="in">
+
+<p><strong>Données.</strong> 10 obligations ayant les probabilités de défaut de la table 24.1, paiements <strong>annuels à terme échu</strong>, $\rho=0{,}3$, $R=40\,\%$, taux sans risque <strong>5 %</strong>, $M=60$.</p>
+<p><em>Étape 1 — les probabilités cumulées inconditionnelles</em> (complément des survies de la table 24.1) :
+$$0{,}0200\ \cdot\ 0{,}0396\ \cdot\ 0{,}0588\ \cdot\ 0{,}0776\ \cdot\ 0{,}0961$$</p>
+<p><em>Étape 2 — conditionner sur $F=-1{,}0104$</em> par (24.5). Exemple pour $t=1$ :
+$$Q(1\mid F)=N\!\left(\frac{N^{-1}(0{,}02)-\sqrt{0{,}3}\times(-1{,}0104)}{\sqrt{0{,}7}}\right)=N\!\left(\frac{-2{,}0537+0{,}5534}{0{,}8367}\right)=N(-1{,}7933)=\mathbf{0{,}0365}$$
+La suite complète :
+$$0{,}0365\ \cdot\ 0{,}0754\ \cdot\ 0{,}1134\ \cdot\ 0{,}1498\ \cdot\ 0{,}1848$$</p>
+<p><em>Étape 3 — la binomiale.</em> Probabilité conditionnelle de <strong>3 défauts ou plus</strong> parmi 10, avant chaque année :
+$$0{,}0048\ \cdot\ 0{,}0344\ \cdot\ 0{,}0950\ \cdot\ 0{,}1794\ \cdot\ 0{,}2767$$</p>
+<p><em>Étape 4 — les différences.</em> Probabilité conditionnelle que <strong>le troisième défaut survienne PENDANT</strong> chaque année :
+$$0{,}0048\ \cdot\ 0{,}0296\ \cdot\ 0{,}0606\ \cdot\ 0{,}0844\ \cdot\ 0{,}0974$$</p>
+<p><em>Étape 5.</em> Une analyse comme celle du §2 donne alors les VA conditionnelles des paiements réguliers, des paiements accrus et des payoffs ; on intègre sur $F$ et on applique $s=C/(A+B)$.</p>
+</div></details>
+
+<h2 data-prio="high">Concept 7 — La corrélation implicite</h2>
+<h3>7.1 Les deux mesures</h3>
+<p>*Dans le modèle standard, $R$ est habituellement supposé à <strong>40 %</strong>. <strong>Cela laisse la corrélation de copule $\rho$ comme SEUL paramètre inconnu — ce qui rend le modèle similaire à Black-Scholes-Merton, où il n'y a qu'un inconnu, la volatilité.</strong> Les participants aiment <strong>impliquer une corrélation</strong> des cotations de tranches, comme ils impliquent une volatilité des prix d'options.*</p>
+<table>
+<thead>
+<tr>
+<th>Mesure</th>
+<th>Définition</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Corrélation COMPOSÉE</strong> (<em>compound correlation</em>)</td>
+<td>pour une tranche $\{\alpha_{q-1},\alpha_q\}$, <strong>la valeur de $\rho$ qui rend le spread du modèle égal au spread de marché</strong>. Trouvée par recherche itérative</td>
+</tr>
+<tr>
+<td><strong>Corrélation de BASE</strong> (<em>base correlation</em>)</td>
+<td>pour un $q&gt;1$ donné, <strong>la valeur de $\rho$ qui valorise la tranche $\{0,\alpha_q\}$ de façon cohérente avec le marché</strong></td>
+</tr>
+</tbody></table>
+<details class="cor">
+<summary><strong>Les quatre étapes du calcul d'une corrélation de base</strong></summary><div class="in">
+
+<table>
+<thead>
+<tr>
+<th>Étape</th>
+<th>Contenu</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>1</strong></td>
+<td>Calculer la <strong>corrélation composée</strong> de chaque tranche</td>
+</tr>
+<tr>
+<td><strong>2</strong></td>
+<td>L'utiliser pour calculer <strong>la VA de la perte espérée sur chaque tranche</strong> pendant la vie du CDO, <strong>en pourcentage du principal de tranche initial</strong> — c'est <strong>la variable $C$</strong>. Noter $C_q$ celle de la tranche $\alpha_{q-1}$ à $\alpha_q$</td>
+</tr>
+<tr>
+<td><strong>3</strong></td>
+<td>Calculer <strong>la VA de la perte espérée sur la tranche $\{0,\alpha_q\}$ en pourcentage du principal TOTAL du portefeuille sous-jacent</strong>, soit $\displaystyle\sum_{p=1}^{q}C_p(\alpha_p-\alpha_{p-1})$</td>
+</tr>
+<tr>
+<td><strong>4</strong></td>
+<td>La valeur de $C$ pour la tranche $\{0,\alpha_q\}$ est la valeur de l'étape 3 <strong>divisée par $\alpha_q$</strong>. <strong>La corrélation de base est le $\rho$ cohérent avec cette valeur de $C$</strong>, trouvé par recherche itérative</td>
+</tr>
+</tbody></table>
+<p><em>Pour iTraxx Europe : $\alpha_0=0$, $\alpha_1=0{,}03$, $\alpha_2=0{,}06$, $\alpha_3=0{,}09$, $\alpha_4=0{,}12$, $\alpha_5=0{,}22$, $\alpha_6=1{,}00$.</em></p>
+</div></details>
+
+<p><strong>Table 24.8 — corrélations implicites, tranches iTraxx Europe 5 ans, 31 janvier 2007</strong> *(taux plats à 3 %, $R=40\,\%$ ; le spread de 23 pb implique un taux de hasard de <strong>0,382 %</strong>)* :</p>
+<table>
+<thead>
+<tr>
+<th>Corrélations <strong>composées</strong></th>
+<th>0-3 %</th>
+<th>3-6 %</th>
+<th>6-9 %</th>
+<th>9-12 %</th>
+<th>12-22 %</th>
+</tr>
+</thead>
+<tbody><tr>
+<td></td>
+<td><strong>17,7 %</strong></td>
+<td><strong>7,8 %</strong></td>
+<td>14,0 %</td>
+<td>18,2 %</td>
+<td>23,3 %</td>
+</tr>
+</tbody></table>
+<table>
+<thead>
+<tr>
+<th>Corrélations <strong>de base</strong></th>
+<th>0-3 %</th>
+<th>0-6 %</th>
+<th>0-9 %</th>
+<th>0-12 %</th>
+<th>0-22 %</th>
+</tr>
+</thead>
+<tbody><tr>
+<td></td>
+<td>17,7 %</td>
+<td>28,4 %</td>
+<td>36,5 %</td>
+<td>43,2 %</td>
+<td><strong>60,5 %</strong></td>
+</tr>
+</tbody></table>
+<blockquote>
+<p class="cal piege"> <strong>Les deux formes, à savoir nommer.</strong></p>
+<ul>
+<li><strong>Les corrélations composées présentent un SOURIRE (<em>correlation smile</em>)</strong> : <em>quand la tranche devient plus senior, la corrélation implicite <strong>DÉCROÎT D'ABORD puis CROÎT</strong></em> (17,7 → <strong>7,8</strong> → 14,0 → 18,2 → 23,3).</li>
+<li><strong>Les corrélations de base présentent un SKEW</strong> : <em>la corrélation implicite est une <strong>fonction CROISSANTE du point de détachement</strong></em> (17,7 → 28,4 → 36,5 → 43,2 → 60,5).</li>
+</ul>
+<p><em><strong>Si les prix de marché étaient cohérents avec le modèle de copule gaussienne à un facteur, les corrélations implicites (composées comme de base) seraient LES MÊMES pour toutes les tranches. Des sourires et skews aussi prononcés permettent d'inférer que les prix de marché NE SONT PAS cohérents avec ce modèle.</strong></em></p>
+</blockquote>
+<h3>7.2 Valoriser une tranche non standard</h3>
+<p><strong>Le problème.</strong> Il faut coter la tranche <strong>4-8 %</strong> d'iTraxx Europe, qui n'est pas standard.</p>
+<table>
+<thead>
+<tr>
+<th>Approche</th>
+<th>Méthode</th>
+<th>Verdict</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Indirecte</strong> (l'ancienne)</td>
+<td><strong>interpoler les corrélations de base</strong> pour estimer celles des tranches 0-4 % et 0-8 %, en déduire les pertes espérées, faire la différence</td>
+<td> <em>il est <strong>maintenant reconnu que ce n'est pas la meilleure façon de procéder</strong></em></td>
+</tr>
+<tr>
+<td><strong>Directe</strong> (la bonne)</td>
+<td>calculer les pertes espérées <strong>pour chaque tranche standard</strong>, tracer la courbe de la perte espérée de la tranche <strong>0-$X$ %</strong> en fonction de $X$ (figure 24.3), <strong>interpoler sur cette courbe</strong> pour obtenir 0-4 % et 0-8 %, et faire la différence</td>
+<td> <em><strong>bien meilleure</strong></em></td>
+</tr>
+</tbody></table>
+<p><strong>La raison, à connaître.</strong> <em>Il peut être montré que <strong>pour l'ABSENCE D'ARBITRAGE, les pertes espérées doivent croître à un rythme DÉCROISSANT</strong>. <strong>Si l'on interpole les corrélations de base puis qu'on en déduit les pertes espérées, cette condition de non-arbitrage n'est souvent PAS satisfaite</strong> — le problème étant que <strong>la corrélation de base d'une tranche 0-$X$ % est une fonction NON LINÉAIRE de la perte espérée de cette tranche</strong>. L'approche directe peut de plus être menée <strong>de façon à garantir la condition de non-arbitrage</strong>.</em></p>
+<h2 data-prio="mid">Concept 8 — Les alternatives au modèle standard</h2>
+<table>
+<thead>
+<tr>
+<th>Alternative</th>
+<th>Principe</th>
+<th>Verdict de Hull</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Modèle hétérogène</strong></td>
+<td>relâcher l'hypothèse d'homogénéité : lois de temps jusqu'au défaut <strong>différentes</strong> par entreprise, corrélations <strong>différentes</strong> par paire</td>
+<td> <em>plus compliqué à implémenter, car <strong>$P(k,t\mid F)$ ne peut plus se calculer par la formule binomiale</strong> ; il faut une procédure numérique (Andersen-Sidenius-Basu 2003, Hull-White 2004)</em></td>
+</tr>
+<tr>
+<td><strong>Autres copules</strong></td>
+<td>copule de <strong>Student</strong>, de <strong>Clayton</strong>, <strong>archimédienne</strong>, de <strong>Marshall-Olkin</strong> ; ou faire suivre à $F$ et aux $Z_i$ des lois non normales de moyenne 0 et d'écart-type 1</td>
+<td> <em>Hull et White montrent qu'<strong>un bon ajustement au marché est obtenu quand $F$ et les $Z_i$ suivent des lois de Student à 4 degrés de liberté</strong> — la <strong>« double $t$ copula »</strong></em></td>
+</tr>
+<tr>
+<td><strong>Plusieurs facteurs</strong></td>
+<td>augmenter le nombre de facteurs</td>
+<td> <em>le modèle est alors <strong>beaucoup plus lent</strong>, car il faut intégrer sur <strong>plusieurs</strong> lois normales</em></td>
+</tr>
+<tr>
+<td><strong>Chargements factoriels aléatoires</strong></td>
+<td>Andersen et Sidenius : <strong>$\rho$ devient une fonction de $F$</strong>, croissant quand $F$ décroît — <em>dans les états du monde où le taux de défaut est élevé, la corrélation est aussi élevée</em></td>
+<td> <em>il y a des <strong>preuves empiriques</strong> que c'est le cas ; le modèle <strong>ajuste les cotations bien mieux</strong> que le modèle standard</em></td>
+</tr>
+<tr>
+<td><strong>Copule implicite</strong></td>
+<td>Hull et White : impliquer la <strong>loi de probabilité du taux de hasard moyen</strong> des cotations de tranches</td>
+<td><em>conceptuellement similaire au calcul d'une <strong>loi implicite</strong> de prix d'action à partir des prix d'options (chapitre 19)</em></td>
+</tr>
+</tbody></table>
+<p><strong>Les modèles dynamiques.</strong> <em>Les modèles précédents sont <strong>STATIQUES</strong> : ils modélisent l'environnement de défaut <strong>moyen</strong> sur la vie du CDO. <strong>Le modèle construit pour un CDO 5 ans est différent de celui pour un 7 ans, lui-même différent de celui pour un 10 ans.</strong> Les modèles <strong>dynamiques</strong> tentent de modéliser <strong>l'ÉVOLUTION de la perte du portefeuille dans le temps</strong>.</em></p>
+<table>
+<thead>
+<tr>
+<th>Type dynamique</th>
+<th>Principe</th>
+<th>Problème</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Structurels</strong></td>
+<td>processus stochastiques des <strong>actifs de nombreuses entreprises simultanément</strong>, corrélés ; défaut quand le prix atteint une <strong>barrière</strong></td>
+<td> <em>doivent être implémentés par <strong>Monte-Carlo</strong> : <strong>la calibration est difficile</strong></em></td>
+</tr>
+<tr>
+<td><strong>À forme réduite</strong></td>
+<td>modéliser les <strong>taux de hasard</strong></td>
+<td> <em>il faut supposer des <strong>SAUTS</strong> dans les taux de hasard pour obtenir une corrélation réaliste</em></td>
+</tr>
+<tr>
+<td><em><strong>Top down</strong></em></td>
+<td>modéliser <strong>directement la perte TOTALE</strong> du portefeuille</td>
+<td><em>ne considèrent pas ce qui arrive aux entreprises individuelles</em></td>
+</tr>
+</tbody></table>
+<h2>Comment reconnaître le type d'exercice</h2>
+<table>
+<thead>
+<tr>
+<th>Indice dans l'énoncé</th>
+<th>Méthode à déclencher</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Taux de hasard donné, spread demandé</td>
+<td>les <strong>trois blocs</strong> $A$, $B$, $C$ puis $s=C/(A+B)$</td>
+</tr>
+<tr>
+<td>Spread donné, taux de hasard demandé</td>
+<td><strong>recherche itérative</strong> (Solver) sur la même mécanique</td>
+</tr>
+<tr>
+<td>« ce CDS avait été conclu à $s_0$ pb »</td>
+<td><strong>MtM</strong> $=(A+B)s_0-C$ pour le <strong>vendeur</strong></td>
+</tr>
+<tr>
+<td>« payoff fixe de 1 dollar »</td>
+<td><strong>CDS binaire</strong> : remplacer $(1-R)$ par 1 dans le bloc $C$</td>
+</tr>
+<tr>
+<td>Spread d'un CDS ordinaire <strong>et</strong> d'un binaire</td>
+<td>on peut estimer <strong>$R$ ET la probabilité de défaut</strong></td>
+</tr>
+<tr>
+<td>« coupon de $C$ pb, spread de $S$ pb »</td>
+<td>$P=100-100D(S-C)$</td>
+</tr>
+<tr>
+<td>« 30/360 »</td>
+<td>multiplier par $365/360$ pour passer en actual/actual</td>
+</tr>
+<tr>
+<td>Points d'attachement et de détachement</td>
+<td>$n_L=Ln/(1-R)$, $n_H=Hn/(1-R)$, principal $=\frac{H-k(1-R)/n}{H-L}$</td>
+</tr>
+<tr>
+<td>« corrélation de copule $\rho$ »</td>
+<td>(24.5) puis la <strong>binomiale conditionnelle</strong> puis <strong>quadrature</strong></td>
+</tr>
+<tr>
+<td>« $k$-ième-à-défaut »</td>
+<td>différence des <strong>probabilités cumulées de $k$ défauts ou plus</strong></td>
+</tr>
+<tr>
+<td>« la tranche equity »</td>
+<td>la cotation est un <strong>paiement d'avance</strong> + 500 pb ; équilibre $C-0{,}05(A+B)$</td>
+</tr>
+<tr>
+<td>« corrélation implicite »</td>
+<td><strong>composée</strong> si tranche $\{\alpha_{q-1},\alpha_q\}$ ; <strong>de base</strong> si tranche $\{0,\alpha_q\}$</td>
+</tr>
+<tr>
+<td>Tranche non standard</td>
+<td>interpoler <strong>les pertes espérées</strong>, pas les corrélations de base</td>
+</tr>
+</tbody></table>
+<h2>Comment résoudre ce type d'exercice</h2>
+<p><strong>A — Le spread d'un CDS (le squelette).</strong></p>
+<ol>
+<li>Construire la <strong>table de survie et de défaut</strong> à partir du taux de hasard : $d_k=\lambda\,v_{k-1}$, $v_k=v_{k-1}-d_k$.</li>
+<li><strong>Bloc A</strong> : $\sum_k v_k\,e^{-r t_k}$ aux dates de <strong>paiement</strong>.</li>
+<li><strong>Bloc C</strong> : $\sum_k d_k(1-R)\,e^{-r t_k^\ast}$ aux dates de <strong>défaut</strong> (mi-période).</li>
+<li><strong>Bloc B</strong> : $\sum_k d_k\times0{,}5\times e^{-rt_k^\ast}$ (l'accru).</li>
+<li>$s=\dfrac{C}{A+B}$.</li>
+<li>Contrôle : le spread doit être proche de $\lambda(1-R)$ pour de petites valeurs.</li>
+</ol>
+<p><strong>B — Le principal espéré d'une tranche.</strong></p>
+<ol>
+<li>Calculer $n_L$ et $n_H$ ; en déduire $m(n_L)$ et $m(n_H)$ <strong>(le plus petit entier STRICTEMENT supérieur)</strong>.</li>
+<li>Pour chaque $F_k$ de la quadrature, calculer $Q(t\mid F_k)$ par (24.5).</li>
+<li>Calculer $P(k,t\mid F)$ par la binomiale.</li>
+<li>Sommer selon (24.8) : <strong>poids 1</strong> en dessous de $m(n_L)$, <strong>poids fractionnaire</strong> entre les deux, <strong>poids 0</strong> au-dessus.</li>
+<li>En déduire $A(F)$, $B(F)$, $C(F)$, puis intégrer par $\sum_kw_kg(F_k)$.</li>
+</ol>
+<p><strong>C — Un $k$-ième-à-défaut CDS.</strong></p>
+<ol>
+<li>Probabilités cumulées inconditionnelles $Q(t_j)$.</li>
+<li>Conditionner par (24.5) sur chaque $F_k$.</li>
+<li>Binomiale : $\sum_{q\geqslant k}P(q,t_j\mid F)$.</li>
+<li><strong>Différencier</strong> entre dates successives → probabilité que le $k$-ième défaut tombe dans l'intervalle.</li>
+<li>Appliquer la mécanique du CDS ordinaire, puis intégrer.</li>
+</ol>
+<h2 data-prio="must">Common mistakes</h2>
+<table>
+<thead>
+<tr>
+<th>Erreur</th>
+<th>Correction</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Oublier le <strong>paiement accru</strong> en cas de défaut</td>
+<td>il ajoute $B$ au dénominateur : ici $4{,}0704\to4{,}1130$</td>
+</tr>
+<tr>
+<td>Actualiser les payoffs aux dates de <strong>paiement</strong></td>
+<td>les défauts sont supposés <strong>à mi-période</strong> : facteurs 0,9753, 0,9277, …</td>
+</tr>
+<tr>
+<td>Utiliser des probabilités <strong>réelles</strong> pour valoriser un CDS</td>
+<td>il faut les <strong>risque-neutres</strong></td>
+</tr>
+<tr>
+<td>Confondre taux de hasard <strong>annuel</strong> et <strong>continu</strong></td>
+<td>$2\,\%$ annuel $\equiv-\ln(0{,}98)=2{,}02\,\%$ continu</td>
+</tr>
+<tr>
+<td>Croire que le CDS est très sensible à $R$</td>
+<td> <strong>non</strong>, si le <strong>même</strong> $R$ sert des deux côtés — mais <strong>oui</strong> pour un CDS <strong>binaire</strong></td>
+</tr>
+<tr>
+<td>Croire que l'indice est exactement la moyenne des spreads</td>
+<td>il est <strong>légèrement inférieur</strong> : les gros spreads portent <strong>moins de poids</strong></td>
+</tr>
+<tr>
+<td>Oublier $\times365/360$ pour une cotation 30/360</td>
+<td>34 pb 30/360 $=0{,}345\,\%$ actual/actual</td>
+</tr>
+<tr>
+<td>Se tromper de sens du paiement initial</td>
+<td>$P&gt;100$ ⇒ <strong>le VENDEUR paie l'acheteur</strong></td>
+</tr>
+<tr>
+<td>Appliquer le spread de tranche au principal <strong>initial</strong></td>
+<td> il s'applique au <strong>principal RÉSIDUEL</strong>, qui décroît</td>
+</tr>
+<tr>
+<td>Croire qu'une corrélation élevée est toujours mauvaise</td>
+<td> elle <strong>réduit</strong> le risque de la tranche <strong>equity</strong> et <strong>augmente</strong> celui des <strong>senior</strong></td>
+</tr>
+<tr>
+<td>Croire qu'un <em>tenth-to-default</em> vaut beaucoup avec $\rho=0$</td>
+<td>il vaut <strong>presque rien</strong> : $P=0{,}0034\,\%$</td>
+</tr>
+<tr>
+<td>Oublier que $m(x)$ est le plus petit entier <strong>strictement supérieur</strong></td>
+<td>avec $n_L=6{,}25$, $m(n_L)=\mathbf7$, pas 6</td>
+</tr>
+<tr>
+<td>Interpoler les <strong>corrélations de base</strong> pour une tranche non standard</td>
+<td>interpoler <strong>les pertes espérées</strong> — sinon la condition de <strong>non-arbitrage</strong> est violée</td>
+</tr>
+<tr>
+<td>Croire que le modèle standard ajuste le marché</td>
+<td> les <strong>sourires</strong> et <strong>skews</strong> prouvent le contraire</td>
+</tr>
+<tr>
+<td>Croire qu'un CDS exige de posséder l'actif</td>
+<td> <strong>non</strong> — c'est la différence clé avec une assurance</td>
+</tr>
+</tbody></table>
+<h2>Ultimate Review</h2>
+<table>
+<thead>
+<tr>
+<th>Élément</th>
+<th>Formule / valeur</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Croissance du marché</strong></td>
+<td>800 milliards (2000) → <strong>32 000 milliards</strong> (déc. 2009)</td>
+</tr>
+<tr>
+<td><strong>Payoff d'un CDS</strong></td>
+<td>$L(1-R)$</td>
+</tr>
+<tr>
+<td><strong>Événement de crédit</strong></td>
+<td><strong>défaut de paiement</strong>, <strong>restructuration</strong>, ou <strong>faillite</strong></td>
+</tr>
+<tr>
+<td><strong>Dates standard</strong></td>
+<td>20 mars · 20 juin · 20 sept. · 20 déc.</td>
+</tr>
+<tr>
+<td><strong>Différence avec l'assurance</strong></td>
+<td> <strong>l'actif n'a pas à être possédé</strong></td>
+</tr>
+<tr>
+<td><strong>Base CDS-obligation</strong></td>
+<td>spread de CDS − asset swap spread ; <strong>≈ 0</strong> en théorie</td>
+</tr>
+<tr>
+<td><strong>Lehman</strong></td>
+<td>400 Md de CDS, 155 Md de dette, payout <strong>91,375 %</strong></td>
+</tr>
+<tr>
+<td><strong>Bloc A</strong></td>
+<td>$\sum(\text{survie})\,e^{-rt}=\mathbf{4{,}0704\,s}$</td>
+</tr>
+<tr>
+<td><strong>Bloc B</strong></td>
+<td>$\sum(\text{défaut})\times0{,}5\times e^{-rt^\ast}=\mathbf{0{,}0426\,s}$</td>
+</tr>
+<tr>
+<td><strong>Bloc C</strong></td>
+<td>$\sum(\text{défaut})(1-R)e^{-rt^\ast}=\mathbf{0{,}0511}$</td>
+</tr>
+<tr>
+<td><strong>Spread</strong></td>
+<td>$s=C/(A+B)=0{,}0511/4{,}1130=\mathbf{124\ \text{pb}}$</td>
+</tr>
+<tr>
+<td><strong>MtM à 150 pb</strong></td>
+<td>$+0{,}0106$ pour le <strong>vendeur</strong></td>
+</tr>
+<tr>
+<td><strong>CDS binaire</strong></td>
+<td>$C=0{,}0852$ → $s=\mathbf{207\ \text{pb}}$</td>
+</tr>
+<tr>
+<td><strong>Hazard pour 100 pb</strong></td>
+<td><strong>1,61 %</strong> annuel = 1,626 % continu</td>
+</tr>
+<tr>
+<td><strong>Sensibilité à $R$</strong></td>
+<td> <strong>faible</strong> pour un CDS ordinaire, <strong>forte</strong> pour un binaire</td>
+</tr>
+<tr>
+<td><strong>Indices</strong></td>
+<td><strong>CDX NA IG</strong> et <strong>iTraxx Europe</strong>, <strong>125 noms</strong> chacun</td>
+</tr>
+<tr>
+<td><strong>Mise à jour</strong></td>
+<td><strong>20 mars et 20 septembre</strong></td>
+</tr>
+<tr>
+<td><strong>Prix avec coupon fixe</strong></td>
+<td>$P=100-100\,D\,(S-C)$</td>
+</tr>
+<tr>
+<td><strong>Exemple 24.1</strong></td>
+<td>$P=\mathbf{100{,}27}$, paiement initial du <strong>vendeur</strong> = 337 500</td>
+</tr>
+<tr>
+<td><strong>Forward CDS</strong></td>
+<td> <strong>cesse d'exister</strong> si défaut avant $T$</td>
+</tr>
+<tr>
+<td><strong>$k$-th-to-default</strong></td>
+<td>payoff au <strong>$k$-ième</strong> défaut seulement, puis <strong>terminaison</strong></td>
+</tr>
+<tr>
+<td><strong>Total return swap</strong></td>
+<td>rendement total <strong>contre LIBOR + spread</strong> ; outil de <strong>financement</strong></td>
+</tr>
+<tr>
+<td><strong>Le spread du TRS dépend de</strong></td>
+<td>crédit du <strong>receveur</strong>, crédit de <strong>l'émetteur</strong>, et leur <strong>corrélation</strong></td>
+</tr>
+<tr>
+<td><strong>CDO synthétique</strong></td>
+<td>vendre des CDS, découper les pertes ; <strong>aucun investissement initial</strong> (mais collatéral)</td>
+</tr>
+<tr>
+<td><strong>Tranches iTraxx</strong></td>
+<td>0-3 · 3-7 · 7-10 · 10-15 · 15-30 · 30-100 %</td>
+</tr>
+<tr>
+<td><strong>Tranches CDX</strong></td>
+<td>0-3 · 3-6 · 6-9 · 9-12 · 12-22 · 22-100 %</td>
+</tr>
+<tr>
+<td><strong>Cotation 0-3 %</strong></td>
+<td><strong>paiement d'avance</strong> en % + <strong>500 pb</strong> par an</td>
+</tr>
+<tr>
+<td><strong>Indice iTraxx 2007 → 2009</strong></td>
+<td><strong>23 pb → 165 pb</strong></td>
+</tr>
+<tr>
+<td><strong>100 noms à 2 %, $\rho=0$</strong></td>
+<td>$P(\geqslant1)=\mathbf{86{,}74\,\%}$ · $P(\geqslant10)=\mathbf{0{,}0034\,\%}$</td>
+</tr>
+<tr>
+<td><strong>$\rho=1$</strong></td>
+<td>$P(\geqslant1)=P(\geqslant10)=\mathbf{2\,\%}$</td>
+</tr>
+<tr>
+<td><strong>$\rho\uparrow$</strong></td>
+<td>equity <strong>moins</strong> risquée, senior <strong>plus</strong> risquées</td>
+</tr>
+<tr>
+<td><strong>$A$</strong></td>
+<td>$\sum(\tau_j-\tau_{j-1})E_jv(\tau_j)$</td>
+</tr>
+<tr>
+<td><strong>$C$</strong></td>
+<td>$\sum(E_{j-1}-E_j)v(\text{milieu})$</td>
+</tr>
+<tr>
+<td><strong>$B$</strong></td>
+<td>$\sum0{,}5(\tau_j-\tau_{j-1})(E_{j-1}-E_j)v(\text{milieu})$</td>
+</tr>
+<tr>
+<td><strong>Spread de tranche</strong></td>
+<td>$s=C/(A+B)$ ; equity : $C-0{,}05(A+B)$</td>
+</tr>
+<tr>
+<td><strong>Bornes en défauts</strong></td>
+<td>$n_L=Ln/(1-R)$, $n_H=Hn/(1-R)$</td>
+</tr>
+<tr>
+<td><strong>Principal résiduel</strong></td>
+<td>$\dfrac{H-k(1-R)/n}{H-L}$</td>
+</tr>
+<tr>
+<td><strong>Binomiale conditionnelle</strong></td>
+<td>$\binom{n}{k}Q(t\mid F)^k[1-Q(t\mid F)]^{n-k}$</td>
+</tr>
+<tr>
+<td><strong>Intégration</strong></td>
+<td><strong>quadrature gaussienne</strong>, polynômes d'<strong>Hermite</strong>, 20 points suffisent</td>
+</tr>
+<tr>
+<td><strong>Exemple 24.2</strong></td>
+<td>$n_L=6{,}25$, $n_H=12{,}5$, $\lambda=0{,}83\,\%$, $A=4{,}2846$, $B=0{,}0187$, $C=0{,}1496$ → <strong>348 pb</strong></td>
+</tr>
+<tr>
+<td><strong>Exemple 24.3</strong></td>
+<td>conditionnelles 0,0365 … 0,1848 ; $P(\geqslant3)$ 0,0048 … 0,2767</td>
+</tr>
+<tr>
+<td><strong>Corrélation composée</strong></td>
+<td>ajuste <strong>une</strong> tranche $\{\alpha_{q-1},\alpha_q\}$ → <strong>SOURIRE</strong></td>
+</tr>
+<tr>
+<td><strong>Corrélation de base</strong></td>
+<td>ajuste la tranche $\{0,\alpha_q\}$ → <strong>SKEW croissant</strong></td>
+</tr>
+<tr>
+<td><strong>iTraxx 31 janv. 2007</strong></td>
+<td>composées 17,7 / <strong>7,8</strong> / 14,0 / 18,2 / 23,3 %</td>
+</tr>
+<tr>
+<td><strong>Bases</strong></td>
+<td>17,7 / 28,4 / 36,5 / 43,2 / <strong>60,5 %</strong></td>
+</tr>
+<tr>
+<td><strong>Ce que le smile prouve</strong></td>
+<td> <strong>les prix de marché ne sont PAS cohérents avec le modèle standard</strong></td>
+</tr>
+<tr>
+<td><strong>Tranche non standard</strong></td>
+<td>interpoler <strong>les pertes espérées</strong>, pas les corrélations</td>
+</tr>
+<tr>
+<td><strong>Condition de non-arbitrage</strong></td>
+<td>les pertes espérées croissent à un rythme <strong>décroissant</strong></td>
+</tr>
+<tr>
+<td><strong>Meilleure copule alternative</strong></td>
+<td>la <strong>double $t$</strong> (Student à <strong>4</strong> degrés de liberté)</td>
+</tr>
+<tr>
+<td><strong>Trois modèles dynamiques</strong></td>
+<td><strong>structurels</strong> · <strong>forme réduite</strong> · <em><strong>top down</strong></em></td>
+</tr>
+</tbody></table>
+<div class="rec"><h2>Active Recall</h2><ol>
+<li>De combien le marché des dérivés de crédit a-t-il crû entre 2000 et décembre 2009 ?</li>
+<li>Distinguer dérivé de crédit <em>single-name</em> et <em>multi-name</em>, avec un exemple de chaque.</li>
+<li>Qui a été acheteur net de protection ? vendeur net ? Pourquoi ?</li>
+<li>Définir entité de référence, événement de crédit, nominal notionnel, spread de CDS.</li>
+<li>Détailler les flux d'un CDS 5 ans de 100 M à 90 pb, sans défaut.</li>
+<li>Que se passe-t-il en cas d'événement de crédit, en livraison physique et en espèces ?</li>
+<li>Qu'est-ce que le paiement accru final, et pourquoi existe-t-il ?</li>
+<li>Que signifie une cotation « bid 250 / offer 260 » ?</li>
+<li>Quelles sont les quatre dates standard de maturité ? Quelle conséquence ?</li>
+<li>Citer les trois définitions d'un événement de crédit.</li>
+<li>Quelle est la différence clé entre un CDS et un contrat d'assurance ?</li>
+<li>Qu'est-il arrivé à AIG, et pourquoi ?</li>
+<li>Quels étaient les montants de CDS et de dette Lehman ? Quel a été le payout ?</li>
+<li>Dérouler l'argument d'arbitrage reliant spread de CDS et excès de rendement obligataire.</li>
+<li>Définir la base CDS-obligation. Quel était son signe avant et pendant la crise ?</li>
+<li>Qu'est-ce que l'option de l'obligation la moins chère à livrer ? D'où vient-elle ?</li>
+<li>Construire la table 24.1 à partir d'un taux de hasard de 2 %.</li>
+<li>Quel est le taux de hasard continu équivalent ?</li>
+<li>Construire le bloc A et détailler la ligne 3.</li>
+<li>Construire le bloc C et détailler la ligne 2,5.</li>
+<li>Construire le bloc B. Pourquoi le facteur 0,5 ?</li>
+<li>Calculer le spread d'équilibre.</li>
+<li>Quelles hypothèses simplificatrices le calcul fait-il ?</li>
+<li>Calculer le MtM d'un CDS conclu à 150 pb, pour le vendeur puis pour l'acheteur.</li>
+<li>Quelles probabilités de défaut faut-il utiliser, et pourquoi ?</li>
+<li>Quel taux de hasard un spread de 100 pb implique-t-il ?</li>
+<li>Qu'est-ce qu'un CDS binaire ? Refaire la table 24.5.</li>
+<li>Quel spread obtient-on ? Quel est son rapport au spread ordinaire ?</li>
+<li>Pourquoi la valeur d'un CDS ordinaire est-elle peu sensible à $R$ ?</li>
+<li>Pourquoi cet argument tombe-t-il pour un CDS binaire ? Que peut-on en tirer ?</li>
+<li>Quels sont les deux portefeuilles standard, et leur composition ?</li>
+<li>Quand sont-ils mis à jour, et selon quel critère ?</li>
+<li>Calculer le coût annuel de 800 000 de protection sur chacun des 125 noms à 66 pb.</li>
+<li>De combien le paiement annuel est-il réduit quand une entreprise fait défaut ?</li>
+<li>Pourquoi l'indice est-il légèrement inférieur à la moyenne des spreads ?</li>
+<li>Décrire les quatre étapes du calcul du prix avec coupon fixe.</li>
+<li>Qu'est-ce que la durée $D$ dans ce calcul ?</li>
+<li>Quel est l'intérêt du mécanisme de coupon fixe ?</li>
+<li>Qu'est-ce que le nominal résiduel, pour un CDS puis pour un indice ?</li>
+<li>Refaire l'exemple 24.1 en entier.</li>
+<li>Qui paie qui au départ dans l'exemple 24.1, et pourquoi ?</li>
+<li>Qu'est-ce qu'un forward CDS ? Que se passe-t-il si l'entité fait défaut avant $T$ ?</li>
+<li>Distinguer call et put sur CDS.</li>
+<li>Distinguer <em>add-up basket</em>, <em>first-to-default</em> et $k$-ième-à-défaut.</li>
+<li>Décrire les flux d'un total return swap.</li>
+<li>Que se passe-t-il en cas de défaut sur l'obligation ?</li>
+<li>Comment caractériser proprement le TRS en ajoutant le nominal des deux côtés ?</li>
+<li>Pourquoi le TRS est-il un outil de financement, et quel avantage a le payeur ?</li>
+<li>De quoi dépend le spread sur LIBOR du TRS ?</li>
+<li>Distinguer cash CDO et CDO synthétique sur cinq points.</li>
+<li>Dérouler l'exemple à trois tranches avec 2 M puis 4 M de payoffs.</li>
+<li>Qu'est-ce que le <em>single-tranche trading</em> ?</li>
+<li>Citer les six tranches standard de chacun des deux indices.</li>
+<li>Comment se lit la cotation de la tranche 0-3 % ?</li>
+<li>De combien l'indice iTraxx a-t-il bougé entre janvier 2007 et janvier 2009 ? Deux raisons ?</li>
+<li>Calculer $P(\geqslant1)$ et $P(\geqslant10)$ pour 100 noms à 2 % avec $\rho=0$.</li>
+<li>Que deviennent ces probabilités quand $\rho\to1$ ? Pourquoi ?</li>
+<li>Quel est l'effet d'une hausse de $\rho$ sur la tranche equity ? sur la senior ?</li>
+<li>Écrire $A$, $B$, $C$ et le spread d'équilibre d'une tranche.</li>
+<li>Quelle est la formule du paiement d'avance d'équilibre pour l'equity ?</li>
+<li>Écrire (24.5) et (24.6).</li>
+<li>Écrire la binomiale conditionnelle.</li>
+<li>Définir $n_L$, $n_H$, et $m(x)$.</li>
+<li>Écrire les trois régimes du principal de tranche.</li>
+<li>Écrire (24.8).</li>
+<li>Qu'est-ce que la quadrature gaussienne ? D'où viennent $w_k$ et $F_k$ ?</li>
+<li>Combien de points d'intégration suffisent en pratique ?</li>
+<li>Refaire l'exemple 24.2 : $n_L$, $n_H$, $m(n_L)$, $m(n_H)$, le spread.</li>
+<li>Que montre l'évolution de $E_{20}(F_k)$ quand $F_k$ décroît ?</li>
+<li>Comment valorise-t-on un $k$-ième-à-défaut CDS ?</li>
+<li>Refaire les quatre lignes de l'exemple 24.3.</li>
+<li>Pourquoi le modèle standard ressemble-t-il à Black-Scholes-Merton ?</li>
+<li>Définir corrélation composée et corrélation de base.</li>
+<li>Décrire les quatre étapes du calcul d'une corrélation de base.</li>
+<li>Quelle forme prennent les corrélations composées ? les corrélations de base ?</li>
+<li>Qu'infère-t-on de ces formes ?</li>
+<li>Comment valoriser une tranche 4-8 % ? Quelle méthode est meilleure et pourquoi ?</li>
+<li>Quelle est la condition de non-arbitrage sur les pertes espérées ?</li>
+<li>Citer cinq alternatives au modèle standard.</li>
+<li>Quels sont les trois types de modèles dynamiques et leurs limites ?</li>
+</ol></div>
+
+<h2>Flashcards</h2>
+<table>
+<thead>
+<tr>
+<th>Question</th>
+<th>Réponse</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Nominal notionnel des dérivés de crédit en 2009 ?</td>
+<td><strong>32 000 milliards</strong> de dollars</td>
+</tr>
+<tr>
+<td>Dérivé single-name le plus populaire ?</td>
+<td>Le <strong>credit default swap</strong></td>
+</tr>
+<tr>
+<td>Dérivé multi-name le plus populaire ?</td>
+<td>Le <strong>collateralized debt obligation</strong></td>
+</tr>
+<tr>
+<td>Acheteurs nets de protection ?</td>
+<td>Les <strong>banques</strong></td>
+</tr>
+<tr>
+<td>Vendeurs nets ?</td>
+<td>Les <strong>compagnies d'assurance</strong></td>
+</tr>
+<tr>
+<td>Pourquoi ?</td>
+<td>Elles ne sont <strong>pas régulées de la même façon</strong></td>
+</tr>
+<tr>
+<td>Entité de référence ?</td>
+<td>L'entreprise (ou pays) sur laquelle porte le CDS</td>
+</tr>
+<tr>
+<td>Événement de crédit ?</td>
+<td><strong>Défaut de paiement</strong>, <strong>restructuration</strong>, ou <strong>faillite</strong></td>
+</tr>
+<tr>
+<td>Payoff d'un CDS ?</td>
+<td>$L(1-R)$</td>
+</tr>
+<tr>
+<td>Fréquence usuelle des paiements ?</td>
+<td><strong>Trimestriels, à terme échu</strong></td>
+</tr>
+<tr>
+<td>Maturité la plus populaire ?</td>
+<td><strong>5 ans</strong></td>
+</tr>
+<tr>
+<td>Dates standard ?</td>
+<td>20 mars, 20 juin, 20 sept., 20 déc.</td>
+</tr>
+<tr>
+<td>Qui détermine le prix de règlement ?</td>
+<td>Une <strong>enchère organisée par l'ISDA</strong></td>
+</tr>
+<tr>
+<td>Paiement accru final ?</td>
+<td>Le prorata <strong>depuis la dernière date de paiement</strong></td>
+</tr>
+<tr>
+<td>Année du contrat standard ISDA ?</td>
+<td><strong>1998-1999</strong></td>
+</tr>
+<tr>
+<td>Différence clé avec une assurance ?</td>
+<td> <strong>L'actif n'a pas à être possédé</strong></td>
+</tr>
+<tr>
+<td>Le gros vendeur de protection AAA ?</td>
+<td><strong>AIG</strong>, renflouée par le gouvernement américain</td>
+</tr>
+<tr>
+<td>CDS Lehman en circulation ?</td>
+<td><strong>400 milliards</strong> contre <strong>155 milliards</strong> de dette</td>
+</tr>
+<tr>
+<td>Payout Lehman ?</td>
+<td><strong>91,375 %</strong> du principal</td>
+</tr>
+<tr>
+<td>Base CDS-obligation ?</td>
+<td>Spread de CDS − <strong>asset swap spread</strong></td>
+</tr>
+<tr>
+<td>Sa valeur théorique ?</td>
+<td><strong>Proche de zéro</strong></td>
+</tr>
+<tr>
+<td>Son signe pendant la crise ?</td>
+<td><strong>Négatif</strong>, très négatif en janvier 2009</td>
+</tr>
+<tr>
+<td>Option de la moins chère à livrer ?</td>
+<td>Plusieurs obligations livrables aux <strong>prix différents</strong></td>
+</tr>
+<tr>
+<td>Pourquoi ces prix diffèrent-ils ?</td>
+<td><strong>Intérêts courus</strong> différents · traitement inégal en réorganisation</td>
+</tr>
+<tr>
+<td>Taux de hasard 2 % annuel en continu ?</td>
+<td>$-\ln(0{,}98)=\mathbf{2{,}02\,\%}$</td>
+</tr>
+<tr>
+<td>Survie à 2 ans avec 2 % ?</td>
+<td>$0{,}98^2=\mathbf{0{,}9604}$</td>
+</tr>
+<tr>
+<td>Défaut pendant l'année 3 ?</td>
+<td>$0{,}02\times0{,}9604=\mathbf{0{,}0192}$</td>
+</tr>
+<tr>
+<td>Bloc A total ?</td>
+<td>$\mathbf{4{,}0704\,s}$</td>
+</tr>
+<tr>
+<td>Bloc B total ?</td>
+<td>$\mathbf{0{,}0426\,s}$</td>
+</tr>
+<tr>
+<td>Bloc C total ?</td>
+<td><strong>0,0511</strong></td>
+</tr>
+<tr>
+<td>Où surviennent les défauts ?</td>
+<td><strong>À mi-période</strong></td>
+</tr>
+<tr>
+<td>Spread d'équilibre ?</td>
+<td>$0{,}0511/4{,}1130=\mathbf{124\ \text{pb}}$</td>
+</tr>
+<tr>
+<td>MtM d'un CDS à 150 pb, vendeur ?</td>
+<td>$\mathbf{+0{,}0106}$ × principal</td>
+</tr>
+<tr>
+<td>Probabilités à utiliser ?</td>
+<td> <strong>Risque-neutres</strong></td>
+</tr>
+<tr>
+<td>Trois sources ?</td>
+<td>Prix d'obligations · <strong>asset swaps</strong> · cotations de <strong>CDS</strong></td>
+</tr>
+<tr>
+<td>Hazard implicite pour 100 pb ?</td>
+<td><strong>1,61 %</strong> annuel</td>
+</tr>
+<tr>
+<td>CDS binaire ?</td>
+<td>Payoff <strong>fixe</strong> de 1 dollar</td>
+</tr>
+<tr>
+<td>Son bloc C ?</td>
+<td><strong>0,0852</strong></td>
+</tr>
+<tr>
+<td>Son spread ?</td>
+<td><strong>207 pb</strong></td>
+</tr>
+<tr>
+<td>Rapport avec 124 pb ?</td>
+<td>$124/(1-R)=124/0{,}6=207$</td>
+</tr>
+<tr>
+<td>Sensibilité d'un CDS ordinaire à $R$ ?</td>
+<td> <strong>Faible</strong> — les deux effets <strong>s'annulent</strong></td>
+</tr>
+<tr>
+<td>Pourquoi ?</td>
+<td>Probabilités $\propto1/(1-R)$, payoffs $\propto(1-R)$</td>
+</tr>
+<tr>
+<td>Pour un binaire ?</td>
+<td> <strong>Forte</strong> — les payoffs sont <strong>indépendants</strong> de $R$</td>
+</tr>
+<tr>
+<td>Que permet la paire ordinaire + binaire ?</td>
+<td>Estimer <strong>$R$ ET la probabilité</strong></td>
+</tr>
+<tr>
+<td>CDX NA IG ?</td>
+<td><strong>125</strong> noms investment grade d'<strong>Amérique du Nord</strong></td>
+</tr>
+<tr>
+<td>iTraxx Europe ?</td>
+<td><strong>125</strong> noms investment grade <strong>européens</strong></td>
+</tr>
+<tr>
+<td>Mise à jour ?</td>
+<td><strong>20 mars</strong> et <strong>20 septembre</strong></td>
+</tr>
+<tr>
+<td>Coût de 800 000 sur 125 noms à 66 pb ?</td>
+<td><strong>660 000 dollars par an</strong></td>
+</tr>
+<tr>
+<td>Réduction du paiement par défaut ?</td>
+<td>$660\,000/125=\mathbf{5\,280}$</td>
+</tr>
+<tr>
+<td>Indice contre moyenne des spreads ?</td>
+<td><strong>Légèrement inférieur</strong></td>
+</tr>
+<tr>
+<td>Pourquoi ?</td>
+<td>Les <strong>gros spreads</strong> ne sont pas payés aussi <strong>longtemps</strong></td>
+</tr>
+<tr>
+<td>Formule du prix ?</td>
+<td>$P=100-100\,D\,(S-C)$</td>
+</tr>
+<tr>
+<td>Que vaut $D$ ?</td>
+<td>La <strong>durée</strong> — le multiplicateur du spread (ex. 4,1130)</td>
+</tr>
+<tr>
+<td>Intérêt du coupon fixe ?</td>
+<td>Les paiements réguliers sont <strong>indépendants du spread d'entrée</strong></td>
+</tr>
+<tr>
+<td>Nominal résiduel d'un indice ?</td>
+<td>Les noms <strong>non encore en défaut</strong> × principal par nom</td>
+</tr>
+<tr>
+<td>34 pb en 30/360 → actual/actual ?</td>
+<td>$\times365/360=\mathbf{0{,}345\,\%}$</td>
+</tr>
+<tr>
+<td>Prix de l'exemple 24.1 ?</td>
+<td><strong>100,27</strong></td>
+</tr>
+<tr>
+<td>Qui paie au départ ?</td>
+<td> <strong>Le VENDEUR</strong> de protection (car $P&gt;100$)</td>
+</tr>
+<tr>
+<td>Combien ?</td>
+<td>$1\,000\,000\times125\times0{,}0027=\mathbf{337\,500}$</td>
+</tr>
+<tr>
+<td>Forward CDS ?</td>
+<td><strong>Obligation</strong> d'entrer dans un CDS en $T$</td>
+</tr>
+<tr>
+<td>Que se passe-t-il si défaut avant $T$ ?</td>
+<td> Le contrat <strong>cesse d'exister</strong></td>
+</tr>
+<tr>
+<td>Call sur CDS ?</td>
+<td>Droit d'<strong>acheter</strong> la protection</td>
+</tr>
+<tr>
+<td>Add-up basket ?</td>
+<td>Payoff si <strong>n'importe laquelle</strong> fait défaut</td>
+</tr>
+<tr>
+<td>First-to-default ?</td>
+<td>Payoff au <strong>premier</strong> défaut seulement</td>
+</tr>
+<tr>
+<td>Après le défaut pertinent ?</td>
+<td>Le swap <strong>se termine</strong></td>
+</tr>
+<tr>
+<td>Total return swap ?</td>
+<td>Rendement <strong>total</strong> contre <strong>LIBOR + spread</strong></td>
+</tr>
+<tr>
+<td>Ce que le rendement total inclut ?</td>
+<td>Coupons, intérêts, <strong>ET le gain ou la perte</strong></td>
+</tr>
+<tr>
+<td>Si l'obligation monte de 10 % ?</td>
+<td>Le <strong>payeur</strong> verse 10 millions</td>
+</tr>
+<tr>
+<td>Si défaut ?</td>
+<td>Le <strong>receveur</strong> verse l'excès du nominal sur la valeur de marché</td>
+</tr>
+<tr>
+<td>Usage principal ?</td>
+<td>Un outil de <strong>FINANCEMENT</strong></td>
+</tr>
+<tr>
+<td>Avantage du payeur ?</td>
+<td>Il <strong>garde la propriété</strong> — pas de problème de collatéral</td>
+</tr>
+<tr>
+<td>De quoi dépend son spread ?</td>
+<td>Crédit du receveur, de l'émetteur, et leur <strong>corrélation</strong></td>
+</tr>
+<tr>
+<td>Analogue de marché ?</td>
+<td>Le <strong>repo</strong></td>
+</tr>
+<tr>
+<td>Cash CDO ?</td>
+<td>Créé d'un <strong>portefeuille d'obligations acheté</strong></td>
+</tr>
+<tr>
+<td>CDO synthétique ?</td>
+<td>Créé en <strong>vendant des CDS</strong></td>
+</tr>
+<tr>
+<td>Investissement initial d'un synthétique ?</td>
+<td> <strong>Aucun</strong> — mais collatéral déposé</td>
+</tr>
+<tr>
+<td>Rémunération du collatéral ?</td>
+<td><strong>LIBOR</strong></td>
+</tr>
+<tr>
+<td>Spread de tranche appliqué à quoi ?</td>
+<td>Le principal <strong>RÉSIDUEL</strong></td>
+</tr>
+<tr>
+<td>Tranches CDX ?</td>
+<td>0-3 · 3-6 · 6-9 · 9-12 · 12-22 · 22-100 %</td>
+</tr>
+<tr>
+<td>Tranches iTraxx ?</td>
+<td>0-3 · 3-7 · 7-10 · 10-15 · 15-30 · 30-100 %</td>
+</tr>
+<tr>
+<td>Cotation de la 0-3 % ?</td>
+<td><strong>Paiement d'avance en %</strong> + <strong>500 pb</strong> par an</td>
+</tr>
+<tr>
+<td>Single-tranche trading ?</td>
+<td>La tranche se négocie <strong>sans créer</strong> le portefeuille CDS</td>
+</tr>
+<tr>
+<td>iTraxx janvier 2007 ?</td>
+<td><strong>23 pb</strong></td>
+</tr>
+<tr>
+<td>iTraxx janvier 2009 ?</td>
+<td><strong>165 pb</strong></td>
+</tr>
+<tr>
+<td>Deux raisons de la hausse ?</td>
+<td>Probabilités de défaut ↑ · <strong>problèmes de liquidité</strong> des vendeurs</td>
+</tr>
+<tr>
+<td>100 noms à 2 %, $\rho=0$ : $P(\geqslant1)$ ?</td>
+<td><strong>86,74 %</strong></td>
+</tr>
+<tr>
+<td>$P(\geqslant10)$ ?</td>
+<td><strong>0,0034 %</strong></td>
+</tr>
+<tr>
+<td>Avec $\rho=1$ ?</td>
+<td>Les deux valent <strong>2 %</strong></td>
+</tr>
+<tr>
+<td>Pourquoi ?</td>
+<td>Les entités deviennent <strong>essentiellement identiques</strong></td>
+</tr>
+<tr>
+<td>$\rho\uparrow$ : tranche equity ?</td>
+<td> <strong>Moins risquée</strong></td>
+</tr>
+<tr>
+<td>$\rho\uparrow$ : tranche senior ?</td>
+<td> <strong>Plus risquée</strong></td>
+</tr>
+<tr>
+<td>Si $\rho=1$ et $R=0$ ?</td>
+<td>Toutes les tranches sont <strong>également risquées</strong></td>
+</tr>
+<tr>
+<td>Formule de $A$ ?</td>
+<td>$\sum(\tau_j-\tau_{j-1})E_jv(\tau_j)$</td>
+</tr>
+<tr>
+<td>Formule de $C$ ?</td>
+<td>$\sum(E_{j-1}-E_j)v(\text{milieu})$</td>
+</tr>
+<tr>
+<td>Formule de $B$ ?</td>
+<td>$\sum0{,}5(\tau_j-\tau_{j-1})(E_{j-1}-E_j)v(\text{milieu})$</td>
+</tr>
+<tr>
+<td>Spread d'équilibre ?</td>
+<td>$C/(A+B)$</td>
+</tr>
+<tr>
+<td>Pour l'equity ?</td>
+<td>$C-0{,}05(A+B)$</td>
+</tr>
+<tr>
+<td>Que vaut $n_L$ ?</td>
+<td>$Ln/(1-R)$</td>
+</tr>
+<tr>
+<td>Que vaut $m(x)$ ?</td>
+<td>Le plus petit entier <strong>strictement supérieur</strong> à $x$</td>
+</tr>
+<tr>
+<td>Principal résiduel intermédiaire ?</td>
+<td>$\dfrac{H-k(1-R)/n}{H-L}$</td>
+</tr>
+<tr>
+<td>Méthode d'intégration ?</td>
+<td>La <strong>quadrature gaussienne</strong></td>
+</tr>
+<tr>
+<td>D'où viennent $w_k$ et $F_k$ ?</td>
+<td>Des racines des polynômes d'<strong>Hermite</strong></td>
+</tr>
+<tr>
+<td>Combien de points suffisent ?</td>
+<td><strong>20</strong> points d'intégration</td>
+</tr>
+<tr>
+<td>Ex. 24.2 : $n_L$ et $n_H$ ?</td>
+<td><strong>6,25</strong> et <strong>12,5</strong></td>
+</tr>
+<tr>
+<td>Ex. 24.2 : $\lambda$ ?</td>
+<td><strong>0,83 %</strong> continu</td>
+</tr>
+<tr>
+<td>Ex. 24.2 : $A$, $B$, $C$ ?</td>
+<td><strong>4,2846</strong> · <strong>0,0187</strong> · <strong>0,1496</strong></td>
+</tr>
+<tr>
+<td>Ex. 24.2 : spread ?</td>
+<td><strong>348 points de base</strong></td>
+</tr>
+<tr>
+<td>Ex. 24.3 : conditionnelles à $F=-1{,}0104$ ?</td>
+<td>0,0365 · 0,0754 · 0,1134 · 0,1498 · 0,1848</td>
+</tr>
+<tr>
+<td>Ex. 24.3 : $P(\geqslant3)$ ?</td>
+<td>0,0048 · 0,0344 · 0,0950 · 0,1794 · 0,2767</td>
+</tr>
+<tr>
+<td>$k$-ième-à-défaut, méthode ?</td>
+<td><strong>Différencier</strong> les $P(\geqslant k)$ entre dates</td>
+</tr>
+<tr>
+<td>Recouvrement supposé du modèle standard ?</td>
+<td><strong>40 %</strong></td>
+</tr>
+<tr>
+<td>Seul paramètre inconnu ?</td>
+<td>La <strong>corrélation de copule</strong> $\rho$</td>
+</tr>
+<tr>
+<td>Analogue Black-Scholes ?</td>
+<td>La <strong>volatilité implicite</strong></td>
+</tr>
+<tr>
+<td>Corrélation composée ?</td>
+<td>Celle qui ajuste <strong>une</strong> tranche $\{\alpha_{q-1},\alpha_q\}$</td>
+</tr>
+<tr>
+<td>Corrélation de base ?</td>
+<td>Celle qui ajuste la tranche $\{0,\alpha_q\}$</td>
+</tr>
+<tr>
+<td>Forme des composées ?</td>
+<td>Un <strong>SOURIRE</strong> (17,7 → <strong>7,8</strong> → 23,3 %)</td>
+</tr>
+<tr>
+<td>Forme des bases ?</td>
+<td>Un <strong>SKEW croissant</strong> (17,7 → <strong>60,5 %</strong>)</td>
+</tr>
+<tr>
+<td>Ce que cela prouve ?</td>
+<td> <strong>Les prix ne sont pas cohérents avec le modèle standard</strong></td>
+</tr>
+<tr>
+<td>Tranche non standard : bonne méthode ?</td>
+<td>Interpoler <strong>les pertes espérées</strong></td>
+</tr>
+<tr>
+<td>Mauvaise méthode ?</td>
+<td>Interpoler les <strong>corrélations de base</strong></td>
+</tr>
+<tr>
+<td>Pourquoi ?</td>
+<td>La base est une fonction <strong>non linéaire</strong> de la perte</td>
+</tr>
+<tr>
+<td>Condition de non-arbitrage ?</td>
+<td>Pertes espérées croissantes <strong>à rythme décroissant</strong></td>
+</tr>
+<tr>
+<td>Problème du modèle hétérogène ?</td>
+<td><strong>Plus de formule binomiale</strong></td>
+</tr>
+<tr>
+<td>Meilleure copule alternative ?</td>
+<td>La <strong>double $t$</strong> (Student, <strong>4</strong> ddl)</td>
+</tr>
+<tr>
+<td>Chargements factoriels aléatoires ?</td>
+<td>$\rho$ <strong>croît quand $F$ décroît</strong></td>
+</tr>
+<tr>
+<td>Limite des multi-facteurs ?</td>
+<td><strong>Beaucoup plus lent</strong></td>
+</tr>
+<tr>
+<td>Copule implicite ?</td>
+<td>Impliquer la <strong>loi du taux de hasard moyen</strong></td>
+</tr>
+<tr>
+<td>Modèles statiques contre dynamiques ?</td>
+<td>Environnement <strong>moyen</strong> contre <strong>évolution</strong> de la perte</td>
+</tr>
+<tr>
+<td>Les trois dynamiques ?</td>
+<td><strong>Structurels</strong> · <strong>forme réduite</strong> · <em><strong>top down</strong></em></td>
+</tr>
+<tr>
+<td>Problème des structurels ?</td>
+<td><strong>Monte-Carlo</strong> → calibration difficile</td>
+</tr>
+<tr>
+<td>Problème des formes réduites ?</td>
+<td>Il faut des <strong>sauts</strong> dans les taux de hasard</td>
+</tr>
+</tbody></table>
+</main>
+
+
+
+
+</body></html>

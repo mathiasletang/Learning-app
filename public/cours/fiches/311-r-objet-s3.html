@@ -1,0 +1,999 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fiche 311 — Le système objet S3 : classes, génériques, UseMethod et NextMethod</title>
+<script>
+window.MathJax={tex:{inlineMath:[["$","$"]],displayMath:[["$$","$$"]],processEscapes:true},
+ options:{skipHtmlTags:["script","noscript","style","textarea","pre","code"]},
+ svg:{fontCache:"global"},
+ startup:{pageReady:()=>MathJax.startup.defaultPageReady().then(()=>{document.body.classList.add("ready")})}};
+setTimeout(function(){document.body.classList.add("ready")},2500);
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+/* ============================================================
+   MathiasLearn — feuille de style des fiches
+   Reprise intégrale des tokens de 00_PARCOURS/*.html
+   + blocs pédagogiques (callouts, méthode, essentiels, recall)
+   ============================================================ */
+:root{--bg:#faf9f7;--card:#fff;--ink:#1a1a1a;--muted:#6b6b6b;--line:#e5e2dd;--accent:#8b5e34;
+ --hl:#fdf8ef;--ok:#2d7d4f;--okbg:#f0f7f3;--warn:#b3402f;--warnbg:#fdf3f1;--blue:#2f5d8b;--bluebg:#f1f5fa}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+ font:17px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;padding:0 16px 100px}
+.nav{position:sticky;top:0;background:rgba(250,249,247,.96);backdrop-filter:blur(8px);
+ border-bottom:1px solid var(--line);margin:0 -16px 30px;padding:11px 16px;z-index:50;
+ display:flex;gap:6px;flex-wrap:wrap;font-size:13px}
+.nav a{color:var(--muted);text-decoration:none;padding:4px 9px;border-radius:5px;white-space:nowrap}
+.nav a:hover{background:var(--line);color:var(--ink)}
+.nav a.on{background:var(--accent);color:#fff}
+main{max-width:780px;margin:0 auto}
+h1{font-size:31px;letter-spacing:-.02em;margin:.4em 0 .5em;line-height:1.25}
+h2{font-size:23px;margin:2.2em 0 .7em;padding-bottom:.3em;border-bottom:1px solid var(--line)}
+h3{font-size:19px;margin:1.9em 0 .5em;color:var(--accent)}
+h4{font-size:17px;margin:1.5em 0 .4em}
+p{margin:.8em 0} a{color:var(--accent)} hr{border:0;border-top:1px solid var(--line);margin:2.6em 0}
+table{border-collapse:collapse;width:100%;margin:1.3em 0;font-size:15.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+th{background:#f3f0eb;font-weight:600}
+tr:nth-child(even) td{background:#fcfbfa}
+code{font-family:"SF Mono",Menlo,Consolas,monospace;font-size:.88em;background:#f2efea;padding:2px 6px;border-radius:4px;overflow-wrap:break-word}
+pre{background:#f2efea;padding:14px 16px;border-radius:8px;overflow-x:auto}
+pre code{background:none;padding:0;white-space:pre}
+blockquote{border-left:3px solid var(--accent);background:var(--hl);margin:1.4em 0;padding:14px 20px;border-radius:0 8px 8px 0}
+blockquote p:first-child{margin-top:0} blockquote p:last-child{margin-bottom:0}
+ul,ol{padding-left:1.5em} li{margin:.35em 0} em{color:#4a4a4a}
+mjx-container[display="true"]{margin:1.1em 0!important;overflow-x:auto;overflow-y:hidden;padding:2px 0}
+mjx-container svg{max-width:100%}
+body:not(.ready) main{opacity:0} main{opacity:1;transition:opacity .25s}
+
+/* --- bandeau de tête de fiche --- */
+.cours{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--accent);
+ border-radius:0 10px 10px 0;padding:18px 22px;margin:0 0 34px}
+.cours h4{margin:0 0 4px;font-size:14px;text-transform:uppercase;letter-spacing:.07em;color:var(--accent)}
+.cours .cs{color:var(--muted);font-size:14.5px;margin:0 0 14px}
+
+/* --- exercices / corrigés --- */
+.ex{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:6px 24px 20px;margin:18px 0}
+.ex>h3:first-child{margin-top:14px}
+details.cor{margin-top:18px;border:1px solid var(--line);border-radius:8px;background:#fcfbfa;overflow:hidden}
+details.cor>summary{cursor:pointer;padding:12px 16px;font-weight:600;font-size:15px;color:var(--accent);
+ list-style:none;display:flex;align-items:center;gap:9px;user-select:none;transition:.15s;min-height:44px}
+details.cor>summary::-webkit-details-marker{display:none}
+details.cor>summary:hover{background:var(--hl)}
+details.cor>summary::before{content:"\25B6";font-size:10px;transition:transform .18s;display:inline-block}
+details.cor[open]>summary::before{transform:rotate(90deg)}
+details.cor[open]>summary{background:var(--okbg);color:var(--ok);border-bottom:1px solid var(--line)}
+.cor .in{padding:4px 20px 16px}
+.cor .in>*:first-child{margin-top:.9em}
+
+/* --- blocs pédagogiques (callouts) ---
+   Générés depuis une citation Markdown dont le premier **gras** commence
+   par un mot-clé : DÉFINITION, THÉORÈME, MÉTHODE, PIÈGE, INTUITION… */
+.cal{border:1px solid var(--line);border-left:4px solid var(--accent);background:var(--card);
+ border-radius:0 10px 10px 0;padding:15px 20px;margin:1.5em 0}
+.cal>p:first-child{margin-top:0}.cal>p:last-child,.cal>ul:last-child,.cal>ol:last-child{margin-bottom:0}
+.cal .lab{display:block;font-size:12.5px;text-transform:uppercase;letter-spacing:.08em;
+ font-weight:700;color:var(--accent);margin-bottom:6px}
+.cal.formel{background:var(--hl)}
+.cal.piege{border-left-color:var(--warn);background:var(--warnbg)}
+.cal.piege .lab{color:var(--warn)}
+.cal.methode{border-left-color:var(--ok);background:var(--okbg)}
+.cal.methode .lab{color:var(--ok)}
+.cal.intu{border-left-color:var(--blue);background:var(--bluebg)}
+.cal.intu .lab{color:var(--blue)}
+.cal.plus{border-left-style:dashed;background:#faf9f7}
+.cal.plus .lab{color:var(--muted)}
+
+/* --- révision express --- */
+.ess{background:var(--card);border:1px solid var(--accent);border-radius:10px;padding:4px 24px 20px;margin:1.6em 0}
+.ess h3{margin-top:1.3em}
+.rec{background:var(--card);border:1px dashed var(--accent);border-radius:10px;padding:4px 24px 18px;margin:1.6em 0}
+.rec ol{counter-reset:none}
+
+/* --- impression / PDF --- */
+@media print{
+ .nav{display:none}
+ body{padding:0;background:#fff;font-size:11.2pt;line-height:1.55}
+ main{max-width:none}
+ h1{font-size:23pt}h2{font-size:15pt;margin-top:1.5em}h3{font-size:12.6pt}
+ h2,h3,h4{break-after:avoid;page-break-after:avoid}
+ table,.cal,blockquote{break-inside:avoid;page-break-inside:avoid}
+ table{display:table;font-size:9.6pt}
+ details.cor{border:1px solid var(--line);background:#fcfbfa}
+ details.cor>summary{display:none}
+ details.cor .in{padding-top:10px}
+ .cal,.ex,.ess,.rec{box-shadow:none}
+ a{color:var(--ink);text-decoration:none}
+}
+@page{margin:16mm 15mm 18mm}
+
+/* --- exemples travaillés --- */
+.exm{background:#fcfbfa;border:1px solid var(--line);border-radius:10px;padding:2px 20px 14px;margin:1.5em 0}
+.exm>h4:first-child{margin:14px 0 .5em;color:var(--accent);font-size:13px;text-transform:uppercase;letter-spacing:.07em}
+
+
+/* --- pastilles de priorité (conventions des fiches de l'app) --- */
+h2[data-prio], h3[data-prio], h4[data-prio]{position:relative}
+h2[data-prio]::before,h3[data-prio]::before,h4[data-prio]::before{
+ content:"";display:inline-block;width:9px;height:9px;border-radius:50%;
+ margin-right:9px;vertical-align:middle;background:var(--muted)}
+[data-prio="must"]::before{background:var(--warn)}
+[data-prio="high"]::before{background:#d98324}
+[data-prio="mid"]::before{background:#c9a227}
+[data-prio="low"]::before{background:var(--ok)}
+/* corrigés des fiches de l'app : même traitement que les corrigés des séries */
+details.cor>summary::after{content:""}
+</style></head><body>
+<div class="nav"><a href="00_COMMENCER_ICI.html">Commencer ici</a><a href="01_NOTATIONS_le-decodeur.html">Notations</a><a href="02_EXERCICES_Serie-0.html">Série 0 — Remise en route</a><a href="03_EXERCICES_Serie-1.html">Série 1 — Convexité</a><a href="04_EXERCICES_Serie-2.html">Série 2 — KKT</a><a href="05_AUTO-EVALUATION.html">Auto-évaluation (quiz)</a><a href="06_FICHE_Optimisation-deux-variables.html">Fiche — Optimisation à 2 variables</a></div>
+<main><h1>Fiche 311 — Le système objet S3 : classes, génériques, <code>UseMethod</code> et <code>NextMethod</code></h1>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Matière</strong></td>
+<td>Code · Langage R</td>
+</tr>
+<tr>
+<td><strong>Cours source</strong></td>
+<td>R Core Team, <em>An Introduction to R</em> 4.6.1 — §10.9 « Classes, generic functions and object orientation » ; §3.4 « The class of an object »</td>
+</tr>
+<tr>
+<td><strong>Sources d'appoint</strong></td>
+<td><em>R Language Definition</em> 4.6.1, chapitre 5 « Object-oriented programming » — §5.1 définition, §5.2 héritage, §5.3 dispatch, §5.4 <code>UseMethod</code>, §5.5 <code>NextMethod</code>, §5.6 <strong>méthodes de groupe</strong>, §5.7 écrire des méthodes ; §2.2.4 « Classes »</td>
+</tr>
+<tr>
+<td><strong>Difficulté</strong></td>
+<td> Avancé — le mécanisme qui explique le comportement de tout R</td>
+</tr>
+<tr>
+<td><strong>Temps d'étude estimé</strong></td>
+<td>1 h 30</td>
+</tr>
+<tr>
+<td><strong>Prérequis</strong></td>
+<td>Fiches 303, 306, 309, 310 (attributs, listes, fonctions, portée)</td>
+</tr>
+<tr>
+<td><strong>Concepts clés</strong></td>
+<td>attribut <code>class</code>, <strong>fonction générique</strong>, <strong>méthode</strong> <code>generic.class</code>, <code>UseMethod</code>, <strong>méthode par défaut</strong>, héritage par vecteur de classes, <code>NextMethod</code>, <code>.Generic</code> / <code>.Class</code> / <code>.Method</code> / <code>.Group</code>, <strong>méthodes de groupe</strong> <code>Math</code>, <code>Summary</code>, <code>Ops</code>, <code>methods()</code>, <code>getS3method()</code>, <code>getAnywhere()</code>, <code>unclass()</code>, S4 dans <code>methods</code></td>
+</tr>
+<tr>
+<td><strong>À retenir en priorité</strong></td>
+<td><strong><code>generic.class</code>, puis la classe suivante, puis <code>generic.default</code></strong> · <strong><code>UseMethod</code> ne rend jamais la main</strong> · <strong>ne jamais nommer une fonction <code>gen.cl</code> par hasard</strong> · <strong>une classe se pose sans aucun contrôle</strong>.</td>
+</tr>
+</tbody></table>
+<h2>Vue d'ensemble</h2>
+<pre><code>LE PRINCIPE   « The CLASS of an object determines HOW IT WILL BE TREATED by
+                what are known as GENERIC FUNCTIONS. »
+
+UNE GENERIQUE  souvent UNE SEULE LIGNE :
+                 mean
+                 function (x, ...)
+                 UseMethod("mean")
+
+LE DISPATCH   class(x) = c("foo", "bar")  et generique = mean
+                 1. cherche  mean.foo
+                 2. sinon    mean.bar
+                 3. sinon    mean.default
+                 4. sinon    ERREUR      -&gt; « always write a default method »
+
+CE QUI EST IGNORE   « The class attributes of ANY OTHER ARGUMENTS to mean
+                      ARE IGNORED. » -- seul le PREMIER argument compte
+
+UseMethod     ne CREE PAS un nouvel environnement : il reutilise celui de l'appel
+              « it DOES NOT RETURN CONTROL to the calling function »
+              -&gt; tout ce qui suit UseMethod n'est JAMAIS execute
+
+NextMethod    passe a la CLASSE SUIVANTE du vecteur -- c'est l'HERITAGE
+
+QUATRE VARIABLES SPECIALES posees dans le cadre : .Generic .Class .Method .Group
+
+TROIS GROUPES  Math      abs, cos, exp, log, round, ...
+               Summary   all, any, max, min, prod, range, sum
+               Ops       + - * / ^ &lt; &gt; &lt;= &gt;= != == %% %/% &amp; | !
+
+EXPLORER      methods(class = "data.frame")   methods(plot)
+              getS3method("coef", "aov")      getAnywhere("coef.aov")
+              unclass(x)  pour voir dessous
+</code></pre>
+<p><strong>Le problème posé.</strong> <em>« <strong>The class of an object determines how it will be treated by what are known as generic functions.</strong> Put the other way round, <strong>a generic function performs a task or action on its arguments specific to the class of the argument itself.</strong> <strong>If the argument lacks any class attribute, or has a class not catered for specifically by the generic function in question, there is always a default action provided.</strong> »</em> (§10.9)</p>
+<div class="cal intu"><span class="lab">Intuition — c'est ce qu'on observe depuis la fiche 300.</span>
+<p> <code>plot(Expt, Speed)</code> produisait des boîtes à moustaches parce que <code>Expt</code> <strong>était un facteur</strong> ; <code>plot(fr)</code> produisait un histogramme parce que <code>fr</code> <strong>était une <code>"table"</code></strong> ; un data frame <strong>s'affiche en tableau</strong> et un facteur <strong>avec sa ligne <code>Levels:</code></strong>. Une seule fonction, des comportements différents. <strong>Ce chapitre en donne la mécanique.</strong></p>
+</div>
+<blockquote>
+<p class="cal piege"> <strong>Le cadrage honnête de la <em>R Language Definition</em> (§5.1).</strong> <em>« <strong>Rather than having a full-fledged object-oriented system</strong>, R has <strong>a class system and a mechanism for dispatching based on the class of an object</strong>. »</em> Et l'avertissement de l'introduction du chapitre 5 : <em>« because of the way that the object system is incorporated into R <strong>this advantage [greater consistency] does not obtain</strong>. <strong>Users are cautioned to use the object system in a straightforward manner.</strong> While it is possible to perform some rather interesting feats <strong>these tend to lead to obfuscated code</strong>. »</em></p>
+</blockquote>
+<h2 data-prio="must">Concept 1 — La classe, et l'absence totale de contrôle</h2>
+<blockquote>
+<p><strong>Rappel (§3.4, fiche 303).</strong> <em>« <strong>All objects in R have a class</strong>, reported by the function <code>class</code>. <strong>For simple vectors this is just the mode</strong> … but <strong><code>"matrix"</code>, <code>"array"</code>, <code>"factor"</code> and <code>"data.frame"</code> are other possible values.</strong> »</em></p>
+</blockquote>
+<div class="cal formel"><span class="lab">Définition (R Language Definition §5.1).</span>
+<p> <em>« <strong>The class system is facilitated through the <code>class</code> attribute. This attribute is a character vector of class names.</strong> So <strong>to create an object of class <code>"foo"</code> one simply attaches a class attribute with the string <code>"foo"</code> in it.</strong>  <strong>Thus, virtually anything can be turned into an object of class <code>"foo"</code>.</strong> »</em></p>
+</div>
+<p><strong>Il n'y a rien de plus.</strong> Pas de déclaration, pas de constructeur imposé, pas de vérification :</p>
+<pre><code class="language-r">x &lt;- 1:10
+class(x) &lt;- "foo"     # x est maintenant « de classe foo »
+</code></pre>
+<blockquote>
+<p class="cal piege"> <strong>L'avertissement du §2.2.4 (fiche 303), qui prend ici tout son sens.</strong> <em>« This attribute <strong>can be accessed and manipulated virtually without restriction by users</strong>. <strong>There is no checking that an object actually contains the components that class methods expect.</strong> Thus, <strong>altering the <code>class</code> attribute should be done with caution</strong>, and <strong>when they are available specific creation and coercion functions should be preferred</strong>. »</em></p>
+<p><strong>La conséquence est différée</strong> : poser une classe ne casse rien <strong>immédiatement</strong>. La panne survient <strong>au premier appel générique</strong>, quand une méthode cherche une composante qui n'existe pas — loin de la ligne fautive.</p>
+</blockquote>
+<h2 data-prio="must">Concept 2 — Une générique, et le dispatch</h2>
+<div class="cal formel"><span class="lab">Définition (R Language Definition §5.1).</span>
+<p> *« The object system makes use of generic functions <strong>via two dispatching functions, <code>UseMethod</code> and <code>NextMethod</code></strong>. <strong>The typical use of the object system is to begin by calling a generic function. This is typically a very simple function and consists of a single line of code.</strong> »*</p>
+</div>
+<pre><code class="language-r">&gt; mean
+function (x, ...)
+UseMethod("mean")
+</code></pre>
+<p>Et l'exemple du cours (§10.9) :</p>
+<pre><code class="language-r">&gt; coef
+function (object, ...)
+UseMethod("coef")
+</code></pre>
+<p><em>« <strong>The presence of <code>UseMethod</code> indicates this is a generic function.</strong> »</em></p>
+<blockquote>
+<p><strong>Règle — comment la méthode est choisie (§5.1).</strong> <em>« When <code>mean</code> is called it can have any number of arguments <strong>but its first argument is special</strong> and <strong>the class of that first argument is used to determine which method should be called</strong>. …  <strong>The class attributes of any other arguments to <code>mean</code> are ignored.</strong> »</em></p>
+</blockquote>
+<blockquote>
+<p><strong>Règle — la recherche complète (§5.1).</strong> <em>« Suppose that <code>x</code> had a class attribute that contained <strong><code>"foo"</code> and <code>"bar"</code>, in that order</strong>. Then R would <strong>first search for a function called <code>mean.foo</code></strong> ; if it did not find one it would then <strong>search for a function <code>mean.bar</code></strong> ; and if that search was also unsuccessful then <strong>a final search for <code>mean.default</code></strong> would be made. <strong>If the last search is unsuccessful R reports an error.</strong>  <strong>It is a good idea to always write a default method.</strong> »</em></p>
+</blockquote>
+<p>$$\texttt{class(x)} = (\texttt{"foo"},\ \texttt{"bar"}) \;\Longrightarrow\; \texttt{mean.foo} \to \texttt{mean.bar} \to \texttt{mean.default} \to \text{erreur}$$</p>
+<p><em>« <strong>Note that the functions <code>mean.foo</code> etc. are referred to, in this context, as methods.</strong> »</em></p>
+<div class="cal plus"><span class="lab">Complément (§5.3).</span>
+<p> *« <strong>Generic functions should consist of a single statement.</strong> They should usually be of the form <strong><code>foo &lt;- function(x, ...) UseMethod("foo", x)</code></strong>. When <code>UseMethod</code> is called, it determines the appropriate method and <strong>that method is invoked with the same arguments, in the same order as the call to the generic, as if the call had been made directly to the method</strong>. »*</p>
+<p><em>« <strong>If the first argument to the generic function has no class attribute then <code>generic.default</code> is used.</strong> »</em></p>
+<p class="cal piege"> *« <strong>Since the introduction of namespaces the methods may not be accessible by their names</strong> (i.e. <code>get("generic.class")</code> may fail), <strong>but they will be accessible by <code>getS3method("generic", "class")</code></strong>. »*</p>
+</div>
+<h3>2.1 L'exemple du manuel : deux représentations d'un point</h3>
+<blockquote>
+<p><strong>Exemple (§5.1).</strong> *« A point in two-dimensional Euclidean space can be specified by its <strong>Cartesian ($x$-$y$)</strong> or <strong>polar ($r$-$\theta$)</strong> coordinates. Hence … we could define two classes, <strong><code>"xypoint"</code> and <code>"rthetapoint"</code></strong>. All <code>xypoint</code> data structures are <strong>lists with an <code>x</code>-component and a <code>y</code>-component</strong>. All <code>rthetapoint</code> objects are <strong>lists with an <code>r</code>-component and a <code>theta</code>-component</strong>. »*</p>
+</blockquote>
+<pre><code class="language-r">xpos &lt;- function(x, ...)
+  UseMethod("xpos")
+
+xpos.xypoint     &lt;- function(x) x$x
+xpos.rthetapoint &lt;- function(x) x$r * cos(x$theta)
+</code></pre>
+<div class="cal intu"><span class="lab">Contrôle — vérifier la seconde méthode.</span>
+<p> En coordonnées polaires, un point de rayon $r$ et d'angle $\theta$ a pour abscisse
+$$x = r\cos\theta$$
+— c'est exactement <code>x$r * cos(x$theta)</code>.  Et la première méthode n'a rien à calculer : l'abscisse <strong>est</strong> la composante <code>x</code>.</p>
+</div>
+<blockquote>
+<p><strong>La leçon (§5.1).</strong> <em>« <strong>The user simply calls the function <code>xpos</code> with either representation as the argument. The internal dispatching method finds the class of the object and calls the appropriate methods.</strong> »</em></p>
+<p><em>« <strong>It is pretty easy to add other representations. One need not write a new generic function, only the methods.</strong> This makes it easy to add to existing systems <strong>since the user is only responsible for dealing with the new representation and not with any of the existing representations</strong>. »</em></p>
+</blockquote>
+<p><strong>C'est l'argument central du système.</strong> Ajouter une classe <strong>n'oblige à toucher à rien</strong> de ce qui existe. C'est l'inverse d'un <code>switch</code> sur un type, qu'il faudrait modifier à chaque ajout.</p>
+<p><em>« <strong>The bulk of the uses of this methodology are to provide specialized printing for objects of different types ; there are about 40 methods for <code>print</code>.</strong> »</em></p>
+<h2 data-prio="must">Concept 3 — <code>UseMethod</code> : deux ruptures avec l'évaluation ordinaire</h2>
+<div class="cal formel"><span class="lab">Définition (§5.4).</span>
+<p> <em>« <strong><code>UseMethod</code> is a special function and it behaves differently from other function calls.</strong> The syntax is <strong><code>UseMethod(generic, object)</code></strong> … <strong><code>UseMethod</code> can only be called from the body of a function.</strong> »</em></p>
+</div>
+<blockquote>
+<p class="cal piege"> <strong>Règle — les deux changements (§5.4).</strong> <em>« <code>UseMethod</code> <strong>changes the evaluation model in two ways</strong>. »</em></p>
+<p><strong>1.</strong> <em>« when it is invoked <strong>it determines the next method (function) to be called</strong>. <strong>It then invokes that function using the current evaluation environment.</strong> »</em> — <em>« <strong>Rather than creating a new evaluation environment R uses the environment of the current function call (the call to the generic).</strong> … <strong>The arguments that were used in the call to the generic are rematched to the formal arguments of the selected method.</strong> »</em></p>
+<p><strong>2.</strong> <em>« <strong>it does not return control to the calling function. This means that any statements after a call to <code>UseMethod</code> are guaranteed not to be executed.</strong> »</em></p>
+</blockquote>
+<p><strong>La seconde règle est la plus concrète</strong> : du code écrit <strong>après</strong> <code>UseMethod</code> dans le corps d'une générique est <strong>du code mort</strong>. C'est pourquoi <em>« generic functions should consist of a single statement »</em>.</p>
+<blockquote>
+<p><strong>Les quatre variables spéciales (§5.4).</strong> *« The call to <code>UseMethod</code> has the effect of <strong>placing some special objects in the evaluation frame. They are <code>.Class</code>, <code>.Generic</code> and <code>.Method</code>.</strong> … <strong><code>.Class</code> is the class of the object, <code>.Generic</code> is the name of the generic function and <code>.Method</code> is the name of the method currently being invoked.</strong> If the method was invoked through one of the internal interfaces then there may also be an object called <strong><code>.Group</code></strong>. »*</p>
+<p class="cal piege"> <em>« <strong>After the initial call to <code>UseMethod</code> these special variables, not the object itself, control the selection of subsequent methods.</strong> »</em> — c'est ce qui rend <code>NextMethod</code> possible (concept 4).</p>
+</blockquote>
+<blockquote>
+<p><strong>Deux précisions utiles (§5.4).</strong></p>
+<ul>
+<li><em>« <strong>If the first argument to <code>UseMethod</code> is not supplied it is assumed to be the name of the current function.</strong> »</em></li>
+<li>*« If <strong>two arguments</strong> are supplied … <strong>the first is the name of the method and the second is assumed to be the object that will be dispatched on</strong>. It is evaluated so that the required method can be determined. <strong>In this case the first argument in the call to the generic is not evaluated and is discarded.</strong> <strong>There is no way to change the other arguments in the call to the method</strong> ; this is <strong>in contrast to <code>NextMethod</code></strong>, where the arguments <strong>can be altered</strong>. »*</li>
+<li><em>« <strong>Any arguments to the generic that were evaluated prior to the call to <code>UseMethod</code> remain evaluated.</strong> »</em></li>
+<li><em>« [<strong>Prior to R 4.4.0</strong> any local assignments in the frame of the generic <strong>would be carried forward</strong> into the call to the method ; <strong>this is no longer the case</strong>.] »</em></li>
+</ul>
+</blockquote>
+<h2 data-prio="must">Concept 4 — <code>NextMethod</code> : l'héritage</h2>
+<div class="cal formel"><span class="lab">Définition (§5.5).</span>
+<p> <em>« <strong><code>NextMethod</code> is used to provide a simple inheritance mechanism.</strong> »</em></p>
+<p><strong>Définition (§5.2).</strong> <em>« <strong>The class attribute of an object can have several elements.</strong> … <strong>inheritance is mainly handled through <code>NextMethod</code>. <code>NextMethod</code> determines the method currently being evaluated, finds the next class from the class attribute, and proceeds.</strong> »</em></p>
+</div>
+<blockquote>
+<p><strong>Le patron d'usage (§5.1).</strong> <em>« <strong>Methods themselves employ <code>NextMethod</code> to provide a form of inheritance. Commonly a specific method performs a few operations to set up the data and then it calls the next appropriate method through a call to <code>NextMethod</code>.</strong> »</em></p>
+</blockquote>
+<p><strong>Le sens du vecteur de classes devient clair</strong> : <code>class(x) &lt;- c("specifique", "general")</code> signifie « traite-moi d'abord comme un <code>specifique</code>, et pour le reste comme un <code>general</code> ». La méthode spécifique fait <strong>ce qu'elle a de particulier</strong>, puis passe la main.</p>
+<blockquote>
+<p><strong>Règle — la syntaxe et les défauts (§5.5).</strong> *« The syntax for a call to <code>NextMethod</code> is <strong><code>NextMethod(generic, object, ...)</code></strong>. <strong>If the generic is not supplied the value of <code>.Generic</code> is used. If the object is not supplied the first argument in the call to the current method is used. Values in the <code>...</code> argument are used to modify the arguments of the next method.</strong> »*</p>
+</blockquote>
+<blockquote>
+<p><strong>Règle — comment les arguments sont transmis (§5.5).</strong> <em>« Methods invoked as a result of a call to <code>NextMethod</code> <strong>behave as if they had been invoked from the previous method</strong>. The arguments to the inherited method are <strong>in the same order and have the same names as the call to the current method</strong> … <strong>the expressions for the arguments are the names of the corresponding formal arguments of the current method</strong>. Thus <strong>the arguments will have values that correspond to their value at the time <code>NextMethod</code> was invoked</strong>. »</em></p>
+<p class="cal piege"> <em>« <strong>Unevaluated arguments remain unevaluated. Missing arguments remain missing.</strong> »</em> — l'évaluation paresseuse de la fiche 309 traverse le dispatch <strong>sans être forcée</strong>.</p>
+</blockquote>
+<blockquote>
+<p class="cal piege"> <strong>Le piège de l'appel direct (§5.1 et §5.7).</strong> *« <strong>A function may have a call to <code>NextMethod</code> anywhere in it.</strong> The determination of which method should then be invoked <strong>is based primarily on the current values of <code>.Class</code> and <code>.Generic</code></strong>. <strong>This is somewhat problematic since the method is really an ordinary function and users may call it directly. If they do so then there will be no values for <code>.Generic</code> or <code>.Class</code>.</strong> »*</p>
+<p><em>« <strong>If a method is invoked directly and it contains a call to <code>NextMethod</code> then the first argument to <code>NextMethod</code> is used to determine the generic function. An error is signalled if this argument has not been supplied ; it is therefore a good idea to always supply this argument.</strong> »</em></p>
+<p><em>« <strong>In the case that a method is invoked directly the class attribute of the first argument to the method is used as the value of <code>.Class</code>.</strong> »</em></p>
+</blockquote>
+<p><strong>Règle pratique</strong> : quand une méthode contient un <code>NextMethod</code>, <strong>écrire le générique explicitement</strong> — <code>NextMethod("mean")</code> plutôt que <code>NextMethod()</code>.</p>
+<details class="cor">
+<summary><strong>Exercice résolu — écrire une classe, sa méthode d'affichage, et son héritage</strong></summary><div class="in">
+
+<p><strong>Énoncé.</strong> Créer une classe <code>"celsius"</code> pour des températures, avec un affichage qui ajoute l'unité, tout en conservant le comportement numérique ordinaire pour le reste.</p>
+<p><em>Étape 1 — poser la classe.</em> Rien de plus qu'un attribut (§5.1) — <em>« to create an object of class <code>"foo"</code> <strong>one simply attaches a class attribute</strong> »</em>. On met <strong>deux</strong> classes, du plus spécifique au plus général :</p>
+<pre><code class="language-r">celsius &lt;- function(x) {
+  class(x) &lt;- c("celsius", "numeric")
+  x
+}
+t &lt;- celsius(c(18.5, 21.0, 3.2))
+</code></pre>
+<p><em>Étape 2 — écrire la méthode d'affichage.</em> Le générique est <code>print</code>, la classe est <code>celsius</code>, donc la méthode s'appelle <strong><code>print.celsius</code></strong> — c'est la règle <code>generic.class</code> du §5.3.</p>
+<pre><code class="language-r">print.celsius &lt;- function(x, ...) {
+  cat(paste0(unclass(x), " °C"), "\n")
+  invisible(x)
+}
+</code></pre>
+<p class="cal piege"> <strong><code>unclass(x)</code> est indispensable ici.</strong> Sans lui, <code>paste0</code> déclencherait à nouveau… non : <code>paste0</code> n'est pas générique, mais tout appel qui <strong>réafficherait</strong> <code>x</code> relancerait <code>print.celsius</code> — récursion infinie. <code>unclass()</code> (§3.4, fiche 303) retire l'effet de classe : c'est <strong>l'usage exact</strong> que le cours lui donne.</p>
+<p class="cal piege"> <strong><code>invisible(x)</code></strong> : une méthode <code>print</code> doit rendre son argument <strong>de façon invisible</strong>, sinon l'affichage se dédouble. C'est le <em>« unless specifically made invisible »</em> du §1.8 (fiche 300).</p>
+<p><em>Étape 3 — vérifier le dispatch.</em> Taper <code>t</code> appelle <code>print</code>, qui est générique. <code>.Class</code> vaut <code>c("celsius", "numeric")</code>. R cherche <strong><code>print.celsius</code></strong> → trouvé. Affichage : <code>18.5 °C 21 °C 3.2 °C</code>.</p>
+<p><em>Étape 4 — ce qui se passe pour les autres génériques.</em> <code>mean(t)</code> : R cherche <code>mean.celsius</code> → absent ; puis <code>mean.numeric</code> → absent ; puis <strong><code>mean.default</code></strong> → trouvé. Le calcul se fait normalement. <strong>C'est le rôle de la méthode par défaut</strong>, et la raison pour laquelle le manuel écrit <em>« <strong>it is a good idea to always write a default method</strong> »</em>.</p>
+<p><em>Étape 5 — ajouter une méthode qui hérite.</em> Supposons qu'on veuille un <code>summary</code> qui annonce l'unité <strong>puis</strong> fasse le résumé habituel :</p>
+<pre><code class="language-r">summary.celsius &lt;- function(object, ...) {
+  cat("Températures en degrés Celsius\n")
+  NextMethod("summary")
+}
+</code></pre>
+<p><code>NextMethod("summary")</code> <em>« determines the method currently being evaluated, <strong>finds the next class from the class attribute</strong>, and proceeds »</em> : après <code>celsius</code> vient <code>numeric</code>, puis le défaut. <strong>La méthode spécifique fait son ajout, et délègue le reste</strong> — c'est exactement le patron du §5.1.</p>
+<p><em>Étape 6 — pourquoi écrire <code>"summary"</code> explicitement.</em> Parce que si quelqu'un appelle <code>summary.celsius(t)</code> <strong>directement</strong>, <em>« there will be no values for <code>.Generic</code> or <code>.Class</code> »</em> et <em>« <strong>an error is signalled if this argument has not been supplied</strong> »</em>. Le donner coûte neuf caractères et supprime la panne.</p>
+<p><em>Étape 7 — vérifier ce qui existe.</em> <code>methods(class = "celsius")</code> liste les deux méthodes écrites. <code>methods(summary)</code> montre combien de classes <code>summary</code> sait traiter.</p>
+<p><em>Étape 8 — la mise en garde.</em> Rien n'a vérifié que <code>t</code> contenait bien des nombres. <em>« <strong>There is no checking that an object actually contains the components that class methods expect.</strong> »</em> Un <code>class(x) &lt;- "celsius"</code> sur une chaîne produirait un objet parfaitement légal et parfaitement absurde.</p>
+</div></details>
+
+<h2 data-prio="high">Concept 5 — Les méthodes de groupe</h2>
+<div class="cal formel"><span class="lab">Définition (§5.6).</span>
+<p> <em>« For several types of internal functions <strong>R provides a dispatching mechanism for operators</strong>. This means that <strong>operators such as <code>==</code> or <code>&lt;</code> can have their behaviour modified for members of special classes</strong>. The functions and operators have been grouped into <strong>three categories</strong> … <strong>There is currently no mechanism to add groups.</strong> <strong>It is possible to write methods specific to any function within a group.</strong> »</em></p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Groupe</th>
+<th>Fonctions</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong><code>Math</code></strong></td>
+<td><code>abs</code>, <code>acos</code>, <code>acosh</code>, <code>asin</code>, <code>asinh</code>, <code>atan</code>, <code>atanh</code>, <code>ceiling</code>, <code>cos</code>, <code>cosh</code>, <code>cospi</code>, <code>cumsum</code>, <code>exp</code>, <code>floor</code>, <code>gamma</code>, <code>lgamma</code>, <code>log</code>, <code>log10</code>, <code>round</code>, <code>signif</code>, <code>sin</code>, <code>sinh</code>, <code>sinpi</code>, <code>tan</code>, <code>tanh</code>, <code>tanpi</code>, <code>trunc</code></td>
+</tr>
+<tr>
+<td><strong><code>Summary</code></strong></td>
+<td><code>all</code>, <code>any</code>, <code>max</code>, <code>min</code>, <code>prod</code>, <code>range</code>, <code>sum</code></td>
+</tr>
+<tr>
+<td><strong><code>Ops</code></strong></td>
+<td><code>+</code> <code>-</code> <code>*</code> <code>/</code> <code>^</code> <code>&lt;</code> <code>&gt;</code> <code>&lt;=</code> <code>&gt;=</code> <code>!=</code> <code>==</code> <code>%%</code> <code>%/%</code> <code>&amp;</code> <code>|</code> <code>!</code></td>
+</tr>
+</tbody></table>
+<blockquote>
+<p class="cal piege"> <strong>La règle de résolution du groupe <code>Ops</code> (§5.6).</strong> <em>« For operators in the <code>Ops</code> group <strong>a special method is invoked if the two operands taken together suggest a single method</strong>. Specifically, <strong>if both operands correspond to the same method</strong>, <strong>or if one operand corresponds to a method that takes precedence over that of the other operand</strong>. <strong>If they do not suggest a single method then the default method is used.</strong> <strong>Either a group method or a class method dominates if the other operand has no corresponding method. A class method dominates a group method.</strong> »</em></p>
+</blockquote>
+<p><strong>Deux règles de priorité à retenir</strong> : (1) <strong>une méthode de classe l'emporte sur une méthode de groupe</strong> ; (2) <strong>si les deux opérandes ne s'accordent pas sur une méthode unique, c'est le défaut</strong>.</p>
+<blockquote>
+<p><strong>Le cas particulier de <code>.Method</code> (§5.6).</strong> <em>« When the group is <code>Ops</code> <strong>the special variable <code>.Method</code> is a character vector with two elements</strong>. The elements are set to <strong>the name of the method if the corresponding argument is a member of the class that was used to determine the method</strong>. <strong>Otherwise the corresponding element of <code>.Method</code> is set to the zero length string, <code>""</code>.</strong> »</em></p>
+<p>C'est ce qui permet à une méthode d'opérateur de savoir <strong>lequel des deux opérandes</strong> a déclenché le dispatch — information indispensable pour un opérateur <strong>non commutatif</strong>.</p>
+</blockquote>
+<h2 data-prio="high">Concept 6 — Explorer le système</h2>
+<div class="cal methode"><span class="lab">Méthode (§10.9).</span>
+<p> <em>« <strong>The number of generic functions that can treat a class in a specific way can be quite large.</strong> For example the functions that can accommodate objects of class <code>"data.frame"</code> include <code>[</code>, <code>[[&lt;-</code>, <code>any</code>, <code>as.matrix</code>, <code>[&lt;-</code>, <code>mean</code>, <code>plot</code>, <code>summary</code>. <strong>A currently complete list can be got by using the <code>methods()</code> function</strong> »</em> :</p>
+</div>
+<pre><code class="language-r">methods(class = "data.frame")
+</code></pre>
+<p><em>« <strong>Conversely the number of classes a generic function can handle can also be quite large.</strong> For example the <code>plot()</code> function has <strong>a default method and variants for objects of classes <code>"data.frame"</code>, <code>"density"</code>, <code>"factor"</code>, and more</strong> »</em> :</p>
+<pre><code class="language-r">methods(plot)
+</code></pre>
+<p><strong>Deux questions symétriques, deux appels</strong> : <em>« que sait-on faire de cette classe ? »</em> → <code>methods(class = ...)</code> ; <em>« quelles classes cette générique sait-elle traiter ? »</em> → <code>methods(generique)</code>.</p>
+<div class="cal methode"><span class="lab">Méthode — lire le code d'une méthode invisible (§10.9).</span>
+<p> *« In this example there are six methods, <strong>none of which can be seen by typing its name (as indicated by the asterisk)</strong>. <strong>We can read these by either of</strong> »* :</p>
+</div>
+<pre><code class="language-r">getAnywhere("coef.aov")
+getS3method("coef", "aov")
+</code></pre>
+<p>Le cours en donne le résultat :</p>
+<pre><code class="language-r">function (object, complete = FALSE, ...)
+{
+  cf &lt;- object$coefficients
+  if (complete)
+    cf
+  else cf[!is.na(cf)]
+}
+</code></pre>
+<p><strong>L'astérisque dans la sortie de <code>methods()</code> signale une méthode non exportée</strong> — conséquence des espaces de noms (fiche 310) : <em>« objects cannot be masked … »</em>, mais ils ne sont pas non plus visibles depuis l'extérieur. <code>getS3method</code> est <strong>la voie officielle</strong>.</p>
+<blockquote>
+<p class="cal piege"> <strong>La règle de nommage à ne jamais oublier (§10.9).</strong> <em>« <strong>A function named <code>gen.cl</code> will be invoked by the generic <code>gen</code> for class <code>cl</code>, so do not name functions in this style unless they are intended to be methods.</strong> »</em></p>
+<p><strong>C'est un piège réel et courant.</strong> Une fonction innocemment nommée <code>plot.data</code> sera prise pour <strong>la méthode <code>plot</code> de la classe <code>data</code></strong>. Les points étant permis dans les noms R (fiche 300), rien ne distingue <code>summary.stats</code> d'une méthode. <strong>Utiliser <code>_</code> ou la casse</strong> pour les noms composés qui ne sont pas des méthodes.</p>
+</blockquote>
+<p><em>« The reader is referred to <strong>The R Language Definition</strong> for a more complete discussion of this mechanism. »</em></p>
+<blockquote>
+<p><strong>Rappel (§3.4, fiche 303).</strong> <strong><code>unclass()</code></strong> <em>« removes temporarily the effects of class »</em> — l'outil d'exploration : il montre qu'un data frame <strong>est une liste</strong>, qu'un facteur <strong>est un vecteur d'entiers</strong>.</p>
+<p>Et la note 4 du §3.4 : <em>« <strong>A different style using "formal" or "S4" classes is provided in package <code>methods</code>.</strong> »</em> — un second système objet, non traité ici.</p>
+</blockquote>
+<h2>Comment reconnaître le type d'exercice</h2>
+<table>
+<thead>
+<tr>
+<th>Le signal dans l'énoncé</th>
+<th>Ce qu'il faut mobiliser</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>« la même fonction se comporte autrement »</td>
+<td><strong>dispatch</strong> sur la classe du <strong>premier</strong> argument</td>
+</tr>
+<tr>
+<td>« le corps de la fonction fait une ligne »</td>
+<td>c'est <strong>une générique</strong> — chercher <code>UseMethod</code></td>
+</tr>
+<tr>
+<td>« quelle méthode est appelée ? »</td>
+<td><code>generic.classe1</code> → <code>generic.classe2</code> → <strong><code>generic.default</code></strong></td>
+</tr>
+<tr>
+<td>« erreur : pas de méthode applicable »</td>
+<td><strong>aucun <code>.default</code></strong> n'a été écrit</td>
+</tr>
+<tr>
+<td>« la classe du second argument est ignorée »</td>
+<td>c'est la règle — <strong>seul le premier compte</strong></td>
+</tr>
+<tr>
+<td>« ajouter un nouveau type sans toucher au reste »</td>
+<td>écrire <strong>une méthode</strong>, pas une générique</td>
+</tr>
+<tr>
+<td>« faire un peu plus, puis le traitement normal »</td>
+<td><strong><code>NextMethod()</code></strong></td>
+</tr>
+<tr>
+<td>« erreur en appelant la méthode directement »</td>
+<td><code>.Generic</code> absent → <strong>nommer le générique</strong></td>
+</tr>
+<tr>
+<td>« redéfinir <code>+</code> pour ma classe »</td>
+<td>méthode de <strong>groupe <code>Ops</code></strong>, ou méthode de classe</td>
+</tr>
+<tr>
+<td>« quelles fonctions connaissent ma classe ? »</td>
+<td><strong><code>methods(class = "…")</code></strong></td>
+</tr>
+<tr>
+<td>« quelles classes cette fonction traite-t-elle ? »</td>
+<td><strong><code>methods(generique)</code></strong></td>
+</tr>
+<tr>
+<td>« la méthode a un astérisque, je ne peux pas la lire »</td>
+<td><strong><code>getS3method()</code></strong> ou <code>getAnywhere()</code></td>
+</tr>
+<tr>
+<td>« ma fonction est appelée à ma place »</td>
+<td>son nom ressemble à <strong><code>generique.classe</code></strong></td>
+</tr>
+<tr>
+<td>« voir ce qu'il y a vraiment dans l'objet »</td>
+<td><strong><code>unclass()</code></strong></td>
+</tr>
+<tr>
+<td>« et S4 ? »</td>
+<td>le paquet <strong><code>methods</code></strong> — autre système</td>
+</tr>
+</tbody></table>
+<h2>Comment résoudre ce type d'exercice</h2>
+<p><strong>Protocole « créer une classe S3 » — 5 étapes.</strong></p>
+<ol>
+<li>Choisir <strong>la structure de données</strong> — le plus souvent <strong>une liste</strong> (fiche 306).</li>
+<li>Écrire <strong>une fonction de construction</strong> qui pose la classe : <code>class(x) &lt;- c("specifique", "general")</code>, <strong>du plus spécifique au plus général</strong>.</li>
+<li>Écrire au minimum <strong><code>print.maclasse</code></strong> — <em>« the bulk of the uses … are to provide specialized printing »</em> — en pensant à <strong><code>unclass()</code></strong> et <strong><code>invisible()</code></strong>.</li>
+<li>Pour les comportements partagés, écrire une <strong>générique</strong> d'une seule ligne <code>UseMethod("nom")</code> et <strong>toujours une <code>.default</code></strong>.</li>
+<li>Vérifier avec <strong><code>methods(class = "maclasse")</code></strong>.</li>
+</ol>
+<p><strong>Protocole « comprendre quelle méthode s'exécute » — 4 étapes.</strong></p>
+<ol>
+<li><strong><code>class(x)</code></strong> — le vecteur, <strong>dans l'ordre</strong>.</li>
+<li>Parcourir <code>generic.classe1</code>, <code>generic.classe2</code>, … puis <strong><code>generic.default</code></strong>.</li>
+<li>Vérifier que la méthode existe : <code>methods(generique)</code> ; la lire par <strong><code>getS3method()</code></strong>.</li>
+<li>Si un <code>NextMethod</code> intervient, <strong>reprendre le vecteur de classes à partir de la classe courante</strong>.</li>
+</ol>
+<p><strong>Protocole « écrire une méthode sûre » — 4 étapes.</strong></p>
+<ol>
+<li>La nommer <strong>exactement</strong> <code>generique.classe</code>.</li>
+<li><strong>Reprendre la signature de la générique</strong> — les arguments sont <strong>réappariés</strong> aux formels de la méthode.</li>
+<li>Si elle contient un <code>NextMethod</code>, <strong>passer le générique en argument</strong>.</li>
+<li>Ne pas écrire de code <strong>après</strong> un <code>UseMethod</code> : <em>« guaranteed not to be executed »</em>.</li>
+</ol>
+<h2 data-prio="must">Common mistakes</h2>
+<table>
+<thead>
+<tr>
+<th>Erreur</th>
+<th>Correction</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Croire que poser une classe convertit l'objet</td>
+<td><em>« <strong>there is no checking</strong> »</em> — la panne est <strong>différée</strong></td>
+</tr>
+<tr>
+<td>Attendre le dispatch sur le second argument</td>
+<td><em>« <strong>the class attributes of any other arguments … are ignored</strong> »</em></td>
+</tr>
+<tr>
+<td>Omettre la méthode <code>.default</code></td>
+<td><em>« <strong>it is a good idea to always write a default method</strong> »</em></td>
+</tr>
+<tr>
+<td>Écrire du code après <code>UseMethod</code></td>
+<td><em>« <strong>guaranteed not to be executed</strong> »</em></td>
+</tr>
+<tr>
+<td>Écrire une générique de plusieurs instructions</td>
+<td><em>« <strong>should consist of a single statement</strong> »</em></td>
+</tr>
+<tr>
+<td>Appeler <code>NextMethod()</code> sans argument dans une méthode appelée directement</td>
+<td><strong>erreur</strong> — nommer le générique</td>
+</tr>
+<tr>
+<td>Croire les arguments réévalués par <code>NextMethod</code></td>
+<td><em>« <strong>unevaluated arguments remain unevaluated</strong> »</em></td>
+</tr>
+<tr>
+<td>Croire qu'<code>UseMethod</code> crée un nouvel environnement</td>
+<td>il <strong>réutilise celui de l'appel à la générique</strong></td>
+</tr>
+<tr>
+<td>Nommer une fonction <code>plot.data</code> sans intention de méthode</td>
+<td>elle <strong>deviendra</strong> une méthode</td>
+</tr>
+<tr>
+<td>Chercher une méthode par <code>get("gen.cl")</code></td>
+<td>depuis les espaces de noms → <strong><code>getS3method()</code></strong></td>
+</tr>
+<tr>
+<td>Oublier <code>unclass()</code> dans <code>print.maclasse</code></td>
+<td><strong>récursion</strong> ou affichage inutilisable</td>
+</tr>
+<tr>
+<td>Oublier <code>invisible()</code> dans une méthode <code>print</code></td>
+<td><strong>affichage dédoublé</strong></td>
+</tr>
+<tr>
+<td>Croire qu'on peut ajouter un groupe</td>
+<td><em>« <strong>There is currently no mechanism to add groups.</strong> »</em></td>
+</tr>
+<tr>
+<td>Croire qu'une méthode de groupe prime</td>
+<td> <em>« <strong>a class method dominates a group method</strong> »</em></td>
+</tr>
+<tr>
+<td>Compter sur les assignations locales de la générique</td>
+<td><strong>plus transmises depuis R 4.4.0</strong></td>
+</tr>
+<tr>
+<td>Confondre S3 et S4</td>
+<td>S4 vit dans le paquet <strong><code>methods</code></strong></td>
+</tr>
+</tbody></table>
+<h2>Ultimate Review</h2>
+<p><strong>Le principe.</strong> <em>« <strong>The class of an object determines how it will be treated by … generic functions.</strong> … <strong>If the argument lacks any class attribute, or has a class not catered for … there is always a default action provided.</strong> »</em></p>
+<p><strong>Ce que R a, et ce qu'il n'a pas.</strong> <em>« <strong>Rather than having a full-fledged object-oriented system</strong>, R has <strong>a class system and a mechanism for dispatching based on the class of an object.</strong> »</em> Quatre objets spéciaux dans le cadre : <strong><code>.Generic</code>, <code>.Class</code>, <code>.Method</code>, <code>.Group</code></strong>.</p>
+<p><strong>La classe.</strong> <em>« <strong>a character vector of class names</strong> »</em> · <em>« to create an object of class <code>"foo"</code> <strong>one simply attaches a class attribute</strong> »</em> ·  <em>« <strong>virtually anything can be turned into an object of class <code>"foo"</code></strong> »</em>, et <em>« <strong>there is no checking</strong> »</em>.</p>
+<p><strong>Une générique.</strong> <em>« typically <strong>a very simple function</strong> and consists of <strong>a single line of code</strong> »</em> : <code>mean &lt;- function(x, ...) UseMethod("mean")</code> · <em>« <strong>The presence of <code>UseMethod</code> indicates this is a generic function.</strong> »</em> · forme recommandée : <strong><code>foo &lt;- function(x, ...) UseMethod("foo", x)</code></strong>.</p>
+<p><strong>Le dispatch.</strong> <strong>Seul le premier argument compte</strong> — <em>« the class attributes of <strong>any other arguments</strong> … <strong>are ignored</strong> »</em> · pour <code>class(x) = c("foo","bar")</code> : <strong><code>mean.foo</code> → <code>mean.bar</code> → <code>mean.default</code> → erreur</strong> · <em>« <strong>it is a good idea to always write a default method</strong> »</em> · sans attribut de classe, <strong><code>generic.default</code></strong> ·  avec les espaces de noms, <code>get("gen.cl")</code> peut échouer → <strong><code>getS3method("gen","cl")</code></strong>.</p>
+<p><strong><code>UseMethod</code> — deux ruptures.</strong> (1) <em>« <strong>Rather than creating a new evaluation environment R uses the environment of the current function call</strong> »</em>, et <em>« <strong>the arguments … are rematched to the formal arguments of the selected method</strong> »</em> ; (2)  <em>« <strong>it does not return control to the calling function</strong> … <strong>any statements after a call to <code>UseMethod</code> are guaranteed not to be executed</strong> »</em>. Sans premier argument, il <strong>prend le nom de la fonction courante</strong> ; avec deux, le second est <strong>l'objet de dispatch</strong> et le premier argument de la générique <strong>n'est pas évalué et est écarté</strong>. Les arguments déjà évalués <strong>le restent</strong>. <em>(Depuis R 4.4.0, les assignations locales de la générique <strong>ne sont plus transmises</strong>.)</em></p>
+<p><strong><code>NextMethod</code> — l'héritage.</strong> <em>« determines the method currently being evaluated, <strong>finds the next class from the class attribute</strong>, and proceeds »</em> · patron : <em>« a specific method <strong>performs a few operations to set up the data</strong> and then <strong>calls the next appropriate method</strong> »</em> · syntaxe <strong><code>NextMethod(generic, object, ...)</code></strong> ; sans générique, <strong><code>.Generic</code></strong> ; sans objet, <strong>le premier argument</strong> ; le <strong><code>...</code></strong> sert à <strong>modifier les arguments</strong> du suivant ·  <em>« <strong>Unevaluated arguments remain unevaluated. Missing arguments remain missing.</strong> »</em> ·  appel direct d'une méthode → <strong>pas de <code>.Generic</code></strong> → <em>« <strong>an error is signalled if this argument has not been supplied</strong> »</em>.</p>
+<p><strong>Méthodes de groupe.</strong> Trois groupes, <strong>non extensibles</strong> : <strong><code>Math</code></strong> (fonctions mathématiques), <strong><code>Summary</code></strong> (<code>all any max min prod range sum</code>), <strong><code>Ops</code></strong> (opérateurs arithmétiques, de comparaison et logiques) · <em>« a special method is invoked <strong>if the two operands taken together suggest a single method</strong> »</em> ; sinon <strong>le défaut</strong> ·  <strong>une méthode de classe domine une méthode de groupe</strong> · pour <code>Ops</code>, <strong><code>.Method</code> a deux éléments</strong>, <code>""</code> pour l'opérande qui n'a pas déclenché le dispatch.</p>
+<p><strong>Explorer.</strong> <strong><code>methods(class = "data.frame")</code></strong> — ce qu'on sait faire de la classe · <strong><code>methods(plot)</code></strong> — ce que la générique sait traiter · <strong><code>getS3method("coef","aov")</code></strong> ou <strong><code>getAnywhere("coef.aov")</code></strong> — lire une méthode marquée d'un <strong>astérisque</strong> · <strong><code>unclass()</code></strong> — voir dessous.</p>
+<p class="cal piege"><strong> La règle de nommage.</strong> <em>« <strong>A function named <code>gen.cl</code> will be invoked by the generic <code>gen</code> for class <code>cl</code>, so do not name functions in this style unless they are intended to be methods.</strong> »</em></p>
+<p><strong>Et au-delà.</strong> *« The bulk of the uses of this methodology are to <strong>provide specialized printing</strong> … there are <strong>about 40 methods for <code>print</code></strong>. »* · S4 : <em>« a different style using <strong>"formal" or "S4" classes</strong> is provided in package <strong><code>methods</code></strong> »</em>.</p>
+<div class="rec"><h2>Active Recall</h2><details class="cor">
+<summary>Comment R choisit-il la méthode à exécuter, exactement ?</summary><div class="in">
+
+<p><em>« When <code>mean</code> is called it can have any number of arguments <strong>but its first argument is special</strong> and <strong>the class of that first argument is used to determine which method should be called</strong> …  <strong>The class attributes of any other arguments to <code>mean</code> are ignored.</strong> »</em> (§5.1)</p>
+<p>*« Suppose that <code>x</code> had a class attribute that contained <strong><code>"foo"</code> and <code>"bar"</code>, in that order</strong>. Then R would first search for <strong><code>mean.foo</code></strong> ; if it did not find one, <strong><code>mean.bar</code></strong> ; and if that search was also unsuccessful, <strong><code>mean.default</code></strong>. <strong>If the last search is unsuccessful R reports an error.</strong> »*</p>
+<p>$$\texttt{mean.foo} \to \texttt{mean.bar} \to \texttt{mean.default} \to \text{erreur}$$</p>
+<p class="cal piege"> <em>« <strong>It is a good idea to always write a default method.</strong> »</em> Et <em>« if the first argument … <strong>has no class attribute</strong> then <code>generic.default</code> is used »</em>.</p>
+</div></details><details class="cor">
+<summary>À quoi reconnaît-on une fonction générique ?</summary><div class="in">
+
+<p>À la présence de <strong><code>UseMethod</code></strong>. Le cours le dit littéralement : <em>« <strong>The presence of <code>UseMethod</code> indicates this is a generic function.</strong> »</em> (§10.9)</p>
+<pre><code class="language-r">&gt; coef
+function (object, ...)
+UseMethod("coef")
+
+&gt; mean
+function (x, ...)
+UseMethod("mean")
+</code></pre>
+<p><em>« This is typically <strong>a very simple function</strong> and consists of <strong>a single line of code</strong> »</em> (§5.1), et la forme recommandée est <strong><code>foo &lt;- function(x, ...) UseMethod("foo", x)</code></strong> (§5.3).</p>
+<p><strong>Taper le nom d'une fonction sans parenthèses</strong> suffit donc à savoir si elle est générique — c'est le <em>« most of the system supplied functions are themselves written in R »</em> de la fiche 300 mis à profit.</p>
+</div></details><details class="cor">
+<summary>Quelles sont les deux façons dont <code>UseMethod</code> change le modèle d'évaluation ?</summary><div class="in">
+
+<p><em>« <strong><code>UseMethod</code> changes the evaluation model in two ways.</strong> »</em> (§5.4)</p>
+<p><strong>1.</strong> <em>« when it is invoked it <strong>determines the next method to be called</strong>. It then <strong>invokes that function using the current evaluation environment</strong> »</em> — et plus loin : <em>« <strong>Rather than creating a new evaluation environment R uses the environment of the current function call (the call to the generic).</strong> … The arguments … <strong>are rematched to the formal arguments of the selected method</strong>. »</em></p>
+<p><strong>2.</strong>  <em>« it <strong>does not return control to the calling function</strong>. This means that <strong>any statements after a call to <code>UseMethod</code> are guaranteed not to be executed</strong>. »</em></p>
+<p><strong>La seconde a une conséquence directe</strong> : du code écrit après <code>UseMethod</code> est <strong>du code mort</strong>. D'où <em>« generic functions <strong>should consist of a single statement</strong> »</em>.</p>
+</div></details><details class="cor">
+<summary>Comment fonctionne l'héritage en S3 ?</summary><div class="in">
+
+<p>Par <strong>le vecteur de classes</strong> et <strong><code>NextMethod</code></strong>.</p>
+<p><em>« <strong>The class attribute of an object can have several elements</strong> … <strong>inheritance is mainly handled through <code>NextMethod</code>. <code>NextMethod</code> determines the method currently being evaluated, finds the next class from the class attribute, and proceeds.</strong> »</em> (§5.2)</p>
+<p>Le patron d'usage (§5.1) : <em>« <strong>Commonly a specific method performs a few operations to set up the data and then it calls the next appropriate method through a call to <code>NextMethod</code>.</strong> »</em></p>
+<p>Ainsi <code>class(x) &lt;- c("specifique", "general")</code> se lit : « traite-moi d'abord comme un <code>specifique</code>, puis comme un <code>general</code> ». <strong>L'ordre du vecteur est l'ordre d'héritage.</strong></p>
+<p class="cal piege"> <em>« <strong>Unevaluated arguments remain unevaluated. Missing arguments remain missing.</strong> »</em> — la paresse (fiche 309) traverse le dispatch.</p>
+</div></details><details class="cor">
+<summary>Pourquoi faut-il toujours écrire <code>NextMethod("summary")</code> plutôt que <code>NextMethod()</code> ?</summary><div class="in">
+
+<p>Parce qu'une méthode <strong>peut être appelée directement</strong>, hors du dispatch.</p>
+<p><em>« This is somewhat problematic since <strong>the method is really an ordinary function and users may call it directly. If they do so then there will be no values for <code>.Generic</code> or <code>.Class</code>.</strong> »</em> (§5.1)</p>
+<p><em>« <strong>If a method is invoked directly and it contains a call to <code>NextMethod</code> then the first argument to <code>NextMethod</code> is used to determine the generic function. An error is signalled if this argument has not been supplied ; it is therefore a good idea to always supply this argument.</strong> »</em></p>
+<p>Et : <em>« In the case that a method is invoked directly <strong>the class attribute of the first argument to the method is used as the value of <code>.Class</code></strong> »</em> — donc <code>.Class</code> se reconstitue, mais <strong>pas <code>.Generic</code></strong>.</p>
+<p><strong>Neuf caractères contre une classe entière de pannes.</strong></p>
+</div></details><details class="cor">
+<summary>Détailler l'exemple des deux représentations d'un point.</summary><div class="in">
+
+<p>*« A point in two-dimensional Euclidean space can be specified by its <strong>Cartesian ($x$-$y$)</strong> or <strong>polar ($r$-$\theta$)</strong> coordinates … we could define two classes, <strong><code>"xypoint"</code></strong> and <strong><code>"rthetapoint"</code></strong>. »* (§5.1)</p>
+<pre><code class="language-r">xpos &lt;- function(x, ...)
+  UseMethod("xpos")
+
+xpos.xypoint     &lt;- function(x) x$x
+xpos.rthetapoint &lt;- function(x) x$r * cos(x$theta)
+</code></pre>
+<p><strong>La seconde méthode est $x = r\cos\theta$</strong> — la conversion polaire → cartésienne. </p>
+<p><em>« <strong>The user simply calls the function <code>xpos</code> with either representation as the argument. The internal dispatching method finds the class of the object and calls the appropriate methods.</strong> »</em></p>
+<p><strong>L'argument décisif</strong> : <em>« <strong>It is pretty easy to add other representations. One need not write a new generic function, only the methods</strong> … the user is <strong>only responsible for dealing with the new representation and not with any of the existing representations</strong>. »</em> C'est l'inverse d'un <code>switch</code> sur un type, qu'il faudrait rouvrir à chaque ajout.</p>
+</div></details><details class="cor">
+<summary>Quels sont les trois groupes de méthodes, et quelle règle de priorité s'applique dans <code>Ops</code> ?</summary><div class="in">
+
+<p><em>« The functions and operators have been grouped into <strong>three categories</strong> …  <strong>There is currently no mechanism to add groups.</strong> »</em> (§5.6)</p>
+<table>
+<thead>
+<tr>
+<th>Groupe</th>
+<th>Contenu</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong><code>Math</code></strong></td>
+<td><code>abs</code>, <code>cos</code>, <code>exp</code>, <code>log</code>, <code>round</code>, <code>signif</code>, <code>trunc</code>, <code>cumsum</code>…</td>
+</tr>
+<tr>
+<td><strong><code>Summary</code></strong></td>
+<td><code>all</code>, <code>any</code>, <code>max</code>, <code>min</code>, <code>prod</code>, <code>range</code>, <code>sum</code></td>
+</tr>
+<tr>
+<td><strong><code>Ops</code></strong></td>
+<td>les opérateurs arithmétiques, de comparaison et logiques</td>
+</tr>
+</tbody></table>
+<p><strong>La règle de <code>Ops</code></strong> : <em>« a special method is invoked <strong>if the two operands taken together suggest a single method</strong> … <strong>If they do not suggest a single method then the default method is used.</strong> <strong>Either a group method or a class method dominates if the other operand has no corresponding method. A class method dominates a group method.</strong> »</em></p>
+<p class="cal piege"> Et <em>« when the group is <code>Ops</code> <strong><code>.Method</code> is a character vector with two elements</strong> … set to <code>""</code> »</em> pour l'opérande qui n'a pas déterminé la méthode — indispensable pour un opérateur <strong>non commutatif</strong>.</p>
+</div></details><details class="cor">
+<summary>Comment savoir quelles méthodes existent, et comment lire celles marquées d'un astérisque ?</summary><div class="in">
+
+<p><strong>Deux questions symétriques</strong> (§10.9) :</p>
+<pre><code class="language-r">methods(class = "data.frame")   # ce qu'on sait faire de cette classe
+methods(plot)                   # ce que cette generique sait traiter
+</code></pre>
+<p>*« In this example there are six methods, <strong>none of which can be seen by typing its name (as indicated by the asterisk)</strong>. <strong>We can read these by either of</strong> »* :</p>
+<pre><code class="language-r">getAnywhere("coef.aov")
+getS3method("coef", "aov")
+</code></pre>
+<p><strong>L'astérisque signale une méthode non exportée</strong> — conséquence des espaces de noms (fiche 310). Le §5.3 le précise : <em>« <strong>Since the introduction of namespaces the methods may not be accessible by their names</strong> (i.e. <code>get("generic.class")</code> may fail), <strong>but they will be accessible by <code>getS3method("generic","class")</code></strong> »</em>.</p>
+</div></details><details class="cor">
+<summary>Quelle règle de nommage faut-il respecter, et pourquoi est-elle un piège ?</summary><div class="in">
+
+<p><em>« <strong>A function named <code>gen.cl</code> will be invoked by the generic <code>gen</code> for class <code>cl</code>, so do not name functions in this style unless they are intended to be methods.</strong> »</em> (§10.9)</p>
+<p><strong>Le piège vient de la syntaxe des noms R</strong> : le point est un caractère <strong>ordinaire</strong> dans un identifiant (fiche 300). Rien ne distingue donc <code>plot.data</code>, choisi comme « le tracé des données », de <strong>la méthode <code>plot</code> de la classe <code>data</code></strong>.</p>
+<p>Le jour où un objet acquiert la classe <code>"data"</code> — volontairement ou par une bibliothèque tierce —, <strong>votre fonction est appelée à la place de <code>plot</code></strong>, avec des arguments qu'elle n'attend pas.</p>
+<p><strong>Le remède</strong> : réserver le point aux méthodes, et utiliser <code>_</code> ou la casse pour les autres noms composés.</p>
+</div></details><details class="cor">
+<summary>Que se passe-t-il si l'on pose une classe sur un objet qui n'a pas les composantes attendues ?</summary><div class="in">
+
+<p><strong>Rien — jusqu'au premier appel générique.</strong></p>
+<p><em>« This attribute <strong>can be accessed and manipulated virtually without restriction by users</strong>. <strong>There is no checking that an object actually contains the components that class methods expect.</strong> Thus, <strong>altering the <code>class</code> attribute should be done with caution</strong>, and <strong>when they are available specific creation and coercion functions should be preferred</strong>. »</em> (§2.2.4)</p>
+<p>Et le §5.1 le dit sans détour : <em>« <strong>virtually anything can be turned into an object of class <code>"foo"</code></strong> »</em>.</p>
+<p><strong>La panne est donc différée et déplacée</strong> : elle survient quand une méthode cherche <code>object$coefficients</code> sur un objet qui n'en a pas, avec un message qui ne mentionne ni la classe ni la ligne où elle a été posée.</p>
+<p><strong>Le remède</strong> : une <strong>fonction de construction</strong> qui valide, plutôt qu'un <code>class(x) &lt;- ...</code> nu.</p>
+</div></details><details class="cor">
+<summary>Pourquoi <code>unclass()</code> est-il nécessaire dans une méthode <code>print</code> ?</summary><div class="in">
+
+<p>Parce que la méthode reçoit un objet <strong>qui porte encore sa classe</strong>. Toute opération qui provoquerait un nouvel affichage relancerait <strong>la même méthode</strong> — récursion sans fin.</p>
+<p><code>unclass()</code> <em>« removes <strong>temporarily</strong> the effects of class »</em> (§3.4, fiche 303). Le cours en fait explicitement <strong>un outil d'apprentissage</strong> : <em>« one [situation] is when you are <strong>learning to come to terms with the idea of class and generic functions</strong> »</em>.</p>
+<p class="cal piege"> Et une méthode <code>print</code> doit rendre son argument <strong>invisiblement</strong> — sinon l'affichage se dédouble, puisque la valeur renvoyée serait à son tour imprimée (fiche 300, §1.8 : <em>« printed <strong>unless specifically made invisible</strong> »</em>).</p>
+<p><strong>Le squelette sûr</strong> : faire l'affichage à partir d'<code>unclass(x)</code>, terminer par <code>invisible(x)</code>.</p>
+</div></details><details class="cor">
+<summary>Que dit le manuel de la qualité du système objet de R, et quelle recommandation en tire-t-il ?</summary><div class="in">
+
+<p><em>« <strong>Rather than having a full-fledged object-oriented system</strong>, R has a class system and a mechanism for dispatching based on the class of an object. »</em> (§5.1)</p>
+<p>Et l'introduction du chapitre 5 est plus explicite encore : <em>« One of the advantages that most object systems impart is <strong>greater consistency</strong>. This is achieved via the rules that are checked by the compiler or interpreter. <strong>Unfortunately because of the way that the object system is incorporated into R this advantage does not obtain.</strong> »</em></p>
+<p><strong>La recommandation</strong> : <em>« <strong>Users are cautioned to use the object system in a straightforward manner.</strong> While it is possible to perform some rather interesting feats <strong>these tend to lead to obfuscated code and may depend on implementation details that will not be carried</strong> [forward]. »</em></p>
+<p>Autrement dit : <strong>s'en tenir au patron simple</strong> — une classe, des méthodes nommées <code>generique.classe</code>, une <code>.default</code>, un <code>NextMethod</code> explicite quand il faut hériter.</p>
+</div></details></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h2>Flashcards</h2>
+<table>
+<thead>
+<tr>
+<th>Question</th>
+<th>Réponse</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Que détermine la classe d'un objet ?</td>
+<td><strong>Comment les fonctions génériques le traitent</strong></td>
+</tr>
+<tr>
+<td>Qu'est-ce qu'une fonction générique ?</td>
+<td>Une fonction qui <strong>agit selon la classe</strong> de son argument</td>
+</tr>
+<tr>
+<td>À quoi la reconnaît-on ?</td>
+<td>À la présence de <strong><code>UseMethod</code></strong></td>
+</tr>
+<tr>
+<td>De combien de lignes est-elle faite ?</td>
+<td><strong>Une seule</strong>, en général</td>
+</tr>
+<tr>
+<td>La forme recommandée ?</td>
+<td><code>foo &lt;- function(x, ...) UseMethod("foo", x)</code></td>
+</tr>
+<tr>
+<td>R a-t-il un vrai système objet ?</td>
+<td><strong>Non</strong> — <em>« rather than a full-fledged … »</em></td>
+</tr>
+<tr>
+<td>Qu'est-ce que l'attribut <code>class</code> ?</td>
+<td>Un <strong>vecteur de caractères</strong> de noms de classes</td>
+</tr>
+<tr>
+<td>Comment crée-t-on un objet de classe <code>"foo"</code> ?</td>
+<td>En <strong>attachant</strong> un attribut <code>class</code></td>
+</tr>
+<tr>
+<td>Y a-t-il un contrôle ?</td>
+<td> <strong>Aucun</strong></td>
+</tr>
+<tr>
+<td>Quel argument détermine la méthode ?</td>
+<td><strong>Le premier</strong>, et lui seul</td>
+</tr>
+<tr>
+<td>Les classes des autres arguments ?</td>
+<td><strong>Ignorées</strong></td>
+</tr>
+<tr>
+<td>Ordre de recherche pour <code>c("foo","bar")</code> ?</td>
+<td><code>mean.foo</code> → <code>mean.bar</code> → <code>mean.default</code></td>
+</tr>
+<tr>
+<td>Si rien n'est trouvé ?</td>
+<td><strong>Une erreur</strong></td>
+</tr>
+<tr>
+<td>Que recommande le manuel ?</td>
+<td><strong>Toujours écrire une méthode par défaut</strong></td>
+</tr>
+<tr>
+<td>Si l'objet n'a pas d'attribut <code>class</code> ?</td>
+<td><strong><code>generic.default</code></strong></td>
+</tr>
+<tr>
+<td>Comment appelle-t-on <code>mean.foo</code> ?</td>
+<td><strong>Une méthode</strong></td>
+</tr>
+<tr>
+<td><code>UseMethod</code> crée-t-il un environnement ?</td>
+<td><strong>Non</strong> — il <strong>réutilise</strong> celui de la générique</td>
+</tr>
+<tr>
+<td>Que deviennent les arguments ?</td>
+<td>Ils sont <strong>réappariés</strong> aux formels de la méthode</td>
+</tr>
+<tr>
+<td><code>UseMethod</code> rend-il la main ?</td>
+<td> <strong>Non, jamais</strong></td>
+</tr>
+<tr>
+<td>Conséquence ?</td>
+<td>Le code après lui <strong>n'est jamais exécuté</strong></td>
+</tr>
+<tr>
+<td>D'où peut-on appeler <code>UseMethod</code> ?</td>
+<td><strong>Du corps d'une fonction</strong> seulement</td>
+</tr>
+<tr>
+<td>Sans premier argument ?</td>
+<td>Il prend <strong>le nom de la fonction courante</strong></td>
+</tr>
+<tr>
+<td>Avec deux arguments ?</td>
+<td>Le second est <strong>l'objet de dispatch</strong></td>
+</tr>
+<tr>
+<td>Les quatre variables spéciales ?</td>
+<td><code>.Generic</code> · <code>.Class</code> · <code>.Method</code> · <code>.Group</code></td>
+</tr>
+<tr>
+<td>Que contient <code>.Class</code> ?</td>
+<td><strong>La classe de l'objet</strong></td>
+</tr>
+<tr>
+<td>Que contient <code>.Method</code> ?</td>
+<td>Le nom de <strong>la méthode en cours</strong></td>
+</tr>
+<tr>
+<td>Qui contrôle les dispatchs suivants ?</td>
+<td><strong>Ces variables</strong>, pas l'objet</td>
+</tr>
+<tr>
+<td>Comment se fait l'héritage ?</td>
+<td>Par <strong><code>NextMethod</code></strong></td>
+</tr>
+<tr>
+<td>Que fait <code>NextMethod</code> ?</td>
+<td>Il passe à <strong>la classe suivante</strong> du vecteur</td>
+</tr>
+<tr>
+<td>Le patron d'usage ?</td>
+<td>Faire quelques opérations, <strong>puis déléguer</strong></td>
+</tr>
+<tr>
+<td>Sa syntaxe complète ?</td>
+<td><strong><code>NextMethod(generic, object, ...)</code></strong></td>
+</tr>
+<tr>
+<td>Sans générique ?</td>
+<td>Il prend <strong><code>.Generic</code></strong></td>
+</tr>
+<tr>
+<td>Sans objet ?</td>
+<td><strong>Le premier argument</strong> de la méthode courante</td>
+</tr>
+<tr>
+<td>À quoi sert le <code>...</code> ?</td>
+<td>À <strong>modifier les arguments</strong> du suivant</td>
+</tr>
+<tr>
+<td>Les arguments non évalués ?</td>
+<td><strong>Restent non évalués</strong></td>
+</tr>
+<tr>
+<td>Les arguments manquants ?</td>
+<td><strong>Restent manquants</strong></td>
+</tr>
+<tr>
+<td>Que se passe-t-il si une méthode est appelée directement ?</td>
+<td><strong>Pas de <code>.Generic</code> ni <code>.Class</code></strong></td>
+</tr>
+<tr>
+<td>Que faire alors ?</td>
+<td><strong>Toujours nommer le générique</strong> dans <code>NextMethod</code></td>
+</tr>
+<tr>
+<td>D'où vient <code>.Class</code> dans ce cas ?</td>
+<td>De <strong>la classe du premier argument</strong></td>
+</tr>
+<tr>
+<td>Les trois groupes de méthodes ?</td>
+<td><strong><code>Math</code></strong>, <strong><code>Summary</code></strong>, <strong><code>Ops</code></strong></td>
+</tr>
+<tr>
+<td>Peut-on en ajouter ?</td>
+<td><strong>Non</strong></td>
+</tr>
+<tr>
+<td>Que contient <code>Summary</code> ?</td>
+<td><code>all any max min prod range sum</code></td>
+</tr>
+<tr>
+<td>Que contient <code>Ops</code> ?</td>
+<td>Les opérateurs arithmétiques, de comparaison, logiques</td>
+</tr>
+<tr>
+<td>Quand une méthode <code>Ops</code> est-elle invoquée ?</td>
+<td>Si les <strong>deux opérandes suggèrent une méthode unique</strong></td>
+</tr>
+<tr>
+<td>Sinon ?</td>
+<td><strong>La méthode par défaut</strong></td>
+</tr>
+<tr>
+<td>Qui l'emporte, classe ou groupe ?</td>
+<td> <strong>La classe</strong></td>
+</tr>
+<tr>
+<td>Combien d'éléments a <code>.Method</code> dans <code>Ops</code> ?</td>
+<td><strong>Deux</strong></td>
+</tr>
+<tr>
+<td>Que vaut l'élément non concerné ?</td>
+<td>La <strong>chaîne vide</strong> <code>""</code></td>
+</tr>
+<tr>
+<td>Lister les méthodes d'une classe ?</td>
+<td><strong><code>methods(class = "…")</code></strong></td>
+</tr>
+<tr>
+<td>Lister les classes d'une générique ?</td>
+<td><strong><code>methods(generique)</code></strong></td>
+</tr>
+<tr>
+<td>Que signale un astérisque ?</td>
+<td>Une méthode <strong>non visible par son nom</strong></td>
+</tr>
+<tr>
+<td>Comment la lire ?</td>
+<td><strong><code>getS3method()</code></strong> ou <code>getAnywhere()</code></td>
+</tr>
+<tr>
+<td>Pourquoi <code>get("gen.cl")</code> peut-il échouer ?</td>
+<td>À cause des <strong>espaces de noms</strong></td>
+</tr>
+<tr>
+<td>Que fait <code>unclass()</code> ?</td>
+<td>Retire <strong>temporairement</strong> l'effet de classe</td>
+</tr>
+<tr>
+<td>Quel usage le cours lui donne-t-il ?</td>
+<td><strong>Apprendre</strong> la notion de classe et de générique</td>
+</tr>
+<tr>
+<td>Que ne faut-il jamais faire côté nommage ?</td>
+<td>Nommer une fonction <strong><code>gen.cl</code></strong> sans le vouloir</td>
+</tr>
+<tr>
+<td>Combien de méthodes pour <code>print</code> ?</td>
+<td><strong>Environ 40</strong></td>
+</tr>
+<tr>
+<td>Quel est l'usage principal du système ?</td>
+<td>L'<strong>affichage spécialisé</strong> des objets</td>
+</tr>
+<tr>
+<td>Où vit le système S4 ?</td>
+<td>Le paquet <strong><code>methods</code></strong></td>
+</tr>
+<tr>
+<td>Quelle recommandation générale du manuel ?</td>
+<td>User du système <strong>de façon simple</strong></td>
+</tr>
+</tbody></table>
+</main>
+
+
+
+
+</body></html>

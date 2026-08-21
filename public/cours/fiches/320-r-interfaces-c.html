@@ -1,0 +1,1267 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fiche 320 — Interfaces avec C et Fortran : .C, .Call, SEXP et PROTECT</title>
+<script>
+window.MathJax={tex:{inlineMath:[["$","$"]],displayMath:[["$$","$$"]],processEscapes:true},
+ options:{skipHtmlTags:["script","noscript","style","textarea","pre","code"]},
+ svg:{fontCache:"global"},
+ startup:{pageReady:()=>MathJax.startup.defaultPageReady().then(()=>{document.body.classList.add("ready")})}};
+setTimeout(function(){document.body.classList.add("ready")},2500);
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+/* ============================================================
+   MathiasLearn — feuille de style des fiches
+   Reprise intégrale des tokens de 00_PARCOURS/*.html
+   + blocs pédagogiques (callouts, méthode, essentiels, recall)
+   ============================================================ */
+:root{--bg:#faf9f7;--card:#fff;--ink:#1a1a1a;--muted:#6b6b6b;--line:#e5e2dd;--accent:#8b5e34;
+ --hl:#fdf8ef;--ok:#2d7d4f;--okbg:#f0f7f3;--warn:#b3402f;--warnbg:#fdf3f1;--blue:#2f5d8b;--bluebg:#f1f5fa}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+ font:17px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;padding:0 16px 100px}
+.nav{position:sticky;top:0;background:rgba(250,249,247,.96);backdrop-filter:blur(8px);
+ border-bottom:1px solid var(--line);margin:0 -16px 30px;padding:11px 16px;z-index:50;
+ display:flex;gap:6px;flex-wrap:wrap;font-size:13px}
+.nav a{color:var(--muted);text-decoration:none;padding:4px 9px;border-radius:5px;white-space:nowrap}
+.nav a:hover{background:var(--line);color:var(--ink)}
+.nav a.on{background:var(--accent);color:#fff}
+main{max-width:780px;margin:0 auto}
+h1{font-size:31px;letter-spacing:-.02em;margin:.4em 0 .5em;line-height:1.25}
+h2{font-size:23px;margin:2.2em 0 .7em;padding-bottom:.3em;border-bottom:1px solid var(--line)}
+h3{font-size:19px;margin:1.9em 0 .5em;color:var(--accent)}
+h4{font-size:17px;margin:1.5em 0 .4em}
+p{margin:.8em 0} a{color:var(--accent)} hr{border:0;border-top:1px solid var(--line);margin:2.6em 0}
+table{border-collapse:collapse;width:100%;margin:1.3em 0;font-size:15.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+th{background:#f3f0eb;font-weight:600}
+tr:nth-child(even) td{background:#fcfbfa}
+code{font-family:"SF Mono",Menlo,Consolas,monospace;font-size:.88em;background:#f2efea;padding:2px 6px;border-radius:4px;overflow-wrap:break-word}
+pre{background:#f2efea;padding:14px 16px;border-radius:8px;overflow-x:auto}
+pre code{background:none;padding:0;white-space:pre}
+blockquote{border-left:3px solid var(--accent);background:var(--hl);margin:1.4em 0;padding:14px 20px;border-radius:0 8px 8px 0}
+blockquote p:first-child{margin-top:0} blockquote p:last-child{margin-bottom:0}
+ul,ol{padding-left:1.5em} li{margin:.35em 0} em{color:#4a4a4a}
+mjx-container[display="true"]{margin:1.1em 0!important;overflow-x:auto;overflow-y:hidden;padding:2px 0}
+mjx-container svg{max-width:100%}
+body:not(.ready) main{opacity:0} main{opacity:1;transition:opacity .25s}
+
+/* --- bandeau de tête de fiche --- */
+.cours{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--accent);
+ border-radius:0 10px 10px 0;padding:18px 22px;margin:0 0 34px}
+.cours h4{margin:0 0 4px;font-size:14px;text-transform:uppercase;letter-spacing:.07em;color:var(--accent)}
+.cours .cs{color:var(--muted);font-size:14.5px;margin:0 0 14px}
+
+/* --- exercices / corrigés --- */
+.ex{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:6px 24px 20px;margin:18px 0}
+.ex>h3:first-child{margin-top:14px}
+details.cor{margin-top:18px;border:1px solid var(--line);border-radius:8px;background:#fcfbfa;overflow:hidden}
+details.cor>summary{cursor:pointer;padding:12px 16px;font-weight:600;font-size:15px;color:var(--accent);
+ list-style:none;display:flex;align-items:center;gap:9px;user-select:none;transition:.15s;min-height:44px}
+details.cor>summary::-webkit-details-marker{display:none}
+details.cor>summary:hover{background:var(--hl)}
+details.cor>summary::before{content:"\25B6";font-size:10px;transition:transform .18s;display:inline-block}
+details.cor[open]>summary::before{transform:rotate(90deg)}
+details.cor[open]>summary{background:var(--okbg);color:var(--ok);border-bottom:1px solid var(--line)}
+.cor .in{padding:4px 20px 16px}
+.cor .in>*:first-child{margin-top:.9em}
+
+/* --- blocs pédagogiques (callouts) ---
+   Générés depuis une citation Markdown dont le premier **gras** commence
+   par un mot-clé : DÉFINITION, THÉORÈME, MÉTHODE, PIÈGE, INTUITION… */
+.cal{border:1px solid var(--line);border-left:4px solid var(--accent);background:var(--card);
+ border-radius:0 10px 10px 0;padding:15px 20px;margin:1.5em 0}
+.cal>p:first-child{margin-top:0}.cal>p:last-child,.cal>ul:last-child,.cal>ol:last-child{margin-bottom:0}
+.cal .lab{display:block;font-size:12.5px;text-transform:uppercase;letter-spacing:.08em;
+ font-weight:700;color:var(--accent);margin-bottom:6px}
+.cal.formel{background:var(--hl)}
+.cal.piege{border-left-color:var(--warn);background:var(--warnbg)}
+.cal.piege .lab{color:var(--warn)}
+.cal.methode{border-left-color:var(--ok);background:var(--okbg)}
+.cal.methode .lab{color:var(--ok)}
+.cal.intu{border-left-color:var(--blue);background:var(--bluebg)}
+.cal.intu .lab{color:var(--blue)}
+.cal.plus{border-left-style:dashed;background:#faf9f7}
+.cal.plus .lab{color:var(--muted)}
+
+/* --- révision express --- */
+.ess{background:var(--card);border:1px solid var(--accent);border-radius:10px;padding:4px 24px 20px;margin:1.6em 0}
+.ess h3{margin-top:1.3em}
+.rec{background:var(--card);border:1px dashed var(--accent);border-radius:10px;padding:4px 24px 18px;margin:1.6em 0}
+.rec ol{counter-reset:none}
+
+/* --- impression / PDF --- */
+@media print{
+ .nav{display:none}
+ body{padding:0;background:#fff;font-size:11.2pt;line-height:1.55}
+ main{max-width:none}
+ h1{font-size:23pt}h2{font-size:15pt;margin-top:1.5em}h3{font-size:12.6pt}
+ h2,h3,h4{break-after:avoid;page-break-after:avoid}
+ table,.cal,blockquote{break-inside:avoid;page-break-inside:avoid}
+ table{display:table;font-size:9.6pt}
+ details.cor{border:1px solid var(--line);background:#fcfbfa}
+ details.cor>summary{display:none}
+ details.cor .in{padding-top:10px}
+ .cal,.ex,.ess,.rec{box-shadow:none}
+ a{color:var(--ink);text-decoration:none}
+}
+@page{margin:16mm 15mm 18mm}
+
+/* --- exemples travaillés --- */
+.exm{background:#fcfbfa;border:1px solid var(--line);border-radius:10px;padding:2px 20px 14px;margin:1.5em 0}
+.exm>h4:first-child{margin:14px 0 .5em;color:var(--accent);font-size:13px;text-transform:uppercase;letter-spacing:.07em}
+
+
+/* --- pastilles de priorité (conventions des fiches de l'app) --- */
+h2[data-prio], h3[data-prio], h4[data-prio]{position:relative}
+h2[data-prio]::before,h3[data-prio]::before,h4[data-prio]::before{
+ content:"";display:inline-block;width:9px;height:9px;border-radius:50%;
+ margin-right:9px;vertical-align:middle;background:var(--muted)}
+[data-prio="must"]::before{background:var(--warn)}
+[data-prio="high"]::before{background:#d98324}
+[data-prio="mid"]::before{background:#c9a227}
+[data-prio="low"]::before{background:var(--ok)}
+/* corrigés des fiches de l'app : même traitement que les corrigés des séries */
+details.cor>summary::after{content:""}
+</style></head><body>
+<div class="nav"><a href="00_COMMENCER_ICI.html">Commencer ici</a><a href="01_NOTATIONS_le-decodeur.html">Notations</a><a href="02_EXERCICES_Serie-0.html">Série 0 — Remise en route</a><a href="03_EXERCICES_Serie-1.html">Série 1 — Convexité</a><a href="04_EXERCICES_Serie-2.html">Série 2 — KKT</a><a href="05_AUTO-EVALUATION.html">Auto-évaluation (quiz)</a><a href="06_FICHE_Optimisation-deux-variables.html">Fiche — Optimisation à 2 variables</a></div>
+<main><h1>Fiche 320 — Interfaces avec C et Fortran : <code>.C</code>, <code>.Call</code>, <code>SEXP</code> et <code>PROTECT</code></h1>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Matière</strong></td>
+<td>Code · Langage R</td>
+</tr>
+<tr>
+<td><strong>Cours source</strong></td>
+<td>R Core Team, <em>Writing R Extensions</em> 4.6.1 — chapitre 5 « System and foreign language interfaces » (§5.1 accès au système, §5.2 <code>.C</code> et <code>.Fortran</code>, §5.3 <code>dyn.load</code>, §5.4 enregistrement des routines natives, §5.9 manipuler les objets R en C, §5.9.1 le ramasse-miettes, §5.9.3 les types, §5.10 <code>.Call</code> et <code>.External</code>)</td>
+</tr>
+<tr>
+<td><strong>Sources d'appoint</strong></td>
+<td>R Core Team, <em>R Internals</em> 4.6.1 — §1.1 « SEXPs », §1.1.1 « SEXPTYPEs »</td>
+</tr>
+<tr>
+<td><strong>Difficulté</strong></td>
+<td> Avancé — la frontière entre R et le code compilé</td>
+</tr>
+<tr>
+<td><strong>Temps d'étude estimé</strong></td>
+<td>1 h 30</td>
+</tr>
+<tr>
+<td><strong>Prérequis</strong></td>
+<td>Fiches 303, 317, 319 (types, profilage, structure d'un paquet)</td>
+</tr>
+<tr>
+<td><strong>Concepts clés</strong></td>
+<td><code>.C</code> et <code>.Fortran</code>, <strong>la table de correspondance des types</strong>, <code>NAOK</code>, argument <strong><code>PACKAGE</code></strong>, <code>dyn.load</code> / <code>dyn.unload</code>, <strong>enregistrement des routines</strong>, <code>R_registerRoutines</code>, <code>R_init_dll</code>, <strong><code>SEXP</code></strong> et <code>SEXPREC</code>, <strong><code>.Call</code></strong> et <strong><code>.External</code></strong>, <strong><code>PROTECT</code></strong> / <strong><code>UNPROTECT</code></strong>, la <strong>pile de protection</strong>, <code>Rf_allocVector</code>, <code>Rf_coerceVector</code>, les <strong><code>SEXPTYPE</code></strong>, <code>Rf_error</code>, préfixe <strong><code>Rf_</code></strong></td>
+</tr>
+<tr>
+<td><strong>À retenir en priorité</strong></td>
+<td><strong>Le tableau des types</strong> · <strong><code>.C</code> copie, <code>.Call</code> non</strong> · <strong><code>PROTECT</code> protège l'objet, pas le pointeur</strong> · <strong>l'argument <code>PACKAGE</code></strong> · <strong>regarder d'abord si R suffit</strong>.</td>
+</tr>
+</tbody></table>
+<h2>Vue d'ensemble</h2>
+<pre><code>QUATRE INTERFACES   .C        .Fortran     -&gt; vecteurs atomiques, arguments COPIES
+                    .Call     .External    -&gt; objets R natifs (SEXP), PAS DE COPIE
+
+LE CONSEIL PREALABLE
+   « Before you decide to use .Call or .External, YOU SHOULD LOOK AT OTHER
+     ALTERNATIVES. First, consider working in interpreted R code ; IF THIS IS
+     FAST ENOUGH, THIS IS NORMALLY THE BEST OPTION. »
+
+TABLE DES TYPES (.C / .Fortran)
+   R storage mode   C type            Fortran type
+   logical          int *             INTEGER
+   integer          int *             INTEGER
+   double           double *          DOUBLE PRECISION
+   complex          Rcomplex *        DOUBLE COMPLEX
+   character        char **           CHARACTER(255)
+   raw              unsigned char *   -- aucun --
+   !! int et INTEGER sont 32 bits SUR TOUTES LES PLATEFORMES
+
+REGLES DE .C     jusqu'a 65 arguments · arguments COPIES a l'aller ET au retour
+                 le retour se fait DANS LES ARGUMENTS -- la fonction C est void
+                 NAOK = FALSE : NA, NaN, Inf, -Inf provoquent une ERREUR
+                 !! PACKAGE = "..."  -- « its use is HIGHLY DESIRABLE »
+
+.Call            SEXP f(SEXP a, SEXP b)         jusqu'a 65 objets
+.External        SEXP f(SEXP args)              UN SEUL argument, une pairlist
+   !! « NEITHER .Call NOR .External COPY THEIR ARGUMENTS : you should treat
+       arguments you receive through these interfaces AS READ-ONLY. »
+
+LE RAMASSE-MIETTES
+   PROTECT(p)      met l'OBJET a l'abri -- « it is THE OBJECT which is protected,
+                   NOT THE POINTER VARIABLE »
+   UNPROTECT(n)    depile les n derniers ; les appels DOIVENT S'EQUILIBRER
+   pile de taille FIXE (10 000 par defaut)
+
+ENREGISTRER   R_registerRoutines() dans R_init_&lt;dll&gt;()  -&gt; plus RAPIDE et VERIFIE
+</code></pre>
+<p><strong>Le problème posé.</strong> <em>« <strong>Using C code to speed up the execution of an R function is often very fruitful.</strong> Traditionally this has been done via the <code>.C</code> function. <strong>However, if a user wants to write C code using internal R data structures, then that can be done using the <code>.Call</code> and <code>.External</code> functions.</strong> »</em> (§5.9)</p>
+<blockquote>
+<p class="cal piege"> <strong>Le conseil qui doit précéder tout le reste (§5.9).</strong> <em>« <strong>Before you decide to use <code>.Call</code> or <code>.External</code>, you should look at other alternatives. First, consider working in interpreted R code ; if this is fast enough, this is normally the best option.</strong> <strong>You should also see if using <code>.C</code> is enough. If the task to be performed in C is simple enough involving only atomic vectors and requiring no call to R, <code>.C</code> suffices.</strong> … <strong>These interfaces allow much more control, but they also impose much greater responsibilities so need to be used with care.</strong> »</em></p>
+<p><strong>Trois marches, dans cet ordre</strong> : du R interprété — <strong>normalement le meilleur choix</strong> —, puis <code>.C</code>, puis <code>.Call</code>. Et la fiche 317 ajoute l'étape zéro : <strong>profiler d'abord</strong>, pour savoir si le goulot est bien là où on le croit. Le §3.2 disait précisément que le profilage sert à <em>« identify … pieces of R code that could benefit from being replaced by compiled code »</em>.</p>
+</blockquote>
+<blockquote>
+<p><strong>Une convention de nommage (§5).</strong> <em>« <strong>Many of the functions described here have entry-point names with a <code>Rf_</code> prefix : if they are called from C code (but not C++ code as from R 4.5.0) that prefix can be omitted. Users are encouraged to use the prefix when writing new C code.</strong> »</em></p>
+</blockquote>
+<h2 data-prio="high">Concept 1 — Accès au système depuis C</h2>
+<blockquote>
+<p><strong>Règle (§5.1).</strong> <em>« <strong>Access to operating system functions is via the R functions <code>system</code> and <code>system2</code>.</strong> The details will differ by platform, and <strong>about all that can safely be assumed is that the first argument will be a string command that will be passed for execution (not necessarily by a shell)</strong> and the second argument to <code>system</code> will be <code>internal</code> which <strong>if true will collect the output of the command into an R character vector</strong>. »</em></p>
+<p><em>« <strong>On POSIX-compliant OSes these commands pass a command-line to a shell : Windows is not POSIX-compliant and there is a separate function <code>shell</code> to do so.</strong> »</em></p>
+<p><em>« <strong>The function <code>system.time</code> is available for timing.</strong>  <strong>Timing on child processes is only available on Unix-alikes, and may not be reliable there.</strong> »</em></p>
+</blockquote>
+<p><strong>C'est la reprise du §14.3</strong> (fiche 318), avec une précision : <em>« <strong>not necessarily by a shell</strong> »</em> — on ne peut <strong>rien</strong> supposer de plus que le passage de la chaîne.</p>
+<h2 data-prio="must">Concept 2 — <code>.C</code> et <code>.Fortran</code></h2>
+<div class="cal formel"><span class="lab">Définition (§5.2).</span>
+<p> *« <strong>These two functions provide an interface to compiled code that has been linked into R, either at build time or via <code>dyn.load</code>.</strong> They are <strong>primarily intended for compiled C and Fortran code respectively</strong>, but <strong>the <code>.C</code> function can be used with other languages which can generate C interfaces, for example C++</strong>. »*</p>
+<p>*« <strong>The first argument to each function is a character string specifying the symbol name as known to C or Fortran</strong> … (<strong>That the symbol is loaded can be tested by, for example, <code>is.loaded("cg")</code>.</strong>) »*</p>
+<p><em>« <strong>There can be up to 65 further arguments</strong> giving R objects to be passed to compiled code.  <strong>Normally these are copied before being passed in, and copied again to an R list object when the compiled code returns.</strong> <strong>If the arguments are given names, these are used as names for the components in the returned list object (but not passed to the compiled code).</strong> »</em></p>
+</div>
+<h3>2.1 La table de correspondance des types</h3>
+<blockquote>
+<p><strong>Règle (§5.2).</strong> <em>« <strong>The following table gives the mapping between the modes of R atomic vectors and the types of arguments to a C function or Fortran subroutine.</strong> »</em></p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>Mode de stockage R</th>
+<th>Type C</th>
+<th>Type Fortran</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>logical</code></td>
+<td><strong><code>int *</code></strong></td>
+<td><code>INTEGER</code></td>
+</tr>
+<tr>
+<td><code>integer</code></td>
+<td><strong><code>int *</code></strong></td>
+<td><code>INTEGER</code></td>
+</tr>
+<tr>
+<td><code>double</code></td>
+<td><strong><code>double *</code></strong></td>
+<td><code>DOUBLE PRECISION</code></td>
+</tr>
+<tr>
+<td><code>complex</code></td>
+<td><strong><code>Rcomplex *</code></strong></td>
+<td><code>DOUBLE COMPLEX</code></td>
+</tr>
+<tr>
+<td><code>character</code></td>
+<td><strong><code>char **</code></strong></td>
+<td><code>CHARACTER(255)</code></td>
+</tr>
+<tr>
+<td><code>raw</code></td>
+<td><strong><code>unsigned char *</code></strong></td>
+<td><em>aucun</em></td>
+</tr>
+</tbody></table>
+<blockquote>
+<p class="cal piege"> <strong>La mise en garde de portabilité (§5.2).</strong> <em>« <strong>On all R platforms <code>int</code> and <code>INTEGER</code> are 32-bit.</strong> <strong>Code ported from S-PLUS (which uses <code>long *</code> for logical and integer) will not work on all 64-bit platforms</strong> (although <strong>it may appear to work on some</strong>, including <code>x86_64</code> Windows). <strong>Note also that if your compiled code is a mixture of C functions and Fortran subprograms the argument types must match as given in the table above.</strong> »</em></p>
+<p><strong>« It may appear to work on some » est le pire des cas</strong> : le code semble correct, jusqu'à ce qu'il tourne ailleurs.</p>
+</blockquote>
+<p><strong>Sur <code>Rcomplex</code> (§5.2)</strong> : *« a structure with double members <code>r</code> and <code>i</code> defined in the header file <code>R_ext/Complex.h</code>. (<strong>On most platforms this is stored in a way compatible with the C99 <code>double complex</code> type : however, it may not be possible to pass <code>Rcomplex</code> to a C99 function</strong> … <strong>Nor need it be compatible with a C++ <code>complex</code> type. Moreover, the compatibility can depend on the optimization level set for the compiler.</strong>) »*</p>
+<p class="cal piege"> <strong>Sur les chaînes et Fortran</strong> : <em>« <strong>Only a single character string of fixed length can be passed to or from Fortran</strong> (the length is not passed), and <strong>the success of this is compiler-dependent : its use was formally deprecated in 2019</strong>. »</em></p>
+<h3>2.2 Les valeurs spéciales</h3>
+<blockquote>
+<p><strong>Règle (§5.2).</strong> *« <strong>Logical values are sent as 0 (<code>FALSE</code>), 1 (<code>TRUE</code>) or <code>INT_MIN</code> = −2147483648 (<code>NA</code>, but only if <code>NAOK</code> is true), and the compiled code should return one of these three values.</strong> (<strong>Non-zero values other than <code>INT_MIN</code> are mapped to <code>TRUE</code>.</strong>) »*</p>
+<p class="cal piege"> <em>« <strong>Note that the use of <code>int *</code> for Fortran <code>logical</code> is not guaranteed to be portable</strong> … <strong>it is better to pass integers and convert to/from Fortran <code>logical</code> in a Fortran wrapper.</strong> »</em></p>
+<p><strong>Règle (§5.2).</strong> <em>« <strong>Unless formal argument <code>NAOK</code> is true, all the other arguments are checked for missing values <code>NA</code> and for the IEEE special values <code>NaN</code>, <code>Inf</code> and <code>-Inf</code>, and the presence of any of these generates an error. If it is true, these values are passed unchecked.</strong> »</em></p>
+</blockquote>
+<p><strong><code>NAOK</code> est donc un garde-fou activé par défaut.</strong> Le passer à <code>TRUE</code> transfère au code C la responsabilité de traiter les valeurs spéciales — ce qui est nécessaire dès qu'on veut y accéder, et dangereux si on ne les gère pas.</p>
+<h3>2.3 L'argument <code>PACKAGE</code></h3>
+<blockquote>
+<p class="cal piege"> <strong>Règle (§5.2).</strong> <em>« <strong>Argument <code>PACKAGE</code> confines the search for the symbol name to a specific shared object</strong> (or use <code>"base"</code> for code compiled into R). <strong>Its use is highly desirable, as there is no way to avoid two package writers using the same symbol name, and such name clashes are normally sufficient to cause R to crash.</strong> »</em></p>
+<p>*« (<strong>If it is not present and the call is from the body of a function defined in a package namespace, the shared object loaded by the first (if any) <code>useDynLib</code> directive will be used.</strong>) »*</p>
+</blockquote>
+<p><strong>« Sufficient to cause R to crash » — le mot est fort.</strong> Deux paquets définissant <code>convolve</code> dans leur DLL, sans <code>PACKAGE</code>, et l'un appelle le code de l'autre avec des arguments qui ne lui conviennent pas. Il n'y a <strong>aucun système de noms</strong> au niveau des symboles compilés — c'est ce que l'enregistrement (concept 4) vient corriger.</p>
+<p>C'est aussi ce que vérifie <strong><code>R CMD check</code></strong>, point 10 de la fiche 319 : <em>« <strong>all foreign function calls … are tested to see if they have a <code>PACKAGE</code> argument</strong> »</em>.</p>
+<blockquote>
+<p class="cal piege"> <strong>La contrainte de retour (§5.2).</strong> <em>« <strong>Note that the compiled code should not return anything except through its arguments : C functions should be of type <code>void</code> and Fortran subprograms should be subroutines.</strong> »</em></p>
+<p><strong>C'est ce qui distingue <code>.C</code> de <code>.Call</code></strong> : avec <code>.C</code>, <strong>le résultat sort par les arguments modifiés</strong>, que R recopie ensuite dans une liste. La fonction C <strong>ne rend rien</strong>.</p>
+</blockquote>
+<h2 data-prio="must">Concept 3 — <code>.Call</code> et <code>.External</code></h2>
+<div class="cal formel"><span class="lab">Définition (§5.9).</span>
+<p> <em>« <strong>A call to <code>.Call</code> is very similar to <code>.C</code></strong> »</em> :</p>
+</div>
+<pre><code class="language-r">.Call("convolve2", a, b)
+</code></pre>
+<p><em>« The first argument should be <strong>a character string giving a C symbol name of code that has already been loaded</strong> into R. <strong>Up to 65 R objects can be passed as arguments.</strong> The C side of the interface is »</em> :</p>
+<pre><code class="language-c">#include &lt;R.h&gt;
+#include &lt;Rinternals.h&gt;
+
+SEXP convolve2(SEXP a, SEXP b)
+  ...
+</code></pre>
+<p><em>« <strong>A call to <code>.External</code> is almost identical</strong> »</em> :</p>
+<pre><code class="language-r">.External("convolveE", a, b)
+</code></pre>
+<p><em>« <strong>but the C side of the interface is different, having only one argument</strong> »</em> :</p>
+<pre><code class="language-c">SEXP convolveE(SEXP args)
+  ...
+</code></pre>
+<p><em>« Here <strong><code>args</code> is a <code>LISTSXP</code>, a Lisp-style pairlist from which the arguments can be extracted</strong>. »</em></p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th><code>.Call</code></th>
+<th><code>.External</code></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Côté C</td>
+<td><strong>un argument par objet</strong></td>
+<td><strong>un seul argument</strong> — une pairlist</td>
+</tr>
+<tr>
+<td>Nombre d'objets</td>
+<td>jusqu'à <strong>65</strong></td>
+<td>quelconque</td>
+</tr>
+<tr>
+<td>Le manuel dit</td>
+<td><em>« <strong>simpler to use</strong> »</em></td>
+<td><em>« <strong>a little more general</strong> »</em></td>
+</tr>
+</tbody></table>
+<blockquote>
+<p class="cal piege"> <strong>La règle absolue (§5.9).</strong> <em>« <strong>Neither <code>.Call</code> nor <code>.External</code> copy their arguments : you should treat arguments you receive through these interfaces as read-only.</strong> »</em></p>
+<p><strong>C'est l'exception à la sémantique de copie de R</strong> (fiche 302), et elle est <strong>à la charge du programmeur</strong>. Modifier un argument reçu par <code>.Call</code>, c'est modifier <strong>l'objet de l'appelant</strong> — silencieusement, et souvent d'autres objets avec lui, R partageant les représentations.</p>
+</blockquote>
+<h2 data-prio="must">Concept 4 — <code>SEXP</code>, ou tout est un pointeur</h2>
+<div class="cal formel"><span class="lab">Définition (§5.9).</span>
+<p> <em>« <strong>All the R objects you will deal with will be handled with the type <code>SEXP</code>, which is a pointer to a structure with <code>typedef SEXPREC</code>.</strong> <strong>Think of this structure as a variant type that can handle all the usual types of R objects</strong> — vectors of various modes, functions, environments, language objects and so on. »</em></p>
+<p><em>« <strong>Think rather of a model such as that used by Visual Basic, in which R objects are handed around in C code (as they are in interpreted R code) as the variant type, and the appropriate part is extracted for, for example, numerical calculations, only when it is needed. As in interpreted R code, much use is made of coercion to force the variant object to the right type.</strong> »</em></p>
+<p><em>(note 17 : « <strong><code>SEXP</code> is an acronym for S imple EXP ression, common in LISP-like language syntaxes.</strong> »)</em></p>
+</div>
+<div class="cal plus"><span class="lab">Complément (R Internals §1.1).</span>
+<p> *« <strong>What R users think of as variables or objects are symbols which are bound to a value.</strong> The value can be thought of as either <strong>a <code>SEXP</code> (a pointer)</strong>, or <strong>the structure it points to, a <code>SEXPREC</code></strong> … <strong>So the basic building blocks of R objects are often called nodes.</strong> »*</p>
+<p class="cal piege"> <em>« <strong>Note that the internal structure of the <code>SEXPREC</code> is not made available to R Extensions : rather <code>SEXP</code> is an opaque pointer, and the internals can only be accessed by the functions provided.</strong> »</em></p>
+<p><em>« Both types of node structure have as their first three fields <strong>a 64-bit <code>sxpinfo</code> header</strong> and then <strong>three pointers</strong> (to <strong>the attributes</strong> and <strong>the previous and next node in a doubly-linked list</strong>) … <strong>On a 32-bit platform a node occupies 32 bytes : on a 64-bit platform typically 56 bytes.</strong> »</em></p>
+<p><em>« <strong>The first five bits of the <code>sxpinfo</code> header specify one of up to 32 <code>SEXPTYPE</code>s.</strong> »</em></p>
+</div>
+<h3>4.1 Les <code>SEXPTYPE</code></h3>
+<blockquote>
+<p><strong>Règle (§5.9.3).</strong> <em>« <strong>The different R data types are represented in C by <code>SEXPTYPE</code>.</strong> Some of these are familiar from R and some are internal data types. »</em></p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th><code>SEXPTYPE</code></th>
+<th>Équivalent R</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong><code>REALSXP</code></strong></td>
+<td><code>numeric</code>, mode de stockage <strong>double</strong></td>
+</tr>
+<tr>
+<td><strong><code>INTSXP</code></strong></td>
+<td><code>integer</code></td>
+</tr>
+<tr>
+<td><strong><code>CPLXSXP</code></strong></td>
+<td><code>complex</code></td>
+</tr>
+<tr>
+<td><strong><code>LGLSXP</code></strong></td>
+<td><code>logical</code></td>
+</tr>
+<tr>
+<td><strong><code>STRSXP</code></strong></td>
+<td><code>character</code></td>
+</tr>
+<tr>
+<td><strong><code>VECSXP</code></strong></td>
+<td><strong><code>list</code></strong> (vecteur générique)</td>
+</tr>
+<tr>
+<td><strong><code>LISTSXP</code></strong></td>
+<td><strong>pairlist</strong></td>
+</tr>
+<tr>
+<td><strong><code>DOTSXP</code></strong></td>
+<td>un objet <strong><code>...</code></strong></td>
+</tr>
+<tr>
+<td><strong><code>NILSXP</code></strong></td>
+<td><code>NULL</code></td>
+</tr>
+<tr>
+<td><strong><code>SYMSXP</code></strong></td>
+<td><strong>nom / symbole</strong></td>
+</tr>
+<tr>
+<td><strong><code>CLOSXP</code></strong></td>
+<td><strong>fonction</strong> ou fermeture</td>
+</tr>
+<tr>
+<td><strong><code>ENVSXP</code></strong></td>
+<td><strong>environnement</strong></td>
+</tr>
+</tbody></table>
+<p>*« Among the important <strong>internal</strong> <code>SEXPTYPE</code>s are <strong><code>LANGSXP</code>, <code>CHARSXP</code>, <code>PROMSXP</code></strong>, etc.  (<strong>although it is possible to return objects of internal types, it is unsafe to do so as assumptions are made about how they are handled which may be violated at user-level evaluation</strong>). »*</p>
+<div class="cal intu"><span class="lab">Contrôle — reconnaître une vieille connaissance.</span>
+<p> Cette table <strong>est</strong> celle de la fiche 303, vue du côté C. <code>VECSXP</code> pour une liste, <code>LISTSXP</code> pour une pairlist, <code>CLOSXP</code> pour une fermeture, <code>PROMSXP</code> pour une promesse — ce sont exactement les valeurs que rend <strong><code>typeof()</code></strong>.</p>
+<p><strong>Et <em>R Internals</em> §1.1.1 donne les numéros</strong> : <code>NILSXP</code> <strong>0</strong>, <code>SYMSXP</code> <strong>1</strong>, <code>LISTSXP</code> <strong>2</strong>, <code>CLOSXP</code> <strong>3</strong>, <code>ENVSXP</code> <strong>4</strong>, <code>PROMSXP</code> <strong>5</strong>, <code>LANGSXP</code> <strong>6</strong>, … <code>LGLSXP</code> <strong>10</strong>, puis <strong>13</strong> <code>INTSXP</code>, <code>REALSXP</code> <strong>14</strong>, <code>CPLXSXP</code> <strong>15</strong>, <code>STRSXP</code> <strong>16</strong>, … <code>VECSXP</code> <strong>19</strong>, <code>EXPRSXP</code> <strong>20</strong>, <code>BCODESXP</code> <strong>21</strong>, <code>EXTPTRSXP</code> <strong>22</strong>, <code>WEAKREFSXP</code> <strong>23</strong>, <code>RAWSXP</code> <strong>24</strong>, <code>OBJSXP</code> <strong>25</strong>.</p>
+<p class="cal piege"> <strong>Le trou en 11-12</strong> : <em>« <strong>Values 11 and 12 were used for internal factors and ordered factors and have since been withdrawn.</strong> <strong>Note that the <code>SEXPTYPE</code> numbers are stored in saved objects and that the ordering of the types is used, so the gap cannot easily be reused.</strong> »</em> — <strong>un vestige gravé dans le format des fichiers <code>.RData</code></strong>.</p>
+</div>
+<h3>4.2 Vérifier et convertir</h3>
+<div class="cal methode"><span class="lab">Méthode (§5.9.3).</span>
+<p> *«  <strong>Unless you are very sure about the type of the arguments, the code should check the data types.</strong> <strong>You can use functions like <code>Rf_isReal</code>, <code>Rf_isInteger</code> and <code>Rf_isString</code></strong> … Other such functions include <strong><code>Rf_isNull</code>, <code>Rf_isSymbol</code>, <code>Rf_isLogical</code>, <code>Rf_isComplex</code>, <code>Rf_isExpression</code>, and <code>Rf_isEnvironment</code></strong>. <strong>All of these take a <code>SEXP</code> as argument and return 1 or 0.</strong> »*</p>
+<p><em>« <strong>What happens if the <code>SEXP</code> is not of the correct type ? Sometimes you have no other option except to generate an error. You can use the function <code>Rf_error</code> for this. It is usually better to coerce the object to the correct type.</strong> »</em></p>
+</div>
+<pre><code class="language-c">newSexp = PROTECT(Rf_coerceVector(oldSexp, REALSXP));
+</code></pre>
+<p><em>« <strong>Protection is needed as a new object is created</strong> ; the object formerly pointed to by the <code>SEXP</code> is still protected but now unused. »</em></p>
+<p><em>« <strong>All the coercion functions do their own error-checking, and generate <code>NA</code>s with a warning or stop with an error as appropriate.</strong> »</em></p>
+<h2 data-prio="must">Concept 5 — Le ramasse-miettes et <code>PROTECT</code></h2>
+<div class="cal formel"><span class="lab">Définition (§5.9.1).</span>
+<p> <em>« <strong>We need to know a little about the way R handles memory allocation. The memory allocated for R objects is not freed by the user ; instead, the memory is from time to time garbage collected.</strong> »</em></p>
+</div>
+<blockquote>
+<p class="cal piege"> <strong>La règle centrale (§5.9.1).</strong> <em>« <strong>If you create an R object in your C code, you must tell R that you are using the object by using the <code>PROTECT</code> macro on a pointer to the object. This tells R that the object is in use so it is not destroyed during garbage collection.</strong> »</em></p>
+<p><em>«  <strong>Notice that it is the object which is protected, not the pointer variable. It is a common mistake to believe that if you invoked <code>PROTECT(p)</code> at some point then <code>p</code> is protected from then on, but that is not true once a new object is assigned to <code>p</code>.</strong> »</em></p>
+<p><em>« <strong>Protecting an R object automatically protects all the R objects pointed to in the corresponding <code>SEXPREC</code></strong> — for example <strong>all elements of a protected list are automatically protected</strong>. »</em></p>
+</blockquote>
+<p><strong>La distinction objet / pointeur est l'erreur la plus fréquente</strong>, et le manuel la nomme comme telle. <code>PROTECT(p)</code> protège <strong>ce que <code>p</code> désigne à cet instant</strong> ; réassigner <code>p</code> laisse le nouvel objet <strong>sans protection</strong>.</p>
+<blockquote>
+<p><strong>Règle — l'équilibre (§5.9.1).</strong> <em>« <strong>The programmer is solely responsible for housekeeping the calls to <code>PROTECT</code>.</strong> There is a corresponding macro <strong><code>UNPROTECT</code> that takes as argument an <code>int</code> giving the number of objects to unprotect</strong>. <strong>The protection mechanism is stack-based, so <code>UNPROTECT(n)</code> unprotects the last <code>n</code> objects which were protected.</strong> <strong>The calls to <code>PROTECT</code> and <code>UNPROTECT</code> must balance when the user's code returns and should balance in all functions.</strong> <strong>R will warn about "stack imbalance in <code>.Call</code>" if the housekeeping is wrong.</strong> »</em></p>
+</blockquote>
+<p><strong>L'exemple du manuel :</strong></p>
+<pre><code class="language-c">#include &lt;R.h&gt;
+#include &lt;Rinternals.h&gt;
+
+SEXP ab;
+   ....
+ab = PROTECT(Rf_allocVector(REALSXP, 2));
+REAL(ab)[0] = 123.45;
+REAL(ab)[1] = 67.89;
+UNPROTECT(1);
+</code></pre>
+<div class="cal intu"><span class="lab">Pourquoi protéger, alors que « c'est juste notre code C qui tourne » (§5.9.1).</span>
+<p> <em>« Now, the reader may ask <strong>how the R object could possibly get removed during those manipulations</strong>, as it is just our C code that is running. <strong>As it happens, we can do without the protection in this example, but in general we do not know (nor want to know) what is hiding behind the R macros and functions we use, and any of them might cause memory to be allocated, hence garbage collection and hence our object <code>ab</code> to be removed.</strong> <strong>It is usually wise to err on the side of caution and assume that any of the R macros and functions might remove the object.</strong> »</em></p>
+<p><strong>C'est un raisonnement de discipline, pas de nécessité locale</strong> : on protège parce qu'on <strong>ne peut pas savoir</strong> ce qu'une macro déclenche.</p>
+</div>
+<blockquote>
+<p class="cal piege"> <strong>La pile a une taille finie (§5.9.1).</strong> <em>« <strong>In some cases it is necessary to keep better track of whether protection is really needed. Be particularly aware of situations where a large number of objects are generated. The pointer protection stack has a fixed size (default 10,000) and can become full. It is not a good idea then to just <code>PROTECT</code> everything in sight and <code>UNPROTECT</code> several thousand objects at the end. It will almost invariably be possible to either assign the objects as part of another object (which automatically protects them) or unprotect them immediately after use.</strong> »</em></p>
+<p><strong>Les deux issues sont données</strong> : <strong>ranger l'objet dans un autre</strong> — la protection est alors héritée — ou <strong>déprotéger tout de suite après usage</strong>.</p>
+</blockquote>
+<p><strong>Les macros plus rares (§5.9.1)</strong> : <strong><code>UNPROTECT_PTR(s)</code></strong> <em>« unprotects the object pointed to by the <code>SEXP</code> <code>s</code>, <strong>even if it is not the top item on the pointer protection stack</strong> »</em> —  <em>« <strong>dangerous to use in combination with <code>UNPROTECT</code> when the same object has been protected multiple times</strong> »</em>, et <em>« <strong>superseded by multi-set based functions <code>R_PreserveInMSet</code> and <code>R_ReleaseFromMSet</code></strong> … <strong>These functions should not be needed outside parsers.</strong> »</em> Et <strong><code>PROTECT_WITH_INDEX</code></strong> pour les objets qu'on remplace en cours de route.</p>
+<h2 data-prio="high">Concept 6 — Enregistrer les routines natives</h2>
+<div class="cal formel"><span class="lab">Définition (§5.4).</span>
+<p> <em>« <strong>By "native" routine, we mean an entry point in compiled code.</strong> »</em></p>
+<p><em>« <strong>In calls to <code>.C</code>, <code>.Call</code>, <code>.Fortran</code> and <code>.External</code>, R must locate the specified native routine by looking in the appropriate shared object/DLL. By default, R uses the operating-system-specific dynamic loader to lookup the symbol in all loaded DLLs</strong> … <strong>Alternatively, the author of the DLL can explicitly register routines with R and use a single, platform-independent mechanism for finding the routines.</strong> »</em></p>
+</div>
+<blockquote>
+<p><strong>Règle — les deux avantages (§5.4).</strong> <em>« <strong>Registering routines has two main advantages : it provides a faster way to find the address of the entry point via tables stored in the DLL at compilation time, and it provides a run-time check that the entry point is called with the right number of arguments and, optionally, the right argument types.</strong> »</em></p>
+</blockquote>
+<p><strong>Le second avantage est le plus important</strong> : sans enregistrement, appeler une routine C avec <strong>le mauvais nombre d'arguments</strong> ne produit <strong>aucun message</strong> — seulement un comportement indéfini. C'est le même problème que l'argument <code>PACKAGE</code> du concept 2, traité à la racine.</p>
+<div class="cal methode"><span class="lab">Méthode (§5.4).</span>
+<p> <em>« <strong>To register routines with R, one calls the C routine <code>R_registerRoutines</code>. This is typically done when the DLL is first loaded within the initialization routine <code>R_init_&lt;dll name&gt;</code>.</strong> <strong><code>R_registerRoutines</code> takes 5 arguments. The first is the <code>DllInfo</code> object passed by R to the initialization routine.</strong> … <strong>The remaining 4 arguments are arrays describing the routines for each of the 4 different interfaces.</strong> »</em></p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Interface</th>
+<th>Type de description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>.C</code></td>
+<td><strong><code>R_CMethodDef</code></strong></td>
+</tr>
+<tr>
+<td><code>.Call</code></td>
+<td><strong><code>R_CallMethodDef</code></strong></td>
+</tr>
+<tr>
+<td><code>.Fortran</code></td>
+<td><strong><code>R_FortranMethodDef</code></strong></td>
+</tr>
+<tr>
+<td><code>.External</code></td>
+<td><strong><code>R_ExternalMethodDef</code></strong></td>
+</tr>
+</tbody></table>
+<p><em>« Each argument is <strong>a <code>NULL</code>-terminated array</strong> … [contenant] <strong>the name of the routine by which it can be accessed in R, a pointer to the actual native symbol, and the number of arguments the routine expects to be passed from R</strong> »</em> :</p>
+<pre><code class="language-c">SEXP myCall(SEXP a, SEXP b, SEXP c);
+
+static const R_CallMethodDef callMethods[] = {
+   {"myCall", (DL_FUNC) &amp;myCall, 3},
+   ...
+};
+</code></pre>
+<details class="cor">
+<summary><strong>Exercice résolu — choisir la bonne interface, et dans le bon ordre</strong></summary><div class="in">
+
+<p><strong>Énoncé.</strong> Une fonction R est trop lente. Quel raisonnement mener, et quelle interface choisir le cas échéant ?</p>
+<p><em>Étape 0 — mesurer.</em> Avant tout, <strong>profiler</strong> (fiche 317) : <code>Rprof()</code> … <code>summaryRprof()</code>, et lire la colonne <strong><code>self</code></strong>. Le §3.2 présentait le profilage comme le moyen d'<em>« identify … pieces of R code that could benefit from being replaced by compiled code »</em> — <strong>le profilage précède la décision</strong>.</p>
+<p><em>Étape 1 — rester en R si possible.</em>  <em>« <strong>First, consider working in interpreted R code ; if this is fast enough, this is normally the best option.</strong> »</em> (§5.9) La vectorisation (fiche 301) et la vision « objet entier » (fiche 308) résolvent beaucoup de cas — l'exemple des déterminants du §5.5 (fiche 305) en est la démonstration.</p>
+<p><em>Étape 2 — la question qui tranche entre <code>.C</code> et <code>.Call</code>.</em> <em>« <strong>You should also see if using <code>.C</code> is enough. If the task to be performed in C is simple enough involving only atomic vectors and requiring no call to R, <code>.C</code> suffices.</strong> »</em></p>
+<p><strong>Deux critères</strong> : <strong>uniquement des vecteurs atomiques</strong>, et <strong>aucun appel à R</strong>. Si les deux sont remplis, <strong><code>.C</code></strong>.</p>
+<p><em>Étape 3 — écrire l'interface <code>.C</code>.</em> La fonction C est <strong><code>void</code></strong> — <em>« <strong>the compiled code should not return anything except through its arguments</strong> »</em>. Les types suivent <strong>la table du §5.2</strong> : <code>double *</code> pour un <code>double</code>, <code>int *</code> pour un <code>integer</code> <strong>et</strong> pour un <code>logical</code>.</p>
+<p><em>Étape 4 — les précautions de <code>.C</code>.</em> <strong>Nommer les arguments</strong> (les noms deviennent ceux de la liste rendue), garder <strong><code>NAOK = FALSE</code></strong> sauf si le code C sait traiter <code>NA</code>/<code>NaN</code>/<code>Inf</code>, et <strong>toujours passer <code>PACKAGE</code></strong> — <em>« <strong>its use is highly desirable</strong> … <strong>such name clashes are normally sufficient to cause R to crash</strong> »</em>.</p>
+<p><em>Étape 5 — si <code>.C</code> ne suffit pas.</em> Listes, attributs, appels à R : c'est <strong><code>.Call</code></strong>. La signature devient <code>SEXP f(SEXP a, SEXP b)</code>, avec <code>R.h</code> et <code>Rinternals.h</code>.</p>
+<p><em>Étape 6 — les deux responsabilités nouvelles.</em>  <strong>Pas de copie</strong> : <em>« <strong>treat arguments you receive through these interfaces as read-only</strong> »</em>. Et  <strong>la protection</strong> : tout objet créé doit être **<code>PROTECT</code>**é, avec un <strong><code>UNPROTECT</code></strong> qui équilibre.</p>
+<p><em>Étape 7 — vérifier les types reçus.</em> <em>« <strong>Unless you are very sure about the type of the arguments, the code should check the data types</strong> »</em> — <code>Rf_isReal</code>, <code>Rf_isInteger</code>… puis <strong>coercer</strong> par <code>Rf_coerceVector</code> ( <strong>en protégeant</strong>, puisqu'un objet est créé) ou <strong>signaler</strong> par <code>Rf_error</code>.</p>
+<p><em>Étape 8 — enregistrer.</em> <code>R_registerRoutines</code> dans <code>R_init_&lt;dll&gt;</code> : <em>« <strong>a faster way to find the address</strong> … <strong>and a run-time check that the entry point is called with the right number of arguments</strong> »</em>.</p>
+<p><em>Étape 9 — ce qu'on perd.</em> Le débogueur de R <strong>ne descend pas</strong> dans le code compilé (fiche 317) : <em>« <strong>no access to the statements in that language is provided</strong> … <strong>A symbolic debugger such as <code>gdb</code> can be used</strong> »</em>. <strong>On échange de la vitesse contre de l'observabilité</strong> — raison de plus pour ne descendre en C <strong>qu'après</strong> avoir mesuré.</p>
+</div></details>
+
+<h2>Comment reconnaître le type d'exercice</h2>
+<table>
+<thead>
+<tr>
+<th>Le signal dans l'énoncé</th>
+<th>Ce qu'il faut mobiliser</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>« ma fonction R est trop lente »</td>
+<td> <strong>profiler d'abord</strong> (fiche 317)</td>
+</tr>
+<tr>
+<td>« faut-il passer en C ? »</td>
+<td><em>« <strong>if [R] is fast enough, this is normally the best option</strong> »</em></td>
+</tr>
+<tr>
+<td>« seulement des vecteurs, pas d'appel à R »</td>
+<td><strong><code>.C</code> suffit</strong></td>
+</tr>
+<tr>
+<td>« manipuler des listes, des attributs »</td>
+<td><strong><code>.Call</code></strong></td>
+</tr>
+<tr>
+<td>« un nombre d'arguments variable »</td>
+<td><strong><code>.External</code></strong> — <em>« a little more general »</em></td>
+</tr>
+<tr>
+<td>« quel type C pour un <code>logical</code> R ? »</td>
+<td><strong><code>int *</code></strong> — comme <code>integer</code></td>
+</tr>
+<tr>
+<td>« du code venu de S-PLUS »</td>
+<td> <strong><code>long *</code></strong> ne marche pas en 64 bits</td>
+</tr>
+<tr>
+<td>« passer une chaîne à Fortran »</td>
+<td> <strong>une seule</strong>, longueur fixe, <strong>déconseillé depuis 2019</strong></td>
+</tr>
+<tr>
+<td>« mes <code>NA</code> provoquent une erreur »</td>
+<td><strong><code>NAOK = TRUE</code></strong> — et les gérer côté C</td>
+</tr>
+<tr>
+<td>« R plante à l'appel »</td>
+<td> <strong><code>PACKAGE</code> manquant</strong> — collision de symboles</td>
+</tr>
+<tr>
+<td>« ma fonction C rend une valeur »</td>
+<td> avec <code>.C</code> elle doit être <strong><code>void</code></strong></td>
+</tr>
+<tr>
+<td>« mon objet a été modifié chez l'appelant »</td>
+<td><code>.Call</code> <strong>ne copie pas</strong></td>
+</tr>
+<tr>
+<td>« stack imbalance in .Call »</td>
+<td><strong><code>PROTECT</code>/<code>UNPROTECT</code> déséquilibrés</strong></td>
+</tr>
+<tr>
+<td>« mon objet disparaît en cours de route »</td>
+<td><strong>protection manquante</strong> après réassignation</td>
+</tr>
+<tr>
+<td>« la pile de protection est pleine »</td>
+<td><strong>10 000</strong> — ranger dans un objet, ou déprotéger tôt</td>
+</tr>
+<tr>
+<td>« vérifier le type d'un argument »</td>
+<td><strong><code>Rf_isReal</code></strong>, <code>Rf_isInteger</code>, …</td>
+</tr>
+<tr>
+<td>« convertir un <code>INTSXP</code> en <code>REALSXP</code> »</td>
+<td><strong><code>Rf_coerceVector</code></strong>, <strong>en protégeant</strong></td>
+</tr>
+<tr>
+<td>« signaler une erreur depuis C »</td>
+<td><strong><code>Rf_error</code></strong></td>
+</tr>
+<tr>
+<td>« accélérer la recherche du symbole »</td>
+<td><strong>enregistrer</strong> les routines</td>
+</tr>
+<tr>
+<td>« vérifier le nombre d'arguments »</td>
+<td><strong>enregistrement</strong> — contrôle <strong>à l'exécution</strong></td>
+</tr>
+<tr>
+<td>« déboguer mon code C »</td>
+<td> <strong><code>gdb</code></strong> — pas le débogueur de R</td>
+</tr>
+</tbody></table>
+<h2>Comment résoudre ce type d'exercice</h2>
+<p><strong>Protocole « faut-il descendre en C ? » — 4 étapes.</strong></p>
+<ol>
+<li><strong>Profiler</strong> — lire la colonne <strong><code>self</code></strong> (fiche 317).</li>
+<li>Chercher une écriture <strong>vectorisée</strong> ou « objet entier » (fiches 301, 305, 308).</li>
+<li>Si le C s'impose : <strong>vecteurs atomiques seuls et aucun appel à R</strong> → <strong><code>.C</code></strong> ; sinon <strong><code>.Call</code></strong>.</li>
+<li>Accepter la contrepartie : <strong>plus de responsabilités</strong>, et <strong>plus de débogueur R</strong>.</li>
+</ol>
+<p><strong>Protocole « écrire une interface <code>.C</code> sûre » — 4 étapes.</strong></p>
+<ol>
+<li>Respecter <strong>la table des types</strong> — et se souvenir que <code>int</code> fait <strong>32 bits partout</strong>.</li>
+<li>Fonction C <strong><code>void</code></strong> : le résultat sort <strong>par les arguments</strong>.</li>
+<li><strong>Nommer les arguments</strong> côté R : les noms deviennent ceux de la liste rendue.</li>
+<li><strong>Toujours <code>PACKAGE = "monpaquet"</code></strong>, et laisser <strong><code>NAOK = FALSE</code></strong> sauf besoin explicite.</li>
+</ol>
+<p><strong>Protocole « écrire une interface <code>.Call</code> sûre » — 5 étapes.</strong></p>
+<ol>
+<li>Inclure <strong><code>R.h</code></strong> et <strong><code>Rinternals.h</code></strong> ; signature <strong><code>SEXP f(SEXP …)</code></strong>.</li>
+<li><strong>Vérifier les types</strong> (<code>Rf_isReal</code>…), puis <strong>coercer</strong> ou <strong><code>Rf_error</code></strong>.</li>
+<li><strong><code>PROTECT</code></strong> tout objet créé — y compris le résultat d'un <strong><code>Rf_coerceVector</code></strong>.</li>
+<li><strong>Équilibrer</strong> par <code>UNPROTECT(n)</code> ; ne jamais laisser la pile grossir sans raison.</li>
+<li>Traiter les arguments reçus comme <strong>en lecture seule</strong>.</li>
+</ol>
+<h2 data-prio="must">Common mistakes</h2>
+<table>
+<thead>
+<tr>
+<th>Erreur</th>
+<th>Correction</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Passer en C sans avoir profilé</td>
+<td><em>« <strong>if this is fast enough, this is normally the best option</strong> »</em></td>
+</tr>
+<tr>
+<td>Choisir <code>.Call</code> quand <code>.C</code> suffit</td>
+<td><em>« <strong>greater responsibilities</strong> »</em></td>
+</tr>
+<tr>
+<td>Utiliser <code>long *</code> pour un entier</td>
+<td> <strong><code>int</code> est 32 bits sur toutes les plateformes</strong></td>
+</tr>
+<tr>
+<td>Croire que « ça marche chez moi » suffit</td>
+<td><em>« <strong>it may appear to work on some</strong> »</em></td>
+</tr>
+<tr>
+<td>Retourner une valeur depuis une fonction <code>.C</code></td>
+<td>elle doit être <strong><code>void</code></strong></td>
+</tr>
+<tr>
+<td>Omettre <code>PACKAGE</code></td>
+<td> <em>« <strong>sufficient to cause R to crash</strong> »</em></td>
+</tr>
+<tr>
+<td>Laisser <code>NAOK = TRUE</code> sans gérer les <code>NA</code></td>
+<td>les valeurs spéciales passent <strong>non vérifiées</strong></td>
+</tr>
+<tr>
+<td>Passer plusieurs chaînes à Fortran</td>
+<td><strong>une seule</strong>, et <strong>déconseillé depuis 2019</strong></td>
+</tr>
+<tr>
+<td>Modifier un argument reçu par <code>.Call</code></td>
+<td> <strong>lecture seule</strong> — il n'est <strong>pas copié</strong></td>
+</tr>
+<tr>
+<td>Croire <code>PROTECT(p)</code> protéger <code>p</code> durablement</td>
+<td> <strong>c'est l'objet, pas le pointeur</strong></td>
+</tr>
+<tr>
+<td>Oublier d'équilibrer <code>UNPROTECT</code></td>
+<td><em>« <strong>stack imbalance in <code>.Call</code></strong> »</em></td>
+</tr>
+<tr>
+<td>Tout protéger et tout déprotéger à la fin</td>
+<td> la pile fait <strong>10 000</strong> places</td>
+</tr>
+<tr>
+<td>Oublier de protéger le résultat d'une coercition</td>
+<td><strong>un nouvel objet est créé</strong></td>
+</tr>
+<tr>
+<td>Ne pas vérifier le type des arguments</td>
+<td><em>« <strong>the code should check the data types</strong> »</em></td>
+</tr>
+<tr>
+<td>Renvoyer un type interne (<code>LANGSXP</code>, <code>PROMSXP</code>…)</td>
+<td> <em>« <strong>it is unsafe to do so</strong> »</em></td>
+</tr>
+<tr>
+<td>Accéder aux champs d'un <code>SEXPREC</code></td>
+<td> <em>« <strong><code>SEXP</code> is an opaque pointer</strong> »</em></td>
+</tr>
+<tr>
+<td>Ne pas enregistrer ses routines</td>
+<td>on perd <strong>la vitesse</strong> et <strong>le contrôle des arguments</strong></td>
+</tr>
+<tr>
+<td>Compter sur le débogueur de R dans le C</td>
+<td>il faut <strong><code>gdb</code></strong></td>
+</tr>
+</tbody></table>
+<h2>Ultimate Review</h2>
+<p class="cal piege"><strong> L'ordre des choix.</strong> <em>« <strong>Before you decide to use <code>.Call</code> or <code>.External</code>, you should look at other alternatives. First, consider working in interpreted R code ; if this is fast enough, this is normally the best option. You should also see if using <code>.C</code> is enough. If the task to be performed in C is simple enough involving only atomic vectors and requiring no call to R, <code>.C</code> suffices.</strong> … <strong>These interfaces allow much more control, but they also impose much greater responsibilities.</strong> »</em></p>
+<p><strong>Le préfixe.</strong> <em>« <strong>Many of the functions … have entry-point names with a <code>Rf_</code> prefix : if they are called from C code … that prefix can be omitted. Users are encouraged to use the prefix when writing new C code.</strong> »</em></p>
+<p><strong>Accès au système.</strong> <strong><code>system</code></strong>, <strong><code>system2</code></strong> ; <em>« <strong>not necessarily by a shell</strong> »</em> ; <strong><code>shell</code></strong> sous Windows ; <strong><code>system.time</code></strong> pour chronométrer —  <em>« <strong>Timing on child processes is only available on Unix-alikes, and may not be reliable there</strong> »</em>.</p>
+<p><strong><code>.C</code> et <code>.Fortran</code>.</strong> Premier argument : <strong>le nom du symbole</strong> (testable par <code>is.loaded</code>) · <strong>jusqu'à 65</strong> arguments ·  <strong>copiés à l'aller et au retour</strong> dans une liste ; <strong>les noms donnés deviennent ceux des composantes</strong> · fonction C <strong><code>void</code></strong>, sous-programme Fortran <strong><code>subroutine</code></strong> · <strong>table des types</strong> : <code>logical</code>/<code>integer</code> → <strong><code>int *</code></strong> / <code>INTEGER</code>, <code>double</code> → <strong><code>double *</code></strong> / <code>DOUBLE PRECISION</code>, <code>complex</code> → <strong><code>Rcomplex *</code></strong> / <code>DOUBLE COMPLEX</code>, <code>character</code> → <strong><code>char **</code></strong> / <code>CHARACTER(255)</code>, <code>raw</code> → <strong><code>unsigned char *</code></strong> / <em>rien</em> ·  <strong><code>int</code> et <code>INTEGER</code> font 32 bits partout</strong> · logiques envoyés comme <strong>0</strong>, <strong>1</strong> ou <strong><code>INT_MIN</code></strong> · <strong><code>NAOK</code></strong> : sinon <code>NA</code>, <code>NaN</code>, <code>Inf</code>, <code>-Inf</code> <strong>provoquent une erreur</strong> ·  <strong><code>PACKAGE</code></strong> — <em>« <strong>its use is highly desirable</strong> … <strong>name clashes are normally sufficient to cause R to crash</strong> »</em> · <strong><code>Csingle</code></strong> pour passer des <code>float</code>.</p>
+<p><strong><code>.Call</code> et <code>.External</code>.</strong> <code>.Call("f", a, b)</code> → <strong><code>SEXP f(SEXP a, SEXP b)</code></strong>, jusqu'à <strong>65</strong> objets, <em>« <strong>simpler to use</strong> »</em> · <code>.External("f", a, b)</code> → <strong><code>SEXP f(SEXP args)</code></strong>, <code>args</code> étant <strong>un <code>LISTSXP</code></strong>, <em>« <strong>a little more general</strong> »</em> · en-têtes <strong><code>R.h</code></strong> et <strong><code>Rinternals.h</code></strong> ·  <em>« <strong>Neither <code>.Call</code> nor <code>.External</code> copy their arguments : you should treat arguments you receive through these interfaces as read-only.</strong> »</em></p>
+<p><strong><code>SEXP</code>.</strong> <em>« <strong>a pointer to a structure with <code>typedef SEXPREC</code></strong> … <strong>a variant type that can handle all the usual types of R objects</strong> »</em> — <em>« <strong>S imple EXP ression</strong> »</em> ·  <em>« <strong><code>SEXP</code> is an opaque pointer, and the internals can only be accessed by the functions provided</strong> »</em> · un nœud : <strong>en-tête <code>sxpinfo</code> de 64 bits</strong> + <strong>trois pointeurs</strong> (attributs, précédent, suivant) ; <strong>32 octets</strong> en 32 bits, <strong>~56</strong> en 64 bits · <strong>les cinq premiers bits</strong> donnent le <code>SEXPTYPE</code>, parmi <strong>32</strong> possibles.</p>
+<p><strong><code>SEXPTYPE</code>.</strong> <code>REALSXP</code> <code>INTSXP</code> <code>CPLXSXP</code> <code>LGLSXP</code> <code>STRSXP</code> (atomiques) · <strong><code>VECSXP</code></strong> = liste · <strong><code>LISTSXP</code></strong> = pairlist · <code>DOTSXP</code> · <code>NILSXP</code> · <code>SYMSXP</code> · <strong><code>CLOSXP</code></strong> · <code>ENVSXP</code> · internes : <code>LANGSXP</code>, <code>CHARSXP</code>, <code>PROMSXP</code> —  <em>« <strong>it is unsafe</strong> »</em> d'en renvoyer · numéros <strong>0-10 et 13-25</strong>,  <strong>11 et 12 retirés</strong> (facteurs internes) et <em>« <strong>the gap cannot easily be reused</strong> »</em>.</p>
+<p><strong>Vérifier et convertir.</strong> <em>« <strong>Unless you are very sure about the type of the arguments, the code should check the data types</strong> »</em> — <strong><code>Rf_isReal</code>, <code>Rf_isInteger</code>, <code>Rf_isString</code>, <code>Rf_isNull</code>, <code>Rf_isSymbol</code>, <code>Rf_isLogical</code>, <code>Rf_isComplex</code>, <code>Rf_isExpression</code>, <code>Rf_isEnvironment</code></strong> · <strong><code>Rf_error</code></strong> pour signaler · <strong><code>Rf_coerceVector</code></strong> pour convertir —  <strong>à protéger</strong>, un objet est créé · <em>« <strong>All the coercion functions do their own error-checking</strong> »</em>.</p>
+<p><strong><code>PROTECT</code>.</strong> <em>« <strong>If you create an R object in your C code, you must tell R that you are using the object by using the <code>PROTECT</code> macro</strong> »</em> ·  <em>« <strong>it is the object which is protected, not the pointer variable</strong> … <strong>a common mistake</strong> »</em> · <em>« <strong>Protecting an R object automatically protects all the R objects pointed to</strong> »</em> · pile <strong>LIFO</strong> : <code>UNPROTECT(n)</code> dépile les <strong>n derniers</strong> · <em>« <strong>The calls … must balance</strong> … <strong>R will warn about "stack imbalance in <code>.Call</code>"</strong> »</em> ·  <strong>taille fixe, 10 000 par défaut</strong> — <em>« <strong>not a good idea then to just <code>PROTECT</code> everything in sight</strong> »</em> ; les deux issues : <strong>ranger dans un autre objet</strong> ou <strong>déprotéger aussitôt</strong> · macros rares : <strong><code>UNPROTECT_PTR</code></strong> ( <strong>dangereuse</strong>, supplantée par <code>R_PreserveInMSet</code>/<code>R_ReleaseFromMSet</code>) et <strong><code>PROTECT_WITH_INDEX</code></strong>.</p>
+<p><strong>Le raisonnement de la protection.</strong> <em>« <strong>we do not know (nor want to know) what is hiding behind the R macros and functions we use, and any of them might cause memory to be allocated, hence garbage collection</strong> … <strong>It is usually wise to err on the side of caution.</strong> »</em></p>
+<p><strong>Enregistrement.</strong> <em>« <strong>By "native" routine, we mean an entry point in compiled code.</strong> »</em> · <strong>deux avantages</strong> : <em>« <strong>a faster way to find the address of the entry point</strong> … <strong>and a run-time check that the entry point is called with the right number of arguments and, optionally, the right argument types</strong> »</em> · <strong><code>R_registerRoutines</code></strong> dans <strong><code>R_init_&lt;dll&gt;</code></strong>, <strong>cinq arguments</strong> : le <code>DllInfo</code>, puis <strong>quatre tableaux terminés par <code>NULL</code></strong> — <strong><code>R_CMethodDef</code></strong>, <strong><code>R_CallMethodDef</code></strong>, <strong><code>R_FortranMethodDef</code></strong>, <strong><code>R_ExternalMethodDef</code></strong> — chacun donnant <strong>le nom, un pointeur vers le symbole, le nombre d'arguments</strong>.</p>
+<div class="rec"><h2>Active Recall</h2><details class="cor">
+<summary>Dans quel ordre faut-il envisager les solutions avant d'écrire du C ?</summary><div class="in">
+
+<p class="cal piege"> <em>« <strong>Before you decide to use <code>.Call</code> or <code>.External</code>, you should look at other alternatives. First, consider working in interpreted R code ; if this is fast enough, this is normally the best option. You should also see if using <code>.C</code> is enough. If the task to be performed in C is simple enough involving only atomic vectors and requiring no call to R, <code>.C</code> suffices.</strong> … <strong>These interfaces allow much more control, but they also impose much greater responsibilities so need to be used with care.</strong> »</em> (§5.9)</p>
+<p><strong>Trois marches</strong> : R interprété — <em>« normally the best option »</em> —, puis <code>.C</code>, puis <code>.Call</code>.</p>
+<p><strong>Et une étape zéro</strong>, donnée par la fiche 317 : <strong>profiler</strong>. Le §3.2 présente le profilage comme le moyen d'<em>« identify … pieces of R code that could benefit from being replaced by compiled code »</em>. Optimiser sans mesurer, c'est optimiser au hasard.</p>
+</div></details><details class="cor">
+<summary>Donner la table de correspondance des types entre R, C et Fortran.</summary><div class="in">
+
+<table>
+<thead>
+<tr>
+<th>Mode R</th>
+<th>C</th>
+<th>Fortran</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>logical</code></td>
+<td><strong><code>int *</code></strong></td>
+<td><code>INTEGER</code></td>
+</tr>
+<tr>
+<td><code>integer</code></td>
+<td><strong><code>int *</code></strong></td>
+<td><code>INTEGER</code></td>
+</tr>
+<tr>
+<td><code>double</code></td>
+<td><strong><code>double *</code></strong></td>
+<td><code>DOUBLE PRECISION</code></td>
+</tr>
+<tr>
+<td><code>complex</code></td>
+<td><strong><code>Rcomplex *</code></strong></td>
+<td><code>DOUBLE COMPLEX</code></td>
+</tr>
+<tr>
+<td><code>character</code></td>
+<td><strong><code>char **</code></strong></td>
+<td><code>CHARACTER(255)</code></td>
+</tr>
+<tr>
+<td><code>raw</code></td>
+<td><strong><code>unsigned char *</code></strong></td>
+<td><em>aucun</em></td>
+</tr>
+</tbody></table>
+<p class="cal piege"> <em>« <strong>On all R platforms <code>int</code> and <code>INTEGER</code> are 32-bit. Code ported from S-PLUS (which uses <code>long *</code> for logical and integer) will not work on all 64-bit platforms (although it may appear to work on some).</strong> »</em> (§5.2)</p>
+<p><strong>Noter que <code>logical</code> et <code>integer</code> partagent <code>int *</code></strong> — c'est pourquoi les logiques circulent comme <strong>0</strong>, <strong>1</strong> ou <strong><code>INT_MIN</code></strong>.</p>
+</div></details><details class="cor">
+<summary>Comment un appel <code>.C</code> rend-il son résultat, et que deviennent les arguments ?</summary><div class="in">
+
+<p><em>«  <strong>Note that the compiled code should not return anything except through its arguments : C functions should be of type <code>void</code> and Fortran subprograms should be subroutines.</strong> »</em> (§5.2)</p>
+<p><em>« <strong>Normally these are copied before being passed in, and copied again to an R list object when the compiled code returns. If the arguments are given names, these are used as names for the components in the returned list object (but not passed to the compiled code).</strong> »</em></p>
+<p><strong>Le cycle complet</strong> : R <strong>copie</strong> les arguments → le C <strong>les modifie sur place</strong> → R <strong>recopie</strong> le tout dans <strong>une liste</strong>. Nommer les arguments côté R rend cette liste lisible.</p>
+<p><strong>C'est l'exact opposé de <code>.Call</code></strong>, où <em>« <strong>neither <code>.Call</code> nor <code>.External</code> copy their arguments</strong> »</em>.</p>
+</div></details><details class="cor">
+<summary>À quoi sert l'argument <code>PACKAGE</code>, et pourquoi son absence est-elle grave ?</summary><div class="in">
+
+<p><em>« <strong>Argument <code>PACKAGE</code> confines the search for the symbol name to a specific shared object</strong> (or use <code>"base"</code> for code compiled into R).  <strong>Its use is highly desirable, as there is no way to avoid two package writers using the same symbol name, and such name clashes are normally sufficient to cause R to crash.</strong> »</em> (§5.2)</p>
+<p><strong>Il n'y a aucun espace de noms au niveau des symboles compilés</strong> — contrairement au code R (fiche 315). Deux DLL exportant <code>convolve</code> sont indiscernables pour le chargeur dynamique.</p>
+<p><em>« If it is not present and the call is from the body of a function defined in a package namespace, <strong>the shared object loaded by the first (if any) <code>useDynLib</code> directive will be used</strong>. »</em></p>
+<p>Et <strong><code>R CMD check</code> le vérifie</strong> — point 10 de la fiche 319.</p>
+</div></details><details class="cor">
+<summary>Quelle est la différence entre <code>.Call</code> et <code>.External</code> côté C ?</summary><div class="in">
+
+<p><strong><code>.Call</code></strong> : <em>« The C side of the interface is <code>SEXP convolve2(SEXP a, SEXP b)</code> »</em> — <strong>un paramètre par objet</strong>, jusqu'à <strong>65</strong>.</p>
+<p><strong><code>.External</code></strong> : <em>« the C side of the interface is different, <strong>having only one argument</strong> : <code>SEXP convolveE(SEXP args)</code>. <strong>Here <code>args</code> is a <code>LISTSXP</code>, a Lisp-style pairlist from which the arguments can be extracted.</strong> »</em> (§5.9)</p>
+<p><em>« <strong>Generally the <code>.Call</code> interface is simpler to use, but <code>.External</code> is a little more general.</strong> »</em></p>
+<p><strong><code>.External</code> accepte un nombre quelconque d'arguments</strong> — il faut les extraire de la pairlist, ce qui est plus lourd mais plus souple.</p>
+<p>Les deux exigent <code>R.h</code> et <code>Rinternals.h</code>, et  <strong>aucun des deux ne copie ses arguments</strong>.</p>
+</div></details><details class="cor">
+<summary>Qu'est-ce qu'un <code>SEXP</code>, et que peut-on en faire ?</summary><div class="in">
+
+<p><em>« <strong>All the R objects you will deal with will be handled with the type <code>SEXP</code>, which is a pointer to a structure with <code>typedef SEXPREC</code>. Think of this structure as a variant type that can handle all the usual types of R objects.</strong> »</em> (§5.9) — <em>« <strong>S imple EXP ression</strong> »</em>.</p>
+<p><em>« <strong>Think rather of a model such as that used by Visual Basic, in which R objects are handed around in C code (as they are in interpreted R code) as the variant type, and the appropriate part is extracted … only when it is needed. As in interpreted R code, much use is made of coercion.</strong> »</em></p>
+<p class="cal piege"> Et <em>R Internals</em> §1.1 précise : <em>« <strong>the internal structure of the <code>SEXPREC</code> is not made available to R Extensions : rather <code>SEXP</code> is an opaque pointer, and the internals can only be accessed by the functions provided</strong> »</em>.</p>
+<p><strong>On ne lit pas les champs d'un <code>SEXPREC</code> : on passe par les macros et fonctions publiques</strong> de <code>Rinternals.h</code>.</p>
+</div></details><details class="cor">
+<summary>Quels sont les principaux <code>SEXPTYPE</code>, et que faut-il savoir du trou 11-12 ?</summary><div class="in">
+
+<table>
+<thead>
+<tr>
+<th><code>SEXPTYPE</code></th>
+<th>R</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>REALSXP</code> <code>INTSXP</code> <code>CPLXSXP</code> <code>LGLSXP</code> <code>STRSXP</code></td>
+<td>les <strong>vecteurs atomiques</strong></td>
+</tr>
+<tr>
+<td><strong><code>VECSXP</code></strong></td>
+<td>une <strong>liste</strong></td>
+</tr>
+<tr>
+<td><strong><code>LISTSXP</code></strong></td>
+<td>une <strong>pairlist</strong></td>
+</tr>
+<tr>
+<td><code>SYMSXP</code> · <code>CLOSXP</code> · <code>ENVSXP</code> · <code>NILSXP</code> · <code>DOTSXP</code></td>
+<td>symbole, fonction, environnement, <code>NULL</code>, <code>...</code></td>
+</tr>
+</tbody></table>
+<p><strong>C'est la table de <code>typeof()</code></strong> (fiche 303), vue du côté C.</p>
+<p class="cal piege"> <em>R Internals</em> §1.1.1 : <em>« <strong>Values 11 and 12 were used for internal factors and ordered factors and have since been withdrawn.</strong> <strong>Note that the <code>SEXPTYPE</code> numbers are stored in saved objects and that the ordering of the types is used, so the gap cannot easily be reused.</strong> »</em></p>
+<p><strong>Un trou dans la numérotation, gravé dans le format des fichiers sauvegardés</strong> — on ne peut pas le combler sans casser la lecture des anciens <code>.RData</code>.</p>
+<p>Et  <em>« <strong>although it is possible to return objects of internal types, it is unsafe to do so</strong> »</em>.</p>
+</div></details><details class="cor">
+<summary>Que fait exactement <code>PROTECT</code>, et quelle est l'erreur que le manuel qualifie de « fréquente » ?</summary><div class="in">
+
+<p><em>« <strong>If you create an R object in your C code, you must tell R that you are using the object by using the <code>PROTECT</code> macro on a pointer to the object. This tells R that the object is in use so it is not destroyed during garbage collection.</strong> »</em> (§5.9.1)</p>
+<p class="cal piege"> <strong>L'erreur nommée</strong> : <em>« <strong>Notice that it is the object which is protected, not the pointer variable. It is a common mistake to believe that if you invoked <code>PROTECT(p)</code> at some point then <code>p</code> is protected from then on, but that is not true once a new object is assigned to <code>p</code>.</strong> »</em></p>
+<p><code>PROTECT(p)</code> met à l'abri <strong>ce que <code>p</code> désigne à cet instant</strong>. Réassigner <code>p</code> laisse le <strong>nouvel</strong> objet sans protection — et l'ancien protégé pour rien.</p>
+<p><strong>Et la protection est transitive</strong> : <em>« <strong>Protecting an R object automatically protects all the R objects pointed to in the corresponding <code>SEXPREC</code></strong> — for example <strong>all elements of a protected list are automatically protected</strong>. »</em></p>
+</div></details><details class="cor">
+<summary>Pourquoi protéger un objet alors que « c'est juste notre code C qui tourne » ?</summary><div class="in">
+
+<p>Le manuel pose lui-même la question (§5.9.1) : <em>« the reader may ask <strong>how the R object could possibly get removed during those manipulations</strong>, as it is just our C code that is running. »</em></p>
+<p>Et il répond : <em>« <strong>As it happens, we can do without the protection in this example, but in general we do not know (nor want to know) what is hiding behind the R macros and functions we use, and any of them might cause memory to be allocated, hence garbage collection and hence our object <code>ab</code> to be removed.</strong> <strong>It is usually wise to err on the side of caution and assume that any of the R macros and functions might remove the object.</strong> »</em></p>
+<p><strong>C'est une règle de discipline, pas de nécessité locale.</strong> Une macro de <code>Rinternals.h</code> peut allouer ; allouer peut déclencher le ramasse-miettes ; le ramasse-miettes peut reprendre tout objet non protégé. <strong>On ne peut pas auditer chaque macro</strong> — donc on protège.</p>
+</div></details><details class="cor">
+<summary>Que se passe-t-il si les appels à <code>PROTECT</code> et <code>UNPROTECT</code> ne s'équilibrent pas ?</summary><div class="in">
+
+<p><em>« <strong>The programmer is solely responsible for housekeeping the calls to <code>PROTECT</code>.</strong> … <strong>The protection mechanism is stack-based, so <code>UNPROTECT(n)</code> unprotects the last <code>n</code> objects which were protected.</strong> <strong>The calls to <code>PROTECT</code> and <code>UNPROTECT</code> must balance when the user's code returns and should balance in all functions.</strong> <strong>R will warn about "stack imbalance in <code>.Call</code>" (or <code>.External</code>) if the housekeeping is wrong.</strong> »</em> (§5.9.1)</p>
+<p class="cal piege"> <strong>Et la pile est finie</strong> : <em>« <strong>The pointer protection stack has a fixed size (default 10,000) and can become full. It is not a good idea then to just <code>PROTECT</code> everything in sight and <code>UNPROTECT</code> several thousand objects at the end.</strong> »</em></p>
+<p><strong>Les deux issues données par le manuel</strong> : <em>« <strong>It will almost invariably be possible to either assign the objects as part of another object (which automatically protects them) or unprotect them immediately after use.</strong> »</em></p>
+</div></details><details class="cor">
+<summary>Comment vérifier et convertir le type d'un <code>SEXP</code> reçu ?</summary><div class="in">
+
+<p>*«  <strong>Unless you are very sure about the type of the arguments, the code should check the data types.</strong> <strong>You can use functions like <code>Rf_isReal</code>, <code>Rf_isInteger</code> and <code>Rf_isString</code></strong> … Other such functions include <strong><code>Rf_isNull</code>, <code>Rf_isSymbol</code>, <code>Rf_isLogical</code>, <code>Rf_isComplex</code>, <code>Rf_isExpression</code>, and <code>Rf_isEnvironment</code></strong>. <strong>All of these take a <code>SEXP</code> as argument and return 1 or 0.</strong> »* (§5.9.3)</p>
+<p><em>« <strong>Sometimes you have no other option except to generate an error. You can use the function <code>Rf_error</code> for this. It is usually better to coerce the object to the correct type.</strong> »</em></p>
+<pre><code class="language-c">newSexp = PROTECT(Rf_coerceVector(oldSexp, REALSXP));
+</code></pre>
+<p class="cal piege"> <em>« <strong>Protection is needed as a new object is created</strong> ; the object formerly pointed to by the <code>SEXP</code> is still protected but now unused. »</em></p>
+<p><em>« <strong>All the coercion functions do their own error-checking, and generate <code>NA</code>s with a warning or stop with an error as appropriate.</strong> »</em></p>
+</div></details><details class="cor">
+<summary>Quels sont les deux avantages d'enregistrer ses routines natives ?</summary><div class="in">
+
+<p><em>« <strong>Registering routines has two main advantages : it provides a faster way to find the address of the entry point via tables stored in the DLL at compilation time, and it provides a run-time check that the entry point is called with the right number of arguments and, optionally, the right argument types.</strong> »</em> (§5.4)</p>
+<p><strong>Le second est le plus important.</strong> Sans enregistrement, appeler une routine C avec le mauvais nombre d'arguments ne produit <strong>aucun message</strong> — seulement un comportement indéfini, souvent un plantage plus loin.</p>
+<p><strong>Comment</strong> : <em>« <strong>one calls the C routine <code>R_registerRoutines</code> … within the initialization routine <code>R_init_&lt;dll name&gt;</code></strong> »</em>, avec <strong>cinq arguments</strong> — le <code>DllInfo</code>, puis quatre tableaux terminés par <code>NULL</code> : <strong><code>R_CMethodDef</code></strong>, <strong><code>R_CallMethodDef</code></strong>, <strong><code>R_FortranMethodDef</code></strong>, <strong><code>R_ExternalMethodDef</code></strong>.</p>
+<p>Chaque entrée donne <em>« <strong>the name of the routine by which it can be accessed in R, a pointer to the actual native symbol, and the number of arguments</strong> »</em>.</p>
+</div></details><details class="cor">
+<summary>Que perd-on en passant au code compilé ?</summary><div class="in">
+
+<p><strong>Trois choses</strong>, réparties dans les fiches.</p>
+<ol>
+<li><strong>L'observabilité</strong> — fiche 317, §9 : <em>« <strong>The debugger provides access only to interpreted expressions. If a function calls a foreign language (such as C) then no access to the statements in that language is provided.</strong> <strong>A symbolic debugger such as <code>gdb</code> can be used to debug compiled code.</strong> »</em></li>
+<li><strong>La sécurité de la sémantique de copie</strong> — §5.9 : <em>« <strong>Neither <code>.Call</code> nor <code>.External</code> copy their arguments : you should treat arguments you receive through these interfaces as read-only.</strong> »</em> Une modification silencieuse touche l'objet de l'appelant.</li>
+<li><strong>La gestion automatique de la mémoire</strong> — §5.9.1 : <em>« <strong>The programmer is solely responsible for housekeeping the calls to <code>PROTECT</code>.</strong> »</em></li>
+</ol>
+<p>Le manuel résume : <em>« <strong>These interfaces allow much more control, but they also impose much greater responsibilities so need to be used with care.</strong> »</em></p>
+<p><strong>D'où la règle</strong> : ne descendre en C <strong>qu'après avoir profilé</strong> et constaté que R ne suffit pas.</p>
+</div></details></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h2>Flashcards</h2>
+<table>
+<thead>
+<tr>
+<th>Question</th>
+<th>Réponse</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Les quatre interfaces vers le code compilé ?</td>
+<td><strong><code>.C</code></strong> · <strong><code>.Fortran</code></strong> · <strong><code>.Call</code></strong> · <strong><code>.External</code></strong></td>
+</tr>
+<tr>
+<td>Que conseille le manuel avant tout ?</td>
+<td><strong>Rester en R interprété</strong> si c'est assez rapide</td>
+</tr>
+<tr>
+<td>Et avant cela ?</td>
+<td><strong>Profiler</strong> (fiche 317)</td>
+</tr>
+<tr>
+<td>Quand <code>.C</code> suffit-il ?</td>
+<td><strong>Vecteurs atomiques seuls</strong> et <strong>aucun appel à R</strong></td>
+</tr>
+<tr>
+<td>Que signifie le préfixe <code>Rf_</code> ?</td>
+<td>Le nom du point d'entrée ; <strong>omissible en C</strong>, recommandé</td>
+</tr>
+<tr>
+<td>Les fonctions d'accès au système ?</td>
+<td><strong><code>system</code></strong> et <strong><code>system2</code></strong></td>
+</tr>
+<tr>
+<td>Que peut-on supposer du premier argument ?</td>
+<td>Qu'il est <strong>passé pour exécution</strong>, pas forcément par un shell</td>
+</tr>
+<tr>
+<td>Sous Windows, pour un shell ?</td>
+<td><strong><code>shell</code></strong></td>
+</tr>
+<tr>
+<td>La fonction de chronométrage ?</td>
+<td><strong><code>system.time</code></strong></td>
+</tr>
+<tr>
+<td>Est-elle fiable sur les processus fils ?</td>
+<td> <strong>Unix seulement</strong>, et <em>« may not be reliable »</em></td>
+</tr>
+<tr>
+<td>Premier argument de <code>.C</code> ?</td>
+<td><strong>Le nom du symbole</strong>, en chaîne</td>
+</tr>
+<tr>
+<td>Comment tester qu'il est chargé ?</td>
+<td><strong><code>is.loaded("...")</code></strong></td>
+</tr>
+<tr>
+<td>Combien d'arguments au maximum ?</td>
+<td><strong>65</strong></td>
+</tr>
+<tr>
+<td>Les arguments sont-ils copiés avec <code>.C</code> ?</td>
+<td><strong>Oui</strong> — à l'aller <strong>et</strong> au retour</td>
+</tr>
+<tr>
+<td>Que deviennent les noms d'arguments ?</td>
+<td>Ceux des <strong>composantes de la liste rendue</strong></td>
+</tr>
+<tr>
+<td>Type C d'un <code>logical</code> R ?</td>
+<td><strong><code>int *</code></strong></td>
+</tr>
+<tr>
+<td>D'un <code>integer</code> ?</td>
+<td><strong><code>int *</code></strong> aussi</td>
+</tr>
+<tr>
+<td>D'un <code>double</code> ?</td>
+<td><strong><code>double *</code></strong></td>
+</tr>
+<tr>
+<td>D'un <code>complex</code> ?</td>
+<td><strong><code>Rcomplex *</code></strong></td>
+</tr>
+<tr>
+<td>D'un <code>raw</code> ?</td>
+<td><strong><code>unsigned char *</code></strong> — rien en Fortran</td>
+</tr>
+<tr>
+<td>Combien de bits fait <code>int</code> ?</td>
+<td><strong>32</strong>, sur toutes les plateformes</td>
+</tr>
+<tr>
+<td>Le piège du code venu de S-PLUS ?</td>
+<td>Il utilise <strong><code>long *</code></strong></td>
+</tr>
+<tr>
+<td>Où est défini <code>Rcomplex</code> ?</td>
+<td><strong><code>R_ext/Complex.h</code></strong></td>
+</tr>
+<tr>
+<td>Combien de chaînes peut-on passer à Fortran ?</td>
+<td><strong>Une seule</strong>, de longueur fixe</td>
+</tr>
+<tr>
+<td>Depuis quand est-ce déconseillé ?</td>
+<td><strong>2019</strong></td>
+</tr>
+<tr>
+<td>Comment une valeur logique circule-t-elle ?</td>
+<td><strong>0</strong>, <strong>1</strong>, ou <strong><code>INT_MIN</code></strong> pour <code>NA</code></td>
+</tr>
+<tr>
+<td>Que fait <code>NAOK = FALSE</code> ?</td>
+<td>Il <strong>rejette</strong> <code>NA</code>, <code>NaN</code>, <code>Inf</code>, <code>-Inf</code></td>
+</tr>
+<tr>
+<td>Que fait <code>Csingle</code> ?</td>
+<td>Il permet de passer des <strong><code>float</code></strong> / <code>REAL</code></td>
+</tr>
+<tr>
+<td>À quoi sert <code>PACKAGE</code> ?</td>
+<td>À <strong>restreindre la recherche</strong> du symbole</td>
+</tr>
+<tr>
+<td>Que dit le manuel de son usage ?</td>
+<td><em>« <strong>highly desirable</strong> »</em></td>
+</tr>
+<tr>
+<td>Que risque-t-on sans lui ?</td>
+<td><strong>Un plantage de R</strong></td>
+</tr>
+<tr>
+<td>Que se passe-t-il s'il est absent dans un paquet ?</td>
+<td>Le premier <strong><code>useDynLib</code></strong> est utilisé</td>
+</tr>
+<tr>
+<td>Comment une fonction <code>.C</code> rend-elle son résultat ?</td>
+<td><strong>Par ses arguments</strong> — elle est <strong><code>void</code></strong></td>
+</tr>
+<tr>
+<td>La signature C de <code>.Call</code> ?</td>
+<td><strong><code>SEXP f(SEXP a, SEXP b)</code></strong></td>
+</tr>
+<tr>
+<td>Celle de <code>.External</code> ?</td>
+<td><strong><code>SEXP f(SEXP args)</code></strong></td>
+</tr>
+<tr>
+<td>Qu'est-ce que <code>args</code> ?</td>
+<td>Un <strong><code>LISTSXP</code></strong> — une pairlist</td>
+</tr>
+<tr>
+<td>Laquelle est plus simple ?</td>
+<td><strong><code>.Call</code></strong></td>
+</tr>
+<tr>
+<td>Laquelle est plus générale ?</td>
+<td><strong><code>.External</code></strong></td>
+</tr>
+<tr>
+<td>Les deux en-têtes à inclure ?</td>
+<td><strong><code>R.h</code></strong> et <strong><code>Rinternals.h</code></strong></td>
+</tr>
+<tr>
+<td><code>.Call</code> copie-t-il ses arguments ?</td>
+<td> <strong>Non</strong></td>
+</tr>
+<tr>
+<td>Comment doit-on les traiter ?</td>
+<td>En <strong>lecture seule</strong></td>
+</tr>
+<tr>
+<td>Qu'est-ce qu'un <code>SEXP</code> ?</td>
+<td>Un <strong>pointeur</strong> vers un <code>SEXPREC</code></td>
+</tr>
+<tr>
+<td>Que signifie l'acronyme ?</td>
+<td><strong>S</strong>imple <strong>EXP</strong>ression</td>
+</tr>
+<tr>
+<td>Peut-on lire les champs d'un <code>SEXPREC</code> ?</td>
+<td> <strong>Non</strong> — pointeur <strong>opaque</strong></td>
+</tr>
+<tr>
+<td>De quoi est fait un nœud ?</td>
+<td>Un en-tête <strong><code>sxpinfo</code></strong> + <strong>trois pointeurs</strong></td>
+</tr>
+<tr>
+<td>Sa taille en 64 bits ?</td>
+<td>Environ <strong>56 octets</strong></td>
+</tr>
+<tr>
+<td>Combien de bits pour le type ?</td>
+<td>Les <strong>cinq premiers</strong> de <code>sxpinfo</code></td>
+</tr>
+<tr>
+<td>Combien de <code>SEXPTYPE</code> possibles ?</td>
+<td><strong>32</strong></td>
+</tr>
+<tr>
+<td>Le <code>SEXPTYPE</code> d'une liste ?</td>
+<td><strong><code>VECSXP</code></strong></td>
+</tr>
+<tr>
+<td>Celui d'une pairlist ?</td>
+<td><strong><code>LISTSXP</code></strong></td>
+</tr>
+<tr>
+<td>Celui d'une fonction ?</td>
+<td><strong><code>CLOSXP</code></strong></td>
+</tr>
+<tr>
+<td>Celui d'un environnement ?</td>
+<td><strong><code>ENVSXP</code></strong></td>
+</tr>
+<tr>
+<td>Celui d'un <code>numeric</code> ?</td>
+<td><strong><code>REALSXP</code></strong></td>
+</tr>
+<tr>
+<td>Celui d'un symbole ?</td>
+<td><strong><code>SYMSXP</code></strong></td>
+</tr>
+<tr>
+<td>Trois types internes ?</td>
+<td><code>LANGSXP</code> · <code>CHARSXP</code> · <code>PROMSXP</code></td>
+</tr>
+<tr>
+<td>Peut-on en renvoyer ?</td>
+<td> <em>« <strong>it is unsafe to do so</strong> »</em></td>
+</tr>
+<tr>
+<td>Quels numéros sont retirés ?</td>
+<td><strong>11 et 12</strong> — anciens facteurs internes</td>
+</tr>
+<tr>
+<td>Pourquoi ne peut-on les réutiliser ?</td>
+<td>Ils sont <strong>stockés dans les objets sauvegardés</strong></td>
+</tr>
+<tr>
+<td>Trois fonctions de test de type ?</td>
+<td><code>Rf_isReal</code> · <code>Rf_isInteger</code> · <code>Rf_isString</code></td>
+</tr>
+<tr>
+<td>Que rendent-elles ?</td>
+<td><strong>1 ou 0</strong></td>
+</tr>
+<tr>
+<td>Comment signaler une erreur depuis C ?</td>
+<td><strong><code>Rf_error</code></strong></td>
+</tr>
+<tr>
+<td>Comment convertir un objet ?</td>
+<td><strong><code>Rf_coerceVector</code></strong></td>
+</tr>
+<tr>
+<td>Faut-il le protéger ?</td>
+<td> <strong>Oui</strong> — un objet est <strong>créé</strong></td>
+</tr>
+<tr>
+<td>Que fait <code>PROTECT</code> ?</td>
+<td>Il met <strong>l'objet</strong> à l'abri du ramasse-miettes</td>
+</tr>
+<tr>
+<td>Protège-t-il le pointeur ?</td>
+<td> <strong>Non</strong> — <em>« a common mistake »</em></td>
+</tr>
+<tr>
+<td>La protection est-elle transitive ?</td>
+<td><strong>Oui</strong> — les éléments d'une liste protégée le sont</td>
+</tr>
+<tr>
+<td>Quel est le mécanisme de la pile ?</td>
+<td><strong>LIFO</strong> — <code>UNPROTECT(n)</code> dépile les n derniers</td>
+</tr>
+<tr>
+<td>Que se passe-t-il si le compte est faux ?</td>
+<td><em>« <strong>stack imbalance in <code>.Call</code></strong> »</em></td>
+</tr>
+<tr>
+<td>Quelle est la taille de la pile ?</td>
+<td><strong>10 000</strong> par défaut</td>
+</tr>
+<tr>
+<td>Les deux façons d'éviter de la saturer ?</td>
+<td><strong>Ranger dans un autre objet</strong> · <strong>déprotéger tôt</strong></td>
+</tr>
+<tr>
+<td>Que fait <code>UNPROTECT_PTR</code> ?</td>
+<td>Il déprotège un objet <strong>même hors du sommet</strong></td>
+</tr>
+<tr>
+<td>Est-ce recommandé ?</td>
+<td> <strong>Dangereux</strong> — supplanté par les multi-ensembles</td>
+</tr>
+<tr>
+<td>La macro pour un objet remplacé en route ?</td>
+<td><strong><code>PROTECT_WITH_INDEX</code></strong></td>
+</tr>
+<tr>
+<td>Qu'est-ce qu'une routine « native » ?</td>
+<td>Un <strong>point d'entrée dans du code compilé</strong></td>
+</tr>
+<tr>
+<td>Comment R la trouve-t-il par défaut ?</td>
+<td>Par le <strong>chargeur dynamique</strong> du système</td>
+</tr>
+<tr>
+<td>Les deux avantages de l'enregistrement ?</td>
+<td><strong>Plus rapide</strong> · <strong>vérification des arguments</strong></td>
+</tr>
+<tr>
+<td>Quelle fonction C l'effectue ?</td>
+<td><strong><code>R_registerRoutines</code></strong></td>
+</tr>
+<tr>
+<td>Où l'appeler ?</td>
+<td>Dans <strong><code>R_init_&lt;nom de la dll&gt;</code></strong></td>
+</tr>
+<tr>
+<td>Combien d'arguments prend-elle ?</td>
+<td><strong>Cinq</strong></td>
+</tr>
+<tr>
+<td>Quel est le premier ?</td>
+<td>L'objet <strong><code>DllInfo</code></strong></td>
+</tr>
+<tr>
+<td>Les quatre types de description ?</td>
+<td><code>R_CMethodDef</code> · <code>R_CallMethodDef</code> · <code>R_FortranMethodDef</code> · <code>R_ExternalMethodDef</code></td>
+</tr>
+<tr>
+<td>Que contient chaque entrée ?</td>
+<td><strong>Le nom</strong>, <strong>le pointeur</strong>, <strong>le nombre d'arguments</strong></td>
+</tr>
+<tr>
+<td>Comment se terminent ces tableaux ?</td>
+<td>Par <strong><code>NULL</code></strong></td>
+</tr>
+<tr>
+<td>Peut-on déboguer le C avec les outils de R ?</td>
+<td> <strong>Non</strong> — il faut <strong><code>gdb</code></strong></td>
+</tr>
+</tbody></table>
+</main>
+
+
+
+
+</body></html>

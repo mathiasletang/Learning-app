@@ -1,0 +1,2010 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fiche 94 — Estimer volatilités et corrélations : EWMA, GARCH(1,1) et maximum de vraisemblance</title>
+<script>
+window.MathJax={tex:{inlineMath:[["$","$"]],displayMath:[["$$","$$"]],processEscapes:true},
+ options:{skipHtmlTags:["script","noscript","style","textarea","pre","code"]},
+ svg:{fontCache:"global"},
+ startup:{pageReady:()=>MathJax.startup.defaultPageReady().then(()=>{document.body.classList.add("ready")})}};
+setTimeout(function(){document.body.classList.add("ready")},2500);
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+/* ============================================================
+   MathiasLearn — feuille de style des fiches
+   Reprise intégrale des tokens de 00_PARCOURS/*.html
+   + blocs pédagogiques (callouts, méthode, essentiels, recall)
+   ============================================================ */
+:root{--bg:#faf9f7;--card:#fff;--ink:#1a1a1a;--muted:#6b6b6b;--line:#e5e2dd;--accent:#8b5e34;
+ --hl:#fdf8ef;--ok:#2d7d4f;--okbg:#f0f7f3;--warn:#b3402f;--warnbg:#fdf3f1;--blue:#2f5d8b;--bluebg:#f1f5fa}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+ font:17px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;padding:0 16px 100px}
+.nav{position:sticky;top:0;background:rgba(250,249,247,.96);backdrop-filter:blur(8px);
+ border-bottom:1px solid var(--line);margin:0 -16px 30px;padding:11px 16px;z-index:50;
+ display:flex;gap:6px;flex-wrap:wrap;font-size:13px}
+.nav a{color:var(--muted);text-decoration:none;padding:4px 9px;border-radius:5px;white-space:nowrap}
+.nav a:hover{background:var(--line);color:var(--ink)}
+.nav a.on{background:var(--accent);color:#fff}
+main{max-width:780px;margin:0 auto}
+h1{font-size:31px;letter-spacing:-.02em;margin:.4em 0 .5em;line-height:1.25}
+h2{font-size:23px;margin:2.2em 0 .7em;padding-bottom:.3em;border-bottom:1px solid var(--line)}
+h3{font-size:19px;margin:1.9em 0 .5em;color:var(--accent)}
+h4{font-size:17px;margin:1.5em 0 .4em}
+p{margin:.8em 0} a{color:var(--accent)} hr{border:0;border-top:1px solid var(--line);margin:2.6em 0}
+table{border-collapse:collapse;width:100%;margin:1.3em 0;font-size:15.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+th{background:#f3f0eb;font-weight:600}
+tr:nth-child(even) td{background:#fcfbfa}
+code{font-family:"SF Mono",Menlo,Consolas,monospace;font-size:.88em;background:#f2efea;padding:2px 6px;border-radius:4px;overflow-wrap:break-word}
+pre{background:#f2efea;padding:14px 16px;border-radius:8px;overflow-x:auto}
+pre code{background:none;padding:0;white-space:pre}
+blockquote{border-left:3px solid var(--accent);background:var(--hl);margin:1.4em 0;padding:14px 20px;border-radius:0 8px 8px 0}
+blockquote p:first-child{margin-top:0} blockquote p:last-child{margin-bottom:0}
+ul,ol{padding-left:1.5em} li{margin:.35em 0} em{color:#4a4a4a}
+mjx-container[display="true"]{margin:1.1em 0!important;overflow-x:auto;overflow-y:hidden;padding:2px 0}
+mjx-container svg{max-width:100%}
+body:not(.ready) main{opacity:0} main{opacity:1;transition:opacity .25s}
+
+/* --- bandeau de tête de fiche --- */
+.cours{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--accent);
+ border-radius:0 10px 10px 0;padding:18px 22px;margin:0 0 34px}
+.cours h4{margin:0 0 4px;font-size:14px;text-transform:uppercase;letter-spacing:.07em;color:var(--accent)}
+.cours .cs{color:var(--muted);font-size:14.5px;margin:0 0 14px}
+
+/* --- exercices / corrigés --- */
+.ex{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:6px 24px 20px;margin:18px 0}
+.ex>h3:first-child{margin-top:14px}
+details.cor{margin-top:18px;border:1px solid var(--line);border-radius:8px;background:#fcfbfa;overflow:hidden}
+details.cor>summary{cursor:pointer;padding:12px 16px;font-weight:600;font-size:15px;color:var(--accent);
+ list-style:none;display:flex;align-items:center;gap:9px;user-select:none;transition:.15s;min-height:44px}
+details.cor>summary::-webkit-details-marker{display:none}
+details.cor>summary:hover{background:var(--hl)}
+details.cor>summary::before{content:"\25B6";font-size:10px;transition:transform .18s;display:inline-block}
+details.cor[open]>summary::before{transform:rotate(90deg)}
+details.cor[open]>summary{background:var(--okbg);color:var(--ok);border-bottom:1px solid var(--line)}
+.cor .in{padding:4px 20px 16px}
+.cor .in>*:first-child{margin-top:.9em}
+
+/* --- blocs pédagogiques (callouts) ---
+   Générés depuis une citation Markdown dont le premier **gras** commence
+   par un mot-clé : DÉFINITION, THÉORÈME, MÉTHODE, PIÈGE, INTUITION… */
+.cal{border:1px solid var(--line);border-left:4px solid var(--accent);background:var(--card);
+ border-radius:0 10px 10px 0;padding:15px 20px;margin:1.5em 0}
+.cal>p:first-child{margin-top:0}.cal>p:last-child,.cal>ul:last-child,.cal>ol:last-child{margin-bottom:0}
+.cal .lab{display:block;font-size:12.5px;text-transform:uppercase;letter-spacing:.08em;
+ font-weight:700;color:var(--accent);margin-bottom:6px}
+.cal.formel{background:var(--hl)}
+.cal.piege{border-left-color:var(--warn);background:var(--warnbg)}
+.cal.piege .lab{color:var(--warn)}
+.cal.methode{border-left-color:var(--ok);background:var(--okbg)}
+.cal.methode .lab{color:var(--ok)}
+.cal.intu{border-left-color:var(--blue);background:var(--bluebg)}
+.cal.intu .lab{color:var(--blue)}
+.cal.plus{border-left-style:dashed;background:#faf9f7}
+.cal.plus .lab{color:var(--muted)}
+
+/* --- révision express --- */
+.ess{background:var(--card);border:1px solid var(--accent);border-radius:10px;padding:4px 24px 20px;margin:1.6em 0}
+.ess h3{margin-top:1.3em}
+.rec{background:var(--card);border:1px dashed var(--accent);border-radius:10px;padding:4px 24px 18px;margin:1.6em 0}
+.rec ol{counter-reset:none}
+
+/* --- impression / PDF --- */
+@media print{
+ .nav{display:none}
+ body{padding:0;background:#fff;font-size:11.2pt;line-height:1.55}
+ main{max-width:none}
+ h1{font-size:23pt}h2{font-size:15pt;margin-top:1.5em}h3{font-size:12.6pt}
+ h2,h3,h4{break-after:avoid;page-break-after:avoid}
+ table,.cal,blockquote{break-inside:avoid;page-break-inside:avoid}
+ table{display:table;font-size:9.6pt}
+ details.cor{border:1px solid var(--line);background:#fcfbfa}
+ details.cor>summary{display:none}
+ details.cor .in{padding-top:10px}
+ .cal,.ex,.ess,.rec{box-shadow:none}
+ a{color:var(--ink);text-decoration:none}
+}
+@page{margin:16mm 15mm 18mm}
+
+/* --- exemples travaillés --- */
+.exm{background:#fcfbfa;border:1px solid var(--line);border-radius:10px;padding:2px 20px 14px;margin:1.5em 0}
+.exm>h4:first-child{margin:14px 0 .5em;color:var(--accent);font-size:13px;text-transform:uppercase;letter-spacing:.07em}
+
+
+/* --- pastilles de priorité (conventions des fiches de l'app) --- */
+h2[data-prio], h3[data-prio], h4[data-prio]{position:relative}
+h2[data-prio]::before,h3[data-prio]::before,h4[data-prio]::before{
+ content:"";display:inline-block;width:9px;height:9px;border-radius:50%;
+ margin-right:9px;vertical-align:middle;background:var(--muted)}
+[data-prio="must"]::before{background:var(--warn)}
+[data-prio="high"]::before{background:#d98324}
+[data-prio="mid"]::before{background:#c9a227}
+[data-prio="low"]::before{background:var(--ok)}
+/* corrigés des fiches de l'app : même traitement que les corrigés des séries */
+details.cor>summary::after{content:""}
+</style></head><body>
+<div class="nav"><a href="00_COMMENCER_ICI.html">Commencer ici</a><a href="01_NOTATIONS_le-decodeur.html">Notations</a><a href="02_EXERCICES_Serie-0.html">Série 0 — Remise en route</a><a href="03_EXERCICES_Serie-1.html">Série 1 — Convexité</a><a href="04_EXERCICES_Serie-2.html">Série 2 — KKT</a><a href="05_AUTO-EVALUATION.html">Auto-évaluation (quiz)</a><a href="06_FICHE_Optimisation-deux-variables.html">Fiche — Optimisation à 2 variables</a></div>
+<main><h1>Fiche 94 — Estimer volatilités et corrélations : EWMA, GARCH(1,1) et maximum de vraisemblance</h1>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Matière</strong></td>
+<td>Maths · Finance de marché · Économétrie</td>
+</tr>
+<tr>
+<td><strong>Cours source</strong></td>
+<td>John C. Hull, <em>Options, Futures, and Other Derivatives</em>, 8ᵉ éd., Pearson — chapitre 22 « Estimating Volatilities and Correlations »</td>
+</tr>
+<tr>
+<td><strong>Difficulté</strong></td>
+<td> Must know — le moteur d'estimation derrière toute VaR et tout modèle de volatilité</td>
+</tr>
+<tr>
+<td><strong>Temps d'étude estimé</strong></td>
+<td>1 h 50</td>
+</tr>
+<tr>
+<td><strong>Prérequis</strong></td>
+<td>Fiche 93 (VaR de Hull), fiche 87 (Black-Scholes), fiche 91 (smiles) — complémentaire de la fiche 53 (modélisation de la volatilité, ARCH/GARCH côté séries temporelles)</td>
+</tr>
+<tr>
+<td><strong>Concepts clés</strong></td>
+<td>Taux de variance, schémas de pondération, ARCH($m$), EWMA, RiskMetrics, GARCH(1,1), retour à la moyenne, maximum de vraisemblance, <em>variance targeting</em>, autocorrélation, statistique de Ljung-Box, prévision de variance, structure par terme de volatilité, mise à jour des covariances, matrice semi-définie positive</td>
+</tr>
+<tr>
+<td><strong>Poids à l'examen</strong></td>
+<td>La <strong>mise à jour EWMA</strong> $\sigma_n^2=\lambda\sigma_{n-1}^2+(1-\lambda)u_{n-1}^2$ · la <strong>décomposition</strong> $\omega=\gamma V_L$, $\gamma=1-\alpha-\beta$ · la <strong>prévision</strong> $E[\sigma_{n+t}^2]=V_L+(\alpha+\beta)^t(\sigma_n^2-V_L)$ · la <strong>fonction de log-vraisemblance</strong> $\sum[-\ln v_i-u_i^2/v_i]$.</td>
+</tr>
+</tbody></table>
+<h2>Vue d'ensemble</h2>
+<pre><code>LE FIL DU CHAPITRE   les volatilités et corrélations NE SONT PAS CONSTANTES : on les traque
+
+u_i = (S_i − S_{i−1})/S_{i−1}          σ_n² = TAUX DE VARIANCE du jour n, estimé fin j. n−1
+
+ÉQUIPONDÉRÉ   σ_n² = (1/m) Σ u²_{n−i}                        aucun poids récent
+ARCH(m)       σ_n² = ω + Σ αᵢ u²_{n−i}                       ω = γV_L
+EWMA          σ_n² = λσ²_{n−1} + (1−λ) u²_{n−1}              RiskMetrics : λ = 0,94
+GARCH(1,1)    σ_n² = ω + α u²_{n−1} + β σ²_{n−1}             α+β&lt;1  γ = 1−α−β  V_L = ω/γ
+
+EWMA = GARCH(1,1) avec ω = 0, α = 1−λ, β = λ   →   PAS de retour à la moyenne
+
+ESTIMATION    maximiser  Σ [ −ln(v_i) − u_i²/v_i ]           recherche itérative (Solver)
+DIAGNOSTIC    autocorrélations de u²/σ² ≈ 0 · Ljung-Box &lt; 25 pour K = 15
+PRÉVISION     E[σ²_{n+t}] = V_L + (α+β)^t (σ_n² − V_L)       a = ln[1/(α+β)]
+COVARIANCES   même modèle, même λ → matrice SEMI-DÉFINIE POSITIVE : wᵀΩw ≥ 0
+</code></pre>
+<p><strong>Le cadrage d'ouverture.</strong> <em>Ce chapitre est pertinent <strong>à la fois</strong> pour le calcul de la VaR par l'approche modèle <strong>et</strong> pour la valorisation de dérivés. Quand on calcule une VaR, on s'intéresse surtout aux <strong>niveaux COURANTS</strong> des volatilités et corrélations, parce qu'on évalue les changements possibles de valeur d'un portefeuille sur une <strong>très courte</strong> période. Quand on valorise un dérivé, ce sont des <strong>PRÉVISIONS</strong> sur toute la durée de vie du dérivé qui sont requises.</em></p>
+<p><em>Les modèles portent des noms imposants — <strong>EWMA</strong> (<em>exponentially weighted moving average</em>), <strong>ARCH</strong> (<em>autoregressive conditional heteroscedasticity</em>), <strong>GARCH</strong> (<em>generalized</em> ARCH). <strong>Leur trait distinctif est qu'ils reconnaissent que les volatilités et corrélations ne sont PAS constantes.</strong> Pendant certaines périodes une volatilité peut être relativement faible, pendant d'autres relativement élevée. Les modèles tentent de <strong>suivre ces variations dans le temps</strong>.</em></p>
+<h2 data-prio="must">Concept 1 — Le taux de variance et les schémas de pondération</h2>
+<h3>1.1 Les définitions</h3>
+<p>$$\boxed{\sigma_n=\text{volatilité de la variable de marché le jour }n\textbf{, estimée à la FIN du jour }n-1}$$
+$$\boxed{\sigma_n^2=\text{le TAUX DE VARIANCE (\textit{variance rate}) du jour }n}$$</p>
+<p>L'estimateur <strong>non biaisé</strong> classique, à partir des $m$ observations les plus récentes :</p>
+<p>$$\sigma_n^2=\frac{1}{m-1}\sum_{i=1}^{m}(u_{n-i}-\bar u)^2\;\text{(22.1)}\qquad\text{avec}\qquad u_i=\ln\frac{S_i}{S_{i-1}}\ \text{ et }\ \bar u=\frac1m\sum_{i=1}^{m}u_{n-i}$$</p>
+<p><strong>Les trois modifications faites pour le suivi quotidien</strong> :</p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Modification</th>
+<th>Justification donnée par Hull</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>1</strong></td>
+<td>$u_i$ devient la <strong>variation en pourcentage</strong> : $\boxed{u_i=\dfrac{S_i-S_{i-1}}{S_{i-1}}}\;\text{(22.2)}$</td>
+<td>cohérent avec la définition de la volatilité <strong>pour les calculs de VaR</strong> (§21.3)</td>
+</tr>
+<tr>
+<td><strong>2</strong></td>
+<td>$\bar u$ est supposée <strong>nulle</strong></td>
+<td>la variation espérée en un jour est <strong>très petite</strong> devant l'écart-type des variations</td>
+</tr>
+<tr>
+<td><strong>3</strong></td>
+<td>$m-1$ est remplacé par $m$</td>
+<td>on passe d'un estimateur <strong>non biaisé</strong> à l'estimateur du <strong>maximum de vraisemblance</strong></td>
+</tr>
+</tbody></table>
+<p>$$\boxed{\sigma_n^2=\frac1m\sum_{i=1}^{m}u_{n-i}^2}\;\text{(22.3)}$$</p>
+<blockquote>
+<p class="cal piege"> <em><strong>Ces trois changements font très peu de différence sur les estimations calculées, mais ils permettent de simplifier la formule.</strong></em></p>
+</blockquote>
+<p class="cal piege"> <strong>La note de bas de page à ne pas manquer — les indices changent de sens entre les chapitres 21 et 22.</strong> <em>Les $u$ de ce chapitre jouent le même rôle que les $\Delta x$ du chapitre 21 : ce sont des variations quotidiennes en pourcentage. Mais <strong>pour les $u$, les indices comptent des observations faites des JOURS DIFFÉRENTS sur la MÊME variable de marché</strong> ; <strong>pour les $\Delta x$, ils comptent des observations faites le MÊME jour sur des variables DIFFÉRENTES</strong>. L'usage des indices de $\sigma$ diffère de la même façon : ici ils désignent des <strong>jours</strong>, au chapitre 21 des <strong>variables de marché</strong>.</em></p>
+<h3>1.2 De la pondération égale à ARCH($m$)</h3>
+<p>L'équation (22.3) donne <strong>un poids égal</strong> à $u_{n-1}^2,u_{n-2}^2,\dots,u_{n-m}^2$. <em>Notre objectif étant d'estimer le niveau <strong>courant</strong> de volatilité, il est logique de <strong>donner plus de poids aux données récentes</strong> :</em></p>
+<p>$$\boxed{\sigma_n^2=\sum_{i=1}^{m}\alpha_i\,u_{n-i}^2}\;\text{(22.4)}\qquad\text{avec }\alpha_i&gt;0,\ \ \alpha_i&lt;\alpha_j\text{ si }i&gt;j,\ \ \sum_{i=1}^{m}\alpha_i=1$$</p>
+<p><strong>L'extension : donner du poids à une variance de long terme.</strong></p>
+<p>$$\boxed{\sigma_n^2=\gamma V_L+\sum_{i=1}^{m}\alpha_i\,u_{n-i}^2}\;\text{(22.5)}\qquad\text{avec}\qquad\gamma+\sum_{i=1}^{m}\alpha_i=1$$</p>
+<p>où $V_L$ est le <strong>taux de variance de long terme</strong> et $\gamma$ le poids qui lui est assigné. <strong>C'est le modèle ARCH($m$)</strong>, proposé pour la première fois par <strong>Engle</strong> (Econometrica, 1982, sur l'inflation britannique). <em>L'estimation de la variance est fondée sur une variance moyenne de long terme <strong>et</strong> $m$ observations : <strong>plus une observation est ancienne, moins elle reçoit de poids</strong>.</em></p>
+<p>En posant $\boxed{\omega=\gamma V_L}$ :</p>
+<p>$$\boxed{\sigma_n^2=\omega+\sum_{i=1}^{m}\alpha_i\,u_{n-i}^2}\;\text{(22.6)}$$</p>
+<h2 data-prio="must">Concept 2 — Le modèle EWMA</h2>
+<h3>2.1 La formule et sa dérivation</h3>
+<p>L'EWMA est le cas particulier de (22.4) où les poids <strong>décroissent exponentiellement</strong> en remontant le temps : $\alpha_{i+1}=\lambda\alpha_i$, avec $\lambda$ constante entre 0 et 1. Ce schéma conduit à une formule de mise à jour <strong>particulièrement simple</strong> :</p>
+<p>$$\boxed{\sigma_n^2=\lambda\,\sigma_{n-1}^2+(1-\lambda)\,u_{n-1}^2}\;\text{(22.7)}$$</p>
+<p>*L'estimation $\sigma_n$ de la volatilité pour le jour $n$ (faite <strong>à la fin du jour $n-1$</strong>) se calcule à partir de $\sigma_{n-1}$ (l'estimation faite à la fin du jour $n-2$ pour le jour $n-1$) et de $u_{n-1}$ (la variation quotidienne en pourcentage la plus récente).*</p>
+<details class="cor">
+<summary><strong>Pourquoi les poids décroissent exponentiellement — la substitution en cascade</strong></summary><div class="in">
+
+<p><em>Étape 1 — substituer $\sigma_{n-1}^2$ :</em>
+$$\sigma_n^2=\lambda\big[\lambda\sigma_{n-2}^2+(1-\lambda)u_{n-2}^2\big]+(1-\lambda)u_{n-1}^2$$
+$$\sigma_n^2=(1-\lambda)\big(u_{n-1}^2+\lambda u_{n-2}^2\big)+\lambda^2\sigma_{n-2}^2$$</p>
+<p><em>Étape 2 — substituer $\sigma_{n-2}^2$ de la même façon :</em>
+$$\sigma_n^2=(1-\lambda)\big(u_{n-1}^2+\lambda u_{n-2}^2+\lambda^2u_{n-3}^2\big)+\lambda^3\sigma_{n-3}^2$$</p>
+<p><em>Étape 3 — en continuant ainsi :</em>
+$$\boxed{\sigma_n^2=(1-\lambda)\sum_{i=1}^{m}\lambda^{i-1}u_{n-i}^2+\lambda^m\sigma_{n-m}^2}$$</p>
+<p><em>Étape 4 — la conclusion.</em> Pour $m$ <strong>grand</strong>, le terme $\lambda^m\sigma_{n-m}^2$ est <strong>suffisamment petit pour être ignoré</strong> : (22.7) est donc identique à (22.4) avec</p>
+<p>$$\boxed{\alpha_i=(1-\lambda)\lambda^{i-1}}$$</p>
+<p><em>Les poids des $u_i$ <strong>déclinent au taux $\lambda$</strong> en remontant le temps : <strong>chaque poids vaut $\lambda$ fois le précédent</strong>.</em></p>
+</div></details>
+
+<details class="cor">
+<summary><strong>Exemple 22.1 — une mise à jour EWMA, pas à pas</strong></summary><div class="in">
+
+<p><strong>Données :</strong> $\lambda=0{,}90$ ; la volatilité estimée pour le jour $n-1$ est <strong>1 % par jour</strong> ; pendant le jour $n-1$ la variable de marché a <strong>augmenté de 2 %</strong>.</p>
+<p><em>Étape 1 — les deux entrées :</em>
+$$\sigma_{n-1}^2=0{,}01^2=0{,}0001\qquad u_{n-1}^2=0{,}02^2=0{,}0004$$</p>
+<p><em>Étape 2 — appliquer (22.7) :</em>
+$$\sigma_n^2=0{,}9\times0{,}0001+0{,}1\times0{,}0004=0{,}00009+0{,}00004=\mathbf{0{,}00013}$$</p>
+<p><em>Étape 3 — la volatilité :</em>
+$$\sigma_n=\sqrt{0{,}00013}=0{,}011402=\mathbf{1{,}14\ \%\text{ par jour}}$$</p>
+<p><em>Étape 4 — la lecture, essentielle.</em> <em><strong>L'espérance de $u_{n-1}^2$ est $\sigma_{n-1}^2$, soit 0,0001. Dans cet exemple la valeur RÉALISÉE de $u_{n-1}^2$ (0,0004) est SUPÉRIEURE à son espérance, et en conséquence notre estimation de volatilité AUGMENTE. Si la valeur réalisée avait été inférieure à son espérance, notre estimation aurait DIMINUÉ.</strong></em></p>
+</div></details>
+
+<h3>2.2 Les propriétés, et le paramètre $\lambda$</h3>
+<table>
+<thead>
+<tr>
+<th>Propriété</th>
+<th>Contenu</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Économie de mémoire</strong></td>
+<td><em>Très peu de données ont besoin d'être stockées : à tout instant, <strong>seuls l'estimation courante du taux de variance et l'observation la plus récente</strong> de la variable de marché doivent être mémorisés.</em> L'ancienne estimation et l'ancienne valeur peuvent être <strong>jetées</strong></td>
+</tr>
+<tr>
+<td><strong>Réactivité</strong></td>
+<td>l'EWMA est <strong>conçu pour suivre les changements de volatilité</strong> : un gros mouvement le jour $n-1$ rend $u_{n-1}^2$ grand, ce qui <strong>fait monter</strong> l'estimation courante</td>
+</tr>
+<tr>
+<td><strong>Rôle de $\lambda$</strong></td>
+<td>$\lambda$ gouverne <strong>la réactivité</strong> de l'estimation à la dernière variation</td>
+</tr>
+<tr>
+<td><strong>$\lambda$ faible</strong></td>
+<td>beaucoup de poids sur $u_{n-1}^2$ → <em>les estimations produites pour des jours successifs sont <strong>elles-mêmes très volatiles</strong></em></td>
+</tr>
+<tr>
+<td><strong>$\lambda$ élevé</strong> (proche de 1)</td>
+<td>estimations qui <strong>répondent lentement</strong> à l'information nouvelle</td>
+</tr>
+</tbody></table>
+<p><strong>RiskMetrics.</strong> <em>La base RiskMetrics, créée à l'origine par <strong>J. P. Morgan</strong> et rendue publique en <strong>1994</strong>, utilise l'EWMA avec $\boxed{\lambda=0{,}94}$ pour mettre à jour les estimations quotidiennes de volatilité. L'entreprise a trouvé que, <strong>sur toute une gamme de variables de marché différentes</strong>, cette valeur de $\lambda$ donne les prévisions du taux de variance <strong>les plus proches du taux de variance réalisé</strong>.</em> Le taux réalisé un jour donné était calculé comme la <strong>moyenne équipondérée des $u_i^2$ des 25 jours suivants</strong>.</p>
+<h2 data-prio="must">Concept 3 — Le modèle GARCH(1,1)</h2>
+<h3>3.1 L'équation et la lecture des paramètres</h3>
+<p>Proposé par <strong>Bollerslev en 1986</strong>. <em>La différence entre GARCH(1,1) et EWMA est <strong>analogue à la différence entre (22.4) et (22.5)</strong> :</em> dans GARCH(1,1), $\sigma_n^2$ se calcule à partir d'un taux de variance moyen de <strong>long terme</strong> $V_L$, <strong>en plus</strong> de $\sigma_{n-1}$ et $u_{n-1}$.</p>
+<p>$$\boxed{\sigma_n^2=\gamma V_L+\alpha\,u_{n-1}^2+\beta\,\sigma_{n-1}^2}\;\text{(22.8)}\qquad\text{avec}\qquad\boxed{\gamma+\alpha+\beta=1}$$</p>
+<table>
+<thead>
+<tr>
+<th>Paramètre</th>
+<th>Poids assigné à</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$\gamma$</td>
+<td>le taux de variance <strong>de long terme</strong> $V_L$</td>
+</tr>
+<tr>
+<td>$\alpha$</td>
+<td>la <strong>dernière observation</strong> $u_{n-1}^2$</td>
+</tr>
+<tr>
+<td>$\beta$</td>
+<td>la <strong>dernière estimation</strong> de variance $\sigma_{n-1}^2$</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>Le lien EWMA-GARCH, à connaître par cœur :</strong> <em>le modèle EWMA est le cas particulier de GARCH(1,1) où $\boxed{\gamma=0,\quad\alpha=1-\lambda,\quad\beta=\lambda}$.</em></p>
+</blockquote>
+<p><strong>Le sens du « (1,1) ».</strong> <em>Il indique que $\sigma_n^2$ est fondé sur <strong>la plus récente observation de $u^2$</strong> et <strong>la plus récente estimation du taux de variance</strong>. Le modèle plus général GARCH($p,q$) calcule $\sigma_n^2$ à partir des $p$ observations les plus récentes de $u^2$ et des $q$ estimations les plus récentes du taux de variance. <strong>GARCH(1,1) est de loin le plus populaire des modèles GARCH.</strong></em></p>
+<p><strong>La forme d'estimation.</strong> En posant $\omega=\gamma V_L$ :</p>
+<p>$$\boxed{\sigma_n^2=\omega+\alpha\,u_{n-1}^2+\beta\,\sigma_{n-1}^2}\;\text{(22.9)}$$</p>
+<p><em>C'est la forme habituellement utilisée pour <strong>estimer</strong> les paramètres.</em> Une fois $\omega$, $\alpha$, $\beta$ estimés :</p>
+<p>$$\boxed{\gamma=1-\alpha-\beta}\qquad\boxed{V_L=\frac{\omega}{\gamma}=\frac{\omega}{1-\alpha-\beta}}$$</p>
+<blockquote>
+<p class="cal piege"> <em><strong>Pour un processus GARCH(1,1) STABLE, il faut $\alpha+\beta&lt;1$. Sinon, le poids appliqué à la variance de long terme est NÉGATIF.</strong></em></p>
+</blockquote>
+<details class="cor">
+<summary><strong>Exemple 22.2 — lire un GARCH estimé et le faire tourner</strong></summary><div class="in">
+
+<p><strong>Le modèle estimé sur données quotidiennes :</strong>
+$$\sigma_n^2=0{,}000002+0{,}13\,u_{n-1}^2+0{,}86\,\sigma_{n-1}^2$$</p>
+<p><em>Étape 1 — identifier les paramètres :</em> $\omega=0{,}000002$, $\alpha=0{,}13$, $\beta=0{,}86$.</p>
+<p><em>Étape 2 — le poids du long terme :</em>
+$$\gamma=1-\alpha-\beta=1-0{,}13-0{,}86=\mathbf{0{,}01}$$</p>
+<p><em>Étape 3 — la variance de long terme :</em>
+$$V_L=\frac{\omega}{\gamma}=\frac{0{,}000002}{0{,}01}=\mathbf{0{,}0002}$$
+<em>En d'autres termes, la variance moyenne de long terme par jour impliquée par le modèle est 0,0002.</em></p>
+<p><em>Étape 4 — la volatilité de long terme :</em>
+$$\sqrt{0{,}0002}=0{,}014=\mathbf{1{,}4\ \%\text{ par jour}}$$</p>
+<p><em>Étape 5 — une mise à jour.</em> Si l'estimation de volatilité au jour $n-1$ est <strong>1,6 %</strong> par jour et que la variable a <strong>baissé de 1 %</strong> ce jour-là :
+$$\sigma_{n-1}^2=0{,}016^2=0{,}000256\qquad u_{n-1}^2=0{,}01^2=0{,}0001$$
+$$\sigma_n^2=0{,}000002+0{,}13\times0{,}0001+0{,}86\times0{,}000256=0{,}000002+0{,}000013+0{,}00022016=\mathbf{0{,}00023516}$$
+$$\sigma_n=\sqrt{0{,}00023516}=0{,}0153=\mathbf{1{,}53\ \%\text{ par jour}}$$</p>
+<p class="cal piege"> <strong>Noter le signe.</strong> <em>$u_{n-1}$ est <strong>négatif</strong> (baisse de 1 %) mais <strong>seul son carré intervient</strong> : GARCH(1,1) ne distingue pas les hausses des baisses.</em></p>
+</div></details>
+
+<h3>3.2 Les poids implicites et le retour à la moyenne</h3>
+<details class="cor">
+<summary><strong>Le déploiement de (22.9) — d'où vient le taux de décroissance β</strong></summary><div class="in">
+
+<p><em>Étape 1 :</em> $\sigma_n^2=\omega+\alpha u_{n-1}^2+\beta\big(\omega+\alpha u_{n-2}^2+\beta\sigma_{n-2}^2\big)$
+$$=\omega+\beta\omega+\alpha u_{n-1}^2+\alpha\beta u_{n-2}^2+\beta^2\sigma_{n-2}^2$$</p>
+<p><em>Étape 2 :</em> en substituant $\sigma_{n-2}^2$,
+$$\sigma_n^2=\omega+\beta\omega+\beta^2\omega+\alpha u_{n-1}^2+\alpha\beta u_{n-2}^2+\alpha\beta^2u_{n-3}^2+\beta^3\sigma_{n-3}^2$$</p>
+<p><em>Étape 3 — la loi générale :</em> <strong>le poids appliqué à $u_{n-i}^2$ vaut $\boxed{\alpha\beta^{i-1}}$.</strong> Les poids <strong>déclinent exponentiellement au taux $\beta$</strong>.</p>
+<p><em>Étape 4 — l'interprétation.</em> <em>$\beta$ s'interprète comme un <strong>taux de décroissance</strong> (<em>decay rate</em>). Il est analogue à $\lambda$ dans l'EWMA : il définit <strong>l'importance relative des observations sur les $u$</strong> dans la détermination du taux de variance courant.</em> Si $\beta=0{,}9$ : $u_{n-2}^2$ n'est important qu'à <strong>90 %</strong> de $u_{n-1}^2$ ; $u_{n-3}^2$ à <strong>81 %</strong> ; etc.</p>
+<blockquote>
+<p><strong>La phrase de synthèse :</strong> <em>GARCH(1,1) est similaire à EWMA sauf que, <strong>en plus</strong> d'assigner des poids décroissant exponentiellement aux $u^2$ passés, <strong>il assigne aussi du poids à la volatilité moyenne de long terme</strong>.</em></p>
+</blockquote>
+</div></details>
+
+<p><strong>Le retour à la moyenne (<em>mean reversion</em>).</strong> *GARCH(1,1) reconnaît qu'<strong>au fil du temps la variance tend à être ramenée vers un niveau moyen de long terme $V_L$</strong>. Le poids assigné à $V_L$ est $\gamma=1-\alpha-\beta$.* GARCH(1,1) est équivalent à un modèle où la variance $V$ suit le processus stochastique</p>
+<p>$$\boxed{dV=a(V_L-V)\,dt+\xi V\,dz}\qquad\text{avec}\qquad\boxed{a=1-\alpha-\beta}\quad\text{et}\quad\boxed{\xi=\alpha\sqrt2}$$</p>
+<p><em>(le temps étant mesuré en jours)</em></p>
+<table>
+<thead>
+<tr>
+<th>Situation</th>
+<th>Drift</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$V&gt;V_L$</td>
+<td>drift <strong>négatif</strong> — la variance est <strong>tirée vers le bas</strong></td>
+</tr>
+<tr>
+<td>$V&lt;V_L$</td>
+<td>drift <strong>positif</strong> — la variance est <strong>tirée vers le haut</strong></td>
+</tr>
+</tbody></table>
+<p><em>Superposée au drift, il y a une volatilité $\xi$.</em></p>
+<h3>3.3 Choisir entre les deux modèles</h3>
+<table>
+<thead>
+<tr>
+<th></th>
+<th><strong>EWMA</strong></th>
+<th><strong>GARCH(1,1)</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Retour à la moyenne</td>
+<td><strong>non</strong></td>
+<td><strong>oui</strong></td>
+</tr>
+<tr>
+<td>Attrait théorique</td>
+<td>—</td>
+<td><em><strong>théoriquement plus séduisant</strong></em> car en pratique les taux de variance <strong>retournent effectivement à la moyenne</strong></td>
+</tr>
+<tr>
+<td>Nombre de paramètres</td>
+<td><strong>1</strong> ($\lambda$)</td>
+<td><strong>3</strong> ($\omega$, $\alpha$, $\beta$)</td>
+</tr>
+<tr>
+<td>Cas dégénéré</td>
+<td>—</td>
+<td>quand $\omega=0$, <strong>GARCH(1,1) se réduit à EWMA</strong></td>
+</tr>
+</tbody></table>
+<blockquote>
+<p class="cal piege"> <em><strong>Dans les circonstances où la valeur de $\omega$ qui ajuste le mieux les données se révèle NÉGATIVE, le modèle GARCH(1,1) n'est pas stable et il est sensé de basculer sur le modèle EWMA.</strong></em></p>
+</blockquote>
+<h2 data-prio="must">Concept 4 — Le maximum de vraisemblance</h2>
+<h3>4.1 Le principe, sur l'exemple le plus simple</h3>
+<blockquote>
+<p><em><strong>La méthode consiste à choisir les valeurs des paramètres qui MAXIMISENT la chance (ou vraisemblance) que les données observées se produisent.</strong></em></p>
+</blockquote>
+<details class="cor">
+<summary><strong>L'exemple des dix actions — vérifier que la méthode donne la bonne réponse</strong></summary><div class="in">
+
+<p><strong>Le problème.</strong> On tire 10 actions au hasard un certain jour : <strong>une</strong> a baissé, les neuf autres sont restées stables ou ont monté. Quelle est la meilleure estimation de la probabilité de baisse ? <em>La réponse naturelle est <strong>0,1</strong>. Voyons si c'est ce que donne le maximum de vraisemblance.</em></p>
+<p><em>Étape 1 — la vraisemblance.</em> Si $p$ est la probabilité de baisse, la probabilité qu'une action particulière baisse et que les neuf autres ne baissent pas vaut
+$$L(p)=p(1-p)^9$$</p>
+<p><em>Étape 2 — maximiser.</em> On dérive par rapport à $p$ et on annule :
+$$\frac{dL}{dp}=(1-p)^9-9p(1-p)^8=(1-p)^8\big[(1-p)-9p\big]=(1-p)^8(1-10p)=0$$</p>
+<p><em>Étape 3 — la solution :</em> $\boxed{p=0{,}1}$ — <strong>exactement comme attendu</strong>.</p>
+</div></details>
+
+<h3>4.2 Estimer une variance constante</h3>
+<p>Problème : estimer la variance $v$ d'une variable $X$ à partir de $m$ observations $u_1,\dots,u_m$, la loi sous-jacente étant <strong>normale de moyenne nulle</strong>.</p>
+<p><em>Étape 1 — la vraisemblance d'une observation</em> = la densité de probabilité en $X=u_i$ :
+$$\frac{1}{\sqrt{2\pi v}}\exp\!\left(\frac{-u_i^2}{2v}\right)$$</p>
+<p><em>Étape 2 — la vraisemblance de $m$ observations, dans l'ordre observé :</em>
+$$\boxed{\prod_{i=1}^{m}\left[\frac{1}{\sqrt{2\pi v}}\exp\!\left(\frac{-u_i^2}{2v}\right)\right]}\;\text{(22.10)}$$</p>
+<p><em>Étape 3 — passer au logarithme.</em> <em>Maximiser une expression équivaut à maximiser son logarithme.</em> En ignorant les facteurs multiplicatifs constants, on veut maximiser :
+$$\boxed{\sum_{i=1}^{m}\left[-\ln(v)-\frac{u_i^2}{v}\right]}\;\text{(22.11)}\qquad\text{soit}\qquad-m\ln(v)-\sum_{i=1}^{m}\frac{u_i^2}{v}$$</p>
+<p><em>Étape 4 — dériver et annuler :</em>
+$$-\frac{m}{v}+\frac{1}{v^2}\sum_{i=1}^{m}u_i^2=0\quad\Longrightarrow\quad\boxed{\hat v=\frac1m\sum_{i=1}^{m}u_i^2}$$</p>
+<blockquote>
+<p class="cal piege"> <strong>C'est exactement (22.3)</strong> — ce qui <strong>confirme</strong> la troisième modification du §1.1 : remplacer $m-1$ par $m$, c'est passer de l'estimateur non biaisé à <strong>l'estimateur du maximum de vraisemblance</strong>.</p>
+</blockquote>
+<h3>4.3 Estimer les paramètres de GARCH(1,1)</h3>
+<p>On pose $v_i=\sigma_i^2$, la variance estimée pour le jour $i$, et on suppose que la loi de $u_i$ <strong>conditionnellement à la variance</strong> est normale. Les meilleurs paramètres maximisent :</p>
+<p>$$\prod_{i=1}^{m}\left[\frac{1}{\sqrt{2\pi v_i}}\exp\!\left(\frac{-u_i^2}{2v_i}\right)\right]\qquad\Longleftrightarrow\qquad\boxed{\max\ \sum_{i=1}^{m}\left[-\ln(v_i)-\frac{u_i^2}{v_i}\right]}\;\text{(22.12)}$$</p>
+<blockquote>
+<p><strong>La seule différence avec (22.11) : $v$ est remplacé par $v_i$.</strong>  <em>Il est nécessaire de <strong>chercher itérativement</strong> les paramètres qui maximisent (22.12).</em></p>
+</blockquote>
+<details class="cor">
+<summary><strong>Table 22.1 — l'organisation du tableur, colonne par colonne (S&amp;P 500, 18 juillet 2005 → 13 août 2010)</strong></summary><div class="in">
+
+<table>
+<thead>
+<tr>
+<th>Colonne</th>
+<th>Contenu</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>la <strong>date</strong></td>
+</tr>
+<tr>
+<td>2</td>
+<td>le compteur de jours $i$</td>
+</tr>
+<tr>
+<td>3</td>
+<td>le <strong>S&amp;P 500</strong> en fin de jour $i$, noté $S_i$</td>
+</tr>
+<tr>
+<td>4</td>
+<td>$u_i=(S_i-S_{i-1})/S_{i-1}$</td>
+</tr>
+<tr>
+<td>5</td>
+<td>$v_i=\sigma_i^2$, l'estimation faite <strong>à la fin du jour $i-1$</strong>.  <em><strong>Au jour 3 on amorce en posant la variance égale à $u_2^2$</strong></em> ; les jours suivants, on applique (22.9)</td>
+</tr>
+<tr>
+<td>6</td>
+<td>la mesure de vraisemblance $-\ln(v_i)-u_i^2/v_i$</td>
+</tr>
+</tbody></table>
+<p><strong>On cherche $\omega$, $\alpha$, $\beta$ maximisant la SOMME de la colonne 6.</strong></p>
+<p>Extrait des données :</p>
+<table>
+<thead>
+<tr>
+<th>Date</th>
+<th>$i$</th>
+<th>$S_i$</th>
+<th>$u_i$</th>
+<th>$v_i=\sigma_i^2$</th>
+<th>$-\ln v_i-u_i^2/v_i$</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>18-juil-2005</td>
+<td>1</td>
+<td>1 221,13</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>19-juil-2005</td>
+<td>2</td>
+<td>1 229,35</td>
+<td>0,006731</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>20-juil-2005</td>
+<td>3</td>
+<td>1 235,20</td>
+<td>0,004759</td>
+<td>0,00004531</td>
+<td>9,5022</td>
+</tr>
+<tr>
+<td>21-juil-2005</td>
+<td>4</td>
+<td>1 227,04</td>
+<td>$-0{,}006606$</td>
+<td>0,00004447</td>
+<td>9,0393</td>
+</tr>
+<tr>
+<td>22-juil-2005</td>
+<td>5</td>
+<td>1 233,68</td>
+<td>0,005411</td>
+<td>0,00004546</td>
+<td>9,3545</td>
+</tr>
+<tr>
+<td>25-juil-2005</td>
+<td>6</td>
+<td>1 229,03</td>
+<td>$-0{,}003769$</td>
+<td>0,00004517</td>
+<td>9,6906</td>
+</tr>
+<tr>
+<td>⋮</td>
+<td>⋮</td>
+<td>⋮</td>
+<td>⋮</td>
+<td>⋮</td>
+<td>⋮</td>
+</tr>
+<tr>
+<td>11-août-2010</td>
+<td>1 277</td>
+<td>1 089,47</td>
+<td>$-0{,}028179$</td>
+<td>0,00011834</td>
+<td>2,3322</td>
+</tr>
+<tr>
+<td>12-août-2010</td>
+<td>1 278</td>
+<td>1 083,61</td>
+<td>$-0{,}005379$</td>
+<td>0,00017527</td>
+<td>8,4841</td>
+</tr>
+<tr>
+<td>13-août-2010</td>
+<td>1 279</td>
+<td>1 079,25</td>
+<td>$-0{,}004024$</td>
+<td>0,00016327</td>
+<td>8,6209</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td><strong>Total</strong></td>
+<td><strong>10 228,2349</strong></td>
+</tr>
+</tbody></table>
+<p><strong>Les paramètres optimaux :</strong>
+$$\omega=0{,}000001366\qquad\alpha=0{,}083394\qquad\beta=0{,}910116$$</p>
+<p>d'où $\alpha+\beta=0{,}993510$ et $\gamma=1-\alpha-\beta=0{,}006490$, puis
+$$V_L=\frac{\omega}{1-\alpha-\beta}=\frac{0{,}000001366}{0{,}006490}=0{,}0002075\quad\Rightarrow\quad\sigma_{LT}=\sqrt{0{,}0002075}=\mathbf{1{,}4404\ \%\text{ par jour}}$$</p>
+<p class="cal piege"> <strong>Incohérence d'arrondi dans la source.</strong> La division telle qu'elle est imprimée donne en réalité $0{,}000001366/0{,}006490=0{,}00021048$, soit <strong>1,4508 %</strong> par jour. La valeur <strong>0,0002075</strong> (et donc 1,4404 %) correspond à $\omega=0{,}000001347$ — précisément l'<strong>estimation d'essai</strong> figurant au bas de la table 22.1. C'est <strong>0,0002075 qui est utilisée dans toute la suite du chapitre</strong> (et qui reproduit exactement les tables 22.3 et 22.4) : c'est donc celle qu'il faut retenir.</p>
+<p><em>Les figures 22.1 et 22.2 montrent l'indice et sa volatilité GARCH sur les 5 ans. <strong>La plupart du temps la volatilité était inférieure à 2 % par jour, mais des volatilités atteignant 5 % par jour ont été observées pendant la crise du crédit</strong> (les très hautes volatilités sont aussi signalées par l'indice VIX).</em></p>
+</div></details>
+
+<h3>4.4 Le <em>variance targeting</em> et l'estimation d'EWMA</h3>
+<p><strong>Le <em>variance targeting</em></strong> <em>(Engle et Mezrich, Risk, 1996)</em> — <em>une approche alternative, <strong>parfois plus robuste</strong>, qui consiste à <strong>fixer $V_L$ égale à la variance d'échantillon</strong> calculée sur les données (ou à une autre valeur jugée raisonnable). La valeur de $\omega$ vaut alors $V_L(1-\alpha-\beta)$ et <strong>seuls DEUX paramètres restent à estimer</strong>.</em></p>
+<table>
+<thead>
+<tr>
+<th>Méthode</th>
+<th>Paramètres</th>
+<th>Valeur de l'objectif (22.12)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>GARCH(1,1) libre</strong></td>
+<td>$\omega=0{,}000001366$, $\alpha=0{,}083394$, $\beta=0{,}910116$</td>
+<td><strong>10 228,2349</strong></td>
+</tr>
+<tr>
+<td><strong>Variance targeting</strong></td>
+<td>$V_L=0{,}0002412$ (soit $\sigma=1{,}5531\,\%$/jour), $\alpha=0{,}08445$, $\beta=0{,}9101$</td>
+<td><strong>10 228,1941</strong> — <em>seulement marginalement en dessous</em></td>
+</tr>
+<tr>
+<td><strong>EWMA</strong> ($\omega=0$, $\alpha=1-\lambda$, $\beta=\lambda$)</td>
+<td>$\lambda=0{,}9374$ — <strong>un seul paramètre</strong></td>
+<td><strong>10 192,5104</strong></td>
+</tr>
+</tbody></table>
+<details class="cor">
+<summary><strong>Le mode d'emploi de Solver donné par Hull</strong></summary><div class="in">
+
+<p><em>Les deux modèles peuvent être implémentés avec <strong>Solver</strong> dans Excel. <strong>La routine fonctionne bien à condition que le tableur soit structuré de sorte que les paramètres cherchés aient des valeurs à peu près ÉGALES.</strong></em></p>
+<p>Astuce concrète pour GARCH(1,1) :</p>
+<table>
+<thead>
+<tr>
+<th>Cellule</th>
+<th>Contient</th>
+<th>Cellule de calcul</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>A1</td>
+<td>$\omega\times10^5$</td>
+<td><code>B1 = A1/100000</code></td>
+</tr>
+<tr>
+<td>A2</td>
+<td>$10\alpha$</td>
+<td><code>B2 = A2/10</code></td>
+</tr>
+<tr>
+<td>A3</td>
+<td>$\beta$</td>
+<td><code>B3 = A3</code></td>
+</tr>
+</tbody></table>
+<p>On utilise <strong>B1, B2, B3</strong> pour calculer la fonction de vraisemblance, et on demande à Solver d'optimiser <strong>A1, A2, A3</strong>.</p>
+<p class="cal piege"> <em><strong>Occasionnellement Solver donne un maximum LOCAL : tester plusieurs valeurs de départ est une bonne idée.</strong></em></p>
+</div></details>
+
+<h3>4.5 Le modèle est-il bon ? Autocorrélations et Ljung-Box</h3>
+<p><strong>Le raisonnement.</strong> <em>L'hypothèse sous-jacente à un modèle GARCH est que la volatilité change au fil du temps. Autrement dit : <strong>quand $u_i^2$ est élevé, $u_{i+1}^2$, $u_{i+2}^2$… ont tendance à être élevés</strong> ; quand $u_i^2$ est faible, ils ont tendance à être faibles. On peut tester cela en examinant la structure d'<strong>autocorrélation</strong> des $u_i^2$.</em></p>
+<blockquote>
+<p><em><strong>Si le modèle GARCH fonctionne bien, il doit SUPPRIMER cette autocorrélation. On teste s'il l'a fait en considérant la structure d'autocorrélation de $u_i^2/\sigma_i^2$. Si celles-ci montrent très peu d'autocorrélation, notre modèle pour $\sigma_i$ a réussi à expliquer les autocorrélations des $u_i^2$.</strong></em></p>
+</blockquote>
+<p><em>(Pour une série $x_i$, l'autocorrélation de retard $k$ est le coefficient de corrélation entre $x_i$ et $x_{i+k}$.)</em></p>
+<p><strong>Table 22.2 — les résultats sur le S&amp;P 500 :</strong></p>
+<table>
+<thead>
+<tr>
+<th>Retard</th>
+<th>Autocorr. de $u_i^2$</th>
+<th>Autocorr. de $u_i^2/\sigma_i^2$</th>
+<th></th>
+<th>Retard</th>
+<th>Autocorr. de $u_i^2$</th>
+<th>Autocorr. de $u_i^2/\sigma_i^2$</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>0,183</td>
+<td>$-0{,}063$</td>
+<td></td>
+<td>9</td>
+<td>0,324</td>
+<td>0,041</td>
+</tr>
+<tr>
+<td>2</td>
+<td>0,385</td>
+<td>$-0{,}004$</td>
+<td></td>
+<td>10</td>
+<td>0,269</td>
+<td>0,083</td>
+</tr>
+<tr>
+<td>3</td>
+<td>0,160</td>
+<td>$-0{,}007$</td>
+<td></td>
+<td>11</td>
+<td>0,431</td>
+<td>$-0{,}007$</td>
+</tr>
+<tr>
+<td>4</td>
+<td>0,301</td>
+<td>0,022</td>
+<td></td>
+<td>12</td>
+<td>0,286</td>
+<td>0,006</td>
+</tr>
+<tr>
+<td>5</td>
+<td>0,339</td>
+<td>0,014</td>
+<td></td>
+<td>13</td>
+<td>0,224</td>
+<td>0,001</td>
+</tr>
+<tr>
+<td>6</td>
+<td>0,308</td>
+<td>$-0{,}011$</td>
+<td></td>
+<td>14</td>
+<td>0,121</td>
+<td>0,017</td>
+</tr>
+<tr>
+<td>7</td>
+<td>0,329</td>
+<td>0,026</td>
+<td></td>
+<td>15</td>
+<td>0,222</td>
+<td>$-0{,}031$</td>
+</tr>
+<tr>
+<td>8</td>
+<td>0,207</td>
+<td>0,038</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+<p><em>Les autocorrélations sont <strong>positives pour $u_i^2$ à TOUS les retards de 1 à 15</strong>. Pour $u_i^2/\sigma_i^2$, certaines sont positives et d'autres négatives, et <strong>elles sont toutes bien plus faibles en magnitude</strong>.</em></p>
+<p><strong>Le test scientifique : la statistique de Ljung-Box</strong> <em>(Ljung et Box, Biometrika, 1978)</em>. Pour une série de $m$ observations :</p>
+<p>$$\boxed{\text{LB}=m\sum_{k=1}^{K}w_k\,\eta_k^2}\qquad\text{avec}\qquad\boxed{w_k=\frac{m+2}{m-k}}$$</p>
+<p>où $\eta_k$ est l'autocorrélation de retard $k$ et $K$ le nombre de retards considérés.</p>
+<p>$$\boxed{\text{Pour }K=15\text{, l'autocorrélation nulle est rejetée à 95 \% quand }\text{LB}&gt;25}$$</p>
+<table>
+<thead>
+<tr>
+<th>Série</th>
+<th>Statistique LB</th>
+<th>Verdict</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$u_i^2$</td>
+<td><strong>≈ 1 566</strong></td>
+<td><em>preuve forte d'autocorrélation</em></td>
+</tr>
+<tr>
+<td>$u_i^2/\sigma_i^2$</td>
+<td><strong>21,7</strong></td>
+<td><em>l'autocorrélation a été <strong>largement supprimée</strong> par le modèle GARCH</em></td>
+</tr>
+</tbody></table>
+<h2 data-prio="must">Concept 5 — Prévoir avec GARCH(1,1)</h2>
+<h3>5.1 La formule de prévision</h3>
+<details class="cor">
+<summary><strong>La dérivation de (22.13), en cinq lignes</strong></summary><div class="in">
+
+<p><em>Étape 1 — réécrire (22.8) avec $\gamma=1-\alpha-\beta$ :</em>
+$$\sigma_n^2=(1-\alpha-\beta)V_L+\alpha u_{n-1}^2+\beta\sigma_{n-1}^2$$</p>
+<p><em>Étape 2 — soustraire $V_L$ des deux côtés :</em>
+$$\sigma_n^2-V_L=\alpha\big(u_{n-1}^2-V_L\big)+\beta\big(\sigma_{n-1}^2-V_L\big)$$</p>
+<p><em>Étape 3 — écrire la même relation au jour $n+t$ :</em>
+$$\sigma_{n+t}^2-V_L=\alpha\big(u_{n+t-1}^2-V_L\big)+\beta\big(\sigma_{n+t-1}^2-V_L\big)$$</p>
+<p><em>Étape 4 — prendre l'espérance.</em> <strong>L'espérance de $u_{n+t-1}^2$ est $\sigma_{n+t-1}^2$</strong>, d'où :
+$$E\big[\sigma_{n+t}^2-V_L\big]=(\alpha+\beta)\,E\big[\sigma_{n+t-1}^2-V_L\big]$$</p>
+<p><em>Étape 5 — itérer :</em>
+$$E\big[\sigma_{n+t}^2-V_L\big]=(\alpha+\beta)^t\big(\sigma_n^2-V_L\big)$$</p>
+</div></details>
+
+<p>$$\boxed{E\big[\sigma_{n+t}^2\big]=V_L+(\alpha+\beta)^t\big(\sigma_n^2-V_L\big)}\;\text{(22.13)}$$</p>
+<p>*Cette équation <strong>prévoit la volatilité du jour $n+t$ en utilisant l'information disponible à la fin du jour $n-1$</strong>.*</p>
+<table>
+<thead>
+<tr>
+<th>Cas</th>
+<th>Conséquence</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>EWMA</strong> ($\alpha+\beta=1$)</td>
+<td><em>le taux de variance futur espéré <strong>ÉGALE</strong> le taux de variance courant</em> — aucune prévision de retour</td>
+</tr>
+<tr>
+<td>$\alpha+\beta&lt;1$</td>
+<td>le dernier terme <strong>décroît</strong> avec $t$ : la prévision <strong>tend vers $V_L$</strong> ; taux de retour $=1-\alpha-\beta$</td>
+</tr>
+<tr>
+<td>$\alpha+\beta&gt;1$</td>
+<td> le poids donné à la variance de long terme est <strong>négatif</strong> : le processus est <em><strong>« mean fleeing » plutôt que « mean reverting »</strong></em></td>
+</tr>
+</tbody></table>
+<details class="cor">
+<summary><strong>Application aux données S&amp;P 500 — deux horizons</strong></summary><div class="in">
+
+<p><strong>Données :</strong> $\alpha+\beta=0{,}9935$, $V_L=0{,}0002075$, variance courante estimée $\sigma_n^2=0{,}0003$ (soit <strong>1,732 %</strong> par jour, car $\sqrt{0{,}0003}=0{,}01732$).</p>
+<p><em>Prévision à 10 jours :</em>
+$$0{,}0002075+0{,}9935^{10}\times(0{,}0003-0{,}0002075)=0{,}0002075+0{,}9369\times0{,}0000925=\mathbf{0{,}0002942}$$
+$$\sigma=\sqrt{0{,}0002942}=\mathbf{1{,}72\ \%\text{ par jour}}\quad\text{— }\textit{encore bien au-dessus de la volatilité de long terme de 1,44 \%}$$</p>
+<p><em>Prévision à 500 jours :</em> $0{,}9935^{500}=0{,}0386$, donc
+$$0{,}0002075+0{,}0386\times0{,}0000925=\mathbf{0{,}0002110}\qquad\sigma=\mathbf{1{,}45\ \%\text{ par jour}}$$
+<em>— <strong>très proche</strong> de la volatilité de long terme.</em></p>
+</div></details>
+
+<h3>5.2 La structure par terme de volatilité</h3>
+<p>On pose, en se plaçant au jour $n$ :</p>
+<p>$$V(t)=E\big(\sigma_{n+t}^2\big)\qquad\text{et}\qquad\boxed{a=\ln\frac{1}{\alpha+\beta}}\qquad\Longrightarrow\qquad\boxed{V(t)=V_L+e^{-at}\big[V(0)-V_L\big]}$$</p>
+<p>$V(t)$ est l'estimation du <strong>taux de variance instantané dans $t$ jours</strong>. Le taux de variance <strong>moyen</strong> par jour entre aujourd'hui et $T$ :</p>
+<p>$$\frac1T\int_0^TV(t)\,dt=V_L+\frac{1-e^{-aT}}{aT}\big[V(0)-V_L\big]$$</p>
+<p><em>Plus $T$ est grand, plus cela est proche de $V_L$.</em> En notant $\sigma(T)$ la <strong>volatilité annuelle</strong> à utiliser pour valoriser une option de $T$ jours, et avec <strong>252 jours par an</strong>, $\sigma(T)^2$ vaut 252 fois le taux de variance moyen par jour :</p>
+<p>$$\boxed{\sigma(T)^2=252\left[V_L+\frac{1-e^{-aT}}{aT}\big(V(0)-V_L\big)\right]}\;\text{(22.14)}$$</p>
+<table>
+<thead>
+<tr>
+<th>Volatilité courante</th>
+<th>Pente estimée de la structure par terme</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>au-dessus</strong> de la volatilité de long terme</td>
+<td><strong>décroissante</strong></td>
+</tr>
+<tr>
+<td><strong>en dessous</strong> de la volatilité de long terme</td>
+<td><strong>croissante</strong></td>
+</tr>
+</tbody></table>
+<p class="cal piege"> <em>La structure par terme <strong>estimée</strong> n'est habituellement <strong>pas la même</strong> que la structure par terme <strong>réelle</strong>. Cependant, elle est souvent utilisée pour <strong>prédire la façon dont la structure réelle réagira aux changements de volatilité</strong>.</em></p>
+<details class="cor">
+<summary><strong>Table 22.3 — la structure par terme du S&amp;P 500, entièrement recalculée</strong></summary><div class="in">
+
+<p><em>Étape 1 — les paramètres.</em> $a=\ln(1/0{,}99351)=\mathbf{0{,}006511}$, $V_L=0{,}0002075$, $V(0)=0{,}0003$.</p>
+<p><em>Étape 2 — la formule à appliquer :</em>
+$$\sigma(T)^2=252\left[0{,}0002075+\frac{1-e^{-0{,}006511\,T}}{0{,}006511\,T}\big(0{,}0003-0{,}0002075\big)\right]$$</p>
+<p><em>Étape 3 — le facteur d'amortissement et le résultat :</em></p>
+<table>
+<thead>
+<tr>
+<th>$T$ (jours)</th>
+<th>$\dfrac{1-e^{-aT}}{aT}$</th>
+<th>$\sigma(T)$ (% par an)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>10</td>
+<td>0,96814</td>
+<td><strong>27,36</strong></td>
+</tr>
+<tr>
+<td>30</td>
+<td>0,90839</td>
+<td><strong>27,10</strong></td>
+</tr>
+<tr>
+<td>50</td>
+<td>0,85354</td>
+<td><strong>26,87</strong></td>
+</tr>
+<tr>
+<td>100</td>
+<td>0,73495</td>
+<td><strong>26,35</strong></td>
+</tr>
+<tr>
+<td>500</td>
+<td>0,29532</td>
+<td><strong>24,32</strong></td>
+</tr>
+</tbody></table>
+<p><em>Étape 4 — la lecture.</em> La volatilité instantanée est $\sigma(0)=\sqrt{252\times0{,}0003}=27{,}50\,\%$, au-dessus de la volatilité de long terme $\sqrt{252\times0{,}0002075}=22{,}87\,\%$ : <strong>la structure par terme est bien décroissante</strong>, et elle converge lentement vers 22,87 %.</p>
+</div></details>
+
+<h3>5.3 L'impact d'un choc de volatilité</h3>
+<p>En réécrivant (22.14) sous la forme $\sigma(T)^2=252\left[V_L+\dfrac{1-e^{-aT}}{aT}\left(\dfrac{\sigma(0)^2}{252}-V_L\right)\right]$, une variation $\Delta\sigma(0)$ produit approximativement :</p>
+<p>$$\boxed{\Delta\sigma(T)=\frac{1-e^{-aT}}{aT}\cdot\frac{\sigma(0)}{\sigma(T)}\cdot\Delta\sigma(0)}\;\text{(22.15)}$$</p>
+<p><strong>Table 22.4 — impact d'une hausse de 100 points de base de la volatilité instantanée</strong> (de 27,50 % à 28,50 % par an, soit $\Delta\sigma(0)=1\,\%$) :</p>
+<table>
+<thead>
+<tr>
+<th>Durée de l'option (jours)</th>
+<th>10</th>
+<th>30</th>
+<th>50</th>
+<th>100</th>
+<th>500</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Hausse de la volatilité (%)</strong></td>
+<td><strong>0,97</strong></td>
+<td><strong>0,92</strong></td>
+<td><strong>0,87</strong></td>
+<td><strong>0,77</strong></td>
+<td><strong>0,33</strong></td>
+</tr>
+</tbody></table>
+<blockquote>
+<p class="cal piege"> <strong>L'usage pratique, qui est tout l'intérêt de la table.</strong> <em>Beaucoup d'institutions financières utilisent ce type d'analyse pour déterminer l'exposition de leurs livres aux changements de volatilité. <strong>Plutôt que de considérer une hausse uniforme de 1 % des volatilités implicites pour calculer le vega, elles relient la taille de la hausse considérée à la MATURITÉ de l'option</strong> : 0,97 % pour une option de 10 jours, 0,92 % pour 30 jours, 0,87 % pour 50 jours, etc.</em></p>
+</blockquote>
+<h2 data-prio="high">Concept 6 — Les corrélations</h2>
+<h3>6.1 Les définitions et la mise à jour EWMA</h3>
+<p>$$\rho=\frac{\text{cov}(X,Y)}{\sigma_X\sigma_Y}\qquad\text{avec}\qquad\text{cov}(X,Y)=E\big[(X-\mu_X)(Y-\mu_Y)\big]$$</p>
+<blockquote>
+<p class="cal piege"> <em><strong>Bien qu'il soit plus facile de développer une intuition sur une corrélation que sur une covariance, ce sont les COVARIANCES qui sont les variables fondamentales de l'analyse</strong></em> — de la même manière que <strong>les taux de variance</strong> étaient les variables fondamentales des procédures EWMA et GARCH, même si les volatilités sont plus faciles à comprendre.</p>
+</blockquote>
+<p>Notations : $x_i=\dfrac{X_i-X_{i-1}}{X_{i-1}}$, $y_i=\dfrac{Y_i-Y_{i-1}}{Y_{i-1}}$ ; $\sigma_{x,n}$ et $\sigma_{y,n}$ les volatilités quotidiennes estimées pour le jour $n$ ; $\text{cov}_n$ l'estimation de covariance calculée le jour $n$. L'estimation de la corrélation le jour $n$ est $\dfrac{\text{cov}_n}{\sigma_{x,n}\sigma_{y,n}}$.</p>
+<p><strong>Équipondération</strong> (moyennes supposées nulles) :</p>
+<p>$$\sigma_{x,n}^2=\frac1m\sum_{i=1}^{m}x_{n-i}^2,\qquad\sigma_{y,n}^2=\frac1m\sum_{i=1}^{m}y_{n-i}^2,\qquad\boxed{\text{cov}_n=\frac1m\sum_{i=1}^{m}x_{n-i}\,y_{n-i}}\;\text{(22.16)}$$</p>
+<p><strong>Mise à jour EWMA</strong> — exactement la même structure que (22.7) :</p>
+<p>$$\boxed{\text{cov}_n=\lambda\,\text{cov}_{n-1}+(1-\lambda)\,x_{n-1}\,y_{n-1}}$$</p>
+<p><em>Les poids donnés aux $x_iy_i$ <strong>déclinent</strong> en remontant le temps ; <strong>plus $\lambda$ est faible, plus les observations récentes reçoivent de poids</strong>.</em></p>
+<p><strong>Mise à jour GARCH(1,1)</strong> :</p>
+<p>$$\boxed{\text{cov}_n=\omega+\alpha\,x_{n-1}y_{n-1}+\beta\,\text{cov}_{n-1}}\qquad\text{covariance moyenne de long terme}=\frac{\omega}{1-\alpha-\beta}$$</p>
+<p><em>Des formules similaires à (22.13) et (22.14) peuvent être développées pour prévoir les covariances futures et calculer la covariance moyenne sur la vie d'une option.</em></p>
+<details class="cor">
+<summary><strong>Exemple 22.3 — mettre à jour une corrélation, étape par étape</strong></summary><div class="in">
+
+<p><strong>Données :</strong> $\lambda=0{,}95$ ; corrélation estimée entre $X$ et $Y$ le jour $n-1$ : <strong>0,6</strong> ; volatilités le jour $n-1$ : <strong>1 %</strong> et <strong>2 %</strong> ; variations en pourcentage le jour $n-1$ : <strong>0,5 %</strong> et <strong>2,5 %</strong>.</p>
+<p><em>Étape 1 — remonter à la covariance</em>, via $\text{cov}=\rho\sigma_X\sigma_Y$ :
+$$\text{cov}_{n-1}=0{,}6\times0{,}01\times0{,}02=\mathbf{0{,}00012}$$</p>
+<p><em>Étape 2 — mettre à jour la variance de $X$ :</em>
+$$\sigma_{x,n}^2=0{,}95\times0{,}01^2+0{,}05\times0{,}005^2=0{,}000095+0{,}00000125=\mathbf{0{,}00009625}$$</p>
+<p><em>Étape 3 — mettre à jour la variance de $Y$ :</em>
+$$\sigma_{y,n}^2=0{,}95\times0{,}02^2+0{,}05\times0{,}025^2=0{,}00038+0{,}00003125=\mathbf{0{,}00041125}$$</p>
+<p><em>Étape 4 — mettre à jour la covariance :</em>
+$$\text{cov}_n=0{,}95\times0{,}00012+0{,}05\times0{,}005\times0{,}025=0{,}000114+0{,}00000625=\mathbf{0{,}00012025}$$</p>
+<p><em>Étape 5 — redescendre aux volatilités :</em>
+$$\sigma_{x,n}=\sqrt{0{,}00009625}=\mathbf{0{,}981\ \%}\qquad\sigma_{y,n}=\sqrt{0{,}00041125}=\mathbf{2{,}028\ \%}$$</p>
+<p><em>Étape 6 — la nouvelle corrélation :</em>
+$$\rho_n=\frac{0{,}00012025}{0{,}00981\times0{,}02028}=\mathbf{0{,}6044}$$</p>
+<p class="cal piege"> <strong>La leçon de méthode :</strong> on <strong>ne met jamais à jour la corrélation directement</strong>. On passe par les <strong>trois</strong> quantités fondamentales — $\sigma_x^2$, $\sigma_y^2$, $\text{cov}$ — et on <strong>recompose</strong> la corrélation à la fin.</p>
+</div></details>
+
+<h3>6.2 La condition de cohérence : matrices semi-définies positives</h3>
+<p><em>Une fois toutes les variances et covariances calculées, une matrice de variance-covariance peut être construite. <strong>Toutes les matrices de variance-covariance ne sont pas cohérentes en interne.</strong></em> La condition pour qu'une matrice $\Omega$ de taille $N\times N$ le soit :</p>
+<p>$$\boxed{\mathbf w^{\mathsf T}\Omega\,\mathbf w\ \geqslant\ 0\quad\text{pour tout vecteur }\mathbf w\ (N\times1)}\;\text{(22.17)}$$</p>
+<p><em>Une matrice qui satisfait cette propriété est dite <strong>SEMI-DÉFINIE POSITIVE</strong>.</em></p>
+<p><strong>Pourquoi la condition doit tenir.</strong> <em>Si $\mathbf w^{\mathsf T}=[w_1,w_2,\dots,w_n]$, l'expression $\mathbf w^{\mathsf T}\Omega\mathbf w$ <strong>est la variance</strong> de $w_1x_1+w_2x_2+\cdots+w_nx_n$ où $x_i$ est la valeur de la variable $i$. <strong>En tant que telle, elle ne peut pas être négative.</strong></em></p>
+<blockquote>
+<p class="cal piege"> <strong>La règle pratique qui en découle.</strong> <em>Pour être sûr de produire une matrice semi-définie positive, <strong>les variances et covariances doivent être calculées de manière COHÉRENTE</strong>. Si les variances sont calculées en donnant un poids égal aux $m$ dernières données, <strong>il faut faire la même chose pour les covariances</strong>. Si les variances sont mises à jour par EWMA avec $\lambda=0{,}94$, <strong>il faut faire la même chose pour les covariances</strong>.</em></p>
+</blockquote>
+<details class="cor">
+<summary><strong>Le contre-exemple — une matrice qui n'est PAS cohérente</strong></summary><div class="in">
+
+<p>$$\Omega=\begin{pmatrix}1&amp;0&amp;0{,}9\\0&amp;1&amp;0{,}9\\0{,}9&amp;0{,}9&amp;1\end{pmatrix}$$</p>
+<p><em>Étape 1 — la lecture intuitive.</em> <em>La variance de chaque variable vaut 1,0, <strong>donc les covariances sont aussi des coefficients de corrélation</strong>. La première variable est <strong>fortement corrélée</strong> à la troisième ; la deuxième est <strong>fortement corrélée</strong> à la troisième ; <strong>mais il n'y a AUCUNE corrélation entre la première et la deuxième</strong>. Cela paraît étrange.</em></p>
+<p><em>Étape 2 — la preuve.</em> On prend $\mathbf w=(1,1,-1)$ :
+$$\mathbf w^{\mathsf T}\Omega\mathbf w=1+1+1+2(0)+2(-0{,}9)+2(-0{,}9)=3-3{,}6=\mathbf{-0{,}60}&lt;0$$
+<strong>La condition (22.17) n'est pas satisfaite : la matrice n'est pas semi-définie positive.</strong></p>
+<p><em>Étape 3 — le critère général en dimension 3.</em> <em>La condition pour qu'une matrice $3\times3$ de corrélations soit cohérente en interne est</em>
+$$\boxed{\rho_{12}^2+\rho_{13}^2+\rho_{23}^2-2\rho_{12}\rho_{13}\rho_{23}\ \leqslant\ 1}$$
+Ici : $0+0{,}81+0{,}81-2\times0\times0{,}9\times0{,}9=\mathbf{1{,}62}&gt;1$ — <strong>violée</strong>, comme prévu.</p>
+</div></details>
+
+<h2 data-prio="must">Concept 7 — L'application au portefeuille des quatre indices</h2>
+<p>On reprend le portefeuille du §21.2 : au 25 septembre 2008, <strong>4 M</strong> sur le DJIA, <strong>3 M</strong> sur le FTSE 100, <strong>1 M</strong> sur le CAC 40, <strong>2 M</strong> sur le Nikkei 225 ; rendements quotidiens collectés sur <strong>500 jours</strong>.</p>
+<p><strong>Table 22.5 — matrice de CORRÉLATION, pondération ÉGALE des 500 derniers rendements</strong> :</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>DJIA</th>
+<th>FTSE 100</th>
+<th>CAC 40</th>
+<th>Nikkei 225</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>DJIA</strong></td>
+<td>1</td>
+<td>0,489</td>
+<td>0,496</td>
+<td>$-0{,}062$</td>
+</tr>
+<tr>
+<td><strong>FTSE 100</strong></td>
+<td>0,489</td>
+<td>1</td>
+<td><strong>0,918</strong></td>
+<td>0,201</td>
+</tr>
+<tr>
+<td><strong>CAC 40</strong></td>
+<td>0,496</td>
+<td><strong>0,918</strong></td>
+<td>1</td>
+<td>0,211</td>
+</tr>
+<tr>
+<td><strong>Nikkei 225</strong></td>
+<td>$-0{,}062$</td>
+<td>0,201</td>
+<td>0,211</td>
+<td>1</td>
+</tr>
+</tbody></table>
+<p><em>Le FTSE 100 et le CAC 40 sont <strong>très fortement corrélés</strong>. Le DJIA est <strong>modérément</strong> corrélé aux deux. <strong>La corrélation du Nikkei 225 avec les autres indices est moins élevée.</strong></em></p>
+<p><strong>Table 22.6 — matrice de COVARIANCE, pondération égale</strong> :</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>DJIA</th>
+<th>FTSE 100</th>
+<th>CAC 40</th>
+<th>Nikkei 225</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>DJIA</strong></td>
+<td>0,0001227</td>
+<td>0,0000768</td>
+<td>0,0000767</td>
+<td>$-0{,}0000095$</td>
+</tr>
+<tr>
+<td><strong>FTSE 100</strong></td>
+<td>0,0000768</td>
+<td>0,0002010</td>
+<td>0,0001817</td>
+<td>0,0000394</td>
+</tr>
+<tr>
+<td><strong>CAC 40</strong></td>
+<td>0,0000767</td>
+<td>0,0001817</td>
+<td>0,0001950</td>
+<td>0,0000407</td>
+</tr>
+<tr>
+<td><strong>Nikkei 225</strong></td>
+<td>$-0{,}0000095$</td>
+<td>0,0000394</td>
+<td>0,0000407</td>
+<td>0,0001909</td>
+</tr>
+</tbody></table>
+<p><strong>Table 22.7 — matrice de COVARIANCE par EWMA avec $\lambda=0{,}94$</strong> :</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>DJIA</th>
+<th>FTSE 100</th>
+<th>CAC 40</th>
+<th>Nikkei 225</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>DJIA</strong></td>
+<td>0,0004801</td>
+<td>0,0004303</td>
+<td>0,0004257</td>
+<td>$-0{,}0000396$</td>
+</tr>
+<tr>
+<td><strong>FTSE 100</strong></td>
+<td>0,0004303</td>
+<td>0,0010314</td>
+<td>0,0009630</td>
+<td>0,0002095</td>
+</tr>
+<tr>
+<td><strong>CAC 40</strong></td>
+<td>0,0004257</td>
+<td>0,0009630</td>
+<td>0,0009535</td>
+<td>0,0001681</td>
+</tr>
+<tr>
+<td><strong>Nikkei 225</strong></td>
+<td>$-0{,}0000396$</td>
+<td>0,0002095</td>
+<td>0,0001681</td>
+<td>0,0002541</td>
+</tr>
+</tbody></table>
+<p class="cal piege"> <em>Dans les calculs EWMA, la variance est <strong>initialement fixée à la variance de population</strong>. Mais <strong>toutes les variances de départ raisonnables donnent essentiellement le même résultat</strong>, car dans ce cas seule la variance <strong>finale</strong> nous intéresse.</em></p>
+<details class="cor">
+<summary><strong>Les deux VaR, recalculées — et le facteur 2 entre les deux</strong></summary><div class="in">
+
+<p><em>Étape 1 — la formule.</em> On applique (21.3) : $\sigma_P^2=\sum_i\sum_j\text{cov}_{ij}\,\alpha_i\alpha_j$ avec $\mathbf a=(4\,000;\ 3\,000;\ 1\,000;\ 2\,000)$ en milliers de dollars.</p>
+<p><em>Étape 2 — cas équipondéré :</em>
+$$\sigma_P^2=8\,761{,}833\quad\Rightarrow\quad\sigma_P=\sqrt{8\,761{,}833}=\mathbf{93{,}60}\quad\Rightarrow\quad\text{VaR}_{1j,99\%}=\mathbf{217{,}757}\ \text{milliers de dollars}$$</p>
+<p><em>Étape 3 — cas EWMA :</em>
+$$\sigma_P^2=40\,995{,}765\quad\Rightarrow\quad\sigma_P=\mathbf{202{,}474}\quad\Rightarrow\quad\text{VaR}_{1j,99\%}=2{,}33\times202{,}474=\mathbf{471{,}025}\ \text{milliers de dollars}$$</p>
+<p><em>Étape 4 — la comparaison, qui est le point de la section :</em></p>
+<table>
+<thead>
+<tr>
+<th>Méthode</th>
+<th>VaR 1 jour 99 %</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Modèle linéaire, <strong>équipondéré</strong></td>
+<td><strong>217 757 dollars</strong></td>
+</tr>
+<tr>
+<td>Modèle linéaire, <strong>EWMA $\lambda=0{,}94$</strong></td>
+<td><strong>471 025 dollars</strong> — <em>plus de DEUX fois plus élevé</em></td>
+</tr>
+<tr>
+<td><strong>Simulation historique</strong> (§21.2)</td>
+<td><strong>253 385 dollars</strong></td>
+</tr>
+</tbody></table>
+<p class="cal piege"> <strong>Note de calcul.</strong> Hull écrit le quantile « $2{,}33$ », mais les valeurs 217,757 et 471,025 s'obtiennent avec le quantile <strong>exact</strong> $N^{-1}(0{,}01)=2{,}32635$ ; avec 2,33 arrondi on trouve 218,09 et 471,78. La différence est sans conséquence, mais il faut savoir d'où viennent les décimales.</p>
+</div></details>
+
+<p><strong>Pourquoi l'écart ? Les deux raisons, mises en table.</strong></p>
+<blockquote>
+<p><em>L'écart-type d'un portefeuille constitué de positions <strong>longues</strong> augmente <strong>avec les écarts-types des rendements</strong> ET <strong>avec les corrélations entre ces rendements</strong>.</em></p>
+</blockquote>
+<p><strong>Table 22.8 — volatilités (% par jour)</strong> :</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>DJIA</th>
+<th>FTSE 100</th>
+<th>CAC 40</th>
+<th>Nikkei 225</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Équipondéré</strong></td>
+<td>1,11</td>
+<td>1,42</td>
+<td>1,40</td>
+<td>1,38</td>
+</tr>
+<tr>
+<td><strong>EWMA</strong></td>
+<td><strong>2,19</strong></td>
+<td><strong>3,21</strong></td>
+<td><strong>3,09</strong></td>
+<td><strong>1,59</strong></td>
+</tr>
+</tbody></table>
+<p><em>Les écarts-types estimés sont <strong>bien plus élevés</strong> avec l'EWMA, <strong>parce que les volatilités étaient bien plus élevées pendant la période immédiatement antérieure au 25 septembre 2008 que pendant le reste des 500 jours</strong> couverts par les données.</em></p>
+<p><strong>Table 22.9 — matrice de corrélation par EWMA</strong> :</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>DJIA</th>
+<th>FTSE 100</th>
+<th>CAC 40</th>
+<th>Nikkei 225</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>DJIA</strong></td>
+<td>1</td>
+<td>0,611</td>
+<td>0,629</td>
+<td>$-0{,}113$</td>
+</tr>
+<tr>
+<td><strong>FTSE 100</strong></td>
+<td>0,611</td>
+<td>1</td>
+<td><strong>0,971</strong></td>
+<td>0,409</td>
+</tr>
+<tr>
+<td><strong>CAC 40</strong></td>
+<td>0,629</td>
+<td><strong>0,971</strong></td>
+<td>1</td>
+<td>0,342</td>
+</tr>
+<tr>
+<td><strong>Nikkei 225</strong></td>
+<td>$-0{,}113$</td>
+<td>0,409</td>
+<td>0,342</td>
+<td>1</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p class="cal piege"> <em><strong>En comparant la table 22.9 à la table 22.5, on voit que les corrélations avaient elles aussi AUGMENTÉ.</strong></em> <em>C'est un exemple du phénomène selon lequel <strong>les corrélations tendent à augmenter dans les conditions de marché adverses</strong>.</em></p>
+</blockquote>
+<p><em>(0,489 → 0,611 · 0,496 → 0,629 · 0,918 → 0,971 · 0,201 → 0,409 · 0,211 → 0,342 : <strong>toutes</strong> les corrélations positives montent.)</em></p>
+<h2>Comment reconnaître le type d'exercice</h2>
+<table>
+<thead>
+<tr>
+<th>Indice dans l'énoncé</th>
+<th>Méthode à déclencher</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>« $\lambda=\dots$ », « la dernière estimation de volatilité était… »</td>
+<td><strong>EWMA</strong> : $\sigma_n^2=\lambda\sigma_{n-1}^2+(1-\lambda)u_{n-1}^2$</td>
+</tr>
+<tr>
+<td>Trois paramètres $\omega$, $\alpha$, $\beta$ donnés</td>
+<td><strong>GARCH(1,1)</strong> : (22.9), puis $\gamma=1-\alpha-\beta$ et $V_L=\omega/\gamma$</td>
+</tr>
+<tr>
+<td>« volatilité de long terme ? »</td>
+<td>$\sqrt{\omega/(1-\alpha-\beta)}$</td>
+</tr>
+<tr>
+<td>« volatilité espérée dans $t$ jours »</td>
+<td>$E[\sigma_{n+t}^2]=V_L+(\alpha+\beta)^t(\sigma_n^2-V_L)$</td>
+</tr>
+<tr>
+<td>« volatilité à utiliser pour une option de $T$ jours »</td>
+<td>(22.14) avec $a=\ln[1/(\alpha+\beta)]$ et le facteur $(1-e^{-aT})/(aT)$</td>
+</tr>
+<tr>
+<td>« de combien bouge la volatilité implicite ? »</td>
+<td>(22.15)</td>
+</tr>
+<tr>
+<td>Corrélation à mettre à jour</td>
+<td>passer par $\sigma_x^2$, $\sigma_y^2$, $\text{cov}$ <strong>séparément</strong>, recomposer à la fin</td>
+</tr>
+<tr>
+<td>« la matrice est-elle acceptable ? »</td>
+<td>tester $\mathbf w^{\mathsf T}\Omega\mathbf w\geqslant0$ ; en dimension 3, le critère $\rho_{12}^2+\rho_{13}^2+\rho_{23}^2-2\rho_{12}\rho_{13}\rho_{23}\leqslant1$</td>
+</tr>
+<tr>
+<td>« estimer les paramètres »</td>
+<td><strong>maximum de vraisemblance</strong> : maximiser $\sum[-\ln v_i-u_i^2/v_i]$</td>
+</tr>
+<tr>
+<td>« le modèle est-il bon ? »</td>
+<td>autocorrélations de $u_i^2/\sigma_i^2$ + <strong>Ljung-Box</strong> (seuil 25 pour $K=15$)</td>
+</tr>
+<tr>
+<td>$\omega$ estimé <strong>négatif</strong></td>
+<td>le GARCH est <strong>instable</strong> : basculer sur <strong>EWMA</strong></td>
+</tr>
+</tbody></table>
+<h2>Comment résoudre ce type d'exercice</h2>
+<p><strong>A — Une mise à jour EWMA ou GARCH (l'exercice le plus fréquent).</strong></p>
+<ol>
+<li>Calculer $u_{n-1}=(S_{n-1}-S_{n-2})/S_{n-2}$ <strong>en proportion</strong>, pas en pourcentage.</li>
+<li>Élever au carré : $u_{n-1}^2$.</li>
+<li>Récupérer $\sigma_{n-1}^2$ = (volatilité donnée)².</li>
+<li>Appliquer la formule : EWMA $\lambda\sigma_{n-1}^2+(1-\lambda)u_{n-1}^2$ ; GARCH $\omega+\alpha u_{n-1}^2+\beta\sigma_{n-1}^2$.</li>
+<li>Prendre la <strong>racine</strong> et reconvertir en pourcentage.</li>
+<li>Contrôle de cohérence : si $u_{n-1}^2&gt;\sigma_{n-1}^2$, la volatilité doit <strong>monter</strong> ; sinon <strong>descendre</strong>.</li>
+</ol>
+<p><strong>B — Lire un GARCH estimé.</strong></p>
+<ol>
+<li>$\gamma=1-\alpha-\beta$ — <strong>vérifier que c'est positif</strong>, sinon le modèle est instable.</li>
+<li>$V_L=\omega/\gamma$ ; $\sigma_{LT}=\sqrt{V_L}$ (par jour), $\times\sqrt{252}$ pour l'annualiser.</li>
+<li>Taux de retour à la moyenne $a=1-\alpha-\beta$ (forme continue) ou $a=\ln[1/(\alpha+\beta)]$ (forme exponentielle de §5.2).</li>
+<li>Prévision : $V_L+(\alpha+\beta)^t(\sigma_n^2-V_L)$.</li>
+</ol>
+<p><strong>C — Une structure par terme.</strong></p>
+<ol>
+<li>Calculer $a=\ln[1/(\alpha+\beta)]$.</li>
+<li>Pour chaque $T$, calculer le facteur $f(T)=\dfrac{1-e^{-aT}}{aT}$ — il vaut <strong>1 en $T\to0$</strong> et tend vers <strong>0</strong> quand $T\to\infty$.</li>
+<li>$\sigma(T)^2=252\big[V_L+f(T)\,(V(0)-V_L)\big]$.</li>
+<li>Pour l'impact d'un choc : $\Delta\sigma(T)=f(T)\dfrac{\sigma(0)}{\sigma(T)}\Delta\sigma(0)$.</li>
+</ol>
+<p><strong>D — Une mise à jour de corrélation.</strong></p>
+<ol>
+<li>$\text{cov}_{n-1}=\rho_{n-1}\sigma_{x,n-1}\sigma_{y,n-1}$.</li>
+<li>Mettre à jour <strong>les trois</strong> : $\sigma_{x,n}^2$, $\sigma_{y,n}^2$, $\text{cov}_n$ — avec <strong>le même</strong> $\lambda$ (ou les mêmes $\omega,\alpha,\beta$).</li>
+<li>$\rho_n=\text{cov}_n/(\sigma_{x,n}\sigma_{y,n})$.</li>
+</ol>
+<h2 data-prio="must">Common mistakes</h2>
+<table>
+<thead>
+<tr>
+<th>Erreur</th>
+<th>Correction</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Utiliser $u_i=\ln(S_i/S_{i-1})$ dans un calcul de VaR</td>
+<td>pour le suivi quotidien, Hull utilise la <strong>variation en pourcentage</strong> $(S_i-S_{i-1})/S_{i-1}$</td>
+</tr>
+<tr>
+<td>Oublier d'élever la volatilité au <strong>carré</strong> avant la mise à jour</td>
+<td>les formules portent sur les <strong>variances</strong>, pas les volatilités</td>
+</tr>
+<tr>
+<td>Mettre à jour la corrélation directement</td>
+<td>passer par <strong>covariance et variances séparément</strong>, recomposer ensuite</td>
+</tr>
+<tr>
+<td>Utiliser $\lambda$ pour les variances et un autre schéma pour les covariances</td>
+<td> produit une matrice <strong>non semi-définie positive</strong></td>
+</tr>
+<tr>
+<td>Croire que $\omega$ est la variance de long terme</td>
+<td>$\omega=\gamma V_L$ ; $V_L=\omega/\gamma$ avec $\gamma=1-\alpha-\beta$</td>
+</tr>
+<tr>
+<td>Ne pas vérifier $\alpha+\beta&lt;1$</td>
+<td>sinon $\gamma&lt;0$ : le processus est <strong>« mean fleeing »</strong></td>
+</tr>
+<tr>
+<td>Croire qu'EWMA prévoit un retour à la moyenne</td>
+<td>$\alpha+\beta=1$ → <strong>la variance future espérée = la variance courante</strong></td>
+</tr>
+<tr>
+<td>Utiliser $a=1-\alpha-\beta$ dans (22.14)</td>
+<td>dans la structure par terme, $a=\ln[1/(\alpha+\beta)]$ — proche mais <strong>pas identique</strong> ($0{,}00649$ contre $0{,}006511$)</td>
+</tr>
+<tr>
+<td>Appliquer un choc de vega uniforme de 1 % à toutes les maturités</td>
+<td> la table 22.4 dit <strong>0,97 % à 10 jours, 0,33 % à 500 jours</strong></td>
+</tr>
+<tr>
+<td>Maximiser la vraisemblance elle-même plutôt que son <strong>log</strong></td>
+<td>numériquement instable ; le log donne (22.11)/(22.12)</td>
+</tr>
+<tr>
+<td>Oublier d'<strong>amorcer</strong> $v_i$ au jour 3</td>
+<td>Hull pose $v_3=u_2^2$ ; sans amorce la récurrence ne démarre pas</td>
+</tr>
+<tr>
+<td>Conclure sur la seule inspection des autocorrélations</td>
+<td>utiliser la <strong>statistique de Ljung-Box</strong> : seuil <strong>25</strong> pour $K=15$</td>
+</tr>
+<tr>
+<td>Croire que GARCH distingue hausses et baisses</td>
+<td>il ne dépend que de $u_{n-1}^2$ ; il faut des modèles <strong>asymétriques</strong> (Nelson, Engle-Ng) pour cela</td>
+</tr>
+<tr>
+<td>Supposer les corrélations stables en crise</td>
+<td>elles <strong>augmentent</strong> — c'est exactement ce que montrent les tables 22.5 vs 22.9</td>
+</tr>
+</tbody></table>
+<h2>Ultimate Review</h2>
+<table>
+<thead>
+<tr>
+<th>Élément</th>
+<th>Formule / valeur</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Variation quotidienne</strong></td>
+<td>$u_i=(S_i-S_{i-1})/S_{i-1}$</td>
+</tr>
+<tr>
+<td><strong>Estimateur équipondéré</strong></td>
+<td>$\sigma_n^2=\frac1m\sum u_{n-i}^2$</td>
+</tr>
+<tr>
+<td><strong>Schéma pondéré</strong></td>
+<td>$\sigma_n^2=\sum\alpha_iu_{n-i}^2$, $\sum\alpha_i=1$</td>
+</tr>
+<tr>
+<td><strong>ARCH($m$)</strong></td>
+<td>$\sigma_n^2=\gamma V_L+\sum\alpha_iu_{n-i}^2$, $\gamma+\sum\alpha_i=1$</td>
+</tr>
+<tr>
+<td><strong>EWMA</strong></td>
+<td>$\sigma_n^2=\lambda\sigma_{n-1}^2+(1-\lambda)u_{n-1}^2$</td>
+</tr>
+<tr>
+<td><strong>Poids EWMA</strong></td>
+<td>$\alpha_i=(1-\lambda)\lambda^{i-1}$</td>
+</tr>
+<tr>
+<td><strong>RiskMetrics</strong></td>
+<td>$\lambda=0{,}94$, publié en <strong>1994</strong> par J. P. Morgan</td>
+</tr>
+<tr>
+<td><strong>GARCH(1,1)</strong></td>
+<td>$\sigma_n^2=\gamma V_L+\alpha u_{n-1}^2+\beta\sigma_{n-1}^2=\omega+\alpha u_{n-1}^2+\beta\sigma_{n-1}^2$</td>
+</tr>
+<tr>
+<td><strong>Contraintes</strong></td>
+<td>$\gamma+\alpha+\beta=1$ ; $\alpha+\beta&lt;1$ ; $\omega=\gamma V_L$ ; $V_L=\omega/(1-\alpha-\beta)$</td>
+</tr>
+<tr>
+<td><strong>EWMA comme GARCH</strong></td>
+<td>$\gamma=0$, $\alpha=1-\lambda$, $\beta=\lambda$</td>
+</tr>
+<tr>
+<td><strong>Poids GARCH sur $u_{n-i}^2$</strong></td>
+<td>$\alpha\beta^{i-1}$</td>
+</tr>
+<tr>
+<td><strong>Processus continu équivalent</strong></td>
+<td>$dV=a(V_L-V)dt+\xi V\,dz$, $a=1-\alpha-\beta$, $\xi=\alpha\sqrt2$</td>
+</tr>
+<tr>
+<td><strong>Log-vraisemblance</strong></td>
+<td>$\sum_i\big[-\ln(v_i)-u_i^2/v_i\big]$</td>
+</tr>
+<tr>
+<td><strong>Amorce du tableur</strong></td>
+<td>$v_3=u_2^2$</td>
+</tr>
+<tr>
+<td><strong>S&amp;P 500 estimé</strong></td>
+<td>$\omega=0{,}000001366$, $\alpha=0{,}083394$, $\beta=0{,}910116$, objectif $=10\,228{,}2349$</td>
+</tr>
+<tr>
+<td><strong>Sa variance / volatilité de long terme</strong></td>
+<td>$V_L=0{,}0002075$ → <strong>1,4404 %</strong> par jour</td>
+</tr>
+<tr>
+<td><strong>Variance targeting</strong></td>
+<td>fixer $V_L$ = variance d'échantillon ; $\omega=V_L(1-\alpha-\beta)$ ; <strong>2 paramètres</strong></td>
+</tr>
+<tr>
+<td><strong>EWMA sur les mêmes données</strong></td>
+<td>$\lambda=0{,}9374$, objectif $=10\,192{,}5104$</td>
+</tr>
+<tr>
+<td><strong>Ljung-Box</strong></td>
+<td>$m\sum_kw_k\eta_k^2$, $w_k=(m+2)/(m-k)$ ; seuil <strong>25</strong> pour $K=15$</td>
+</tr>
+<tr>
+<td><strong>Résultats du test</strong></td>
+<td>$u_i^2$ : <strong>≈ 1 566</strong> · $u_i^2/\sigma_i^2$ : <strong>21,7</strong></td>
+</tr>
+<tr>
+<td><strong>Prévision</strong></td>
+<td>$E[\sigma_{n+t}^2]=V_L+(\alpha+\beta)^t(\sigma_n^2-V_L)$</td>
+</tr>
+<tr>
+<td><strong>Structure par terme</strong></td>
+<td>$\sigma(T)^2=252\big[V_L+\frac{1-e^{-aT}}{aT}(V(0)-V_L)\big]$, $a=\ln\frac{1}{\alpha+\beta}$</td>
+</tr>
+<tr>
+<td><strong>Table 22.3</strong></td>
+<td>27,36 · 27,10 · 26,87 · 26,35 · 24,32 % pour 10/30/50/100/500 jours</td>
+</tr>
+<tr>
+<td><strong>Table 22.4</strong></td>
+<td>0,97 · 0,92 · 0,87 · 0,77 · 0,33 % pour un choc de 1 %</td>
+</tr>
+<tr>
+<td><strong>Covariance EWMA</strong></td>
+<td>$\text{cov}_n=\lambda\text{cov}_{n-1}+(1-\lambda)x_{n-1}y_{n-1}$</td>
+</tr>
+<tr>
+<td><strong>Covariance GARCH</strong></td>
+<td>$\text{cov}_n=\omega+\alpha x_{n-1}y_{n-1}+\beta\text{cov}_{n-1}$</td>
+</tr>
+<tr>
+<td><strong>Cohérence</strong></td>
+<td>$\mathbf w^{\mathsf T}\Omega\mathbf w\geqslant0$ : <strong>semi-définie positive</strong></td>
+</tr>
+<tr>
+<td><strong>Critère $3\times3$</strong></td>
+<td>$\rho_{12}^2+\rho_{13}^2+\rho_{23}^2-2\rho_{12}\rho_{13}\rho_{23}\leqslant1$</td>
+</tr>
+<tr>
+<td><strong>Quatre indices, équipondéré</strong></td>
+<td>$\sigma_P=93{,}60$ → VaR <strong>217 757 dollars</strong></td>
+</tr>
+<tr>
+<td><strong>Quatre indices, EWMA</strong></td>
+<td>$\sigma_P=202{,}474$ → VaR <strong>471 025 dollars</strong></td>
+</tr>
+<tr>
+<td><strong>Simulation historique (rappel)</strong></td>
+<td><strong>253 385 dollars</strong></td>
+</tr>
+<tr>
+<td><strong>Le phénomène de crise</strong></td>
+<td>volatilités <strong>et</strong> corrélations <strong>augmentent</strong> simultanément</td>
+</tr>
+</tbody></table>
+<div class="rec"><h2>Active Recall</h2><ol>
+<li>Que note $\sigma_n$ exactement, et à quel moment est-elle estimée ?</li>
+<li>Écrire l'estimateur non biaisé (22.1) puis les trois modifications qui mènent à (22.3).</li>
+<li>Pourquoi remplacer $m-1$ par $m$ ? Quel estimateur obtient-on ?</li>
+<li>En quoi les indices des $u$ diffèrent-ils des indices des $\Delta x$ du chapitre 21 ?</li>
+<li>Écrire un schéma de pondération général et les deux contraintes sur les $\alpha_i$.</li>
+<li>Écrire le modèle ARCH($m$). Qui l'a proposé, et en quelle année ?</li>
+<li>Quelle est la relation entre $\omega$, $\gamma$ et $V_L$ ?</li>
+<li>Écrire la formule de mise à jour EWMA.</li>
+<li>Démontrer que l'EWMA donne des poids $(1-\lambda)\lambda^{i-1}$.</li>
+<li>Quel terme néglige-t-on dans cette démonstration, et pourquoi ?</li>
+<li>Refaire l'exemple 22.1 : $\lambda=0{,}9$, $\sigma_{n-1}=1\,\%$, $u_{n-1}=2\,\%$.</li>
+<li>Pourquoi la volatilité <strong>monte</strong>-t-elle dans cet exemple ?</li>
+<li>Quel est l'avantage de stockage de l'EWMA ?</li>
+<li>Que se passe-t-il quand $\lambda$ est faible ? quand $\lambda$ est proche de 1 ?</li>
+<li>Quelle valeur de $\lambda$ RiskMetrics utilise-t-elle, et comment a-t-elle été choisie ?</li>
+<li>Comment le « taux de variance réalisé » était-il calculé chez J. P. Morgan ?</li>
+<li>Écrire GARCH(1,1) sous les deux formes (22.8) et (22.9).</li>
+<li>Quels poids portent $\gamma$, $\alpha$ et $\beta$ respectivement ?</li>
+<li>Sous quelles conditions EWMA est-il un cas particulier de GARCH(1,1) ?</li>
+<li>Que signifie le « (1,1) » ? Qu'est-ce que GARCH($p,q$) ?</li>
+<li>Refaire l'exemple 22.2 en entier, y compris la mise à jour.</li>
+<li>Quel poids GARCH(1,1) donne-t-il à $u_{n-i}^2$ ?</li>
+<li>Comment interpréter $\beta$ ? À quoi est-il analogue ?</li>
+<li>Écrire le processus stochastique équivalent, avec $a$ et $\xi$.</li>
+<li>Quel est le signe du drift quand $V&gt;V_L$ ?</li>
+<li>Quel est l'argument théorique en faveur de GARCH sur EWMA ?</li>
+<li>Que faire si le $\omega$ optimal est négatif ?</li>
+<li>Énoncer le principe du maximum de vraisemblance.</li>
+<li>Refaire l'exemple des dix actions et montrer que $p=0{,}1$.</li>
+<li>Dériver l'estimateur de variance constante par maximum de vraisemblance.</li>
+<li>Pourquoi maximise-t-on le <strong>logarithme</strong> de la vraisemblance ?</li>
+<li>Écrire (22.12) et dire en quoi elle diffère de (22.11).</li>
+<li>Décrire les six colonnes du tableur de la table 22.1.</li>
+<li>Comment amorce-t-on la récurrence des variances ?</li>
+<li>Quels sont les paramètres optimaux trouvés sur le S&amp;P 500, et la valeur de l'objectif ?</li>
+<li>Calculer $V_L$ et la volatilité de long terme correspondante.</li>
+<li>Qu'est-ce que le <em>variance targeting</em>, et combien de paramètres reste-t-il à estimer ?</li>
+<li>Quelles valeurs obtient-on par variance targeting ? Perd-on beaucoup ?</li>
+<li>Quelle valeur de $\lambda$ maximise la vraisemblance sur les mêmes données ?</li>
+<li>Quelle astuce Hull donne-t-il pour faire fonctionner Solver ?</li>
+<li>Sur quelle série teste-t-on l'autocorrélation <strong>avant</strong> le modèle ? Et <strong>après</strong> ?</li>
+<li>Écrire la statistique de Ljung-Box et le poids $w_k$.</li>
+<li>Quel est le seuil de rejet pour $K=15$ ?</li>
+<li>Quelles valeurs obtient-on pour les deux séries du S&amp;P 500 ? Conclusion ?</li>
+<li>Dériver la formule de prévision (22.13).</li>
+<li>Quelle propriété de $u_{n+t-1}^2$ utilise-t-on dans cette dérivation ?</li>
+<li>Que devient la prévision dans le cas EWMA ?</li>
+<li>Que se passe-t-il si $\alpha+\beta&gt;1$ ? Quel nom donne-t-on à ce comportement ?</li>
+<li>Calculer la variance espérée à 10 et à 500 jours pour le S&amp;P 500 avec $V(0)=0{,}0003$.</li>
+<li>Écrire (22.14) et dire ce que représente $\sigma(T)$.</li>
+<li>Que vaut $a$ pour le S&amp;P 500 ?</li>
+<li>Quelle est la pente de la structure par terme si la volatilité courante est au-dessus de $V_L$ ?</li>
+<li>Reproduire la table 22.3 pour $T=10$ et $T=500$.</li>
+<li>Écrire (22.15) et l'appliquer à un choc de 1 % sur une option de 30 jours.</li>
+<li>Comment les institutions utilisent-elles la table 22.4 pour le calcul du vega ?</li>
+<li>Écrire les définitions de la corrélation et de la covariance.</li>
+<li>Pourquoi la covariance est-elle la « variable fondamentale » de l'analyse ?</li>
+<li>Écrire la mise à jour EWMA d'une covariance, puis sa version GARCH(1,1).</li>
+<li>Refaire l'exemple 22.3 en entier, les six étapes.</li>
+<li>Pourquoi ne met-on jamais à jour une corrélation directement ?</li>
+<li>Énoncer la condition (22.17) et le nom de la propriété.</li>
+<li>Pourquoi $\mathbf w^{\mathsf T}\Omega\mathbf w$ ne peut-il pas être négatif ?</li>
+<li>Quelle règle pratique garantit une matrice cohérente ?</li>
+<li>Montrer que la matrice de Hull n'est pas semi-définie positive avec $\mathbf w=(1,1,-1)$.</li>
+<li>Énoncer le critère de cohérence en dimension 3 et l'appliquer.</li>
+<li>Quelles sont les deux paires les plus corrélées dans le portefeuille des quatre indices ?</li>
+<li>Quelle VaR obtient-on en équipondéré ? en EWMA ? Comment se comparent-elles à la simulation historique ?</li>
+<li>Donner les deux raisons de l'écart entre les deux VaR.</li>
+<li>Comparer les volatilités quotidiennes des tables 22.8.</li>
+<li>Qu'observe-t-on sur les corrélations entre les tables 22.5 et 22.9, et quel phénomène général cela illustre-t-il ?</li>
+</ol></div>
+
+<h2>Flashcards</h2>
+<table>
+<thead>
+<tr>
+<th>Question</th>
+<th>Réponse</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Que signifie $\sigma_n$ ?</td>
+<td>La volatilité du <strong>jour $n$</strong>, estimée <strong>fin du jour $n-1$</strong></td>
+</tr>
+<tr>
+<td>Taux de variance ?</td>
+<td>$\sigma_n^2$</td>
+</tr>
+<tr>
+<td>$u_i$ pour le suivi quotidien ?</td>
+<td>$(S_i-S_{i-1})/S_{i-1}$</td>
+</tr>
+<tr>
+<td>Les trois modifications de (22.1) ?</td>
+<td>Variation <strong>en %</strong> · $\bar u=0$ · $m-1\to m$</td>
+</tr>
+<tr>
+<td>Que devient l'estimateur ?</td>
+<td>Celui du <strong>maximum de vraisemblance</strong></td>
+</tr>
+<tr>
+<td>Contraintes sur les poids ?</td>
+<td>$\alpha_i&gt;0$, décroissants, <strong>somme = 1</strong></td>
+</tr>
+<tr>
+<td>ARCH($m$) ?</td>
+<td>$\sigma_n^2=\gamma V_L+\sum\alpha_iu_{n-i}^2$</td>
+</tr>
+<tr>
+<td>Auteur d'ARCH ?</td>
+<td><strong>Engle</strong>, 1982</td>
+</tr>
+<tr>
+<td>Que vaut $\omega$ ?</td>
+<td>$\gamma V_L$</td>
+</tr>
+<tr>
+<td>Formule EWMA ?</td>
+<td>$\sigma_n^2=\lambda\sigma_{n-1}^2+(1-\lambda)u_{n-1}^2$</td>
+</tr>
+<tr>
+<td>Poids EWMA sur $u_{n-i}^2$ ?</td>
+<td>$(1-\lambda)\lambda^{i-1}$</td>
+</tr>
+<tr>
+<td>Terme négligé dans la dérivation ?</td>
+<td>$\lambda^m\sigma_{n-m}^2$</td>
+</tr>
+<tr>
+<td>Exemple 22.1 : résultat ?</td>
+<td>$\sigma_n^2=0{,}00013$ → <strong>1,14 %</strong></td>
+</tr>
+<tr>
+<td>Pourquoi la volatilité monte ?</td>
+<td>$u_{n-1}^2&gt;\sigma_{n-1}^2$ (réalisé <strong>au-dessus</strong> de l'espéré)</td>
+</tr>
+<tr>
+<td>Avantage de stockage de l'EWMA ?</td>
+<td>Ne garder que <strong>la variance courante</strong> et <strong>la dernière observation</strong></td>
+</tr>
+<tr>
+<td>$\lambda$ faible ?</td>
+<td>Estimations <strong>très volatiles</strong></td>
+</tr>
+<tr>
+<td>$\lambda$ élevé ?</td>
+<td>Réponse <strong>lente</strong> à l'information</td>
+</tr>
+<tr>
+<td>$\lambda$ de RiskMetrics ?</td>
+<td><strong>0,94</strong></td>
+</tr>
+<tr>
+<td>Année de publication ?</td>
+<td><strong>1994</strong>, par <strong>J. P. Morgan</strong></td>
+</tr>
+<tr>
+<td>Variance réalisée chez RiskMetrics ?</td>
+<td>Moyenne équipondérée des $u_i^2$ des <strong>25 jours suivants</strong></td>
+</tr>
+<tr>
+<td>GARCH(1,1) ?</td>
+<td>$\sigma_n^2=\omega+\alpha u_{n-1}^2+\beta\sigma_{n-1}^2$</td>
+</tr>
+<tr>
+<td>Auteur, année ?</td>
+<td><strong>Bollerslev</strong>, <strong>1986</strong></td>
+</tr>
+<tr>
+<td>Somme des poids ?</td>
+<td>$\gamma+\alpha+\beta=1$</td>
+</tr>
+<tr>
+<td>Condition de stabilité ?</td>
+<td>$\alpha+\beta&lt;1$</td>
+</tr>
+<tr>
+<td>$V_L$ ?</td>
+<td>$\omega/(1-\alpha-\beta)$</td>
+</tr>
+<tr>
+<td>EWMA en langage GARCH ?</td>
+<td>$\gamma=0$, $\alpha=1-\lambda$, $\beta=\lambda$</td>
+</tr>
+<tr>
+<td>Sens de « (1,1) » ?</td>
+<td><strong>1</strong> observation de $u^2$, <strong>1</strong> estimation de variance</td>
+</tr>
+<tr>
+<td>Le plus populaire des GARCH ?</td>
+<td><strong>GARCH(1,1)</strong></td>
+</tr>
+<tr>
+<td>Ex. 22.2 : $\gamma$, $V_L$, $\sigma_{LT}$ ?</td>
+<td>$0{,}01$ · $0{,}0002$ · <strong>1,4 % par jour</strong></td>
+</tr>
+<tr>
+<td>Ex. 22.2 : nouvelle volatilité ?</td>
+<td><strong>1,53 %</strong> par jour</td>
+</tr>
+<tr>
+<td>Poids GARCH sur $u_{n-i}^2$ ?</td>
+<td>$\alpha\beta^{i-1}$</td>
+</tr>
+<tr>
+<td>Interprétation de $\beta$ ?</td>
+<td>Un <strong>taux de décroissance</strong>, analogue à $\lambda$</td>
+</tr>
+<tr>
+<td>Processus continu équivalent ?</td>
+<td>$dV=a(V_L-V)dt+\xi V\,dz$</td>
+</tr>
+<tr>
+<td>Que valent $a$ et $\xi$ ?</td>
+<td>$a=1-\alpha-\beta$ · $\xi=\alpha\sqrt2$</td>
+</tr>
+<tr>
+<td>Drift si $V&gt;V_L$ ?</td>
+<td><strong>Négatif</strong></td>
+</tr>
+<tr>
+<td>Avantage théorique de GARCH ?</td>
+<td>Il intègre le <strong>retour à la moyenne</strong></td>
+</tr>
+<tr>
+<td>Si $\omega$ optimal &lt; 0 ?</td>
+<td>GARCH <strong>instable</strong> → basculer sur <strong>EWMA</strong></td>
+</tr>
+<tr>
+<td>Principe du maximum de vraisemblance ?</td>
+<td>Choisir les paramètres qui <strong>maximisent la chance</strong> des données observées</td>
+</tr>
+<tr>
+<td>Exemple des 10 actions ?</td>
+<td>Maximiser $p(1-p)^9$ → $p=\mathbf{0{,}1}$</td>
+</tr>
+<tr>
+<td>Vraisemblance d'une observation normale ?</td>
+<td>$\frac{1}{\sqrt{2\pi v}}e^{-u_i^2/2v}$</td>
+</tr>
+<tr>
+<td>Objectif à maximiser (variance constante) ?</td>
+<td>$\sum[-\ln v-u_i^2/v]$</td>
+</tr>
+<tr>
+<td>Estimateur obtenu ?</td>
+<td>$\frac1m\sum u_i^2$</td>
+</tr>
+<tr>
+<td>Objectif GARCH (22.12) ?</td>
+<td>$\sum[-\ln v_i-u_i^2/v_i]$</td>
+</tr>
+<tr>
+<td>Différence avec (22.11) ?</td>
+<td>$v$ devient $v_i$</td>
+</tr>
+<tr>
+<td>Résolution ?</td>
+<td><strong>Recherche itérative</strong> (Solver, Levenberg-Marquardt)</td>
+</tr>
+<tr>
+<td>Amorce du tableur ?</td>
+<td>$v_3=u_2^2$</td>
+</tr>
+<tr>
+<td>Période des données S&amp;P 500 ?</td>
+<td>18 juillet 2005 → 13 août 2010 (<strong>1 279 jours</strong>)</td>
+</tr>
+<tr>
+<td>Paramètres optimaux ?</td>
+<td>$\omega=0{,}000001366$, $\alpha=0{,}083394$, $\beta=0{,}910116$</td>
+</tr>
+<tr>
+<td>Valeur de l'objectif ?</td>
+<td><strong>10 228,2349</strong></td>
+</tr>
+<tr>
+<td>$\alpha+\beta$ ?</td>
+<td><strong>0,99351</strong></td>
+</tr>
+<tr>
+<td>$V_L$ et volatilité de long terme ?</td>
+<td><strong>0,0002075</strong> → <strong>1,4404 %</strong> par jour</td>
+</tr>
+<tr>
+<td>Volatilité max pendant la crise ?</td>
+<td>Jusqu'à <strong>5 % par jour</strong></td>
+</tr>
+<tr>
+<td>Variance targeting ?</td>
+<td>Fixer $V_L$ = variance d'échantillon ; $\omega=V_L(1-\alpha-\beta)$</td>
+</tr>
+<tr>
+<td>Combien de paramètres restent ?</td>
+<td><strong>Deux</strong></td>
+</tr>
+<tr>
+<td>Résultat sur le S&amp;P 500 ?</td>
+<td>$\alpha=0{,}08445$, $\beta=0{,}9101$, objectif <strong>10 228,1941</strong></td>
+</tr>
+<tr>
+<td>Variance d'échantillon ?</td>
+<td><strong>0,0002412</strong> → 1,5531 % par jour</td>
+</tr>
+<tr>
+<td>$\lambda$ optimal par MV ?</td>
+<td><strong>0,9374</strong>, objectif <strong>10 192,5104</strong></td>
+</tr>
+<tr>
+<td>Astuce Solver ?</td>
+<td>Structurer pour que les paramètres aient des <strong>valeurs comparables</strong></td>
+</tr>
+<tr>
+<td>Risque de Solver ?</td>
+<td>Un <strong>maximum local</strong> — tester plusieurs départs</td>
+</tr>
+<tr>
+<td>Série testée avant le modèle ?</td>
+<td>$u_i^2$</td>
+</tr>
+<tr>
+<td>Série testée après ?</td>
+<td>$u_i^2/\sigma_i^2$</td>
+</tr>
+<tr>
+<td>Statistique de Ljung-Box ?</td>
+<td>$m\sum_kw_k\eta_k^2$, $w_k=(m+2)/(m-k)$</td>
+</tr>
+<tr>
+<td>Seuil pour $K=15$ ?</td>
+<td><strong>25</strong></td>
+</tr>
+<tr>
+<td>LB pour $u_i^2$ ?</td>
+<td><strong>≈ 1 566</strong> — forte autocorrélation</td>
+</tr>
+<tr>
+<td>LB pour $u_i^2/\sigma_i^2$ ?</td>
+<td><strong>21,7</strong> — autocorrélation largement supprimée</td>
+</tr>
+<tr>
+<td>Formule de prévision ?</td>
+<td>$E[\sigma_{n+t}^2]=V_L+(\alpha+\beta)^t(\sigma_n^2-V_L)$</td>
+</tr>
+<tr>
+<td>Propriété utilisée ?</td>
+<td>$E[u_{n+t-1}^2]=\sigma_{n+t-1}^2$</td>
+</tr>
+<tr>
+<td>Prévision EWMA ?</td>
+<td>La variance future espérée <strong>= la variance courante</strong></td>
+</tr>
+<tr>
+<td>Si $\alpha+\beta&gt;1$ ?</td>
+<td>Processus <em><strong>« mean fleeing »</strong></em></td>
+</tr>
+<tr>
+<td>Prévision S&amp;P à 10 jours ?</td>
+<td><strong>0,0002942</strong> → 1,72 %/jour</td>
+</tr>
+<tr>
+<td>À 500 jours ?</td>
+<td><strong>0,0002110</strong> → 1,45 %/jour</td>
+</tr>
+<tr>
+<td>$a$ dans la structure par terme ?</td>
+<td>$\ln[1/(\alpha+\beta)]$</td>
+</tr>
+<tr>
+<td>$a$ pour le S&amp;P 500 ?</td>
+<td><strong>0,006511</strong></td>
+</tr>
+<tr>
+<td>Formule (22.14) ?</td>
+<td>$\sigma(T)^2=252[V_L+\frac{1-e^{-aT}}{aT}(V(0)-V_L)]$</td>
+</tr>
+<tr>
+<td>Table 22.3 à 10 jours ?</td>
+<td><strong>27,36 %</strong></td>
+</tr>
+<tr>
+<td>À 500 jours ?</td>
+<td><strong>24,32 %</strong></td>
+</tr>
+<tr>
+<td>$\sigma(0)$ ?</td>
+<td>$\sqrt{252\times0{,}0003}=\mathbf{27{,}50\,\%}$</td>
+</tr>
+<tr>
+<td>Pente si $\sigma$ courante &gt; long terme ?</td>
+<td><strong>Décroissante</strong></td>
+</tr>
+<tr>
+<td>Formule d'impact (22.15) ?</td>
+<td>$\frac{1-e^{-aT}}{aT}\frac{\sigma(0)}{\sigma(T)}\Delta\sigma(0)$</td>
+</tr>
+<tr>
+<td>Impact d'un choc de 1 % à 10 jours ?</td>
+<td><strong>0,97 %</strong></td>
+</tr>
+<tr>
+<td>À 500 jours ?</td>
+<td><strong>0,33 %</strong></td>
+</tr>
+<tr>
+<td>Usage pratique ?</td>
+<td>Calculer le <strong>vega par maturité</strong>, pas un choc uniforme</td>
+</tr>
+<tr>
+<td>Covariance ?</td>
+<td>$E[(X-\mu_X)(Y-\mu_Y)]$</td>
+</tr>
+<tr>
+<td>Variable fondamentale de l'analyse ?</td>
+<td>La <strong>covariance</strong>, pas la corrélation</td>
+</tr>
+<tr>
+<td>Covariance EWMA ?</td>
+<td>$\lambda\text{cov}_{n-1}+(1-\lambda)x_{n-1}y_{n-1}$</td>
+</tr>
+<tr>
+<td>Covariance GARCH(1,1) ?</td>
+<td>$\omega+\alpha x_{n-1}y_{n-1}+\beta\text{cov}_{n-1}$</td>
+</tr>
+<tr>
+<td>Covariance de long terme ?</td>
+<td>$\omega/(1-\alpha-\beta)$</td>
+</tr>
+<tr>
+<td>Ex. 22.3 : $\text{cov}_{n-1}$ ?</td>
+<td>$0{,}6\times0{,}01\times0{,}02=\mathbf{0{,}00012}$</td>
+</tr>
+<tr>
+<td>Ex. 22.3 : nouvelles volatilités ?</td>
+<td><strong>0,981 %</strong> et <strong>2,028 %</strong></td>
+</tr>
+<tr>
+<td>Ex. 22.3 : nouvelle covariance ?</td>
+<td><strong>0,00012025</strong></td>
+</tr>
+<tr>
+<td>Ex. 22.3 : nouvelle corrélation ?</td>
+<td><strong>0,6044</strong></td>
+</tr>
+<tr>
+<td>Méthode à suivre ?</td>
+<td>Mettre à jour <strong>les trois</strong> quantités, <strong>recomposer</strong> ensuite</td>
+</tr>
+<tr>
+<td>Condition de cohérence ?</td>
+<td>$\mathbf w^{\mathsf T}\Omega\mathbf w\geqslant0$ pour tout $\mathbf w$</td>
+</tr>
+<tr>
+<td>Nom de la propriété ?</td>
+<td><strong>Semi-définie positive</strong></td>
+</tr>
+<tr>
+<td>Pourquoi ?</td>
+<td>C'est la <strong>variance</strong> de $\sum w_ix_i$</td>
+</tr>
+<tr>
+<td>Règle pratique ?</td>
+<td><strong>Même schéma</strong> de pondération pour variances <strong>et</strong> covariances</td>
+</tr>
+<tr>
+<td>Contre-exemple de Hull ?</td>
+<td>$\rho_{13}=\rho_{23}=0{,}9$ mais $\rho_{12}=0$</td>
+</tr>
+<tr>
+<td>Vecteur qui le démasque ?</td>
+<td>$\mathbf w=(1,1,-1)$ → $\mathbf w^{\mathsf T}\Omega\mathbf w=\mathbf{-0{,}60}$</td>
+</tr>
+<tr>
+<td>Critère $3\times3$ ?</td>
+<td>$\rho_{12}^2+\rho_{13}^2+\rho_{23}^2-2\rho_{12}\rho_{13}\rho_{23}\leqslant1$</td>
+</tr>
+<tr>
+<td>Sa valeur ici ?</td>
+<td><strong>1,62</strong> &gt; 1 — violé</td>
+</tr>
+<tr>
+<td>Paire la plus corrélée (équipondéré) ?</td>
+<td><strong>FTSE 100 / CAC 40</strong> à <strong>0,918</strong></td>
+</tr>
+<tr>
+<td>Indice le moins corrélé ?</td>
+<td>Le <strong>Nikkei 225</strong></td>
+</tr>
+<tr>
+<td>VaR équipondérée des 4 indices ?</td>
+<td><strong>217 757 dollars</strong></td>
+</tr>
+<tr>
+<td>VaR EWMA ?</td>
+<td><strong>471 025 dollars</strong> — plus du <strong>double</strong></td>
+</tr>
+<tr>
+<td>VaR par simulation historique ?</td>
+<td><strong>253 385 dollars</strong></td>
+</tr>
+<tr>
+<td>Les deux causes de l'écart ?</td>
+<td>Volatilités <strong>plus élevées</strong> et corrélations <strong>plus élevées</strong></td>
+</tr>
+<tr>
+<td>Volatilité EWMA du FTSE ?</td>
+<td><strong>3,21 %</strong> contre 1,42 % en équipondéré</td>
+</tr>
+<tr>
+<td>Corrélation FTSE/CAC en EWMA ?</td>
+<td><strong>0,971</strong> contre 0,918</td>
+</tr>
+<tr>
+<td>Le phénomène général ?</td>
+<td><em>Les corrélations <strong>augmentent</strong> dans les conditions de marché adverses</em></td>
+</tr>
+</tbody></table>
+</main>
+
+
+
+
+</body></html>

@@ -1,0 +1,1859 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fiche 100 — Dérivés de taux : les modèles de marché standard (obligations, caps, swaptions)</title>
+<script>
+window.MathJax={tex:{inlineMath:[["$","$"]],displayMath:[["$$","$$"]],processEscapes:true},
+ options:{skipHtmlTags:["script","noscript","style","textarea","pre","code"]},
+ svg:{fontCache:"global"},
+ startup:{pageReady:()=>MathJax.startup.defaultPageReady().then(()=>{document.body.classList.add("ready")})}};
+setTimeout(function(){document.body.classList.add("ready")},2500);
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+/* ============================================================
+   MathiasLearn — feuille de style des fiches
+   Reprise intégrale des tokens de 00_PARCOURS/*.html
+   + blocs pédagogiques (callouts, méthode, essentiels, recall)
+   ============================================================ */
+:root{--bg:#faf9f7;--card:#fff;--ink:#1a1a1a;--muted:#6b6b6b;--line:#e5e2dd;--accent:#8b5e34;
+ --hl:#fdf8ef;--ok:#2d7d4f;--okbg:#f0f7f3;--warn:#b3402f;--warnbg:#fdf3f1;--blue:#2f5d8b;--bluebg:#f1f5fa}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+ font:17px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;padding:0 16px 100px}
+.nav{position:sticky;top:0;background:rgba(250,249,247,.96);backdrop-filter:blur(8px);
+ border-bottom:1px solid var(--line);margin:0 -16px 30px;padding:11px 16px;z-index:50;
+ display:flex;gap:6px;flex-wrap:wrap;font-size:13px}
+.nav a{color:var(--muted);text-decoration:none;padding:4px 9px;border-radius:5px;white-space:nowrap}
+.nav a:hover{background:var(--line);color:var(--ink)}
+.nav a.on{background:var(--accent);color:#fff}
+main{max-width:780px;margin:0 auto}
+h1{font-size:31px;letter-spacing:-.02em;margin:.4em 0 .5em;line-height:1.25}
+h2{font-size:23px;margin:2.2em 0 .7em;padding-bottom:.3em;border-bottom:1px solid var(--line)}
+h3{font-size:19px;margin:1.9em 0 .5em;color:var(--accent)}
+h4{font-size:17px;margin:1.5em 0 .4em}
+p{margin:.8em 0} a{color:var(--accent)} hr{border:0;border-top:1px solid var(--line);margin:2.6em 0}
+table{border-collapse:collapse;width:100%;margin:1.3em 0;font-size:15.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+th{background:#f3f0eb;font-weight:600}
+tr:nth-child(even) td{background:#fcfbfa}
+code{font-family:"SF Mono",Menlo,Consolas,monospace;font-size:.88em;background:#f2efea;padding:2px 6px;border-radius:4px;overflow-wrap:break-word}
+pre{background:#f2efea;padding:14px 16px;border-radius:8px;overflow-x:auto}
+pre code{background:none;padding:0;white-space:pre}
+blockquote{border-left:3px solid var(--accent);background:var(--hl);margin:1.4em 0;padding:14px 20px;border-radius:0 8px 8px 0}
+blockquote p:first-child{margin-top:0} blockquote p:last-child{margin-bottom:0}
+ul,ol{padding-left:1.5em} li{margin:.35em 0} em{color:#4a4a4a}
+mjx-container[display="true"]{margin:1.1em 0!important;overflow-x:auto;overflow-y:hidden;padding:2px 0}
+mjx-container svg{max-width:100%}
+body:not(.ready) main{opacity:0} main{opacity:1;transition:opacity .25s}
+
+/* --- bandeau de tête de fiche --- */
+.cours{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--accent);
+ border-radius:0 10px 10px 0;padding:18px 22px;margin:0 0 34px}
+.cours h4{margin:0 0 4px;font-size:14px;text-transform:uppercase;letter-spacing:.07em;color:var(--accent)}
+.cours .cs{color:var(--muted);font-size:14.5px;margin:0 0 14px}
+
+/* --- exercices / corrigés --- */
+.ex{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:6px 24px 20px;margin:18px 0}
+.ex>h3:first-child{margin-top:14px}
+details.cor{margin-top:18px;border:1px solid var(--line);border-radius:8px;background:#fcfbfa;overflow:hidden}
+details.cor>summary{cursor:pointer;padding:12px 16px;font-weight:600;font-size:15px;color:var(--accent);
+ list-style:none;display:flex;align-items:center;gap:9px;user-select:none;transition:.15s;min-height:44px}
+details.cor>summary::-webkit-details-marker{display:none}
+details.cor>summary:hover{background:var(--hl)}
+details.cor>summary::before{content:"\25B6";font-size:10px;transition:transform .18s;display:inline-block}
+details.cor[open]>summary::before{transform:rotate(90deg)}
+details.cor[open]>summary{background:var(--okbg);color:var(--ok);border-bottom:1px solid var(--line)}
+.cor .in{padding:4px 20px 16px}
+.cor .in>*:first-child{margin-top:.9em}
+
+/* --- blocs pédagogiques (callouts) ---
+   Générés depuis une citation Markdown dont le premier **gras** commence
+   par un mot-clé : DÉFINITION, THÉORÈME, MÉTHODE, PIÈGE, INTUITION… */
+.cal{border:1px solid var(--line);border-left:4px solid var(--accent);background:var(--card);
+ border-radius:0 10px 10px 0;padding:15px 20px;margin:1.5em 0}
+.cal>p:first-child{margin-top:0}.cal>p:last-child,.cal>ul:last-child,.cal>ol:last-child{margin-bottom:0}
+.cal .lab{display:block;font-size:12.5px;text-transform:uppercase;letter-spacing:.08em;
+ font-weight:700;color:var(--accent);margin-bottom:6px}
+.cal.formel{background:var(--hl)}
+.cal.piege{border-left-color:var(--warn);background:var(--warnbg)}
+.cal.piege .lab{color:var(--warn)}
+.cal.methode{border-left-color:var(--ok);background:var(--okbg)}
+.cal.methode .lab{color:var(--ok)}
+.cal.intu{border-left-color:var(--blue);background:var(--bluebg)}
+.cal.intu .lab{color:var(--blue)}
+.cal.plus{border-left-style:dashed;background:#faf9f7}
+.cal.plus .lab{color:var(--muted)}
+
+/* --- révision express --- */
+.ess{background:var(--card);border:1px solid var(--accent);border-radius:10px;padding:4px 24px 20px;margin:1.6em 0}
+.ess h3{margin-top:1.3em}
+.rec{background:var(--card);border:1px dashed var(--accent);border-radius:10px;padding:4px 24px 18px;margin:1.6em 0}
+.rec ol{counter-reset:none}
+
+/* --- impression / PDF --- */
+@media print{
+ .nav{display:none}
+ body{padding:0;background:#fff;font-size:11.2pt;line-height:1.55}
+ main{max-width:none}
+ h1{font-size:23pt}h2{font-size:15pt;margin-top:1.5em}h3{font-size:12.6pt}
+ h2,h3,h4{break-after:avoid;page-break-after:avoid}
+ table,.cal,blockquote{break-inside:avoid;page-break-inside:avoid}
+ table{display:table;font-size:9.6pt}
+ details.cor{border:1px solid var(--line);background:#fcfbfa}
+ details.cor>summary{display:none}
+ details.cor .in{padding-top:10px}
+ .cal,.ex,.ess,.rec{box-shadow:none}
+ a{color:var(--ink);text-decoration:none}
+}
+@page{margin:16mm 15mm 18mm}
+
+/* --- exemples travaillés --- */
+.exm{background:#fcfbfa;border:1px solid var(--line);border-radius:10px;padding:2px 20px 14px;margin:1.5em 0}
+.exm>h4:first-child{margin:14px 0 .5em;color:var(--accent);font-size:13px;text-transform:uppercase;letter-spacing:.07em}
+
+
+/* --- pastilles de priorité (conventions des fiches de l'app) --- */
+h2[data-prio], h3[data-prio], h4[data-prio]{position:relative}
+h2[data-prio]::before,h3[data-prio]::before,h4[data-prio]::before{
+ content:"";display:inline-block;width:9px;height:9px;border-radius:50%;
+ margin-right:9px;vertical-align:middle;background:var(--muted)}
+[data-prio="must"]::before{background:var(--warn)}
+[data-prio="high"]::before{background:#d98324}
+[data-prio="mid"]::before{background:#c9a227}
+[data-prio="low"]::before{background:var(--ok)}
+/* corrigés des fiches de l'app : même traitement que les corrigés des séries */
+details.cor>summary::after{content:""}
+</style></head><body>
+<div class="nav"><a href="00_COMMENCER_ICI.html">Commencer ici</a><a href="01_NOTATIONS_le-decodeur.html">Notations</a><a href="02_EXERCICES_Serie-0.html">Série 0 — Remise en route</a><a href="03_EXERCICES_Serie-1.html">Série 1 — Convexité</a><a href="04_EXERCICES_Serie-2.html">Série 2 — KKT</a><a href="05_AUTO-EVALUATION.html">Auto-évaluation (quiz)</a><a href="06_FICHE_Optimisation-deux-variables.html">Fiche — Optimisation à 2 variables</a></div>
+<main><h1>Fiche 100 — Dérivés de taux : les modèles de marché standard (obligations, caps, swaptions)</h1>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Matière</strong></td>
+<td>Maths · Finance de marché · Produits de taux</td>
+</tr>
+<tr>
+<td><strong>Cours source</strong></td>
+<td>John C. Hull, <em>Options, Futures, and Other Derivatives</em>, 8ᵉ éd., Pearson — chapitre 28 « Interest Rate Derivatives: The Standard Market Models »</td>
+</tr>
+<tr>
+<td><strong>Difficulté</strong></td>
+<td> Must know — les trois produits de taux les plus négociés de gré à gré</td>
+</tr>
+<tr>
+<td><strong>Temps d'étude estimé</strong></td>
+<td>1 h 50</td>
+</tr>
+<tr>
+<td><strong>Prérequis</strong></td>
+<td>Fiches 77 (taux et duration), 80 (swaps), 89 (modèle de Black), 99 (martingales et numéraires)</td>
+</tr>
+<tr>
+<td><strong>Concepts clés</strong></td>
+<td>Option sur obligation, obligation <em>callable</em> et <em>puttable</em>, prix forward d'obligation, prix <em>clean</em> et <em>dirty</em>, volatilité de rendement, cap et floor de taux, tenor, caplet et floorlet, cap comme portefeuille d'options sur obligations, collar, volatilités <em>spot</em> et <em>flat</em>, bosse de volatilité, swaption, facteur d'annuité, cotations de courtiers, conventions de décompte des jours, DV01 et deltas de courbe</td>
+</tr>
+<tr>
+<td><strong>Poids à l'examen</strong></td>
+<td>$F_B=\dfrac{B_0-I}{P(0,T)}$ · $\sigma_B=D\,y_0\,\sigma_y$ · le <strong>caplet</strong> $L\delta_kP(0,t_{k+1})[F_kN(d_1)-R_KN(d_2)]$ · la <strong>swaption</strong> $LA[s_0N(d_1)-s_KN(d_2)]$ · <strong>la parité cap = floor + swap</strong>.</td>
+</tr>
+</tbody></table>
+<h2>Vue d'ensemble</h2>
+<pre><code>POURQUOI LES TAUX SONT PLUS DURS QUE LES ACTIONS   quatre raisons
+  1. le comportement d'UN taux est plus compliqué qu'un cours ou un change
+  2. il faut souvent modéliser TOUTE LA COURBE zéro-coupon
+  3. les volatilités DIFFÈRENT selon le point de la courbe
+  4. les taux servent À ACTUALISER le dérivé ET À DÉFINIR SON PAYOFF
+
+LES TROIS PRODUITS ET LEURS TROIS MODÈLES DE BLACK
+  OPTION SUR OBLIGATION   on suppose le PRIX FORWARD D'OBLIGATION lognormal
+        c = P(0,T)[F_B N(d₁) − K N(d₂)]        F_B = (B₀ − I)/P(0,T)
+  CAP / FLOOR             on suppose chaque TAUX FORWARD lognormal
+        caplet = Lδ_k P(0,t_{k+1})[F_k N(d₁) − R_K N(d₂)]     ⚠️ σ√t_k mais P(0,t_{k+1})
+  SWAPTION                on suppose le TAUX DE SWAP FORWARD lognormal
+        LA[s₀ N(d₁) − s_K N(d₂)]        A = (1/m) Σ P(0,T_i)
+
+⚠️ CHAQUE MODÈLE EST COHÉRENT AVEC LUI-MÊME, MAIS PAS AVEC LES AUTRES
+   prix lognormaux ⇒ taux NON lognormaux, et réciproquement
+
+PARITÉ    cap = floor + swap          collar = cap long + floor court (coût nul)
+VOLATILITÉS   spot (par caplet) contre flat (par cap) — la BOSSE vers 2-3 ans
+</code></pre>
+<p><strong>Les quatre raisons de la difficulté, énoncées d'entrée.</strong> <em>Les dérivés de taux sont plus difficiles à valoriser que les dérivés actions et change parce que : <strong>(1)</strong> le comportement d'un taux individuel est <strong>plus compliqué</strong> que celui d'un cours d'action ou d'un taux de change ; <strong>(2)</strong> la valorisation de beaucoup de produits exige de développer un modèle décrivant le comportement de <strong>TOUTE la courbe des taux zéro-coupon</strong> ; <strong>(3)</strong> <strong>les volatilités de différents points de la courbe sont différentes</strong> ; <strong>(4)</strong>  <strong>les taux servent à ACTUALISER le dérivé aussi bien qu'à DÉFINIR SON PAYOFF</strong>.</em></p>
+<h2 data-prio="high">Concept 1 — Les options sur obligations</h2>
+<h3>1.1 Les options intégrées</h3>
+<blockquote>
+<p><em><strong>Une option sur obligation est une option d'acheter ou de vendre une obligation particulière à une date particulière pour un prix particulier.</strong></em></p>
+</blockquote>
+<p><em>En plus du gré à gré, <strong>les options sur obligations sont fréquemment INTÉGRÉES aux obligations à l'émission</strong>, pour les rendre plus attractives à l'émetteur ou aux acheteurs.</em></p>
+<table>
+<thead>
+<tr>
+<th>Produit</th>
+<th>Option intégrée</th>
+<th>Effet sur le rendement</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Obligation <em>callable</em></strong></td>
+<td> <em>le détenteur a <strong>VENDU un CALL</strong> à l'émetteur</em>. Le <strong>prix de rappel</strong> (<em>call price</em>) est le prix prédéterminé que l'émetteur doit payer</td>
+<td> <strong>rendements PLUS ÉLEVÉS</strong> que les obligations sans clause</td>
+</tr>
+<tr>
+<td><strong>Obligation <em>puttable</em></strong></td>
+<td><em>le détenteur a <strong>ACHETÉ un PUT</strong> sur l'obligation, en plus de l'obligation elle-même</em> — il peut exiger un <strong>remboursement anticipé</strong></td>
+<td> <strong>rendements PLUS FAIBLES</strong> (l'option augmente la valeur pour le détenteur)</td>
+</tr>
+</tbody></table>
+<details class="cor">
+<summary><strong>Les quatre exemples d'options sur obligations cachées</strong></summary><div class="in">
+
+<p><strong>1 — L'échéancier d'un <em>callable</em> à 10 ans.</strong> <em>Il peut n'y avoir <strong>aucun privilège de rappel les 2 premières années</strong> (la <strong>période de <em>lockout</em></strong>). Ensuite, l'émetteur peut racheter :</em></p>
+<table>
+<thead>
+<tr>
+<th>Années</th>
+<th>Prix de rappel</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>3 et 4</td>
+<td><strong>110</strong></td>
+</tr>
+<tr>
+<td>5 et 6</td>
+<td><strong>107,5</strong></td>
+</tr>
+<tr>
+<td>7 et 8</td>
+<td><strong>106</strong></td>
+</tr>
+<tr>
+<td>9 et 10</td>
+<td><strong>103</strong></td>
+</tr>
+</tbody></table>
+<p class="cal piege"><em> <strong>Après le lockout, le prix de rappel est habituellement une fonction DÉCROISSANTE du temps.</strong></em></p>
+<p><strong>2 — L'obligation <em>retractable</em>.</strong> <em>Une obligation à 10 ans où le détenteur a le droit d'être remboursé <strong>au bout de 5 ans</strong>.</em></p>
+<p><strong>3 — Le dépôt à taux fixe rachetable.</strong> <em>Un dépôt à 5 ans <strong>remboursable sans pénalité à tout moment</strong> contient un <strong>PUT AMÉRICAIN sur obligation</strong> : le dépôt est une obligation que l'investisseur a le droit de « rendre » à l'institution <strong>à sa valeur faciale</strong>, à tout moment.</em> Les <strong>privilèges de remboursement anticipé</strong> sur prêts et crédits hypothécaires sont de même <strong>des CALLS sur obligations</strong>.</p>
+<p><strong>4 — L'engagement de prêt.</strong>  <em>Un <strong>engagement de prêt</strong> d'une banque <strong>est un PUT sur obligation</strong>. Si une banque cote un taux à 5 ans de <strong>5 %</strong> à un emprunteur potentiel en précisant que <strong>le taux est valable 2 mois</strong>, le client a en effet obtenu <strong>le droit de VENDRE une obligation à 5 ans de coupon 5 % à l'institution, à sa valeur faciale, à tout moment dans les 2 mois</strong>. <strong>L'option sera exercée si les taux MONTENT.</strong></em></p>
+</div></details>
+
+<h3>1.2 Le modèle de marché standard</h3>
+<blockquote>
+<p><em><strong>L'hypothèse : le PRIX FORWARD de l'obligation a une volatilité CONSTANTE $\sigma_B$.</strong></em> Cela permet d'utiliser le modèle de Black (fiche 99, §27.6).</p>
+</blockquote>
+<p>$$\boxed{c=P(0,T)\big[F_BN(d_1)-KN(d_2)\big]}\;\text{(28.1)}$$
+$$\boxed{p=P(0,T)\big[KN(-d_2)-F_BN(-d_1)\big]}\;\text{(28.2)}$$
+$$d_1=\frac{\ln(F_B/K)+\sigma_B^2T/2}{\sigma_B\sqrt T}\qquad d_2=d_1-\sigma_B\sqrt T$$</p>
+<p><strong>Le prix forward de l'obligation</strong> <em>(fiche 78, §5.5)</em> :</p>
+<p>$$\boxed{F_B=\frac{B_0-I}{P(0,T)}}\;\text{(28.3)}$$</p>
+<p>où $B_0$ est le prix de l'obligation en 0 et $I$ <strong>la valeur actuelle des coupons versés PENDANT la vie de l'option</strong>.</p>
+<blockquote>
+<p class="cal piege"> <strong>Dans cette formule, le prix spot ET le prix forward sont des prix CASH (<em>dirty</em>), pas des prix cotés.</strong></p>
+</blockquote>
+<p><strong>Le choix de $K$ — le piège classique</strong> :</p>
+<table>
+<thead>
+<tr>
+<th>Termes de l'option</th>
+<th>Valeur de $K$</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Le strike est le <strong>montant CASH</strong> échangé à l'exercice</td>
+<td>$K=$ ce prix d'exercice</td>
+</tr>
+<tr>
+<td> <strong>Le strike est le PRIX COTÉ</strong> applicable à l'exercice (<strong>le cas le plus courant</strong>)</td>
+<td> $K=$ prix d'exercice <strong>PLUS LES INTÉRÊTS COURUS</strong> à l'expiration de l'option</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><em><strong>Les traders appellent le prix COTÉ d'une obligation le « CLEAN PRICE » et le prix CASH le « DIRTY PRICE ».</strong></em></p>
+</blockquote>
+<details class="cor">
+<summary><strong>Exemple 28.1 — les deux conventions de strike, entièrement recalculées</strong></summary><div class="in">
+
+<p><strong>Données.</strong> Call européen à <strong>10 mois</strong> sur une obligation à <strong>9,75 ans</strong> de valeur faciale <strong>1 000 dollars</strong>. <em>(À maturité de l'option, l'obligation aura <strong>8 ans et 11 mois</strong> restants.)</em> Prix cash courant <strong>960</strong>, strike <strong>1 000</strong>, taux sans risque 10 mois <strong>10 %</strong>, volatilité du prix forward <strong>9 %</strong>. Coupon <strong>10 % par an, semestriel</strong> : paiements de <strong>50 dollars</strong> dans <strong>3 mois</strong> et <strong>9 mois</strong>. <em>(L'intérêt couru est donc <strong>25 dollars</strong> et le prix coté <strong>935</strong>.)</em> Taux à 3 mois et 9 mois : <strong>9,0 %</strong> et <strong>9,5 %</strong>.</p>
+<p><em>Étape 1 — la valeur actuelle des coupons :</em>
+$$I=50e^{-0{,}25\times0{,}09}+50e^{-0{,}75\times0{,}095}=48{,}89+46{,}56=\mathbf{95{,}45}$$</p>
+<p><em>Étape 2 — le prix forward, par (28.3) :</em>
+$$F_B=(960-95{,}45)\,e^{0{,}1\times0{,}8333}=864{,}55\times1{,}0870=\mathbf{939{,}68}$$</p>
+<p><em>Étape 3 — le facteur d'actualisation :</em>
+$$P(0,T)=e^{-0{,}1\times10/12}=\mathbf{0{,}9200}$$</p>
+<p><em>Étape 4a — cas (a), strike = prix CASH.</em> $F_B=939{,}68$, $K=1\,000$, $P(0,T)=0{,}9200$, $\sigma_B=0{,}09$, $T=10/12$ :
+$$\boxed{c=\mathbf{9{,}49\ \text{dollars}}}$$</p>
+<p><em>Étape 4b — cas (b), strike = prix COTÉ.</em>  <strong>Il faut ajouter UN MOIS d'intérêts courus</strong> à $K$, parce que la maturité de l'option tombe <strong>1 mois après une date de coupon</strong> :
+$$K=1\,000+100\times0{,}08333=\mathbf{1\,008{,}33}$$
+Les autres paramètres sont inchangés :
+$$\boxed{c=\mathbf{7{,}97\ \text{dollars}}}$$</p>
+<blockquote>
+<p><strong>La leçon :</strong> un strike <strong>coté</strong> est en réalité un strike <strong>cash plus élevé</strong> ⇒ le call vaut <strong>moins cher</strong>. <strong>Toujours lire la convention de strike avant de calculer.</strong></p>
+</blockquote>
+</div></details>
+
+<h3>1.3 La volatilité du prix forward et la volatilité de rendement</h3>
+<details class="cor">
+<summary><strong>La forme en cloche de l'écart-type — figure 28.1</strong></summary><div class="in">
+
+<p><em>Comment l'écart-type du logarithme du prix d'une obligation évolue quand on regarde de plus en plus loin :</em></p>
+<table>
+<thead>
+<tr>
+<th>Instant</th>
+<th>Écart-type</th>
+<th>Raison</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Aujourd'hui</strong></td>
+<td><strong>ZÉRO</strong></td>
+<td><em>il n'y a <strong>aucune incertitude</strong> sur le prix d'aujourd'hui</em></td>
+</tr>
+<tr>
+<td>Entre les deux</td>
+<td><strong>augmente puis diminue</strong></td>
+<td>—</td>
+</tr>
+<tr>
+<td><strong>À la maturité de l'OBLIGATION</strong></td>
+<td> <strong>ZÉRO</strong></td>
+<td><em>on sait que <strong>le prix égalera la valeur faciale</strong> à maturité</em></td>
+</tr>
+</tbody></table>
+<p><strong>La volatilité à utiliser dans Black :</strong>
+$$\boxed{\sigma_B=\frac{\text{écart-type du logarithme du prix de l'obligation à la maturité de l'OPTION}}{\text{temps jusqu'à la maturité de l'option}}}$$</p>
+<p class="cal piege"> <strong>La conséquence (figure 28.2) :</strong> <em>pour une obligation donnée, <strong>$\sigma_B$ DÉCLINE quand la vie de l'option augmente</strong></em>.</p>
+</div></details>
+
+<p><strong>Pourquoi le marché cote des VOLATILITÉS DE RENDEMENT.</strong> <em>Les volatilités cotées pour les options sur obligations sont souvent des <strong>volatilités de RENDEMENT</strong> plutôt que de prix. <strong>Le concept de DURATION est utilisé par le marché pour convertir l'une en l'autre.</strong></em></p>
+<p>$$\frac{\Delta F_B}{F_B}\approx-D\,\Delta y_F=-Dy_F\,\frac{\Delta y_F}{y_F}\qquad\Longrightarrow\qquad\boxed{\sigma_B=D\,y_0\,\sigma_y}\;\text{(28.4)}$$</p>
+<p>où $D$ est <strong>la duration MODIFIÉE de l'obligation À LA MATURITÉ DE L'OPTION</strong> et $y_0$ la valeur initiale du rendement forward.</p>
+<p><strong>L'exemple de Hull.</strong> *Duration modifiée à maturité <strong>5 ans</strong>, rendement forward <strong>8 %</strong>, volatilité de rendement cotée par un courtier <strong>20 %</strong> :*
+$$\sigma_B=5\times0{,}08\times0{,}2=0{,}08=\mathbf{8\,\%\text{ par an}}$$</p>
+<div class="cal intu"><span class="lab">Pourquoi les traders les préfèrent : la figure 28.2 montre que les volatilités de PRIX forward DÉPENDENT de l'option considérée. Les volatilités de RENDEMENT forward sont BEAUCOUP PLUS CONSTANTES.</span>
+<p class="cal piege"> </p>
+</div>
+<p><strong>Exemple 28.2</strong> <em>(via DerivaGem)</em> : *put européen sur une obligation à 10 ans de principal 100, coupon 8 % semestriel ; vie de l'option <strong>2,25 ans</strong>, strike <strong>115</strong>, volatilité de rendement forward <strong>20 %</strong>, courbe zéro plate à <strong>5 %</strong> continu. Le prix coté de l'obligation est <strong>122,82</strong>. <strong>Le prix de l'option vaut 2,36 quand le strike est un prix COTÉ, et 1,74 quand c'est un prix CASH.</strong>*</p>
+<h2 data-prio="must">Concept 2 — Les caps et les floors de taux</h2>
+<h3>2.1 Le mécanisme</h3>
+<p><strong>Le contexte.</strong> <em>Un <strong>billet à taux variable</strong> (<em>floating-rate note</em>) dont le taux est réinitialisé périodiquement au LIBOR. <strong>Le temps entre deux réinitialisations s'appelle le TENOR.</strong></em></p>
+<blockquote>
+<p><em><strong>Un CAP est conçu pour fournir une assurance contre la hausse du taux du billet au-dessus d'un certain niveau, appelé le TAUX DU CAP (cap rate).</strong></em></p>
+</blockquote>
+<details class="cor">
+<summary><strong>L'exemple chiffré du cap à 5 ans</strong></summary><div class="in">
+
+<p><strong>Données.</strong> Principal <strong>10 millions de dollars</strong>, tenor <strong>3 mois</strong>, vie <strong>5 ans</strong>, taux du cap <strong>4 %</strong> <em>(exprimé en composition trimestrielle puisque les paiements sont trimestriels)</em>.</p>
+<p><em>Situation à une date de réinitialisation où le LIBOR 3 mois est <strong>5 %</strong> :</em></p>
+<table>
+<thead>
+<tr>
+<th>Sans cap</th>
+<th>Avec cap</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$0{,}25\times0{,}05\times10\,000\,000=\mathbf{125\,000}$</td>
+<td>$0{,}25\times0{,}04\times10\,000\,000=\mathbf{100\,000}$</td>
+</tr>
+</tbody></table>
+<p>$$\text{Payoff du cap}=\mathbf{25\,000\ \text{dollars}}$$</p>
+<blockquote>
+<p class="cal piege"> <em><strong>Le payoff ne survient PAS à la date de réinitialisation où les 5 % sont observés : il survient TROIS MOIS PLUS TARD. Cela reflète le décalage habituel entre l'observation d'un taux et le paiement correspondant.</strong></em></p>
+</blockquote>
+<p><strong>Le décompte des dates.</strong> <em> <strong>Les caps sont habituellement définis de sorte que le LIBOR INITIAL, même s'il dépasse le taux du cap, ne donne PAS lieu à un payoff à la première date.</strong></em> Sur 5 ans avec un tenor trimestriel :</p>
+<ul>
+<li><strong>19 dates de réinitialisation</strong> : 0,25 · 0,50 · 0,75 · … · <strong>4,75</strong> ans ;</li>
+<li><strong>19 payoffs potentiels</strong> : 0,50 · 0,75 · 1,00 · … · <strong>5,00</strong> ans.</li></ul></div></details>
+
+<h3>2.2 Les deux lectures d'un cap</h3>
+<p><strong>Lecture 1 — un portefeuille d'options sur TAUX.</strong> Avec des dates de réinitialisation $t_1,\dots,t_n$ et $t_{n+1}=T$, et $R_k$ le LIBOR pour $[t_k,t_{k+1}]$ <strong>observé en $t_k$</strong> :</p>
+<p>$$\boxed{\text{Payoff en }t_{k+1}=L\,\delta_k\max(R_k-R_K,\ 0)}\;\text{(28.5)}\qquad\delta_k=t_{k+1}-t_k$$</p>
+<blockquote>
+<p><em><strong>C'est le payoff d'un CALL sur le taux LIBOR observé en $t_k$, versé en $t_{k+1}$. Le cap est un portefeuille de $n$ telles options, appelées CAPLETS.</strong></em></p>
+</blockquote>
+<details class="cor">
+<summary><strong>Lecture 2 — un portefeuille de PUTS sur obligations zéro-coupon</strong></summary><div class="in">
+
+<p><em>Étape 1 — ramener le payoff en $t_k$.</em> Le payoff (28.5), reçu en $t_{k+1}$, vaut <strong>en $t_k$</strong> :
+$$\frac{L\delta_k}{1+R_k\delta_k}\max(R_k-R_K,\ 0)$$</p>
+<p><em>Étape 2 — quelques lignes d'algèbre.</em> Cela se réduit à :
+$$\boxed{\max\!\left(L-\frac{L(1+R_K\delta_k)}{1+R_k\delta_k},\ 0\right)}\;\text{(28.6)}$$</p>
+<p><em>Étape 3 — reconnaître l'objet.</em> L'expression $\dfrac{L(1+R_K\delta_k)}{1+R_k\delta_k}$ est <strong>la valeur en $t_k$ d'une obligation zéro-coupon versant $L(1+R_K\delta_k)$ en $t_{k+1}$</strong>.</p>
+<p><em>Étape 4 — la conclusion.</em></p>
+<blockquote>
+<p class="cal piege"> <em><strong>(28.6) est le payoff d'un PUT de maturité $t_k$ sur une obligation zéro-coupon de maturité $t_{k+1}$, de valeur faciale $L(1+R_K\delta_k)$ et de strike $L$. UN CAP DE TAUX EST DONC UN PORTEFEUILLE DE PUTS EUROPÉENS SUR OBLIGATIONS ZÉRO-COUPON.</strong></em></p>
+</blockquote>
+</div></details>
+
+<h3>2.3 Floors et collars</h3>
+<table>
+<thead>
+<tr>
+<th>Instrument</th>
+<th>Payoff en $t_{k+1}$</th>
+<th>Nature</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Cap</strong></td>
+<td>$L\delta_k\max(R_k-R_K,0)$</td>
+<td>portefeuille de <strong>calls sur taux</strong> = portefeuille de <strong>PUTS sur obligations</strong></td>
+</tr>
+<tr>
+<td><strong>Floor</strong></td>
+<td>$L\delta_k\max(R_K-R_k,0)$</td>
+<td>portefeuille de <strong>puts sur taux</strong> = portefeuille de <strong>CALLS sur obligations</strong>. Chaque option est un <em><strong>floorlet</strong></em></td>
+</tr>
+<tr>
+<td><strong>Collar</strong> <em>(ou</em> floor-ceiling agreement*)*</td>
+<td>—</td>
+<td> <em><strong>cap LONG + floor COURT</strong></em>. <em>Habituellement construit de sorte que <strong>le prix du cap égale initialement celui du floor</strong> : <strong>le coût d'entrée est alors NUL</strong></em></td>
+</tr>
+</tbody></table>
+<details class="cor">
+<summary><strong>Business Snapshot 28.1 — la parité put-call des caps et floors</strong></summary><div class="in">
+
+<p>$$\boxed{\text{Valeur du cap}=\text{Valeur du floor}+\text{Valeur du swap}}$$</p>
+<p>*Dans cette relation, <strong>le cap et le floor ont le MÊME strike $R_K$</strong>. Le swap est un accord de <strong>recevoir le LIBOR et payer le fixe $R_K$</strong>, <strong> sans échange de paiements à la première date de réinitialisation</strong>. Les trois instruments ont <strong>la même vie et la même fréquence de paiements</strong>.*</p>
+<p><strong>La démonstration.</strong> <em>Considérons un <strong>cap long combiné à un floor court</strong> :</em></p>
+<table>
+<thead>
+<tr>
+<th>Situation</th>
+<th>Cap</th>
+<th>Floor court</th>
+<th>Total</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>LIBOR $&gt;R_K$</td>
+<td>$\text{LIBOR}-R_K$</td>
+<td>0</td>
+<td>$\text{LIBOR}-R_K$</td>
+</tr>
+<tr>
+<td>LIBOR $&lt;R_K$</td>
+<td>0</td>
+<td>$-(R_K-\text{LIBOR})$</td>
+<td>$\text{LIBOR}-R_K$</td>
+</tr>
+</tbody></table>
+<p><em>Il y a donc un flux de $\text{LIBOR}-R_K$ <strong>dans toutes les circonstances</strong> : <strong>c'est le flux du swap</strong>.</em></p>
+<p class="cal piege"> <strong>Pourquoi un swap NON STANDARD.</strong> <em>Les swaps sont habituellement structurés de sorte que <strong>le LIBOR à la date 0 détermine un paiement à la première date</strong>. <strong>Les caps et floors sont structurés de sorte qu'il n'y a AUCUN payoff à la première date.</strong> C'est pourquoi la parité fait intervenir <strong>un swap non standard sans paiement à la première date</strong>.</em></p>
+</div></details>
+
+<h3>2.4 La valorisation</h3>
+<p>$$\boxed{\text{caplet}=L\,\delta_k\,P(0,t_{k+1})\big[F_kN(d_1)-R_KN(d_2)\big]}\;\text{(28.7)}$$
+$$\boxed{\text{floorlet}=L\,\delta_k\,P(0,t_{k+1})\big[R_KN(-d_2)-F_kN(-d_1)\big]}\;\text{(28.8)}$$
+$$d_1=\frac{\ln(F_k/R_K)+\sigma_k^2t_k/2}{\sigma_k\sqrt{t_k}}\qquad d_2=d_1-\sigma_k\sqrt{t_k}$$</p>
+<p>où $F_k$ est <strong>le taux forward en 0 pour la période $[t_k,t_{k+1}]$</strong> et $\sigma_k$ sa volatilité.</p>
+<blockquote>
+<p class="cal piege"> <strong>LE POINT DE VIGILANCE ABSOLU, à savoir énoncer.</strong> *La volatilité $\sigma_k$ est multipliée par $\sqrt{t_k}$ <strong>parce que le taux $R_k$ est OBSERVÉ en $t_k$</strong>, mais <strong>le facteur d'actualisation est $P(0,t_{k+1})$ parce que LE PAYOFF EST EN $t_{k+1}$, pas en $t_k$</strong>.</p>
+<p><strong>DEUX DATES DIFFÉRENTES DANS LA MÊME FORMULE.</strong></p>
+</blockquote>
+<details class="cor">
+<summary><strong>Exemple 28.3 — un caplet, ligne par ligne</strong></summary><div class="in">
+
+<p><strong>Données.</strong> Contrat plafonnant le LIBOR sur <strong>10 millions</strong> à <strong>8 %</strong> (composition trimestrielle) pour <strong>3 mois commençant dans 1 an</strong>. Courbe LIBOR/swap plate à <strong>7 %</strong> en composition trimestrielle, volatilité du taux forward <strong>20 %</strong>.</p>
+<p><em>Étape 1 — le taux continu équivalent :</em>
+$$r_c=4\ln\!\left(1+\frac{0{,}07}{4}\right)=\mathbf{6{,}9395\,\%}$$</p>
+<p><em>Étape 2 — les paramètres.</em> $F_k=0{,}07$, $\delta_k=0{,}25$, $L=10$ (millions), $R_K=0{,}08$, $t_k=1{,}0$, $t_{k+1}=1{,}25$, $\sigma_k=0{,}20$ et
+$$P(0,t_{k+1})=e^{-0{,}069395\times1{,}25}=\mathbf{0{,}9169}$$</p>
+<p><em>Étape 3 — les deux quantiles :</em>
+$$d_1=\frac{\ln(0{,}07/0{,}08)+0{,}2^2\times1/2}{0{,}20\times1}=\frac{-0{,}13353+0{,}02}{0{,}20}=\mathbf{-0{,}5677}$$
+$$d_2=d_1-0{,}20=\mathbf{-0{,}7677}$$</p>
+<p><em>Étape 4 — le prix (en millions) :</em>
+$$0{,}25\times10\times0{,}9169\big[0{,}07\,N(-0{,}5677)-0{,}08\,N(-0{,}7677)\big]=\mathbf{0{,}005162}$$</p>
+<p>$$\boxed{\text{soit }\mathbf{5\,162\ \text{dollars}}}$$</p>
+</div></details>
+
+<h3>2.5 Volatilités <em>spot</em> contre <em>flat</em>, et la bosse</h3>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Définition</th>
+<th>Maturité concernée</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Volatilités <em>SPOT</em></strong></td>
+<td>une volatilité <strong>DIFFÉRENTE pour chaque caplet</strong> (ou floorlet)</td>
+<td>la maturité <strong>du caplet</strong></td>
+</tr>
+<tr>
+<td><strong>Volatilités <em>FLAT</em></strong></td>
+<td><strong>la MÊME volatilité pour tous les caplets</strong> d'un cap donné, mais <strong>variant selon la vie du cap</strong></td>
+<td>la maturité <strong>du cap</strong></td>
+</tr>
+</tbody></table>
+<blockquote>
+<p class="cal piege"> <em><strong>Les volatilités cotées sur le marché sont habituellement les volatilités FLAT. Cependant beaucoup de traders aiment estimer les volatilités SPOT, parce que cela leur permet d'identifier les caplets SOUS- et SUR-évalués.</strong></em></p>
+<p><em>Les puts (calls) sur futures eurodollar sont <strong>très similaires</strong> aux caplets (floorlets) : les volatilités spot des caplets sur LIBOR 3 mois sont fréquemment comparées à celles issues des prix de futures eurodollar.</em></p>
+</blockquote>
+<p><strong>La bosse de volatilité (figure 28.3).</strong> <em>Les volatilités flat sont <strong>comme des moyennes cumulées</strong> des spot et présentent donc <strong>moins de variabilité</strong>. <strong>Une « BOSSE » est habituellement observée, avec un pic vers le point 2 à 3 ANS.</strong> Elle est observée <strong>à la fois</strong> dans les volatilités implicites <strong>et</strong> dans celles calculées sur données historiques.</em></p>
+<details class="cor">
+<summary><strong>L'explication possible de la bosse, et la table de cotations</strong></summary><div class="in">
+
+<blockquote>
+<p class="cal piege"> <em><strong>Il n'y a pas d'accord général sur la raison de l'existence de la bosse.</strong></em> <em>Une explication possible : les taux <strong>au bout court</strong> de la courbe sont <strong>contrôlés par les banques centrales</strong> ; par contraste, les taux à <strong>2 et 3 ans</strong> sont largement déterminés par <strong>l'activité des traders</strong>, qui <strong>peuvent SURRÉAGIR aux changements du taux court</strong>, rendant leur volatilité supérieure à celle des taux courts. <strong>Au-delà de 2-3 ans, le RETOUR À LA MOYENNE des taux (chapitre 30) fait décliner les volatilités.</strong></em></p>
+</blockquote>
+<p><strong>Table 28.1 — cotations <em>flat</em> implicites typiques de courtiers, caps et floors en dollars (% par an)</strong> <em>(tenor 3 mois, instruments « à la monnaie », c'est-à-dire taux du cap = taux du swap de mêmes dates de paiement)</em> :</p>
+<table>
+<thead>
+<tr>
+<th>Vie</th>
+<th>Cap <em>bid</em></th>
+<th>Cap <em>offer</em></th>
+<th>Floor <em>bid</em></th>
+<th>Floor <em>offer</em></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1 an</td>
+<td>18,00</td>
+<td>20,00</td>
+<td>18,00</td>
+<td>20,00</td>
+</tr>
+<tr>
+<td><strong>2 ans</strong></td>
+<td>23,25</td>
+<td>24,25</td>
+<td>23,75</td>
+<td>24,75</td>
+</tr>
+<tr>
+<td><strong>3 ans</strong></td>
+<td><strong>24,00</strong></td>
+<td><strong>25,00</strong></td>
+<td><strong>24,50</strong></td>
+<td><strong>25,50</strong></td>
+</tr>
+<tr>
+<td>4 ans</td>
+<td>23,75</td>
+<td>24,75</td>
+<td>24,25</td>
+<td>25,25</td>
+</tr>
+<tr>
+<td>5 ans</td>
+<td>23,50</td>
+<td>24,50</td>
+<td>24,00</td>
+<td>25,00</td>
+</tr>
+<tr>
+<td>7 ans</td>
+<td>21,75</td>
+<td>22,75</td>
+<td>22,00</td>
+<td>23,00</td>
+</tr>
+<tr>
+<td>10 ans</td>
+<td>20,00</td>
+<td>21,00</td>
+<td>20,25</td>
+<td>21,25</td>
+</tr>
+</tbody></table>
+<p><strong>La bosse est visible : maximum à 3 ans, déclin ensuite.</strong></p>
+</div></details>
+
+<h3>2.6 La justification théorique</h3>
+<details class="cor">
+<summary><strong>Pourquoi (28.7) est intérieurement cohérent — les deux résultats du chapitre 27</strong></summary><div class="in">
+
+<p>*On considère un monde <strong>forward risque-neutre par rapport à une obligation zéro-coupon maturant en $t_{k+1}$</strong>. Le chapitre 27 (fiche 99) donne :*</p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Résultat</th>
+<th>Équation</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>1</strong></td>
+<td><em>la valeur courante de tout titre est <strong>sa valeur espérée en $t_{k+1}$ dans ce monde, multipliée par le prix d'une obligation maturant en $t_{k+1}$</strong></em></td>
+<td>(27.20)</td>
+</tr>
+<tr>
+<td><strong>2</strong></td>
+<td><em>la valeur espérée d'un taux courant entre $t_k$ et $t_{k+1}$ <strong>ÉGALE LE TAUX FORWARD</strong> dans ce monde</em></td>
+<td>(27.22)</td>
+</tr>
+</tbody></table>
+<p><em>Étape 1 — appliquer le résultat 1 :</em>
+$$L\delta_kP(0,t_{k+1})\,E_{k+1}\big[\max(R_k-R_K,0)\big]\;\text{(28.9)}$$</p>
+<p><em>Étape 2 — supposer $R_k$ LOGNORMALE</em> avec $\ln R_k$ d'écart-type $\sigma_k\sqrt{t_k}$ (volatilité constante du taux forward). L'annexe du chapitre 14 donne :
+$$L\delta_kP(0,t_{k+1})\big[E_{k+1}(R_k)N(d_1)-R_KN(d_2)\big]$$</p>
+<p><em>Étape 3 — appliquer le résultat 2 :</em>
+$$\boxed{E_{k+1}(R_k)=F_k}$$</p>
+<p><em>Étape 4 — conclusion.</em></p>
+<blockquote>
+<p class="cal piege"> <em><strong>On peut ACTUALISER AU TAUX DE MATURITÉ $t_{k+1}$ OBSERVÉ SUR LE MARCHÉ AUJOURD'HUI, POURVU QU'ON POSE LE TAUX ESPÉRÉ ÉGAL AU TAUX FORWARD.</strong></em></p>
+</blockquote>
+</div></details>
+
+<h3>2.7 L'impact des conventions de décompte des jours</h3>
+<p><em>Si le taux du cap $R_K$ est exprimé en <strong>actual/360</strong> (la norme américaine), <strong>l'intervalle $\delta_k$ des formules doit être remplacé par $a_k$, la fraction d'accroissement</strong> entre $t_k$ et $t_{k+1}$.</em></p>
+<p><strong>L'exemple.</strong> <em>Si $t_k$ est le <strong>1ᵉʳ mai</strong> et $t_{k+1}$ le <strong>1ᵉʳ août</strong>, il y a <strong>92 jours</strong> : $a_k=92/360=\mathbf{0{,}2556}$.</em> Le taux forward $F_k$ doit alors être exprimé en actual/360, donc résoudre :
+$$1+a_kF_k=\frac{P(0,t_k)}{P(0,t_{k+1})}$$</p>
+<blockquote>
+<p><em>L'impact est <strong>à peu près le même</strong> que : calculer $\delta_k$ en <strong>actual/actual</strong>, convertir $R_K$ d'actual/360 en actual/actual, et calculer $F_k$ en actual/actual en résolvant $1+\delta_kF_k=\dfrac{P(0,t_k)}{P(0,t_{k+1})}$.</em></p>
+</blockquote>
+<h2 data-prio="must">Concept 3 — Les swaptions européennes</h2>
+<h3>3.1 Le produit</h3>
+<blockquote>
+<p><em><strong>Les swaptions donnent au détenteur LE DROIT D'ENTRER dans un swap de taux donné, à une date future donnée.</strong></em></p>
+</blockquote>
+<details class="cor">
+<summary><strong>L'exemple d'usage, et la comparaison avec le swap forward</strong></summary><div class="in">
+
+<p><strong>L'exemple.</strong> <em>Une entreprise sait que <strong>dans 6 mois</strong> elle entrera dans un prêt à taux variable de <strong>5 ans</strong> et voudra <strong>échanger le variable contre du fixe</strong>. Elle peut, <strong>à un coût</strong>, entrer dans une swaption lui donnant le droit de <strong>recevoir le LIBOR 6 mois et payer un taux fixe de 8 %</strong> pour 5 ans, <strong>commençant dans 6 mois</strong>.</em></p>
+<table>
+<thead>
+<tr>
+<th>Ce qui arrive dans 6 mois</th>
+<th>Décision</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Le taux de swap 5 ans est <strong>inférieur</strong> à 8 %</td>
+<td> <strong>ne pas exercer</strong> — entrer dans un swap normal</td>
+</tr>
+<tr>
+<td>Le taux de swap 5 ans est <strong>supérieur</strong> à 8 %</td>
+<td> <strong>exercer</strong> — obtenir un swap à des conditions <strong>plus favorables que le marché</strong></td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><em><strong>Les swaptions fournissent aux entreprises la GARANTIE que le taux fixe qu'elles paieront sur un prêt futur NE DÉPASSERA PAS UN CERTAIN NIVEAU.</strong></em></p>
+</blockquote>
+<p><strong>Swaption contre swap forward (<em>deferred swap</em>).</strong></p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th><strong>Swap forward</strong></th>
+<th><strong>Swaption</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Coût initial</td>
+<td><strong>aucun</strong></td>
+<td> un <strong>coût</strong> (la prime)</td>
+</tr>
+<tr>
+<td>Inconvénient</td>
+<td> <strong>OBLIGE</strong> l'entreprise à entrer dans le swap</td>
+<td>—</td>
+</tr>
+<tr>
+<td>Avantage</td>
+<td>—</td>
+<td><em><strong>bénéficier des mouvements FAVORABLES tout en acquérant une protection contre les DÉFAVORABLES</strong></em></td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><em><strong>La différence est analogue à celle entre une OPTION de change et un CONTRAT FORWARD sur devise.</strong></em></p>
+</blockquote>
+<p><strong>Business Snapshot 28.2 — swaptions et options sur obligations.</strong></p>
+<p><em>Un swap peut être vu comme un accord d'<strong>échanger une obligation à taux fixe contre une obligation à taux variable</strong>.  <strong>Au départ d'un swap, la valeur de l'obligation variable ÉGALE TOUJOURS LE PRINCIPAL.</strong> Une swaption peut donc être vue comme <strong>une option d'échanger une obligation à taux fixe contre le principal du swap — c'est-à-dire un TYPE D'OPTION SUR OBLIGATION</strong>.</em></p>
+<table>
+<thead>
+<tr>
+<th>Swaption</th>
+<th>Option sur obligation équivalente</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Droit de <strong>PAYER fixe</strong> et recevoir variable</td>
+<td> un <strong>PUT</strong> sur l'obligation à taux fixe, de strike <strong>égal au principal</strong></td>
+</tr>
+<tr>
+<td>Droit de <strong>PAYER variable</strong> et recevoir fixe</td>
+<td> un <strong>CALL</strong> sur l'obligation à taux fixe, de strike <strong>égal au principal</strong></td>
+</tr>
+</tbody></table>
+</div></details>
+
+<h3>3.2 La valorisation</h3>
+<p><strong>Le payoff.</strong> <em>Si le taux de swap $n$ ans démarrant en $T$ se révèle être $s_T$, la comparaison des flux montre que le payoff consiste en <strong>une SÉRIE de flux</strong> :</em></p>
+<p>$$\boxed{\frac{L}{m}\max(s_T-s_K,\ 0)\qquad\text{reçus }m\text{ fois par an pendant }n\text{ ans}}$$</p>
+<blockquote>
+<p class="cal piege"> <strong>LA DIFFÉRENCE CONCEPTUELLE AVEC UN CAP, à savoir énoncer.</strong>
+<em><strong>Alors qu'un CAP est un PORTEFEUILLE D'OPTIONS sur des taux, une SWAPTION est UNE OPTION UNIQUE sur le taux de swap, AVEC DES PAYOFFS RÉPÉTÉS.</strong></em></p>
+</blockquote>
+<p>$$\boxed{\text{Payer fixe}\ :\ \sum_{i=1}^{mn}\frac Lm P(0,T_i)\big[s_0N(d_1)-s_KN(d_2)\big]=LA\big[s_0N(d_1)-s_KN(d_2)\big]}\;\text{(28.10)}$$
+$$\boxed{\text{Recevoir fixe}\ :\ LA\big[s_KN(-d_2)-s_0N(-d_1)\big]}\;\text{(28.11)}$$
+$$\boxed{A=\frac1m\sum_{i=1}^{mn}P(0,T_i)}\qquad d_1=\frac{\ln(s_0/s_K)+\sigma^2T/2}{\sigma\sqrt T}\qquad d_2=d_1-\sigma\sqrt T$$</p>
+<p>où $s_0$ est <strong>le taux de swap FORWARD en 0</strong> (calculé comme en (27.23)) et $\sigma$ <strong>la volatilité du taux de swap forward</strong>.</p>
+<blockquote>
+<p class="cal piege"> <em><strong>$\sigma$ est multipliée par $\sqrt T$ (la maturité de l'OPTION), et $A$ est le facteur d'actualisation des $mn$ payoffs.</strong></em></p>
+</blockquote>
+<details class="cor">
+<summary><strong>Exemple 28.4 — une swaption 5×3, recalculée</strong></summary><div class="in">
+
+<p><strong>Données.</strong> Courbe LIBOR plate à <strong>6 %</strong> continu. Swaption donnant le droit de <strong>payer 6,2 %</strong> dans un swap de <strong>3 ans démarrant dans 5 ans</strong>. Volatilité du taux de swap forward <strong>20 %</strong>. Paiements <strong>semestriels</strong>, principal <strong>100 millions</strong>.</p>
+<p><em>Étape 1 — le facteur d'annuité.</em> Les six dates de paiement sont 5,5 · 6,0 · 6,5 · 7,0 · 7,5 · 8,0 :
+$$A=\tfrac12\big(e^{-0{,}33}+e^{-0{,}36}+e^{-0{,}39}+e^{-0{,}42}+e^{-0{,}45}+e^{-0{,}48}\big)=\mathbf{2{,}0035}$$</p>
+<p><em>Étape 2 — convertir le taux.</em>  <strong>6 % continu se traduit en 6,09 % SEMESTRIEL</strong> :
+$$s_0=2\big(e^{0{,}03}-1\big)=\mathbf{0{,}0609}$$</p>
+<p><em>Étape 3 — les paramètres.</em> $s_K=0{,}062$, $T=5$, $\sigma=0{,}2$ :
+$$d_1=\frac{\ln(0{,}0609/0{,}062)+0{,}2^2\times5/2}{0{,}2\sqrt5}=\frac{-0{,}01790+0{,}10}{0{,}4472}=\mathbf{0{,}1836}$$
+$$d_2=d_1-0{,}2\sqrt5=\mathbf{-0{,}2636}$$</p>
+<p><em>Étape 4 — la valeur, en millions :</em>
+$$100\times2{,}0035\times\big[0{,}0609\,N(0{,}1836)-0{,}062\,N(-0{,}2636)\big]=\boxed{\mathbf{2{,}07\ \text{millions de dollars}}}$$</p>
+</div></details>
+
+<h3>3.3 Cotations, justification théorique et décompte des jours</h3>
+<p><strong>Table 28.2 — cotations typiques de courtiers, swaptions européennes en dollars (volatilités mid-market, % par an)</strong> <em>(instruments « à la monnaie » : strike = taux de swap forward)</em> :</p>
+<table>
+<thead>
+<tr>
+<th>Expiration</th>
+<th>1 an</th>
+<th>2</th>
+<th>3</th>
+<th>4</th>
+<th>5</th>
+<th>7</th>
+<th>10</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1 mois</td>
+<td>17,75</td>
+<td>17,75</td>
+<td>17,75</td>
+<td>17,50</td>
+<td>17,00</td>
+<td>17,00</td>
+<td>16,00</td>
+</tr>
+<tr>
+<td>3 mois</td>
+<td>19,50</td>
+<td>19,00</td>
+<td>19,00</td>
+<td>18,00</td>
+<td>17,50</td>
+<td>17,00</td>
+<td>16,00</td>
+</tr>
+<tr>
+<td>6 mois</td>
+<td>20,00</td>
+<td>20,00</td>
+<td>19,25</td>
+<td>18,50</td>
+<td>18,75</td>
+<td>17,75</td>
+<td>16,75</td>
+</tr>
+<tr>
+<td><strong>1 an</strong></td>
+<td><strong>22,50</strong></td>
+<td><strong>21,75</strong></td>
+<td>20,50</td>
+<td>20,00</td>
+<td>19,50</td>
+<td>18,25</td>
+<td>16,75</td>
+</tr>
+<tr>
+<td><strong>2 ans</strong></td>
+<td>22,00</td>
+<td><strong>22,00</strong></td>
+<td>20,75</td>
+<td>19,50</td>
+<td>19,75</td>
+<td>18,25</td>
+<td>16,75</td>
+</tr>
+<tr>
+<td>3 ans</td>
+<td>21,50</td>
+<td>21,00</td>
+<td>20,00</td>
+<td>19,25</td>
+<td>19,00</td>
+<td>17,75</td>
+<td>16,50</td>
+</tr>
+<tr>
+<td>4 ans</td>
+<td>20,75</td>
+<td>20,25</td>
+<td>19,25</td>
+<td>18,50</td>
+<td>18,25</td>
+<td>17,50</td>
+<td>16,00</td>
+</tr>
+<tr>
+<td>5 ans</td>
+<td>20,00</td>
+<td>19,50</td>
+<td>18,50</td>
+<td>17,75</td>
+<td>17,50</td>
+<td>17,00</td>
+<td>15,50</td>
+</tr>
+</tbody></table>
+<p class="cal piege"><em> <strong>Les volatilités de la colonne « 1 an » présentent une bosse similaire à celle des caps.</strong> Quand on va vers les colonnes de swaps plus longs, <strong>la bosse persiste mais devient MOINS PRONONCÉE</strong>.</em></p>
+<details class="cor">
+<summary><strong>La justification théorique et les conventions de jours</strong></summary><div class="in">
+
+<p>*On considère un monde <strong>forward risque-neutre par rapport à l'ANNUITÉ $A$</strong>. Le chapitre 27 donne :*</p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Résultat</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>1</strong></td>
+<td><em>la valeur courante de tout titre est <strong>la valeur courante de l'annuité multipliée par l'espérance de $\dfrac{\text{prix du titre en }T}{\text{valeur de l'annuité en }T}$</strong></em> (27.25)</td>
+</tr>
+<tr>
+<td><strong>2</strong></td>
+<td><em>l'espérance du taux de swap en $T$ dans ce monde <strong>ÉGALE LE TAUX DE SWAP FORWARD</strong></em> (27.24)</td>
+</tr>
+</tbody></table>
+<p><em>Étape 1 :</em> la valeur de la swaption est $LA\,E_A\big[\max(s_T-s_K,0)\big]$.</p>
+<p><em>Étape 2 :</em> par l'annexe du chapitre 14, cela vaut $LA\big[E_A(s_T)N(d_1)-s_KN(d_2)\big]$.</p>
+<p><em>Étape 3 :</em> le second résultat donne $E_A(s_T)=s_0$, d'où (28.10).</p>
+<blockquote>
+<p class="cal piege"> <em><strong>Ils montrent qu'on peut TRAITER LES TAUX COMME CONSTANTS pour les besoins de l'actualisation, POURVU QU'ON POSE LE TAUX DE SWAP ESPÉRÉ ÉGAL AU TAUX DE SWAP FORWARD.</strong></em></p>
+</blockquote>
+<p><strong>Les conventions de décompte des jours.</strong> *Le taux fixe est exprimé en actual/365, 30/360, etc. En posant $T_0=T$ et $a_i$ la fraction d'accroissement entre $T_{i-1}$ et $T_i$ (par exemple <strong>1ᵉʳ mars → 1ᵉʳ septembre en actual/365 : $a_i=184/365=\mathbf{0{,}5041}$</strong>), les formules restent correctes avec :*
+$$\boxed{A=\sum_{i=1}^{mn}a_i\,P(0,T_i)}\qquad\text{et}\qquad\boxed{s_0A=P(0,T)-P(0,T_{mn})}$$</p>
+</div></details>
+
+<h2 data-prio="must">Concept 4 — Les généralisations et l'incohérence mutuelle</h2>
+<blockquote>
+<p class="cal piege"> <strong>LE POINT LE PLUS IMPORTANT DU CHAPITRE.</strong></p>
+<p><em><strong>« Nous avons présenté TROIS versions différentes du modèle de Black : une pour les options sur obligations, une pour les caps, une pour les swaptions. CHACUN DES MODÈLES EST INTÉRIEUREMENT COHÉRENT, MAIS ILS NE SONT PAS COHÉRENTS ENTRE EUX. »</strong></em></p>
+<p><em><strong>Quand les prix futurs d'obligations sont lognormaux, les taux zéro et les taux de swap NE le sont PAS ; quand les taux zéro sont lognormaux, les prix d'obligations et les taux de swap NE le sont PAS.</strong></em></p>
+</blockquote>
+<p><strong>Les trois généralisations</strong> :</p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Instrument</th>
+<th>Règle</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>1</strong></td>
+<td>payoff en $T$ dépendant de <strong>la valeur d'une OBLIGATION observée en $T$</strong></td>
+<td>sa valeur est $P(0,T)\times$ le payoff espéré, <strong>dans un monde où le prix espéré de l'obligation égale son PRIX FORWARD</strong></td>
+</tr>
+<tr>
+<td><strong>2</strong></td>
+<td>payoff en $T^\ast$ dépendant du <strong>TAUX observé en $T$ pour la période $[T,T^\ast]$</strong></td>
+<td>sa valeur est $P(0,T^\ast)\times$ le payoff espéré, <strong>dans un monde où le taux espéré égale le TAUX FORWARD</strong></td>
+</tr>
+<tr>
+<td><strong>3</strong></td>
+<td>payoff sous forme d'<strong>ANNUITÉ</strong>, dont la taille est déterminée en $T$ comme fonction du taux de swap $n$ ans en $T$, l'annuité durant $n$ ans avec les mêmes dates que le swap</td>
+<td>sa valeur est $A\times$ le payoff espéré par an, avec (a) $A$ la valeur courante de l'annuité <strong>au taux de 1 dollar par an</strong> et (b) l'espérance prise <strong>dans un monde où le taux de swap futur espéré égale le TAUX DE SWAP FORWARD</strong></td>
+</tr>
+</tbody></table>
+<p><em>La première généralise le modèle des options sur obligations ; la deuxième celui des caps/floors ; la troisième celui des swaptions.</em></p>
+<h2 data-prio="high">Concept 5 — La couverture des dérivés de taux</h2>
+<h3>5.1 Les quatre mesures de delta</h3>
+<blockquote>
+<p><em><strong>Dans le contexte des dérivés de taux, le RISQUE DELTA est le risque associé à un DÉPLACEMENT DE LA COURBE ZÉRO. Comme il y a de NOMBREUSES façons dont la courbe peut se déplacer, DE NOMBREUX DELTAS peuvent être calculés.</strong></em></p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Méthode</th>
+<th>Nom</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>1</strong></td>
+<td>l'impact d'un déplacement <strong>parallèle de 1 point de base</strong> de la courbe zéro</td>
+<td> le <em><strong>DV01</strong></em></td>
+</tr>
+<tr>
+<td><strong>2</strong></td>
+<td>l'impact de <strong>petites variations des COTATIONS de chacun des instruments</strong> servant à construire la courbe zéro</td>
+<td>—</td>
+</tr>
+<tr>
+<td><strong>3</strong></td>
+<td>découper la courbe (zéro ou forward) en <strong>sections (<em>buckets</em>)</strong> et déplacer les taux <strong>d'un seul bucket</strong> de 1 pb, le reste inchangé</td>
+<td><em>bucketing</em></td>
+</tr>
+<tr>
+<td><strong>4</strong></td>
+<td>mener une <strong>ACP</strong> (fiche 93, §21.9) et calculer un delta par rapport à chacun des premiers facteurs — <em>le premier mesure un déplacement approximativement <strong>parallèle</strong>, le deuxième une <strong>torsion</strong>, etc.</em></td>
+<td>—</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p class="cal piege"> <em><strong>En pratique, LES TRADERS PRÉFÈRENT LA DEUXIÈME APPROCHE. Ils soutiennent que la SEULE façon dont la courbe zéro peut changer est si la cotation d'un des instruments servant à la calculer change. Il leur semble donc sensé de se concentrer sur les expositions issues des changements de prix de CES instruments.</strong></em></p>
+</blockquote>
+<h3>5.2 Gammas et vegas</h3>
+<p><strong>Le problème de l'explosion combinatoire.</strong> *Si <strong>10 instruments</strong> servent à calculer la courbe zéro et qu'on calcule des deltas pour chacun, le gamma est une dérivée seconde $\partial^2\Pi/\partial x_i\partial x_j$ : il y a <strong>10 choix pour $x_i$ et 10 pour $x_j$</strong>, soit <strong>55 mesures de gamma différentes</strong>.  <strong>Ce peut être une « SURCHARGE D'INFORMATION ».</strong>*</p>
+<table>
+<thead>
+<tr>
+<th>Remède</th>
+<th>Contenu</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>1</strong></td>
+<td><strong>ignorer les gammas croisés</strong> et se concentrer sur les <strong>10</strong> dérivées avec $i=j$</td>
+</tr>
+<tr>
+<td><strong>2</strong></td>
+<td>calculer <strong>UNE seule</strong> mesure : la dérivée seconde par rapport à un <strong>déplacement parallèle</strong></td>
+</tr>
+<tr>
+<td><strong>3</strong></td>
+<td>calculer les gammas par rapport aux <strong>deux premiers facteurs d'une ACP</strong></td>
+</tr>
+</tbody></table>
+<p><strong>Le vega.</strong> <em>Une approche : calculer l'impact d'un <strong>même petit changement des volatilités de Black de TOUS les caps et swaptions</strong>.  <strong>Mais cela suppose qu'UN SEUL facteur pilote toutes les volatilités et peut être trop simpliste.</strong> <strong>Une meilleure idée : mener une ACP sur les volatilités des caps et swaptions et calculer des vegas correspondant aux 2 ou 3 premiers facteurs.</strong></em></p>
+<h2>Comment reconnaître le type d'exercice</h2>
+<table>
+<thead>
+<tr>
+<th>Indice dans l'énoncé</th>
+<th>Méthode à déclencher</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>« option sur une obligation », coupons pendant la vie de l'option</td>
+<td>$F_B=\dfrac{B_0-I}{P(0,T)}$, puis (28.1)/(28.2)</td>
+</tr>
+<tr>
+<td>« le strike est le prix COTÉ »</td>
+<td> <strong>ajouter les intérêts courus</strong> à $K$</td>
+</tr>
+<tr>
+<td>« volatilité de rendement de $x$ % »</td>
+<td>$\sigma_B=Dy_0\sigma_y$ <strong>avant tout calcul</strong></td>
+</tr>
+<tr>
+<td>« plafonner le LIBOR à $R_K$ »</td>
+<td><strong>caplet</strong> : (28.7), avec $\sqrt{t_k}$ et $P(0,t_{k+1})$</td>
+</tr>
+<tr>
+<td>« plancher », « floorlet »</td>
+<td>(28.8)</td>
+</tr>
+<tr>
+<td>« collar à coût nul »</td>
+<td>prix du cap = prix du floor</td>
+</tr>
+<tr>
+<td>« cap et floor de même strike »</td>
+<td><strong>parité</strong> cap = floor + swap (non standard)</td>
+</tr>
+<tr>
+<td>« volatilité flat » cotée</td>
+<td>la <strong>même</strong> pour tous les caplets d'un cap donné</td>
+</tr>
+<tr>
+<td>« droit d'entrer dans un swap »</td>
+<td><strong>swaption</strong> : (28.10)/(28.11), calculer $A$ d'abord</td>
+</tr>
+<tr>
+<td>« payer fixe » / « recevoir fixe »</td>
+<td>call / put sur le taux de swap → <strong>put / call</strong> sur l'obligation fixe</td>
+</tr>
+<tr>
+<td>Taux donné en composition continue</td>
+<td> <strong>convertir</strong> dans la fréquence des paiements</td>
+</tr>
+<tr>
+<td>« actual/360 » ou « 30/360 »</td>
+<td>remplacer $\delta_k$ par $a_k$ et recalculer $F_k$</td>
+</tr>
+<tr>
+<td>« quel delta calculer ? »</td>
+<td>DV01 · cotations · buckets · <strong>ACP</strong></td>
+</tr>
+</tbody></table>
+<h2>Comment résoudre ce type d'exercice</h2>
+<p><strong>A — Une option sur obligation.</strong></p>
+<ol>
+<li>Calculer $I$ = <strong>valeur actuelle des coupons versés PENDANT la vie de l'option</strong> (pas au-delà).</li>
+<li>$F_B=\dfrac{B_0-I}{P(0,T)}$, avec $B_0$ le prix <strong>CASH</strong>.</li>
+<li>Lire la convention de strike ; si le strike est <strong>coté</strong>, ajouter les intérêts courus <strong>à la maturité de l'option</strong>.</li>
+<li>Si l'on donne une volatilité de <strong>rendement</strong>, convertir : $\sigma_B=Dy_0\sigma_y$.</li>
+<li>Appliquer $c=P(0,T)[F_BN(d_1)-KN(d_2)]$.</li>
+</ol>
+<p><strong>B — Un caplet.</strong></p>
+<ol>
+<li>Identifier $t_k$ (<strong>observation</strong>) et $t_{k+1}$ (<strong>paiement</strong>) ; $\delta_k=t_{k+1}-t_k$.</li>
+<li>Convertir la courbe en composition <strong>continue</strong> pour obtenir $P(0,t_{k+1})$.</li>
+<li>Exprimer $F_k$ et $R_K$ <strong>dans la même fréquence de composition que le tenor</strong>.</li>
+<li>$d_1=\dfrac{\ln(F_k/R_K)+\sigma_k^2t_k/2}{\sigma_k\sqrt{t_k}}$ —  <strong>$t_k$, pas $t_{k+1}$</strong>.</li>
+<li>Multiplier par $L\delta_kP(0,t_{k+1})$.</li>
+<li>Contrôle : un cap est la <strong>somme</strong> des caplets, chacun valorisé <strong>séparément</strong>.</li>
+</ol>
+<p><strong>C — Une swaption.</strong></p>
+<ol>
+<li>Lister les $mn$ dates de paiement $T_i$ du swap sous-jacent.</li>
+<li>$A=\frac1m\sum P(0,T_i)$ (ou $\sum a_iP(0,T_i)$ avec les conventions).</li>
+<li>Calculer $s_0$ <strong>dans la fréquence des paiements</strong> (convertir depuis le continu !).</li>
+<li>$d_1=\dfrac{\ln(s_0/s_K)+\sigma^2T/2}{\sigma\sqrt T}$ —  <strong>$T$ = maturité de l'OPTION</strong>, pas du swap.</li>
+<li>Valeur $=LA[s_0N(d_1)-s_KN(d_2)]$ pour un payeur de fixe.</li>
+<li>Contrôle : la parité <strong>payeur $-$ receveur $=$ swap forward</strong>.</li>
+</ol>
+<h2 data-prio="must">Common mistakes</h2>
+<table>
+<thead>
+<tr>
+<th>Erreur</th>
+<th>Correction</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Utiliser le prix <strong>coté</strong> dans (28.3)</td>
+<td> $B_0$ et $F_B$ sont des prix <strong>CASH (<em>dirty</em>)</strong></td>
+</tr>
+<tr>
+<td>Inclure dans $I$ des coupons versés <strong>après</strong> la maturité de l'option</td>
+<td> seulement ceux versés <strong>pendant</strong> sa vie</td>
+</tr>
+<tr>
+<td>Oublier d'ajouter les intérêts courus à un strike <strong>coté</strong></td>
+<td>ici $1\,000\to\mathbf{1\,008{,}33}$, et le prix passe de 9,49 à <strong>7,97</strong></td>
+</tr>
+<tr>
+<td>Utiliser une volatilité de rendement telle quelle</td>
+<td> convertir par $\sigma_B=Dy_0\sigma_y$</td>
+</tr>
+<tr>
+<td>Croire que $\sigma_B$ est stable selon les options</td>
+<td> <strong>non</strong> — elle <strong>décline</strong> quand la vie de l'option augmente ; ce sont les volatilités de <strong>rendement</strong> qui sont stables</td>
+</tr>
+<tr>
+<td>Croire que le payoff du cap survient à la <strong>date de réinitialisation</strong></td>
+<td> il survient <strong>un tenor plus tard</strong></td>
+</tr>
+<tr>
+<td>Compter un payoff à la <strong>première</strong> date de réinitialisation</td>
+<td> <strong>les caps n'en versent PAS</strong></td>
+</tr>
+<tr>
+<td>Utiliser $\sqrt{t_{k+1}}$ dans $d_1$</td>
+<td> c'est $\sqrt{t_k}$ — <strong>le taux est OBSERVÉ en $t_k$</strong></td>
+</tr>
+<tr>
+<td>Actualiser à $P(0,t_k)$</td>
+<td> c'est $P(0,t_{k+1})$ — <strong>le payoff est en $t_{k+1}$</strong></td>
+</tr>
+<tr>
+<td>Confondre volatilité <em>spot</em> et <em>flat</em></td>
+<td><em>spot</em> = par <strong>caplet</strong> ; <em>flat</em> = par <strong>cap</strong></td>
+</tr>
+<tr>
+<td>Utiliser une volatilité flat pour identifier des caplets mal évalués</td>
+<td>il faut passer par les <strong>spot</strong></td>
+</tr>
+<tr>
+<td>Traiter une swaption comme un portefeuille d'options</td>
+<td> c'est <strong>UNE option</strong> avec des <strong>payoffs répétés</strong></td>
+</tr>
+<tr>
+<td>Utiliser $\sqrt{T_{\text{swap}}}$ dans une swaption</td>
+<td> c'est $\sqrt T$, la maturité de <strong>l'OPTION</strong></td>
+</tr>
+<tr>
+<td>Utiliser un taux continu comme $s_0$</td>
+<td> convertir : 6 % continu $\to$ <strong>6,09 %</strong> semestriel</td>
+</tr>
+<tr>
+<td>Croire les trois modèles mutuellement cohérents</td>
+<td> <em><strong>ils ne le sont PAS</strong></em></td>
+</tr>
+<tr>
+<td>Se contenter d'un delta unique pour un livre de taux</td>
+<td>il y a <strong>quatre</strong> familles de mesures ; les traders préfèrent la <strong>deuxième</strong></td>
+</tr>
+<tr>
+<td>Calculer les 55 gammas</td>
+<td><strong>surcharge d'information</strong> — ignorer les croisés ou passer par l'ACP</td>
+</tr>
+</tbody></table>
+<h2>Ultimate Review</h2>
+<table>
+<thead>
+<tr>
+<th>Élément</th>
+<th>Formule / valeur</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Les quatre difficultés</strong></td>
+<td>comportement d'un taux · toute la <strong>courbe</strong> · volatilités <strong>différentes</strong> · taux servant à <strong>actualiser ET définir le payoff</strong></td>
+</tr>
+<tr>
+<td><strong>Callable</strong></td>
+<td>le détenteur a <strong>VENDU un CALL</strong> → rendements <strong>plus élevés</strong></td>
+</tr>
+<tr>
+<td><strong>Puttable</strong></td>
+<td>le détenteur a <strong>ACHETÉ un PUT</strong> → rendements <strong>plus faibles</strong></td>
+</tr>
+<tr>
+<td><strong>Lockout</strong></td>
+<td>la période initiale <strong>sans rappel possible</strong></td>
+</tr>
+<tr>
+<td><strong>Engagement de prêt</strong></td>
+<td>un <strong>PUT sur obligation</strong></td>
+</tr>
+<tr>
+<td><strong>Prépaiement de crédit</strong></td>
+<td>un <strong>CALL sur obligation</strong></td>
+</tr>
+<tr>
+<td><strong>Modèle standard obligation</strong></td>
+<td>prix <strong>forward</strong> de l'obligation <strong>lognormal</strong></td>
+</tr>
+<tr>
+<td><strong>Formule call</strong></td>
+<td>$P(0,T)[F_BN(d_1)-KN(d_2)]$</td>
+</tr>
+<tr>
+<td><strong>Prix forward</strong></td>
+<td>$F_B=\dfrac{B_0-I}{P(0,T)}$</td>
+</tr>
+<tr>
+<td><strong>Prix employés</strong></td>
+<td> <strong>CASH</strong>, pas cotés</td>
+</tr>
+<tr>
+<td><strong>Clean / dirty</strong></td>
+<td>prix <strong>coté</strong> / prix <strong>cash</strong></td>
+</tr>
+<tr>
+<td><strong>Strike coté</strong></td>
+<td> ajouter les <strong>intérêts courus</strong></td>
+</tr>
+<tr>
+<td><strong>Exemple 28.1</strong></td>
+<td>$I=95{,}45$, $F_B=939{,}68$, $P=0{,}9200$ → <strong>9,49</strong> puis <strong>7,97</strong></td>
+</tr>
+<tr>
+<td><strong>Écart-type du log du prix</strong></td>
+<td><strong>nul aujourd'hui</strong>, <strong>nul à maturité de l'obligation</strong>, cloche entre les deux</td>
+</tr>
+<tr>
+<td><strong>$\sigma_B$ et la vie de l'option</strong></td>
+<td>elle <strong>DÉCLINE</strong></td>
+</tr>
+<tr>
+<td><strong>Volatilité de rendement</strong></td>
+<td>$\sigma_B=D\,y_0\,\sigma_y$</td>
+</tr>
+<tr>
+<td><strong>L'exemple</strong></td>
+<td>$5\times0{,}08\times0{,}2=\mathbf{8\,\%}$</td>
+</tr>
+<tr>
+<td><strong>Pourquoi les traders les préfèrent</strong></td>
+<td>elles sont <strong>beaucoup plus constantes</strong></td>
+</tr>
+<tr>
+<td><strong>Exemple 28.2</strong></td>
+<td>prix coté 122,82 → option <strong>2,36</strong> (strike coté) ou <strong>1,74</strong> (strike cash)</td>
+</tr>
+<tr>
+<td><strong>Tenor</strong></td>
+<td>le temps entre deux <strong>réinitialisations</strong></td>
+</tr>
+<tr>
+<td><strong>Payoff du cap</strong></td>
+<td>$L\delta_k\max(R_k-R_K,0)$ <strong>en $t_{k+1}$</strong></td>
+</tr>
+<tr>
+<td><strong>Cap 5 ans, tenor 3 mois</strong></td>
+<td><strong>19</strong> réinitialisations, <strong>19</strong> payoffs</td>
+</tr>
+<tr>
+<td><strong>Cap = ?</strong></td>
+<td>portefeuille de <strong>calls sur taux</strong> = portefeuille de <strong>PUTS sur obligations zéro-coupon</strong></td>
+</tr>
+<tr>
+<td><strong>Le put équivalent</strong></td>
+<td>maturité $t_k$, sous-jacent maturant en $t_{k+1}$, faciale $L(1+R_K\delta_k)$, strike $L$</td>
+</tr>
+<tr>
+<td><strong>Floor = ?</strong></td>
+<td>portefeuille de <strong>puts sur taux</strong> = <strong>CALLS sur obligations</strong></td>
+</tr>
+<tr>
+<td><strong>Collar</strong></td>
+<td>cap <strong>long</strong> + floor <strong>court</strong>, <strong>coût nul</strong></td>
+</tr>
+<tr>
+<td><strong>Parité</strong></td>
+<td>$\text{cap}=\text{floor}+\text{swap}$ (swap <strong>non standard</strong>)</td>
+</tr>
+<tr>
+<td><strong>Caplet</strong></td>
+<td>$L\delta_kP(0,t_{k+1})[F_kN(d_1)-R_KN(d_2)]$</td>
+</tr>
+<tr>
+<td><strong>Les deux dates</strong></td>
+<td> $\sqrt{t_k}$ dans $d_1$ · $P(0,t_{k+1})$ dans le facteur</td>
+</tr>
+<tr>
+<td><strong>Exemple 28.3</strong></td>
+<td>$P=0{,}9169$, $d_1=-0{,}5677$, $d_2=-0{,}7677$ → <strong>5 162 dollars</strong></td>
+</tr>
+<tr>
+<td><strong>Volatilités spot</strong></td>
+<td>une par <strong>caplet</strong></td>
+</tr>
+<tr>
+<td><strong>Volatilités flat</strong></td>
+<td>une par <strong>cap</strong> — <strong>ce que le marché cote</strong></td>
+</tr>
+<tr>
+<td><strong>La bosse</strong></td>
+<td>pic vers <strong>2-3 ans</strong> ; pas d'explication consensuelle</td>
+</tr>
+<tr>
+<td><strong>Explication proposée</strong></td>
+<td>banques centrales au court · <strong>surréaction des traders</strong> à 2-3 ans · <strong>retour à la moyenne</strong> au-delà</td>
+</tr>
+<tr>
+<td><strong>Justification du modèle de cap</strong></td>
+<td>numéraire $P(t,t_{k+1})$ : $E_{k+1}(R_k)=F_k$</td>
+</tr>
+<tr>
+<td><strong>Actual/360</strong></td>
+<td>$a_k=92/360=0{,}2556$ ; $1+a_kF_k=\dfrac{P(0,t_k)}{P(0,t_{k+1})}$</td>
+</tr>
+<tr>
+<td><strong>Swaption</strong></td>
+<td>droit d'<strong>entrer dans un swap</strong> à une date future</td>
+</tr>
+<tr>
+<td><strong>Contre swap forward</strong></td>
+<td>le forward <strong>oblige</strong> ; la swaption <strong>coûte</strong> mais laisse le choix</td>
+</tr>
+<tr>
+<td><strong>Payer fixe = ?</strong></td>
+<td>un <strong>PUT</strong> sur l'obligation fixe, strike = <strong>principal</strong></td>
+</tr>
+<tr>
+<td><strong>Recevoir fixe = ?</strong></td>
+<td>un <strong>CALL</strong> sur l'obligation fixe</td>
+</tr>
+<tr>
+<td><strong>Payoff</strong></td>
+<td>$\frac Lm\max(s_T-s_K,0)$, reçu $mn$ fois</td>
+</tr>
+<tr>
+<td><strong>Nature</strong></td>
+<td> <strong>UNE option</strong> à payoffs <strong>répétés</strong> (contre un <strong>portefeuille</strong> pour le cap)</td>
+</tr>
+<tr>
+<td><strong>Formule payeur</strong></td>
+<td>$LA[s_0N(d_1)-s_KN(d_2)]$</td>
+</tr>
+<tr>
+<td><strong>Annuité</strong></td>
+<td>$A=\frac1m\sum_{i=1}^{mn}P(0,T_i)$</td>
+</tr>
+<tr>
+<td><strong>Exemple 28.4</strong></td>
+<td>$A=2{,}0035$, $s_0=6{,}09\,\%$, $d_1=0{,}1836$ → <strong>2,07 millions</strong></td>
+</tr>
+<tr>
+<td><strong>Justification du modèle de swaption</strong></td>
+<td>numéraire $A$ : $E_A(s_T)=s_0$</td>
+</tr>
+<tr>
+<td><strong>Avec les conventions</strong></td>
+<td>$A=\sum a_iP(0,T_i)$ et $s_0A=P(0,T)-P(0,T_{mn})$</td>
+</tr>
+<tr>
+<td><strong>L'incohérence mutuelle</strong></td>
+<td> prix lognormaux ⇒ taux <strong>non</strong> lognormaux, et réciproquement</td>
+</tr>
+<tr>
+<td><strong>Généralisation 1</strong></td>
+<td>payoff sur <strong>obligation</strong> → $P(0,T)\times$ espérance au <strong>prix forward</strong></td>
+</tr>
+<tr>
+<td><strong>Généralisation 2</strong></td>
+<td>payoff sur <strong>taux</strong> → $P(0,T^\ast)\times$ espérance au <strong>taux forward</strong></td>
+</tr>
+<tr>
+<td><strong>Généralisation 3</strong></td>
+<td>payoff en <strong>annuité</strong> → $A\times$ espérance au <strong>taux de swap forward</strong></td>
+</tr>
+<tr>
+<td><strong>Les quatre deltas</strong></td>
+<td><strong>DV01</strong> · cotations des instruments · <strong>buckets</strong> · <strong>ACP</strong></td>
+</tr>
+<tr>
+<td><strong>Ce que préfèrent les traders</strong></td>
+<td>la <strong>deuxième</strong> approche</td>
+</tr>
+<tr>
+<td><strong>Le problème des gammas</strong></td>
+<td><strong>55</strong> mesures avec 10 instruments</td>
+</tr>
+<tr>
+<td><strong>Le vega bien fait</strong></td>
+<td>une <strong>ACP</strong> sur les volatilités de caps et swaptions</td>
+</tr>
+</tbody></table>
+<div class="rec"><h2>Active Recall</h2><ol>
+<li>Citer les quatre raisons pour lesquelles les dérivés de taux sont plus difficiles à valoriser.</li>
+<li>Définir une option sur obligation. Pourquoi sont-elles souvent intégrées ?</li>
+<li>Qu'est-ce qu'une obligation <em>callable</em> ? Qui a vendu quoi à qui ?</li>
+<li>Pourquoi les <em>callable</em> offrent-elles des rendements plus élevés ?</li>
+<li>Décrire l'échéancier de rappel du <em>callable</em> à 10 ans de Hull.</li>
+<li>Qu'est-ce qu'une obligation <em>puttable</em> ? Une obligation <em>retractable</em> ?</li>
+<li>Pourquoi un dépôt à 5 ans remboursable contient-il un put américain ?</li>
+<li>Pourquoi un engagement de prêt est-il un put sur obligation ? Quand est-il exercé ?</li>
+<li>Quelle hypothèse le modèle standard fait-il pour les options sur obligations ?</li>
+<li>Écrire (28.1) et (28.2) avec leurs $d_1$ et $d_2$.</li>
+<li>Écrire (28.3). Quels coupons entrent dans $I$ ?</li>
+<li>Les prix employés sont-ils cotés ou cash ?</li>
+<li>Comment choisir $K$ selon la convention de strike ?</li>
+<li>Que signifient <em>clean price</em> et <em>dirty price</em> ?</li>
+<li>Refaire l'exemple 28.1 en entier, les deux cas.</li>
+<li>Pourquoi le prix baisse-t-il de 9,49 à 7,97 ?</li>
+<li>Décrire la forme de l'écart-type du logarithme du prix. Pourquoi est-il nul aux deux bouts ?</li>
+<li>Écrire la définition de $\sigma_B$ à utiliser.</li>
+<li>Comment $\sigma_B$ varie-t-elle avec la vie de l'option ?</li>
+<li>Dériver (28.4) à partir de la duration.</li>
+<li>Que vaut $\sigma_B$ pour $D=5$, $y_0=8\,\%$, $\sigma_y=20\,\%$ ?</li>
+<li>Pourquoi les traders préfèrent-ils les volatilités de rendement ?</li>
+<li>Rappeler les deux prix de l'exemple 28.2 et la différence entre eux.</li>
+<li>Qu'est-ce que le tenor ? Le taux du cap ?</li>
+<li>Refaire l'exemple 5 % / 4 % sur 10 millions.</li>
+<li>Quand le payoff survient-il ? Pourquoi ce décalage ?</li>
+<li>Combien de réinitialisations et de payoffs pour un cap 5 ans à tenor trimestriel ?</li>
+<li>Écrire (28.5). Qu'est-ce qu'un caplet ?</li>
+<li>Dériver la seconde lecture : le cap comme portefeuille de puts sur obligations.</li>
+<li>Quels sont la maturité, la faciale et le strike de ces puts ?</li>
+<li>Écrire le payoff d'un floor. À quoi équivaut-il en termes d'obligations ?</li>
+<li>Qu'est-ce qu'un collar ? Pourquoi son coût est-il nul ?</li>
+<li>Énoncer et démontrer la parité cap-floor-swap.</li>
+<li>Pourquoi le swap de la parité est-il non standard ?</li>
+<li>Écrire (28.7) et (28.8).</li>
+<li>Quelles sont les DEUX dates différentes qui apparaissent, et pourquoi ?</li>
+<li>Refaire l'exemple 28.3 en entier.</li>
+<li>Distinguer volatilités spot et flat. Lesquelles le marché cote-t-il ?</li>
+<li>Pourquoi les traders estiment-ils quand même les spot ?</li>
+<li>À quels instruments d'échange les caplets se comparent-ils ?</li>
+<li>Décrire la bosse de volatilité. Où est son pic ?</li>
+<li>Quelle explication possible Hull donne-t-il, en trois segments de maturité ?</li>
+<li>Que signifie « à la monnaie » pour un cap ?</li>
+<li>Justifier théoriquement (28.7) par les deux résultats du chapitre 27.</li>
+<li>Quelle est la conclusion sur l'actualisation ?</li>
+<li>Comment traiter une convention actual/360 ?</li>
+<li>Qu'est-ce qu'une swaption ? Détailler l'exemple de l'entreprise à 6 mois.</li>
+<li>Comparer swaption et swap forward sur trois points.</li>
+<li>À quelle analogie de change Hull fait-il appel ?</li>
+<li>Pourquoi une swaption est-elle un type d'option sur obligation ?</li>
+<li>Quel type d'option sur obligation correspond à « payer fixe » ? à « recevoir fixe » ?</li>
+<li>Écrire le payoff d'une swaption payeuse.</li>
+<li>Quelle est la différence conceptuelle entre un cap et une swaption ?</li>
+<li>Écrire (28.10) et (28.11), avec $A$.</li>
+<li>Que multiplie-t-on par $\sqrt T$ ? Quel $T$ ?</li>
+<li>Refaire l'exemple 28.4 en entier.</li>
+<li>Pourquoi doit-on convertir 6 % continu en 6,09 % ?</li>
+<li>Décrire la forme de la table 28.2. Que devient la bosse pour les swaps longs ?</li>
+<li>Justifier théoriquement (28.10) par les deux résultats du chapitre 27.</li>
+<li>Comment les conventions de jours modifient-elles $A$ et $s_0$ ?</li>
+<li>Énoncer l'incohérence mutuelle des trois modèles.</li>
+<li>Énoncer les trois généralisations.</li>
+<li>Qu'est-ce que le risque delta pour un dérivé de taux ?</li>
+<li>Citer les quatre façons de calculer un delta. Qu'est-ce que le DV01 ?</li>
+<li>Laquelle les traders préfèrent-ils, et pourquoi ?</li>
+<li>Combien de gammas avec 10 instruments ? Citer les trois remèdes.</li>
+<li>Quelle est l'approche naïve du vega, et son défaut ?</li>
+<li>Quelle est la meilleure approche ?</li>
+</ol></div>
+
+<h2>Flashcards</h2>
+<table>
+<thead>
+<tr>
+<th>Question</th>
+<th>Réponse</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Les taux servent à quoi, doublement ?</td>
+<td> <strong>Actualiser</strong> le dérivé <strong>ET</strong> définir son <strong>payoff</strong></td>
+</tr>
+<tr>
+<td>Obligation callable ?</td>
+<td>Le détenteur a <strong>VENDU un CALL</strong> à l'émetteur</td>
+</tr>
+<tr>
+<td>Son effet sur le rendement ?</td>
+<td>Rendements <strong>PLUS ÉLEVÉS</strong></td>
+</tr>
+<tr>
+<td>Période de lockout ?</td>
+<td>Les premières années <strong>sans rappel possible</strong></td>
+</tr>
+<tr>
+<td>Évolution du prix de rappel ?</td>
+<td><strong>Décroissant</strong> dans le temps</td>
+</tr>
+<tr>
+<td>Obligation puttable ?</td>
+<td>Le détenteur a <strong>ACHETÉ un PUT</strong></td>
+</tr>
+<tr>
+<td>Son effet sur le rendement ?</td>
+<td>Rendements <strong>PLUS FAIBLES</strong></td>
+</tr>
+<tr>
+<td>Obligation retractable ?</td>
+<td>Un <em>puttable</em> remboursable à une <strong>date unique</strong></td>
+</tr>
+<tr>
+<td>Dépôt remboursable sans pénalité ?</td>
+<td>Un <strong>PUT AMÉRICAIN</strong> sur obligation</td>
+</tr>
+<tr>
+<td>Prépaiement de crédit ?</td>
+<td>Un <strong>CALL</strong> sur obligation</td>
+</tr>
+<tr>
+<td>Engagement de prêt ?</td>
+<td>Un <strong>PUT</strong> sur obligation</td>
+</tr>
+<tr>
+<td>Quand est-il exercé ?</td>
+<td>Si les taux <strong>MONTENT</strong></td>
+</tr>
+<tr>
+<td>Hypothèse du modèle standard obligation ?</td>
+<td>Le <strong>prix FORWARD</strong> est <strong>lognormal</strong></td>
+</tr>
+<tr>
+<td>Formule du call ?</td>
+<td>$P(0,T)[F_BN(d_1)-KN(d_2)]$</td>
+</tr>
+<tr>
+<td>Prix forward de l'obligation ?</td>
+<td>$F_B=\dfrac{B_0-I}{P(0,T)}$</td>
+</tr>
+<tr>
+<td>Que contient $I$ ?</td>
+<td>La VA des coupons versés <strong>pendant la vie de l'option</strong></td>
+</tr>
+<tr>
+<td>Quels prix employer ?</td>
+<td> Les prix <strong>CASH (dirty)</strong></td>
+</tr>
+<tr>
+<td>Clean price ?</td>
+<td>Le prix <strong>COTÉ</strong></td>
+</tr>
+<tr>
+<td>Dirty price ?</td>
+<td>Le prix <strong>CASH</strong></td>
+</tr>
+<tr>
+<td>Si le strike est coté ?</td>
+<td> <strong>Ajouter les intérêts courus</strong></td>
+</tr>
+<tr>
+<td>Ex. 28.1 : $I$ ?</td>
+<td><strong>95,45</strong></td>
+</tr>
+<tr>
+<td>Ex. 28.1 : $F_B$ ?</td>
+<td><strong>939,68</strong></td>
+</tr>
+<tr>
+<td>Ex. 28.1 : $P(0,T)$ ?</td>
+<td><strong>0,9200</strong></td>
+</tr>
+<tr>
+<td>Ex. 28.1 : strike cash ?</td>
+<td><strong>9,49 dollars</strong></td>
+</tr>
+<tr>
+<td>Ex. 28.1 : strike coté ?</td>
+<td>$K=1\,008{,}33$ → <strong>7,97 dollars</strong></td>
+</tr>
+<tr>
+<td>Écart-type du log aujourd'hui ?</td>
+<td><strong>ZÉRO</strong></td>
+</tr>
+<tr>
+<td>À maturité de l'obligation ?</td>
+<td> <strong>ZÉRO</strong> aussi</td>
+</tr>
+<tr>
+<td>Pourquoi ?</td>
+<td>Le prix <strong>égale la valeur faciale</strong></td>
+</tr>
+<tr>
+<td>$\sigma_B$ quand la vie de l'option augmente ?</td>
+<td>Elle <strong>DÉCLINE</strong></td>
+</tr>
+<tr>
+<td>Conversion rendement → prix ?</td>
+<td>$\sigma_B=D\,y_0\,\sigma_y$</td>
+</tr>
+<tr>
+<td>Que représente $D$ ?</td>
+<td>La duration <strong>modifiée à la maturité de l'option</strong></td>
+</tr>
+<tr>
+<td>$D=5$, $y_0=8\,\%$, $\sigma_y=20\,\%$ ?</td>
+<td>$\sigma_B=\mathbf{8\,\%}$</td>
+</tr>
+<tr>
+<td>Pourquoi les traders préfèrent le rendement ?</td>
+<td>Ces volatilités sont <strong>beaucoup plus constantes</strong></td>
+</tr>
+<tr>
+<td>Ex. 28.2 : les deux prix ?</td>
+<td><strong>2,36</strong> (coté) et <strong>1,74</strong> (cash)</td>
+</tr>
+<tr>
+<td>Tenor ?</td>
+<td>Le temps entre deux <strong>réinitialisations</strong></td>
+</tr>
+<tr>
+<td>Cap rate ?</td>
+<td>Le niveau au-dessus duquel le cap <strong>assure</strong></td>
+</tr>
+<tr>
+<td>LIBOR 5 %, cap 4 %, 10 M, trimestre ?</td>
+<td>Payoff de <strong>25 000 dollars</strong></td>
+</tr>
+<tr>
+<td>Quand le payoff survient-il ?</td>
+<td> <strong>Un tenor plus tard</strong></td>
+</tr>
+<tr>
+<td>Y a-t-il un payoff à la 1ʳᵉ date ?</td>
+<td> <strong>NON</strong></td>
+</tr>
+<tr>
+<td>Cap 5 ans, tenor 3 mois ?</td>
+<td><strong>19</strong> réinitialisations, <strong>19</strong> payoffs</td>
+</tr>
+<tr>
+<td>Payoff d'un caplet ?</td>
+<td>$L\delta_k\max(R_k-R_K,0)$</td>
+</tr>
+<tr>
+<td>Un cap est un portefeuille de ?</td>
+<td><strong>Calls sur taux</strong> = <strong>PUTS sur obligations</strong></td>
+</tr>
+<tr>
+<td>Maturité du put équivalent ?</td>
+<td>$t_k$</td>
+</tr>
+<tr>
+<td>Maturité de son sous-jacent ?</td>
+<td>$t_{k+1}$</td>
+</tr>
+<tr>
+<td>Sa faciale ?</td>
+<td>$L(1+R_K\delta_k)$</td>
+</tr>
+<tr>
+<td>Son strike ?</td>
+<td>$L$</td>
+</tr>
+<tr>
+<td>Un floor est un portefeuille de ?</td>
+<td><strong>Puts sur taux</strong> = <strong>CALLS sur obligations</strong></td>
+</tr>
+<tr>
+<td>Collar ?</td>
+<td>Cap <strong>long</strong> + floor <strong>court</strong></td>
+</tr>
+<tr>
+<td>Son coût habituel ?</td>
+<td> <strong>ZÉRO</strong></td>
+</tr>
+<tr>
+<td>Parité cap-floor ?</td>
+<td>$\text{cap}=\text{floor}+\text{swap}$</td>
+</tr>
+<tr>
+<td>Le swap y est-il standard ?</td>
+<td> <strong>NON</strong> — pas de paiement à la 1ʳᵉ date</td>
+</tr>
+<tr>
+<td>Formule du caplet ?</td>
+<td>$L\delta_kP(0,t_{k+1})[F_kN(d_1)-R_KN(d_2)]$</td>
+</tr>
+<tr>
+<td>Quelle racine dans $d_1$ ?</td>
+<td> $\sqrt{t_k}$ — le taux est <strong>OBSERVÉ</strong> en $t_k$</td>
+</tr>
+<tr>
+<td>Quel facteur d'actualisation ?</td>
+<td> $P(0,t_{k+1})$ — le <strong>payoff</strong> est en $t_{k+1}$</td>
+</tr>
+<tr>
+<td>Ex. 28.3 : taux continu ?</td>
+<td><strong>6,9395 %</strong></td>
+</tr>
+<tr>
+<td>Ex. 28.3 : $P(0,1{,}25)$ ?</td>
+<td><strong>0,9169</strong></td>
+</tr>
+<tr>
+<td>Ex. 28.3 : $d_1$ et $d_2$ ?</td>
+<td>$-0{,}5677$ et $-0{,}7677$</td>
+</tr>
+<tr>
+<td>Ex. 28.3 : le prix ?</td>
+<td><strong>5 162 dollars</strong></td>
+</tr>
+<tr>
+<td>Volatilité spot ?</td>
+<td><strong>Une par caplet</strong></td>
+</tr>
+<tr>
+<td>Volatilité flat ?</td>
+<td><strong>Une par cap</strong></td>
+</tr>
+<tr>
+<td>Laquelle le marché cote-t-il ?</td>
+<td>La <strong>FLAT</strong></td>
+</tr>
+<tr>
+<td>Pourquoi estimer les spot ?</td>
+<td>Repérer les caplets <strong>mal évalués</strong></td>
+</tr>
+<tr>
+<td>Comparaison de marché ?</td>
+<td>Les options sur <strong>futures eurodollar</strong></td>
+</tr>
+<tr>
+<td>Où est le pic de la bosse ?</td>
+<td>Vers <strong>2 à 3 ans</strong></td>
+</tr>
+<tr>
+<td>Bosse observée où ?</td>
+<td>Dans les implicites <strong>ET</strong> les historiques</td>
+</tr>
+<tr>
+<td>Explication du bout court ?</td>
+<td>Les taux sont <strong>contrôlés par les banques centrales</strong></td>
+</tr>
+<tr>
+<td>Explication à 2-3 ans ?</td>
+<td><strong>Surréaction des traders</strong></td>
+</tr>
+<tr>
+<td>Explication au-delà ?</td>
+<td>Le <strong>RETOUR À LA MOYENNE</strong></td>
+</tr>
+<tr>
+<td>« À la monnaie » pour un cap ?</td>
+<td>Taux du cap = <strong>taux du swap</strong> de mêmes dates</td>
+</tr>
+<tr>
+<td>Numéraire justifiant le modèle de cap ?</td>
+<td>L'obligation <strong>$P(t,t_{k+1})$</strong></td>
+</tr>
+<tr>
+<td>Le résultat employé ?</td>
+<td>$E_{k+1}(R_k)=F_k$</td>
+</tr>
+<tr>
+<td>La conclusion sur l'actualisation ?</td>
+<td>Actualiser au <strong>taux de marché $t_{k+1}$</strong> suffit</td>
+</tr>
+<tr>
+<td>Actual/360, mai → août ?</td>
+<td>$92/360=\mathbf{0{,}2556}$</td>
+</tr>
+<tr>
+<td>Comment recalculer $F_k$ ?</td>
+<td>$1+a_kF_k=\dfrac{P(0,t_k)}{P(0,t_{k+1})}$</td>
+</tr>
+<tr>
+<td>Swaption ?</td>
+<td>Le <strong>DROIT d'entrer</strong> dans un swap futur</td>
+</tr>
+<tr>
+<td>Coût d'un swap forward ?</td>
+<td><strong>Aucun</strong></td>
+</tr>
+<tr>
+<td>Son inconvénient ?</td>
+<td>Il <strong>OBLIGE</strong> à entrer dans le swap</td>
+</tr>
+<tr>
+<td>Analogie de change ?</td>
+<td>Option contre <strong>contrat forward</strong></td>
+</tr>
+<tr>
+<td>Valeur de la jambe variable au départ ?</td>
+<td>Le <strong>principal</strong></td>
+</tr>
+<tr>
+<td>Payer fixe = ?</td>
+<td>Un <strong>PUT</strong> sur l'obligation fixe</td>
+</tr>
+<tr>
+<td>Recevoir fixe = ?</td>
+<td>Un <strong>CALL</strong> sur l'obligation fixe</td>
+</tr>
+<tr>
+<td>Strike de ces options ?</td>
+<td>Le <strong>PRINCIPAL</strong></td>
+</tr>
+<tr>
+<td>Payoff d'une swaption payeuse ?</td>
+<td>$\frac Lm\max(s_T-s_K,0)$, $mn$ fois</td>
+</tr>
+<tr>
+<td>Cap contre swaption ?</td>
+<td> <strong>Portefeuille d'options</strong> contre <strong>UNE option à payoffs répétés</strong></td>
+</tr>
+<tr>
+<td>Formule payeur ?</td>
+<td>$LA[s_0N(d_1)-s_KN(d_2)]$</td>
+</tr>
+<tr>
+<td>Formule receveur ?</td>
+<td>$LA[s_KN(-d_2)-s_0N(-d_1)]$</td>
+</tr>
+<tr>
+<td>Facteur d'annuité ?</td>
+<td>$A=\frac1m\sum_{i=1}^{mn}P(0,T_i)$</td>
+</tr>
+<tr>
+<td>Quel $T$ dans $d_1$ ?</td>
+<td> La maturité de <strong>l'OPTION</strong></td>
+</tr>
+<tr>
+<td>Ex. 28.4 : $A$ ?</td>
+<td><strong>2,0035</strong></td>
+</tr>
+<tr>
+<td>Ex. 28.4 : $s_0$ ?</td>
+<td><strong>6,09 %</strong> semestriel</td>
+</tr>
+<tr>
+<td>Ex. 28.4 : $d_1$ et $d_2$ ?</td>
+<td>$0{,}1836$ et $-0{,}2636$</td>
+</tr>
+<tr>
+<td>Ex. 28.4 : la valeur ?</td>
+<td><strong>2,07 millions de dollars</strong></td>
+</tr>
+<tr>
+<td>Numéraire justifiant les swaptions ?</td>
+<td>Le <strong>facteur d'ANNUITÉ $A$</strong></td>
+</tr>
+<tr>
+<td>Le résultat employé ?</td>
+<td>$E_A(s_T)=s_0$</td>
+</tr>
+<tr>
+<td>$A$ avec les conventions de jours ?</td>
+<td>$\sum a_iP(0,T_i)$</td>
+</tr>
+<tr>
+<td>$s_0$ avec les conventions ?</td>
+<td>$s_0A=P(0,T)-P(0,T_{mn})$</td>
+</tr>
+<tr>
+<td>Les trois modèles sont-ils cohérents entre eux ?</td>
+<td> <strong>NON</strong></td>
+</tr>
+<tr>
+<td>Pourquoi ?</td>
+<td>Prix lognormaux ⇒ <strong>taux non lognormaux</strong></td>
+</tr>
+<tr>
+<td>Généralisation 1 ?</td>
+<td>Payoff sur <strong>obligation</strong> → prix <strong>forward</strong></td>
+</tr>
+<tr>
+<td>Généralisation 2 ?</td>
+<td>Payoff sur <strong>taux</strong> → taux <strong>forward</strong></td>
+</tr>
+<tr>
+<td>Généralisation 3 ?</td>
+<td>Payoff en <strong>annuité</strong> → taux de <strong>swap forward</strong></td>
+</tr>
+<tr>
+<td>Risque delta de taux ?</td>
+<td>Le risque d'un <strong>déplacement de la courbe zéro</strong></td>
+</tr>
+<tr>
+<td>Qu'est-ce que le DV01 ?</td>
+<td>L'impact d'un déplacement <strong>parallèle de 1 pb</strong></td>
+</tr>
+<tr>
+<td>Les quatre méthodes ?</td>
+<td>DV01 · <strong>cotations</strong> · buckets · <strong>ACP</strong></td>
+</tr>
+<tr>
+<td>Celle que préfèrent les traders ?</td>
+<td>La <strong>deuxième</strong> (cotations des instruments)</td>
+</tr>
+<tr>
+<td>Leur argument ?</td>
+<td>La courbe ne change que si <strong>une cotation</strong> change</td>
+</tr>
+<tr>
+<td>Combien de gammas avec 10 instruments ?</td>
+<td><strong>55</strong></td>
+</tr>
+<tr>
+<td>Les trois remèdes ?</td>
+<td>Ignorer les <strong>croisés</strong> · un gamma <strong>parallèle</strong> · l'<strong>ACP</strong></td>
+</tr>
+<tr>
+<td>Défaut du vega naïf ?</td>
+<td>Il suppose <strong>UN SEUL facteur</strong> de volatilité</td>
+</tr>
+<tr>
+<td>La meilleure approche ?</td>
+<td>Une <strong>ACP</strong> sur les volatilités de caps et swaptions</td>
+</tr>
+</tbody></table>
+</main>
+
+
+
+
+</body></html>

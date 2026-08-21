@@ -1,0 +1,1179 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fiche 89 — Options sur indices, devises et futures : le modèle de Black</title>
+<script>
+window.MathJax={tex:{inlineMath:[["$","$"]],displayMath:[["$$","$$"]],processEscapes:true},
+ options:{skipHtmlTags:["script","noscript","style","textarea","pre","code"]},
+ svg:{fontCache:"global"},
+ startup:{pageReady:()=>MathJax.startup.defaultPageReady().then(()=>{document.body.classList.add("ready")})}};
+setTimeout(function(){document.body.classList.add("ready")},2500);
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+/* ============================================================
+   MathiasLearn — feuille de style des fiches
+   Reprise intégrale des tokens de 00_PARCOURS/*.html
+   + blocs pédagogiques (callouts, méthode, essentiels, recall)
+   ============================================================ */
+:root{--bg:#faf9f7;--card:#fff;--ink:#1a1a1a;--muted:#6b6b6b;--line:#e5e2dd;--accent:#8b5e34;
+ --hl:#fdf8ef;--ok:#2d7d4f;--okbg:#f0f7f3;--warn:#b3402f;--warnbg:#fdf3f1;--blue:#2f5d8b;--bluebg:#f1f5fa}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+ font:17px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;padding:0 16px 100px}
+.nav{position:sticky;top:0;background:rgba(250,249,247,.96);backdrop-filter:blur(8px);
+ border-bottom:1px solid var(--line);margin:0 -16px 30px;padding:11px 16px;z-index:50;
+ display:flex;gap:6px;flex-wrap:wrap;font-size:13px}
+.nav a{color:var(--muted);text-decoration:none;padding:4px 9px;border-radius:5px;white-space:nowrap}
+.nav a:hover{background:var(--line);color:var(--ink)}
+.nav a.on{background:var(--accent);color:#fff}
+main{max-width:780px;margin:0 auto}
+h1{font-size:31px;letter-spacing:-.02em;margin:.4em 0 .5em;line-height:1.25}
+h2{font-size:23px;margin:2.2em 0 .7em;padding-bottom:.3em;border-bottom:1px solid var(--line)}
+h3{font-size:19px;margin:1.9em 0 .5em;color:var(--accent)}
+h4{font-size:17px;margin:1.5em 0 .4em}
+p{margin:.8em 0} a{color:var(--accent)} hr{border:0;border-top:1px solid var(--line);margin:2.6em 0}
+table{border-collapse:collapse;width:100%;margin:1.3em 0;font-size:15.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+th{background:#f3f0eb;font-weight:600}
+tr:nth-child(even) td{background:#fcfbfa}
+code{font-family:"SF Mono",Menlo,Consolas,monospace;font-size:.88em;background:#f2efea;padding:2px 6px;border-radius:4px;overflow-wrap:break-word}
+pre{background:#f2efea;padding:14px 16px;border-radius:8px;overflow-x:auto}
+pre code{background:none;padding:0;white-space:pre}
+blockquote{border-left:3px solid var(--accent);background:var(--hl);margin:1.4em 0;padding:14px 20px;border-radius:0 8px 8px 0}
+blockquote p:first-child{margin-top:0} blockquote p:last-child{margin-bottom:0}
+ul,ol{padding-left:1.5em} li{margin:.35em 0} em{color:#4a4a4a}
+mjx-container[display="true"]{margin:1.1em 0!important;overflow-x:auto;overflow-y:hidden;padding:2px 0}
+mjx-container svg{max-width:100%}
+body:not(.ready) main{opacity:0} main{opacity:1;transition:opacity .25s}
+
+/* --- bandeau de tête de fiche --- */
+.cours{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--accent);
+ border-radius:0 10px 10px 0;padding:18px 22px;margin:0 0 34px}
+.cours h4{margin:0 0 4px;font-size:14px;text-transform:uppercase;letter-spacing:.07em;color:var(--accent)}
+.cours .cs{color:var(--muted);font-size:14.5px;margin:0 0 14px}
+
+/* --- exercices / corrigés --- */
+.ex{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:6px 24px 20px;margin:18px 0}
+.ex>h3:first-child{margin-top:14px}
+details.cor{margin-top:18px;border:1px solid var(--line);border-radius:8px;background:#fcfbfa;overflow:hidden}
+details.cor>summary{cursor:pointer;padding:12px 16px;font-weight:600;font-size:15px;color:var(--accent);
+ list-style:none;display:flex;align-items:center;gap:9px;user-select:none;transition:.15s;min-height:44px}
+details.cor>summary::-webkit-details-marker{display:none}
+details.cor>summary:hover{background:var(--hl)}
+details.cor>summary::before{content:"\25B6";font-size:10px;transition:transform .18s;display:inline-block}
+details.cor[open]>summary::before{transform:rotate(90deg)}
+details.cor[open]>summary{background:var(--okbg);color:var(--ok);border-bottom:1px solid var(--line)}
+.cor .in{padding:4px 20px 16px}
+.cor .in>*:first-child{margin-top:.9em}
+
+/* --- blocs pédagogiques (callouts) ---
+   Générés depuis une citation Markdown dont le premier **gras** commence
+   par un mot-clé : DÉFINITION, THÉORÈME, MÉTHODE, PIÈGE, INTUITION… */
+.cal{border:1px solid var(--line);border-left:4px solid var(--accent);background:var(--card);
+ border-radius:0 10px 10px 0;padding:15px 20px;margin:1.5em 0}
+.cal>p:first-child{margin-top:0}.cal>p:last-child,.cal>ul:last-child,.cal>ol:last-child{margin-bottom:0}
+.cal .lab{display:block;font-size:12.5px;text-transform:uppercase;letter-spacing:.08em;
+ font-weight:700;color:var(--accent);margin-bottom:6px}
+.cal.formel{background:var(--hl)}
+.cal.piege{border-left-color:var(--warn);background:var(--warnbg)}
+.cal.piege .lab{color:var(--warn)}
+.cal.methode{border-left-color:var(--ok);background:var(--okbg)}
+.cal.methode .lab{color:var(--ok)}
+.cal.intu{border-left-color:var(--blue);background:var(--bluebg)}
+.cal.intu .lab{color:var(--blue)}
+.cal.plus{border-left-style:dashed;background:#faf9f7}
+.cal.plus .lab{color:var(--muted)}
+
+/* --- révision express --- */
+.ess{background:var(--card);border:1px solid var(--accent);border-radius:10px;padding:4px 24px 20px;margin:1.6em 0}
+.ess h3{margin-top:1.3em}
+.rec{background:var(--card);border:1px dashed var(--accent);border-radius:10px;padding:4px 24px 18px;margin:1.6em 0}
+.rec ol{counter-reset:none}
+
+/* --- impression / PDF --- */
+@media print{
+ .nav{display:none}
+ body{padding:0;background:#fff;font-size:11.2pt;line-height:1.55}
+ main{max-width:none}
+ h1{font-size:23pt}h2{font-size:15pt;margin-top:1.5em}h3{font-size:12.6pt}
+ h2,h3,h4{break-after:avoid;page-break-after:avoid}
+ table,.cal,blockquote{break-inside:avoid;page-break-inside:avoid}
+ table{display:table;font-size:9.6pt}
+ details.cor{border:1px solid var(--line);background:#fcfbfa}
+ details.cor>summary{display:none}
+ details.cor .in{padding-top:10px}
+ .cal,.ex,.ess,.rec{box-shadow:none}
+ a{color:var(--ink);text-decoration:none}
+}
+@page{margin:16mm 15mm 18mm}
+
+/* --- exemples travaillés --- */
+.exm{background:#fcfbfa;border:1px solid var(--line);border-radius:10px;padding:2px 20px 14px;margin:1.5em 0}
+.exm>h4:first-child{margin:14px 0 .5em;color:var(--accent);font-size:13px;text-transform:uppercase;letter-spacing:.07em}
+
+
+/* --- pastilles de priorité (conventions des fiches de l'app) --- */
+h2[data-prio], h3[data-prio], h4[data-prio]{position:relative}
+h2[data-prio]::before,h3[data-prio]::before,h4[data-prio]::before{
+ content:"";display:inline-block;width:9px;height:9px;border-radius:50%;
+ margin-right:9px;vertical-align:middle;background:var(--muted)}
+[data-prio="must"]::before{background:var(--warn)}
+[data-prio="high"]::before{background:#d98324}
+[data-prio="mid"]::before{background:#c9a227}
+[data-prio="low"]::before{background:var(--ok)}
+/* corrigés des fiches de l'app : même traitement que les corrigés des séries */
+details.cor>summary::after{content:""}
+</style></head><body>
+<div class="nav"><a href="00_COMMENCER_ICI.html">Commencer ici</a><a href="01_NOTATIONS_le-decodeur.html">Notations</a><a href="02_EXERCICES_Serie-0.html">Série 0 — Remise en route</a><a href="03_EXERCICES_Serie-1.html">Série 1 — Convexité</a><a href="04_EXERCICES_Serie-2.html">Série 2 — KKT</a><a href="05_AUTO-EVALUATION.html">Auto-évaluation (quiz)</a><a href="06_FICHE_Optimisation-deux-variables.html">Fiche — Optimisation à 2 variables</a></div>
+<main><h1>Fiche 89 — Options sur indices, devises et futures : le modèle de Black</h1>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Matière</strong></td>
+<td>Maths · Finance de marché</td>
+</tr>
+<tr>
+<td><strong>Cours source</strong></td>
+<td>John C. Hull, <em>Options, Futures, and Other Derivatives</em>, 8ᵉ éd., Pearson — chapitres 16 « Options on Stock Indices and Currencies » et 17 « Futures Options »</td>
+</tr>
+<tr>
+<td><strong>Difficulté</strong></td>
+<td> Must know — l'extension qui rend Black-Scholes universel</td>
+</tr>
+<tr>
+<td><strong>Temps d'étude estimé</strong></td>
+<td>1 h 45</td>
+</tr>
+<tr>
+<td><strong>Prérequis</strong></td>
+<td>Fiches 83, 85, 87</td>
+</tr>
+<tr>
+<td><strong>Concepts clés</strong></td>
+<td>Options sur indices, assurance de portefeuille, options de change, <em>range forward</em>, rendement de dividende connu, règle $S_0\to S_0e^{-qT}$, formules de Merton, options sur futures, parité pour futures, dérive nulle du prix futures, modèle de Black, options <em>futures-style</em></td>
+</tr>
+<tr>
+<td><strong>Poids à l'examen</strong></td>
+<td>La <strong>règle $S_0\to S_0e^{-qT}$</strong> et ses trois applications ($q$, $r_f$, $r$) · l'<strong>assurance de portefeuille avec $\beta\ne1$</strong> · le <strong>modèle de Black</strong> $c=e^{-rT}[F_0N(d_1)-KN(d_2)]$.</td>
+</tr>
+</tbody></table>
+<h2>Vue d'ensemble</h2>
+<pre><code>LA RÈGLE UNIQUE   remplacer S₀ par S₀e^{−qT} dans TOUS les résultats du ch. 14
+  indice   q = rendement du dividende de l'indice
+  devise   q = r_f  (taux sans risque étranger)
+  futures  q = r    (dérive risque-neutre NULLE)
+
+FORMULES   c = S₀e^{−qT}N(d₁) − Ke^{−rT}N(d₂)      d₁ = [ln(S₀/K)+(r−q+σ²/2)T]/(σ√T)
+BLACK      c = e^{−rT}[F₀N(d₁) − KN(d₂)]           d₁ = [ln(F₀/K)+σ²T/2]/(σ√T)
+PARITÉ     c + Ke^{−rT} = p + S₀e^{−qT}   =   p + F₀e^{−rT}
+ASSURANCE  β · V/(100·S₀) contrats de put, strike lu dans le MEDAF
+</code></pre>
+<p><strong>L'unification.</strong> <em>Les résultats du chapitre 14 sont d'abord étendus aux options européennes sur une action versant un <strong>rendement de dividende connu</strong>. On soutient ensuite que <strong>les indices ET les devises sont analogues à des actions versant un rendement de dividende</strong>, ce qui permet d'appliquer les mêmes résultats.</em> Le chapitre 17 ajoute le troisième cas : <strong>un prix futures se comporte comme une action de rendement $q=r$</strong>.</p>
+<h2 data-prio="mid">Concept 1 — Les options sur indices</h2>
+<table>
+<thead>
+<tr>
+<th>Caractéristique</th>
+<th>Valeur</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Taille du contrat</td>
+<td><strong>100 fois l'indice</strong></td>
+</tr>
+<tr>
+<td>Règlement</td>
+<td><strong>en espèces</strong> — call : $(S-K)\times100$, put : $(K-S)\times100$</td>
+</tr>
+<tr>
+<td>Produits du CBOE</td>
+<td><strong>OEX et XEO</strong> (S&amp;P 100, américaine et européenne), <strong>SPX</strong> (S&amp;P 500, européenne), <strong>DJX</strong> (Dow Jones, européenne), <strong>NDX</strong> (Nasdaq 100, européenne)</td>
+</tr>
+<tr>
+<td>Autres formes</td>
+<td><strong>LEAPS</strong> et options <strong>FLEX</strong> existent aussi sur indices</td>
+</tr>
+</tbody></table>
+<p class="cal piege"> <em>L'indice Dow Jones utilisé pour les options vaut <strong>0,01 fois</strong> l'indice habituellement coté.</em></p>
+<h3>1.1 L'assurance de portefeuille</h3>
+<p><strong>Le cas simple, $\beta=1$.</strong> <em>Un bêta de 1 implique que les rendements du portefeuille reflètent ceux de l'indice.</em> En supposant le même rendement de dividende, on protège le portefeuille contre une chute de l'indice sous $K$ en achetant <strong>un contrat de put de strike $K$ pour chaque $100S_0$ dollars de portefeuille</strong>.</p>
+<details class="cor">
+<summary><strong>Exercice résolu A — assurance avec $\beta=1$</strong></summary><div class="in">
+
+<p><strong>Données.</strong> Portefeuille de <strong>500 000</strong>, indice à <strong>1 000</strong>. Protection voulue : ne pas descendre sous <strong>450 000</strong> en trois mois.</p>
+<p><em>Étape 1 — exprimer le portefeuille en unités d'indice.</em> $500\,000/1\,000=\mathbf{500}$ fois l'indice.
+<em>Étape 2 — nombre de contrats.</em> Chaque contrat porte sur 100 fois l'indice → $500/100=\mathbf{5}$ contrats.
+<em>Étape 3 — le strike.</em> La protection à 450 000, soit <strong>90 %</strong> de 500 000, correspond à un indice de $0{,}9\times1\,000=\mathbf{900}$.
+<em>Étape 4 — vérifier sur un scénario.</em> Si l'indice tombe à <strong>880</strong>, le portefeuille vaut environ <strong>440 000</strong>. Les options paient
+$$5\times(900-880)\times100=\mathbf{10\,000}$$
+Total : $440\,000+10\,000=\mathbf{450\,000}$  — exactement la valeur assurée.</p>
+</div></details>
+
+<p><strong>Le cas général, $\beta\ne1$.</strong> Il faut acheter $\beta$ contrats pour chaque $100S_0$ dollars :
+$$\boxed{N=\beta\,\frac{V}{100\,S_0}}$$</p>
+<details class="cor">
+<summary><strong>Exercice résolu B — assurance avec $\beta=2$, et le calcul du strike par le MEDAF</strong></summary><div class="in">
+
+<p><strong>Données.</strong> Même portefeuille de <strong>500 000</strong>, indice <strong>1 000</strong>, mais $\beta=\mathbf{2{,}0}$. Taux sans risque <strong>12 %</strong>, rendement du dividende <strong>4 %</strong> sur l'indice <strong>et</strong> sur le portefeuille. Protection à <strong>450 000</strong> sur <strong>trois mois</strong>.</p>
+<p><em>Étape 1 — le nombre de contrats.</em>
+$$N=2{,}0\times\frac{500\,000}{1\,000\times100}=\mathbf{10}\ \text{contrats}\quad\text{(au lieu de 5)}$$</p>
+<p><em>Étape 2 — le strike ne se lit plus directement.</em> Il faut passer par le <strong>MEDAF</strong> : <em>l'excès de rendement espéré du portefeuille sur le taux sans risque égale $\beta$ fois l'excès de rendement de l'indice</em>. Détail du calcul pour un indice à <strong>1 040</strong> :</p>
+<table>
+<thead>
+<tr>
+<th>Étape</th>
+<th>Valeur (par trimestre)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Rendement dû au changement d'indice</td>
+<td>$40/1\,000=\mathbf{4\,\%}$</td>
+</tr>
+<tr>
+<td>Dividendes de l'indice</td>
+<td>$0{,}25\times4=\mathbf{1\,\%}$</td>
+</tr>
+<tr>
+<td><strong>Rendement total de l'indice</strong></td>
+<td>$4+1=\mathbf{5\,\%}$</td>
+</tr>
+<tr>
+<td>Taux sans risque</td>
+<td>$0{,}25\times12=\mathbf{3\,\%}$</td>
+</tr>
+<tr>
+<td>Excès de l'indice</td>
+<td>$5-3=\mathbf{2\,\%}$</td>
+</tr>
+<tr>
+<td><strong>Excès du portefeuille</strong></td>
+<td>$2\times2=\mathbf{4\,\%}$</td>
+</tr>
+<tr>
+<td>Rendement du portefeuille</td>
+<td>$3+4=\mathbf{7\,\%}$</td>
+</tr>
+<tr>
+<td>Moins ses dividendes</td>
+<td>$-1\,\%$</td>
+</tr>
+<tr>
+<td><strong>Hausse de valeur</strong></td>
+<td>$\mathbf{6\,\%}$</td>
+</tr>
+<tr>
+<td><strong>Valeur du portefeuille</strong></td>
+<td>$500\,000\times1{,}06=\mathbf{530\,000}$</td>
+</tr>
+</tbody></table>
+<p><em>Étape 3 — la table complète.</em></p>
+<table>
+<thead>
+<tr>
+<th>Indice dans 3 mois</th>
+<th>1 080</th>
+<th>1 040</th>
+<th>1 000</th>
+<th><strong>960</strong></th>
+<th>920</th>
+<th>880</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Portefeuille</td>
+<td>570 000</td>
+<td>530 000</td>
+<td>490 000</td>
+<td><strong>450 000</strong></td>
+<td>410 000</td>
+<td>370 000</td>
+</tr>
+</tbody></table>
+<p><em>Étape 4 — lire le strike.</em> Le niveau de protection <strong>450 000</strong> correspond à un indice de $\boxed{\mathbf{960}}$.
+<em>Étape 5 — vérifier.</em> Si l'indice tombe à <strong>880</strong>, le portefeuille vaut <strong>370 000</strong> et les puts paient
+$$(960-880)\times10\times100=\mathbf{80\,000}$$
+Total : $370\,000+80\,000=\mathbf{450\,000}$ .</p>
+<blockquote>
+<p class="cal piege"> <strong>La conclusion à retenir.</strong> <em><strong>Il y a DEUX raisons pour lesquelles le coût de la couverture augmente avec le bêta : il faut PLUS de puts, ET ils ont un strike PLUS ÉLEVÉ.</strong></em></p>
+</blockquote>
+<p><em>Détail de finesse signalé en note : environ <strong>1 %</strong> de 500 000, soit <strong>5 000</strong>, sera gagné en dividendes. Si l'on veut que le niveau assuré de 450 000 <strong>inclue</strong> les dividendes, il faut choisir le strike correspondant à <strong>445 000</strong>, soit <strong>955</strong>.</em></p>
+</div></details>
+
+<h2 data-prio="mid">Concept 2 — Les options de change et le <em>range forward</em></h2>
+<p><em>Les options de change se traitent <strong>principalement de gré à gré</strong> : l'avantage est de permettre de <strong>grosses transactions</strong>, avec strikes, échéances et autres caractéristiques <strong>taillés sur mesure</strong> pour les trésoriers. Le marché coté (NASDAQ OMX) est <strong>bien plus petit</strong>.</em></p>
+<p><strong>Exemples de payoffs.</strong> Call européen d'achat d'<strong>un million d'euros</strong> à <strong>1,2000</strong> USD/EUR ; si le cours final est <strong>1,2500</strong> : $1\,000\,000\times(1{,}2500-1{,}2000)=\mathbf{50\,000}$ dollars. Put européen de vente de <strong>10 millions de dollars australiens</strong> à <strong>0,9000</strong> ; si le cours est <strong>0,8700</strong> : $10\,000\,000\times0{,}0300=\mathbf{300\,000}$ dollars.</p>
+<p><strong>L'usage de couverture.</strong> <em>Une entreprise devant <strong>recevoir</strong> des livres peut acheter des <strong>puts</strong> échéant à cette date : cela <strong>garantit un cours plancher</strong> tout en laissant profiter des mouvements favorables. Une entreprise devant <strong>payer</strong> des livres achète des <strong>calls</strong>.</em>  <em>Alors qu'un forward <strong>verrouille</strong> le cours, une option fournit <strong>une sorte d'assurance — et ce n'est pas gratuit</strong> : entrer dans un forward ne coûte rien, une option exige une <strong>prime payée d'avance</strong>.</em></p>
+<details class="cor">
+<summary><strong>Le *range forward* — comment le rendre gratuit</strong></summary><div class="in">
+
+<p><strong>Le décor.</strong> Une entreprise américaine recevra <strong>un million de livres</strong> dans trois mois. Cours à terme trois mois : <strong>1,5200</strong>. Elle pourrait simplement vendre à terme, verrouillant <strong>1 520 000</strong> dollars.</p>
+<p><strong>L'alternative — le <em>range forward</em> court.</strong> Acheter un <strong>put</strong> européen de strike $K_1$ et <strong>vendre</strong> un <strong>call</strong> européen de strike $K_2$, avec $K_1&lt;1{,}5200&lt;K_2$.</p>
+<table>
+<thead>
+<tr>
+<th>Cours final</th>
+<th>Ce qui se passe</th>
+<th>Cours réalisé</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$&lt;K_1$</td>
+<td>le <strong>put est exercé</strong></td>
+<td>$\mathbf{K_1}$</td>
+</tr>
+<tr>
+<td>entre $K_1$ et $K_2$</td>
+<td><strong>aucune</strong> option exercée</td>
+<td>le <strong>cours du marché</strong></td>
+</tr>
+<tr>
+<td>$&gt;K_2$</td>
+<td>le <strong>call est exercé contre</strong> l'entreprise</td>
+<td>$\mathbf{K_2}$</td>
+</tr>
+</tbody></table>
+<p><strong>Le <em>range forward</em> long</strong> (pour une entreprise devant <strong>payer</strong>) : <strong>vendre</strong> le put $K_1$ et <strong>acheter</strong> le call $K_2$. <em>Le cours payé est le même que celui reçu dans l'exemple précédent.</em></p>
+<p><strong>La condition de gratuité — et son calcul.</strong> <em>En pratique, un range forward est monté de sorte que <strong>le prix du put égale le prix du call</strong> : il ne coûte alors <strong>rien</strong> à mettre en place, tout comme un forward ordinaire.</em></p>
+<p><em>Étape 1 — les données.</em> Taux américain et britannique <strong>tous deux à 5 %</strong>, donc <strong>cours comptant $=$ cours à terme $=1{,}5200$</strong>. Volatilité <strong>14 %</strong>.
+<em>Étape 2 — chercher la paire équilibrée.</em> Un put de strike <strong>1,5000</strong> vaut exactement le même prix qu'un call de strike <strong>1,5413</strong> — <strong>tous deux 0,03250</strong>.
+<em>Étape 3 — conclure.</em> $K_1=\mathbf{1{,}5000}$ et $K_2=\mathbf{1{,}5413}$ donnent un contrat de <strong>coût nul</strong>.</p>
+<blockquote>
+<p class="cal piege"> <strong>Le cas limite éclairant.</strong> <em>À mesure que les strikes du call et du put se <strong>rapprochent</strong>, le range forward <strong>devient un forward ordinaire</strong> — court dans un cas, long dans l'autre.</em> Le forward est donc le <strong>cas dégénéré</strong> du tunnel.</p>
+</blockquote>
+</div></details>
+
+<h2 data-prio="must">Concept 3 — La règle unique : un rendement de dividende connu</h2>
+<blockquote>
+<p><strong>Le raisonnement, en trois lignes.</strong> *Les dividendes font baisser le cours à la date de détachement. Un rendement de dividende au taux $q$ fait donc croître le cours <strong>moins vite qu'il ne le ferait autrement, d'un montant $q$</strong>. Si, avec un rendement $q$, le cours passe de $S_0$ à $S_T$, alors <strong>en l'absence de dividendes il passerait de $S_0$ à $S_Te^{qT}$</strong> — ou, de façon équivalente, <strong>de $S_0e^{-qT}$ à $S_T$</strong>.*</p>
+<p><strong>On obtient donc la même loi de $S_T$ dans les deux cas :</strong></p>
+<ol>
+<li>l'action part de <strong>$S_0$</strong> et verse un rendement $q$ ;</li>
+<li>l'action part de <strong>$S_0e^{-qT}$</strong> et <strong>ne verse rien</strong>.</li>
+</ol>
+</blockquote>
+<p>$$\boxed{\text{pour valoriser une européenne de maturité }T\text{ sur une action de rendement }q,\ \text{remplacer }S_0\text{ par }S_0e^{-qT}}$$</p>
+<p class="cal piege"> <strong>Analogie avec le chapitre 14.</strong> <em>Là, on <strong>retranchait la valeur actuelle</strong> des dividendes en espèces ; ici, on <strong>actualise le cours au taux du dividende</strong>.</em> Ce sont deux traitements du même phénomène, adaptés à deux conventions de spécification.</p>
+<p><strong>Les résultats qui en découlent mécaniquement.</strong></p>
+<table>
+<thead>
+<tr>
+<th>Résultat</th>
+<th>Forme avec rendement $q$</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Borne du call</td>
+<td>$c\ge\max\big(S_0e^{-qT}-Ke^{-rT},\,0\big)$ ;(16.1)</td>
+</tr>
+<tr>
+<td>Borne du put</td>
+<td>$p\ge\max\big(Ke^{-rT}-S_0e^{-qT},\,0\big)$ ;(16.2)</td>
+</tr>
+<tr>
+<td><strong>Parité européenne</strong></td>
+<td>$\boxed{c+Ke^{-rT}=p+S_0e^{-qT}}$ ;(16.3)</td>
+</tr>
+<tr>
+<td>Parité <strong>américaine</strong></td>
+<td>$S_0e^{-qT}-K\le C-P\le S_0-Ke^{-rT}$</td>
+</tr>
+<tr>
+<td><strong>Formules de Merton</strong></td>
+<td>$\boxed{c=S_0e^{-qT}N(d_1)-Ke^{-rT}N(d_2)}$ ;(16.4) · $\boxed{p=Ke^{-rT}N(-d_2)-S_0e^{-qT}N(-d_1)}$ ;(16.5)</td>
+</tr>
+<tr>
+<td>$d_1$, $d_2$</td>
+<td>$d_1=\dfrac{\ln(S_0/K)+(r-q+\sigma^2/2)T}{\sigma\sqrt T}$, $d_2=d_1-\sigma\sqrt T$</td>
+</tr>
+</tbody></table>
+<p><em>Ces résultats furent d'abord obtenus par <strong>Merton</strong> (1973).</em></p>
+<details class="cor">
+<summary><strong>Les portefeuilles qui démontrent directement ces résultats</strong></summary><div class="in">
+
+<p><strong>Pour la borne du call.</strong></p>
+<ul>
+<li><strong>A</strong> : un call européen $+$ un montant de liquidités $Ke^{-rT}$</li>
+<li><strong>B</strong> : <strong>$e^{-qT}$ actions</strong>, les dividendes étant <strong>réinvestis en actions supplémentaires</strong></li>
+</ul>
+<p><em>Le point clé : $e^{-qT}$ actions dont on réinvestit les dividendes deviennent <strong>exactement une action</strong> en $T$.</em> Le raisonnement du chapitre 10 s'applique alors mot pour mot.</p>
+<p><strong>Pour la borne du put.</strong></p>
+<ul>
+<li><strong>C</strong> : un put européen $+$ $e^{-qT}$ actions, dividendes réinvestis</li>
+<li><strong>D</strong> : liquidités $Ke^{-rT}$</li>
+</ul>
+<p><strong>Pour la parité.</strong> A et C valent <strong>tous deux $\max(S_T,K)$</strong> en $T$ — donc la même chose aujourd'hui.</p>
+<p><strong>Et l'EDP.</strong> En incluant le rendement $q$ dans l'analyse de la section 14.6, l'EDP devient
+$$\boxed{\frac{\partial f}{\partial t}+(r-q)S\frac{\partial f}{\partial S}+\frac12\sigma^2S^2\frac{\partial^2f}{\partial S^2}=rf}\;\text{(16.6)}$$
+<em>Comme (14.16), <strong>elle ne contient aucune variable affectée par les préférences pour le risque</strong></em> : la valorisation risque-neutre s'applique. Le processus risque-neutre devient
+$$\boxed{dS=(r-q)S\,dt+\sigma S\,dz}\;\text{(16.7)}$$
+*En monde risque-neutre, <strong>le rendement total doit être $r$</strong> ; les dividendes en fournissent $q$ ; <strong>le taux de croissance espéré du cours est donc $r-q$</strong>, et $\hat{\mathbb E}(S_T)=S_0e^{(r-q)T}$.*</p>
+</div></details>
+
+<h2 data-prio="must">Concept 4 — Trois applications de la même règle</h2>
+<table>
+<thead>
+<tr>
+<th>Sous-jacent</th>
+<th>Pourquoi c'est un « rendement »</th>
+<th>Ce que vaut $q$</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Indice</strong></td>
+<td><em>l'indice est le prix d'un <strong>portefeuille d'actions versant des dividendes</strong></em></td>
+<td><strong>rendement de dividende annualisé moyen</strong> de l'indice sur la vie de l'option</td>
+</tr>
+<tr>
+<td><strong>Devise</strong></td>
+<td><em>le détenteur d'une devise étrangère <strong>reçoit un rendement égal au taux sans risque étranger</strong></em></td>
+<td>$\boxed{q=r_f}$</td>
+</tr>
+<tr>
+<td><strong>Futures</strong></td>
+<td><em>un prix futures a une <strong>dérive nulle</strong> en monde risque-neutre</em></td>
+<td>$\boxed{q=r}$</td>
+</tr>
+</tbody></table>
+<h3>4.1 Indices</h3>
+<details class="cor">
+<summary><strong>Exercice résolu C — call sur le S&amp;P 500 (exemple 16.1)</strong></summary><div class="in">
+
+<p><strong>Données.</strong> Call européen <strong>2 mois</strong> sur le S&amp;P 500. Indice <strong>930</strong>, strike <strong>900</strong>, $r=8\,\%$, $\sigma=20\,\%$. Rendements de dividende attendus : <strong>0,2 %</strong> le premier mois, <strong>0,3 %</strong> le second.</p>
+<p><em>Étape 1 — annualiser le rendement de dividende.</em> Total sur la vie : $0{,}2+0{,}3=\mathbf{0{,}5\,\%}$ sur deux mois, soit $\mathbf{3\,\%}$ par an. Donc $q=0{,}03$.
+<em>Étape 2 — $d_1$.</em>
+$$d_1=\frac{\ln(930/900)+(0{,}08-0{,}03+0{,}02)\times\frac16}{0{,}2\sqrt{1/6}}=\frac{0{,}03279+0{,}011667}{0{,}081650}=\mathbf{0{,}5444}$$
+<em>Étape 3 — $d_2$.</em> $0{,}5444-0{,}0817=\mathbf{0{,}4628}$.
+<em>Étape 4 — les $N$.</em> $N(0{,}5444)=0{,}7069$ · $N(0{,}4628)=0{,}6782$.
+<em>Étape 5 — le prix.</em>
+$$c=930\times0{,}7069\,e^{-0{,}03/6}-900\times0{,}6782\,e^{-0{,}08/6}=\boxed{\mathbf{51{,}83}}$$
+<em>Étape 6 — le coût d'un contrat.</em> $100\times51{,}83=\mathbf{5\,183}$ dollars.</p>
+<p class="cal piege"> <strong>Le choix de $q$ n'est pas anodin.</strong> <em>Le calcul de $q$ ne doit inclure que les dividendes dont <strong>la date de détachement tombe pendant la vie de l'option</strong>. Aux États-Unis, ces dates se concentrent la <strong>première semaine de février, mai, août et novembre</strong> : le bon $q$ dépend donc de la <strong>durée</strong> de l'option. <strong>C'est encore plus vrai ailleurs</strong> — au Japon, toutes les entreprises tendent à utiliser les mêmes dates.</em></p>
+<p class="cal piege"> <strong>L'alternative en montants, et pourquoi on l'évite.</strong> <em>Si l'on connaît le <strong>montant absolu</strong> des dividendes, on peut utiliser Black-Scholes en retranchant leur valeur actuelle. <strong>Mais c'est difficile à mettre en œuvre pour un indice large : il faudrait connaître les dividendes attendus sur CHAQUE action de l'indice.</strong></em></p>
+</div></details>
+
+<details class="cor">
+<summary><strong>Peut-on garantir que les actions battront les obligations à long terme ?</strong></summary><div class="in">
+
+<p><em>On dit souvent qu'un investisseur de long terme devrait acheter des actions plutôt que des obligations. Un gérant américain pourrait être tenté d'offrir aux souscripteurs d'un fonds indiciel S&amp;P 500 la <strong>garantie que leur rendement sera au moins aussi bon que celui des obligations sans risque sur dix ans</strong>. <strong>Historiquement, les actions ont surperformé les obligations sur presque toute période de dix ans</strong> : il semble qu'il ne donnerait pas grand-chose.</em></p>
+<p><em><strong>En fait, ce type de garantie est étonnamment coûteux.</strong></em></p>
+<p><em>Étape 1 — les données.</em> Indice <strong>1 000</strong>, rendement du dividende <strong>1 %</strong>, volatilité <strong>15 %</strong>, taux sans risque dix ans <strong>5 %</strong>.
+<em>Étape 2 — quel niveau d'indice faut-il atteindre ?</em> <em>Pour battre les obligations, les actions doivent gagner plus de <strong>5 %</strong> par an. Le dividende en fournit <strong>1 %</strong> : <strong>les plus-values doivent donc fournir 4 % par an</strong>.</em> Il faut donc
+$$1\,000\,e^{0{,}04\times10}=\mathbf{1\,492}$$
+<em>Étape 3 — traduire la garantie.</em> <em>Elle équivaut au <strong>droit de vendre l'indice à 1 492 dans dix ans</strong> — c'est-à-dire un <strong>put européen</strong>.</em>
+<em>Étape 4 — le valoriser.</em> Avec $S_0=1\,000$, $K=1\,492$, $r=5\,\%$, $\sigma=15\,\%$, $T=10$, $q=1\,\%$ : la valeur du put est <strong>169,7</strong>.
+<em>Étape 5 — la conclusion.</em> <em><strong>La garantie envisagée vaut environ 17 % du fonds — ce n'est guère quelque chose à donner gratuitement !</strong></em></p>
+</div></details>
+
+<p><strong>La reformulation par le prix forward.</strong> Puisque $F_0=S_0e^{(r-q)T}$ (fiche 78), les formules se réécrivent :
+$$\boxed{c=e^{-rT}\big[F_0N(d_1)-KN(d_2)\big]}\;\text{(16.8)}\qquad\boxed{p=e^{-rT}\big[KN(-d_2)-F_0N(-d_1)\big]}\;\text{(16.9)}$$
+$$d_1=\frac{\ln(F_0/K)+\sigma^2T/2}{\sigma\sqrt T}\qquad d_2=\frac{\ln(F_0/K)-\sigma^2T/2}{\sigma\sqrt T}$$</p>
+<p><strong>Et la parité devient une formule d'extraction.</strong> $c+Ke^{-rT}=p+F_0e^{-rT}$, soit
+$$\boxed{F_0=K+(c-p)e^{rT}}\;\text{(16.10)}$$
+<em>Si des paires de puts et calls de même strike sont activement traitées, cette équation <strong>estime le prix forward de l'indice</strong>. <strong>L'avantage de cette approche est que le rendement de dividende n'a pas à être estimé explicitement.</strong></em> Et si l'on a besoin de $q$ (pour une américaine) :
+$$\boxed{q=-\frac1T\ln\frac{c-p+Ke^{-rT}}{S_0}}$$
+ <em>Pour un strike et une maturité donnés, ces estimations sont <strong>peu fiables</strong> ; mais <strong>en combinant de nombreuses paires appariées, une image plus claire du rendement de dividende supposé par le marché émerge</strong>.</em></p>
+<h3>4.2 Devises</h3>
+<p>$$\boxed{c=S_0e^{-r_fT}N(d_1)-Ke^{-rT}N(d_2)}\;\text{(16.11)}\qquad d_1=\frac{\ln(S_0/K)+(r-r_f+\sigma^2/2)T}{\sigma\sqrt T}$$</p>
+<p><em>$S_0$ est <strong>la valeur d'une unité de devise étrangère en dollars</strong>. $r$ et $r_f$ sont les taux de maturité $T$.</em></p>
+<blockquote>
+<p><strong>La symétrie des options de change, à connaître.</strong> <em>Un <strong>put</strong> de vente de la devise A contre la devise B au strike $K$ <strong>est le même</strong> qu'un <strong>call</strong> d'achat de B contre A au strike $\mathbf{1/K}$.</em></p>
+</blockquote>
+<p><strong>Exemple 16.2 — volatilité implicite.</strong> Call <strong>4 mois</strong> sur la livre. $S_0=K=1{,}6000$, $r=8\,\%$ (États-Unis), $r_f=11\,\%$ (Royaume-Uni), prix <strong>4,3 cents</strong>. *Par essais et erreurs : $\sigma=20\,\%$ donne <strong>0,0639</strong> ; $\sigma=10\,\%$ donne <strong>0,0285</strong>. La volatilité implicite est <strong>14,1 %</strong>.*</p>
+<p><strong>Et la version forward.</strong> Avec $F_0=S_0e^{(r-r_f)T}$, on retrouve <strong>exactement (16.8) et (16.9)</strong>.</p>
+<h2 data-prio="must">Concept 5 — Les options sur futures</h2>
+<div class="cal formel"><span class="lab">Définition.</span>
+<p> <em>Une option sur futures est le <strong>droit, non l'obligation, d'entrer dans un contrat futures à un certain prix futures avant une certaine date</strong>. Un <strong>call</strong> donne le droit d'entrer dans une position <strong>longue</strong> ; un <strong>put</strong>, dans une position <strong>courte</strong>. <strong>Les options sur futures sont généralement américaines.</strong></em></p>
+<p><strong>Ce qu'on reçoit à l'exercice.</strong> <em>Un <strong>call</strong> exercé donne une <strong>position longue</strong> dans le futures <strong>plus</strong> un montant en espèces égal au <strong>dernier prix de règlement moins le strike</strong>. Un <strong>put</strong> exercé donne une position <strong>courte</strong> plus <strong>le strike moins le dernier prix de règlement</strong>.</em></p>
+</div>
+<p>$$\boxed{\text{payoff effectif}=\max(F_T-K,0)\ \text{(call)}\qquad \max(K-F_T,0)\ \text{(put)}}$$</p>
+<details class="cor">
+<summary><strong>Deux exercices résolus — pourquoi le payoff effectif est bien $F-K$ (exemples 17.1 et 17.2)</strong></summary><div class="in">
+
+<p><strong>Exemple 17.1 — un call sur futures cuivre.</strong> 15 août, call septembre, strike <strong>240 cents/livre</strong>, contrat de <strong>25 000 livres</strong>. Prix futures actuel <strong>251</strong>, dernier règlement (14 août) <strong>250</strong>.</p>
+<p><em>Étape 1 — le versement en espèces à l'exercice.</em>
+$$25\,000\times(250-240)\ \text{cents}=\mathbf{2\,500}\ \text{dollars}$$
+<em>Étape 2 — plus la position longue.</em> Un futures d'achat de 25 000 livres en septembre.
+<em>Étape 3 — si on la dénoue immédiatement.</em> Elle vaut la variation depuis le dernier règlement :
+$$25\,000\times(251-250)\ \text{cents}=\mathbf{250}\ \text{dollars}$$
+<em>Étape 4 — le total.</em> $2\,500+250=\mathbf{2\,750}=25\,000(F-K)$  avec $F=251$, $K=240$.</p>
+<p><strong>Exemple 17.2 — un put sur futures maïs.</strong> Put décembre, strike <strong>400 cents/boisseau</strong>, contrat de <strong>5 000 boisseaux</strong>. Prix futures <strong>380</strong>, dernier règlement <strong>379</strong>.</p>
+<p><em>Étape 1.</em> Espèces : $5\,000\times(400-379)=\mathbf{1\,050}$ dollars.
+<em>Étape 2.</em> Plus une position <strong>courte</strong>.
+<em>Étape 3.</em> En la dénouant : $5\,000\times(380-379)=\mathbf{50}$ dollars, <strong>à retrancher</strong> (le prix a monté depuis le règlement, ce qui pénalise une position courte).
+<em>Étape 4.</em> Net : $1\,050-50=\mathbf{1\,000}=5\,000(K-F)$ .</p>
+<blockquote>
+<p class="cal piege"> <strong>La leçon.</strong> Le <strong>découpage</strong> entre espèces et position futures dépend du dernier règlement, <strong>mais le total ne dépend que de $F$ et $K$</strong>. C'est pourquoi on peut raisonner directement sur $\max(F_T-K,0)$.</p>
+</blockquote>
+</div></details>
+
+<p><strong>Les quatre raisons de leur popularité.</strong></p>
+<table>
+<thead>
+<tr>
+<th>Raison</th>
+<th>Détail</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Liquidité</strong></td>
+<td><em>un futures est souvent <strong>plus liquide et plus facile à traiter</strong> que le sous-jacent — le marché des futures T-bond est bien plus actif que celui d'une obligation particulière</em></td>
+</tr>
+<tr>
+<td><strong>Transparence du prix</strong></td>
+<td><em>le prix futures est <strong>connu immédiatement</strong> par la cotation, alors que le prix comptant peut n'être obtenu <strong>qu'en contactant des courtiers</strong></em></td>
+</tr>
+<tr>
+<td><strong>Règlement en espèces</strong></td>
+<td><em>l'exercice <strong>ne conduit habituellement pas à la livraison</strong> : le futures est dénoué avant. <strong>Cela séduit les investisseurs à capital limité</strong>, qui auraient du mal à trouver les fonds pour acheter le sous-jacent</em></td>
+</tr>
+<tr>
+<td><strong>Proximité et coûts</strong></td>
+<td><em>futures et options sur futures se traitent <strong>côte à côte sur la même bourse</strong>, ce qui facilite couverture, arbitrage et spéculation ; et les <strong>coûts de transaction sont souvent plus faibles</strong></em></td>
+</tr>
+</tbody></table>
+<p class="cal piege"> <strong>Le nom trompe.</strong> <em>Les options sur futures sont désignées par le <strong>mois de livraison du futures sous-jacent</strong>, <strong>pas</strong> par le mois d'expiration de l'option.</em> L'expiration est généralement <strong>le jour de la première date de livraison du futures, ou quelques jours avant</strong>.</p>
+<details class="cor">
+<summary><strong>Deux exercices résolus — options sur futures de taux (exemples 17.3 et 17.4)</strong></summary><div class="in">
+
+<p><strong>Rappel de lecture.</strong> <em>Les prix futures de taux <strong>montent quand les prix obligataires montent</strong>, c'est-à-dire <strong>quand les taux baissent</strong>.</em> Donc : <strong>anticiper une hausse des taux → acheter des PUTS</strong> ; <strong>anticiper une baisse → acheter des CALLS</strong>.</p>
+<p><strong>Exemple 17.3 — call sur futures eurodollar.</strong> Février ; futures juin à <strong>93,82</strong> (taux 3 mois de <strong>6,18 %</strong>). Call de strike <strong>94,00</strong> coté <strong>0,1</strong>, soit <strong>10 points de base</strong>.</p>
+<p><em>Étape 1 — le coût.</em> En options eurodollar, <strong>1 point de base $=$ 25 dollars</strong> (fiche 79) : $10\times25=\mathbf{250}$ dollars.
+<em>Étape 2 — le scénario.</em> Les taux baissent d'environ 100 pb ; le futures monte à <strong>94,78</strong> (taux <strong>5,22 %</strong>).
+<em>Étape 3 — le payoff.</em>
+$$25\times(94{,}78-94{,}00)\times100=25\times0{,}78\times100=\mathbf{1\,950}\ \text{dollars}$$
+<em>Étape 4 — le profit.</em> $1\,950-250=\boxed{\mathbf{1\,700}}$ dollars.</p>
+<p><strong>Exemple 17.4 — call sur futures T-bond.</strong> Août ; futures décembre à <strong>96-09</strong>, soit $96+\frac9{32}=\mathbf{96{,}28125}$ ; rendement long terme <strong>6,4 %</strong>. Call décembre de strike <strong>98</strong> coté <strong>1-04</strong>, soit $1+\frac4{64}=\mathbf{1{,}0625\,\%}$ du nominal.</p>
+<p><em>Étape 1 — le scénario.</em> Les taux tombent à <strong>6 %</strong> et le futures monte à <strong>100-00</strong>.
+<em>Étape 2 — le profit par 100 de nominal.</em>
+$$100{,}00-98{,}00-1{,}0625=\mathbf{0{,}9375}$$
+<em>Étape 3 — par contrat.</em> Un contrat porte sur <strong>100 000</strong> de nominal :
+$$0{,}9375\,\%\times100\,000=\boxed{\mathbf{937{,}50}}\ \text{dollars}$$</p>
+<p class="cal piege"> <em>Le prix d'une option sur T-bond futures est coté <strong>en pourcentage du nominal, au soixante-quatrième de 1 % près</strong> — d'où le « 1-04 ».</em></p>
+</div></details>
+
+<h3>5.1 Parité et bornes</h3>
+<p><strong>Le résultat qui relie tout.</strong> <em>Le payoff d'un call européen sur le <strong>spot</strong> est $\max(S_T-K,0)$ ; celui d'un call européen sur le <strong>futures</strong> est $\max(F_T-K,0)$. <strong>Si le futures échoit en même temps que l'option, $F_T=S_T$ et les deux options sont équivalentes.</strong></em></p>
+<details class="cor">
+<summary><strong>La parité pour options sur futures, démontrée</strong></summary><div class="in">
+
+<table>
+<thead>
+<tr>
+<th>Portefeuille</th>
+<th>Contenu</th>
+<th>Valeur en $T$</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>A</strong></td>
+<td>call sur futures $+$ liquidités $Ke^{-rT}$</td>
+<td>$\max(F_T,K)$</td>
+</tr>
+<tr>
+<td><strong>B</strong></td>
+<td>put sur futures $+$ <strong>un futures long</strong> $+$ liquidités $F_0e^{-rT}$</td>
+<td>$F_0+(F_T-F_0)+\max(K-F_T,0)=\max(F_T,K)$</td>
+</tr>
+</tbody></table>
+<p><em>Comme les deux portefeuilles valent la même chose en $T$ et que les européennes ne peuvent être exercées tôt, <strong>ils valent la même chose aujourd'hui</strong>. <strong>Le règlement quotidien garantit que le futures de B vaut zéro aujourd'hui.</strong></em> D'où
+$$\boxed{c+Ke^{-rT}=p+F_0e^{-rT}}\;\text{(17.1)}$$</p>
+<blockquote>
+<p><strong>La différence avec (10.6) tient en une substitution :</strong> <em>le prix de l'action $S_0$ est remplacé par <strong>le prix futures actualisé $F_0e^{-rT}$</strong></em>.</p>
+</blockquote>
+<p><strong>Version américaine :</strong> $F_0e^{-rT}-K&lt;C-P&lt;F_0-Ke^{-rT}$ ;(17.2).</p>
+<p><strong>Les bornes en découlent immédiatement.</strong> Comme $p\ge0$ : $\boxed{c\ge(F_0-K)e^{-rT}}$ ;(17.3). Comme $c\ge0$ : $\boxed{p\ge(K-F_0)e^{-rT}}$ ;(17.4).</p>
+<p class="cal piege"> <strong>Pourquoi les options très dans la monnaie collent à leur borne.</strong> <em>Quand un call est <strong>très dans la monnaie</strong>, le put correspondant est <strong>très hors la monnaie</strong>, donc $p$ est <strong>très proche de zéro</strong>. Or <strong>l'écart entre $c$ et sa borne inférieure vaut exactement $p$</strong> : le call est donc <strong>très proche de sa borne</strong>.</em></p>
+<p><strong>Et pour les américaines</strong> : $C\ge F_0-K$ et $P\ge K-F_0$. <em>Avec des taux positifs, <strong>la borne américaine est toujours plus élevée que la borne européenne : il y a toujours une chance qu'une option américaine sur futures soit exercée par anticipation</strong>.</em></p>
+<details class="cor">
+<summary>Application (exemple 17.5)</summary><div class="in">
+
+<p>Call européen sur argent <strong>spot</strong> 6 mois à <strong>0,56</strong> l'once, strike <strong>8,50</strong>. Futures argent 6 mois : <strong>8,00</strong>. $r=10\,\%$. Le put correspondant vaut
+$$p=c+Ke^{-rT}-F_0e^{-rT}=0{,}56+(8{,}50-8{,}00)e^{-0{,}05}=0{,}56+0{,}476=\boxed{\mathbf{1{,}04}}$$</p>
+</div></details>
+</div></details>
+
+<h3>5.2 La dérive nulle et le modèle de Black</h3>
+<details class="cor">
+<summary><strong>La démonstration que la dérive risque-neutre d'un prix futures est nulle</strong></summary><div class="in">
+
+<p><em>Étape 1 — un futures long conclu en 0 <strong>vaut zéro</strong>.</em>
+<em>Étape 2 — en $\Delta t$, il procure un payoff de $F_{\Delta t}-F_0$.</em>
+<em>Étape 3 — par valorisation risque-neutre, sa valeur en 0 est</em>
+$$e^{-r\Delta t}\hat{\mathbb E}\big[F_{\Delta t}-F_0\big]$$
+<em>Étape 4 — cette valeur doit être nulle</em>, donc $\hat{\mathbb E}(F_{\Delta t})=F_0$.
+<em>Étape 5 — répéter.</em> $\hat{\mathbb E}(F_{2\Delta t})=F_{\Delta t}$, $\hat{\mathbb E}(F_{3\Delta t})=F_{2\Delta t}$… et en enchaînant :
+$$\boxed{\hat{\mathbb E}(F_T)=F_0\quad\text{pour tout }T}$$</p>
+<blockquote>
+<p><em><strong>La dérive du prix futures en monde risque-neutre est donc NULLE. D'après (16.7), le prix futures se comporte comme une action versant un rendement $q$ ÉGAL À $r$. Ce résultat est très général : il vaut pour tous les prix futures et ne dépend d'aucune hypothèse sur les taux, les volatilités, etc.</strong></em></p>
+</blockquote>
+<p class="cal piege"> <strong>La formulation précise, annoncée pour le chapitre 27.</strong> <em>« Un prix futures a une dérive nulle dans le monde risque-neutre traditionnel où le <strong>numéraire est le compte monétaire</strong> ». Un processus de dérive nulle s'appelle une <strong>martingale</strong>. <strong>Un prix FORWARD est une martingale dans un monde risque-neutre DIFFÉRENT</strong> — celui où le numéraire est une obligation zéro-coupon de maturité $T$.</em></p>
+<p><strong>Le processus supposé et l'EDP.</strong>
+$$dF=\sigma F\,dz\;\text{(17.7)}\qquad\qquad \boxed{\frac{\partial f}{\partial t}+\frac12\sigma^2F^2\frac{\partial^2f}{\partial F^2}=rf}\;\text{(17.8)}$$
+<em>Elle a la même forme que (16.6) <strong>avec $q=r$</strong></em> — ce qui confirme le résultat. <strong>Notez qu'il n'y a plus de terme du premier ordre</strong> : c'est la signature de la dérive nulle.</p>
+<p><strong>Les deux indices qui mettaient sur la voie.</strong> <em>L'équation de $p$ dans un arbre de futures est la même que celle d'une action de rendement $q$ <strong>quand $q=r$</strong></em> ; et la parité pour options sur futures est la même que (16.3) <strong>avec $q=r$</strong>.</p>
+</div></details>
+
+<blockquote>
+<p><strong>Le modèle de Black (1976).</strong> <em>Fischer Black fut le premier à montrer cela, dans un article de <strong>1976</strong>.</em> En remplaçant $S_0$ par $F_0$ et $q$ par $r$ dans (16.4)-(16.5) :</p>
+</blockquote>
+<p>$$\boxed{c=e^{-rT}\big[F_0N(d_1)-KN(d_2)\big]}\;\text{(17.9)}\qquad\boxed{p=e^{-rT}\big[KN(-d_2)-F_0N(-d_1)\big]}\;\text{(17.10)}$$
+$$d_1=\frac{\ln(F_0/K)+\sigma^2T/2}{\sigma\sqrt T}\qquad d_2=d_1-\sigma\sqrt T$$</p>
+<p class="cal piege"> <em>Quand le <strong>coût de portage</strong> et le <strong>rendement de commodité</strong> sont des fonctions du seul temps, <strong>la volatilité du prix futures égale la volatilité du sous-jacent</strong>.</em></p>
+<details class="cor">
+<summary><strong>Deux exercices résolus avec le modèle de Black (exemples 17.6 et 17.7)</strong></summary><div class="in">
+
+<p><strong>Exemple 17.6 — put sur futures pétrole, à la monnaie.</strong> $F_0=K=20$, $T=4/12$, $r=9\,\%$, $\sigma=25\,\%$.</p>
+<p><em>Étape 1 — le cas $F_0=K$ simplifie tout.</em> $\ln(F_0/K)=0$, donc
+$$d_1=\frac{\sigma\sqrt T}{2}=\frac{0{,}25\times0{,}5774}{2}=\mathbf{0{,}07216}\qquad d_2=-\mathbf{0{,}07216}$$
+<em>Étape 2 — les $N$.</em> $N(-d_1)=0{,}4712$ · $N(-d_2)=0{,}5288$.
+<em>Étape 3 — le prix.</em>
+$$p=e^{-0{,}03}\big(20\times0{,}5288-20\times0{,}4712\big)=e^{-0{,}03}\times1{,}152=\boxed{\mathbf{1{,}12}}$$</p>
+<p><strong>Exemple 17.7 — call sur l'or SPOT, valorisé par Black.</strong> Call européen <strong>6 mois</strong> d'achat d'une once <strong>au comptant</strong>. Strike <strong>1 200</strong>, <strong>futures 6 mois à 1 240</strong>, $r=5\,\%$, $\sigma=20\,\%$.</p>
+<p><em>Étape 1 — l'équivalence.</em> <em>L'option est la même qu'une option européenne 6 mois sur le <strong>prix futures 6 mois</strong></em> (concept 5.1).
+<em>Étape 2 — $d_1$ et $d_2$.</em>
+$$d_1=\frac{\ln(1\,240/1\,200)+0{,}2^2\times0{,}5/2}{0{,}2\sqrt{0{,}5}}=\frac{0{,}03279+0{,}01}{0{,}14142}=\mathbf{0{,}3026}\qquad d_2=\mathbf{0{,}1611}$$
+<em>Étape 3 — le prix.</em>
+$$c=e^{-0{,}025}\big[1\,240\,N(0{,}3026)-1\,200\,N(0{,}1611)\big]=\boxed{\mathbf{88{,}37}}$$</p>
+<blockquote>
+<p class="cal piege"> <strong>Le grand avantage du modèle de Black, et c'est la raison pour laquelle les traders le préfèrent.</strong> <em>Il a une <strong>applicabilité assez générale</strong> : le sous-jacent peut être un actif de <strong>consommation ou d'investissement</strong>, et il peut <strong>procurer un revenu</strong>. <strong>Le grand avantage est qu'il évite d'avoir à estimer le revenu (ou le rendement de commodité) du sous-jacent : le prix futures ou forward utilisé INCORPORE l'estimation du marché de ce revenu.</strong></em></p>
+</blockquote>
+<p><strong>Le tableau des équivalences — trois écritures de la même formule.</strong></p>
+<table>
+<thead>
+<tr>
+<th>Sous-jacent</th>
+<th>Formule</th>
+<th>Où l'on a substitué</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Indice</td>
+<td>(16.8)-(16.9)</td>
+<td>$F_0=S_0e^{(r-q)T}$</td>
+</tr>
+<tr>
+<td>Devise</td>
+<td>(16.13)-(16.14)</td>
+<td>$F_0=S_0e^{(r-r_f)T}$</td>
+</tr>
+<tr>
+<td>Futures</td>
+<td>(17.9)-(17.10)</td>
+<td>$F_0$ directement</td>
+</tr>
+</tbody></table>
+<p><strong>Elles sont toutes identiques.</strong> <em>Et l'on utilise la parité pour <strong>impliquer les prix forward</strong> des maturités activement traitées, puis on <strong>interpole</strong> pour les autres — approche valable pour un large éventail de sous-jacents.</em></p>
+</div></details>
+
+<h3>5.3 Américaines et <em>futures-style</em></h3>
+<p><strong>Américaine sur futures contre américaine sur spot.</strong> <em>Avec $r&gt;0$, <strong>il y a toujours une chance qu'il soit optimal d'exercer une américaine sur futures par anticipation</strong> : elle vaut donc plus que son homologue européenne.</em></p>
+<table>
+<thead>
+<tr>
+<th>Marché</th>
+<th>Call américain sur futures</th>
+<th>Put américain sur futures</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Normal</strong> ($F&gt;S$)</td>
+<td>vaut <strong>plus</strong> que le call sur spot</td>
+<td>vaut <strong>moins</strong></td>
+</tr>
+<tr>
+<td><strong>Inversé</strong> ($F&lt;S$)</td>
+<td>vaut <strong>moins</strong></td>
+<td>vaut <strong>plus</strong></td>
+</tr>
+</tbody></table>
+<p><em>Ces différences valent aussi quand le futures expire <strong>plus tard</strong> que l'option — et <strong>plus le futures expire tard, plus les différences tendent à être grandes</strong>.</em></p>
+<p><strong>Les options <em>futures-style</em>.</strong> <em>Ce sont des <strong>contrats futures sur le payoff d'une option</strong>. Au lieu de payer (recevoir) la prime d'avance, on <strong>dépose une marge</strong> comme sur un futures ordinaire ; le contrat est <strong>réglé quotidiennement</strong> et le <strong>prix de règlement final est le payoff de l'option</strong>.</em></p>
+<div class="cal intu"><span class="lab">Ce que le prix représente.</span>
+<p> <em>Si les taux sont constants, le prix futures d'une option <em>futures-style</em> égale le <strong>prix forward</strong> d'un contrat forward sur le payoff de l'option. <strong>C'est donc le prix qu'on paierait pour l'option si le paiement était fait à terme échu</strong> : la valeur d'une option ordinaire <strong>capitalisée au taux sans risque</strong>.</em></p>
+</div>
+<p>$$\boxed{\text{call : }F_0N(d_1)-KN(d_2)}\qquad\boxed{\text{put : }KN(-d_2)-F_0N(-d_1)}\qquad\boxed{p+F_0=c+K}$$</p>
+<p class="cal piege"> <em><strong>Ces formules ne dépendent PAS du niveau des taux d'intérêt.</strong></em> Et : <em>il <strong>n'est jamais optimal</strong> d'exercer par anticipation une option <em>futures-style</em> américaine <strong>sur un futures</strong>, parce que <strong>son prix futures est toujours supérieur à la valeur intrinsèque</strong> — on peut donc la traiter comme l'européenne correspondante.</em></p>
+<h2>Comment reconnaître le type d'exercice</h2>
+<table>
+<thead>
+<tr>
+<th>Signal</th>
+<th>$q$ à utiliser</th>
+<th>Formule</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Rendement de dividende d'une action ou d'un indice</td>
+<td>$q$</td>
+<td>(16.4)-(16.5)</td>
+</tr>
+<tr>
+<td>Deux taux et un cours de change</td>
+<td>$q=r_f$</td>
+<td>(16.11)-(16.12)</td>
+</tr>
+<tr>
+<td>Un <strong>prix futures</strong></td>
+<td>$q=r$</td>
+<td><strong>Black</strong> (17.9)-(17.10)</td>
+</tr>
+<tr>
+<td>Un <strong>prix forward</strong> donné au lieu du spot</td>
+<td>—</td>
+<td><strong>Black</strong>, sans estimer de revenu</td>
+</tr>
+<tr>
+<td>Un portefeuille, un bêta, un niveau de protection</td>
+<td>—</td>
+<td>$N=\beta V/(100S_0)$, strike par le <strong>MEDAF</strong></td>
+</tr>
+<tr>
+<td>« quel strike rend le tunnel gratuit ? »</td>
+<td>—</td>
+<td>égaliser les primes du put et du call</td>
+</tr>
+<tr>
+<td>Une paire call/put de même strike</td>
+<td>—</td>
+<td>$F_0=K+(c-p)e^{rT}$</td>
+</tr>
+<tr>
+<td>Une option <strong>américaine</strong> sur indice ou devise</td>
+<td>—</td>
+<td><strong>arbre</strong>, avec $a=e^{(r-q)\Delta t}$ ou $e^{(r-r_f)\Delta t}$</td>
+</tr>
+</tbody></table>
+<h2>Comment résoudre ce type d'exercice</h2>
+<p><strong>Protocole « quel $q$ ? » — 3 étapes.</strong></p>
+<ol>
+<li>Identifier le <strong>revenu proportionnel</strong> que procure la détention du sous-jacent.</li>
+<li>Indice → dividende annualisé <strong>sur la vie de l'option</strong> ; devise → <strong>$r_f$</strong> ; futures → <strong>$r$</strong>.</li>
+<li>Appliquer $S_0\to S_0e^{-qT}$ <strong>partout</strong> — dans la formule <strong>et</strong> dans $d_1$ (où $r$ devient $r-q$).</li>
+</ol>
+<p><strong>Protocole assurance de portefeuille — 4 étapes.</strong></p>
+<ol>
+<li>$N=\beta\dfrac{V}{100\,S_0}$ contrats de put.</li>
+<li>Si $\beta=1$ : le strike est $S_0\times$ (niveau de protection / valeur du portefeuille).</li>
+<li>Si $\beta\ne1$ : construire la table valeur de l'indice → valeur du portefeuille <strong>par le MEDAF</strong>, puis <strong>lire</strong> le niveau d'indice correspondant à la protection voulue.</li>
+<li><strong>Vérifier</strong> sur un scénario que portefeuille + payoff des puts $=$ niveau assuré.</li>
+</ol>
+<h2 data-prio="must">Common mistakes</h2>
+<table>
+<thead>
+<tr>
+<th>Erreur</th>
+<th>Correction</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Oublier le $-q$ dans $d_1$</td>
+<td>$d_1=\frac{\ln(S_0/K)+(r-q+\sigma^2/2)T}{\sigma\sqrt T}$</td>
+</tr>
+<tr>
+<td>Appliquer $e^{-qT}$ au seul terme en $S_0$ de la formule</td>
+<td>Il faut <strong>aussi</strong> corriger $d_1$ et $d_2$</td>
+</tr>
+<tr>
+<td>Utiliser $q$ pour une devise</td>
+<td>C'est <strong>$r_f$</strong>, le taux <strong>étranger</strong></td>
+</tr>
+<tr>
+<td>Utiliser $q=0$ pour un futures</td>
+<td>C'est <strong>$q=r$</strong> — dérive risque-neutre <strong>nulle</strong></td>
+</tr>
+<tr>
+<td>Actualiser un prix d'option sur futures deux fois</td>
+<td>Une seule fois, $e^{-rT}$ — Black <strong>intègre déjà</strong> la dérive nulle</td>
+</tr>
+<tr>
+<td>Garder le même strike quand $\beta$ passe de 1 à 2</td>
+<td><strong>Deux</strong> effets : plus de puts <strong>et</strong> strike plus élevé</td>
+</tr>
+<tr>
+<td>Annualiser le dividende sur l'année entière</td>
+<td>Ne compter que les détachements <strong>pendant la vie de l'option</strong></td>
+</tr>
+<tr>
+<td>Croire qu'un tunnel a un coût</td>
+<td>Il est monté pour que <strong>prime du put $=$ prime du call</strong></td>
+</tr>
+<tr>
+<td>Croire que le payoff d'une option sur futures dépend du dernier règlement</td>
+<td>Le <strong>découpage</strong> en dépend, <strong>pas le total</strong></td>
+</tr>
+<tr>
+<td>Croire qu'américaine sur futures $=$ américaine sur spot</td>
+<td><strong>Faux</strong> dès que $F\ne S$ (voir le tableau du concept 5.3)</td>
+</tr>
+<tr>
+<td>Payer une option <em>futures-style</em> d'avance</td>
+<td>On <strong>dépose une marge</strong>, réglée <strong>quotidiennement</strong></td>
+</tr>
+</tbody></table>
+<h2>Ultimate Review</h2>
+<p><strong>La règle qui unifie tout.</strong> $\boxed{S_0\ \longrightarrow\ S_0e^{-qT}}$ dans <strong>tous</strong> les résultats du chapitre 14.</p>
+<table>
+<thead>
+<tr>
+<th>Sous-jacent</th>
+<th>$q$</th>
+<th>Justification</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Indice</td>
+<td>rendement de dividende</td>
+<td>portefeuille d'actions versant des dividendes</td>
+</tr>
+<tr>
+<td><strong>Devise</strong></td>
+<td>$\boldsymbol{r_f}$</td>
+<td><em>le détenteur reçoit le taux sans risque étranger</em></td>
+</tr>
+<tr>
+<td><strong>Futures</strong></td>
+<td>$\boldsymbol{r}$</td>
+<td><em>dérive risque-neutre <strong>nulle</strong></em></td>
+</tr>
+</tbody></table>
+<p><strong>Les formules.</strong>
+$$c=S_0e^{-qT}N(d_1)-Ke^{-rT}N(d_2)\qquad d_1=\frac{\ln(S_0/K)+(r-q+\sigma^2/2)T}{\sigma\sqrt T}$$
+$$\textbf{Black}:\quad c=e^{-rT}\big[F_0N(d_1)-KN(d_2)\big]\qquad d_1=\frac{\ln(F_0/K)+\sigma^2T/2}{\sigma\sqrt T}$$</p>
+<p><strong>Les parités.</strong> $c+Ke^{-rT}=p+S_0e^{-qT}=p+F_0e^{-rT}$ · extraction : $F_0=K+(c-p)e^{rT}$.</p>
+<p><strong>L'EDP généralisée.</strong> $\dfrac{\partial f}{\partial t}+(r-q)S\dfrac{\partial f}{\partial S}+\dfrac12\sigma^2S^2\dfrac{\partial^2f}{\partial S^2}=rf$ · processus risque-neutre $dS=(r-q)S\,dt+\sigma S\,dz$ · pour un futures : $\dfrac{\partial f}{\partial t}+\dfrac12\sigma^2F^2\dfrac{\partial^2f}{\partial F^2}=rf$ (<strong>sans terme du premier ordre</strong>).</p>
+<p><strong>L'assurance de portefeuille.</strong> $N=\beta\dfrac{V}{100S_0}$ · strike lu dans la table MEDAF · <strong>deux</strong> effets du bêta : plus de puts <strong>et</strong> strike plus haut.</p>
+<p><strong>Les chiffres.</strong> Contrat d'indice <strong>100 fois</strong> l'indice · exemple 16.1 : $q=3\,\%$, $d_1=0{,}5444$, $c=\mathbf{51{,}83}$, contrat <strong>5 183</strong> · garantie actions/obligations : indice cible <strong>1 492</strong>, put à <strong>169,7</strong>, soit <strong>17 %</strong> du fonds · tunnel gratuit : $K_1=1{,}5000$, $K_2=1{,}5413$, primes <strong>0,03250</strong> · assurance $\beta=2$ : <strong>10</strong> contrats, strike <strong>960</strong> · exemple 16.2 : volatilité implicite <strong>14,1 %</strong> · options sur futures autorisées <strong>1982</strong>, permanentes <strong>1987</strong> · exemple 17.3 : profit <strong>1 700</strong> · exemple 17.4 : <strong>937,50</strong> · exemple 17.5 : $p=\mathbf{1{,}04}$ · exemple 17.6 : $p=\mathbf{1{,}12}$ · exemple 17.7 : $c=\mathbf{88{,}37}$ · Black <strong>1976</strong>.</p>
+<div class="rec"><h2>Active Recall</h2><details class="cor">
+<summary>Démontrer la règle « remplacer $S_0$ par $S_0e^{-qT}$ ».</summary><div class="in">
+
+<p>*Un rendement de dividende $q$ fait croître le cours <strong>moins vite d'un montant $q$</strong>. Si, avec ce rendement, le cours passe de $S_0$ à $S_T$, alors <strong>sans dividendes il passerait de $S_0e^{-qT}$ à $S_T$</strong>.* On obtient donc <strong>la même loi de $S_T$</strong> dans deux situations : (1) départ de $S_0$ avec rendement $q$ ; (2) départ de $S_0e^{-qT}$ <strong>sans</strong> dividende. Comme le prix d'une européenne ne dépend que de la loi de $S_T$, <strong>il suffit de faire la substitution</strong>.</p>
+<p class="cal piege"> Attention : la substitution affecte <strong>aussi $d_1$</strong>, où $r$ devient $r-q$.</p>
+</div></details><details class="cor">
+<summary>Un portefeuille de 500 000 réplique un indice à 1 000. Comment l'assurer à 450 000 sur trois mois ?</summary><div class="in">
+
+<p>Le portefeuille vaut <strong>500 fois</strong> l'indice, et chaque contrat porte sur <strong>100 fois</strong> l'indice → <strong>5 contrats</strong> de put. La protection à 450 000, soit <strong>90 %</strong>, correspond à un strike de <strong>900</strong>.</p>
+<p>Vérification à un indice de 880 : portefeuille ≈ <strong>440 000</strong>, puts $=5\times(900-880)\times100=\mathbf{10\,000}$, total <strong>450 000</strong> .</p>
+</div></details><details class="cor">
+<summary>Le même portefeuille a un bêta de 2. Qu'est-ce qui change ?</summary><div class="in">
+
+<p><strong>Deux choses.</strong> <strong>(1) Le nombre de contrats</strong> : $N=2{,}0\times\dfrac{500\,000}{1\,000\times100}=\mathbf{10}$. <strong>(2) Le strike</strong> : il ne se lit plus par proportionnalité mais <strong>par le MEDAF</strong>. Avec $r=12\,\%$ et $q=4\,\%$, la table donne : indice <strong>960</strong> → portefeuille <strong>450 000</strong>. Le strike est donc <strong>960</strong>, contre 900 dans le cas $\beta=1$.</p>
+<blockquote>
+<p><em><strong>Il y a donc deux raisons pour lesquelles le coût de la couverture augmente avec le bêta : il faut plus de puts, ET ils ont un strike plus élevé.</strong></em></p>
+</blockquote>
+</div></details><details class="cor">
+<summary>Comment monte-t-on un *range forward* gratuit, et quel est son cas limite ?</summary><div class="in">
+
+<p>Une entreprise recevant des devises <strong>achète un put</strong> de strike $K_1$ et <strong>vend un call</strong> de strike $K_2$, avec $K_1&lt;F_0&lt;K_2$. Le cours réalisé est $K_1$ si le marché tombe sous $K_1$, le cours de marché entre les deux, et $K_2$ au-dessus.</p>
+<p><strong>La gratuité</strong> s'obtient en choisissant $K_1$ et $K_2$ tels que <strong>les deux primes s'égalisent</strong> : avec $F_0=1{,}5200$, $r=r_f=5\,\%$, $\sigma=14\,\%$, le put à <strong>1,5000</strong> et le call à <strong>1,5413</strong> valent tous deux <strong>0,03250</strong>.</p>
+<p><strong>Le cas limite</strong> : <em>à mesure que les strikes se rapprochent, <strong>le range forward devient un forward ordinaire</strong></em>.</p>
+</div></details><details class="cor">
+<summary>Calculer le prix d'un call européen 2 mois sur le S&amp;P 500 (930), strike 900, $r=8\,\%$, $\sigma=20\,\%$, dividendes 0,2 % puis 0,3 %.</summary><div class="in">
+
+<p>$q$ annualisé $=(0{,}2+0{,}3)\times6=\mathbf{3\,\%}$.
+$$d_1=\frac{\ln(930/900)+(0{,}08-0{,}03+0{,}02)/6}{0{,}2/\sqrt6}=\mathbf{0{,}5444}\qquad d_2=\mathbf{0{,}4628}$$
+$$c=930(0{,}7069)e^{-0{,}005}-900(0{,}6782)e^{-0{,}013333}=\boxed{\mathbf{51{,}83}}$$
+Un contrat coûte $100\times51{,}83=\mathbf{5\,183}$ dollars.</p>
+</div></details><details class="cor">
+<summary>Pourquoi une garantie « actions ≥ obligations sur 10 ans » est-elle si chère ?</summary><div class="in">
+
+<p>*Pour battre les obligations à <strong>5 %</strong>, les actions doivent gagner plus de 5 % ; <strong>le dividende en fournit 1 %, donc les plus-values doivent fournir 4 % par an</strong>*. Il faut donc que l'indice atteigne $1\,000e^{0{,}4}=\mathbf{1\,492}$.</p>
+<p>La garantie <strong>est</strong> un <strong>put européen</strong> de strike 1 492 sur 10 ans. Avec $S_0=1\,000$, $\sigma=15\,\%$, $r=5\,\%$, $q=1\,\%$, il vaut <strong>169,7</strong> — soit <em><strong>environ 17 % du fonds : hardly something that should be given away</strong></em>.</p>
+</div></details><details class="cor">
+<summary>Que devient l'EDP quand il y a un rendement $q$, et pourquoi cela suffit-il à conclure ?</summary><div class="in">
+
+<p>$$\frac{\partial f}{\partial t}+(r-q)S\frac{\partial f}{\partial S}+\frac12\sigma^2S^2\frac{\partial^2f}{\partial S^2}=rf$$
+<em>Comme (14.16), <strong>elle ne contient aucune variable affectée par les préférences pour le risque</strong></em> : la valorisation risque-neutre s'applique. En monde risque-neutre, <strong>le rendement total est $r$, les dividendes en fournissent $q$, donc la croissance du cours est $r-q$</strong> : $dS=(r-q)S\,dt+\sigma S\,dz$ et $\hat{\mathbb E}(S_T)=S_0e^{(r-q)T}$.</p>
+</div></details><details class="cor">
+<summary>Comment extraire le prix forward d'un indice à partir de prix d'options ?</summary><div class="in">
+
+<p>Par la parité $c+Ke^{-rT}=p+F_0e^{-rT}$, réarrangée :
+$$\boxed{F_0=K+(c-p)e^{rT}}$$
+<em>Si des paires de puts et calls de même strike sont activement traitées, cette équation estime le prix forward pour cette maturité.</em> <strong>L'avantage : le rendement de dividende n'a pas à être estimé explicitement.</strong> Si l'on en a besoin (pour une américaine) : $q=-\frac1T\ln\frac{c-p+Ke^{-rT}}{S_0}$ — <em>peu fiable pour une seule paire, <strong>mais une image claire émerge en combinant de nombreuses paires</strong></em>.</p>
+</div></details><details class="cor">
+<summary>Un call sur futures cuivre, strike 240, est exercé quand le futures vaut 251 et le dernier règlement 250. Que reçoit-on ?</summary><div class="in">
+
+<p><strong>Espèces</strong> : $25\,000\times(250-240)=\mathbf{2\,500}$ dollars, <strong>plus</strong> une position <strong>longue</strong> dans le futures. En la dénouant immédiatement : $25\,000\times(251-250)=\mathbf{250}$ dollars de plus. <strong>Total : 2 750 dollars $=25\,000(F-K)$.</strong></p>
+<p class="cal piege"> Le <strong>découpage</strong> dépend du dernier règlement ; <strong>le total n'en dépend pas</strong>. D'où le payoff effectif $\max(F_T-K,0)$.</p>
+</div></details><details class="cor">
+<summary>Démontrer la parité call-put pour options européennes sur futures.</summary><div class="in">
+
+<p><strong>A</strong> = call sur futures $+$ liquidités $Ke^{-rT}$ → vaut $\max(F_T,K)$ en $T$.
+<strong>B</strong> = put sur futures $+$ <strong>un futures long</strong> $+$ liquidités $F_0e^{-rT}$ → vaut $F_0+(F_T-F_0)+\max(K-F_T,0)=\max(F_T,K)$.</p>
+<p>Mêmes valeurs en $T$, européennes donc pas d'exercice anticipé → mêmes valeurs aujourd'hui. <em>Le <strong>règlement quotidien</strong> garantit que le futures de B vaut <strong>zéro</strong> aujourd'hui</em>, donc
+$$c+Ke^{-rT}=p+F_0e^{-rT}$$
+<strong>La seule différence avec (10.6) : $S_0$ est remplacé par $F_0e^{-rT}$.</strong></p>
+</div></details><details class="cor">
+<summary>Démontrer que la dérive risque-neutre d'un prix futures est nulle.</summary><div class="in">
+
+<p>Un futures long conclu en 0 <strong>vaut zéro</strong> et procure $F_{\Delta t}-F_0$ en $\Delta t$. Par valorisation risque-neutre, sa valeur est $e^{-r\Delta t}\hat{\mathbb E}[F_{\Delta t}-F_0]$, qui doit être <strong>nulle</strong> : donc $\hat{\mathbb E}(F_{\Delta t})=F_0$. En répétant : $\hat{\mathbb E}(F_T)=F_0$ pour tout $T$.</p>
+<p>*Le prix futures se comporte donc comme une action de rendement <strong>$q=r$</strong>. <strong>Ce résultat est très général : il vaut pour tous les prix futures et ne dépend d'aucune hypothèse sur les taux ou les volatilités.</strong>*</p>
+</div></details><details class="cor">
+<summary>Quel est le grand avantage du modèle de Black ?</summary><div class="in">
+
+<p>$$c=e^{-rT}\big[F_0N(d_1)-KN(d_2)\big]$$
+<em>Il a une <strong>applicabilité assez générale</strong> : le sous-jacent peut être un actif de <strong>consommation ou d'investissement</strong>, et il peut <strong>procurer un revenu</strong>.</em> <strong>Et surtout : <em>il évite d'avoir à estimer le revenu (ou le rendement de commodité) du sous-jacent — le prix futures ou forward utilisé incorpore déjà l'estimation du marché de ce revenu</em>.</strong></p>
+<p>C'est pourquoi <em>les traders préfèrent Black à Black-Scholes-Merton</em> pour valoriser des options européennes sur spot.</p>
+</div></details><details class="cor">
+<summary>Une américaine sur futures vaut-elle la même chose qu'une américaine sur spot ?</summary><div class="in">
+
+<p><strong>Non</strong>, sauf si $F=S$. En <strong>marché normal</strong> ($F&gt;S$) : le <strong>call</strong> sur futures vaut <strong>plus</strong> que le call sur spot (<em>il sera parfois exercé tôt, ce qui donne un profit supérieur</em>), et le <strong>put</strong> sur futures vaut <strong>moins</strong>. En <strong>marché inversé</strong>, l'inverse. <em>Ces différences valent aussi quand le futures expire plus tard que l'option — et <strong>plus il expire tard, plus elles sont grandes</strong>.</em></p>
+</div></details><details class="cor">
+<summary>Qu'est-ce qu'une option *futures-style*, et pourquoi ne l'exerce-t-on jamais tôt ?</summary><div class="in">
+
+<p>C'est un <strong>contrat futures sur le payoff d'une option</strong> : au lieu de payer la prime d'avance, on <strong>dépose une marge</strong> ; règlement <strong>quotidien</strong>, prix de règlement final $=$ <strong>payoff de l'option</strong>. Son prix est <em>le prix qu'on paierait pour l'option si le paiement était fait <strong>à terme échu</strong></em> — la valeur de l'option ordinaire <strong>capitalisée</strong> :
+$$F_0N(d_1)-KN(d_2)\qquad\text{(call)}$$
+ <em>Ces formules <strong>ne dépendent pas du niveau des taux</strong>.</em> Et <em>il n'est <strong>jamais optimal</strong> d'exercer tôt une <em>futures-style</em> américaine sur un futures, parce que <strong>son prix futures est toujours supérieur à la valeur intrinsèque</strong></em> : on la traite comme l'européenne.</p>
+</div></details></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h2>Flashcards</h2>
+<table>
+<thead>
+<tr>
+<th>Question</th>
+<th>Réponse</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Taille d'un contrat d'option sur indice ?</td>
+<td><strong>100 fois</strong> l'indice</td>
+</tr>
+<tr>
+<td>Comment sont-elles réglées ?</td>
+<td><strong>En espèces</strong></td>
+</tr>
+<tr>
+<td>Quel indice du CBOE est américain ?</td>
+<td>L'<strong>OEX</strong> (S&amp;P 100)</td>
+</tr>
+<tr>
+<td>Combien de puts pour assurer un portefeuille ?</td>
+<td>$N=\beta\,V/(100\,S_0)$</td>
+</tr>
+<tr>
+<td>Comment trouve-t-on le strike si $\beta\ne1$ ?</td>
+<td>Par une table construite avec le <strong>MEDAF</strong></td>
+</tr>
+<tr>
+<td>Les deux effets d'un bêta élevé ?</td>
+<td><strong>Plus</strong> de puts <strong>et</strong> strike <strong>plus haut</strong></td>
+</tr>
+<tr>
+<td>Où se traitent les options de change ?</td>
+<td>Principalement <strong>de gré à gré</strong></td>
+</tr>
+<tr>
+<td>Composition d'un <em>range forward</em> court ?</td>
+<td><strong>Acheter</strong> un put $K_1$, <strong>vendre</strong> un call $K_2$</td>
+</tr>
+<tr>
+<td>Comment le rend-on gratuit ?</td>
+<td>En <strong>égalisant</strong> les deux primes</td>
+</tr>
+<tr>
+<td>Son cas limite ?</td>
+<td>Un <strong>forward ordinaire</strong></td>
+</tr>
+<tr>
+<td>La règle unique du chapitre 16 ?</td>
+<td>Remplacer $S_0$ par $\mathbf{S_0e^{-qT}}$</td>
+</tr>
+<tr>
+<td>Pourquoi est-elle valable ?</td>
+<td>Même <strong>loi de $S_T$</strong> dans les deux situations</td>
+</tr>
+<tr>
+<td>Parité avec rendement $q$ ?</td>
+<td>$c+Ke^{-rT}=p+S_0e^{-qT}$</td>
+</tr>
+<tr>
+<td>Formule de $d_1$ avec rendement ?</td>
+<td>$\frac{\ln(S_0/K)+(r-q+\sigma^2/2)T}{\sigma\sqrt T}$</td>
+</tr>
+<tr>
+<td>Qui a établi ces formules ?</td>
+<td><strong>Merton</strong>, 1973</td>
+</tr>
+<tr>
+<td>Composition du portefeuille B modifié ?</td>
+<td><strong>$e^{-qT}$ actions</strong>, dividendes <strong>réinvestis</strong></td>
+</tr>
+<tr>
+<td>EDP avec rendement $q$ ?</td>
+<td>$f_t+(r-q)Sf_S+\frac12\sigma^2S^2f_{SS}=rf$</td>
+</tr>
+<tr>
+<td>Processus risque-neutre ?</td>
+<td>$dS=(r-q)S\,dt+\sigma S\,dz$</td>
+</tr>
+<tr>
+<td>$q$ pour un indice ?</td>
+<td>Le <strong>rendement de dividende</strong> de l'indice</td>
+</tr>
+<tr>
+<td>Quels dividendes compter ?</td>
+<td>Ceux dont la <strong>date de détachement</strong> tombe dans la vie de l'option</td>
+</tr>
+<tr>
+<td>$q$ pour une devise ?</td>
+<td>$\boldsymbol{r_f}$, le taux <strong>étranger</strong></td>
+</tr>
+<tr>
+<td>Symétrie des options de change ?</td>
+<td>Put A/B au strike $K$ $=$ call B/A au strike <strong>$1/K$</strong></td>
+</tr>
+<tr>
+<td>$q$ pour un futures ?</td>
+<td>$\boldsymbol{r}$</td>
+</tr>
+<tr>
+<td>Extraction du prix forward ?</td>
+<td>$F_0=K+(c-p)e^{rT}$</td>
+</tr>
+<tr>
+<td>Son avantage ?</td>
+<td><strong>Pas besoin d'estimer $q$</strong></td>
+</tr>
+<tr>
+<td>Coût de la garantie actions/obligations 10 ans ?</td>
+<td><strong>169,7</strong>, soit <strong>17 %</strong> du fonds</td>
+</tr>
+<tr>
+<td>Qu'est-ce qu'une option sur futures ?</td>
+<td>Droit d'<strong>entrer dans un contrat futures</strong></td>
+</tr>
+<tr>
+<td>Que reçoit-on en exerçant un call sur futures ?</td>
+<td>Position <strong>longue</strong> $+$ (règlement $-$ strike) en espèces</td>
+</tr>
+<tr>
+<td>Payoff effectif ?</td>
+<td>$\max(F_T-K,0)$</td>
+</tr>
+<tr>
+<td>Par quel mois sont-elles désignées ?</td>
+<td>Le mois de <strong>livraison du futures</strong></td>
+</tr>
+<tr>
+<td>Les quatre raisons de leur popularité ?</td>
+<td>Liquidité · prix <strong>connu</strong> · règlement en <strong>espèces</strong> · coûts</td>
+</tr>
+<tr>
+<td>Valeur d'un point de base en option eurodollar ?</td>
+<td><strong>25 dollars</strong></td>
+</tr>
+<tr>
+<td>Anticiper une hausse des taux : quelle option ?</td>
+<td>Un <strong>put</strong> sur futures de taux</td>
+</tr>
+<tr>
+<td>Parité pour options sur futures ?</td>
+<td>$c+Ke^{-rT}=p+F_0e^{-rT}$</td>
+</tr>
+<tr>
+<td>Bornes qui en découlent ?</td>
+<td>$c\ge(F_0-K)e^{-rT}$ · $p\ge(K-F_0)e^{-rT}$</td>
+</tr>
+<tr>
+<td>Pourquoi une option très ITM colle à sa borne ?</td>
+<td>L'<strong>écart vaut exactement</strong> le prix de l'option opposée</td>
+</tr>
+<tr>
+<td>Dérive d'un prix futures en monde risque-neutre ?</td>
+<td><strong>Nulle</strong></td>
+</tr>
+<tr>
+<td>Comment s'appelle un processus de dérive nulle ?</td>
+<td>Une <strong>martingale</strong></td>
+</tr>
+<tr>
+<td>Le forward est martingale sous quel numéraire ?</td>
+<td>Une <strong>obligation zéro-coupon</strong> de maturité $T$</td>
+</tr>
+<tr>
+<td>EDP pour un futures ?</td>
+<td>$f_t+\frac12\sigma^2F^2f_{FF}=rf$ — <strong>sans terme d'ordre 1</strong></td>
+</tr>
+<tr>
+<td>Le modèle de Black ?</td>
+<td>$c=e^{-rT}[F_0N(d_1)-KN(d_2)]$</td>
+</tr>
+<tr>
+<td>Son $d_1$ ?</td>
+<td>$\frac{\ln(F_0/K)+\sigma^2T/2}{\sigma\sqrt T}$</td>
+</tr>
+<tr>
+<td>Année de publication ?</td>
+<td><strong>1976</strong></td>
+</tr>
+<tr>
+<td>Son grand avantage ?</td>
+<td><strong>Pas besoin d'estimer le revenu</strong> du sous-jacent</td>
+</tr>
+<tr>
+<td>Quand la volatilité du futures égale-t-elle celle du spot ?</td>
+<td>Si portage et rendement de commodité ne dépendent <strong>que du temps</strong></td>
+</tr>
+<tr>
+<td>Américaine sur futures vs sur spot, marché normal ?</td>
+<td>Call <strong>plus cher</strong>, put <strong>moins cher</strong></td>
+</tr>
+<tr>
+<td>Qu'est-ce qu'une option <em>futures-style</em> ?</td>
+<td>Un <strong>futures sur le payoff</strong> d'une option</td>
+</tr>
+<tr>
+<td>Comment la paie-t-on ?</td>
+<td>Par <strong>marge</strong>, règlement <strong>quotidien</strong></td>
+</tr>
+<tr>
+<td>Ses formules dépendent-elles de $r$ ?</td>
+<td><strong>Non</strong></td>
+</tr>
+<tr>
+<td>Faut-il l'exercer tôt ?</td>
+<td><strong>Jamais</strong> (sur un futures)</td>
+</tr>
+<tr>
+<td>Sa parité ?</td>
+<td>$p+F_0=c+K$</td>
+</tr>
+</tbody></table>
+</main>
+
+
+
+
+</body></html>

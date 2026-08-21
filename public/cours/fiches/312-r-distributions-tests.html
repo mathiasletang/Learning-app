@@ -1,0 +1,1340 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fiche 312 — Lois de probabilité, exploration d'une distribution et tests classiques</title>
+<script>
+window.MathJax={tex:{inlineMath:[["$","$"]],displayMath:[["$$","$$"]],processEscapes:true},
+ options:{skipHtmlTags:["script","noscript","style","textarea","pre","code"]},
+ svg:{fontCache:"global"},
+ startup:{pageReady:()=>MathJax.startup.defaultPageReady().then(()=>{document.body.classList.add("ready")})}};
+setTimeout(function(){document.body.classList.add("ready")},2500);
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+/* ============================================================
+   MathiasLearn — feuille de style des fiches
+   Reprise intégrale des tokens de 00_PARCOURS/*.html
+   + blocs pédagogiques (callouts, méthode, essentiels, recall)
+   ============================================================ */
+:root{--bg:#faf9f7;--card:#fff;--ink:#1a1a1a;--muted:#6b6b6b;--line:#e5e2dd;--accent:#8b5e34;
+ --hl:#fdf8ef;--ok:#2d7d4f;--okbg:#f0f7f3;--warn:#b3402f;--warnbg:#fdf3f1;--blue:#2f5d8b;--bluebg:#f1f5fa}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+ font:17px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;padding:0 16px 100px}
+.nav{position:sticky;top:0;background:rgba(250,249,247,.96);backdrop-filter:blur(8px);
+ border-bottom:1px solid var(--line);margin:0 -16px 30px;padding:11px 16px;z-index:50;
+ display:flex;gap:6px;flex-wrap:wrap;font-size:13px}
+.nav a{color:var(--muted);text-decoration:none;padding:4px 9px;border-radius:5px;white-space:nowrap}
+.nav a:hover{background:var(--line);color:var(--ink)}
+.nav a.on{background:var(--accent);color:#fff}
+main{max-width:780px;margin:0 auto}
+h1{font-size:31px;letter-spacing:-.02em;margin:.4em 0 .5em;line-height:1.25}
+h2{font-size:23px;margin:2.2em 0 .7em;padding-bottom:.3em;border-bottom:1px solid var(--line)}
+h3{font-size:19px;margin:1.9em 0 .5em;color:var(--accent)}
+h4{font-size:17px;margin:1.5em 0 .4em}
+p{margin:.8em 0} a{color:var(--accent)} hr{border:0;border-top:1px solid var(--line);margin:2.6em 0}
+table{border-collapse:collapse;width:100%;margin:1.3em 0;font-size:15.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+th{background:#f3f0eb;font-weight:600}
+tr:nth-child(even) td{background:#fcfbfa}
+code{font-family:"SF Mono",Menlo,Consolas,monospace;font-size:.88em;background:#f2efea;padding:2px 6px;border-radius:4px;overflow-wrap:break-word}
+pre{background:#f2efea;padding:14px 16px;border-radius:8px;overflow-x:auto}
+pre code{background:none;padding:0;white-space:pre}
+blockquote{border-left:3px solid var(--accent);background:var(--hl);margin:1.4em 0;padding:14px 20px;border-radius:0 8px 8px 0}
+blockquote p:first-child{margin-top:0} blockquote p:last-child{margin-bottom:0}
+ul,ol{padding-left:1.5em} li{margin:.35em 0} em{color:#4a4a4a}
+mjx-container[display="true"]{margin:1.1em 0!important;overflow-x:auto;overflow-y:hidden;padding:2px 0}
+mjx-container svg{max-width:100%}
+body:not(.ready) main{opacity:0} main{opacity:1;transition:opacity .25s}
+
+/* --- bandeau de tête de fiche --- */
+.cours{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--accent);
+ border-radius:0 10px 10px 0;padding:18px 22px;margin:0 0 34px}
+.cours h4{margin:0 0 4px;font-size:14px;text-transform:uppercase;letter-spacing:.07em;color:var(--accent)}
+.cours .cs{color:var(--muted);font-size:14.5px;margin:0 0 14px}
+
+/* --- exercices / corrigés --- */
+.ex{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:6px 24px 20px;margin:18px 0}
+.ex>h3:first-child{margin-top:14px}
+details.cor{margin-top:18px;border:1px solid var(--line);border-radius:8px;background:#fcfbfa;overflow:hidden}
+details.cor>summary{cursor:pointer;padding:12px 16px;font-weight:600;font-size:15px;color:var(--accent);
+ list-style:none;display:flex;align-items:center;gap:9px;user-select:none;transition:.15s;min-height:44px}
+details.cor>summary::-webkit-details-marker{display:none}
+details.cor>summary:hover{background:var(--hl)}
+details.cor>summary::before{content:"\25B6";font-size:10px;transition:transform .18s;display:inline-block}
+details.cor[open]>summary::before{transform:rotate(90deg)}
+details.cor[open]>summary{background:var(--okbg);color:var(--ok);border-bottom:1px solid var(--line)}
+.cor .in{padding:4px 20px 16px}
+.cor .in>*:first-child{margin-top:.9em}
+
+/* --- blocs pédagogiques (callouts) ---
+   Générés depuis une citation Markdown dont le premier **gras** commence
+   par un mot-clé : DÉFINITION, THÉORÈME, MÉTHODE, PIÈGE, INTUITION… */
+.cal{border:1px solid var(--line);border-left:4px solid var(--accent);background:var(--card);
+ border-radius:0 10px 10px 0;padding:15px 20px;margin:1.5em 0}
+.cal>p:first-child{margin-top:0}.cal>p:last-child,.cal>ul:last-child,.cal>ol:last-child{margin-bottom:0}
+.cal .lab{display:block;font-size:12.5px;text-transform:uppercase;letter-spacing:.08em;
+ font-weight:700;color:var(--accent);margin-bottom:6px}
+.cal.formel{background:var(--hl)}
+.cal.piege{border-left-color:var(--warn);background:var(--warnbg)}
+.cal.piege .lab{color:var(--warn)}
+.cal.methode{border-left-color:var(--ok);background:var(--okbg)}
+.cal.methode .lab{color:var(--ok)}
+.cal.intu{border-left-color:var(--blue);background:var(--bluebg)}
+.cal.intu .lab{color:var(--blue)}
+.cal.plus{border-left-style:dashed;background:#faf9f7}
+.cal.plus .lab{color:var(--muted)}
+
+/* --- révision express --- */
+.ess{background:var(--card);border:1px solid var(--accent);border-radius:10px;padding:4px 24px 20px;margin:1.6em 0}
+.ess h3{margin-top:1.3em}
+.rec{background:var(--card);border:1px dashed var(--accent);border-radius:10px;padding:4px 24px 18px;margin:1.6em 0}
+.rec ol{counter-reset:none}
+
+/* --- impression / PDF --- */
+@media print{
+ .nav{display:none}
+ body{padding:0;background:#fff;font-size:11.2pt;line-height:1.55}
+ main{max-width:none}
+ h1{font-size:23pt}h2{font-size:15pt;margin-top:1.5em}h3{font-size:12.6pt}
+ h2,h3,h4{break-after:avoid;page-break-after:avoid}
+ table,.cal,blockquote{break-inside:avoid;page-break-inside:avoid}
+ table{display:table;font-size:9.6pt}
+ details.cor{border:1px solid var(--line);background:#fcfbfa}
+ details.cor>summary{display:none}
+ details.cor .in{padding-top:10px}
+ .cal,.ex,.ess,.rec{box-shadow:none}
+ a{color:var(--ink);text-decoration:none}
+}
+@page{margin:16mm 15mm 18mm}
+
+/* --- exemples travaillés --- */
+.exm{background:#fcfbfa;border:1px solid var(--line);border-radius:10px;padding:2px 20px 14px;margin:1.5em 0}
+.exm>h4:first-child{margin:14px 0 .5em;color:var(--accent);font-size:13px;text-transform:uppercase;letter-spacing:.07em}
+
+
+/* --- pastilles de priorité (conventions des fiches de l'app) --- */
+h2[data-prio], h3[data-prio], h4[data-prio]{position:relative}
+h2[data-prio]::before,h3[data-prio]::before,h4[data-prio]::before{
+ content:"";display:inline-block;width:9px;height:9px;border-radius:50%;
+ margin-right:9px;vertical-align:middle;background:var(--muted)}
+[data-prio="must"]::before{background:var(--warn)}
+[data-prio="high"]::before{background:#d98324}
+[data-prio="mid"]::before{background:#c9a227}
+[data-prio="low"]::before{background:var(--ok)}
+/* corrigés des fiches de l'app : même traitement que les corrigés des séries */
+details.cor>summary::after{content:""}
+</style></head><body>
+<div class="nav"><a href="00_COMMENCER_ICI.html">Commencer ici</a><a href="01_NOTATIONS_le-decodeur.html">Notations</a><a href="02_EXERCICES_Serie-0.html">Série 0 — Remise en route</a><a href="03_EXERCICES_Serie-1.html">Série 1 — Convexité</a><a href="04_EXERCICES_Serie-2.html">Série 2 — KKT</a><a href="05_AUTO-EVALUATION.html">Auto-évaluation (quiz)</a><a href="06_FICHE_Optimisation-deux-variables.html">Fiche — Optimisation à 2 variables</a></div>
+<main><h1>Fiche 312 — Lois de probabilité, exploration d'une distribution et tests classiques</h1>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Matière</strong></td>
+<td>Code · Langage R</td>
+</tr>
+<tr>
+<td><strong>Cours source</strong></td>
+<td>R Core Team, <em>An Introduction to R</em> 4.6.1 — chapitre 8 « Probability distributions » (§8.1 R comme jeu de tables statistiques, §8.2 examiner la distribution d'un jeu de données, §8.3 tests à un et deux échantillons)</td>
+</tr>
+<tr>
+<td><strong>Difficulté</strong></td>
+<td> Intermédiaire — peu de langage, beaucoup de fonctions à savoir nommer</td>
+</tr>
+<tr>
+<td><strong>Temps d'étude estimé</strong></td>
+<td>1 h 30</td>
+</tr>
+<tr>
+<td><strong>Prérequis</strong></td>
+<td>Fiches 301, 304, 306, 307 (vecteurs, facteurs, listes, <code>scan()</code>)</td>
+</tr>
+<tr>
+<td><strong>Concepts clés</strong></td>
+<td>les <strong>quatre préfixes</strong> <code>d</code>, <code>p</code>, <code>q</code>, <code>r</code>, le nom du premier argument, <code>lower.tail</code>, <code>log.p</code>, <code>log</code>, <strong>fonction de hasard cumulée</strong>, <code>summary()</code>, <code>fivenum()</code>, <code>stem()</code>, <code>hist()</code>, <code>density()</code> et <strong>la largeur de bande</strong>, <code>rug()</code>, <code>ecdf()</code>, <code>qqnorm()</code> / <code>qqline()</code> / <code>qqplot()</code>, <code>ppoints()</code>, <code>shapiro.test()</code>, <code>ks.test()</code>, <code>boxplot()</code>, <strong><code>t.test()</code> de Welch</strong>, <code>var.test()</code>, <code>var.equal = TRUE</code>, <code>wilcox.test()</code></td>
+</tr>
+<tr>
+<td><strong>À retenir en priorité</strong></td>
+<td><strong><code>d</code>/<code>p</code>/<code>q</code>/<code>r</code> + nom de la loi</strong> · <strong><code>t.test()</code> fait du Welch par défaut</strong> · <strong><code>lower.tail = FALSE</code></strong> pour la queue droite · <strong>le piège du <code>ks.test</code> à paramètres estimés</strong>.</td>
+</tr>
+</tbody></table>
+<h2>Vue d'ensemble</h2>
+<pre><code>QUATRE PREFIXES, UN NOM DE LOI
+   d + nom   la DENSITE            1er argument : x
+   p + nom   la REPARTITION P(X&lt;=x) 1er argument : q
+   q + nom   les QUANTILES          1er argument : p
+   r + nom   la SIMULATION          1er argument : n
+   (sauf rhyper, rsignrank, rwilcox : nn)
+
+ARGUMENTS COMMUNS   pxxx et qxxx : lower.tail , log.p
+                    dxxx         : log
+
+EXPLORER UNE DISTRIBUTION
+   les nombres    summary()   fivenum()   stem()
+   la forme       hist()  +  lines(density(...))  +  rug()
+   la repartition plot(ecdf(x), do.points=FALSE, verticals=TRUE)
+   la normalite   qqnorm() ; qqline()      qqplot() contre une loi choisie
+   les tests      shapiro.test()           ks.test()
+
+DEUX ECHANTILLONS
+   voir        boxplot(A, B)      deux ecdf superposees      qqplot(A, B)
+   moyennes    t.test(A, B)                 &lt;- WELCH par defaut
+               t.test(A, B, var.equal=TRUE) &lt;- t classique
+   variances   var.test(A, B)               &lt;- exige la NORMALITE
+   sans loi    wilcox.test(A, B)            &lt;- loi continue commune
+               ks.test(A, B)                &lt;- ecart vertical maximal des ecdf
+
+OU SONT LES TESTS ?  « all "classical" tests ... are in package stats
+                       WHICH IS NORMALLY LOADED »
+</code></pre>
+<p><strong>Le problème posé.</strong> <em>« <strong>One convenient use of R is to provide a comprehensive set of statistical tables.</strong> »</em> (§8.1) Avant d'être un langage, R est ici <strong>un formulaire</strong> : les tables de la loi normale, de Student, du khi-deux — et de quinze autres — sont des fonctions, disponibles dans les quatre directions.</p>
+<div class="cal intu"><span class="lab">Intuition — pourquoi quatre fonctions par loi et pas une.</span>
+<p> Une table imprimée ne se lit que dans <strong>un sens</strong> : on entre par $x$ et on lit $P(X\le x)$. R fournit <strong>les quatre trajets</strong> — densité, répartition, quantile, simulation —, et c'est ce qui rend inutile toute table papier : $\texttt{qnorm}$ <strong>inverse</strong> $\texttt{pnorm}$, $\texttt{rnorm}$ <strong>échantillonne</strong>, $\texttt{dnorm}$ donne l'ordonnée de la courbe.</p>
+</div>
+<h2 data-prio="must">Concept 1 — Les quatre préfixes</h2>
+<div class="cal formel"><span class="lab">Définition (§8.1).</span>
+<p> *« Functions are provided to evaluate <strong>the cumulative distribution function $P(X\le x)$</strong>, <strong>the probability density function</strong> and <strong>the quantile function</strong> (given $q$, <strong>the smallest $x$ such that $P(X\le x) &gt; q$</strong>), and <strong>to simulate from the distribution</strong>. »*</p>
+</div>
+<blockquote>
+<p><strong>Règle (§8.1).</strong> *« <strong>Prefix the name given here by <code>d</code> for the density, <code>p</code> for the CDF, <code>q</code> for the quantile function and <code>r</code> for simulation (random deviates).</strong> <strong>The first argument is <code>x</code> for <code>dxxx</code>, <code>q</code> for <code>pxxx</code>, <code>p</code> for <code>qxxx</code> and <code>n</code> for <code>rxxx</code></strong> (<strong>except for <code>rhyper</code>, <code>rsignrank</code> and <code>rwilcox</code>, for which it is <code>nn</code></strong>). »*</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>Préfixe</th>
+<th>Ce qu'il calcule</th>
+<th>1ᵉʳ argument</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong><code>d</code></strong></td>
+<td>la <strong>densité</strong></td>
+<td><strong><code>x</code></strong></td>
+</tr>
+<tr>
+<td><strong><code>p</code></strong></td>
+<td>la <strong>fonction de répartition</strong>, $P(X\le x)$</td>
+<td><strong><code>q</code></strong></td>
+</tr>
+<tr>
+<td><strong><code>q</code></strong></td>
+<td>la <strong>fonction quantile</strong></td>
+<td><strong><code>p</code></strong></td>
+</tr>
+<tr>
+<td><strong><code>r</code></strong></td>
+<td>une <strong>simulation</strong></td>
+<td><strong><code>n</code></strong> ( <strong><code>nn</code></strong> pour <code>rhyper</code>, <code>rsignrank</code>, <code>rwilcox</code>)</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p class="cal piege"> <strong>Le nom du premier argument n'est pas décoratif.</strong> Pour <code>pnorm</code> il s'appelle <strong><code>q</code></strong> et pour <code>qnorm</code> il s'appelle <strong><code>p</code></strong> — l'inverse de ce que l'initiale du préfixe suggère. C'est logique : <code>pnorm</code> <strong>reçoit un quantile</strong> et rend une probabilité ; <code>qnorm</code> <strong>reçoit une probabilité</strong> et rend un quantile. Cela compte dès qu'on nomme les arguments.</p>
+</blockquote>
+<h3>1.1 Le tableau des lois</h3>
+<table>
+<thead>
+<tr>
+<th>Loi</th>
+<th>Nom R</th>
+<th>Arguments supplémentaires</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>bêta</td>
+<td><code>beta</code></td>
+<td><code>shape1</code>, <code>shape2</code>, <code>ncp</code></td>
+</tr>
+<tr>
+<td>binomiale</td>
+<td><code>binom</code></td>
+<td><code>size</code>, <code>prob</code></td>
+</tr>
+<tr>
+<td>Cauchy</td>
+<td><code>cauchy</code></td>
+<td><code>location</code>, <code>scale</code></td>
+</tr>
+<tr>
+<td>khi-deux</td>
+<td><code>chisq</code></td>
+<td><code>df</code>, <code>ncp</code></td>
+</tr>
+<tr>
+<td>exponentielle</td>
+<td><code>exp</code></td>
+<td><code>rate</code></td>
+</tr>
+<tr>
+<td>F (Fisher)</td>
+<td><code>f</code></td>
+<td><code>df1</code>, <code>df2</code>, <code>ncp</code></td>
+</tr>
+<tr>
+<td>gamma</td>
+<td><code>gamma</code></td>
+<td><code>shape</code>, <code>scale</code></td>
+</tr>
+<tr>
+<td>géométrique</td>
+<td><code>geom</code></td>
+<td><code>prob</code></td>
+</tr>
+<tr>
+<td>hypergéométrique</td>
+<td><code>hyper</code></td>
+<td><code>m</code>, <code>n</code>, <code>k</code></td>
+</tr>
+<tr>
+<td>log-normale</td>
+<td><code>lnorm</code></td>
+<td><code>meanlog</code>, <code>sdlog</code></td>
+</tr>
+<tr>
+<td>logistique</td>
+<td><code>logis</code></td>
+<td><code>location</code>, <code>scale</code></td>
+</tr>
+<tr>
+<td>binomiale négative</td>
+<td><code>nbinom</code></td>
+<td><code>size</code>, <code>prob</code></td>
+</tr>
+<tr>
+<td>normale</td>
+<td><code>norm</code></td>
+<td><code>mean</code>, <code>sd</code></td>
+</tr>
+<tr>
+<td>Poisson</td>
+<td><code>pois</code></td>
+<td><code>lambda</code></td>
+</tr>
+<tr>
+<td>rang signé</td>
+<td><code>signrank</code></td>
+<td><code>n</code></td>
+</tr>
+<tr>
+<td>Student</td>
+<td><code>t</code></td>
+<td><code>df</code>, <code>ncp</code></td>
+</tr>
+<tr>
+<td>uniforme</td>
+<td><code>unif</code></td>
+<td><code>min</code>, <code>max</code></td>
+</tr>
+<tr>
+<td>Weibull</td>
+<td><code>weibull</code></td>
+<td><code>shape</code>, <code>scale</code></td>
+</tr>
+<tr>
+<td>Wilcoxon</td>
+<td><code>wilcox</code></td>
+<td><code>m</code>, <code>n</code></td>
+</tr>
+</tbody></table>
+<p class="cal piege"> <em>« <strong>In not quite all cases is the non-centrality parameter <code>ncp</code> currently available</strong> : see the on-line help for details. »</em></p>
+<p><strong>Au-delà du tableau (§8.1)</strong> : <em>« there are functions <strong><code>ptukey</code> and <code>qtukey</code></strong> for <strong>the distribution of the studentized range</strong> of samples from a normal distribution, and <strong><code>dmultinom</code> and <code>rmultinom</code></strong> for the multinomial distribution. <strong>Further distributions are available in contributed packages, notably <code>SuppDists</code>.</strong> »</em></p>
+<h3>1.2 Les arguments communs, et pourquoi ils existent</h3>
+<blockquote>
+<p><strong>Règle (§8.1).</strong> *« <strong>The <code>pxxx</code> and <code>qxxx</code> functions all have logical arguments <code>lower.tail</code> and <code>log.p</code></strong>, and <strong>the <code>dxxx</code> ones have <code>log</code></strong>. »*</p>
+</blockquote>
+<div class="cal methode"><span class="lab">Méthode — ce que cela permet (§8.1).</span>
+<p> <em>« This allows, e.g., getting <strong>the cumulative (or "integrated") hazard function</strong>, $H(t) = -\log(1-F(t))$, by</em></p>
+<pre><code class="language-r">- pxxx(t, ..., lower.tail = FALSE, log.p = TRUE)
+</code></pre>
+<p><em>or <strong>more accurate log-likelihoods</strong> (by <code>dxxx(..., log = TRUE)</code>), <strong>directly</strong>. »</em></p>
+</div>
+<p><strong>Le mot important est « directly ».</strong> L'intérêt n'est pas la concision mais <strong>la précision numérique</strong> :</p>
+<ul>
+<li><code>lower.tail = FALSE</code> rend $1 - F(t)$ <strong>calculé directement</strong>, et non par soustraction. Quand $F(t)$ vaut $0{,}999999999$, la soustraction perd presque tous les chiffres significatifs ; le calcul direct les garde.</li>
+<li><code>log.p = TRUE</code> rend <strong>le logarithme</strong>, calculé sans passer par la probabilité — indispensable quand celle-ci vaut $10^{-300}$ et <strong>sous-passerait</strong> en zéro.</li>
+<li><code>log = TRUE</code> sur une densité donne des <strong>log-vraisemblances plus précises</strong>, ce qui importe dès qu'on somme des centaines de termes.</li>
+</ul>
+<div class="cal intu"><span class="lab">Contrôle — vérifier la formule du hasard cumulé.</span>
+<p> Par définition $H(t) = -\log\bigl(1-F(t)\bigr)$, où $1-F(t) = P(X&gt;t)$ est <strong>la queue supérieure</strong>. Or <code>pxxx(t, lower.tail = FALSE)</code> <strong>est</strong> cette queue, et <code>log.p = TRUE</code> en donne le logarithme. Le signe moins devant l'appel complète la formule. </p>
+</div>
+<p><strong>Les deux exemples du cours (§8.1) :</strong></p>
+<pre><code class="language-r">## valeur p bilaterale pour une loi de Student
+2*pt(-2.43, df = 13)
+
+## point superieur a 1 % pour une loi F(2, 7)
+qf(0.01, 2, 7, lower.tail = FALSE)
+</code></pre>
+<div class="cal intu"><span class="lab">Contrôle — lire ces deux lignes.</span>
+<p> La première : $P(T \le -2{,}43)$ pour $13$ degrés de liberté, <strong>doublé</strong> — la loi de Student étant <strong>symétrique</strong>, la valeur $p$ bilatérale est deux fois la queue inférieure au point négatif. La seconde : <code>lower.tail = FALSE</code> inverse le sens, donc <code>qf(0.01, ..., lower.tail = FALSE)</code> rend le point tel que <strong>1 % de la masse est au-dessus</strong> — le « point supérieur à 1 % ». Sans cet argument, on obtiendrait le point à 1 % <strong>par le bas</strong>.</p>
+</div>
+<p><em>« See the on-line help on <strong><code>RNG</code></strong> for how random-number generation is done in R. »</em></p>
+<h2 data-prio="must">Concept 2 — Examiner la distribution d'un échantillon</h2>
+<blockquote>
+<p><strong>Cadrage (§8.2).</strong> <em>« Given a (univariate) set of data we can examine its distribution in <strong>a large number of ways</strong>. <strong>The simplest is to examine the numbers.</strong> »</em></p>
+</blockquote>
+<h3>2.1 Les résumés numériques</h3>
+<pre><code class="language-r">attach(faithful)
+summary(eruptions)
+#    Min. 1st Qu.  Median    Mean 3rd Qu.    Max.
+#   1.600   2.163   4.000   3.488   4.454   5.100
+
+fivenum(eruptions)
+# [1] 1.6000 2.1585 4.0000 4.4585 5.1000
+</code></pre>
+<p><em>« <strong>Two slightly different summaries are given by <code>summary</code> and <code>fivenum</code></strong> and a display of the numbers by <strong><code>stem</code></strong> (a <strong>"stem and leaf" plot</strong>). »</em></p>
+<div class="cal intu"><span class="lab">En clair — pourquoi « slightly different ».</span>
+<p> Les deux rendent minimum, quartiles, médiane et maximum ; les valeurs diffèrent légèrement (<strong>2,163 contre 2,1585</strong>, <strong>4,454 contre 4,4585</strong>). <code>summary</code> utilise la définition de quantile par défaut de R, <code>fivenum</code> <strong>le résumé de Tukey</strong> (les « charnières »), qui se calcule autrement. Ni l'un ni l'autre n'est faux — ce sont <strong>deux conventions</strong>.</p>
+<p class="cal piege"> Et <code>summary</code> donne <strong>la moyenne</strong> ; <code>fivenum</code> <strong>non</strong>. Sur ces données, moyenne <strong>3,488</strong> contre médiane <strong>4,000</strong> : l'écart signale déjà une distribution <strong>non symétrique</strong>.</p>
+</div>
+<details class="cor">
+<summary><strong>Le diagramme à tiges et feuilles du cours, et comment le lire</strong></summary><div class="in">
+
+<pre><code>&gt; stem(eruptions)
+
+  The decimal point is 1 digit(s) to the left of the |
+
+  16 | 070355555588
+  18 | 000022233333335577777777888822335777888
+  20 | 00002223378800035778
+  22 | 0002335578023578
+  24 | 00228
+  26 | 23
+  28 | 080
+  30 | 7
+  32 | 2337
+  34 | 250077
+  36 | 0000823577
+  38 | 2333335582225577
+  40 | 0000003357788888002233555577778
+  42 | 03335555778800233333555577778
+  44 | 02222335557780000000023333357778888
+  46 | 0000233357700000023578
+  48 | 00000022335800333
+  50 | 0370
+</code></pre>
+<p><em>Étape 1 — lire l'échelle.</em> <em>« The decimal point is <strong>1 digit(s) to the left of the <code>|</code></strong> »</em> : la tige <code>16</code> se lit <strong>1,6</strong>, la tige <code>50</code> se lit <strong>5,0</strong>.</p>
+<p><em>Étape 2 — lire une ligne.</em> <code>16 | 070355555588</code> signifie douze observations comprises entre 1,60 et 1,69 : 1,60 · 1,67 · 1,60 · 1,63 · 1,65 (×5) · 1,68 (×2).</p>
+<p><em>Étape 3 — voir la forme.</em> Deux zones denses — autour de <strong>1,8-2,2</strong> et autour de <strong>4,0-4,8</strong> — séparées par une zone presque vide entre <strong>2,6 et 3,4</strong>. <strong>La distribution est bimodale.</strong></p>
+<p><em>Étape 4 — la conséquence.</em> Le cours l'énonce plus loin : <em>« <strong>This distribution is obviously far from any standard distribution.</strong> »</em> Aucun ajustement d'une loi usuelle n'a de sens <strong>sur l'ensemble</strong> — d'où l'idée de n'en étudier <strong>qu'un mode</strong>.</p>
+<p><em>Étape 5 — pourquoi ce diagramme et pas un histogramme.</em> <em>« <strong>A stem-and-leaf plot is like a histogram</strong> »</em>, mais il <strong>conserve les chiffres</strong> : on y lit les valeurs individuelles, et donc les arrondis, les répétitions, les valeurs aberrantes. C'est un histogramme <strong>qui n'a rien perdu</strong>.</p>
+</div></details>
+
+<h3>2.2 Les vues graphiques</h3>
+<pre><code class="language-r">hist(eruptions)
+## des classes plus fines, et un trace de densite
+hist(eruptions, seq(1.6, 5.2, 0.2), prob = TRUE)
+lines(density(eruptions, bw = 0.1))
+rug(eruptions)   # montrer les points de donnees reels
+</code></pre>
+<blockquote>
+<p><strong>Trois précisions du cours (§8.2).</strong></p>
+<ul>
+<li><em>« <strong>More elegant density plots can be made by <code>density</code></strong> »</em>.</li>
+<li> <em>« <strong>The bandwidth <code>bw</code> was chosen by trial-and-error as the default gives too much smoothing (it usually does for "interesting" densities).</strong> »</em></li>
+<li><em>« <strong>Better automated methods of bandwidth choice are available, and in this example <code>bw = "SJ"</code> gives a good result.</strong> »</em></li>
+</ul>
+</blockquote>
+<p><strong>La largeur de bande est le paramètre décisif d'une estimation de densité.</strong> Trop grande, elle lisse les deux modes en un seul — c'est précisément ce que fait le défaut ici, et le cours en avertit. Trop petite, elle transforme le bruit en structure. Le cours donne les deux voies : <strong>l'essai</strong> (<code>bw = 0.1</code>) et <strong>une règle automatique</strong> (<code>bw = "SJ"</code>).</p>
+<p class="cal piege"> <strong><code>prob = TRUE</code> est indispensable</strong> avant de superposer une densité : sans lui, l'histogramme affiche des <strong>effectifs</strong>, et la courbe de densité — d'intégrale 1 — serait invisible à côté.</p>
+<p><strong>La fonction de répartition empirique :</strong></p>
+<pre><code class="language-r">plot(ecdf(eruptions), do.points = FALSE, verticals = TRUE)
+</code></pre>
+<h3>2.3 Ajuster une loi à un mode</h3>
+<div class="cal methode"><span class="lab">Méthode (§8.2).</span>
+<p> <em>« <strong>This distribution is obviously far from any standard distribution. How about the right-hand mode, say eruptions of longer than 3 minutes? Let us fit a normal distribution and overlay the fitted CDF.</strong> »</em></p>
+</div>
+<pre><code class="language-r">long &lt;- eruptions[eruptions &gt; 3]
+plot(ecdf(long), do.points = FALSE, verticals = TRUE)
+x &lt;- seq(3, 5.4, 0.01)
+lines(x, pnorm(x, mean = mean(long), sd = sqrt(var(long))), lty = 3)
+</code></pre>
+<div class="cal intu"><span class="lab">Contrôle — lire les trois arguments de pnorm.</span>
+<p> <code>x</code> est le vecteur de quantiles (le premier argument, nommé <code>q</code>) ; <code>mean</code> et <code>sd</code> sont <strong>estimés sur l'échantillon</strong>. Et <code>sd = sqrt(var(long))</code> : le cours passe par <strong><code>var</code></strong> puis la racine — équivalent à <code>sd(long)</code>, mais explicite sur ce qui est calculé. <code>lty = 3</code> trace <strong>en pointillé</strong>, pour distinguer l'ajustement des données.</p>
+</div>
+<p><strong>Les diagrammes quantile-quantile :</strong></p>
+<pre><code class="language-r">par(pty = "s")            # une region de trace CARREE
+qqnorm(long); qqline(long)
+</code></pre>
+<p><em>« <strong>This shows a reasonable fit but a shorter right tail than one would expect from a normal distribution.</strong> »</em></p>
+<p class="cal piege"> <code>par(pty = "s")</code> <strong>n'est pas cosmétique</strong> dans un Q-Q : une région carrée est ce qui permet de juger l'alignement sur la diagonale <strong>sans distorsion d'échelle</strong>. Et il faudra le restaurer (fiche 314).</p>
+<p><strong>La comparaison avec une loi connue (§8.2) :</strong></p>
+<pre><code class="language-r">x &lt;- rt(250, df = 5)
+qqnorm(x); qqline(x)
+</code></pre>
+<p><em>« which will <strong>usually (if it is a random sample) show longer tails than expected for a normal</strong> »</em>.</p>
+<pre><code class="language-r">qqplot(qt(ppoints(250), df = 5), x, xlab = "Q-Q plot for t dsn")
+qqline(x)
+</code></pre>
+<p><em>« <strong>We can make a Q-Q plot against the generating distribution</strong> »</em> — c'est-à-dire comparer l'échantillon <strong>à la loi dont il sort</strong>, et non à la normale. <strong><code>ppoints(250)</code></strong> fabrique les 250 probabilités théoriques, <code>qt(...)</code> les convertit en quantiles de Student.</p>
+<h3>2.4 Les tests de normalité</h3>
+<pre><code class="language-r">shapiro.test(long)
+#   Shapiro-Wilk normality test
+#   data:  long
+#   W = 0.9793, p-value = 0.01052
+
+ks.test(long, "pnorm", mean = mean(long), sd = sqrt(var(long)))
+#   One-sample Kolmogorov-Smirnov test
+#   data:  long
+#   D = 0.0661, p-value = 0.4284
+#   alternative hypothesis: two.sided
+</code></pre>
+<blockquote>
+<p class="cal piege"> <strong>La mise en garde du cours, à ne jamais oublier (§8.2).</strong> *« (<strong>Note that the distribution theory is not valid here as we have estimated the parameters of the normal distribution from the same sample.</strong>) »*</p>
+<p>Le test de Kolmogorov-Smirnov suppose la loi de référence <strong>entièrement spécifiée à l'avance</strong>. Ici, <code>mean</code> et <code>sd</code> viennent <strong>des données testées</strong> : l'ajustement est meilleur qu'il ne devrait, la statistique $D$ est <strong>trop petite</strong>, et la valeur $p$ <strong>trop grande</strong>. Le test est <strong>conservateur au mauvais sens</strong> — il accepte trop facilement.</p>
+<p><strong>C'est ce qui explique la contradiction apparente</strong> entre les deux résultats : Shapiro-Wilk rejette ($p = 0{,}0105$), Kolmogorov-Smirnov non ($p = 0{,}428$). Le premier est <strong>conçu</strong> pour des paramètres estimés ; le second ne l'est pas.</p>
+</blockquote>
+<h2 data-prio="must">Concept 3 — Comparer deux échantillons</h2>
+<blockquote>
+<p><strong>Cadrage (§8.3).</strong> <em>« So far we have compared a single sample to a normal distribution. <strong>A much more common operation is to compare aspects of two samples.</strong>  <strong>Note that in R, all "classical" tests including the ones used below are in package <code>stats</code> which is normally loaded.</strong> »</em></p>
+</blockquote>
+<p><strong>Les données du cours</strong> — <em>« on the latent heat of the fusion of ice (cal/gm) from Rice (1995, p. 490) »</em> :</p>
+<pre><code class="language-r">A &lt;- scan()
+79.98 80.04 80.02 80.04 80.03 80.03 80.04 79.97
+80.05 80.03 80.02 80.00 80.02
+
+B &lt;- scan()
+80.02 79.94 79.98 79.97 79.97 80.03 79.95 79.97
+
+boxplot(A, B)
+</code></pre>
+<p class="cal piege"> <strong>Noter l'usage de <code>scan()</code> sans argument</strong> : c'est l'idiome de la fiche 307 — <code>stdin()</code> désigne <strong>le fichier de script</strong>, donc les données suivent directement dans le source.</p>
+<p><em>« <strong>The plot indicates that the first group tends to give higher results than the second.</strong> »</em></p>
+<h3>3.1 Comparer les moyennes</h3>
+<pre><code class="language-r">t.test(A, B)
+#         Welch Two Sample t-test
+#   data:  A and B
+#   t = 3.2499, df = 12.027, p-value = 0.00694
+#   alternative hypothesis: true difference in means is not equal to 0
+#   95 percent confidence interval:
+#    0.01385526 0.07018320
+#   sample estimates:
+#   mean of x mean of y
+#    80.02077  79.97875
+</code></pre>
+<blockquote>
+<p class="cal piege"> <strong>La phrase décisive (§8.3).</strong> <em>« which does indicate <strong>a significant difference, assuming normality</strong>. <strong>By default the R function does not assume equality of variances in the two samples.</strong> »</em></p>
+<p><strong><code>t.test(A, B)</code> fait du Welch, pas du Student classique.</strong> C'est ce que révèle le titre de la sortie, et surtout <strong>le degré de liberté non entier : <code>df = 12.027</code></strong>. Un $t$ classique aurait $n_A + n_B - 2 = 13 + 8 - 2 = \mathbf{19}$ degrés de liberté. <strong>Le df fractionnaire est la signature de Welch.</strong></p>
+</blockquote>
+<h3>3.2 Vérifier l'égalité des variances</h3>
+<pre><code class="language-r">var.test(A, B)
+#         F test to compare two variances
+#   data:  A and B
+#   F = 0.5837, num df = 12, denom df = 7, p-value = 0.3938
+#   alternative hypothesis: true ratio of variances is not equal to 1
+#   95 percent confidence interval:
+#    0.1251097 2.1052687
+#   sample estimates:
+#   ratio of variances
+#            0.5837405
+</code></pre>
+<p><em>« We can use <strong>the F test to test for equality in the variances, provided that the two samples are from normal populations</strong> … which shows <strong>no evidence of a significant difference</strong>, and so <strong>we can use the classical t-test that assumes equality of the variances</strong>. »</em></p>
+<div class="cal intu"><span class="lab">Contrôle — vérifier les degrés de liberté.</span>
+<p> <code>num df = 12</code> et <code>denom df = 7</code> : ce sont $n_A - 1 = 13-1 = 12$ et $n_B - 1 = 8-1 = 7$.  Cela confirme au passage que <strong>A a 13 valeurs et B en a 8</strong>.</p>
+</div>
+<h3>3.3 Le t classique</h3>
+<pre><code class="language-r">t.test(A, B, var.equal = TRUE)
+#         Two Sample t-test
+#   data:  A and B
+#   t = 3.4722, df = 19, p-value = 0.002551
+#   95 percent confidence interval:
+#    0.01669058 0.06734788
+</code></pre>
+<div class="cal intu"><span class="lab">Contrôle — la cohérence de toute la section.</span>
+<p> Le degré de liberté vaut maintenant <strong>19</strong>, soit $13 + 8 - 2$. </p>
+<p>Et l'intervalle est <strong>centré sur la différence des moyennes</strong> : $\frac{0{,}01669058 + 0{,}06734788}{2} = 0{,}04201923$, tandis que $80{,}02077 - 79{,}97875 = 0{,}04202$.  Les deux sorties se recoupent.</p>
+<p><strong>L'intervalle de Welch est plus large</strong> ($0{,}0563$ contre $0{,}0507$) et la valeur $p$ plus grande ($0{,}0069$ contre $0{,}0026$) : ne pas supposer l'égalité des variances <strong>coûte de la puissance</strong>. C'est le prix d'une hypothèse en moins.</p>
+</div>
+<h3>3.4 Sans hypothèse de loi</h3>
+<pre><code class="language-r">wilcox.test(A, B)
+#         Wilcoxon rank sum test with continuity correction
+#   data:  A and B
+#   W = 89, p-value = 0.007497
+#   alternative hypothesis: true location shift is not equal to 0
+#
+#   Warning message:
+#   Cannot compute exact p-value with ties in: wilcox.test(A, B)
+</code></pre>
+<blockquote>
+<p><strong>Règle (§8.3).</strong> <em>« <strong>All these tests assume normality of the two samples.</strong> <strong>The two-sample Wilcoxon (or Mann-Whitney) test only assumes a common continuous distribution under the null hypothesis.</strong> »</em></p>
+</blockquote>
+<blockquote>
+<p class="cal piege"> <strong>L'avertissement est une information, pas une nuisance (§8.3).</strong> <em>« <strong>Note the warning : there are several ties in each sample, which suggests strongly that these data are from a discrete distribution (probably due to rounding).</strong> »</em></p>
+<p>Le test suppose une loi <strong>continue</strong> — donc <strong>aucune égalité</strong> entre observations. Les ex æquo présents prouvent que l'hypothèse est violée. Le cours en tire une <strong>conclusion sur les données</strong> : elles sont arrondies au centième. <strong>L'avertissement du logiciel devient un diagnostic statistique.</strong></p>
+</blockquote>
+<p><strong>Comparer graphiquement, et le test de Kolmogorov-Smirnov à deux échantillons :</strong></p>
+<pre><code class="language-r">plot(ecdf(A), do.points = FALSE, verticals = TRUE, xlim = range(A, B))
+plot(ecdf(B), do.points = FALSE, verticals = TRUE, add = TRUE)
+
+ks.test(A, B)
+#         Two-sample Kolmogorov-Smirnov test
+#   data:  A and B
+#   D = 0.5962, p-value = 0.05919
+#
+#   Warning message:
+#   cannot compute correct p-values with ties in: ks.test(A, B)
+</code></pre>
+<p><em>« <strong>The Kolmogorov-Smirnov test is of the maximal vertical distance between the two ecdfs, assuming a common continuous distribution.</strong> »</em> —  <strong>même avertissement d'ex æquo, même cause</strong>.</p>
+<p class="cal piege"> <strong><code>xlim = range(A, B)</code></strong> avant <code>add = TRUE</code> : sans lui, la seconde courbe pourrait sortir du cadre fixé par la première. C'est le <code>range</code> de la fiche 301, ici employé sur <strong>deux</strong> vecteurs à la fois — <code>max</code>/<code>min</code> acceptant plusieurs arguments.</p>
+<details class="cor">
+<summary><strong>Exercice résolu — reconstituer le raisonnement complet du §8.3</strong></summary><div class="in">
+
+<p><strong>Énoncé.</strong> À partir des deux séries de mesures de chaleur latente, retracer la démarche du cours : quelles questions, dans quel ordre, et pourquoi.</p>
+<p><em>Étape 1 — regarder avant de tester.</em> <code>boxplot(A, B)</code>. <em>« The plot indicates that <strong>the first group tends to give higher results than the second</strong>. »</em> <strong>On formule l'hypothèse à partir du graphique</strong>, on ne la teste pas encore.</p>
+<p><em>Étape 2 — le test le plus robuste d'abord.</em> <code>t.test(A, B)</code> sans option. Résultat : $t = 3{,}2499$, $\mathrm{df} = 12{,}027$, $p = 0{,}00694$. <strong>Différence significative</strong> — <em>« assuming normality »</em>.</p>
+<p><em>Étape 3 — comprendre ce qui vient d'être fait.</em> Le <code>df = 12,027</code> <strong>non entier</strong> signale Welch : <em>« <strong>By default the R function does not assume equality of variances</strong> »</em>. R a choisi, sans le demander, <strong>la variante prudente</strong>.</p>
+<p><em>Étape 4 — peut-on faire mieux ?</em> Si les variances sont égales, le test classique est <strong>plus puissant</strong>. On teste donc l'hypothèse : <code>var.test(A, B)</code> → $F = 0{,}5837$, $p = 0{,}3938$.  <em>« <strong>provided that the two samples are from normal populations</strong> »</em> — le test F <strong>ajoute</strong> une hypothèse de normalité.</p>
+<p><em>Étape 5 — appliquer le test classique.</em> <code>t.test(A, B, var.equal = TRUE)</code> → $t = 3{,}4722$, $\mathrm{df} = 19$, $p = 0{,}002551$.</p>
+<p><em>Étape 6 — comparer les deux conclusions.</em></p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Welch</th>
+<th>Classique</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>df</td>
+<td><strong>12,027</strong></td>
+<td><strong>19</strong></td>
+</tr>
+<tr>
+<td>$t$</td>
+<td>3,2499</td>
+<td>3,4722</td>
+</tr>
+<tr>
+<td>$p$</td>
+<td>0,00694</td>
+<td><strong>0,002551</strong></td>
+</tr>
+<tr>
+<td>Largeur de l'IC</td>
+<td>0,0563</td>
+<td><strong>0,0507</strong></td>
+</tr>
+</tbody></table>
+<p><strong>La même conclusion, avec plus de puissance</strong> — au prix d'une hypothèse supplémentaire, elle-même vérifiée sous une autre hypothèse. <strong>La chaîne d'hypothèses s'allonge à mesure qu'on gagne en précision.</strong></p>
+<p><em>Étape 7 — se passer de la normalité.</em> <code>wilcox.test(A, B)</code> → $W = 89$, $p = 0{,}007497$. <em>« <strong>only assumes a common continuous distribution</strong> »</em>. <strong>Conclusion inchangée</strong> — ce qui est rassurant : le résultat ne dépend pas de la normalité.</p>
+<p><em>Étape 8 — lire l'avertissement.</em> <em>« there are <strong>several ties in each sample</strong>, which <strong>suggests strongly that these data are from a discrete distribution (probably due to rounding)</strong> »</em>. Les données sont au <strong>centième</strong> près. L'hypothèse de continuité est violée — pour Wilcoxon <strong>comme</strong> pour Kolmogorov-Smirnov, qui émet le même avertissement.</p>
+<p><em>Étape 9 — le dernier regard.</em> Deux <code>ecdf</code> superposées, et <code>ks.test(A, B)</code> → $D = 0{,}5962$, $p = 0{,}05919$. <strong>Non significatif au seuil de 5 %</strong> — le KS à deux échantillons teste <strong>toute différence de loi</strong>, pas seulement un décalage de position ; il est donc <strong>moins puissant</strong> contre une alternative de décalage. Trois tests, trois valeurs $p$, une seule conclusion à formuler prudemment.</p>
+<p><em>Étape 10 — la leçon de méthode.</em> Le cours ne présente pas un test, mais <strong>une démarche</strong> : voir, tester au plus robuste, vérifier si l'on peut resserrer, confirmer sans hypothèse de loi, <strong>et lire les avertissements comme des résultats</strong>.</p>
+</div></details>
+
+<h2>Comment reconnaître le type d'exercice</h2>
+<table>
+<thead>
+<tr>
+<th>Le signal dans l'énoncé</th>
+<th>Ce qu'il faut mobiliser</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>« la probabilité que $X \le a$ »</td>
+<td><strong><code>p</code> + nom de loi</strong></td>
+</tr>
+<tr>
+<td>« la valeur telle que 5 % soient au-dessus »</td>
+<td><strong><code>q</code> + nom</strong>, avec <strong><code>lower.tail = FALSE</code></strong></td>
+</tr>
+<tr>
+<td>« tracer la courbe de densité théorique »</td>
+<td><strong><code>d</code> + nom</strong></td>
+</tr>
+<tr>
+<td>« simuler un échantillon »</td>
+<td><strong><code>r</code> + nom</strong></td>
+</tr>
+<tr>
+<td>« une valeur $p$ bilatérale »</td>
+<td><strong>2 ×</strong> la queue, si la loi est <strong>symétrique</strong></td>
+</tr>
+<tr>
+<td>« une probabilité minuscule »</td>
+<td><strong><code>log.p = TRUE</code></strong> — sinon sous-passement</td>
+</tr>
+<tr>
+<td>« la fonction de hasard cumulée »</td>
+<td><code>-pxxx(t, lower.tail = FALSE, log.p = TRUE)</code></td>
+</tr>
+<tr>
+<td>« une log-vraisemblance »</td>
+<td><strong><code>dxxx(..., log = TRUE)</code></strong></td>
+</tr>
+<tr>
+<td>« résumer un échantillon »</td>
+<td><strong><code>summary()</code></strong>, <strong><code>fivenum()</code></strong>, <strong><code>stem()</code></strong></td>
+</tr>
+<tr>
+<td>« la forme de la distribution »</td>
+<td><strong><code>hist()</code></strong> + <code>density()</code> + <code>rug()</code></td>
+</tr>
+<tr>
+<td>« ma densité estimée n'a qu'un mode »</td>
+<td>la <strong>largeur de bande</strong> est trop grande</td>
+</tr>
+<tr>
+<td>« la répartition empirique »</td>
+<td><strong><code>ecdf()</code></strong></td>
+</tr>
+<tr>
+<td>« est-ce normal ? » — visuellement</td>
+<td><strong><code>qqnorm()</code> / <code>qqline()</code></strong></td>
+</tr>
+<tr>
+<td>« est-ce normal ? » — formellement</td>
+<td><strong><code>shapiro.test()</code></strong></td>
+</tr>
+<tr>
+<td>« comparer à une loi donnée »</td>
+<td><strong><code>ks.test(x, "pnorm", ...)</code></strong></td>
+</tr>
+<tr>
+<td>« comparer à la loi qui a engendré »</td>
+<td><code>qqplot(qt(ppoints(n), df), x)</code></td>
+</tr>
+<tr>
+<td>« comparer deux moyennes »</td>
+<td><strong><code>t.test(A, B)</code></strong> — Welch par défaut</td>
+</tr>
+<tr>
+<td>« les variances sont-elles égales ? »</td>
+<td><strong><code>var.test()</code></strong> — exige la normalité</td>
+</tr>
+<tr>
+<td>« un df non entier »</td>
+<td>c'est <strong>Welch</strong></td>
+</tr>
+<tr>
+<td>« sans hypothèse de normalité »</td>
+<td><strong><code>wilcox.test()</code></strong></td>
+</tr>
+<tr>
+<td>« comparer deux lois entières »</td>
+<td><strong><code>ks.test(A, B)</code></strong></td>
+</tr>
+<tr>
+<td>« avertissement d'ex æquo »</td>
+<td>les données sont <strong>discrètes ou arrondies</strong></td>
+</tr>
+</tbody></table>
+<h2>Comment résoudre ce type d'exercice</h2>
+<p><strong>Protocole « lire une table statistique » — 4 étapes.</strong></p>
+<ol>
+<li><strong>Choisir le préfixe</strong> selon ce qu'on cherche : <code>d</code> densité, <code>p</code> probabilité, <code>q</code> quantile, <code>r</code> simulation.</li>
+<li><strong>Ajouter le nom de la loi</strong> et <strong>ses paramètres</strong> (colonne « arguments supplémentaires »).</li>
+<li><strong>Choisir la queue</strong> : <code>lower.tail = FALSE</code> pour la queue droite — plus précis qu'un <code>1 - p</code>.</li>
+<li>Si la probabilité risque d'être extrême, <strong>passer en logarithme</strong> (<code>log.p</code>, <code>log</code>).</li>
+</ol>
+<p><strong>Protocole « explorer une distribution » — 5 étapes.</strong></p>
+<ol>
+<li><strong>Les nombres</strong> : <code>summary()</code> — et comparer <strong>moyenne et médiane</strong> pour détecter l'asymétrie.</li>
+<li><strong>Le détail</strong> : <code>stem()</code>, qui conserve les chiffres et révèle arrondis et multimodalité.</li>
+<li><strong>La forme</strong> : <code>hist(..., prob = TRUE)</code> + <code>lines(density(..., bw = ...))</code> + <code>rug()</code>. <strong>Toujours régler la bande.</strong></li>
+<li><strong>La répartition</strong> : <code>plot(ecdf(x), do.points = FALSE, verticals = TRUE)</code>.</li>
+<li><strong>La normalité</strong> : <code>qqnorm()</code>/<code>qqline()</code> d'abord — puis <code>shapiro.test()</code> si un chiffre est exigé.</li>
+</ol>
+<p><strong>Protocole « comparer deux échantillons » — 5 étapes.</strong></p>
+<ol>
+<li><strong>Regarder</strong> : <code>boxplot(A, B)</code>, deux <code>ecdf</code> superposées, <code>qqplot(A, B)</code>.</li>
+<li><strong><code>t.test(A, B)</code></strong> — c'est <strong>du Welch</strong>, donc l'hypothèse la plus faible.</li>
+<li>Si l'on veut le test classique : <strong><code>var.test()</code></strong> d'abord, puis <code>t.test(..., var.equal = TRUE)</code>.</li>
+<li><strong><code>wilcox.test(A, B)</code></strong> pour se passer de la normalité.</li>
+<li><strong>Lire les avertissements</strong> : les ex æquo disent quelque chose <strong>sur les données</strong>.</li>
+</ol>
+<h2 data-prio="must">Common mistakes</h2>
+<table>
+<thead>
+<tr>
+<th>Erreur</th>
+<th>Correction</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Confondre <code>pnorm</code> et <code>qnorm</code></td>
+<td><code>p</code> <strong>rend</strong> une probabilité, <code>q</code> <strong>rend</strong> un quantile</td>
+</tr>
+<tr>
+<td>Nommer <code>p = </code> le premier argument de <code>pnorm</code></td>
+<td>il s'appelle <strong><code>q</code></strong></td>
+</tr>
+<tr>
+<td>Utiliser <code>n</code> pour <code>rhyper</code>, <code>rsignrank</code>, <code>rwilcox</code></td>
+<td>c'est <strong><code>nn</code></strong></td>
+</tr>
+<tr>
+<td>Écrire <code>1 - pnorm(x)</code></td>
+<td><strong><code>pnorm(x, lower.tail = FALSE)</code></strong> est plus précis</td>
+</tr>
+<tr>
+<td>Calculer <code>log(dnorm(x))</code></td>
+<td><strong><code>dnorm(x, log = TRUE)</code></strong> évite le sous-passement</td>
+</tr>
+<tr>
+<td>Oublier <code>lower.tail = FALSE</code> pour un point supérieur</td>
+<td>on obtient le point <strong>inférieur</strong></td>
+</tr>
+<tr>
+<td>Croire <code>summary</code> et <code>fivenum</code> identiques</td>
+<td><em>« <strong>slightly different</strong> »</em> — deux conventions de quantile</td>
+</tr>
+<tr>
+<td>Se fier au <code>bw</code> par défaut de <code>density</code></td>
+<td><em>« <strong>gives too much smoothing</strong> »</em> — essayer, ou <code>bw = "SJ"</code></td>
+</tr>
+<tr>
+<td>Superposer une densité sans <code>prob = TRUE</code></td>
+<td>l'histogramme est en <strong>effectifs</strong></td>
+</tr>
+<tr>
+<td>Faire un Q-Q sans région carrée</td>
+<td><code>par(pty = "s")</code> — sinon l'alignement est illisible</td>
+</tr>
+<tr>
+<td>Utiliser <code>ks.test</code> avec des paramètres estimés</td>
+<td> <em>« <strong>the distribution theory is not valid</strong> »</em></td>
+</tr>
+<tr>
+<td>Croire <code>t.test(A, B)</code> classique</td>
+<td>c'est <strong>du Welch</strong> — voir le <strong>df non entier</strong></td>
+</tr>
+<tr>
+<td>Utiliser <code>var.test</code> sans penser à la normalité</td>
+<td><em>« <strong>provided that the two samples are from normal populations</strong> »</em></td>
+</tr>
+<tr>
+<td>Ignorer un avertissement d'ex æquo</td>
+<td>il révèle des données <strong>discrètes ou arrondies</strong></td>
+</tr>
+<tr>
+<td>Croire <code>wilcox.test</code> sans hypothèse</td>
+<td>il suppose <strong>une loi continue commune</strong></td>
+</tr>
+<tr>
+<td>Superposer deux <code>ecdf</code> sans <code>xlim</code></td>
+<td>la seconde peut <strong>sortir du cadre</strong></td>
+</tr>
+<tr>
+<td>Chercher à charger un paquet pour les tests</td>
+<td>ils sont dans <strong><code>stats</code></strong>, <em>« normally loaded »</em></td>
+</tr>
+</tbody></table>
+<h2>Ultimate Review</h2>
+<p><strong>Les quatre préfixes.</strong> <strong><code>d</code></strong> densité (1ᵉʳ arg. <strong><code>x</code></strong>) · <strong><code>p</code></strong> répartition $P(X\le x)$ (1ᵉʳ arg. <strong><code>q</code></strong>) · <strong><code>q</code></strong> quantile — <em>« the <strong>smallest $x$</strong> such that $P(X\le x) &gt; q$ »</em> (1ᵉʳ arg. <strong><code>p</code></strong>) · <strong><code>r</code></strong> simulation (1ᵉʳ arg. <strong><code>n</code></strong>,  <strong><code>nn</code></strong> pour <code>rhyper</code>, <code>rsignrank</code>, <code>rwilcox</code>).</p>
+<p><strong>Les dix-neuf lois.</strong> <code>beta</code> <code>binom</code> <code>cauchy</code> <code>chisq</code> <code>exp</code> <code>f</code> <code>gamma</code> <code>geom</code> <code>hyper</code> <code>lnorm</code> <code>logis</code> <code>nbinom</code> <code>norm</code> <code>pois</code> <code>signrank</code> <code>t</code> <code>unif</code> <code>weibull</code> <code>wilcox</code> ·  <strong><code>ncp</code> n'est pas partout disponible</strong> · en plus : <strong><code>ptukey</code>/<code>qtukey</code></strong> (étendue studentisée), <strong><code>dmultinom</code>/<code>rmultinom</code></strong> ; ailleurs, <strong><code>SuppDists</code></strong>.</p>
+<p><strong>Arguments communs.</strong> <code>pxxx</code> et <code>qxxx</code> : <strong><code>lower.tail</code></strong>, <strong><code>log.p</code></strong> · <code>dxxx</code> : <strong><code>log</code></strong> · usage : <strong>fonction de hasard cumulée</strong> $H(t) = -\log(1-F(t))$ par <code>-pxxx(t, lower.tail = FALSE, log.p = TRUE)</code>, et <strong>log-vraisemblances plus exactes</strong> par <code>dxxx(..., log = TRUE)</code> — <em>« <strong>directly</strong> »</em>, donc <strong>sans perte de précision</strong>.</p>
+<p><strong>Deux exemples.</strong> <code>2*pt(-2.43, df = 13)</code> — valeur $p$ <strong>bilatérale</strong> · <code>qf(0.01, 2, 7, lower.tail = FALSE)</code> — <strong>point supérieur à 1 %</strong>. Génération aléatoire : voir <strong><code>RNG</code></strong>.</p>
+<p><strong>Résumés numériques.</strong> <strong><code>summary</code></strong> (avec la <strong>moyenne</strong>) · <strong><code>fivenum</code></strong> (résumé de Tukey, <em>« slightly different »</em>) · <strong><code>stem</code></strong> — un histogramme <strong>qui conserve les chiffres</strong>. Sur <code>eruptions</code> : min <strong>1,600</strong>, médiane <strong>4,000</strong>, moyenne <strong>3,488</strong>, max <strong>5,100</strong> ; <code>fivenum</code> donne <strong>2,1585</strong> et <strong>4,4585</strong> là où <code>summary</code> donne <strong>2,163</strong> et <strong>4,454</strong>.</p>
+<p><strong>Graphiques.</strong> <code>hist(x, seq(...), prob = TRUE)</code> + <code>lines(density(x, bw = ...))</code> + <strong><code>rug(x)</code></strong> ·  <em>« the default <strong>gives too much smoothing</strong> (it usually does for "interesting" densities) »</em>, et <strong><code>bw = "SJ"</code></strong> est cité comme bon choix ici · <code>plot(ecdf(x), do.points = FALSE, verticals = TRUE)</code> · <strong><code>par(pty = "s")</code></strong> avant un Q-Q · <code>qqnorm</code> / <code>qqline</code> / <code>qqplot</code> / <strong><code>ppoints</code></strong>.</p>
+<p><strong>Tests d'ajustement.</strong> <strong><code>shapiro.test(long)</code></strong> → $W = 0{,}9793$, $p = 0{,}01052$ · <strong><code>ks.test(long, "pnorm", ...)</code></strong> → $D = 0{,}0661$, $p = 0{,}4284$ ·  <em>« <strong>the distribution theory is not valid here as we have estimated the parameters of the normal distribution from the same sample</strong> »</em> — d'où la divergence entre les deux.</p>
+<p><strong>Où sont les tests.</strong> <em>« all "classical" tests … are in <strong>package <code>stats</code> which is normally loaded</strong> »</em>.</p>
+<p><strong>Deux échantillons.</strong> <strong><code>boxplot(A, B)</code></strong> pour voir · <strong><code>t.test(A, B)</code></strong> → <strong>Welch</strong>, $t = 3{,}2499$, <strong>df = 12,027</strong>, $p = 0{,}00694$ — <em>« <strong>By default the R function does not assume equality of variances</strong> »</em> · <strong><code>var.test(A, B)</code></strong> → $F = 0{,}5837$, df <strong>12</strong> et <strong>7</strong>, $p = 0{,}3938$, <em>« <strong>provided that the two samples are from normal populations</strong> »</em> · <strong><code>t.test(A, B, var.equal = TRUE)</code></strong> → $t = 3{,}4722$, <strong>df = 19</strong>, $p = 0{,}002551$ · <strong><code>wilcox.test(A, B)</code></strong> → $W = 89$, $p = 0{,}007497$, <em>« <strong>only assumes a common continuous distribution</strong> »</em> · <strong><code>ks.test(A, B)</code></strong> → $D = 0{,}5962$, $p = 0{,}05919$, <em>« <strong>the maximal vertical distance between the two ecdfs</strong> »</em>.</p>
+<p><strong>Moyennes.</strong> $\bar A = 80{,}02077$, $\bar B = 79{,}97875$, différence $0{,}04202$ — centre des deux intervalles de confiance. </p>
+<p class="cal piege"><strong> L'avertissement des ex æquo.</strong> <em>« there are <strong>several ties in each sample</strong>, which <strong>suggests strongly that these data are from a discrete distribution (probably due to rounding)</strong> »</em> — <strong>un message du logiciel qui est un résultat statistique</strong>.</p>
+<div class="rec"><h2>Active Recall</h2><details class="cor">
+<summary>Quels sont les quatre préfixes, et quel est le premier argument de chacun ?</summary><div class="in">
+
+<p>*« <strong>Prefix the name … by <code>d</code> for the density, <code>p</code> for the CDF, <code>q</code> for the quantile function and <code>r</code> for simulation (random deviates).</strong> <strong>The first argument is <code>x</code> for <code>dxxx</code>, <code>q</code> for <code>pxxx</code>, <code>p</code> for <code>qxxx</code> and <code>n</code> for <code>rxxx</code></strong> (<strong>except for <code>rhyper</code>, <code>rsignrank</code> and <code>rwilcox</code>, for which it is <code>nn</code></strong>). »* (§8.1)</p>
+<table>
+<thead>
+<tr>
+<th>Préfixe</th>
+<th>Calcule</th>
+<th>1ᵉʳ argument</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>d</code></td>
+<td>la <strong>densité</strong></td>
+<td><code>x</code></td>
+</tr>
+<tr>
+<td><code>p</code></td>
+<td>$P(X\le x)$</td>
+<td><strong><code>q</code></strong></td>
+</tr>
+<tr>
+<td><code>q</code></td>
+<td>le <strong>quantile</strong></td>
+<td><strong><code>p</code></strong></td>
+</tr>
+<tr>
+<td><code>r</code></td>
+<td>une <strong>simulation</strong></td>
+<td><code>n</code> (ou <code>nn</code>)</td>
+</tr>
+</tbody></table>
+<p class="cal piege"> <strong>Le croisement est délibéré</strong> : <code>pnorm</code> <strong>reçoit</strong> un quantile, <code>qnorm</code> <strong>reçoit</strong> une probabilité. Le nom de l'argument décrit <strong>ce qui entre</strong>, le préfixe <strong>ce qui sort</strong>.</p>
+</div></details><details class="cor">
+<summary>Comment obtient-on la fonction de hasard cumulée, et pourquoi pas par soustraction ?</summary><div class="in">
+
+<p><em>« This allows, e.g., getting <strong>the cumulative (or "integrated") hazard function</strong>, $H(t) = -\log(1-F(t))$, by</em></p>
+<pre><code class="language-r">- pxxx(t, ..., lower.tail = FALSE, log.p = TRUE)
+</code></pre>
+<p><em>or <strong>more accurate log-likelihoods</strong> (by <code>dxxx(..., log = TRUE)</code>), <strong>directly</strong>. »</em> (§8.1)</p>
+<p><strong>Pourquoi pas <code>-log(1 - pxxx(t))</code>.</strong> Le mot du cours est <strong>« directly »</strong>, et l'enjeu est <strong>numérique</strong> :</p>
+<ul>
+<li>quand $F(t) \approx 0{,}999999999$, la soustraction $1 - F(t)$ <strong>perd presque tous les chiffres significatifs</strong> ; <code>lower.tail = FALSE</code> calcule la queue <strong>sans soustraire</strong> ;</li>
+<li>quand cette queue vaut $10^{-320}$, elle <strong>sous-passe</strong> en zéro et le logarithme vaut $-\infty$ ; <code>log.p = TRUE</code> rend <strong>le logarithme directement</strong>, sans passer par la probabilité.</li></ul></div></details><details class="cor">
+<summary>Lire les deux exemples du §8.1.</summary><div class="in">
+
+<pre><code class="language-r">2*pt(-2.43, df = 13)                  # valeur p bilaterale
+qf(0.01, 2, 7, lower.tail = FALSE)    # point superieur a 1 % d'une F(2,7)
+</code></pre>
+<p><strong>Le premier</strong> : <code>pt(-2.43, df = 13)</code> est $P(T \le -2{,}43)$, la queue <strong>inférieure</strong>. La loi de Student étant <strong>symétrique</strong>, la valeur $p$ bilatérale est <strong>le double</strong>.</p>
+<p><strong>Le second</strong> : sans <code>lower.tail = FALSE</code>, <code>qf(0.01, 2, 7)</code> rendrait le point tel que <strong>1 % de la masse est en dessous</strong>. L'argument <strong>inverse le sens</strong> : on obtient le point tel que 1 % est <strong>au-dessus</strong> — le « point supérieur à 1 % », soit le quantile à 99 %.</p>
+</div></details><details class="cor">
+<summary>Quelle différence entre <code>summary()</code> et <code>fivenum()</code> ?</summary><div class="in">
+
+<p><em>« <strong>Two slightly different summaries are given by <code>summary</code> and <code>fivenum</code></strong> »</em> (§8.2).</p>
+<pre><code class="language-r">summary(eruptions)
+#    Min. 1st Qu.  Median    Mean 3rd Qu.    Max.
+#   1.600   2.163   4.000   3.488   4.454   5.100
+fivenum(eruptions)
+# [1] 1.6000 2.1585 4.0000 4.4585 5.1000
+</code></pre>
+<p><strong>Deux différences.</strong> (1) Les quartiles diffèrent — <strong>2,163 contre 2,1585</strong>, <strong>4,454 contre 4,4585</strong> : <code>summary</code> utilise la définition de quantile par défaut de R, <code>fivenum</code> <strong>les charnières de Tukey</strong>. Ni l'un ni l'autre n'est faux. (2) <strong><code>summary</code> donne la moyenne</strong>, <code>fivenum</code> non.</p>
+<p class="cal piege"> Et la comparaison <strong>moyenne 3,488 / médiane 4,000</strong> signale déjà une distribution <strong>non symétrique</strong> — ce que <code>stem()</code> confirmera en montrant <strong>deux modes</strong>.</p>
+</div></details><details class="cor">
+<summary>Que dit le cours de la largeur de bande de <code>density()</code> ?</summary><div class="in">
+
+<p class="cal piege"> <em>« <strong>The bandwidth <code>bw</code> was chosen by trial-and-error as the default gives too much smoothing (it usually does for "interesting" densities).</strong> <strong>Better automated methods of bandwidth choice are available, and in this example <code>bw = "SJ"</code> gives a good result.</strong> »</em> (§8.2)</p>
+<p><strong>C'est le paramètre décisif.</strong> Trop grand, il <strong>lisse les deux modes en un seul</strong> — exactement ce que fait le défaut sur <code>eruptions</code>, dont la bimodalité est le fait saillant. Trop petit, il transforme le bruit en structure.</p>
+<p>Deux voies : <strong>l'essai</strong> (<code>bw = 0.1</code> ici) ou <strong>une règle automatique</strong> (<code>bw = "SJ"</code>).</p>
+<p class="cal piege"> Et <code>hist(..., prob = TRUE)</code> est requis avant <code>lines(density(...))</code> : sinon l'histogramme est en <strong>effectifs</strong> et la densité, d'intégrale 1, sera invisible.</p>
+</div></details><details class="cor">
+<summary>Pourquoi le cours n'ajuste-t-il une loi normale qu'à une partie des données ?</summary><div class="in">
+
+<p>Parce que <em>« <strong>This distribution is obviously far from any standard distribution.</strong> »</em> — <code>stem()</code> révèle <strong>deux modes</strong>, séparés par une zone presque vide entre 2,6 et 3,4.</p>
+<p><em>« <strong>How about the right-hand mode, say eruptions of longer than 3 minutes ? Let us fit a normal distribution and overlay the fitted CDF.</strong> »</em> (§8.2)</p>
+<pre><code class="language-r">long &lt;- eruptions[eruptions &gt; 3]
+plot(ecdf(long), do.points = FALSE, verticals = TRUE)
+x &lt;- seq(3, 5.4, 0.01)
+lines(x, pnorm(x, mean = mean(long), sd = sqrt(var(long))), lty = 3)
+</code></pre>
+<p><strong>La leçon de méthode</strong> : on n'ajuste pas une loi unimodale à des données bimodales. <strong>On isole d'abord le mode</strong>, puis on ajuste. Le filtrage se fait par indexation logique (fiche 302).</p>
+</div></details><details class="cor">
+<summary>Pourquoi Shapiro-Wilk rejette-t-il la normalité et Kolmogorov-Smirnov non ?</summary><div class="in">
+
+<p>Les deux résultats du cours :</p>
+<pre><code>shapiro.test(long)   W = 0.9793, p-value = 0.01052   -&gt; rejette a 5 %
+ks.test(long, "pnorm", mean = mean(long), sd = sqrt(var(long)))
+                     D = 0.0661, p-value = 0.4284    -&gt; ne rejette pas
+</code></pre>
+<p class="cal piege"> <strong>La cause est donnée par le cours lui-même</strong> : *« (<strong>Note that the distribution theory is not valid here as we have estimated the parameters of the normal distribution from the same sample.</strong>) »*</p>
+<p>Le test de Kolmogorov-Smirnov suppose la loi de référence <strong>entièrement spécifiée d'avance</strong>. Ici <code>mean</code> et <code>sd</code> viennent <strong>des données testées</strong> : l'ajustement est <strong>artificiellement bon</strong>, $D$ <strong>trop petit</strong>, $p$ <strong>trop grand</strong>. Shapiro-Wilk, lui, <strong>est conçu</strong> pour des paramètres estimés.</p>
+<p><strong>En cas de désaccord, c'est Shapiro-Wilk qu'il faut croire ici.</strong></p>
+</div></details><details class="cor">
+<summary>Quel test <code>t.test(A, B)</code> effectue-t-il par défaut, et à quoi le voit-on ?</summary><div class="in">
+
+<p class="cal piege"> <em>« <strong>By default the R function does not assume equality of variances in the two samples.</strong> »</em> (§8.3)</p>
+<p>C'est <strong>le test de Welch</strong>, et deux indices le montrent dans la sortie :</p>
+<ol>
+<li>le <strong>titre</strong> : <code>Welch Two Sample t-test</code> ;</li>
+<li>surtout, <strong>le degré de liberté non entier</strong> : <code>df = 12.027</code>.</li>
+</ol>
+<p>Un $t$ classique aurait $n_A + n_B - 2 = 13 + 8 - 2 = \mathbf{19}$ degrés de liberté — c'est bien ce qu'affiche <code>t.test(A, B, var.equal = TRUE)</code>.</p>
+<p><strong>Le df fractionnaire est la signature de Welch</strong>, et le moyen le plus rapide de savoir quel test on a réellement lancé.</p>
+</div></details><details class="cor">
+<summary>Comparer les deux versions du test t sur les données du cours. Que coûte l'hypothèse en moins ?</summary><div class="in">
+
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Welch</th>
+<th>Classique (<code>var.equal = TRUE</code>)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>df</td>
+<td><strong>12,027</strong></td>
+<td><strong>19</strong></td>
+</tr>
+<tr>
+<td>$t$</td>
+<td>3,2499</td>
+<td>3,4722</td>
+</tr>
+<tr>
+<td>$p$</td>
+<td>0,00694</td>
+<td><strong>0,002551</strong></td>
+</tr>
+<tr>
+<td>IC à 95 %</td>
+<td>$[0{,}01386\,;\,0{,}07018]$</td>
+<td>$[0{,}01669\,;\,0{,}06735]$</td>
+</tr>
+<tr>
+<td>Largeur</td>
+<td>0,0563</td>
+<td><strong>0,0507</strong></td>
+</tr>
+</tbody></table>
+<p><strong>Même conclusion, puissance différente.</strong> Ne pas supposer l'égalité des variances <strong>coûte des degrés de liberté</strong>, donc élargit l'intervalle et augmente la valeur $p$.</p>
+<p><strong>Contrôle de cohérence</strong> : les deux intervalles sont centrés sur $\frac{0{,}01669+0{,}06735}{2} = 0{,}04202$, qui est bien $80{,}02077 - 79{,}97875$. </p>
+<p>Et le chemin pour passer de l'un à l'autre est <code>var.test(A, B)</code> → $p = 0{,}3938$, <em>« <strong>no evidence of a significant difference</strong> »</em>.</p>
+</div></details><details class="cor">
+<summary>Que suppose <code>wilcox.test</code>, et que signifie son avertissement ?</summary><div class="in">
+
+<p><em>« <strong>All these tests assume normality of the two samples. The two-sample Wilcoxon (or Mann-Whitney) test only assumes a common continuous distribution under the null hypothesis.</strong> »</em> (§8.3)</p>
+<p>Résultat : $W = 89$, $p = 0{,}007497$ — <strong>même conclusion</strong> que le test $t$, sans hypothèse de normalité.</p>
+<p class="cal piege"> <strong>L'avertissement est un résultat</strong> : *« Note the warning : <strong>there are several ties in each sample, which suggests strongly that these data are from a discrete distribution (probably due to rounding)</strong>. »*</p>
+<p>Le test suppose une loi <strong>continue</strong>, donc <strong>aucune égalité</strong> entre observations. Les ex æquo prouvent que l'hypothèse est violée — et le cours en tire une <strong>conclusion sur les données</strong> : elles sont arrondies au centième. <strong>Le même avertissement apparaît pour <code>ks.test(A, B)</code>, pour la même raison.</strong></p>
+</div></details><details class="cor">
+<summary>Que teste <code>ks.test</code> à deux échantillons, et pourquoi sa valeur p est-elle plus grande ici ?</summary><div class="in">
+
+<p><em>« <strong>The Kolmogorov-Smirnov test is of the maximal vertical distance between the two ecdfs, assuming a common continuous distribution.</strong> »</em> (§8.3)</p>
+<pre><code>ks.test(A, B)   D = 0.5962, p-value = 0.05919
+</code></pre>
+<p><strong>Non significatif à 5 %</strong>, alors que le test $t$ donnait $p = 0{,}0026$ et Wilcoxon $p = 0{,}0075$.</p>
+<p><strong>La raison est la nature de l'alternative.</strong> Le KS teste <strong>toute différence entre les deux lois</strong> — forme, dispersion, position. Contre une alternative précise de <strong>décalage de position</strong>, il est donc <strong>moins puissant</strong> qu'un test conçu pour elle. Un test général paie sa généralité en puissance.</p>
+<p class="cal piege"> Et le même avertissement d'ex æquo s'applique : <em>« cannot compute correct p-values with ties »</em>.</p>
+</div></details><details class="cor">
+<summary>Comment compare-t-on graphiquement deux échantillons ?</summary><div class="in">
+
+<p>Le cours donne <strong>trois</strong> voies (§8.3) :</p>
+<ol>
+<li><strong>Boîtes à moustaches</strong> : <code>boxplot(A, B)</code> — <em>« We have already seen a pair of boxplots. »</em></li>
+<li><strong>Deux répartitions empiriques superposées</strong> :</li>
+</ol>
+<pre><code class="language-r">plot(ecdf(A), do.points = FALSE, verticals = TRUE, xlim = range(A, B))
+plot(ecdf(B), do.points = FALSE, verticals = TRUE, add = TRUE)
+</code></pre>
+<ol start="3">
+<li><strong><code>qqplot</code></strong> — <em>« <code>qqplot</code> will perform a Q-Q plot of the two samples »</em>.</li>
+</ol>
+<p class="cal piege"> <strong><code>xlim = range(A, B)</code> est indispensable</strong> : la première courbe fixe le cadre, et sans un domaine couvrant <strong>les deux</strong> échantillons, la seconde en sortirait. Noter que <code>range</code> accepte <strong>plusieurs vecteurs</strong> (fiche 301) — il rend <code>c(min, max)</code> de l'ensemble.</p>
+</div></details></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h2>Flashcards</h2>
+<table>
+<thead>
+<tr>
+<th>Question</th>
+<th>Réponse</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Le préfixe de la densité ?</td>
+<td><strong><code>d</code></strong></td>
+</tr>
+<tr>
+<td>De la fonction de répartition ?</td>
+<td><strong><code>p</code></strong></td>
+</tr>
+<tr>
+<td>De la fonction quantile ?</td>
+<td><strong><code>q</code></strong></td>
+</tr>
+<tr>
+<td>De la simulation ?</td>
+<td><strong><code>r</code></strong></td>
+</tr>
+<tr>
+<td>Premier argument de <code>dxxx</code> ?</td>
+<td><strong><code>x</code></strong></td>
+</tr>
+<tr>
+<td>De <code>pxxx</code> ?</td>
+<td><strong><code>q</code></strong></td>
+</tr>
+<tr>
+<td>De <code>qxxx</code> ?</td>
+<td><strong><code>p</code></strong></td>
+</tr>
+<tr>
+<td>De <code>rxxx</code> ?</td>
+<td><strong><code>n</code></strong></td>
+</tr>
+<tr>
+<td>Les trois exceptions à <code>n</code> ?</td>
+<td><code>rhyper</code> · <code>rsignrank</code> · <code>rwilcox</code> → <strong><code>nn</code></strong></td>
+</tr>
+<tr>
+<td>Définition de la fonction quantile ?</td>
+<td>Le <strong>plus petit $x$</strong> tel que $P(X\le x) &gt; q$</td>
+</tr>
+<tr>
+<td>Nom R de la loi normale ?</td>
+<td><strong><code>norm</code></strong> — <code>mean</code>, <code>sd</code></td>
+</tr>
+<tr>
+<td>De la loi de Student ?</td>
+<td><strong><code>t</code></strong> — <code>df</code>, <code>ncp</code></td>
+</tr>
+<tr>
+<td>De la loi F ?</td>
+<td><strong><code>f</code></strong> — <code>df1</code>, <code>df2</code>, <code>ncp</code></td>
+</tr>
+<tr>
+<td>Du khi-deux ?</td>
+<td><strong><code>chisq</code></strong> — <code>df</code>, <code>ncp</code></td>
+</tr>
+<tr>
+<td>De la binomiale ?</td>
+<td><strong><code>binom</code></strong> — <code>size</code>, <code>prob</code></td>
+</tr>
+<tr>
+<td>De la loi de Poisson ?</td>
+<td><strong><code>pois</code></strong> — <code>lambda</code></td>
+</tr>
+<tr>
+<td>De l'exponentielle ?</td>
+<td><strong><code>exp</code></strong> — <code>rate</code></td>
+</tr>
+<tr>
+<td>De l'uniforme ?</td>
+<td><strong><code>unif</code></strong> — <code>min</code>, <code>max</code></td>
+</tr>
+<tr>
+<td>Le paramètre <code>ncp</code> est-il partout ?</td>
+<td> <strong>Non</strong></td>
+</tr>
+<tr>
+<td>Deux fonctions hors tableau ?</td>
+<td><strong><code>ptukey</code>/<code>qtukey</code></strong>, <strong><code>dmultinom</code>/<code>rmultinom</code></strong></td>
+</tr>
+<tr>
+<td>Un paquet pour d'autres lois ?</td>
+<td><strong><code>SuppDists</code></strong></td>
+</tr>
+<tr>
+<td>Les deux arguments de <code>pxxx</code> et <code>qxxx</code> ?</td>
+<td><strong><code>lower.tail</code></strong> et <strong><code>log.p</code></strong></td>
+</tr>
+<tr>
+<td>L'argument de <code>dxxx</code> ?</td>
+<td><strong><code>log</code></strong></td>
+</tr>
+<tr>
+<td>La formule du hasard cumulé ?</td>
+<td>$H(t) = -\log(1-F(t))$</td>
+</tr>
+<tr>
+<td>Comment le calculer ?</td>
+<td><code>-pxxx(t, lower.tail = FALSE, log.p = TRUE)</code></td>
+</tr>
+<tr>
+<td>Pourquoi pas par soustraction ?</td>
+<td><strong>Perte de précision</strong> et <strong>sous-passement</strong></td>
+</tr>
+<tr>
+<td>Valeur $p$ bilatérale d'un $t$ ?</td>
+<td><strong>2 ×</strong> la queue — la loi est symétrique</td>
+</tr>
+<tr>
+<td>Point supérieur à 1 % d'une F(2,7) ?</td>
+<td><code>qf(0.01, 2, 7, lower.tail = FALSE)</code></td>
+</tr>
+<tr>
+<td>Où lire comment R tire au hasard ?</td>
+<td>L'aide de <strong><code>RNG</code></strong></td>
+</tr>
+<tr>
+<td>Deux résumés à cinq nombres ?</td>
+<td><strong><code>summary()</code></strong> et <strong><code>fivenum()</code></strong></td>
+</tr>
+<tr>
+<td>Lequel donne la moyenne ?</td>
+<td><strong><code>summary()</code></strong></td>
+</tr>
+<tr>
+<td>Pourquoi diffèrent-ils ?</td>
+<td><strong>Deux conventions</strong> de quantile</td>
+</tr>
+<tr>
+<td>Qu'est-ce que <code>stem()</code> ?</td>
+<td>Un diagramme <strong>à tiges et feuilles</strong></td>
+</tr>
+<tr>
+<td>Son avantage sur l'histogramme ?</td>
+<td>Il <strong>conserve les chiffres</strong></td>
+</tr>
+<tr>
+<td>Que révèle-t-il sur <code>eruptions</code> ?</td>
+<td>Une distribution <strong>bimodale</strong></td>
+</tr>
+<tr>
+<td>Moyenne et médiane de <code>eruptions</code> ?</td>
+<td><strong>3,488</strong> et <strong>4,000</strong></td>
+</tr>
+<tr>
+<td>Que faut-il avant <code>lines(density(...))</code> ?</td>
+<td><strong><code>prob = TRUE</code></strong> dans <code>hist</code></td>
+</tr>
+<tr>
+<td>Que fait <code>rug()</code> ?</td>
+<td>Il <strong>montre les points de données</strong></td>
+</tr>
+<tr>
+<td>Le défaut de <code>bw</code> est-il bon ?</td>
+<td> <strong>Non</strong> — <em>« too much smoothing »</em></td>
+</tr>
+<tr>
+<td>Une bonne règle automatique ?</td>
+<td><strong><code>bw = "SJ"</code></strong></td>
+</tr>
+<tr>
+<td>Tracer la répartition empirique ?</td>
+<td><code>plot(ecdf(x), do.points=FALSE, verticals=TRUE)</code></td>
+</tr>
+<tr>
+<td>Que faire avant un Q-Q ?</td>
+<td><strong><code>par(pty = "s")</code></strong></td>
+</tr>
+<tr>
+<td>Les deux fonctions du Q-Q normal ?</td>
+<td><strong><code>qqnorm()</code></strong> et <strong><code>qqline()</code></strong></td>
+</tr>
+<tr>
+<td>Comparer à une loi choisie ?</td>
+<td><strong><code>qqplot(qt(ppoints(n), df), x)</code></strong></td>
+</tr>
+<tr>
+<td>Que fabrique <code>ppoints(n)</code> ?</td>
+<td>Les <strong>probabilités théoriques</strong></td>
+</tr>
+<tr>
+<td>Le test de normalité de R ?</td>
+<td><strong><code>shapiro.test()</code></strong></td>
+</tr>
+<tr>
+<td>Son résultat sur <code>long</code> ?</td>
+<td>$W = 0{,}9793$, $p = 0{,}01052$</td>
+</tr>
+<tr>
+<td>Le test d'ajustement à une loi ?</td>
+<td><strong><code>ks.test(x, "pnorm", ...)</code></strong></td>
+</tr>
+<tr>
+<td>Son résultat sur <code>long</code> ?</td>
+<td>$D = 0{,}0661$, $p = 0{,}4284$</td>
+</tr>
+<tr>
+<td>Pourquoi ce désaccord ?</td>
+<td>Les paramètres sont <strong>estimés sur le même échantillon</strong></td>
+</tr>
+<tr>
+<td>Où sont les tests classiques ?</td>
+<td>Le paquet <strong><code>stats</code></strong>, <em>« normally loaded »</em></td>
+</tr>
+<tr>
+<td>Que fait <code>t.test(A, B)</code> par défaut ?</td>
+<td>Le test de <strong>Welch</strong></td>
+</tr>
+<tr>
+<td>À quoi le voit-on ?</td>
+<td>Au <strong>df non entier</strong> — 12,027</td>
+</tr>
+<tr>
+<td>Son résultat ?</td>
+<td>$t = 3{,}2499$, $p = 0{,}00694$</td>
+</tr>
+<tr>
+<td>Le test d'égalité des variances ?</td>
+<td><strong><code>var.test()</code></strong></td>
+</tr>
+<tr>
+<td>Que suppose-t-il ?</td>
+<td>Deux populations <strong>normales</strong></td>
+</tr>
+<tr>
+<td>Son résultat ?</td>
+<td>$F = 0{,}5837$, $p = 0{,}3938$</td>
+</tr>
+<tr>
+<td>Ses degrés de liberté ?</td>
+<td><strong>12</strong> et <strong>7</strong> — soit $n-1$ de chaque</td>
+</tr>
+<tr>
+<td>Le test $t$ classique ?</td>
+<td><strong><code>t.test(A, B, var.equal = TRUE)</code></strong></td>
+</tr>
+<tr>
+<td>Son df ?</td>
+<td><strong>19</strong> — soit $13+8-2$</td>
+</tr>
+<tr>
+<td>Son résultat ?</td>
+<td>$t = 3{,}4722$, $p = 0{,}002551$</td>
+</tr>
+<tr>
+<td>Que coûte l'hypothèse en moins ?</td>
+<td>De la <strong>puissance</strong> — IC plus large</td>
+</tr>
+<tr>
+<td>Les deux moyennes ?</td>
+<td><strong>80,02077</strong> et <strong>79,97875</strong></td>
+</tr>
+<tr>
+<td>Leur différence ?</td>
+<td><strong>0,04202</strong> — le centre des deux IC</td>
+</tr>
+<tr>
+<td>Le test sans normalité ?</td>
+<td><strong><code>wilcox.test()</code></strong></td>
+</tr>
+<tr>
+<td>Que suppose-t-il ?</td>
+<td>Une <strong>loi continue commune</strong></td>
+</tr>
+<tr>
+<td>Son résultat ?</td>
+<td>$W = 89$, $p = 0{,}007497$</td>
+</tr>
+<tr>
+<td>Que teste <code>ks.test</code> à deux échantillons ?</td>
+<td>L'<strong>écart vertical maximal</strong> des deux ecdf</td>
+</tr>
+<tr>
+<td>Son résultat ?</td>
+<td>$D = 0{,}5962$, $p = 0{,}05919$</td>
+</tr>
+<tr>
+<td>Pourquoi est-il moins concluant ?</td>
+<td>Il teste <strong>toute différence</strong>, donc moins puissant</td>
+</tr>
+<tr>
+<td>Que signalent les avertissements d'ex æquo ?</td>
+<td>Des données <strong>discrètes ou arrondies</strong></td>
+</tr>
+<tr>
+<td>Que faut-il avec deux <code>ecdf</code> superposées ?</td>
+<td><strong><code>xlim = range(A, B)</code></strong></td>
+</tr>
+</tbody></table>
+</main>
+
+
+
+
+</body></html>

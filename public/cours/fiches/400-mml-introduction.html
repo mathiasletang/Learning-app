@@ -1,0 +1,1041 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fiche 400 — Mathematics for Machine Learning : introduction et carte du livre</title>
+<script>
+window.MathJax={tex:{inlineMath:[["$","$"]],displayMath:[["$$","$$"]],processEscapes:true},
+ options:{skipHtmlTags:["script","noscript","style","textarea","pre","code"]},
+ svg:{fontCache:"global"},
+ startup:{pageReady:()=>MathJax.startup.defaultPageReady().then(()=>{document.body.classList.add("ready")})}};
+setTimeout(function(){document.body.classList.add("ready")},2500);
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+/* ============================================================
+   MathiasLearn — feuille de style des fiches
+   Reprise intégrale des tokens de 00_PARCOURS/*.html
+   + blocs pédagogiques (callouts, méthode, essentiels, recall)
+   ============================================================ */
+:root{--bg:#faf9f7;--card:#fff;--ink:#1a1a1a;--muted:#6b6b6b;--line:#e5e2dd;--accent:#8b5e34;
+ --hl:#fdf8ef;--ok:#2d7d4f;--okbg:#f0f7f3;--warn:#b3402f;--warnbg:#fdf3f1;--blue:#2f5d8b;--bluebg:#f1f5fa}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+ font:17px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;padding:0 16px 100px}
+.nav{position:sticky;top:0;background:rgba(250,249,247,.96);backdrop-filter:blur(8px);
+ border-bottom:1px solid var(--line);margin:0 -16px 30px;padding:11px 16px;z-index:50;
+ display:flex;gap:6px;flex-wrap:wrap;font-size:13px}
+.nav a{color:var(--muted);text-decoration:none;padding:4px 9px;border-radius:5px;white-space:nowrap}
+.nav a:hover{background:var(--line);color:var(--ink)}
+.nav a.on{background:var(--accent);color:#fff}
+main{max-width:780px;margin:0 auto}
+h1{font-size:31px;letter-spacing:-.02em;margin:.4em 0 .5em;line-height:1.25}
+h2{font-size:23px;margin:2.2em 0 .7em;padding-bottom:.3em;border-bottom:1px solid var(--line)}
+h3{font-size:19px;margin:1.9em 0 .5em;color:var(--accent)}
+h4{font-size:17px;margin:1.5em 0 .4em}
+p{margin:.8em 0} a{color:var(--accent)} hr{border:0;border-top:1px solid var(--line);margin:2.6em 0}
+table{border-collapse:collapse;width:100%;margin:1.3em 0;font-size:15.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+th{background:#f3f0eb;font-weight:600}
+tr:nth-child(even) td{background:#fcfbfa}
+code{font-family:"SF Mono",Menlo,Consolas,monospace;font-size:.88em;background:#f2efea;padding:2px 6px;border-radius:4px;overflow-wrap:break-word}
+pre{background:#f2efea;padding:14px 16px;border-radius:8px;overflow-x:auto}
+pre code{background:none;padding:0;white-space:pre}
+blockquote{border-left:3px solid var(--accent);background:var(--hl);margin:1.4em 0;padding:14px 20px;border-radius:0 8px 8px 0}
+blockquote p:first-child{margin-top:0} blockquote p:last-child{margin-bottom:0}
+ul,ol{padding-left:1.5em} li{margin:.35em 0} em{color:#4a4a4a}
+mjx-container[display="true"]{margin:1.1em 0!important;overflow-x:auto;overflow-y:hidden;padding:2px 0}
+mjx-container svg{max-width:100%}
+body:not(.ready) main{opacity:0} main{opacity:1;transition:opacity .25s}
+
+/* --- bandeau de tête de fiche --- */
+.cours{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--accent);
+ border-radius:0 10px 10px 0;padding:18px 22px;margin:0 0 34px}
+.cours h4{margin:0 0 4px;font-size:14px;text-transform:uppercase;letter-spacing:.07em;color:var(--accent)}
+.cours .cs{color:var(--muted);font-size:14.5px;margin:0 0 14px}
+
+/* --- exercices / corrigés --- */
+.ex{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:6px 24px 20px;margin:18px 0}
+.ex>h3:first-child{margin-top:14px}
+details.cor{margin-top:18px;border:1px solid var(--line);border-radius:8px;background:#fcfbfa;overflow:hidden}
+details.cor>summary{cursor:pointer;padding:12px 16px;font-weight:600;font-size:15px;color:var(--accent);
+ list-style:none;display:flex;align-items:center;gap:9px;user-select:none;transition:.15s;min-height:44px}
+details.cor>summary::-webkit-details-marker{display:none}
+details.cor>summary:hover{background:var(--hl)}
+details.cor>summary::before{content:"\25B6";font-size:10px;transition:transform .18s;display:inline-block}
+details.cor[open]>summary::before{transform:rotate(90deg)}
+details.cor[open]>summary{background:var(--okbg);color:var(--ok);border-bottom:1px solid var(--line)}
+.cor .in{padding:4px 20px 16px}
+.cor .in>*:first-child{margin-top:.9em}
+
+/* --- blocs pédagogiques (callouts) ---
+   Générés depuis une citation Markdown dont le premier **gras** commence
+   par un mot-clé : DÉFINITION, THÉORÈME, MÉTHODE, PIÈGE, INTUITION… */
+.cal{border:1px solid var(--line);border-left:4px solid var(--accent);background:var(--card);
+ border-radius:0 10px 10px 0;padding:15px 20px;margin:1.5em 0}
+.cal>p:first-child{margin-top:0}.cal>p:last-child,.cal>ul:last-child,.cal>ol:last-child{margin-bottom:0}
+.cal .lab{display:block;font-size:12.5px;text-transform:uppercase;letter-spacing:.08em;
+ font-weight:700;color:var(--accent);margin-bottom:6px}
+.cal.formel{background:var(--hl)}
+.cal.piege{border-left-color:var(--warn);background:var(--warnbg)}
+.cal.piege .lab{color:var(--warn)}
+.cal.methode{border-left-color:var(--ok);background:var(--okbg)}
+.cal.methode .lab{color:var(--ok)}
+.cal.intu{border-left-color:var(--blue);background:var(--bluebg)}
+.cal.intu .lab{color:var(--blue)}
+.cal.plus{border-left-style:dashed;background:#faf9f7}
+.cal.plus .lab{color:var(--muted)}
+
+/* --- révision express --- */
+.ess{background:var(--card);border:1px solid var(--accent);border-radius:10px;padding:4px 24px 20px;margin:1.6em 0}
+.ess h3{margin-top:1.3em}
+.rec{background:var(--card);border:1px dashed var(--accent);border-radius:10px;padding:4px 24px 18px;margin:1.6em 0}
+.rec ol{counter-reset:none}
+
+/* --- impression / PDF --- */
+@media print{
+ .nav{display:none}
+ body{padding:0;background:#fff;font-size:11.2pt;line-height:1.55}
+ main{max-width:none}
+ h1{font-size:23pt}h2{font-size:15pt;margin-top:1.5em}h3{font-size:12.6pt}
+ h2,h3,h4{break-after:avoid;page-break-after:avoid}
+ table,.cal,blockquote{break-inside:avoid;page-break-inside:avoid}
+ table{display:table;font-size:9.6pt}
+ details.cor{border:1px solid var(--line);background:#fcfbfa}
+ details.cor>summary{display:none}
+ details.cor .in{padding-top:10px}
+ .cal,.ex,.ess,.rec{box-shadow:none}
+ a{color:var(--ink);text-decoration:none}
+}
+@page{margin:16mm 15mm 18mm}
+
+/* --- exemples travaillés --- */
+.exm{background:#fcfbfa;border:1px solid var(--line);border-radius:10px;padding:2px 20px 14px;margin:1.5em 0}
+.exm>h4:first-child{margin:14px 0 .5em;color:var(--accent);font-size:13px;text-transform:uppercase;letter-spacing:.07em}
+
+
+/* --- pastilles de priorité (conventions des fiches de l'app) --- */
+h2[data-prio], h3[data-prio], h4[data-prio]{position:relative}
+h2[data-prio]::before,h3[data-prio]::before,h4[data-prio]::before{
+ content:"";display:inline-block;width:9px;height:9px;border-radius:50%;
+ margin-right:9px;vertical-align:middle;background:var(--muted)}
+[data-prio="must"]::before{background:var(--warn)}
+[data-prio="high"]::before{background:#d98324}
+[data-prio="mid"]::before{background:#c9a227}
+[data-prio="low"]::before{background:var(--ok)}
+/* corrigés des fiches de l'app : même traitement que les corrigés des séries */
+details.cor>summary::after{content:""}
+</style></head><body>
+<div class="nav"><a href="00_COMMENCER_ICI.html">Commencer ici</a><a href="01_NOTATIONS_le-decodeur.html">Notations</a><a href="02_EXERCICES_Serie-0.html">Série 0 — Remise en route</a><a href="03_EXERCICES_Serie-1.html">Série 1 — Convexité</a><a href="04_EXERCICES_Serie-2.html">Série 2 — KKT</a><a href="05_AUTO-EVALUATION.html">Auto-évaluation (quiz)</a><a href="06_FICHE_Optimisation-deux-variables.html">Fiche — Optimisation à 2 variables</a></div>
+<main><h1>Fiche 400 — Mathematics for Machine Learning : introduction et carte du livre</h1>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Matière</strong></td>
+<td>Maths · Apprentissage automatique</td>
+</tr>
+<tr>
+<td><strong>Cours source</strong></td>
+<td>Deisenroth, Faisal &amp; Ong, <em>Mathematics for Machine Learning</em>, Cambridge University Press — chapitre 1 « Introduction and Motivation » (p. 11-16)</td>
+</tr>
+<tr>
+<td><strong>Difficulté</strong></td>
+<td> Fondamental — le plan de vol des onze fiches suivantes</td>
+</tr>
+<tr>
+<td><strong>Temps d'étude estimé</strong></td>
+<td>30 min</td>
+</tr>
+<tr>
+<td><strong>Prérequis</strong></td>
+<td>Aucun</td>
+</tr>
+<tr>
+<td><strong>Concepts clés</strong></td>
+<td>Données, modèle, apprentissage, prédicteur contre entraînement, les trois vues d'un vecteur, généralisation, lecture <em>bottom-up</em> et <em>top-down</em>, les quatre piliers de l'apprentissage automatique, les six fondations mathématiques</td>
+</tr>
+<tr>
+<td><strong>Poids à l'examen</strong></td>
+<td>Les <strong>trois concepts au cœur</strong> · l'<strong>ambiguïté du mot « algorithme »</strong> · les <strong>quatre piliers</strong> et les <strong>six fondations</strong> · la distinction <strong>mémoriser / GÉNÉRALISER</strong>.</td>
+</tr>
+</tbody></table>
+<h2>Vue d'ensemble</h2>
+<pre><code>LA DÉFINITION D'OUVERTURE
+  « L'apprentissage automatique consiste à concevoir des algorithmes qui extraient
+    AUTOMATIQUEMENT de l'information précieuse à partir de DONNÉES. »
+  L'accent est sur AUTOMATIQUE : des méthodologies GÉNÉRALISTES applicables
+  à de nombreux jeux de données, produisant quelque chose de SIGNIFIANT
+
+TROIS CONCEPTS AU CŒUR   DONNÉES · MODÈLE · APPRENTISSAGE
+
+LE RÉSUMÉ EN TROIS LIGNES DU LIVRE
+  1. on REPRÉSENTE LES DONNÉES COMME DES VECTEURS
+  2. on CHOISIT UN MODÈLE, vue PROBABILISTE ou vue OPTIMISATION
+  3. on APPREND par OPTIMISATION NUMÉRIQUE, pour que le modèle marche
+     sur des données NON UTILISÉES POUR L'ENTRAÎNEMENT
+
+LES SIX FONDATIONS (partie I)          LES QUATRE PILIERS (partie II)
+  ch. 2  algèbre linéaire                 ch. 9  RÉGRESSION
+  ch. 3  géométrie analytique             ch. 10 RÉDUCTION DE DIMENSION
+  ch. 4  décompositions matricielles      ch. 11 ESTIMATION DE DENSITÉ
+  ch. 5  calcul vectoriel                 ch. 12 CLASSIFICATION
+  ch. 6  probabilités et distributions   (ch. 8 : le pont — données, modèles, apprentissage)
+  ch. 7  optimisation continue
+
+DEUX FAÇONS DE LIRE   BOTTOM-UP (des fondations vers l'avancé)
+                      TOP-DOWN (des besoins pratiques vers les prérequis)
+</code></pre>
+<p><strong>La phrase de définition, mot pour mot.</strong> <em>« <strong>L'apprentissage automatique consiste à concevoir des algorithmes qui extraient AUTOMATIQUEMENT de l'information précieuse à partir de données.</strong> L'accent est mis ici sur <strong>« automatique »</strong> : l'apprentissage automatique s'intéresse à des <strong>méthodologies GÉNÉRALISTES applicables à de nombreux jeux de données</strong>, tout en produisant quelque chose de <strong>SIGNIFIANT</strong>. »</em></p>
+<h2 data-prio="must">Concept 1 — Les trois concepts au cœur</h2>
+<p>$$\boxed{\textbf{DONNÉES}\qquad\textbf{MODÈLE}\qquad\textbf{APPRENTISSAGE}}$$</p>
+<table>
+<thead>
+<tr>
+<th>Concept</th>
+<th>Ce que le livre en dit</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>DONNÉES</strong></td>
+<td><em>« L'apprentissage automatique étant <strong>intrinsèquement PILOTÉ PAR LES DONNÉES</strong>, les données sont à son cœur. Le but est de concevoir des méthodologies généralistes pour en extraire des motifs précieux, <strong>IDÉALEMENT SANS BEAUCOUP D'EXPERTISE SPÉCIFIQUE AU DOMAINE</strong>. »</em> L'exemple : <em>un grand corpus de documents, dont on extrait automatiquement <strong>les sujets pertinents partagés</strong> entre documents</em></td>
+</tr>
+<tr>
+<td><strong>MODÈLE</strong></td>
+<td><em>« On conçoit des modèles <strong>typiquement RELIÉS AU PROCESSUS QUI GÉNÈRE les données</strong>. Par exemple, en régression, le modèle décrirait <strong>une fonction qui envoie des entrées sur des sorties à valeurs réelles</strong>. »</em></td>
+</tr>
+<tr>
+<td><strong>APPRENTISSAGE</strong></td>
+<td> <em>La paraphrase de <strong>Mitchell (1997)</strong> : <strong>« Un modèle est dit APPRENDRE des données si sa PERFORMANCE sur une tâche donnée S'AMÉLIORE après que les données ont été prises en compte. »</strong></em> <em>« Le but est de trouver de bons modèles qui <strong>GÉNÉRALISENT BIEN à des données encore JAMAIS VUES</strong>. »</em></td>
+</tr>
+</tbody></table>
+<div class="cal intu"><span class="lab">Pourquoi les mathématiques.</span>
+<p class="cal piege">  <em>« Bien que l'apprentissage automatique ait connu de nombreux succès et que les logiciels soient facilement disponibles, <strong>nous croyons que les FONDATIONS MATHÉMATIQUES sont importantes pour comprendre les PRINCIPES FONDAMENTAUX sur lesquels des systèmes plus compliqués sont bâtis</strong>. Les comprendre facilite : <strong>créer de NOUVELLES solutions</strong>, <strong>comprendre et DÉBOGUER les approches existantes</strong>, et <strong>connaître les HYPOTHÈSES et LIMITES INHÉRENTES</strong> aux méthodologies. »</em></p>
+</div>
+<h2 data-prio="must">Concept 2 — Trouver des mots pour les intuitions</h2>
+<h3>2.1 L'ambiguïté du mot « algorithme »</h3>
+<blockquote>
+<p class="cal piege"> <em>« Un défi auquel nous faisons régulièrement face est que <strong>les concepts et les mots sont GLISSANTS</strong>, et qu'un composant particulier d'un système peut être abstrait en <strong>différents concepts mathématiques</strong>. »</em></p>
+</blockquote>
+<p><strong>Le mot « algorithme d'apprentissage automatique » a AU MOINS deux sens :</strong></p>
+<table>
+<thead>
+<tr>
+<th>Sens</th>
+<th>Ce que c'est</th>
+<th>Nom donné</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>1</strong></td>
+<td><em>un système qui <strong>fait des PRÉDICTIONS</strong> à partir de données d'entrée</em></td>
+<td> un <strong>PRÉDICTEUR</strong></td>
+</tr>
+<tr>
+<td><strong>2</strong></td>
+<td><em>un système qui <strong>ADAPTE certains paramètres INTERNES du prédicteur</strong> pour qu'il performe bien sur des données futures non vues</em></td>
+<td> l'<strong>ENTRAÎNEMENT</strong> (<em>training</em>)</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><em>« Ce livre <strong>ne résoudra PAS</strong> le problème de l'ambiguïté, mais nous voulons souligner d'emblée que, <strong>selon le contexte, les mêmes expressions peuvent signifier des choses différentes</strong>. »</em></p>
+</blockquote>
+<h3>2.2 Les trois vues d'un vecteur</h3>
+<p><em>« Bien que toutes les données ne soient pas numériques, il est souvent utile de les considérer sous forme de nombres. <strong>Dans ce livre, nous supposons que les données ont déjà été converties en une représentation numérique</strong> appropriée. <strong>Nous pensons donc les données COMME DES VECTEURS.</strong> »</em></p>
+<blockquote>
+<p class="cal piege"> <em><strong>« Comme autre illustration de la subtilité des mots, il y a (AU MOINS) TROIS façons de penser un vecteur : »</strong></em></p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>Vue</th>
+<th>Définition</th>
+<th>Discipline</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>1</strong></td>
+<td>un vecteur comme <strong>un TABLEAU DE NOMBRES</strong></td>
+<td><em>une vue d'<strong>INFORMATICIEN</strong></em></td>
+</tr>
+<tr>
+<td><strong>2</strong></td>
+<td>un vecteur comme <strong>une FLÈCHE avec une direction et une magnitude</strong></td>
+<td><em>une vue de <strong>PHYSICIEN</strong></em></td>
+</tr>
+<tr>
+<td><strong>3</strong></td>
+<td> un vecteur comme <strong>un OBJET QUI OBÉIT À L'ADDITION ET À LA MISE À L'ÉCHELLE</strong></td>
+<td><em>une vue de <strong>MATHÉMATICIEN</strong></em></td>
+</tr>
+</tbody></table>
+<p class="cal piege"> <em>Une mise en garde pratique du livre : <strong>« Attention à vérifier si les opérations sur les tableaux effectuent réellement des opérations VECTORIELLES quand on implémente sur ordinateur. »</strong></em></p>
+<h3>2.3 Modèle et apprentissage, précisés</h3>
+<table>
+<thead>
+<tr>
+<th>Notion</th>
+<th>Formulation du livre</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Un bon modèle</strong></td>
+<td><em>« une <strong>VERSION SIMPLIFIÉE du VRAI processus (INCONNU) de génération des données</strong>, capturant les aspects pertinents. <strong>Un bon modèle peut alors servir à prédire ce qui se passerait dans le monde réel SANS FAIRE D'EXPÉRIENCES RÉELLES.</strong> »</em></td>
+</tr>
+<tr>
+<td><strong>Entraîner</strong></td>
+<td><em>« utiliser les données disponibles pour <strong>OPTIMISER certains paramètres du modèle par rapport à une FONCTION D'UTILITÉ</strong> qui évalue à quel point le modèle prédit bien les données d'entraînement »</em></td>
+</tr>
+<tr>
+<td><strong>L'analogie</strong></td>
+<td> <em>« La plupart des méthodes d'entraînement peuvent être vues comme <strong>GRAVIR UNE COLLINE POUR ATTEINDRE SON SOMMET</strong>. Dans cette analogie, <strong>le sommet correspond à un MAXIMUM d'une mesure de performance désirée.</strong> »</em></td>
+</tr>
+</tbody></table>
+<blockquote>
+<p class="cal piege"> <strong>LE PIÈGE CENTRAL, énoncé dès le chapitre 1.</strong></p>
+<p><em><strong>« En pratique, ce qui nous intéresse est que le modèle performe bien sur des données NON VUES. BIEN PERFORMER SUR DES DONNÉES DÉJÀ VUES (les données d'entraînement) PEUT SEULEMENT SIGNIFIER QU'ON A TROUVÉ UN BON MOYEN DE MÉMORISER LES DONNÉES. Cela peut NE PAS bien généraliser. »</strong></em></p>
+</blockquote>
+<h2 data-prio="high">Concept 3 — Les deux façons de lire le livre</h2>
+<table>
+<thead>
+<tr>
+<th>Stratégie</th>
+<th>Principe</th>
+<th>Avantage</th>
+<th> Inconvénient</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><em><strong>BOTTOM-UP</strong></em></td>
+<td><em>bâtir les concepts <strong>du fondamental vers l'avancé</strong> — l'approche préférée dans les domaines techniques comme les mathématiques</em></td>
+<td><em>le lecteur peut <strong>à tout moment s'appuyer sur ce qu'il a déjà appris</strong></em></td>
+<td> <em>« pour un praticien, beaucoup de concepts fondamentaux <strong>ne sont pas particulièrement intéressants EN EUX-MÊMES</strong>, et <strong>le manque de motivation fait que la plupart des définitions sont VITE OUBLIÉES</strong> »</em></td>
+</tr>
+<tr>
+<td><em><strong>TOP-DOWN</strong></em></td>
+<td><em>descendre <strong>des besoins pratiques vers les prérequis de base</strong></em></td>
+<td><em>le lecteur sait <strong>à tout moment POURQUOI</strong> il travaille sur un concept, et il y a <strong>un chemin CLAIR</strong> de connaissances requises</em></td>
+<td> <em>« la connaissance est bâtie sur des <strong>fondations potentiellement BRANLANTES</strong>, et les lecteurs doivent <strong>retenir un ensemble de mots qu'ils n'ont AUCUN MOYEN DE COMPRENDRE</strong> »</em></td>
+</tr>
+</tbody></table>
+<p><strong>Le choix des auteurs.</strong> <em>« Nous avons décidé d'écrire ce livre <strong>de façon MODULAIRE</strong>, pour séparer les concepts fondamentaux (mathématiques) des applications, <strong>afin qu'il puisse être lu DES DEUX FAÇONS</strong>. »</em></p>
+<table>
+<thead>
+<tr>
+<th>Partie</th>
+<th>Contenu</th>
+<th>Couplage entre chapitres</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>PARTIE I</strong></td>
+<td>les fondations mathématiques</td>
+<td>*les chapitres <strong>s'appuient surtout sur les précédents</strong>, mais <strong>il est possible d'en sauter un et de travailler à rebours</strong>si nécessaire*</td>
+</tr>
+<tr>
+<td><strong>PARTIE II</strong></td>
+<td>les quatre piliers</td>
+<td> <em>les chapitres sont <strong>SEULEMENT FAIBLEMENT COUPLÉS et peuvent être lus DANS N'IMPORTE QUEL ORDRE</strong></em></td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><em>« Bien sûr, il y a <strong>plus de deux façons</strong> de lire ce livre. <strong>La plupart des lecteurs apprennent en COMBINANT les approches</strong>, bâtissant parfois des compétences de base avant d'attaquer des concepts complexes, mais choisissant aussi les sujets <strong>selon les applications</strong>. »</em></p>
+</blockquote>
+<h2 data-prio="must">Concept 4 — La carte : six fondations, quatre piliers</h2>
+<h3>4.1 La figure 1.1 en texte</h3>
+<pre><code>                      APPRENTISSAGE AUTOMATIQUE
+   ┌──────────┬────────────────┬──────────────┬────────────────┐
+   │RÉGRESSION│  RÉDUCTION DE  │ ESTIMATION   │ CLASSIFICATION │   ← LES QUATRE PILIERS
+   │  (ch. 9) │   DIMENSION    │ DE DENSITÉ   │    (ch. 12)    │
+   │          │    (ch. 10)    │   (ch. 11)   │                │
+   └──────────┴────────────────┴──────────────┴────────────────┘
+   ═══════════════════════════════════════════════════════════════
+      CALCUL VECTORIEL  ·  ALGÈBRE LINÉAIRE                        ← LES SIX FONDATIONS
+      PROBABILITÉS ET DISTRIBUTIONS  ·  GÉOMÉTRIE ANALYTIQUE
+      OPTIMISATION  ·  DÉCOMPOSITION MATRICIELLE
+</code></pre>
+<h3>4.2 Pourquoi chaque fondation existe</h3>
+<details class="cor">
+<summary><strong>Les six fondations, chacune justifiée par un besoin</strong></summary><div class="in">
+
+<table>
+<thead>
+<tr>
+<th>Chapitre</th>
+<th>Le BESOIN qui la motive</th>
+<th>Fiche</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>2 — Algèbre linéaire</strong></td>
+<td><em>« Nous représentons <strong>les données numériques comme des VECTEURS</strong> et <strong>une TABLE de telles données comme une MATRICE</strong>. L'étude des vecteurs et des matrices s'appelle l'algèbre linéaire. »</em></td>
+<td>401</td>
+</tr>
+<tr>
+<td><strong>3 — Géométrie analytique</strong></td>
+<td> <em>« Étant donné deux vecteurs représentant deux objets du monde réel, <strong>nous voulons énoncer des choses sur leur SIMILARITÉ</strong>. L'idée : <strong>des vecteurs SIMILAIRES doivent produire des sorties SIMILAIRES</strong> dans notre prédicteur. Pour formaliser cela, il faut des opérations prenant deux vecteurs et <strong>renvoyant une valeur numérique représentant leur similarité</strong>. »</em></td>
+<td>402</td>
+</tr>
+<tr>
+<td><strong>4 — Décompositions matricielles</strong></td>
+<td><em>« Certaines opérations sur les matrices sont <strong>extrêmement utiles</strong> : elles permettent <strong>une interprétation INTUITIVE des données</strong> et <strong>un apprentissage PLUS EFFICACE</strong>. »</em></td>
+<td>403</td>
+</tr>
+<tr>
+<td><strong>5 — Calcul vectoriel</strong></td>
+<td><em>« Pour entraîner, on trouve typiquement les paramètres qui <strong>maximisent une mesure de performance</strong>. Beaucoup de techniques d'optimisation exigent <strong>le concept de GRADIENT, qui indique LA DIRECTION dans laquelle chercher une solution</strong>. »</em></td>
+<td>404</td>
+</tr>
+<tr>
+<td><strong>6 — Probabilités et distributions</strong></td>
+<td> <em>« On considère souvent les données comme <strong>des observations BRUITÉES d'un vrai signal sous-jacent</strong>. Cela exige <strong>un langage pour QUANTIFIER ce que "bruit" signifie</strong>. On voudrait aussi des prédicteurs <strong>exprimant une forme d'INCERTITUDE</strong>, par exemple <strong>la CONFIANCE qu'on a dans la valeur prédite</strong> en un point de test particulier. »</em></td>
+<td>405</td>
+</tr>
+<tr>
+<td><strong>7 — Optimisation continue</strong></td>
+<td><em>trouver les <strong>maxima et minima</strong> des fonctions, en utilisant les gradients du chapitre 5</em></td>
+<td>406</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p class="cal piege"> <strong>Noter l'ordre logique caché :</strong> le chapitre <strong>5</strong> (gradients) est écrit <strong>avant</strong> le chapitre <strong>7</strong> (optimisation) parce que le second <strong>utilise</strong> le premier — mais le chapitre <strong>6</strong> (probabilités) s'intercale entre les deux dans la numérotation.</p>
+</blockquote>
+</div></details>
+
+<h3>4.3 Les quatre piliers</h3>
+<details class="cor">
+<summary><strong>Les cinq chapitres de la partie II, et ce qui les distingue</strong></summary><div class="in">
+
+<p><em>« Les chapitres sont <strong>largement ordonnés par DIFFICULTÉ CROISSANTE</strong>. »</em></p>
+<table>
+<thead>
+<tr>
+<th>Chapitre</th>
+<th>Objet</th>
+<th>Y a-t-il des ÉTIQUETTES ?</th>
+<th>Fiche</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>8 — Quand les modèles rencontrent les données</strong></td>
+<td><em>« <strong>RÉÉNONCER les trois composants (données, modèles, estimation de paramètres) de façon MATHÉMATIQUE.</strong> En outre, <strong>des lignes directrices pour construire des dispositifs expérimentaux qui PRÉMUNISSENT contre des évaluations TROP OPTIMISTES</strong> »</em></td>
+<td>—</td>
+<td>407</td>
+</tr>
+<tr>
+<td><strong>9 — Régression linéaire</strong></td>
+<td><em>« trouver des fonctions envoyant des entrées $\mathbf x\in\mathbb R^D$ sur des valeurs observées $y\in\mathbb R$, qu'on peut interpréter comme <strong>les ÉTIQUETTES de leurs entrées</strong> ». Ajustement classique par <strong>maximum de vraisemblance et maximum a posteriori</strong>, plus <strong>la régression linéaire BAYÉSIENNE, où l'on INTÈGRE les paramètres au lieu de les optimiser</strong></em></td>
+<td> <strong>OUI</strong>, à valeurs <strong>RÉELLES</strong></td>
+<td>408</td>
+</tr>
+<tr>
+<td><strong>10 — Réduction de dimension (ACP)</strong></td>
+<td><em>« trouver une représentation <strong>COMPACTE, de plus BASSE dimension</strong>, de données de haute dimension — souvent <strong>plus facile à analyser</strong> que les données originales »</em></td>
+<td> <strong>NON</strong> — <em>« contrairement à la régression, <strong>la réduction de dimension ne s'intéresse QU'À MODÉLISER LES DONNÉES</strong> »</em></td>
+<td>409</td>
+</tr>
+<tr>
+<td><strong>11 — Estimation de densité (mélanges gaussiens)</strong></td>
+<td><em>« trouver <strong>une LOI DE PROBABILITÉ qui décrit un jeu de données</strong> », avec <strong>un schéma ITÉRATIF</strong> pour trouver les paramètres</em></td>
+<td> <strong>NON</strong> — <em>mais <strong>on ne cherche PAS non plus une représentation de basse dimension</strong> : on veut <strong>un MODÈLE DE DENSITÉ</strong>"</em></td>
+<td>410</td>
+</tr>
+<tr>
+<td><strong>12 — Classification (SVM)</strong></td>
+<td>*comme la régression, on a des entrées $\mathbf x$ et des étiquettes $y$ —  <em><strong>mais, contrairement à la régression où les étiquettes étaient RÉELLES, ici LES ÉTIQUETTES SONT DES ENTIERS, ce qui exige un soin PARTICULIER</strong></em></td>
+<td> <strong>OUI</strong>, à valeurs <strong>ENTIÈRES</strong></td>
+<td>411</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>Le tableau de discrimination à retenir :</strong></p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th><strong>avec étiquettes</strong></th>
+<th><strong>sans étiquette</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>sortie réelle</strong></td>
+<td><strong>RÉGRESSION</strong> (ch. 9)</td>
+<td>—</td>
+</tr>
+<tr>
+<td><strong>sortie entière</strong></td>
+<td><strong>CLASSIFICATION</strong> (ch. 12)</td>
+<td>—</td>
+</tr>
+<tr>
+<td><strong>représentation compacte</strong></td>
+<td>—</td>
+<td><strong>RÉDUCTION DE DIMENSION</strong> (ch. 10)</td>
+</tr>
+<tr>
+<td><strong>loi de probabilité</strong></td>
+<td>—</td>
+<td><strong>ESTIMATION DE DENSITÉ</strong> (ch. 11)</td>
+</tr>
+</tbody></table>
+</blockquote>
+</div></details>
+
+<h3>4.4 Exercices et matériel</h3>
+<table>
+<thead>
+<tr>
+<th>Partie</th>
+<th>Ce que le livre fournit</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Partie I</strong></td>
+<td><em>des exercices <strong>faisables essentiellement au STYLO ET PAPIER</strong></em></td>
+</tr>
+<tr>
+<td><strong>Partie II</strong></td>
+<td> <em>des <strong>tutoriels de programmation (notebooks Jupyter)</strong> pour explorer les propriétés des algorithmes</em></td>
+</tr>
+</tbody></table>
+<p><em>Le livre est <strong>librement téléchargeable</strong> sur <strong>mml-book.com</strong>, où l'on trouve aussi tutoriels, errata et matériel additionnel.</em></p>
+<h2>Comment reconnaître le type d'exercice</h2>
+<table>
+<thead>
+<tr>
+<th>Question posée</th>
+<th>Réponse à mobiliser</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>« Que signifie qu'un modèle apprend ? »</td>
+<td>la paraphrase de <strong>Mitchell</strong> : la <strong>performance s'améliore</strong> après prise en compte des données</td>
+</tr>
+<tr>
+<td>« Le mot algorithme dans quel sens ? »</td>
+<td><strong>prédicteur</strong> ou <strong>entraînement</strong> — préciser lequel</td>
+</tr>
+<tr>
+<td>« Qu'est-ce qu'un vecteur ? »</td>
+<td><strong>trois</strong> vues : tableau · flèche · <strong>objet obéissant à l'addition et à l'échelle</strong></td>
+</tr>
+<tr>
+<td>« Le modèle marche parfaitement sur l'entraînement »</td>
+<td> cela peut n'être que de la <strong>MÉMORISATION</strong></td>
+</tr>
+<tr>
+<td>Quelle fondation pour la similarité entre données ?</td>
+<td>la <strong>géométrie analytique</strong> (ch. 3)</td>
+</tr>
+<tr>
+<td>Quelle fondation pour le bruit et l'incertitude ?</td>
+<td>les <strong>probabilités</strong> (ch. 6)</td>
+</tr>
+<tr>
+<td>Quelle fondation pour la direction de recherche ?</td>
+<td>le <strong>calcul vectoriel</strong> (ch. 5), via le <strong>gradient</strong></td>
+</tr>
+<tr>
+<td>Données sans étiquette, on veut une représentation compacte</td>
+<td>la <strong>réduction de dimension</strong> (ch. 10)</td>
+</tr>
+<tr>
+<td>Données sans étiquette, on veut une loi</td>
+<td>l'<strong>estimation de densité</strong> (ch. 11)</td>
+</tr>
+<tr>
+<td>Étiquettes <strong>entières</strong></td>
+<td>la <strong>classification</strong> (ch. 12)</td>
+</tr>
+</tbody></table>
+<h2 data-prio="must">Common mistakes</h2>
+<table>
+<thead>
+<tr>
+<th>Erreur</th>
+<th>Correction</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Confondre les deux sens d'« algorithme »</td>
+<td> <strong>prédicteur</strong> (qui prédit) contre <strong>entraînement</strong> (qui adapte)</td>
+</tr>
+<tr>
+<td>N'avoir qu'une seule vue du vecteur</td>
+<td>il y en a <strong>trois</strong>, et la vue <strong>mathématique</strong> est celle qui compte pour l'algèbre linéaire</td>
+</tr>
+<tr>
+<td>Croire qu'une opération sur tableau est une opération vectorielle</td>
+<td> <strong>vérifier</strong> — l'avertissement explicite du livre</td>
+</tr>
+<tr>
+<td>Juger un modèle sur les données d'entraînement</td>
+<td> cela peut n'être que de la <strong>MÉMORISATION</strong></td>
+</tr>
+<tr>
+<td>Croire les chapitres de la partie II séquentiels</td>
+<td> ils sont <strong>faiblement couplés</strong>, lisibles <strong>dans n'importe quel ordre</strong></td>
+</tr>
+<tr>
+<td>Croire les chapitres de la partie I strictement séquentiels</td>
+<td>on peut <strong>en sauter un et travailler à rebours</strong></td>
+</tr>
+<tr>
+<td>Croire que la réduction de dimension utilise des étiquettes</td>
+<td> <strong>non</strong> — elle ne modélise <strong>que les données</strong></td>
+</tr>
+<tr>
+<td>Confondre réduction de dimension et estimation de densité</td>
+<td>l'une cherche une <strong>représentation compacte</strong>, l'autre une <strong>LOI</strong></td>
+</tr>
+<tr>
+<td>Croire la classification identique à la régression</td>
+<td> les étiquettes sont <strong>ENTIÈRES</strong>, ce qui exige un soin particulier</td>
+</tr>
+</tbody></table>
+<h2>Ultimate Review</h2>
+<table>
+<thead>
+<tr>
+<th>Élément</th>
+<th>Contenu</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>La définition</strong></td>
+<td>concevoir des algorithmes extrayant <strong>automatiquement</strong> de l'information des données</td>
+</tr>
+<tr>
+<td><strong>L'accent</strong></td>
+<td>sur  <strong>« AUTOMATIQUE »</strong> : des méthodologies <strong>généralistes</strong></td>
+</tr>
+<tr>
+<td><strong>Les trois concepts au cœur</strong></td>
+<td><strong>DONNÉES · MODÈLE · APPRENTISSAGE</strong></td>
+</tr>
+<tr>
+<td><strong>L'idéal des données</strong></td>
+<td>extraire des motifs  <strong>sans beaucoup d'expertise de domaine</strong></td>
+</tr>
+<tr>
+<td><strong>Ce qu'est un modèle</strong></td>
+<td>une <strong>version SIMPLIFIÉE du vrai processus INCONNU</strong> de génération</td>
+</tr>
+<tr>
+<td><strong>Son usage</strong></td>
+<td>prédire <strong>sans faire d'expériences réelles</strong></td>
+</tr>
+<tr>
+<td><strong>La définition de Mitchell (1997)</strong></td>
+<td>la <strong>performance s'AMÉLIORE</strong> après prise en compte des données</td>
+</tr>
+<tr>
+<td><strong>Le but</strong></td>
+<td>des modèles qui <strong>GÉNÉRALISENT</strong> à des données <strong>jamais vues</strong></td>
+</tr>
+<tr>
+<td><strong>Pourquoi les maths</strong></td>
+<td><strong>créer</strong> · <strong>déboguer</strong> · connaître les <strong>hypothèses et limites</strong></td>
+</tr>
+<tr>
+<td><strong>Les deux sens d'« algorithme »</strong></td>
+<td>le <strong>PRÉDICTEUR</strong> · l'<strong>ENTRAÎNEMENT</strong></td>
+</tr>
+<tr>
+<td><strong>Les trois vues d'un vecteur</strong></td>
+<td><strong>tableau</strong> (informatique) · <strong>flèche</strong> (physique) · <strong>objet additif et échelonnable</strong> (maths)</td>
+</tr>
+<tr>
+<td><strong>L'avertissement pratique</strong></td>
+<td>vérifier que les opérations sur tableaux sont bien <strong>vectorielles</strong></td>
+</tr>
+<tr>
+<td><strong>Entraîner</strong></td>
+<td>optimiser des paramètres selon une <strong>fonction d'UTILITÉ</strong></td>
+</tr>
+<tr>
+<td><strong>L'analogie</strong></td>
+<td> <strong>gravir une colline vers son sommet</strong></td>
+</tr>
+<tr>
+<td><strong>Le piège</strong></td>
+<td>bien faire sur l'entraînement peut n'être que <strong>MÉMORISER</strong></td>
+</tr>
+<tr>
+<td><strong>Le résumé en trois lignes</strong></td>
+<td>données <strong>= vecteurs</strong> · modèle <strong>probabiliste ou d'optimisation</strong> · apprentissage <strong>par optimisation numérique</strong></td>
+</tr>
+<tr>
+<td><strong>Bottom-up</strong></td>
+<td>du fondamental vers l'avancé ;  <strong>définitions vite oubliées</strong> faute de motivation</td>
+</tr>
+<tr>
+<td><strong>Top-down</strong></td>
+<td>des besoins vers les prérequis ;  <strong>fondations branlantes</strong></td>
+</tr>
+<tr>
+<td><strong>Le choix des auteurs</strong></td>
+<td>une écriture <strong>MODULAIRE</strong>, lisible des <strong>deux</strong> façons</td>
+</tr>
+<tr>
+<td><strong>Partie I</strong></td>
+<td>chapitres <strong>s'appuyant</strong> sur les précédents, mais sauts possibles</td>
+</tr>
+<tr>
+<td><strong>Partie II</strong></td>
+<td> chapitres <strong>faiblement couplés</strong>, <strong>n'importe quel ordre</strong></td>
+</tr>
+<tr>
+<td><strong>Les six fondations</strong></td>
+<td>algèbre linéaire · géométrie analytique · décompositions · calcul vectoriel · probabilités · optimisation</td>
+</tr>
+<tr>
+<td><strong>Les quatre piliers</strong></td>
+<td><strong>régression · réduction de dimension · estimation de densité · classification</strong></td>
+</tr>
+<tr>
+<td><strong>Le chapitre pont</strong></td>
+<td>le <strong>8</strong>, qui réénonce les trois composants <strong>mathématiquement</strong></td>
+</tr>
+<tr>
+<td><strong>Ce que le ch. 8 apporte en plus</strong></td>
+<td>des garde-fous contre les évaluations  <strong>trop optimistes</strong></td>
+</tr>
+<tr>
+<td><strong>Régression (ch. 9)</strong></td>
+<td>étiquettes <strong>RÉELLES</strong> ; MV, MAP, et <strong>bayésienne</strong> (on <strong>intègre</strong> au lieu d'optimiser)</td>
+</tr>
+<tr>
+<td><strong>Réduction de dimension (ch. 10)</strong></td>
+<td> <strong>AUCUNE étiquette</strong> ; représentation <strong>compacte</strong></td>
+</tr>
+<tr>
+<td><strong>Estimation de densité (ch. 11)</strong></td>
+<td>aucune étiquette ; une <strong>LOI</strong>, par <strong>mélanges gaussiens</strong> et schéma <strong>itératif</strong></td>
+</tr>
+<tr>
+<td><strong>Classification (ch. 12)</strong></td>
+<td>étiquettes  <strong>ENTIÈRES</strong> ; par <strong>SVM</strong></td>
+</tr>
+<tr>
+<td><strong>L'ordre de la partie II</strong></td>
+<td>par <strong>difficulté croissante</strong></td>
+</tr>
+<tr>
+<td><strong>Exercices partie I</strong></td>
+<td> <strong>stylo et papier</strong></td>
+</tr>
+<tr>
+<td><strong>Exercices partie II</strong></td>
+<td> <strong>notebooks Jupyter</strong></td>
+</tr>
+</tbody></table>
+<div class="rec"><h2>Active Recall</h2><ol>
+<li>Donner la définition d'ouverture de l'apprentissage automatique. Où est l'accent ?</li>
+<li>Citer les trois concepts au cœur de l'apprentissage automatique.</li>
+<li>Quel est l'idéal poursuivi concernant l'expertise de domaine ? Donner l'exemple du livre.</li>
+<li>À quoi un modèle est-il typiquement relié ?</li>
+<li>Énoncer la paraphrase de Mitchell (1997).</li>
+<li>Quel est le but ultime en matière de données futures ?</li>
+<li>Citer les trois raisons pour lesquelles les fondations mathématiques importent.</li>
+<li>Quels sont les deux sens du mot « algorithme d'apprentissage » ? Quels noms leur donne-t-on ?</li>
+<li>Le livre résout-il cette ambiguïté ?</li>
+<li>Sous quelle forme le livre suppose-t-il les données ?</li>
+<li>Citer les trois façons de penser un vecteur, et la discipline associée à chacune.</li>
+<li>Quel avertissement pratique le livre donne-t-il sur les tableaux ?</li>
+<li>Qu'est-ce qu'un bon modèle ? Quel est son usage ?</li>
+<li>Que signifie « entraîner » un modèle ? Par rapport à quoi optimise-t-on ?</li>
+<li>Quelle analogie décrit la plupart des méthodes d'entraînement ?</li>
+<li>Quel est le piège de bien performer sur les données d'entraînement ?</li>
+<li>Donner le résumé en trois lignes des concepts couverts par le livre.</li>
+<li>Décrire la stratégie <em>bottom-up</em>, son avantage et son inconvénient.</li>
+<li>Décrire la stratégie <em>top-down</em>, son avantage et son inconvénient.</li>
+<li>Quel choix d'écriture les auteurs ont-ils fait, et pourquoi ?</li>
+<li>Comment les chapitres de la partie I sont-ils couplés ? Et ceux de la partie II ?</li>
+<li>Citer les six fondations mathématiques.</li>
+<li>Citer les quatre piliers.</li>
+<li>Quel besoin motive l'algèbre linéaire ?</li>
+<li>Quel besoin motive la géométrie analytique ? Énoncer l'idée sur la similarité.</li>
+<li>Quel besoin motive les décompositions matricielles ?</li>
+<li>Quel besoin motive le calcul vectoriel ? Que dit le gradient ?</li>
+<li>Quels deux besoins motivent les probabilités ?</li>
+<li>Quel est le rôle du chapitre 8 ? Qu'apporte-t-il en plus ?</li>
+<li>Que cherche la régression linéaire ? Quelles trois méthodes d'ajustement ?</li>
+<li>Qu'est-ce qui distingue la régression bayésienne des deux autres ?</li>
+<li>Que cherche la réduction de dimension ? Y a-t-il des étiquettes ?</li>
+<li>Que cherche l'estimation de densité ? En quoi diffère-t-elle de la réduction de dimension ?</li>
+<li>Que cherche la classification ? Qu'est-ce qui exige un soin particulier ?</li>
+<li>Dans quel ordre les chapitres de la partie II sont-ils rangés ?</li>
+<li>Quelle est la nature des exercices dans chaque partie ?</li>
+</ol></div>
+
+<h2>Flashcards</h2>
+<table>
+<thead>
+<tr>
+<th>Question</th>
+<th>Réponse</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>La définition de l'apprentissage automatique ?</td>
+<td>Concevoir des algorithmes extrayant <strong>automatiquement</strong> de l'information des <strong>données</strong></td>
+</tr>
+<tr>
+<td>Où est l'accent ?</td>
+<td>Sur  <strong>« AUTOMATIQUE »</strong></td>
+</tr>
+<tr>
+<td>Ce que cela implique ?</td>
+<td>Des méthodologies <strong>GÉNÉRALISTES</strong> applicables à <strong>beaucoup</strong> de jeux de données</td>
+</tr>
+<tr>
+<td>Les trois concepts au cœur ?</td>
+<td><strong>DONNÉES · MODÈLE · APPRENTISSAGE</strong></td>
+</tr>
+<tr>
+<td>L'idéal sur l'expertise ?</td>
+<td> <strong>Sans beaucoup d'expertise de domaine</strong></td>
+</tr>
+<tr>
+<td>L'exemple donné ?</td>
+<td>Trouver les <strong>sujets partagés</strong> dans un grand corpus</td>
+</tr>
+<tr>
+<td>À quoi un modèle est-il relié ?</td>
+<td>Au <strong>processus qui GÉNÈRE</strong> les données</td>
+</tr>
+<tr>
+<td>Le modèle en régression ?</td>
+<td>Une fonction <strong>entrées → sorties RÉELLES</strong></td>
+</tr>
+<tr>
+<td>La définition de Mitchell ?</td>
+<td>La <strong>performance s'AMÉLIORE</strong> après prise en compte des données</td>
+</tr>
+<tr>
+<td>Le but ultime ?</td>
+<td><strong>GÉNÉRALISER</strong> à des données <strong>jamais vues</strong></td>
+</tr>
+<tr>
+<td>Trois raisons d'apprendre les maths ?</td>
+<td><strong>Créer</strong> · <strong>déboguer</strong> · connaître <strong>hypothèses et limites</strong></td>
+</tr>
+<tr>
+<td>Sens 1 d'« algorithme » ?</td>
+<td>Un <strong>PRÉDICTEUR</strong></td>
+</tr>
+<tr>
+<td>Sens 2 ?</td>
+<td>L'<strong>ENTRAÎNEMENT</strong></td>
+</tr>
+<tr>
+<td>Le livre résout-il l'ambiguïté ?</td>
+<td> <strong>NON</strong> — il la <strong>signale</strong></td>
+</tr>
+<tr>
+<td>Sous quelle forme les données ?</td>
+<td> Comme des <strong>VECTEURS</strong></td>
+</tr>
+<tr>
+<td>Vue 1 du vecteur ?</td>
+<td>Un <strong>TABLEAU de nombres</strong> (informatique)</td>
+</tr>
+<tr>
+<td>Vue 2 ?</td>
+<td>Une <strong>FLÈCHE</strong> avec direction et magnitude (physique)</td>
+</tr>
+<tr>
+<td>Vue 3 ?</td>
+<td> Un <strong>objet obéissant à l'ADDITION et à la MISE À L'ÉCHELLE</strong> (maths)</td>
+</tr>
+<tr>
+<td>L'avertissement pratique ?</td>
+<td>Vérifier que les opérations sur tableaux sont <strong>vectorielles</strong></td>
+</tr>
+<tr>
+<td>Qu'est-ce qu'un bon modèle ?</td>
+<td>Une <strong>version SIMPLIFIÉE du vrai processus INCONNU</strong></td>
+</tr>
+<tr>
+<td>Son usage ?</td>
+<td>Prédire  <strong>sans expérience réelle</strong></td>
+</tr>
+<tr>
+<td>Entraîner, c'est ?</td>
+<td><strong>Optimiser des paramètres</strong> selon une <strong>fonction d'UTILITÉ</strong></td>
+</tr>
+<tr>
+<td>L'analogie de l'entraînement ?</td>
+<td> <strong>Gravir une colline vers son sommet</strong></td>
+</tr>
+<tr>
+<td>Que représente le sommet ?</td>
+<td>Un <strong>MAXIMUM</strong> de la mesure de performance</td>
+</tr>
+<tr>
+<td>Le piège du bon score d'entraînement ?</td>
+<td> Ce peut n'être que de la <strong>MÉMORISATION</strong></td>
+</tr>
+<tr>
+<td>Ligne 1 du résumé ?</td>
+<td>Les données sont des <strong>VECTEURS</strong></td>
+</tr>
+<tr>
+<td>Ligne 2 ?</td>
+<td>Choisir un modèle, vue <strong>probabiliste</strong> ou <strong>optimisation</strong></td>
+</tr>
+<tr>
+<td>Ligne 3 ?</td>
+<td>Apprendre par <strong>optimisation NUMÉRIQUE</strong> pour les données <strong>non vues</strong></td>
+</tr>
+<tr>
+<td>Bottom-up ?</td>
+<td>Du <strong>fondamental vers l'avancé</strong></td>
+</tr>
+<tr>
+<td>Son avantage ?</td>
+<td>On s'appuie <strong>toujours</strong> sur l'acquis</td>
+</tr>
+<tr>
+<td>Son inconvénient ?</td>
+<td> Définitions <strong>vite oubliées</strong> faute de motivation</td>
+</tr>
+<tr>
+<td>Top-down ?</td>
+<td>Des <strong>besoins pratiques</strong> vers les prérequis</td>
+</tr>
+<tr>
+<td>Son avantage ?</td>
+<td>On sait <strong>toujours POURQUOI</strong></td>
+</tr>
+<tr>
+<td>Son inconvénient ?</td>
+<td> Fondations <strong>branlantes</strong>, mots incompris</td>
+</tr>
+<tr>
+<td>Le choix des auteurs ?</td>
+<td>Une écriture <strong>MODULAIRE</strong></td>
+</tr>
+<tr>
+<td>Couplage en partie I ?</td>
+<td>Chapitres <strong>s'appuyant</strong> sur les précédents</td>
+</tr>
+<tr>
+<td>Couplage en partie II ?</td>
+<td> <strong>Faible</strong> — n'importe quel ordre</td>
+</tr>
+<tr>
+<td>Les six fondations ?</td>
+<td>Algèbre linéaire · géométrie analytique · décompositions · calcul vectoriel · probabilités · optimisation</td>
+</tr>
+<tr>
+<td>Les quatre piliers ?</td>
+<td><strong>Régression · réduction de dimension · estimation de densité · classification</strong></td>
+</tr>
+<tr>
+<td>Besoin motivant l'algèbre linéaire ?</td>
+<td>Données <strong>= vecteurs</strong>, tables <strong>= matrices</strong></td>
+</tr>
+<tr>
+<td>Besoin motivant la géométrie analytique ?</td>
+<td> Formaliser la <strong>SIMILARITÉ</strong></td>
+</tr>
+<tr>
+<td>L'idée sur la similarité ?</td>
+<td>Des vecteurs <strong>similaires</strong> → des sorties <strong>similaires</strong></td>
+</tr>
+<tr>
+<td>Besoin motivant les décompositions ?</td>
+<td>Interprétation <strong>intuitive</strong> et apprentissage <strong>plus efficace</strong></td>
+</tr>
+<tr>
+<td>Besoin motivant le calcul vectoriel ?</td>
+<td>Le <strong>GRADIENT</strong></td>
+</tr>
+<tr>
+<td>Ce que dit le gradient ?</td>
+<td> <strong>LA DIRECTION</strong> dans laquelle chercher</td>
+</tr>
+<tr>
+<td>Les deux besoins motivant les probabilités ?</td>
+<td>Quantifier le <strong>BRUIT</strong> · exprimer l'<strong>INCERTITUDE</strong></td>
+</tr>
+<tr>
+<td>Rôle du chapitre 8 ?</td>
+<td><strong>Réénoncer</strong> les trois composants <strong>mathématiquement</strong></td>
+</tr>
+<tr>
+<td>Son apport supplémentaire ?</td>
+<td>Des garde-fous contre les évaluations  <strong>trop optimistes</strong></td>
+</tr>
+<tr>
+<td>Régression : les entrées et sorties ?</td>
+<td>$\mathbf x\in\mathbb R^D$ vers $y\in\mathbb R$</td>
+</tr>
+<tr>
+<td>Ses trois méthodes ?</td>
+<td><strong>MV</strong> · <strong>MAP</strong> · <strong>bayésienne</strong></td>
+</tr>
+<tr>
+<td>Ce qui distingue la bayésienne ?</td>
+<td> On <strong>INTÈGRE</strong> les paramètres au lieu de les <strong>optimiser</strong></td>
+</tr>
+<tr>
+<td>Réduction de dimension : le but ?</td>
+<td>Une représentation <strong>COMPACTE, de basse dimension</strong></td>
+</tr>
+<tr>
+<td>Y a-t-il des étiquettes ?</td>
+<td> <strong>NON</strong></td>
+</tr>
+<tr>
+<td>Estimation de densité : le but ?</td>
+<td>Une <strong>LOI DE PROBABILITÉ</strong> décrivant les données</td>
+</tr>
+<tr>
+<td>Le modèle employé ?</td>
+<td>Les <strong>mélanges GAUSSIENS</strong></td>
+</tr>
+<tr>
+<td>Le schéma de résolution ?</td>
+<td><strong>ITÉRATIF</strong></td>
+</tr>
+<tr>
+<td>En quoi diffère-t-elle de l'ACP ?</td>
+<td>On ne cherche <strong>PAS</strong> une basse dimension</td>
+</tr>
+<tr>
+<td>Classification : ce qui la distingue ?</td>
+<td> Les étiquettes sont des <strong>ENTIERS</strong></td>
+</tr>
+<tr>
+<td>Le modèle employé ?</td>
+<td>Les <strong>SVM</strong></td>
+</tr>
+<tr>
+<td>Ordre des chapitres de la partie II ?</td>
+<td>Par <strong>difficulté CROISSANTE</strong></td>
+</tr>
+<tr>
+<td>Exercices de la partie I ?</td>
+<td> <strong>Stylo et papier</strong></td>
+</tr>
+<tr>
+<td>Exercices de la partie II ?</td>
+<td> <strong>Notebooks Jupyter</strong></td>
+</tr>
+<tr>
+<td>Où trouver le livre ?</td>
+<td><strong>mml-book.com</strong>, librement téléchargeable</td>
+</tr>
+</tbody></table>
+</main>
+
+
+
+
+</body></html>

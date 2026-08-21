@@ -1,0 +1,1398 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fiche 409 — Réduction de dimension par ACP : variance maximale, projection, ACP probabiliste</title>
+<script>
+window.MathJax={tex:{inlineMath:[["$","$"]],displayMath:[["$$","$$"]],processEscapes:true},
+ options:{skipHtmlTags:["script","noscript","style","textarea","pre","code"]},
+ svg:{fontCache:"global"},
+ startup:{pageReady:()=>MathJax.startup.defaultPageReady().then(()=>{document.body.classList.add("ready")})}};
+setTimeout(function(){document.body.classList.add("ready")},2500);
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+/* ============================================================
+   MathiasLearn — feuille de style des fiches
+   Reprise intégrale des tokens de 00_PARCOURS/*.html
+   + blocs pédagogiques (callouts, méthode, essentiels, recall)
+   ============================================================ */
+:root{--bg:#faf9f7;--card:#fff;--ink:#1a1a1a;--muted:#6b6b6b;--line:#e5e2dd;--accent:#8b5e34;
+ --hl:#fdf8ef;--ok:#2d7d4f;--okbg:#f0f7f3;--warn:#b3402f;--warnbg:#fdf3f1;--blue:#2f5d8b;--bluebg:#f1f5fa}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+ font:17px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;padding:0 16px 100px}
+.nav{position:sticky;top:0;background:rgba(250,249,247,.96);backdrop-filter:blur(8px);
+ border-bottom:1px solid var(--line);margin:0 -16px 30px;padding:11px 16px;z-index:50;
+ display:flex;gap:6px;flex-wrap:wrap;font-size:13px}
+.nav a{color:var(--muted);text-decoration:none;padding:4px 9px;border-radius:5px;white-space:nowrap}
+.nav a:hover{background:var(--line);color:var(--ink)}
+.nav a.on{background:var(--accent);color:#fff}
+main{max-width:780px;margin:0 auto}
+h1{font-size:31px;letter-spacing:-.02em;margin:.4em 0 .5em;line-height:1.25}
+h2{font-size:23px;margin:2.2em 0 .7em;padding-bottom:.3em;border-bottom:1px solid var(--line)}
+h3{font-size:19px;margin:1.9em 0 .5em;color:var(--accent)}
+h4{font-size:17px;margin:1.5em 0 .4em}
+p{margin:.8em 0} a{color:var(--accent)} hr{border:0;border-top:1px solid var(--line);margin:2.6em 0}
+table{border-collapse:collapse;width:100%;margin:1.3em 0;font-size:15.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+th{background:#f3f0eb;font-weight:600}
+tr:nth-child(even) td{background:#fcfbfa}
+code{font-family:"SF Mono",Menlo,Consolas,monospace;font-size:.88em;background:#f2efea;padding:2px 6px;border-radius:4px;overflow-wrap:break-word}
+pre{background:#f2efea;padding:14px 16px;border-radius:8px;overflow-x:auto}
+pre code{background:none;padding:0;white-space:pre}
+blockquote{border-left:3px solid var(--accent);background:var(--hl);margin:1.4em 0;padding:14px 20px;border-radius:0 8px 8px 0}
+blockquote p:first-child{margin-top:0} blockquote p:last-child{margin-bottom:0}
+ul,ol{padding-left:1.5em} li{margin:.35em 0} em{color:#4a4a4a}
+mjx-container[display="true"]{margin:1.1em 0!important;overflow-x:auto;overflow-y:hidden;padding:2px 0}
+mjx-container svg{max-width:100%}
+body:not(.ready) main{opacity:0} main{opacity:1;transition:opacity .25s}
+
+/* --- bandeau de tête de fiche --- */
+.cours{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--accent);
+ border-radius:0 10px 10px 0;padding:18px 22px;margin:0 0 34px}
+.cours h4{margin:0 0 4px;font-size:14px;text-transform:uppercase;letter-spacing:.07em;color:var(--accent)}
+.cours .cs{color:var(--muted);font-size:14.5px;margin:0 0 14px}
+
+/* --- exercices / corrigés --- */
+.ex{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:6px 24px 20px;margin:18px 0}
+.ex>h3:first-child{margin-top:14px}
+details.cor{margin-top:18px;border:1px solid var(--line);border-radius:8px;background:#fcfbfa;overflow:hidden}
+details.cor>summary{cursor:pointer;padding:12px 16px;font-weight:600;font-size:15px;color:var(--accent);
+ list-style:none;display:flex;align-items:center;gap:9px;user-select:none;transition:.15s;min-height:44px}
+details.cor>summary::-webkit-details-marker{display:none}
+details.cor>summary:hover{background:var(--hl)}
+details.cor>summary::before{content:"\25B6";font-size:10px;transition:transform .18s;display:inline-block}
+details.cor[open]>summary::before{transform:rotate(90deg)}
+details.cor[open]>summary{background:var(--okbg);color:var(--ok);border-bottom:1px solid var(--line)}
+.cor .in{padding:4px 20px 16px}
+.cor .in>*:first-child{margin-top:.9em}
+
+/* --- blocs pédagogiques (callouts) ---
+   Générés depuis une citation Markdown dont le premier **gras** commence
+   par un mot-clé : DÉFINITION, THÉORÈME, MÉTHODE, PIÈGE, INTUITION… */
+.cal{border:1px solid var(--line);border-left:4px solid var(--accent);background:var(--card);
+ border-radius:0 10px 10px 0;padding:15px 20px;margin:1.5em 0}
+.cal>p:first-child{margin-top:0}.cal>p:last-child,.cal>ul:last-child,.cal>ol:last-child{margin-bottom:0}
+.cal .lab{display:block;font-size:12.5px;text-transform:uppercase;letter-spacing:.08em;
+ font-weight:700;color:var(--accent);margin-bottom:6px}
+.cal.formel{background:var(--hl)}
+.cal.piege{border-left-color:var(--warn);background:var(--warnbg)}
+.cal.piege .lab{color:var(--warn)}
+.cal.methode{border-left-color:var(--ok);background:var(--okbg)}
+.cal.methode .lab{color:var(--ok)}
+.cal.intu{border-left-color:var(--blue);background:var(--bluebg)}
+.cal.intu .lab{color:var(--blue)}
+.cal.plus{border-left-style:dashed;background:#faf9f7}
+.cal.plus .lab{color:var(--muted)}
+
+/* --- révision express --- */
+.ess{background:var(--card);border:1px solid var(--accent);border-radius:10px;padding:4px 24px 20px;margin:1.6em 0}
+.ess h3{margin-top:1.3em}
+.rec{background:var(--card);border:1px dashed var(--accent);border-radius:10px;padding:4px 24px 18px;margin:1.6em 0}
+.rec ol{counter-reset:none}
+
+/* --- impression / PDF --- */
+@media print{
+ .nav{display:none}
+ body{padding:0;background:#fff;font-size:11.2pt;line-height:1.55}
+ main{max-width:none}
+ h1{font-size:23pt}h2{font-size:15pt;margin-top:1.5em}h3{font-size:12.6pt}
+ h2,h3,h4{break-after:avoid;page-break-after:avoid}
+ table,.cal,blockquote{break-inside:avoid;page-break-inside:avoid}
+ table{display:table;font-size:9.6pt}
+ details.cor{border:1px solid var(--line);background:#fcfbfa}
+ details.cor>summary{display:none}
+ details.cor .in{padding-top:10px}
+ .cal,.ex,.ess,.rec{box-shadow:none}
+ a{color:var(--ink);text-decoration:none}
+}
+@page{margin:16mm 15mm 18mm}
+
+/* --- exemples travaillés --- */
+.exm{background:#fcfbfa;border:1px solid var(--line);border-radius:10px;padding:2px 20px 14px;margin:1.5em 0}
+.exm>h4:first-child{margin:14px 0 .5em;color:var(--accent);font-size:13px;text-transform:uppercase;letter-spacing:.07em}
+
+
+/* --- pastilles de priorité (conventions des fiches de l'app) --- */
+h2[data-prio], h3[data-prio], h4[data-prio]{position:relative}
+h2[data-prio]::before,h3[data-prio]::before,h4[data-prio]::before{
+ content:"";display:inline-block;width:9px;height:9px;border-radius:50%;
+ margin-right:9px;vertical-align:middle;background:var(--muted)}
+[data-prio="must"]::before{background:var(--warn)}
+[data-prio="high"]::before{background:#d98324}
+[data-prio="mid"]::before{background:#c9a227}
+[data-prio="low"]::before{background:var(--ok)}
+/* corrigés des fiches de l'app : même traitement que les corrigés des séries */
+details.cor>summary::after{content:""}
+</style></head><body>
+<div class="nav"><a href="00_COMMENCER_ICI.html">Commencer ici</a><a href="01_NOTATIONS_le-decodeur.html">Notations</a><a href="02_EXERCICES_Serie-0.html">Série 0 — Remise en route</a><a href="03_EXERCICES_Serie-1.html">Série 1 — Convexité</a><a href="04_EXERCICES_Serie-2.html">Série 2 — KKT</a><a href="05_AUTO-EVALUATION.html">Auto-évaluation (quiz)</a><a href="06_FICHE_Optimisation-deux-variables.html">Fiche — Optimisation à 2 variables</a></div>
+<main><h1>Fiche 409 — Réduction de dimension par ACP : variance maximale, projection, ACP probabiliste</h1>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Matière</strong></td>
+<td>Maths · Apprentissage automatique</td>
+</tr>
+<tr>
+<td><strong>Cours source</strong></td>
+<td>Deisenroth, Faisal &amp; Ong, <em>Mathematics for Machine Learning</em>, Cambridge University Press — chapitre 10 « Dimensionality Reduction with Principal Component Analysis » (p. 317-348)</td>
+</tr>
+<tr>
+<td><strong>Difficulté</strong></td>
+<td> Avancé — le <strong>deuxième pilier</strong>, la synthèse la plus complète du livre</td>
+</tr>
+<tr>
+<td><strong>Temps d'étude estimé</strong></td>
+<td>140 min</td>
+</tr>
+<tr>
+<td><strong>Prérequis</strong></td>
+<td>Fiche 401 (base, changement de base) · Fiche 402 (projections) · Fiche 403 (valeurs propres, SVD, Eckart-Young) · Fiche 405 (gaussiennes) · Fiche 406 (optimisation sous contraintes)</td>
+</tr>
+<tr>
+<td><strong>Concepts clés</strong></td>
+<td>Matrice de covariance des données, code, sous-espace principal, matrice de projection, perspective de la variance maximale, composante principale, chargement, perspective de la projection, erreur de reconstruction, coordonnées optimales, complément orthogonal, approximation de rang faible, itération de la puissance, ACP en grande dimension, centrage, standardisation, ACP probabiliste (PPCA), processus génératif, échantillonnage ancestral, vraisemblance, a posteriori latente</td>
+</tr>
+<tr>
+<td><strong>Poids à l'examen</strong></td>
+<td>$S=\frac1N\sum_nx_nx_n^\top$ · $z_n=B^\top x_n$ et $\tilde x_n=BB^\top x_n$ · <strong>$Sb_m=\lambda_mb_m$</strong> et $V_m=\lambda_m$ · <strong>$J_M=\sum_{j=M+1}^{D}\lambda_j$</strong> · l'<strong>équivalence</strong> variance maximale $\Leftrightarrow$ erreur de reconstruction minimale · l'astuce $\frac1NX^\top X$ en grande dimension · <strong>PPCA</strong> : $p(x)=\mathcal N(\mu,BB^\top+\sigma^2I)$.</td>
+</tr>
+</tbody></table>
+<h2>Vue d'ensemble</h2>
+<pre><code>LE FIL DU CHAPITRE : DEUX dérivations, UNE seule réponse — les VECTEURS PROPRES de S
+
+  §10.1 CADRE     données centrées x_n ∈ R^D ,  COVARIANCE  S = (1/N) Σn xn xnᵀ
+        CODE            z_n = Bᵀ x_n ∈ R^M        (M &lt; D)
+        RECONSTRUCTION  x̃_n = B Bᵀ x_n ∈ R^D
+        B = [b1,…,bM] ∈ R^(D×M) à colonnes ORTHONORMÉES
+  §10.2 PERSPECTIVE « VARIANCE MAXIMALE »
+        max_{b} bᵀ S b  s.c. ‖b‖² = 1   →  LAGRANGE  →  S b1 = λ1 b1
+        ⚠️ V1 = b1ᵀ S b1 = λ1        la variance EST la valeur propre
+        la m-ième CP : même résultat, sur les données DÉFLATÉES  Ŝ b_m = S b_m = λ_m b_m
+        VARIANCE RETENUE par M composantes  =  λ1 + … + λM
+  §10.3 PERSPECTIVE « PROJECTION »
+        J_M = (1/N) Σn ‖x_n − x̃_n‖²        ← ERREUR DE RECONSTRUCTION
+        COORDONNÉES OPTIMALES  z_in = b_iᵀ x_n     ← la PROJECTION ORTHOGONALE
+        x_n − x̃_n vit ENTIÈREMENT dans le COMPLÉMENT ORTHOGONAL
+        J_M = Σ_{j&gt;M} b_jᵀ S b_j = tr( (Σ_{j&gt;M} b_j b_jᵀ) S )  =  Σ_{j&gt;M} λ_j
+        ⚠️ MINIMISER l'erreur ⟺ MAXIMISER la variance retenue — MÊME SOLUTION
+  §10.4 CALCUL     eigendécomposition de S  OU  SVD de X (⚠️ λi = σi²)
+        ECKART-YOUNG : la meilleure approximation de rang M est la SVD TRONQUÉE
+        ITÉRATION DE LA PUISSANCE  x_{k+1} = S x_k / ‖S x_k‖  → le 1er vecteur propre
+  §10.5 GRANDE DIMENSION (N ≪ D)
+        ⚠️ diagonaliser (1/N) XᵀX ∈ R^(N×N) au lieu de (1/N) XXᵀ ∈ R^(D×D)
+        MÊMES valeurs propres non nulles ;  b_m se retrouve par  c_m = Xᵀ b_m
+  §10.6 LES CINQ ÉTAPES EN PRATIQUE
+        1. CENTRER   2. STANDARDISER   3. EIGENDÉCOMPOSITION
+        4. PROJETER  z* = Bᵀ x*        5. DÉ-STANDARDISER pour revenir dans l'espace original
+  §10.7 PERSPECTIVE VARIABLE LATENTE — l'ACP PROBABILISTE (PPCA)
+        z ~ N(0, I) ,  x = Bz + µ + ε ,  ε ~ N(0, σ²I)
+        VRAISEMBLANCE  p(x) = N(x | µ , B Bᵀ + σ² I)
+        A POSTERIORI   p(z|x) = N(m, C) ,  m = Bᵀ(BBᵀ+σ²I)⁻¹(x−µ)
+                                            C = I − Bᵀ(BBᵀ+σ²I)⁻¹B
+        ⚠️ la covariance a posteriori NE DÉPEND PAS de x
+
+LE RÉSULTAT UNIQUE   Les colonnes de B sont les M VECTEURS PROPRES de S
+                     associés aux M PLUS GRANDES VALEURS PROPRES.
+</code></pre>
+<blockquote>
+<p><strong>L'intuition fondatrice.</strong> <em>« La réduction de dimension exploite une propriété des données de grande dimension (par exemple les images) : elles <strong>résident souvent sur un SOUS-ESPACE de basse dimension</strong>. »</em> L'exemple de la figure 10.1 : les données *« ne résident pas tout à fait sur une droite, mais elles <strong>ne varient pas beaucoup dans la direction $x_2$</strong>, si bien qu'on peut les exprimer <strong>comme si</strong> elles étaient sur une droite — <strong>presque sans perte</strong> »*.</p>
+</blockquote>
+<blockquote>
+<p> <strong>Autres noms de l'ACP.</strong> Dans la communauté du <strong>traitement du signal</strong>, l'ACP est aussi connue sous le nom de <strong>transformée de KARHUNEN-LOÈVE</strong>.</p>
+</blockquote>
+<h2 data-prio="high">Concept 1 — Le cadre (§10.1)</h2>
+<p><strong>Le jeu de données</strong> : $\mathcal X=\{x_1,\dots,x_N\}$, $x_n\in\mathbb R^D$, i.i.d., <strong>de moyenne $0$</strong>, avec la <strong>matrice de covariance des données</strong> :</p>
+<p>$$\boxed{\;S=\frac1N\sum_{n=1}^{N}x_nx_n^\top\;}$$</p>
+<p><strong>Les deux objets centraux :</strong></p>
+<p>$$\boxed{\;\underbrace{z_n=B^\top x_n\in\mathbb R^M}_{\text{le CODE (représentation compressée)}}\qquad\underbrace{\tilde x_n=BB^\top x_n\in\mathbb R^D}_{\text{la RECONSTRUCTION}}\;}$$</p>
+<p>avec la <strong>matrice de projection</strong> $B:=[b_1,\dots,b_M]\in\mathbb R^{D\times M}$ à colonnes <strong>ORTHONORMÉES</strong> : $b_i^\top b_j=0$ si $i\neq j$ et $b_i^\top b_i=1$.</p>
+<blockquote>
+<p><strong>L'objectif.</strong> <em>« Trouver des projections $\tilde x_n$ des points $x_n$ qui soient <strong>AUSSI SEMBLABLES QUE POSSIBLE</strong> aux points originaux, mais qui aient une <strong>dimensionnalité INTRINSÈQUE significativement PLUS BASSE</strong>. »</em></p>
+</blockquote>
+<p class="cal piege"> <strong>Trois espaces à distinguer</strong> (figure 10.2) :</p>
+<table>
+<thead>
+<tr>
+<th>Objet</th>
+<th>Espace</th>
+<th>Rôle</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$x$</td>
+<td>$\mathbb R^D$</td>
+<td><strong>Original</strong></td>
+</tr>
+<tr>
+<td>$z$</td>
+<td>$\mathbb R^M$</td>
+<td> <strong>Compressé</strong> — c'est ce que <strong>l'ACP RENVOIE</strong></td>
+</tr>
+<tr>
+<td>$\tilde x$</td>
+<td>$\mathbb R^D$</td>
+<td><strong>Reconstruit</strong> — il <strong>vit dans l'espace original</strong> mais a une représentation intrinsèque de plus basse dimension</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p class="cal piege"> <strong>La remarque clé.</strong> <em>« Bien que $\tilde x_n$ soit un vecteur de dimension $D$, il <strong>ne requiert qu'une SEULE coordonnée</strong> $z_{1n}$ pour être représenté par rapport au vecteur de base $b_1\in\mathbb R^D$. »</em></p>
+</blockquote>
+<p><strong>Exemple 10.1 — coordonnées contre représentation.</strong> Dans $\mathbb R^2$ avec la base canonique, $[5,3]^\top=5e_1+3e_2$ demande <strong>deux</strong> coordonnées. Mais un vecteur de la forme $\tilde x=[z,0]^\top$ <strong>ne demande qu'UNE</strong> coordonnée par rapport à $e_1$ : <em>« il vit dans un sous-espace de dimension 1 »</em>.</p>
+<blockquote>
+<p> <strong>La remarque de notation, propre à ce chapitre.</strong> <em>« Nous <strong>NE suivons PAS</strong> la convention de collecter les données en LIGNES de la matrice : nous les définissons comme les <strong>COLONNES</strong> de $X$. Notre matrice $X$ est donc <strong>$D\times N$</strong> et non $N\times D$. La raison : les <strong>opérations algébriques se déroulent SANS AVOIR À TRANSPOSER</strong> la matrice ni redéfinir les vecteurs comme vecteurs lignes. »</em></p>
+</blockquote>
+<h2 data-prio="must">Concept 2 — La perspective de la variance maximale (§10.2)</h2>
+<h3>2.1 Le principe</h3>
+<blockquote>
+<p><strong>L'idée.</strong> <em>« Si l'on interprète le <strong>contenu informationnel</strong> des données comme leur caractère "<strong>REMPLISSANT L'ESPACE</strong>", alors on peut décrire l'information contenue en regardant l'<strong>ÉTALEMENT</strong> des données. La <strong>VARIANCE</strong> est un indicateur de cet étalement. »</em>
+$$\boxed{\;\text{Conserver le plus d'information}\ \equiv\ \text{capturer la PLUS GRANDE VARIANCE dans le code de basse dimension (Hotelling, 1933)}\;}$$</p>
+</blockquote>
+<div class="cal intu"><span class="lab">Pourquoi le centrage est SANS PERTE DE GÉNÉRALITÉ.</span>
+<p> 
+$$\mathbb V_z[z]=\mathbb V_x\big[B^\top(x-\mu)\big]=\mathbb V_x\big[B^\top x-B^\top\mu\big]=\mathbb V_x\big[B^\top x\big]$$
+<em>« La variance du code de basse dimension <strong>NE DÉPEND PAS de la MOYENNE</strong> des données. »</em> Et avec cette hypothèse, la moyenne du code est aussi $0$ puisque $\mathbb E_z[z]=B^\top\mathbb E_x[x]=0$.</p>
+</div>
+<h3>2.2 La direction de variance maximale</h3>
+<p><strong>Étape 1 — l'objectif.</strong> On maximise la variance de la première coordonnée :</p>
+<p>$$V_1:=\mathbb V[z_1]=\frac1N\sum_{n=1}^{N}z_{1n}^2\qquad\text{avec}\qquad z_{1n}=b_1^\top x_n$$</p>
+<p><strong>Étape 2 — la réécriture matricielle.</strong></p>
+<p>$$V_1=\frac1N\sum_{n=1}^{N}(b_1^\top x_n)^2=\frac1N\sum_{n=1}^{N}b_1^\top x_nx_n^\top b_1=b_1^\top\left(\frac1N\sum_{n=1}^{N}x_nx_n^\top\right)b_1$$</p>
+<p>$$\boxed{\;V_1=b_1^\top Sb_1\;}$$</p>
+<p><strong>Étape 3 — la contrainte.</strong>  <em>« <strong>Augmenter arbitrairement la MAGNITUDE de $b_1$ AUGMENTE $V_1$</strong> : un vecteur deux fois plus long peut donner un $V_1$ potentiellement <strong>QUATRE fois plus grand</strong>. On restreint donc toutes les solutions à $\lVert b_1\rVert^2=1$. »</em></p>
+<p>$$\boxed{\;\max_{b_1}\ b_1^\top Sb_1\quad\text{s.c.}\quad\lVert b_1\rVert^2=1\;}$$</p>
+<p><strong>Étape 4 — le lagrangien</strong> (§7.2) :</p>
+<p>$$\mathfrak L(b_1,\lambda)=b_1^\top Sb_1+\lambda_1(1-b_1^\top b_1)$$</p>
+<p>$$\frac{\partial\mathfrak L}{\partial b_1}=2b_1^\top S-2\lambda_1b_1^\top,\qquad\frac{\partial\mathfrak L}{\partial\lambda_1}=1-b_1^\top b_1$$</p>
+<p><strong>Étape 5 — l'annulation.</strong></p>
+<p>$$\boxed{\;Sb_1=\lambda_1b_1\qquad\text{et}\qquad b_1^\top b_1=1\;}$$</p>
+<blockquote>
+<p> <strong>LA RÉVÉLATION.</strong> *« En comparant avec la définition d'une décomposition en valeurs propres (§4.4), on voit que <strong>$b_1$ est un VECTEUR PROPRE de la matrice de covariance $S$</strong>, et que le <strong>multiplicateur de LAGRANGE $\lambda_1$ joue le rôle de la VALEUR PROPRE</strong> correspondante. »*</p>
+</blockquote>
+<p><strong>Étape 6 — la conséquence.</strong></p>
+<p>$$\boxed{\;V_1=b_1^\top Sb_1=\lambda_1b_1^\top b_1=\lambda_1\;}$$</p>
+<blockquote>
+<p> <strong>LA CONCLUSION.</strong> <em>« La variance des données projetées sur un sous-espace de dimension 1 <strong>ÉGALE LA VALEUR PROPRE</strong> associée au vecteur de base qui engendre ce sous-espace. Donc, pour <strong>MAXIMISER</strong> la variance du code, on choisit le vecteur de base associé à <strong>LA PLUS GRANDE valeur propre</strong> de $S$. Ce vecteur propre est la <strong>PREMIÈRE COMPOSANTE PRINCIPALE</strong>. »</em></p>
+</blockquote>
+<p class="cal piege"> <strong>Vocabulaire.</strong> <em>« La quantité $\sqrt{\lambda_1}$ est appelée le <strong>CHARGEMENT</strong> (<em>loading</em>) du vecteur unitaire $b_1$ et représente <strong>l'ÉCART-TYPE</strong> des données pris en compte par le sous-espace principal. »</em></p>
+<h3>2.3 Le sous-espace de dimension $M$</h3>
+<p><strong>L'idée de DÉFLATION.</strong> <em>« La $m$-ième composante principale se trouve en <strong>SOUSTRAYANT l'effet des $m-1$ premières</strong> composantes des données, essayant ainsi de trouver des composantes qui compressent <strong>l'information RESTANTE</strong>. »</em></p>
+<p>$$\boxed{\;\hat X:=X-\sum_{i=1}^{m-1}b_ib_i^\top X=X-B_{m-1}X\;}$$</p>
+<p>où $B_{m-1}:=\sum_{i=1}^{m-1}b_ib_i^\top$ <strong>projette sur le sous-espace engendré par $b_1,\dots,b_{m-1}$</strong>.  <em>« $\hat X$ contient l'information des données <strong>qui n'a PAS ENCORE été compressée</strong>. »</em></p>
+<p><strong>Le résultat remarquable.</strong> Les vecteurs propres de $S$ et de $\hat S$ sont <strong>IDENTIQUES</strong> :</p>
+<p>$$\hat Sb_i=\big(S-SB_{m-1}-B_{m-1}S+B_{m-1}SB_{m-1}\big)b_i$$</p>
+<p><strong>Les deux cas :</strong></p>
+<p>$$\boxed{\;B_{m-1}b_i=b_i\ \text{ si }i&lt;m\qquad\qquad B_{m-1}b_i=0\ \text{ si }i\geqslant m\;}$$</p>
+<table>
+<thead>
+<tr>
+<th>Cas</th>
+<th>Résultat</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$i\geqslant m$</td>
+<td>$\hat Sb_i=(S-B_{m-1}S)b_i=Sb_i=\lambda_ib_i$ —  <strong>même vecteur propre, MÊME valeur propre</strong></td>
+</tr>
+<tr>
+<td>$i&lt;m$</td>
+<td>$\hat Sb_i=0=0\cdot b_i$ —  <strong>valeur propre NULLE</strong> : $b_1,\dots,b_{m-1}$ engendrent le <strong>NOYAU de $\hat S$</strong></td>
+</tr>
+</tbody></table>
+<blockquote>
+<p> <strong>La conclusion.</strong> *« <strong>Tout vecteur propre de $S$ est aussi vecteur propre de $\hat S$.</strong> Mais si le vecteur propre fait partie du sous-espace principal de dimension $m-1$, sa valeur propre pour $\hat S$ est <strong>$0$</strong>. »* Donc $\lambda_m$ est <strong>la plus grande</strong> valeur propre de $\hat S$ <strong>et</strong> la <strong>$m$-ième plus grande</strong> de $S$.</p>
+</blockquote>
+<p>$$\boxed{\;V_m=b_m^\top Sb_m=\lambda_m\qquad\Longrightarrow\qquad\text{Variance retenue par }M\text{ composantes}=\sum_{m=1}^{M}\lambda_m\;}$$</p>
+<details class="cor">
+<summary> Vérification numérique complète des trois identités</summary><div class="in">
+
+<p>Sur un jeu simulé ($D=4$, $N=200$, structure latente de rang 2 plus bruit) :</p>
+<p><strong>Valeurs propres de $S$</strong> : $[4{,}112758\ ;\ 1{,}937579\ ;\ 0{,}102982\ ;\ 0{,}093462]$, et $\operatorname{tr}(S)=6{,}246782=\sum_m\lambda_m$  (théorème 4.17)</p>
+<p><strong>$V_m=b_m^\top Sb_m=\lambda_m$</strong> :</p>
+<table>
+<thead>
+<tr>
+<th>$m$</th>
+<th>$b_m^\top Sb_m$</th>
+<th>$\lambda_m$</th>
+<th>écart</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$1$</td>
+<td>$4{,}11275820$</td>
+<td>$4{,}11275820$</td>
+<td>$8{,}9\cdot10^{-16}$</td>
+</tr>
+<tr>
+<td>$2$</td>
+<td>$1{,}93757947$</td>
+<td>$1{,}93757947$</td>
+<td>$0$</td>
+</tr>
+<tr>
+<td>$3$</td>
+<td>$0{,}10298190$</td>
+<td>$0{,}10298190$</td>
+<td>$3{,}5\cdot10^{-16}$</td>
+</tr>
+<tr>
+<td>$4$</td>
+<td>$0{,}09346227$</td>
+<td>$0{,}09346227$</td>
+<td>$6{,}9\cdot10^{-17}$</td>
+</tr>
+</tbody></table>
+<p><strong>Variance du code $=\sum_{m\leqslant M}\lambda_m$</strong> :</p>
+<table>
+<thead>
+<tr>
+<th>$M$</th>
+<th>Variance de $z$ mesurée</th>
+<th>$\sum_{m\leqslant M}\lambda_m$</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$1$</td>
+<td>$4{,}11275820$</td>
+<td>$4{,}11275820$ </td>
+</tr>
+<tr>
+<td>$2$</td>
+<td>$6{,}05033767$</td>
+<td>$6{,}05033767$ </td>
+</tr>
+<tr>
+<td>$3$</td>
+<td>$6{,}15331957$</td>
+<td>$6{,}15331957$ </td>
+</tr>
+<tr>
+<td>$4$</td>
+<td>$6{,}24678184$</td>
+<td>$6{,}24678184$ </td>
+</tr>
+</tbody></table>
+</div></details>
+
+<p><strong>Exemple 10.2 — les « 8 » de MNIST.</strong> Sur tous les chiffres « 8 » de l'ensemble d'entraînement, <em>« on voit que <strong>seules quelques</strong> valeurs propres diffèrent significativement de $0$. Donc <strong>l'essentiel de la variance est capturé par SEULEMENT quelques composantes principales</strong>. »</em></p>
+<h2 data-prio="must">Concept 3 — La perspective de la projection (§10.3)</h2>
+<h3>3.1 L'objectif</h3>
+<blockquote>
+<p><strong>La reformulation.</strong> <em>« On dérive l'ACP comme un algorithme qui <strong>MINIMISE DIRECTEMENT l'ERREUR DE RECONSTRUCTION MOYENNE</strong>. Cette perspective permet d'interpréter l'ACP comme un <strong>AUTO-ENCODEUR LINÉAIRE OPTIMAL</strong>. »</em></p>
+</blockquote>
+<p>Avec une <strong>base orthonormée ordonnée</strong> $(b_1,\dots,b_D)$ de $\mathbb R^D$ :</p>
+<p>$$x=\sum_{d=1}^{D}\zeta_db_d=\underbrace{\sum_{m=1}^{M}\zeta_mb_m}_{\text{retenu}}+\underbrace{\sum_{j=M+1}^{D}\zeta_jb_j}_{\text{abandonné}}$$</p>
+<p>$$\boxed{\;J_M:=\frac1N\sum_{n=1}^{N}\lVert x_n-\tilde x_n\rVert^2\;}$$</p>
+<p>C'est l'<strong>ERREUR DE RECONSTRUCTION</strong> (Pearson, 1901).  <em>« On rend explicite que $M$ est la dimension du sous-espace sur lequel on projette. »</em></p>
+<p><strong>La stratégie en deux temps :</strong> <em>« D'abord on <strong>optimise les COORDONNÉES $z_n$</strong> pour une base orthonormée donnée ; ensuite on trouve la <strong>base OPTIMALE</strong>. »</em></p>
+<h3>3.2 Les coordonnées optimales</h3>
+<p>$$\frac{\partial J_M}{\partial z_{in}}=\frac{\partial J_M}{\partial\tilde x_n}\frac{\partial\tilde x_n}{\partial z_{in}},\qquad\frac{\partial J_M}{\partial\tilde x_n}=-\frac2N(x_n-\tilde x_n)^\top,\qquad\frac{\partial\tilde x_n}{\partial z_{in}}=b_i$$</p>
+<p>$$\frac{\partial J_M}{\partial z_{in}}=-\frac2N(x_n-\tilde x_n)^\top b_i\overset{\text{ONB}}{=}-\frac2N\big(x_n^\top b_i-z_{in}\big)$$</p>
+<p>$$\boxed{\;z_{in}=x_n^\top b_i=b_i^\top x_n\;}$$</p>
+<blockquote>
+<p> <strong>LA CONCLUSION GÉOMÉTRIQUE.</strong> <em>« Les coordonnées de la projection optimale de $x_n$ par rapport aux vecteurs de base sont <strong>les coordonnées de la PROJECTION ORTHOGONALE de $x_n$ sur le sous-espace principal</strong>. »</em> C'est exactement le résultat du §3.8 (fiche 402), retrouvé ici <strong>par le calcul</strong>.</p>
+</blockquote>
+<h3>3.3 Le déplacement vit dans le complément orthogonal</h3>
+<p>$$\tilde x_n=\sum_{m=1}^{M}z_{mn}b_m=\sum_{m=1}^{M}(x_n^\top b_m)b_m=\left(\sum_{m=1}^{M}b_mb_m^\top\right)x_n$$</p>
+<p>$$x_n=\left(\sum_{d=1}^{D}b_db_d^\top\right)x_n=\underbrace{\left(\sum_{m=1}^{M}b_mb_m^\top\right)x_n}_{=\tilde x_n}+\left(\sum_{j=M+1}^{D}b_jb_j^\top\right)x_n$$</p>
+<p>$$\boxed{\;x_n-\tilde x_n=\left(\sum_{j=M+1}^{D}b_jb_j^\top\right)x_n\;}$$</p>
+<blockquote>
+<p> <em>« La différence est <strong>EXACTEMENT la PROJECTION du point sur le COMPLÉMENT ORTHOGONAL</strong> du sous-espace principal. Le vecteur de déplacement $x_n-\tilde x_n$ <strong>vit dans le sous-espace ORTHOGONAL</strong> au sous-espace principal. »</em></p>
+</blockquote>
+<blockquote>
+<p> <strong>Le lien avec Eckart-Young.</strong> La matrice de projection est
+$$\boxed{\;\sum_{m=1}^{M}b_mb_m^\top=BB^\top\;}$$
+*« Par construction comme <strong>somme de matrices de RANG 1</strong> $b_mb_m^\top$, $BB^\top$ est <strong>symétrique et de RANG $M$</strong>. »* Et
+$$\frac1N\sum_{n=1}^{N}\lVert x_n-\tilde x_n\rVert^2=\frac1N\sum_{n=1}^{N}\big\lVert(I-BB^\top)x_n\big\rVert^2$$
+ <em>« Trouver les $b_1,\dots,b_M$ qui minimisent la différence est <strong>ÉQUIVALENT à trouver la MEILLEURE APPROXIMATION DE RANG $M$ de la MATRICE IDENTITÉ $I$</strong> »</em> (§4.6).</p>
+</blockquote>
+<details class="cor">
+<summary> Les quatre propriétés vérifiées numériquement</summary><div class="in">
+
+<p>Avec $M=2$ et $D=4$ :</p>
+<table>
+<thead>
+<tr>
+<th>Propriété</th>
+<th>Test</th>
+<th>Résultat</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Idempotence</strong> de $BB^\top$</td>
+<td>$\max\lvert P^2-P\rvert$</td>
+<td>$0{,}0$ </td>
+</tr>
+<tr>
+<td><strong>Symétrie</strong></td>
+<td>$\max\lvert P-P^\top\rvert$</td>
+<td>$0{,}0$ </td>
+</tr>
+<tr>
+<td><strong>Trace $=M$</strong></td>
+<td>$\operatorname{tr}(BB^\top)$</td>
+<td>$2{,}0$ </td>
+</tr>
+<tr>
+<td><strong>Déplacement orthogonal</strong></td>
+<td>$\max_{n,m}\lvert(x_n-\tilde x_n)\cdot b_m\rvert$</td>
+<td>$0{,}0$ </td>
+</tr>
+</tbody></table>
+</div></details>
+
+<h3>3.4 La reformulation de la perte — le point culminant</h3>
+<p>$$J_M=\frac1N\sum_{n=1}^{N}\left\lVert\sum_{j=M+1}^{D}(b_j^\top x_n)b_j\right\rVert^2\overset{\text{ONB}}{=}\frac1N\sum_{n=1}^{N}\sum_{j=M+1}^{D}(b_j^\top x_n)^2$$</p>
+<p>En échangeant les sommes :</p>
+<p>$$J_M=\sum_{j=M+1}^{D}b_j^\top\left(\frac1N\sum_{n=1}^{N}x_nx_n^\top\right)b_j=\sum_{j=M+1}^{D}b_j^\top Sb_j$$</p>
+<p>Puis, par <strong>linéarité et invariance CYCLIQUE de la trace</strong> (fiche 403) :</p>
+<p>$$\boxed{\;J_M=\sum_{j=M+1}^{D}\operatorname{tr}\big(b_j^\top Sb_j\big)=\operatorname{tr}\left(\underbrace{\left(\sum_{j=M+1}^{D}b_jb_j^\top\right)}_{\text{matrice de projection, de rang }D-M}S\right)\;}$$</p>
+<blockquote>
+<p> <strong>L'ÉQUIVALENCE DES DEUX PERSPECTIVES, énoncée par le livre :</strong>
+<em>« On peut formuler l'erreur de reconstruction quadratique moyenne comme <strong>la COVARIANCE des données PROJETÉE sur le COMPLÉMENT ORTHOGONAL</strong> du sous-espace principal. <strong>Minimiser l'erreur de reconstruction moyenne est donc ÉQUIVALENT à MINIMISER la variance des données projetée sur le sous-espace QU'ON IGNORE</strong> — ou, de façon équivalente, à <strong>MAXIMISER la variance de la projection qu'on RETIENT</strong>. »</em>
+$$\boxed{\;\text{ERREUR MINIMALE}\ \Longleftrightarrow\ \text{VARIANCE MAXIMALE}\ \Longrightarrow\ \text{MÊME SOLUTION}\;}$$</p>
+</blockquote>
+<p><strong>La conséquence chiffrée</strong> — l'équation (10.62) :</p>
+<p>$$\boxed{\;J_M=\frac1N\sum_{n=1}^{N}\lVert x_n-\tilde x_n\rVert^2=\sum_{i=M+1}^{D}\lambda_i\;}$$</p>
+<p><em>« L'erreur de reconstruction est la <strong>SOMME des valeurs propres ABANDONNÉES</strong>. »</em></p>
+<details class="cor">
+<summary> Vérification exacte de l'équation (10.62)</summary><div class="in">
+
+<table>
+<thead>
+<tr>
+<th>$M$</th>
+<th>$J_M$ mesurée</th>
+<th>$\sum_{j&gt;M}\lambda_j$</th>
+<th>écart</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$1$</td>
+<td>$2{,}13402364$</td>
+<td>$2{,}13402364$</td>
+<td>$4{,}4\cdot10^{-16}$</td>
+</tr>
+<tr>
+<td>$2$</td>
+<td>$0{,}19644416$</td>
+<td>$0{,}19644416$</td>
+<td>$2{,}8\cdot10^{-17}$</td>
+</tr>
+<tr>
+<td>$3$</td>
+<td>$0{,}09346227$</td>
+<td>$0{,}09346227$</td>
+<td>$2{,}1\cdot10^{-16}$</td>
+</tr>
+<tr>
+<td>$4$</td>
+<td>$0{,}00000000$</td>
+<td>$0{,}00000000$</td>
+<td>$2{,}6\cdot10^{-31}$</td>
+</tr>
+</tbody></table>
+<p class="cal piege"> <strong>Le contrôle de cohérence global</strong> : pour tout $M$, on a <strong>variance retenue $+$ erreur $=\operatorname{tr}(S)$</strong>. En $M=2$ : $6{,}05034+0{,}19644=6{,}24678=\operatorname{tr}(S)$  — les deux perspectives partagent <strong>le même budget total</strong>.</p>
+</div></details>
+
+<h2 data-prio="high">Concept 4 — Calcul des vecteurs propres (§10.4)</h2>
+<h3>4.1 Les deux voies</h3>
+<p>$$S=\frac1N\sum_{n=1}^{N}x_nx_n^\top=\frac1NXX^\top,\qquad X=[x_1,\dots,x_N]\in\mathbb R^{D\times N}$$</p>
+<table>
+<thead>
+<tr>
+<th>Voie</th>
+<th>Comment</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Eigendécomposition</strong></td>
+<td>Directement sur $S$ (§4.2)</td>
+</tr>
+<tr>
+<td><strong>SVD de $X$</strong></td>
+<td>$X=U\Sigma V^\top$ ;  <em>« Comme $S$ est symétrique et se factorise en $XX^\top$ (au facteur $\frac1N$ près), les <strong>valeurs propres de $S$ sont les CARRÉS des valeurs SINGULIÈRES de $X$</strong> »</em></td>
+</tr>
+</tbody></table>
+<p>$$\boxed{\;\lambda_i=\sigma_i^2\qquad\text{et}\qquad U=B\;}$$</p>
+<h3>4.2 Eckart-Young appliqué à l'ACP</h3>
+<p><em>« Le théorème d'Eckart-Young (théorème 4.25) offre une façon <strong>DIRECTE</strong> d'estimer la représentation de basse dimension. »</em> La meilleure approximation de rang $M$</p>
+<p>$$\tilde X_M:=\operatorname*{argmin}_{\operatorname{rk}(A)\leqslant M}\lVert X-A\rVert_2$$</p>
+<p>est donnée par la <strong>SVD TRONQUÉE au top-$M$</strong> :</p>
+<p>$$\boxed{\;\tilde X_M=U_M\Sigma_MV_M^\top\in\mathbb R^{D\times N}\;}$$</p>
+<p>avec $U_M\in\mathbb R^{D\times M}$, $\Sigma_M\in\mathbb R^{M\times M}$ diagonale des $M$ plus grandes valeurs singulières, $V_M\in\mathbb R^{N\times M}$.</p>
+<h3>4.3 Aspects pratiques</h3>
+<div class="cal intu"><span class="lab">Pourquoi on ne passe pas par le polynôme caractéristique.</span>
+<p class="cal piege">  <em>« Pour les matrices plus grandes que $4\times4$, ce n'est <strong>PAS possible</strong> : il faudrait trouver les racines d'un polynôme de degré 5 ou plus — et le <strong>théorème d'ABEL-RUFFINI</strong> (Ruffini 1799 ; Abel 1826) établit qu'il <strong>n'existe AUCUNE solution ALGÉBRIQUE</strong> à ce problème. »</em></p>
+</div>
+<div class="cal intu"><span class="lab">Pourquoi ne pas tout calculer.</span>
+<p>  <em>« Dans beaucoup d'applications on n'a besoin que de <strong>quelques vecteurs propres</strong>. Il serait <strong>GASPILLEUR</strong> de calculer la décomposition complète pour ensuite jeter tout le reste. Les <strong>processus ITÉRATIFS</strong> qui optimisent directement ces vecteurs propres sont <strong>computationnellement plus efficaces</strong>. »</em></p>
+</div>
+<p><strong>L'ITÉRATION DE LA PUISSANCE</strong> — le cas extrême du premier vecteur propre seul. On choisit $x_0$ <strong>hors du noyau de $S$</strong>, puis :</p>
+<p>$$\boxed{\;x_{k+1}=\frac{Sx_k}{\lVert Sx_k\rVert},\qquad k=0,1,\dots\;}$$</p>
+<p><em>« Le vecteur est multiplié par $S$ à chaque itération puis <strong>NORMALISÉ</strong> — on a toujours $\lVert x_k\rVert=1$. Cette suite <strong>CONVERGE vers le vecteur propre associé à la PLUS GRANDE valeur propre</strong> de $S$. »</em></p>
+<details class="cor">
+<summary> Convergence de l'itération de la puissance</summary><div class="in">
+
+<p>Après 300 itérations depuis un $x_0$ aléatoire :</p>
+<p>$$\lvert x_k\cdot b_1\rvert=1{,}0000000000\quad\text{(alignement PARFAIT)}$$</p>
+<p>Quotient de Rayleigh $x_k^\top Sx_k=4{,}1127582$ contre $\lambda_1=4{,}1127582$ </p>
+</div></details>
+
+<h2 data-prio="high">Concept 5 — L'ACP en grande dimension (§10.5)</h2>
+<blockquote>
+<p><strong>Le problème.</strong> *« En $D$ dimensions, la covariance est une matrice $D\times D$ ; calculer ses valeurs et vecteurs propres coûte <strong>CUBIQUEMENT en $D$</strong>. Pour des images de $100\times100$ pixels, il faudrait diagonaliser une matrice <strong>$10\,000\times10\,000$</strong>. »*</p>
+</blockquote>
+<p><strong>L'ASTUCE — quand $N\ll D$.</strong> Partant de $Sb_m=\frac1NXX^\top b_m=\lambda_mb_m$, <strong>multiplier à gauche par $X^\top\in\mathbb R^{N\times D}$</strong> :</p>
+<p>$$\frac1NX^\top X\,\underbrace{X^\top b_m}_{=:c_m}=\lambda_m\,X^\top b_m\qquad\Longleftrightarrow\qquad\boxed{\;\frac1NX^\top Xc_m=\lambda_mc_m\;}$$</p>
+<blockquote>
+<p> <strong>Le gain.</strong> *« $\frac1NX^\top X$ a <strong>LES MÊMES valeurs propres NON NULLES</strong> que la matrice de covariance $S$. Mais c'est maintenant une matrice <strong>$N\times N$</strong>, dont on peut calculer valeurs et vecteurs propres <strong>BEAUCOUP plus efficacement</strong>. »* On récupère ensuite $b_m$ en <strong>remultipliant par $X$</strong> et en normalisant.</p>
+</blockquote>
+<details class="cor">
+<summary> Vérification et une inexactitude d'énoncé dans le livre</summary><div class="in">
+
+<p>Avec $D=8$, $N=3$ :</p>
+<table>
+<thead>
+<tr>
+<th>Matrice</th>
+<th>Valeurs propres</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$\frac1NXX^\top$ ($8\times8$)</td>
+<td>$[5{,}102489\ ;\ 3{,}067560\ ;\ 0{,}453579\ ;\ 0;0;0;0;0]$</td>
+</tr>
+<tr>
+<td>$\frac1NX^\top X$ ($3\times3$)</td>
+<td>$[5{,}102489\ ;\ 3{,}067560\ ;\ 0{,}453579]$</td>
+</tr>
+</tbody></table>
+<p>Les trois plus grandes <strong>coïncident exactement</strong> </p>
+<blockquote>
+<p class="cal piege"> <strong>Une inexactitude d'une unité dans l'énoncé du §10.5.</strong> Le livre écrit : <em>« le rang de la matrice de covariance $S$ est $N$, elle a donc $D-N+1$ valeurs propres nulles »</em>. Les deux affirmations sont <strong>incohérentes</strong> : un rang $N$ donnerait $D-N$ zéros. Vérification numérique avec $D=8$, $N=3$ :</p>
+<table>
+<thead>
+<tr>
+<th>Données</th>
+<th>Rang de $S$</th>
+<th>Nombre de valeurs propres nulles</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Non centrées</strong></td>
+<td>$3=N$</td>
+<td>$5=D-N$</td>
+</tr>
+<tr>
+<td><strong>CENTRÉES</strong> (l'hypothèse du §10.5)</td>
+<td>$2=N-1$</td>
+<td> $6=D-N+1$</td>
+</tr>
+</tbody></table>
+<p>C'est donc le <strong>comptage $D-N+1$ qui est CORRECT</strong> — mais il découle du rang <strong>$N-1$</strong>, pas $N$ : le <strong>CENTRAGE</strong> fait perdre exactement un degré de liberté. Cela ne change rien à la validité de l'astuce.</p>
+</blockquote>
+</div></details>
+
+<h2 data-prio="must">Concept 6 — Les cinq étapes en pratique (§10.6)</h2>
+<p><strong>Étape 1 — SOUSTRACTION DE LA MOYENNE.</strong> Calculer $\mu$ et le soustraire de chaque point. <em>« La soustraction de la moyenne n'est pas <strong>strictement nécessaire</strong>, mais elle <strong>RÉDUIT le RISQUE de PROBLÈMES NUMÉRIQUES</strong>. »</em></p>
+<p><strong>Étape 2 — STANDARDISATION.</strong> Diviser par l'écart-type $\sigma_d$ de chaque dimension $d$. <em>« Les données sont maintenant <strong>SANS UNITÉ</strong> et de <strong>variance 1 le long de chaque axe</strong>. »</em></p>
+<p><strong>Étape 3 — EIGENDÉCOMPOSITION.</strong> Calculer $S$, ses valeurs et vecteurs propres. <em>« Comme la covariance est <strong>SYMÉTRIQUE</strong>, le théorème spectral (4.15) garantit qu'on peut trouver une <strong>ONB de vecteurs propres</strong>. »</em> Sur la figure 10.11(d), <em>« les vecteurs propres sont mis à l'échelle par la magnitude de la valeur propre correspondante ; <strong>le plus LONG engendre le sous-espace principal</strong> »</em>.</p>
+<p><strong>Étape 4 — PROJECTION.</strong>  <strong>Standardiser d'abord</strong> le point de test avec la moyenne <strong>et</strong> l'écart-type <strong>des données d'ENTRAÎNEMENT</strong> :</p>
+<p>$$x_*^{(d)}\leftarrow\frac{x_*^{(d)}-\mu_d}{\sigma_d},\qquad d=1,\dots,D$$</p>
+<p>$$\boxed{\;\tilde x_*=BB^\top x_*\qquad\text{avec les coordonnées}\qquad z_*=B^\top x_*\;}$$</p>
+<div class="cal intu"><span class="lab">CE QUE L'ACP RENVOIE.</span>
+<p class="cal piege">  *« L'ACP renvoie <strong>les COORDONNÉES $z_*$</strong>, <strong>PAS les projections $\tilde x_*$</strong>. »*</p>
+</div>
+<p><strong>Étape 5 — DÉ-STANDARDISATION.</strong> <em>« Ayant standardisé le jeu de données, $\tilde x_*=BB^\top x_*$ ne donne les projections que <strong>dans le contexte du jeu STANDARDISÉ</strong> »</em> — il faut <strong>multiplier par $\sigma_d$ et rajouter $\mu_d$</strong> pour revenir dans l'espace original.</p>
+<p><strong>Exemple 10.4 — MNIST.</strong> $60\,000$ chiffres manuscrits en images $28\times28=784$ pixels, donc $x\in\mathbb R^{784}$. Sur $5\,389$ images du chiffre « 8 » :</p>
+<table>
+<thead>
+<tr>
+<th>Nombre de CP</th>
+<th>Qualité de la reconstruction</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$1$</td>
+<td><em>« Une reconstruction <strong>à moitié décente</strong>, mais <strong>FLOUE et GÉNÉRIQUE</strong> »</em></td>
+</tr>
+<tr>
+<td>$10$, $100$</td>
+<td><em>« Les reconstructions deviennent <strong>plus NETTES</strong>, plus de détails sont pris en compte »</em></td>
+</tr>
+<tr>
+<td>$500$</td>
+<td><em>« Une reconstruction <strong>quasi PARFAITE</strong> »</em></td>
+</tr>
+<tr>
+<td>$784$</td>
+<td> <em>« On récupérerait le chiffre <strong>EXACT, sans AUCUNE perte</strong> de compression »</em></td>
+</tr>
+</tbody></table>
+<blockquote>
+<p> <em>« L'importance des composantes principales <strong>CHUTE RAPIDEMENT</strong>, et seuls des gains marginaux s'obtiennent en ajoutant davantage de CP. »</em></p>
+</blockquote>
+<h2 data-prio="must">Concept 7 — L'ACP probabiliste (§10.7)</h2>
+<h3>7.1 Les neuf raisons d'un modèle probabiliste</h3>
+<p>*« Une ACP dérivée sans notion de modèle probabiliste permet de <strong>contourner toutes les difficultés mathématiques</strong> de la théorie des probabilités, mais un modèle probabiliste offrirait *<em>plus de FLEXIBILITÉ et des APERÇUS utiles ».</em> Il permettrait de :</p>
+<ol>
+<li>Disposer d'une <strong>fonction de VRAISEMBLANCE</strong>, et traiter explicitement les <strong>observations BRUITÉES</strong>.</li>
+<li>Faire de la <strong>comparaison de modèles BAYÉSIENNE</strong> via la vraisemblance marginale (§8.6).</li>
+<li>Voir l'ACP comme un <strong>modèle GÉNÉRATIF</strong> — donc <strong>SIMULER de nouvelles données</strong>.</li>
+<li>Établir des <strong>connexions directes</strong> avec des algorithmes apparentés.</li>
+<li>Traiter les <strong>dimensions MANQUANTES au hasard</strong> en appliquant le théorème de Bayes.</li>
+<li>Disposer d'une notion de <strong>NOUVEAUTÉ</strong> d'un point de donnée.</li>
+<li><strong>Étendre</strong> le modèle de façon principielle, par exemple à un <strong>mélange de modèles d'ACP</strong>.</li>
+<li> Retrouver l'<strong>ACP classique comme CAS PARTICULIER</strong>.</li>
+<li>Permettre un <strong>traitement pleinement bayésien</strong> en marginalisant les paramètres.</li>
+</ol>
+<p><strong>La PPCA</strong> a été proposée par <strong>Tipping et Bishop (1999)</strong>.  <em>« La solution d'ACP obtenue en maximisant la variance ou en minimisant l'erreur de reconstruction est obtenue comme le <strong>cas particulier du maximum de vraisemblance dans un cadre SANS BRUIT</strong>. »</em></p>
+<h3>7.2 Le processus génératif</h3>
+<p>$$\boxed{\;z\sim\mathcal N(0,I)\in\mathbb R^M\qquad x=Bz+\mu+\epsilon\in\mathbb R^D,\qquad\epsilon\sim\mathcal N(0,\sigma^2I)\;}$$</p>
+<p>$$\boxed{\;p(x\mid z,B,\mu,\sigma^2)=\mathcal N\big(x\mid Bz+\mu,\ \sigma^2I\big)\;}$$</p>
+<blockquote>
+<p> <strong>L'ÉCHANTILLONNAGE ANCESTRAL.</strong> <em>« Pour générer un point typique : on échantillonne d'abord une variable latente $z_n$ de $p(z)$ ; <strong>puis</strong> on l'utilise pour échantillonner un point <strong>CONDITIONNÉ</strong> sur ce $z_n$. »</em></p>
+</blockquote>
+<p>Le <strong>modèle probabiliste</strong> (la loi jointe, §8.4) :</p>
+<p>$$p(x,z\mid B,\mu,\sigma^2)=p(x\mid z,B,\mu,\sigma^2)\,p(z)$$</p>
+<h3>7.3 La vraisemblance</h3>
+<p>On <strong>marginalise la variable latente</strong> (§8.4.3) :</p>
+<p>$$p(x\mid B,\mu,\sigma^2)=\int\mathcal N\big(x\mid Bz+\mu,\sigma^2I\big)\,\mathcal N(z\mid0,I)\,dz$$</p>
+<p><strong>Les deux moments, par les règles des transformations affines</strong> (§6.4.4) :</p>
+<p>$$\mathbb E_x[x]=\mathbb E_z[Bz+\mu]+\mathbb E_\epsilon[\epsilon]=\mu$$
+$$\mathbb V[x]=\mathbb V_z[Bz]+\sigma^2I=B\,\mathbb V_z[z]\,B^\top+\sigma^2I=BB^\top+\sigma^2I$$</p>
+<p>$$\boxed{\;p(x\mid B,\mu,\sigma^2)=\mathcal N\big(x\mid\mu,\ BB^\top+\sigma^2I\big)\;}$$</p>
+<div class="cal intu"><span class="lab">Pourquoi on ne peut PAS utiliser $p(x\mid z)$ directement.</span>
+<p class="cal piege">  <em>« On ne peut <strong>pas</strong> utiliser la loi conditionnelle pour le maximum de vraisemblance car elle <strong>DÉPEND ENCORE des variables latentes</strong>. La fonction de vraisemblance requise <strong>ne doit dépendre QUE des données et des paramètres</strong>. »</em></p>
+</div>
+<p><strong>La loi jointe complète.</strong> La covariance croisée manquante :</p>
+<p>$$\operatorname{Cov}[x,z]=\operatorname{Cov}_z[Bz+\mu]=B\operatorname{Cov}_z[z,z]=B$$</p>
+<p>$$\boxed{\;p(x,z\mid B,\mu,\sigma^2)=\mathcal N\left(\begin{bmatrix}x\\z\end{bmatrix}\ \middle|\ \begin{bmatrix}\mu\\0\end{bmatrix},\ \begin{bmatrix}BB^\top+\sigma^2I&amp;B\\B^\top&amp;I\end{bmatrix}\right)\;}$$</p>
+<p>de vecteur moyenne de longueur $D+M$ et covariance $(D+M)\times(D+M)$.</p>
+<details class="cor">
+<summary> Contrôle de $\operatorname{Cov}[x]=BB^\top+\sigma^2I$</summary><div class="in">
+
+<p>Avec $B$ construite à partir des deux premières composantes principales mises à l'échelle par $\sqrt{\lambda_m}$, et $\sigma^2=0{,}09$, $D=4$ :</p>
+<p>$$\operatorname{tr}\big(BB^\top+\sigma^2I\big)=6{,}410338$$
+$$\lambda_1+\lambda_2+D\sigma^2=6{,}050338+4\times0{,}09=6{,}410338\quad\text{}$$</p>
+<p class="cal piege"> La lecture est limpide : la trace de la covariance PPCA se <strong>décompose exactement</strong> en <strong>variance expliquée par le sous-espace</strong> ($\lambda_1+\lambda_2$) <strong>plus bruit isotrope</strong> ($D\sigma^2$).</p>
+</div></details>
+
+<h3>7.4 L'a posteriori latente</h3>
+<p>Le <strong>conditionnement gaussien</strong> (§6.5.1) appliqué à la jointe donne immédiatement :</p>
+<p>$$\boxed{\;p(z\mid x)=\mathcal N(z\mid m,C)\;}$$
+$$\boxed{\;m=B^\top(BB^\top+\sigma^2I)^{-1}(x-\mu)\;}$$
+$$\boxed{\;C=I-B^\top(BB^\top+\sigma^2I)^{-1}B\;}$$</p>
+<blockquote>
+<p class="cal piege"> <strong>LE POINT REMARQUABLE.</strong> *« La covariance a posteriori <strong>NE DÉPEND PAS des données observées $x$</strong>. »* — exactement comme pour la régression bayésienne (fiche 408).  <em>« Pour une nouvelle observation $x_*$, on utilise (10.73) pour déterminer la loi a posteriori de la variable latente correspondante $z_*$. La matrice de covariance $C$ permet d'<strong>évaluer la CONFIANCE</strong> dans l'encodage. »</em></p>
+</blockquote>
+<h2>Comment reconnaître le type d'exercice</h2>
+<table>
+<thead>
+<tr>
+<th>L'énoncé dit...</th>
+<th>Le type</th>
+<th>La méthode</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>« Calculer la matrice de covariance »</td>
+<td><strong>§10.1</strong></td>
+<td> <strong>CENTRER d'abord</strong>, puis $S=\frac1N\sum_nx_nx_n^\top=\frac1NXX^\top$</td>
+</tr>
+<tr>
+<td>« Trouver la direction de variance maximale »</td>
+<td><strong>§10.2.1</strong></td>
+<td>Lagrangien $\Rightarrow Sb_1=\lambda_1b_1$ : le <strong>vecteur propre dominant</strong></td>
+</tr>
+<tr>
+<td>« Quelle variance conserve-t-on ? »</td>
+<td><strong>§10.2.2</strong></td>
+<td>$\sum_{m\leqslant M}\lambda_m$ ; en proportion : $\dfrac{\sum_{m\leqslant M}\lambda_m}{\operatorname{tr}S}$</td>
+</tr>
+<tr>
+<td>« Quelle est l'erreur de reconstruction ? »</td>
+<td><strong>(10.62)</strong></td>
+<td> $J_M=\sum_{j&gt;M}\lambda_j$ — la <strong>somme des vp ABANDONNÉES</strong></td>
+</tr>
+<tr>
+<td>« Coder / décoder un point »</td>
+<td><strong>§10.1</strong></td>
+<td>Code $z=B^\top x$ ; reconstruction $\tilde x=BB^\top x$</td>
+</tr>
+<tr>
+<td>« Montrer que la projection est orthogonale »</td>
+<td><strong>§10.3.2</strong></td>
+<td>Dériver $J_M$ par $z_{in}$, annuler $\Rightarrow z_{in}=b_i^\top x_n$</td>
+</tr>
+<tr>
+<td>« Où vit le vecteur d'erreur ? »</td>
+<td><strong>§10.3.3</strong></td>
+<td> Dans le <strong>COMPLÉMENT ORTHOGONAL</strong> : $\big(\sum_{j&gt;M}b_jb_j^\top\big)x_n$</td>
+</tr>
+<tr>
+<td>« Relier ACP et Eckart-Young »</td>
+<td><strong>§10.4.1</strong></td>
+<td>La <strong>SVD tronquée</strong> au top-$M$ est la meilleure approximation de rang $M$</td>
+</tr>
+<tr>
+<td>« Passer de la SVD aux valeurs propres »</td>
+<td><strong>§10.4</strong></td>
+<td> $\lambda_i=\sigma_i^2$ et $U=B$</td>
+</tr>
+<tr>
+<td>« $N\ll D$, comment faire ? »</td>
+<td><strong>§10.5</strong></td>
+<td>Diagonaliser $\frac1NX^\top X\in\mathbb R^{N\times N}$ ; puis $c_m=X^\top b_m$</td>
+</tr>
+<tr>
+<td>« Trouver seulement le premier vecteur propre »</td>
+<td><strong>§10.4.2</strong></td>
+<td><strong>Itération de la puissance</strong> : $x_{k+1}=Sx_k/\lVert Sx_k\rVert$</td>
+</tr>
+<tr>
+<td>« Appliquer l'ACP à un nouveau point »</td>
+<td><strong>§10.6</strong></td>
+<td> Standardiser avec la <strong>moyenne et l'écart-type d'ENTRAÎNEMENT</strong></td>
+</tr>
+<tr>
+<td>« Écrire le modèle génératif de la PPCA »</td>
+<td><strong>§10.7.1</strong></td>
+<td>$z\sim\mathcal N(0,I)$, $x=Bz+\mu+\epsilon$</td>
+</tr>
+<tr>
+<td>« Quelle est la vraisemblance de la PPCA ? »</td>
+<td><strong>§10.7.2</strong></td>
+<td>$\mathcal N(x\mid\mu,\ BB^\top+\sigma^2I)$</td>
+</tr>
+<tr>
+<td>« Encoder probabilistiquement »</td>
+<td><strong>§10.7.3</strong></td>
+<td>$p(z\mid x)=\mathcal N(m,C)$ par <strong>conditionnement gaussien</strong></td>
+</tr>
+</tbody></table>
+<h2>Comment résoudre : les cinq méthodes pas-à-pas</h2>
+<p><strong>Méthode A — Faire une ACP complète.</strong></p>
+<ol>
+<li><strong>Centrer</strong> : $x_n\leftarrow x_n-\mu$.</li>
+<li><strong>Standardiser</strong> : $x_n^{(d)}\leftarrow x_n^{(d)}/\sigma_d$.</li>
+<li>$S=\frac1NXX^\top$ ;  vérifier la <strong>symétrie</strong>.</li>
+<li><strong>Eigendécomposition</strong> ; trier les $\lambda$ par ordre <strong>décroissant</strong>.</li>
+<li>$B=$ les $M$ premiers vecteurs propres <strong>en colonnes</strong>.</li>
+<li><strong>Coder</strong> : $z_n=B^\top x_n$.</li>
+<li><strong>Contrôles</strong> : $\sum_m\lambda_m=\operatorname{tr}(S)$ ; variance du code $=\sum_{m\leqslant M}\lambda_m$ ; $J_M=\sum_{j&gt;M}\lambda_j$.</li>
+</ol>
+<p><strong>Méthode B — Choisir $M$.</strong></p>
+<ol>
+<li>Tracer les $\lambda_m$ par ordre décroissant (le <strong>spectre</strong>).</li>
+<li>Chercher le « <strong>coude</strong> » — la chute rapide.</li>
+<li>Calculer la <strong>variance cumulée</strong> $\frac{\sum_{m\leqslant M}\lambda_m}{\operatorname{tr}S}$.</li>
+<li>Choisir $M$ pour un seuil (90 %, 95 %…).</li>
+<li> <strong>Contrôle</strong> : la variance perdue est <strong>exactement</strong> l'erreur de reconstruction.</li>
+</ol>
+<p><strong>Méthode C — Dériver l'ACP par la variance maximale.</strong></p>
+<ol>
+<li>Écrire $V_1=b_1^\top Sb_1$ en développant $\frac1N\sum(b_1^\top x_n)^2$.</li>
+<li> <strong>Imposer $\lVert b_1\rVert^2=1$</strong>, sinon le problème est <strong>non borné</strong>.</li>
+<li>Lagrangien $\mathfrak L=b_1^\top Sb_1+\lambda_1(1-b_1^\top b_1)$.</li>
+<li>Annuler les deux dérivées partielles.</li>
+<li>Reconnaître <strong>l'équation aux valeurs propres</strong>.</li>
+<li>Conclure $V_1=\lambda_1$ : <strong>prendre la plus grande</strong>.</li>
+</ol>
+<p><strong>Méthode D — Dériver l'ACP par la projection.</strong></p>
+<ol>
+<li>Décomposer $x$ sur une ONB complète : partie <strong>retenue</strong> $+$ partie <strong>abandonnée</strong>.</li>
+<li>Dériver $J_M$ par rapport à $z_{in}$ ; annuler $\Rightarrow z_{in}=b_i^\top x_n$.</li>
+<li>Réinjecter : $\tilde x_n=BB^\top x_n$, donc $x_n-\tilde x_n=\big(\sum_{j&gt;M}b_jb_j^\top\big)x_n$.</li>
+<li>Développer $J_M$ en exploitant <strong>l'orthonormalité</strong>.</li>
+<li>Échanger les sommes pour faire apparaître $S$.</li>
+<li>Utiliser la <strong>trace</strong> et son invariance cyclique.</li>
+<li>Conclure : <strong>même problème</strong> que la variance maximale.</li>
+</ol>
+<p><strong>Méthode E — PPCA.</strong></p>
+<ol>
+<li>Écrire le processus génératif.</li>
+<li><strong>Marginaliser $z$</strong> pour la vraisemblance ; utiliser $\mathbb E[Ax+b]=A\mu+b$ et $\mathbb V[Ax]=A\Sigma A^\top$.</li>
+<li>Calculer la <strong>covariance croisée</strong> $\operatorname{Cov}[x,z]=B$.</li>
+<li>Assembler la <strong>jointe en blocs</strong>.</li>
+<li><strong>Conditionner</strong> (§6.5.1) pour $p(z\mid x)$.</li>
+<li> <strong>Contrôle</strong> : $C$ <strong>ne dépend pas de $x$</strong>.</li>
+</ol>
+<h2 data-prio="must">Common mistakes</h2>
+<table>
+<thead>
+<tr>
+<th>Erreur</th>
+<th>Correction</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Oublier de centrer les données</td>
+<td> $S=\frac1N\sum x_nx_n^\top$ n'est la covariance <strong>que si la moyenne est $0$</strong></td>
+</tr>
+<tr>
+<td>Croire que le centrage change la solution</td>
+<td> <strong>NON</strong> : $\mathbb V[B^\top(x-\mu)]=\mathbb V[B^\top x]$ — c'est <strong>sans perte de généralité</strong></td>
+</tr>
+<tr>
+<td>Ranger les $x_n$ en lignes de $X$</td>
+<td> Dans <strong>ce chapitre</strong>, $X$ est <strong>$D\times N$</strong> — les points sont des <strong>COLONNES</strong></td>
+</tr>
+<tr>
+<td>Maximiser $b^\top Sb$ sans contrainte</td>
+<td> Le problème serait <strong>NON BORNÉ</strong> : doubler $b$ <strong>quadruple</strong> l'objectif</td>
+</tr>
+<tr>
+<td>Prendre le <strong>plus PETIT</strong> vecteur propre</td>
+<td> On veut la <strong>variance MAXIMALE</strong>, donc la <strong>plus GRANDE</strong> valeur propre</td>
+</tr>
+<tr>
+<td>Croire que $\hat S$ a d'autres vecteurs propres que $S$</td>
+<td> <strong>Les mêmes</strong> — seules les valeurs propres des CP déjà extraites passent à <strong>$0$</strong></td>
+</tr>
+<tr>
+<td>Croire que les deux perspectives donnent des résultats différents</td>
+<td> <strong>La MÊME solution</strong> : minimiser l'erreur $\equiv$ maximiser la variance</td>
+</tr>
+<tr>
+<td>Confondre variance retenue et erreur</td>
+<td> Retenue $=\sum_{m\leqslant M}\lambda_m$ ; erreur $=\sum_{j&gt;M}\lambda_j$ ; <strong>somme $=\operatorname{tr}S$</strong></td>
+</tr>
+<tr>
+<td>Croire que $BB^\top=I$</td>
+<td> <strong>NON</strong> : $B^\top B=I_M$ (colonnes orthonormées), mais $BB^\top$ est une <strong>projection de rang $M$</strong>, <strong>singulière</strong></td>
+</tr>
+<tr>
+<td>Croire que le vecteur d'erreur est arbitraire</td>
+<td> Il vit <strong>ENTIÈREMENT</strong> dans le complément orthogonal</td>
+</tr>
+<tr>
+<td>Rendre l'ACP $\tilde x$ au lieu de $z$</td>
+<td> *« L'ACP renvoie <strong>les COORDONNÉES $z_*$</strong>, pas les projections »*</td>
+</tr>
+<tr>
+<td>Confondre $\lambda_i$ et $\sigma_i$</td>
+<td> $\lambda_i=\sigma_i^2$ — les valeurs propres sont les <strong>CARRÉS</strong> des valeurs singulières</td>
+</tr>
+<tr>
+<td>Chercher les valeurs propres par le polynôme caractéristique</td>
+<td> <strong>Impossible</strong> au-delà de $4\times4$ — <strong>théorème d'ABEL-RUFFINI</strong></td>
+</tr>
+<tr>
+<td>Calculer la décomposition complète pour $M$ petit</td>
+<td> <strong>Gaspillage</strong> : préférer les méthodes <strong>itératives</strong></td>
+</tr>
+<tr>
+<td>Démarrer l'itération de la puissance dans le noyau de $S$</td>
+<td> Le livre l'exige explicitement : $x_0$ <strong>hors du noyau</strong></td>
+</tr>
+<tr>
+<td>Oublier de normaliser à chaque itération de la puissance</td>
+<td> La suite <strong>diverge ou s'effondre</strong> sans normalisation</td>
+</tr>
+<tr>
+<td>Diagonaliser $XX^\top$ quand $N\ll D$</td>
+<td> Diagonaliser $X^\top X$ ($N\times N$) : <strong>mêmes valeurs propres non nulles</strong></td>
+</tr>
+<tr>
+<td>Standardiser un point de test avec ses propres statistiques</td>
+<td> Utiliser <strong>la moyenne et l'écart-type d'ENTRAÎNEMENT</strong></td>
+</tr>
+<tr>
+<td>Oublier de dé-standardiser</td>
+<td> $BB^\top x_*$ vit dans <strong>l'espace STANDARDISÉ</strong></td>
+</tr>
+<tr>
+<td>Utiliser $p(x\mid z)$ pour le maximum de vraisemblance</td>
+<td> Elle <strong>dépend encore de $z$</strong> — il faut <strong>marginaliser</strong></td>
+</tr>
+<tr>
+<td>Écrire $\mathbb V[x]=B^\top B+\sigma^2I$</td>
+<td> C'est $BB^\top+\sigma^2I$ — une matrice <strong>$D\times D$</strong></td>
+</tr>
+<tr>
+<td>Croire que $C$ dépend de l'observation</td>
+<td> <em>« La covariance a posteriori <strong>NE DÉPEND PAS</strong> des données observées $x$ »</em></td>
+</tr>
+<tr>
+<td>Croire que la PPCA remplace l'ACP</td>
+<td> L'ACP classique est le <strong>CAS PARTICULIER sans bruit</strong> de la PPCA</td>
+</tr>
+</tbody></table>
+<h2>Ultimate Review</h2>
+<pre><code>════════ LES SEPT FORMULES À SAVOIR SANS HÉSITER ════════
+  1.  S = (1/N) Σn xn xnᵀ = (1/N) X Xᵀ          ⚠️ données CENTRÉES, X est D×N
+  2.  CODE  z = Bᵀ x        RECONSTRUCTION  x̃ = B Bᵀ x
+  3.  S b_m = λ_m b_m       et       V_m = b_mᵀ S b_m = λ_m
+  4.  VARIANCE RETENUE = λ1 + … + λM
+      ERREUR J_M = Σ_{j=M+1..D} λ_j            ⚠️ somme + retenue = tr(S)
+  5.  COORDONNÉES OPTIMALES  z_in = b_iᵀ x_n   ← projection ORTHOGONALE
+      x_n − x̃_n = (Σ_{j&gt;M} b_j b_jᵀ) x_n       ← COMPLÉMENT ORTHOGONAL
+  6.  SVD  X = U Σ Vᵀ  →  λi = σi²  et  B = U_M
+      GRANDE DIM.  diagonaliser (1/N) XᵀX ∈ R^(N×N) ,  c_m = Xᵀ b_m
+      PUISSANCE   x_{k+1} = S x_k / ‖S x_k‖
+  7.  PPCA  z ~ N(0,I) ,  x = Bz + µ + ε
+      p(x) = N(µ , BBᵀ + σ² I)
+      p(z|x) = N( Bᵀ(BBᵀ+σ²I)⁻¹(x−µ) ,  I − Bᵀ(BBᵀ+σ²I)⁻¹B )
+═════════════════════════════════════════════════════════
+</code></pre>
+<p><strong>LES DEUX PERSPECTIVES — même point d'arrivée :</strong></p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th><strong>VARIANCE MAXIMALE</strong> (§10.2)</th>
+<th><strong>PROJECTION</strong> (§10.3)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Objectif</td>
+<td>$\max b^\top Sb$ s.c. $\lVert b\rVert=1$</td>
+<td>$\min\frac1N\sum_n\lVert x_n-\tilde x_n\rVert^2$</td>
+</tr>
+<tr>
+<td>Outil</td>
+<td><strong>Multiplicateurs de Lagrange</strong> (ch. 7)</td>
+<td><strong>Dérivation</strong> puis <strong>trace</strong> (ch. 5, 4)</td>
+</tr>
+<tr>
+<td>Ce qu'on <strong>retient</strong></td>
+<td>$\sum_{m\leqslant M}\lambda_m$</td>
+<td>—</td>
+</tr>
+<tr>
+<td>Ce qu'on <strong>perd</strong></td>
+<td>—</td>
+<td>$\sum_{j&gt;M}\lambda_j$</td>
+</tr>
+<tr>
+<td>Interprétation</td>
+<td>Conserver <strong>l'information</strong></td>
+<td><strong>Auto-encodeur linéaire optimal</strong></td>
+</tr>
+<tr>
+<td>Solution</td>
+<td> <strong>LES MÊMES $M$ vecteurs propres dominants de $S$</strong></td>
+<td> <strong>IDEM</strong></td>
+</tr>
+</tbody></table>
+<p><strong>Ce que chaque chapitre antérieur apporte ici :</strong></p>
+<table>
+<thead>
+<tr>
+<th>Chapitre</th>
+<th>Ce qu'il fournit</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>2</strong> — base, changement de base</td>
+<td>Le <strong>code</strong> comme coordonnées dans une nouvelle base</td>
+</tr>
+<tr>
+<td><strong>3</strong> — projections</td>
+<td> $\tilde x=BB^\top x$, le <strong>complément orthogonal</strong>, l'ONB</td>
+</tr>
+<tr>
+<td><strong>4</strong> — valeurs propres, SVD</td>
+<td> <strong>La solution elle-même</strong> · $\lambda_i=\sigma_i^2$ · <strong>Eckart-Young</strong> · trace $=\sum\lambda_i$</td>
+</tr>
+<tr>
+<td><strong>6</strong> — gaussiennes</td>
+<td>La <strong>PPCA</strong>, le conditionnement, les transformations affines</td>
+</tr>
+<tr>
+<td><strong>7</strong> — optimisation sous contraintes</td>
+<td> Le <strong>lagrangien</strong> de la variance maximale</td>
+</tr>
+<tr>
+<td><strong>8</strong> — variables latentes</td>
+<td>Le cadre de la <strong>PPCA</strong> et de l'algorithme EM</td>
+</tr>
+</tbody></table>
+<p><strong>Les trois lectures d'une valeur propre $\lambda_m$ :</strong></p>
+<table>
+<thead>
+<tr>
+<th>Lecture</th>
+<th>Énoncé</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Variance</strong></td>
+<td>La <strong>variance des données projetées</strong> sur $b_m$</td>
+</tr>
+<tr>
+<td><strong>Erreur</strong></td>
+<td>Si $b_m$ est <strong>abandonné</strong>, sa contribution <strong>exacte</strong> à l'erreur de reconstruction</td>
+</tr>
+<tr>
+<td><strong>Singulière</strong></td>
+<td>$\lambda_m=\sigma_m^2$, le carré de la $m$-ième valeur singulière de $X$</td>
+</tr>
+</tbody></table>
+<div class="rec"><h2>Active Recall</h2><p><strong>Cadre</strong></p><ol>
+<li>Écrire la matrice de covariance. Quelle hypothèse sur les données ?</li>
+<li>Écrire le code et la reconstruction. Dans quels espaces vivent-ils ?</li>
+<li>Quelle condition sur les colonnes de $B$ ?</li>
+<li>Pourquoi $\tilde x_n$ a-t-il $D$ composantes mais une seule coordonnée pour $M=1$ ?</li>
+<li>Quelle convention de notation ce chapitre adopte-t-il pour $X$ ? Pourquoi ?</li>
+</ol><p><strong>Variance maximale</strong>
+6. Pourquoi la variance mesure-t-elle l'information ?
+7. Montrer que le centrage est sans perte de généralité.
+8. Dériver $V_1=b_1^\top Sb_1$.
+9. Pourquoi faut-il la contrainte $\lVert b_1\rVert^2=1$ ?
+10. Écrire le lagrangien et ses deux dérivées partielles.
+11. Que révèle l'annulation ? Quel est le rôle de $\lambda_1$ ?
+12. Que vaut $V_1$ ? Quelle est la conclusion ?
+13. Qu'est-ce que le chargement ?
+14. Comment obtient-on la $m$-ième composante ? Qu'est-ce que $\hat X$ ?
+15. Que valent $B_{m-1}b_i$ dans les deux cas ?
+16. Quelle est la relation entre les vecteurs propres de $S$ et $\hat S$ ?
+17. Que vaut la variance retenue par $M$ composantes ?</p><p><strong>Projection</strong>
+18. Écrire l'erreur de reconstruction. Quelle est la stratégie en deux temps ?
+19. Dériver les coordonnées optimales. Quelle interprétation géométrique ?
+20. Où vit le vecteur $x_n-\tilde x_n$ ?
+21. Quelles sont les propriétés de $BB^\top$ ?
+22. Quel lien avec l'approximation de rang faible de $I$ ?
+23. Reformuler $J_M$ avec la trace.
+24. Énoncer l'équivalence des deux perspectives.
+25. Écrire l'équation (10.62).</p><p><strong>Calcul</strong>
+26. Quelles sont les deux voies de calcul ? Quel est le lien $\lambda_i$–$\sigma_i$ ?
+27. Énoncer Eckart-Young appliqué à l'ACP.
+28. Pourquoi ne peut-on pas passer par le polynôme caractéristique ?
+29. Décrire l'itération de la puissance. Quelle condition sur $x_0$ ?
+30. Décrire l'astuce de la grande dimension. Quel gain ?</p><p><strong>Pratique et PPCA</strong>
+31. Citer les cinq étapes de l'ACP en pratique.
+32. Que renvoie l'ACP exactement ?
+33. Comment standardiser un point de test ?
+34. Citer cinq des neuf raisons d'une ACP probabiliste.
+35. Écrire le processus génératif de la PPCA.
+36. Qu'est-ce que l'échantillonnage ancestral ?
+37. Dériver la vraisemblance de la PPCA.
+38. Pourquoi ne peut-on pas utiliser $p(x\mid z)$ ?
+39. Écrire la loi jointe en blocs. Que vaut $\operatorname{Cov}[x,z]$ ?
+40. Écrire l'a posteriori latente. Quelle particularité de $C$ ?</p></div>
+
+
+
+
+
+
+<h2>Flashcards</h2>
+<table>
+<thead>
+<tr>
+<th>Question</th>
+<th>Réponse</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Autre nom de l'ACP en traitement du signal ?</td>
+<td>La transformée de <strong>KARHUNEN-LOÈVE</strong></td>
+</tr>
+<tr>
+<td>Matrice de covariance des données ?</td>
+<td>$S=\frac1N\sum_nx_nx_n^\top=\frac1NXX^\top$ —  données <strong>CENTRÉES</strong></td>
+</tr>
+<tr>
+<td>Le code ?</td>
+<td>$z_n=B^\top x_n\in\mathbb R^M$</td>
+</tr>
+<tr>
+<td>La reconstruction ?</td>
+<td>$\tilde x_n=BB^\top x_n\in\mathbb R^D$</td>
+</tr>
+<tr>
+<td>Condition sur $B$ ?</td>
+<td>Colonnes <strong>ORTHONORMÉES</strong> : $B^\top B=I_M$</td>
+</tr>
+<tr>
+<td>Que renvoie l'ACP ?</td>
+<td> Les <strong>COORDONNÉES $z$</strong>, <strong>PAS</strong> les projections $\tilde x$</td>
+</tr>
+<tr>
+<td>Convention sur $X$ dans ce chapitre ?</td>
+<td> $X\in\mathbb R^{D\times N}$ — les points sont les <strong>COLONNES</strong></td>
+</tr>
+<tr>
+<td>Pourquoi ?</td>
+<td>Les opérations algébriques <strong>se déroulent sans transposer</strong></td>
+</tr>
+<tr>
+<td>Pourquoi la variance mesure-t-elle l'information ?</td>
+<td>Elle mesure l'<strong>ÉTALEMENT</strong> — le caractère « remplissant l'espace »</td>
+</tr>
+<tr>
+<td>Le centrage change-t-il la solution ?</td>
+<td> <strong>NON</strong> : $\mathbb V[B^\top(x-\mu)]=\mathbb V[B^\top x]$</td>
+</tr>
+<tr>
+<td>$V_1$ en fonction de $S$ ?</td>
+<td>$V_1=b_1^\top Sb_1$</td>
+</tr>
+<tr>
+<td>Pourquoi la contrainte $\lVert b_1\rVert=1$ ?</td>
+<td> Sinon <strong>non borné</strong> : un $b$ deux fois plus long <strong>quadruple</strong> $V_1$</td>
+</tr>
+<tr>
+<td>Le lagrangien ?</td>
+<td>$\mathfrak L=b_1^\top Sb_1+\lambda_1(1-b_1^\top b_1)$</td>
+</tr>
+<tr>
+<td>Ce que donne l'annulation ?</td>
+<td> <strong>$Sb_1=\lambda_1b_1$</strong> — une <strong>équation aux valeurs propres</strong></td>
+</tr>
+<tr>
+<td>Le rôle du multiplicateur $\lambda_1$ ?</td>
+<td> Il <strong>EST la VALEUR PROPRE</strong></td>
+</tr>
+<tr>
+<td>Que vaut $V_1$ ?</td>
+<td> <strong>$\lambda_1$</strong> — la variance <strong>EST</strong> la valeur propre</td>
+</tr>
+<tr>
+<td>Quelle valeur propre choisir ?</td>
+<td> <strong>LA PLUS GRANDE</strong></td>
+</tr>
+<tr>
+<td>Première composante principale ?</td>
+<td>Le vecteur propre de $S$ associé à $\lambda_{\max}$</td>
+</tr>
+<tr>
+<td>Le chargement (<em>loading</em>) ?</td>
+<td>$\sqrt{\lambda_1}$ — l'<strong>ÉCART-TYPE</strong> pris en compte par le sous-espace</td>
+</tr>
+<tr>
+<td>Comment trouver la $m$-ième CP ?</td>
+<td>En <strong>SOUSTRAYANT l'effet</strong> des $m-1$ premières : $\hat X=X-B_{m-1}X$</td>
+</tr>
+<tr>
+<td>Que contient $\hat X$ ?</td>
+<td> L'information <strong>PAS ENCORE compressée</strong></td>
+</tr>
+<tr>
+<td>$B_{m-1}b_i$ pour $i&lt;m$ ?</td>
+<td>$=b_i$</td>
+</tr>
+<tr>
+<td>$B_{m-1}b_i$ pour $i\geqslant m$ ?</td>
+<td>$=0$</td>
+</tr>
+<tr>
+<td>Vecteurs propres de $S$ et $\hat S$ ?</td>
+<td> <strong>IDENTIQUES</strong> ; mais ceux du sous-espace principal ont <strong>valeur propre $0$</strong> pour $\hat S$</td>
+</tr>
+<tr>
+<td>Que vaut $V_m$ ?</td>
+<td>$\lambda_m$</td>
+</tr>
+<tr>
+<td>Variance retenue par $M$ composantes ?</td>
+<td>$\sum_{m=1}^{M}\lambda_m$</td>
+</tr>
+<tr>
+<td>L'erreur de reconstruction ?</td>
+<td>$J_M=\frac1N\sum_n\lVert x_n-\tilde x_n\rVert^2$</td>
+</tr>
+<tr>
+<td>Son autre nom ?</td>
+<td>L'<strong>auto-encodeur linéaire optimal</strong> (Pearson, 1901)</td>
+</tr>
+<tr>
+<td>Les coordonnées optimales ?</td>
+<td> $z_{in}=b_i^\top x_n$ — la <strong>PROJECTION ORTHOGONALE</strong></td>
+</tr>
+<tr>
+<td>Où vit $x_n-\tilde x_n$ ?</td>
+<td> <strong>ENTIÈREMENT</strong> dans le <strong>COMPLÉMENT ORTHOGONAL</strong></td>
+</tr>
+<tr>
+<td>Sa formule ?</td>
+<td>$\big(\sum_{j=M+1}^{D}b_jb_j^\top\big)x_n$</td>
+</tr>
+<tr>
+<td>Les trois propriétés de $BB^\top$ ?</td>
+<td><strong>Symétrique</strong> · <strong>idempotente</strong> · de <strong>RANG $M$</strong></td>
+</tr>
+<tr>
+<td>Sa trace ?</td>
+<td>$M$</td>
+</tr>
+<tr>
+<td>Le lien avec l'approximation de rang faible ?</td>
+<td> Trouver $B$ $\equiv$ trouver la <strong>meilleure approximation de rang $M$ de l'IDENTITÉ</strong></td>
+</tr>
+<tr>
+<td>$J_M$ avec la trace ?</td>
+<td>$\operatorname{tr}\big(\big(\sum_{j&gt;M}b_jb_j^\top\big)S\big)$</td>
+</tr>
+<tr>
+<td>L'équivalence des deux perspectives ?</td>
+<td> <strong>Minimiser l'erreur $\equiv$ maximiser la variance retenue</strong></td>
+</tr>
+<tr>
+<td>L'équation (10.62) ?</td>
+<td> $J_M=\sum_{i=M+1}^{D}\lambda_i$ — la <strong>somme des vp ABANDONNÉES</strong></td>
+</tr>
+<tr>
+<td>Le contrôle de cohérence ?</td>
+<td><strong>Variance retenue $+$ erreur $=\operatorname{tr}(S)$</strong></td>
+</tr>
+<tr>
+<td>Les deux voies de calcul ?</td>
+<td><strong>Eigendécomposition</strong> de $S$ · <strong>SVD</strong> de $X$</td>
+</tr>
+<tr>
+<td>Le lien $\lambda$–$\sigma$ ?</td>
+<td> $\lambda_i=\sigma_i^2$</td>
+</tr>
+<tr>
+<td>Eckart-Young appliqué ?</td>
+<td>La meilleure approximation de rang $M$ est la <strong>SVD TRONQUÉE</strong> $U_M\Sigma_MV_M^\top$</td>
+</tr>
+<tr>
+<td>Pourquoi pas le polynôme caractéristique ?</td>
+<td> <strong>ABEL-RUFFINI</strong> : pas de solution algébrique au-delà du degré 4</td>
+</tr>
+<tr>
+<td>L'itération de la puissance ?</td>
+<td>$x_{k+1}=\dfrac{Sx_k}{\lVert Sx_k\rVert}$</td>
+</tr>
+<tr>
+<td>Vers quoi converge-t-elle ?</td>
+<td>Le vecteur propre de <strong>plus grande</strong> valeur propre</td>
+</tr>
+<tr>
+<td>La condition sur $x_0$ ?</td>
+<td> <strong>Hors du NOYAU</strong> de $S$</td>
+</tr>
+<tr>
+<td>Le problème en grande dimension ?</td>
+<td> Le coût est <strong>CUBIQUE en $D$</strong></td>
+</tr>
+<tr>
+<td>L'astuce quand $N\ll D$ ?</td>
+<td>Diagonaliser $\frac1NX^\top X\in\mathbb R^{N\times N}$</td>
+</tr>
+<tr>
+<td>Pourquoi ça marche ?</td>
+<td> <strong>MÊMES valeurs propres NON NULLES</strong> que $S$</td>
+</tr>
+<tr>
+<td>Comment retrouver $b_m$ ?</td>
+<td>Via $c_m=X^\top b_m$, en remultipliant par $X$ et en normalisant</td>
+</tr>
+<tr>
+<td>Les cinq étapes en pratique ?</td>
+<td><strong>1.</strong> centrer <strong>2.</strong> standardiser <strong>3.</strong> eigendécomposition <strong>4.</strong> projeter <strong>5.</strong> dé-standardiser</td>
+</tr>
+<tr>
+<td>Le centrage est-il indispensable ?</td>
+<td>Pas strictement, mais il <strong>réduit le risque de problèmes NUMÉRIQUES</strong></td>
+</tr>
+<tr>
+<td>Qu'apporte la standardisation ?</td>
+<td>Données <strong>SANS UNITÉ</strong>, de <strong>variance 1</strong> sur chaque axe</td>
+</tr>
+<tr>
+<td>Standardiser un point de test ?</td>
+<td> Avec la moyenne et l'écart-type <strong>d'ENTRAÎNEMENT</strong></td>
+</tr>
+<tr>
+<td>MNIST : combien de dimensions ?</td>
+<td>$28\times28=784$ pixels, donc $x\in\mathbb R^{784}$</td>
+</tr>
+<tr>
+<td>Reconstruction avec 1 CP ?</td>
+<td><em>« À moitié décente, mais <strong>FLOUE et GÉNÉRIQUE</strong> »</em></td>
+</tr>
+<tr>
+<td>Avec 784 CP ?</td>
+<td> Le chiffre <strong>EXACT, sans aucune perte</strong></td>
+</tr>
+<tr>
+<td>Neuf raisons de la PPCA ?</td>
+<td>Vraisemblance · comparaison bayésienne · <strong>modèle GÉNÉRATIF</strong> · connexions · <strong>données manquantes</strong> · nouveauté · extensions · ACP comme <strong>cas particulier</strong> · traitement pleinement bayésien</td>
+</tr>
+<tr>
+<td>Qui a proposé la PPCA ?</td>
+<td><strong>Tipping et Bishop (1999)</strong></td>
+</tr>
+<tr>
+<td>L'a priori latente ?</td>
+<td>$z\sim\mathcal N(0,I)$</td>
+</tr>
+<tr>
+<td>Le lien latent-observé ?</td>
+<td>$x=Bz+\mu+\epsilon$ avec $\epsilon\sim\mathcal N(0,\sigma^2I)$</td>
+</tr>
+<tr>
+<td>L'échantillonnage ancestral ?</td>
+<td> Échantillonner <strong>$z_n$ D'ABORD</strong>, puis $x_n$ <strong>conditionné</strong> sur $z_n$</td>
+</tr>
+<tr>
+<td>La vraisemblance de la PPCA ?</td>
+<td> $p(x)=\mathcal N(x\mid\mu,\ BB^\top+\sigma^2I)$</td>
+</tr>
+<tr>
+<td>Sa moyenne ?</td>
+<td>$\mu$</td>
+</tr>
+<tr>
+<td>Sa covariance ?</td>
+<td>$BB^\top+\sigma^2I$</td>
+</tr>
+<tr>
+<td>Pourquoi pas $p(x\mid z)$ pour le MLE ?</td>
+<td> Elle <strong>dépend encore des variables LATENTES</strong></td>
+</tr>
+<tr>
+<td>$\operatorname{Cov}[x,z]$ ?</td>
+<td>$B$</td>
+</tr>
+<tr>
+<td>La loi jointe ?</td>
+<td>$\mathcal N\!\left(\begin{bmatrix}\mu\\0\end{bmatrix},\begin{bmatrix}BB^\top+\sigma^2I&amp;B\\B^\top&amp;I\end{bmatrix}\right)$</td>
+</tr>
+<tr>
+<td>Sa taille ?</td>
+<td>Moyenne de longueur $D+M$, covariance $(D+M)\times(D+M)$</td>
+</tr>
+<tr>
+<td>L'a posteriori latente ?</td>
+<td>$p(z\mid x)=\mathcal N(m,C)$</td>
+</tr>
+<tr>
+<td>$m$ ?</td>
+<td>$B^\top(BB^\top+\sigma^2I)^{-1}(x-\mu)$</td>
+</tr>
+<tr>
+<td>$C$ ?</td>
+<td>$I-B^\top(BB^\top+\sigma^2I)^{-1}B$</td>
+</tr>
+<tr>
+<td>La particularité de $C$ ?</td>
+<td> Elle <strong>NE DÉPEND PAS des données observées $x$</strong></td>
+</tr>
+<tr>
+<td>À quoi sert $C$ ?</td>
+<td>Évaluer la <strong>CONFIANCE</strong> dans l'encodage</td>
+</tr>
+<tr>
+<td>L'ACP classique dans ce cadre ?</td>
+<td> Le <strong>cas particulier du maximum de vraisemblance SANS BRUIT</strong></td>
+</tr>
+</tbody></table>
+</main>
+
+
+
+
+</body></html>

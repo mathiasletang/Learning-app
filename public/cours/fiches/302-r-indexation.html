@@ -1,0 +1,1341 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fiche 302 — Indexation : les quatre index, [, [[, $ et l'assignation par sous-ensemble</title>
+<script>
+window.MathJax={tex:{inlineMath:[["$","$"]],displayMath:[["$$","$$"]],processEscapes:true},
+ options:{skipHtmlTags:["script","noscript","style","textarea","pre","code"]},
+ svg:{fontCache:"global"},
+ startup:{pageReady:()=>MathJax.startup.defaultPageReady().then(()=>{document.body.classList.add("ready")})}};
+setTimeout(function(){document.body.classList.add("ready")},2500);
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+/* ============================================================
+   MathiasLearn — feuille de style des fiches
+   Reprise intégrale des tokens de 00_PARCOURS/*.html
+   + blocs pédagogiques (callouts, méthode, essentiels, recall)
+   ============================================================ */
+:root{--bg:#faf9f7;--card:#fff;--ink:#1a1a1a;--muted:#6b6b6b;--line:#e5e2dd;--accent:#8b5e34;
+ --hl:#fdf8ef;--ok:#2d7d4f;--okbg:#f0f7f3;--warn:#b3402f;--warnbg:#fdf3f1;--blue:#2f5d8b;--bluebg:#f1f5fa}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+ font:17px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;padding:0 16px 100px}
+.nav{position:sticky;top:0;background:rgba(250,249,247,.96);backdrop-filter:blur(8px);
+ border-bottom:1px solid var(--line);margin:0 -16px 30px;padding:11px 16px;z-index:50;
+ display:flex;gap:6px;flex-wrap:wrap;font-size:13px}
+.nav a{color:var(--muted);text-decoration:none;padding:4px 9px;border-radius:5px;white-space:nowrap}
+.nav a:hover{background:var(--line);color:var(--ink)}
+.nav a.on{background:var(--accent);color:#fff}
+main{max-width:780px;margin:0 auto}
+h1{font-size:31px;letter-spacing:-.02em;margin:.4em 0 .5em;line-height:1.25}
+h2{font-size:23px;margin:2.2em 0 .7em;padding-bottom:.3em;border-bottom:1px solid var(--line)}
+h3{font-size:19px;margin:1.9em 0 .5em;color:var(--accent)}
+h4{font-size:17px;margin:1.5em 0 .4em}
+p{margin:.8em 0} a{color:var(--accent)} hr{border:0;border-top:1px solid var(--line);margin:2.6em 0}
+table{border-collapse:collapse;width:100%;margin:1.3em 0;font-size:15.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+th{background:#f3f0eb;font-weight:600}
+tr:nth-child(even) td{background:#fcfbfa}
+code{font-family:"SF Mono",Menlo,Consolas,monospace;font-size:.88em;background:#f2efea;padding:2px 6px;border-radius:4px;overflow-wrap:break-word}
+pre{background:#f2efea;padding:14px 16px;border-radius:8px;overflow-x:auto}
+pre code{background:none;padding:0;white-space:pre}
+blockquote{border-left:3px solid var(--accent);background:var(--hl);margin:1.4em 0;padding:14px 20px;border-radius:0 8px 8px 0}
+blockquote p:first-child{margin-top:0} blockquote p:last-child{margin-bottom:0}
+ul,ol{padding-left:1.5em} li{margin:.35em 0} em{color:#4a4a4a}
+mjx-container[display="true"]{margin:1.1em 0!important;overflow-x:auto;overflow-y:hidden;padding:2px 0}
+mjx-container svg{max-width:100%}
+body:not(.ready) main{opacity:0} main{opacity:1;transition:opacity .25s}
+
+/* --- bandeau de tête de fiche --- */
+.cours{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--accent);
+ border-radius:0 10px 10px 0;padding:18px 22px;margin:0 0 34px}
+.cours h4{margin:0 0 4px;font-size:14px;text-transform:uppercase;letter-spacing:.07em;color:var(--accent)}
+.cours .cs{color:var(--muted);font-size:14.5px;margin:0 0 14px}
+
+/* --- exercices / corrigés --- */
+.ex{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:6px 24px 20px;margin:18px 0}
+.ex>h3:first-child{margin-top:14px}
+details.cor{margin-top:18px;border:1px solid var(--line);border-radius:8px;background:#fcfbfa;overflow:hidden}
+details.cor>summary{cursor:pointer;padding:12px 16px;font-weight:600;font-size:15px;color:var(--accent);
+ list-style:none;display:flex;align-items:center;gap:9px;user-select:none;transition:.15s;min-height:44px}
+details.cor>summary::-webkit-details-marker{display:none}
+details.cor>summary:hover{background:var(--hl)}
+details.cor>summary::before{content:"\25B6";font-size:10px;transition:transform .18s;display:inline-block}
+details.cor[open]>summary::before{transform:rotate(90deg)}
+details.cor[open]>summary{background:var(--okbg);color:var(--ok);border-bottom:1px solid var(--line)}
+.cor .in{padding:4px 20px 16px}
+.cor .in>*:first-child{margin-top:.9em}
+
+/* --- blocs pédagogiques (callouts) ---
+   Générés depuis une citation Markdown dont le premier **gras** commence
+   par un mot-clé : DÉFINITION, THÉORÈME, MÉTHODE, PIÈGE, INTUITION… */
+.cal{border:1px solid var(--line);border-left:4px solid var(--accent);background:var(--card);
+ border-radius:0 10px 10px 0;padding:15px 20px;margin:1.5em 0}
+.cal>p:first-child{margin-top:0}.cal>p:last-child,.cal>ul:last-child,.cal>ol:last-child{margin-bottom:0}
+.cal .lab{display:block;font-size:12.5px;text-transform:uppercase;letter-spacing:.08em;
+ font-weight:700;color:var(--accent);margin-bottom:6px}
+.cal.formel{background:var(--hl)}
+.cal.piege{border-left-color:var(--warn);background:var(--warnbg)}
+.cal.piege .lab{color:var(--warn)}
+.cal.methode{border-left-color:var(--ok);background:var(--okbg)}
+.cal.methode .lab{color:var(--ok)}
+.cal.intu{border-left-color:var(--blue);background:var(--bluebg)}
+.cal.intu .lab{color:var(--blue)}
+.cal.plus{border-left-style:dashed;background:#faf9f7}
+.cal.plus .lab{color:var(--muted)}
+
+/* --- révision express --- */
+.ess{background:var(--card);border:1px solid var(--accent);border-radius:10px;padding:4px 24px 20px;margin:1.6em 0}
+.ess h3{margin-top:1.3em}
+.rec{background:var(--card);border:1px dashed var(--accent);border-radius:10px;padding:4px 24px 18px;margin:1.6em 0}
+.rec ol{counter-reset:none}
+
+/* --- impression / PDF --- */
+@media print{
+ .nav{display:none}
+ body{padding:0;background:#fff;font-size:11.2pt;line-height:1.55}
+ main{max-width:none}
+ h1{font-size:23pt}h2{font-size:15pt;margin-top:1.5em}h3{font-size:12.6pt}
+ h2,h3,h4{break-after:avoid;page-break-after:avoid}
+ table,.cal,blockquote{break-inside:avoid;page-break-inside:avoid}
+ table{display:table;font-size:9.6pt}
+ details.cor{border:1px solid var(--line);background:#fcfbfa}
+ details.cor>summary{display:none}
+ details.cor .in{padding-top:10px}
+ .cal,.ex,.ess,.rec{box-shadow:none}
+ a{color:var(--ink);text-decoration:none}
+}
+@page{margin:16mm 15mm 18mm}
+
+/* --- exemples travaillés --- */
+.exm{background:#fcfbfa;border:1px solid var(--line);border-radius:10px;padding:2px 20px 14px;margin:1.5em 0}
+.exm>h4:first-child{margin:14px 0 .5em;color:var(--accent);font-size:13px;text-transform:uppercase;letter-spacing:.07em}
+
+
+/* --- pastilles de priorité (conventions des fiches de l'app) --- */
+h2[data-prio], h3[data-prio], h4[data-prio]{position:relative}
+h2[data-prio]::before,h3[data-prio]::before,h4[data-prio]::before{
+ content:"";display:inline-block;width:9px;height:9px;border-radius:50%;
+ margin-right:9px;vertical-align:middle;background:var(--muted)}
+[data-prio="must"]::before{background:var(--warn)}
+[data-prio="high"]::before{background:#d98324}
+[data-prio="mid"]::before{background:#c9a227}
+[data-prio="low"]::before{background:var(--ok)}
+/* corrigés des fiches de l'app : même traitement que les corrigés des séries */
+details.cor>summary::after{content:""}
+</style></head><body>
+<div class="nav"><a href="00_COMMENCER_ICI.html">Commencer ici</a><a href="01_NOTATIONS_le-decodeur.html">Notations</a><a href="02_EXERCICES_Serie-0.html">Série 0 — Remise en route</a><a href="03_EXERCICES_Serie-1.html">Série 1 — Convexité</a><a href="04_EXERCICES_Serie-2.html">Série 2 — KKT</a><a href="05_AUTO-EVALUATION.html">Auto-évaluation (quiz)</a><a href="06_FICHE_Optimisation-deux-variables.html">Fiche — Optimisation à 2 variables</a></div>
+<main><h1>Fiche 302 — Indexation : les quatre index, <code>[</code>, <code>[[</code>, <code>$</code> et l'assignation par sous-ensemble</h1>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Matière</strong></td>
+<td>Code · Langage R</td>
+</tr>
+<tr>
+<td><strong>Cours source</strong></td>
+<td>R Core Team, <em>An Introduction to R</em> 4.6.1 — §2.7 « Index vectors; selecting and modifying subsets of a data set »</td>
+</tr>
+<tr>
+<td><strong>Sources d'appoint</strong></td>
+<td><em>R Language Definition</em> 4.6.1, §3.4 « Indexing » — §3.4.1 indexation par vecteurs, §3.4.2 matrices et tableaux, §3.4.3 autres structures, §3.4.4 assignation par sous-ensemble</td>
+</tr>
+<tr>
+<td><strong>Difficulté</strong></td>
+<td> Fondamental — l'opération la plus fréquente de R, et celle qui a le plus de cas particuliers</td>
+</tr>
+<tr>
+<td><strong>Temps d'étude estimé</strong></td>
+<td>1 h 30</td>
+</tr>
+<tr>
+<td><strong>Prérequis</strong></td>
+<td>Fiches 300 et 301 (recyclage, <code>NA</code>, vecteurs logiques)</td>
+</tr>
+<tr>
+<td><strong>Concepts clés</strong></td>
+<td>les <strong>quatre types d'index</strong> (logique, entier positif, entier négatif, caractère), <code>[</code> contre <code>[[</code> contre <code>$</code>, dépassement de bornes, index zéro, troncature, recyclage d'un index logique, appariement partiel et argument <code>exact</code>, index facteur, <code>x[]</code>, <code>NULL</code>, index <code>NA</code>, index matriciel, <code>drop = FALSE</code>, tableau à une dimension, <code>[.data.frame</code>, environnements, assignation par sous-ensemble et le mécanisme <code>`*tmp*`</code>, fonctions de remplacement</td>
+</tr>
+<tr>
+<td><strong>À retenir en priorité</strong></td>
+<td><strong>Les quatre types d'index</strong> · <strong><code>[</code> garde la structure, <code>[[</code> extrait l'élément</strong> · <strong>l'appariement partiel de <code>$</code> et <code>[[</code></strong> · <strong><code>drop = FALSE</code></strong> · le fait que <strong><code>x[i] &lt;- v</code> est un appel de fonction</strong>.</td>
+</tr>
+</tbody></table>
+<h2>Vue d'ensemble</h2>
+<pre><code>TROIS OPERATEURS   x[i]     conserve la structure ; accepte un VECTEUR d'indices
+                   x[[i]]   extrait UN element ; perd noms et dimnames
+                   x$a      un NOM LITTERAL seulement -- l'index n'est pas calculable
+
+QUATRE INDEX (R-intro 2.7)
+   logique         x[!is.na(x)]        recycle si trop court, NA si trop long
+   entier POSITIF  x[1:10]             hors bornes -&gt; NA
+   entier NEGATIF  x[-(1:5)]           = « tout sauf » ; hors bornes -&gt; IGNORE
+   caractere       fruit["apple"]      via l'attribut names
+
+   ... plus quatre cas de bord (R-lang 3.4.1)
+   facteur   =  x[as.integer(i)]  -- les NIVEAUX NE SONT PAS UTILISES
+   vide      x[]  rend x en laissant tomber les attributs « non pertinents »
+   NULL      traite comme integer(0)
+   NA        rend NA. x[NA] a la longueur de x ; x[c(1,NA)] a la longueur 2
+
+SIGNES           tous les elements d'un index entier ont LE MEME SIGNE
+ZERO             x[0] est vide ; un zero melange aux autres est IGNORE
+
+MATRICES         m[i]      un seul indice -&gt; c(m)[i], dim ignore
+                 m[i, j]   deux indices
+                 m[idx]    idx MATRICE d'entiers : une ligne = un element
+                 UNE DIMENSION DE LONGUEUR 1 EST SUPPRIMEE -&gt; drop = FALSE
+
+ASSIGNER         x[3:5] &lt;- 13:15   est un APPEL DE FONCTION :
+                 x &lt;- `[&lt;-`(x, 3:5, value = 13:15)
+</code></pre>
+<p><strong>Le problème posé.</strong> <em>« Subsets of the elements of a vector may be selected by <strong>appending to the name of the vector an index vector in square brackets</strong> »</em> (§2.7). L'idée est simple ; ce qui ne l'est pas, c'est que <strong>le crochet accepte sept sortes d'index différentes</strong>, dont trois se comportent de façon contre-intuitive. C'est là que se logent la moitié des bugs silencieux d'un débutant.</p>
+<div class="cal intu"><span class="lab">Intuition — indexer, c'est appeler une fonction.</span>
+<p> <em>« Like the other operators, <strong>indexing is really done by functions</strong>, and one could have used <code>`[`(x, 2)</code> instead of <code>x[2]</code> »</em> (<em>R Language Definition</em> §3.1.4). Le crochet n'est pas une syntaxe spéciale du langage : c'est <strong>une fonction générique</strong> dont on peut écrire des méthodes (§3.4.3), qu'on peut passer en argument, et dont il existe une version <strong>de remplacement</strong> (<code>`[&lt;-`</code>) qui explique tout le concept 8.</p>
+</div>
+<h2 data-prio="must">Concept 1 — Trois opérateurs, trois intentions</h2>
+<div class="cal formel"><span class="lab">Définition (R Language Definition §3.4).</span>
+<p> <em>« R has <strong>three basic indexing operators</strong>, with syntax displayed by the following examples : »</em></p>
+</div>
+<pre><code class="language-r">x[i]
+x[i, j]
+x[[i]]
+x[[i, j]]
+x$a
+x$"a"
+</code></pre>
+<table>
+<thead>
+<tr>
+<th></th>
+<th><code>[</code></th>
+<th><code>[[</code></th>
+<th><code>$</code></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Intention</td>
+<td><strong>prendre un sous-ensemble</strong></td>
+<td><strong>extraire un élément</strong></td>
+<td>extraire <strong>un élément nommé</strong></td>
+</tr>
+<tr>
+<td>Nombre d'éléments</td>
+<td>un <strong>vecteur</strong> d'indices</td>
+<td><strong>un seul</strong></td>
+<td><strong>un seul</strong></td>
+</tr>
+<tr>
+<td>Type du résultat</td>
+<td><strong>le même que l'objet</strong></td>
+<td>le type <strong>de l'élément</strong></td>
+<td>le type de l'élément</td>
+</tr>
+<tr>
+<td>Index calculable</td>
+<td>oui</td>
+<td>oui</td>
+<td><strong>non</strong></td>
+</tr>
+<tr>
+<td>Appariement partiel</td>
+<td><strong>jamais</strong></td>
+<td>oui (contrôlable)</td>
+<td>oui</td>
+</tr>
+</tbody></table>
+<h3>1.1 Ce que <code>[[</code> fait de plus que <code>[</code></h3>
+<blockquote>
+<p><strong>Règle (§3.4).</strong> <em>« For vectors and matrices <strong>the <code>[[</code> forms are rarely used</strong>, although they have some <strong>slight semantic differences</strong> from the <code>[</code> form : e.g. <strong>it drops any <code>names</code> or <code>dimnames</code> attribute</strong>, and that <strong>partial matching is used for character indices</strong>. »</em></p>
+<p><em>« When indexing multi-dimensional structures with a single index, <code>x[[i]]</code> or <code>x[i]</code> will return <strong>the i-th sequential element</strong> of <code>x</code>. »</em></p>
+<p><em>« <strong>For lists, one generally uses <code>[[</code> to select any single element, whereas <code>[</code> returns a list of the selected elements.</strong> »</em></p>
+</blockquote>
+<p>C'est <strong>la</strong> distinction à retenir pour les listes (fiche 306) :</p>
+<pre><code class="language-r">l &lt;- list(a = 1:3, b = "texte")
+l[1]      # une LISTE de un element
+l[[1]]    # le VECTEUR 1:3 lui-meme
+</code></pre>
+<blockquote>
+<p><strong>Règle — pourquoi <code>[[</code> n'accepte qu'un élément (§3.4).</strong> <em>« The <code>[[</code> form allows <strong>only a single element to be selected</strong> using integer or character indices, whereas <code>[</code> allows indexing by vectors. »</em></p>
+<p class="cal piege"> <em>« Note though that <strong>for a list or other recursive object, the index can be a vector</strong> and <strong>each element of the vector is applied in turn</strong> to the list, the selected component, the selected component of that component, and so on. <strong>The result is still a single element.</strong> »</em></p>
+<p>Autrement dit <code>l[[c(1, 2)]]</code> <strong>n'extrait pas deux éléments</strong> : il extrait le 1ᵉʳ élément de <code>l</code>, puis le 2ᵉ élément <strong>de celui-ci</strong>. C'est une <strong>descente en profondeur</strong>, pas une sélection multiple.</p>
+</blockquote>
+<h3>1.2 Ce que <code>$</code> a de particulier</h3>
+<blockquote>
+<p><strong>Règle (§3.4).</strong> <em>« The form using <code>$</code> applies to <strong>recursive objects</strong> such as lists and pairlists. It allows <strong>only a literal character string or a symbol</strong> as the index. That is, <strong>the index is not computable</strong> : for cases where you need to <strong>evaluate an expression</strong> to find the index, use <code>x[[expr]]</code>. <strong>Applying <code>$</code> to a non-recursive object is an error.</strong> »</em></p>
+</blockquote>
+<p class="cal piege"> <strong>C'est le piège n° 1 de la programmation en R.</strong></p>
+<pre><code class="language-r">colonne &lt;- "prix"
+donnees$colonne     # cherche une colonne litteralement nommee « colonne » -&gt; NULL
+donnees[[colonne]]  # cherche la colonne « prix »            &lt;- CE QU'ON VOULAIT
+</code></pre>
+<p>Le premier ne lève <strong>aucune erreur</strong> : il rend <code>NULL</code>. Le symptôme apparaît plus loin, sous une forme incompréhensible. <strong>Dès qu'un nom de colonne est dans une variable, <code>$</code> est le mauvais outil.</strong></p>
+<h2 data-prio="must">Concept 2 — Les quatre types d'index du cours</h2>
+<div class="cal formel"><span class="lab">Définition (§2.7).</span>
+<p> <em>« More generally, <strong>any expression that evaluates to a vector</strong> may have subsets of its elements similarly selected by appending an index vector in square brackets immediately after the expression. <strong>Such index vectors can be any of four distinct types.</strong> »</em></p>
+</div>
+<h3>2.1 Type 1 — un vecteur logique</h3>
+<blockquote>
+<p><em>« In this case the index vector is <strong>recycled to the same length</strong> as the vector from which elements are to be selected. <strong>Values corresponding to <code>TRUE</code> in the index vector are selected and those corresponding to <code>FALSE</code> are omitted.</strong> »</em> (§2.7)</p>
+</blockquote>
+<pre><code class="language-r">y &lt;- x[!is.na(x)]
+</code></pre>
+<p><em>« creates (or re-creates) an object <code>y</code> which will contain <strong>the non-missing values of <code>x</code>, in the same order</strong>. <strong>Note that if <code>x</code> has missing values, <code>y</code> will be shorter than <code>x</code>.</strong> »</em></p>
+<p class="cal piege"> <strong>C'est le détail qui casse les analyses.</strong> Filtrer <strong>raccourcit</strong>. Si vous filtrez <code>x</code> mais pas <code>y</code>, les deux vecteurs ne sont plus alignés — et R ne dira rien, il recyclera (fiche 301).</p>
+<p>L'exemple composé du cours, à lire de l'intérieur vers l'extérieur :</p>
+<pre><code class="language-r">(x+1)[(!is.na(x)) &amp; x &gt; 0] -&gt; z
+</code></pre>
+<p><em>« creates an object <code>z</code> and places in it the values of the vector <strong><code>x+1</code></strong> for which the corresponding value <strong>in <code>x</code></strong> was both <strong>non-missing and positive</strong>. »</em></p>
+<p>Trois choses y sont remarquables : l'objet indexé est <strong>une expression</strong> <code>(x+1)</code>, pas un nom ; la condition porte sur <strong><code>x</code></strong> et non sur <code>x+1</code> ; et les deux conditions sont combinées par <strong><code>&amp;</code></strong>, l'opérateur vectorisé (fiche 301).</p>
+<div class="cal plus"><span class="lab">Complément — les deux longueurs anormales (R Language Definition §3.4.1).</span>
+<p> *« The indexing <code>i</code> should <strong>generally have the same length as <code>x</code></strong>. <strong>If it is shorter, then its elements will be recycled</strong> ; <strong>if it is longer, then <code>x</code> is conceptually extended with <code>NA</code>s</strong>. »*</p>
+<table>
+<thead>
+<tr>
+<th>Longueur de l'index logique</th>
+<th>Comportement</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>égale</strong></td>
+<td>le cas normal</td>
+</tr>
+<tr>
+<td><strong>plus courte</strong></td>
+<td><strong>recyclée</strong> — d'où l'idiome <code>x[c(TRUE, FALSE)]</code> qui prend un élément sur deux</td>
+</tr>
+<tr>
+<td><strong>plus longue</strong></td>
+<td><code>x</code> est <strong>prolongé par des <code>NA</code></strong> — on obtient des <code>NA</code> en fin de résultat</td>
+</tr>
+</tbody></table>
+</div>
+<h3>2.2 Type 2 — des entiers positifs</h3>
+<blockquote>
+<p>*« In this case the values in the index vector <strong>must lie in the set $\{1, 2, \ldots, \texttt{length(x)}\}$</strong>. The corresponding elements are selected and concatenated, <strong>in that order</strong>, in the result. <strong>The index vector can be of any length and the result is of the same length as the index vector.</strong> »* (§2.7)</p>
+</blockquote>
+<pre><code class="language-r">x[6]        # le sixieme element
+x[1:10]     # les dix premiers (si length(x) &gt;= 10)
+</code></pre>
+<p>L'exemple délibérément étrange du cours, qui montre que <strong>l'index peut être plus long que le vecteur</strong> :</p>
+<pre><code class="language-r">c("x","y")[rep(c(1,2,2,1), times = 4)]
+</code></pre>
+<p><em>« (an admittedly unlikely thing to do) produces a character vector <strong>of length 16</strong> consisting of <code>"x", "y", "y", "x"</code> <strong>repeated four times</strong>. »</em> Un vecteur de <strong>2</strong> éléments indexé par <strong>16</strong> indices donne <strong>16</strong> éléments : <strong>la longueur du résultat est celle de l'index</strong>, pas celle du vecteur.</p>
+<div class="cal plus"><span class="lab">Complément — le hors-bornes et le zéro (R Language Definition §3.4.1).</span>
+
+<ul>
+<li><em>« <strong>If <code>i</code> is positive and exceeds <code>length(x)</code> then the corresponding selection is <code>NA</code>.</strong> »</em></li>
+<li>*« <strong>Negative out of bounds values for <code>i</code> are silently disregarded</strong> since R version <strong>2.6.0</strong>, S compatibly, as they mean to <strong>drop non-existing elements</strong> and that is <strong>an empty operation ("no-op")</strong>. »*</li>
+<li><em>« <strong>A special case is the zero index, which has null effects</strong> : <strong><code>x[0]</code> is an empty vector</strong> and otherwise <strong>including zeros among positive or negative indices has the same effect as if they were omitted</strong>. »</em></li>
+<li><em>« <strong>All elements of <code>i</code> must have the same sign.</strong> »</em></li>
+</ul>
+</div>
+<p class="cal piege"> <strong>L'asymétrie positif / négatif est un piège de diagnostic.</strong> Un indice positif hors bornes <strong>produit un <code>NA</code></strong> — un symptôme visible. Un indice négatif hors bornes est <strong>silencieusement ignoré</strong>. Sur <code>x</code> de longueur 5 : <code>x[7]</code> rend <code>NA</code>, <code>x[-7]</code> rend <strong><code>x</code> en entier</strong>, sans le moindre signe.</p>
+<div class="cal plus"><span class="lab">Complément — les index non entiers.</span>
+<p> <em>« <strong>Other numeric.</strong> Non-integer values are <strong>converted to integer (by truncation towards zero)</strong> before use. »</em> Donc <code>x[2.9]</code> rend <strong><code>x[2]</code></strong>, sans avertissement. Une division qui aurait dû être <code>%/%</code> passe inaperçue.</p>
+</div>
+<h3>2.3 Type 3 — des entiers négatifs</h3>
+<blockquote>
+<p><em>« Such an index vector specifies the values <strong>to be excluded rather than included</strong>. »</em> (§2.7)</p>
+</blockquote>
+<pre><code class="language-r">y &lt;- x[-(1:5)]     # « tout sauf les cinq premiers »
+</code></pre>
+<p class="cal piege"> <strong>Les parenthèses sont obligatoires.</strong> <code>x[-1:5]</code> n'est pas <code>x[-(1:5)]</code> : le <code>:</code> étant prioritaire (fiche 301), <code>-1:5</code> vaut <code>c(-1, 0, 1, 2, 3, 4, 5)</code> — des signes <strong>mélangés</strong>, ce que la règle interdit : <em>« All elements of <code>i</code> must have the same sign »</em>. R lève alors une erreur — heureusement.</p>
+<h3>2.4 Type 4 — des chaînes de caractères</h3>
+<blockquote>
+<p><em>« This possibility <strong>only applies where an object has a <code>names</code> attribute</strong> to identify its components. In this case a sub-vector of the <code>names</code> vector may be used in the same way as the positive integral labels. »</em> (§2.7)</p>
+</blockquote>
+<pre><code class="language-r">fruit &lt;- c(5, 10, 1, 20)
+names(fruit) &lt;- c("orange", "banana", "apple", "peach")
+lunch &lt;- fruit[c("apple", "orange")]     # 1 et 5, DANS CET ORDRE
+</code></pre>
+<p><em>« The advantage is that <strong>alphanumeric names are often easier to remember than numeric indices</strong>. This option is particularly useful <strong>in connection with data frames</strong>. »</em></p>
+<p><strong>Et l'ordre suit l'index, pas l'objet</strong> : <code>fruit[c("apple","orange")]</code> rend <code>apple</code> <strong>d'abord</strong>. C'est la même règle qu'au type 2 — <em>« concatenated, <strong>in that order</strong> »</em>.</p>
+<div class="cal plus"><span class="lab">Complément décisif — l'appariement partiel (R Language Definition §3.4.1).</span>
+<p> *« The strings in <code>i</code> are matched against the <code>names</code> attribute of <code>x</code> and the resulting integers are used. <strong>For <code>[[</code> and <code>$</code> partial matching is used if exact matching fails</strong>, so <code>x$aa</code> will match <code>x$aabb</code> <strong>if <code>x</code> does not contain a component named <code>"aa"</code></strong> and <code>"aabb"</code> is <strong>the only name which has prefix <code>"aa"</code></strong>. »*</p>
+<p>*« For <code>[[</code>, partial matching can be controlled via the <strong><code>exact</code> argument</strong> which <strong>defaults to <code>NA</code></strong>, indicating that partial matching <strong>is allowed but should result in a warning</strong> when it occurs. Setting <code>exact</code> to <strong><code>TRUE</code> prevents</strong> partial matching, a <strong><code>FALSE</code></strong> value <strong>allows it and does not issue any warnings</strong>. <strong>Note that <code>[</code> always requires an exact match.</strong> »*</p>
+<table>
+<thead>
+<tr>
+<th>Opérateur</th>
+<th>Appariement partiel</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>[</code></td>
+<td><strong>jamais</strong></td>
+</tr>
+<tr>
+<td><code>[[</code></td>
+<td><code>exact = NA</code> (défaut) : autorisé <strong>avec avertissement</strong> · <code>TRUE</code> : interdit · <code>FALSE</code> : autorisé <strong>en silence</strong></td>
+</tr>
+<tr>
+<td><code>$</code></td>
+<td><strong>oui, silencieusement</strong></td>
+</tr>
+</tbody></table>
+<p class="cal piege"> <em>« Note that <strong>partial matching is only used when extracting and not when replacing</strong>. »</em> Conséquence redoutable : <code>l$val</code> <strong>lit</strong> <code>l$valeur</code> par appariement partiel, mais <code>l$val &lt;- 3</code> <strong>crée un nouvel élément <code>val</code></strong>. On croit modifier ; on ajoute.</p>
+<p class="cal piege"> *« The string <code>""</code> is treated specially : it indicates <strong>"no name"</strong> and <strong>matches no element (not even those without a name)</strong>. »*</p>
+</div>
+<h2 data-prio="high">Concept 3 — Les quatre cas de bord</h2>
+<p>Ces quatre-là ne sont pas dans <em>An Introduction to R</em>. Ils sont dans la <em>R Language Definition</em> §3.4.1, et chacun explique un comportement qui paraît autrement absurde.</p>
+<h3>3.1 Un facteur comme index</h3>
+<div class="cal piege"><span class="lab">Piège (§3.4.1).</span>
+<p class="cal piege">  *« <strong>Factor.</strong> The result is identical to <strong><code>x[as.integer(i)]</code></strong>. <strong>The factor levels are never used.</strong> If so desired, use <strong><code>x[as.character(i)]</code></strong> or a similar construction. »*</p>
+</div>
+<p>C'est le piège le plus vicieux de la section, parce qu'un facteur <strong>s'affiche</strong> avec ses étiquettes tout en <strong>valant</strong> ses codes entiers (fiche 304). Indexer par un facteur indexe donc <strong>par des positions 1, 2, 3…</strong> que rien à l'écran ne laisse deviner. Le résultat a la bonne longueur, il est simplement faux.</p>
+<h3>3.2 L'index vide <code>x[]</code></h3>
+<blockquote>
+<p><strong>Règle (§3.4.1).</strong> *« <strong>Empty.</strong> The expression <strong><code>x[]</code> returns <code>x</code></strong>, but <strong>drops "irrelevant" attributes</strong> from the result. <strong>Only <code>names</code>, and in multi-dimensional arrays <code>dim</code> and <code>dimnames</code> attributes, are retained.</strong> »*</p>
+</blockquote>
+<p><code>x[]</code> n'est donc pas une opération neutre : c'est <strong>un nettoyage d'attributs</strong>. Et surtout, à gauche d'une assignation, <code>x[] &lt;- 0</code> <strong>conserve la forme de <code>x</code></strong> alors que <code>x &lt;- 0</code> la détruit.</p>
+<h3>3.3 <code>NULL</code></h3>
+<blockquote>
+<p>*« <strong>NULL.</strong> This is treated as if it were <strong><code>integer(0)</code></strong>. »* — donc <code>x[NULL]</code> rend un vecteur <strong>vide</strong>, comme <code>x[0]</code>.</p>
+</blockquote>
+<h3>3.4 Un index <code>NA</code> — et la longueur qui change de règle</h3>
+<div class="cal formel"><span class="lab">Problème (§3.4.1).</span>
+<p class="cal piege">  *« Indexing with a <strong>missing (i.e. <code>NA</code>) value gives an <code>NA</code> result</strong>. This rule applies <strong>also to the case of logical indexing</strong> : the elements of <code>x</code> that have an <code>NA</code> selector in <code>i</code> <strong>get included in the result, but their value will be <code>NA</code></strong>. »*</p>
+<p>*« Notice however that there are <strong>different modes of <code>NA</code></strong> — the literal constant is of mode <code>"logical"</code>, but it is frequently automatically coerced to other types. One effect of this is that <strong><code>x[NA]</code> has the length of <code>x</code></strong>, but <strong><code>x[c(1, NA)]</code> has length 2</strong>. That is because <strong>the rules for logical indices apply in the former case, but those for integer indices in the latter</strong>. »*</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Écriture</th>
+<th>Type effectif de l'index</th>
+<th>Longueur du résultat</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>x[NA]</code></td>
+<td><strong>logique</strong> (le type par défaut de <code>NA</code>) — recyclé sur toute la longueur</td>
+<td><strong><code>length(x)</code></strong>, tout en <code>NA</code></td>
+</tr>
+<tr>
+<td><code>x[c(1, NA)]</code></td>
+<td><strong>entier</strong> (<code>c(1, NA)</code> est coercé en entier)</td>
+<td><strong>2</strong></td>
+</tr>
+</tbody></table>
+<p>Une même constante <code>NA</code>, deux comportements, parce que <strong>son type a changé au moment de la concaténation</strong>. C'est la conséquence directe de la règle vue en fiche 301 : <em>« the default type of <code>NA</code> is logical, <strong>unless coerced to some other type</strong> »</em>.</p>
+<p><em>Une dernière règle, simple mais utile</em> : <em>« <strong>Indexing with <code>[</code> will also carry out the relevant subsetting of any <code>names</code> attributes.</strong> »</em> Les noms suivent le sous-ensemble.</p>
+<details class="cor">
+<summary><strong>Exercice résolu — prévoir sept résultats sur le même vecteur</strong></summary><div class="in">
+
+<p><strong>Énoncé.</strong> Soit <code>x &lt;- c(a = 10, b = 20, c = 30, d = 40, e = 50)</code>. Donner longueur et contenu de :
+<code>x[2.9]</code> · <code>x[7]</code> · <code>x[-7]</code> · <code>x[0]</code> · <code>x[c(1, 0, 3)]</code> · <code>x[NA]</code> · <code>x[c(1, NA)]</code>.</p>
+<p><em>Étape 1 — <code>x[2.9]</code>.</em> Règle « Other numeric » : <em>« converted to integer <strong>by truncation towards zero</strong> »</em>. <code>2.9</code> devient <code>2</code>. Résultat : <strong><code>b = 20</code></strong>, longueur <strong>1</strong>. Aucun avertissement.</p>
+<p><em>Étape 2 — <code>x[7]</code>.</em> Entier positif dépassant <code>length(x) = 5</code>. <em>« If <code>i</code> is positive and exceeds <code>length(x)</code> then the corresponding selection is <strong><code>NA</code></strong> »</em>. Résultat : <strong><code>NA</code></strong>, longueur <strong>1</strong>, avec un nom <code>&lt;NA&gt;</code>.</p>
+<p><em>Étape 3 — <code>x[-7]</code>.</em> Entier négatif hors bornes. <em>« <strong>Negative out of bounds values for <code>i</code> are silently disregarded</strong> »</em> depuis R 2.6.0 — retirer un élément inexistant est une opération vide. Résultat : <strong><code>x</code> en entier</strong>, longueur <strong>5</strong>.  Asymétrie complète avec l'étape 2 : le positif signale, le négatif se tait.</p>
+<p><em>Étape 4 — <code>x[0]</code>.</em> <em>« <code>x[0]</code> is <strong>an empty vector</strong> »</em>. Longueur <strong>0</strong>, du même type que <code>x</code>.</p>
+<p><em>Étape 5 — <code>x[c(1, 0, 3)]</code>.</em> <em>« including zeros among positive or negative indices has the same effect <strong>as if they were omitted</strong> »</em>. L'index vaut donc <code>c(1, 3)</code>. Résultat : <strong><code>a = 10, c = 30</code></strong>, longueur <strong>2</strong> — pas 3.</p>
+<p><em>Étape 6 — <code>x[NA]</code>.</em> Le <code>NA</code> nu est <strong>de mode logique</strong>. Les règles logiques s'appliquent : index recyclé sur toute la longueur de <code>x</code>, et chaque sélecteur <code>NA</code> fait entrer l'élément <strong>avec la valeur <code>NA</code></strong>. Longueur <strong>5</strong>, cinq <code>NA</code>.</p>
+<p><em>Étape 7 — <code>x[c(1, NA)]</code>.</em> <code>c(1, NA)</code> force le <code>NA</code> <strong>en entier</strong>. Les règles entières s'appliquent : deux indices, donc <strong>longueur 2</strong> — <code>a = 10</code> puis <code>NA</code>.</p>
+<p><em>Étape 8 — la leçon.</em> Quatre de ces sept expressions rendent quelque chose <strong>sans le moindre message</strong>, dont deux d'une longueur inattendue. En R, <strong>la vérification à faire après un sous-ensemble est <code>length()</code></strong>, systématiquement.</p>
+</div></details>
+
+<h2 data-prio="must">Concept 4 — Indexer une matrice ou un tableau</h2>
+<blockquote>
+<p><strong>Règle générale (§3.4.2).</strong> *« Subsetting multi-dimensional structures <strong>generally follows the same rules as single-dimensional indexing for each index variable</strong>, with the relevant component of <strong><code>dimnames</code> taking the place of <code>names</code></strong>. <strong>A couple of special rules apply, though.</strong> »*</p>
+</blockquote>
+<h3>4.1 Un seul indice sur une matrice</h3>
+<blockquote>
+<p class="cal piege"> *« Normally, a structure is accessed using <strong>the number of indices corresponding to its dimension</strong>. It is however also possible to use <strong>a single index</strong>, in which case <strong>the <code>dim</code> and <code>dimnames</code> attributes are disregarded</strong> and the result is effectively that of <strong><code>c(m)[i]</code></strong>. <strong>Notice that <code>m[1]</code> is usually very different from <code>m[1, ]</code> or <code>m[, 1]</code>.</strong> »*</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>Écriture</th>
+<th>Ce que R rend</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>m[1]</code></td>
+<td><strong>le premier élément du vecteur sous-jacent</strong>, <code>dim</code> ignoré</td>
+</tr>
+<tr>
+<td><code>m[1, ]</code></td>
+<td><strong>la première ligne</strong></td>
+</tr>
+<tr>
+<td><code>m[, 1]</code></td>
+<td><strong>la première colonne</strong></td>
+</tr>
+</tbody></table>
+<p>C'est la conséquence directe de ce qu'annonçait le §2.8 : une matrice <strong>est</strong> un vecteur (fiches 301 et 303). Le <code>dim</code> est un attribut ; avec un seul indice, il est simplement <strong>mis de côté</strong>.</p>
+<h3>4.2 Une matrice d'entiers comme index</h3>
+<div class="cal methode"><span class="lab">Méthode (§3.4.2).</span>
+<p> <em>« It is possible to use <strong>a matrix of integers as an index</strong>. In this case, <strong>the number of columns of the matrix should match the number of dimensions of the structure</strong>, and the result will be <strong>a vector with length as the number of rows of the matrix</strong>. »</em></p>
+</div>
+<p>L'exemple du manuel, qui extrait <code>m[1, 1]</code> et <code>m[2, 2]</code> <strong>en une seule opération</strong> :</p>
+<pre><code class="language-r">m &lt;- matrix(1:4, 2)
+m
+#      [,1] [,2]
+# [1,]    1    3
+# [2,]    2    4
+
+i &lt;- matrix(c(1, 1, 2, 2), 2, byrow = TRUE)
+i
+#      [,1] [,2]
+# [1,]    1    1
+# [2,]    2    2
+
+m[i]
+# [1] 1 4
+</code></pre>
+<p><strong>Comment le lire</strong> : chaque <strong>ligne</strong> de <code>i</code> est <strong>un jeu de coordonnées</strong>. Ligne 1 → <code>(1,1)</code> → la valeur <strong>1</strong>. Ligne 2 → <code>(2,2)</code> → la valeur <strong>4</strong>. Deux lignes dans l'index, deux valeurs en sortie. C'est ainsi qu'on extrait la diagonale, ou n'importe quel ensemble de cases dispersées, sans boucle.</p>
+<blockquote>
+<p class="cal piege"> <strong>Les restrictions (§3.4.2).</strong> <em>« <strong>Indexing matrices may not contain negative indices.</strong> <code>NA</code> and zero values are allowed : <strong>rows in an index matrix containing a zero are ignored</strong>, whereas <strong>rows containing an <code>NA</code> produce an <code>NA</code> in the result</strong>. »</em></p>
+<p>Et : <em>« Both in the case of using a single index and in matrix indexing, <strong>a <code>names</code> attribute is used if present</strong>, as had the structure been one-dimensional. »</em></p>
+</blockquote>
+<h3>4.3 <code>drop</code> — la dimension qui disparaît</h3>
+<blockquote>
+<p class="cal piege"> <strong>Le piège que le manuel qualifie lui-même de « cause fréquente d'échec » (§3.4.2).</strong> <em>« If an indexing operation causes the result to have <strong>one of its extents of length one</strong> — as in selecting a single slice of a three-dimensional matrix with (say) <code>m[2, , ]</code> — <strong>the corresponding dimension is generally dropped from the result</strong>. If a single-dimensional structure results, <strong>a vector is obtained</strong>. »</em></p>
+<p><em>« This is occasionally undesirable and <strong>can be turned off by adding <code>drop = FALSE</code></strong> to the indexing operation. <strong>Notice that this is an additional argument to the <code>[</code> function and doesn't add to the index count.</strong> Hence the correct way of selecting the first row of a matrix as a <strong>1 par n matrice</strong> is <code>m[1, , drop = FALSE]</code>. »</em></p>
+<p><em>« <strong>Forgetting to disable the dropping feature is a common cause of failure in general subroutines</strong> where an index <strong>occasionally, but not usually, has length one</strong>. »</em></p>
+</blockquote>
+<p><strong>Pourquoi cette phrase est la plus importante de la section.</strong> Le bug ne se manifeste <strong>pas</strong> pendant les tests : tant que la sélection porte sur plusieurs lignes, tout va bien. Le jour où le filtre n'en retient qu'une, le résultat cesse d'être une matrice, et <code>nrow()</code> rend <code>NULL</code>, <code>[, 2]</code> échoue, la fonction plante. <strong>Le code est faux depuis le début et paraissait juste.</strong></p>
+<pre><code class="language-r">m[1, ]                  # un VECTEUR de longueur n
+m[1, , drop = FALSE]    # une MATRICE 1 x n           &lt;- ce qu'il faut dans une fonction
+</code></pre>
+<p><em>« This rule <strong>still applies to a one-dimensional array</strong>, where <strong>any subsetting will give a vector result</strong> unless <code>drop = FALSE</code> is used. »</em></p>
+<h3>4.4 Vecteur contre tableau à une dimension</h3>
+<blockquote>
+<p><strong>Distinction (§3.4.2).</strong> *« Notice that <strong>vectors are distinct from one-dimensional arrays</strong> in that <strong>the latter have <code>dim</code> and <code>dimnames</code> attributes (both of length one)</strong>. One-dimensional arrays <strong>are not easily obtained from subsetting operations</strong> but they <strong>can be constructed explicitly</strong> and <strong>are returned by <code>table</code></strong>. This is sometimes useful because <strong>the elements of the <code>dimnames</code> list may themselves be named</strong>, which is <strong>not the case for the <code>names</code> attribute</strong>. »*</p>
+</blockquote>
+<p>C'est l'explication d'un mystère fréquent : le résultat de <code>table()</code> <strong>n'est pas un vecteur nommé ordinaire</strong>, il a un <code>dim</code> de longueur 1 — d'où un affichage avec un en-tête que <code>names()</code> seul ne saurait produire. Voir fiche 305.</p>
+<p><em>« Some operations such as <strong><code>m[FALSE, ]</code></strong> result in structures in which <strong>a dimension has zero extent</strong>. R generally tries to handle these structures sensibly. »</em></p>
+<details class="cor">
+<summary><strong>Exercice résolu — la fonction qui marche jusqu'au jour où elle ne marche plus</strong></summary><div class="in">
+
+<p><strong>Énoncé.</strong> Une fonction sélectionne les lignes d'une matrice vérifiant une condition, puis calcule la moyenne de chaque colonne.</p>
+<pre><code class="language-r">moyennes &lt;- function(m, garde) {
+  sous &lt;- m[garde, ]
+  colMeans(sous)
+}
+</code></pre>
+<p>Elle fonctionne pendant des mois, puis échoue. Pourquoi, et comment la corriger ?</p>
+<p><em>Étape 1 — reproduire.</em> Avec une matrice 5 × 3 et <code>garde</code> retenant <strong>trois</strong> lignes, <code>sous</code> est une matrice 3 × 3 et <code>colMeans</code> rend trois moyennes. Tout va bien.</p>
+<p><em>Étape 2 — le cas qui casse.</em> Le jour où <code>garde</code> ne retient <strong>qu'une seule ligne</strong>, la règle du §3.4.2 s'applique : <em>« if an indexing operation causes the result to have <strong>one of its extents of length one</strong> … the corresponding dimension is <strong>generally dropped</strong> »</em>. <code>sous</code> n'est plus une matrice 1 × 3 : c'est <strong>un vecteur de longueur 3</strong>.</p>
+<p><em>Étape 3 — le symptôme.</em> <code>colMeans</code> exige un objet ayant des dimensions. Sur un vecteur, il lève une erreur du type <em>« 'x' must be an array of at least two dimensions »</em>. L'erreur ne mentionne <strong>ni l'indexation, ni <code>drop</code></strong> — rien ne pointe vers la vraie cause.</p>
+<p><em>Étape 4 — pourquoi le bug a mis des mois à sortir.</em> Le manuel le dit exactement : <em>« a common cause of failure in general subroutines where an index <strong>occasionally, but not usually, has length one</strong> »</em>. Le cas limite est <strong>rare</strong>, donc absent des jeux d'essai.</p>
+<p><em>Étape 5 — la correction.</em></p>
+<pre><code class="language-r">moyennes &lt;- function(m, garde) {
+  sous &lt;- m[garde, , drop = FALSE]
+  colMeans(sous)
+}
+</code></pre>
+<p><em>Étape 6 — vérifier qu'on n'a pas décalé les indices.</em> <em>« Notice that this is <strong>an additional argument to the <code>[</code> function and doesn't add to the index count</strong> »</em>. <code>m[garde, , drop = FALSE]</code> a toujours <strong>deux</strong> indices : <code>garde</code> et l'indice de colonne vide. La virgule avant <code>drop</code> reste indispensable.</p>
+<p><em>Étape 7 — généraliser.</em> <strong>Dans une fonction, tout <code>[</code> à deux indices sur une matrice devrait porter <code>drop = FALSE</code></strong>, sauf intention contraire explicite. En interactif, la suppression est commode ; en bibliothèque, c'est une bombe à retardement.</p>
+<p><em>Étape 8 — le cas zéro.</em> Si <code>garde</code> ne retient <strong>aucune</strong> ligne, <code>drop = FALSE</code> rend une matrice <strong>0 × 3</strong> — <em>« R generally tries to handle these structures sensibly »</em> — et <code>colMeans</code> rend trois <code>NaN</code>. C'est un résultat exploitable, là où la version sans <code>drop</code> aurait rendu un vecteur vide.</p>
+</div></details>
+
+<h2 data-prio="high">Concept 5 — Indexer les autres structures</h2>
+<blockquote>
+<p><strong>Règle (§3.4.3).</strong> *« The operator <strong><code>[</code> is a generic function which allows class methods to be added</strong>, and the <strong><code>$</code> and <code>[[</code> operators likewise</strong>. Thus, it is possible to have <strong>user-defined indexing operations for any structure</strong>. Such a function, say <strong><code>[.foo</code></strong>, is called with a set of arguments of which <strong>the first is the structure being indexed</strong> and the rest are the indices. »*</p>
+<p><em>« In the case of <code>$</code>, <strong>the index argument is of mode <code>"symbol"</code></strong> even when using the <code>x$"abc"</code> form. »</em></p>
+<p class="cal piege"> <em>« <strong>It is important to be aware that class methods do not necessarily behave in the same way as the basic methods</strong>, for example <strong>with respect to partial matching</strong>. »</em></p>
+</blockquote>
+<p>C'est un avertissement de portée générale : ce que vous venez d'apprendre décrit <strong>les méthodes de base</strong>. Un objet d'une classe particulière peut légitimement indexer autrement. Voir fiche 311.</p>
+<h3>5.1 Le data frame — le cas le plus important</h3>
+<blockquote>
+<p><strong>Règle (§3.4.3).</strong> <em>« <strong>The most important example of a class method for <code>[</code> is that used for data frames.</strong> … In broad terms, <strong>if two indices are supplied (even if one is empty) it creates matrix-like indexing</strong> for a structure that is basically <strong>a list of vectors of the same length</strong>. <strong>If a single index is supplied, it is interpreted as indexing the list of columns</strong> — in that case <strong>the <code>drop</code> argument is ignored, with a warning</strong>. »</em></p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>Écriture</th>
+<th>Interprétation</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>df[i, j]</code></td>
+<td>indexation <strong>matricielle</strong> : lignes et colonnes</td>
+</tr>
+<tr>
+<td><code>df[i, ]</code></td>
+<td>des <strong>lignes</strong> (deux indices, le second vide)</td>
+</tr>
+<tr>
+<td><code>df[, j]</code></td>
+<td>des <strong>colonnes</strong> (deux indices, le premier vide)</td>
+</tr>
+<tr>
+<td><code>df[j]</code></td>
+<td> <strong>des colonnes</strong> — un seul indice indexe <strong>la liste des colonnes</strong></td>
+</tr>
+</tbody></table>
+<p class="cal piege"> <strong><code>df[2]</code> et <code>df[2, ]</code> sont deux choses différentes</strong> : la <strong>deuxième colonne</strong> contre la <strong>deuxième ligne</strong>. La virgule seule fait la différence, et les deux écritures sont valides. Voir <code>[.data.frame</code> et la fiche 306.</p>
+<h3>5.2 Les environnements</h3>
+<blockquote>
+<p><em>« The basic operators <strong><code>$</code> and <code>[[</code> can be applied to environments</strong>. <strong>Only character indices are allowed</strong> and <strong>no partial matching is done.</strong> »</em> (§3.4.3)</p>
+</blockquote>
+<p>Deux restrictions par rapport aux listes — pas d'index numérique (un environnement <strong>n'est pas ordonné</strong>), pas d'appariement partiel. Voir fiche 310.</p>
+<h2 data-prio="must">Concept 6 — Assigner dans un sous-ensemble</h2>
+<div class="cal formel"><span class="lab">Définition (§2.7).</span>
+<p> <em>« An indexed expression can also appear on <strong>the receiving end of an assignment</strong>, in which case the assignment operation is <strong>performed only on those elements</strong> of the vector. »</em></p>
+</div>
+<pre><code class="language-r">x[is.na(x)] &lt;- 0        # remplace les manquants par des zeros
+y[y &lt; 0] &lt;- -y[y &lt; 0]   # « has the same effect as y &lt;- abs(y) »
+</code></pre>
+<p class="cal piege"> <strong>La restriction du cours (§2.7).</strong> *« The expression <strong>must be of the form <code>vector[index_vector]</code></strong>, as <strong>having an arbitrary expression in place of the vector name does not make much sense here</strong>. »* On peut indexer une expression <strong>pour lire</strong> — <code>(x+1)[cond]</code> — mais pas <strong>pour écrire</strong> : <code>(x+1)[cond] &lt;- 0</code> n'a pas de sens, puisqu'il n'y a aucun objet à modifier.</p>
+<div class="cal intu"><span class="lab">Contrôle — vérifier y[y &lt; 0] &lt;- -y[y &lt; 0].</span>
+<p> Pour <code>y = c(-3, 2, -1)</code> : la condition vaut <code>TRUE FALSE TRUE</code>, le membre droit <code>-y[y &lt; 0]</code> vaut <code>c(3, 1)</code>, et ces deux valeurs remplacent les positions 1 et 3. Résultat <code>c(3, 2, 1)</code> — bien <code>abs(y)</code>. <strong>Les longueurs concordent : 2 positions sélectionnées, 2 valeurs fournies.</strong> Si elles ne concordaient pas, le recyclage s'appliquerait (fiche 301).</p>
+</div>
+<h2 data-prio="mid">Concept 7 — Ce qui se passe vraiment : le mécanisme <code>`*tmp*`</code></h2>
+<div class="cal formel"><span class="lab">Définition (§3.4.4).</span>
+<p> <em>« Assignment to subsets of a structure is <strong>a special case of a general mechanism for complex assignment</strong> : »</em></p>
+</div>
+<pre><code class="language-r">x[3:5] &lt;- 13:15
+</code></pre>
+<p><em>« The result of this command is <strong>as if the following had been executed</strong> : »</em></p>
+<pre><code class="language-r">`*tmp*` &lt;- x
+x &lt;- "[&lt;-"(`*tmp*`, 3:5, value = 13:15)
+rm(`*tmp*`)
+</code></pre>
+<div class="cal intu"><span class="lab">En clair — ce que cela signifie.</span>
+<p> <code>x[3:5] &lt;- 13:15</code> <strong>n'est pas une modification sur place</strong>. C'est : <em>copier <code>x</code> dans un objet temporaire</em>, <em>appeler la fonction <code>`[&lt;-`</code> qui rend un <strong>nouvel</strong> objet</em>, <em>réassigner ce nouvel objet à <code>x</code></em>, <em>effacer le temporaire</em>. Toute la sémantique de R découle de là — c'est pourquoi <strong>modifier un objet dans une fonction ne modifie jamais l'original</strong> (fiche 310).</p>
+</div>
+<p class="cal piege"> <strong>Deux conséquences pratiques données par le manuel.</strong></p>
+<ol>
+<li><em>« Note that <strong>the index is first converted to a numeric index and then the elements are replaced sequentially along the numeric index, as if a <code>for</code> loop had been used</strong>. »</em> L'ordre de remplacement est donc <strong>déterminé</strong> — ce qui compte si le même indice apparaît deux fois : <strong>le dernier gagne</strong>.</li>
+<li><em>« <strong>Any existing variable called <code>`*tmp*`</code> will be overwritten and deleted</strong>, and <strong>this variable name should not be used in code.</strong> »</em></li>
+</ol>
+<h3>7.1 Les fonctions de remplacement — la règle générale</h3>
+<div class="cal formel"><span class="lab">Formule (§3.4.4).</span>
+<p> <em>« <strong>The same mechanism can be applied to functions other than <code>[</code>.</strong> The <strong>replacement function has the same name with <code>&lt;-</code> pasted on</strong>. <strong>Its last argument, which must be called <code>value</code>, is the new value to be assigned.</strong> »</em></p>
+</div>
+<pre><code class="language-r">names(x) &lt;- c("a", "b")
+</code></pre>
+<p><em>est équivalent à</em></p>
+<pre><code class="language-r">`*tmp*` &lt;- x
+x &lt;- "names&lt;-"(`*tmp*`, value = c("a","b"))
+rm(`*tmp*`)
+</code></pre>
+<p><strong>C'est l'explication de toute une famille de constructions</strong> qui ressemblent à des affectations de propriété et n'en sont pas :</p>
+<table>
+<thead>
+<tr>
+<th>Écriture</th>
+<th>Fonction réellement appelée</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>names(x) &lt;- v</code></td>
+<td><code>`names&lt;-`(x, value = v)</code></td>
+</tr>
+<tr>
+<td><code>dim(x) &lt;- v</code></td>
+<td><code>`dim&lt;-`(x, value = v)</code></td>
+</tr>
+<tr>
+<td><code>levels(f) &lt;- v</code></td>
+<td><code>`levels&lt;-`(f, value = v)</code></td>
+</tr>
+<tr>
+<td><code>class(x) &lt;- v</code></td>
+<td><code>`class&lt;-`(x, value = v)</code></td>
+</tr>
+<tr>
+<td><code>x[i] &lt;- v</code></td>
+<td><code>`[&lt;-`(x, i, value = v)</code></td>
+</tr>
+<tr>
+<td><code>is.na(x) &lt;- i</code></td>
+<td><code>`is.na&lt;-`(x, value = i)</code></td>
+</tr>
+</tbody></table>
+<p>Ce qui explique aussi le passage de la fiche 300 : <code>assign("names(x)", nm)</code> <strong>ne fait pas</strong> ce que fait <code>names(x) &lt;- nm</code>, puisque <code>assign</code> prend le texte pour un nom d'objet et <strong>ne connaît pas les fonctions de remplacement</strong>.</p>
+<blockquote>
+<p><strong>Rappel du §3.1.3.</strong> *« A special type of function calls can appear on the left hand side of the assignment operator, as in <code>class(x) &lt;- "foo"</code>. <strong>What this construction really does is to call the function <code>class&lt;-</code> with the original object and the right hand side.</strong> … (<strong>At least conceptually, this is what happens. Some additional effort is made to avoid unnecessary data duplication.</strong>) »* — la copie décrite est <strong>le modèle sémantique</strong>, pas nécessairement ce que fait la machine.</p>
+</blockquote>
+<h2>Comment reconnaître le type d'exercice</h2>
+<table>
+<thead>
+<tr>
+<th>Le signal dans l'énoncé</th>
+<th>Ce qu'il faut mobiliser</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>« garder les éléments qui vérifient… »</td>
+<td>index <strong>logique</strong>, <code>x[cond]</code> — et <strong>la longueur change</strong></td>
+</tr>
+<tr>
+<td>« retirer les cinq premiers »</td>
+<td>index <strong>négatif</strong>, <code>x[-(1:5)]</code> — <strong>parenthèses obligatoires</strong></td>
+</tr>
+<tr>
+<td>« dans cet ordre-là »</td>
+<td>index <strong>entier positif</strong> ou <strong>caractère</strong> : le résultat suit <strong>l'ordre de l'index</strong></td>
+</tr>
+<tr>
+<td>« accéder par nom »</td>
+<td>index <strong>caractère</strong>, via l'attribut <code>names</code></td>
+</tr>
+<tr>
+<td>le nom de la colonne est <strong>dans une variable</strong></td>
+<td><strong><code>x[[nom]]</code></strong>, jamais <code>$</code></td>
+</tr>
+<tr>
+<td>« pourquoi ai-je <code>NULL</code> ? »</td>
+<td><code>$</code> avec un nom qui n'existe pas — ou un nom <strong>calculé</strong></td>
+</tr>
+<tr>
+<td>« je lis la bonne valeur mais l'écriture crée un doublon »</td>
+<td><strong>appariement partiel</strong> : actif en lecture, <strong>inactif en écriture</strong></td>
+</tr>
+<tr>
+<td>« mon résultat a un <code>NA</code> en trop »</td>
+<td>index <strong>positif hors bornes</strong>, ou index <strong>logique plus long</strong> que le vecteur</td>
+</tr>
+<tr>
+<td>« je crois avoir retiré un élément, rien n'a bougé »</td>
+<td>index <strong>négatif hors bornes</strong> — <strong>silencieusement ignoré</strong></td>
+</tr>
+<tr>
+<td>« le résultat a une longueur inattendue »</td>
+<td>des <strong>zéros</strong> dans l'index, ou une <strong>troncature</strong> d'index non entier</td>
+</tr>
+<tr>
+<td>« j'indexe par un facteur »</td>
+<td> c'est <strong><code>x[as.integer(i)]</code></strong> — les <strong>niveaux ne sont pas utilisés</strong></td>
+</tr>
+<tr>
+<td>« <code>nrow()</code> rend <code>NULL</code> dans ma fonction »</td>
+<td><strong><code>drop</code></strong> : la dimension de longueur 1 a été supprimée</td>
+</tr>
+<tr>
+<td>« <code>m[1]</code> ne me rend pas la première ligne »</td>
+<td>un <strong>seul indice</strong> ignore <code>dim</code> : c'est <code>c(m)[1]</code></td>
+</tr>
+<tr>
+<td>« extraire des cases dispersées sans boucle »</td>
+<td><strong>index matriciel</strong> : une <strong>ligne</strong> = un jeu de coordonnées</td>
+</tr>
+<tr>
+<td>« <code>df[2]</code> ou <code>df[2, ]</code> ? »</td>
+<td><strong>colonne</strong> contre <strong>ligne</strong> — <code>[.data.frame</code></td>
+</tr>
+<tr>
+<td>« pourquoi mon objet n'est pas modifié dans la fonction ? »</td>
+<td>le mécanisme <strong><code>`*tmp*`</code></strong> : l'assignation <strong>recrée</strong> l'objet</td>
+</tr>
+</tbody></table>
+<h2>Comment résoudre ce type d'exercice</h2>
+<p><strong>Protocole « prévoir le résultat d'un <code>x[i]</code> » — 5 étapes.</strong></p>
+<ol>
+<li><strong>Identifier le type de <code>i</code></strong> : logique, entier positif, entier négatif, caractère, facteur, vide, <code>NULL</code>, <code>NA</code>. Sept comportements différents.</li>
+<li><strong>Vérifier les signes</strong> : dans un index entier, tous les éléments doivent avoir <strong>le même signe</strong>.</li>
+<li><strong>Déterminer la longueur du résultat</strong> — c'est là que sont les surprises : logique → longueur de <code>x</code> (après recyclage) ; entier → <strong>longueur de l'index</strong> ; négatif → <code>length(x)</code> moins les valides ; <code>x[0]</code> et <code>x[NULL]</code> → <strong>0</strong>.</li>
+<li><strong>Traiter les cas de bord</strong> : hors bornes positif → <code>NA</code> ; hors bornes négatif → <strong>ignoré</strong> ; zéros → <strong>ignorés</strong> ; non entiers → <strong>tronqués vers zéro</strong>.</li>
+<li><strong>Vérifier <code>length()</code></strong> sur le résultat, systématiquement.</li>
+</ol>
+<p><strong>Protocole « indexer proprement dans une fonction » — 4 étapes.</strong></p>
+<ol>
+<li>Nom de composante venant d'une variable → <strong><code>[[</code></strong>, jamais <code>$</code>.</li>
+<li>Deux indices sur une matrice ou un data frame → <strong><code>drop = FALSE</code></strong> par défaut.</li>
+<li>Appariement partiel non souhaité → <strong><code>x[[nom, exact = TRUE]]</code></strong>, ou <code>[</code> qui exige toujours l'exactitude.</li>
+<li>Après le sous-ensemble, <strong>vérifier la classe et les dimensions</strong> avant de les utiliser.</li>
+</ol>
+<p><strong>Protocole « modifier une partie d'un objet » — 4 étapes.</strong></p>
+<ol>
+<li>Écrire l'assignation sous la forme <strong><code>objet[index] &lt;- valeurs</code></strong> — jamais une expression à gauche.</li>
+<li><strong>Compter</strong> : combien de positions sélectionnées, combien de valeurs fournies. Longueurs égales, ou un multiple exact.</li>
+<li>Se souvenir que le remplacement est <strong>séquentiel le long de l'index numérique</strong> : un indice répété → <strong>la dernière valeur gagne</strong>.</li>
+<li>Se souvenir qu'<strong>un nouvel objet est créé</strong> : à l'intérieur d'une fonction, seule la copie locale change.</li>
+</ol>
+<h2 data-prio="must">Common mistakes</h2>
+<table>
+<thead>
+<tr>
+<th>Erreur</th>
+<th>Correction</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Utiliser <code>$</code> avec un nom stocké dans une variable</td>
+<td><code>$</code> <strong>n'évalue pas</strong> son index → <strong><code>x[[nom]]</code></strong></td>
+</tr>
+<tr>
+<td>S'attendre à une erreur de <code>x$inexistant</code></td>
+<td>il rend <strong><code>NULL</code></strong>, silencieusement</td>
+</tr>
+<tr>
+<td>Croire que <code>l[1]</code> et <code>l[[1]]</code> sont pareils</td>
+<td><code>[</code> rend <strong>une liste</strong>, <code>[[</code> rend <strong>l'élément</strong></td>
+</tr>
+<tr>
+<td>Croire que <code>l[[c(1,2)]]</code> prend deux éléments</td>
+<td>c'est une <strong>descente en profondeur</strong> : élément 2 de l'élément 1</td>
+</tr>
+<tr>
+<td>Écrire <code>x[-1:5]</code> pour « tout sauf 1 à 5 »</td>
+<td>signes mélangés → <strong>erreur</strong> ; écrire <strong><code>x[-(1:5)]</code></strong></td>
+</tr>
+<tr>
+<td>Croire un index positif hors bornes sans effet</td>
+<td>il produit un <strong><code>NA</code></strong></td>
+</tr>
+<tr>
+<td>Croire un index négatif hors bornes signalé</td>
+<td>il est <strong>silencieusement ignoré</strong> (depuis R 2.6.0)</td>
+</tr>
+<tr>
+<td>Compter <code>x[c(1, 0, 3)]</code> pour 3 éléments</td>
+<td>les <strong>zéros sont ignorés</strong> → 2 éléments</td>
+</tr>
+<tr>
+<td>Croire <code>x[2.9]</code> invalide</td>
+<td>il vaut <strong><code>x[2]</code></strong> — troncature <strong>vers zéro</strong>, sans avertissement</td>
+</tr>
+<tr>
+<td>Indexer par un facteur en croyant utiliser ses niveaux</td>
+<td>c'est <strong><code>x[as.integer(i)]</code></strong> → utiliser <strong><code>x[as.character(i)]</code></strong></td>
+</tr>
+<tr>
+<td>Croire <code>x[]</code> équivalent à <code>x</code></td>
+<td>il <strong>laisse tomber les attributs « non pertinents »</strong></td>
+</tr>
+<tr>
+<td>Croire <code>x[NA]</code> et <code>x[c(1,NA)]</code> de même longueur</td>
+<td><strong>règles logiques</strong> contre <strong>règles entières</strong></td>
+</tr>
+<tr>
+<td>Compter sur l'appariement partiel en écriture</td>
+<td><em>« only used when extracting, <strong>not when replacing</strong> »</em> → un élément <strong>est créé</strong></td>
+</tr>
+<tr>
+<td>Croire <code>[</code> capable d'appariement partiel</td>
+<td><strong><code>[</code> exige toujours l'exactitude</strong></td>
+</tr>
+<tr>
+<td>Utiliser <code>""</code> comme nom</td>
+<td><em>« indicates "no name" and <strong>matches no element</strong> »</em></td>
+</tr>
+<tr>
+<td>Croire <code>m[1]</code> égal à <code>m[1, ]</code></td>
+<td>un seul indice <strong>ignore <code>dim</code></strong> : c'est <code>c(m)[1]</code></td>
+</tr>
+<tr>
+<td>Oublier <code>drop = FALSE</code> dans une fonction</td>
+<td>la dimension de longueur 1 <strong>disparaît</strong> — panne <strong>différée</strong></td>
+</tr>
+<tr>
+<td>Croire que <code>drop</code> décale les indices</td>
+<td><em>« doesn't add to the index count »</em> : garder la virgule</td>
+</tr>
+<tr>
+<td>Mettre des indices négatifs dans une matrice d'index</td>
+<td><strong>interdit</strong></td>
+</tr>
+<tr>
+<td>Croire les lignes à zéro d'une matrice d'index sélectionnantes</td>
+<td>elles sont <strong>ignorées</strong> ; celles à <code>NA</code> produisent <strong><code>NA</code></strong></td>
+</tr>
+<tr>
+<td>Confondre <code>df[2]</code> et <code>df[2, ]</code></td>
+<td><strong>colonne</strong> contre <strong>ligne</strong></td>
+</tr>
+<tr>
+<td>Passer <code>drop</code> à un <code>df[j]</code> à un seul indice</td>
+<td><strong>ignoré, avec un avertissement</strong></td>
+</tr>
+<tr>
+<td>Indexer un environnement par un entier</td>
+<td><strong>seuls les index caractères</strong> sont permis, <strong>sans</strong> appariement partiel</td>
+</tr>
+<tr>
+<td>Croire <code>x[i] &lt;- v</code> modifier sur place</td>
+<td>c'est <strong><code>`[&lt;-`(x, i, value = v)</code></strong> — un nouvel objet</td>
+</tr>
+<tr>
+<td>Utiliser une variable nommée <code>`*tmp*`</code></td>
+<td>elle est <strong>écrasée et détruite</strong> par toute assignation complexe</td>
+</tr>
+<tr>
+<td>Écrire une fonction de remplacement sans <code>value</code></td>
+<td>le dernier argument <strong>doit</strong> s'appeler <code>value</code></td>
+</tr>
+</tbody></table>
+<h2>Ultimate Review</h2>
+<p><strong>Trois opérateurs.</strong> <strong><code>[</code></strong> prend un <strong>sous-ensemble</strong> (accepte un vecteur d'indices, conserve le type, <strong>jamais d'appariement partiel</strong>) · <strong><code>[[</code></strong> extrait <strong>un seul élément</strong> (perd <code>names</code>/<code>dimnames</code>, appariement partiel possible) · <strong><code>$</code></strong> extrait par <strong>nom littéral</strong> (index <strong>non calculable</strong>, appariement partiel <strong>silencieux</strong>, <strong>erreur</strong> sur un objet non récursif). Pour une liste : <code>l[1]</code> est une <strong>liste</strong>, <code>l[[1]]</code> est <strong>l'élément</strong>. <code>l[[c(1,2)]]</code> <strong>descend en profondeur</strong>.</p>
+<p><strong>Les quatre index du cours (§2.7).</strong> <strong>Logique</strong> — recyclé si court, <code>x</code> prolongé par des <code>NA</code> s'il est long ; sélectionne les <code>TRUE</code>. <strong>Entier positif</strong> — valeurs dans $\{1,\dots,n\}$, <strong>le résultat a la longueur de l'index</strong>, l'ordre est celui de l'index. <strong>Entier négatif</strong> — <strong>exclusion</strong> ; parenthéser : <code>x[-(1:5)]</code>. <strong>Caractère</strong> — via <code>names</code>.</p>
+<p><strong>Les quatre cas de bord (§3.4.1).</strong> <strong>Facteur</strong> = <code>x[as.integer(i)]</code>, <strong>les niveaux ne servent pas</strong>. <strong>Vide</strong> <code>x[]</code> rend <code>x</code> <strong>en laissant tomber les attributs non pertinents</strong> (garde <code>names</code>, et <code>dim</code>/<code>dimnames</code> en multi-dimensionnel). <strong><code>NULL</code></strong> = <code>integer(0)</code>. <strong><code>NA</code></strong> → résultat <code>NA</code> ; <strong><code>x[NA]</code> a la longueur de <code>x</code></strong> (règles logiques), <strong><code>x[c(1,NA)]</code> a la longueur 2</strong> (règles entières).</p>
+<p><strong>Les règles silencieuses.</strong> Positif <strong>hors bornes → <code>NA</code></strong> · négatif hors bornes <strong>ignoré</strong> (depuis <strong>R 2.6.0</strong>) · <strong><code>x[0]</code> vide</strong>, zéros mélangés <strong>ignorés</strong> · non entiers <strong>tronqués vers zéro</strong> · <strong>tous les éléments d'un index entier ont le même signe</strong> · <code>[</code> <strong>sous-ensemble aussi les <code>names</code></strong>.</p>
+<p><strong>Appariement partiel.</strong> <code>[</code> <strong>jamais</strong> · <code>[[</code> selon <strong><code>exact</code></strong> : <code>NA</code> (défaut) autorisé <strong>avec avertissement</strong>, <code>TRUE</code> interdit, <code>FALSE</code> autorisé en silence · <code>$</code> <strong>oui, en silence</strong> ·  <strong>seulement en extraction, jamais en remplacement</strong> · <code>""</code> signifie <strong>« pas de nom »</strong> et <strong>n'apparie rien</strong>.</p>
+<p><strong>Matrices (§3.4.2).</strong> <strong>Un seul indice</strong> → <code>dim</code>/<code>dimnames</code> <strong>ignorés</strong>, résultat <code>c(m)[i]</code> : <strong><code>m[1]</code> ≠ <code>m[1, ]</code> ≠ <code>m[, 1]</code></strong> · <strong>index matriciel</strong> : autant de colonnes que de dimensions, <strong>une ligne = un jeu de coordonnées</strong>, résultat de longueur <code>nrow(index)</code> ; <strong>pas d'indices négatifs</strong>, lignes à <strong>zéro ignorées</strong>, lignes à <strong><code>NA</code></strong> → <code>NA</code> · <strong><code>drop</code></strong> : toute extension de longueur 1 est <strong>supprimée</strong> → <strong><code>m[1, , drop = FALSE]</code></strong>, argument <strong>qui ne compte pas dans les indices</strong> ; <em>« a common cause of failure in general subroutines »</em> · <strong>un tableau 1-D n'est pas un vecteur</strong> (il a <code>dim</code> et <code>dimnames</code> de longueur 1) et <strong><code>table()</code> en rend un</strong> · <code>m[FALSE, ]</code> donne une <strong>extension nulle</strong>.</p>
+<p><strong>Autres structures (§3.4.3).</strong> <code>[</code>, <code>[[</code>, <code>$</code> sont <strong>génériques</strong> : <code>[.foo</code> reçoit <strong>l'objet d'abord</strong>, puis les indices ; pour <code>$</code>, l'index est <strong>de mode <code>"symbol"</code></strong>, même écrit <code>x$"abc"</code> · <strong>les méthodes de classe ne se comportent pas nécessairement comme les méthodes de base</strong> · <strong>data frame</strong> : deux indices → <strong>matriciel</strong> ; <strong>un seul indice → les colonnes</strong>, et <strong><code>drop</code> est ignoré avec un avertissement</strong> · <strong>environnements</strong> : <strong>index caractères seulement</strong>, <strong>aucun appariement partiel</strong>.</p>
+<p><strong>Assignation (§2.7 et §3.4.4).</strong> <code>x[cond] &lt;- v</code> n'agit <strong>que sur les éléments sélectionnés</strong> · <strong>le membre gauche doit être <code>vecteur[index]</code></strong>, pas une expression quelconque · le mécanisme réel est</p>
+<pre><code class="language-r">`*tmp*` &lt;- x ; x &lt;- `[&lt;-`(`*tmp*`, i, value = v) ; rm(`*tmp*`)
+</code></pre>
+<p>· l'index est <strong>converti en index numérique</strong>, puis les éléments <strong>remplacés séquentiellement, comme par une boucle <code>for</code></strong> · <strong>ne jamais nommer une variable <code>`*tmp*`</code></strong> · <strong>fonction de remplacement</strong> = le nom <strong>plus <code>&lt;-</code></strong>, dont <strong>le dernier argument s'appelle <code>value</code></strong> : <code>names&lt;-</code>, <code>dim&lt;-</code>, <code>class&lt;-</code>, <code>levels&lt;-</code>, <code>is.na&lt;-</code>.</p>
+<div class="rec"><h2>Active Recall</h2><details class="cor">
+<summary>Quels sont les quatre types d'index vecteur donnés par le cours, et à quoi sert chacun ?</summary><div class="in">
+
+<p><em>« Such index vectors can be <strong>any of four distinct types</strong>. »</em> (§2.7)</p>
+<ol>
+<li><strong>Un vecteur logique</strong> — <em>« the index vector is <strong>recycled to the same length</strong> as the vector … values corresponding to <code>TRUE</code> are selected »</em>. Sert à <strong>filtrer</strong> : <code>x[!is.na(x)]</code>.</li>
+<li><strong>Un vecteur d'entiers positifs</strong> — valeurs dans $\{1,\dots,n\}$ ; <em>« The index vector can be <strong>of any length</strong> and the result is of <strong>the same length as the index vector</strong> »</em>. Sert à <strong>choisir et réordonner</strong>.</li>
+<li><strong>Un vecteur d'entiers négatifs</strong> — <em>« specifies the values <strong>to be excluded</strong> rather than included »</em> : <code>x[-(1:5)]</code>.</li>
+<li><strong>Un vecteur de chaînes</strong> — <em>« only applies where an object <strong>has a <code>names</code> attribute</strong> »</em>. Sert à accéder <strong>par nom</strong>.</li>
+</ol>
+<p class="cal piege"> La <em>R Language Definition</em> en ajoute quatre : <strong>facteur</strong>, <strong>vide</strong>, <strong><code>NULL</code></strong>, <strong><code>NA</code></strong>.</p>
+</div></details><details class="cor">
+<summary>Pourquoi <code>donnees$colonne</code> échoue-t-il quand le nom est dans une variable, et que rend-il ?</summary><div class="in">
+
+<p><em>« The form using <code>$</code> … allows <strong>only a literal character string or a symbol</strong> as the index. That is, <strong>the index is not computable</strong> : for cases where you need to <strong>evaluate an expression</strong> to find the index, use <code>x[[expr]]</code>. »</em> (§3.4)</p>
+<p><code>donnees$colonne</code> cherche donc une composante <strong>littéralement nommée <code>colonne</code></strong>. Comme elle n'existe pas, R rend <strong><code>NULL</code></strong> — <strong>sans erreur</strong>. Le symptôme n'apparaît qu'en aval, sous une forme sans rapport.</p>
+<p><strong>La bonne écriture</strong> : <code>donnees[[colonne]]</code>.</p>
+</div></details><details class="cor">
+<summary>Que se passe-t-il quand un index logique est plus court, puis plus long, que le vecteur ?</summary><div class="in">
+
+<p><em>« The indexing <code>i</code> should generally have the same length as <code>x</code>. <strong>If it is shorter, then its elements will be recycled</strong> … <strong>If it is longer, then <code>x</code> is conceptually extended with <code>NA</code>s.</strong> »</em> (§3.4.1)</p>
+<ul>
+<li><strong>Plus court</strong> : recyclage — d'où l'idiome <code>x[c(TRUE, FALSE)]</code>, qui prend <strong>un élément sur deux</strong>.</li>
+<li><strong>Plus long</strong> : <code>x</code> est prolongé par des <code>NA</code>, qui apparaissent <strong>à la fin du résultat</strong>.</li>
+</ul>
+<p>Le second cas est presque toujours un bug : deux vecteurs qu'on croyait alignés ne le sont pas.</p>
+</div></details><details class="cor">
+<summary>Sur <code>x</code> de longueur 5, comparer <code>x[7]</code> et <code>x[-7]</code>. Pourquoi cette asymétrie ?</summary><div class="in">
+
+<ul>
+<li><strong><code>x[7]</code></strong> → <strong><code>NA</code></strong>. <em>« If <code>i</code> is positive and <strong>exceeds <code>length(x)</code></strong> then the corresponding selection is <strong><code>NA</code></strong> »</em>.</li>
+<li><strong><code>x[-7]</code></strong> → <strong><code>x</code> en entier</strong>. <em>« <strong>Negative out of bounds values for <code>i</code> are silently disregarded</strong> since R version <strong>2.6.0</strong>, S compatibly, as they mean to <strong>drop non-existing elements</strong> and that is <strong>an empty operation ("no-op")</strong> »</em>.</li>
+</ul>
+<p><strong>La logique de l'asymétrie</strong> : demander l'élément 7 d'un vecteur de 5 est une <strong>question sans réponse</strong> → <code>NA</code>. Demander de <strong>retirer</strong> l'élément 7 est une <strong>instruction sans effet</strong> → rien. Le premier signale, le second se tait.</p>
+</div></details><details class="cor">
+<summary>Que valent <code>x[0]</code>, <code>x[c(1, 0, 3)]</code>, <code>x[2.9]</code> et <code>x[NULL]</code> ?</summary><div class="in">
+
+<ul>
+<li><strong><code>x[0]</code></strong> : <em>« a special case is the zero index, which has <strong>null effects</strong> : <code>x[0]</code> is <strong>an empty vector</strong> »</em> → longueur <strong>0</strong>.</li>
+<li><strong><code>x[c(1, 0, 3)]</code></strong> : <em>« including zeros among positive or negative indices has the same effect <strong>as if they were omitted</strong> »</em> → équivaut à <code>x[c(1, 3)]</code>, <strong>longueur 2</strong>.</li>
+<li><strong><code>x[2.9]</code></strong> : <em>« <strong>Other numeric.</strong> Non-integer values are <strong>converted to integer (by truncation towards zero)</strong> »</em> → <strong><code>x[2]</code></strong>, sans avertissement.</li>
+<li><strong><code>x[NULL]</code></strong> : <em>« <strong>NULL.</strong> This is treated as if it were <strong><code>integer(0)</code></strong> »</em> → vecteur <strong>vide</strong>.</li></ul></div></details><details class="cor">
+<summary>Pourquoi indexer par un facteur est-il dangereux ?</summary><div class="in">
+
+<p>*« <strong>Factor.</strong> The result is identical to <strong><code>x[as.integer(i)]</code></strong>. <strong>The factor levels are never used.</strong> If so desired, use <strong><code>x[as.character(i)]</code></strong> or a similar construction. »* (§3.4.1)</p>
+<p>Un facteur <strong>s'affiche avec ses étiquettes</strong> mais <strong>vaut ses codes entiers</strong> (fiche 304). Indexer par un facteur indexe donc <strong>par des positions 1, 2, 3…</strong> que rien à l'écran ne laisse deviner : le résultat a la <strong>bonne longueur</strong>, et il est <strong>faux</strong>.</p>
+<p>Pour indexer par les étiquettes, il faut <strong><code>as.character()</code></strong>.</p>
+</div></details><details class="cor">
+<summary>Pourquoi <code>x[NA]</code> et <code>x[c(1, NA)]</code> n'ont-ils pas la même longueur ?</summary><div class="in">
+
+<p>*« there are <strong>different modes of <code>NA</code></strong> — the literal constant is of mode <code>"logical"</code>, but it is <strong>frequently automatically coerced</strong> to other types. One effect of this is that <strong><code>x[NA]</code> has the length of <code>x</code></strong>, but <strong><code>x[c(1, NA)]</code> has length 2</strong>. That is because <strong>the rules for logical indices apply in the former case, but those for integer indices in the latter</strong>. »* (§3.4.1)</p>
+<ul>
+<li><code>NA</code> <strong>seul</strong> est <strong>logique</strong> → index logique <strong>recyclé</strong> sur toute la longueur, résultat de longueur <code>length(x)</code>, tout en <code>NA</code>.</li>
+<li><code>c(1, NA)</code> <strong>coerce</strong> le <code>NA</code> en <strong>entier</strong> → index entier de longueur 2, résultat de longueur 2.</li>
+</ul>
+<p>C'est <strong>la coercition dans <code>c()</code></strong> qui change la règle.</p>
+</div></details><details class="cor">
+<summary>Où l'appariement partiel s'applique-t-il, et où ne s'applique-t-il pas ?</summary><div class="in">
+
+<p><em>« For <strong><code>[[</code> and <code>$</code> partial matching is used if exact matching fails</strong> … <strong>Note that <code>[</code> always requires an exact match.</strong> »</em> Et pour <code>[[</code>, l'argument <strong><code>exact</code></strong> : défaut <code>NA</code> (autorisé <strong>avec avertissement</strong>), <code>TRUE</code> (<strong>interdit</strong>), <code>FALSE</code> (autorisé <strong>sans avertissement</strong>). (§3.4.1)</p>
+<p class="cal piege"> <strong>La restriction critique</strong> : <em>« <strong>partial matching is only used when extracting and not when replacing</strong> »</em>.</p>
+<p>Conséquence : <code>l$val</code> <strong>lit</strong> <code>l$valeur</code>, mais <code>l$val &lt;- 3</code> <strong>crée un nouvel élément nommé <code>val</code></strong> à côté de <code>valeur</code>. On croit modifier, on ajoute — et la lecture suivante, <code>l$val</code>, trouvera désormais l'élément exact et non plus l'ancien.</p>
+<p class="cal piege"> Enfin : <code>""</code> <em>« indicates "no name" and <strong>matches no element (not even those without a name)</strong> »</em>.</p>
+</div></details><details class="cor">
+<summary>Que rendent <code>m[1]</code>, <code>m[1, ]</code> et <code>m[, 1]</code> ? Pourquoi ?</summary><div class="in">
+
+<p>*« It is however also possible to use <strong>a single index</strong>, in which case <strong>the <code>dim</code> and <code>dimnames</code> attributes are disregarded</strong> and the result is effectively that of <strong><code>c(m)[i]</code></strong>. <strong>Notice that <code>m[1]</code> is usually very different from <code>m[1, ]</code> or <code>m[, 1]</code>.</strong> »* (§3.4.2)</p>
+<ul>
+<li><code>m[1]</code> → <strong>le premier élément du vecteur sous-jacent</strong> (colonne par colonne, R stockant en ordre colonne-majeur).</li>
+<li><code>m[1, ]</code> → <strong>la première ligne</strong>.</li>
+<li><code>m[, 1]</code> → <strong>la première colonne</strong>.</li>
+</ul>
+<p><strong>Pourquoi</strong> : une matrice <strong>est un vecteur muni d'un <code>dim</code></strong> (§2.8). Avec un seul indice, <code>dim</code> est <strong>mis de côté</strong> et l'on retombe sur le vecteur.</p>
+</div></details><details class="cor">
+<summary>Comment extraire <code>m[1,1]</code> et <code>m[2,2]</code> en une seule opération ?</summary><div class="in">
+
+<p>Par un <strong>index matriciel</strong> (§3.4.2) : <em>« the <strong>number of columns of the matrix should match the number of dimensions</strong> of the structure, and the result will be <strong>a vector with length as the number of rows</strong> of the matrix »</em>.</p>
+<pre><code class="language-r">m &lt;- matrix(1:4, 2)
+i &lt;- matrix(c(1, 1, 2, 2), 2, byrow = TRUE)
+m[i]
+# [1] 1 4
+</code></pre>
+<p>Chaque <strong>ligne</strong> de <code>i</code> est <strong>un jeu de coordonnées</strong>.</p>
+<p class="cal piege"> <em>« Indexing matrices <strong>may not contain negative indices</strong>. <code>NA</code> and zero values are allowed : <strong>rows containing a zero are ignored</strong>, whereas <strong>rows containing an <code>NA</code> produce an <code>NA</code></strong> in the result. »</em></p>
+</div></details><details class="cor">
+<summary>Qu'est-ce que <code>drop</code>, et pourquoi le manuel parle-t-il d'une « cause fréquente d'échec » ?</summary><div class="in">
+
+<p>*« If an indexing operation causes the result to have <strong>one of its extents of length one</strong> … <strong>the corresponding dimension is generally dropped from the result</strong>. If a single-dimensional structure results, <strong>a vector is obtained</strong>. … can be turned off by adding <strong><code>drop = FALSE</code></strong>. »* (§3.4.2)</p>
+<p><em>« <strong>Forgetting to disable the dropping feature is a common cause of failure in general subroutines where an index occasionally, but not usually, has length one.</strong> »</em></p>
+<p><strong>Pourquoi c'est insidieux</strong> : tant que la sélection porte sur plusieurs lignes, tout marche. Le jour où elle n'en retient qu'une, le résultat <strong>cesse d'être une matrice</strong> — <code>nrow()</code> rend <code>NULL</code>, <code>[, 2]</code> échoue — et l'erreur ne mentionne <strong>ni l'indexation ni <code>drop</code></strong>.</p>
+<p>L'écriture correcte : <strong><code>m[1, , drop = FALSE]</code></strong>, en notant que <em>« this is an additional argument to the <code>[</code> function and <strong>doesn't add to the index count</strong> »</em> — <strong>la virgule reste</strong>.</p>
+</div></details><details class="cor">
+<summary>Quelle est la différence entre un vecteur nommé et un tableau à une dimension ?</summary><div class="in">
+
+<p>*« <strong>Vectors are distinct from one-dimensional arrays</strong> in that <strong>the latter have <code>dim</code> and <code>dimnames</code> attributes (both of length one)</strong>. One-dimensional arrays <strong>are not easily obtained from subsetting operations</strong> but they can be <strong>constructed explicitly</strong> and <strong>are returned by <code>table</code></strong>. This is sometimes useful because <strong>the elements of the <code>dimnames</code> list may themselves be named</strong>, which is <strong>not the case for the <code>names</code> attribute</strong>. »* (§3.4.2)</p>
+<p>C'est pourquoi le résultat de <code>table()</code> s'affiche avec <strong>un en-tête nommé</strong> : le nom de la variable tabulée est <strong>le nom de l'élément de <code>dimnames</code></strong>, chose qu'un simple <code>names</code> ne peut pas porter.</p>
+</div></details><details class="cor">
+<summary>Quelle est la différence entre <code>df[2]</code> et <code>df[2, ]</code> ?</summary><div class="in">
+
+<p><em>« if <strong>two indices are supplied (even if one is empty)</strong> it creates <strong>matrix-like indexing</strong> … <strong>If a single index is supplied, it is interpreted as indexing the list of columns</strong> — in that case <strong>the <code>drop</code> argument is ignored, with a warning</strong>. »</em> (§3.4.3)</p>
+<ul>
+<li><strong><code>df[2]</code></strong> → la <strong>deuxième colonne</strong> (un data frame d'une colonne).</li>
+<li><strong><code>df[2, ]</code></strong> → la <strong>deuxième ligne</strong>.</li>
+</ul>
+<p>Une virgule sépare les deux, et <strong>les deux écritures sont valides</strong> : rien ne signale l'erreur. Un data frame est <em>« basically <strong>a list of vectors of the same length</strong> »</em>, et l'indexation à un seul indice le traite <strong>comme la liste qu'il est</strong>.</p>
+</div></details><details class="cor">
+<summary>Que fait réellement <code>x[3:5] &lt;- 13:15</code> ?</summary><div class="in">
+
+<p><em>« The result of this command is <strong>as if the following had been executed</strong> »</em> (§3.4.4) :</p>
+<pre><code class="language-r">`*tmp*` &lt;- x
+x &lt;- "[&lt;-"(`*tmp*`, 3:5, value = 13:15)
+rm(`*tmp*`)
+</code></pre>
+<p>Ce n'est <strong>pas</strong> une modification sur place : c'est <strong>une copie</strong>, <strong>un appel de fonction</strong> qui rend un <strong>nouvel</strong> objet, <strong>une réassignation</strong>, puis <strong>l'effacement du temporaire</strong>. C'est de là que vient le fait qu'une fonction ne peut pas modifier son argument (fiche 310).</p>
+<p class="cal piege"> Deux précisions : <em>« the index is <strong>first converted to a numeric index</strong> and then the elements are <strong>replaced sequentially along the numeric index, as if a <code>for</code> loop had been used</strong> »</em> — donc un indice <strong>répété</strong> voit <strong>la dernière valeur l'emporter</strong>. Et : <em>« <strong>any existing variable called <code>`*tmp*`</code> will be overwritten and deleted</strong>, and this variable name <strong>should not be used in code</strong> »</em>.</p>
+</div></details><details class="cor">
+<summary>Qu'est-ce qu'une fonction de remplacement, et comment l'écrit-on ?</summary><div class="in">
+
+<p><em>« The <strong>replacement function has the same name with <code>&lt;-</code> pasted on</strong>. <strong>Its last argument, which must be called <code>value</code>, is the new value to be assigned.</strong> »</em> (§3.4.4)</p>
+<p>Ainsi <code>names(x) &lt;- c("a","b")</code> <strong>est</strong> l'appel <code>`names&lt;-`(x, value = c("a","b"))</code> suivi d'une réassignation à <code>x</code>.</p>
+<p>Toute une famille suit cette règle : <code>`dim&lt;-`</code>, <code>`class&lt;-`</code>, <code>`levels&lt;-`</code>, <code>`is.na&lt;-`</code>, <code>`[&lt;-`</code>, <code>`[[&lt;-`</code>, <code>`$&lt;-`</code>.</p>
+<p>C'est aussi ce qui explique la mise en garde de la fiche 300 : <code>assign("names(x)", nm)</code> <strong>n'est pas</strong> <code>names(x) &lt;- nm</code>, puisque <code>assign</code> prend la chaîne pour <strong>un nom d'objet</strong> et ignore les fonctions de remplacement.</p>
+</div></details><details class="cor">
+<summary>Pourquoi le manuel prévient-il que « les méthodes de classe ne se comportent pas nécessairement comme les méthodes de base » ?</summary><div class="in">
+
+<p><em>« The operator <strong><code>[</code> is a generic function which allows class methods to be added</strong>, and the <code>$</code> and <code>[[</code> operators likewise. … <strong>It is important to be aware that class methods do not necessarily behave in the same way as the basic methods</strong>, for example <strong>with respect to partial matching</strong>. »</em> (§3.4.3)</p>
+<p>Tout ce qui précède décrit <strong>les méthodes de base</strong>. Une classe peut définir <code>[.foo</code> — appelé <em>« with a set of arguments of which <strong>the first is the structure being indexed</strong> and the rest are the indices »</em> — et lui donner d'autres règles. Le data frame en est l'exemple le plus courant : <code>df[j]</code> à un seul indice <strong>n'a rien du <code>m[i]</code> d'une matrice</strong>.</p>
+</div></details></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h2>Flashcards</h2>
+<table>
+<thead>
+<tr>
+<th>Question</th>
+<th>Réponse</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Les trois opérateurs d'indexation ?</td>
+<td><strong><code>[</code></strong>, <strong><code>[[</code></strong>, <strong><code>$</code></strong></td>
+</tr>
+<tr>
+<td>Ce que rend <code>[</code> ?</td>
+<td>Un <strong>sous-ensemble</strong>, <strong>du même type</strong> que l'objet</td>
+</tr>
+<tr>
+<td>Ce que rend <code>[[</code> ?</td>
+<td><strong>Un seul élément</strong>, dépouillé de <code>names</code>/<code>dimnames</code></td>
+</tr>
+<tr>
+<td><code>l[1]</code> contre <code>l[[1]]</code> pour une liste ?</td>
+<td>Une <strong>liste</strong> contre <strong>l'élément</strong></td>
+</tr>
+<tr>
+<td>Que fait <code>l[[c(1,2)]]</code> ?</td>
+<td><strong>Descend en profondeur</strong> : élément 2 de l'élément 1</td>
+</tr>
+<tr>
+<td><code>$</code> accepte quoi comme index ?</td>
+<td><strong>Une chaîne littérale ou un symbole</strong> — <strong>non calculable</strong></td>
+</tr>
+<tr>
+<td>Nom de composante dans une variable ?</td>
+<td><strong><code>x[[nom]]</code></strong>, jamais <code>$</code></td>
+</tr>
+<tr>
+<td><code>$</code> sur un objet non récursif ?</td>
+<td>Une <strong>erreur</strong></td>
+</tr>
+<tr>
+<td>Que rend <code>x$inexistant</code> ?</td>
+<td><strong><code>NULL</code></strong>, silencieusement</td>
+</tr>
+<tr>
+<td>Les quatre types d'index du cours ?</td>
+<td><strong>Logique · entier positif · entier négatif · caractère</strong></td>
+</tr>
+<tr>
+<td>Index logique trop court ?</td>
+<td><strong>Recyclé</strong></td>
+</tr>
+<tr>
+<td>Index logique trop long ?</td>
+<td><code>x</code> est <strong>prolongé par des <code>NA</code></strong></td>
+</tr>
+<tr>
+<td>Longueur du résultat d'un index entier positif ?</td>
+<td>Celle <strong>de l'index</strong></td>
+</tr>
+<tr>
+<td>L'ordre du résultat ?</td>
+<td>Celui <strong>de l'index</strong></td>
+</tr>
+<tr>
+<td>Que fait un index négatif ?</td>
+<td>Il <strong>exclut</strong></td>
+</tr>
+<tr>
+<td>Pourquoi <code>x[-(1:5)]</code> et pas <code>x[-1:5]</code> ?</td>
+<td><code>:</code> prioritaire → <strong>signes mélangés</strong>, interdits</td>
+</tr>
+<tr>
+<td>Index entier positif hors bornes ?</td>
+<td><strong><code>NA</code></strong></td>
+</tr>
+<tr>
+<td>Index négatif hors bornes ?</td>
+<td><strong>Silencieusement ignoré</strong> (depuis R 2.6.0)</td>
+</tr>
+<tr>
+<td>Que vaut <code>x[0]</code> ?</td>
+<td>Un vecteur <strong>vide</strong></td>
+</tr>
+<tr>
+<td>Un zéro parmi d'autres indices ?</td>
+<td><strong>Ignoré</strong></td>
+</tr>
+<tr>
+<td>Que vaut <code>x[2.9]</code> ?</td>
+<td><strong><code>x[2]</code></strong> — troncature <strong>vers zéro</strong></td>
+</tr>
+<tr>
+<td>Que vaut <code>x[NULL]</code> ?</td>
+<td>Comme <code>integer(0)</code> → <strong>vide</strong></td>
+</tr>
+<tr>
+<td>Longueur de <code>x[NA]</code> ?</td>
+<td><strong><code>length(x)</code></strong> — règles <strong>logiques</strong></td>
+</tr>
+<tr>
+<td>Longueur de <code>x[c(1, NA)]</code> ?</td>
+<td><strong>2</strong> — règles <strong>entières</strong></td>
+</tr>
+<tr>
+<td>Indexer par un facteur ?</td>
+<td><strong><code>x[as.integer(i)]</code></strong> — <strong>niveaux non utilisés</strong></td>
+</tr>
+<tr>
+<td>Comment indexer par les étiquettes d'un facteur ?</td>
+<td><strong><code>x[as.character(i)]</code></strong></td>
+</tr>
+<tr>
+<td>Que fait <code>x[]</code> ?</td>
+<td>Rend <code>x</code> en <strong>laissant tomber les attributs non pertinents</strong></td>
+</tr>
+<tr>
+<td>Quels attributs <code>x[]</code> conserve-t-il ?</td>
+<td><strong><code>names</code></strong>, et <code>dim</code>/<code>dimnames</code> en multi-dimensionnel</td>
+</tr>
+<tr>
+<td>Signes dans un index entier ?</td>
+<td><strong>Tous les mêmes</strong></td>
+</tr>
+<tr>
+<td><code>[</code> touche-t-il aux noms ?</td>
+<td>Oui — il <strong>sous-ensemble aussi <code>names</code></strong></td>
+</tr>
+<tr>
+<td><code>[</code> fait-il de l'appariement partiel ?</td>
+<td><strong>Jamais</strong></td>
+</tr>
+<tr>
+<td>Défaut de <code>exact</code> pour <code>[[</code> ?</td>
+<td><strong><code>NA</code></strong> : partiel autorisé, <strong>avec avertissement</strong></td>
+</tr>
+<tr>
+<td><code>exact = TRUE</code> ?</td>
+<td><strong>Interdit</strong> l'appariement partiel</td>
+</tr>
+<tr>
+<td><code>exact = FALSE</code> ?</td>
+<td>L'<strong>autorise sans avertissement</strong></td>
+</tr>
+<tr>
+<td><code>$</code> et l'appariement partiel ?</td>
+<td><strong>Oui, en silence</strong></td>
+</tr>
+<tr>
+<td>L'appariement partiel en écriture ?</td>
+<td><strong>Jamais</strong> — un élément <strong>est créé</strong></td>
+</tr>
+<tr>
+<td>Que signifie le nom <code>""</code> ?</td>
+<td><strong>« pas de nom »</strong> — n'apparie <strong>aucun</strong> élément</td>
+</tr>
+<tr>
+<td><code>m[1]</code> contre <code>m[1, ]</code> ?</td>
+<td>Élément du <strong>vecteur sous-jacent</strong> contre <strong>première ligne</strong></td>
+</tr>
+<tr>
+<td>Pourquoi ?</td>
+<td>Un seul indice <strong>ignore <code>dim</code></strong> : c'est <code>c(m)[1]</code></td>
+</tr>
+<tr>
+<td>Index matriciel : combien de colonnes ?</td>
+<td>Autant que <strong>de dimensions</strong></td>
+</tr>
+<tr>
+<td>Longueur du résultat ?</td>
+<td>Le <strong>nombre de lignes</strong> de la matrice d'index</td>
+</tr>
+<tr>
+<td>Que représente une ligne de l'index ?</td>
+<td><strong>Un jeu de coordonnées</strong></td>
+</tr>
+<tr>
+<td>Indices négatifs dans une matrice d'index ?</td>
+<td><strong>Interdits</strong></td>
+</tr>
+<tr>
+<td>Ligne contenant un zéro ?</td>
+<td><strong>Ignorée</strong></td>
+</tr>
+<tr>
+<td>Ligne contenant un <code>NA</code> ?</td>
+<td>Produit un <strong><code>NA</code></strong></td>
+</tr>
+<tr>
+<td>Qu'est-ce que la suppression de dimension ?</td>
+<td>Toute extension <strong>de longueur 1</strong> est <strong>retirée</strong></td>
+</tr>
+<tr>
+<td>Comment l'empêcher ?</td>
+<td><strong><code>drop = FALSE</code></strong></td>
+</tr>
+<tr>
+<td><code>drop</code> compte-t-il comme un indice ?</td>
+<td><strong>Non</strong> — garder la virgule</td>
+</tr>
+<tr>
+<td>Première ligne comme matrice 1 × n ?</td>
+<td><strong><code>m[1, , drop = FALSE]</code></strong></td>
+</tr>
+<tr>
+<td>Pourquoi le manuel parle-t-il d'une cause fréquente d'échec ?</td>
+<td>Le cas « <strong>une seule ligne</strong> » est <strong>rare</strong>, donc non testé</td>
+</tr>
+<tr>
+<td>Vecteur contre tableau 1-D ?</td>
+<td>Le second a <strong><code>dim</code> et <code>dimnames</code></strong> (de longueur 1)</td>
+</tr>
+<tr>
+<td>Qui rend un tableau 1-D ?</td>
+<td><strong><code>table()</code></strong></td>
+</tr>
+<tr>
+<td>Avantage de <code>dimnames</code> sur <code>names</code> ?</td>
+<td>Ses <strong>éléments peuvent eux-mêmes être nommés</strong></td>
+</tr>
+<tr>
+<td>Que donne <code>m[FALSE, ]</code> ?</td>
+<td>Une structure à <strong>dimension d'extension nulle</strong></td>
+</tr>
+<tr>
+<td><code>[</code> est-il générique ?</td>
+<td><strong>Oui</strong>, ainsi que <code>$</code> et <code>[[</code></td>
+</tr>
+<tr>
+<td>Signature de <code>[.foo</code> ?</td>
+<td><strong>L'objet d'abord</strong>, puis les indices</td>
+</tr>
+<tr>
+<td>Mode de l'index de <code>$</code> ?</td>
+<td><strong><code>"symbol"</code></strong>, même écrit <code>x$"abc"</code></td>
+</tr>
+<tr>
+<td><code>df[i, j]</code> ?</td>
+<td>Indexation <strong>matricielle</strong></td>
+</tr>
+<tr>
+<td><code>df[j]</code> ?</td>
+<td><strong>Les colonnes</strong> — la liste de colonnes</td>
+</tr>
+<tr>
+<td><code>drop</code> sur un <code>df</code> à un seul indice ?</td>
+<td><strong>Ignoré, avec un avertissement</strong></td>
+</tr>
+<tr>
+<td>Indexer un environnement ?</td>
+<td><strong><code>$</code> et <code>[[</code></strong>, <strong>chaînes seulement</strong>, <strong>aucun</strong> appariement partiel</td>
+</tr>
+<tr>
+<td>Forme obligatoire du membre gauche d'une assignation indexée ?</td>
+<td><strong><code>vecteur[index]</code></strong></td>
+</tr>
+<tr>
+<td>Que fait <code>x[is.na(x)] &lt;- 0</code> ?</td>
+<td>Remplace les manquants <strong>par des zéros</strong></td>
+</tr>
+<tr>
+<td>Équivalent de <code>y[y &lt; 0] &lt;- -y[y &lt; 0]</code> ?</td>
+<td><strong><code>y &lt;- abs(y)</code></strong></td>
+</tr>
+<tr>
+<td>Le mécanisme réel de <code>x[i] &lt;- v</code> ?</td>
+<td><code>`*tmp*`</code> → <code>`[&lt;-`</code> → réassignation → <code>rm</code></td>
+</tr>
+<tr>
+<td>L'ordre de remplacement ?</td>
+<td><strong>Séquentiel</strong>, comme une boucle <code>for</code></td>
+</tr>
+<tr>
+<td>Un indice répété en assignation ?</td>
+<td><strong>La dernière valeur gagne</strong></td>
+</tr>
+<tr>
+<td>Nom de variable à ne jamais utiliser ?</td>
+<td><strong><code>`*tmp*`</code></strong></td>
+</tr>
+<tr>
+<td>Comment se nomme une fonction de remplacement ?</td>
+<td>Le nom <strong>plus <code>&lt;-</code></strong></td>
+</tr>
+<tr>
+<td>Comment doit s'appeler son dernier argument ?</td>
+<td><strong><code>value</code></strong></td>
+</tr>
+<tr>
+<td>Cinq fonctions de remplacement usuelles ?</td>
+<td><code>names&lt;-</code> · <code>dim&lt;-</code> · <code>class&lt;-</code> · <code>levels&lt;-</code> · <code>is.na&lt;-</code></td>
+</tr>
+<tr>
+<td>Pourquoi <code>assign("names(x)", nm)</code> échoue-t-il ?</td>
+<td><code>assign</code> <strong>ignore</strong> les fonctions de remplacement</td>
+</tr>
+</tbody></table>
+</main>
+
+
+
+
+</body></html>

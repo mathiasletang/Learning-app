@@ -1,0 +1,1044 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fiche 306 — Listes et data frames : la structure qui porte tout le reste</title>
+<script>
+window.MathJax={tex:{inlineMath:[["$","$"]],displayMath:[["$$","$$"]],processEscapes:true},
+ options:{skipHtmlTags:["script","noscript","style","textarea","pre","code"]},
+ svg:{fontCache:"global"},
+ startup:{pageReady:()=>MathJax.startup.defaultPageReady().then(()=>{document.body.classList.add("ready")})}};
+setTimeout(function(){document.body.classList.add("ready")},2500);
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+/* ============================================================
+   MathiasLearn — feuille de style des fiches
+   Reprise intégrale des tokens de 00_PARCOURS/*.html
+   + blocs pédagogiques (callouts, méthode, essentiels, recall)
+   ============================================================ */
+:root{--bg:#faf9f7;--card:#fff;--ink:#1a1a1a;--muted:#6b6b6b;--line:#e5e2dd;--accent:#8b5e34;
+ --hl:#fdf8ef;--ok:#2d7d4f;--okbg:#f0f7f3;--warn:#b3402f;--warnbg:#fdf3f1;--blue:#2f5d8b;--bluebg:#f1f5fa}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+ font:17px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;padding:0 16px 100px}
+.nav{position:sticky;top:0;background:rgba(250,249,247,.96);backdrop-filter:blur(8px);
+ border-bottom:1px solid var(--line);margin:0 -16px 30px;padding:11px 16px;z-index:50;
+ display:flex;gap:6px;flex-wrap:wrap;font-size:13px}
+.nav a{color:var(--muted);text-decoration:none;padding:4px 9px;border-radius:5px;white-space:nowrap}
+.nav a:hover{background:var(--line);color:var(--ink)}
+.nav a.on{background:var(--accent);color:#fff}
+main{max-width:780px;margin:0 auto}
+h1{font-size:31px;letter-spacing:-.02em;margin:.4em 0 .5em;line-height:1.25}
+h2{font-size:23px;margin:2.2em 0 .7em;padding-bottom:.3em;border-bottom:1px solid var(--line)}
+h3{font-size:19px;margin:1.9em 0 .5em;color:var(--accent)}
+h4{font-size:17px;margin:1.5em 0 .4em}
+p{margin:.8em 0} a{color:var(--accent)} hr{border:0;border-top:1px solid var(--line);margin:2.6em 0}
+table{border-collapse:collapse;width:100%;margin:1.3em 0;font-size:15.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+th{background:#f3f0eb;font-weight:600}
+tr:nth-child(even) td{background:#fcfbfa}
+code{font-family:"SF Mono",Menlo,Consolas,monospace;font-size:.88em;background:#f2efea;padding:2px 6px;border-radius:4px;overflow-wrap:break-word}
+pre{background:#f2efea;padding:14px 16px;border-radius:8px;overflow-x:auto}
+pre code{background:none;padding:0;white-space:pre}
+blockquote{border-left:3px solid var(--accent);background:var(--hl);margin:1.4em 0;padding:14px 20px;border-radius:0 8px 8px 0}
+blockquote p:first-child{margin-top:0} blockquote p:last-child{margin-bottom:0}
+ul,ol{padding-left:1.5em} li{margin:.35em 0} em{color:#4a4a4a}
+mjx-container[display="true"]{margin:1.1em 0!important;overflow-x:auto;overflow-y:hidden;padding:2px 0}
+mjx-container svg{max-width:100%}
+body:not(.ready) main{opacity:0} main{opacity:1;transition:opacity .25s}
+
+/* --- bandeau de tête de fiche --- */
+.cours{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--accent);
+ border-radius:0 10px 10px 0;padding:18px 22px;margin:0 0 34px}
+.cours h4{margin:0 0 4px;font-size:14px;text-transform:uppercase;letter-spacing:.07em;color:var(--accent)}
+.cours .cs{color:var(--muted);font-size:14.5px;margin:0 0 14px}
+
+/* --- exercices / corrigés --- */
+.ex{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:6px 24px 20px;margin:18px 0}
+.ex>h3:first-child{margin-top:14px}
+details.cor{margin-top:18px;border:1px solid var(--line);border-radius:8px;background:#fcfbfa;overflow:hidden}
+details.cor>summary{cursor:pointer;padding:12px 16px;font-weight:600;font-size:15px;color:var(--accent);
+ list-style:none;display:flex;align-items:center;gap:9px;user-select:none;transition:.15s;min-height:44px}
+details.cor>summary::-webkit-details-marker{display:none}
+details.cor>summary:hover{background:var(--hl)}
+details.cor>summary::before{content:"\25B6";font-size:10px;transition:transform .18s;display:inline-block}
+details.cor[open]>summary::before{transform:rotate(90deg)}
+details.cor[open]>summary{background:var(--okbg);color:var(--ok);border-bottom:1px solid var(--line)}
+.cor .in{padding:4px 20px 16px}
+.cor .in>*:first-child{margin-top:.9em}
+
+/* --- blocs pédagogiques (callouts) ---
+   Générés depuis une citation Markdown dont le premier **gras** commence
+   par un mot-clé : DÉFINITION, THÉORÈME, MÉTHODE, PIÈGE, INTUITION… */
+.cal{border:1px solid var(--line);border-left:4px solid var(--accent);background:var(--card);
+ border-radius:0 10px 10px 0;padding:15px 20px;margin:1.5em 0}
+.cal>p:first-child{margin-top:0}.cal>p:last-child,.cal>ul:last-child,.cal>ol:last-child{margin-bottom:0}
+.cal .lab{display:block;font-size:12.5px;text-transform:uppercase;letter-spacing:.08em;
+ font-weight:700;color:var(--accent);margin-bottom:6px}
+.cal.formel{background:var(--hl)}
+.cal.piege{border-left-color:var(--warn);background:var(--warnbg)}
+.cal.piege .lab{color:var(--warn)}
+.cal.methode{border-left-color:var(--ok);background:var(--okbg)}
+.cal.methode .lab{color:var(--ok)}
+.cal.intu{border-left-color:var(--blue);background:var(--bluebg)}
+.cal.intu .lab{color:var(--blue)}
+.cal.plus{border-left-style:dashed;background:#faf9f7}
+.cal.plus .lab{color:var(--muted)}
+
+/* --- révision express --- */
+.ess{background:var(--card);border:1px solid var(--accent);border-radius:10px;padding:4px 24px 20px;margin:1.6em 0}
+.ess h3{margin-top:1.3em}
+.rec{background:var(--card);border:1px dashed var(--accent);border-radius:10px;padding:4px 24px 18px;margin:1.6em 0}
+.rec ol{counter-reset:none}
+
+/* --- impression / PDF --- */
+@media print{
+ .nav{display:none}
+ body{padding:0;background:#fff;font-size:11.2pt;line-height:1.55}
+ main{max-width:none}
+ h1{font-size:23pt}h2{font-size:15pt;margin-top:1.5em}h3{font-size:12.6pt}
+ h2,h3,h4{break-after:avoid;page-break-after:avoid}
+ table,.cal,blockquote{break-inside:avoid;page-break-inside:avoid}
+ table{display:table;font-size:9.6pt}
+ details.cor{border:1px solid var(--line);background:#fcfbfa}
+ details.cor>summary{display:none}
+ details.cor .in{padding-top:10px}
+ .cal,.ex,.ess,.rec{box-shadow:none}
+ a{color:var(--ink);text-decoration:none}
+}
+@page{margin:16mm 15mm 18mm}
+
+/* --- exemples travaillés --- */
+.exm{background:#fcfbfa;border:1px solid var(--line);border-radius:10px;padding:2px 20px 14px;margin:1.5em 0}
+.exm>h4:first-child{margin:14px 0 .5em;color:var(--accent);font-size:13px;text-transform:uppercase;letter-spacing:.07em}
+
+
+/* --- pastilles de priorité (conventions des fiches de l'app) --- */
+h2[data-prio], h3[data-prio], h4[data-prio]{position:relative}
+h2[data-prio]::before,h3[data-prio]::before,h4[data-prio]::before{
+ content:"";display:inline-block;width:9px;height:9px;border-radius:50%;
+ margin-right:9px;vertical-align:middle;background:var(--muted)}
+[data-prio="must"]::before{background:var(--warn)}
+[data-prio="high"]::before{background:#d98324}
+[data-prio="mid"]::before{background:#c9a227}
+[data-prio="low"]::before{background:var(--ok)}
+/* corrigés des fiches de l'app : même traitement que les corrigés des séries */
+details.cor>summary::after{content:""}
+</style></head><body>
+<div class="nav"><a href="00_COMMENCER_ICI.html">Commencer ici</a><a href="01_NOTATIONS_le-decodeur.html">Notations</a><a href="02_EXERCICES_Serie-0.html">Série 0 — Remise en route</a><a href="03_EXERCICES_Serie-1.html">Série 1 — Convexité</a><a href="04_EXERCICES_Serie-2.html">Série 2 — KKT</a><a href="05_AUTO-EVALUATION.html">Auto-évaluation (quiz)</a><a href="06_FICHE_Optimisation-deux-variables.html">Fiche — Optimisation à 2 variables</a></div>
+<main><h1>Fiche 306 — Listes et data frames : la structure qui porte tout le reste</h1>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Matière</strong></td>
+<td>Code · Langage R</td>
+</tr>
+<tr>
+<td><strong>Cours source</strong></td>
+<td>R Core Team, <em>An Introduction to R</em> 4.6.1 — chapitre 6 « Lists and data frames » (§6.1 listes, §6.2 construire et modifier, §6.2.1 concaténer, §6.3 data frames, §6.3.1 les fabriquer, §6.3.2 <code>attach()</code> et <code>detach()</code>, §6.3.3 méthode de travail, §6.3.4 listes quelconques, §6.3.5 le chemin de recherche)</td>
+</tr>
+<tr>
+<td><strong>Sources d'appoint</strong></td>
+<td><em>R Language Definition</em> 4.6.1, §2.1.2 « Lists », §2.3.2 « Data frame objects », §3.4.3 « Indexing other structures »</td>
+</tr>
+<tr>
+<td><strong>Difficulté</strong></td>
+<td> Fondamental — la liste est ce que R rend quand il rend un résultat</td>
+</tr>
+<tr>
+<td><strong>Temps d'étude estimé</strong></td>
+<td>1 h 15</td>
+</tr>
+<tr>
+<td><strong>Prérequis</strong></td>
+<td>Fiches 301 à 305</td>
+</tr>
+<tr>
+<td><strong>Concepts clés</strong></td>
+<td>liste, composante, <code>[[</code> contre <code>[</code>, <code>$</code> et l'appariement partiel, <code>Lst[[x]]</code> avec nom calculé, <code>length()</code> au <strong>niveau supérieur</strong>, copie à la construction, extension par indice, <code>c()</code> sur des listes, data frame = <strong>liste de classe <code>"data.frame"</code></strong>, les <strong>trois restrictions</strong>, <code>data.frame()</code>, <code>as.data.frame()</code>, <code>attach()</code> / <code>detach()</code>, <strong>masquage</strong>, <strong>position 2</strong>, chemin de recherche, <code>search()</code>, <code>ls(2)</code>, <code>.GlobalEnv</code></td>
+</tr>
+<tr>
+<td><strong>À retenir en priorité</strong></td>
+<td><strong><code>Lst[[1]]</code> ≠ <code>Lst[1]</code></strong> · <strong>un data frame est une liste</strong> · <strong><code>attach()</code> attache une copie</strong> · <strong><code>u &lt;- v+w</code> ne modifie pas la colonne</strong> · le <strong>chemin de recherche</strong>.</td>
+</tr>
+</tbody></table>
+<h2>Vue d'ensemble</h2>
+<pre><code>UNE LISTE     une collection ORDONNEE d'objets appeles COMPOSANTES
+              « THERE IS NO PARTICULAR NEED FOR THE COMPONENTS TO BE
+                OF THE SAME MODE OR TYPE »
+
+TROIS ACCES   Lst[[3]]       par NUMERO -- toujours possible
+              Lst[["nom"]]   par nom, en chaine -- CALCULABLE
+              Lst$nom        par nom, litteral -- NON calculable
+
+LA DISTINCTION QUI COMPTE
+              Lst[[1]]   L'OBJET lui-meme, le nom n'est PAS inclus
+              Lst[1]     une SOUS-LISTE d'une entree, les noms sont TRANSFERES
+
+ABREVIATION   Lst$coefficients  peut s'ecrire  Lst$coe
+              (appariement partiel -- pratique en console, dangereux en script)
+
+CONSTRUIRE    list(nom1 = obj1, ...)   les composantes sont COPIEES
+ETENDRE       Lst[5] &lt;- list(matrix = Mat)
+CONCATENER    c(listeA, listeB)  -&gt; une liste ; les autres attributs (dim) SAUTENT
+
+DATA FRAME    « A data frame is A LIST WITH CLASS "data.frame" »
+              3 restrictions : types admis, colonnes fournies, MEME LONGUEUR
+
+CHEMIN DE RECHERCHE
+              .GlobalEnv  -&gt;  [attaches]  -&gt;  Autoloads  -&gt;  package:base
+              attach(df) place df en POSITION 2 -- et c'est une COPIE
+              u &lt;- v+w   ne modifie PAS df$u : il le MASQUE en position 1
+</code></pre>
+<p><strong>Le problème posé.</strong> <em>« An R list is <strong>an object consisting of an ordered collection of objects known as its components</strong>. <strong>There is no particular need for the components to be of the same mode or type</strong> — a list could consist of a numeric vector, a logical value, a matrix, a complex vector, a character array, <strong>a function</strong>, and so on. »</em> (§6.1)</p>
+<div class="cal intu"><span class="lab">Intuition — pourquoi la liste est la structure la plus importante de R.</span>
+<p> Le §1.3 disait que R <em>« will give minimal output and <strong>store the results in a fit object</strong> »</em> (fiche 300). Cet objet de résultat <strong>est presque toujours une liste</strong> : <code>eigen()</code> rend une liste de deux composantes, <code>svd()</code> une liste de trois, <code>lsfit()</code> une liste, <code>lm()</code> une liste. <strong>Savoir lire une liste, c'est savoir lire tout résultat R.</strong> Et un data frame — la structure de données centrale de l'analyse — <strong>est une liste</strong>, avec une classe par-dessus.</p>
+</div>
+<h2 data-prio="must">Concept 1 — La liste et ses trois accès</h2>
+<p><strong>L'exemple du cours (§6.1) :</strong></p>
+<pre><code class="language-r">Lst &lt;- list(name = "Fred", wife = "Mary", no.children = 3,
+            child.ages = c(4, 7, 9))
+</code></pre>
+<blockquote>
+<p><strong>Règle (§6.1).</strong> *« <strong>Components are always numbered and may always be referred to as such.</strong> Thus if <code>Lst</code> is the name of a list with four components, these may be individually referred to as <strong><code>Lst[[1]]</code>, <code>Lst[[2]]</code>, <code>Lst[[3]]</code> and <code>Lst[[4]]</code></strong>. If, further, <code>Lst[[4]]</code> is a vector subscripted array then <strong><code>Lst[[4]][1]</code> is its first entry</strong>. »*</p>
+<p><em>« If <code>Lst</code> is a list, then <strong>the function <code>length(Lst)</code> gives the number of (top level) components</strong> it has. »</em></p>
+</blockquote>
+<p class="cal piege"> <strong>« Top level » n'est pas un détail.</strong> <code>length(Lst)</code> vaut <strong>4</strong>, alors que la liste contient sept valeurs élémentaires. La longueur d'une liste compte <strong>ses composantes</strong>, pas ce qu'il y a dedans — la liste est <strong>récursive</strong> (fiche 303).</p>
+<blockquote>
+<p><strong>Règle (§6.1).</strong> *« Components of lists <strong>may also be named</strong>, and in this case the component may be referred to <strong>either by giving the component name as a character string in place of the number in double square brackets</strong>, or, <strong>more conveniently, by giving an expression of the form <code>name$component_name</code></strong>. <strong>This is a very useful convention as it makes it easier to get the right component if you forget the number.</strong> »*</p>
+</blockquote>
+<p><strong>La table d'équivalence du cours :</strong></p>
+<table>
+<thead>
+<tr>
+<th>Écriture par nom</th>
+<th>Écriture par numéro</th>
+<th>Valeur</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>Lst$name</code></td>
+<td><code>Lst[[1]]</code></td>
+<td>la chaîne <code>"Fred"</code></td>
+</tr>
+<tr>
+<td><code>Lst$wife</code></td>
+<td><code>Lst[[2]]</code></td>
+<td>la chaîne <code>"Mary"</code></td>
+</tr>
+<tr>
+<td><code>Lst$child.ages[1]</code></td>
+<td><code>Lst[[4]][1]</code></td>
+<td>le nombre <strong>4</strong></td>
+</tr>
+</tbody></table>
+<div class="cal methode"><span class="lab">Méthode — le cas du nom calculé (§6.1).</span>
+<p> <em>« Additionally, one can also use <strong>the names of the list components in double square brackets</strong> : <code>Lst[["name"]]</code> is the same as <code>Lst$name</code>. <strong>This is especially useful when the name of the component to be extracted is stored in another variable</strong>, as in :</em></p>
+</div>
+<pre><code class="language-r">x &lt;- "name"; Lst[[x]]
+</code></pre>
+<p><em>»</em> — c'est exactement la règle de la fiche 302 : <strong><code>$</code> n'évalue pas son index, <code>[[</code> oui</strong>. Dès qu'un nom vient d'une variable, <strong><code>[[</code> est le seul outil correct</strong>.</p>
+<h3>1.1 <code>[[</code> contre <code>[</code> — la distinction fondamentale</h3>
+<blockquote>
+<p class="cal piege"> <strong>Règle (§6.1).</strong> <em>« <strong>It is very important to distinguish <code>Lst[[1]]</code> from <code>Lst[1]</code>.</strong> <code>[[...]]</code> is <strong>the operator used to select a single element</strong>, whereas <code>[...]</code> is <strong>a general subscripting operator</strong>. Thus <strong>the former is the first object in the list <code>Lst</code>, and if it is a named list the name is not included</strong>. <strong>The latter is a sublist of the list <code>Lst</code> consisting of the first entry only.</strong> <strong>If it is a named list, the names are transferred to the sublist.</strong> »</em></p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th></th>
+<th><code>Lst[[1]]</code></th>
+<th><code>Lst[1]</code></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Ce qu'on obtient</td>
+<td><strong>l'objet</strong> lui-même</td>
+<td><strong>une sous-liste</strong> d'une entrée</td>
+</tr>
+<tr>
+<td>Classe du résultat</td>
+<td>celle de l'objet (<code>character</code>)</td>
+<td><strong><code>list</code></strong></td>
+</tr>
+<tr>
+<td>Le nom</td>
+<td><strong>n'est pas inclus</strong></td>
+<td><strong>est transféré</strong> à la sous-liste</td>
+</tr>
+<tr>
+<td><code>length()</code> du résultat</td>
+<td>celle de l'objet</td>
+<td><strong>1</strong></td>
+</tr>
+</tbody></table>
+<p>C'est la source d'erreur numéro un sur les résultats de fonctions. <code>eigen(Sm)[1]</code> rend <strong>une liste</strong> contenant les valeurs propres ; <code>eigen(Sm)[[1]]</code> rend <strong>le vecteur</strong> des valeurs propres. La première ne peut pas être additionnée, tracée, ni passée à une fonction numérique — et le message d'erreur ne parle pas de crochets.</p>
+<h3>1.2 L'abréviation des noms</h3>
+<blockquote>
+<p><strong>Règle (§6.1).</strong> *« <strong>The names of components may be abbreviated down to the minimum number of letters needed to identify them uniquely.</strong> Thus <strong><code>Lst$coefficients</code> may be minimally specified as <code>Lst$coe</code></strong> and <strong><code>Lst$covariance</code> as <code>Lst$cov</code></strong>. »*</p>
+</blockquote>
+<p>C'est l'appariement partiel de la fiche 302, vu du côté du confort. <strong>Il est commode en console et dangereux en script</strong> — la <em>R Language Definition</em> rappelait que <code>$</code> apparie <strong>en silence</strong>, que <code>[[</code> peut avertir (<code>exact = NA</code>, son défaut), et surtout que <strong>l'appariement partiel ne joue pas en écriture</strong> : <code>Lst$coe &lt;- 0</code> <strong>crée une composante <code>coe</code></strong> à côté de <code>coefficients</code>.</p>
+<div class="cal formel"><span class="lab">Remarque (§6.1).</span>
+<p> <em>« <strong>The vector of names is in fact simply an attribute of the list like any other</strong> and may be handled as such. <strong>Other structures besides lists may, of course, similarly be given a <code>names</code> attribute also.</strong> »</em> — cohérent avec la fiche 303 : <code>names</code> n'a rien de propre aux listes.</p>
+</div>
+<h2 data-prio="high">Concept 2 — Construire, étendre, concaténer</h2>
+<div class="cal formel"><span class="lab">Définition (§6.2).</span>
+<p> <em>« New lists may be formed from existing objects by the function <code>list()</code>. An assignment of the form</em></p>
+<pre><code class="language-r">Lst &lt;- list(name_1 = object_1, ..., name_m = object_m)
+</code></pre>
+<p><em>sets up a list <code>Lst</code> of $m$ components … giving them names as specified by the argument names (<strong>which can be freely chosen</strong>). <strong>If these names are omitted, the components are numbered only.</strong> »</em></p>
+</div>
+<blockquote>
+<p class="cal piege"> <strong>Le point le plus important du paragraphe (§6.2).</strong> <em>« <strong>The components used to form the list are copied when forming the new list and the originals are not affected.</strong> »</em></p>
+<p>C'est la sémantique de copie de R (fiche 302), énoncée ici explicitement. Mettre un objet dans une liste <strong>ne crée pas de lien</strong> avec l'original : modifier l'un ne modifie pas l'autre. La seule exception du langage reste <strong>l'environnement</strong> (fiche 303).</p>
+</blockquote>
+<p><strong>Étendre (§6.2).</strong> <em>« Lists, <strong>like any subscripted object, can be extended by specifying additional components</strong> »</em> :</p>
+<pre><code class="language-r">Lst[5] &lt;- list(matrix = Mat)
+</code></pre>
+<p>C'est le mécanisme du §3.2 (fiche 303) : écrire hors des bornes allonge l'objet.</p>
+<div class="cal formel"><span class="lab">Définition (§6.2.1).</span>
+<p> <em>« When the concatenation function <strong><code>c()</code> is given list arguments, the result is an object of mode <code>list</code> also</strong>, whose components are <strong>those of the argument lists joined together in sequence</strong>. »</em></p>
+</div>
+<pre><code class="language-r">list.ABC &lt;- c(list.A, list.B, list.C)
+</code></pre>
+<p class="cal piege"> <em>« Recall that <strong>with vector objects as arguments</strong> the concatenation function similarly joined together all arguments into a single vector structure. <strong>In this case all other attributes, such as <code>dim</code> attributes, are discarded.</strong> »</em> — la remarque du §5.9 (fiche 305) : <code>c()</code> <strong>efface <code>dim</code></strong>.</p>
+<blockquote>
+<p><strong>Rappel de la fiche 301.</strong> La note 1 du §2.1 prévenait déjà : <em>« With other than vector types of argument, such as <strong>list mode arguments</strong>, <strong>the action of <code>c()</code> is rather different</strong> »</em>. Voici la précision annoncée : sur des listes, <code>c()</code> <strong>concatène les composantes</strong> — il n'imbrique pas et n'aplatit pas les composantes elles-mêmes.</p>
+</blockquote>
+<h2 data-prio="must">Concept 3 — Le data frame</h2>
+<div class="cal formel"><span class="lab">Définition (§6.3).</span>
+<p> <em>« <strong>A data frame is a list with class <code>"data.frame"</code>.</strong> »</em></p>
+</div>
+<p>Une phrase, et tout est dit. Le reste du paragraphe énumère <strong>les restrictions</strong> qui font qu'une liste peut devenir data frame.</p>
+<blockquote>
+<p><strong>Règle — les trois restrictions (§6.3).</strong></p>
+<ol>
+<li><em>« <strong>The components must be vectors (numeric, character, or logical), factors, numeric matrices, lists, or other data frames.</strong> »</em></li>
+<li><em>« <strong>Matrices, lists, and data frames provide as many variables to the new data frame as they have columns, elements, or variables, respectively.</strong> »</em></li>
+<li><em>« <strong>Vector structures appearing as variables of the data frame must all have the same length, and matrix structures must all have the same number of rows.</strong> »</em></li>
+</ol>
+</blockquote>
+<div class="cal intu"><span class="lab">En clair.</span>
+<p> La restriction 3 est <strong>la</strong> contrainte : toutes les colonnes ont <strong>la même longueur</strong>. C'est ce qui autorise la lecture matricielle. La restriction 2 est la plus surprenante : une <strong>matrice</strong> placée dans un data frame y fournit <strong>autant de variables qu'elle a de colonnes</strong> — elle n'y entre pas comme une seule colonne.</p>
+</div>
+<blockquote>
+<p><strong>Règle (§6.3).</strong> <em>« A data frame may <strong>for many purposes be regarded as a matrix with columns possibly of differing modes and attributes</strong>. It may be <strong>displayed in matrix form</strong>, and <strong>its rows and columns extracted using matrix indexing conventions</strong>. »</em></p>
+</blockquote>
+<p class="cal piege"> <strong>« For many purposes », pas pour tous.</strong> La fiche 302 a donné l'exception : <em>« <strong>if a single index is supplied, it is interpreted as indexing the list of columns</strong> »</em> (<em>R Language Definition</em> §3.4.3). <code>df[2]</code> est <strong>la deuxième colonne</strong>, <code>df[2, ]</code> la deuxième <strong>ligne</strong>. Le data frame est matriciel <strong>quand on lui donne deux indices</strong> et redevient <strong>une liste</strong> quand on n'en donne qu'un.</p>
+<p><strong>Le construire (§6.3.1).</strong></p>
+<pre><code class="language-r">accountants &lt;- data.frame(home = statef, loot = incomes, shot = incomef)
+</code></pre>
+<p>*« A list whose components conform to the restrictions of a data frame may be <strong>coerced into a data frame using the function <code>as.data.frame()</code></strong>. »*</p>
+<p><em>« <strong>The simplest way to construct a data frame from scratch is to use the <code>read.table()</code> function to read an entire data frame from an external file.</strong> »</em> — fiche 307.</p>
+<div class="cal plus"><span class="lab">Complément (R Language Definition §2.3.2).</span>
+<p> <em>« Data frames are the R structures which <strong>most closely mimic the SAS or SPSS data set</strong>, i.e. <strong>a "cases by variables" matrix of data</strong>. … In addition, a data frame generally has <strong>a <code>names</code> attribute labeling the variables</strong> and <strong>a <code>row.names</code> attribute for labeling the cases</strong>. »</em></p>
+</div>
+<h2 data-prio="must">Concept 4 — <code>attach()</code> et <code>detach()</code> : commodité et piège</h2>
+<blockquote>
+<p><strong>Le besoin (§6.3.2).</strong> <em>« The <code>$</code> notation, such as <code>accountants$home</code>, for list components is <strong>not always very convenient</strong>. A useful facility would be somehow to <strong>make the components of a list or data frame temporarily visible as variables under their component name</strong>, without the need to quote the list name explicitly each time. »</em></p>
+</blockquote>
+<pre><code class="language-r">attach(lentils)     # lentils a trois variables : u, v, w
+</code></pre>
+<div class="cal formel"><span class="lab">Définition (§6.3.2).</span>
+<p> <em>« <code>attach()</code> <strong>places the data frame in the search path at position 2</strong>, and <strong>provided there are no variables <code>u</code>, <code>v</code> or <code>w</code> in position 1</strong>, <code>u</code>, <code>v</code> and <code>w</code> are <strong>available as variables from the data frame in their own right</strong>. »</em></p>
+</div>
+<h3>4.1 Le piège du masquage</h3>
+<div class="cal formel"><span class="lab">Problème (§6.3.2).</span>
+<p class="cal piege">  <em>« At this point an assignment such as <code>u &lt;- v + w</code> <strong>does not replace the component <code>u</code> of the data frame</strong>, but rather <strong>masks it with another variable <code>u</code> in the workspace at position 1 on the search path</strong>. »</em></p>
+<p><em>« <strong>To make a permanent change to the data frame itself, the simplest way is to resort once again to the <code>$</code> notation</strong> : <code>lentils$u &lt;- v + w</code>. <strong>However the new value of component <code>u</code> is not visible until the data frame is detached and attached again.</strong> »</em></p>
+</div>
+<p><strong>C'est un double piège, et le second est pire que le premier.</strong></p>
+<table>
+<thead>
+<tr>
+<th>Écriture</th>
+<th>Ce que ça fait</th>
+<th>Ce qu'on croit qu'elle fait</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>u &lt;- v + w</code></td>
+<td>crée un <code>u</code> <strong>dans l'espace de travail</strong>, qui <strong>masque</strong> la colonne</td>
+<td>modifier la colonne</td>
+</tr>
+<tr>
+<td><code>lentils$u &lt;- v + w</code></td>
+<td><strong>modifie la colonne</strong> — mais <strong>le <code>u</code> visible reste l'ancien</strong></td>
+<td>modifier, et voir le changement</td>
+</tr>
+</tbody></table>
+<p>Après <code>lentils$u &lt;- v + w</code>, un <code>u</code> tapé à la console rend <strong>l'ancienne valeur</strong> : la copie attachée en position 2 n'a pas bougé. Il faut <code>detach()</code> puis <code>attach()</code> pour que le changement devienne visible. <strong>Deux façons d'écrire, deux façons de se tromper.</strong></p>
+<h3>4.2 Détacher</h3>
+<blockquote>
+<p><strong>Règle (§6.3.2).</strong> <em>« To detach a data frame, use the function <code>detach()</code>. <strong>More precisely, this statement detaches from the search path the entity currently at position 2.</strong> … <strong>Entities at positions greater than 2 on the search path can be detached by giving their number to <code>detach</code>, but it is much safer to always use a name</strong>, for example <code>detach(lentils)</code> or <code>detach("lentils")</code>. »</em></p>
+</blockquote>
+<p class="cal piege"> <strong><code>detach()</code> sans argument détache « ce qui est en position 2 »</strong>, quoi que ce soit. Si deux objets ont été attachés depuis, ce n'est plus celui qu'on croit. <strong>Toujours nommer.</strong></p>
+<h3>4.3 La note encadrée du cours — la plus importante du chapitre</h3>
+<blockquote>
+<p class="cal piege"> <em><strong>Note (§6.3.2, encadrée dans le cours).</strong></em> <em>« <strong>In R lists and data frames can only be attached at position 2 or above</strong>, and <strong>what is attached is a copy of the original object</strong>. <strong>You can alter the attached values via <code>assign</code>, but the original list or data frame is unchanged.</strong> »</em></p>
+</blockquote>
+<p>Trois faits, chacun décisif :</p>
+<ol>
+<li><strong>Jamais en position 1</strong> — l'espace de travail garde toujours la priorité. C'est ce qui rend le masquage possible.</li>
+<li><strong>C'est une copie</strong> — d'où l'invisibilité du <code>lentils$u &lt;- v + w</code>.</li>
+<li><strong>Modifier la copie via <code>assign</code> ne touche pas l'original</strong> — la copie est un cul-de-sac.</li>
+</ol>
+<h2 data-prio="high">Concept 5 — La méthode de travail recommandée par le cours</h2>
+<div class="cal methode"><span class="lab">Méthode (§6.3.3).</span>
+<p> <em>« <strong>A useful convention that allows you to work with many different problems comfortably together in the same workspace</strong> is »</em> — quatre règles, dans cet ordre :</p>
+</div>
+<ol>
+<li><em>« <strong>gather together all variables for any well defined and separate problem in a data frame</strong> under a suitably informative name »</em> ;</li>
+<li><em>« when working with a problem <strong>attach the appropriate data frame at position 2</strong>, and <strong>use the workspace at level 1 for operational quantities and temporary variables</strong> »</em> ;</li>
+<li><em>« <strong>before leaving a problem, add any variables you wish to keep for future reference to the data frame using the <code>$</code> form of assignment, and then <code>detach()</code></strong> »</em> ;</li>
+<li><em>« finally <strong>remove all unwanted variables from the workspace</strong> and keep it <strong>as clean of left-over temporary variables as possible</strong> »</em>.</li>
+</ol>
+<div class="cal intu"><span class="lab">En clair — c'est la solution du problème posé en fiche 300.</span>
+<p> Le §1.11 recommandait <strong>un répertoire par analyse</strong> pour que des noms comme <code>x</code> et <code>y</code> restent utilisables. Le §6.3.3 propose la solution <strong>à l'intérieur d'une même session</strong> : <em>« In this way it is quite simple to <strong>work with many problems in the same directory, all of which have variables named <code>x</code>, <code>y</code> and <code>z</code></strong> »</em>.</p>
+<p>Le data frame joue le rôle de <strong>conteneur nommé</strong>, et le chemin de recherche celui de <strong>contexte courant</strong>. Position 1 = le brouillon ; position 2 = le problème en cours.</p>
+</div>
+<p><em>« <code>attach()</code> is <strong>a generic function</strong> that allows not only directories and data frames to be attached to the search path, but <strong>other classes of object as well</strong>. In particular <strong>any object of mode <code>"list"</code> may be attached in the same way</strong> »</em> (§6.3.4) — puisqu'un data frame <strong>est</strong> une liste, la généralité était acquise.</p>
+<h2 data-prio="high">Concept 6 — Le chemin de recherche</h2>
+<div class="cal formel"><span class="lab">Définition (§6.3.5).</span>
+<p> <em>« The function <strong><code>search</code> shows the current search path</strong> and so is <strong>a very useful way to keep track of which data frames and lists (and packages) have been attached and detached</strong>. »</em></p>
+</div>
+<p><strong>Au départ :</strong></p>
+<pre><code class="language-r">search()
+# [1] ".GlobalEnv"  "Autoloads"  "package:base"
+</code></pre>
+<p><em>« where <strong><code>.GlobalEnv</code> is the workspace</strong> »</em> (note 1 : <em>« See the on-line help for <code>autoload</code> for the meaning of the second term »</em>).</p>
+<p><strong>Après <code>attach(lentils)</code> :</strong></p>
+<pre><code class="language-r">search()
+# [1] ".GlobalEnv"  "lentils"  "Autoloads"  "package:base"
+
+ls(2)
+# [1] "u" "v" "w"
+</code></pre>
+<p><em>« and as we see <strong><code>ls</code> (or <code>objects</code>) can be used to examine the contents of any position on the search path</strong> »</em>.</p>
+<p><strong>Après <code>detach("lentils")</code> :</strong></p>
+<pre><code class="language-r">search()
+# [1] ".GlobalEnv"  "Autoloads"  "package:base"
+</code></pre>
+<div class="cal intu"><span class="lab">En clair — comment R trouve un nom.</span>
+<p> Le chemin de recherche est une <strong>liste ordonnée d'endroits où chercher</strong>. R parcourt les positions <strong>dans l'ordre</strong> et s'arrête à la première correspondance. D'où :</p>
+<ul>
+<li>un objet de l'espace de travail (<strong>position 1</strong>) <strong>masque</strong> tout homonyme attaché ;</li>
+<li>un objet attaché masque un objet de même nom d'un paquet chargé plus loin ;</li>
+<li><strong><code>ls(n)</code></strong> montre ce que contient la position <code>n</code>, ce qui permet de diagnostiquer un masquage.</li>
+</ul>
+<p>C'est la mécanique complète que la fiche 310 reprendra du côté des <strong>environnements</strong> : le chemin de recherche <strong>est</strong> une chaîne d'environnements, chacun étant l'enclos du précédent.</p>
+</div>
+<details class="cor">
+<summary><strong>Exercice résolu — reconstituer une séance <code>attach</code> qui tourne mal</strong></summary><div class="in">
+
+<p><strong>Énoncé.</strong> <code>lentils</code> est un data frame de variables <code>u</code>, <code>v</code>, <code>w</code>. Un utilisateur exécute la séquence suivante et s'étonne du résultat final. Expliquer chaque étape.</p>
+<pre><code class="language-r">attach(lentils)
+u &lt;- v + w
+lentils$u &lt;- v + w
+u
+detach()
+u
+</code></pre>
+<p><em>Étape 1 — <code>attach(lentils)</code>.</em> Le data frame — plus exactement <strong>une copie</strong> — est placé <strong>en position 2</strong> du chemin de recherche. <code>search()</code> montrerait <code>".GlobalEnv" "lentils" "Autoloads" "package:base"</code>. Puisqu'aucun <code>u</code>, <code>v</code>, <code>w</code> n'existe en position 1, les trois sont <em>« available as variables from the data frame in their own right »</em>.</p>
+<p><em>Étape 2 — <code>u &lt;- v + w</code>.</em>  <em>« <strong>does not replace the component <code>u</code> of the data frame</strong>, but rather <strong>masks it with another variable <code>u</code> in the workspace at position 1</strong> »</em>. Une nouvelle variable <code>u</code> naît <strong>dans <code>.GlobalEnv</code></strong>. La colonne du data frame est <strong>intacte</strong>, et <strong>invisible</strong> — puisque la position 1 est consultée d'abord.</p>
+<p><em>Étape 3 — <code>lentils$u &lt;- v + w</code>.</em> Cette fois la colonne <strong>est</strong> modifiée. C'est la voie que le cours recommande : <em>« the simplest way is to <strong>resort once again to the <code>$</code> notation</strong> »</em>.</p>
+<p><em>Étape 4 — <code>u</code> tapé à la console.</em> Il rend <strong>le <code>u</code> de la position 1</strong>, celui de l'étape 2. Il se trouve qu'il a la même valeur — ce qui masque le problème plutôt que de le révéler.</p>
+<p><em>Étape 5 — <code>detach()</code>.</em>  <em>« this statement <strong>detaches from the search path the entity currently at position 2</strong> »</em>. Ici c'est bien <code>lentils</code>, mais <strong>par accident</strong> : si l'utilisateur avait attaché autre chose entre-temps, il aurait détaché le mauvais objet. La forme sûre est <strong><code>detach(lentils)</code></strong>.</p>
+<p><em>Étape 6 — <code>u</code> de nouveau.</em> Il rend <strong>toujours</strong> le <code>u</code> de l'espace de travail : le <code>detach</code> a retiré la position 2, pas la position 1. <strong>La variable temporaire survit au détachement</strong> — c'est exactement le désordre que la règle 4 du §6.3.3 cherche à éviter : <em>« remove all unwanted variables from the workspace »</em>.</p>
+<p><em>Étape 7 — ce qu'il aurait fallu faire.</em></p>
+<pre><code class="language-r">attach(lentils)
+tmp &lt;- v + w            # un nom de travail EXPLICITE, pas le nom d'une colonne
+lentils$u &lt;- tmp        # modification permanente
+detach(lentils)         # nomme, pas implicite
+rm(tmp)                 # nettoyage
+attach(lentils)         # la nouvelle valeur devient visible
+</code></pre>
+<p><em>Étape 8 — la leçon.</em> Le cours signale que la nouvelle valeur <em>« <strong>is not visible until the data frame is detached and attached again</strong> »</em>. Le cycle attacher / travailler / écrire par <code>$</code> / détacher / nettoyer est celui du §6.3.3, et <strong>chacune de ses quatre règles répare l'un des pièges rencontrés ici</strong>.</p>
+</div></details>
+
+<h2>Comment reconnaître le type d'exercice</h2>
+<table>
+<thead>
+<tr>
+<th>Le signal dans l'énoncé</th>
+<th>Ce qu'il faut mobiliser</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>« stocker des objets de types différents »</td>
+<td>une <strong>liste</strong></td>
+</tr>
+<tr>
+<td>« le résultat de la fonction »</td>
+<td>c'est presque toujours <strong>une liste</strong> — <code>$</code> ou <code>[[</code></td>
+</tr>
+<tr>
+<td>« je ne peux pas additionner le résultat »</td>
+<td>vous avez <strong><code>[</code></strong> au lieu de <strong><code>[[</code></strong></td>
+</tr>
+<tr>
+<td>« le nom de la colonne est dans une variable »</td>
+<td><strong><code>Lst[[x]]</code></strong>, jamais <code>$</code></td>
+</tr>
+<tr>
+<td>« <code>length()</code> me rend un nombre trop petit »</td>
+<td>il compte les composantes <strong>de niveau supérieur</strong></td>
+</tr>
+<tr>
+<td>« <code>Lst$coe</code> fonctionne pour <code>coefficients</code> »</td>
+<td><strong>appariement partiel</strong> — à éviter en script</td>
+</tr>
+<tr>
+<td>« j'écris <code>Lst$coe &lt;- …</code> et rien ne change »</td>
+<td>l'appariement partiel <strong>ne joue pas en écriture</strong></td>
+</tr>
+<tr>
+<td>« ajouter une composante »</td>
+<td>écrire <strong>hors des bornes</strong> : <code>Lst[5] &lt;- list(...)</code></td>
+</tr>
+<tr>
+<td>« fusionner deux listes »</td>
+<td><strong><code>c(listeA, listeB)</code></strong></td>
+</tr>
+<tr>
+<td>« mon <code>dim</code> a disparu »</td>
+<td><strong><code>c()</code> efface les attributs</strong></td>
+</tr>
+<tr>
+<td>« transformer une liste en tableau de données »</td>
+<td><strong><code>as.data.frame()</code></strong> — si les restrictions sont respectées</td>
+</tr>
+<tr>
+<td>« colonnes de longueurs différentes »</td>
+<td><strong>interdit</strong> : <em>« must all have the same length »</em></td>
+</tr>
+<tr>
+<td>« <code>df[2]</code> ou <code>df[2, ]</code> ? »</td>
+<td><strong>colonne</strong> contre <strong>ligne</strong></td>
+</tr>
+<tr>
+<td>« éviter d'écrire le nom du data frame partout »</td>
+<td><strong><code>attach()</code></strong> — avec toutes ses précautions</td>
+</tr>
+<tr>
+<td>« ma modification n'apparaît pas »</td>
+<td><code>attach</code> attache <strong>une copie</strong> → <code>detach</code> puis <code>attach</code></td>
+</tr>
+<tr>
+<td>« ma variable en masque une autre »</td>
+<td><strong>le chemin de recherche</strong> — <code>search()</code>, <code>ls(2)</code></td>
+</tr>
+<tr>
+<td>« quel objet est visible ? »</td>
+<td>le <strong>premier trouvé</strong> en parcourant le chemin</td>
+</tr>
+</tbody></table>
+<h2>Comment résoudre ce type d'exercice</h2>
+<p><strong>Protocole « exploiter un résultat de fonction » — 4 étapes.</strong></p>
+<ol>
+<li><strong><code>names(res)</code></strong> — quelles composantes existent.</li>
+<li><strong><code>str(res)</code></strong> ou <code>length(res)</code> — combien, et de quelle nature.</li>
+<li>Extraire avec <strong><code>[[</code> ou <code>$</code></strong>, jamais <code>[</code> — sauf si l'on veut vraiment une sous-liste.</li>
+<li>Si le nom est calculé, <strong><code>res[[nom]]</code></strong> ; en script, écrire le nom <strong>en entier</strong> pour ne pas dépendre de l'appariement partiel.</li>
+</ol>
+<p><strong>Protocole « construire un data frame propre » — 4 étapes.</strong></p>
+<ol>
+<li>Vérifier <strong>les trois restrictions</strong>, en particulier <strong>l'égalité des longueurs</strong>.</li>
+<li><code>data.frame(...)</code> avec des <strong>noms de variables explicites</strong>, ou <code>as.data.frame()</code> sur une liste conforme.</li>
+<li>Se rappeler qu'une <strong>matrice</strong> apporte <strong>autant de variables qu'elle a de colonnes</strong>.</li>
+<li>Depuis un fichier : <strong><code>read.table()</code></strong> (fiche 307) — <em>« the simplest way to construct a data frame from scratch »</em>.</li>
+</ol>
+<p><strong>Protocole « travailler avec <code>attach()</code> sans se piéger » — 5 étapes.</strong></p>
+<ol>
+<li><strong>Attacher</strong> le data frame du problème en cours : <code>attach(df)</code>.</li>
+<li><strong>Ne jamais réutiliser un nom de colonne</strong> pour une variable de travail — c'est ce qui crée le masquage.</li>
+<li>Pour <strong>modifier une colonne</strong>, passer par <strong><code>df$col &lt;- …</code></strong> ; la nouvelle valeur ne sera <strong>visible</strong> qu'après un cycle <code>detach</code> / <code>attach</code>.</li>
+<li><strong><code>detach(df)</code> en nommant</strong>, jamais <code>detach()</code> seul.</li>
+<li><strong><code>rm()</code></strong> les variables temporaires, et vérifier avec <strong><code>search()</code></strong> et <code>ls()</code>.</li>
+</ol>
+<h2 data-prio="must">Common mistakes</h2>
+<table>
+<thead>
+<tr>
+<th>Erreur</th>
+<th>Correction</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Confondre <code>Lst[[1]]</code> et <code>Lst[1]</code></td>
+<td><strong>l'objet</strong> contre <strong>une sous-liste d'un élément</strong></td>
+</tr>
+<tr>
+<td>Croire que <code>[</code> sur une liste extrait</td>
+<td>il rend <strong>toujours une liste</strong></td>
+</tr>
+<tr>
+<td>Utiliser <code>$</code> avec un nom stocké dans une variable</td>
+<td><strong><code>Lst[[x]]</code></strong></td>
+</tr>
+<tr>
+<td>Compter sur l'appariement partiel en script</td>
+<td>il est <strong>silencieux</strong> avec <code>$</code> — et <strong>inactif en écriture</strong></td>
+</tr>
+<tr>
+<td>Croire <code>length()</code> égal au nombre de valeurs</td>
+<td>il compte les composantes <strong>de niveau supérieur</strong></td>
+</tr>
+<tr>
+<td>Croire que mettre un objet dans une liste crée un lien</td>
+<td><em>« the components … <strong>are copied</strong> … <strong>the originals are not affected</strong> »</em></td>
+</tr>
+<tr>
+<td>Utiliser <code>c()</code> pour fusionner des matrices dans une liste</td>
+<td><code>c()</code> <strong>efface <code>dim</code></strong></td>
+</tr>
+<tr>
+<td>Mettre des colonnes de longueurs différentes</td>
+<td><em>« must all have the same length »</em></td>
+</tr>
+<tr>
+<td>Croire qu'une matrice devient <strong>une</strong> colonne</td>
+<td>elle fournit <strong>autant de variables qu'elle a de colonnes</strong></td>
+</tr>
+<tr>
+<td>Croire <code>df[2]</code> égal à <code>df[2, ]</code></td>
+<td><strong>colonne</strong> contre <strong>ligne</strong></td>
+</tr>
+<tr>
+<td>Croire <code>attach()</code> créer un lien vivant</td>
+<td>c'est <strong>une copie</strong></td>
+</tr>
+<tr>
+<td>Écrire <code>u &lt;- v+w</code> en croyant modifier la colonne</td>
+<td>cela <strong>masque</strong> la colonne en position 1</td>
+</tr>
+<tr>
+<td>Croire <code>df$u &lt;- …</code> immédiatement visible</td>
+<td><em>« <strong>not visible until the data frame is detached and attached again</strong> »</em></td>
+</tr>
+<tr>
+<td>Utiliser <code>detach()</code> sans argument</td>
+<td>il détache <strong>ce qui est en position 2</strong>, quoi que ce soit</td>
+</tr>
+<tr>
+<td>Croire pouvoir attacher en position 1</td>
+<td><em>« can <strong>only</strong> be attached at <strong>position 2 or above</strong> »</em></td>
+</tr>
+<tr>
+<td>Croire modifier l'original par <code>assign</code> sur la copie attachée</td>
+<td><em>« <strong>the original list or data frame is unchanged</strong> »</em></td>
+</tr>
+<tr>
+<td>Laisser traîner les variables de travail</td>
+<td>règle 4 du §6.3.3 : <strong>nettoyer</strong></td>
+</tr>
+<tr>
+<td>Chercher pourquoi un nom « ne marche plus »</td>
+<td><strong><code>search()</code></strong> puis <strong><code>ls(n)</code></strong> — c'est un masquage</td>
+</tr>
+</tbody></table>
+<h2>Ultimate Review</h2>
+<p><strong>La liste.</strong> <em>« <strong>an ordered collection of objects known as its components</strong> »</em> · <em>« <strong>no particular need for the components to be of the same mode or type</strong> »</em> · une composante peut être <strong>une fonction</strong>, une matrice, une autre liste.</p>
+<p><strong>Trois accès.</strong> <strong><code>Lst[[i]]</code></strong> par numéro — toujours possible · <strong><code>Lst[["nom"]]</code></strong> par nom <strong>calculable</strong> · <strong><code>Lst$nom</code></strong> par nom <strong>littéral</strong>, non calculable. <code>Lst[[4]][1]</code> = premier élément de la 4ᵉ composante.</p>
+<p>**<code>[[</code> contre <code>[</code> — <em>« It is very important to distinguish »</em>.** <code>Lst[[1]]</code> = <strong>l'objet</strong>, <em>« the name is <strong>not included</strong> »</em> · <code>Lst[1]</code> = <strong>une sous-liste</strong> d'une entrée, <em>« the names <strong>are transferred</strong> to the sublist »</em>.</p>
+<p><strong><code>length()</code></strong> compte <em>« the number of <strong>(top level)</strong> components »</em>.</p>
+<p><strong>Appariement partiel.</strong> <em>« may be <strong>abbreviated down to the minimum number of letters needed to identify them uniquely</strong> »</em> : <code>Lst$coe</code> pour <code>coefficients</code>, <code>Lst$cov</code> pour <code>covariance</code>.  Silencieux avec <code>$</code>, <strong>inactif en écriture</strong>.</p>
+<p><strong><code>names</code> n'est qu'un attribut</strong> <em>« like any other »</em> — d'autres structures peuvent en porter un.</p>
+<p><strong>Construire.</strong> <code>list(nom = objet, …)</code> ; noms <strong>librement choisis</strong> ; omis → composantes <strong>numérotées seulement</strong> ·  <em>« the components … <strong>are copied</strong> … <strong>the originals are not affected</strong> »</em> · étendre par <strong><code>Lst[5] &lt;- list(...)</code></strong> · <strong><code>c()</code></strong> sur des listes rend <strong>une liste</strong>, en joignant les composantes <strong>en séquence</strong> ; sur des vecteurs, <em>« all other attributes, such as <code>dim</code>, <strong>are discarded</strong> »</em>.</p>
+<p><strong>Le data frame.</strong> <em>« <strong>A data frame is a list with class <code>"data.frame"</code>.</strong> »</em> <strong>Trois restrictions</strong> : (1) composantes = vecteurs (numériques, caractères, logiques), <strong>facteurs</strong>, <strong>matrices numériques</strong>, <strong>listes</strong>, ou <strong>autres data frames</strong> ; (2) matrices, listes et data frames fournissent <strong>autant de variables qu'ils ont de colonnes, d'éléments ou de variables</strong> ; (3) <strong>toutes les longueurs égales</strong> — et même nombre de lignes pour les matrices. <em>« may <strong>for many purposes</strong> be regarded as a matrix with <strong>columns possibly of differing modes and attributes</strong> »</em>. Attributs : <strong><code>names</code></strong> (variables) et <strong><code>row.names</code></strong> (cas). Le construire : <strong><code>data.frame()</code></strong>, <strong><code>as.data.frame()</code></strong>, ou <strong><code>read.table()</code></strong> — <em>« the simplest way … from scratch »</em>.</p>
+<p><strong><code>attach()</code>.</strong> Place l'objet <strong>en position 2</strong> · rend les composantes visibles <strong>sous leur nom</strong>, <em>« provided there are no variables … in position 1 »</em> · c'est <strong>une fonction générique</strong>, applicable à <em>« any object of mode <code>"list"</code> »</em>.</p>
+<p class="cal piege"><strong> La note encadrée.</strong> <em>« In R lists and data frames <strong>can only be attached at position 2 or above</strong>, and <strong>what is attached is a copy of the original object</strong>. <strong>You can alter the attached values via <code>assign</code>, but the original list or data frame is unchanged.</strong> »</em></p>
+<p><strong>Les deux pièges.</strong> <code>u &lt;- v + w</code> <em>« <strong>does not replace the component</strong> … but rather <strong>masks it</strong> »</em> · <code>df$u &lt;- v + w</code> modifie bien, mais <em>« <strong>the new value … is not visible until the data frame is detached and attached again</strong> »</em>.</p>
+<p><strong><code>detach()</code></strong> <em>« detaches from the search path <strong>the entity currently at position 2</strong> »</em> — <em>« <strong>it is much safer to always use a name</strong> »</em> : <code>detach(lentils)</code> ou <code>detach("lentils")</code>.</p>
+<p><strong>La méthode du §6.3.3 — quatre règles.</strong> (1) <strong>regrouper</strong> toutes les variables d'un problème dans <strong>un data frame</strong> ; (2) <strong>attacher</strong> en position 2, <strong>travailler en position 1</strong> ; (3) avant de partir, <strong>ranger par <code>$</code></strong> ce qu'on veut garder, puis <strong><code>detach()</code></strong> ; (4) <strong>nettoyer</strong> l'espace de travail. Ainsi <em>« it is quite simple to <strong>work with many problems in the same directory, all of which have variables named <code>x</code>, <code>y</code> and <code>z</code></strong> »</em>.</p>
+<p><strong>Le chemin de recherche.</strong> <strong><code>search()</code></strong> l'affiche · au départ <strong><code>.GlobalEnv</code>, <code>Autoloads</code>, <code>package:base</code></strong> — <em>« <strong><code>.GlobalEnv</code> is the workspace</strong> »</em> · après un <code>attach</code>, l'objet s'intercale <strong>en position 2</strong> · <strong><code>ls(n)</code></strong> (ou <code>objects(n)</code>) <em>« can be used to examine the contents of <strong>any position</strong> on the search path »</em> · R prend <strong>la première correspondance</strong> — d'où le masquage.</p>
+<div class="rec"><h2>Active Recall</h2><details class="cor">
+<summary>Qu'est-ce qu'une liste, et qu'est-ce qui la distingue d'un vecteur ?</summary><div class="in">
+
+<p><em>« An R list is <strong>an object consisting of an ordered collection of objects known as its components</strong>. <strong>There is no particular need for the components to be of the same mode or type</strong> — a list could consist of a numeric vector, a logical value, a matrix, a complex vector, a character array, <strong>a function</strong>, and so on. »</em> (§6.1)</p>
+<p>C'est la <strong>structure récursive</strong> de la fiche 303 : un vecteur atomique impose <em>« all of the same mode »</em>, une liste ne l'impose pas. Et la <em>R Language Definition</em> (§2.1.2) précise que <strong>les listes sont des vecteurs</strong> — des « vecteurs génériques ».</p>
+<p class="cal piege"> <strong><code>length()</code> compte les composantes de niveau supérieur</strong> : la liste <code>Lst</code> du cours a <strong>4</strong> composantes pour sept valeurs élémentaires.</p>
+</div></details><details class="cor">
+<summary>Quelles sont les trois façons d'accéder à une composante nommée, et laquelle choisir quand le nom est calculé ?</summary><div class="in">
+
+<p>Sur <code>Lst &lt;- list(name = "Fred", wife = "Mary", no.children = 3, child.ages = c(4,7,9))</code> :</p>
+<table>
+<thead>
+<tr>
+<th>Écriture</th>
+<th>Remarque</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>Lst[[1]]</code></td>
+<td>par <strong>numéro</strong> — <em>« Components are <strong>always numbered</strong> »</em></td>
+</tr>
+<tr>
+<td><code>Lst[["name"]]</code></td>
+<td>par nom, <strong>en chaîne</strong></td>
+</tr>
+<tr>
+<td><code>Lst$name</code></td>
+<td>par nom, <strong>littéral</strong></td>
+</tr>
+</tbody></table>
+<p><em>« This is especially useful <strong>when the name of the component to be extracted is stored in another variable</strong>, as in <code>x &lt;- "name"; Lst[[x]]</code> »</em> (§6.1).</p>
+<p><strong>Quand le nom est calculé, <code>[[</code> est le seul correct</strong> : <code>$</code> n'évalue pas son index (fiche 302) et rendrait <code>NULL</code> sans erreur.</p>
+</div></details><details class="cor">
+<summary>Expliquer la différence entre <code>Lst[[1]]</code> et <code>Lst[1]</code>. Pourquoi le cours dit-il que c'est « très important » ?</summary><div class="in">
+
+<p><em>« <strong>It is very important to distinguish <code>Lst[[1]]</code> from <code>Lst[1]</code>.</strong> <code>[[...]]</code> is <strong>the operator used to select a single element</strong>, whereas <code>[...]</code> is <strong>a general subscripting operator</strong>. Thus <strong>the former is the first object in the list</strong>, and if it is a named list <strong>the name is not included</strong>. <strong>The latter is a sublist … consisting of the first entry only</strong> ; if it is a named list, <strong>the names are transferred to the sublist</strong>. »</em> (§6.1)</p>
+<p><strong>Pourquoi c'est « très important »</strong> : la plupart des fonctions de R rendent <strong>des listes</strong>. <code>eigen(Sm)[1]</code> rend une <strong>liste</strong> contenant les valeurs propres — inutilisable telle quelle ; <code>eigen(Sm)[[1]]</code> rend <strong>le vecteur</strong>. L'erreur qui suit ne parle jamais de crochets.</p>
+</div></details><details class="cor">
+<summary>Que se passe-t-il exactement quand on met un objet dans une liste ?</summary><div class="in">
+
+<p><em>« <strong>The components used to form the list are copied when forming the new list and the originals are not affected.</strong> »</em> (§6.2)</p>
+<p>C'est la <strong>sémantique de copie</strong> de R, déjà rencontrée sous la forme du mécanisme <code>`*tmp*`</code> (fiche 302). Mettre <code>x</code> dans une liste ne crée <strong>aucun lien</strong> : modifier <code>Lst[[1]]</code> ne touche pas <code>x</code>, et modifier <code>x</code> ne touche pas la liste.</p>
+<p class="cal piege"> <strong>L'unique exception du langage</strong> reste <strong>l'environnement</strong>, <em>« <strong>not copied</strong> when passed to functions or used in assignments »</em> (fiche 303).</p>
+</div></details><details class="cor">
+<summary>Que fait <code>c()</code> sur des listes, et en quoi diffère-t-il de son action sur des vecteurs ?</summary><div class="in">
+
+<p><em>« When the concatenation function <strong><code>c()</code> is given list arguments, the result is an object of mode <code>list</code> also</strong>, whose components are <strong>those of the argument lists joined together in sequence</strong>. »</em> (§6.2.1)</p>
+<pre><code class="language-r">list.ABC &lt;- c(list.A, list.B, list.C)
+</code></pre>
+<p>C'est la précision annoncée par la note 1 du §2.1 : <em>« With other than vector types of argument, such as list mode arguments, <strong>the action of <code>c()</code> is rather different</strong> »</em>.</p>
+<p class="cal piege"> Et pour les vecteurs : <em>« <strong>all other attributes, such as <code>dim</code> attributes, are discarded</strong> »</em> — cohérent avec le §5.9 (fiche 305) et avec la règle générale de la fiche 303 (<em>« coercion drops all attributes »</em>).</p>
+</div></details><details class="cor">
+<summary>Qu'est-ce qu'un data frame ? Quelles sont ses trois restrictions ?</summary><div class="in">
+
+<p><em>« <strong>A data frame is a list with class <code>"data.frame"</code>.</strong> »</em> (§6.3)</p>
+<p>Les trois restrictions :</p>
+<ol>
+<li><em>« The components must be <strong>vectors (numeric, character, or logical), factors, numeric matrices, lists, or other data frames</strong>. »</em></li>
+<li><em>« <strong>Matrices, lists, and data frames provide as many variables to the new data frame as they have columns, elements, or variables</strong>, respectively. »</em></li>
+<li><em>« <strong>Vector structures … must all have the same length</strong>, and <strong>matrix structures must all have the same number of rows</strong>. »</em></li>
+</ol>
+<p>La troisième est <strong>la</strong> contrainte : c'est l'égalité des longueurs qui autorise la lecture matricielle. La deuxième est la plus surprenante : une matrice y entre comme <strong>plusieurs</strong> variables.</p>
+</div></details><details class="cor">
+<summary>Dans quelle mesure un data frame se comporte-t-il comme une matrice ?</summary><div class="in">
+
+<p><em>« A data frame may <strong>for many purposes</strong> be regarded as <strong>a matrix with columns possibly of differing modes and attributes</strong>. It may be <strong>displayed in matrix form</strong>, and <strong>its rows and columns extracted using matrix indexing conventions</strong>. »</em> (§6.3)</p>
+<p class="cal piege"> <strong>« For many purposes », pas tous.</strong> L'exception est donnée par la <em>R Language Definition</em> §3.4.3 : <em>« <strong>if a single index is supplied, it is interpreted as indexing the list of columns</strong> — in that case <strong>the <code>drop</code> argument is ignored, with a warning</strong> »</em>.</p>
+<p>Donc <strong><code>df[2]</code> est la deuxième colonne</strong> et <strong><code>df[2, ]</code> la deuxième ligne</strong>. Avec deux indices, le data frame est matriciel ; avec un seul, <strong>il redevient la liste qu'il est</strong>.</p>
+</div></details><details class="cor">
+<summary>Que fait <code>attach(lentils)</code>, et sous quelle condition les variables deviennent-elles visibles ?</summary><div class="in">
+
+<p><em>« <code>attach()</code> <strong>places the data frame in the search path at position 2</strong>, and <strong>provided there are no variables <code>u</code>, <code>v</code> or <code>w</code> in position 1</strong>, <code>u</code>, <code>v</code> and <code>w</code> are <strong>available as variables from the data frame in their own right</strong>. »</em> (§6.3.2)</p>
+<p><strong>La condition est le cœur du mécanisme</strong> : R parcourt le chemin de recherche <strong>dans l'ordre</strong> et prend <strong>la première correspondance</strong>. La position 1 — l'espace de travail — est toujours consultée en premier, donc <strong>tout homonyme y masque la colonne</strong>.</p>
+<p class="cal piege"> Et la note encadrée ajoute : <em>« lists and data frames can <strong>only be attached at position 2 or above</strong>, and <strong>what is attached is a copy of the original object</strong> »</em>.</p>
+</div></details><details class="cor">
+<summary>Pourquoi <code>u &lt;- v + w</code> ne modifie-t-il pas la colonne <code>u</code> ? Et pourquoi <code>lentils$u &lt;- v + w</code> ne se voit-il pas ?</summary><div class="in">
+
+<p><strong>Premier piège</strong> : <em>« an assignment such as <code>u &lt;- v + w</code> <strong>does not replace the component <code>u</code> of the data frame</strong>, but rather <strong>masks it with another variable <code>u</code> in the workspace at position 1 on the search path</strong> »</em> (§6.3.2). Une nouvelle variable naît en position 1 ; la colonne est intacte et <strong>cachée</strong>.</p>
+<p><strong>Second piège</strong> : <em>« To make a permanent change … the simplest way is to <strong>resort once again to the <code>$</code> notation</strong> : <code>lentils$u &lt;- v + w</code>. <strong>However the new value of component <code>u</code> is not visible until the data frame is detached and attached again.</strong> »</em></p>
+<p>La raison des deux est la même : <strong>ce qui est attaché est une copie</strong>. La modification touche l'original ; la copie en position 2, elle, ne change pas.</p>
+</div></details><details class="cor">
+<summary>Pourquoi ne faut-il pas utiliser <code>detach()</code> sans argument ?</summary><div class="in">
+
+<p><em>« <strong>More precisely, this statement detaches from the search path the entity currently at position 2.</strong> … Entities at positions greater than 2 can be detached by giving their number to <code>detach</code>, <strong>but it is much safer to always use a name</strong>, for example <code>detach(lentils)</code> or <code>detach("lentils")</code>. »</em> (§6.3.2)</p>
+<p><code>detach()</code> détache <strong>ce qui se trouve en position 2</strong>, pas <em>« ce que j'ai attaché »</em>. Dès qu'un second objet a été attaché, les positions ont glissé et <strong>on détache le mauvais objet</strong> — sans erreur, puisque l'opération est parfaitement valide.</p>
+<p><strong>Nommer coûte trois caractères et supprime la classe entière de ce bug.</strong></p>
+</div></details><details class="cor">
+<summary>Énoncer les quatre règles de la méthode de travail du §6.3.3, et dire quel problème elles résolvent.</summary><div class="in">
+
+<ol>
+<li><em>« <strong>gather together all variables for any well defined and separate problem in a data frame</strong> under a suitably informative name »</em></li>
+<li><em>« <strong>attach the appropriate data frame at position 2</strong>, and <strong>use the workspace at level 1 for operational quantities and temporary variables</strong> »</em></li>
+<li><em>« before leaving a problem, <strong>add any variables you wish to keep … to the data frame using the <code>$</code> form of assignment, and then <code>detach()</code></strong> »</em></li>
+<li><em>« finally <strong>remove all unwanted variables from the workspace</strong> »</em></li>
+</ol>
+<p><strong>Le problème résolu</strong> est celui posé au §1.11 (fiche 300) : <em>« It is quite common for objects with names <code>x</code> and <code>y</code> to be created … it can be quite hard to decide what they might be when several analyses have been conducted in the same directory. »</em></p>
+<p>La solution du chapitre 1 était <strong>un répertoire par analyse</strong> ; celle du chapitre 6 est <strong>un data frame par problème</strong>, ce qui permet — le cours le dit — de <em>« <strong>work with many problems in the same directory, all of which have variables named <code>x</code>, <code>y</code> and <code>z</code></strong> »</em>.</p>
+</div></details><details class="cor">
+<summary>Qu'affiche <code>search()</code> au départ, et comment diagnostiquer un masquage ?</summary><div class="in">
+
+<pre><code class="language-r">search()
+# [1] ".GlobalEnv"  "Autoloads"  "package:base"
+</code></pre>
+<p><em>« where <strong><code>.GlobalEnv</code> is the workspace</strong> »</em> (§6.3.5). Après <code>attach(lentils)</code>, <code>lentils</code> s'intercale <strong>en position 2</strong>.</p>
+<p><strong>Pour diagnostiquer</strong>, le cours donne l'outil : <em>« <strong><code>ls</code> (or <code>objects</code>) can be used to examine the contents of any position on the search path</strong> »</em> — <code>ls(2)</code> rend ici <code>"u" "v" "w"</code>.</p>
+<p><strong>La méthode</strong> : <code>search()</code> pour voir l'ordre des positions, puis <code>ls(n)</code> pour voir laquelle contient le nom litigieux. R prend <strong>la première correspondance</strong> — celle de la position la plus basse.</p>
+</div></details><details class="cor">
+<summary>Peut-on attacher autre chose qu'un data frame ?</summary><div class="in">
+
+<p><em>« <strong><code>attach()</code> is a generic function</strong> that allows not only directories and data frames to be attached to the search path, but <strong>other classes of object as well</strong>. In particular <strong>any object of mode <code>"list"</code> may be attached in the same way</strong> : <code>attach(any.old.list)</code>. »</em> (§6.3.4)</p>
+<p>C'était acquis d'avance, puisque <em>« <strong>a data frame is a list</strong> with class <code>"data.frame"</code> »</em>.</p>
+<p><em>« <strong>Anything that has been attached can be detached by <code>detach</code>, by position number or, preferably, by name.</strong> »</em> — la recommandation de nommer revient une seconde fois.</p>
+</div></details></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h2>Flashcards</h2>
+<table>
+<thead>
+<tr>
+<th>Question</th>
+<th>Réponse</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Qu'est-ce qu'une liste ?</td>
+<td>Une <strong>collection ordonnée</strong> d'objets appelés <strong>composantes</strong></td>
+</tr>
+<tr>
+<td>Ses composantes doivent-elles être du même mode ?</td>
+<td><strong>Non</strong></td>
+</tr>
+<tr>
+<td>Une composante peut-elle être une fonction ?</td>
+<td><strong>Oui</strong></td>
+</tr>
+<tr>
+<td>Que rend <code>length(Lst)</code> ?</td>
+<td>Le nombre de composantes <strong>de niveau supérieur</strong></td>
+</tr>
+<tr>
+<td>Accéder à la 3ᵉ composante ?</td>
+<td><strong><code>Lst[[3]]</code></strong></td>
+</tr>
+<tr>
+<td>Par son nom, en chaîne ?</td>
+<td><strong><code>Lst[["nom"]]</code></strong></td>
+</tr>
+<tr>
+<td>Par son nom, littéralement ?</td>
+<td><strong><code>Lst$nom</code></strong></td>
+</tr>
+<tr>
+<td>Le nom est dans une variable <code>x</code> ?</td>
+<td><strong><code>Lst[[x]]</code></strong></td>
+</tr>
+<tr>
+<td>Le 1ᵉʳ élément de la 4ᵉ composante ?</td>
+<td><strong><code>Lst[[4]][1]</code></strong></td>
+</tr>
+<tr>
+<td>Que rend <code>Lst[[1]]</code> ?</td>
+<td><strong>L'objet</strong> — le nom <strong>n'est pas inclus</strong></td>
+</tr>
+<tr>
+<td>Que rend <code>Lst[1]</code> ?</td>
+<td><strong>Une sous-liste</strong> d'une entrée, <strong>avec le nom</strong></td>
+</tr>
+<tr>
+<td>Classe de <code>Lst[1]</code> ?</td>
+<td><strong><code>list</code></strong></td>
+</tr>
+<tr>
+<td>Que dit le cours de cette distinction ?</td>
+<td><em>« <strong>It is very important to distinguish</strong> »</em></td>
+</tr>
+<tr>
+<td>Peut-on abréger les noms ?</td>
+<td>Oui — jusqu'au <strong>minimum identifiant de façon unique</strong></td>
+</tr>
+<tr>
+<td>Abréviation de <code>Lst$coefficients</code> ?</td>
+<td><strong><code>Lst$coe</code></strong></td>
+</tr>
+<tr>
+<td>L'appariement partiel joue-t-il en écriture ?</td>
+<td> <strong>Non</strong></td>
+</tr>
+<tr>
+<td>Le vecteur des noms, c'est quoi ?</td>
+<td><strong>Un attribut comme un autre</strong></td>
+</tr>
+<tr>
+<td>Comment créer une liste ?</td>
+<td><strong><code>list(nom = objet, …)</code></strong></td>
+</tr>
+<tr>
+<td>Si les noms sont omis ?</td>
+<td>Les composantes sont <strong>numérotées seulement</strong></td>
+</tr>
+<tr>
+<td>Que deviennent les objets d'origine ?</td>
+<td>Ils sont <strong>copiés</strong> — <strong>non affectés</strong></td>
+</tr>
+<tr>
+<td>Comment étendre une liste ?</td>
+<td><strong><code>Lst[5] &lt;- list(...)</code></strong></td>
+</tr>
+<tr>
+<td>Que rend <code>c()</code> sur des listes ?</td>
+<td>Une <strong>liste</strong>, composantes <strong>jointes en séquence</strong></td>
+</tr>
+<tr>
+<td>Que devient <code>dim</code> avec <code>c()</code> ?</td>
+<td>Il est <strong>écarté</strong></td>
+</tr>
+<tr>
+<td>Qu'est-ce qu'un data frame ?</td>
+<td><strong>Une liste de classe <code>"data.frame"</code></strong></td>
+</tr>
+<tr>
+<td>Restriction 1 ?</td>
+<td>Vecteurs, <strong>facteurs</strong>, matrices numériques, listes, data frames</td>
+</tr>
+<tr>
+<td>Restriction 2 ?</td>
+<td>Ils fournissent <strong>autant de variables que de colonnes</strong></td>
+</tr>
+<tr>
+<td>Restriction 3 ?</td>
+<td><strong>Toutes les longueurs égales</strong></td>
+</tr>
+<tr>
+<td>Un data frame se lit-il comme une matrice ?</td>
+<td><strong>Pour beaucoup d'usages</strong>, oui</td>
+</tr>
+<tr>
+<td>L'exception ?</td>
+<td><strong>Un seul indice → les colonnes</strong></td>
+</tr>
+<tr>
+<td><code>df[2]</code> ?</td>
+<td>La <strong>deuxième colonne</strong></td>
+</tr>
+<tr>
+<td><code>df[2, ]</code> ?</td>
+<td>La <strong>deuxième ligne</strong></td>
+</tr>
+<tr>
+<td>Ses deux attributs de nommage ?</td>
+<td><strong><code>names</code></strong> et <strong><code>row.names</code></strong></td>
+</tr>
+<tr>
+<td>Quelle structure imite-t-il ?</td>
+<td>Le jeu de données <strong>SAS ou SPSS</strong></td>
+</tr>
+<tr>
+<td>Le créer à partir de vecteurs ?</td>
+<td><strong><code>data.frame()</code></strong></td>
+</tr>
+<tr>
+<td>À partir d'une liste conforme ?</td>
+<td><strong><code>as.data.frame()</code></strong></td>
+</tr>
+<tr>
+<td>La façon la plus simple, à partir de rien ?</td>
+<td><strong><code>read.table()</code></strong></td>
+</tr>
+<tr>
+<td>Que fait <code>attach(df)</code> ?</td>
+<td>Il le place <strong>en position 2</strong> du chemin</td>
+</tr>
+<tr>
+<td>À quelle condition les colonnes sont-elles visibles ?</td>
+<td>Qu'aucun homonyme <strong>n'existe en position 1</strong></td>
+</tr>
+<tr>
+<td>Peut-on attacher en position 1 ?</td>
+<td><strong>Non</strong> — <em>« position 2 or above »</em></td>
+</tr>
+<tr>
+<td>Qu'est-ce qui est attaché ?</td>
+<td> <strong>Une copie</strong></td>
+</tr>
+<tr>
+<td><code>assign</code> sur la copie modifie-t-il l'original ?</td>
+<td><strong>Non</strong></td>
+</tr>
+<tr>
+<td>Que fait <code>u &lt;- v + w</code> après <code>attach</code> ?</td>
+<td>Il <strong>masque</strong> la colonne, en position 1</td>
+</tr>
+<tr>
+<td>Comment modifier vraiment la colonne ?</td>
+<td><strong><code>df$u &lt;- v + w</code></strong></td>
+</tr>
+<tr>
+<td>Le changement est-il visible aussitôt ?</td>
+<td><strong>Non</strong> — après <strong><code>detach</code> puis <code>attach</code></strong></td>
+</tr>
+<tr>
+<td>Que détache <code>detach()</code> sans argument ?</td>
+<td><strong>Ce qui est en position 2</strong></td>
+</tr>
+<tr>
+<td>La forme sûre ?</td>
+<td><strong><code>detach(df)</code></strong> ou <code>detach("df")</code></td>
+</tr>
+<tr>
+<td><code>attach()</code> est-elle générique ?</td>
+<td><strong>Oui</strong></td>
+</tr>
+<tr>
+<td>Que peut-on attacher d'autre ?</td>
+<td><strong>Tout objet de mode <code>"list"</code></strong></td>
+</tr>
+<tr>
+<td>Règle 1 de la méthode du §6.3.3 ?</td>
+<td><strong>Regrouper</strong> les variables d'un problème dans un data frame</td>
+</tr>
+<tr>
+<td>Règle 2 ?</td>
+<td><strong>Attacher en 2</strong>, travailler en <strong>1</strong></td>
+</tr>
+<tr>
+<td>Règle 3 ?</td>
+<td><strong>Ranger par <code>$</code></strong>, puis <strong><code>detach()</code></strong></td>
+</tr>
+<tr>
+<td>Règle 4 ?</td>
+<td><strong>Nettoyer</strong> l'espace de travail</td>
+</tr>
+<tr>
+<td>Quel problème cette méthode résout-elle ?</td>
+<td>Plusieurs problèmes ayant tous des <code>x</code>, <code>y</code>, <code>z</code></td>
+</tr>
+<tr>
+<td>Quelle fonction affiche le chemin de recherche ?</td>
+<td><strong><code>search()</code></strong></td>
+</tr>
+<tr>
+<td>Son contenu initial ?</td>
+<td><code>.GlobalEnv</code> · <code>Autoloads</code> · <code>package:base</code></td>
+</tr>
+<tr>
+<td>Que désigne <code>.GlobalEnv</code> ?</td>
+<td><strong>L'espace de travail</strong></td>
+</tr>
+<tr>
+<td>Comment voir le contenu d'une position ?</td>
+<td><strong><code>ls(n)</code></strong> ou <code>objects(n)</code></td>
+</tr>
+<tr>
+<td>Quelle correspondance R retient-il ?</td>
+<td><strong>La première</strong> rencontrée</td>
+</tr>
+</tbody></table>
+</main>
+
+
+
+
+</body></html>

@@ -1,0 +1,1640 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fiche 104 — Les swaps revisités : structures non standard et options intégrées</title>
+<script>
+window.MathJax={tex:{inlineMath:[["$","$"]],displayMath:[["$$","$$"]],processEscapes:true},
+ options:{skipHtmlTags:["script","noscript","style","textarea","pre","code"]},
+ svg:{fontCache:"global"},
+ startup:{pageReady:()=>MathJax.startup.defaultPageReady().then(()=>{document.body.classList.add("ready")})}};
+setTimeout(function(){document.body.classList.add("ready")},2500);
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+/* ============================================================
+   MathiasLearn — feuille de style des fiches
+   Reprise intégrale des tokens de 00_PARCOURS/*.html
+   + blocs pédagogiques (callouts, méthode, essentiels, recall)
+   ============================================================ */
+:root{--bg:#faf9f7;--card:#fff;--ink:#1a1a1a;--muted:#6b6b6b;--line:#e5e2dd;--accent:#8b5e34;
+ --hl:#fdf8ef;--ok:#2d7d4f;--okbg:#f0f7f3;--warn:#b3402f;--warnbg:#fdf3f1;--blue:#2f5d8b;--bluebg:#f1f5fa}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+ font:17px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;padding:0 16px 100px}
+.nav{position:sticky;top:0;background:rgba(250,249,247,.96);backdrop-filter:blur(8px);
+ border-bottom:1px solid var(--line);margin:0 -16px 30px;padding:11px 16px;z-index:50;
+ display:flex;gap:6px;flex-wrap:wrap;font-size:13px}
+.nav a{color:var(--muted);text-decoration:none;padding:4px 9px;border-radius:5px;white-space:nowrap}
+.nav a:hover{background:var(--line);color:var(--ink)}
+.nav a.on{background:var(--accent);color:#fff}
+main{max-width:780px;margin:0 auto}
+h1{font-size:31px;letter-spacing:-.02em;margin:.4em 0 .5em;line-height:1.25}
+h2{font-size:23px;margin:2.2em 0 .7em;padding-bottom:.3em;border-bottom:1px solid var(--line)}
+h3{font-size:19px;margin:1.9em 0 .5em;color:var(--accent)}
+h4{font-size:17px;margin:1.5em 0 .4em}
+p{margin:.8em 0} a{color:var(--accent)} hr{border:0;border-top:1px solid var(--line);margin:2.6em 0}
+table{border-collapse:collapse;width:100%;margin:1.3em 0;font-size:15.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+th{background:#f3f0eb;font-weight:600}
+tr:nth-child(even) td{background:#fcfbfa}
+code{font-family:"SF Mono",Menlo,Consolas,monospace;font-size:.88em;background:#f2efea;padding:2px 6px;border-radius:4px;overflow-wrap:break-word}
+pre{background:#f2efea;padding:14px 16px;border-radius:8px;overflow-x:auto}
+pre code{background:none;padding:0;white-space:pre}
+blockquote{border-left:3px solid var(--accent);background:var(--hl);margin:1.4em 0;padding:14px 20px;border-radius:0 8px 8px 0}
+blockquote p:first-child{margin-top:0} blockquote p:last-child{margin-bottom:0}
+ul,ol{padding-left:1.5em} li{margin:.35em 0} em{color:#4a4a4a}
+mjx-container[display="true"]{margin:1.1em 0!important;overflow-x:auto;overflow-y:hidden;padding:2px 0}
+mjx-container svg{max-width:100%}
+body:not(.ready) main{opacity:0} main{opacity:1;transition:opacity .25s}
+
+/* --- bandeau de tête de fiche --- */
+.cours{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--accent);
+ border-radius:0 10px 10px 0;padding:18px 22px;margin:0 0 34px}
+.cours h4{margin:0 0 4px;font-size:14px;text-transform:uppercase;letter-spacing:.07em;color:var(--accent)}
+.cours .cs{color:var(--muted);font-size:14.5px;margin:0 0 14px}
+
+/* --- exercices / corrigés --- */
+.ex{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:6px 24px 20px;margin:18px 0}
+.ex>h3:first-child{margin-top:14px}
+details.cor{margin-top:18px;border:1px solid var(--line);border-radius:8px;background:#fcfbfa;overflow:hidden}
+details.cor>summary{cursor:pointer;padding:12px 16px;font-weight:600;font-size:15px;color:var(--accent);
+ list-style:none;display:flex;align-items:center;gap:9px;user-select:none;transition:.15s;min-height:44px}
+details.cor>summary::-webkit-details-marker{display:none}
+details.cor>summary:hover{background:var(--hl)}
+details.cor>summary::before{content:"\25B6";font-size:10px;transition:transform .18s;display:inline-block}
+details.cor[open]>summary::before{transform:rotate(90deg)}
+details.cor[open]>summary{background:var(--okbg);color:var(--ok);border-bottom:1px solid var(--line)}
+.cor .in{padding:4px 20px 16px}
+.cor .in>*:first-child{margin-top:.9em}
+
+/* --- blocs pédagogiques (callouts) ---
+   Générés depuis une citation Markdown dont le premier **gras** commence
+   par un mot-clé : DÉFINITION, THÉORÈME, MÉTHODE, PIÈGE, INTUITION… */
+.cal{border:1px solid var(--line);border-left:4px solid var(--accent);background:var(--card);
+ border-radius:0 10px 10px 0;padding:15px 20px;margin:1.5em 0}
+.cal>p:first-child{margin-top:0}.cal>p:last-child,.cal>ul:last-child,.cal>ol:last-child{margin-bottom:0}
+.cal .lab{display:block;font-size:12.5px;text-transform:uppercase;letter-spacing:.08em;
+ font-weight:700;color:var(--accent);margin-bottom:6px}
+.cal.formel{background:var(--hl)}
+.cal.piege{border-left-color:var(--warn);background:var(--warnbg)}
+.cal.piege .lab{color:var(--warn)}
+.cal.methode{border-left-color:var(--ok);background:var(--okbg)}
+.cal.methode .lab{color:var(--ok)}
+.cal.intu{border-left-color:var(--blue);background:var(--bluebg)}
+.cal.intu .lab{color:var(--blue)}
+.cal.plus{border-left-style:dashed;background:#faf9f7}
+.cal.plus .lab{color:var(--muted)}
+
+/* --- révision express --- */
+.ess{background:var(--card);border:1px solid var(--accent);border-radius:10px;padding:4px 24px 20px;margin:1.6em 0}
+.ess h3{margin-top:1.3em}
+.rec{background:var(--card);border:1px dashed var(--accent);border-radius:10px;padding:4px 24px 18px;margin:1.6em 0}
+.rec ol{counter-reset:none}
+
+/* --- impression / PDF --- */
+@media print{
+ .nav{display:none}
+ body{padding:0;background:#fff;font-size:11.2pt;line-height:1.55}
+ main{max-width:none}
+ h1{font-size:23pt}h2{font-size:15pt;margin-top:1.5em}h3{font-size:12.6pt}
+ h2,h3,h4{break-after:avoid;page-break-after:avoid}
+ table,.cal,blockquote{break-inside:avoid;page-break-inside:avoid}
+ table{display:table;font-size:9.6pt}
+ details.cor{border:1px solid var(--line);background:#fcfbfa}
+ details.cor>summary{display:none}
+ details.cor .in{padding-top:10px}
+ .cal,.ex,.ess,.rec{box-shadow:none}
+ a{color:var(--ink);text-decoration:none}
+}
+@page{margin:16mm 15mm 18mm}
+
+/* --- exemples travaillés --- */
+.exm{background:#fcfbfa;border:1px solid var(--line);border-radius:10px;padding:2px 20px 14px;margin:1.5em 0}
+.exm>h4:first-child{margin:14px 0 .5em;color:var(--accent);font-size:13px;text-transform:uppercase;letter-spacing:.07em}
+
+
+/* --- pastilles de priorité (conventions des fiches de l'app) --- */
+h2[data-prio], h3[data-prio], h4[data-prio]{position:relative}
+h2[data-prio]::before,h3[data-prio]::before,h4[data-prio]::before{
+ content:"";display:inline-block;width:9px;height:9px;border-radius:50%;
+ margin-right:9px;vertical-align:middle;background:var(--muted)}
+[data-prio="must"]::before{background:var(--warn)}
+[data-prio="high"]::before{background:#d98324}
+[data-prio="mid"]::before{background:#c9a227}
+[data-prio="low"]::before{background:var(--ok)}
+/* corrigés des fiches de l'app : même traitement que les corrigés des séries */
+details.cor>summary::after{content:""}
+</style></head><body>
+<div class="nav"><a href="00_COMMENCER_ICI.html">Commencer ici</a><a href="01_NOTATIONS_le-decodeur.html">Notations</a><a href="02_EXERCICES_Serie-0.html">Série 0 — Remise en route</a><a href="03_EXERCICES_Serie-1.html">Série 1 — Convexité</a><a href="04_EXERCICES_Serie-2.html">Série 2 — KKT</a><a href="05_AUTO-EVALUATION.html">Auto-évaluation (quiz)</a><a href="06_FICHE_Optimisation-deux-variables.html">Fiche — Optimisation à 2 variables</a></div>
+<main><h1>Fiche 104 — Les swaps revisités : structures non standard et options intégrées</h1>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Matière</strong></td>
+<td>Maths · Finance de marché · Produits de taux</td>
+</tr>
+<tr>
+<td><strong>Cours source</strong></td>
+<td>John C. Hull, <em>Options, Futures, and Other Derivatives</em>, 8ᵉ éd., Pearson — chapitre 32 « Swaps Revisited »</td>
+</tr>
+<tr>
+<td><strong>Difficulté</strong></td>
+<td> High — le catalogue complet des swaps de gré à gré</td>
+</tr>
+<tr>
+<td><strong>Temps d'étude estimé</strong></td>
+<td>1 h 20</td>
+</tr>
+<tr>
+<td><strong>Prérequis</strong></td>
+<td>Fiches 80 (swaps), 100 (caps et swaptions), 101 (ajustements), 102-103 (modèles de taux)</td>
+</tr>
+<tr>
+<td><strong>Concepts clés</strong></td>
+<td>Règle « supposer les taux forward réalisés », <em>step-up</em> et <em>amortizing swap</em>, <em>basis swap</em>, swap à capitalisation, swap de devises <em>floating-for-floating</em>, swap LIBOR-in-arrears, swap CMS et CMT, <em>diff swap</em>, swap d'actions, <em>accrual swap</em>, swap annulable, <em>index amortizing rate swap</em>, swap de matières premières</td>
+</tr>
+<tr>
+<td><strong>Poids à l'examen</strong></td>
+<td><strong>Les trois familles</strong> : règle simple / ajustements / options intégrées · $F_i+\dfrac{F_i^2\sigma_i^2\delta_it_i}{1+F_i\delta_i}$ pour l'in-arrears · l'ajustement <strong>double</strong> du CMS · $V_i+V_i\rho_i\sigma_{W,i}\sigma_{V,i}t_i$ pour le <em>diff swap</em>.</td>
+</tr>
+</tbody></table>
+<h2>Vue d'ensemble</h2>
+<pre><code>LA RÈGLE STANDARD (chapitre 7)   « SUPPOSER QUE LES TAUX FORWARD SERONT RÉALISÉS »
+  1. calculer les flux nets en supposant les LIBOR futurs = taux forward d'aujourd'hui
+  2. actualiser à la courbe zéro LIBOR/swap
+
+TROIS FAMILLES DE SWAPS NON STANDARD
+
+  A — LA RÈGLE SIMPLE SUFFIT
+      step-up · amortizing · principaux et fréquences différents · basis swap
+      swap à CAPITALISATION · swaps de devises floating-for-floating et cross-currency
+
+  B — IL FAUT UN AJUSTEMENT (chapitre 29)
+      LIBOR-IN-ARREARS   convexité     Fᵢ + Fᵢ²σᵢ²δᵢtᵢ/(1+Fᵢδᵢ)
+      CMS / CMT          convexité ET timing — DEUX termes
+      DIFF SWAP          quanto        Vᵢ + Vᵢ ρᵢ σ_W σ_V tᵢ
+
+  C — IL Y A UNE OPTION INTÉGRÉE (chapitres 28, 30, 31)
+      ACCRUAL SWAP  = swap ordinaire + un PORTEFEUILLE D'OPTIONS BINAIRES (une par JOUR)
+      CANCELABLE    = swap ordinaire + une SWAPTION (européenne si une seule date,
+                      BERMUDIENNE sinon)
+
+SWAP D'ACTIONS   vaut ZÉRO à l'initiation ET juste après chaque date de paiement
+                 entre deux dates : la jambe actions vaut L·E/E₀
+</code></pre>
+<p><strong>La règle standard, rappelée d'entrée.</strong> *Le chapitre 7 a montré comment valoriser un swap de taux vanille. L'approche standard se résume à : <strong>« SUPPOSER QUE LES TAUX FORWARD SERONT RÉALISÉS »</strong>.*</p>
+<table>
+<thead>
+<tr>
+<th>Étape</th>
+<th>Contenu</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>1</strong></td>
+<td>Calculer les <strong>flux nets</strong> du swap <strong>en supposant que les LIBOR futurs égalent les taux forward</strong> calculés de la courbe zéro LIBOR/swap d'aujourd'hui</td>
+</tr>
+<tr>
+<td><strong>2</strong></td>
+<td>Poser la valeur du swap égale à la <strong>valeur actuelle</strong> de ces flux nets, <strong>en actualisant avec la courbe zéro LIBOR/swap</strong></td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><em>« <strong>Les swaps ont été centraux au succès des marchés de gré à gré.</strong> Ils se sont révélés des instruments <strong>très flexibles</strong> pour gérer le risque. Au vu de la gamme des contrats négociés et du volume total traité chaque année, <strong>les swaps sont sans doute l'une des innovations les plus réussies de l'histoire des marchés financiers.</strong> »</em></p>
+</blockquote>
+<h2 data-prio="mid">Concept 1 — Les variations mineures : la règle simple suffit</h2>
+<h3>1.1 Les variations de principal et de fréquence</h3>
+<table>
+<thead>
+<tr>
+<th>Variation</th>
+<th>Description</th>
+<th>Usage type</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><em><strong>Step-up swap</strong></em></td>
+<td>le principal notionnel est une fonction <strong>CROISSANTE</strong> du temps</td>
+<td><em>une <strong>entreprise de construction</strong> qui compte emprunter des montants <strong>croissants</strong> à taux variable pour financer un projet et veut passer au fixe</em></td>
+</tr>
+<tr>
+<td><em><strong>Amortizing swap</strong></em></td>
+<td>le principal est une fonction <strong>DÉCROISSANTE</strong> du temps</td>
+<td><em>une entreprise ayant des <strong>emprunts à taux fixe avec un échéancier de remboursement</strong> et voulant passer au variable</em></td>
+</tr>
+<tr>
+<td><strong>Principaux différents</strong></td>
+<td>le principal peut <strong>différer sur les deux jambes</strong></td>
+<td><em>(Business Snapshot 32.1 : <strong>120 millions</strong> côté variable, <strong>100 millions</strong> côté fixe)</em></td>
+</tr>
+<tr>
+<td><strong>Fréquences différentes</strong></td>
+<td>les paiements peuvent avoir des <strong>fréquences différentes</strong></td>
+<td><em>(même exemple : <strong>mensuels</strong> côté variable, <strong>semestriels</strong> côté fixe)</em></td>
+</tr>
+</tbody></table>
+<blockquote>
+<p class="cal piege"> <em><strong>« Ces types de variations à la structure vanille de base N'AFFECTENT PAS LA MÉTHODOLOGIE DE VALORISATION. L'approche « supposer les taux forward réalisés » peut toujours être utilisée. »</strong></em></p>
+</blockquote>
+<h3>1.2 Le <em>basis swap</em></h3>
+<p>*Le taux de référence variable <strong>n'est pas toujours le LIBOR</strong> : dans certains swaps c'est le taux du <strong>papier commercial (CP)</strong>.*</p>
+<blockquote>
+<p><em><strong>Un BASIS SWAP échange des flux calculés avec UN taux de référence variable contre des flux calculés avec UN AUTRE taux de référence variable.</strong></em></p>
+</blockquote>
+<p><strong>L'exemple.</strong> <em>Le <strong>taux CP à 3 mois plus 10 points de base</strong> contre <strong>le LIBOR à 3 mois</strong>, les deux appliqués à un principal de <strong>100 millions</strong>.</em></p>
+<p><em>L'usage : <strong>la gestion de risque d'une institution financière dont les actifs et les passifs dépendent de taux de référence variables DIFFÉRENTS</strong>.</em></p>
+<blockquote>
+<p class="cal piege"> <strong>La méthode de valorisation, à savoir énoncer précisément.</strong> <em>« Les swaps dont le taux de référence n'est pas le LIBOR se valorisent par l'approche « supposer les taux forward réalisés ». <strong>UNE COURBE ZÉRO AUTRE QUE LIBOR est nécessaire pour calculer les flux futurs</strong> sur l'hypothèse que les taux forward sont réalisés.  <strong>LES FLUX SONT ACTUALISÉS AU LIBOR.</strong> »</em></p>
+</blockquote>
+<h3>1.3 Les swaps à capitalisation</h3>
+<p><em>Dans un <strong>swap à capitalisation</strong> (<em>compounding swap</em>), <strong>il n'y a qu'UNE SEULE date de paiement</strong> pour les deux jambes : <strong>à la fin de la vie du swap</strong>. <strong>Au lieu d'être payés, les intérêts sont CAPITALISÉS jusqu'à cette date.</strong></em></p>
+<p><strong>L'exemple de Business Snapshot 32.2 :</strong> taux variable <strong>LIBOR + 20 pb</strong>, <strong>capitalisé à LIBOR + 10 pb</strong> ; taux fixe <strong>6 %</strong>, <strong>capitalisé à 6,3 %</strong>.</p>
+<blockquote>
+<p><em>« L'approche « supposer les taux forward réalisés » peut être utilisée, <strong>au moins approximativement</strong>. Le côté fixe est <strong>direct</strong> car le paiement à maturité est <strong>connu avec certitude</strong>. <strong>L'approche se justifie côté variable parce qu'il existe une série de FRA où les flux variables sont échangés contre les valeurs qu'ils auraient si chaque taux égalait le taux forward correspondant.</strong> »</em></p>
+<p class="cal piege"> <em>La note technique : l'approche est <strong>EXACTE</strong> si le spread de capitalisation $s_c$ est <strong>nul</strong>, ou s'il est appliqué de sorte que $Q$ capitalise en $Q(1+R\delta)(1+s_c\delta)$. <strong>Si, comme c'est plus usuel, il capitalise en $Q[1+(R+s_c)\delta]$, il y a une PETITE approximation.</strong></em></p>
+</blockquote>
+<details class="cor">
+<summary><strong>Exemple 32.1 — un swap à capitalisation à 3 ans, entièrement recalculé</strong></summary><div class="in">
+
+<p><strong>Données.</strong> Réinitialisations <strong>annuelles</strong>, vie <strong>3 ans</strong>. On <strong>paie le fixe</strong> et <strong>reçoit le variable</strong>. Taux fixe <strong>4 %</strong>, taux variable <strong>LIBOR 12 mois</strong>. Le fixe capitalise à <strong>3,9 %</strong>, le variable à <strong>LIBOR 12 mois moins 20 pb</strong>. Courbe LIBOR <strong>plate à 5 %</strong> en composition annuelle. Principal <strong>100 millions</strong>.</p>
+<p><em>Étape 1 — la jambe FIXE, capitalisée à 3,9 % :</em></p>
+<table>
+<thead>
+<tr>
+<th>Fin d'année</th>
+<th>Calcul</th>
+<th>Montant cumulé (M)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>intérêt de $4\,\%\times100$</td>
+<td><strong>4,000</strong></td>
+</tr>
+<tr>
+<td>2</td>
+<td>$4\times1{,}039=4{,}156$, plus le nouvel intérêt de 4</td>
+<td><strong>8,156</strong></td>
+</tr>
+<tr>
+<td>3</td>
+<td>$8{,}156\times1{,}039=8{,}474$, plus le nouvel intérêt de 4</td>
+<td>$\boxed{\mathbf{12{,}474}}$</td>
+</tr>
+</tbody></table>
+<p><em>Étape 2 — la jambe VARIABLE.</em>  <strong>On suppose que tous les taux futurs égalent les taux forward LIBOR</strong> ; avec une courbe plate, <strong>tous valent 5 %</strong>. La capitalisation se fait à $5\,\%-20$ pb $=\mathbf{4{,}8\,\%}$ :</p>
+<table>
+<thead>
+<tr>
+<th>Fin d'année</th>
+<th>Calcul</th>
+<th>Montant cumulé (M)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>$5\,\%\times100$</td>
+<td><strong>5,000</strong></td>
+</tr>
+<tr>
+<td>2</td>
+<td>$5\times1{,}048=5{,}24$, plus 5</td>
+<td><strong>10,240</strong></td>
+</tr>
+<tr>
+<td>3</td>
+<td>$10{,}24\times1{,}048=10{,}731$, plus 5</td>
+<td>$\boxed{\mathbf{15{,}731}}$</td>
+</tr>
+</tbody></table>
+<p><em>Étape 3 — valoriser.</em> Le swap équivaut à <strong>une entrée de 15,731 M et une sortie de 12,474 M à la fin de l'année 3</strong> :
+$$\frac{15{,}731-12{,}474}{1{,}05^3}=\frac{3{,}257}{1{,}157625}=\boxed{\mathbf{2{,}814\ \text{millions de dollars}}}$$</p>
+<p><em>(Cette analyse <strong>ignore les conventions de décompte des jours</strong> et fait l'approximation de la note ci-dessus.)</em></p>
+</div></details>
+
+<h3>1.4 Les swaps de devises</h3>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Fixe contre fixe</strong></td>
+<td>un taux fixe <strong>par devise</strong>, appliqué au principal de <strong>sa</strong> devise (fiche 80, §7.9)</td>
+</tr>
+<tr>
+<td><em><strong>Floating-for-floating</strong></em></td>
+<td><strong>LIBOR USD</strong> (éventuellement avec spread) contre <strong>LIBOR GBP</strong> (éventuellement avec spread)</td>
+</tr>
+<tr>
+<td><strong>Swap de taux <em>cross-currency</em></strong></td>
+<td>un taux <strong>variable</strong> dans une devise contre un taux <strong>fixe</strong> dans une autre</td>
+</tr>
+</tbody></table>
+<p><strong>La méthode.</strong> <em>« Les floating-for-floating et cross-currency se valorisent par la règle « supposer les taux forward réalisés ». Les LIBOR futurs dans chaque devise sont supposés égaux aux forwards d'aujourd'hui.  <strong>Les flux USD sont actualisés au taux zéro LIBOR USD ; les flux GBP au taux zéro LIBOR GBP. Le change COURANT sert ensuite à traduire les deux valeurs actuelles dans une devise commune.</strong> »</em></p>
+<details class="cor">
+<summary><strong>L'ajustement de marché des taux d'actualisation</strong></summary><div class="in">
+
+<blockquote>
+<p class="cal piege"> <em>« <strong>En théorie, un nouveau floating-for-floating devrait échanger le LIBOR d'une devise contre le LIBOR d'une autre, SANS SPREAD. En pratique, des effets MACROÉCONOMIQUES engendrent des spreads.</strong> Les institutions financières <strong>ajustent souvent les taux d'actualisation</strong> qu'elles emploient pour en tenir compte. »</em></p>
+</blockquote>
+<p><strong>L'exemple.</strong> <em>Si les conditions de marché sont telles que <strong>le LIBOR USD s'échange contre le LIBOR yen MOINS 20 points de base</strong> dans les nouveaux floating-for-floating <strong>de toutes maturités</strong>, une institution américaine :</em></p>
+<ul>
+<li><em>actualiserait les flux <strong>USD au LIBOR USD</strong> ;</em></li>
+<li><em>actualiserait les flux <strong>JPY au LIBOR JPY MOINS 20 pb</strong> ;</em></li>
+<li>* <em>et le ferait <strong>dans TOUS les swaps impliquant des flux dans les deux devises</strong>.</em></li>
+</ul>
+<p class="cal piege"> <em>« <strong>Cet ajustement est AD HOC, mais s'il n'est pas fait, les traders réalisent un profit ou une perte IMMÉDIATS chaque fois qu'ils traitent un nouveau floating-for-floating JPY/USD.</strong> »</em></p>
+</div></details>
+
+<h2 data-prio="must">Concept 2 — Les swaps exigeant un ajustement</h2>
+<blockquote>
+<p><em><strong>« Dans chaque cas, il faut supposer qu'un TAUX FORWARD AJUSTÉ, plutôt que le taux forward réel, sera réalisé. »</strong></em></p>
+</blockquote>
+<h3>2.1 Le swap LIBOR-in-arrears</h3>
+<p><strong>Le contraste.</strong> <em>Un swap vanille est conçu de sorte que <strong>le taux variable OBSERVÉ à une date de paiement soit PAYÉ à la date SUIVANTE</strong>.  <strong>Dans un LIBOR-in-arrears, le taux variable payé à une date de paiement ÉGALE LE TAUX OBSERVÉ À CETTE DATE MÊME.</strong></em></p>
+<p>$$\boxed{\text{Taux à supposer}=F_i+\frac{F_i^2\,\sigma_i^2\,\delta_i\,t_i}{1+F_i\delta_i}}\;\text{(32.1)}$$</p>
+<p>où $F_i$ est le <strong>forward de $R_i$</strong>, $\sigma_i$ <strong>sa volatilité</strong> <em>(typiquement impliquée des prix de caplets)</em>, et $\delta_i=t_{i+1}-t_i$.</p>
+<blockquote>
+<p class="cal piege"> <strong>C'est exactement l'ajustement de CONVEXITÉ de (29.2)</strong> <em>(fiche 101, application 1)</em> — <em>parce que le taux est <strong>payé EN AVANCE</strong> par rapport à sa convention normale.</em></p>
+</blockquote>
+<details class="cor">
+<summary><strong>Exemple 32.2 — le coût de l'in-arrears, chiffré</strong></summary><div class="in">
+
+<p><strong>Données.</strong> Principal <strong>100 millions</strong>. On <strong>reçoit 5 % fixe</strong> annuellement et <strong>paie le LIBOR</strong>. Échanges aux fins des années 1 à 5. Courbe <strong>plate à 5 %</strong> (composition annuelle). <strong>Toutes les volatilités de caplets valent 22 %</strong>.</p>
+<p><em>Étape 1 — le point de référence.</em> Le taux forward de chaque paiement variable est <strong>5 %</strong>.  <em><strong>Si c'était un swap ORDINAIRE, sa valeur serait EXACTEMENT ZÉRO</strong></em> (en ignorant les conventions de jours).</p>
+<p><em>Étape 2 — l'ajustement.</em> Avec $F_i=0{,}05$, $\sigma_i=0{,}22$, $\delta_i=1$ :
+$$0{,}05+\frac{0{,}05^2\times0{,}22^2\times1\times1}{1+0{,}05\times1}\,t_i=0{,}05+0{,}000115\,t_i$$</p>
+<p><em>Étape 3 — les cinq taux à supposer :</em></p>
+<table>
+<thead>
+<tr>
+<th>Année</th>
+<th>1</th>
+<th>2</th>
+<th>3</th>
+<th>4</th>
+<th>5</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Taux (%)</strong></td>
+<td>5,0115</td>
+<td>5,0230</td>
+<td>5,0345</td>
+<td>5,0460</td>
+<td>5,0575</td>
+</tr>
+</tbody></table>
+<p><em>Étape 4 — les flux nets.</em> <em>L'échange net à la première date équivaut à une <strong>SORTIE de 0,0115 % de 100 millions</strong>, soit <strong>11 500 dollars</strong> ; les autres se calculent de même.</em></p>
+<p><em>Étape 5 — la valeur :</em>
+$$-\frac{11\,500}{1{,}05}-\frac{23\,000}{1{,}05^2}-\frac{34\,500}{1{,}05^3}-\frac{46\,000}{1{,}05^4}-\frac{57\,500}{1{,}05^5}=\boxed{\mathbf{-144\,514\ \text{dollars}}}$$</p>
+<p class="cal piege"> <strong>Précision de calcul.</strong> L'ajustement exact vaut $0{,}00011524$, ce qui donne des flux de $11\,524$, $23\,048$, … et une valeur de <strong>$-144\,813$</strong>. Le <strong>$-144\,514$</strong> du manuel provient des flux <strong>ARRONDIS</strong> à 11 500 / 23 000 / 34 500 / 46 000 / 57 500. <strong>L'écart est sans conséquence</strong> ; c'est simplement l'effet des arrondis intermédiaires.</p>
+<blockquote>
+<p class="cal piege"> <strong>La leçon :</strong> <em>un swap qui vaudrait <strong>exactement zéro</strong> en version ordinaire vaut <strong>$-144\,500$ dollars</strong> en version in-arrears. <strong>L'ajustement de convexité n'est PAS un détail.</strong></em></p>
+</blockquote>
+</div></details>
+
+<h3>2.2 Les swaps CMS et CMT</h3>
+<blockquote>
+<p><em><strong>Un CONSTANT MATURITY SWAP (CMS) est un swap de taux où LE TAUX VARIABLE ÉGALE LE TAUX DE SWAP d'un swap d'une certaine durée de vie.</strong></em></p>
+</blockquote>
+<p><em>Exemple : les paiements variables tous les 6 mois <strong>au taux de swap à 5 ans</strong>.  <strong>Il y a habituellement un DÉCALAGE : le paiement à une date donnée égale le taux de swap observé à la date PRÉCÉDENTE.</strong></em></p>
+<p>$$\text{Paiement variable en }t_{i+1}=\delta_i\,L\,S_i\qquad\delta_i=t_{i+1}-t_i$$</p>
+<p>$$\boxed{\text{Taux à supposer}=y_i\underbrace{-\tfrac12y_i^2\sigma_{y,i}^2t_i\frac{G_i''(y_i)}{G_i'(y_i)}}_{\text{CONVEXITÉ}}\underbrace{-\frac{y_i\delta_i F_i\rho_i\sigma_{y,i}\sigma_{F,i}}{1+F_i\delta_i}t_i}_{\text{TIMING}}}\;\text{(32.2)}$$</p>
+<table>
+<thead>
+<tr>
+<th>Symbole</th>
+<th>Signification</th>
+<th>Source</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$y_i$</td>
+<td>le <strong>forward du taux de swap</strong> $S_i$</td>
+<td>courbe</td>
+</tr>
+<tr>
+<td>$\sigma_{y,i}$</td>
+<td>volatilité du taux de swap forward</td>
+<td> <strong>implicite des SWAPTIONS</strong></td>
+</tr>
+<tr>
+<td>$F_i$</td>
+<td>le taux forward entre $t_i$ et $t_{i+1}$</td>
+<td>courbe</td>
+</tr>
+<tr>
+<td>$\sigma_{F,i}$</td>
+<td>sa volatilité</td>
+<td> <strong>implicite des CAPLETS</strong></td>
+</tr>
+<tr>
+<td>$\rho_i$</td>
+<td>la corrélation entre les deux</td>
+<td> <strong>estimée sur DONNÉES HISTORIQUES</strong></td>
+</tr>
+<tr>
+<td>$G_i(x)$</td>
+<td>le prix en $t_i$ d'une obligation <strong>de coupon $y_i$, de même vie et fréquence que le swap</strong></td>
+<td>construite</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p class="cal piege"> <strong>Les deux termes, à savoir justifier :</strong></p>
+<ul>
+<li>le <strong>premier</strong> est l'ajustement de convexité de l'exemple 29.2 (fiche 101) — <em>il repose sur l'hypothèse que <strong>le taux de swap $S_i$ ne conduit qu'à UN SEUL paiement en $t_i$, plutôt qu'à une ANNUITÉ de paiements</strong></em> ;</li>
+<li>le <strong>second</strong> est l'ajustement de timing du §29.2 — <em>pour le fait que <strong>le paiement calculé à partir de $S_i$ est fait en $t_{i+1}$, pas en $t_i$</strong></em>.</li>
+</ul>
+</blockquote>
+<details class="cor">
+<summary><strong>Exemple 32.3 — un CMS swap à 6 ans, entièrement recalculé</strong></summary><div class="in">
+
+<p><strong>Données.</strong> Swap CMS à <strong>6 ans</strong> : on <strong>reçoit le taux de swap à 5 ans</strong> et <strong>paie 5 % fixe</strong> sur <strong>100 millions</strong>. Échanges <strong>semestriels</strong> (sur le swap à 5 ans sous-jacent <strong>et</strong> sur le CMS lui-même). L'échange à une date est déterminé par le taux de swap de la date <strong>précédente</strong>. Structure <strong>plate à 5 %</strong> en composition semestrielle. <strong>Swaptions 5 ans à 15 %</strong> de volatilité implicite ; <strong>caplets de tenor 6 mois à 20 %</strong> ; corrélation <strong>0,7</strong>.</p>
+<p><em>Étape 1 — les paramètres.</em> $y_i=0{,}05$, $\sigma_{y,i}=0{,}15$, $\delta_i=0{,}5$, $F_i=0{,}05$, $\sigma_{F,i}=0{,}20$, $\rho_i=0{,}7$.</p>
+<p><em>Étape 2 — la fonction $G$</em>, pour une obligation à <strong>5 ans, coupon 5 % semestriel</strong> :
+$$G_i(x)=\sum_{i=1}^{10}\frac{2{,}5}{(1+x/2)^i}+\frac{100}{(1+x/2)^{10}}$$</p>
+<p><em>Étape 3 — les dérivées en $y_i=0{,}05$ :</em>
+$$G_i'(y_i)=\mathbf{-437{,}603}\qquad G_i''(y_i)=\mathbf{2\,261{,}23}$$
+<em>(contrôle : $G_i(0{,}05)=100$ — l'obligation cote <strong>au pair</strong>)</em></p>
+<p><em>Étape 4 — les deux termes de l'ajustement :</em>
+$$\text{convexité}=\tfrac12\times0{,}05^2\times0{,}15^2\times\frac{2\,261{,}23}{437{,}603}=\mathbf{0{,}0001453}\ \text{par an}$$
+$$\text{timing}=\frac{0{,}05\times0{,}5\times0{,}05\times0{,}7\times0{,}15\times0{,}20}{1+0{,}05\times0{,}5}=\mathbf{0{,}0000256}\ \text{par an}$$
+$$\boxed{\text{total}=0{,}0001453-0{,}0000256=\mathbf{0{,}0001197}\ \text{par an}=\mathbf{1{,}197\ \text{points de base par an}}}$$</p>
+<p><em>Étape 5 — l'application.</em> <em>Pour valoriser le CMS, <strong>le taux de swap à 5 ans dans 4 ans doit être supposé valoir 5,0479 % et non 5 %</strong></em>, et le flux net reçu au point <strong>4,5 ans</strong> vaut
+$$0{,}5\times0{,}000479\times100\,000\,000=\mathbf{23\,940\ \text{dollars}}$$</p>
+<p><em>Étape 6 — la valeur totale, en actualisant tous les flux :</em>
+$$\boxed{\mathbf{159\,811\ \text{dollars}}}$$</p>
+<blockquote>
+<p><strong>Noter les signes :</strong> <em>la convexité <strong>AJOUTE</strong> au taux (elle est <strong>positive</strong>), le timing <strong>RETRANCHE</strong>. La convexité <strong>domine largement</strong> ici (145 contre 26 en dixièmes de pb).</em></p>
+</blockquote>
+</div></details>
+
+<p><strong>Le CMT swap.</strong> <em>« Un <strong>constant maturity Treasury swap</strong> fonctionne comme un CMS <strong>sauf que le taux variable est LE RENDEMENT D'UNE OBLIGATION D'ÉTAT d'une durée spécifiée</strong>.  <strong>L'analyse est essentiellement la même, avec $S_i$ défini comme LE RENDEMENT AU PAIR d'une obligation d'État de la durée spécifiée.</strong> »</em></p>
+<h3>2.3 Les <em>differential swaps</em></h3>
+<blockquote>
+<p><em><strong>Un DIFFERENTIAL SWAP (ou DIFF SWAP) est un swap de taux où UN TAUX VARIABLE EST OBSERVÉ DANS UNE DEVISE ET APPLIQUÉ À UN PRINCIPAL DANS UNE AUTRE DEVISE.</strong></em></p>
+</blockquote>
+<p>$$\boxed{\text{Taux à supposer}=V_i+V_i\,\rho_i\,\sigma_{W,i}\,\sigma_{V,i}\,t_i}\;\text{(32.3)}$$</p>
+<table>
+<thead>
+<tr>
+<th>Symbole</th>
+<th>Signification</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$V_i$</td>
+<td>le <strong>taux forward</strong> entre $t_i$ et $t_{i+1}$ <strong>dans la devise Y</strong></td>
+</tr>
+<tr>
+<td>$W_i$</td>
+<td>le <strong>change forward</strong> pour une échéance $t_{i+1}$, en <strong>unités de Y par unité de X</strong></td>
+</tr>
+<tr>
+<td>$\sigma_{V,i}$, $\sigma_{W,i}$</td>
+<td>leurs volatilités</td>
+</tr>
+<tr>
+<td>$\rho_i$</td>
+<td>leur corrélation</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p class="cal piege"> <strong>C'est l'ajustement QUANTO de (29.6)</strong> <em>(fiche 101)</em>, dans sa forme <strong>linéarisée</strong>.</p>
+</blockquote>
+<details class="cor">
+<summary><strong>Exemple 32.4 — un diff swap USD/GBP à 3 ans</strong></summary><div class="in">
+
+<p><strong>Données.</strong> Taux zéro <strong>plats à 5 %</strong> en composition annuelle <strong>dans les deux pays</strong>. Swap à <strong>3 ans</strong>, paiements annuels : on <strong>REÇOIT le LIBOR USD 12 mois</strong> et <strong>PAIE le LIBOR sterling 12 mois</strong>,  <strong>les DEUX appliqués à un principal de 10 millions de LIVRES STERLING</strong>. Volatilité des forwards à 1 an aux États-Unis : <strong>20 %</strong> ; volatilité du change forward USD/sterling (dollars par livre) : <strong>12 %</strong> ; corrélation : <strong>0,4</strong>.</p>
+<p><em>Étape 1 — l'ajustement :</em>
+$$0{,}05+0{,}05\times0{,}4\times0{,}12\times0{,}2\times t_i=0{,}05+\mathbf{0{,}00048}\,t_i$$</p>
+<p><em>Étape 2 — les flux nets.</em>  <em>Le taux observé en $t_i$ est payé en $t_{i+1}$.</em> Le taux <strong>observé en 0</strong> est <strong>connu et vaut 5 %</strong> ; le décalage donne :</p>
+<table>
+<thead>
+<tr>
+<th>Paiement à</th>
+<th>Taux observé en</th>
+<th>Ajustement</th>
+<th>Flux net (livres)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1 an</td>
+<td>0</td>
+<td><strong>0</strong></td>
+<td><strong>0</strong></td>
+</tr>
+<tr>
+<td>2 ans</td>
+<td>1 an</td>
+<td>$0{,}00048$</td>
+<td><strong>4 800</strong></td>
+</tr>
+<tr>
+<td>3 ans</td>
+<td>2 ans</td>
+<td>$0{,}00096$</td>
+<td><strong>9 600</strong></td>
+</tr>
+</tbody></table>
+<p><em>Étape 3 — la valeur :</em>
+$$\frac{0}{1{,}05}+\frac{4\,800}{1{,}05^2}+\frac{9\,600}{1{,}05^3}=\boxed{\mathbf{12\,647\ \text{livres sterling}}}$$</p>
+<blockquote>
+<p><strong>La lecture :</strong> <em>la jambe sterling est <strong>exactement compensée</strong> par la structure ; <strong>toute la valeur vient de l'ajustement QUANTO</strong> sur la jambe américaine.</em></p>
+</blockquote>
+</div></details>
+
+<h2 data-prio="high">Concept 3 — Les swaps d'actions</h2>
+<blockquote>
+<p><em><strong>Dans un SWAP D'ACTIONS, une partie promet de payer LE RENDEMENT D'UN INDICE ACTIONS sur un principal notionnel, tandis que l'autre promet un rendement FIXE ou VARIABLE sur un principal notionnel.</strong></em></p>
+</blockquote>
+<p><em>L'utilité : <strong>permettre aux gérants de fonds d'AUGMENTER OU RÉDUIRE leur exposition à un indice SANS ACHETER NI VENDRE d'actions</strong>. C'est <strong>une façon commode d'empaqueter une série de forwards sur indice</strong>.</em></p>
+<p><strong>L'exemple (Business Snapshot 32.3).</strong> <em>Le rendement à 6 mois du <strong>S&amp;P 500</strong> contre le <strong>LIBOR 6 mois</strong>, principal <strong>100 millions de chaque côté</strong>, paiements <strong>semestriels</strong>. Le paiement actions vaut $100(I_1-I_0)/I_0$, où $I_1$ est le niveau de l'indice à la date de paiement et $I_0$ à la <strong>date de paiement immédiatement précédente</strong>.</em></p>
+<p class="cal piege"> <em>L'indice est habituellement <strong>un indice de RENDEMENT TOTAL</strong>, où <strong>les dividendes sont réinvestis</strong> dans les actions le composant.</em></p>
+<details class="cor">
+<summary><strong>Pourquoi le swap vaut zéro, et sa valeur entre deux dates</strong></summary><div class="in">
+
+<blockquote>
+<p class="cal piege"> <em><strong>« Pour un swap actions-contre-variable, LA VALEUR AU DÉBUT DE SA VIE EST ZÉRO. »</strong></em></p>
+</blockquote>
+<p><strong>La démonstration par réplication.</strong> <em>« Une institution financière peut organiser de <strong>répliquer SANS COÛT</strong> les flux d'un côté <strong>en EMPRUNTANT le principal à chaque date de paiement au LIBOR et en l'INVESTISSANT dans l'indice jusqu'à la date suivante, les dividendes étant réinvestis</strong>. »</em></p>
+<blockquote>
+<p class="cal piege"> <em><strong>« Un argument similaire montre que LE SWAP VAUT TOUJOURS ZÉRO IMMÉDIATEMENT APRÈS UNE DATE DE PAIEMENT. »</strong></em></p>
+</blockquote>
+<p><strong>Entre deux dates de paiement</strong>, il faut valoriser les deux flux de la prochaine date :</p>
+<table>
+<thead>
+<tr>
+<th>Jambe</th>
+<th>Valeur</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>LIBOR</strong></td>
+<td> <strong>fixée à la dernière réinitialisation</strong> — donc <strong>facile</strong> à valoriser</td>
+</tr>
+<tr>
+<td><strong>Actions</strong></td>
+<td>$\boxed{L\,\dfrac{E}{E_0}}$ où $L$ est le principal, $E$ <strong>la valeur courante</strong> de l'indice, $E_0$ sa valeur <strong>à la dernière date de paiement</strong></td>
+</tr>
+</tbody></table>
+</div></details>
+
+<h2 data-prio="must">Concept 4 — Les swaps à options intégrées</h2>
+<h3>4.1 L'<em>accrual swap</em></h3>
+<blockquote>
+<p><em><strong>Les ACCRUAL SWAPS sont des swaps où LES INTÉRÊTS D'UN CÔTÉ NE COURENT QUE LORSQUE LE TAUX DE RÉFÉRENCE VARIABLE EST DANS UNE CERTAINE FOURCHETTE.</strong></em></p>
+</blockquote>
+<p><em>Parfois la fourchette <strong>reste fixe</strong> toute la vie du swap ; parfois elle est <strong>réinitialisée périodiquement</strong>.</em></p>
+<details class="cor">
+<summary><strong>La décomposition en options binaires — l'idée maîtresse</strong></summary><div class="in">
+
+<p><strong>L'exemple simple.</strong> <em>Un taux fixe $Q$ contre le LIBOR 3 mois chaque trimestre,  <strong>le fixe ne courant QUE les jours où le LIBOR 3 mois est SOUS 8 % par an</strong>. Principal $L$.</em></p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Swap normal</th>
+<th>Accrual swap</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Paiement fixe</td>
+<td>$QL\dfrac{n_1}{n_2}$</td>
+<td>$QL\dfrac{n_3}{n_2}$</td>
+</tr>
+</tbody></table>
+<p>où $n_1$ = jours du trimestre précédent, $n_2$ = jours de l'année,  <strong>$n_3$ = jours du trimestre où le LIBOR était SOUS 8 %</strong>.</p>
+<blockquote>
+<p class="cal piege"> <em><strong>« Le payeur du fixe ÉCONOMISE $QL/n_2$ CHAQUE JOUR où le LIBOR 3 mois est AU-DESSUS de 8 %. SA POSITION EST DONC ÉQUIVALENTE À UN SWAP ORDINAIRE PLUS UNE SÉRIE D'OPTIONS BINAIRES — UNE POUR CHAQUE JOUR DE LA VIE DU SWAP. Les options binaires versent $QL/n_2$ quand le LIBOR 3 mois est au-dessus de 8 %. »</strong></em></p>
+</blockquote>
+<p><strong>La formule générale.</strong> Avec $R_K$ le taux de coupure, $\delta$ l'intervalle entre paiements, $t_i$ le temps jusqu'au jour $i$, $R_i$ le taux $\delta$-an ce jour-là, $F_i$ son forward et $\sigma_i$ sa volatilité <em>(estimée des volatilités SPOT de caplets)</em> :</p>
+<p><em>Étape 1 — la probabilité, sous l'hypothèse lognormale usuelle, que le LIBOR dépasse $R_K$ dans un monde forward risque-neutre par rapport à un zéro-coupon maturant en $t_i+\delta$ :</em>
+$$N(d_2)\qquad\text{avec}\qquad\boxed{d_2=\frac{\ln(F_i/R_K)-\sigma_i^2t_i/2}{\sigma_i\sqrt{t_i}}}$$</p>
+<p><em>Étape 2 — la correction de timing.</em>  *Le payoff est réalisé <strong>à la date de paiement du swap SUIVANT le jour $i$</strong>, notée $s_i$. La probabilité dans un monde forward risque-neutre par rapport à $P(t,s_i)$ est $N(d_2^\ast)$, <strong>où $d_2^\ast$ se calcule par la même formule mais avec un PETIT AJUSTEMENT DE TIMING à $F_i$</strong>, reflétant la différence entre $t_i+\delta$ et $s_i$.*</p>
+<p><em>Étape 3 — la valeur d'une option binaire :</em>
+$$\boxed{\frac{QL}{n_2}\,P(0,s_i)\,N(d_2^\ast)}$$</p>
+<p><em>Étape 4 — sommer sur <strong>CHAQUE JOUR</strong> de la vie du swap.</em></p>
+<p class="cal piege"> <em>« <strong>L'ajustement de timing (le passage de $d_2$ à $d_2^\ast$) est si PETIT qu'en pratique il est fréquemment IGNORÉ.</strong> »</em></p>
+<p><em>(Convention : <strong>si un jour est férié, le taux applicable est celui du jour ouvré immédiatement précédent</strong>.)</em></p>
+</div></details>
+
+<h3>4.2 Le swap annulable</h3>
+<blockquote>
+<p><em><strong>Un CANCELABLE SWAP est un swap de taux vanille où UN CÔTÉ A L'OPTION DE TERMINER à une ou plusieurs dates de paiement.</strong></em></p>
+</blockquote>
+<p><strong>Le principe de décomposition.</strong> <em>« <strong>Terminer un swap est la même chose qu'entrer dans le swap OPPOSÉ.</strong> »</em></p>
+<table>
+<thead>
+<tr>
+<th>Qui a l'option</th>
+<th>Décomposition</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Microsoft</strong> peut annuler</td>
+<td>swap ordinaire <strong>+ position LONGUE</strong> dans une option d'entrer dans le swap opposé</td>
+</tr>
+<tr>
+<td><strong>Goldman Sachs</strong> peut annuler</td>
+<td>Microsoft a un swap ordinaire <strong>+ position COURTE</strong> dans cette option</td>
+</tr>
+</tbody></table>
+<details class="cor">
+<summary><strong>Les deux cas : une seule date ou plusieurs</strong></summary><div class="in">
+
+<p><strong>Cas 1 — une SEULE date de terminaison ⇒ une SWAPTION EUROPÉENNE.</strong></p>
+<p><em>Exemple : un swap de <strong>10 ans</strong> où Microsoft <strong>reçoit 6 %</strong> et <strong>paie le LIBOR</strong>, avec l'option de terminer <strong>au bout de 6 ans</strong>.</em></p>
+<p>$$\boxed{\text{= swap 10 ans (recevoir 6 \%) + CALL européen à 6 ans sur un swap 4 ans (payer 6 \%, recevoir LIBOR)}}$$</p>
+<p class="cal piege"> <em><strong>C'est une swaption européenne $6\times4$</strong></em> — valorisée par le modèle de marché standard du chapitre 28 (fiche 100).</p>
+<p><strong>Cas 2 — PLUSIEURS dates ⇒ une SWAPTION BERMUDIENNE.</strong></p>
+<p><em>Exemple : un swap de <strong>5 ans</strong>, paiements <strong>semestriels</strong>, Microsoft <strong>reçoit 6 %</strong> et <strong>paie le LIBOR</strong> ;  <strong>la CONTREPARTIE</strong> a l'option de terminer <strong>à toute date de paiement entre l'année 2 et l'année 5</strong>.</em></p>
+<p>$$\boxed{\text{= swap ordinaire + position COURTE dans une swaption BERMUDIENNE}}$$</p>
+<p><em>La swaption bermudienne est une option d'entrer dans un swap maturant à 5 ans où <strong>6 % est reçu et le LIBOR payé</strong>, exerçable <strong>à toute date de paiement entre l'année 2 et l'année 5</strong>.</em> Valorisation : chapitres <strong>30 et 31</strong> (fiches 102-103).</p>
+</div></details>
+
+<details class="cor">
+<summary><strong>Les swaps à capitalisation annulables — les astuces de valorisation</strong></summary><div class="in">
+
+<p><em>Sur terminaison : <strong>le payeur variable paie la valeur CAPITALISÉE des montants variables jusqu'à la terminaison</strong>, et le payeur fixe <strong>celle des paiements fixes</strong>.</em></p>
+<p><strong>Cas A — le taux variable est le LIBOR, capitalisé au LIBOR.</strong></p>
+<table>
+<thead>
+<tr>
+<th>Étape</th>
+<th>Contenu</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td> <strong>Supposer que le PRINCIPAL est payé des DEUX côtés à la fin de vie du swap.</strong> <em>C'est le passage de la table 7.1 à la table 7.2 pour un swap vanille (fiche 80).</em> <strong>Cela ne change pas la valeur</strong> et garantit que <strong>la valeur de la jambe variable ÉGALE TOUJOURS LE NOTIONNEL à une date de paiement</strong></td>
+</tr>
+<tr>
+<td>2</td>
+<td> <em><strong>Pour prendre la décision d'annulation, IL SUFFIT DONC DE REGARDER LA JAMBE FIXE.</strong></em></td>
+</tr>
+<tr>
+<td>3</td>
+<td>Construire un <strong>arbre de taux</strong> (chapitre 30), le remonter en valorisant la jambe fixe</td>
+</tr>
+<tr>
+<td>4</td>
+<td>À chaque nœud d'annulation possible,  <strong>annuler revient à mettre la jambe fixe AU PAIR</strong></td>
+</tr>
+<tr>
+<td>5</td>
+<td>Si l'on <strong>paie fixe et reçoit variable</strong> : <strong>MINIMISER</strong> la valeur de la jambe fixe. Si l'on <strong>reçoit fixe</strong> : <strong>MAXIMISER</strong>-la</td>
+</tr>
+</tbody></table>
+<p><strong>Cas B — LIBOR plus un spread, capitalisé au LIBOR.</strong> <em> <strong>Les flux correspondant au spread peuvent être RETRANCHÉS de la jambe FIXE au lieu d'être ajoutés à la variable.</strong> L'option se valorise ensuite comme dans le cas A.</em></p>
+<p><strong>Cas C — capitalisation au LIBOR plus un spread.</strong> L'approche <strong>approchée</strong> :</p>
+<table>
+<thead>
+<tr>
+<th>Étape</th>
+<th>Contenu</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>1</strong></td>
+<td>valeur de la jambe variable à chaque date d'annulation <strong>en supposant les forwards réalisés</strong></td>
+</tr>
+<tr>
+<td><strong>2</strong></td>
+<td>valeur de la jambe variable <strong>en supposant taux LIBOR capitalisé au LIBOR</strong></td>
+</tr>
+<tr>
+<td><strong>3</strong></td>
+<td>définir l'excès de (1) sur (2) comme <strong>« la valeur des spreads »</strong></td>
+</tr>
+<tr>
+<td><strong>4</strong></td>
+<td>traiter l'option comme au cas A,  <strong>en RETRANCHANT la valeur des spreads des valeurs calculées pour la jambe fixe</strong></td>
+</tr>
+</tbody></table>
+<p class="cal piege"> <em>« Cette approche <strong>n'est pas parfaitement exacte</strong>, en ce qu'elle suppose que <strong>la décision d'exercice n'est PAS influencée par le fait que les paiements futurs sont capitalisés à un taux différent du LIBOR</strong>. »</em></p>
+</div></details>
+
+<h2 data-prio="mid">Concept 5 — Les autres swaps</h2>
+<table>
+<thead>
+<tr>
+<th>Swap</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><em><strong>Index amortizing rate swap</strong></em> <em>(ou</em> indexed principal swap*)*</td>
+<td><em>très populaire aux <strong>États-Unis au milieu des années 1990</strong>.  <strong>Le principal se réduit d'une façon DÉPENDANT DU NIVEAU DES TAUX : plus le taux est bas, plus la réduction est grande.</strong> La jambe fixe était <strong>conçue à l'origine pour reproduire approximativement le rendement d'un MBS d'agence après prise en compte des options de prépaiement</strong></em> (fiche 103)</td>
+</tr>
+<tr>
+<td><strong>Swap de matières premières</strong></td>
+<td>*une entreprise consommant <strong>100 000 barils de pétrole par an</strong> peut convenir de payer <strong>8 millions de dollars par an pendant 10 ans</strong> et de recevoir $100\,000\,S$, où $S$ est le prix du baril.  <strong>Cela verrouille son coût du pétrole à 80 dollars le baril.</strong> Un producteur ferait l'échange <strong>inverse</strong></td>
+</tr>
+<tr>
+<td><strong>Renvois</strong></td>
+<td><em>les <strong>asset swaps</strong> au chapitre 23 (fiche 95), les <strong>total return swaps</strong> et <strong>CDS</strong> au chapitre 24 (fiche 96), les <strong>swaps de volatilité et de variance</strong> au chapitre 25 (fiche 97)</em></td>
+</tr>
+</tbody></table>
+<details class="cor">
+<summary><strong>Business Snapshot 32.4 — l'affaire Procter &amp; Gamble contre Bankers Trust</strong></summary><div class="in">
+
+<p class="cal piege"><em> « <strong>Certains swaps ont des payoffs calculés de façons TOUT À FAIT BIZARRES.</strong> »</em></p>
+<p><strong>Le contrat « 5/30 »</strong>, conclu entre <strong>Bankers Trust (BT)</strong> et <strong>Procter &amp; Gamble (P&amp;G)</strong> le <strong>2 novembre 1993</strong> : swap de <strong>5 ans</strong>, paiements <strong>semestriels</strong>, notionnel <strong>200 millions de dollars</strong>.</p>
+<table>
+<thead>
+<tr>
+<th>Qui</th>
+<th>Paie</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>BT</strong></td>
+<td><strong>5,30 % par an</strong> à P&amp;G</td>
+</tr>
+<tr>
+<td><strong>P&amp;G</strong></td>
+<td><strong>le taux CP 30 jours MOYEN moins 75 points de base, PLUS UN SPREAD</strong></td>
+</tr>
+</tbody></table>
+<p><em>Le taux CP moyen était calculé <strong>en observant le taux CP 30 jours CHAQUE JOUR de la période d'accroissement précédente et en moyennant</strong>.</em></p>
+<p><strong>Le spread</strong>, nul pour le premier paiement (2 mai 1994), valait ensuite :</p>
+<p>$$\boxed{\max\left[0,\ \frac{98{,}5\times\dfrac{\text{CMT 5 ans}\,\%}{5{,}78\,\%}-(\text{prix du TSY 30 ans})}{100}\right]}$$</p>
+<p><em>où <strong>CMT 5 ans</strong> est le rendement du Trésor à maturité constante 5 ans (rapporté par la Réserve fédérale) et <strong>le prix du TSY 30 ans</strong> est le milieu des prix cash bid/offer de l'obligation du Trésor 6,25 % maturant en août 2023.</em></p>
+<blockquote>
+<p class="cal piege"> <em><strong>« Noter que le spread calculé par la formule est un TAUX D'INTÉRÊT DÉCIMAL. Il n'est PAS mesuré en points de base. SI LA FORMULE DONNE 0,1 ET QUE LE TAUX CP EST 6 %, LE TAUX PAYÉ PAR P&amp;G EST 15,25 %. »</strong></em></p>
+</blockquote>
+<p><strong>Le dénouement.</strong> <em>« P&amp;G espérait que le spread serait NUL et que l'accord lui permettrait d'échanger un financement fixe à 5,30 % contre un financement à <strong>75 points de base SOUS le taux CP</strong>.  <strong>EN FAIT, LES TAUX ONT FORTEMENT MONTÉ DÉBUT 1994, LES PRIX D'OBLIGATIONS ONT CHUTÉ, ET LE SWAP S'EST RÉVÉLÉ TRÈS, TRÈS COÛTEUX.</strong> »</em></p>
+<p><em>(Les détails sont dans le domaine public car l'affaire a fait l'objet d'un <strong>contentieux</strong>.)</em></p>
+</div></details>
+
+<h2>Comment reconnaître le type d'exercice</h2>
+<table>
+<thead>
+<tr>
+<th>Indice dans l'énoncé</th>
+<th>Traitement</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Principal variable, fréquences différentes, taux CP</td>
+<td> <strong>règle simple</strong> — mais actualiser <strong>au LIBOR</strong></td>
+</tr>
+<tr>
+<td>« les intérêts sont capitalisés jusqu'à la fin »</td>
+<td><strong>swap à capitalisation</strong> : construire les deux cumuls, actualiser la différence</td>
+</tr>
+<tr>
+<td>« le taux payé égale le taux observé <strong>ce jour même</strong> »</td>
+<td> <strong>LIBOR-in-arrears</strong> : convexité (32.1)</td>
+</tr>
+<tr>
+<td>« le taux variable est le <strong>taux de swap à $n$ ans</strong> »</td>
+<td><strong>CMS</strong> : les <strong>DEUX</strong> ajustements (32.2)</td>
+</tr>
+<tr>
+<td>« le rendement d'une obligation d'État à $n$ ans »</td>
+<td><strong>CMT</strong> : idem avec le <strong>rendement au pair</strong></td>
+</tr>
+<tr>
+<td>Taux d'une devise appliqué au principal d'une autre</td>
+<td> <em><strong>diff swap</strong></em> : quanto (32.3)</td>
+</tr>
+<tr>
+<td>« le rendement d'un indice actions »</td>
+<td><strong>swap d'actions</strong> : vaut <strong>zéro</strong> aux dates de paiement</td>
+</tr>
+<tr>
+<td>« n'accrue que si le taux est dans une fourchette »</td>
+<td> <em><strong>accrual swap</strong></em> : swap + <strong>options binaires quotidiennes</strong></td>
+</tr>
+<tr>
+<td>« une partie peut terminer »</td>
+<td> <strong>cancelable</strong> : swap + <strong>swaption</strong> (européenne ou bermudienne)</td>
+</tr>
+<tr>
+<td>Le principal se réduit selon les taux</td>
+<td><em><strong>index amortizing rate swap</strong></em></td>
+</tr>
+<tr>
+<td>« verrouiller le prix du pétrole »</td>
+<td><strong>swap de matières premières</strong></td>
+</tr>
+</tbody></table>
+<h2>Comment résoudre ce type d'exercice</h2>
+<p><strong>A — Un swap à capitalisation.</strong></p>
+<ol>
+<li>Construire la <strong>jambe fixe</strong> : capitaliser au taux fixe de capitalisation, ajouter l'intérêt chaque année.</li>
+<li>Construire la <strong>jambe variable</strong> :  <strong>poser tous les taux futurs égaux aux forwards</strong>, capitaliser au taux variable de capitalisation.</li>
+<li>Différence des deux montants terminaux.</li>
+<li>Actualiser <strong>à la date terminale</strong> avec la courbe zéro.</li>
+</ol>
+<p><strong>B — Un swap avec ajustement.</strong></p>
+<ol>
+<li>Identifier <strong>laquelle des trois anomalies</strong> est présente : paiement <strong>anticipé</strong> (convexité), <strong>retardé</strong> (timing), <strong>devise croisée</strong> (quanto).</li>
+<li>Calculer l'ajustement,  <strong>proportionnel à $t_i$</strong> dans les trois cas.</li>
+<li>Construire les <strong>taux ajustés</strong> date par date.</li>
+<li>Calculer les <strong>flux nets</strong> contre la jambe fixe.</li>
+<li>Actualiser.  <strong>Contrôle : si le swap serait nul en version ordinaire, toute la valeur vient de l'ajustement.</strong></li>
+</ol>
+<p><strong>C — Un swap à option intégrée.</strong></p>
+<ol>
+<li><strong>Décomposer</strong> : swap ordinaire <strong>+</strong> (ou $-$) l'option.</li>
+<li>Valoriser le swap ordinaire par la <strong>règle simple</strong>.</li>
+<li>Identifier l'option : <strong>binaires quotidiennes</strong> (accrual) ou <strong>swaption</strong> (cancelable).</li>
+<li>Valoriser l'option avec l'outil approprié : Black pour les binaires et l'européenne, <strong>arbre</strong> ou <strong>LMM</strong> pour la bermudienne.</li>
+<li><strong>Additionner</strong> avec le bon signe.</li>
+</ol>
+<h2 data-prio="must">Common mistakes</h2>
+<table>
+<thead>
+<tr>
+<th>Erreur</th>
+<th>Correction</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Croire que la règle simple marche toujours</td>
+<td> <strong>trois familles d'exceptions</strong></td>
+</tr>
+<tr>
+<td>Actualiser des flux CP à la courbe CP</td>
+<td> les flux se <strong>CALCULENT</strong> avec la courbe CP mais s'<strong>ACTUALISENT au LIBOR</strong></td>
+</tr>
+<tr>
+<td>Croire qu'un in-arrears vaut zéro comme un swap ordinaire</td>
+<td> ici $-144\,500$ dollars sur 100 M</td>
+</tr>
+<tr>
+<td>Oublier un des deux termes du CMS</td>
+<td> il y a <strong>CONVEXITÉ ET TIMING</strong></td>
+</tr>
+<tr>
+<td>Se tromper de source de volatilité pour le CMS</td>
+<td>$\sigma_y$ des <strong>SWAPTIONS</strong>, $\sigma_F$ des <strong>CAPLETS</strong>, $\rho$ de l'<strong>historique</strong></td>
+</tr>
+<tr>
+<td>Croire que le taux de swap produit une annuité dans (32.2)</td>
+<td> l'ajustement suppose <strong>UN SEUL paiement</strong></td>
+</tr>
+<tr>
+<td>Oublier le décalage d'observation dans un <em>diff swap</em></td>
+<td>le <strong>premier</strong> flux net est <strong>NUL</strong> (le taux est déjà connu)</td>
+</tr>
+<tr>
+<td>Croire qu'un swap d'actions a toujours une valeur</td>
+<td> il vaut <strong>zéro à l'initiation ET juste après chaque paiement</strong></td>
+</tr>
+<tr>
+<td>Valoriser la jambe actions par un modèle</td>
+<td>c'est simplement $L\,E/E_0$</td>
+</tr>
+<tr>
+<td>Traiter un <em>accrual swap</em> comme un swap ordinaire</td>
+<td> c'est un swap <strong>plus un portefeuille d'options binaires — une par JOUR</strong></td>
+</tr>
+<tr>
+<td>Oublier la convention des jours fériés</td>
+<td>le taux est celui du <strong>jour ouvré PRÉCÉDENT</strong></td>
+</tr>
+<tr>
+<td>Croire qu'annuler ≠ entrer dans le swap opposé</td>
+<td> <strong>c'est exactement la même chose</strong></td>
+</tr>
+<tr>
+<td>Confondre swaption européenne et bermudienne</td>
+<td><strong>une</strong> date d'annulation → européenne ; <strong>plusieurs</strong> → bermudienne</td>
+</tr>
+<tr>
+<td>Se tromper de sens de l'optimisation d'annulation</td>
+<td><strong>payer fixe → MINIMISER</strong> ; <strong>recevoir fixe → MAXIMISER</strong> la jambe fixe</td>
+</tr>
+<tr>
+<td>Ajouter le spread à la jambe variable dans un compounding annulable</td>
+<td> le <strong>RETRANCHER de la jambe FIXE</strong> simplifie tout</td>
+</tr>
+<tr>
+<td>Lire le spread P&amp;G en points de base</td>
+<td> c'est un <strong>taux DÉCIMAL</strong> — 0,1 signifie <strong>10 %</strong></td>
+</tr>
+</tbody></table>
+<h2>Ultimate Review</h2>
+<table>
+<thead>
+<tr>
+<th>Élément</th>
+<th>Formule / valeur</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>La règle standard</strong></td>
+<td><strong>« supposer les taux forward réalisés »</strong>, actualiser au <strong>LIBOR</strong></td>
+</tr>
+<tr>
+<td><strong>Step-up swap</strong></td>
+<td>principal <strong>croissant</strong></td>
+</tr>
+<tr>
+<td><strong>Amortizing swap</strong></td>
+<td>principal <strong>décroissant</strong></td>
+</tr>
+<tr>
+<td><strong>Principaux et fréquences différents</strong></td>
+<td> <strong>n'affectent PAS</strong> la méthodologie</td>
+</tr>
+<tr>
+<td><strong>Basis swap</strong></td>
+<td>un taux <strong>variable</strong> contre un <strong>autre</strong> taux variable</td>
+</tr>
+<tr>
+<td><strong>Sa valorisation</strong></td>
+<td>flux calculés avec <strong>l'autre courbe</strong>, actualisés <strong>au LIBOR</strong></td>
+</tr>
+<tr>
+<td><strong>Swap à capitalisation</strong></td>
+<td><strong>une seule</strong> date de paiement, à la <strong>fin</strong></td>
+</tr>
+<tr>
+<td><strong>Exemple 32.1 : jambe fixe</strong></td>
+<td>$4\to8{,}156\to\mathbf{12{,}474}$ M</td>
+</tr>
+<tr>
+<td><strong>Sa jambe variable</strong></td>
+<td>$5\to10{,}24\to\mathbf{15{,}731}$ M</td>
+</tr>
+<tr>
+<td><strong>Sa valeur</strong></td>
+<td>$\dfrac{3{,}257}{1{,}05^3}=\mathbf{2{,}814}$ M</td>
+</tr>
+<tr>
+<td><strong>Swaps de devises</strong></td>
+<td>fixe/fixe · <strong>floating/floating</strong> · <strong>cross-currency</strong></td>
+</tr>
+<tr>
+<td><strong>Leur actualisation</strong></td>
+<td> <strong>chaque devise à SA courbe</strong>, puis conversion au <strong>change courant</strong></td>
+</tr>
+<tr>
+<td><strong>L'ajustement de marché</strong></td>
+<td>actualiser le JPY à <strong>LIBOR JPY $-$ 20 pb</strong> si c'est le spread coté</td>
+</tr>
+<tr>
+<td><strong>LIBOR-in-arrears</strong></td>
+<td>le taux <strong>observé</strong> est payé <strong>à cette date même</strong></td>
+</tr>
+<tr>
+<td><strong>Son ajustement</strong></td>
+<td>$F_i+\dfrac{F_i^2\sigma_i^2\delta_it_i}{1+F_i\delta_i}$ — <strong>CONVEXITÉ</strong></td>
+</tr>
+<tr>
+<td><strong>Exemple 32.2</strong></td>
+<td>ajustement $0{,}000115\,t$, taux 5,0115 % à 5,0575 %, valeur $\mathbf{-144\,514}$ dollars</td>
+</tr>
+<tr>
+<td><strong>CMS</strong></td>
+<td>le taux variable est <strong>le TAUX DE SWAP</strong> d'une durée donnée</td>
+</tr>
+<tr>
+<td><strong>Son ajustement</strong></td>
+<td> <strong>DEUX termes : convexité ET timing</strong></td>
+</tr>
+<tr>
+<td><strong>$\sigma_y$ vient de</strong></td>
+<td>les <strong>SWAPTIONS</strong></td>
+</tr>
+<tr>
+<td><strong>$\sigma_F$ vient de</strong></td>
+<td>les <strong>CAPLETS</strong></td>
+</tr>
+<tr>
+<td><strong>$\rho$ vient de</strong></td>
+<td>les <strong>données HISTORIQUES</strong></td>
+</tr>
+<tr>
+<td><strong>Exemple 32.3</strong></td>
+<td>$G'=-437{,}603$, $G''=2\,261{,}23$</td>
+</tr>
+<tr>
+<td><strong>Ses deux termes</strong></td>
+<td>convexité $\mathbf{+0{,}0001453}$ · timing $\mathbf{-0{,}0000256}$</td>
+</tr>
+<tr>
+<td><strong>Son total</strong></td>
+<td>$\mathbf{1{,}197}$ <strong>points de base par an</strong></td>
+</tr>
+<tr>
+<td><strong>Son taux à 4 ans</strong></td>
+<td><strong>5,0479 %</strong></td>
+</tr>
+<tr>
+<td><strong>Sa valeur</strong></td>
+<td><strong>159 811 dollars</strong></td>
+</tr>
+<tr>
+<td><strong>CMT</strong></td>
+<td>comme CMS, avec <strong>le RENDEMENT AU PAIR d'une obligation d'État</strong></td>
+</tr>
+<tr>
+<td><strong>Diff swap</strong></td>
+<td>taux d'une devise sur un principal <strong>d'une autre</strong></td>
+</tr>
+<tr>
+<td><strong>Son ajustement</strong></td>
+<td>$V_i+V_i\rho_i\sigma_{W,i}\sigma_{V,i}t_i$ — <strong>QUANTO</strong></td>
+</tr>
+<tr>
+<td><strong>Exemple 32.4</strong></td>
+<td>ajustement $0{,}00048\,t$ ; flux <strong>0 / 4 800 / 9 600</strong> ; valeur <strong>12 647 £</strong></td>
+</tr>
+<tr>
+<td><strong>Swap d'actions</strong></td>
+<td>rendement d'un <strong>indice de RENDEMENT TOTAL</strong> contre fixe ou variable</td>
+</tr>
+<tr>
+<td><strong>Son usage</strong></td>
+<td>changer d'exposition <strong>sans acheter ni vendre</strong> d'actions</td>
+</tr>
+<tr>
+<td><strong>Sa valeur à l'initiation</strong></td>
+<td> <strong>ZÉRO</strong></td>
+</tr>
+<tr>
+<td><strong>Juste après un paiement</strong></td>
+<td> <strong>ZÉRO</strong> aussi</td>
+</tr>
+<tr>
+<td><strong>L'argument</strong></td>
+<td><strong>réplication sans coût</strong> : emprunter au LIBOR, investir dans l'indice</td>
+</tr>
+<tr>
+<td><strong>Sa jambe actions entre deux dates</strong></td>
+<td>$L\,E/E_0$</td>
+</tr>
+<tr>
+<td><strong>Accrual swap</strong></td>
+<td>les intérêts ne courent <strong>que dans une fourchette</strong></td>
+</tr>
+<tr>
+<td><strong>Sa décomposition</strong></td>
+<td>swap ordinaire <strong>+ une option BINAIRE PAR JOUR</strong></td>
+</tr>
+<tr>
+<td><strong>Ce que verse chaque binaire</strong></td>
+<td>$QL/n_2$</td>
+</tr>
+<tr>
+<td><strong>Sa formule</strong></td>
+<td>$\dfrac{QL}{n_2}P(0,s_i)N(d_2^\ast)$</td>
+</tr>
+<tr>
+<td><strong>L'ajustement de timing</strong></td>
+<td> <strong>si petit qu'il est fréquemment IGNORÉ</strong></td>
+</tr>
+<tr>
+<td><strong>Cancelable swap</strong></td>
+<td>un côté peut <strong>terminer</strong></td>
+</tr>
+<tr>
+<td><strong>Le principe</strong></td>
+<td>terminer $=$ <strong>entrer dans le swap OPPOSÉ</strong></td>
+</tr>
+<tr>
+<td><strong>Une seule date</strong></td>
+<td>swap $+$ <strong>swaption EUROPÉENNE</strong> ($6\times4$ dans l'exemple)</td>
+</tr>
+<tr>
+<td><strong>Plusieurs dates</strong></td>
+<td>swap $+$ <strong>swaption BERMUDIENNE</strong></td>
+</tr>
+<tr>
+<td><strong>Compounding annulable, astuce 1</strong></td>
+<td><strong>ajouter le principal des deux côtés</strong> → la jambe variable vaut <strong>le pair</strong></td>
+</tr>
+<tr>
+<td><strong>Sa conséquence</strong></td>
+<td> <strong>il suffit de regarder la JAMBE FIXE</strong></td>
+</tr>
+<tr>
+<td><strong>La règle d'optimisation</strong></td>
+<td>payer fixe → <strong>minimiser</strong> ; recevoir fixe → <strong>maximiser</strong></td>
+</tr>
+<tr>
+<td><strong>Le spread</strong></td>
+<td>le <strong>retrancher de la jambe FIXE</strong></td>
+</tr>
+<tr>
+<td><strong>Index amortizing rate swap</strong></td>
+<td>le principal se réduit <strong>quand les taux baissent</strong></td>
+</tr>
+<tr>
+<td><strong>Son origine</strong></td>
+<td>reproduire le rendement d'un <strong>MBS d'agence</strong></td>
+</tr>
+<tr>
+<td><strong>Swap de matières premières</strong></td>
+<td>8 M par an contre $100\,000\,S$ → <strong>80 dollars le baril verrouillés</strong></td>
+</tr>
+<tr>
+<td><strong>L'affaire P&amp;G</strong></td>
+<td>swap <strong>5/30</strong>, 2 nov. 1993, <strong>200 M</strong>, BT paie <strong>5,30 %</strong></td>
+</tr>
+<tr>
+<td><strong>Le piège</strong></td>
+<td> <strong>le spread est un taux DÉCIMAL</strong>, pas des points de base</td>
+</tr>
+<tr>
+<td><strong>Le dénouement</strong></td>
+<td> <strong>les taux ont monté début 1994 : très, très coûteux</strong></td>
+</tr>
+</tbody></table>
+<div class="rec"><h2>Active Recall</h2><ol>
+<li>Écrire les deux étapes de la règle standard de valorisation d'un swap.</li>
+<li>Citer les trois familles de swaps non standard et leur traitement.</li>
+<li>Définir <em>step-up</em> et <em>amortizing swap</em>, avec leur usage type.</li>
+<li>Que se passe-t-il si les principaux et les fréquences diffèrent ?</li>
+<li>Définir un <em>basis swap</em> et donner un exemple.</li>
+<li>Quelle courbe sert à calculer les flux d'un <em>basis swap</em> ? Laquelle à les actualiser ?</li>
+<li>Décrire un swap à capitalisation. Combien de dates de paiement ?</li>
+<li>Pourquoi la règle simple se justifie-t-elle côté variable ?</li>
+<li>Quand l'approche est-elle exacte, et quand est-elle approchée ?</li>
+<li>Refaire l'exemple 32.1 : les deux jambes puis la valeur.</li>
+<li>Citer les trois types de swaps de devises.</li>
+<li>Comment actualise-t-on chaque jambe ? Comment les combine-t-on ?</li>
+<li>Décrire l'ajustement de marché des taux d'actualisation et sa justification.</li>
+<li>Qu'est-ce qu'un swap LIBOR-in-arrears ? En quoi diffère-t-il du vanille ?</li>
+<li>Écrire (32.1) et dire de quel ajustement il s'agit.</li>
+<li>Refaire l'exemple 32.2 : l'ajustement, les cinq taux, la valeur.</li>
+<li>Pourquoi le swap ne vaut-il pas zéro ?</li>
+<li>Définir un CMS swap. Quel décalage y a-t-il habituellement ?</li>
+<li>Écrire (32.2) et nommer ses deux termes.</li>
+<li>D'où viennent $\sigma_y$, $\sigma_F$ et $\rho$ respectivement ?</li>
+<li>Que représente $G_i(x)$ ? Quel coupon porte-t-elle ?</li>
+<li>Justifier chacun des deux termes de l'ajustement.</li>
+<li>Refaire l'exemple 32.3 : $G'$, $G''$, les deux termes, le total.</li>
+<li>Quel taux suppose-t-on pour le swap à 5 ans dans 4 ans ? Quel flux à 4,5 ans ?</li>
+<li>Qu'est-ce qu'un CMT swap ? Comment l'analyse-t-on ?</li>
+<li>Définir un <em>diff swap</em>.</li>
+<li>Écrire (32.3) et définir chaque symbole.</li>
+<li>Refaire l'exemple 32.4 : l'ajustement, les trois flux, la valeur.</li>
+<li>Pourquoi le premier flux net est-il nul ?</li>
+<li>Décrire un swap d'actions et son utilité.</li>
+<li>Quel type d'indice utilise-t-on habituellement ?</li>
+<li>Pourquoi le swap vaut-il zéro à l'initiation ? Détailler la réplication.</li>
+<li>Que vaut-il juste après une date de paiement ?</li>
+<li>Comment valorise-t-on chaque jambe entre deux dates ?</li>
+<li>Définir un <em>accrual swap</em>.</li>
+<li>Écrire le paiement fixe d'un swap normal puis d'un <em>accrual swap</em>.</li>
+<li>Ce que le payeur du fixe économise, et l'équivalence qui en découle.</li>
+<li>Écrire $d_2$ et expliquer le passage à $d_2^\ast$.</li>
+<li>Écrire la valeur d'une option binaire quotidienne.</li>
+<li>L'ajustement de timing est-il important en pratique ?</li>
+<li>Quelle est la convention pour les jours fériés ?</li>
+<li>Qu'est-ce qu'un swap annulable ? Quel est le principe de décomposition ?</li>
+<li>Détailler le cas d'une seule date d'annulation. Quelle swaption obtient-on ?</li>
+<li>Détailler le cas de plusieurs dates.</li>
+<li>Que paie chaque côté à la terminaison d'un compounding annulable ?</li>
+<li>Quelle astuce simplifie le cas LIBOR capitalisé au LIBOR ?</li>
+<li>Pourquoi suffit-il alors de regarder la jambe fixe ?</li>
+<li>Que fait-on à chaque nœud d'annulation possible ?</li>
+<li>Quelle est la règle d'optimisation selon le sens du swap ?</li>
+<li>Comment traiter un spread additif ? Une capitalisation à LIBOR plus spread ?</li>
+<li>Quelle est la limite de cette approche approchée ?</li>
+<li>Qu'est-ce qu'un <em>index amortizing rate swap</em> ? Quelle était son origine ?</li>
+<li>Décrire un swap de matières premières et l'effet obtenu.</li>
+<li>Décrire le swap 5/30 de P&amp;G : les dates, le notionnel, les deux jambes.</li>
+<li>Écrire la formule du spread et le piège d'unité.</li>
+<li>Qu'espérait P&amp;G, et que s'est-il passé ?</li>
+</ol></div>
+
+<h2>Flashcards</h2>
+<table>
+<thead>
+<tr>
+<th>Question</th>
+<th>Réponse</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>La règle standard ?</td>
+<td><strong>« Supposer les taux forward réalisés »</strong></td>
+</tr>
+<tr>
+<td>Où actualise-t-on ?</td>
+<td>À la courbe <strong>LIBOR/swap</strong></td>
+</tr>
+<tr>
+<td>Les trois familles ?</td>
+<td><strong>Règle simple</strong> · <strong>ajustements</strong> · <strong>options intégrées</strong></td>
+</tr>
+<tr>
+<td>Step-up swap ?</td>
+<td>Principal <strong>CROISSANT</strong></td>
+</tr>
+<tr>
+<td>Amortizing swap ?</td>
+<td>Principal <strong>DÉCROISSANT</strong></td>
+</tr>
+<tr>
+<td>Usage du step-up ?</td>
+<td>Une entreprise de <strong>construction</strong></td>
+</tr>
+<tr>
+<td>Principaux différents ?</td>
+<td> <strong>N'affecte PAS</strong> la méthode</td>
+</tr>
+<tr>
+<td>Basis swap ?</td>
+<td>Un <strong>variable</strong> contre un <strong>autre variable</strong></td>
+</tr>
+<tr>
+<td>Exemple ?</td>
+<td><strong>CP 3 mois + 10 pb</strong> contre <strong>LIBOR 3 mois</strong></td>
+</tr>
+<tr>
+<td>Son usage ?</td>
+<td>Actifs et passifs sur des <strong>références différentes</strong></td>
+</tr>
+<tr>
+<td>Courbe de calcul des flux ?</td>
+<td>Celle du <strong>taux de référence</strong></td>
+</tr>
+<tr>
+<td>Courbe d'actualisation ?</td>
+<td> <strong>LIBOR</strong></td>
+</tr>
+<tr>
+<td>Swap à capitalisation ?</td>
+<td><strong>UNE seule</strong> date de paiement, à la <strong>fin</strong></td>
+</tr>
+<tr>
+<td>Ce qui remplace le paiement ?</td>
+<td>Les intérêts sont <strong>CAPITALISÉS</strong></td>
+</tr>
+<tr>
+<td>Justification côté variable ?</td>
+<td>Une série de <strong>FRA</strong></td>
+</tr>
+<tr>
+<td>Quand est-ce exact ?</td>
+<td>Si le spread de capitalisation est <strong>nul</strong></td>
+</tr>
+<tr>
+<td>Ex. 32.1 : jambe fixe ?</td>
+<td><strong>12,474 M</strong></td>
+</tr>
+<tr>
+<td>Ex. 32.1 : jambe variable ?</td>
+<td><strong>15,731 M</strong></td>
+</tr>
+<tr>
+<td>Le taux de capitalisation variable ?</td>
+<td>$5\,\%-20$ pb $=\mathbf{4{,}8\,\%}$</td>
+</tr>
+<tr>
+<td>Ex. 32.1 : la valeur ?</td>
+<td><strong>2,814 M de dollars</strong></td>
+</tr>
+<tr>
+<td>Les trois swaps de devises ?</td>
+<td>Fixe/fixe · <strong>floating/floating</strong> · <strong>cross-currency</strong></td>
+</tr>
+<tr>
+<td>Comment actualiser ?</td>
+<td><strong>Chaque devise à SA courbe</strong></td>
+</tr>
+<tr>
+<td>Comment combiner ?</td>
+<td>Au <strong>change COURANT</strong></td>
+</tr>
+<tr>
+<td>L'ajustement de marché ?</td>
+<td>Actualiser le JPY à <strong>LIBOR $-$ 20 pb</strong></td>
+</tr>
+<tr>
+<td>Sa justification ?</td>
+<td>Sinon <strong>profit ou perte immédiats</strong> à chaque nouveau swap</td>
+</tr>
+<tr>
+<td>LIBOR-in-arrears ?</td>
+<td>Le taux <strong>observé</strong> est payé <strong>à cette date même</strong></td>
+</tr>
+<tr>
+<td>L'ajustement nécessaire ?</td>
+<td>La <strong>CONVEXITÉ</strong></td>
+</tr>
+<tr>
+<td>Sa formule ?</td>
+<td>$F_i+\dfrac{F_i^2\sigma_i^2\delta_it_i}{1+F_i\delta_i}$</td>
+</tr>
+<tr>
+<td>Ex. 32.2 : ajustement par an ?</td>
+<td><strong>0,000115</strong></td>
+</tr>
+<tr>
+<td>Ex. 32.2 : taux de l'année 5 ?</td>
+<td><strong>5,0575 %</strong></td>
+</tr>
+<tr>
+<td>Ex. 32.2 : la valeur ?</td>
+<td>$\mathbf{-144\,514}$ dollars</td>
+</tr>
+<tr>
+<td>Ce que vaudrait le swap ordinaire ?</td>
+<td> <strong>ZÉRO</strong></td>
+</tr>
+<tr>
+<td>CMS swap ?</td>
+<td>Le variable est <strong>le TAUX DE SWAP</strong> à $n$ ans</td>
+</tr>
+<tr>
+<td>Le décalage habituel ?</td>
+<td>Le taux de la date <strong>PRÉCÉDENTE</strong></td>
+</tr>
+<tr>
+<td>Combien d'ajustements ?</td>
+<td> <strong>DEUX</strong> : convexité <strong>et</strong> timing</td>
+</tr>
+<tr>
+<td>$\sigma_y$ vient de ?</td>
+<td>Les <strong>SWAPTIONS</strong></td>
+</tr>
+<tr>
+<td>$\sigma_F$ vient de ?</td>
+<td>Les <strong>CAPLETS</strong></td>
+</tr>
+<tr>
+<td>$\rho$ vient de ?</td>
+<td>Les <strong>données HISTORIQUES</strong></td>
+</tr>
+<tr>
+<td>Que représente $G_i(x)$ ?</td>
+<td>Une obligation de <strong>coupon $y_i$</strong>, même vie et fréquence</td>
+</tr>
+<tr>
+<td>Hypothèse du terme de convexité ?</td>
+<td>Le taux de swap donne <strong>UN SEUL paiement</strong></td>
+</tr>
+<tr>
+<td>Hypothèse du terme de timing ?</td>
+<td>Le paiement est en <strong>$t_{i+1}$, pas $t_i$</strong></td>
+</tr>
+<tr>
+<td>Ex. 32.3 : $G'$ ?</td>
+<td>$\mathbf{-437{,}603}$</td>
+</tr>
+<tr>
+<td>Ex. 32.3 : $G''$ ?</td>
+<td>$\mathbf{2\,261{,}23}$</td>
+</tr>
+<tr>
+<td>Ex. 32.3 : convexité ?</td>
+<td>$\mathbf{+0{,}0001453}$ par an</td>
+</tr>
+<tr>
+<td>Ex. 32.3 : timing ?</td>
+<td>$\mathbf{-0{,}0000256}$ par an</td>
+</tr>
+<tr>
+<td>Ex. 32.3 : total ?</td>
+<td><strong>1,197 pb par an</strong></td>
+</tr>
+<tr>
+<td>Ex. 32.3 : taux à 4 ans ?</td>
+<td><strong>5,0479 %</strong></td>
+</tr>
+<tr>
+<td>Ex. 32.3 : flux à 4,5 ans ?</td>
+<td><strong>23 940 dollars</strong></td>
+</tr>
+<tr>
+<td>Ex. 32.3 : valeur ?</td>
+<td><strong>159 811 dollars</strong></td>
+</tr>
+<tr>
+<td>CMT swap ?</td>
+<td>Le <strong>rendement d'une obligation d'ÉTAT</strong></td>
+</tr>
+<tr>
+<td>Comment l'analyser ?</td>
+<td>Comme un CMS avec le <strong>rendement AU PAIR</strong></td>
+</tr>
+<tr>
+<td>Diff swap ?</td>
+<td>Taux d'<strong>une devise</strong> sur un principal d'<strong>une autre</strong></td>
+</tr>
+<tr>
+<td>L'ajustement nécessaire ?</td>
+<td>Le <strong>QUANTO</strong></td>
+</tr>
+<tr>
+<td>Sa formule ?</td>
+<td>$V_i+V_i\rho_i\sigma_{W,i}\sigma_{V,i}t_i$</td>
+</tr>
+<tr>
+<td>Ex. 32.4 : l'ajustement ?</td>
+<td><strong>0,00048</strong> par an</td>
+</tr>
+<tr>
+<td>Ex. 32.4 : les trois flux ?</td>
+<td><strong>0 · 4 800 · 9 600</strong> livres</td>
+</tr>
+<tr>
+<td>Pourquoi le premier est-il nul ?</td>
+<td>Le taux <strong>observé en 0 est déjà connu</strong></td>
+</tr>
+<tr>
+<td>Ex. 32.4 : la valeur ?</td>
+<td><strong>12 647 livres sterling</strong></td>
+</tr>
+<tr>
+<td>Swap d'actions ?</td>
+<td>Rendement d'un <strong>indice</strong> contre fixe ou variable</td>
+</tr>
+<tr>
+<td>Son utilité ?</td>
+<td>Changer d'exposition <strong>sans acheter d'actions</strong></td>
+</tr>
+<tr>
+<td>Quel indice ?</td>
+<td>Un indice de <strong>RENDEMENT TOTAL</strong></td>
+</tr>
+<tr>
+<td>Sa valeur à l'initiation ?</td>
+<td> <strong>ZÉRO</strong></td>
+</tr>
+<tr>
+<td>Juste après un paiement ?</td>
+<td> <strong>ZÉRO</strong></td>
+</tr>
+<tr>
+<td>L'argument ?</td>
+<td><strong>Réplication sans coût</strong> : emprunter au LIBOR, investir</td>
+</tr>
+<tr>
+<td>Valeur de la jambe actions entre deux dates ?</td>
+<td>$L\,E/E_0$</td>
+</tr>
+<tr>
+<td>Valeur de la jambe LIBOR ?</td>
+<td><strong>Fixée à la dernière réinitialisation</strong></td>
+</tr>
+<tr>
+<td>Accrual swap ?</td>
+<td>Les intérêts ne courent <strong>que dans une fourchette</strong></td>
+</tr>
+<tr>
+<td>Paiement fixe normal ?</td>
+<td>$QL\,n_1/n_2$</td>
+</tr>
+<tr>
+<td>Paiement d'un accrual ?</td>
+<td>$QL\,n_3/n_2$</td>
+</tr>
+<tr>
+<td>Que représente $n_3$ ?</td>
+<td>Les jours où le taux est <strong>dans la fourchette</strong></td>
+</tr>
+<tr>
+<td>Sa décomposition ?</td>
+<td>Swap <strong>+ une option BINAIRE PAR JOUR</strong></td>
+</tr>
+<tr>
+<td>Ce que verse chaque binaire ?</td>
+<td>$QL/n_2$</td>
+</tr>
+<tr>
+<td>Formule de $d_2$ ?</td>
+<td>$\dfrac{\ln(F_i/R_K)-\sigma_i^2t_i/2}{\sigma_i\sqrt{t_i}}$</td>
+</tr>
+<tr>
+<td>Pourquoi $d_2^\ast$ ?</td>
+<td>Un <strong>ajustement de TIMING</strong> de $t_i+\delta$ à $s_i$</td>
+</tr>
+<tr>
+<td>Est-il important ?</td>
+<td> <strong>Non — souvent IGNORÉ</strong></td>
+</tr>
+<tr>
+<td>Convention des jours fériés ?</td>
+<td>Le taux du <strong>jour ouvré précédent</strong></td>
+</tr>
+<tr>
+<td>Cancelable swap ?</td>
+<td>Un côté peut <strong>terminer</strong></td>
+</tr>
+<tr>
+<td>Terminer, c'est ?</td>
+<td> <strong>Entrer dans le swap OPPOSÉ</strong></td>
+</tr>
+<tr>
+<td>Une seule date ?</td>
+<td>Une swaption <strong>EUROPÉENNE</strong></td>
+</tr>
+<tr>
+<td>L'exemple ?</td>
+<td>Swap 10 ans, option à 6 ans → swaption <strong>$6\times4$</strong></td>
+</tr>
+<tr>
+<td>Plusieurs dates ?</td>
+<td>Une swaption <strong>BERMUDIENNE</strong></td>
+</tr>
+<tr>
+<td>Où la valoriser ?</td>
+<td>Chapitres <strong>30 et 31</strong></td>
+</tr>
+<tr>
+<td>Compounding annulable : l'astuce 1 ?</td>
+<td><strong>Ajouter le principal des deux côtés</strong></td>
+</tr>
+<tr>
+<td>Son effet ?</td>
+<td>La jambe variable vaut <strong>le pair</strong></td>
+</tr>
+<tr>
+<td>Sa conséquence ?</td>
+<td> Il suffit de regarder <strong>la jambe FIXE</strong></td>
+</tr>
+<tr>
+<td>Payer fixe : que fait-on ?</td>
+<td><strong>MINIMISER</strong> la valeur de la jambe fixe</td>
+</tr>
+<tr>
+<td>Recevoir fixe ?</td>
+<td><strong>MAXIMISER</strong></td>
+</tr>
+<tr>
+<td>Le spread additif ?</td>
+<td>Le <strong>RETRANCHER de la jambe FIXE</strong></td>
+</tr>
+<tr>
+<td>Capitalisation à LIBOR + spread ?</td>
+<td>Calculer la <strong>« valeur des spreads »</strong> et la retrancher</td>
+</tr>
+<tr>
+<td>La limite de l'approche ?</td>
+<td>Elle suppose la décision <strong>non influencée</strong> par le spread</td>
+</tr>
+<tr>
+<td>Index amortizing rate swap ?</td>
+<td>Le principal se réduit <strong>quand les taux baissent</strong></td>
+</tr>
+<tr>
+<td>Son origine ?</td>
+<td>Reproduire un <strong>MBS d'agence</strong></td>
+</tr>
+<tr>
+<td>Swap de matières premières ?</td>
+<td>8 M par an contre $100\,000\,S$</td>
+</tr>
+<tr>
+<td>L'effet ?</td>
+<td><strong>80 dollars le baril verrouillés</strong></td>
+</tr>
+<tr>
+<td>Le swap P&amp;G ?</td>
+<td>Le <strong>5/30</strong>, 2 novembre 1993</td>
+</tr>
+<tr>
+<td>Son notionnel ?</td>
+<td><strong>200 millions de dollars</strong></td>
+</tr>
+<tr>
+<td>Ce que BT payait ?</td>
+<td><strong>5,30 % par an</strong></td>
+</tr>
+<tr>
+<td>Ce que P&amp;G payait ?</td>
+<td><strong>CP moyen $-$ 75 pb $+$ un SPREAD</strong></td>
+</tr>
+<tr>
+<td>Le piège d'unité ?</td>
+<td> Le spread est un taux <strong>DÉCIMAL</strong></td>
+</tr>
+<tr>
+<td>Si la formule donne 0,1 et le CP 6 % ?</td>
+<td>P&amp;G paie <strong>15,25 %</strong></td>
+</tr>
+<tr>
+<td>Ce qu'espérait P&amp;G ?</td>
+<td>Un spread <strong>NUL</strong></td>
+</tr>
+<tr>
+<td>Ce qui est arrivé ?</td>
+<td> Les taux <strong>ont monté début 1994</strong></td>
+</tr>
+</tbody></table>
+</main>
+
+
+
+
+</body></html>

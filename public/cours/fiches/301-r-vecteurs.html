@@ -1,0 +1,1713 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fiche 301 — Vecteurs : arithmétique vectorisée, recyclage, valeurs manquantes</title>
+<script>
+window.MathJax={tex:{inlineMath:[["$","$"]],displayMath:[["$$","$$"]],processEscapes:true},
+ options:{skipHtmlTags:["script","noscript","style","textarea","pre","code"]},
+ svg:{fontCache:"global"},
+ startup:{pageReady:()=>MathJax.startup.defaultPageReady().then(()=>{document.body.classList.add("ready")})}};
+setTimeout(function(){document.body.classList.add("ready")},2500);
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+/* ============================================================
+   MathiasLearn — feuille de style des fiches
+   Reprise intégrale des tokens de 00_PARCOURS/*.html
+   + blocs pédagogiques (callouts, méthode, essentiels, recall)
+   ============================================================ */
+:root{--bg:#faf9f7;--card:#fff;--ink:#1a1a1a;--muted:#6b6b6b;--line:#e5e2dd;--accent:#8b5e34;
+ --hl:#fdf8ef;--ok:#2d7d4f;--okbg:#f0f7f3;--warn:#b3402f;--warnbg:#fdf3f1;--blue:#2f5d8b;--bluebg:#f1f5fa}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+ font:17px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;padding:0 16px 100px}
+.nav{position:sticky;top:0;background:rgba(250,249,247,.96);backdrop-filter:blur(8px);
+ border-bottom:1px solid var(--line);margin:0 -16px 30px;padding:11px 16px;z-index:50;
+ display:flex;gap:6px;flex-wrap:wrap;font-size:13px}
+.nav a{color:var(--muted);text-decoration:none;padding:4px 9px;border-radius:5px;white-space:nowrap}
+.nav a:hover{background:var(--line);color:var(--ink)}
+.nav a.on{background:var(--accent);color:#fff}
+main{max-width:780px;margin:0 auto}
+h1{font-size:31px;letter-spacing:-.02em;margin:.4em 0 .5em;line-height:1.25}
+h2{font-size:23px;margin:2.2em 0 .7em;padding-bottom:.3em;border-bottom:1px solid var(--line)}
+h3{font-size:19px;margin:1.9em 0 .5em;color:var(--accent)}
+h4{font-size:17px;margin:1.5em 0 .4em}
+p{margin:.8em 0} a{color:var(--accent)} hr{border:0;border-top:1px solid var(--line);margin:2.6em 0}
+table{border-collapse:collapse;width:100%;margin:1.3em 0;font-size:15.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+th{background:#f3f0eb;font-weight:600}
+tr:nth-child(even) td{background:#fcfbfa}
+code{font-family:"SF Mono",Menlo,Consolas,monospace;font-size:.88em;background:#f2efea;padding:2px 6px;border-radius:4px;overflow-wrap:break-word}
+pre{background:#f2efea;padding:14px 16px;border-radius:8px;overflow-x:auto}
+pre code{background:none;padding:0;white-space:pre}
+blockquote{border-left:3px solid var(--accent);background:var(--hl);margin:1.4em 0;padding:14px 20px;border-radius:0 8px 8px 0}
+blockquote p:first-child{margin-top:0} blockquote p:last-child{margin-bottom:0}
+ul,ol{padding-left:1.5em} li{margin:.35em 0} em{color:#4a4a4a}
+mjx-container[display="true"]{margin:1.1em 0!important;overflow-x:auto;overflow-y:hidden;padding:2px 0}
+mjx-container svg{max-width:100%}
+body:not(.ready) main{opacity:0} main{opacity:1;transition:opacity .25s}
+
+/* --- bandeau de tête de fiche --- */
+.cours{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--accent);
+ border-radius:0 10px 10px 0;padding:18px 22px;margin:0 0 34px}
+.cours h4{margin:0 0 4px;font-size:14px;text-transform:uppercase;letter-spacing:.07em;color:var(--accent)}
+.cours .cs{color:var(--muted);font-size:14.5px;margin:0 0 14px}
+
+/* --- exercices / corrigés --- */
+.ex{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:6px 24px 20px;margin:18px 0}
+.ex>h3:first-child{margin-top:14px}
+details.cor{margin-top:18px;border:1px solid var(--line);border-radius:8px;background:#fcfbfa;overflow:hidden}
+details.cor>summary{cursor:pointer;padding:12px 16px;font-weight:600;font-size:15px;color:var(--accent);
+ list-style:none;display:flex;align-items:center;gap:9px;user-select:none;transition:.15s;min-height:44px}
+details.cor>summary::-webkit-details-marker{display:none}
+details.cor>summary:hover{background:var(--hl)}
+details.cor>summary::before{content:"\25B6";font-size:10px;transition:transform .18s;display:inline-block}
+details.cor[open]>summary::before{transform:rotate(90deg)}
+details.cor[open]>summary{background:var(--okbg);color:var(--ok);border-bottom:1px solid var(--line)}
+.cor .in{padding:4px 20px 16px}
+.cor .in>*:first-child{margin-top:.9em}
+
+/* --- blocs pédagogiques (callouts) ---
+   Générés depuis une citation Markdown dont le premier **gras** commence
+   par un mot-clé : DÉFINITION, THÉORÈME, MÉTHODE, PIÈGE, INTUITION… */
+.cal{border:1px solid var(--line);border-left:4px solid var(--accent);background:var(--card);
+ border-radius:0 10px 10px 0;padding:15px 20px;margin:1.5em 0}
+.cal>p:first-child{margin-top:0}.cal>p:last-child,.cal>ul:last-child,.cal>ol:last-child{margin-bottom:0}
+.cal .lab{display:block;font-size:12.5px;text-transform:uppercase;letter-spacing:.08em;
+ font-weight:700;color:var(--accent);margin-bottom:6px}
+.cal.formel{background:var(--hl)}
+.cal.piege{border-left-color:var(--warn);background:var(--warnbg)}
+.cal.piege .lab{color:var(--warn)}
+.cal.methode{border-left-color:var(--ok);background:var(--okbg)}
+.cal.methode .lab{color:var(--ok)}
+.cal.intu{border-left-color:var(--blue);background:var(--bluebg)}
+.cal.intu .lab{color:var(--blue)}
+.cal.plus{border-left-style:dashed;background:#faf9f7}
+.cal.plus .lab{color:var(--muted)}
+
+/* --- révision express --- */
+.ess{background:var(--card);border:1px solid var(--accent);border-radius:10px;padding:4px 24px 20px;margin:1.6em 0}
+.ess h3{margin-top:1.3em}
+.rec{background:var(--card);border:1px dashed var(--accent);border-radius:10px;padding:4px 24px 18px;margin:1.6em 0}
+.rec ol{counter-reset:none}
+
+/* --- impression / PDF --- */
+@media print{
+ .nav{display:none}
+ body{padding:0;background:#fff;font-size:11.2pt;line-height:1.55}
+ main{max-width:none}
+ h1{font-size:23pt}h2{font-size:15pt;margin-top:1.5em}h3{font-size:12.6pt}
+ h2,h3,h4{break-after:avoid;page-break-after:avoid}
+ table,.cal,blockquote{break-inside:avoid;page-break-inside:avoid}
+ table{display:table;font-size:9.6pt}
+ details.cor{border:1px solid var(--line);background:#fcfbfa}
+ details.cor>summary{display:none}
+ details.cor .in{padding-top:10px}
+ .cal,.ex,.ess,.rec{box-shadow:none}
+ a{color:var(--ink);text-decoration:none}
+}
+@page{margin:16mm 15mm 18mm}
+
+/* --- exemples travaillés --- */
+.exm{background:#fcfbfa;border:1px solid var(--line);border-radius:10px;padding:2px 20px 14px;margin:1.5em 0}
+.exm>h4:first-child{margin:14px 0 .5em;color:var(--accent);font-size:13px;text-transform:uppercase;letter-spacing:.07em}
+
+
+/* --- pastilles de priorité (conventions des fiches de l'app) --- */
+h2[data-prio], h3[data-prio], h4[data-prio]{position:relative}
+h2[data-prio]::before,h3[data-prio]::before,h4[data-prio]::before{
+ content:"";display:inline-block;width:9px;height:9px;border-radius:50%;
+ margin-right:9px;vertical-align:middle;background:var(--muted)}
+[data-prio="must"]::before{background:var(--warn)}
+[data-prio="high"]::before{background:#d98324}
+[data-prio="mid"]::before{background:#c9a227}
+[data-prio="low"]::before{background:var(--ok)}
+/* corrigés des fiches de l'app : même traitement que les corrigés des séries */
+details.cor>summary::after{content:""}
+</style></head><body>
+<div class="nav"><a href="00_COMMENCER_ICI.html">Commencer ici</a><a href="01_NOTATIONS_le-decodeur.html">Notations</a><a href="02_EXERCICES_Serie-0.html">Série 0 — Remise en route</a><a href="03_EXERCICES_Serie-1.html">Série 1 — Convexité</a><a href="04_EXERCICES_Serie-2.html">Série 2 — KKT</a><a href="05_AUTO-EVALUATION.html">Auto-évaluation (quiz)</a><a href="06_FICHE_Optimisation-deux-variables.html">Fiche — Optimisation à 2 variables</a></div>
+<main><h1>Fiche 301 — Vecteurs : arithmétique vectorisée, recyclage, valeurs manquantes</h1>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Matière</strong></td>
+<td>Code · Langage R</td>
+</tr>
+<tr>
+<td><strong>Cours source</strong></td>
+<td>R Core Team, <em>An Introduction to R</em> 4.6.1 — chapitre 2 « Simple manipulations; numbers and vectors », §2.1 à §2.6 et §2.8</td>
+</tr>
+<tr>
+<td><strong>Sources d'appoint</strong></td>
+<td><em>R Language Definition</em> 4.6.1, §3.1.1 « Constants », §3.1.4 « Operators », §3.3 « Elementary arithmetic operations » (§3.3.1 recyclage, §3.3.4 traitement des <code>NA</code>)</td>
+</tr>
+<tr>
+<td><strong>Difficulté</strong></td>
+<td> Fondamental — tout le reste de R est bâti là-dessus</td>
+</tr>
+<tr>
+<td><strong>Temps d'étude estimé</strong></td>
+<td>1 h 30</td>
+</tr>
+<tr>
+<td><strong>Prérequis</strong></td>
+<td>Fiche 300 (session, assignation, mots réservés)</td>
+</tr>
+<tr>
+<td><strong>Concepts clés</strong></td>
+<td><code>c()</code>, <code>&lt;-</code> / <code>=</code> / <code>assign()</code> / <code>-&gt;</code>, un scalaire est un vecteur de longueur 1, vectorisation, <strong>recyclage</strong>, avertissement de non-multiple, longueur nulle, <code>:</code> et sa priorité, <code>seq()</code>, <code>rep()</code>, <code>TRUE</code>/<code>FALSE</code>/<code>NA</code>, piège <code>T</code>/<code>F</code>, coercition logique → 0/1, <code>NA</code> contre <code>NaN</code>, <code>is.na()</code> contre <code>is.nan()</code>, <code>x == NA</code>, types de <code>NA</code>, <code>NA_character_</code>, chaînes et séquences d'échappement, <code>paste()</code> et <code>sep</code>, suffixe <code>L</code>, table des opérateurs, <code>`+`(x, y)</code></td>
+</tr>
+<tr>
+<td><strong>À retenir en priorité</strong></td>
+<td><strong>Le recyclage</strong> et son avertissement · <strong><code>x == NA</code> ne teste rien</strong> · <code>1:n-1</code> ≠ <code>1:(n-1)</code> · <code>T</code>/<code>F</code> réassignables · la coercition d'un logique en <code>0</code>/<code>1</code>.</td>
+</tr>
+</tbody></table>
+<h2>Vue d'ensemble</h2>
+<pre><code>LE VECTEUR       la structure la plus simple : une collection ORDONNEE de nombres
+                 un nombre isole EST un vecteur de longueur 1 -- il n'y a pas de scalaire
+
+CREER            c(10.4, 5.6, 3.1)   1:30   seq(-5, 5, by=.2)   rep(x, times=5)
+
+ARITHMETIQUE     element par element, TOUJOURS
+                 2*x + y + 1   -&gt;  chaque operation recycle le plus court
+
+RECYCLAGE        longueur du resultat = longueur du PLUS LONG
+                 le plus court est repete, EVENTUELLEMENT FRACTIONNAIREMENT
+                 pas un multiple -&gt; AVERTISSEMENT (mais le calcul se fait)
+                 longueur 0 quelque part -&gt; resultat de longueur 0
+
+QUATRE TYPES     numerique   logique   caractere   (+ complexe)
+                 TRUE/FALSE/NA        "texte"        1+2i
+
+MANQUANT         NA  = non disponible          is.na()   TRUE pour NA ET NaN
+                 NaN = indefini (0/0, Inf-Inf) is.nan()  TRUE pour NaN SEUL
+                 x == NA  -&gt; QUE DES NA. Ce n'est PAS un test.
+
+PIEGES           1:n-1  vaut (1:n)-1        T et F sont des VARIABLES
+</code></pre>
+<p><strong>Le problème posé.</strong> <em>« R operates on <strong>named data structures</strong>. The simplest such structure is the <strong>numeric vector</strong>, which is a single entity consisting of an <strong>ordered collection of numbers</strong>. »</em> Tout le reste — matrices, tableaux, facteurs, listes, data frames — se construit <strong>à partir du vecteur</strong>, en lui ajoutant des attributs. Comprendre le vecteur, c'est comprendre 80 % de R.</p>
+<div class="cal intu"><span class="lab">Intuition — l'absence de scalaire.</span>
+<p> <em>« <strong>A number occurring by itself in an expression is taken as a vector of length one.</strong> »</em> En R, il n'existe pas de « nombre » à part : <code>3</code> <strong>est</strong> un vecteur numérique de longueur 1. Cette uniformité est ce qui rend la vectorisation possible partout, sans exception ni cas particulier — et c'est aussi la raison pour laquelle le recyclage (concept 3) s'applique <strong>même à une constante</strong>.</p>
+</div>
+<h2 data-prio="must">Concept 1 — Créer un vecteur, et les quatre façons d'assigner</h2>
+<div class="cal formel"><span class="lab">Définition (§2.1).</span>
+<p> <em>Pour créer un vecteur nommé <code>x</code>, composé de cinq nombres — 10,4 ; 5,6 ; 3,1 ; 6,4 et 21,7 — on utilise la commande :</em></p>
+</div>
+<pre><code class="language-r">x &lt;- c(10.4, 5.6, 3.1, 6.4, 21.7)
+</code></pre>
+<p>*C'est une <strong>assignation</strong> utilisant la fonction <strong><code>c()</code></strong>, qui dans ce contexte peut prendre <strong>un nombre arbitraire d'arguments vectoriels</strong> et dont la valeur est <strong>un vecteur obtenu en concaténant ses arguments bout à bout</strong>.*</p>
+<p class="cal piege"> <strong>Le « dans ce contexte » compte.</strong> La note 1 du §2.1 prévient : <em>« With other than vector types of argument, such as <strong>list mode arguments</strong>, the action of <code>c()</code> is <strong>rather different</strong>. »</em> Voir fiche 306.</p>
+<h3>1.1 Les quatre écritures de l'assignation</h3>
+<div class="cal formel"><span class="lab">Notation (§2.1).</span>
+<p> <em>L'<strong>opérateur d'assignation</strong> <code>&lt;-</code> est composé des deux caractères <code>&lt;</code> (« inférieur à ») et <code>-</code> (« moins ») placés <strong>strictement côte à côte</strong>, et il <strong>« pointe » vers l'objet qui reçoit</strong> la valeur de l'expression.</em></p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Écriture</th>
+<th>Ce que dit le cours</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>x &lt;- c(10.4, 5.6, 3.1, 6.4, 21.7)</code></td>
+<td>la forme usuelle</td>
+</tr>
+<tr>
+<td><code>x = c(...)</code></td>
+<td><em>« In most contexts the <code>=</code> operator can be used as an alternative. »</em> — <strong>« dans la plupart des contextes »</strong>, pas dans tous</td>
+</tr>
+<tr>
+<td><code>assign("x", c(...))</code></td>
+<td><em>« An equivalent way of making the same assignment »</em>. <strong><code>&lt;-</code> peut être vu comme un raccourci syntaxique de <code>assign()</code></strong></td>
+</tr>
+<tr>
+<td><code>c(10.4, 5.6, 3.1, 6.4, 21.7) -&gt; x</code></td>
+<td><em>« Assignments can also be made <strong>in the other direction</strong> »</em></td>
+</tr>
+</tbody></table>
+<div class="cal intu"><span class="lab">Pourquoi &lt;- et pas =.</span>
+<p class="cal piege">  Le cours reste prudent (« dans la plupart des contextes ») parce que <code>=</code> sert aussi à <strong>nommer un argument</strong> dans un appel de fonction. <code>f(n = 10)</code> passe l'argument <code>n</code> ; <code>f(n &lt;- 10)</code> <strong>crée la variable <code>n</code></strong> et passe sa valeur en position. Deux instructions différentes à un caractère près. Et rappel de la fiche 300 : <code>x&lt;-5</code> sans espaces est une <strong>assignation</strong>, <code>x &lt; -5</code> une <strong>comparaison</strong>.</p>
+</div>
+<p><strong>Ce qui suit une assignation (§2.1).</strong> <em>« If an expression is used as a complete command, the value is <strong>printed and lost</strong>. »</em> Ainsi, après les assignations ci-dessus :</p>
+<pre><code class="language-r">1/x        # AFFICHE les cinq inverses -- x, lui, est inchange
+y &lt;- c(x, 0, x)   # un vecteur de 11 entrees : deux copies de x, un zero au milieu
+</code></pre>
+<p class="cal piege"> <strong><code>c()</code> aplatit.</strong> <code>c(x, 0, x)</code> ne crée pas une structure à trois éléments dont deux sont des vecteurs : elle produit <strong>un vecteur plat de 11 nombres</strong>. C'est la conséquence directe de « concaténer bout à bout ».</p>
+<h2 data-prio="must">Concept 2 — L'arithmétique est élément par élément</h2>
+<div class="cal formel"><span class="lab">Définition (§2.2).</span>
+<p> <em>Les vecteurs peuvent être utilisés dans des expressions arithmétiques, <strong>auquel cas les opérations sont effectuées élément par élément</strong>.</em></p>
+</div>
+<div class="cal intu"><span class="lab">Intuition — ce que « vectorisé » veut dire (R Language Definition §3.1.4).</span>
+<p> <em>« R deals with <strong>entire vectors of data at a time</strong>, and most of the elementary operators and basic mathematical functions like <code>log</code> are <strong>vectorized</strong>. This means that e.g. adding two vectors of the same length will create a vector containing the <strong>element-wise sums</strong>, <strong>implicitly looping over the vector index</strong>. »</em></p>
+<p>La boucle existe toujours — <strong>elle est simplement écrite pour vous, en C</strong>. C'est pourquoi, en R, une boucle <code>for</code> explicite sur les éléments d'un vecteur est presque toujours le signe qu'on n'a pas trouvé l'opération vectorisée correspondante.</p>
+</div>
+<h3>2.1 Les opérateurs et les fonctions élémentaires</h3>
+<p><em>Les opérateurs arithmétiques élémentaires sont les habituels <strong><code>+</code>, <code>-</code>, <code>*</code>, <code>/</code> et <code>^</code></strong> pour l'élévation à une puissance. En outre, <strong>toutes les fonctions arithmétiques courantes sont disponibles</strong> : <code>log</code>, <code>exp</code>, <code>sin</code>, <code>cos</code>, <code>tan</code>, <code>sqrt</code>, etc.</em> (§2.2)</p>
+<table>
+<thead>
+<tr>
+<th>Fonction (§2.2)</th>
+<th>Ce qu'elle rend</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>max(x)</code> / <code>min(x)</code></td>
+<td>le plus grand / le plus petit élément</td>
+</tr>
+<tr>
+<td><code>range(x)</code></td>
+<td><em>« a vector of length two, namely <code>c(min(x), max(x))</code> »</em></td>
+</tr>
+<tr>
+<td><code>length(x)</code></td>
+<td>le <strong>nombre d'éléments</strong></td>
+</tr>
+<tr>
+<td><code>sum(x)</code> / <code>prod(x)</code></td>
+<td>le total / le produit</td>
+</tr>
+<tr>
+<td><code>mean(x)</code></td>
+<td>la moyenne d'échantillon — <em>« the same as <code>sum(x)/length(x)</code> »</em></td>
+</tr>
+<tr>
+<td><code>var(x)</code></td>
+<td>la <strong>variance d'échantillon</strong>, c'est-à-dire <code>sum((x-mean(x))^2)/(length(x)-1)</code></td>
+</tr>
+<tr>
+<td><code>sort(x)</code></td>
+<td>un vecteur <strong>de même taille</strong>, éléments <strong>par ordre croissant</strong></td>
+</tr>
+<tr>
+<td><code>order(x)</code>, <code>sort.list(x)</code></td>
+<td><em>« more flexible sorting facilities »</em> : elles produisent <strong>une permutation</strong> qui réalise le tri</td>
+</tr>
+<tr>
+<td><code>pmax(...)</code>, <code>pmin(...)</code></td>
+<td>les maxima et minima <strong>parallèles</strong></td>
+</tr>
+</tbody></table>
+<p>$$\operatorname{var}(x)=\frac{1}{n-1}\sum_{i=1}^{n}\bigl(x_i-\bar x\bigr)^2$$</p>
+<div class="cal plus"><span class="lab">Complément — var() sur une matrice (§2.2).</span>
+<p> <em>« If the argument to <code>var()</code> is an <strong>n-by-p matrix</strong> the value is a <strong>p-by-p sample covariance matrix</strong> got by regarding the <strong>rows as independent p-variate sample vectors</strong>. »</em> Une même fonction, deux comportements selon la forme de l'argument — le premier exemple, dans le cours, de ce que les attributs (fiche 303) changent au résultat.</p>
+</div>
+<blockquote>
+<p class="cal piege"> <strong><code>max</code>/<code>min</code> contre <code>pmax</code>/<code>pmin</code> — la distinction que tout le monde rate.</strong> <em>« Note that <code>max</code> and <code>min</code> select <strong>the largest and smallest values in their arguments</strong>, <strong>even if they are given several vectors</strong>. The <strong>parallel</strong> maximum and minimum functions <code>pmax</code> and <code>pmin</code> return <strong>a vector (of length equal to their longest argument)</strong> that contains <strong>in each element</strong> the largest (smallest) element <strong>in that position</strong> in any of the input vectors. »</em></p>
+</blockquote>
+<details class="cor">
+<summary><strong>Exercice résolu — <code>max</code> ou <code>pmax</code> ?</strong></summary><div class="in">
+
+<p><strong>Énoncé.</strong> Soient <code>a &lt;- c(1, 9, 3)</code> et <code>b &lt;- c(7, 2, 5)</code>. Que valent <code>max(a, b)</code> et <code>pmax(a, b)</code> ?</p>
+<p><em>Étape 1 — lire la définition de <code>max</code>.</em> Elle sélectionne <strong>la plus grande valeur parmi tous ses arguments</strong>, tous vecteurs confondus. Elle <strong>aplatit</strong> donc les deux vecteurs en six nombres : 1, 9, 3, 7, 2, 5.</p>
+<p><em>Étape 2 — le résultat.</em> <code>max(a, b)</code> vaut <strong><code>9</code></strong> — un vecteur de <strong>longueur 1</strong>.</p>
+<p><em>Étape 3 — lire la définition de <code>pmax</code>.</em> Elle rend un vecteur <strong>de la longueur du plus long argument</strong>, contenant <strong>en chaque position</strong> le plus grand élément <strong>de cette position</strong>.</p>
+<p><em>Étape 4 — dérouler position par position.</em></p>
+<table>
+<thead>
+<tr>
+<th>Position</th>
+<th><code>a</code></th>
+<th><code>b</code></th>
+<th><code>pmax</code></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>1</td>
+<td>7</td>
+<td><strong>7</strong></td>
+</tr>
+<tr>
+<td>2</td>
+<td>9</td>
+<td>2</td>
+<td><strong>9</strong></td>
+</tr>
+<tr>
+<td>3</td>
+<td>3</td>
+<td>5</td>
+<td><strong>5</strong></td>
+</tr>
+</tbody></table>
+<p><em>Étape 5 — le résultat.</em> <code>pmax(a, b)</code> vaut <strong><code>c(7, 9, 5)</code></strong> — un vecteur de <strong>longueur 3</strong>.</p>
+<p><em>Étape 6 — le test de reconnaissance.</em> « Le plus grand <strong>du lot</strong> » → <code>max</code>. « Le plus grand <strong>de chaque paire</strong> » → <code>pmax</code>. Un résultat de longueur 1 là où on en attendait <em>n</em> est la signature de l'erreur.</p>
+</div></details>
+
+<h3>2.2 Entiers, réels, complexes</h3>
+<p><em>« For most purposes the user <strong>will not be concerned</strong> if the "numbers" in a numeric vector are integers, reals or even complex. <strong>Internally calculations are done as double precision real numbers</strong>, or double precision complex numbers if the input data are complex. »</em> (§2.2)</p>
+<blockquote>
+<p class="cal piege"> <strong>Le nombre complexe doit être demandé (§2.2).</strong> <em>« To work with complex numbers, <strong>supply an explicit complex part</strong>. »</em></p>
+</blockquote>
+<pre><code class="language-r">sqrt(-17)      # NaN, avec un AVERTISSEMENT
+sqrt(-17+0i)   # fait le calcul EN COMPLEXES
+</code></pre>
+<p>La règle générale est celle-ci : <strong>R ne change pas de corps de nombres tout seul</strong>. Si l'entrée est réelle, la sortie est réelle — quitte à valoir <code>NaN</code>. C'est vous qui déclarez l'intention, en écrivant <code>+0i</code>.</p>
+<h3>2.3 Le suffixe <code>L</code> — fabriquer un entier pour de bon</h3>
+<div class="cal plus"><span class="lab">Complément (R Language Definition §3.1.1).</span>
+<p> <em>« Perhaps unexpectedly, <strong>the number returned from the expression <code>1</code> is a numeric</strong>. »</em> Autrement dit, <code>1</code> n'est <strong>pas</strong> un entier : c'est un double.</p>
+</div>
+<p><em>« In most cases, the difference between an integer and a numeric value will be unimportant as R will do the right thing. There are, however, times when we would like to <strong>explicitly create an integer value</strong> for a constant. »</em> Le moyen le plus simple est le <strong>suffixe <code>L</code></strong> :</p>
+<table>
+<thead>
+<tr>
+<th>Écriture</th>
+<th>Résultat</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>1L</code></td>
+<td>l'entier <strong>1</strong></td>
+</tr>
+<tr>
+<td><code>0x10L</code></td>
+<td>l'entier <strong>16</strong> (hexadécimal)</td>
+</tr>
+<tr>
+<td><code>1e3L</code></td>
+<td><strong>1000 comme entier</strong> — <em>« Note that the <code>L</code> is treated as qualifying the term <code>1e3</code> and <strong>not the <code>3</code></strong> »</em>, et c'est équivalent à <code>1000L</code></td>
+</tr>
+<tr>
+<td><code>1e-3L</code></td>
+<td> <strong>avertissement</strong>, et c'est <strong>une valeur numérique</strong> qui est créée</td>
+</tr>
+<tr>
+<td><code>1.L</code></td>
+<td> <strong>avertissement</strong> : point décimal inutile</td>
+</tr>
+<tr>
+<td><code>12iL</code></td>
+<td> <strong>erreur de syntaxe</strong> : pas de <code>L</code> sur un complexe</td>
+</tr>
+</tbody></table>
+<h2 data-prio="must">Concept 3 — Le recyclage : la règle qui décide de tout</h2>
+<div class="cal formel"><span class="lab">Définition (§2.2).</span>
+<p> <em>« Vectors occurring in the same expression <strong>need not all be of the same length</strong>. If they are not, the value of the expression is a vector with <strong>the same length as the longest vector</strong> which occurs in the expression. <strong>Recycling occurs in each binary operation</strong>: the shorter vector is <strong>recycled as often as need be (perhaps fractionally)</strong> until it matches the length of the longer vector. <strong>In particular a constant is simply repeated.</strong> »</em></p>
+</div>
+<div class="cal plus"><span class="lab">Complément — l'avertissement (R Language Definition §3.3.1).</span>
+<p> <em>« If one tries to add two structures with a different number of elements, then the shortest is recycled to length of longest. That is, if for instance you add <code>c(1, 2, 3)</code> to a six-element vector then you will really add <code>c(1, 2, 3, 1, 2, 3)</code>. <strong>If the length of the longer vector is not a multiple of the shorter one, a warning is given.</strong> »</em></p>
+<p>Et : <em>« As from <strong>R 1.4.0</strong>, any arithmetic operation involving a <strong>zero-length vector</strong> has a <strong>zero-length result</strong>. »</em></p>
+</div>
+<p><strong>Les trois cas, et un seul est silencieux :</strong></p>
+<table>
+<thead>
+<tr>
+<th>Situation</th>
+<th>Comportement</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Longueurs <strong>égales</strong></td>
+<td>élément par élément, rien à signaler</td>
+</tr>
+<tr>
+<td>La longue est <strong>un multiple</strong> de la courte</td>
+<td>recyclage <strong>silencieux</strong> — c'est le cas voulu</td>
+</tr>
+<tr>
+<td>La longue <strong>n'est pas</strong> un multiple</td>
+<td>recyclage <strong>fractionnaire</strong> + <strong>avertissement</strong> — le calcul se fait quand même</td>
+</tr>
+<tr>
+<td>L'une est de <strong>longueur 0</strong></td>
+<td>résultat de <strong>longueur 0</strong></td>
+</tr>
+</tbody></table>
+<p class="cal piege"> <strong>Le troisième cas est le plus dangereux, précisément parce que le calcul aboutit.</strong> Un avertissement n'interrompt rien : vous obtenez un résultat de la bonne forme, faux au milieu. Dans un script non interactif, l'avertissement peut passer inaperçu.</p>
+<details class="cor">
+<summary><strong>Exercice résolu — dérouler <code>v &lt;- 2*x + y + 1</code> entièrement (§2.2)</strong></summary><div class="in">
+
+<p><strong>Énoncé (celui du cours).</strong> Avec <code>x &lt;- c(10.4, 5.6, 3.1, 6.4, 21.7)</code> (longueur 5) et <code>y &lt;- c(x, 0, x)</code> (longueur 11), que produit <code>v &lt;- 2*x + y + 1</code> ?</p>
+<p>Le cours répond en une phrase : <em>« generates a new vector <code>v</code> of <strong>length 11</strong> constructed by adding together, element by element, <strong><code>2*x</code> repeated 2.2 times</strong>, <strong><code>y</code> repeated just once</strong>, and <strong><code>1</code> repeated 11 times</strong> »</em>. Voici le déroulé complet.</p>
+<p><em>Étape 1 — recenser les longueurs.</em> <code>x</code> : <strong>5</strong>. <code>y</code> : <strong>11</strong>. La constante <code>1</code> : <strong>1</strong>. Le plus long est <code>y</code>, donc <strong>le résultat aura la longueur 11</strong>.</p>
+<p><em>Étape 2 — se rappeler que le recyclage est par opération binaire.</em> La phrase du cours est <em>« Recycling occurs in <strong>each binary operation</strong> »</em>. L'expression contient trois opérations : <code>2*x</code>, puis <code>(2*x) + y</code>, puis <code>(...) + 1</code>. Chacune recycle <strong>séparément</strong>.</p>
+<p><em>Étape 3 — la première opération, <code>2*x</code>.</em> <code>2</code> est un vecteur de longueur 1, <code>x</code> de longueur 5. Le court est <code>2</code>, répété 5 fois. Résultat de <strong>longueur 5</strong> : <code>c(20.8, 11.2, 6.2, 12.8, 43.4)</code>.</p>
+<p><em>Étape 4 — la deuxième opération, <code>2*x + y</code>.</em> Longueurs 5 et 11. <strong>11 n'est pas un multiple de 5</strong> : le recyclage est <strong>fractionnaire</strong> — d'où le « répété 2,2 fois » du cours — et <strong>R émet un avertissement</strong>. Le vecteur effectivement additionné à <code>y</code> est :</p>
+<table>
+<thead>
+<tr>
+<th>position</th>
+<th>1</th>
+<th>2</th>
+<th>3</th>
+<th>4</th>
+<th>5</th>
+<th>6</th>
+<th>7</th>
+<th>8</th>
+<th>9</th>
+<th>10</th>
+<th>11</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>2*x</code> recyclé</td>
+<td>20,8</td>
+<td>11,2</td>
+<td>6,2</td>
+<td>12,8</td>
+<td>43,4</td>
+<td>20,8</td>
+<td>11,2</td>
+<td>6,2</td>
+<td>12,8</td>
+<td>43,4</td>
+<td><strong>20,8</strong></td>
+</tr>
+</tbody></table>
+<p>Les positions 1 à 5 sont le premier passage, 6 à 10 le deuxième, et la position 11 est <strong>le premier élément d'un troisième passage interrompu</strong> : $11/5 = 2{,}2$.</p>
+<p><em>Étape 5 — la troisième opération, <code>+ 1</code>.</em> Longueurs 11 et 1 : la constante est <strong>simplement répétée</strong> 11 fois. Aucun avertissement — 11 est un multiple de 1.</p>
+<p><em>Étape 6 — le résultat.</em> Un vecteur de longueur 11, dont la 11ᵉ valeur vaut $20{,}8 + y_{11} + 1 = 20{,}8 + 21{,}7 + 1 = 43{,}5$.</p>
+<p><em>Étape 7 — l'interprétation, et l'avertissement à prendre au sérieux.</em> Le cours donne cet exemple pour illustrer la <strong>mécanique</strong>, pas pour en recommander l'usage. Un recyclage fractionnaire est presque toujours <strong>une erreur de conception</strong> : on croit combiner deux séries alignées, et on aligne en réalité une série sur elle-même en décalé. <strong>L'avertissement est ici le seul indice</strong> — il ne faut pas l'ignorer.</p>
+</div></details>
+
+<h2 data-prio="must">Concept 4 — Fabriquer des séquences</h2>
+<h3>4.1 L'opérateur <code>:</code> et son piège de priorité</h3>
+<div class="cal formel"><span class="lab">Notation (§2.3).</span>
+<p> *« For example <strong><code>1:30</code> is the vector <code>c(1, 2, ..., 29, 30)</code></strong>. The colon operator has <strong>high priority within an expression</strong>, so, for example <strong><code>2*1:15</code> is the vector <code>c(2, 4, ..., 28, 30)</code></strong>. »*</p>
+</div>
+<blockquote>
+<p class="cal piege"> <strong>Le piège que le cours vous fait découvrir vous-même.</strong> *« Put <code>n &lt;- 10</code> and <strong>compare the sequences <code>1:n-1</code> and <code>1:(n-1)</code></strong>. »*</p>
+<table>
+<thead>
+<tr>
+<th>Écriture</th>
+<th>Ce que R lit</th>
+<th>Résultat pour <code>n &lt;- 10</code></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>1:n-1</code></td>
+<td><code>(1:n) - 1</code> — le <code>:</code> est prioritaire</td>
+<td><code>0 1 2 3 4 5 6 7 8 9</code> — <strong>dix</strong> valeurs, commençant à <strong>0</strong></td>
+</tr>
+<tr>
+<td><code>1:(n-1)</code></td>
+<td><code>1:9</code></td>
+<td><code>1 2 3 4 5 6 7 8 9</code> — <strong>neuf</strong> valeurs, commençant à <strong>1</strong></td>
+</tr>
+</tbody></table>
+<p>Les deux vecteurs ont <strong>des longueurs différentes</strong> et <strong>des premières valeurs différentes</strong>. C'est la source d'erreur d'indice la plus fréquente chez le débutant, et elle est <strong>silencieuse</strong>.</p>
+</blockquote>
+<p><em>« The construction <strong><code>30:1</code></strong> may be used to generate a sequence <strong>backwards</strong>. »</em></p>
+<h3>4.2 <code>seq()</code> — cinq arguments, jamais tous ensemble</h3>
+<div class="cal formel"><span class="lab">Définition (§2.3).</span>
+<p> <em>« The function <code>seq()</code> is a <strong>more general facility</strong> for generating sequences. It has <strong>five arguments, only some of which may be specified in any one call</strong>. »</em></p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Argument</th>
+<th>Rôle (§2.3)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>from=</code></td>
+<td>le <strong>début</strong></td>
+</tr>
+<tr>
+<td><code>to=</code></td>
+<td>la <strong>fin</strong></td>
+</tr>
+<tr>
+<td><code>by=</code></td>
+<td>le <strong>pas</strong></td>
+</tr>
+<tr>
+<td><code>length=</code></td>
+<td>la <strong>longueur</strong></td>
+</tr>
+<tr>
+<td><code>along=</code></td>
+<td><em>« normally used as the <strong>only argument</strong>, to create the sequence <code>1, 2, …, length(vector)</code>, <strong>or the empty sequence if the vector is empty (as it can be)</strong> »</em></td>
+</tr>
+</tbody></table>
+<p><em>Si seuls <code>from</code> et <code>to</code> sont donnés, <strong>le résultat est le même que celui de l'opérateur deux-points</strong> : <code>seq(2,10)</code> est le même vecteur que <code>2:10</code>.</em></p>
+<div class="cal methode"><span class="lab">Méthode — les arguments nommés (§2.3).</span>
+<p> <em>« Arguments to <code>seq()</code>, <strong>and to many other R functions</strong>, can also be given in <strong>named form</strong>, in which case <strong>l'ordre dans lequel ils apparaissent n'a aucune importance</strong>. »</em> Ainsi <code>seq(1,30)</code>, <code>seq(from=1, to=30)</code> et <code>seq(to=30, from=1)</code> <strong>sont tous identiques à <code>1:30</code></strong>. Voir fiche 309 pour la règle générale d'appariement des arguments.</p>
+</div>
+<p><strong>Les deux exemples du cours, et pourquoi ils donnent le même vecteur.</strong></p>
+<pre><code class="language-r">seq(-5, 5, by = .2) -&gt; s3          # de -5 a 5 par pas de 0,2
+s4 &lt;- seq(length = 51, from = -5, by = .2)
+</code></pre>
+<p><em>« generates in <code>s3</code> the vector <code>c(-5.0, -4.8, -4.6, ..., 4.6, 4.8, 5.0)</code> »</em>, et <code>s4</code> <strong>le même vecteur</strong>. Vérification : de $-5$ à $5$ par pas de $0{,}2$, le nombre de valeurs est $\frac{5-(-5)}{0{,}2}+1 = 50+1 = \mathbf{51}$. Les deux écritures spécifient donc bien la même chose — l'une par la <strong>borne</strong>, l'autre par le <strong>compte</strong>.</p>
+<p class="cal piege"> <em><strong><code>along=</code> est la seule protection contre le vecteur vide.</strong></em> <code>1:length(v)</code> sur un <code>v</code> vide donne <code>1 0</code> — c'est-à-dire <code>c(1, 0)</code>, <strong>deux itérations</strong> au lieu de zéro. <code>seq(along = v)</code> donne <strong>la séquence vide</strong>, exactement comme il faut. C'est la raison d'être de cet argument, et le cours le souligne : <em>« or the empty sequence if the vector is empty (<strong>as it can be</strong>) »</em>.</p>
+<h3>4.3 <code>rep()</code> — deux façons de répéter</h3>
+<div class="cal formel"><span class="lab">Définition (§2.3).</span>
+<p> <em>« A related function is <code>rep()</code> which can be used for <strong>replicating an object in various complicated ways</strong>. »</em></p>
+</div>
+<pre><code class="language-r">s5 &lt;- rep(x, times = 5)   # « cinq copies de x bout a bout »
+s6 &lt;- rep(x, each = 5)    # « repete CHAQUE element de x cinq fois avant de passer au suivant »
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>Pour <code>x &lt;- c(1, 2, 3)</code></th>
+<th>Résultat</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>rep(x, times = 3)</code></td>
+<td><code>1 2 3 1 2 3 1 2 3</code> — le <strong>motif</strong> se répète</td>
+</tr>
+<tr>
+<td><code>rep(x, each = 3)</code></td>
+<td><code>1 1 1 2 2 2 3 3 3</code> — chaque <strong>valeur</strong> se répète</td>
+</tr>
+</tbody></table>
+<p><strong>Les deux ont la même longueur et un ordre entièrement différent.</strong> <code>times</code> sert à <strong>répliquer une structure</strong> ; <code>each</code> sert à <strong>fabriquer des groupes</strong> — d'où son rôle central dans la construction des facteurs (fiche 304).</p>
+<h2 data-prio="must">Concept 5 — Les vecteurs logiques</h2>
+<div class="cal formel"><span class="lab">Définition (§2.4).</span>
+<p> <em>« As well as numerical vectors, R allows manipulation of <strong>logical quantities</strong>. The elements of a logical vector can have the values <strong><code>TRUE</code>, <code>FALSE</code>, and <code>NA</code></strong> (for "not available"). »</em></p>
+</div>
+<p><em>« <strong>Logical vectors are generated by conditions.</strong> »</em></p>
+<pre><code class="language-r">temp &lt;- x &gt; 13
+</code></pre>
+<p>*met dans <code>temp</code> un vecteur <strong>de la même longueur que <code>x</code></strong>, valant <code>FALSE</code> là où la condition n'est pas remplie et <code>TRUE</code> là où elle l'est.*</p>
+<table>
+<thead>
+<tr>
+<th>Famille (§2.4)</th>
+<th>Opérateurs</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Comparaison</td>
+<td><code>&lt;</code>  <code>&lt;=</code>  <code>&gt;</code>  <code>&gt;=</code>  <strong><code>==</code> pour l'égalité exacte</strong>  <strong><code>!=</code> pour l'inégalité</strong></td>
+</tr>
+<tr>
+<td>Logique</td>
+<td><code>c1 &amp; c2</code> <strong>intersection</strong> (« et ») · <code>c1 | c2</code> <strong>union</strong> (« ou ») · <code>!c1</code> <strong>négation</strong></td>
+</tr>
+</tbody></table>
+<h3>5.1 Le piège <code>T</code> et <code>F</code></h3>
+<blockquote>
+<p class="cal piege"> <strong>Le piège (§2.4), déjà annoncé en fiche 300.</strong> <em>« The first two are often abbreviated as <code>T</code> and <code>F</code>, respectively. <strong>Note however that <code>T</code> and <code>F</code> are just variables which are set to <code>TRUE</code> and <code>FALSE</code> by default, but are not reserved words and hence can be overwritten by the user.</strong> Hence, <strong>you should always use <code>TRUE</code> and <code>FALSE</code>.</strong> »</em></p>
+</blockquote>
+<p>La démonstration tient en trois lignes :</p>
+<pre><code class="language-r">T          # TRUE
+T &lt;- 0     # parfaitement legal : T n'est pas un mot reserve
+if (1 == 1 &amp;&amp; T) "ok" else "casse"   # « casse »
+</code></pre>
+<p>Rien n'a protesté. Toute expression écrite avec <code>T</code> ailleurs dans la session est désormais fausse, <strong>silencieusement</strong>.</p>
+<h3>5.2 La coercition logique → numérique</h3>
+<blockquote>
+<p><strong>Règle (§2.4).</strong> <em>« Logical vectors may be used in <strong>ordinary arithmetic</strong>, in which case they are <strong>coerced into numeric vectors</strong>, <strong><code>FALSE</code> becoming 0 and <code>TRUE</code> becoming 1</strong>. »</em></p>
+</blockquote>
+<p>C'est ce qui rend l'idiome suivant possible — et c'est l'un des plus utiles de R :</p>
+<pre><code class="language-r">sum(x &gt; 13)         # COMBIEN d'elements depassent 13 : on somme des 1
+mean(x &gt; 13)        # quelle PROPORTION : la moyenne de 0 et de 1
+</code></pre>
+<blockquote>
+<p class="cal piege"> <strong>Mais la coercition n'est pas une équivalence (§2.4).</strong> <em>« However there are situations where <strong>logical vectors and their coerced numeric counterparts are not equivalent</strong>, for example see the next subsection. »</em> Le cours renvoie explicitement aux <strong>valeurs manquantes</strong>, et surtout à l'<strong>indexation</strong> : un vecteur logique et un vecteur de 0/1 <strong>n'indexent pas de la même façon</strong> (fiche 302). <code>x[c(TRUE, FALSE)]</code> prend un élément sur deux ; <code>x[c(1, 0)]</code> prend le premier élément, une fois.</p>
+</blockquote>
+<h2 data-prio="must">Concept 6 — Valeurs manquantes : <code>NA</code> et <code>NaN</code></h2>
+<div class="cal formel"><span class="lab">Définition (§2.5).</span>
+<p> *« When an element or value is <strong>"not available"</strong> or a <strong>"missing value" in the statistical sense</strong>, a place within a vector may be reserved for it by assigning it <strong>the special value <code>NA</code></strong>. <strong>In general any operation on an <code>NA</code> becomes an <code>NA</code>.</strong> »*</p>
+</div>
+<div class="cal intu"><span class="lab">Intuition — la justification du cours, qui vaut d'être retenue (§2.5).</span>
+<p> <em>« The motivation for this rule is simply that <strong>if the specification of an operation is incomplete, the result cannot be known and hence is not available</strong>. »</em> <code>NA</code> n'est pas « zéro », ni « rien » : c'est <strong>« je ne sais pas »</strong>. Et tout calcul fait à partir de quelque chose qu'on ne sait pas donne quelque chose qu'on ne sait pas.</p>
+</div>
+<h3>6.1 Le piège central : <code>x == NA</code> ne teste rien</h3>
+<div class="cal formel"><span class="lab">Problème (§2.5).</span>
+<p class="cal piege">  *« Notice that the logical expression <strong><code>x == NA</code> is quite different from <code>is.na(x)</code></strong> since <strong><code>NA</code> is not really a value but a marker for a quantity that is not available</strong>. Thus <strong><code>x == NA</code> is a vector of the same length as <code>x</code> all of whose values are <code>NA</code></strong>, as the logical expression itself is <strong>incomplete and hence undecidable</strong>. »*</p>
+</div>
+<pre><code class="language-r">z &lt;- c(1:3, NA)
+ind &lt;- is.na(z)      # FALSE FALSE FALSE TRUE   &lt;- LE bon test
+z == NA              # NA NA NA NA              &lt;- ne teste rien
+</code></pre>
+<p><strong>Pourquoi <code>1 == NA</code> vaut <code>NA</code> et non <code>FALSE</code></strong> : la question posée est « 1 est-il égal à une valeur que je ne connais pas ? ». La réponse honnête n'est pas « non », c'est <strong>« je ne peux pas savoir »</strong>. R répond <code>NA</code>.</p>
+<p><em>« The function <strong><code>is.na(x)</code></strong> gives a logical vector of the same size as <code>x</code> with value <code>TRUE</code> <strong>if and only if</strong> the corresponding element in <code>x</code> is <code>NA</code>. »</em></p>
+<h3>6.2 <code>NaN</code> — l'autre sorte de manquant</h3>
+<div class="cal formel"><span class="lab">Définition (§2.5).</span>
+<p> *« Note that there is a <strong>second kind of "missing" values</strong> which are produced by <strong>numerical computation</strong>, the so-called <strong>Not a Number, <code>NaN</code></strong>, values. »*</p>
+</div>
+<pre><code class="language-r">0/0          # NaN
+Inf - Inf    # NaN
+</code></pre>
+<p><em>« which both give <code>NaN</code> since <strong>the result cannot be defined sensibly</strong> ».</em></p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th><code>NA</code></th>
+<th><code>NaN</code></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Origine</td>
+<td><strong>une donnée absente</strong></td>
+<td><strong>un calcul indéfini</strong></td>
+</tr>
+<tr>
+<td>Sens</td>
+<td>« non disponible »</td>
+<td>« pas un nombre »</td>
+</tr>
+<tr>
+<td><code>is.na()</code></td>
+<td><code>TRUE</code></td>
+<td> <strong><code>TRUE</code> aussi</strong></td>
+</tr>
+<tr>
+<td><code>is.nan()</code></td>
+<td><code>FALSE</code></td>
+<td><strong><code>TRUE</code></strong></td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>Le résumé du cours (§2.5).</strong> <em>« In summary, <strong><code>is.na(xx)</code> is <code>TRUE</code> both for <code>NA</code> and <code>NaN</code> values</strong>. To differentiate these, <strong><code>is.nan(xx)</code> is only <code>TRUE</code> for <code>NaN</code>s</strong>. »</em></p>
+</blockquote>
+<p><em>« Missing values are sometimes printed as <strong><code>&lt;NA&gt;</code></strong> when character vectors are printed <strong>without quotes</strong>. »</em></p>
+<h3>6.3 Les types de <code>NA</code> — le complément décisif de la <em>R Language Definition</em></h3>
+<p>Cette partie n'est pas dans <em>An Introduction to R</em>. Elle est dans <strong>§3.3.4</strong> de la <em>R Language Definition</em>, et elle explique des comportements autrement inexplicables.</p>
+<div class="cal formel"><span class="lab">Définition.</span>
+<p> <em>« As the elements of an <strong>atomic vector must be of the same type</strong>, there are <strong>multiple types of <code>NA</code> values</strong>. There is one case where this is particularly important to the user : <strong>the default type of <code>NA</code> is logical</strong>, unless coerced to some other type, so <strong>the appearance of a missing value may trigger logical rather than numeric indexing</strong>. »</em></p>
+</div>
+<p>Conséquence immédiate, que le manuel énonce dans sa section indexation (fiche 302) : <strong><code>x[NA]</code> a la longueur de <code>x</code></strong>, tandis que <strong><code>x[c(1, NA)]</code> a la longueur 2</strong> — dans le premier cas ce sont les règles de l'index <strong>logique</strong> qui s'appliquent, dans le second celles de l'index <strong>entier</strong>.</p>
+<div class="cal formel"><span class="lab">Formule — les cas où NA ne se propage pas.</span>
+<p> <em>« Numeric and logical calculations with <code>NA</code> <strong>generally</strong> return <code>NA</code>. <strong>In cases where the result of the operation would be the same for all possible values the <code>NA</code> could take, the operation may return this value.</strong> In particular, <code>FALSE &amp; NA</code> is <code>FALSE</code>, <code>TRUE | NA</code> is <code>TRUE</code>. »</em></p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Expression</th>
+<th>Résultat</th>
+<th>Pourquoi</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>FALSE &amp; NA</code></td>
+<td><strong><code>FALSE</code></strong></td>
+<td>un « et » avec un <code>FALSE</code> est faux <strong>quelle que soit</strong> l'autre valeur</td>
+</tr>
+<tr>
+<td><code>TRUE | NA</code></td>
+<td><strong><code>TRUE</code></strong></td>
+<td>un « ou » avec un <code>TRUE</code> est vrai <strong>quelle que soit</strong> l'autre valeur</td>
+</tr>
+<tr>
+<td><code>TRUE &amp; NA</code></td>
+<td><code>NA</code></td>
+<td>là, la réponse <strong>dépendrait</strong> de la valeur inconnue</td>
+</tr>
+<tr>
+<td><code>NA == NA</code></td>
+<td><code>NA</code></td>
+<td><em>« <code>NA</code> is <strong>not equal to any other value or to itself</strong> »</em></td>
+</tr>
+</tbody></table>
+<p class="cal piege"> <strong>Mais <code>match</code> fait exception</strong> : <em>« However, an <code>NA</code> value <strong>will match another <code>NA</code> value in <code>match</code></strong> »</em>. Donc <code>NA %in% c(1, NA)</code> vaut <strong><code>TRUE</code></strong>, alors que <code>NA == NA</code> vaut <code>NA</code>. Deux notions différentes : <strong>égalité</strong> (indécidable) et <strong>appariement</strong> (une opération de recherche, qui traite <code>NA</code> comme un motif).</p>
+<p><strong>Les autres règles de §3.3.4, à connaître :</strong></p>
+<ul>
+<li><code>NaN</code> <em>« exists <strong>only in the double type</strong> and for real or imaginary components of the complex type »</em>.</li>
+<li><strong>Coercer <code>NaN</code></strong> en logique ou en entier donne <strong>un <code>NA</code> du type approprié</strong> ; <strong>en caractère</strong>, cela donne <strong>la chaîne <code>"NaN"</code></strong>.</li>
+<li>*« <code>NaN</code> values are <strong>incomparable</strong>, so tests of equality or collation involving <code>NaN</code> will result in <code>NA</code>. They are regarded as <strong>matching any <code>NaN</code> value</strong> (and no other value, <strong>not even <code>NA</code></strong>) by <code>match</code>. »*</li>
+<li> *« The <strong><code>NA</code> of character type is distinct from the string <code>"NA"</code></strong>. Programmers who need to specify an explicit string <code>NA</code> should use <strong><code>NA_character_</code></strong> rather than <code>"NA"</code>, or set elements to <code>NA</code> using <strong><code>is.na&lt;-</code></strong>. »*</li>
+<li>Les constantes <code>NA_integer_</code>, <code>NA_real_</code>, <code>NA_complex_</code> et <code>NA_character_</code> <em>« will generate (in the parser) an <code>NA</code> value of the appropriate type, and will be used <strong>in deparsing</strong> when it is not otherwise possible to identify the type of an <code>NA</code> »</em>.</li>
+<li><em>« There is <strong>no <code>NA</code> value for raw vectors</strong>. »</em></li>
+</ul>
+<blockquote>
+<p class="cal piege"> <strong>Ne pas confondre <code>NA</code> et l'argument manquant.</strong> <em>« This should <strong>not be confused with the <code>missing</code> property for a function argument that has not been supplied</strong> »</em> (§3.3.4, qui renvoie à §4.1.2). Un argument non fourni n'est pas <code>NA</code> : il n'existe pas. Voir fiche 309.</p>
+</blockquote>
+<details class="cor">
+<summary><strong>Exercice résolu — pourquoi <code>mean(z)</code> vaut <code>NA</code>, et les deux façons de le réparer</strong></summary><div class="in">
+
+<p><strong>Énoncé.</strong> <code>z &lt;- c(1:3, NA)</code>. Que vaut <code>mean(z)</code> ? Comment obtenir la moyenne des valeurs connues ?</p>
+<p><em>Étape 1 — appliquer la règle.</em> <em>« In general <strong>any operation on an <code>NA</code> becomes an <code>NA</code></strong> »</em>. La somme <code>1 + 2 + 3 + NA</code> vaut <code>NA</code>, donc la moyenne aussi. <strong><code>mean(z)</code> vaut <code>NA</code>.</strong></p>
+<p><em>Étape 2 — comprendre que ce n'est pas un bug.</em> C'est la réponse correcte à la question posée. La moyenne de quatre nombres dont un est inconnu <strong>est</strong> inconnue. Si R répondait <code>2</code>, il répondrait à une <strong>autre</strong> question.</p>
+<p><em>Étape 3 — poser la bonne question, voie 1 : filtrer.</em> La technique du §2.7 :</p>
+<pre><code class="language-r">z[!is.na(z)]          # 1 2 3
+mean(z[!is.na(z)])    # 2
+</code></pre>
+<p class="cal piege"> <strong>Ne pas écrire <code>z[z != NA]</code></strong> : <code>z != NA</code> vaut <code>NA NA NA NA</code>, et indexer par des <code>NA</code> renvoie des <code>NA</code>.</p>
+<p><em>Étape 4 — poser la bonne question, voie 2 : l'argument dédié.</em></p>
+<pre><code class="language-r">mean(z, na.rm = TRUE)   # 2
+</code></pre>
+<p><em>Étape 5 — laquelle choisir.</em> <code>na.rm = TRUE</code> est plus lisible et évite de recopier le vecteur ; le filtrage explicite est nécessaire quand <strong>plusieurs</strong> vecteurs doivent rester alignés (garder les mêmes positions dans <code>x</code> et dans <code>y</code>).</p>
+<p><em>Étape 6 — vérifier le dénominateur.</em> <code>mean(z, na.rm = TRUE)</code> divise par <strong>3</strong>, pas par 4 : <code>sum = 6</code>, <code>n = 3</code>, moyenne <strong>2</strong>. Les valeurs manquantes sont <strong>retirées</strong>, elles ne sont pas remplacées par zéro. Si elles l'étaient, on obtiendrait $6/4 = 1{,}5$ — c'est l'erreur que produit un <code>z[is.na(z)] &lt;- 0</code> fait sans réfléchir.</p>
+<blockquote>
+<p><em>Enrichissement pédagogique (hors cours) : l'argument <code>na.rm</code> n'est pas décrit au §2.5 d'<em>An Introduction to R</em> ; il est documenté dans les pages d'aide de <code>mean</code>, <code>sum</code>, <code>var</code> (<em>Reference Index</em>, paquet <code>base</code>). Le filtrage par <code>!is.na()</code>, lui, est bien la technique donnée par le cours au §2.7.</em></p>
+</blockquote>
+</div></details>
+
+<h2 data-prio="high">Concept 7 — Les vecteurs de caractères</h2>
+<div class="cal formel"><span class="lab">Définition (§2.6).</span>
+<p> <em>« Character quantities and character vectors are used frequently in R, for example <strong>as plot labels</strong>. Where needed they are denoted by a <strong>sequence of characters delimited by the double quote character</strong>, e.g. <code>"x-values"</code>, <code>"New iteration results"</code>. »</em></p>
+</div>
+<p><strong>Les guillemets (§2.6).</strong> <em>« Character strings are entered using <strong>either matching double (<code>"</code>) or single (<code>'</code>) quotes</strong>, but are <strong>printed using double quotes</strong> (or sometimes without quotes). »</em></p>
+<p><strong>Les échappements (§2.6).</strong> <em>« They use <strong>C-style escape sequences</strong>, using <code>\</code> as the escape character, so <code>\</code> is entered and printed as <code>\\</code>, and inside double quotes <code>"</code> is entered as <code>\"</code>. Other useful escape sequences are <code>\n</code>, newline, <code>\t</code>, tab and <code>\b</code>, backspace — see <code>?Quotes</code> for a full list. »</em></p>
+<div class="cal plus"><span class="lab">Complément — la liste des échappements (R Language Definition §10.3.1).</span>
+<p> Au-delà de <code>\n</code>, <code>\t</code>, <code>\b</code> et <code>\\</code> : <strong><code>\nnn</code></strong> (code <strong>octal</strong>, une à trois chiffres de 0 à 7), <strong><code>\xnn</code></strong> (code <strong>hexadécimal</strong>, un ou deux chiffres), <strong><code>\unnnn</code></strong> ou <strong><code>\u{nnnn}</code></strong> (Unicode, jusqu'à <strong>quatre</strong> chiffres hexadécimaux), <strong><code>\Unnnnnnnn</code></strong> ou <strong><code>\U{nnnnnnnn}</code></strong> (Unicode, jusqu'à <strong>huit</strong>). Les formes <code>\u</code> et <code>\U</code> exigent un environnement multi-octets ; <em>« otherwise an error »</em>, et le caractère <em>« needs to be valid in the current locale »</em>.</p>
+<p class="cal piege"> <em>« A <strong>NUL (<code>\0</code>) is not allowed</strong> in a character string, so using <code>\0</code> in a string constant <strong>terminates the constant</strong> (usually with a warning) : further characters up to the closing quote <strong>are scanned but ignored</strong>. »</em></p>
+<p>Et une commodité : <em>« A single quote may also be <strong>embedded directly</strong> in a double-quote delimited string <strong>and vice versa</strong>. »</em> — la règle déjà vue en fiche 300 avec <code>"It's important"</code>.</p>
+</div>
+<h3>7.1 <code>paste()</code> — et le recyclage qui frappe encore</h3>
+<div class="cal formel"><span class="lab">Définition (§2.6).</span>
+<p> *« The <code>paste()</code> function takes an <strong>arbitrary number of arguments</strong> and <strong>concatenates them one by one into character strings</strong>. <strong>Any numbers given among the arguments are coerced into character strings</strong> in the evident way — that is, in the same way they would be if they were printed. The arguments are <strong>by default separated in the result by a single blank character</strong>, but this can be changed by the named argument <strong><code>sep=string</code></strong>, possibly empty. »*</p>
+</div>
+<details class="cor">
+<summary><strong>Exercice résolu — l'exemple <code>paste</code> du cours, et pourquoi le résultat surprend</strong></summary><div class="in">
+
+<p><strong>Énoncé (celui du cours, §2.6).</strong></p>
+<pre><code class="language-r">labs &lt;- paste(c("X","Y"), 1:10, sep = "")
+</code></pre>
+<p>Que contient <code>labs</code> ?</p>
+<p><em>Étape 1 — recenser les longueurs.</em> Premier argument : <strong>2</strong>. Deuxième : <strong>10</strong>. Le résultat aura la <strong>longueur 10</strong>.</p>
+<p><em>Étape 2 — appliquer le recyclage.</em> Le cours l'écrit noir sur blanc : <em>« Note particularly that <strong>recycling of short lists takes place here too</strong> ; thus <code>c("X", "Y")</code> is <strong>repeated 5 times</strong> to match the sequence <code>1:10</code>. »</em> 10 est un multiple de 2 : <strong>aucun avertissement</strong>.</p>
+<p><em>Étape 3 — dérouler l'appariement.</em></p>
+<table>
+<thead>
+<tr>
+<th>position</th>
+<th>1</th>
+<th>2</th>
+<th>3</th>
+<th>4</th>
+<th>5</th>
+<th>6</th>
+<th>7</th>
+<th>8</th>
+<th>9</th>
+<th>10</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>lettre recyclée</td>
+<td>X</td>
+<td>Y</td>
+<td>X</td>
+<td>Y</td>
+<td>X</td>
+<td>Y</td>
+<td>X</td>
+<td>Y</td>
+<td>X</td>
+<td>Y</td>
+</tr>
+<tr>
+<td>nombre</td>
+<td>1</td>
+<td>2</td>
+<td>3</td>
+<td>4</td>
+<td>5</td>
+<td>6</td>
+<td>7</td>
+<td>8</td>
+<td>9</td>
+<td>10</td>
+</tr>
+</tbody></table>
+<p><em>Étape 4 — appliquer <code>sep = ""</code>.</em> Le séparateur par défaut est <strong>une espace</strong> ; ici il est <strong>vide</strong>, donc lettre et nombre sont collés.</p>
+<p><em>Étape 5 — le résultat, tel que le cours le donne.</em></p>
+<pre><code class="language-r">c("X1", "Y2", "X3", "Y4", "X5", "Y6", "X7", "Y8", "X9", "Y10")
+</code></pre>
+<p><em>Étape 6 — pourquoi c'est surprenant, et ce qu'on voulait sans doute.</em> On attend souvent « X1…X10 puis Y1…Y10 », soit <strong>20</strong> étiquettes. On en obtient <strong>10</strong>, alternées. Pour l'autre résultat, il faut faire varier les deux facteurs explicitement — par exemple avec <code>rep(..., each = 10)</code>, ce qui ramène au concept 4 :</p>
+<pre><code class="language-r">paste(rep(c("X","Y"), each = 10), 1:10, sep = "")
+# "X1" ... "X10" "Y1" ... "Y10"   -- 20 etiquettes
+</code></pre>
+<p class="cal piege"> <strong>Sans avertissement, un recyclage reste un recyclage.</strong> Le silence de R signifie « les longueurs sont compatibles », pas « c'est ce que tu voulais ».</p>
+</div></details>
+
+<div class="cal plus"><span class="lab">Complément — collapse (note 3, §2.6).</span>
+<p> <em>« <code>paste(..., collapse=ss)</code> <strong>joins the arguments into a single character string</strong> putting <code>ss</code> in between, e.g. <code>ss &lt;- "|"</code>. »</em> Deux arguments à ne pas confondre : <strong><code>sep</code></strong> sépare les <strong>colonnes</strong> (et le résultat garde sa longueur) ; <strong><code>collapse</code></strong> réduit le vecteur <strong>à un seul élément</strong>.</p>
+<p><em>« There are <strong>more tools for character manipulation</strong>, see the help for <code>sub</code> and <code>substring</code>. »</em></p>
+</div>
+<h2 data-prio="mid">Concept 8 — La table des opérateurs</h2>
+<div class="cal formel"><span class="lab">Notation (R Language Definition §3.1.4).</span>
+<p> <em>« R contains a number of operators. They are listed in the table below. »</em></p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Opérateur</th>
+<th>Rôle</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-</code></td>
+<td><strong>Moins</strong>, peut être <strong>unaire ou binaire</strong></td>
+</tr>
+<tr>
+<td><code>+</code></td>
+<td><strong>Plus</strong>, peut être <strong>unaire ou binaire</strong></td>
+</tr>
+<tr>
+<td><code>!</code></td>
+<td><strong>Non</strong> unaire</td>
+</tr>
+<tr>
+<td><code>~</code></td>
+<td><strong>Tilde</strong>, pour les <strong>formules de modèle</strong> ; peut être unaire ou binaire</td>
+</tr>
+<tr>
+<td><code>?</code></td>
+<td><strong>Aide</strong></td>
+</tr>
+<tr>
+<td><code>:</code></td>
+<td><strong>Séquence</strong>, binaire (<em>dans une formule de modèle : <strong>interaction</strong></em>)</td>
+</tr>
+<tr>
+<td><code>*</code> <code>/</code> <code>^</code></td>
+<td>multiplication, division, <strong>exponentiation</strong>, binaires</td>
+</tr>
+<tr>
+<td><code>%x%</code></td>
+<td><strong>opérateurs binaires spéciaux</strong> — <em>« <code>x</code> can be replaced by <strong>any valid name</strong> »</em></td>
+</tr>
+<tr>
+<td><code>%%</code></td>
+<td><strong>modulo</strong>, binaire</td>
+</tr>
+<tr>
+<td><code>%/%</code></td>
+<td><strong>division entière</strong>, binaire</td>
+</tr>
+<tr>
+<td><code>%*%</code></td>
+<td><strong>produit matriciel</strong>, binaire</td>
+</tr>
+<tr>
+<td><code>%o%</code></td>
+<td><strong>produit extérieur</strong>, binaire</td>
+</tr>
+<tr>
+<td><code>%x%</code></td>
+<td><strong>produit de Kronecker</strong>, binaire</td>
+</tr>
+<tr>
+<td><code>%in%</code></td>
+<td><strong>opérateur d'appariement</strong>, binaire (<em>dans une formule : <strong>imbrication</strong></em>)</td>
+</tr>
+<tr>
+<td><code>%||%</code></td>
+<td>opérateur de <strong>coalescence nulle</strong>, binaire</td>
+</tr>
+<tr>
+<td><code>&lt;</code> <code>&gt;</code> <code>==</code> <code>&gt;=</code> <code>&lt;=</code></td>
+<td>inférieur, supérieur, égal, supérieur ou égal, inférieur ou égal — binaires</td>
+</tr>
+<tr>
+<td><code>&amp;</code></td>
+<td><strong>et</strong>, binaire, <strong>vectorisé</strong></td>
+</tr>
+<tr>
+<td><code>&amp;&amp;</code></td>
+<td><strong>et</strong>, binaire, <strong>non vectorisé</strong></td>
+</tr>
+<tr>
+<td><code>|</code></td>
+<td><strong>ou</strong>, binaire, <strong>vectorisé</strong></td>
+</tr>
+<tr>
+<td><code>||</code></td>
+<td><strong>ou</strong>, binaire, <strong>non vectorisé</strong></td>
+</tr>
+<tr>
+<td><code>&lt;-</code> / <code>-&gt;</code></td>
+<td>assignation <strong>à gauche</strong> / <strong>à droite</strong>, binaires</td>
+</tr>
+<tr>
+<td><code>$</code></td>
+<td><strong>sous-ensemble de liste</strong>, binaire</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p class="cal piege"> <strong>Deux remarques de lecture.</strong></p>
+<ol>
+<li><strong><code>!=</code> ne figure pas dans cette table</strong> de la <em>R Language Definition</em>. Il existe bel et bien, et <em>An Introduction to R</em> le donne au §2.4 (<em>« <code>!=</code> for inequality »</em>). C'est une lacune de la table, pas du langage.</li>
+<li><strong><code>&amp;</code> contre <code>&amp;&amp;</code></strong> est la distinction la plus lourde de conséquences du tableau : <code>&amp;</code> travaille <strong>élément par élément</strong> et rend un vecteur ; <code>&amp;&amp;</code> rend <strong>une seule valeur</strong> et sert aux conditions de <code>if</code>. Voir fiche 308.</li>
+</ol>
+</blockquote>
+<blockquote>
+<p><strong>Ce qu'il faut retenir de plus profond (§3.1.4).</strong> *« <strong>Except for the syntax, there is no difference between applying an operator and calling a function.</strong> In fact, <strong><code>x + y</code> can equivalently be written <code>`+`(x, y)</code></strong>. Notice that since <code>+</code> is a <strong>non-standard function name, it needs to be quoted</strong>. »*</p>
+<p>De même pour l'indexation : <em>« Like the other operators, <strong>indexing is really done by functions</strong>, and one could have used <code>`[`(x, 2)</code> instead of <code>x[2]</code>. »</em> Cette identité opérateur = fonction est le fondement de la fiche 317 (calcul sur le langage) — et elle explique pourquoi on peut écrire <code>sapply(liste, </code>[[<code>, 1)</code>.</p>
+</blockquote>
+<p class="cal piege"> <strong><code>%x%</code> apparaît deux fois dans la table</strong> : une fois comme <strong>forme générale</strong> des opérateurs binaires définis par l'utilisateur (« <code>x</code> peut être remplacé par n'importe quel nom valide »), une fois comme l'opérateur <strong>concret</strong> du produit de Kronecker. Ce n'est pas une coquille : c'est la même syntaxe, employée à deux niveaux. Voir fiche 309 pour définir le vôtre.</p>
+<h2 data-prio="low">Concept 9 — La carte du reste : les autres types d'objets</h2>
+<div class="cal formel"><span class="lab">Définition (§2.8).</span>
+<p> <em>« <strong>Vectors are the most important type of object in R</strong>, but there are several others which we will meet more formally in later sections. »</em></p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Objet (§2.8)</th>
+<th>Ce que le cours en dit</th>
+<th>Fiche</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>matrices</strong>, plus généralement <strong>arrays</strong></td>
+<td><em>« multi-dimensional generalizations of vectors. <strong>In fact, they are vectors that can be indexed by two or more indices</strong> and will be printed in special ways »</em></td>
+<td>305</td>
+</tr>
+<tr>
+<td><strong>factors</strong></td>
+<td><em>« provide <strong>compact ways to handle categorical data</strong> »</em></td>
+<td>304</td>
+</tr>
+<tr>
+<td><strong>lists</strong></td>
+<td><em>« a <strong>general form of vector</strong> in which the various elements <strong>need not be of the same type</strong>, and are often themselves vectors or lists. Lists provide a convenient way to <strong>return the results of a statistical computation</strong> »</em></td>
+<td>306</td>
+</tr>
+<tr>
+<td><strong>data frames</strong></td>
+<td><em>« <strong>matrix-like structures, in which the columns can be of different types</strong>. Think of data frames as "data matrices" with <strong>one row per observational unit</strong> but with (possibly) both numerical and categorical variables »</em></td>
+<td>306</td>
+</tr>
+<tr>
+<td><strong>functions</strong></td>
+<td><em>« are <strong>themselves objects in R</strong> which can be stored in the project's workspace. This provides a simple and convenient way to <strong>extend R</strong> »</em></td>
+<td>309</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>La phrase à garder.</strong> <em>« <strong>In fact, they are vectors</strong> that can be indexed by two or more indices. »</em> Une matrice n'est <strong>pas</strong> un nouveau type : c'est <strong>un vecteur muni d'un attribut <code>dim</code></strong>. C'est exactement ce que démontre la fiche 303, et ce qui explique que <code>m[1]</code> — un seul indice sur une matrice — rende toujours quelque chose de sensé.</p>
+</blockquote>
+<h2>Comment reconnaître le type d'exercice</h2>
+<table>
+<thead>
+<tr>
+<th>Le signal dans l'énoncé</th>
+<th>Ce qu'il faut mobiliser</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>deux vecteurs de longueurs différentes dans un calcul</td>
+<td><strong>recyclage</strong> : longueur du résultat = celle du <strong>plus long</strong> ; avertissement si non-multiple</td>
+</tr>
+<tr>
+<td>« pourquoi ai-je un avertissement <code>longer object length is not a multiple</code> ? »</td>
+<td>recyclage <strong>fractionnaire</strong> — presque toujours une erreur de conception</td>
+</tr>
+<tr>
+<td>« le résultat est vide »</td>
+<td>un opérande de <strong>longueur 0</strong> → résultat de longueur 0</td>
+</tr>
+<tr>
+<td>« combien d'éléments vérifient… ? »</td>
+<td><code>sum(condition)</code> — coercition <code>TRUE</code> → 1</td>
+</tr>
+<tr>
+<td>« quelle proportion… ? »</td>
+<td><code>mean(condition)</code></td>
+</tr>
+<tr>
+<td>« le plus grand de chaque paire »</td>
+<td><strong><code>pmax</code></strong>, pas <code>max</code></td>
+</tr>
+<tr>
+<td>« ma moyenne vaut <code>NA</code> »</td>
+<td>propagation du <code>NA</code> → <code>na.rm = TRUE</code> ou <code>x[!is.na(x)]</code></td>
+</tr>
+<tr>
+<td>« mon test <code>== NA</code> ne marche pas »</td>
+<td>il <strong>ne peut pas</strong> marcher → <strong><code>is.na()</code></strong></td>
+</tr>
+<tr>
+<td>« distinguer une donnée absente d'un calcul raté »</td>
+<td><code>is.na()</code> vaut <code>TRUE</code> pour les deux ; <strong><code>is.nan()</code></strong> isole <code>NaN</code></td>
+</tr>
+<tr>
+<td>« ma boucle tourne une fois de trop sur un vecteur vide »</td>
+<td><code>1:length(v)</code> → <strong><code>seq(along = v)</code></strong></td>
+</tr>
+<tr>
+<td>« mon indice commence à 0 »</td>
+<td><code>1:n-1</code> lu comme <code>(1:n)-1</code> → parenthéser</td>
+</tr>
+<tr>
+<td>une racine de nombre négatif</td>
+<td><code>sqrt(-17)</code> = <code>NaN</code> ; il faut <code>sqrt(-17+0i)</code></td>
+</tr>
+<tr>
+<td>construire des étiquettes</td>
+<td><code>paste()</code> + <code>sep</code> ; <code>collapse</code> pour tout réduire à <strong>une</strong> chaîne</td>
+</tr>
+<tr>
+<td>fabriquer des groupes égaux</td>
+<td><code>rep(x, each = k)</code> ; répéter un motif : <code>times</code></td>
+</tr>
+<tr>
+<td>un <code>if</code> qui proteste sur une condition de longueur &gt; 1</td>
+<td><code>&amp;</code>/<code>|</code> sont <strong>vectorisés</strong>, <code>&amp;&amp;</code>/<code>||</code> <strong>non</strong></td>
+</tr>
+</tbody></table>
+<h2>Comment résoudre ce type d'exercice</h2>
+<p><strong>Protocole « prévoir le résultat d'une expression vectorielle » — 5 étapes.</strong></p>
+<ol>
+<li><strong>Noter la longueur de chaque opérande</strong>, la constante comprise (longueur 1).</li>
+<li><strong>Décomposer en opérations binaires</strong> — le recyclage se fait <strong>à chaque opération</strong>, pas une fois pour l'expression.</li>
+<li>Pour chaque opération : longueur du résultat = <strong>le maximum</strong> ; vérifier si le max est <strong>un multiple</strong> du min (sinon, <strong>avertissement</strong>).</li>
+<li><strong>Dérouler le recyclage position par position</strong> dans un tableau, au moins pour la première opération douteuse.</li>
+<li><strong>Vérifier le type</strong> du résultat : un logique entré dans une opération arithmétique <strong>devient 0/1</strong> ; un <code>NA</code> quelque part <strong>se propage</strong>, sauf <code>FALSE &amp; NA</code> et <code>TRUE | NA</code>.</li>
+</ol>
+<p><strong>Protocole « nettoyer un vecteur de ses manquants » — 4 étapes.</strong></p>
+<ol>
+<li><strong>Diagnostiquer</strong> : <code>is.na(x)</code> pour l'ensemble manquant, <code>is.nan(x)</code> pour distinguer les calculs indéfinis.</li>
+<li><strong>Décider</strong> : retirer (<code>na.rm = TRUE</code> ou <code>x[!is.na(x)]</code>) ou remplacer (<code>x[is.na(x)] &lt;- 0</code>) — les deux <strong>ne donnent pas le même dénominateur</strong>.</li>
+<li><strong>Ne jamais tester par <code>==</code></strong> : <code>x == NA</code> rend <code>NA</code> partout.</li>
+<li><strong>Vérifier la longueur</strong> après coup : filtrer <strong>raccourcit</strong> le vecteur, ce qui <strong>désaligne</strong> les vecteurs parallèles.</li>
+</ol>
+<p><strong>Protocole « fabriquer la bonne séquence » — 4 étapes.</strong></p>
+<ol>
+<li>Bornes connues, pas de 1 → <strong><code>a:b</code></strong> ; se méfier de la <strong>priorité</strong> du <code>:</code>, parenthéser au moindre doute.</li>
+<li>Pas différent de 1 → <strong><code>seq(from, to, by =)</code></strong> ; nombre de valeurs voulu → <strong><code>seq(length =, from =, by =)</code></strong>.</li>
+<li>Indexer un vecteur existant → <strong><code>seq(along = v)</code></strong>, jamais <code>1:length(v)</code>.</li>
+<li>Répéter → <strong><code>times</code></strong> pour le motif, <strong><code>each</code></strong> pour les groupes.</li>
+</ol>
+<h2 data-prio="must">Common mistakes</h2>
+<table>
+<thead>
+<tr>
+<th>Erreur</th>
+<th>Correction</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Tester <code>x == NA</code></td>
+<td><strong>impossible par construction</strong> → <code>is.na(x)</code></td>
+</tr>
+<tr>
+<td>Croire <code>is.na()</code> spécifique à <code>NA</code></td>
+<td>il vaut <strong><code>TRUE</code> pour <code>NaN</code> aussi</strong> → <code>is.nan()</code> pour distinguer</td>
+</tr>
+<tr>
+<td>Croire <code>NA == NA</code> égal à <code>TRUE</code></td>
+<td>c'est <strong><code>NA</code></strong> — mais <code>match</code>/<code>%in%</code> <strong>apparie</strong> les <code>NA</code></td>
+</tr>
+<tr>
+<td>Croire que tout calcul avec <code>NA</code> donne <code>NA</code></td>
+<td><strong><code>FALSE &amp; NA</code></strong> vaut <code>FALSE</code>, <strong><code>TRUE | NA</code></strong> vaut <code>TRUE</code></td>
+</tr>
+<tr>
+<td>Confondre le <code>NA</code> caractère et la chaîne <code>"NA"</code></td>
+<td>ce sont <strong>deux choses distinctes</strong> → <code>NA_character_</code></td>
+</tr>
+<tr>
+<td>Confondre <code>NA</code> et un argument non fourni</td>
+<td>l'un est <strong>une valeur</strong>, l'autre une <strong>absence d'argument</strong> (<code>missing</code>)</td>
+</tr>
+<tr>
+<td>Ignorer l'avertissement de recyclage</td>
+<td>le calcul <strong>aboutit quand même</strong>, faux au milieu</td>
+</tr>
+<tr>
+<td>Croire que le recyclage s'applique une fois à l'expression</td>
+<td>il s'applique à <strong>chaque opération binaire</strong></td>
+</tr>
+<tr>
+<td>Écrire <code>1:n-1</code> pour « de 1 à n−1 »</td>
+<td>le <code>:</code> est <strong>prioritaire</strong> → <code>1:(n-1)</code></td>
+</tr>
+<tr>
+<td>Écrire <code>1:length(v)</code></td>
+<td>sur un <code>v</code> <strong>vide</strong>, cela vaut <code>c(1, 0)</code> → <strong><code>seq(along = v)</code></strong></td>
+</tr>
+<tr>
+<td>Utiliser <code>max</code> pour un maximum position par position</td>
+<td>c'est <strong><code>pmax</code></strong></td>
+</tr>
+<tr>
+<td>Attendre un complexe de <code>sqrt(-17)</code></td>
+<td>il faut <strong><code>sqrt(-17+0i)</code></strong></td>
+</tr>
+<tr>
+<td>Utiliser <code>T</code> et <code>F</code></td>
+<td><strong>variables réassignables</strong> → <code>TRUE</code> et <code>FALSE</code></td>
+</tr>
+<tr>
+<td>Confondre <code>rep(x, times=k)</code> et <code>rep(x, each=k)</code></td>
+<td>motif répété contre <strong>valeurs groupées</strong></td>
+</tr>
+<tr>
+<td>Attendre 20 étiquettes de <code>paste(c("X","Y"), 1:10)</code></td>
+<td><strong>recyclage</strong> : 10 étiquettes alternées</td>
+</tr>
+<tr>
+<td>Confondre <code>sep</code> et <code>collapse</code></td>
+<td><code>sep</code> sépare <strong>dans chaque élément</strong> ; <code>collapse</code> réduit à <strong>un seul</strong> élément</td>
+</tr>
+<tr>
+<td>Utiliser <code>&amp;&amp;</code> sur des vecteurs</td>
+<td><code>&amp;&amp;</code> est <strong>non vectorisé</strong> — pour un vecteur, c'est <code>&amp;</code></td>
+</tr>
+<tr>
+<td>Écrire <code>1</code> en croyant écrire un entier</td>
+<td><code>1</code> est un <strong>double</strong> ; l'entier est <strong><code>1L</code></strong></td>
+</tr>
+<tr>
+<td>Écrire <code>1e-3L</code> en attendant un entier</td>
+<td><strong>avertissement</strong>, et c'est un <strong>numérique</strong> qui est créé</td>
+</tr>
+<tr>
+<td>Croire qu'un <code>NA</code> dans un index se comporte toujours pareil</td>
+<td><code>x[NA]</code> suit les règles <strong>logiques</strong>, <code>x[c(1, NA)]</code> les règles <strong>entières</strong></td>
+</tr>
+<tr>
+<td>Croire <code>c()</code> capable d'imbriquer</td>
+<td><code>c(x, 0, x)</code> <strong>aplatit</strong> — 11 éléments, pas 3</td>
+</tr>
+</tbody></table>
+<h2>Ultimate Review</h2>
+<p><strong>Le vecteur.</strong> <em>La structure la plus simple ; une <strong>collection ordonnée</strong>.</em> <strong>Un nombre isolé est un vecteur de longueur 1.</strong> <code>c()</code> <strong>concatène bout à bout</strong> — donc <strong>aplatit</strong>. Quatre écritures d'assignation : <code>&lt;-</code>, <code>=</code> (« dans la plupart des contextes »), <code>assign("x", …)</code>, <code>-&gt; x</code>.</p>
+<p><strong>La vectorisation.</strong> Toute opération est <strong>élément par élément</strong>, avec <strong>la boucle implicite écrite en C</strong>. <code>x + y</code> s'écrit aussi <code>`+`(x, y)</code> : <em>« except for the syntax, there is no difference between applying an operator and calling a function »</em>.</p>
+<p><strong>Le recyclage — la règle en quatre lignes.</strong> Longueur du résultat = <strong>celle du plus long</strong> · le plus court est <strong>répété, éventuellement fractionnairement</strong> · <strong>non-multiple → avertissement</strong> · <strong>longueur 0 quelque part → résultat de longueur 0</strong> (depuis R 1.4.0). Et il s'applique <strong>à chaque opération binaire</strong>, pas une fois pour l'expression.</p>
+<p><strong>Les fonctions de base.</strong> <code>length</code> <code>sum</code> <code>prod</code> <code>max</code> <code>min</code> <code>range</code> = <code>c(min, max)</code> · <code>mean</code> = <code>sum/length</code> · <code>var</code> = $\frac{1}{n-1}\sum(x_i-\bar x)^2$, et <strong>matrice de covariance $p\times p$</strong> si l'argument est une matrice $n\times p$ · <code>sort</code> trie, <strong><code>order</code>/<code>sort.list</code> rendent la permutation</strong> · <strong><code>pmax</code>/<code>pmin</code> parallèles</strong>.</p>
+<p><strong>Séquences.</strong> <code>1:30</code> · <strong>le <code>:</code> est prioritaire</strong> : <code>2*1:15</code> = <code>c(2,…,30)</code>, et <code>1:n-1</code> = <code>(1:n)-1</code> · <code>30:1</code> à rebours · <code>seq()</code> a <strong>cinq</strong> arguments (<code>from</code>, <code>to</code>, <code>by</code>, <code>length</code>, <code>along</code>), jamais tous ensemble · <code>seq(2,10)</code> = <code>2:10</code> · <strong><code>along=</code> protège du vecteur vide</strong> · <code>rep(x, times=)</code> répète le <strong>motif</strong>, <code>rep(x, each=)</code> répète <strong>chaque valeur</strong>.</p>
+<p><strong>Logiques.</strong> Valeurs <code>TRUE</code>, <code>FALSE</code>, <strong><code>NA</code></strong> · générés <strong>par des conditions</strong> · <code>&lt;</code> <code>&lt;=</code> <code>&gt;</code> <code>&gt;=</code> <code>==</code> <code>!=</code> · <code>&amp;</code> <code>|</code> <code>!</code> · <strong>coercition en arithmétique : <code>FALSE</code>→0, <code>TRUE</code>→1</strong>, d'où <code>sum(cond)</code> et <code>mean(cond)</code> · <strong><code>T</code> et <code>F</code> sont des variables, pas des mots réservés</strong>.</p>
+<p><strong>Manquants.</strong> <strong><code>NA</code></strong> = donnée non disponible ; <strong><code>NaN</code></strong> = calcul indéfini (<code>0/0</code>, <code>Inf - Inf</code>) · <strong><code>is.na()</code> vaut <code>TRUE</code> pour les deux</strong>, <strong><code>is.nan()</code> pour <code>NaN</code> seul</strong> · <strong><code>x == NA</code> rend <code>NA</code> partout — ce n'est pas un test</strong> · <code>NA</code> n'est égal ni à rien ni à lui-même, <strong>mais <code>match</code> apparie les <code>NA</code></strong> · <code>FALSE &amp; NA</code> = <code>FALSE</code>, <code>TRUE | NA</code> = <code>TRUE</code> · le <strong>type par défaut de <code>NA</code> est logique</strong>, d'où <code>x[NA]</code> de la longueur de <code>x</code> et <code>x[c(1,NA)]</code> de longueur 2 · <code>NA_character_</code> ≠ <code>"NA"</code> · <strong>pas de <code>NA</code> pour les vecteurs <code>raw</code></strong> · affichage <code>&lt;NA&gt;</code> sans guillemets.</p>
+<p><strong>Caractères.</strong> Guillemets <strong>doubles ou simples</strong>, <strong>affichés en doubles</strong> · échappements <strong>à la C</strong> : <code>\\</code> <code>\"</code> <code>\n</code> <code>\t</code> <code>\b</code>, plus <code>\nnn</code> (octal), <code>\xnn</code> (hexa), <code>\unnnn</code> / <code>\Unnnnnnnn</code> (Unicode) · <strong><code>\0</code> interdit</strong> : il termine la constante · <code>paste()</code> <strong>coerce les nombres</strong>, sépare par <strong>une espace</strong> par défaut, <code>sep=</code> change, <strong><code>collapse=</code> réduit à une seule chaîne</strong> · <strong>le recyclage s'y applique aussi</strong>.</p>
+<p><strong>Constantes.</strong> <code>1</code> est un <strong>double</strong> ; <code>1L</code> un <strong>entier</strong> · <code>0x10L</code> = 16 · <code>1e3L</code> = <code>1000L</code> (le <code>L</code> qualifie <code>1e3</code>) · <code>1e-3L</code> et <code>1.L</code> → <strong>avertissement</strong> · <code>12iL</code> → <strong>erreur</strong>.</p>
+<p><strong>Opérateurs.</strong> <code>%%</code> modulo · <code>%/%</code> division entière · <code>%*%</code> produit matriciel · <code>%o%</code> produit extérieur · <code>%x%</code> Kronecker · <code>%in%</code> appariement · <code>%||%</code> coalescence nulle · <strong><code>&amp;</code>/<code>|</code> vectorisés, <code>&amp;&amp;</code>/<code>||</code> non</strong> · <code>%nom%</code> pour définir le sien · <strong><code>!=</code> manque à la table de la <em>R Language Definition</em></strong>, mais existe.</p>
+<p><strong>Les cinq autres objets (§2.8).</strong> matrices/arrays (<strong>des vecteurs à plusieurs indices</strong>), facteurs (catégoriel compact), listes (<strong>éléments de types différents</strong>), data frames (<strong>colonnes de types différents, une ligne par unité d'observation</strong>), fonctions (<strong>des objets</strong>, stockables dans l'espace de travail).</p>
+<div class="rec"><h2>Active Recall</h2><details class="cor">
+<summary>Énoncer la règle du recyclage, y compris ce que fait R quand elle « tombe mal ».</summary><div class="in">
+
+<p>*« If they are not [of the same length], the value of the expression is a vector with <strong>the same length as the longest</strong> vector which occurs in the expression. <strong>Recycling occurs in each binary operation</strong>: the shorter vector is <strong>recycled as often as need be (perhaps fractionally)</strong>. <strong>In particular a constant is simply repeated.</strong> »* (§2.2)</p>
+<p><strong>Quand elle tombe mal</strong> (<em>R Language Definition</em> §3.3.1) : <em>« If the length of the longer vector is <strong>not a multiple</strong> of the shorter one, <strong>a warning is given</strong> »</em> — mais <strong>le calcul se fait quand même</strong>. Et : <em>« any arithmetic operation involving a <strong>zero-length vector</strong> has a <strong>zero-length result</strong> »</em> (depuis R 1.4.0).</p>
+</div></details><details class="cor">
+<summary>Dérouler <code>2*x + y + 1</code> avec <code>length(x) = 5</code> et <code>length(y) = 11</code>.</summary><div class="in">
+
+<p>Trois opérations binaires, chacune recyclant séparément.</p>
+<ol>
+<li><strong><code>2*x</code></strong> : longueurs 1 et 5 → résultat de <strong>longueur 5</strong>, la constante répétée.</li>
+<li><strong><code>2*x + y</code></strong> : longueurs 5 et 11. <strong>11 n'est pas un multiple de 5</strong> → recyclage <strong>fractionnaire</strong> (<em>« <code>2*x</code> repeated <strong>2,2 times</strong> »</em>) et <strong>avertissement</strong>. La 11ᵉ position reprend <strong>le 1ᵉʳ</strong> élément de <code>2*x</code>.</li>
+<li><strong><code>… + 1</code></strong> : longueurs 11 et 1 → la constante est répétée <strong>11 fois</strong>, sans avertissement.</li>
+</ol>
+<p>Résultat : un vecteur de <strong>longueur 11</strong>. Et le message essentiel : un recyclage fractionnaire est presque toujours <strong>une erreur</strong>, dont <strong>l'avertissement est le seul indice</strong>.</p>
+</div></details><details class="cor">
+<summary>Pourquoi <code>x == NA</code> ne peut pas fonctionner, et que vaut-il exactement ?</summary><div class="in">
+
+<p>*« <code>NA</code> <strong>is not really a value but a marker for a quantity that is not available</strong>. Thus <strong><code>x == NA</code> is a vector of the same length as <code>x</code> all of whose values are <code>NA</code></strong>, as the logical expression itself is <strong>incomplete and hence undecidable</strong>. »* (§2.5)</p>
+<p>La question « 1 est-il égal à une valeur inconnue ? » n'a pas pour réponse « non » mais <strong>« je ne peux pas savoir »</strong>. Le bon test est <strong><code>is.na(x)</code></strong>, qui rend <code>TRUE</code> <strong>si et seulement si</strong> l'élément correspondant est <code>NA</code>.</p>
+</div></details><details class="cor">
+<summary>Distinguer <code>NA</code>, <code>NaN</code>, <code>is.na()</code> et <code>is.nan()</code>.</summary><div class="in">
+
+<table>
+<thead>
+<tr>
+<th></th>
+<th><code>NA</code></th>
+<th><code>NaN</code></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Origine</td>
+<td>une <strong>donnée absente</strong></td>
+<td>un <strong>calcul indéfini</strong> (<code>0/0</code>, <code>Inf - Inf</code>)</td>
+</tr>
+<tr>
+<td><code>is.na()</code></td>
+<td><code>TRUE</code></td>
+<td><strong><code>TRUE</code> aussi</strong></td>
+</tr>
+<tr>
+<td><code>is.nan()</code></td>
+<td><code>FALSE</code></td>
+<td><code>TRUE</code></td>
+</tr>
+</tbody></table>
+<p><em>« In summary, <strong><code>is.na(xx)</code> is <code>TRUE</code> both for <code>NA</code> and <code>NaN</code> values</strong>. To differentiate these, <code>is.nan(xx)</code> is <strong>only <code>TRUE</code> for <code>NaN</code>s</strong>. »</em> (§2.5)</p>
+<p class="cal piege"> <code>NaN</code> <em>« exists <strong>only in the double type</strong> »</em> et pour les composantes d'un complexe. Coercé en logique ou en entier il donne <strong>un <code>NA</code></strong> ; en caractère, <strong>la chaîne <code>"NaN"</code></strong>.</p>
+</div></details><details class="cor">
+<summary>Dans quels cas une opération impliquant <code>NA</code> ne rend-elle PAS <code>NA</code> ?</summary><div class="in">
+
+<p>*« In cases where <strong>the result of the operation would be the same for all possible values the <code>NA</code> could take</strong>, the operation may return this value. In particular, <strong><code>FALSE &amp; NA</code> is <code>FALSE</code></strong>, <strong><code>TRUE | NA</code> is <code>TRUE</code></strong>. »* (<em>R Language Definition</em> §3.3.4)</p>
+<p>La logique est celle de l'<strong>évaluation suffisante</strong> : un « et » avec un <code>FALSE</code> est faux quoi qu'il arrive ; un « ou » avec un <code>TRUE</code> est vrai quoi qu'il arrive. En revanche <code>TRUE &amp; NA</code> vaut <code>NA</code> — là, la réponse <strong>dépendrait</strong> de la valeur inconnue.</p>
+<p class="cal piege"> Autre exception, d'une autre nature : <em>« an <code>NA</code> value <strong>will match another <code>NA</code> value in <code>match</code></strong> »</em>, alors que <code>NA == NA</code> vaut <code>NA</code>. <strong>Égalité</strong> et <strong>appariement</strong> ne sont pas la même opération.</p>
+</div></details><details class="cor">
+<summary>Que valent <code>1:n-1</code> et <code>1:(n-1)</code> pour <code>n &lt;- 10</code>, et pourquoi ?</summary><div class="in">
+
+<p><em>« The colon operator has <strong>high priority</strong> within an expression »</em> (§2.3).</p>
+<ul>
+<li><code>1:n-1</code> est lu <strong><code>(1:10) - 1</code></strong> → <code>0 1 2 … 9</code> : <strong>dix</strong> valeurs, commençant à <strong>0</strong>.</li>
+<li><code>1:(n-1)</code> est <code>1:9</code> → <code>1 2 … 9</code> : <strong>neuf</strong> valeurs, commençant à <strong>1</strong>.</li>
+</ul>
+<p>Longueur différente <strong>et</strong> première valeur différente. C'est le cours lui-même qui invite à la comparaison : <em>« Put <code>n &lt;- 10</code> and compare the sequences »</em>. Même mécanisme pour <code>2*1:15</code>, qui vaut <code>c(2, 4, …, 30)</code> et non <code>(2*1):15</code>.</p>
+</div></details><details class="cor">
+<summary>Pourquoi <code>seq(along = v)</code> plutôt que <code>1:length(v)</code> ?</summary><div class="in">
+
+<p>Parce que <code>along=</code> produit <em>« the sequence <code>1, 2, …, length(vector)</code>, <strong>or the empty sequence if the vector is empty (as it can be)</strong> »</em> (§2.3).</p>
+<p>Sur un vecteur vide, <code>length(v)</code> vaut <code>0</code> et <code>1:0</code> vaut <strong><code>c(1, 0)</code></strong> — soit <strong>deux</strong> itérations là où il en fallait <strong>zéro</strong>, avec deux indices dont l'un est hors bornes. <code>seq(along = v)</code> rend la séquence vide. Le cas du vecteur vide est rare en interactif et fréquent en production : c'est précisément le genre de bug qui n'apparaît qu'une fois le code livré.</p>
+</div></details><details class="cor">
+<summary>Quelle est la différence entre <code>max</code> et <code>pmax</code> ? Entre <code>rep(x, times=3)</code> et <code>rep(x, each=3)</code> ?</summary><div class="in">
+
+<p><strong><code>max</code> / <code>pmax</code></strong> : <em>« <code>max</code> and <code>min</code> select the largest and smallest values in their arguments, <strong>even if they are given several vectors</strong> »</em> — résultat de <strong>longueur 1</strong>. <em>« The <strong>parallel</strong> maximum and minimum functions <code>pmax</code> and <code>pmin</code> return a vector (<strong>of length equal to their longest argument</strong>) that contains <strong>in each element</strong> the largest element <strong>in that position</strong> »</em>. Pour <code>a = c(1,9,3)</code>, <code>b = c(7,2,5)</code> : <code>max</code> → <strong>9</strong> ; <code>pmax</code> → <strong><code>c(7, 9, 5)</code></strong>.</p>
+<p><strong><code>times</code> / <code>each</code></strong> : pour <code>x = c(1,2,3)</code>, <code>rep(x, times=3)</code> → <code>1 2 3 1 2 3 1 2 3</code> (le <strong>motif</strong> se répète) ; <code>rep(x, each=3)</code> → <code>1 1 1 2 2 2 3 3 3</code> (chaque <strong>valeur</strong> se répète). Même longueur, ordre entièrement différent. <code>each</code> sert à fabriquer des <strong>groupes</strong>.</p>
+</div></details><details class="cor">
+<summary>Que contient <code>labs &lt;- paste(c("X","Y"), 1:10, sep = "")</code>, et pourquoi pas vingt étiquettes ?</summary><div class="in">
+
+<pre><code class="language-r">c("X1", "Y2", "X3", "Y4", "X5", "Y6", "X7", "Y8", "X9", "Y10")
+</code></pre>
+<p><strong>Dix</strong> étiquettes, alternées. <em>« Note particularly that <strong>recycling of short lists takes place here too</strong> ; thus <code>c("X", "Y")</code> is <strong>repeated 5 times</strong> to match the sequence <code>1:10</code>. »</em> (§2.6) Le résultat a la longueur du <strong>plus long</strong> argument, soit 10 ; et 10 étant un multiple de 2, <strong>aucun avertissement</strong> ne le signale.</p>
+<p>Pour les vingt étiquettes attendues, il faut faire varier les deux facteurs :</p>
+<pre><code class="language-r">paste(rep(c("X","Y"), each = 10), 1:10, sep = "")
+</code></pre>
+</div></details><details class="cor">
+<summary>Comment R compte-t-il les éléments d'un vecteur qui vérifient une condition, et sur quelle propriété repose l'astuce ?</summary><div class="in">
+
+<pre><code class="language-r">sum(x &gt; 13)     # le NOMBRE
+mean(x &gt; 13)    # la PROPORTION
+</code></pre>
+<p>Cela repose sur la coercition du §2.4 : <em>« Logical vectors may be used in ordinary arithmetic, in which case they are <strong>coerced into numeric vectors, <code>FALSE</code> becoming 0 and <code>TRUE</code> becoming 1</strong> »</em>. Sommer des <code>TRUE</code>, c'est les compter ; en faire la moyenne, c'est en prendre la proportion.</p>
+<p class="cal piege"> Le cours prévient aussitôt : <em>« <strong>there are situations where logical vectors and their coerced numeric counterparts are not equivalent</strong> »</em>. En <strong>indexation</strong> notamment : <code>x[c(TRUE, FALSE)]</code> prend un élément sur deux, <code>x[c(1, 0)]</code> prend le premier une fois (fiche 302).</p>
+</div></details><details class="cor">
+<summary>Que se passe-t-il si l'on écrit <code>T &lt;- 0</code> ? Pourquoi le langage le permet-il ?</summary><div class="in">
+
+<p>Rien — et c'est le problème. <em>« <code>T</code> and <code>F</code> are <strong>just variables</strong> which are set to <code>TRUE</code> and <code>FALSE</code> by default, but <strong>are not reserved words</strong> and hence <strong>can be overwritten by the user</strong>. Hence, <strong>you should always use <code>TRUE</code> and <code>FALSE</code>.</strong> »</em> (§2.4)</p>
+<p>La preuve est dans la liste des mots réservés (<em>R Language Definition</em> §10.3.3) : <code>TRUE</code> et <code>FALSE</code> y sont, <strong><code>T</code> et <code>F</code> n'y sont pas</strong>. Après un <code>T &lt;- 0</code>, toute condition écrite avec <code>T</code> devient fausse <strong>sans le moindre message</strong>.</p>
+</div></details><details class="cor">
+<summary>Que vaut <code>sqrt(-17)</code> ? Et comment obtenir le résultat complexe ?</summary><div class="in">
+
+<p><code>sqrt(-17)</code> donne <strong><code>NaN</code> avec un avertissement</strong>. <em>« To work with complex numbers, <strong>supply an explicit complex part</strong> »</em> (§2.2) :</p>
+<pre><code class="language-r">sqrt(-17+0i)   # le calcul est fait EN COMPLEXES
+</code></pre>
+<p>La règle générale : <strong>R ne change pas de corps de nombres tout seul</strong>. Entrée réelle, sortie réelle — quitte à valoir <code>NaN</code>. C'est l'utilisateur qui déclare l'intention.</p>
+<p><em>« Internally calculations are done as <strong>double precision real numbers</strong>, or double precision complex numbers <strong>if the input data are complex</strong>. »</em></p>
+</div></details><details class="cor">
+<summary>Pourquoi <code>1</code> n'est-il pas un entier, et comment en fabriquer un ?</summary><div class="in">
+
+<p><em>« <strong>Perhaps unexpectedly, the number returned from the expression <code>1</code> is a numeric.</strong> »</em> (<em>R Language Definition</em> §3.1.1) C'est un <strong>double</strong>.</p>
+<p>Le plus simple est le <strong>suffixe <code>L</code></strong> : <code>1L</code>. Également <code>0x10L</code> (= 16), et <code>1e3L</code> = <code>1000L</code> — <em>« Note that the <code>L</code> is treated as qualifying the term <code>1e3</code> <strong>and not the <code>3</code></strong> »</em>.</p>
+<p class="cal piege"> Trois cas d'échec : <code>1e-3L</code> → <strong>avertissement</strong>, et c'est <strong>un numérique</strong> qui est créé ; <code>1.L</code> → <strong>avertissement</strong> (point décimal inutile) ; <code>12iL</code> → <strong>erreur de syntaxe</strong>.</p>
+</div></details><details class="cor">
+<summary>Expliquer « il n'y a pas de différence entre appliquer un opérateur et appeler une fonction ».</summary><div class="in">
+
+<p><em>« <strong>Except for the syntax, there is no difference between applying an operator and calling a function.</strong> In fact, <code>x + y</code> can equivalently be written <code>`+`(x, y)</code>. Notice that since <code>+</code> is a <strong>non-standard function name, it needs to be quoted</strong>. »</em> (<em>R Language Definition</em> §3.1.4)</p>
+<p>Cela vaut aussi pour l'indexation : <em>« indexing is really done by functions, and one could have used <code>`[`(x, 2)</code> instead of <code>x[2]</code> »</em>.</p>
+<p><strong>Les conséquences pratiques</strong> : on peut <strong>passer un opérateur en argument</strong> (<code>sapply(l, </code>[[<code>, 1)</code>), <strong>le redéfinir</strong>, et <strong>définir le sien</strong> avec la syntaxe <code>%nom%</code>. C'est le socle du calcul sur le langage (fiche 317).</p>
+</div></details><details class="cor">
+<summary>Quelle est la différence entre <code>&amp;</code> et <code>&amp;&amp;</code> ?</summary><div class="in">
+
+<p>La table des opérateurs (<em>R Language Definition</em> §3.1.4) est explicite : <strong><code>&amp;</code></strong> est <em>« And, binary, <strong>vectorized</strong> »</em> ; <strong><code>&amp;&amp;</code></strong> est <em>« And, binary, <strong>not vectorized</strong> »</em>. Idem pour <code>|</code> et <code>||</code>.</p>
+<p><code>&amp;</code> travaille <strong>élément par élément</strong> et rend <strong>un vecteur de la longueur du plus long</strong> (recyclage compris). <code>&amp;&amp;</code> rend <strong>une seule valeur</strong> : c'est la forme faite pour la condition d'un <code>if</code>, qui a besoin d'un scalaire. Voir fiche 308.</p>
+</div></details><details class="cor">
+<summary>Pourquoi le cours écrit-il qu'une matrice « est » un vecteur ?</summary><div class="in">
+
+<p><em>« <strong>matrices</strong> or more generally <strong>arrays</strong> are multi-dimensional generalizations of vectors. <strong>In fact, they are vectors that can be indexed by two or more indices</strong> and will be printed in special ways. »</em> (§2.8)</p>
+<p>Une matrice <strong>n'est pas un type nouveau</strong> : c'est un vecteur <strong>muni d'un attribut <code>dim</code></strong> (fiche 303). D'où deux conséquences directes : <code>m[1]</code> — un seul indice — a un sens et rend le premier élément <strong>du vecteur sous-jacent</strong> ; et <code>length(m)</code> rend le <strong>nombre total de cases</strong>, pas le nombre de lignes.</p>
+</div></details></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h2>Flashcards</h2>
+<table>
+<thead>
+<tr>
+<th>Question</th>
+<th>Réponse</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>La structure la plus simple de R ?</td>
+<td>Le <strong>vecteur numérique</strong> — une collection <strong>ordonnée</strong></td>
+</tr>
+<tr>
+<td>Combien vaut la longueur de <code>3</code> ?</td>
+<td><strong>1</strong> — un nombre isolé est un vecteur de longueur 1</td>
+</tr>
+<tr>
+<td>Que fait <code>c()</code> ?</td>
+<td><strong>Concatène ses arguments bout à bout</strong> — donc <strong>aplatit</strong></td>
+</tr>
+<tr>
+<td>Que vaut <code>length(c(x, 0, x))</code> si <code>length(x) = 5</code> ?</td>
+<td><strong>11</strong></td>
+</tr>
+<tr>
+<td>Les quatre écritures d'assignation ?</td>
+<td><code>&lt;-</code> · <code>=</code> · <code>assign("x", …)</code> · <code>-&gt; x</code></td>
+</tr>
+<tr>
+<td><code>&lt;-</code> est un raccourci de quoi ?</td>
+<td>De <strong><code>assign()</code></strong></td>
+</tr>
+<tr>
+<td>Une expression seule, que devient sa valeur ?</td>
+<td><strong>Affichée puis perdue</strong></td>
+</tr>
+<tr>
+<td>L'arithmétique vectorielle est… ?</td>
+<td><strong>Élément par élément</strong>, avec boucle implicite</td>
+</tr>
+<tr>
+<td>Longueur du résultat d'une opération binaire ?</td>
+<td>Celle du <strong>plus long</strong> opérande</td>
+</tr>
+<tr>
+<td>Que fait R du plus court ?</td>
+<td>Il le <strong>recycle</strong>, éventuellement <strong>fractionnairement</strong></td>
+</tr>
+<tr>
+<td>Quand y a-t-il un avertissement ?</td>
+<td>Quand la longue <strong>n'est pas un multiple</strong> de la courte</td>
+</tr>
+<tr>
+<td>Le calcul se fait-il quand même ?</td>
+<td><strong>Oui</strong> — c'est ce qui rend l'erreur dangereuse</td>
+</tr>
+<tr>
+<td>Le recyclage s'applique à quoi ?</td>
+<td>À <strong>chaque opération binaire</strong>, pas à l'expression entière</td>
+</tr>
+<tr>
+<td>Opération avec un vecteur de longueur 0 ?</td>
+<td>Résultat de <strong>longueur 0</strong> (depuis <strong>R 1.4.0</strong>)</td>
+</tr>
+<tr>
+<td>Que vaut <code>range(x)</code> ?</td>
+<td><strong><code>c(min(x), max(x))</code></strong></td>
+</tr>
+<tr>
+<td>La formule de <code>var(x)</code> ?</td>
+<td><code>sum((x-mean(x))^2)/(length(x)-1)</code></td>
+</tr>
+<tr>
+<td><code>var()</code> d'une matrice $n\times p$ ?</td>
+<td>La <strong>matrice de covariance</strong> $p\times p$, lignes = observations</td>
+</tr>
+<tr>
+<td>Différence <code>sort</code> / <code>order</code> ?</td>
+<td><code>sort</code> trie ; <code>order</code> rend <strong>la permutation</strong> qui trie</td>
+</tr>
+<tr>
+<td><code>max(a, b)</code> contre <code>pmax(a, b)</code> ?</td>
+<td><strong>Le plus grand du lot</strong> (longueur 1) contre <strong>position par position</strong></td>
+</tr>
+<tr>
+<td>Que vaut <code>sqrt(-17)</code> ?</td>
+<td><strong><code>NaN</code></strong> + avertissement</td>
+</tr>
+<tr>
+<td>Comment forcer le complexe ?</td>
+<td><code>sqrt(-17+0i)</code></td>
+</tr>
+<tr>
+<td>En interne, R calcule en quoi ?</td>
+<td><strong>Double précision</strong></td>
+</tr>
+<tr>
+<td><code>1</code> est-il un entier ?</td>
+<td><strong>Non</strong>, c'est un <strong>double</strong></td>
+</tr>
+<tr>
+<td>Comment écrire l'entier 1 ?</td>
+<td><strong><code>1L</code></strong></td>
+</tr>
+<tr>
+<td>Que vaut <code>1e3L</code> ?</td>
+<td><strong><code>1000L</code></strong> — le <code>L</code> qualifie <code>1e3</code></td>
+</tr>
+<tr>
+<td>Que donne <code>1e-3L</code> ?</td>
+<td>Un <strong>avertissement</strong>, et une valeur <strong>numérique</strong></td>
+</tr>
+<tr>
+<td>Que donne <code>12iL</code> ?</td>
+<td>Une <strong>erreur de syntaxe</strong></td>
+</tr>
+<tr>
+<td>Que vaut <code>1:30</code> ?</td>
+<td><code>c(1, 2, …, 30)</code></td>
+</tr>
+<tr>
+<td>Priorité du <code>:</code> ?</td>
+<td><strong>Haute</strong> — <code>2*1:15</code> vaut <code>c(2, …, 30)</code></td>
+</tr>
+<tr>
+<td><code>1:n-1</code> pour <code>n &lt;- 10</code> ?</td>
+<td><code>0 1 … 9</code> — <strong>dix</strong> valeurs</td>
+</tr>
+<tr>
+<td><code>1:(n-1)</code> ?</td>
+<td><code>1 … 9</code> — <strong>neuf</strong> valeurs</td>
+</tr>
+<tr>
+<td>Séquence à rebours ?</td>
+<td><strong><code>30:1</code></strong></td>
+</tr>
+<tr>
+<td>Combien d'arguments a <code>seq()</code> ?</td>
+<td><strong>Cinq</strong> — jamais tous ensemble</td>
+</tr>
+<tr>
+<td>Lesquels ?</td>
+<td><code>from</code> <code>to</code> <code>by</code> <code>length</code> <code>along</code></td>
+</tr>
+<tr>
+<td><code>seq(2,10)</code> vaut ?</td>
+<td><strong><code>2:10</code></strong></td>
+</tr>
+<tr>
+<td>L'ordre des arguments nommés compte-t-il ?</td>
+<td><strong>Non</strong></td>
+</tr>
+<tr>
+<td>Longueur de <code>seq(-5, 5, by=.2)</code> ?</td>
+<td><strong>51</strong></td>
+</tr>
+<tr>
+<td>Pourquoi <code>seq(along = v)</code> ?</td>
+<td>Sur un <code>v</code> <strong>vide</strong> il rend la séquence vide, <code>1:length(v)</code> rend <code>c(1, 0)</code></td>
+</tr>
+<tr>
+<td><code>rep(x, times=3)</code> ?</td>
+<td>Le <strong>motif</strong> répété : <code>1 2 3 1 2 3 1 2 3</code></td>
+</tr>
+<tr>
+<td><code>rep(x, each=3)</code> ?</td>
+<td>Chaque <strong>valeur</strong> répétée : <code>1 1 1 2 2 2 3 3 3</code></td>
+</tr>
+<tr>
+<td>Les trois valeurs d'un logique ?</td>
+<td><strong><code>TRUE</code></strong>, <strong><code>FALSE</code></strong>, <strong><code>NA</code></strong></td>
+</tr>
+<tr>
+<td>Comment naît un vecteur logique ?</td>
+<td><strong>D'une condition</strong></td>
+</tr>
+<tr>
+<td>Les six comparateurs ?</td>
+<td><code>&lt;</code> <code>&lt;=</code> <code>&gt;</code> <code>&gt;=</code> <code>==</code> <code>!=</code></td>
+</tr>
+<tr>
+<td>Les trois opérateurs logiques ?</td>
+<td><code>&amp;</code> · <code>|</code> · <code>!</code></td>
+</tr>
+<tr>
+<td><code>&amp;</code> contre <code>&amp;&amp;</code> ?</td>
+<td><strong>Vectorisé</strong> contre <strong>non vectorisé</strong></td>
+</tr>
+<tr>
+<td>Coercition d'un logique en arithmétique ?</td>
+<td><code>FALSE</code> → <strong>0</strong>, <code>TRUE</code> → <strong>1</strong></td>
+</tr>
+<tr>
+<td>Compter les éléments vérifiant une condition ?</td>
+<td><strong><code>sum(cond)</code></strong></td>
+</tr>
+<tr>
+<td>En prendre la proportion ?</td>
+<td><strong><code>mean(cond)</code></strong></td>
+</tr>
+<tr>
+<td>Pourquoi ne jamais utiliser <code>T</code> / <code>F</code> ?</td>
+<td>Ce sont des <strong>variables</strong>, pas des mots réservés</td>
+</tr>
+<tr>
+<td>Que signifie <code>NA</code> ?</td>
+<td><strong>Not available</strong> — une donnée <strong>non disponible</strong></td>
+</tr>
+<tr>
+<td>La justification de la propagation ?</td>
+<td>Spécification <strong>incomplète</strong> → résultat <strong>inconnaissable</strong></td>
+</tr>
+<tr>
+<td>Le bon test d'un <code>NA</code> ?</td>
+<td><strong><code>is.na(x)</code></strong></td>
+</tr>
+<tr>
+<td>Que vaut <code>x == NA</code> ?</td>
+<td><strong><code>NA</code> partout</strong> — ce n'est pas un test</td>
+</tr>
+<tr>
+<td>Qu'est-ce que <code>NaN</code> ?</td>
+<td>Un résultat <strong>indéfini</strong> : <code>0/0</code>, <code>Inf - Inf</code></td>
+</tr>
+<tr>
+<td><code>is.na(NaN)</code> ?</td>
+<td><strong><code>TRUE</code></strong></td>
+</tr>
+<tr>
+<td><code>is.nan(NA)</code> ?</td>
+<td><strong><code>FALSE</code></strong></td>
+</tr>
+<tr>
+<td>Type par défaut d'un <code>NA</code> ?</td>
+<td><strong>Logique</strong></td>
+</tr>
+<tr>
+<td>Longueur de <code>x[NA]</code> ?</td>
+<td>Celle <strong>de <code>x</code></strong> — règles de l'index <strong>logique</strong></td>
+</tr>
+<tr>
+<td>Longueur de <code>x[c(1, NA)]</code> ?</td>
+<td><strong>2</strong> — règles de l'index <strong>entier</strong></td>
+</tr>
+<tr>
+<td><code>FALSE &amp; NA</code> ?</td>
+<td><strong><code>FALSE</code></strong></td>
+</tr>
+<tr>
+<td><code>TRUE | NA</code> ?</td>
+<td><strong><code>TRUE</code></strong></td>
+</tr>
+<tr>
+<td><code>NA == NA</code> ?</td>
+<td><strong><code>NA</code></strong></td>
+</tr>
+<tr>
+<td><code>NA %in% c(1, NA)</code> ?</td>
+<td><strong><code>TRUE</code></strong> — <code>match</code> <strong>apparie</strong> les <code>NA</code></td>
+</tr>
+<tr>
+<td><code>NaN</code> existe dans quel type ?</td>
+<td><strong>Le double</strong> seulement (et les composantes complexes)</td>
+</tr>
+<tr>
+<td><code>as.character(NaN)</code> ?</td>
+<td>La chaîne <strong><code>"NaN"</code></strong></td>
+</tr>
+<tr>
+<td><code>NA</code> caractère contre <code>"NA"</code> ?</td>
+<td><strong>Distincts</strong> → utiliser <strong><code>NA_character_</code></strong></td>
+</tr>
+<tr>
+<td>Existe-t-il un <code>NA</code> pour <code>raw</code> ?</td>
+<td><strong>Non</strong></td>
+</tr>
+<tr>
+<td>Comment <code>NA</code> s'affiche-t-il sans guillemets ?</td>
+<td><strong><code>&lt;NA&gt;</code></strong></td>
+</tr>
+<tr>
+<td>Guillemets acceptés pour une chaîne ?</td>
+<td><strong>Doubles ou simples</strong> ; affichage <strong>en doubles</strong></td>
+</tr>
+<tr>
+<td>Trois échappements courants ?</td>
+<td><code>\n</code> · <code>\t</code> · <code>\b</code></td>
+</tr>
+<tr>
+<td>Le backslash lui-même ?</td>
+<td><strong><code>\\</code></strong></td>
+</tr>
+<tr>
+<td>Échappement Unicode ?</td>
+<td><code>\unnnn</code> (4 chiffres) · <code>\Unnnnnnnn</code> (8)</td>
+</tr>
+<tr>
+<td>Que fait <code>\0</code> dans une chaîne ?</td>
+<td>Il <strong>termine la constante</strong> — interdit</td>
+</tr>
+<tr>
+<td>Séparateur par défaut de <code>paste()</code> ?</td>
+<td><strong>Une espace</strong></td>
+</tr>
+<tr>
+<td><code>sep</code> contre <code>collapse</code> ?</td>
+<td><code>sep</code> <strong>dans chaque élément</strong> ; <code>collapse</code> réduit à <strong>une seule chaîne</strong></td>
+</tr>
+<tr>
+<td>Que vaut <code>paste(c("X","Y"), 1:10, sep="")</code> ?</td>
+<td><strong>Dix</strong> étiquettes alternées : <code>"X1" "Y2" … "Y10"</code></td>
+</tr>
+<tr>
+<td>Deux autres outils sur les chaînes ?</td>
+<td><strong><code>sub</code></strong> et <strong><code>substring</code></strong></td>
+</tr>
+<tr>
+<td><code>%%</code> ?</td>
+<td><strong>Modulo</strong></td>
+</tr>
+<tr>
+<td><code>%/%</code> ?</td>
+<td><strong>Division entière</strong></td>
+</tr>
+<tr>
+<td><code>%*%</code> ?</td>
+<td><strong>Produit matriciel</strong></td>
+</tr>
+<tr>
+<td><code>%o%</code> ?</td>
+<td><strong>Produit extérieur</strong></td>
+</tr>
+<tr>
+<td><code>%x%</code> ?</td>
+<td><strong>Kronecker</strong></td>
+</tr>
+<tr>
+<td><code>%in%</code> ?</td>
+<td><strong>Appariement</strong></td>
+</tr>
+<tr>
+<td><code>%||%</code> ?</td>
+<td><strong>Coalescence nulle</strong></td>
+</tr>
+<tr>
+<td>Comment définir son propre opérateur ?</td>
+<td>Syntaxe <strong><code>%nom%</code></strong></td>
+</tr>
+<tr>
+<td>Que vaut <code>`+`(x, y)</code> ?</td>
+<td><strong><code>x + y</code></strong> — opérateur = fonction</td>
+</tr>
+<tr>
+<td>Et <code>`[`(x, 2)</code> ?</td>
+<td><strong><code>x[2]</code></strong></td>
+</tr>
+<tr>
+<td>Que manque-t-il à la table d'opérateurs de R-lang ?</td>
+<td><strong><code>!=</code></strong> — donné au §2.4 de R-intro</td>
+</tr>
+<tr>
+<td>Une matrice, c'est quoi au fond ?</td>
+<td><strong>Un vecteur</strong> indexable par deux indices ou plus</td>
+</tr>
+<tr>
+<td>Une liste ?</td>
+<td>Un vecteur <strong>général</strong> dont les éléments <strong>peuvent différer de type</strong></td>
+</tr>
+<tr>
+<td>Un data frame ?</td>
+<td>Structure <strong>matricielle à colonnes de types différents</strong>, <strong>une ligne par unité d'observation</strong></td>
+</tr>
+<tr>
+<td>Une fonction, en R ?</td>
+<td><strong>Un objet</strong>, stockable dans l'espace de travail</td>
+</tr>
+</tbody></table>
+</main>
+
+
+
+
+</body></html>

@@ -1,0 +1,1205 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fiche 317 — Erreurs, avertissements, débogage et profilage</title>
+<script>
+window.MathJax={tex:{inlineMath:[["$","$"]],displayMath:[["$$","$$"]],processEscapes:true},
+ options:{skipHtmlTags:["script","noscript","style","textarea","pre","code"]},
+ svg:{fontCache:"global"},
+ startup:{pageReady:()=>MathJax.startup.defaultPageReady().then(()=>{document.body.classList.add("ready")})}};
+setTimeout(function(){document.body.classList.add("ready")},2500);
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+/* ============================================================
+   MathiasLearn — feuille de style des fiches
+   Reprise intégrale des tokens de 00_PARCOURS/*.html
+   + blocs pédagogiques (callouts, méthode, essentiels, recall)
+   ============================================================ */
+:root{--bg:#faf9f7;--card:#fff;--ink:#1a1a1a;--muted:#6b6b6b;--line:#e5e2dd;--accent:#8b5e34;
+ --hl:#fdf8ef;--ok:#2d7d4f;--okbg:#f0f7f3;--warn:#b3402f;--warnbg:#fdf3f1;--blue:#2f5d8b;--bluebg:#f1f5fa}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+ font:17px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;padding:0 16px 100px}
+.nav{position:sticky;top:0;background:rgba(250,249,247,.96);backdrop-filter:blur(8px);
+ border-bottom:1px solid var(--line);margin:0 -16px 30px;padding:11px 16px;z-index:50;
+ display:flex;gap:6px;flex-wrap:wrap;font-size:13px}
+.nav a{color:var(--muted);text-decoration:none;padding:4px 9px;border-radius:5px;white-space:nowrap}
+.nav a:hover{background:var(--line);color:var(--ink)}
+.nav a.on{background:var(--accent);color:#fff}
+main{max-width:780px;margin:0 auto}
+h1{font-size:31px;letter-spacing:-.02em;margin:.4em 0 .5em;line-height:1.25}
+h2{font-size:23px;margin:2.2em 0 .7em;padding-bottom:.3em;border-bottom:1px solid var(--line)}
+h3{font-size:19px;margin:1.9em 0 .5em;color:var(--accent)}
+h4{font-size:17px;margin:1.5em 0 .4em}
+p{margin:.8em 0} a{color:var(--accent)} hr{border:0;border-top:1px solid var(--line);margin:2.6em 0}
+table{border-collapse:collapse;width:100%;margin:1.3em 0;font-size:15.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+th{background:#f3f0eb;font-weight:600}
+tr:nth-child(even) td{background:#fcfbfa}
+code{font-family:"SF Mono",Menlo,Consolas,monospace;font-size:.88em;background:#f2efea;padding:2px 6px;border-radius:4px;overflow-wrap:break-word}
+pre{background:#f2efea;padding:14px 16px;border-radius:8px;overflow-x:auto}
+pre code{background:none;padding:0;white-space:pre}
+blockquote{border-left:3px solid var(--accent);background:var(--hl);margin:1.4em 0;padding:14px 20px;border-radius:0 8px 8px 0}
+blockquote p:first-child{margin-top:0} blockquote p:last-child{margin-bottom:0}
+ul,ol{padding-left:1.5em} li{margin:.35em 0} em{color:#4a4a4a}
+mjx-container[display="true"]{margin:1.1em 0!important;overflow-x:auto;overflow-y:hidden;padding:2px 0}
+mjx-container svg{max-width:100%}
+body:not(.ready) main{opacity:0} main{opacity:1;transition:opacity .25s}
+
+/* --- bandeau de tête de fiche --- */
+.cours{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--accent);
+ border-radius:0 10px 10px 0;padding:18px 22px;margin:0 0 34px}
+.cours h4{margin:0 0 4px;font-size:14px;text-transform:uppercase;letter-spacing:.07em;color:var(--accent)}
+.cours .cs{color:var(--muted);font-size:14.5px;margin:0 0 14px}
+
+/* --- exercices / corrigés --- */
+.ex{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:6px 24px 20px;margin:18px 0}
+.ex>h3:first-child{margin-top:14px}
+details.cor{margin-top:18px;border:1px solid var(--line);border-radius:8px;background:#fcfbfa;overflow:hidden}
+details.cor>summary{cursor:pointer;padding:12px 16px;font-weight:600;font-size:15px;color:var(--accent);
+ list-style:none;display:flex;align-items:center;gap:9px;user-select:none;transition:.15s;min-height:44px}
+details.cor>summary::-webkit-details-marker{display:none}
+details.cor>summary:hover{background:var(--hl)}
+details.cor>summary::before{content:"\25B6";font-size:10px;transition:transform .18s;display:inline-block}
+details.cor[open]>summary::before{transform:rotate(90deg)}
+details.cor[open]>summary{background:var(--okbg);color:var(--ok);border-bottom:1px solid var(--line)}
+.cor .in{padding:4px 20px 16px}
+.cor .in>*:first-child{margin-top:.9em}
+
+/* --- blocs pédagogiques (callouts) ---
+   Générés depuis une citation Markdown dont le premier **gras** commence
+   par un mot-clé : DÉFINITION, THÉORÈME, MÉTHODE, PIÈGE, INTUITION… */
+.cal{border:1px solid var(--line);border-left:4px solid var(--accent);background:var(--card);
+ border-radius:0 10px 10px 0;padding:15px 20px;margin:1.5em 0}
+.cal>p:first-child{margin-top:0}.cal>p:last-child,.cal>ul:last-child,.cal>ol:last-child{margin-bottom:0}
+.cal .lab{display:block;font-size:12.5px;text-transform:uppercase;letter-spacing:.08em;
+ font-weight:700;color:var(--accent);margin-bottom:6px}
+.cal.formel{background:var(--hl)}
+.cal.piege{border-left-color:var(--warn);background:var(--warnbg)}
+.cal.piege .lab{color:var(--warn)}
+.cal.methode{border-left-color:var(--ok);background:var(--okbg)}
+.cal.methode .lab{color:var(--ok)}
+.cal.intu{border-left-color:var(--blue);background:var(--bluebg)}
+.cal.intu .lab{color:var(--blue)}
+.cal.plus{border-left-style:dashed;background:#faf9f7}
+.cal.plus .lab{color:var(--muted)}
+
+/* --- révision express --- */
+.ess{background:var(--card);border:1px solid var(--accent);border-radius:10px;padding:4px 24px 20px;margin:1.6em 0}
+.ess h3{margin-top:1.3em}
+.rec{background:var(--card);border:1px dashed var(--accent);border-radius:10px;padding:4px 24px 18px;margin:1.6em 0}
+.rec ol{counter-reset:none}
+
+/* --- impression / PDF --- */
+@media print{
+ .nav{display:none}
+ body{padding:0;background:#fff;font-size:11.2pt;line-height:1.55}
+ main{max-width:none}
+ h1{font-size:23pt}h2{font-size:15pt;margin-top:1.5em}h3{font-size:12.6pt}
+ h2,h3,h4{break-after:avoid;page-break-after:avoid}
+ table,.cal,blockquote{break-inside:avoid;page-break-inside:avoid}
+ table{display:table;font-size:9.6pt}
+ details.cor{border:1px solid var(--line);background:#fcfbfa}
+ details.cor>summary{display:none}
+ details.cor .in{padding-top:10px}
+ .cal,.ex,.ess,.rec{box-shadow:none}
+ a{color:var(--ink);text-decoration:none}
+}
+@page{margin:16mm 15mm 18mm}
+
+/* --- exemples travaillés --- */
+.exm{background:#fcfbfa;border:1px solid var(--line);border-radius:10px;padding:2px 20px 14px;margin:1.5em 0}
+.exm>h4:first-child{margin:14px 0 .5em;color:var(--accent);font-size:13px;text-transform:uppercase;letter-spacing:.07em}
+
+
+/* --- pastilles de priorité (conventions des fiches de l'app) --- */
+h2[data-prio], h3[data-prio], h4[data-prio]{position:relative}
+h2[data-prio]::before,h3[data-prio]::before,h4[data-prio]::before{
+ content:"";display:inline-block;width:9px;height:9px;border-radius:50%;
+ margin-right:9px;vertical-align:middle;background:var(--muted)}
+[data-prio="must"]::before{background:var(--warn)}
+[data-prio="high"]::before{background:#d98324}
+[data-prio="mid"]::before{background:#c9a227}
+[data-prio="low"]::before{background:var(--ok)}
+/* corrigés des fiches de l'app : même traitement que les corrigés des séries */
+details.cor>summary::after{content:""}
+</style></head><body>
+<div class="nav"><a href="00_COMMENCER_ICI.html">Commencer ici</a><a href="01_NOTATIONS_le-decodeur.html">Notations</a><a href="02_EXERCICES_Serie-0.html">Série 0 — Remise en route</a><a href="03_EXERCICES_Serie-1.html">Série 1 — Convexité</a><a href="04_EXERCICES_Serie-2.html">Série 2 — KKT</a><a href="05_AUTO-EVALUATION.html">Auto-évaluation (quiz)</a><a href="06_FICHE_Optimisation-deux-variables.html">Fiche — Optimisation à 2 variables</a></div>
+<main><h1>Fiche 317 — Erreurs, avertissements, débogage et profilage</h1>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Matière</strong></td>
+<td>Code · Langage R</td>
+</tr>
+<tr>
+<td><strong>Cours source</strong></td>
+<td>R Core Team, <em>R Language Definition</em> 4.6.1 — chapitre 8 « Exception handling » (§8.1 <code>stop</code>, §8.2 <code>warning</code>, §8.3 <code>on.exit</code>, §8.4 options d'erreur) et chapitre 9 « Debugging » (§9.1 <code>browser</code>, §9.2 <code>debug</code>/<code>undebug</code>, §9.3 <code>trace</code>/<code>untrace</code>, §9.4 <code>traceback</code>)</td>
+</tr>
+<tr>
+<td><strong>Sources d'appoint</strong></td>
+<td>R Core Team, <em>Writing R Extensions</em> 4.6.1 — chapitre 3 « Tidying and profiling R code » (§3.1 mise au propre, §3.2 profilage en vitesse)</td>
+</tr>
+<tr>
+<td><strong>Difficulté</strong></td>
+<td> Intermédiaire — peu de concepts, beaucoup de réflexes</td>
+</tr>
+<tr>
+<td><strong>Temps d'étude estimé</strong></td>
+<td>1 h 15</td>
+</tr>
+<tr>
+<td><strong>Prérequis</strong></td>
+<td>Fiches 309, 310, 316 (fonctions, environnements, appels)</td>
+</tr>
+<tr>
+<td><strong>Concepts clés</strong></td>
+<td><code>stop()</code>, <code>warning()</code>, l'option <strong><code>warn</code></strong> et ses quatre régimes, <code>last.warning</code>, <code>warnings()</code>, <strong><code>on.exit()</code></strong>, options <strong><code>error</code></strong> et <strong><code>warning.expression</code></strong>, <code>browser()</code>, les <strong>cinq commandes</strong> du débogueur, <code>debug()</code> / <code>undebug()</code>, <code>trace()</code> / <code>untrace()</code>, <strong><code>.Traceback</code></strong> et <code>traceback()</code>, <strong><code>keep.source</code></strong>, <code>removeSource()</code>, <code>dump()</code>, <strong><code>Rprof()</code></strong>, <code>summaryRprof()</code></td>
+</tr>
+<tr>
+<td><strong>À retenir en priorité</strong></td>
+<td><strong>Les quatre valeurs de <code>warn</code></strong> · <strong><code>on.exit</code> est exécuté même sur avertissement</strong> · <strong>les cinq commandes <code>RET c n where Q</code></strong> · <strong><code>traceback()</code> après une erreur</strong> · <strong>profiler avant d'optimiser</strong>.</td>
+</tr>
+</tbody></table>
+<h2>Vue d'ensemble</h2>
+<pre><code>DEUX MECANISMES  « Functions such as stop or warning can be CALLED DIRECTLY
+                   or OPTIONS such as "warn" can be used to control
+                   the handling of problems. »
+
+stop()      « HALTS the evaluation of the current expression, PRINTS the
+              message argument and RETURNS EXECUTION TO TOP-LEVEL »
+
+warning()   son comportement depend de l'option "warn" :
+   warn &lt; 0   les avertissements sont IGNORES
+   warn = 0   STOCKES, imprimes APRES la fonction de haut niveau  (defaut)
+   warn = 1   imprimes AU MOMENT ou ils surviennent
+   warn &gt;= 2  TRANSFORMES EN ERREURS
+   a warn = 0 : moins de 10 -&gt; imprimes ; plus de 10 -&gt; un simple compte
+                last.warning garde le vecteur ; warnings() y accede
+
+on.exit()   « the effect ... is to STORE THE VALUE OF THE BODY so that it will
+              be EXECUTED WHEN THE FUNCTION EXITS »
+            « guaranteed to be executed ... EITHER DIRECTLY OR AS THE RESULT
+              OF A WARNING »
+
+TROIS OPTIONS  warn  ·  warning.expression  ·  error
+               « Expressions installed by options("error") are evaluated
+                 BEFORE calls to on.exit are carried out. »
+
+DEBOGUER    browser()  s'arrete ICI        debug(f)  s'arrete a CHAQUE appel
+            trace(f)   imprime l'appel     traceback()  la pile APRES l'erreur
+
+CINQ COMMANDES DU DEBOGUEUR
+   RET     instruction suivante (debug) / continuer (browser)
+   c cont  continuer
+   n       instruction suivante -- MARCHE AUSSI depuis le browser
+   where   afficher la PILE D'APPELS
+   Q       arreter et remonter au sommet IMMEDIATEMENT
+
+PROFILER    Rprof("f.out") ... Rprof(NULL)  puis  summaryRprof()
+            echantillonne toutes les 20 ms QUELLE LIGNE DE QUELLE FONCTION
+</code></pre>
+<p><strong>Le problème posé.</strong> <em>« <strong>The exception handling facilities in R are provided through two mechanisms. Functions such as <code>stop</code> or <code>warning</code> can be called directly or options such as <code>"warn"</code> can be used to control the handling of problems.</strong> »</em> (§8)</p>
+<div class="cal intu"><span class="lab">Intuition — signaler et régler sont deux choses distinctes.</span>
+<p> Le code <strong>signale</strong> (<code>stop</code>, <code>warning</code>) ; l'utilisateur <strong>décide</strong> ce qui en est fait (<code>options</code>). Un même <code>warning()</code> peut être ignoré, différé, immédiat ou fatal — <strong>sans que le code change</strong>. C'est ce partage qui permet à <code>options(warn = 2)</code> de transformer un script indulgent en script strict, le temps d'un diagnostic.</p>
+</div>
+<h2 data-prio="must">Concept 1 — Signaler une erreur</h2>
+<div class="cal formel"><span class="lab">Définition (§8.1).</span>
+<p> <em>« <strong>A call to <code>stop</code> halts the evaluation of the current expression, prints the message argument and returns execution to top-level.</strong> »</em></p>
+</div>
+<p><strong>Trois effets en une phrase</strong> : <strong>arrêter</strong>, <strong>afficher</strong>, <strong>revenir au sommet</strong>. Rien de ce qui suit dans la fonction n'est exécuté — c'est ce qui rend le garde-fou du compte en banque efficace (fiche 310) :</p>
+<pre><code class="language-r">withdraw = function(amount) {
+  if (amount &gt; total)
+    stop("You don't have that much money!\n")
+  total &lt;&lt;- total - amount        # &lt;- jamais atteinte si le stop se declenche
+  ...
+}
+</code></pre>
+<h2 data-prio="must">Concept 2 — Avertir, et les quatre régimes de <code>warn</code></h2>
+<div class="cal formel"><span class="lab">Définition (§8.2).</span>
+<p> <em>« <strong>The function <code>warning</code> takes a single argument that is a character string. The behaviour of a call to <code>warning</code> depends on the value of the option <code>"warn"</code>.</strong> »</em></p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Valeur de <code>warn</code></th>
+<th>Comportement</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>négative</strong></td>
+<td><em>« <strong>warnings are ignored</strong> »</em></td>
+</tr>
+<tr>
+<td><strong>zéro</strong> (le défaut)</td>
+<td><em>« they are <strong>stored and printed after the top-level function has completed</strong> »</em></td>
+</tr>
+<tr>
+<td><strong>un</strong></td>
+<td><em>« they are <strong>printed as they occur</strong> »</em></td>
+</tr>
+<tr>
+<td><strong>2 ou plus</strong></td>
+<td> <em>« <strong>warnings are turned into errors</strong> »</em></td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>Le détail du régime par défaut (§8.2).</strong> <em>« <strong>If <code>"warn"</code> is zero (the default), a variable <code>last.warning</code> is created and the messages associated with each call to <code>warning</code> are stored, sequentially, in this vector.</strong> <strong>If there are fewer than 10 warnings they are printed after the function has finished evaluating. If there are more than 10 then a message indicating how many warnings occurred is printed.</strong> <strong>In either case <code>last.warning</code> contains the vector of messages, and <code>warnings</code> provides a way to access and print it.</strong> »</em></p>
+</blockquote>
+<div class="cal methode"><span class="lab">Méthode — les deux réglages qui servent en pratique.</span>
+
+<ul>
+<li><strong><code>options(warn = 1)</code></strong> quand on cherche <strong>où</strong> un avertissement se produit : à <code>warn = 0</code> il est affiché <strong>après</strong> la fonction de haut niveau, donc <strong>détaché de sa cause</strong>. À <code>warn = 1</code> il apparaît <strong>au bon endroit</strong> dans la trace.</li>
+<li><strong><code>options(warn = 2)</code></strong> quand on veut <strong>traiter un avertissement comme un bug</strong> : il devient une erreur, donc <code>traceback()</code> (concept 5) donne <strong>la pile d'appels complète</strong>.</li>
+</ul>
+<p>Et <strong>le seuil de dix</strong> explique le « There were 12 warnings (use <code>warnings()</code> to see them) » que tout utilisateur a rencontré : au-delà de dix, R <strong>ne les imprime plus</strong>, il les <strong>compte</strong>. <strong><code>warnings()</code></strong> les récupère.</p>
+</div>
+<h2 data-prio="must">Concept 3 — <code>on.exit()</code></h2>
+<div class="cal formel"><span class="lab">Définition (§8.3).</span>
+<p> <em>« <strong>A function can insert a call to <code>on.exit</code> at any point in the body of a function. The effect of a call to <code>on.exit</code> is to store the value of the body so that it will be executed when the function exits.</strong> <strong>This allows the function to change some system parameters and to ensure that they are reset to appropriate values when the function is finished.</strong> »</em></p>
+<p><em>«  <strong>The <code>on.exit</code> is guaranteed to be executed when the function exits either directly or as the result of a warning.</strong> »</em></p>
+<p><em>« <strong>An error in the evaluation of the <code>on.exit</code> code causes an immediate jump to top-level without further processing of the <code>on.exit</code> code.</strong> »</em></p>
+<p><em>« <strong><code>on.exit</code> takes a single argument which is an expression to be evaluated when the function is exited.</strong> »</em></p>
+</div>
+<p><strong>C'est la garantie qui manquait à l'idiome <code>oldpar</code></strong> de la fiche 314. Le cours de graphiques écrit :</p>
+<pre><code class="language-r">oldpar &lt;- par(no.readonly = TRUE)
+# ... commandes de trace ...
+par(oldpar)
+</code></pre>
+<p class="cal piege"> <strong>Si une commande intermédiaire échoue, la dernière ligne n'est jamais atteinte</strong> — et les réglages de l'utilisateur restent modifiés. <code>on.exit</code> supprime ce risque :</p>
+<pre><code class="language-r">oldpar &lt;- par(no.readonly = TRUE)
+on.exit(par(oldpar))
+# ... commandes de trace ...
+</code></pre>
+<p><strong>Le même patron vaut pour tout ce qui doit être rendu</strong> : un périphérique graphique ouvert (<code>dev.off()</code>, fiche 314), un <code>sink()</code> ouvert (fiche 300), un fichier temporaire, un répertoire de travail changé.</p>
+<h2 data-prio="high">Concept 4 — Les options d'erreur</h2>
+<div class="cal formel"><span class="lab">Définition (§8.4).</span>
+<p> <em>« <strong>There are a number of options variables that can be used to control how R handles errors and warnings.</strong> »</em></p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Rôle</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong><code>warn</code></strong></td>
+<td><em>« <strong>Controls the printing of warnings.</strong> »</em> — concept 2</td>
+</tr>
+<tr>
+<td><strong><code>warning.expression</code></strong></td>
+<td><em>« <strong>Sets an expression that is to be evaluated when a warning occurs.</strong>  <strong>The normal printing of warnings is suppressed if this option is set.</strong> »</em></td>
+</tr>
+<tr>
+<td><strong><code>error</code></strong></td>
+<td><em>« <strong>Installs an expression that will be evaluated when an error occurs.</strong> <strong>The normal printing of error messages and warning messages precedes the evaluation of the expression.</strong> »</em></td>
+</tr>
+</tbody></table>
+<blockquote>
+<p class="cal piege"> <strong>L'ordre d'exécution (§8.4).</strong> <em>« <strong>Expressions installed by <code>options("error")</code> are evaluated before calls to <code>on.exit</code> are carried out.</strong> »</em></p>
+<p><strong>Cela compte</strong> : au moment où l'expression d'erreur s'exécute, <strong>les nettoyages n'ont pas encore eu lieu</strong>. C'est précisément ce qui rend un <code>options(error = recover)</code> utile — l'état des cadres d'appel est <strong>encore intact</strong>.</p>
+</blockquote>
+<blockquote>
+<p><strong>L'exemple du manuel (§8.4).</strong> <em>« <strong>One can use <code>options(error = expression(q("yes")))</code> to get R to quit when an error has been signalled. In this case an error will cause R to shut down and the global environment will be saved.</strong> »</em></p>
+<p><strong>Usage typique : le script par lots.</strong> En <code>R CMD BATCH</code> (fiche 300), un script qui continue après une erreur produit des résultats faux. Cette option le fait <strong>s'arrêter net</strong> — en sauvegardant l'espace de travail pour l'autopsie.</p>
+</blockquote>
+<h2 data-prio="must">Concept 5 — Les outils de débogage</h2>
+<blockquote>
+<p><strong>Cadrage (§9).</strong> <em>« <strong>Debugging code has always been a bit of an art.</strong> R provides several tools that help users find problems in their code. <strong>These tools halt execution at particular points in the code and the current state of the computation can be inspected.</strong> »</em></p>
+<p><em>« <strong>Most debugging takes place either through calls to <code>browser</code> or <code>debug</code>. Both of these functions rely on the same internal mechanism and both provide the user with a special prompt.</strong> <strong>Any command can be typed at the prompt. The evaluation environment for the command is the currently active environment. This allows you to examine the current state of any variables.</strong> »</em></p>
+</blockquote>
+<h3>5.1 Les cinq commandes spéciales</h3>
+<blockquote>
+<p><strong>Règle (§9).</strong> <em>« <strong>There are five special commands that R interprets differently.</strong> »</em></p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>Commande</th>
+<th>Effet</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong><code>RET</code></strong></td>
+<td><em>« <strong>Go to the next statement if the function is being debugged. Continue execution if the browser was invoked.</strong> »</em></td>
+</tr>
+<tr>
+<td><strong><code>c</code></strong> / <strong><code>cont</code></strong></td>
+<td><em>« <strong>Continue</strong> the execution. »</em></td>
+</tr>
+<tr>
+<td><strong><code>n</code></strong></td>
+<td><em>« <strong>Execute the next statement in the function.</strong> <strong>This works from the browser as well.</strong> »</em></td>
+</tr>
+<tr>
+<td><strong><code>where</code></strong></td>
+<td><em>« <strong>Show the call stack</strong> »</em></td>
+</tr>
+<tr>
+<td><strong><code>Q</code></strong></td>
+<td><em>« <strong>Halt execution and jump to the top-level immediately.</strong> »</em></td>
+</tr>
+</tbody></table>
+<blockquote>
+<p class="cal piege"> <strong>Le collision de noms (§9).</strong> <em>« <strong>If there is a local variable with the same name as one of the special commands listed above then its value can be accessed by using <code>get</code>. A call to <code>get</code> with the name in quotes will retrieve the value in the current environment.</strong> »</em></p>
+<p>Une variable locale nommée <code>c</code> ou <code>n</code> <strong>est inaccessible directement</strong> dans le débogueur — la lettre est interprétée comme une commande. <strong><code>get("c")</code></strong> la récupère. C'est exactement l'exemple donné au §9.1.</p>
+</blockquote>
+<blockquote>
+<p class="cal piege"> <strong>La limite (§9).</strong> <em>« <strong>The debugger provides access only to interpreted expressions. If a function calls a foreign language (such as C) then no access to the statements in that language is provided. Execution will halt on the next statement that is evaluated in R. A symbolic debugger such as <code>gdb</code> can be used to debug compiled code.</strong> »</em> — voir fiche 320.</p>
+</blockquote>
+<h3>5.2 <code>browser()</code> — s'arrêter ici</h3>
+<div class="cal formel"><span class="lab">Définition (§9.1).</span>
+<p> <em>« <strong>A call to the function <code>browser</code> causes R to halt execution at that point and to provide the user with a special prompt.</strong>  <strong>Arguments to <code>browser</code> are ignored.</strong> »</em></p>
+</div>
+<pre><code class="language-r">&gt; foo &lt;- function(s) {
++   c &lt;- 3
++   browser()
++ }
+&gt; foo(4)
+Called from: foo(4)
+Browse[1]&gt; s
+[1] 4
+Browse[1]&gt; get("c")
+[1] 3
+</code></pre>
+<p><strong>L'exemple est choisi pour montrer les deux choses</strong> : on inspecte <code>s</code>, l'argument, <strong>dans son environnement d'évaluation</strong> ; et <code>c</code>, variable locale, exige <strong><code>get("c")</code></strong> parce que <code>c</code> est une commande du débogueur.</p>
+<h3>5.3 <code>debug()</code> — s'arrêter à chaque appel</h3>
+<div class="cal formel"><span class="lab">Définition (§9.2).</span>
+<p> <em>« <strong>The debugger can be invoked on any function by using the command <code>debug(fun)</code>. Subsequently, each time that function is evaluated the debugger is invoked.</strong> <strong>The debugger allows you to control the evaluation of the statements in the body of the function. Before each statement is executed the statement is printed out and a special prompt provided.</strong> »</em></p>
+<p><em>« <strong>Debugging is turned off by a call to <code>undebug</code> with the function as an argument.</strong> »</em></p>
+</div>
+<pre><code class="language-r">&gt; debug(mean.default)
+&gt; mean(1:10)
+debugging in: mean.default(1:10)
+debug: {
+    if (na.rm) x &lt;- x[!is.na(x)]
+    trim &lt;- trim[1]
+    n &lt;- length(c(x, recursive = TRUE))
+    ...
+}
+Browse[1]&gt;
+debug: if (na.rm) x &lt;- x[!is.na(x)]
+Browse[1]&gt;
+debug: trim &lt;- trim[1]
+Browse[1]&gt;
+debug: n &lt;- length(c(x, recursive = TRUE))
+Browse[1]&gt; c
+exiting from: mean.default(1:10)
+[1] 5.5
+</code></pre>
+<div class="cal intu"><span class="lab">Contrôle — trois choses à remarquer dans cette trace.</span>
+
+<ol>
+<li><strong><code>debug(mean.default)</code>, pas <code>debug(mean)</code></strong> : <code>mean</code> est <strong>une générique</strong> (fiche 311), son corps se résume à <code>UseMethod("mean")</code>. C'est <strong>la méthode</strong> qu'il faut instrumenter.</li>
+<li><strong>Le corps entier s'affiche d'abord</strong>, puis <strong>une instruction à la fois</strong> ; chaque <code>RET</code> avance d'une ligne.</li>
+<li><strong><code>c</code> termine le pas-à-pas</strong> et laisse la fonction s'achever — d'où le <code>[1] 5.5</code> final.</li>
+</ol>
+</div>
+<h3>5.4 <code>trace()</code> — voir les appels</h3>
+<div class="cal formel"><span class="lab">Définition (§9.3).</span>
+<p> <em>« <strong>Another way of monitoring the behaviour of R is through the trace mechanism.</strong> <code>trace</code> is called with a single argument that is the name of the function you want to trace. <strong>The name does not need to be quoted but for some functions you will need to quote the name in order to avoid a syntax error.</strong> »</em></p>
+<p><em>« <strong>When <code>trace</code> has been invoked on a function then every time that function is evaluated the call to it is printed out.</strong> <strong>This mechanism is removed by calling <code>untrace</code>.</strong> »</em></p>
+</div>
+<pre><code class="language-r">&gt; trace("[&lt;-")
+&gt; x &lt;- 1:10
+&gt; x[3] &lt;- 4
+trace: "[&lt;-"(*tmp*, 3, value = 4)
+</code></pre>
+<blockquote>
+<p><strong>Cet exemple vaut une démonstration.</strong> Il rend <strong>visible</strong> le mécanisme <code>`*tmp*`</code> de la fiche 302 : <code>x[3] &lt;- 4</code> est <strong>réellement</strong> l'appel <code>`[&lt;-`(*tmp*, 3, value = 4)</code>. Ce que le manuel décrivait comme <em>« as if the following had been executed »</em> est ici <strong>observé</strong>.</p>
+<p>Et il illustre la réserve sur les guillemets : <code>trace([&lt;-)</code> serait <strong>une erreur de syntaxe</strong> — <code>[&lt;-</code> n'est pas un identifiant (fiche 300).</p>
+</blockquote>
+<p><strong>La différence avec <code>debug</code></strong> : <code>trace</code> <strong>n'interrompt pas</strong>. Il affiche l'appel et laisse continuer — utile quand on veut savoir <strong>combien de fois</strong> et <strong>avec quels arguments</strong> une fonction est appelée, sans arrêter le flux.</p>
+<h3>5.5 <code>traceback()</code> — la pile après coup</h3>
+<div class="cal formel"><span class="lab">Définition (§9.4).</span>
+<p> <em>« <strong>When an error has caused a jump to top-level a special variable called <code>.Traceback</code> is placed into the base environment. <code>.Traceback</code> is a character vector with one entry for each function call that was active at the time the error occurred. An examination of <code>.Traceback</code> can be carried out by a call to <code>traceback</code>.</strong> »</em></p>
+</div>
+<p><strong>C'est le premier réflexe après une erreur inattendue.</strong> Le message d'erreur dit <strong>quoi</strong> ; <code>traceback()</code> dit <strong>où</strong>, en remontant toute la chaîne d'appels.</p>
+<div class="cal methode"><span class="lab">Méthode — pourquoi cela résout les erreurs « incompréhensibles ».</span>
+<p> Les fiches précédentes ont montré plusieurs pannes <strong>différées</strong> : une classe posée sans vérification qui échoue au premier générique (fiche 311), un <code>drop</code> oublié qui casse <code>colMeans</code> (fiche 302), un <code>predict()</code> aux noms de variables discordants (fiche 313). Dans tous ces cas, <strong>le message ne parle pas de la cause</strong> — mais <code>traceback()</code> montre <strong>la chaîne</strong> qui y mène.</p>
+</div>
+<h2 data-prio="high">Concept 6 — Mettre au propre</h2>
+<blockquote>
+<p><strong>Cadrage (<em>Writing R Extensions</em> §3).</strong> <em>« <strong>R code which is worth preserving in a package and perhaps making available for others to use is worth documenting, tidying up and perhaps optimizing.</strong> »</em></p>
+</blockquote>
+<blockquote>
+<p><strong>Règle (§3.1).</strong> <em>« <strong>R treats function code loaded from packages and code entered by users differently.</strong> <strong>By default code entered by users has the source code stored internally, and when the function is listed, the original source is reproduced. Loading code from a package (by default) discards the source code, and the function listing is re-created from the parse tree of the function.</strong> »</em></p>
+<p><em>« <strong>Normally keeping the source code is a good idea, and in particular it avoids comments being removed.</strong> <strong>However, we can make use of the ability to re-create a function listing from its parse tree to produce a tidy version of the function</strong>, for example <strong>with consistent indentation and spaces around operators</strong>. »</em></p>
+</blockquote>
+<div class="cal methode"><span class="lab">Méthode — les deux façons de renoncer à la source (§3.1).</span>
+
+<ol>
+<li><em>« <strong>The option <code>keep.source</code> can be set to <code>FALSE</code> before the code is loaded into R.</strong> »</em></li>
+<li><em>« <strong>The stored source code can be removed by calling the <code>removeSource()</code> function</strong> »</em> : <code>myfun &lt;- removeSource(myfun)</code>.</li>
+</ol>
+</div>
+<p><strong>La recette complète (§3.1)</strong> — pour mettre au propre un fichier <code>myfuns.R</code>, écrire <code>tidy.R</code> :</p>
+<pre><code class="language-r">source("myfuns.R", keep.source = FALSE)
+dump(ls(all.names = TRUE), file = "new.myfuns.R")
+</code></pre>
+<p><em>« and run R with this as the source file, for example by <strong><code>R --vanilla &lt; tidy.R</code></strong> or by pasting into an R session. <strong>Then the file <code>new.myfuns.R</code> will contain the functions in alphabetical order in the standard layout.</strong>  <strong>Warning : comments in your functions will be lost.</strong> »</em></p>
+<div class="cal intu"><span class="lab">Contrôle — décoder ces deux lignes.</span>
+<p> <code>keep.source = FALSE</code> fait <strong>oublier le texte d'origine</strong> ; les fonctions n'existent plus que comme <strong>arbres syntaxiques</strong> (fiche 316). <code>ls(all.names = TRUE)</code> liste <strong>tous</strong> les objets, <strong>y compris ceux dont le nom commence par un point</strong> (fiche 300). <code>dump()</code> les réécrit <strong>à partir de l'arbre</strong> — donc dans <strong>la mise en page canonique</strong>. Et <code>R --vanilla</code> (fiche 300) garantit qu'aucun fichier de démarrage n'interfère.</p>
+</div>
+<blockquote>
+<p><strong>La recommandation de style (§3.1).</strong> <em>« The standard format provides a good starting point for further tidying. <strong>Although the deparsing cannot do so, we recommend the consistent use of the preferred assignment operator <code>&lt;-</code> (rather than <code>=</code>) for assignment.</strong> Many package authors use <strong>a version of Emacs</strong> … using the <strong>ESS[S]</strong> mode. »</em></p>
+</blockquote>
+<h2 data-prio="high">Concept 7 — Profiler</h2>
+<div class="cal formel"><span class="lab">Définition (Writing R Extensions §3.2).</span>
+<p> <em>« <strong>The command <code>Rprof</code> is used to control profiling.</strong> <strong>Profiling works by recording at fixed intervals (by default every 20 msecs) which line in which R function is being used, and recording the results in a file (default <code>Rprof.out</code> in the working directory). Then the function <code>summaryRprof</code> or the command-line utility <code>R CMD Rprof Rprof.out</code> can be used to summarize the activity.</strong> »</em></p>
+<p><em>(note 2 : « <strong>For Unix-alikes by default these are intervals of CPU time, and for Windows of elapsed ("wall-clock") time.</strong> »)</em></p>
+</div>
+<p><strong>Le patron d'usage</strong>, tiré de l'exemple du manuel (d'après <strong>Venables &amp; Ripley, 2002, pp. 225-6</strong>) :</p>
+<pre><code class="language-r">Rprof("boot.out")
+storm.boot &lt;- boot(rs, storm.bf, R = 4999)   # slow enough to profile
+Rprof(NULL)
+</code></pre>
+<p>puis</p>
+<pre><code>R CMD Rprof boot.out
+</code></pre>
+<p><strong>La sortie donne deux tableaux</strong>, et le manuel en explique les colonnes :</p>
+<blockquote>
+<p><em>« <strong>Total seconds : time spent in function and callees.</strong> <strong>Self seconds : time spent in function alone.</strong> »</em></p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>Colonne</th>
+<th>Ce qu'elle mesure</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>total</strong></td>
+<td>le temps passé <strong>dans la fonction et dans ce qu'elle appelle</strong></td>
+</tr>
+<tr>
+<td><strong>self</strong></td>
+<td>le temps passé <strong>dans la fonction seule</strong></td>
+</tr>
+</tbody></table>
+<p><strong>La distinction est décisive.</strong> Une fonction peut avoir un <code>total</code> de 100 % et un <code>self</code> de 0,2 % — c'est le cas de <code>boot</code> dans l'exemple : elle <strong>ne fait rien elle-même</strong>, elle appelle. <strong>On optimise ce qui a un <code>self</code> élevé.</strong></p>
+<p><em>« <strong>This often produces surprising results and can be used to identify bottlenecks or pieces of R code that could benefit from being replaced by compiled code.</strong> »</em></p>
+<blockquote>
+<p class="cal piege"> <strong>Trois mises en garde du manuel (§3.2).</strong></p>
+<ol>
+<li><em>« <strong>profiling does impose a small performance penalty</strong> »</em> ;</li>
+<li><em>« <strong>the output files can be very large if long runs are profiled at the default sampling interval</strong> »</em> ;</li>
+<li><em>« <strong>Profiling short runs can sometimes give misleading results. R from time to time performs garbage collection to reclaim unused memory, and this takes an appreciable amount of time which profiling will charge to whichever function happens to provoke it.</strong> <strong>It may be useful to compare profiling code immediately after a call to <code>gc()</code> with a profiling run without a preceding call to <code>gc</code>.</strong> »</em></li>
+</ol>
+<p><strong>La troisième est la plus subtile</strong> : le ramasse-miettes est <strong>imputé à la fonction qui l'a déclenché</strong>, laquelle n'y est pour rien. Sur un profil court, cela peut désigner <strong>un coupable innocent</strong>.</p>
+</blockquote>
+<p><em>« <strong>More detailed analysis of the output can be achieved by the tools in the CRAN packages <code>proftools</code> and <code>profr</code> : in particular these allow call graphs to be studied.</strong> »</em></p>
+<details class="cor">
+<summary><strong>Exercice résolu — diagnostiquer une fonction qui échoue de temps en temps</strong></summary><div class="in">
+
+<p><strong>Énoncé.</strong> Une fonction appelée dans une boucle plante « une fois sur vingt », avec un message qui ne mentionne pas son code. Quel enchaînement d'outils ?</p>
+<p><em>Étape 1 — obtenir la pile.</em> Après l'erreur, <strong><code>traceback()</code></strong>. <em>« <strong><code>.Traceback</code> is a character vector with one entry for each function call that was active at the time the error occurred</strong> »</em> (§9.4). Elle nomme <strong>la chaîne complète</strong>, du haut niveau jusqu'à la fonction fautive — ce que le message d'erreur seul ne dit pas.</p>
+<p><em>Étape 2 — si l'erreur n'est qu'un avertissement devenu fatal ailleurs.</em> <strong><code>options(warn = 2)</code></strong> : <em>« <strong>if it is 2 (or larger) warnings are turned into errors</strong> »</em> (§8.2). L'avertissement devient une erreur, donc <strong>traçable</strong> par l'étape 1.</p>
+<p><em>Étape 3 — si l'avertissement s'affiche loin de sa cause.</em> <strong><code>options(warn = 1)</code></strong> : <em>« <strong>they are printed as they occur</strong> »</em>. À <code>warn = 0</code>, ils sont affichés <strong>après la fonction de haut niveau</strong> — donc détachés du contexte.</p>
+<p><em>Étape 4 — entrer dans la fonction.</em> <strong><code>debug(mafonction)</code></strong> : <em>« <strong>each time that function is evaluated the debugger is invoked</strong> … <strong>before each statement is executed the statement is printed out</strong> »</em> (§9.2). On avance par <code>RET</code>, on inspecte les variables au prompt — <em>« <strong>the evaluation environment for the command is the currently active environment</strong> »</em>.</p>
+<p><em>Étape 5 — sauter directement au point suspect.</em> Plutôt que dérouler vingt appels, insérer <strong><code>browser()</code></strong> sous une condition :</p>
+<pre><code class="language-r">if (length(x) == 1) browser()
+</code></pre>
+<p class="cal piege"> <em>« <strong>Arguments to <code>browser</code> are ignored</strong> »</em> — on ne peut pas lui passer de condition, il faut l'entourer d'un <code>if</code>.</p>
+<p><em>Étape 6 — se repérer dans la pile.</em> Au prompt, <strong><code>where</code></strong> — <em>« <strong>Show the call stack</strong> »</em>. Et <strong><code>Q</code></strong> pour <em>« <strong>halt execution and jump to the top-level immediately</strong> »</em> si l'on a vu ce qu'on voulait.</p>
+<p><em>Étape 7 — le piège des noms.</em> Si la fonction a une variable locale nommée <code>c</code> ou <code>n</code>, la taper <strong>exécute la commande du débogueur</strong>. <em>« <strong>its value can be accessed by using <code>get</code></strong> »</em> → <strong><code>get("c")</code></strong>.</p>
+<p><em>Étape 8 — nettoyer.</em> <strong><code>undebug(mafonction)</code></strong>, sinon <strong>chaque appel ultérieur</strong> rouvre le débogueur. Et retirer les <code>browser()</code> du code : ils sont <strong>invisibles</strong> dans un script qui tourne en batch — où ils bloquent indéfiniment.</p>
+<p><em>Étape 9 — la protection durable.</em> Si la fonction modifie un état global (paramètres graphiques, <code>sink</code>, répertoire), poser <strong><code>on.exit()</code></strong> dès le début : <em>« <strong>guaranteed to be executed when the function exits either directly or as the result of a warning</strong> »</em> (§8.3). Une erreur ne laissera pas la session dans un état bancal.</p>
+</div></details>
+
+<h2>Comment reconnaître le type d'exercice</h2>
+<table>
+<thead>
+<tr>
+<th>Le signal dans l'énoncé</th>
+<th>Ce qu'il faut mobiliser</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>« interrompre avec un message »</td>
+<td><strong><code>stop()</code></strong></td>
+</tr>
+<tr>
+<td>« signaler sans interrompre »</td>
+<td><strong><code>warning()</code></strong></td>
+</tr>
+<tr>
+<td>« mes avertissements arrivent trop tard »</td>
+<td><strong><code>options(warn = 1)</code></strong></td>
+</tr>
+<tr>
+<td>« traiter les avertissements comme des bugs »</td>
+<td><strong><code>options(warn = 2)</code></strong></td>
+</tr>
+<tr>
+<td>« il y avait 12 avertissements »</td>
+<td>plus de dix → <strong><code>warnings()</code></strong></td>
+</tr>
+<tr>
+<td>« restaurer un réglage quoi qu'il arrive »</td>
+<td><strong><code>on.exit()</code></strong></td>
+</tr>
+<tr>
+<td>« faire quelque chose à chaque erreur »</td>
+<td><strong><code>options(error = ...)</code></strong></td>
+</tr>
+<tr>
+<td>« arrêter R au premier problème en batch »</td>
+<td><code>options(error = expression(q("yes")))</code></td>
+</tr>
+<tr>
+<td>« d'où vient cette erreur ? »</td>
+<td><strong><code>traceback()</code></strong></td>
+</tr>
+<tr>
+<td>« s'arrêter à un endroit précis »</td>
+<td><strong><code>browser()</code></strong>, éventuellement sous un <code>if</code></td>
+</tr>
+<tr>
+<td>« suivre une fonction pas à pas »</td>
+<td><strong><code>debug()</code></strong> — puis <strong><code>undebug()</code></strong></td>
+</tr>
+<tr>
+<td>« déboguer une générique »</td>
+<td> instrumenter <strong>la méthode</strong>, pas la générique</td>
+</tr>
+<tr>
+<td>« savoir combien de fois c'est appelé »</td>
+<td><strong><code>trace()</code></strong></td>
+</tr>
+<tr>
+<td>« voir la pile depuis le débogueur »</td>
+<td><strong><code>where</code></strong></td>
+</tr>
+<tr>
+<td>« ma variable s'appelle <code>c</code> »</td>
+<td><strong><code>get("c")</code></strong></td>
+</tr>
+<tr>
+<td>« déboguer du code C »</td>
+<td> <strong>pas avec ces outils</strong> — <code>gdb</code></td>
+</tr>
+<tr>
+<td>« uniformiser la présentation du code »</td>
+<td><strong><code>keep.source = FALSE</code></strong> + <strong><code>dump()</code></strong></td>
+</tr>
+<tr>
+<td>« où mon programme passe-t-il son temps ? »</td>
+<td><strong><code>Rprof()</code></strong> + <strong><code>summaryRprof()</code></strong></td>
+</tr>
+<tr>
+<td>« quelle fonction optimiser ? »</td>
+<td>celle dont le <strong><code>self</code></strong> est élevé</td>
+</tr>
+<tr>
+<td>« mon profil accuse une fonction inattendue »</td>
+<td>peut-être <strong>le ramasse-miettes</strong></td>
+</tr>
+</tbody></table>
+<h2>Comment résoudre ce type d'exercice</h2>
+<p><strong>Protocole « diagnostiquer une erreur » — 4 étapes.</strong></p>
+<ol>
+<li><strong><code>traceback()</code></strong> immédiatement après — la chaîne d'appels.</li>
+<li>Si c'est un avertissement qui dégénère : <strong><code>options(warn = 2)</code></strong>, puis retour à l'étape 1.</li>
+<li><strong><code>debug()</code></strong> sur la fonction suspecte, ou <strong><code>browser()</code></strong> sous condition au bon endroit.</li>
+<li><strong><code>undebug()</code></strong> et retirer les <code>browser()</code> avant de refermer.</li>
+</ol>
+<p><strong>Protocole « rendre une fonction sûre » — 3 étapes.</strong></p>
+<ol>
+<li><strong>Valider tôt</strong> : <code>stop()</code> <strong>avant</strong> toute modification d'état (le patron <code>withdraw</code> de la fiche 310).</li>
+<li><strong>Poser <code>on.exit()</code></strong> dès qu'un réglage global est touché — <em>« guaranteed to be executed … either directly or as the result of a warning »</em>.</li>
+<li>Ne jamais laisser un <code>browser()</code> dans du code livré.</li>
+</ol>
+<p><strong>Protocole « optimiser » — 4 étapes.</strong></p>
+<ol>
+<li><strong>Mesurer d'abord</strong> : <code>Rprof("f.out")</code> … <code>Rprof(NULL)</code>, puis <code>summaryRprof()</code>.</li>
+<li>Lire <strong><code>self</code></strong>, pas <code>total</code> — le <code>total</code> d'une fonction qui délègue ne dit rien.</li>
+<li>Se méfier des <strong>exécutions courtes</strong> : le ramasse-miettes fausse l'imputation → comparer <strong>avec et sans <code>gc()</code></strong> préalable.</li>
+<li>Puis seulement, chercher <strong>la vectorisation</strong> (fiche 301), <strong>l'opération « objet entier »</strong> (fiche 308), ou du <strong>code compilé</strong> (fiche 320).</li>
+</ol>
+<h2 data-prio="must">Common mistakes</h2>
+<table>
+<thead>
+<tr>
+<th>Erreur</th>
+<th>Correction</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Croire qu'un <code>warning</code> interrompt</td>
+<td>seul <strong><code>stop</code></strong> interrompt</td>
+</tr>
+<tr>
+<td>Chercher un avertissement là où il s'affiche</td>
+<td>à <code>warn = 0</code> il est <strong>différé</strong> → <code>options(warn = 1)</code></td>
+</tr>
+<tr>
+<td>Ignorer « There were 12 warnings »</td>
+<td><strong><code>warnings()</code></strong> les montre</td>
+</tr>
+<tr>
+<td>Restaurer un réglage en fin de corps</td>
+<td>une erreur <strong>saute la ligne</strong> → <strong><code>on.exit()</code></strong></td>
+</tr>
+<tr>
+<td>Croire <code>on.exit</code> exécuté après un avertissement seulement</td>
+<td>il l'est <strong>dans les deux cas</strong></td>
+</tr>
+<tr>
+<td>Croire l'expression d'erreur exécutée après <code>on.exit</code></td>
+<td> elle l'est <strong>avant</strong></td>
+</tr>
+<tr>
+<td>Passer un argument à <code>browser()</code></td>
+<td> <em>« <strong>Arguments to <code>browser</code> are ignored</strong> »</em></td>
+</tr>
+<tr>
+<td><code>debug()</code> sur une fonction générique</td>
+<td>son corps est <strong><code>UseMethod</code></strong> — déboguer <strong>la méthode</strong></td>
+</tr>
+<tr>
+<td>Oublier <code>undebug()</code></td>
+<td><strong>chaque</strong> appel ultérieur rouvre le débogueur</td>
+</tr>
+<tr>
+<td>Laisser un <code>browser()</code> dans un script batch</td>
+<td>il <strong>bloque</strong> indéfiniment</td>
+</tr>
+<tr>
+<td>Taper <code>c</code> pour voir une variable nommée <code>c</code></td>
+<td>c'est <strong>une commande</strong> → <code>get("c")</code></td>
+</tr>
+<tr>
+<td>Attendre du débogueur qu'il entre dans du C</td>
+<td><em>« <strong>no access to the statements in that language</strong> »</em> → <code>gdb</code></td>
+</tr>
+<tr>
+<td><code>trace()</code> sur un nom non identifiant</td>
+<td>il faut <strong>des guillemets</strong> : <code>trace("[&lt;-")</code></td>
+</tr>
+<tr>
+<td>Optimiser sans mesurer</td>
+<td><strong>profiler d'abord</strong></td>
+</tr>
+<tr>
+<td>Lire <code>total</code> au lieu de <code>self</code></td>
+<td><code>total</code> inclut <strong>les appelées</strong></td>
+</tr>
+<tr>
+<td>Profiler une exécution très courte</td>
+<td>le <strong>ramasse-miettes</strong> fausse le résultat</td>
+</tr>
+<tr>
+<td>Profiler longtemps au pas par défaut</td>
+<td><em>« <strong>the output files can be very large</strong> »</em></td>
+</tr>
+<tr>
+<td>Croire <code>dump()</code> fidèle au source</td>
+<td> <em>« <strong>comments in your functions will be lost</strong> »</em></td>
+</tr>
+</tbody></table>
+<h2>Ultimate Review</h2>
+<p><strong>Deux mécanismes.</strong> <em>« <strong>Functions such as <code>stop</code> or <code>warning</code> can be called directly or options such as <code>"warn"</code> can be used to control the handling of problems.</strong> »</em> — <strong>le code signale, l'utilisateur décide</strong>.</p>
+<p><strong><code>stop</code>.</strong> <em>« <strong>halts the evaluation of the current expression, prints the message argument and returns execution to top-level</strong> »</em>.</p>
+<p><strong><code>warning</code> et l'option <code>warn</code>.</strong> <strong>négatif</strong> → <em>« <strong>ignored</strong> »</em> · <strong>0</strong> (défaut) → <em>« <strong>stored and printed after the top-level function has completed</strong> »</em> · <strong>1</strong> → <em>« <strong>printed as they occur</strong> »</em> · <strong>≥ 2</strong> → <em>« <strong>turned into errors</strong> »</em>. À <code>warn = 0</code> : <strong>moins de dix</strong> → imprimés ; <strong>plus de dix</strong> → <em>« <strong>a message indicating how many warnings occurred</strong> »</em> ; dans les deux cas <strong><code>last.warning</code></strong> contient le vecteur et <strong><code>warnings()</code></strong> y donne accès.</p>
+<p><strong><code>on.exit</code>.</strong> <em>« <strong>stores the value of the body so that it will be executed when the function exits</strong> … <strong>allows the function to change some system parameters and to ensure that they are reset</strong> »</em> ·  <em>« <strong>guaranteed to be executed when the function exits either directly or as the result of a warning</strong> »</em> · <em>« <strong>an error in the evaluation of the <code>on.exit</code> code causes an immediate jump to top-level</strong> »</em> · <strong>un seul argument</strong> : l'expression à évaluer.</p>
+<p><strong>Trois options.</strong> <strong><code>warn</code></strong> · <strong><code>warning.expression</code></strong> —  <em>« <strong>the normal printing of warnings is suppressed if this option is set</strong> »</em> · <strong><code>error</code></strong> — <em>« <strong>the normal printing of error messages … precedes the evaluation of the expression</strong> »</em>.  <em>« <strong>Expressions installed by <code>options("error")</code> are evaluated before calls to <code>on.exit</code> are carried out.</strong> »</em> Exemple : <strong><code>options(error = expression(q("yes")))</code></strong> — <em>« <strong>an error will cause R to shut down and the global environment will be saved</strong> »</em>.</p>
+<p><strong>Le débogueur.</strong> <em>« <strong>Most debugging takes place either through calls to <code>browser</code> or <code>debug</code>. Both … rely on the same internal mechanism</strong> … <strong>The evaluation environment for the command is the currently active environment.</strong> »</em></p>
+<p><strong>Les cinq commandes.</strong> <strong><code>RET</code></strong> — instruction suivante en <code>debug</code>, <strong>continuer</strong> depuis le browser · <strong><code>c</code></strong> / <strong><code>cont</code></strong> — continuer · <strong><code>n</code></strong> — instruction suivante, <em>« <strong>works from the browser as well</strong> »</em> · <strong><code>where</code></strong> — <em>« <strong>show the call stack</strong> »</em> · <strong><code>Q</code></strong> — <em>« <strong>halt execution and jump to the top-level immediately</strong> »</em>.  Variable locale homonyme → <strong><code>get("c")</code></strong>.  <em>« <strong>The debugger provides access only to interpreted expressions</strong> »</em> — pour le C, <strong><code>gdb</code></strong>.</p>
+<p><strong><code>browser()</code>.</strong> <em>« <strong>causes R to halt execution at that point</strong> »</em> ·  <em>« <strong>Arguments to <code>browser</code> are ignored</strong> »</em>.</p>
+<p><strong><code>debug()</code> / <code>undebug()</code>.</strong> <em>« <strong>each time that function is evaluated the debugger is invoked</strong> … <strong>before each statement is executed the statement is printed out</strong> »</em> · l'exemple du manuel instrumente <strong><code>mean.default</code></strong>, pas <code>mean</code>.</p>
+<p><strong><code>trace()</code> / <code>untrace()</code>.</strong> <em>« <strong>every time that function is evaluated the call to it is printed out</strong> »</em> · <em>« <strong>The name does not need to be quoted but for some functions you will need to quote the name</strong> »</em> · l'exemple <code>trace("[&lt;-")</code> <strong>rend visible</strong> le mécanisme <code>`*tmp*`</code> : <code>trace: "[&lt;-"(*tmp*, 3, value = 4)</code>.</p>
+<p><strong><code>traceback()</code>.</strong> <em>« <strong>when an error has caused a jump to top-level a special variable called <code>.Traceback</code> is placed into the base environment</strong> … <strong>one entry for each function call that was active at the time the error occurred</strong> »</em>.</p>
+<p><strong>Mettre au propre.</strong> <em>« <strong>code entered by users has the source code stored internally</strong> … <strong>loading code from a package (by default) discards the source code</strong> »</em> · <strong><code>keep.source = FALSE</code></strong> ou <strong><code>removeSource()</code></strong> · la recette : <code>source("myfuns.R", keep.source = FALSE)</code> puis <code>dump(ls(all.names = TRUE), file = "new.myfuns.R")</code>, lancé par <strong><code>R --vanilla &lt; tidy.R</code></strong> ·  <em>« <strong>comments in your functions will be lost</strong> »</em> · recommandation : <strong><code>&lt;-</code> plutôt que <code>=</code></strong>.</p>
+<p><strong>Profiler.</strong> <strong><code>Rprof("f.out")</code> … <code>Rprof(NULL)</code></strong>, puis <strong><code>summaryRprof()</code></strong> ou <strong><code>R CMD Rprof</code></strong> · <em>« <strong>recording at fixed intervals (by default every 20 msecs) which line in which R function is being used</strong> »</em> · <strong>CPU</strong> sur Unix, <strong>temps écoulé</strong> sur Windows · <strong><code>Total seconds : time spent in function and callees. Self seconds : time spent in function alone.</code></strong> — <strong>optimiser ce qui a un <code>self</code> élevé</strong> · <em>« <strong>often produces surprising results</strong> »</em> ·  trois réserves : <strong>pénalité de performance</strong>, <strong>fichiers très volumineux</strong>, et <strong>le ramasse-miettes imputé à qui le déclenche</strong> — d'où l'intérêt de comparer <strong>avec et sans <code>gc()</code></strong> · outils plus fins : <strong><code>proftools</code></strong> et <strong><code>profr</code></strong>, <em>« these allow <strong>call graphs</strong> to be studied »</em>.</p>
+<div class="rec"><h2>Active Recall</h2><details class="cor">
+<summary>Quels sont les deux mécanismes de gestion des exceptions en R ?</summary><div class="in">
+
+<p><em>« <strong>The exception handling facilities in R are provided through two mechanisms. Functions such as <code>stop</code> or <code>warning</code> can be called directly or options such as <code>"warn"</code> can be used to control the handling of problems.</strong> »</em> (§8)</p>
+<p><strong>Le partage est net</strong> : le code <strong>signale</strong> (<code>stop</code>, <code>warning</code>), l'utilisateur <strong>décide</strong> de ce qui en est fait (<code>options</code>).</p>
+<p>C'est ce qui permet à <code>options(warn = 2)</code> de rendre strict un script indulgent <strong>sans en changer une ligne</strong> — les mêmes <code>warning()</code> deviennent alors des erreurs, donc traçables par <code>traceback()</code>.</p>
+</div></details><details class="cor">
+<summary>Quels sont les quatre régimes de l'option <code>warn</code> ?</summary><div class="in">
+
+<p><em>« <strong>The behaviour of a call to <code>warning</code> depends on the value of the option <code>"warn"</code>.</strong> »</em> (§8.2)</p>
+<table>
+<thead>
+<tr>
+<th><code>warn</code></th>
+<th>Comportement</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>négatif</strong></td>
+<td><em>« warnings are <strong>ignored</strong> »</em></td>
+</tr>
+<tr>
+<td><strong>0</strong> (défaut)</td>
+<td><em>« <strong>stored and printed after the top-level function has completed</strong> »</em></td>
+</tr>
+<tr>
+<td><strong>1</strong></td>
+<td><em>« <strong>printed as they occur</strong> »</em></td>
+</tr>
+<tr>
+<td><strong>≥ 2</strong></td>
+<td><em>« <strong>turned into errors</strong> »</em></td>
+</tr>
+</tbody></table>
+<p>Et le détail du défaut : <em>« <strong>If there are fewer than 10 warnings they are printed after the function has finished evaluating. If there are more than 10 then a message indicating how many warnings occurred is printed. In either case <code>last.warning</code> contains the vector of messages, and <code>warnings</code> provides a way to access and print it.</strong> »</em></p>
+<p><strong>C'est l'explication du fameux « There were 12 warnings (use <code>warnings()</code> to see them) ».</strong></p>
+</div></details><details class="cor">
+<summary>Que garantit <code>on.exit()</code>, et pourquoi est-ce mieux qu'une ligne en fin de fonction ?</summary><div class="in">
+
+<p><em>« <strong>The effect of a call to <code>on.exit</code> is to store the value of the body so that it will be executed when the function exits.</strong> <strong>This allows the function to change some system parameters and to ensure that they are reset to appropriate values when the function is finished.</strong>  <strong>The <code>on.exit</code> is guaranteed to be executed when the function exits either directly or as the result of a warning.</strong> »</em> (§8.3)</p>
+<p><strong>Une ligne en fin de corps n'est atteinte que si tout s'est bien passé.</strong> Sur l'idiome <code>oldpar</code> de la fiche 314 :</p>
+<pre><code class="language-r">oldpar &lt;- par(no.readonly = TRUE)
+on.exit(par(oldpar))          # &lt;- execute QUOI QU'IL ARRIVE
+</code></pre>
+<p>Sans lui, une erreur au milieu du tracé <strong>laisserait les réglages de l'utilisateur modifiés</strong>.</p>
+<p class="cal piege"> <em>« <strong>An error in the evaluation of the <code>on.exit</code> code causes an immediate jump to top-level</strong> »</em>.</p>
+</div></details><details class="cor">
+<summary>Quelles sont les trois options d'erreur, et quel ordre d'exécution faut-il connaître ?</summary><div class="in">
+
+<p>(§8.4)</p>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Rôle</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong><code>warn</code></strong></td>
+<td><em>« Controls the printing of warnings »</em></td>
+</tr>
+<tr>
+<td><strong><code>warning.expression</code></strong></td>
+<td>une expression évaluée à chaque avertissement —  <em>« <strong>the normal printing of warnings is suppressed</strong> »</em></td>
+</tr>
+<tr>
+<td><strong><code>error</code></strong></td>
+<td>une expression évaluée à chaque erreur — <em>« <strong>the normal printing … precedes the evaluation</strong> »</em></td>
+</tr>
+</tbody></table>
+<p class="cal piege"> <strong>L'ordre</strong> : <em>« <strong>Expressions installed by <code>options("error")</code> are evaluated before calls to <code>on.exit</code> are carried out.</strong> »</em></p>
+<p><strong>Cela compte</strong> : au moment où l'expression d'erreur s'exécute, <strong>les nettoyages n'ont pas eu lieu</strong> — l'état des cadres est <strong>encore intact</strong>, ce qui rend l'inspection possible.</p>
+<p>L'exemple du manuel : <code>options(error = expression(q("yes")))</code> — <em>« <strong>an error will cause R to shut down and the global environment will be saved</strong> »</em>.</p>
+</div></details><details class="cor">
+<summary>Quelles sont les cinq commandes spéciales du débogueur ?</summary><div class="in">
+
+<p><em>« <strong>There are five special commands that R interprets differently.</strong> »</em> (§9)</p>
+<table>
+<thead>
+<tr>
+<th>Commande</th>
+<th>Effet</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong><code>RET</code></strong></td>
+<td><em>« <strong>Go to the next statement if the function is being debugged. Continue execution if the browser was invoked.</strong> »</em></td>
+</tr>
+<tr>
+<td><strong><code>c</code></strong> / <strong><code>cont</code></strong></td>
+<td><em>« Continue the execution »</em></td>
+</tr>
+<tr>
+<td><strong><code>n</code></strong></td>
+<td><em>« Execute the next statement … <strong>This works from the browser as well</strong> »</em></td>
+</tr>
+<tr>
+<td><strong><code>where</code></strong></td>
+<td><em>« <strong>Show the call stack</strong> »</em></td>
+</tr>
+<tr>
+<td><strong><code>Q</code></strong></td>
+<td><em>« <strong>Halt execution and jump to the top-level immediately</strong> »</em></td>
+</tr>
+</tbody></table>
+<p class="cal piege"> <strong>Le piège</strong> : <em>« <strong>If there is a local variable with the same name as one of the special commands … its value can be accessed by using <code>get</code>.</strong> »</em> Une variable locale <code>c</code> exige <strong><code>get("c")</code></strong> — c'est l'exemple même du §9.1.</p>
+</div></details><details class="cor">
+<summary>Quelle est la différence entre <code>browser()</code> et <code>debug()</code> ?</summary><div class="in">
+
+<p><strong><code>browser()</code></strong> <em>« <strong>causes R to halt execution at that point</strong> »</em> (§9.1) — <strong>un point d'arrêt posé dans le code</strong>.  <em>« <strong>Arguments to <code>browser</code> are ignored</strong> »</em>, d'où la nécessité d'un <code>if</code> pour le conditionner.</p>
+<p><strong><code>debug(fun)</code></strong> — <em>« <strong>Subsequently, each time that function is evaluated the debugger is invoked</strong> … <strong>Before each statement is executed the statement is printed out and a special prompt provided.</strong> »</em> (§9.2) — <strong>un pas-à-pas sur toute la fonction</strong>, à <strong>chaque</strong> appel, jusqu'à <code>undebug()</code>.</p>
+<p><em>« <strong>Both of these functions rely on the same internal mechanism and both provide the user with a special prompt.</strong> »</em></p>
+<p class="cal piege"> Dans l'exemple du manuel, c'est <strong><code>debug(mean.default)</code></strong> et non <code>debug(mean)</code> : <code>mean</code> est une <strong>générique</strong> dont le corps est <code>UseMethod("mean")</code> (fiche 311).</p>
+</div></details><details class="cor">
+<summary>Que montre l'exemple <code>trace("[&lt;-")</code> du manuel, et pourquoi les guillemets ?</summary><div class="in">
+
+<pre><code class="language-r">&gt; trace("[&lt;-")
+&gt; x &lt;- 1:10
+&gt; x[3] &lt;- 4
+trace: "[&lt;-"(*tmp*, 3, value = 4)
+</code></pre>
+<p><strong>Il rend visible le mécanisme <code>`*tmp*`</code></strong> de la fiche 302 : <code>x[3] &lt;- 4</code> <strong>est réellement</strong> l'appel <code>`[&lt;-`(*tmp*, 3, value = 4)</code>. Ce que le manuel décrivait comme <em>« as if the following had been executed »</em> est ici <strong>observé en direct</strong>.</p>
+<p><strong>Les guillemets</strong> : <em>« <strong>The name does not need to be quoted but for some functions you will need to quote the name in order to avoid a syntax error.</strong> »</em> (§9.3) — <code>[&lt;-</code> n'est pas un identifiant (fiche 300), donc <code>trace([&lt;-)</code> serait une erreur de syntaxe.</p>
+<p><strong>La différence avec <code>debug</code></strong> : <code>trace</code> <strong>n'interrompt pas</strong> — il affiche l'appel et laisse continuer.</p>
+</div></details><details class="cor">
+<summary>Qu'est-ce que <code>.Traceback</code>, et quand s'en sert-on ?</summary><div class="in">
+
+<p><em>« <strong>When an error has caused a jump to top-level a special variable called <code>.Traceback</code> is placed into the base environment. <code>.Traceback</code> is a character vector with one entry for each function call that was active at the time the error occurred. An examination of <code>.Traceback</code> can be carried out by a call to <code>traceback</code>.</strong> »</em> (§9.4)</p>
+<p><strong>C'est le premier réflexe après une erreur inattendue</strong> : le message dit <strong>quoi</strong>, <code>traceback()</code> dit <strong>où</strong>.</p>
+<p>Il est particulièrement utile pour les pannes <strong>différées</strong> rencontrées dans les fiches précédentes — une classe posée sans vérification (fiche 311), un <code>drop</code> oublié (fiche 302), un <code>predict()</code> mal nommé (fiche 313) — où <strong>le message ne mentionne pas la cause</strong>.</p>
+</div></details><details class="cor">
+<summary>Comment produit-on une version « propre » d'un fichier de fonctions, et que perd-on ?</summary><div class="in">
+
+<p><em>« <strong>By default code entered by users has the source code stored internally</strong> … <strong>Loading code from a package (by default) discards the source code, and the function listing is re-created from the parse tree.</strong> »</em> (<em>Writing R Extensions</em> §3.1)</p>
+<p><strong>La recette</strong> — un fichier <code>tidy.R</code> contenant :</p>
+<pre><code class="language-r">source("myfuns.R", keep.source = FALSE)
+dump(ls(all.names = TRUE), file = "new.myfuns.R")
+</code></pre>
+<p>lancé par <strong><code>R --vanilla &lt; tidy.R</code></strong>. <em>« <strong>Then the file <code>new.myfuns.R</code> will contain the functions in alphabetical order in the standard layout.</strong> »</em></p>
+<p class="cal piege"> <strong>Ce qu'on perd</strong> : <em>« <strong>Warning : comments in your functions will be lost.</strong> »</em></p>
+<p><strong>Chaque morceau a sa raison</strong> : <code>keep.source = FALSE</code> fait oublier le texte d'origine ; <code>ls(all.names = TRUE)</code> prend <strong>aussi les noms à point</strong> (fiche 300) ; <code>dump</code> réécrit <strong>depuis l'arbre syntaxique</strong> (fiche 316) ; <code>--vanilla</code> isole des fichiers de démarrage.</p>
+<p>L'alternative ponctuelle : <strong><code>myfun &lt;- removeSource(myfun)</code></strong>.</p>
+</div></details><details class="cor">
+<summary>Comment profile-t-on du code R, et quelle colonne faut-il lire ?</summary><div class="in">
+
+<pre><code class="language-r">Rprof("boot.out")
+# ... code lent ...
+Rprof(NULL)
+</code></pre>
+<p>puis <strong><code>summaryRprof()</code></strong> ou <strong><code>R CMD Rprof boot.out</code></strong>.</p>
+<p><em>« <strong>Profiling works by recording at fixed intervals (by default every 20 msecs) which line in which R function is being used</strong> »</em> (§3.2) — <strong>CPU</strong> sur Unix, <strong>temps écoulé</strong> sur Windows.</p>
+<p><strong>Les deux colonnes</strong> : <em>« <strong>Total seconds : time spent in function and callees. Self seconds : time spent in function alone.</strong> »</em></p>
+<p class="cal piege"> <strong>C'est <code>self</code> qu'il faut lire.</strong> Dans l'exemple du manuel, <code>boot</code> a un <strong>total de 100 %</strong> et un <strong>self de 0,2 %</strong> : elle ne fait rien elle-même, elle appelle. <strong>Optimiser une fonction à <code>self</code> faible n'apporte rien.</strong></p>
+<p><em>« <strong>This often produces surprising results and can be used to identify bottlenecks or pieces of R code that could benefit from being replaced by compiled code.</strong> »</em></p>
+</div></details><details class="cor">
+<summary>Quelles précautions le manuel donne-t-il sur le profilage ?</summary><div class="in">
+
+<p><strong>Trois</strong> (§3.2) :</p>
+<ol>
+<li><em>« <strong>profiling does impose a small performance penalty</strong> »</em> ;</li>
+<li><em>« <strong>the output files can be very large if long runs are profiled at the default sampling interval</strong> »</em> ;</li>
+<li> <em>« <strong>Profiling short runs can sometimes give misleading results. R from time to time performs garbage collection to reclaim unused memory, and this takes an appreciable amount of time which profiling will charge to whichever function happens to provoke it.</strong> <strong>It may be useful to compare profiling code immediately after a call to <code>gc()</code> with a profiling run without a preceding call to <code>gc</code>.</strong> »</em></li>
+</ol>
+<p><strong>La troisième est la plus insidieuse</strong> : le ramasse-miettes est <strong>imputé à la fonction qui l'a déclenché</strong>, laquelle n'en est pas responsable. Sur une exécution courte, le profil peut donc <strong>désigner un innocent</strong>.</p>
+<p><strong>Le remède du manuel</strong> : comparer deux profils, l'un précédé d'un <code>gc()</code>, l'autre non.</p>
+<p>Pour aller plus loin : <strong><code>proftools</code></strong> et <strong><code>profr</code></strong>, <em>« these allow <strong>call graphs</strong> to be studied »</em>.</p>
+</div></details><details class="cor">
+<summary>Pourquoi le débogueur de R ne suffit-il pas toujours ?</summary><div class="in">
+
+<p><em>« <strong>The debugger provides access only to interpreted expressions. If a function calls a foreign language (such as C) then no access to the statements in that language is provided. Execution will halt on the next statement that is evaluated in R. A symbolic debugger such as <code>gdb</code> can be used to debug compiled code.</strong> »</em> (§9)</p>
+<p><strong>Les outils de ce chapitre s'arrêtent à la frontière du code compilé.</strong> Un <code>.Call</code> s'exécute d'un bloc : on voit ce qui entre et ce qui sort, jamais ce qui se passe dedans.</p>
+<p>C'est l'un des coûts de l'interfaçage avec C (fiche 320), et l'une des raisons de <strong>ne descendre en C qu'après avoir profilé</strong> — le code compilé est <strong>plus rapide et moins observable</strong>.</p>
+</div></details></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h2>Flashcards</h2>
+<table>
+<thead>
+<tr>
+<th>Question</th>
+<th>Réponse</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Les deux mécanismes de gestion des exceptions ?</td>
+<td>Les <strong>fonctions</strong> (<code>stop</code>, <code>warning</code>) et les <strong>options</strong></td>
+</tr>
+<tr>
+<td>Que fait <code>stop()</code> ?</td>
+<td><strong>Arrête</strong>, <strong>affiche</strong>, <strong>revient au sommet</strong></td>
+</tr>
+<tr>
+<td>De quoi dépend le comportement de <code>warning()</code> ?</td>
+<td>De l'option <strong><code>warn</code></strong></td>
+</tr>
+<tr>
+<td><code>warn</code> négatif ?</td>
+<td>Les avertissements sont <strong>ignorés</strong></td>
+</tr>
+<tr>
+<td><code>warn = 0</code> ?</td>
+<td><strong>Stockés</strong>, imprimés <strong>après</strong> la fonction de haut niveau</td>
+</tr>
+<tr>
+<td><code>warn = 1</code> ?</td>
+<td>Imprimés <strong>au moment où ils surviennent</strong></td>
+</tr>
+<tr>
+<td><code>warn &gt;= 2</code> ?</td>
+<td><strong>Transformés en erreurs</strong></td>
+</tr>
+<tr>
+<td>Quel est le défaut ?</td>
+<td><strong>0</strong></td>
+</tr>
+<tr>
+<td>Le seuil d'affichage à <code>warn = 0</code> ?</td>
+<td><strong>Dix</strong></td>
+</tr>
+<tr>
+<td>Au-delà, qu'affiche R ?</td>
+<td><strong>Un compte</strong>, pas les messages</td>
+</tr>
+<tr>
+<td>Où sont-ils conservés ?</td>
+<td><strong><code>last.warning</code></strong></td>
+</tr>
+<tr>
+<td>Comment y accéder ?</td>
+<td><strong><code>warnings()</code></strong></td>
+</tr>
+<tr>
+<td>Que fait <code>on.exit()</code> ?</td>
+<td>Il <strong>stocke une expression</strong> exécutée <strong>à la sortie</strong></td>
+</tr>
+<tr>
+<td>Quand est-elle garantie ?</td>
+<td>Sortie <strong>directe</strong> ou <strong>par avertissement</strong></td>
+</tr>
+<tr>
+<td>Combien d'arguments prend-il ?</td>
+<td><strong>Un seul</strong></td>
+</tr>
+<tr>
+<td>Que se passe-t-il si le code d'<code>on.exit</code> échoue ?</td>
+<td><strong>Saut immédiat au sommet</strong></td>
+</tr>
+<tr>
+<td>Les trois options d'erreur ?</td>
+<td><strong><code>warn</code></strong>, <strong><code>warning.expression</code></strong>, <strong><code>error</code></strong></td>
+</tr>
+<tr>
+<td>Effet de <code>warning.expression</code> ?</td>
+<td>L'affichage normal est <strong>supprimé</strong></td>
+</tr>
+<tr>
+<td>Et de <code>error</code> ?</td>
+<td>L'affichage normal <strong>précède</strong> l'évaluation</td>
+</tr>
+<tr>
+<td>Quel ordre entre <code>options("error")</code> et <code>on.exit</code> ?</td>
+<td> <strong>L'expression d'erreur d'abord</strong></td>
+</tr>
+<tr>
+<td>Comment quitter R à la première erreur ?</td>
+<td><code>options(error = expression(q("yes")))</code></td>
+</tr>
+<tr>
+<td>Les deux principaux outils de débogage ?</td>
+<td><strong><code>browser</code></strong> et <strong><code>debug</code></strong></td>
+</tr>
+<tr>
+<td>Quel environnement au prompt ?</td>
+<td><strong>L'environnement actif</strong></td>
+</tr>
+<tr>
+<td>Combien de commandes spéciales ?</td>
+<td><strong>Cinq</strong></td>
+</tr>
+<tr>
+<td>Que fait <code>RET</code> en mode <code>debug</code> ?</td>
+<td><strong>Instruction suivante</strong></td>
+</tr>
+<tr>
+<td>Et depuis le browser ?</td>
+<td>Il <strong>continue</strong></td>
+</tr>
+<tr>
+<td>Que fait <code>c</code> ?</td>
+<td><strong>Continuer</strong></td>
+</tr>
+<tr>
+<td>Que fait <code>n</code> ?</td>
+<td>Instruction suivante — <strong>aussi depuis le browser</strong></td>
+</tr>
+<tr>
+<td>Que fait <code>where</code> ?</td>
+<td>Affiche la <strong>pile d'appels</strong></td>
+</tr>
+<tr>
+<td>Que fait <code>Q</code> ?</td>
+<td><strong>Arrêt immédiat</strong>, retour au sommet</td>
+</tr>
+<tr>
+<td>Variable locale nommée <code>c</code> ?</td>
+<td><strong><code>get("c")</code></strong></td>
+</tr>
+<tr>
+<td>Le débogueur entre-t-il dans le code C ?</td>
+<td> <strong>Non</strong></td>
+</tr>
+<tr>
+<td>Quel outil pour cela ?</td>
+<td><strong><code>gdb</code></strong></td>
+</tr>
+<tr>
+<td>Que fait <code>browser()</code> ?</td>
+<td>Il <strong>arrête l'exécution à ce point</strong></td>
+</tr>
+<tr>
+<td>Accepte-t-il des arguments ?</td>
+<td> <strong>Ils sont ignorés</strong></td>
+</tr>
+<tr>
+<td>Que fait <code>debug(f)</code> ?</td>
+<td>Le débogueur s'ouvre à <strong>chaque appel</strong></td>
+</tr>
+<tr>
+<td>Comment l'arrêter ?</td>
+<td><strong><code>undebug(f)</code></strong></td>
+</tr>
+<tr>
+<td>Que faut-il déboguer sur une générique ?</td>
+<td><strong>La méthode</strong>, pas la générique</td>
+</tr>
+<tr>
+<td>Que fait <code>trace(f)</code> ?</td>
+<td>Il <strong>imprime l'appel</strong> à chaque évaluation</td>
+</tr>
+<tr>
+<td>Interrompt-il ?</td>
+<td><strong>Non</strong></td>
+</tr>
+<tr>
+<td>Comment l'annuler ?</td>
+<td><strong><code>untrace(f)</code></strong></td>
+</tr>
+<tr>
+<td>Quand faut-il des guillemets ?</td>
+<td>Quand le nom <strong>n'est pas un identifiant</strong></td>
+</tr>
+<tr>
+<td>Que montre <code>trace("[&lt;-")</code> ?</td>
+<td>Le mécanisme <strong><code>`*tmp*`</code></strong></td>
+</tr>
+<tr>
+<td>Qu'est-ce que <code>.Traceback</code> ?</td>
+<td>Un <strong>vecteur de caractères</strong> des appels actifs</td>
+</tr>
+<tr>
+<td>Où est-il placé ?</td>
+<td>Dans l'<strong>environnement de base</strong></td>
+</tr>
+<tr>
+<td>Comment l'examiner ?</td>
+<td><strong><code>traceback()</code></strong></td>
+</tr>
+<tr>
+<td>Le code utilisateur garde-t-il sa source ?</td>
+<td><strong>Oui</strong>, par défaut</td>
+</tr>
+<tr>
+<td>Et le code d'un paquet ?</td>
+<td><strong>Non</strong> — reconstruit depuis <strong>l'arbre syntaxique</strong></td>
+</tr>
+<tr>
+<td>Comment renoncer à la source ?</td>
+<td><strong><code>keep.source = FALSE</code></strong> ou <strong><code>removeSource()</code></strong></td>
+</tr>
+<tr>
+<td>Quelle fonction réécrit les objets ?</td>
+<td><strong><code>dump()</code></strong></td>
+</tr>
+<tr>
+<td>Dans quel ordre ?</td>
+<td><strong>Alphabétique</strong>, mise en page standard</td>
+</tr>
+<tr>
+<td>Que perd-on ?</td>
+<td> <strong>Les commentaires</strong></td>
+</tr>
+<tr>
+<td>Quel opérateur d'assignation est recommandé ?</td>
+<td><strong><code>&lt;-</code></strong>, plutôt que <code>=</code></td>
+</tr>
+<tr>
+<td>Quelle commande contrôle le profilage ?</td>
+<td><strong><code>Rprof</code></strong></td>
+</tr>
+<tr>
+<td>Comment l'arrêter ?</td>
+<td><strong><code>Rprof(NULL)</code></strong></td>
+</tr>
+<tr>
+<td>Le fichier par défaut ?</td>
+<td><strong><code>Rprof.out</code></strong></td>
+</tr>
+<tr>
+<td>L'intervalle par défaut ?</td>
+<td><strong>20 ms</strong></td>
+</tr>
+<tr>
+<td>Que mesure-t-on sous Unix ?</td>
+<td>Le temps <strong>CPU</strong></td>
+</tr>
+<tr>
+<td>Et sous Windows ?</td>
+<td>Le temps <strong>écoulé</strong></td>
+</tr>
+<tr>
+<td>Comment résumer ?</td>
+<td><strong><code>summaryRprof()</code></strong> ou <strong><code>R CMD Rprof</code></strong></td>
+</tr>
+<tr>
+<td>Que mesure la colonne <code>total</code> ?</td>
+<td>La fonction <strong>et ses appelées</strong></td>
+</tr>
+<tr>
+<td>Et la colonne <code>self</code> ?</td>
+<td>La fonction <strong>seule</strong></td>
+</tr>
+<tr>
+<td>Laquelle guide l'optimisation ?</td>
+<td><strong><code>self</code></strong></td>
+</tr>
+<tr>
+<td>Trois réserves sur le profilage ?</td>
+<td><strong>Pénalité</strong>, <strong>fichiers volumineux</strong>, <strong>ramasse-miettes</strong></td>
+</tr>
+<tr>
+<td>À qui le ramasse-miettes est-il imputé ?</td>
+<td>À <strong>celui qui le déclenche</strong></td>
+</tr>
+<tr>
+<td>Comment s'en prémunir ?</td>
+<td>Comparer <strong>avec et sans <code>gc()</code></strong></td>
+</tr>
+<tr>
+<td>Deux paquets d'analyse plus fine ?</td>
+<td><strong><code>proftools</code></strong> et <strong><code>profr</code></strong></td>
+</tr>
+<tr>
+<td>Que permettent-ils ?</td>
+<td>D'étudier les <strong>graphes d'appels</strong></td>
+</tr>
+</tbody></table>
+</main>
+
+
+
+
+</body></html>

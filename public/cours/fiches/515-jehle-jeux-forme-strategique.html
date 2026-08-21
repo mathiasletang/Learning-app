@@ -1,0 +1,3290 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fiche 515 — Les jeux sous forme stratégique : dominance, équilibre de Nash et information incomplète</title>
+<script>
+window.MathJax={tex:{inlineMath:[["$","$"]],displayMath:[["$$","$$"]],processEscapes:true},
+ options:{skipHtmlTags:["script","noscript","style","textarea","pre","code"]},
+ svg:{fontCache:"global"},
+ startup:{pageReady:()=>MathJax.startup.defaultPageReady().then(()=>{document.body.classList.add("ready")})}};
+setTimeout(function(){document.body.classList.add("ready")},2500);
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+/* ============================================================
+   MathiasLearn — feuille de style des fiches
+   Reprise intégrale des tokens de 00_PARCOURS/*.html
+   + blocs pédagogiques (callouts, méthode, essentiels, recall)
+   ============================================================ */
+:root{--bg:#faf9f7;--card:#fff;--ink:#1a1a1a;--muted:#6b6b6b;--line:#e5e2dd;--accent:#8b5e34;
+ --hl:#fdf8ef;--ok:#2d7d4f;--okbg:#f0f7f3;--warn:#b3402f;--warnbg:#fdf3f1;--blue:#2f5d8b;--bluebg:#f1f5fa}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+ font:17px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;padding:0 16px 100px}
+.nav{position:sticky;top:0;background:rgba(250,249,247,.96);backdrop-filter:blur(8px);
+ border-bottom:1px solid var(--line);margin:0 -16px 30px;padding:11px 16px;z-index:50;
+ display:flex;gap:6px;flex-wrap:wrap;font-size:13px}
+.nav a{color:var(--muted);text-decoration:none;padding:4px 9px;border-radius:5px;white-space:nowrap}
+.nav a:hover{background:var(--line);color:var(--ink)}
+.nav a.on{background:var(--accent);color:#fff}
+main{max-width:780px;margin:0 auto}
+h1{font-size:31px;letter-spacing:-.02em;margin:.4em 0 .5em;line-height:1.25}
+h2{font-size:23px;margin:2.2em 0 .7em;padding-bottom:.3em;border-bottom:1px solid var(--line)}
+h3{font-size:19px;margin:1.9em 0 .5em;color:var(--accent)}
+h4{font-size:17px;margin:1.5em 0 .4em}
+p{margin:.8em 0} a{color:var(--accent)} hr{border:0;border-top:1px solid var(--line);margin:2.6em 0}
+table{border-collapse:collapse;width:100%;margin:1.3em 0;font-size:15.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+th{background:#f3f0eb;font-weight:600}
+tr:nth-child(even) td{background:#fcfbfa}
+code{font-family:"SF Mono",Menlo,Consolas,monospace;font-size:.88em;background:#f2efea;padding:2px 6px;border-radius:4px;overflow-wrap:break-word}
+pre{background:#f2efea;padding:14px 16px;border-radius:8px;overflow-x:auto}
+pre code{background:none;padding:0;white-space:pre}
+blockquote{border-left:3px solid var(--accent);background:var(--hl);margin:1.4em 0;padding:14px 20px;border-radius:0 8px 8px 0}
+blockquote p:first-child{margin-top:0} blockquote p:last-child{margin-bottom:0}
+ul,ol{padding-left:1.5em} li{margin:.35em 0} em{color:#4a4a4a}
+mjx-container[display="true"]{margin:1.1em 0!important;overflow-x:auto;overflow-y:hidden;padding:2px 0}
+mjx-container svg{max-width:100%}
+body:not(.ready) main{opacity:0} main{opacity:1;transition:opacity .25s}
+
+/* --- bandeau de tête de fiche --- */
+.cours{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--accent);
+ border-radius:0 10px 10px 0;padding:18px 22px;margin:0 0 34px}
+.cours h4{margin:0 0 4px;font-size:14px;text-transform:uppercase;letter-spacing:.07em;color:var(--accent)}
+.cours .cs{color:var(--muted);font-size:14.5px;margin:0 0 14px}
+
+/* --- exercices / corrigés --- */
+.ex{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:6px 24px 20px;margin:18px 0}
+.ex>h3:first-child{margin-top:14px}
+details.cor{margin-top:18px;border:1px solid var(--line);border-radius:8px;background:#fcfbfa;overflow:hidden}
+details.cor>summary{cursor:pointer;padding:12px 16px;font-weight:600;font-size:15px;color:var(--accent);
+ list-style:none;display:flex;align-items:center;gap:9px;user-select:none;transition:.15s;min-height:44px}
+details.cor>summary::-webkit-details-marker{display:none}
+details.cor>summary:hover{background:var(--hl)}
+details.cor>summary::before{content:"\25B6";font-size:10px;transition:transform .18s;display:inline-block}
+details.cor[open]>summary::before{transform:rotate(90deg)}
+details.cor[open]>summary{background:var(--okbg);color:var(--ok);border-bottom:1px solid var(--line)}
+.cor .in{padding:4px 20px 16px}
+.cor .in>*:first-child{margin-top:.9em}
+
+/* --- blocs pédagogiques (callouts) ---
+   Générés depuis une citation Markdown dont le premier **gras** commence
+   par un mot-clé : DÉFINITION, THÉORÈME, MÉTHODE, PIÈGE, INTUITION… */
+.cal{border:1px solid var(--line);border-left:4px solid var(--accent);background:var(--card);
+ border-radius:0 10px 10px 0;padding:15px 20px;margin:1.5em 0}
+.cal>p:first-child{margin-top:0}.cal>p:last-child,.cal>ul:last-child,.cal>ol:last-child{margin-bottom:0}
+.cal .lab{display:block;font-size:12.5px;text-transform:uppercase;letter-spacing:.08em;
+ font-weight:700;color:var(--accent);margin-bottom:6px}
+.cal.formel{background:var(--hl)}
+.cal.piege{border-left-color:var(--warn);background:var(--warnbg)}
+.cal.piege .lab{color:var(--warn)}
+.cal.methode{border-left-color:var(--ok);background:var(--okbg)}
+.cal.methode .lab{color:var(--ok)}
+.cal.intu{border-left-color:var(--blue);background:var(--bluebg)}
+.cal.intu .lab{color:var(--blue)}
+.cal.plus{border-left-style:dashed;background:#faf9f7}
+.cal.plus .lab{color:var(--muted)}
+
+/* --- révision express --- */
+.ess{background:var(--card);border:1px solid var(--accent);border-radius:10px;padding:4px 24px 20px;margin:1.6em 0}
+.ess h3{margin-top:1.3em}
+.rec{background:var(--card);border:1px dashed var(--accent);border-radius:10px;padding:4px 24px 18px;margin:1.6em 0}
+.rec ol{counter-reset:none}
+
+/* --- impression / PDF --- */
+@media print{
+ .nav{display:none}
+ body{padding:0;background:#fff;font-size:11.2pt;line-height:1.55}
+ main{max-width:none}
+ h1{font-size:23pt}h2{font-size:15pt;margin-top:1.5em}h3{font-size:12.6pt}
+ h2,h3,h4{break-after:avoid;page-break-after:avoid}
+ table,.cal,blockquote{break-inside:avoid;page-break-inside:avoid}
+ table{display:table;font-size:9.6pt}
+ details.cor{border:1px solid var(--line);background:#fcfbfa}
+ details.cor>summary{display:none}
+ details.cor .in{padding-top:10px}
+ .cal,.ex,.ess,.rec{box-shadow:none}
+ a{color:var(--ink);text-decoration:none}
+}
+@page{margin:16mm 15mm 18mm}
+
+/* --- exemples travaillés --- */
+.exm{background:#fcfbfa;border:1px solid var(--line);border-radius:10px;padding:2px 20px 14px;margin:1.5em 0}
+.exm>h4:first-child{margin:14px 0 .5em;color:var(--accent);font-size:13px;text-transform:uppercase;letter-spacing:.07em}
+
+
+/* --- pastilles de priorité (conventions des fiches de l'app) --- */
+h2[data-prio], h3[data-prio], h4[data-prio]{position:relative}
+h2[data-prio]::before,h3[data-prio]::before,h4[data-prio]::before{
+ content:"";display:inline-block;width:9px;height:9px;border-radius:50%;
+ margin-right:9px;vertical-align:middle;background:var(--muted)}
+[data-prio="must"]::before{background:var(--warn)}
+[data-prio="high"]::before{background:#d98324}
+[data-prio="mid"]::before{background:#c9a227}
+[data-prio="low"]::before{background:var(--ok)}
+/* corrigés des fiches de l'app : même traitement que les corrigés des séries */
+details.cor>summary::after{content:""}
+</style></head><body>
+<div class="nav"><a href="00_COMMENCER_ICI.html">Commencer ici</a><a href="01_NOTATIONS_le-decodeur.html">Notations</a><a href="02_EXERCICES_Serie-0.html">Série 0 — Remise en route</a><a href="03_EXERCICES_Serie-1.html">Série 1 — Convexité</a><a href="04_EXERCICES_Serie-2.html">Série 2 — KKT</a><a href="05_AUTO-EVALUATION.html">Auto-évaluation (quiz)</a><a href="06_FICHE_Optimisation-deux-variables.html">Fiche — Optimisation à 2 variables</a></div>
+<main><h1>Fiche 515 — Les jeux sous forme stratégique : dominance, équilibre de Nash et information incomplète</h1>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Matière</strong></td>
+<td>Maths · Microéconomie avancée</td>
+</tr>
+<tr>
+<td><strong>Cours source</strong></td>
+<td>Jehle &amp; Reny, <em>Advanced Microeconomic Theory</em>, 3ᵉ éd., Pearson 2011 — chapitre 7 « Game Theory », §7.1 « Strategic Decision Making » et §7.2 « Strategic Form Games » (p. 305-325)</td>
+</tr>
+<tr>
+<td><strong>Difficulté</strong></td>
+<td> Avancé</td>
+</tr>
+<tr>
+<td><strong>Temps d'étude estimé</strong></td>
+<td>145 min</td>
+</tr>
+<tr>
+<td><strong>Prérequis</strong></td>
+<td>Fiche 506 (utilité de von Neumann-Morgenstern, loteries, espérance d'utilité) · fiche 509 (duopoles de Cournot et de Bertrand) · fiche 510 (théorème du point fixe de Brouwer, A1.11)</td>
+</tr>
+<tr>
+<td><strong>Concepts clés</strong></td>
+<td>Décision stratégique, circularité, imprévisibilité, jeu sous forme stratégique, stratégie dominante stricte, stratégie strictement dominée, élimination itérative, dominance faible, « devine la moyenne », équilibre de Nash en stratégies pures, stratégie mixte, équilibre de Nash, tests simplifiés, existence de Nash, point fixe de Brouwer, jeu de coordination, deux interprétations des stratégies mixtes, information incomplète, types, croyances, a priori commun, jeu bayésien, jeu stratégique associé, équilibre bayésien-nashien</td>
+</tr>
+<tr>
+<td><strong>Poids à l'examen</strong></td>
+<td>Les <strong>définitions 7.1 à 7.9</strong> énoncées précisément · l'analyse <strong>heuristique</strong> du duel batteur-lanceur · le jeu <strong>« devine la moyenne »</strong> et ses tours d'élimination · le <strong>théorème 7.1</strong> et sa preuve <em>(les trois équivalences)</em> · la <strong>preuve complète du théorème 7.2</strong> — la construction de $f$, Brouwer, et le calcul algébrique du pas 3 · les <strong>deux interprétations</strong> des stratégies mixtes · la construction du <strong>jeu stratégique associé $G^+$</strong>.</td>
+</tr>
+</tbody></table>
+<h2>Vue d'ensemble</h2>
+<pre><code>LE FIL DU §7.1 ET DU §7.2 :
+comment des agents rationnels agissent quand chacun depend des autres
+
+  §7.1  LA DECISION STRATEGIQUE
+
+     « Chaque agent doit d'abord CONNAITRE la decision des autres
+       avant de savoir quelle decision est la meilleure pour lui.
+       CETTE CIRCULARITE est la MARQUE de la theorie des jeux. »
+
+     LE DUEL BATTEUR-LANCEUR  (fig. 7.1)
+
+              batteur : F      C
+        lanceur  F   -1, 1    1, -1
+                 C    1, -1  -1, 1
+
+     Le raisonnement HEURISTIQUE :
+        « toujours la balle rapide » est PREVISIBLE
+        -&gt; le batteur s'y prepare -&gt; le lanceur devrait lancer la courbe
+        -&gt; CONTRADICTION avec l'hypothese de depart
+
+     CONCLUSION : le comportement doit etre IMPREVISIBLE.
+     « Tout bon joueur de poker le comprend bien --
+       c'est un aspect essentiel du BLUFF reussi. »
+
+  §7.2  LES JEUX SOUS FORME STRATEGIQUE
+
+     DEF. 7.1  G = (S_i, u_i) pour i = 1..N
+               joueurs, STRATEGIES, PAIEMENTS
+
+  §7.2.1  LA DOMINANCE
+
+     DEF. 7.2  strategie STRICTEMENT DOMINANTE  (rare !)
+     DEF. 7.3  strategie STRICTEMENT DOMINEE  (une contre UNE autre)
+     DEF. 7.4  ELIMINATION ITERATIVE stricte  (S_i^n)
+     DEF. 7.5  dominance FAIBLE
+     DEF. 7.6  elimination iterative FAIBLE  (W_i^n)
+
+     « DEVINE LA MOYENNE » :  chacun choisit 1 a 100,
+     le plus proche du TIERS de la moyenne gagne
+        33 domine faiblement tout nombre superieur  (car moy/3 &lt;= 33.33)
+        puis 11, puis ...  -&gt;  il ne reste que 1
+
+  §7.2.2  L'EQUILIBRE DE NASH
+
+     DEF. 7.7  Nash en STRATEGIES PURES :  u_i(s^) &gt;= u_i(s_i, s^_-i)
+        -&gt; le duel batteur-lanceur n'en a AUCUN
+
+     DEF. 7.8  STRATEGIE MIXTE = distribution de probabilite sur S_i
+     DEF. 7.9  EQUILIBRE DE NASH  (en strategies mixtes)
+
+     THEOREME 7.1  TESTS SIMPLIFIES -- trois enonces equivalents
+        (b) INDIFFERENCE entre les pures de SUPPORT POSITIF
+            (le plus utile pour CALCULER)
+        (c) il suffit de tester les strategies PURES
+            (le plus utile pour VERIFIER)
+
+     EXEMPLE 7.1  le jeu de COORDINATION  (traitement de texte)
+        deux equilibres PURS + un equilibre MIXTE  p = q = 1/3
+        -&gt; paiement 2/3, INEFFICACE
+
+     LES DEUX INTERPRETATIONS d'une strategie mixte :
+        (1) une ROULETTE -- randomisation deliberee
+        (2) les CROYANCES des autres sur ce que je vais jouer
+
+     THEOREME 7.2  (NASH)  TOUT jeu fini possede un equilibre de Nash
+        preuve en 3 pas :  construire f  -&gt;  BROUWER  -&gt;  le point fixe
+                           est un equilibre
+
+  §7.2.3  L'INFORMATION INCOMPLETE  (Harsanyi 1967-68)
+
+     On ajoute :  des TYPES T_i  et des CROYANCES p_i(t_-i | t_i)
+     eventuellement issues d'un A PRIORI COMMUN p
+
+     DEF. 7.10  JEU BAYESIEN  G = (p_i, T_i, S_i, u_i)
+     DEF. 7.11  le JEU STRATEGIQUE ASSOCIE G+
+                CHAQUE TYPE de chaque joueur devient UN JOUEUR
+     DEF. 7.12  EQUILIBRE BAYESIEN-NASHIEN = Nash de G+
+
+     THEOREME 7.3  tout jeu bayesien FINI en possede un
+                   (corollaire immediat du theoreme 7.2)
+</code></pre>
+<blockquote>
+<p class="cal piege"> <strong>Note de transcription — identique aux fiches 500-514.</strong> Le PDF de ce chapitre perd le <strong>barré du $\neq$</strong> <em>(ainsi « $s_i=\hat s_i$ » dans la définition 7.2 signifie $s_i\neq\hat s_i$, et « $(x,a)\notin X$ » s'exporte parfois comme « $\in/$ »)</em>, ainsi que $\sum$, $\times$, $\gg$ et l'implication $\Longrightarrow$. Les exposants de la notation $S_i^{n}$ et $W_i^{n}$ sont parfois collés au symbole. Ces éléments sont rétablis depuis la prose et les équations voisines — <strong>il s'agit d'une réparation de transcription, non d'un ajout de contenu</strong>.</p>
+</blockquote>
+<h2 data-prio="must">Concept 1 — §7.1 : ce qui rend une décision « stratégique »</h2>
+<h3>1.1 L'ouverture du chapitre</h3>
+<div class="cal methode"><span class="lab">comment marchandera-t-il avec le vendeur</span>
+<p><em>« Quand un consommateur va acheter une nouvelle voiture,  ? Si deux pays négocient un accord commercial, <strong>quel en sera le résultat</strong> ? Quelles stratégies suivront plusieurs compagnies pétrolières enchérissant chacune sur une parcelle offshore dans une <strong>enchère à pli scellé</strong> ? »</em></p>
+</div>
+<blockquote>
+<p><em>« Dans des situations telles que celles-ci, <strong>les actions qu'un agent quelconque peut prendre auront des conséquences pour les autres</strong>. À cause de cela, <strong>les agents ont une raison d'agir STRATÉGIQUEMENT</strong>. »</em></p>
+</blockquote>
+<h3 data-prio="must">1.2  La définition de la théorie des jeux, et la CIRCULARITÉ</h3>
+<blockquote>
+<p><em>« <strong>La théorie des jeux est l'étude systématique de la manière dont des agents RATIONNELS se comportent dans des situations stratégiques, ou dans des JEUX, où chaque agent doit d'abord CONNAÎTRE la décision des autres agents avant de savoir quelle décision est la meilleure pour lui-même.</strong> »</em></p>
+</blockquote>
+<p>$$\boxed{\;\textbf{« CETTE CIRCULARITÉ est la MARQUE de la théorie des jeux. »}\;}$$</p>
+<h3>1.3 Le plan annoncé du chapitre</h3>
+<table>
+<thead>
+<tr>
+<th>Forme</th>
+<th>Ce qu'elle décrit</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Forme stratégique</strong></td>
+<td><em>« des jeux dans lesquels les agents font <strong>un choix unique et SIMULTANÉ</strong> »</em></td>
+</tr>
+<tr>
+<td><strong>Forme extensive</strong></td>
+<td><em>« des jeux dans lesquels les joueurs peuvent faire des choix <strong>EN SÉQUENCE</strong> »</em></td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><em>« Chemin faisant, nous rencontrerons <strong>une variété de méthodes</strong> pour déterminer l'issue d'un jeu. Vous verrez que <strong>chaque méthode donne naissance à un CONCEPT DE SOLUTION particulier.</strong> »</em></p>
+</blockquote>
+<p><strong>Les six concepts de solution annoncés :</strong></p>
+<p>$$\text{dominance} \ \to\ \text{Nash} \ \to\ \text{Bayes-Nash} \ \to\ \text{induction à rebours} \ \to\ \text{perfection en sous-jeux} \ \to\ \text{équilibre séquentiel}$$</p>
+<blockquote>
+<p><em>« <strong>Chacun de ces concepts est plus SOPHISTIQUÉ que ses prédécesseurs, et savoir QUAND appliquer une solution plutôt qu'une autre est une part importante du métier de bon économiste appliqué.</strong> »</em></p>
+</blockquote>
+<h3>1.4 La distinction stratégique / non stratégique</h3>
+<blockquote>
+<p><em>« <strong>La différence essentielle entre les décisions stratégiques et non stratégiques est que les dernières peuvent être prises « en ISOLEMENT », sans tenir compte des décisions que d'autres pourraient prendre.</strong> »</em></p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>Non stratégique</th>
+<th>Stratégique</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>La <strong>théorie du consommateur</strong> <em>(chapitre 1)</em> : <em>« étant donnés les prix et le revenu, chaque consommateur agit <strong>entièrement pour son compte, sans égard au comportement des autres</strong> »</em></td>
+<td>Les modèles de <strong>Cournot</strong> et de <strong>Bertrand</strong> <em>(chapitre 4)</em> : <em>« chaque firme comprend bien que <strong>son action optimale dépend de l'action prise par l'autre firme</strong> »</em></td>
+</tr>
+</tbody></table>
+<h2 data-prio="must">Concept 2 — Le duel batteur-lanceur et l'argument d'imprévisibilité</h2>
+<h3>2.1 La mise en place</h3>
+<blockquote>
+<p>*« Considérez le <strong>duel classique entre un batteur et un lanceur au baseball</strong>. Pour garder les choses simples, supposons que le lanceur n'a que <strong>deux lancers possibles — une BALLE RAPIDE (fastball) et une COURBE (curve)</strong>. Supposons aussi qu'il est <strong>bien connu que ce lanceur a la meilleure balle rapide de la ligue, mais que sa courbe n'est que MOYENNE</strong>. »*</p>
+</blockquote>
+<h3 data-prio="must">2.2  Pourquoi la décision non stratégique échoue</h3>
+<blockquote>
+<p><em>« Sur cette base, <strong>il pourrait sembler préférable pour le lanceur de toujours lancer sa balle rapide</strong>. Cependant, <strong>une telle décision NON STRATÉGIQUE de la part du lanceur ne tient PAS compte de la décision du batteur. Car si le batteur s'attend à ce que le lanceur lance une balle rapide, alors, y étant préparé, IL LA FRAPPERA.</strong> »</em></p>
+</blockquote>
+<blockquote>
+<p><em>« Par conséquent, <strong>il serait sage pour le lanceur de tenir compte de la décision du batteur À PROPOS DU LANCER DU LANCEUR avant de décider quel lancer effectuer</strong>. »</em></p>
+</blockquote>
+<h3>2.3 La mise en nombres</h3>
+<blockquote>
+<p>*« Pensez-y comme étant <strong>la fin de la neuvième manche, avec un compte plein, les bases pleines, deux retraits, et l'équipe du lanceur menant d'un point</strong>. Supposons aussi que le batteur soit <strong>frappe un coup de circuit (et gagne le match) soit est retiré sur trois prises (et perd le match)</strong>. Par conséquent, <strong>il reste exactement un lancer dans le match</strong>. »*</p>
+</blockquote>
+<p>Chaque joueur tire une utilité de <strong>$1$ d'une victoire</strong> et de <strong>$-1$ d'une défaite</strong>.</p>
+<blockquote>
+<p><strong>La figure 7.1 — le jeu batteur-lanceur.</strong></p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th></th>
+<th><strong>Batteur : $F$</strong></th>
+<th><strong>Batteur : $C$</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Lanceur : $F$</strong></td>
+<td>$-1,\ 1$</td>
+<td>$1,\ -1$</td>
+</tr>
+<tr>
+<td><strong>Lanceur : $C$</strong></td>
+<td>$1,\ -1$</td>
+<td>$-1,\ 1$</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><em>« Le lanceur (P) choisit <strong>la LIGNE</strong>, $F$ (fastball) ou $C$ (curve), et le batteur (B) choisit <strong>la COLONNE</strong>. <strong>Le batteur frappe un coup de circuit quand il se prépare pour le lancer que le lanceur a choisi, et est retiré sinon.</strong> »</em></p>
+</blockquote>
+<p class="cal piege"> <strong>La convention de lecture</strong> : <em>« le paiement du lanceur étant <strong>le PREMIER nombre</strong> de chaque entrée et celui du batteur <strong>le SECOND</strong> »</em>.</p>
+<h3 data-prio="must">2.4  L'argument d'imprévisibilité — à savoir dérouler</h3>
+<blockquote>
+<p><em>« Nous pouvons immédiatement tirer une conclusion <strong>assez importante</strong>, fondée uniquement sur les idées que <strong>chaque joueur cherche à maximiser son paiement</strong> et que <strong>chacun raisonne stratégiquement</strong>. Ici, <strong>chaque joueur doit se comporter d'une manière « IMPRÉVISIBLE ». Pourquoi ?</strong> »</em></p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>Pas</th>
+<th>Le raisonnement</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>1</strong></td>
+<td><em>« Si le comportement du lanceur était <strong>prévisible</strong> en ce que, disons, <strong>il lance toujours sa balle rapide</strong>, alors le batteur, <strong>en choisissant $F$, serait GARANTI de frapper un coup de circuit</strong> et de gagner. »</em></td>
+</tr>
+<tr>
+<td><strong>2</strong></td>
+<td><em>« Mais ceci signifierait que <strong>le comportement du batteur est prévisible aussi</strong> — il se prépare <strong>toujours</strong> pour une balle rapide. »</em></td>
+</tr>
+<tr>
+<td><strong>3</strong></td>
+<td><em>« Par conséquent, <strong>parce que le lanceur se comporte stratégiquement, il choisira optimalement de lancer sa COURBE</strong>, retirant ainsi le batteur et gagnant le match. »</em></td>
+</tr>
+<tr>
+<td><strong>4</strong></td>
+<td> <em>« <strong>Mais ceci CONTREDIT notre supposition originelle que le lanceur lance toujours sa balle rapide !</strong> »</em></td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><em>« Nous concluons qu'<strong>il ne peut pas être correctement prédit que le lanceur lance toujours une balle rapide. De même, il doit être incorrect de prédire qu'il lance toujours une courbe.</strong> Ainsi, <strong>quel que soit le comportement qui émerge finalement de ce scénario, il doit impliquer un certain MANQUE DE PRÉVISIBILITÉ.</strong> »</em></p>
+</blockquote>
+<h3>2.5 La leçon générale</h3>
+<blockquote>
+<p><em>« Ainsi, <strong>quand des individus rationnels prennent des décisions stratégiquement, chacun tenant compte de la décision que l'autre prend, ils se comportent parfois d'une manière « IMPRÉVISIBLE ». Tout bon joueur de poker le comprend bien — c'est un aspect essentiel du BLUFF réussi.</strong> »</em></p>
+</blockquote>
+<p class="cal piege"> *« Notez, cependant, qu'<strong>il n'y a AUCUN tel avantage dans des cadres non stratégiques — quand vous êtes SEUL, il n'y a personne à « TROMPER »</strong>. »*</p>
+<blockquote>
+<p><em>« <strong>Ceci n'est qu'un exemple de la manière dont les issues parmi des décideurs stratégiques peuvent différer TRÈS significativement de celles parmi des décideurs non stratégiques.</strong> »</em></p>
+</blockquote>
+<h2 data-prio="must">Concept 3 — La définition d'un jeu sous forme stratégique</h2>
+<h3>3.1 La recherche des éléments communs</h3>
+<blockquote>
+<p><em>« Le duel batteur-lanceur, ainsi que les duopoles de Cournot et de Bertrand, ne sont que <strong>trois exemples</strong> des sortes de situations stratégiques que les économistes souhaitent analyser. D'autres exemples incluent <strong>le marchandage entre un syndicat et une firme</strong>, <strong>les guerres commerciales entre deux pays</strong>, <strong>les courses à la recherche-développement entre entreprises</strong>, et ainsi de suite. »</em></p>
+</blockquote>
+<blockquote>
+<p><em>« Nous cherchons <strong>un cadre UNIQUE capable de saisir les traits essentiels de chacun</strong>. Nous devons donc chercher <strong>les éléments qui leur sont COMMUNS</strong>. »</em></p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>L'élément</th>
+<th>Le nom qu'on lui donne</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><em>« un certain nombre de participants »</em></td>
+<td>les <strong>JOUEURS</strong></td>
+</tr>
+<tr>
+<td><em>« une gamme d'actions possibles qui peuvent être prises »</em></td>
+<td>les <strong>STRATÉGIES</strong></td>
+</tr>
+<tr>
+<td><em>« un paiement ou un autre selon <strong>son propre</strong> choix de stratégie <strong>ainsi que</strong> les stratégies choisies par chacun des autres »</em></td>
+<td>les <strong>PAIEMENTS</strong></td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><em>« Comme le veut la tradition, nous nous référerons à une telle situation comme à un <strong>JEU</strong>, <strong>même si les enjeux peuvent être fort SÉRIEUX</strong>. »</em></p>
+</blockquote>
+<h3>3.2 La définition 7.1</h3>
+<div class="cal formel"><span class="lab">DÉFINITION 7.1 — Jeu sous forme stratégique</span>
+<p>
+Un <strong>jeu sous forme stratégique</strong> est un $n$-uplet $G=(S_i,u_i)_{i=1}^{N}$, où pour chaque joueur $i=1,\dots,N$, <strong>$S_i$ est l'ensemble des stratégies disponibles pour le joueur $i$</strong>, et
+$$u_i:\ \prod_{j=1}^{N}S_j\ \longrightarrow\ \mathbb{R}$$
+décrit <strong>le paiement du joueur $i$ comme fonction des stratégies choisies par TOUS les joueurs</strong>.
+Un jeu sous forme stratégique est <strong>FINI</strong> si l'ensemble de stratégies de chaque joueur contient <strong>un nombre fini d'éléments</strong>.</p>
+</div>
+<h3>3.3 Le duel batteur-lanceur en forme stratégique</h3>
+<p>Avec le lanceur désigné comme joueur 1 :</p>
+<p>$$S_1=S_2=\{F,C\}$$
+$$u_1(F,F)=u_1(C,C)=-1, \qquad u_1(F,C)=u_1(C,F)=1$$
+$$u_2(s_1,s_2)=-\,u_1(s_1,s_2) \qquad \forall\,(s_1,s_2)\in S_1\times S_2$$</p>
+<p class="cal piege"> <strong>La dernière ligne fait du jeu un jeu à SOMME NULLE</strong> <em>(exercice 7.7)</em>.</p>
+<blockquote>
+<p><em>« Notez que <strong>les jeux sous forme stratégique à DEUX joueurs avec des ensembles de stratégies FINIS peuvent toujours être représentés sous forme MATRICIELLE</strong>, les lignes indexant les stratégies du joueur 1, les colonnes celles du joueur 2, et les entrées désignant leurs paiements. »</em></p>
+</blockquote>
+<h3>3.4 La notation qui servira partout</h3>
+<table>
+<thead>
+<tr>
+<th>Symbole</th>
+<th>Ce qu'il désigne</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$S=S_1\times\cdots\times S_N$</td>
+<td><em>« l'ensemble des <strong>stratégies pures JOINTES</strong> »</em></td>
+</tr>
+<tr>
+<td>$-i$</td>
+<td> <em>« <strong>tous les joueurs SAUF le joueur $i$</strong> »</em></td>
+</tr>
+<tr>
+<td>$S_{-i}$</td>
+<td>$S_1\times\cdots\times S_{i-1}\times S_{i+1}\times\cdots\times S_N$</td>
+</tr>
+<tr>
+<td>$s_{-i}$</td>
+<td>un élément de $S_{-i}$</td>
+</tr>
+</tbody></table>
+<h2 data-prio="must">Concept 4 — §7.2.1 : la dominance stricte</h2>
+<h3>4.1 Pourquoi on commence par là</h3>
+<blockquote>
+<p><em>« Chaque fois que nous tentons de prédire l'issue d'un jeu, <strong>il est préférable de le faire SANS exiger que les joueurs en sachent beaucoup sur la manière dont leurs adversaires se comporteront. Ceci n'est pas toujours possible, mais quand ça l'est, la solution obtenue est particulièrement CONVAINCANTE.</strong> »</em></p>
+</blockquote>
+<h3>4.2 Le jeu de la figure 7.2</h3>
+<blockquote>
+<p><strong>La figure 7.2 — stratégies strictement dominantes.</strong></p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>$L$</th>
+<th>$R$</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$U$</td>
+<td>$3,\ 0$</td>
+<td>$0,\ -4$</td>
+</tr>
+<tr>
+<td>$D$</td>
+<td>$2,\ 4$</td>
+<td>$-1,\ 8$</td>
+</tr>
+</tbody></table>
+<p><strong>Le joueur 2 doit raisonner stratégiquement :</strong></p>
+<blockquote>
+<p><em>« Le choix maximisant le paiement du joueur 2 <strong>dépend du choix fait par le joueur 1</strong>. Si 1 choisit $U$, il est meilleur pour 2 de choisir $L$ ; si 1 choisit $D$, il est meilleur pour 2 de choisir $R$. »</em></p>
+</blockquote>
+<p><strong>Le joueur 1, lui, n'a pas à raisonner du tout :</strong></p>
+<blockquote>
+<p><em>« Regardez de près les paiements et vous verrez que <strong>le meilleur choix du joueur 1 est en fait INDÉPENDANT du choix fait par le joueur 2. Quel que soit le choix du joueur 2, $U$ est le meilleur pour le joueur 1.</strong> »</em></p>
+</blockquote>
+<p>⟹ 1 choisit $U$ ; <strong>l'ayant déduit</strong>, 2 choisit $L$. *« Ainsi, <strong>la seule issue sensée de ce jeu est la paire $(U,L)$</strong>, de vecteur de paiements $(3,0)$. »*</p>
+<h3>4.3 La définition 7.2</h3>
+<div class="cal formel"><span class="lab">DÉFINITION 7.2 — Stratégies strictement dominantes</span>
+<p>
+Une stratégie $\hat s_i$ pour le joueur $i$ est <strong>strictement dominante</strong> si
+$$u_i(\hat s_i,s_{-i})&gt;u_i(s_i,s_{-i}) \qquad \text{pour tout } (s_i,s_{-i})\in S \text{ avec } s_i\neq\hat s_i$$</p>
+</div>
+<p class="cal piege"> <em>« La présence d'une stratégie strictement dominante, <strong>une qui est strictement supérieure à TOUTES les autres, est plutôt RARE</strong>. »</em></p>
+<h3>4.4 Le jeu de la figure 7.3 et la dominance d'une stratégie sur UNE autre</h3>
+<blockquote>
+<p><strong>La figure 7.3 — stratégies strictement dominées.</strong></p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>$L$</th>
+<th>$M$</th>
+<th>$R$</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$U$</td>
+<td>$3,\ 0$</td>
+<td>$0,\ -5$</td>
+<td>$0,\ -4$</td>
+</tr>
+<tr>
+<td>$C$</td>
+<td>$1,\ -1$</td>
+<td>$3,\ 3$</td>
+<td>$-2,\ 4$</td>
+</tr>
+<tr>
+<td>$D$</td>
+<td>$2,\ 4$</td>
+<td>$4,\ 1$</td>
+<td>$-1,\ 8$</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><em>« <strong>Aucun joueur ne possède ici de stratégie strictement dominante.</strong> Pour le voir : le meilleur choix <strong>unique</strong> de 1 est $U$ quand 2 joue $L$, mais $D$ quand 2 joue $M$ ; et le meilleur choix unique de 2 est $L$ quand 1 joue $U$, mais $R$ quand 1 joue $D$. »</em></p>
+</blockquote>
+<p><strong>Mais chacun a une stratégie particulièrement peu attrayante :</strong></p>
+<table>
+<thead>
+<tr>
+<th>Le joueur</th>
+<th>La stratégie à éliminer</th>
+<th>Pourquoi</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>1</strong></td>
+<td>$C$</td>
+<td><em>« toujours surpassée par $D$ […] <strong>quelle que soit</strong> la stratégie choisie par 2 »</em></td>
+</tr>
+<tr>
+<td><strong>2</strong></td>
+<td>$M$</td>
+<td><em>« surpassée par $R$ <strong>(vérifiez-le)</strong> »</em></td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><em>« Maintenant que $C$ et $M$ ont été retirées, vous remarquerez que <strong>le jeu s'est RÉDUIT à celui de la figure 7.2</strong>. Ainsi, comme avant, la seule issue sensée est $(3,0)$. »</em></p>
+</blockquote>
+<p class="cal piege"> <em>« Mais cette fois <strong>nous nous sommes concentrés sur la dominance d'une stratégie sur UNE SEULE autre, plutôt que sur TOUTES les autres</strong>. »</em></p>
+<h3>4.5 La définition 7.3</h3>
+<div class="cal formel"><span class="lab">DÉFINITION 7.3 — Stratégies strictement dominées</span>
+<p>
+La stratégie $\hat s_i$ du joueur $i$ <strong>domine strictement</strong> une autre de ses stratégies $\bar s_i$ si
+$$u_i(\hat s_i,s_{-i})&gt;u_i(\bar s_i,s_{-i}) \qquad \text{pour tout } s_{-i}\in S_{-i}$$
+Dans ce cas, on dit aussi que <strong>$\bar s_i$ est strictement dominée dans $S$</strong>.</p>
+</div>
+<h2 data-prio="must">Concept 5 — L'élimination itérative</h2>
+<h3 data-prio="must">5.1  La revue des deux solutions — le point qui motive l'itération</h3>
+<p><strong>Dans le jeu de la figure 7.2 :</strong></p>
+<blockquote>
+<p><em>« $U$ était strictement <strong>dominante</strong> pour 1. Nous avons donc pu éliminer $D$. Une fois fait, nous avons pu conclure que 2 choisirait $L$ — ou, ce qui revient au même, éliminer $R$. »</em></p>
+</blockquote>
+<blockquote>
+<p class="cal piege"> <em>« Notez que <strong>bien que $R$ ne soit PAS strictement dominée dans le jeu ORIGINAL, elle EST strictement dominée (par $L$) dans le jeu RÉDUIT</strong> dans lequel $D$ a été éliminée. »</em></p>
+</blockquote>
+<p><strong>Dans le jeu de la figure 7.3 :</strong></p>
+<p>$$C \ \text{et} \ M \quad\to\quad D \quad\to\quad R \qquad\Longrightarrow\qquad (U,L)$$</p>
+<blockquote>
+<p class="cal piege"> <em>« À nouveau, <strong>$D$ n'est pas strictement dominée dans le jeu original, mais elle l'est dans le jeu réduit</strong> dans lequel $C$ a été éliminée. De même, <strong>$R$ ne devient strictement dominée qu'APRÈS que $C$ ET $D$ ont été éliminées</strong>. »</em></p>
+</blockquote>
+<p>$$\boxed{\;\text{La dominance CRÉE de la dominance — d'où l'itération.}\;}$$</p>
+<h3>5.2 La construction formelle</h3>
+<p>Poser $S_i^0=S_i$ pour chaque joueur, et pour $n\geq1$, soit $S_i^n$ <strong>l'ensemble des stratégies de $i$ survivant après le $n$-ième tour d'élimination</strong> :</p>
+<p>$$s_i\in S_i^n \quad\text{si}\quad s_i\in S_i^{n-1} \text{ n'est pas strictement dominée dans } S^{n-1}$$</p>
+<div class="cal formel"><span class="lab">DÉFINITION 7.4 — Stratégies itérativement strictement non dominées</span>
+<p>
+Une stratégie $s_i$ est <strong>itérativement strictement non dominée dans $S$</strong> <em>(ou <strong>survit à l'élimination itérative des stratégies strictement dominées</strong>)</em> si $s_i\in S_i^n$ <strong>pour tout $n\geq1$</strong>.</p>
+</div>
+<h3>5.3 La dominance faible</h3>
+<div class="cal formel"><span class="lab">DÉFINITION 7.5 — Stratégies faiblement dominées</span>
+<p>
+La stratégie $\hat s_i$ <strong>domine faiblement</strong> $\bar s_i$ si
+$$u_i(\hat s_i,s_{-i})\geq u_i(\bar s_i,s_{-i}) \quad \text{pour tout } s_{-i}\in S_{-i}, \quad \textbf{avec au moins une inégalité STRICTE}$$</p>
+</div>
+<blockquote>
+<p><strong>La figure 7.4 — stratégies faiblement dominées.</strong></p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>$L$</th>
+<th>$R$</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$U$</td>
+<td>$1,\ 1$</td>
+<td>$0,\ 0$</td>
+</tr>
+<tr>
+<td>$D$</td>
+<td>$0,\ 0$</td>
+<td>$0,\ 0$</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p>*« Dans ce jeu, <strong>aucun joueur n'a de stratégie strictement dominée</strong>. Cependant, <strong>$D$ et $R$ sont faiblement dominées par $U$ et $L$</strong>, respectivement. Ainsi, <strong>éliminer les stratégies strictement dominées n'a AUCUN effet ici</strong>, alors qu'<strong>éliminer les faiblement dominées isole la paire unique $(U,L)$</strong>. »*</p>
+</blockquote>
+<p><strong>La construction itérative</strong> : $W_i^0=S_i$, et $s_i\in W_i^n$ si $s_i\in W_i^{n-1}$ n'est pas <strong>faiblement</strong> dominée dans $W^{n-1}=W_1^{n-1}\times\cdots\times W_N^{n-1}$.</p>
+<div class="cal formel"><span class="lab">DÉFINITION 7.6 — Stratégies itérativement faiblement non dominées</span>
+<p>
+$s_i$ est <strong>itérativement faiblement non dominée dans $S$</strong> si $s_i\in W_i^n$ pour tout $n\geq1$.</p>
+</div>
+<h3>5.4 La relation entre les deux procédures</h3>
+<blockquote>
+<p><em>« <strong>Il devrait être clair que l'ensemble des stratégies restant après l'application de la dominance faible itérative est CONTENU dans l'ensemble restant après l'application de la dominance stricte itérative.</strong> »</em> <em>(C'est l'<strong>exercice 7.6</strong>.)</em></p>
+</blockquote>
+<p>$$\bigcap_n W_i^n \ \subseteq\ \bigcap_n S_i^n$$</p>
+<p class="cal piege"> <strong>La dominance faible élimine PLUS</strong> — mais elle est aussi <strong>plus fragile</strong> : <em>« l'ordre dans lequel les stratégies faiblement dominées sont éliminées <strong>peut affecter les issues qui restent</strong> »</em> <em>(exercice 7.3(a))</em>, alors que pour la dominance <strong>stricte</strong>, <em>« l'ordre d'élimination <strong>n'importe pas</strong> »</em> <em>(exercice 7.3(b))</em>.</p>
+<h2 data-prio="must">Concept 6 — Le jeu « devine la moyenne »</h2>
+<h3>6.1 Les règles</h3>
+<blockquote>
+<p><em>« Pour avoir une idée du pouvoir <strong>parfois SURPRENANT</strong> des arguments de dominance itérative, considérez le jeu suivant appelé « <strong>DEVINE LA MOYENNE</strong> » dans lequel $N\geq2$ joueurs essaient de se surpasser mutuellement. »</em></p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>La règle</th>
+<th>Le détail</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Le choix</td>
+<td><em>« Chaque joueur doit <strong>simultanément</strong> choisir <strong>un entier entre 1 et 100</strong>. »</em></td>
+</tr>
+<tr>
+<td>Le gagnant</td>
+<td>*« La personne <strong>la plus proche du TIERS de la moyenne</strong> des propositions gagne <strong>100 $</strong>, les autres n'obtiennent rien. »*</td>
+</tr>
+<tr>
+<td>Les ex æquo</td>
+<td><em>« Le prix de 100 $ est <strong>partagé également</strong> s'il y a égalité. »</em></td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><em>« <strong>Avant de lire plus loin, réfléchissez un moment à la manière dont VOUS joueriez ce jeu quand il y a, disons, 20 joueurs.</strong> »</em></p>
+</blockquote>
+<h3 data-prio="must">6.2  La solution par dominance faible itérative</h3>
+<details class="cor">
+<summary><strong>Le premier tour : pourquoi 33 domine faiblement tout nombre plus grand</strong></summary><div class="in">
+
+<blockquote>
+<p><em>« Notez que <strong>choisir le nombre 33 domine FAIBLEMENT tous les nombres plus élevés</strong>. »</em></p>
+</blockquote>
+<p><strong>La raison</strong> : <em>« <strong>le tiers de la moyenne des nombres doit être inférieur ou égal à $33\tfrac13$</strong> »</em> — car la moyenne elle-même est au plus $100$.</p>
+<table>
+<thead>
+<tr>
+<th>L'inégalité</th>
+<th>La conséquence</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$\dfrac{\text{moyenne}}{3}\leq\dfrac{100}{3}=33\tfrac13$</td>
+<td><em>« <strong>quels que soient les nombres annoncés par les autres, 33 n'est pas un plus mauvais choix qu'un nombre plus élevé</strong> »</em></td>
+</tr>
+<tr>
+<td>Le cas de stricte inégalité</td>
+<td><em>« <strong>si tous les autres joueurs choisissent le nombre 34</strong>, alors le choix de 33 est <strong>strictement meilleur</strong> que tous les nombres plus élevés »</em></td>
+</tr>
+</tbody></table>
+<p class="cal piege"> <strong>C'est exactement la structure de la définition 7.5</strong> : $\geq$ partout, <strong>avec au moins un cas strict</strong>.</p>
+<p>$$W_i^1\subseteq\{1,2,\dots,33\}$$</p>
+<blockquote>
+<p><em>(Note de bas de page 1.)</em> <em>« <strong>Selon le nombre de joueurs, d'autres nombres peuvent être faiblement dominés aussi.</strong> Ceci est exploré dans les exercices. »</em></p>
+</blockquote>
+</div></details>
+
+<details class="cor">
+<summary><strong>Les tours suivants, et la conclusion</strong></summary><div class="in">
+
+<blockquote>
+<p>*« Mais <strong>un argument SEMBLABLE établit que tous les nombres au-dessus de 11 sont faiblement dominés dans $W^1$</strong>. Ainsi $W_i^2\subseteq\{1,2,\dots,11\}$. »*</p>
+</blockquote>
+<p class="cal piege"> <strong>Pourquoi 11</strong> : une fois que tout le monde choisit au plus $33$, la moyenne est au plus $33$, donc son tiers est au plus $11$.</p>
+<p>$$100 \ \to\ 33 \ \to\ 11 \ \to\ \dots$$</p>
+<blockquote>
+<p><em>« <strong>En continuant de cette manière, on établit que pour chaque joueur, la seule stratégie survivant à la dominance faible itérative est le choix du nombre 1.</strong> »</em></p>
+</blockquote>
+<p><strong>Ce que les exercices précisent</strong> <em>(exercice 7.5)</em> :</p>
+<ul>
+<li><strong>(a)</strong> <em>« aucune stratégie <strong>pure</strong> n'en domine strictement une autre »</em> ;</li>
+<li><strong>(b)</strong> il existe cependant une <strong>stratégie MIXTE</strong> qui domine strictement $100$ ;</li>
+<li><strong>(c)</strong>  <em>« montrer que <strong>99 n'est PAS strictement dominée</strong> »</em> ;</li>
+<li><strong>(d)</strong> la dominance <strong>stricte</strong> itérative aboutit aussi à $1$ — mais <strong>en 99 tours</strong> ;</li>
+<li><strong>(e)</strong> avec $N=3$ joueurs, la dominance <strong>faible</strong> donne $W_i^1=\{1,\dots,14\}$, $W_i^2=\{1,2\}$, $W_i^3=\{1\}$.</li>
+</ul>
+</div></details>
+
+<h3 data-prio="must">6.3  Et le duel batteur-lanceur ?</h3>
+<blockquote>
+<p><em>« Si vous avez gardé le duel batteur-lanceur à l'esprit, vous avez peut-être remarqué que dans ce jeu, <strong>aucune stratégie pour aucun joueur n'est strictement ou faiblement dominée</strong>. Dès lors, <strong>AUCUNE des procédures d'élimination décrites ne réduira les stratégies considérées</strong>. »</em></p>
+</blockquote>
+<blockquote>
+<p><em>« Bien que ces procédures soient clairement très utiles dans certaines circonstances, <strong>nous ne sommes pas plus près de résoudre le duel batteur-lanceur que lorsque nous l'avons mis de côté. Il est temps de changer cela.</strong> »</em></p>
+</blockquote>
+<h2 data-prio="must">Concept 7 — §7.2.2 : l'équilibre de Nash en stratégies pures</h2>
+<h3>7.1 L'analogie avec l'équilibre de marché</h3>
+<blockquote>
+<p><em>« Selon la théorie de l'offre et de la demande, la notion d'<strong>équilibre de marché</strong> où la demande égale l'offre est centrale. <strong>L'attrait théorique du concept vient de ce que, dans une telle situation, il n'y a AUCUNE TENDANCE ni NÉCESSITÉ pour le comportement de qui que ce soit de CHANGER. Ces RÉGULARITÉS dans le comportement forment la base des PRÉDICTIONS.</strong> »</em></p>
+</blockquote>
+<blockquote>
+<p><em>« Nous souhaitons décrire des régularités potentielles dans le comportement qui pourraient survenir dans un cadre stratégique. En même temps, nous souhaitons incorporer l'idée que <strong>les joueurs sont « rationnels », à la fois au sens qu'ils agissent dans leur propre intérêt ET qu'ils sont pleinement conscients des régularités dans le comportement des autres</strong>. »</em></p>
+</blockquote>
+<blockquote>
+<p><em>« En effet, <strong>l'équilibre de Nash, introduit dans Nash (1951), est LE concept d'équilibre le plus important de toute la théorie des jeux</strong>. »</em></p>
+</blockquote>
+<h3>7.2 L'idée informelle, puis la définition</h3>
+<blockquote>
+<p><em>« Informellement, une stratégie jointe $\hat s\in S$ constitue un équilibre de Nash <strong>du moment que CHAQUE individu, tout en étant PLEINEMENT CONSCIENT du comportement des autres, n'a AUCUNE INCITATION à changer le sien</strong>. Ainsi, <strong>un équilibre de Nash décrit un comportement qui peut être RATIONNELLEMENT SOUTENU</strong>. »</em></p>
+</blockquote>
+<div class="cal formel"><span class="lab">DÉFINITION 7.7 — Équilibre de Nash en stratégies pures</span>
+<p>
+Étant donné un jeu sous forme stratégique $G=(S_i,u_i)_{i=1}^{N}$, la stratégie jointe $\hat s\in S$ est un <strong>équilibre de Nash en stratégies pures</strong> de $G$ si, <strong>pour chaque joueur $i$</strong> :
+$$u_i(\hat s)\geq u_i(s_i,\hat s_{-i}) \qquad \text{pour tout } s_i\in S_i$$</p>
+</div>
+<h3>7.3 Le lien avec les figures 7.2 à 7.4</h3>
+<blockquote>
+<p><em>« Notez que dans <strong>chacun</strong> des jeux des figures 7.2 à 7.4, <strong>la paire $(U,L)$ constitue un équilibre de Nash en stratégies pures</strong>. »</em></p>
+</blockquote>
+<p><strong>La vérification pour la figure 7.2</strong> : <em>« En passant à $D$, le paiement du joueur 1 <strong>chute de 3 à 2</strong>. Par conséquent, le joueur 1 ne peut pas améliorer son paiement. De même, le joueur 2 ne peut pas améliorer le sien en changeant de stratégie quand celle de 1 est fixée à $U$. »</em></p>
+<p class="cal piege"> <strong>La multiplicité</strong> : <em>« dans le jeu de la figure 7.4, <strong>$(D,R)$ est AUSSI un équilibre de Nash en stratégies pures</strong> »</em> — car aucun joueur ne peut <strong>strictement</strong> améliorer son paiement en changeant seul.</p>
+<h3 data-prio="must">7.4  Le duel batteur-lanceur n'a AUCUN équilibre en stratégies pures</h3>
+<blockquote>
+<p><strong>La figure 7.5 — reproduction de la figure 7.1.</strong></p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>$F$</th>
+<th>$C$</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$F$</td>
+<td>$-1,\ 1$</td>
+<td>$1,\ -1$</td>
+</tr>
+<tr>
+<td>$C$</td>
+<td>$1,\ -1$</td>
+<td>$-1,\ 1$</td>
+</tr>
+</tbody></table>
+<p><strong>La vérification de $(F,F)$, en entier :</strong></p>
+<table>
+<thead>
+<tr>
+<th>Le joueur</th>
+<th>Son paiement en $(F,F)$</th>
+<th>En déviant</th>
+<th>Verdict</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Le batteur</strong></td>
+<td>$1$</td>
+<td>vers $C$ ⟹ $(F,C)$ ⟹ <strong>$-1$</strong></td>
+<td>ne peut <strong>pas</strong> améliorer</td>
+</tr>
+<tr>
+<td><strong>Le lanceur</strong></td>
+<td>$-1$</td>
+<td>vers $C$ ⟹ $(C,F)$ ⟹ <strong>$1$</strong></td>
+<td> <strong>améliore !</strong></td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><em>« Ainsi, <strong>le lanceur peut améliorer son paiement en changeant unilatéralement sa stratégie, et donc $(F,F)$ n'est PAS un équilibre de Nash en stratégies pures. Un argument similaire s'applique aux trois autres possibilités.</strong> »</em></p>
+</blockquote>
+<h3 data-prio="must">7.5  Pourquoi c'était prévisible</h3>
+<blockquote>
+<p><em>« Bien sûr, ceci était à attendre à la lumière de notre analyse <strong>heuristique</strong> du duel au début de ce chapitre. Là, nous avions conclu que <strong>le batteur et le lanceur doivent tous deux se comporter d'une manière IMPRÉVISIBLE</strong>. »</em></p>
+</blockquote>
+<blockquote>
+<p><em>« Mais <strong>incorporé dans la définition d'un équilibre de Nash en stratégies pures est que CHAQUE JOUEUR SAIT PRÉCISÉMENT QUELLE STRATÉGIE CHACUN DES AUTRES CHOISIRA. C'est-à-dire que, dans un équilibre en stratégies pures, les choix de tout le monde sont PARFAITEMENT PRÉVISIBLES.</strong> »</em></p>
+</blockquote>
+<p>$$\boxed{\;\text{équilibre en stratégies PURES} \ \Longleftrightarrow\ \text{prévisibilité parfaite}\;}$$</p>
+<blockquote>
+<p><em>« Le duel batteur-lanceur <strong>continue d'échapper à l'analyse. Mais nous nous en rapprochons rapidement.</strong> »</em></p>
+</blockquote>
+<h2 data-prio="must">Concept 8 — Les stratégies mixtes</h2>
+<h3>8.1 L'idée</h3>
+<blockquote>
+<p><em>« <strong>Une manière infaillible de faire un choix que les autres ne peuvent pas prédire est de le faire d'une manière que VOUS-MÊME ne pouvez pas prédire. Et la manière la plus simple de faire cela est de RANDOMISER entre vos choix.</strong> »</em></p>
+</blockquote>
+<blockquote>
+<p><em>« Par exemple, dans le duel batteur-lanceur, <strong>tous deux peuvent éviter que leur choix soit prédit simplement en LANÇANT UNE PIÈCE</strong> pour décider. »</em></p>
+</blockquote>
+<h3>8.2 La vérification que c'est un équilibre</h3>
+<details class="cor">
+<summary><strong>Le calcul complet pour le duel batteur-lanceur</strong></summary><div class="in">
+
+<p><strong>Le montage</strong> : chacun a une <strong>pièce équilibrée</strong> ; face ⟹ $F$, pile ⟹ $C$. <em>« Chacun est <strong>parfaitement conscient</strong> que l'autre fait son choix de cette manière. »</em></p>
+<p><strong>L'hypothèse nécessaire</strong> : <em>« supposons que <strong>les paiements des joueurs sont en fait des utilités de von Neumann-Morgenstern</strong>, et qu'ils se comporteront de manière à <strong>maximiser leur espérance d'utilité</strong> »</em>.</p>
+<p><strong>Le calcul du lanceur.</strong> Il sait que le batteur choisit $F$ et $C$ avec probabilité $\tfrac12$ chacune.</p>
+<p>$$\mathbb{E}[F]=\tfrac12(-1)+\tfrac12(1)=0 \qquad\qquad \mathbb{E}[C]=\tfrac12(1)+\tfrac12(-1)=0$$</p>
+<blockquote>
+<p><em>« Ainsi, étant donné que le batteur choisit $F$ et $C$ avec probabilité un demi chacune, <strong>le lanceur est INDIFFÉRENT entre $F$ et $C$ lui-même</strong>. »</em></p>
+</blockquote>
+<p class="cal piege"> <strong>La conclusion décisive</strong> : <em>« ainsi, <strong>alors que choisir soit $F$ soit $C$ donnerait au lanceur son paiement le plus élevé possible de zéro, RANDOMISER entre eux avec probabilité un demi sur chacun le ferait AUSSI</strong> »</em>.</p>
+<p><strong>Symétriquement</strong> pour le batteur.</p>
+<blockquote>
+<p><em>« En bref, <strong>les choix randomisés des joueurs forment un ÉQUILIBRE : chacun est conscient de la manière (randomisée) dont l'autre fait son choix, et NI L'UN NI L'AUTRE ne peut améliorer son paiement espéré en changeant unilatéralement la manière dont son choix est fait</strong>. »</em></p>
+</blockquote>
+</div></details>
+
+<h3>8.3 La définition 7.8</h3>
+<div class="cal formel"><span class="lab">DÉFINITION 7.8 — Stratégies mixtes</span>
+<p>
+Fixons un jeu sous forme stratégique <strong>FINI</strong> $G=(S_i,u_i)_{i=1}^{N}$. Une <strong>stratégie mixte</strong> $m_i$ pour le joueur $i$ est <strong>une distribution de probabilité sur $S_i$</strong>. C'est-à-dire, $m_i:S_i\to[0,1]$ assigne à chaque $s_i\in S_i$ <strong>la probabilité $m_i(s_i)$ que $s_i$ soit jouée</strong>. On note $M_i$ l'ensemble des stratégies mixtes de $i$ :
+$$M_i=\Big\{m_i:S_i\to[0,1]\ \Big|\ \sum_{s_i\in S_i}m_i(s_i)=1\Big\}$$
+ <strong>Désormais, on appelle $S_i$ l'ensemble des stratégies PURES du joueur $i$.</strong></p>
+</div>
+<h3>8.4 L'image de la roulette, et l'inclusion</h3>
+<blockquote>
+<p><em>« Une manière de penser une stratégie mixte est <strong>simplement comme une ROULETTE portant les noms de diverses stratégies pures imprimés sur des sections de la roue</strong>. Différentes roulettes pourraient avoir des sections plus grandes assignées à une stratégie pure ou une autre, donnant différentes probabilités. <strong>L'ensemble des stratégies mixtes est alors l'ensemble de toutes ces roulettes.</strong> »</em></p>
+</blockquote>
+<p class="cal piege"> *« Notez que ceci donne à chaque joueur <strong>STRICTEMENT PLUS de choix qu'avant</strong>, parce que <strong>chaque stratégie pure $\bar s_i\in S_i$ est représentée dans $M_i$ par la distribution (DÉGÉNÉRÉE) assignant la probabilité un à $\bar s_i$</strong>. »*</p>
+<h3>8.5 Le paiement espéré</h3>
+<p>Si $u_i$ est une utilité <strong>VNM</strong> sur $S$ et que la stratégie $m\in M$ est jouée :</p>
+<p>$$\boxed{\;u_i(m)\equiv\sum_{s\in S}m_1(s_1)\cdots m_N(s_N)\,u_i(s)\;}$$</p>
+<blockquote>
+<p><em>« Cette formule découle du fait que <strong>les joueurs choisissent leurs stratégies INDÉPENDAMMENT</strong>. Par conséquent, <strong>la probabilité que la stratégie pure $s=(s_1,\dots,s_N)$ soit choisie est le PRODUIT des probabilités</strong> que chaque composante séparée soit choisie. »</em></p>
+</blockquote>
+<h3>8.6 La définition 7.9</h3>
+<div class="cal formel"><span class="lab">DÉFINITION 7.9 — Équilibre de Nash</span>
+<p>
+Étant donné un jeu sous forme stratégique <strong>FINI</strong> $G=(S_i,u_i)_{i=1}^{N}$, une stratégie jointe $\hat m\in M$ est un <strong>équilibre de Nash</strong> de $G$ si, pour chaque joueur $i$ :
+$$u_i(\hat m)\geq u_i(m_i,\hat m_{-i}) \qquad \text{pour tout } m_i\in M_i$$</p>
+</div>
+<blockquote>
+<p><em>« Ainsi, dans un équilibre de Nash, <strong>chaque joueur peut randomiser ses choix, et aucun joueur ne peut améliorer son paiement espéré en randomisant DIFFÉREMMENT de manière unilatérale</strong>. »</em></p>
+</blockquote>
+<h2 data-prio="must">Concept 9 — Le théorème 7.1 : les tests simplifiés</h2>
+<h3>9.1 Le problème que le théorème résout</h3>
+<blockquote>
+<p>*« <strong>Il pourrait sembler que vérifier un équilibre de Nash requiert de vérifier, pour chaque joueur $i$, CHAQUE stratégie dans l'ensemble INFINI $M_i$ contre $\hat m_i$.</strong> Le résultat suivant <strong>simplifie cette tâche en tirant parti de la LINÉARITÉ de $u_i$ en $m_i$</strong>. »*</p>
+</blockquote>
+<h3>9.2 L'énoncé</h3>
+<div class="cal formel"><span class="lab">THÉORÈME 7.1 — Tests simplifiés pour l'équilibre de Nash</span>
+<p>
+Les énoncés suivants sont <strong>équivalents</strong> :</p>
+<p><strong>(a)</strong> $\hat m\in M$ est un <strong>équilibre de Nash</strong>.</p>
+<p><strong>(b)</strong> Pour chaque joueur $i$ : $u_i(\hat m)=u_i(s_i,\hat m_{-i})$ <strong>pour toute $s_i\in S_i$ recevant un POIDS POSITIF de $\hat m_i$</strong>, et $u_i(\hat m)\geq u_i(s_i,\hat m_{-i})$ <strong>pour toute $s_i\in S_i$ recevant un POIDS NUL de $\hat m_i$</strong>.</p>
+<p><strong>(c)</strong> Pour chaque joueur $i$ : $u_i(\hat m)\geq u_i(s_i,\hat m_{-i})$ <strong>pour toute $s_i\in S_i$</strong>.</p>
+</div>
+<h3 data-prio="must">9.3  À quoi sert chacun des deux tests</h3>
+<table>
+<thead>
+<tr>
+<th>L'énoncé</th>
+<th>Son usage, selon le livre</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>(b)</strong></td>
+<td><em>« <strong>le plus utile pour CALCULER les équilibres de Nash</strong>. Il dit qu'<strong>un joueur doit être INDIFFÉRENT entre toutes les stratégies pures recevant un poids positif</strong> et que chacune de celles-ci <strong>ne doit pas être pire qu'une stratégie pure de poids nul</strong>. »</em></td>
+</tr>
+<tr>
+<td><strong>(c)</strong></td>
+<td><em>« il <strong>suffit de vérifier, pour chaque joueur, qu'AUCUNE STRATÉGIE PURE ne donne un paiement espéré plus élevé que sa stratégie mixte</strong> »</em></td>
+</tr>
+</tbody></table>
+<p>$$\boxed{\;\textbf{(b) pour CALCULER} \qquad\qquad \textbf{(c) pour VÉRIFIER}\;}$$</p>
+<h3>9.4 La preuve</h3>
+<details class="cor">
+<summary><strong>(a) ⟹ (b) — la partie non triviale</strong></summary><div class="in">
+
+<p>Supposons $\hat m$ équilibre de Nash, donc $u_i(\hat m)\geq u_i(m_i,\hat m_{-i})$ pour toute $m_i\in M_i$.</p>
+<p><strong>Pas 1 — les stratégies pures.</strong> <em>« En particulier, pour chaque $s_i\in S_i$, <strong>nous pouvons choisir $m_i$ comme la stratégie donnant la probabilité UN à $s_i$</strong> »</em>, de sorte que</p>
+<p>$$u_i(\hat m)\geq u_i(s_i,\hat m_{-i}) \qquad \textbf{pour toute } s_i\in S_i$$</p>
+<p><strong>Pas 2 — l'égalité sur le support.</strong></p>
+<blockquote>
+<p class="cal piege"> <em>« Or, <strong>si l'un de ces nombres différait de $u_i(\hat m)$, alors au moins un serait STRICTEMENT PLUS GRAND, parce que $u_i(\hat m)$ est une COMBINAISON CONVEXE STRICTE d'entre eux. Mais ceci contredirait l'inégalité qui vient d'être établie.</strong> »</em></p>
+</blockquote>
+<div class="cal plus"><span class="lab">Enrichissement pédagogique (hors cours) — pourquoi c'est une moyenne.</span>
+<p> Par la formule du §8.5, $u_i(\hat m)=\sum_{s_i}\hat m_i(s_i)\,u_i(s_i,\hat m_{-i})$ : le paiement de la stratégie mixte est <strong>la moyenne pondérée</strong> des paiements des stratégies pures du <strong>support</strong>, les poids étant les $\hat m_i(s_i)&gt;0$. Une moyenne pondérée de nombres non tous égaux est <strong>strictement inférieure au plus grand d'entre eux</strong> — d'où la contradiction.</p>
+</div>
+</div></details>
+
+<details class="cor">
+<summary><strong>(b) ⟹ (c) et (c) ⟹ (a)</strong></summary><div class="in">
+
+<blockquote>
+<p>*« <strong>Parce qu'il est évident que (b) implique (c)</strong>, il reste seulement à établir que <strong>(c) implique (a)</strong>. »*</p>
+</blockquote>
+<p>Supposons $u_i(\hat m)\geq u_i(s_i,\hat m_{-i})$ pour toute $s_i\in S_i$ et tout joueur $i$. Fixons $i$ et $m_i\in M_i$.</p>
+<blockquote>
+<p>*« <strong>Parce que le nombre $u_i(m_i,\hat m_{-i})$ est une COMBINAISON CONVEXE des nombres $\{u_i(s_i,\hat m_{-i})\}_{s_i\in S_i}$</strong>, nous avons $u_i(\hat m)\geq u_i(m_i,\hat m_{-i})$. »*</p>
+</blockquote>
+<blockquote>
+<p><em>« <strong>Parce que le joueur ET la stratégie choisie étaient arbitraires</strong>, $\hat m$ est un équilibre de Nash de $G$. »</em> $\blacksquare$</p>
+</blockquote>
+<p class="cal piege"> <strong>Toute la preuve repose sur un seul fait</strong> : $u_i$ est <strong>linéaire en $m_i$</strong>, donc le paiement d'une mixte est <strong>une moyenne pondérée</strong> des paiements des pures.</p>
+</div></details>
+
+<h2 data-prio="must">Concept 10 — L'exemple 7.1 et les deux interprétations des stratégies mixtes</h2>
+<h3>10.1 L'histoire</h3>
+<blockquote>
+<p><em>« Vous et un collègue devez assembler un rapport prêt dans une heure. Vous convenez de <strong>partager le travail en deux moitiés</strong>. À votre consternation mutuelle, <strong>vous découvrez que le traitement de texte que vous utilisez n'est pas compatible avec celui de l'autre</strong>. »</em></p>
+</blockquote>
+<blockquote>
+<p><em>« Bien sûr, <strong>parce qu'il est coûteux de se familiariser avec un nouveau traitement de texte, chacun de vous préférerait que ce soit l'AUTRE qui change</strong>. D'autre part, <strong>chacun préfère changer plutôt que d'échouer à se coordonner du tout</strong>. Enfin, supposons qu'<strong>il n'y a pas de temps pour en discuter</strong> — chacun doit décider <strong>dans l'intimité de son propre bureau</strong>. »</em></p>
+</blockquote>
+<blockquote>
+<p><strong>La figure 7.6 — un jeu de coordination.</strong></p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>$WP$</th>
+<th>$MW$</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$WP$</td>
+<td>$2,\ 1$</td>
+<td>$0,\ 0$</td>
+</tr>
+<tr>
+<td>$MW$</td>
+<td>$0,\ 0$</td>
+<td>$1,\ 2$</td>
+</tr>
+</tbody></table>
+<table>
+<thead>
+<tr>
+<th>Le résultat</th>
+<th>Le paiement</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Échec</strong> de coordination</td>
+<td>$0$</td>
+</tr>
+<tr>
+<td>Coordination <strong>sur son PROPRE</strong> logiciel</td>
+<td>$2$</td>
+</tr>
+<tr>
+<td>Coordination <strong>sur celui de l'AUTRE</strong></td>
+<td>$1$</td>
+</tr>
+</tbody></table>
+<p><strong>Les deux équilibres purs</strong> : $(WP,WP)$ et $(MW,MW)$.</p>
+<h3>10.2 Le calcul de l'équilibre mixte</h3>
+<details class="cor">
+<summary><strong>Le calcul complet</strong></summary><div class="in">
+
+<blockquote>
+<p><em>« S'il y en a, <strong>il est facile de voir que les deux joueurs doivent choisir chacune de leurs stratégies pures avec probabilité STRICTEMENT POSITIVE</strong>. »</em></p>
+</blockquote>
+<p>Soit $p&gt;0$ la probabilité que <strong>1 choisisse $MW$</strong> <em>(le logiciel de son collègue)</em> et $q&gt;0$ celle que <strong>2 choisisse $WP$</strong> <em>(le logiciel de son collègue)</em>.</p>
+<blockquote>
+<p><em>« <strong>Par la partie (b) du théorème 7.1, chaque joueur doit être INDIFFÉRENT entre chacune de ses stratégies pures.</strong> »</em></p>
+</blockquote>
+<p><strong>Pour le joueur 1 :</strong></p>
+<p>$$q(2)+(1-q)(0)\ =\ q(0)+(1-q)(1)$$</p>
+<p><em>(à gauche : il joue $WP$ — il touche 2 si 2 joue $WP$, 0 sinon. À droite : il joue $MW$ — 0 si 2 joue $WP$, 1 sinon.)</em></p>
+<p>$$2q=1-q \quad\Longrightarrow\quad q=\tfrac13$$</p>
+<p><strong>Pour le joueur 2 :</strong></p>
+<p>$$(1-p)(1)+p(0)\ =\ (1-p)(0)+p(2) \quad\Longrightarrow\quad 1-p=2p \quad\Longrightarrow\quad p=\tfrac13$$</p>
+<blockquote>
+<p><em>« Ainsi, la stratégie (mixte) dans laquelle <strong>chaque joueur choisit le traitement de texte de son collègue avec probabilité $1/3$ et le sien avec probabilité $2/3$</strong> est un <strong>troisième</strong> équilibre de Nash de ce jeu. <strong>Il n'y en a pas d'autres.</strong> »</em></p>
+</blockquote>
+</div></details>
+
+<h3 data-prio="must">10.3  Les trois enseignements de l'exemple</h3>
+<blockquote>
+<p><em>« Le jeu de l'exemple 7.1 est intéressant à <strong>plusieurs égards</strong>. »</em></p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>L'enseignement</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>1</strong></td>
+<td><em>« il possède <strong>de MULTIPLES équilibres de Nash, certains purs, d'autres non</strong> »</em></td>
+</tr>
+<tr>
+<td><strong>2</strong></td>
+<td> *« <strong>l'un de ces équilibres est INEFFICACE</strong>. Notez que dans l'équilibre en stratégies mixtes, <strong>le paiement espéré de chaque joueur est $2/3$</strong>, de sorte que <strong>chacun serait strictement mieux loti si l'un OU l'autre des équilibres purs était joué</strong>. »*</td>
+</tr>
+<tr>
+<td><strong>3</strong></td>
+<td> <em>« <strong>un équilibre en stratégies mixtes est présent MÊME SI ce n'est pas un jeu dans lequel l'un des joueurs souhaite se comporter de manière imprévisible</strong> »</em></td>
+</tr>
+</tbody></table>
+<h3>10.4 Les deux interprétations d'une stratégie mixte</h3>
+<blockquote>
+<p><em>« <strong>Devrions-nous alors IGNORER l'équilibre en stratégies mixtes trouvé ici, parce que les stratégies mixtes n'y servent pas le but pour lequel elles ont été introduites ? NON.</strong> »</em></p>
+</blockquote>
+<blockquote>
+<p><em>« Bien que <strong>nous ayons d'abord introduit les stratégies mixtes pour donner aux joueurs l'occasion de se comporter de manière imprévisible</strong>, il y a <strong>UNE AUTRE MANIÈRE d'interpréter le sens d'une stratégie mixte. Plutôt que de penser une stratégie mixte du joueur 1 comme une RANDOMISATION DÉLIBÉRÉE de sa part, pensez-la comme une EXPRESSION DES CROYANCES DES AUTRES JOUEURS concernant la stratégie pure que le joueur 1 choisira.</strong> »</em></p>
+</blockquote>
+<p><strong>Appliqué à la figure 7.6</strong> : <em>« la stratégie d'équilibre du joueur 1 plaçant la probabilité $1/3$ sur $MW$ et $2/3$ sur $WP$ <strong>peut être interprétée comme reflétant l'INCERTITUDE DU JOUEUR 2</strong> concernant la stratégie pure que le joueur 1 choisira. »</em></p>
+<table>
+<thead>
+<tr>
+<th>L'interprétation</th>
+<th>Sa nature</th>
+<th>Quand elle a du sens</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>(1) La roulette</strong></td>
+<td><em>« des <strong>dispositifs physiques réels</strong> que les joueurs utilisent pour <strong>randomiser délibérément</strong> »</em></td>
+<td> <em>« dans les jeux comme le duel batteur-lanceur <strong>dans lesquels les intérêts des joueurs sont OPPOSÉS</strong> »</em></td>
+</tr>
+<tr>
+<td><strong>(2) Les croyances</strong></td>
+<td><em>« la stratégie mixte d'un joueur peut <strong>simplement représenter les CROYANCES que les autres entretiennent</strong> sur la stratégie pure qu'il pourrait choisir. <strong>Dans cette interprétation, AUCUN joueur ne randomise explicitement.</strong> »</em></td>
+<td> <em>« pour les jeux comme celui de la figure 7.6, <strong>dans lesquels les intérêts des joueurs, dans une certaine mesure, COÏNCIDENT</strong> »</em></td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><em>« <strong>Le fait que nous choisissions d'employer une interprétation ou l'autre dépend largement du CONTEXTE.</strong> »</em></p>
+</blockquote>
+<h2 data-prio="must">Concept 11 — Le théorème 7.2 : l'existence d'un équilibre de Nash</h2>
+<h3>11.1 L'énoncé</h3>
+<blockquote>
+<p><em>« <strong>Tout jeu possède-t-il au moins un équilibre de Nash ?</strong> Rappelez-vous que dans le cas des stratégies <strong>pures</strong>, la réponse est <strong>NON</strong> (le duel batteur-lanceur). <strong>Cependant, une fois les stratégies mixtes introduites, la réponse est OUI, de manière tout à fait générale.</strong> »</em></p>
+</blockquote>
+<div class="cal formel"><span class="lab">THÉORÈME 7.2 — (Nash) Existence d'un équilibre de Nash</span>
+<p>
+<strong>Tout jeu sous forme stratégique FINI possède au moins un équilibre de Nash.</strong></p>
+</div>
+<h3>11.2 Le montage et la stratégie de preuve</h3>
+<p>Pour simplifier la notation, on suppose que <strong>chaque joueur a le même nombre $n$ de stratégies pures</strong>, indexées $S_i=\{1,2,\dots,n\}$. Alors</p>
+<p>$$M_i=\Big\{(m_{i1},\dots,m_{in})\in\mathbb{R}^n_+\ \Big|\ \sum_{j=1}^{n}m_{ij}=1\Big\}$$</p>
+<p class="cal piege"> <em>« Notez que <strong>$M_i$ est NON VIDE, COMPACT et CONVEXE</strong>. »</em> — les trois hypothèses de Brouwer.</p>
+<blockquote>
+<p>*« Nous montrerons qu'un équilibre existe <strong>en démontrant l'existence d'un POINT FIXE d'une fonction dont les points fixes sont nécessairement des équilibres de $G$</strong>. Ainsi, le reste de la preuve consiste en <strong>TROIS PAS</strong> : »*</p>
+</blockquote>
+<p>$$\textbf{(1) construire la fonction} \quad\to\quad \textbf{(2) prouver qu'elle a un point fixe} \quad\to\quad \textbf{(3) montrer que ce point fixe est un équilibre}$$</p>
+<h3>11.3 La preuve</h3>
+<details class="cor">
+<summary><strong>Pas 1 — la construction de $f$</strong></summary><div class="in">
+
+<p>Définir $f:M\to M$ ainsi. Pour chaque $m\in M$, chaque joueur $i$, et chaque stratégie pure $j$ :</p>
+<p>$$\boxed{\;f_{ij}(m)=\frac{m_{ij}+\max\big(0,\ u_i(j,m_{-i})-u_i(m)\big)}{1+\displaystyle\sum_{j'=1}^{n}\max\big(0,\ u_i(j',m_{-i})-u_i(m)\big)}\;}$$</p>
+<p><strong>Comment la lire</strong> <em>(enrichissement)</em> : au numérateur, on <strong>ajoute au poids actuel de $j$ l'excès de paiement</strong> que la pure $j$ procurerait par rapport à la mixte $m_i$ — mais <strong>seulement si cet excès est positif</strong>. Au dénominateur, on <strong>renormalise</strong> pour que la somme fasse $1$. <strong>La fonction pousse le poids vers les stratégies qui font mieux que la moyenne.</strong></p>
+<p>Poser $f_i(m)=(f_{i1}(m),\dots,f_{in}(m))$ et $f(m)=(f_1(m),\dots,f_N(m))$.</p>
+<blockquote>
+<p><em>« Notez que pour chaque joueur $i$, $\sum_{j=1}^{n}f_{ij}(m)=1$ et que $f_{ij}(m)\geq0$ pour tout $j$. <strong>Donc $f_i(m)\in M_i$ pour tout $i$, et ainsi $f(m)\in M$.</strong> »</em></p>
+</blockquote>
+</div></details>
+
+<details class="cor">
+<summary><strong>Pas 2 — l'application de Brouwer</strong></summary><div class="in">
+
+<blockquote>
+<p><em>« <strong>Parce que le NUMÉRATEUR définissant $f_{ij}$ est continu en $m$, et que le DÉNOMINATEUR est à la fois continu en $m$ ET BORNÉ LOIN DE ZÉRO (en effet, il n'est JAMAIS inférieur à UN), $f_{ij}$ est une fonction CONTINUE de $m$ pour tous $i$ et $j$.</strong> »</em></p>
+</blockquote>
+<p class="cal piege"> <strong>Le détail qui compte</strong> : chaque terme du dénominateur est un $\max(0,\cdot)\geq0$, donc le dénominateur vaut <strong>au moins 1</strong> — la division est <strong>toujours licite</strong>.</p>
+<blockquote>
+<p><em>« Par conséquent, <strong>$f$ est une fonction CONTINUE envoyant l'ensemble NON VIDE, COMPACT et CONVEXE $M$ DANS LUI-MÊME. Nous pouvons donc appliquer le THÉORÈME DU POINT FIXE DE BROUWER (théorème A1.11) pour conclure que $f$ a un point fixe $\hat m$.</strong> »</em></p>
+</blockquote>
+</div></details>
+
+<details class="cor">
+<summary><strong>Pas 3 — le calcul algébrique qui conclut</strong></summary><div class="in">
+
+<p>Puisque $f(\hat m)=\hat m$, on a $f_{ij}(\hat m)=\hat m_{ij}$ pour tous $i,j$, donc</p>
+<p>$$\hat m_{ij}=\frac{\hat m_{ij}+\max\big(0,u_i(j,\hat m_{-i})-u_i(\hat m)\big)}{1+\sum_{j'}\max\big(0,u_i(j',\hat m_{-i})-u_i(\hat m)\big)}$$</p>
+<p><strong>En multipliant en croix et en simplifiant $\hat m_{ij}$ :</strong></p>
+<p>$$\hat m_{ij}\sum_{j'=1}^{n}\max\big(0,u_i(j',\hat m_{-i})-u_i(\hat m)\big)\ =\ \max\big(0,u_i(j,\hat m_{-i})-u_i(\hat m)\big)$$</p>
+<p><strong>L'astuce</strong> : <em>« <strong>multiplier les deux côtés de cette équation par $u_i(j,\hat m_{-i})-u_i(\hat m)$ et SOMMER sur $j$</strong> »</em> :</p>
+<p>$$\underbrace{\sum_{j=1}^{n}\hat m_{ij}\big[u_i(j,\hat m_{-i})-u_i(\hat m)\big]}_{\textbf{= 0, voir ci-dessous}}\ \cdot\sum_{j'=1}^{n}\max\big(0,\cdot\big)\ =\ \sum_{j=1}^{n}\big[u_i(j,\hat m_{-i})-u_i(\hat m)\big]\max\big(0,u_i(j,\hat m_{-i})-u_i(\hat m)\big) \tag{P.1}$$</p>
+<p><strong>Pourquoi le membre de gauche est NUL :</strong></p>
+<p>$$\sum_{j=1}^{n}\hat m_{ij}\big[u_i(j,\hat m_{-i})-u_i(\hat m)\big]=\sum_{j=1}^{n}\hat m_{ij}u_i(j,\hat m_{-i})-u_i(\hat m)=u_i(\hat m)-u_i(\hat m)=0$$</p>
+<blockquote>
+<p><em>« où <strong>la première égalité découle de ce que les $m_{ij}$ somment à un sur $j$</strong> »</em></p>
+</blockquote>
+<p><strong>Donc (P.1) se réécrit :</strong></p>
+<p>$$0=\sum_{j=1}^{n}\big[u_i(j,\hat m_{-i})-u_i(\hat m)\big]\max\big(0,u_i(j,\hat m_{-i})-u_i(\hat m)\big)$$</p>
+<p><strong>La conclusion :</strong></p>
+<blockquote>
+<p class="cal piege"> *« Mais <strong>la somme de droite ne peut être nulle que si $u_i(j,\hat m_{-i})-u_i(\hat m)\leq0$ pour tout $j$</strong>. <strong>(Si $u_i(j,\hat m_{-i})-u_i(\hat m)&gt;0$ pour un certain $j$, alors le $j$-ième terme de la somme est strictement positif. Parce qu'AUCUN terme de la somme n'est négatif, ceci rendrait la somme ENTIÈRE strictement positive.)</strong> »*</p>
+</blockquote>
+<div class="cal plus"><span class="lab">Enrichissement pédagogique (hors cours) — pourquoi aucun terme n'est négatif.</span>
+<p> Chaque terme est de la forme $x\cdot\max(0,x)$, qui vaut $x^2\geq0$ si $x&gt;0$ et $0$ si $x\leq0$ — donc <strong>toujours $\geq0$</strong>. Une somme de termes $\geq0$ est nulle <strong>ssi chacun l'est</strong>.</p>
+</div>
+<blockquote>
+<p><em>« Dès lors, <strong>par la partie (c) du théorème 7.1, $\hat m$ est un équilibre de Nash</strong>. »</em> $\blacksquare$</p>
+</blockquote>
+</div></details>
+
+<h3 data-prio="must">11.4  La portée du théorème 7.2</h3>
+<blockquote>
+<p><em>« <strong>Le théorème 7.2 est tout à fait REMARQUABLE.</strong> Il dit que <strong>peu importe combien de joueurs sont impliqués, du moment que chacun possède un nombre FINI de stratégies pures, il y aura au moins un équilibre de Nash.</strong> »</em></p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>La portée</th>
+<th>Le commentaire du livre</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Pratique</strong></td>
+<td><em>« la recherche d'un équilibre de Nash <strong>ne sera pas VAINE</strong> »</em></td>
+</tr>
+<tr>
+<td><strong>Conceptuelle</strong></td>
+<td> <em>« <strong>Plus important encore</strong>, le théorème établit que <strong>la notion d'équilibre de Nash est COHÉRENTE d'une manière profonde. Si les équilibres de Nash existaient RAREMENT, ceci indiquerait une INCOHÉRENCE FONDAMENTALE dans la définition. Que les équilibres de Nash existent TOUJOURS dans les jeux finis est UNE MESURE DE LA SOLIDITÉ DE L'IDÉE.</strong> »</em></td>
+</tr>
+</tbody></table>
+<h2 data-prio="must">Concept 12 — §7.2.3 : l'information incomplète</h2>
+<h3>12.1 La limitation qu'on lève</h3>
+<blockquote>
+<p><em>« Bien qu'une grande variété de situations puisse être modélisée comme des jeux sous forme stratégique, <strong>notre analyse de ces jeux semble jusqu'ici sujette à une limitation assez importante</strong>. Jusqu'à présent, […] <strong>nous avons toujours supposé que CHAQUE joueur est parfaitement informé des paiements de TOUS les autres. Sinon, les joueurs n'auraient pas pu effectuer les calculs nécessaires pour dériver leurs stratégies optimales.</strong> »</em></p>
+</blockquote>
+<blockquote>
+<p><em>« Mais <strong>beaucoup de situations réelles impliquent des doses substantielles d'information INCOMPLÈTE sur les paiements des adversaires</strong>. Considérez, par exemple, <strong>deux firmes en concurrence sur le même marché. Il est très probable que l'une ou les deux soient imparfaitement informées des COÛTS DE PRODUCTION de l'autre.</strong> »</em></p>
+</blockquote>
+<h3 data-prio="must">12.2  L'idée centrale de Harsanyi</h3>
+<div class="cal methode"><span class="lab">Comment analyser une telle situation ? L'IDÉE est de lui AJOUTER un ingrédient de plus, de sorte qu'elle devienne un JEU SOUS FORME STRATÉGIQUE. Nous serons alors capables d'appliquer n'importe laquelle des méthodes de solution que nous avons développées.</span>
+<p>*«  Ces idées ont été inaugurées dans <strong>Harsanyi (1967-1968)</strong>. »*</p>
+</div>
+<p>$$\boxed{\;\text{On ne construit PAS une théorie nouvelle — on RAMÈNE le cas incomplet au cas complet.}\;}$$</p>
+<h3>12.3 L'ingrédient additionnel : les croyances</h3>
+<blockquote>
+<p><em>« <strong>L'ingrédient additionnel est une spécification des CROYANCES de chaque firme sur le coût de l'autre.</strong> »</em></p>
+</blockquote>
+<p><strong>L'exemple du livre, avec la corrélation :</strong></p>
+<blockquote>
+<p><em>« Par exemple, nous pourrions spécifier que <strong>la firme 1 croit qu'il est également probable que la firme 2 soit une firme à coût élevé ou à coût faible</strong>. De plus, nous pourrions souhaiter capturer l'idée que <strong>les coûts des deux firmes sont CORRÉLÉS</strong> : quand le coût de la firme 1 est faible, il peut être plus probable que celui de 2 le soit aussi. Nous pourrions donc spécifier que <strong>quand le coût de 1 est faible il croit que celui de 2 a deux fois plus de chances d'être faible qu'élevé</strong>, et <strong>quand son coût est élevé, l'inverse</strong>. »</em></p>
+</blockquote>
+<h3>12.4 Les types</h3>
+<p>Comme d'habitude : $N$ joueurs, un ensemble de stratégies pures $S_i$ pour chacun. En plus :</p>
+<blockquote>
+<p><em>« il peut y avoir de <strong>l'incertitude sur les PAIEMENTS</strong> de certains d'entre eux. Pour saisir cela, <strong>nous introduisons pour chaque joueur $i$ un ensemble FINI $T_i$ de « TYPES » possibles que ce joueur pourrait être</strong>. »</em></p>
+</blockquote>
+<p class="cal piege"> <strong>La dépendance du paiement est TRIPLE :</strong></p>
+<p>$$u_i:\ S\times T\ \longrightarrow\ \mathbb{R}, \qquad\qquad T=\prod_{i=1}^{N}T_i$$</p>
+<blockquote>
+<p><em>« Nous permettons au paiement d'un joueur de dépendre comme d'habitude <strong>de la stratégie pure jointe choisie</strong>, mais aussi <strong>de SON PROPRE type ainsi que des types DES AUTRES</strong>. »</em></p>
+</blockquote>
+<p><strong>Pourquoi cette dernière dépendance compte :</strong></p>
+<blockquote>
+<p><em>« Permettre au paiement de $i$ de dépendre du type d'un AUTRE joueur nous permet d'analyser des situations <strong>où l'information possédée par un joueur AFFECTE le paiement d'un autre</strong>. Par exemple, <strong>dans l'enchère de parcelles pétrolières offshore, le paiement d'un enchérisseur ainsi que son enchère optimale dépendront de la PROBABILITÉ QUE LA PARCELLE CONTIENNE DU PÉTROLE, quelque chose sur quoi d'autres enchérisseurs peuvent avoir de l'information</strong>. »</em></p>
+</blockquote>
+<h3>12.5 Les croyances</h3>
+<blockquote>
+<p><em>« L'ingrédient supplémentaire est <strong>une spécification, pour chaque joueur $i$ et chacun de ses types $t_i$, des CROYANCES qu'il entretient sur les types que les autres pourraient être</strong>. »</em></p>
+</blockquote>
+<p>$$p_i(t_{-i}\mid t_i)\in[0,1], \qquad \sum_{t_{-i}\in T_{-i}}p_i(t_{-i}\mid t_i)=1$$</p>
+<h3 data-prio="must">12.6  L'a priori commun</h3>
+<blockquote>
+<p><em>« <strong>Il est souvent utile de spécifier les croyances des joueurs de sorte qu'elles soient en un certain sens COHÉRENTES entre elles.</strong> Par exemple, on peut souhaiter insister sur le fait que <strong>deux joueurs seraient d'accord sur les types d'un TROISIÈME joueur qui ont une probabilité positive</strong>. »</em></p>
+</blockquote>
+<p><strong>La méthode standard</strong> : <em>« supposer que les croyances des joueurs sont <strong>engendrées à partir d'une DISTRIBUTION DE PROBABILITÉ UNIQUE $p$ sur l'espace des types joints $T$</strong> »</em>, avec $p(t)&gt;0$ pour tout $t$ et $\sum_{t\in T}p(t)=1$.</p>
+<blockquote>
+<p>*« <strong>Si nous pensons le vecteur de types $t\in T$ comme choisi par la NATURE selon $p$</strong>, alors par la <strong>règle de Bayes</strong>, les croyances de $i$ se calculent depuis $p$ : »*</p>
+</blockquote>
+<p>$$\boxed{\;p_i(t_{-i}\mid t_i)=\frac{p(t_i,t_{-i})}{\displaystyle\sum_{t'_{-i}\in T_{-i}}p(t_i,t'_{-i})}\;}$$</p>
+<blockquote>
+<p><em>« Si tous les $p_i$ peuvent être calculés depuis $p$ selon cette formule, <strong>on dit que $p$ est un A PRIORI COMMUN</strong>. »</em></p>
+</blockquote>
+<p><strong>Les deux lectures de l'hypothèse d'a priori commun :</strong></p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>La lecture</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>1</strong></td>
+<td><em>« $p$ est simplement une <strong>distribution empirique OBJECTIVE</strong> sur les types des joueurs, <strong>confirmée par de nombreuses observations passées</strong> »</em></td>
+</tr>
+<tr>
+<td><strong>2</strong></td>
+<td> <em>« l'hypothèse reflète l'idée que <strong>les différences de croyances ne proviennent QUE de différences d'INFORMATION</strong>. Par conséquent, <strong>AVANT que les joueurs soient conscients de leurs propres types — et se trouvent donc dans une position informationnellement SYMÉTRIQUE — les croyances de chaque joueur doivent être IDENTIQUES, et égales à $p$.</strong> »</em></td>
+</tr>
+</tbody></table>
+<h3 data-prio="must">12.7  Le livre n'impose PAS l'a priori commun</h3>
+<blockquote>
+<p><em>« <strong>Notre capacité à analyser une situation d'information incomplète NE REQUERRA PAS l'hypothèse d'a priori commun. Nous n'insisterons donc PAS pour que les croyances des joueurs soient engendrées à partir d'un a priori commun.</strong> »</em></p>
+</blockquote>
+<blockquote>
+<p><em>« Ainsi, <strong>nous permettons des situations dans lesquelles, par exemple, un certain type du joueur 1 assigne la probabilité ZÉRO à un type du joueur 3 qui reçoit toujours une probabilité POSITIVE du joueur 2, quel que soit son propre type</strong>. »</em></p>
+</blockquote>
+<p><em>(L'<strong>exercice 7.20</strong> demande de montrer que <strong>cette situation est IMPOSSIBLE avec un a priori commun</strong>.)</em></p>
+<h3>12.8 La définition 7.10</h3>
+<div class="cal formel"><span class="lab">DÉFINITION 7.10 — Jeu d'information incomplète (jeu bayésien)</span>
+<p>
+Un <strong>jeu d'information incomplète</strong> est un $n$-uplet $G=(p_i,T_i,S_i,u_i)_{i=1}^{N}$ où, pour chaque joueur $i$ :</p>
+<ul>
+<li>l'ensemble $T_i$ est <strong>fini</strong> ;</li>
+<li>$u_i:S\times T\to\mathbb{R}$ ;</li>
+<li>pour chaque $t_i\in T_i$, $p_i(\cdot\mid t_i)$ est une <strong>distribution de probabilité sur $T_{-i}$</strong>.</li>
+</ul>
+<p>Si de plus <strong>chaque $S_i$ est fini</strong>, $G$ est un <strong>jeu FINI d'information incomplète</strong>. Un jeu d'information incomplète est aussi appelé un <strong>JEU BAYÉSIEN</strong>.</p>
+</div>
+<h2 data-prio="must">Concept 13 — Le jeu stratégique associé $G^+$</h2>
+<h3>13.1 La réponse à la question</h3>
+<blockquote>
+<p><em>« <strong>La question demeure : comment appliquer nos solutions précédemment développées aux jeux d'information incomplète ?</strong> »</em></p>
+</blockquote>
+<p>$$\boxed{\;\textbf{La réponse : ASSOCIER à } G \textbf{ un jeu sous forme stratégique } G^+ \textbf{ dans lequel}\\\textbf{CHAQUE TYPE de chaque joueur est traité comme un JOUEUR SÉPARÉ.}\;}$$</p>
+<blockquote>
+<p><em>« Nous pouvons alors appliquer <strong>tous</strong> nos résultats sur les jeux sous forme stratégique à $G^+$. <strong>Bien sûr, nous devons vous convaincre que $G^+$ capture TOUS les aspects pertinents</strong> de la situation d'information incomplète dont nous sommes partis. »</em></p>
+</blockquote>
+<h3>13.2 L'exemple 7.2 — la construction en images</h3>
+<blockquote>
+<p><em>« <strong>Deux firmes sont engagées dans une concurrence en prix à la Bertrand</strong>, sauf que <strong>l'une est incertaine du coût marginal constant de l'autre</strong>. Le coût marginal de la firme 1 est <strong>connu</strong>, et celui de la firme 2 est <strong>soit élevé soit faible, chaque possibilité étant également probable</strong>. Il n'y a pas de coûts fixes. »</em></p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>Firme</th>
+<th>Ses types</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>1</strong></td>
+<td> <strong>un seul</strong> type</td>
+</tr>
+<tr>
+<td><strong>2</strong></td>
+<td><strong>deux</strong> types — coût <strong>élevé</strong> et coût <strong>faible</strong></td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><em>« Les deux firmes ont <strong>le même ensemble de stratégies</strong>, à savoir <strong>l'ensemble des prix non négatifs</strong>. <strong>Le paiement de la firme 2 dépend de son type, mais celui de la firme 1 est INDÉPENDANT du type de la firme 2 ; il ne dépend que des prix choisis.</strong> »</em></p>
+</blockquote>
+<p><strong>La construction, en mots :</strong></p>
+<blockquote>
+<p><em>« <strong>Imaginez qu'il y a en fait TROIS firmes plutôt que deux, à savoir : la firme 1, la firme 2 à COÛT ÉLEVÉ, et la firme 2 à COÛT FAIBLE. Imaginez aussi que chacune des trois doit SIMULTANÉMENT choisir un prix et que la firme 1 croit que chacune des firmes 2 est également susceptible d'être son unique concurrent.</strong> »</em></p>
+</blockquote>
+<blockquote>
+<p class="cal piege"> <em>« <strong>Un peu de réflexion vous convaincra que cette manière de voir les choses capture MAGNIFIQUEMENT tous les traits stratégiques pertinents de la situation originale.</strong> En particulier, <strong>la firme 1 doit choisir son prix SANS SAVOIR si son concurrent a des coûts élevés ou faibles. De plus, la firme 1 comprend que le prix du concurrent peut DIFFÉRER selon ses coûts.</strong> »</em></p>
+</blockquote>
+<h3>13.3 La construction formelle</h3>
+<p><strong>Les joueurs de $G^+$</strong> : pour chaque $i$ et chaque $t_i\in T_i$, <strong>$t_i$ est un joueur de $G^+$</strong> dont l'ensemble fini de stratégies pures est <strong>$S_i$</strong>.</p>
+<p>$$\text{joueurs de } G^+ \ = \ T_1\cup\cdots\cup T_N \qquad\qquad S^+=S_1^{T_1}\times\cdots\times S_N^{T_N}$$</p>
+<blockquote>
+<p><em>(Note de bas de page 2.)</em> <em>« Nous supposons ici que <strong>les ensembles de types $T_1,\dots,T_N$ sont MUTUELLEMENT DISJOINTS. Ceci est SANS PERTE DE GÉNÉRALITÉ</strong> puisque les ensembles de types, <strong>étant finis, peuvent toujours être définis comme des sous-ensembles d'entiers</strong>, et nous pouvons toujours choisir ces entiers de sorte que $t_i&lt;t_j$ si $i&lt;j$. Dès lors, <strong>il n'y a aucune AMBIGUÏTÉ à identifier un joueur de $G^+$ par son type seul</strong>. »</em></p>
+</blockquote>
+<p><strong>Les paiements de $G^+$.</strong> Soit $s_i(t_i)\in S_i$ la stratégie pure choisie par le joueur $t_i$. Étant donnée une stratégie pure jointe $s^+\in S^+$, le paiement du joueur $t_i$ est</p>
+<p>$$\boxed{\;v_{t_i}(s^+)=\sum_{t_{-i}\in T_{-i}}p_i(t_{-i}\mid t_i)\ u_i\big(s_1(t_1),\dots,s_N(t_N),\ t_1,\dots,t_N\big)\;}$$</p>
+<div class="cal formel"><span class="lab">DÉFINITION 7.11 — Le jeu stratégique associé</span>
+<p>
+Soit $G=(p_i,T_i,S_i,u_i)_{i=1}^{N}$ un jeu d'information incomplète. Le jeu $G^+$ défini ci-dessus est <strong>le jeu sous forme stratégique ASSOCIÉ au jeu d'information incomplète $G$</strong>.</p>
+</div>
+<h3 data-prio="must">13.4  Pourquoi cette formule capture bien la situation</h3>
+<blockquote>
+<p><em>« <strong>La manière la plus simple de le voir est de comprendre la FORMULE DE PAIEMENT du joueur $i$.</strong> »</em></p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>Le morceau de la formule</th>
+<th>Ce qu'il capture</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$p_i(t_{-i}\mid t_i)$</td>
+<td><em>« <strong>le joueur $i$ est INCERTAIN des types des autres</strong> — il l'utilise pour <strong>évaluer leur probabilité</strong> »</em></td>
+</tr>
+<tr>
+<td>$s_j(t_j)$ <strong>dépend de $t_j$</strong></td>
+<td><em>« <strong>le comportement des autres joueurs peut DÉPENDRE DE LEURS TYPES</strong> »</em></td>
+</tr>
+</tbody></table>
+<p>$$\boxed{\;\text{En associant } G^+ \text{ à } G,\ \textbf{on a RÉDUIT l'étude des jeux d'information incomplète}\\\textbf{à celle des jeux d'information COMPLÈTE.}\;}$$</p>
+<h3>13.5 L'équilibre bayésien-nashien et son existence</h3>
+<div class="cal formel"><span class="lab">DÉFINITION 7.12 — Équilibre bayésien-nashien</span>
+<p>
+Un <strong>équilibre bayésien-nashien</strong> d'un jeu d'information incomplète est <strong>un équilibre de Nash du jeu sous forme stratégique associé</strong>.</p>
+</div>
+<div class="cal formel"><span class="lab">THÉORÈME 7.3 — Existence d'un équilibre bayésien-nashien</span>
+<p>
+<strong>Tout jeu FINI d'information incomplète possède au moins un équilibre bayésien-nashien.</strong></p>
+</div>
+<details class="cor">
+<summary><strong>La preuve — trois lignes</strong></summary><div class="in">
+
+<blockquote>
+<p><em>« <strong>Par la définition 7.12, il suffit de montrer que le jeu sous forme stratégique associé possède un équilibre de Nash. Parce que le jeu associé à un jeu FINI d'information incomplète est LUI-MÊME FINI, nous pouvons appliquer le THÉORÈME 7.2</strong> pour conclure qu'il possède un équilibre de Nash. »</em> $\blacksquare$</p>
+</blockquote>
+<p class="cal piege"> <strong>C'est tout le bénéfice de la construction</strong> : un théorème d'existence entièrement nouveau s'obtient <strong>gratuitement</strong>, par simple traduction.</p>
+</div></details>
+
+<h2 data-prio="high">Concept 14 — L'exemple 7.3 : Bertrand avec information incomplète</h2>
+<h3>14.1 Les données</h3>
+<table>
+<thead>
+<tr>
+<th>L'élément</th>
+<th>La valeur</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Coût marginal de la <strong>firme 1</strong></td>
+<td>$0$</td>
+</tr>
+<tr>
+<td>Coûts possibles de la <strong>firme 2</strong></td>
+<td>$1$ <em>(faible)</em> ou $4$ <em>(élevé)</em>, <strong>chacun avec probabilité $1/2$</strong></td>
+</tr>
+<tr>
+<td>La demande de marché</td>
+<td>$8-p$, où $p$ est <strong>le prix le plus bas pratiqué</strong></td>
+</tr>
+<tr>
+<td>Les prix admissibles</td>
+<td> <strong>seulement $1$, $4$ ou $6$</strong> — <em>« pour garder les choses simples »</em></td>
+</tr>
+</tbody></table>
+<h3 data-prio="must">14.2  La convention de partage — à ne pas inventer</h3>
+<blockquote>
+<p><em>« <strong>En accord avec la nature Bertrand du problème, nous avons institué la convention suivante pour déterminer les paiements quand les firmes choisissent le MÊME prix.</strong> »</em></p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>Le cas</th>
+<th>Le partage</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Les coûts des <strong>deux</strong> firmes sont <strong>strictement inférieurs</strong> au prix commun</td>
+<td><em>« <strong>le marché est partagé également</strong> entre elles »</em></td>
+</tr>
+<tr>
+<td>Sinon</td>
+<td><em>« <strong>la firme 1 capture le marché ENTIER</strong> au prix commun »</em></td>
+</tr>
+</tbody></table>
+<p><strong>La justification donnée par le livre :</strong></p>
+<blockquote>
+<p><em>« <strong>Ce partage inégal reflète l'idée que si le prix commun est au-dessus du coût de la SEULE firme 1, la firme 1 pourrait capturer le marché entier en BAISSANT LÉGÈREMENT son prix</strong> (ce que, si on le lui permettait, elle pourrait faire tout en couvrant plus que ses coûts), <strong>alors que la firme 2 ne baisserait PAS son prix (même si on le lui permettait) parce que cela entraînerait des PERTES</strong>. »</em></p>
+</blockquote>
+<h3>14.3 Le jeu d'information incomplète (figure 7.7)</h3>
+<blockquote>
+<p><strong>La firme 2 est à COÛT FAIBLE ($c=1$).</strong> <em>(paiement de 1, puis de $2_\ell$)</em></p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>$p_\ell=6$</th>
+<th>$p_\ell=4$</th>
+<th>$p_\ell=1$</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$p_1=6$</td>
+<td>$6,\ 5$</td>
+<td>$0,\ 12$</td>
+<td>$0,\ 0$</td>
+</tr>
+<tr>
+<td>$p_1=4$</td>
+<td>$16,\ 0$</td>
+<td>$8,\ 6$</td>
+<td>$0,\ 0$</td>
+</tr>
+<tr>
+<td>$p_1=1$</td>
+<td>$7,\ 0$</td>
+<td>$7,\ 0$</td>
+<td>$7,\ 0$</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>La firme 2 est à COÛT ÉLEVÉ ($c=4$).</strong> <em>(paiement de 1, puis de $2_h$)</em></p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>$p_h=6$</th>
+<th>$p_h=4$</th>
+<th>$p_h=1$</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$p_1=6$</td>
+<td>$6,\ 2$</td>
+<td>$0,\ 0$</td>
+<td>$0,\ -21$</td>
+</tr>
+<tr>
+<td>$p_1=4$</td>
+<td>$16,\ 0$</td>
+<td>$16,\ 0$</td>
+<td>$0,\ -21$</td>
+</tr>
+<tr>
+<td>$p_1=1$</td>
+<td>$7,\ 0$</td>
+<td>$7,\ 0$</td>
+<td>$7,\ 0$</td>
+</tr>
+</tbody></table>
+<h3>14.4 Le jeu stratégique associé (figure 7.8)</h3>
+<blockquote>
+<p>*« Le jeu associé est un jeu à <strong>TROIS joueurs : la firme 1, la firme $2_\ell$ (coût faible), et la firme $2_h$ (coût élevé)</strong>. Chacune a le même ensemble de stratégies pures, à savoir $\{1,4,6\}$. »*</p>
+</blockquote>
+<blockquote>
+<p><em>« Comme il y a trois joueurs, <strong>le choix de prix de la firme 1 détermine LA MATRICE</strong>, et les prix de $2_\ell$ et $2_h$ déterminent <strong>la LIGNE et la COLONNE</strong> de la matrice choisie. »</em></p>
+</blockquote>
+<p><strong>Matrice « la firme 1 choisit $p_1=6$ » :</strong></p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>$p_h=6$</th>
+<th>$p_h=4$</th>
+<th>$p_h=1$</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$p_\ell=6$</td>
+<td>$6,\ 5,\ 2$</td>
+<td>$3,\ 5,\ 0$</td>
+<td>$3,\ 5,\ -21$</td>
+</tr>
+<tr>
+<td>$p_\ell=4$</td>
+<td>$3,\ 12,\ 2$</td>
+<td>$0,\ 12,\ 0$</td>
+<td>$0,\ 12,\ -21$</td>
+</tr>
+<tr>
+<td>$p_\ell=1$</td>
+<td>$3,\ 0,\ 2$</td>
+<td>$0,\ 0,\ 0$</td>
+<td>$0,\ 0,\ -21$</td>
+</tr>
+</tbody></table>
+<p><strong>Matrice « la firme 1 choisit $p_1=4$ » :</strong></p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>$p_h=6$</th>
+<th>$p_h=4$</th>
+<th>$p_h=1$</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$p_\ell=6$</td>
+<td>$16,\ 0,\ 0$</td>
+<td>$16,\ 0,\ 0$</td>
+<td>$8,\ 0,\ -21$</td>
+</tr>
+<tr>
+<td>$p_\ell=4$</td>
+<td>$12,\ 6,\ 0$</td>
+<td>$12,\ 6,\ 0$</td>
+<td>$4,\ 6,\ -21$</td>
+</tr>
+<tr>
+<td>$p_\ell=1$</td>
+<td>$8,\ 0,\ 0$</td>
+<td>$8,\ 0,\ 0$</td>
+<td>$0,\ 0,\ -21$</td>
+</tr>
+</tbody></table>
+<p><strong>Matrice « la firme 1 choisit $p_1=1$ » :</strong> toutes les entrées sont $7,\ 0,\ 0$.</p>
+<h3 data-prio="must">14.5  Comment les paiements sont obtenus</h3>
+<p><strong>Pour $2_\ell$ et $2_h$ — par simple lecture :</strong></p>
+<blockquote>
+<p><em>« Les paiements dans le jeu associé pour les firmes $2_\ell$ et $2_h$ peuvent être obtenus <strong>en les LISANT SIMPLEMENT sur les matrices de la figure 7.7. C'est parce qu'il n'y a qu'UN SEUL « type » de firme 1.</strong> »</em></p>
+</blockquote>
+<blockquote>
+<p><em>« Par exemple, si $2_\ell$ choisit $p_\ell=6$, elle reçoit $5$ si la firme 1 choisit $p_1=6$. <strong>Notez que ceci est reflété dans le jeu associé, où le paiement de $2_\ell$ est $5$ […] QUEL QUE SOIT le prix choisi par $2_h$.</strong> »</em></p>
+</blockquote>
+<p><strong>Pour la firme 1 — par ESPÉRANCE :</strong></p>
+<blockquote>
+<p><em>« Les paiements de la firme 1 sont obtenus <strong>en considérant ses CROYANCES sur les coûts de la firme 2</strong>. »</em></p>
+</blockquote>
+<p><strong>L'exemple travaillé du livre</strong> — $p_\ell=1$, $p_h=6$, $p_1=4$ :</p>
+<table>
+<thead>
+<tr>
+<th>Si le coût de 2 est…</th>
+<th>Le paiement de 1 <em>(fig. 7.7)</em></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>faible</strong> <em>(elle affronte $2_\ell$ à $p_\ell=1$)</em></td>
+<td>$0$</td>
+</tr>
+<tr>
+<td><strong>élevé</strong> <em>(elle affronte $2_h$ à $p_h=6$)</em></td>
+<td>$16$</td>
+</tr>
+</tbody></table>
+<p>$$\text{Espérance} \ =\ \tfrac12(0)+\tfrac12(16)\ =\ \boxed{8}$$</p>
+<blockquote>
+<p><em>« <strong>Ceci est précisément le paiement de la firme 1 correspondant à $p_1=4$, $p_\ell=1$ et $p_h=6$ dans la figure 7.8.</strong> »</em></p>
+</blockquote>
+<h3>14.6 La résolution</h3>
+<blockquote>
+<p><em>« Pour découvrir un équilibre bayésien-nashien, <strong>nous devons chercher un équilibre de Nash du jeu associé de la figure 7.8</strong>. »</em></p>
+</blockquote>
+<blockquote>
+<p><em>« <strong>Trouver UN équilibre de Nash est particulièrement facile ici.</strong> »</em></p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>Le joueur</th>
+<th>Sa stratégie</th>
+<th>Son statut</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$2_\ell$</td>
+<td><strong>prix $4$</strong></td>
+<td><strong>faiblement dominante</strong></td>
+</tr>
+<tr>
+<td>$2_h$</td>
+<td><strong>prix $6$</strong></td>
+<td><strong>faiblement dominante</strong></td>
+</tr>
+<tr>
+<td>$1$</td>
+<td><strong>prix $4$</strong></td>
+<td> <strong>strictement dominante</strong> <em>une fois les autres éliminées</em></td>
+</tr>
+</tbody></table>
+<p><strong>La vérification pour la firme 1</strong>, avec $p_\ell=4$ et $p_h=6$ :</p>
+<p>$$p_1=6\ \Rightarrow\ 3 \qquad\qquad \boxed{p_1=4\ \Rightarrow\ 12} \qquad\qquad p_1=1\ \Rightarrow\ 7$$</p>
+<blockquote>
+<p><em>« Par conséquent, <strong>il y a un équilibre bayésien-nashien en stratégies PURES dans lequel DEUX des trois firmes choisissent un prix de 4 tandis que la troisième choisit un prix de 6</strong>. »</em></p>
+</blockquote>
+<h3 data-prio="must">14.7  La leçon économique</h3>
+<blockquote>
+<p><em>« Notez qu'<strong>EN CONTRASTE avec le cas de la concurrence de Bertrand en information COMPLÈTE, les PROFITS NE SONT PAS RAMENÉS À ZÉRO ici. En effet, seule la firme 2 à coût ÉLEVÉ gagne un profit nul dans l'équilibre décrit.</strong> »</em></p>
+</blockquote>
+<p><strong>Comparez à la fiche 509</strong> : en Bertrand avec information complète et coûts identiques, $p=c$ et les profits sont <strong>nuls</strong>.  <strong>L'incertitude sur les coûts du rival suffit à faire disparaître ce résultat.</strong></p>
+<h2>Comment reconnaître le type d'exercice</h2>
+<table>
+<thead>
+<tr>
+<th>Signal dans l'énoncé</th>
+<th>Famille</th>
+<th>Marche à suivre</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>« formuler le jeu sous forme stratégique »</td>
+<td><strong>Définition 7.1</strong></td>
+<td>Nommer $S_i$ et écrire $u_i$ comme fonction du <strong>profil complet</strong></td>
+</tr>
+<tr>
+<td>Une matrice à résoudre « par élimination »</td>
+<td><strong>Déf. 7.3-7.6</strong></td>
+<td>Chercher les <strong>dominées</strong>, éliminer, <strong>recommencer</strong></td>
+</tr>
+<tr>
+<td>« l'ordre d'élimination importe-t-il ? »</td>
+<td><strong>Exercice 7.3</strong></td>
+<td> <strong>Oui</strong> pour la faible, <strong>non</strong> pour la stricte</td>
+</tr>
+<tr>
+<td>« une stratégie mixte peut-elle dominer ? »</td>
+<td><strong>Exercice 7.4</strong></td>
+<td>Chercher un <strong>mélange</strong> qui bat une pure — c'est possible</td>
+</tr>
+<tr>
+<td>« devine la moyenne »</td>
+<td><strong>§7.2.1</strong></td>
+<td>$100\to33\to11\to\dots\to1$</td>
+</tr>
+<tr>
+<td>« trouver tous les équilibres de Nash »</td>
+<td><strong>Théorème 7.1(b)</strong></td>
+<td>Poser l'<strong>indifférence</strong> sur le support, résoudre</td>
+</tr>
+<tr>
+<td>« vérifier que c'est un équilibre »</td>
+<td><strong>Théorème 7.1(c)</strong></td>
+<td>Tester <strong>seulement les stratégies pures</strong></td>
+</tr>
+<tr>
+<td>Aucun équilibre pur visible</td>
+<td><strong>Stratégies mixtes</strong></td>
+<td>Chercher un équilibre <strong>complètement mixte</strong></td>
+</tr>
+<tr>
+<td>Un jeu à <strong>somme nulle</strong></td>
+<td><strong>Exercice 7.7</strong></td>
+<td>Théorème du <strong>minimax</strong> ; équilibres <strong>interchangeables</strong> ; <strong>valeur</strong> unique</td>
+</tr>
+<tr>
+<td>Un jeu <strong>symétrique</strong></td>
+<td><strong>Exercice 7.8</strong></td>
+<td>Il possède un équilibre <strong>symétrique</strong></td>
+</tr>
+<tr>
+<td>Des coûts / valeurs <strong>privés</strong></td>
+<td><strong>§7.2.3</strong></td>
+<td>Construire $G^+$ : <strong>un joueur par TYPE</strong></td>
+</tr>
+<tr>
+<td>« croyances cohérentes »</td>
+<td><strong>A priori commun</strong></td>
+<td>Appliquer <strong>Bayes</strong> à $p$</td>
+</tr>
+</tbody></table>
+<p><strong>Les trois réflexes de cadrage :</strong></p>
+<ol>
+<li><strong>Toujours chercher les dominées d'abord.</strong> Elles réduisent le jeu <strong>gratuitement</strong>, et parfois le résolvent.</li>
+<li><strong>Pour un équilibre mixte, poser l'indifférence — pas la maximisation.</strong> C'est le théorème 7.1(b).</li>
+<li><strong>Devant de l'information incomplète, compter les JOUEURS de $G^+$</strong>, pas ceux de $G$. Un joueur à $k$ types en fournit $k$.</li>
+</ol>
+<h2>Comment résoudre ce type d'exercice — les cinq méthodes</h2>
+<h3>Méthode 1 — Résoudre par élimination itérative</h3>
+<ol>
+<li><strong>Balayer les lignes</strong> <em>(joueur 1)</em> : une ligne est-elle <strong>partout</strong> strictement inférieure à une autre ?</li>
+<li><strong>Balayer les colonnes</strong> <em>(joueur 2)</em> de même.</li>
+<li><strong>Éliminer</strong>, redessiner la matrice réduite.</li>
+<li><strong>Recommencer</strong> —  des dominances <strong>nouvelles</strong> apparaissent.</li>
+<li>S'arrêter quand plus rien ne bouge.</li>
+<li> Si l'on utilise la dominance <strong>faible</strong>, <strong>noter l'ordre</strong> — le résultat peut en dépendre.</li>
+</ol>
+<h3>Méthode 2 — Trouver tous les équilibres de Nash d'un jeu $2\times2$</h3>
+<ol>
+<li><strong>Les purs</strong> : pour chaque case, vérifier <strong>deux</strong> déviations unilatérales.</li>
+<li><strong>Le mixte</strong> : poser $p$ et $q$ les probabilités des <strong>premières</strong> stratégies.</li>
+<li><strong>Écrire l'indifférence de 1</strong> —  <strong>en fonction de $q$</strong>, la probabilité de <strong>l'AUTRE</strong>.</li>
+<li><strong>Écrire l'indifférence de 2</strong> — en fonction de $p$.</li>
+<li><strong>Résoudre les deux équations séparément</strong> : chacune ne contient <strong>qu'une</strong> inconnue.</li>
+<li><strong>Vérifier</strong> $p,q\in(0,1)$ ; sinon il n'y a pas d'équilibre complètement mixte.</li>
+</ol>
+<p class="cal piege"> <strong>Le piège</strong> : l'indifférence du joueur 1 détermine <strong>$q$</strong>, pas $p$.</p>
+<h3>Méthode 3 — Dérouler la preuve du théorème 7.2</h3>
+<table>
+<thead>
+<tr>
+<th>Pas</th>
+<th>Ce qu'on fait</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>1</strong></td>
+<td>Construire $f_{ij}(m)=\dfrac{m_{ij}+\max(0,u_i(j,m_{-i})-u_i(m))}{1+\sum_{j'}\max(0,u_i(j',m_{-i})-u_i(m))}$ ; vérifier $f(m)\in M$</td>
+</tr>
+<tr>
+<td><strong>2</strong></td>
+<td>Numérateur <strong>continu</strong>, dénominateur <strong>continu et $\geq1$</strong> ⟹ $f$ continue ; $M$ <strong>non vide, compact, convexe</strong> ⟹ <strong>BROUWER</strong></td>
+</tr>
+<tr>
+<td><strong>3</strong></td>
+<td>Au point fixe : multiplier en croix, <strong>multiplier par $u_i(j,\hat m_{-i})-u_i(\hat m)$ et sommer sur $j$</strong> ; le membre de gauche est <strong>nul</strong> ; chaque terme de droite est $x\max(0,x)\geq0$ ⟹ <strong>tous nuls</strong> ⟹ <strong>théorème 7.1(c)</strong></td>
+</tr>
+</tbody></table>
+<h3>Méthode 4 — Construire le jeu stratégique associé $G^+$</h3>
+<ol>
+<li><strong>Lister les types</strong> de chaque joueur : $T_1,\dots,T_N$.</li>
+<li><strong>Créer un joueur par type</strong> — $|T_1|+\cdots+|T_N|$ joueurs en tout.</li>
+<li><strong>Donner à $t_i$ l'ensemble de stratégies $S_i$</strong> — celui de son joueur d'origine.</li>
+<li><strong>Calculer les paiements</strong> : pour chaque $t_i$, prendre <strong>l'espérance sur $t_{-i}$</strong> avec les poids $p_i(t_{-i}\mid t_i)$.</li>
+<li> <strong>Un joueur à type unique lit ses paiements DIRECTEMENT</strong> ; ceux à plusieurs types les moyennent.</li>
+<li><strong>Chercher un équilibre de Nash de $G^+$</strong> — c'est l'équilibre bayésien-nashien.</li>
+</ol>
+<h3>Méthode 5 — Reconnaître qu'un équilibre pur n'existe pas</h3>
+<ol>
+<li><strong>Encadrer, dans chaque colonne, le meilleur paiement du joueur en ligne.</strong></li>
+<li><strong>Encadrer, dans chaque ligne, le meilleur paiement du joueur en colonne.</strong></li>
+<li><strong>Un équilibre pur est une case DOUBLEMENT encadrée.</strong></li>
+<li>S'il n'y en a aucune, <strong>il faut passer aux mixtes</strong> — et le théorème 7.2 garantit qu'il en existe.</li>
+</ol>
+<h2 data-prio="must">Common mistakes</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>L'erreur</th>
+<th>Pourquoi c'est faux</th>
+<th>Ce qu'il faut écrire</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>Oublier ce qui définit une situation stratégique</td>
+<td> <em>« chaque agent doit d'abord <strong>connaître la décision des autres</strong> avant de savoir laquelle est la meilleure pour lui »</em></td>
+<td>C'est <strong>la circularité</strong></td>
+</tr>
+<tr>
+<td>2</td>
+<td>Croire que le meilleur lancer est la balle rapide</td>
+<td> <em>« une telle décision <strong>non stratégique</strong> ne tient pas compte de la décision du batteur »</em></td>
+<td>Il la <strong>frappera</strong></td>
+</tr>
+<tr>
+<td>3</td>
+<td>Croire que l'imprévisibilité est un choix</td>
+<td> Elle est <strong>forcée</strong> par le raisonnement par l'absurde</td>
+<td>Prévisible ⟹ contradiction</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Croire que l'imprévisibilité aide toujours</td>
+<td> <em>« <strong>quand vous êtes SEUL, il n'y a personne à TROMPER</strong> »</em></td>
+<td>Seulement en cadre <strong>stratégique</strong></td>
+</tr>
+<tr>
+<td>5</td>
+<td>Confondre dominante et dominée</td>
+<td><strong>Dominante</strong> : bat <strong>toutes</strong> les autres · <strong>dominée</strong> : est battue par <strong>une</strong> autre</td>
+<td>Déf. 7.2 vs 7.3</td>
+</tr>
+<tr>
+<td>6</td>
+<td>Croire que les stratégies dominantes sont fréquentes</td>
+<td> <em>« <strong>plutôt RARE</strong> »</em></td>
+<td>D'où l'intérêt de la dominance <strong>d'une sur une</strong></td>
+</tr>
+<tr>
+<td>7</td>
+<td>Ne faire qu'un seul tour d'élimination</td>
+<td> <em>« $R$ <strong>n'est pas</strong> strictement dominée dans le jeu ORIGINAL, mais elle l'est dans le jeu RÉDUIT »</em></td>
+<td><strong>La dominance crée de la dominance</strong></td>
+</tr>
+<tr>
+<td>8</td>
+<td>Oublier « au moins une inégalité stricte » dans la dominance faible</td>
+<td>Sans elle, toute stratégie « dominerait » sa copie</td>
+<td>Déf. 7.5</td>
+</tr>
+<tr>
+<td>9</td>
+<td>Croire que dominance faible et stricte donnent le même résultat</td>
+<td> Fig. 7.4 : la stricte n'élimine <strong>rien</strong>, la faible isole $(U,L)$</td>
+<td>Ce sont deux procédures</td>
+</tr>
+<tr>
+<td>10</td>
+<td>Croire que la faible élimine moins</td>
+<td> Elle élimine <strong>PLUS</strong> : $\bigcap W_i^n\subseteq\bigcap S_i^n$</td>
+<td>Exercice 7.6</td>
+</tr>
+<tr>
+<td>11</td>
+<td>Croire que l'ordre d'élimination est indifférent</td>
+<td> <strong>Pour la faible, il compte</strong> <em>(ex. 7.3(a))</em> ; pour la stricte, non <em>(7.3(b))</em></td>
+<td>La faible est <strong>fragile</strong></td>
+</tr>
+<tr>
+<td>12</td>
+<td>Dans « devine la moyenne », croire que 33 domine <strong>strictement</strong></td>
+<td> C'est une dominance <strong>FAIBLE</strong> — égalité dans la plupart des cas</td>
+<td>Le cas strict : <em>« si tous les autres choisissent 34 »</em></td>
+</tr>
+<tr>
+<td>13</td>
+<td>Croire que 99 est strictement dominée</td>
+<td> <em>« montrer que <strong>99 n'est PAS strictement dominée</strong> »</em> <em>(ex. 7.5(c))</em></td>
+<td>Attention à la nuance</td>
+</tr>
+<tr>
+<td>14</td>
+<td>Croire qu'un équilibre pur existe toujours</td>
+<td> <strong>Le duel batteur-lanceur n'en a aucun</strong></td>
+<td>D'où les mixtes</td>
+</tr>
+<tr>
+<td>15</td>
+<td>Croire que l'équilibre de Nash est unique</td>
+<td> Fig. 7.4 a $(U,L)$ <strong>et</strong> $(D,R)$ ; l'exemple 7.1 en a <strong>trois</strong></td>
+<td>La multiplicité est la règle</td>
+</tr>
+<tr>
+<td>16</td>
+<td>Ne tester qu'une déviation par équilibre pur</td>
+<td>Il en faut <strong>une par joueur</strong></td>
+<td>Fixer les autres, faire varier <strong>un seul</strong></td>
+</tr>
+<tr>
+<td>17</td>
+<td>Oublier pourquoi le duel n'a pas d'équilibre pur</td>
+<td> <em>« dans un équilibre pur, <strong>les choix de tout le monde sont PARFAITEMENT PRÉVISIBLES</strong> »</em></td>
+<td>Contradiction avec le §7.1</td>
+</tr>
+<tr>
+<td>18</td>
+<td>Croire que les mixtes ajoutent seulement des mélanges</td>
+<td> Elles donnent <strong>strictement plus</strong> de choix, les pures y étant les <strong>distributions dégénérées</strong></td>
+<td>$S_i\subset M_i$</td>
+</tr>
+<tr>
+<td>19</td>
+<td>Oublier pourquoi $u_i(m)$ est un <strong>produit</strong> de probabilités</td>
+<td> <em>« parce que <strong>les joueurs choisissent leurs stratégies INDÉPENDAMMENT</strong> »</em></td>
+<td>$m_1(s_1)\cdots m_N(s_N)$</td>
+</tr>
+<tr>
+<td>20</td>
+<td>Croire qu'il faut tester toutes les mixtes</td>
+<td> Le théorème 7.1(c) : <strong>les pures suffisent</strong></td>
+<td>Grâce à la <strong>linéarité</strong></td>
+</tr>
+<tr>
+<td>21</td>
+<td>Mal appliquer le théorème 7.1(b)</td>
+<td> <strong>Égalité</strong> sur le support, <strong>$\geq$</strong> hors du support</td>
+<td>Deux conditions, pas une</td>
+</tr>
+<tr>
+<td>22</td>
+<td>Résoudre l'indifférence de 1 pour trouver $p$</td>
+<td> Elle donne <strong>$q$</strong> — la probabilité de <strong>l'autre</strong></td>
+<td>Le piège classique</td>
+</tr>
+<tr>
+<td>23</td>
+<td>Croire que l'équilibre mixte est efficace</td>
+<td> Exemple 7.1 : paiement $2/3$, <strong>pire que les deux purs</strong></td>
+<td>Il est <strong>inefficace</strong></td>
+</tr>
+<tr>
+<td>24</td>
+<td>Croire qu'un équilibre mixte signifie randomisation</td>
+<td> <strong>Deux</strong> interprétations : la <strong>roulette</strong> ou les <strong>croyances</strong></td>
+<td>Le contexte tranche</td>
+</tr>
+<tr>
+<td>25</td>
+<td>Croire que le théorème 7.2 vaut pour tout jeu</td>
+<td> <strong>Jeux FINIS</strong> seulement</td>
+<td>Il faut $S_i$ fini</td>
+</tr>
+<tr>
+<td>26</td>
+<td>Oublier pourquoi $M$ satisfait Brouwer</td>
+<td> <strong>Non vide, compact, convexe</strong> — les trois</td>
+<td>Un simplexe</td>
+</tr>
+<tr>
+<td>27</td>
+<td>Oublier pourquoi le dénominateur de $f$ ne s'annule pas</td>
+<td> <em>« il n'est <strong>JAMAIS inférieur à UN</strong> »</em></td>
+<td>Somme de $\max(0,\cdot)\geq0$, plus 1</td>
+</tr>
+<tr>
+<td>28</td>
+<td>Se tromper dans le pas 3</td>
+<td> Il faut <strong>multiplier par $u_i(j,\hat m_{-i})-u_i(\hat m)$ PUIS sommer sur $j$</strong></td>
+<td>Sans cela, rien ne se simplifie</td>
+</tr>
+<tr>
+<td>29</td>
+<td>Ne pas voir pourquoi le membre de gauche est nul</td>
+<td> $\sum_j\hat m_{ij}u_i(j,\hat m_{-i})=u_i(\hat m)$ — <strong>les $m_{ij}$ somment à 1</strong></td>
+<td>C'est la définition de $u_i(m)$</td>
+</tr>
+<tr>
+<td>30</td>
+<td>Ne pas voir pourquoi chaque terme est $\geq0$</td>
+<td> $x\cdot\max(0,x)=\max(0,x)^2\geq0$</td>
+<td>Somme nulle ⟹ tous nuls</td>
+</tr>
+<tr>
+<td>31</td>
+<td>Sous-estimer la portée du théorème 7.2</td>
+<td> <em>« si les équilibres existaient rarement, ceci indiquerait une <strong>INCOHÉRENCE FONDAMENTALE</strong> dans la définition »</em></td>
+<td>Une <strong>mesure de solidité</strong></td>
+</tr>
+<tr>
+<td>32</td>
+<td>Croire que l'information incomplète exige une théorie nouvelle</td>
+<td> <em>« l'idée est de lui <strong>AJOUTER un ingrédient</strong> de sorte qu'elle devienne un jeu sous forme stratégique »</em></td>
+<td>Harsanyi (1967-68)</td>
+</tr>
+<tr>
+<td>33</td>
+<td>Croire que $u_i$ ne dépend que de son propre type</td>
+<td> $u_i:S\times T\to\mathbb{R}$ — <strong>elle dépend de TOUS les types</strong></td>
+<td>Cf. l'enchère pétrolière</td>
+</tr>
+<tr>
+<td>34</td>
+<td>Croire que l'a priori commun est obligatoire</td>
+<td> <em>« notre capacité à analyser <strong>ne requerra PAS</strong> l'hypothèse d'a priori commun »</em></td>
+<td>Le livre ne l'impose pas</td>
+</tr>
+<tr>
+<td>35</td>
+<td>Confondre les deux lectures de l'a priori commun</td>
+<td><strong>(1)</strong> distribution <strong>empirique objective</strong> · <strong>(2)</strong> <em>« les différences de croyances ne viennent <strong>que</strong> de différences d'information »</em></td>
+<td>Deux justifications distinctes</td>
+</tr>
+<tr>
+<td>36</td>
+<td>Dans $G^+$, garder $N$ joueurs</td>
+<td> <strong>Chaque TYPE devient UN JOUEUR</strong></td>
+<td>$T_1\cup\cdots\cup T_N$</td>
+</tr>
+<tr>
+<td>37</td>
+<td>Calculer les paiements de $G^+$ sans espérance</td>
+<td> $v_{t_i}(s^+)=\sum_{t_{-i}}p_i(t_{-i}\mid t_i)\,u_i(\cdot)$</td>
+<td>Un joueur à type <strong>unique</strong> lit directement</td>
+</tr>
+<tr>
+<td>38</td>
+<td>Oublier que les $s_j$ <strong>dépendent de $t_j$</strong></td>
+<td> <em>« le comportement des autres <strong>peut dépendre de leurs types</strong> »</em></td>
+<td>C'est $s_j(t_j)$, pas $s_j$</td>
+</tr>
+<tr>
+<td>39</td>
+<td>Croire que le théorème 7.3 exige une preuve nouvelle</td>
+<td> <strong>Trois lignes</strong> — $G^+$ est fini, donc théorème 7.2</td>
+<td>Tout le bénéfice de la construction</td>
+</tr>
+<tr>
+<td>40</td>
+<td>Dans l'exemple 7.3, inventer la règle de partage</td>
+<td> Elle est <strong>stipulée</strong> : partage égal si <strong>les deux</strong> coûts sont sous le prix, sinon <strong>1 prend tout</strong></td>
+<td>Elle a une <strong>justification Bertrand</strong></td>
+</tr>
+<tr>
+<td>41</td>
+<td>Croire que Bertrand annule toujours les profits</td>
+<td> <em>« <strong>en contraste avec l'information complète, les profits NE SONT PAS ramenés à zéro</strong> »</em></td>
+<td>Seule $2_h$ gagne zéro</td>
+</tr>
+</tbody></table>
+<h2>Ultimate Review</h2>
+<p><strong>§7.1 — la décision stratégique.</strong></p>
+<blockquote>
+<p><em>« <strong>La théorie des jeux est l'étude systématique de la manière dont des agents rationnels se comportent dans des JEUX, où chaque agent doit d'abord CONNAÎTRE la décision des autres avant de savoir laquelle est la meilleure pour lui-même.</strong> »</em></p>
+</blockquote>
+<p>$$\boxed{\;\textbf{« CETTE CIRCULARITÉ est la MARQUE de la théorie des jeux. »}\;}$$</p>
+<p><strong>Les six concepts de solution du chapitre</strong> : dominance → <strong>Nash</strong> → <strong>Bayes-Nash</strong> → induction à rebours → perfection en sous-jeux → équilibre séquentiel.  <em>« Chacun est plus <strong>sophistiqué</strong> que ses prédécesseurs. »</em></p>
+<p><strong>LE DUEL BATTEUR-LANCEUR (fig. 7.1)</strong> — chaque joueur gagne s'il <strong>devine</strong> l'autre :</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>$F$</th>
+<th>$C$</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$F$</td>
+<td>$-1,1$</td>
+<td>$1,-1$</td>
+</tr>
+<tr>
+<td>$C$</td>
+<td>$1,-1$</td>
+<td>$-1,1$</td>
+</tr>
+</tbody></table>
+<p><strong>L'argument d'imprévisibilité</strong> : « toujours $F$ » ⟹ le batteur prépare $F$ ⟹ le lanceur doit jouer $C$ ⟹ <strong>contredit l'hypothèse</strong>.</p>
+<blockquote>
+<p><em>« <strong>Tout bon joueur de poker le comprend bien — c'est un aspect essentiel du BLUFF réussi.</strong> »</em>  Mais <em>« quand vous êtes <strong>seul</strong>, il n'y a personne à <strong>tromper</strong> »</em>.</p>
+</blockquote>
+<p><strong>§7.2 — la forme stratégique.</strong></p>
+<p><strong>DÉF. 7.1</strong> : $G=(S_i,u_i)_{i=1}^{N}$ avec $u_i:\prod_j S_j\to\mathbb{R}$. <strong>FINI</strong> si chaque $S_i$ l'est.</p>
+<p><strong>Notation</strong> : $S=S_1\times\cdots\times S_N$, et $-i$ = <strong>tous sauf $i$</strong>.</p>
+<p><strong>§7.2.1 — la dominance.</strong></p>
+<p><strong>DÉF. 7.2 — dominante stricte</strong> : $u_i(\hat s_i,s_{-i})&gt;u_i(s_i,s_{-i})$ pour <strong>tous</strong> $s_i\neq\hat s_i$ et tous $s_{-i}$.  <em>« plutôt RARE »</em>.
+<strong>DÉF. 7.3 — strictement dominée</strong> : $\hat s_i$ bat $\bar s_i$ pour tout $s_{-i}$.
+<strong>DÉF. 7.4 — itérativement non dominée</strong> : $s_i\in S_i^n$ pour tout $n$.
+<strong>DÉF. 7.5 — faiblement dominée</strong> : $\geq$ partout,  <strong>avec au moins une STRICTE</strong>.
+<strong>DÉF. 7.6</strong> : $s_i\in W_i^n$ pour tout $n$.</p>
+<p>$$\bigcap_n W_i^n\ \subseteq\ \bigcap_n S_i^n \qquad\text{(exercice 7.6)}$$</p>
+<p class="cal piege"> <strong>Le fait moteur</strong> : <em>« $R$ n'est pas dominée dans le jeu <strong>original</strong>, mais elle l'est dans le jeu <strong>réduit</strong> »</em> — <strong>la dominance CRÉE de la dominance</strong>.</p>
+<p class="cal piege"> <strong>Fragilité</strong> : l'<strong>ordre</strong> compte pour la dominance <strong>faible</strong> <em>(ex. 7.3(a))</em>, pas pour la <strong>stricte</strong> <em>(7.3(b))</em>.</p>
+<p><strong>« DEVINE LA MOYENNE »</strong> : $N\geq2$ joueurs, entier de 1 à 100, le plus proche du <strong>tiers de la moyenne</strong> gagne.</p>
+<p>$$100 \ \xrightarrow{\ \text{moy}/3\leq33\tfrac13\ } \ 33 \ \longrightarrow\ 11 \ \longrightarrow\ \dots \ \longrightarrow\ \boxed{1}$$</p>
+<p><em>(Exercice 7.5 : la dominance <strong>stricte</strong> y arrive aussi — <strong>en 99 tours</strong> ; avec $N=3$, la faible donne $14$, puis $2$, puis $1$.)</em></p>
+<p><strong>§7.2.2 — l'équilibre de Nash.</strong></p>
+<p><strong>DÉF. 7.7 — en stratégies PURES</strong> : $u_i(\hat s)\geq u_i(s_i,\hat s_{-i})$ pour tout $s_i$.</p>
+<p class="cal piege"> <strong>Le duel n'en a AUCUN</strong> — car <em>« dans un équilibre pur, <strong>les choix de tout le monde sont PARFAITEMENT PRÉVISIBLES</strong> »</em>.</p>
+<p><strong>DÉF. 7.8 — stratégie MIXTE</strong> : $m_i:S_i\to[0,1]$ avec $\sum_{s_i}m_i(s_i)=1$. <em>« Une <strong>ROULETTE</strong>. »</em></p>
+<p>$$u_i(m)\equiv\sum_{s\in S}m_1(s_1)\cdots m_N(s_N)\,u_i(s) \qquad \text{(les choix sont INDÉPENDANTS)}$$</p>
+<p><strong>DÉF. 7.9 — Nash</strong> : $u_i(\hat m)\geq u_i(m_i,\hat m_{-i})$ pour toute $m_i\in M_i$.</p>
+<p><strong>THÉORÈME 7.1 — les tests simplifiés.</strong> Équivalence de :</p>
+<p><strong>(a)</strong> $\hat m$ est un équilibre ·
+<strong>(b)</strong> <strong>égalité</strong> sur le support, <strong>$\geq$</strong> hors du support ·
+<strong>(c)</strong> $u_i(\hat m)\geq u_i(s_i,\hat m_{-i})$ pour toute <strong>pure</strong> $s_i$.</p>
+<p>$$\boxed{\;\textbf{(b) pour CALCULER} \qquad \textbf{(c) pour VÉRIFIER}\;}$$</p>
+<p><em>Preuve : (a)⟹(b) car $u_i(\hat m)$ est une <strong>combinaison convexe stricte</strong> des $u_i(s_i,\hat m_{-i})$ du support ; (c)⟹(a) car $u_i(m_i,\hat m_{-i})$ est une <strong>combinaison convexe</strong> des mêmes nombres. <strong>Tout repose sur la LINÉARITÉ de $u_i$ en $m_i$.</strong></em></p>
+<p><strong>EXEMPLE 7.1 — le jeu de coordination.</strong></p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>$WP$</th>
+<th>$MW$</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$WP$</td>
+<td>$2,1$</td>
+<td>$0,0$</td>
+</tr>
+<tr>
+<td>$MW$</td>
+<td>$0,0$</td>
+<td>$1,2$</td>
+</tr>
+</tbody></table>
+<p>Deux équilibres <strong>purs</strong> ; l'équilibre <strong>mixte</strong> résout $2q=1-q$ et $1-p=2p$ ⟹ $\boxed{p=q=\tfrac13}$.</p>
+<p class="cal piege"> <strong>Trois enseignements</strong> : <strong>multiplicité</strong> · l'équilibre mixte est <strong>INEFFICACE</strong> <em>(paiement $2/3$)</em> · <strong>un équilibre mixte existe même sans désir d'imprévisibilité</strong>.</p>
+<p><strong>LES DEUX INTERPRÉTATIONS d'une stratégie mixte :</strong></p>
+<table>
+<thead>
+<tr>
+<th>Interprétation</th>
+<th>Quand</th>
+<th>Exemple</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>La roulette</strong> — randomisation délibérée</td>
+<td>intérêts <strong>OPPOSÉS</strong></td>
+<td>duel batteur-lanceur</td>
+</tr>
+<tr>
+<td><strong>Les croyances</strong> des autres —  <em>« aucun joueur ne randomise explicitement »</em></td>
+<td>intérêts qui <strong>COÏNCIDENT</strong> en partie</td>
+<td>fig. 7.6</td>
+</tr>
+</tbody></table>
+<p><strong>THÉORÈME 7.2 — (Nash) existence.</strong></p>
+<p>$$\boxed{\;\textbf{TOUT jeu sous forme stratégique FINI possède au moins un équilibre de Nash.}\;}$$</p>
+<table>
+<thead>
+<tr>
+<th>Pas</th>
+<th>Le contenu</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>1</strong></td>
+<td>$f_{ij}(m)=\dfrac{m_{ij}+\max(0,u_i(j,m_{-i})-u_i(m))}{1+\sum_{j'}\max(0,u_i(j',m_{-i})-u_i(m))}$ — elle <strong>pousse le poids vers ce qui fait mieux que la moyenne</strong> ; $f(m)\in M$</td>
+</tr>
+<tr>
+<td><strong>2</strong></td>
+<td>Numérateur continu, dénominateur continu et <strong>$\geq1$</strong> ⟹ $f$ continue ; $M$ <strong>non vide, compact, convexe</strong> ⟹ <strong>BROUWER (A1.11)</strong> ⟹ point fixe $\hat m$</td>
+</tr>
+<tr>
+<td><strong>3</strong></td>
+<td>$\hat m_{ij}\sum_{j'}\max(0,\cdot)=\max(0,\cdot)$ ; multiplier par $u_i(j,\hat m_{-i})-u_i(\hat m)$ et <strong>sommer sur $j$</strong> ; le membre de gauche vaut <strong>0</strong> ; chaque terme de droite est $x\max(0,x)\geq0$ ⟹ tous <strong>nuls</strong> ⟹ <strong>thm 7.1(c)</strong></td>
+</tr>
+</tbody></table>
+<p class="cal piege"> <strong>La portée conceptuelle</strong> : <em>« si les équilibres existaient rarement, ceci indiquerait une <strong>incohérence fondamentale dans la définition</strong>. Qu'ils existent toujours dans les jeux finis est <strong>une mesure de la solidité de l'idée</strong>. »</em></p>
+<p><strong>§7.2.3 — l'information incomplète.</strong></p>
+<p>$$\boxed{\;\text{On ne construit pas une théorie nouvelle — on RAMÈNE l'incomplet au complet.}\;}$$</p>
+<p><strong>Les objets nouveaux</strong> : des <strong>TYPES</strong> $T_i$ finis, des paiements $u_i:S\times T\to\mathbb{R}$  <em>(dépendant de TOUS les types)</em>, et des <strong>CROYANCES</strong> $p_i(t_{-i}\mid t_i)$.</p>
+<p><strong>L'A PRIORI COMMUN</strong> : quand tous les $p_i$ viennent d'un même $p$ par <strong>Bayes</strong> :</p>
+<p>$$p_i(t_{-i}\mid t_i)=\frac{p(t_i,t_{-i})}{\sum_{t'_{-i}}p(t_i,t'_{-i})}$$</p>
+<p><strong>Ses deux lectures</strong> : distribution <strong>empirique objective</strong> · ou <em>« les différences de croyances ne proviennent <strong>que</strong> de différences d'<strong>information</strong> »</em>.  <strong>Le livre NE l'impose PAS.</strong></p>
+<p><strong>DÉF. 7.10</strong> : $G=(p_i,T_i,S_i,u_i)_{i=1}^{N}$ — un <strong>jeu bayésien</strong>.
+<strong>DÉF. 7.11 — le jeu associé $G^+$</strong> :  <strong>chaque TYPE devient un JOUEUR</strong>, avec $S_i$ pour stratégies et</p>
+<p>$$v_{t_i}(s^+)=\sum_{t_{-i}\in T_{-i}}p_i(t_{-i}\mid t_i)\,u_i\big(s_1(t_1),\dots,s_N(t_N),t_1,\dots,t_N\big)$$</p>
+<p><strong>DÉF. 7.12 — équilibre bayésien-nashien</strong> = un <strong>équilibre de Nash de $G^+$</strong>.
+<strong>THÉORÈME 7.3</strong> : tout jeu bayésien <strong>fini</strong> en possède un —  <strong>trois lignes</strong>, via le théorème 7.2.</p>
+<p><strong>EXEMPLE 7.3 — Bertrand incomplet.</strong> Coût de 1 : $0$. Coût de 2 : $1$ ou $4$, équiprobables. Demande $8-p$, prix dans $\{1,4,6\}$. <strong>Trois joueurs</strong> : $1$, $2_\ell$, $2_h$.</p>
+<p>Les paiements de $2_\ell$ et $2_h$ <strong>se lisent directement</strong> <em>(1 n'a qu'un type)</em> ; ceux de $1$ sont des <strong>espérances</strong> — ex. $\tfrac12(0)+\tfrac12(16)=8$.</p>
+<p><strong>L'équilibre</strong> : $p_\ell=4$ et $p_h=6$ <strong>faiblement dominantes</strong>, puis $p_1=4$ <strong>strictement dominante</strong> <em>(paiements $3$, $12$, $7$)</em>.</p>
+<p class="cal piege"> <strong>La leçon</strong> : <em>« <strong>en contraste avec Bertrand en information complète, les profits NE SONT PAS ramenés à zéro</strong> — seule la firme 2 à coût élevé gagne zéro »</em>.</p>
+<div class="rec"><h2>Active Recall</h2><details class="cor">
+<summary><strong>1. Comment le livre définit-il la théorie des jeux ?</strong></summary><div class="in">
+
+<blockquote>
+<p><em>« <strong>La théorie des jeux est l'étude systématique de la manière dont des agents RATIONNELS se comportent dans des situations stratégiques, ou dans des JEUX, où chaque agent doit d'abord CONNAÎTRE la décision des autres agents avant de savoir quelle décision est la meilleure pour lui-même.</strong> »</em></p>
+</blockquote>
+<p>$$\textbf{« CETTE CIRCULARITÉ est la MARQUE de la théorie des jeux. »}$$</p>
+</div></details><details class="cor">
+<summary><strong>2. Quels concepts de solution le chapitre annonce-t-il ?</strong></summary><div class="in">
+
+<p><strong>Dominance</strong> → <strong>Nash</strong> → <strong>Bayes-Nash</strong> → <strong>induction à rebours</strong> → <strong>perfection en sous-jeux</strong> → <strong>équilibre séquentiel</strong>.</p>
+<blockquote>
+<p><em>« <strong>Chacun de ces concepts est plus SOPHISTIQUÉ que ses prédécesseurs, et savoir QUAND appliquer une solution plutôt qu'une autre est une part importante du métier de bon économiste appliqué.</strong> »</em></p>
+</blockquote>
+</div></details><details class="cor">
+<summary><strong>3. Qu'est-ce qui distingue une décision stratégique d'une décision non stratégique ?</strong></summary><div class="in">
+
+<blockquote>
+<p><em>« <strong>Les dernières peuvent être prises « en ISOLEMENT », sans tenir compte des décisions que d'autres pourraient prendre.</strong> »</em></p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>Non stratégique</th>
+<th>Stratégique</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>La <strong>théorie du consommateur</strong> — <em>« chacun agit entièrement pour son compte, sans égard au comportement des autres »</em></td>
+<td><strong>Cournot</strong> et <strong>Bertrand</strong> — <em>« son action optimale <strong>dépend</strong> de l'action prise par l'autre firme »</em></td>
+</tr>
+</tbody></table>
+</div></details><details class="cor">
+<summary><strong>4. Décrire le duel batteur-lanceur et sa matrice.</strong></summary><div class="in">
+
+<p>Le lanceur a <strong>la meilleure balle rapide de la ligue</strong> mais <strong>une courbe moyenne</strong>. Fin de neuvième manche, compte plein, bases pleines, deux retraits, un point d'avance ⟹ <strong>un seul lancer</strong>. Circuit ⟹ victoire ; retrait ⟹ défaite. Utilités $\pm1$.</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Batteur $F$</th>
+<th>Batteur $C$</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Lanceur $F$</td>
+<td>$-1,\ 1$</td>
+<td>$1,\ -1$</td>
+</tr>
+<tr>
+<td>Lanceur $C$</td>
+<td>$1,\ -1$</td>
+<td>$-1,\ 1$</td>
+</tr>
+</tbody></table>
+<p class="cal piege"> <em>« Le batteur frappe un circuit <strong>quand il se prépare pour le lancer que le lanceur a choisi</strong>, et est retiré sinon. »</em></p>
+</div></details><details class="cor">
+<summary><strong>5.  Dérouler l'argument d'imprévisibilité.</strong></summary><div class="in">
+
+<ol>
+<li>Si le lanceur est <strong>prévisible</strong> — <em>« il lance toujours sa balle rapide »</em> — le batteur, <strong>en choisissant $F$, est GARANTI de gagner</strong>.</li>
+<li>Mais alors <strong>le batteur aussi est prévisible</strong> — il prépare toujours $F$.</li>
+<li><em>« Par conséquent, <strong>parce que le lanceur se comporte stratégiquement, il choisira optimalement de lancer sa COURBE</strong> »</em> et gagne.</li>
+<li> <em>« <strong>Mais ceci CONTREDIT notre supposition originelle !</strong> »</em></li>
+</ol>
+<blockquote>
+<p><em>« Nous concluons qu'<strong>il ne peut pas être correctement prédit que le lanceur lance toujours une balle rapide. De même</strong> pour la courbe. »</em></p>
+</blockquote>
+</div></details><details class="cor">
+<summary><strong>6. Quelle est la leçon générale, et sa limite ?</strong></summary><div class="in">
+
+<blockquote>
+<p><em>« <strong>Quand des individus rationnels prennent des décisions stratégiquement, ils se comportent parfois d'une manière « IMPRÉVISIBLE ». Tout bon joueur de poker le comprend bien — c'est un aspect essentiel du BLUFF réussi.</strong> »</em></p>
+</blockquote>
+<p class="cal piege"> <strong>La limite</strong> : *« il n'y a <strong>AUCUN tel avantage dans des cadres NON stratégiques — quand vous êtes SEUL, il n'y a personne à « TROMPER »</strong>. »*</p>
+</div></details><details class="cor">
+<summary><strong>7. Énoncer la définition 7.1.</strong></summary><div class="in">
+
+<p>Un <strong>jeu sous forme stratégique</strong> est $G=(S_i,u_i)_{i=1}^{N}$ où $S_i$ est <strong>l'ensemble des stratégies</strong> de $i$ et</p>
+<p>$$u_i:\prod_{j=1}^{N}S_j\to\mathbb{R}$$</p>
+<p>décrit <strong>le paiement de $i$ en fonction des stratégies choisies par TOUS</strong>. Il est <strong>FINI</strong> si chaque $S_i$ contient un nombre fini d'éléments.</p>
+<p><strong>Les trois éléments communs identifiés</strong> : les <strong>joueurs</strong>, les <strong>stratégies</strong>, les <strong>paiements</strong>.</p>
+</div></details><details class="cor">
+<summary><strong>8. Écrire le duel batteur-lanceur en forme stratégique.</strong></summary><div class="in">
+
+<p>$$S_1=S_2=\{F,C\}$$
+$$u_1(F,F)=u_1(C,C)=-1, \qquad u_1(F,C)=u_1(C,F)=1$$
+$$u_2(s_1,s_2)=-u_1(s_1,s_2) \quad \forall(s_1,s_2)$$</p>
+<p class="cal piege"> La dernière ligne en fait un jeu à <strong>SOMME NULLE</strong>.</p>
+<blockquote>
+<p><em>« Les jeux à <strong>deux joueurs</strong> avec ensembles <strong>finis</strong> peuvent <strong>toujours</strong> être représentés sous forme <strong>matricielle</strong>. »</em></p>
+</blockquote>
+</div></details><details class="cor">
+<summary><strong>9. Énoncer les définitions 7.2 et 7.3, et dire ce qui les distingue.</strong></summary><div class="in">
+
+<p><strong>DÉF. 7.2 — strictement DOMINANTE</strong> : $u_i(\hat s_i,s_{-i})&gt;u_i(s_i,s_{-i})$ pour <strong>tout</strong> $(s_i,s_{-i})\in S$ avec $s_i\neq\hat s_i$.</p>
+<p><strong>DÉF. 7.3 — strictement DOMINÉE</strong> : $\hat s_i$ <strong>domine strictement</strong> $\bar s_i$ si $u_i(\hat s_i,s_{-i})&gt;u_i(\bar s_i,s_{-i})$ pour <strong>tout</strong> $s_{-i}\in S_{-i}$.</p>
+<p class="cal piege"> <strong>La différence</strong> : la dominance stricte porte sur <strong>une stratégie contre UNE autre</strong> ; être <strong>dominante</strong> signifie battre <strong>TOUTES</strong> les autres.</p>
+<blockquote>
+<p><em>« La présence d'une stratégie strictement dominante est <strong>plutôt RARE</strong>. »</em></p>
+</blockquote>
+</div></details><details class="cor">
+<summary><strong>10. Analyser le jeu de la figure 7.2.</strong></summary><div class="in">
+
+<table>
+<thead>
+<tr>
+<th></th>
+<th>$L$</th>
+<th>$R$</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$U$</td>
+<td>$3,0$</td>
+<td>$0,-4$</td>
+</tr>
+<tr>
+<td>$D$</td>
+<td>$2,4$</td>
+<td>$-1,8$</td>
+</tr>
+</tbody></table>
+<p><strong>Le joueur 2</strong> doit raisonner : <em>« si 1 choisit $U$, il est meilleur pour 2 de choisir $L$ ; si 1 choisit $D$, de choisir $R$ »</em>.</p>
+<p class="cal piege"> <strong>Le joueur 1 n'a pas à raisonner</strong> : <em>« son meilleur choix est en fait <strong>INDÉPENDANT</strong> du choix fait par 2. <strong>Quel que soit</strong> le choix de 2, $U$ est le meilleur. »</em></p>
+<p>⟹ 1 choisit $U$ ; <strong>l'ayant déduit</strong>, 2 choisit $L$ ⟹ <strong>$(U,L)$, paiements $(3,0)$</strong>.</p>
+</div></details><details class="cor">
+<summary><strong>11. Analyser le jeu de la figure 7.3.</strong></summary><div class="in">
+
+<table>
+<thead>
+<tr>
+<th></th>
+<th>$L$</th>
+<th>$M$</th>
+<th>$R$</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$U$</td>
+<td>$3,0$</td>
+<td>$0,-5$</td>
+<td>$0,-4$</td>
+</tr>
+<tr>
+<td>$C$</td>
+<td>$1,-1$</td>
+<td>$3,3$</td>
+<td>$-2,4$</td>
+</tr>
+<tr>
+<td>$D$</td>
+<td>$2,4$</td>
+<td>$4,1$</td>
+<td>$-1,8$</td>
+</tr>
+</tbody></table>
+<p class="cal piege"> <strong>Aucun joueur n'a de stratégie dominante.</strong> Mais <strong>$C$ est toujours surpassée par $D$</strong> <em>(pour 1)</em> et <strong>$M$ par $R$</strong> <em>(pour 2)</em>.</p>
+<blockquote>
+<p><em>« Maintenant que $C$ et $M$ ont été retirées, <strong>le jeu s'est RÉDUIT à celui de la figure 7.2</strong> »</em> ⟹ $(3,0)$.</p>
+</blockquote>
+</div></details><details class="cor">
+<summary><strong>12.  Pourquoi faut-il ITÉRER l'élimination ?</strong></summary><div class="in">
+
+<blockquote>
+<p><em>« Notez que <strong>bien que $R$ ne soit PAS strictement dominée dans le jeu ORIGINAL, elle EST strictement dominée (par $L$) dans le jeu RÉDUIT</strong> dans lequel $D$ a été éliminée. »</em></p>
+</blockquote>
+<blockquote>
+<p><em>« De même, <strong>$D$ n'est pas strictement dominée dans le jeu original, mais elle l'est dans le jeu réduit dans lequel $C$ a été éliminée</strong>, et <strong>$R$ ne devient strictement dominée qu'APRÈS que $C$ ET $D$ ont été éliminées</strong>. »</em></p>
+</blockquote>
+<p>$$\boxed{\;\text{LA DOMINANCE CRÉE DE LA DOMINANCE.}\;}$$</p>
+</div></details><details class="cor">
+<summary><strong>13. Définir $S_i^n$ et $W_i^n$, et énoncer les définitions 7.4 et 7.6.</strong></summary><div class="in">
+
+<p>$S_i^0=S_i$ ; pour $n\geq1$, $s_i\in S_i^n$ si $s_i\in S_i^{n-1}$ <strong>n'est pas strictement dominée dans $S^{n-1}$</strong>.</p>
+<p><strong>DÉF. 7.4</strong> : $s_i$ est <strong>itérativement strictement non dominée</strong> si $s_i\in S_i^n$ <strong>pour tout $n\geq1$</strong>.</p>
+<p>$W_i^0=S_i$ ; $s_i\in W_i^n$ si $s_i\in W_i^{n-1}$ n'est pas <strong>faiblement</strong> dominée dans $W^{n-1}$.</p>
+<p><strong>DÉF. 7.6</strong> : $s_i$ est <strong>itérativement faiblement non dominée</strong> si $s_i\in W_i^n$ pour tout $n\geq1$.</p>
+</div></details><details class="cor">
+<summary><strong>14. Énoncer la dominance faible, et illustrer la différence.</strong></summary><div class="in">
+
+<p><strong>DÉF. 7.5</strong> : $\hat s_i$ <strong>domine faiblement</strong> $\bar s_i$ si $u_i(\hat s_i,s_{-i})\geq u_i(\bar s_i,s_{-i})$ pour tout $s_{-i}$,  <strong>avec au moins une inégalité STRICTE</strong>.</p>
+<p><strong>Figure 7.4</strong> :</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>$L$</th>
+<th>$R$</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$U$</td>
+<td>$1,1$</td>
+<td>$0,0$</td>
+</tr>
+<tr>
+<td>$D$</td>
+<td>$0,0$</td>
+<td>$0,0$</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p>*« <strong>Aucun joueur n'a de stratégie strictement dominée.</strong> Cependant, $D$ et $R$ sont <strong>faiblement</strong> dominées. Ainsi, <strong>éliminer les strictement dominées n'a AUCUN effet, alors qu'éliminer les faiblement dominées isole $(U,L)$</strong>. »*</p>
+</blockquote>
+</div></details><details class="cor">
+<summary><strong>15. Comparer les deux procédures d'élimination.</strong></summary><div class="in">
+
+<p>$$\bigcap_n W_i^n \ \subseteq\ \bigcap_n S_i^n \qquad\text{(exercice 7.6)}$$</p>
+<blockquote>
+<p><em>« L'ensemble restant après la dominance <strong>faible</strong> itérative est <strong>CONTENU</strong> dans celui restant après la dominance <strong>stricte</strong> itérative. »</em></p>
+</blockquote>
+<p class="cal piege"> <strong>La contrepartie</strong> : <em>« l'<strong>ORDRE</strong> dans lequel les stratégies <strong>faiblement</strong> dominées sont éliminées <strong>peut affecter les issues qui restent</strong> »</em> <em>(ex. 7.3(a))</em>, alors que pour la <strong>stricte</strong>, <em>« l'ordre <strong>n'importe pas</strong> »</em> <em>(7.3(b))</em>.</p>
+</div></details><details class="cor">
+<summary><strong>16. Énoncer les règles de « devine la moyenne » et résoudre le premier tour.</strong></summary><div class="in">
+
+<p>$N\geq2$ joueurs choisissent <strong>simultanément un entier entre 1 et 100</strong> ; <strong>le plus proche du TIERS de la moyenne</strong> gagne 100 $, partagés en cas d'égalité.</p>
+<p><strong>Le premier tour</strong> : <em>« choisir <strong>33 domine FAIBLEMENT tous les nombres plus élevés</strong> »</em>.</p>
+<table>
+<thead>
+<tr>
+<th>Pourquoi $\geq$</th>
+<th>Le tiers de la moyenne est <strong>au plus $33\tfrac13$</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Pourquoi <strong>strict</strong> quelque part</td>
+<td><em>« <strong>si tous les autres choisissent 34</strong>, 33 est <strong>strictement meilleur</strong> »</em></td>
+</tr>
+</tbody></table>
+<p>$$W_i^1\subseteq\{1,\dots,33\}$$</p>
+</div></details><details class="cor">
+<summary><strong>17. Terminer « devine la moyenne » et citer les résultats des exercices.</strong></summary><div class="in">
+
+<blockquote>
+<p><em>« Mais un argument semblable établit que <strong>tous les nombres au-dessus de 11 sont faiblement dominés dans $W^1$</strong> »</em> ⟹ $W_i^2\subseteq\{1,\dots,11\}$.</p>
+</blockquote>
+<p>$$100\ \to\ 33\ \to\ 11\ \to\ \dots\ \to\ \boxed{1}$$</p>
+<p><strong>Exercice 7.5</strong> : <strong>(a)</strong> aucune pure n'en domine strictement une autre · <strong>(b)</strong> une <strong>mixte</strong> domine strictement $100$ · <strong>(c)</strong>  <strong>99 n'est PAS strictement dominée</strong> · <strong>(d)</strong> la stricte itérative donne aussi $1$, <strong>en 99 tours</strong> · <strong>(e)</strong> avec $N=3$ : $W^1=\{1,\dots,14\}$, $W^2=\{1,2\}$, $W^3=\{1\}$.</p>
+</div></details><details class="cor">
+<summary><strong>18. Pourquoi la dominance ne résout-elle pas le duel batteur-lanceur ?</strong></summary><div class="in">
+
+<blockquote>
+<p><em>« Dans ce jeu, <strong>aucune stratégie pour aucun joueur n'est strictement OU faiblement dominée</strong>. Dès lors, <strong>AUCUNE des procédures d'élimination décrites ne réduira les stratégies considérées</strong>. »</em></p>
+</blockquote>
+<blockquote>
+<p><em>« Bien que ces procédures soient très utiles dans certaines circonstances, <strong>nous ne sommes pas plus près de résoudre le duel qu'au moment où nous l'avons mis de côté. Il est temps de changer cela.</strong> »</em></p>
+</blockquote>
+</div></details><details class="cor">
+<summary><strong>19. Énoncer la définition 7.7, et l'analogie qui la motive.</strong></summary><div class="in">
+
+<p><strong>DÉF. 7.7</strong> : $\hat s\in S$ est un <strong>équilibre de Nash en stratégies pures</strong> si, pour chaque $i$,</p>
+<p>$$u_i(\hat s)\geq u_i(s_i,\hat s_{-i}) \qquad \forall\,s_i\in S_i$$</p>
+<p><strong>L'analogie</strong> : <em>« l'attrait théorique de l'équilibre de marché vient de ce qu'<strong>il n'y a aucune TENDANCE ni NÉCESSITÉ pour le comportement de qui que ce soit de CHANGER. Ces RÉGULARITÉS forment la base des PRÉDICTIONS.</strong> »</em></p>
+<p><strong>L'idée informelle</strong> : <em>« <strong>chaque individu, tout en étant PLEINEMENT CONSCIENT du comportement des autres, n'a AUCUNE INCITATION à changer le sien</strong> »</em>.</p>
+</div></details><details class="cor">
+<summary><strong>20.  Montrer que le duel n'a aucun équilibre en stratégies pures, et dire pourquoi.</strong></summary><div class="in">
+
+<p><strong>Vérification de $(F,F)$ :</strong></p>
+<table>
+<thead>
+<tr>
+<th>Joueur</th>
+<th>Paiement</th>
+<th>En déviant vers $C$</th>
+<th>Verdict</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Batteur</td>
+<td>$1$</td>
+<td>$(F,C)$ ⟹ $-1$</td>
+<td>pas d'amélioration</td>
+</tr>
+<tr>
+<td>Lanceur</td>
+<td>$-1$</td>
+<td>$(C,F)$ ⟹ $1$</td>
+<td> <strong>améliore</strong></td>
+</tr>
+</tbody></table>
+<p>⟹ $(F,F)$ n'est pas un équilibre. <em>« Un argument similaire s'applique aux trois autres. »</em></p>
+<p><strong>Pourquoi c'était prévisible</strong> : <em>« <strong>incorporé dans la définition d'un équilibre en stratégies pures est que CHAQUE joueur SAIT PRÉCISÉMENT quelle stratégie chacun des autres choisira. Les choix de tout le monde sont PARFAITEMENT PRÉVISIBLES.</strong> »</em> — ce que le §7.1 a exclu.</p>
+</div></details><details class="cor">
+<summary><strong>21. Vérifier que le mélange à $\tfrac12$-$\tfrac12$ résout le duel.</strong></summary><div class="in">
+
+<p>Chacun lance <strong>une pièce équilibrée</strong>, et <strong>chacun le sait</strong>. On suppose les paiements <strong>VNM</strong> et la maximisation de l'<strong>espérance</strong>.</p>
+<p><strong>Pour le lanceur</strong>, face à un batteur qui joue $\tfrac12$-$\tfrac12$ :</p>
+<p>$$\mathbb{E}[F]=\tfrac12(-1)+\tfrac12(1)=0 \qquad \mathbb{E}[C]=\tfrac12(1)+\tfrac12(-1)=0$$</p>
+<p>⟹ <strong>il est INDIFFÉRENT</strong>.  <em>« Ainsi, <strong>alors que choisir soit $F$ soit $C$ lui donnerait son paiement le plus élevé de zéro, RANDOMISER à $\tfrac12$-$\tfrac12$ le ferait AUSSI.</strong> »</em></p>
+<p><strong>Symétriquement</strong> pour le batteur ⟹ <strong>c'est un équilibre</strong>.</p>
+</div></details><details class="cor">
+<summary><strong>22. Énoncer la définition 7.8 et la formule du paiement espéré.</strong></summary><div class="in">
+
+<p>Une <strong>stratégie mixte</strong> est $m_i:S_i\to[0,1]$ avec $\sum_{s_i\in S_i}m_i(s_i)=1$ ; $M_i$ en est l'ensemble.</p>
+<p class="cal piege"> <em>« Ceci donne à chaque joueur <strong>STRICTEMENT PLUS de choix</strong>, chaque pure $\bar s_i$ étant représentée par la distribution <strong>DÉGÉNÉRÉE</strong> de probabilité un. »</em></p>
+<p>$$u_i(m)\equiv\sum_{s\in S}m_1(s_1)\cdots m_N(s_N)\,u_i(s)$$</p>
+<blockquote>
+<p class="cal piege"> <em>« Cette formule découle du fait que <strong>les joueurs choisissent leurs stratégies INDÉPENDAMMENT</strong> »</em> — d'où le <strong>produit</strong> des probabilités.</p>
+</blockquote>
+</div></details><details class="cor">
+<summary><strong>23. Énoncer le théorème 7.1 et dire à quoi sert chaque partie.</strong></summary><div class="in">
+
+<p>Sont équivalents : <strong>(a)</strong> $\hat m$ est un équilibre · <strong>(b)</strong> pour chaque $i$, <strong>égalité</strong> $u_i(\hat m)=u_i(s_i,\hat m_{-i})$ sur les pures de <strong>poids positif</strong>, et <strong>$\geq$</strong> sur celles de <strong>poids nul</strong> · <strong>(c)</strong> $u_i(\hat m)\geq u_i(s_i,\hat m_{-i})$ pour <strong>toute pure</strong>.</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Son usage</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>(b)</strong></td>
+<td><em>« le plus utile pour <strong>CALCULER</strong> — un joueur doit être <strong>INDIFFÉRENT</strong> entre toutes les pures de son support »</em></td>
+</tr>
+<tr>
+<td><strong>(c)</strong></td>
+<td><em>« il <strong>suffit de vérifier</strong> qu'aucune <strong>pure</strong> ne fait mieux »</em></td>
+</tr>
+</tbody></table>
+<p><strong>Ce qu'il exploite</strong> : <em>« la <strong>LINÉARITÉ de $u_i$ en $m_i$</strong> »</em>.</p>
+</div></details><details class="cor">
+<summary><strong>24.  Démontrer (a) ⟹ (b).</strong></summary><div class="in">
+
+<p><strong>Pas 1</strong> : dans $u_i(\hat m)\geq u_i(m_i,\hat m_{-i})$, <em>« nous pouvons choisir $m_i$ comme <strong>la stratégie donnant la probabilité UN à $s_i$</strong> »</em>, donc $u_i(\hat m)\geq u_i(s_i,\hat m_{-i})$ <strong>pour toute pure</strong>.</p>
+<p><strong>Pas 2</strong> :  <em>« <strong>si l'un de ces nombres différait de $u_i(\hat m)$, alors au moins un serait STRICTEMENT PLUS GRAND, parce que $u_i(\hat m)$ est une COMBINAISON CONVEXE STRICTE d'entre eux. Mais ceci contredirait l'inégalité qui vient d'être établie.</strong> »</em></p>
+<p><em>(Pourquoi c'est une moyenne : $u_i(\hat m)=\sum_{s_i}\hat m_i(s_i)u_i(s_i,\hat m_{-i})$.)</em></p>
+</div></details><details class="cor">
+<summary><strong>25. Démontrer (c) ⟹ (a).</strong></summary><div class="in">
+
+<p>Supposons $u_i(\hat m)\geq u_i(s_i,\hat m_{-i})$ pour toute pure et tout $i$. Fixons $i$ et $m_i\in M_i$.</p>
+<blockquote>
+<p>*« <strong>Parce que le nombre $u_i(m_i,\hat m_{-i})$ est une COMBINAISON CONVEXE des nombres $\{u_i(s_i,\hat m_{-i})\}$</strong>, nous avons $u_i(\hat m)\geq u_i(m_i,\hat m_{-i})$. »*</p>
+</blockquote>
+<p><em>« Parce que <strong>le joueur ET la stratégie étaient arbitraires</strong>, $\hat m$ est un équilibre. »</em> $\blacksquare$</p>
+<p class="cal piege"> <strong>Une moyenne pondérée ne dépasse jamais le plus grand des nombres moyennés.</strong></p>
+</div></details><details class="cor">
+<summary><strong>26. Calculer l'équilibre mixte de l'exemple 7.1.</strong></summary><div class="in">
+
+<table>
+<thead>
+<tr>
+<th></th>
+<th>$WP$</th>
+<th>$MW$</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$WP$</td>
+<td>$2,1$</td>
+<td>$0,0$</td>
+</tr>
+<tr>
+<td>$MW$</td>
+<td>$0,0$</td>
+<td>$1,2$</td>
+</tr>
+</tbody></table>
+<p>$p$ = proba que <strong>1</strong> joue $MW$ ; $q$ = proba que <strong>2</strong> joue $WP$. Par le <strong>théorème 7.1(b)</strong>, chacun est <strong>indifférent</strong>.</p>
+<p><strong>Joueur 1</strong> : $q(2)+(1-q)(0)=q(0)+(1-q)(1)$ ⟹ $2q=1-q$ ⟹ $\boxed{q=\tfrac13}$.
+<strong>Joueur 2</strong> : $(1-p)(1)+p(0)=(1-p)(0)+p(2)$ ⟹ $1-p=2p$ ⟹ $\boxed{p=\tfrac13}$.</p>
+<p class="cal piege"> <strong>Chaque joueur choisit le logiciel de son collègue avec probabilité $1/3$.</strong> <em>« Il n'y en a pas d'autres. »</em></p>
+</div></details><details class="cor">
+<summary><strong>27.  Quels sont les trois enseignements de l'exemple 7.1 ?</strong></summary><div class="in">
+
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>L'enseignement</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>1</strong></td>
+<td>Il possède <strong>de multiples équilibres</strong>, certains purs, d'autres non</td>
+</tr>
+<tr>
+<td><strong>2</strong></td>
+<td> <strong>L'équilibre mixte est INEFFICACE</strong> : chaque paiement espéré est $2/3$, donc <em>« chacun serait strictement mieux loti si <strong>l'un OU l'autre</strong> des équilibres purs était joué »</em></td>
+</tr>
+<tr>
+<td><strong>3</strong></td>
+<td> <em>« un équilibre en stratégies mixtes est présent <strong>MÊME SI ce n'est pas un jeu dans lequel l'un des joueurs souhaite se comporter de manière imprévisible</strong> »</em></td>
+</tr>
+</tbody></table>
+</div></details><details class="cor">
+<summary><strong>28. Quelles sont les deux interprétations d'une stratégie mixte ?</strong></summary><div class="in">
+
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>L'interprétation</th>
+<th>Quand elle convient</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>1</strong></td>
+<td><strong>La ROULETTE</strong> — <em>« des dispositifs physiques réels que les joueurs utilisent pour <strong>randomiser délibérément</strong> »</em></td>
+<td> jeux à intérêts <strong>OPPOSÉS</strong> <em>(le duel)</em></td>
+</tr>
+<tr>
+<td><strong>2</strong></td>
+<td><strong>Les CROYANCES</strong> — <em>« une <strong>expression des croyances des AUTRES joueurs</strong> concernant la stratégie pure qu'il choisira. <strong>Dans cette interprétation, aucun joueur ne randomise explicitement.</strong> »</em></td>
+<td> jeux où les intérêts <strong>COÏNCIDENT</strong> en partie <em>(fig. 7.6)</em></td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><em>« <strong>Le fait de choisir une interprétation ou l'autre dépend largement du CONTEXTE.</strong> »</em></p>
+</blockquote>
+</div></details><details class="cor">
+<summary><strong>29. Énoncer le théorème 7.2 et la stratégie de sa preuve.</strong></summary><div class="in">
+
+<p><strong>Tout jeu sous forme stratégique FINI possède au moins un équilibre de Nash.</strong></p>
+<blockquote>
+<p><em>« Nous montrerons qu'un équilibre existe <strong>en démontrant l'existence d'un POINT FIXE d'une fonction dont les points fixes sont NÉCESSAIREMENT des équilibres</strong>. »</em></p>
+</blockquote>
+<p>$$\textbf{(1) construire } f \quad\to\quad \textbf{(2) point fixe} \quad\to\quad \textbf{(3) c'est un équilibre}$$</p>
+<p>Avec $S_i=\{1,\dots,n\}$ et $M_i=\{(m_{i1},\dots,m_{in})\in\mathbb{R}^n_+ : \sum_j m_{ij}=1\}$ —  <strong>non vide, compact, convexe</strong>.</p>
+</div></details><details class="cor">
+<summary><strong>30. Écrire la fonction $f$ et expliquer ce qu'elle fait.</strong></summary><div class="in">
+
+<p>$$f_{ij}(m)=\frac{m_{ij}+\max\big(0,\ u_i(j,m_{-i})-u_i(m)\big)}{1+\sum_{j'=1}^{n}\max\big(0,\ u_i(j',m_{-i})-u_i(m)\big)}$$</p>
+<p><strong>Sa lecture</strong> : au numérateur, on <strong>ajoute au poids de $j$ l'EXCÈS de paiement</strong> de la pure $j$ sur la mixte $m_i$ — <strong>s'il est positif</strong> ; au dénominateur, on <strong>renormalise</strong>.</p>
+<p>$$\boxed{\;f \textbf{ pousse le poids vers les stratégies qui font MIEUX que la moyenne.}\;}$$</p>
+<p>*« Notez que $\sum_j f_{ij}(m)=1$ et $f_{ij}(m)\geq0$, donc <strong>$f(m)\in M$</strong>. »*</p>
+</div></details><details class="cor">
+<summary><strong>31.  Justifier l'application de Brouwer.</strong></summary><div class="in">
+
+<blockquote>
+<p><em>« <strong>Parce que le NUMÉRATEUR est continu en $m$, et que le DÉNOMINATEUR est à la fois continu ET BORNÉ LOIN DE ZÉRO (en effet, il n'est JAMAIS inférieur à UN), $f_{ij}$ est CONTINUE.</strong> »</em></p>
+</blockquote>
+<p class="cal piege"> <strong>Pourquoi le dénominateur est $\geq1$</strong> : chaque terme est un $\max(0,\cdot)\geq0$, ajouté à $1$.</p>
+<blockquote>
+<p>*« $f$ est une fonction <strong>continue</strong> envoyant l'ensemble <strong>non vide, compact et convexe</strong> $M$ <strong>DANS LUI-MÊME</strong>. Nous pouvons donc appliquer le <strong>théorème du point fixe de BROUWER (A1.11)</strong>. »*</p>
+</blockquote>
+</div></details><details class="cor">
+<summary><strong>32. Dérouler le pas 3 de la preuve du théorème 7.2.</strong></summary><div class="in">
+
+<p>Au point fixe, en multipliant en croix et en simplifiant :</p>
+<p>$$\hat m_{ij}\sum_{j'}\max\big(0,u_i(j',\hat m_{-i})-u_i(\hat m)\big)=\max\big(0,u_i(j,\hat m_{-i})-u_i(\hat m)\big)$$</p>
+<p><strong>L'astuce</strong> : multiplier par $u_i(j,\hat m_{-i})-u_i(\hat m)$ et <strong>sommer sur $j$</strong>. Le membre de gauche contient</p>
+<p>$$\sum_j\hat m_{ij}\big[u_i(j,\hat m_{-i})-u_i(\hat m)\big]=u_i(\hat m)-u_i(\hat m)=0$$</p>
+<p><em>« où <strong>la première égalité découle de ce que les $m_{ij}$ somment à un</strong> »</em>. Donc</p>
+<p>$$0=\sum_{j}\big[u_i(j,\hat m_{-i})-u_i(\hat m)\big]\max\big(0,u_i(j,\hat m_{-i})-u_i(\hat m)\big)$$</p>
+</div></details><details class="cor">
+<summary><strong>33.  Conclure la preuve.</strong></summary><div class="in">
+
+<blockquote>
+<p><em>« <strong>La somme ne peut être nulle que si $u_i(j,\hat m_{-i})-u_i(\hat m)\leq0$ pour tout $j$. (Si elle était $&gt;0$ pour un $j$, le $j$-ième terme serait strictement positif. Parce qu'AUCUN terme n'est négatif, ceci rendrait la somme ENTIÈRE strictement positive.)</strong> »</em></p>
+</blockquote>
+<p><strong>Pourquoi aucun terme n'est négatif</strong> : chaque terme vaut $x\cdot\max(0,x)=\max(0,x)^2\geq0$.</p>
+<blockquote>
+<p><em>« Dès lors, <strong>par la partie (c) du théorème 7.1, $\hat m$ est un équilibre de Nash</strong>. »</em> $\blacksquare$</p>
+</blockquote>
+</div></details><details class="cor">
+<summary><strong>34. Quelle est la portée du théorème 7.2 ?</strong></summary><div class="in">
+
+<blockquote>
+<p><em>« <strong>Le théorème 7.2 est tout à fait remarquable.</strong> Peu importe combien de joueurs, <strong>du moment que chacun possède un nombre FINI de stratégies pures, il y aura au moins un équilibre de Nash.</strong> »</em></p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>Portée</th>
+<th>Le commentaire</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Pratique</strong></td>
+<td><em>« la recherche d'un équilibre <strong>ne sera pas VAINE</strong> »</em></td>
+</tr>
+<tr>
+<td><strong>Conceptuelle</strong></td>
+<td> <em>« <strong>si les équilibres existaient RAREMENT, ceci indiquerait une INCOHÉRENCE FONDAMENTALE dans la définition. Qu'ils existent TOUJOURS dans les jeux finis est UNE MESURE DE LA SOLIDITÉ DE L'IDÉE.</strong> »</em></td>
+</tr>
+</tbody></table>
+</div></details><details class="cor">
+<summary><strong>35. Quelle limitation le §7.2.3 lève-t-il, et comment ?</strong></summary><div class="in">
+
+<blockquote>
+<p><em>« Nous avons <strong>toujours supposé que chaque joueur est parfaitement informé des paiements de TOUS les autres. Sinon, les joueurs n'auraient pas pu effectuer les calculs nécessaires.</strong> »</em></p>
+</blockquote>
+<blockquote>
+<p class="cal piege"> <em>« <strong>L'IDÉE est de lui AJOUTER un ingrédient de plus, de sorte qu'elle devienne un JEU SOUS FORME STRATÉGIQUE.</strong> Nous serons alors capables d'appliquer <strong>n'importe laquelle</strong> des méthodes développées. »</em> — <strong>Harsanyi (1967-1968)</strong>.</p>
+</blockquote>
+</div></details><details class="cor">
+<summary><strong>36. Qu'est-ce qu'un type, et de quoi dépend le paiement ?</strong></summary><div class="in">
+
+<p><em>« Pour chaque joueur $i$, un ensemble <strong>FINI $T_i$ de « TYPES » possibles</strong> que ce joueur pourrait être. »</em></p>
+<p>$$u_i:\ S\times T\to\mathbb{R}, \qquad T=\prod_i T_i$$</p>
+<p class="cal piege"> <strong>Le paiement dépend du profil de stratégies, de SON type ET des types des AUTRES.</strong></p>
+<p><strong>Pourquoi</strong> : <em>« dans l'enchère de parcelles offshore, <strong>le paiement d'un enchérisseur dépendra de la probabilité que la parcelle contienne du pétrole, quelque chose sur quoi d'AUTRES enchérisseurs peuvent avoir de l'information</strong> »</em>.</p>
+</div></details><details class="cor">
+<summary><strong>37. Qu'est-ce qu'un a priori commun, et quelles sont ses deux lectures ?</strong></summary><div class="in">
+
+<p>Les croyances $p_i(t_{-i}\mid t_i)$ viennent d'une distribution unique $p$ sur $T$ par la <strong>règle de Bayes</strong> :</p>
+<p>$$p_i(t_{-i}\mid t_i)=\frac{p(t_i,t_{-i})}{\sum_{t'_{-i}}p(t_i,t'_{-i})}$$</p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>La lecture</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>1</strong></td>
+<td><em>« une distribution <strong>empirique OBJECTIVE</strong>, <strong>confirmée par de nombreuses observations passées</strong> »</em></td>
+</tr>
+<tr>
+<td><strong>2</strong></td>
+<td> <em>« <strong>les différences de croyances ne proviennent QUE de différences d'INFORMATION</strong> : avant que les joueurs connaissent leur type — <strong>position informationnellement SYMÉTRIQUE</strong> — leurs croyances doivent être <strong>identiques et égales à $p$</strong> »</em></td>
+</tr>
+</tbody></table>
+</div></details><details class="cor">
+<summary><strong>38.  Le livre impose-t-il l'a priori commun ?</strong></summary><div class="in">
+
+<blockquote>
+<p><em>« <strong>NON. Notre capacité à analyser une situation d'information incomplète NE REQUERRA PAS l'hypothèse d'a priori commun.</strong> »</em></p>
+</blockquote>
+<blockquote>
+<p><em>« Ainsi, <strong>nous permettons des situations dans lesquelles un certain type du joueur 1 assigne la probabilité ZÉRO à un type du joueur 3 qui reçoit toujours une probabilité POSITIVE du joueur 2</strong> »</em>.</p>
+</blockquote>
+<p><em>(L'<strong>exercice 7.20</strong> demande de montrer que <strong>cela est impossible avec un a priori commun</strong>.)</em></p>
+</div></details><details class="cor">
+<summary><strong>39. Énoncer la définition 7.10.</strong></summary><div class="in">
+
+<p>Un <strong>jeu d'information incomplète (jeu BAYÉSIEN)</strong> est $G=(p_i,T_i,S_i,u_i)_{i=1}^{N}$ où, pour chaque $i$ : $T_i$ est <strong>fini</strong>, $u_i:S\times T\to\mathbb{R}$, et pour chaque $t_i$, $p_i(\cdot\mid t_i)$ est une <strong>distribution de probabilité sur $T_{-i}$</strong>.</p>
+<p>Il est <strong>FINI</strong> si de plus chaque $S_i$ est fini.</p>
+</div></details><details class="cor">
+<summary><strong>40.  Comment construit-on $G^+$ ?</strong></summary><div class="in">
+
+<p>$$\boxed{\;\textbf{CHAQUE TYPE de chaque joueur devient UN JOUEUR SÉPARÉ.}\;}$$</p>
+<ul>
+<li><strong>Les joueurs</strong> : $T_1\cup\cdots\cup T_N$ ; le joueur $t_i$ a pour stratégies pures <strong>$S_i$</strong>.</li>
+<li><strong>Les stratégies jointes</strong> : $S^+=S_1^{T_1}\times\cdots\times S_N^{T_N}$.</li>
+<li><strong>Les paiements</strong> :</li>
+</ul>
+<p>$$v_{t_i}(s^+)=\sum_{t_{-i}\in T_{-i}}p_i(t_{-i}\mid t_i)\ u_i\big(s_1(t_1),\dots,s_N(t_N),t_1,\dots,t_N\big)$$</p>
+<p><em>(Note de bas de page : les $T_i$ sont supposés <strong>disjoints</strong>, ce qui est <strong>sans perte de généralité</strong> — on peut les définir comme des sous-ensembles d'entiers avec $t_i&lt;t_j$ si $i&lt;j$.)</em></p>
+</div></details><details class="cor">
+<summary><strong>41. Pourquoi la formule de paiement de $G^+$ capture-t-elle bien la situation ?</strong></summary><div class="in">
+
+<table>
+<thead>
+<tr>
+<th>Le morceau</th>
+<th>Ce qu'il capture</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$p_i(t_{-i}\mid t_i)$</td>
+<td><em>« <strong>le joueur $i$ est INCERTAIN des types des autres</strong> — il l'utilise pour évaluer leur probabilité »</em></td>
+</tr>
+<tr>
+<td>$s_j(t_j)$</td>
+<td> <em>« <strong>le comportement des autres joueurs peut DÉPENDRE DE LEURS TYPES</strong> »</em></td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><em>« En associant $G^+$ à $G$, <strong>nous avons RÉDUIT l'étude des jeux d'information INCOMPLÈTE à l'étude des jeux d'information COMPLÈTE</strong>. »</em></p>
+</blockquote>
+</div></details><details class="cor">
+<summary><strong>42. Énoncer les définitions 7.11-7.12 et le théorème 7.3.</strong></summary><div class="in">
+
+<p><strong>DÉF. 7.11</strong> : $G^+$ est <strong>le jeu sous forme stratégique associé</strong> à $G$.
+<strong>DÉF. 7.12</strong> : un <strong>équilibre bayésien-nashien</strong> est <strong>un équilibre de Nash de $G^+$</strong>.
+<strong>THÉORÈME 7.3</strong> : <strong>tout jeu FINI d'information incomplète en possède au moins un</strong>.</p>
+<p><strong>La preuve, en trois lignes</strong> : <em>« il suffit de montrer que $G^+$ possède un équilibre de Nash. <strong>Parce que le jeu associé à un jeu FINI est LUI-MÊME FINI</strong>, on applique le <strong>théorème 7.2</strong>. »</em> $\blacksquare$</p>
+<p class="cal piege"> <strong>Tout le bénéfice de la construction</strong> : un théorème d'existence entièrement nouveau, <strong>gratuitement</strong>.</p>
+</div></details><details class="cor">
+<summary><strong>43. Décrire l'exemple 7.2 et la manière de « voir » la construction.</strong></summary><div class="in">
+
+<p>Deux firmes en concurrence <strong>à la Bertrand</strong> ; <strong>le coût marginal de 1 est connu</strong>, celui de 2 est <strong>élevé ou faible, équiprobables</strong>. Firme 1 : <strong>un type</strong> ; firme 2 : <strong>deux types</strong>.</p>
+<blockquote>
+<p class="cal piege"> <em>« <strong>Imaginez qu'il y a en fait TROIS firmes</strong> : la firme 1, la firme 2 à coût élevé, et la firme 2 à coût faible. <strong>Imaginez que chacune doit SIMULTANÉMENT choisir un prix</strong> et que la firme 1 croit que <strong>chacune des firmes 2 est également susceptible d'être son unique concurrent</strong>. »</em></p>
+</blockquote>
+<blockquote>
+<p><em>« <strong>Un peu de réflexion vous convaincra que cette manière de voir capture MAGNIFIQUEMENT tous les traits stratégiques pertinents</strong> : la firme 1 choisit <strong>sans savoir</strong> le type du concurrent, et <strong>comprend que son prix peut différer selon ses coûts</strong>. »</em></p>
+</blockquote>
+</div></details><details class="cor">
+<summary><strong>44.  Quelle convention de partage l'exemple 7.3 stipule-t-il, et pourquoi ?</strong></summary><div class="in">
+
+<table>
+<thead>
+<tr>
+<th>Le cas</th>
+<th>Le partage</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Les coûts des <strong>deux</strong> firmes sont <strong>strictement sous</strong> le prix commun</td>
+<td><strong>partage égal</strong></td>
+</tr>
+<tr>
+<td>Sinon</td>
+<td><strong>la firme 1 prend tout</strong></td>
+</tr>
+</tbody></table>
+<p><strong>La justification</strong> : <em>« si le prix commun est au-dessus du coût de la <strong>seule</strong> firme 1, <strong>la firme 1 pourrait capturer le marché entier en BAISSANT LÉGÈREMENT son prix</strong> […] <strong>alors que la firme 2 ne baisserait PAS le sien parce que cela entraînerait des PERTES</strong> »</em>.</p>
+</div></details><details class="cor">
+<summary><strong>45. Comment obtient-on les paiements du jeu associé (figure 7.8) ?</strong></summary><div class="in">
+
+<p><strong>Pour $2_\ell$ et $2_h$</strong> : <em>« <strong>en les LISANT SIMPLEMENT</strong> sur les matrices de la figure 7.7. <strong>C'est parce qu'il n'y a qu'UN SEUL type de firme 1.</strong> »</em> — leur paiement est le même <strong>quel que soit</strong> le prix de l'autre type.</p>
+<p><strong>Pour la firme 1</strong> : par <strong>ESPÉRANCE</strong>. Exemple travaillé avec $p_1=4$, $p_\ell=1$, $p_h=6$ :</p>
+<table>
+<thead>
+<tr>
+<th>Coût de 2</th>
+<th>Paiement de 1</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>faible</td>
+<td>$0$</td>
+</tr>
+<tr>
+<td>élevé</td>
+<td>$16$</td>
+</tr>
+</tbody></table>
+<p>$$\tfrac12(0)+\tfrac12(16)=\boxed{8}$$</p>
+</div></details><details class="cor">
+<summary><strong>46. Résoudre l'exemple 7.3 et en tirer la leçon économique.</strong></summary><div class="in">
+
+<table>
+<thead>
+<tr>
+<th>Firme</th>
+<th>Stratégie</th>
+<th>Statut</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$2_\ell$</td>
+<td>prix $4$</td>
+<td><strong>faiblement dominante</strong></td>
+</tr>
+<tr>
+<td>$2_h$</td>
+<td>prix $6$</td>
+<td><strong>faiblement dominante</strong></td>
+</tr>
+<tr>
+<td>$1$</td>
+<td>prix $4$</td>
+<td><strong>strictement dominante</strong> <em>une fois les autres éliminées</em></td>
+</tr>
+</tbody></table>
+<p><strong>La vérification pour 1</strong>, avec $p_\ell=4$, $p_h=6$ : $p_1=6\Rightarrow3$ · $p_1=4\Rightarrow\boxed{12}$ · $p_1=1\Rightarrow7$.</p>
+<p>⟹ <em>« <strong>deux des trois firmes choisissent un prix de 4 tandis que la troisième choisit 6</strong> »</em>.</p>
+<p class="cal piege"> <strong>La leçon</strong> : <em>« <strong>en contraste avec Bertrand en information COMPLÈTE, les profits NE SONT PAS ramenés à zéro. Seule la firme 2 à coût élevé gagne un profit nul.</strong> »</em></p>
+</div></details></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h2>Flashcards</h2>
+<table>
+<thead>
+<tr>
+<th>Question</th>
+<th>Réponse</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>La définition de la théorie des jeux ?</td>
+<td>L'étude de <strong>comment des agents rationnels se comportent dans des jeux</strong></td>
+</tr>
+<tr>
+<td> Sa « marque » ?</td>
+<td><strong>LA CIRCULARITÉ</strong> — chacun doit connaître l'autre pour décider</td>
+</tr>
+<tr>
+<td>Les six concepts de solution du chapitre ?</td>
+<td>dominance · <strong>Nash</strong> · <strong>Bayes-Nash</strong> · induction à rebours · perfection en sous-jeux · équilibre séquentiel</td>
+</tr>
+<tr>
+<td>Ce qui distingue le non stratégique ?</td>
+<td>Les décisions se prennent <strong>« en ISOLEMENT »</strong></td>
+</tr>
+<tr>
+<td>Deux modèles stratégiques déjà vus ?</td>
+<td><strong>Cournot</strong> et <strong>Bertrand</strong> <em>(chapitre 4)</em></td>
+</tr>
+<tr>
+<td>Les deux lancers du duel ?</td>
+<td>Balle rapide ($F$) et courbe ($C$)</td>
+</tr>
+<tr>
+<td>Qui gagne dans le duel ?</td>
+<td>Le <strong>batteur</strong> s'il <strong>devine</strong> le lancer ; sinon le lanceur</td>
+</tr>
+<tr>
+<td> Pourquoi « toujours la rapide » échoue ?</td>
+<td>Le batteur <strong>s'y prépare et la frappe</strong></td>
+</tr>
+<tr>
+<td>La structure de l'argument d'imprévisibilité ?</td>
+<td>Par l'<strong>absurde</strong> : prévisible ⟹ contradiction</td>
+</tr>
+<tr>
+<td>L'analogie du livre ?</td>
+<td><em>« un aspect essentiel du <strong>BLUFF réussi</strong> au poker »</em></td>
+</tr>
+<tr>
+<td> Sa limite ?</td>
+<td><em>« Quand vous êtes <strong>seul</strong>, il n'y a <strong>personne à tromper</strong> »</em></td>
+</tr>
+<tr>
+<td>Définition 7.1 ?</td>
+<td>$G=(S_i,u_i)_{i=1}^N$ avec $u_i:\prod_j S_j\to\mathbb{R}$</td>
+</tr>
+<tr>
+<td>Ce qui rend $G$ <strong>fini</strong> ?</td>
+<td>Chaque $S_i$ contient <strong>finiment</strong> d'éléments</td>
+</tr>
+<tr>
+<td>Ce que signifie $-i$ ?</td>
+<td><strong>Tous les joueurs SAUF $i$</strong></td>
+</tr>
+<tr>
+<td>Définition 7.2 ?</td>
+<td>$\hat s_i$ <strong>strictement DOMINANTE</strong> : bat <strong>toutes</strong> les autres, pour tout $s_{-i}$</td>
+</tr>
+<tr>
+<td> Sa fréquence ?</td>
+<td><em>« <strong>plutôt RARE</strong> »</em></td>
+</tr>
+<tr>
+<td>Définition 7.3 ?</td>
+<td>$\hat s_i$ domine strictement $\bar s_i$ : $u_i(\hat s_i,s_{-i})&gt;u_i(\bar s_i,s_{-i})$ pour tout $s_{-i}$</td>
+</tr>
+<tr>
+<td>La différence entre les deux ?</td>
+<td><strong>Une contre TOUTES</strong> vs <strong>une contre UNE</strong></td>
+</tr>
+<tr>
+<td>Le résultat de la fig. 7.2 ?</td>
+<td>$(U,L)$, paiements $(3,0)$</td>
+</tr>
+<tr>
+<td> Ce que 1 n'a pas à faire dans la fig. 7.2 ?</td>
+<td><strong>Raisonner</strong> — son meilleur choix est <strong>indépendant</strong> de 2</td>
+</tr>
+<tr>
+<td>Ce qu'on élimine dans la fig. 7.3 ?</td>
+<td>$C$ <em>(pour 1)</em> et $M$ <em>(pour 2)</em></td>
+</tr>
+<tr>
+<td> Le fait qui force l'itération ?</td>
+<td><strong>La dominance CRÉE de la dominance</strong></td>
+</tr>
+<tr>
+<td>L'exemple précis ?</td>
+<td>$R$ n'est pas dominée dans l'original, mais l'est <strong>une fois $D$ éliminée</strong></td>
+</tr>
+<tr>
+<td>Définition 7.4 ?</td>
+<td>$s_i\in S_i^n$ <strong>pour tout $n\geq1$</strong></td>
+</tr>
+<tr>
+<td>Définition 7.5 ?</td>
+<td>$\geq$ partout,  <strong>avec au moins une STRICTE</strong></td>
+</tr>
+<tr>
+<td>Ce que montre la figure 7.4 ?</td>
+<td>La stricte n'élimine <strong>rien</strong> ; la faible isole $(U,L)$</td>
+</tr>
+<tr>
+<td>La relation entre les deux procédures ?</td>
+<td>$\bigcap_n W_i^n\subseteq\bigcap_n S_i^n$</td>
+</tr>
+<tr>
+<td> Pour laquelle l'ORDRE compte ?</td>
+<td> Pour la <strong>FAIBLE</strong> <em>(ex. 7.3(a))</em> — pas la stricte</td>
+</tr>
+<tr>
+<td>La règle de « devine la moyenne » ?</td>
+<td>Le plus proche du <strong>tiers de la moyenne</strong> gagne 100 $</td>
+</tr>
+<tr>
+<td>Pourquoi 33 domine faiblement ?</td>
+<td>Le tiers de la moyenne est <strong>au plus $33\tfrac13$</strong></td>
+</tr>
+<tr>
+<td>Le cas où c'est <strong>strict</strong> ?</td>
+<td><em>« si <strong>tous les autres choisissent 34</strong> »</em></td>
+</tr>
+<tr>
+<td>La suite des tours ?</td>
+<td>$100\to33\to11\to\dots\to\boxed{1}$</td>
+</tr>
+<tr>
+<td> Combien de tours pour la dominance <strong>stricte</strong> ?</td>
+<td> <strong>99</strong> <em>(ex. 7.5(d))</em></td>
+</tr>
+<tr>
+<td>99 est-elle strictement dominée ?</td>
+<td> <strong>NON</strong> <em>(ex. 7.5(c))</em></td>
+</tr>
+<tr>
+<td>Pourquoi la dominance ne résout pas le duel ?</td>
+<td> <strong>Aucune</strong> stratégie n'y est dominée, ni strictement ni faiblement</td>
+</tr>
+<tr>
+<td>L'analogie qui motive Nash ?</td>
+<td>L'<strong>équilibre de marché</strong> — <em>« aucune tendance à changer »</em></td>
+</tr>
+<tr>
+<td>Définition 7.7 ?</td>
+<td>$u_i(\hat s)\geq u_i(s_i,\hat s_{-i})$ pour tout $s_i$</td>
+</tr>
+<tr>
+<td>L'idée informelle ?</td>
+<td><em>« <strong>pleinement conscient</strong> du comportement des autres, <strong>aucune incitation à changer</strong> »</em></td>
+</tr>
+<tr>
+<td>Le duel a-t-il un équilibre pur ?</td>
+<td> <strong>AUCUN</strong></td>
+</tr>
+<tr>
+<td> Pourquoi c'était prévisible ?</td>
+<td>Un équilibre pur rend les choix <strong>PARFAITEMENT PRÉVISIBLES</strong></td>
+</tr>
+<tr>
+<td>Définition 7.8 ?</td>
+<td>$m_i:S_i\to[0,1]$ avec $\sum_{s_i}m_i(s_i)=1$</td>
+</tr>
+<tr>
+<td>L'image du livre ?</td>
+<td>Une <strong>ROULETTE</strong> portant les noms des stratégies pures</td>
+</tr>
+<tr>
+<td> Les mixtes donnent-elles plus de choix ?</td>
+<td> <strong>Strictement plus</strong> — les pures sont les <strong>dégénérées</strong></td>
+</tr>
+<tr>
+<td>La formule de $u_i(m)$ ?</td>
+<td>$\sum_{s\in S}m_1(s_1)\cdots m_N(s_N)u_i(s)$</td>
+</tr>
+<tr>
+<td> Pourquoi un <strong>produit</strong> ?</td>
+<td>Parce que les joueurs choisissent <strong>INDÉPENDAMMENT</strong></td>
+</tr>
+<tr>
+<td>Définition 7.9 ?</td>
+<td>$u_i(\hat m)\geq u_i(m_i,\hat m_{-i})$ pour toute $m_i\in M_i$</td>
+</tr>
+<tr>
+<td>Le problème que résout le thm 7.1 ?</td>
+<td>Il faudrait sinon tester <strong>tout l'ensemble INFINI</strong> $M_i$</td>
+</tr>
+<tr>
+<td>Ce qu'il exploite ?</td>
+<td> La <strong>LINÉARITÉ</strong> de $u_i$ en $m_i$</td>
+</tr>
+<tr>
+<td>L'énoncé (b) ?</td>
+<td><strong>Égalité</strong> sur le support, <strong>$\geq$</strong> hors du support</td>
+</tr>
+<tr>
+<td>L'énoncé (c) ?</td>
+<td>Il suffit de tester <strong>les stratégies PURES</strong></td>
+</tr>
+<tr>
+<td> Lequel sert à CALCULER ?</td>
+<td> <strong>(b)</strong> — l'<strong>indifférence</strong></td>
+</tr>
+<tr>
+<td>Lequel sert à VÉRIFIER ?</td>
+<td><strong>(c)</strong></td>
+</tr>
+<tr>
+<td>Le pas clé de (a)⟹(b) ?</td>
+<td>$u_i(\hat m)$ est une <strong>combinaison convexe STRICTE</strong> des paiements du support</td>
+</tr>
+<tr>
+<td>Le pas clé de (c)⟹(a) ?</td>
+<td>$u_i(m_i,\hat m_{-i})$ est une <strong>combinaison convexe</strong> des mêmes nombres</td>
+</tr>
+<tr>
+<td>Les paiements de l'exemple 7.1 ?</td>
+<td>$0$ <em>(échec)</em> · $2$ <em>(son propre logiciel)</em> · $1$ <em>(celui de l'autre)</em></td>
+</tr>
+<tr>
+<td>Ses équilibres purs ?</td>
+<td>$(WP,WP)$ et $(MW,MW)$</td>
+</tr>
+<tr>
+<td>L'équation d'indifférence de 1 ?</td>
+<td>$2q=1-q$</td>
+</tr>
+<tr>
+<td>Celle de 2 ?</td>
+<td>$1-p=2p$</td>
+</tr>
+<tr>
+<td>Le résultat ?</td>
+<td>$p=q=\boxed{1/3}$</td>
+</tr>
+<tr>
+<td> Le paiement dans l'équilibre mixte ?</td>
+<td>$2/3$ —  <strong>INEFFICACE</strong></td>
+</tr>
+<tr>
+<td> Le troisième enseignement ?</td>
+<td>Un équilibre mixte existe <strong>même sans désir d'imprévisibilité</strong></td>
+</tr>
+<tr>
+<td>Interprétation n°1 des mixtes ?</td>
+<td>La <strong>ROULETTE</strong> — randomisation <strong>délibérée</strong></td>
+</tr>
+<tr>
+<td>Interprétation n°2 ?</td>
+<td>Les <strong>CROYANCES</strong> des autres —  personne ne randomise</td>
+</tr>
+<tr>
+<td>Quand la n°1 convient ?</td>
+<td>Intérêts <strong>OPPOSÉS</strong> <em>(le duel)</em></td>
+</tr>
+<tr>
+<td>Quand la n°2 ?</td>
+<td>Intérêts qui <strong>coïncident</strong> en partie</td>
+</tr>
+<tr>
+<td>Théorème 7.2 ?</td>
+<td><strong>Tout jeu FINI possède au moins un équilibre de Nash</strong></td>
+</tr>
+<tr>
+<td>Son auteur ?</td>
+<td><strong>Nash (1951)</strong></td>
+</tr>
+<tr>
+<td>Les trois pas de sa preuve ?</td>
+<td>Construire $f$ · <strong>BROUWER</strong> · le point fixe est un équilibre</td>
+</tr>
+<tr>
+<td>Ce que fait $f$ ?</td>
+<td> Elle <strong>pousse le poids vers ce qui fait mieux que la moyenne</strong></td>
+</tr>
+<tr>
+<td> Pourquoi le dénominateur ne s'annule pas ?</td>
+<td>Il n'est <strong>jamais inférieur à UN</strong></td>
+</tr>
+<tr>
+<td>Les trois propriétés de $M$ ?</td>
+<td><strong>Non vide</strong>, <strong>compact</strong>, <strong>convexe</strong></td>
+</tr>
+<tr>
+<td>Le numéro du théorème de Brouwer ?</td>
+<td><strong>A1.11</strong></td>
+</tr>
+<tr>
+<td>L'astuce du pas 3 ?</td>
+<td>Multiplier par $u_i(j,\hat m_{-i})-u_i(\hat m)$ et <strong>sommer sur $j$</strong></td>
+</tr>
+<tr>
+<td> Pourquoi le membre de gauche est nul ?</td>
+<td>Les $\hat m_{ij}$ <strong>somment à 1</strong> ⟹ $u_i(\hat m)-u_i(\hat m)=0$</td>
+</tr>
+<tr>
+<td>Pourquoi chaque terme de droite est $\geq0$ ?</td>
+<td>$x\cdot\max(0,x)=\max(0,x)^2$</td>
+</tr>
+<tr>
+<td>Ce qui conclut ?</td>
+<td>Le <strong>théorème 7.1(c)</strong></td>
+</tr>
+<tr>
+<td> La portée conceptuelle du thm 7.2 ?</td>
+<td><em>« <strong>une mesure de la SOLIDITÉ de l'idée</strong> »</em></td>
+</tr>
+<tr>
+<td>La limitation levée par le §7.2.3 ?</td>
+<td>On supposait chacun <strong>parfaitement informé</strong> des paiements des autres</td>
+</tr>
+<tr>
+<td>L'auteur de l'idée ?</td>
+<td><strong>Harsanyi (1967-1968)</strong></td>
+</tr>
+<tr>
+<td> L'idée en une phrase ?</td>
+<td><strong>Ajouter un ingrédient</strong> pour en refaire un jeu sous forme stratégique</td>
+</tr>
+<tr>
+<td>Ce qu'est un <strong>type</strong> ?</td>
+<td>Un élément de l'ensemble <strong>fini</strong> $T_i$</td>
+</tr>
+<tr>
+<td> De quoi dépend $u_i$ ?</td>
+<td>De $S$ <strong>ET de TOUS les types</strong> — $u_i:S\times T\to\mathbb{R}$</td>
+</tr>
+<tr>
+<td>L'exemple qui le justifie ?</td>
+<td>L'<strong>enchère pétrolière</strong> — l'info des autres affecte mon paiement</td>
+</tr>
+<tr>
+<td>Ce qu'est une croyance ?</td>
+<td>$p_i(t_{-i}\mid t_i)$, une distribution sur $T_{-i}$</td>
+</tr>
+<tr>
+<td>L'a priori commun ?</td>
+<td>Tous les $p_i$ dérivés d'un <strong>$p$ unique</strong> par <strong>Bayes</strong></td>
+</tr>
+<tr>
+<td>Sa lecture n°1 ?</td>
+<td>Une distribution <strong>empirique objective</strong></td>
+</tr>
+<tr>
+<td>Sa lecture n°2 ?</td>
+<td>Les différences de croyances viennent <strong>uniquement de l'information</strong></td>
+</tr>
+<tr>
+<td> Le livre l'impose-t-il ?</td>
+<td> <strong>NON</strong></td>
+</tr>
+<tr>
+<td>Ce qui devient impossible avec lui ?</td>
+<td>Deux joueurs en <strong>désaccord sur le support</strong> d'un troisième <em>(ex. 7.20)</em></td>
+</tr>
+<tr>
+<td>Définition 7.10 ?</td>
+<td>$G=(p_i,T_i,S_i,u_i)_{i=1}^N$ — un <strong>jeu bayésien</strong></td>
+</tr>
+<tr>
+<td> Le principe de $G^+$ ?</td>
+<td> <strong>Chaque TYPE devient un JOUEUR</strong></td>
+</tr>
+<tr>
+<td>Les stratégies du joueur $t_i$ ?</td>
+<td><strong>$S_i$</strong> — celles de son joueur d'origine</td>
+</tr>
+<tr>
+<td>La formule de $v_{t_i}$ ?</td>
+<td>$\sum_{t_{-i}}p_i(t_{-i}\mid t_i)\,u_i\big(s_1(t_1),\dots,s_N(t_N),t\big)$</td>
+</tr>
+<tr>
+<td>Ce que capture $p_i(t_{-i}\mid t_i)$ ?</td>
+<td>L'<strong>incertitude</strong> de $i$ sur les types des autres</td>
+</tr>
+<tr>
+<td>Ce que capture $s_j(t_j)$ ?</td>
+<td>Que <strong>le comportement des autres dépend de leurs types</strong></td>
+</tr>
+<tr>
+<td>Définition 7.12 ?</td>
+<td>Un <strong>équilibre de Nash de $G^+$</strong></td>
+</tr>
+<tr>
+<td>Théorème 7.3 ?</td>
+<td>Tout jeu bayésien <strong>fini</strong> possède un équilibre bayésien-nashien</td>
+</tr>
+<tr>
+<td> Sa preuve ?</td>
+<td> <strong>Trois lignes</strong> — $G^+$ est fini, donc <strong>théorème 7.2</strong></td>
+</tr>
+<tr>
+<td>Les trois joueurs de l'exemple 7.3 ?</td>
+<td>$1$, $2_\ell$ <em>(coût faible)</em>, $2_h$ <em>(coût élevé)</em></td>
+</tr>
+<tr>
+<td>Les coûts ?</td>
+<td>$0$ pour 1 ; $1$ ou $4$ pour 2, <strong>équiprobables</strong></td>
+</tr>
+<tr>
+<td>La demande ?</td>
+<td>$8-p$ au <strong>prix le plus bas</strong></td>
+</tr>
+<tr>
+<td>Les prix admissibles ?</td>
+<td>$\{1,\ 4,\ 6\}$</td>
+</tr>
+<tr>
+<td> La convention de partage ?</td>
+<td>Égal si <strong>les deux</strong> coûts sont sous le prix ; <strong>sinon 1 prend tout</strong></td>
+</tr>
+<tr>
+<td>Comment lit-on les paiements de $2_\ell$, $2_h$ ?</td>
+<td><strong>Directement</strong> — la firme 1 n'a <strong>qu'un type</strong></td>
+</tr>
+<tr>
+<td>Comment calcule-t-on ceux de 1 ?</td>
+<td>Par <strong>ESPÉRANCE</strong> — ex. $\tfrac12(0)+\tfrac12(16)=8$</td>
+</tr>
+<tr>
+<td>Les stratégies faiblement dominantes ?</td>
+<td>$p_\ell=4$ et $p_h=6$</td>
+</tr>
+<tr>
+<td>Celle de la firme 1 ensuite ?</td>
+<td>$p_1=4$, <strong>strictement dominante</strong> <em>(3, 12, 7)</em></td>
+</tr>
+<tr>
+<td> La leçon économique ?</td>
+<td> <strong>Les profits ne sont PAS ramenés à zéro</strong> — seule $2_h$ gagne zéro</td>
+</tr>
+</tbody></table>
+</main>
+
+
+
+
+</body></html>

@@ -1,0 +1,1400 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fiche 408 — Régression linéaire : MLE, MAP, régression bayésienne, projection orthogonale</title>
+<script>
+window.MathJax={tex:{inlineMath:[["$","$"]],displayMath:[["$$","$$"]],processEscapes:true},
+ options:{skipHtmlTags:["script","noscript","style","textarea","pre","code"]},
+ svg:{fontCache:"global"},
+ startup:{pageReady:()=>MathJax.startup.defaultPageReady().then(()=>{document.body.classList.add("ready")})}};
+setTimeout(function(){document.body.classList.add("ready")},2500);
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+/* ============================================================
+   MathiasLearn — feuille de style des fiches
+   Reprise intégrale des tokens de 00_PARCOURS/*.html
+   + blocs pédagogiques (callouts, méthode, essentiels, recall)
+   ============================================================ */
+:root{--bg:#faf9f7;--card:#fff;--ink:#1a1a1a;--muted:#6b6b6b;--line:#e5e2dd;--accent:#8b5e34;
+ --hl:#fdf8ef;--ok:#2d7d4f;--okbg:#f0f7f3;--warn:#b3402f;--warnbg:#fdf3f1;--blue:#2f5d8b;--bluebg:#f1f5fa}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+ font:17px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;padding:0 16px 100px}
+.nav{position:sticky;top:0;background:rgba(250,249,247,.96);backdrop-filter:blur(8px);
+ border-bottom:1px solid var(--line);margin:0 -16px 30px;padding:11px 16px;z-index:50;
+ display:flex;gap:6px;flex-wrap:wrap;font-size:13px}
+.nav a{color:var(--muted);text-decoration:none;padding:4px 9px;border-radius:5px;white-space:nowrap}
+.nav a:hover{background:var(--line);color:var(--ink)}
+.nav a.on{background:var(--accent);color:#fff}
+main{max-width:780px;margin:0 auto}
+h1{font-size:31px;letter-spacing:-.02em;margin:.4em 0 .5em;line-height:1.25}
+h2{font-size:23px;margin:2.2em 0 .7em;padding-bottom:.3em;border-bottom:1px solid var(--line)}
+h3{font-size:19px;margin:1.9em 0 .5em;color:var(--accent)}
+h4{font-size:17px;margin:1.5em 0 .4em}
+p{margin:.8em 0} a{color:var(--accent)} hr{border:0;border-top:1px solid var(--line);margin:2.6em 0}
+table{border-collapse:collapse;width:100%;margin:1.3em 0;font-size:15.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+th{background:#f3f0eb;font-weight:600}
+tr:nth-child(even) td{background:#fcfbfa}
+code{font-family:"SF Mono",Menlo,Consolas,monospace;font-size:.88em;background:#f2efea;padding:2px 6px;border-radius:4px;overflow-wrap:break-word}
+pre{background:#f2efea;padding:14px 16px;border-radius:8px;overflow-x:auto}
+pre code{background:none;padding:0;white-space:pre}
+blockquote{border-left:3px solid var(--accent);background:var(--hl);margin:1.4em 0;padding:14px 20px;border-radius:0 8px 8px 0}
+blockquote p:first-child{margin-top:0} blockquote p:last-child{margin-bottom:0}
+ul,ol{padding-left:1.5em} li{margin:.35em 0} em{color:#4a4a4a}
+mjx-container[display="true"]{margin:1.1em 0!important;overflow-x:auto;overflow-y:hidden;padding:2px 0}
+mjx-container svg{max-width:100%}
+body:not(.ready) main{opacity:0} main{opacity:1;transition:opacity .25s}
+
+/* --- bandeau de tête de fiche --- */
+.cours{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--accent);
+ border-radius:0 10px 10px 0;padding:18px 22px;margin:0 0 34px}
+.cours h4{margin:0 0 4px;font-size:14px;text-transform:uppercase;letter-spacing:.07em;color:var(--accent)}
+.cours .cs{color:var(--muted);font-size:14.5px;margin:0 0 14px}
+
+/* --- exercices / corrigés --- */
+.ex{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:6px 24px 20px;margin:18px 0}
+.ex>h3:first-child{margin-top:14px}
+details.cor{margin-top:18px;border:1px solid var(--line);border-radius:8px;background:#fcfbfa;overflow:hidden}
+details.cor>summary{cursor:pointer;padding:12px 16px;font-weight:600;font-size:15px;color:var(--accent);
+ list-style:none;display:flex;align-items:center;gap:9px;user-select:none;transition:.15s;min-height:44px}
+details.cor>summary::-webkit-details-marker{display:none}
+details.cor>summary:hover{background:var(--hl)}
+details.cor>summary::before{content:"\25B6";font-size:10px;transition:transform .18s;display:inline-block}
+details.cor[open]>summary::before{transform:rotate(90deg)}
+details.cor[open]>summary{background:var(--okbg);color:var(--ok);border-bottom:1px solid var(--line)}
+.cor .in{padding:4px 20px 16px}
+.cor .in>*:first-child{margin-top:.9em}
+
+/* --- blocs pédagogiques (callouts) ---
+   Générés depuis une citation Markdown dont le premier **gras** commence
+   par un mot-clé : DÉFINITION, THÉORÈME, MÉTHODE, PIÈGE, INTUITION… */
+.cal{border:1px solid var(--line);border-left:4px solid var(--accent);background:var(--card);
+ border-radius:0 10px 10px 0;padding:15px 20px;margin:1.5em 0}
+.cal>p:first-child{margin-top:0}.cal>p:last-child,.cal>ul:last-child,.cal>ol:last-child{margin-bottom:0}
+.cal .lab{display:block;font-size:12.5px;text-transform:uppercase;letter-spacing:.08em;
+ font-weight:700;color:var(--accent);margin-bottom:6px}
+.cal.formel{background:var(--hl)}
+.cal.piege{border-left-color:var(--warn);background:var(--warnbg)}
+.cal.piege .lab{color:var(--warn)}
+.cal.methode{border-left-color:var(--ok);background:var(--okbg)}
+.cal.methode .lab{color:var(--ok)}
+.cal.intu{border-left-color:var(--blue);background:var(--bluebg)}
+.cal.intu .lab{color:var(--blue)}
+.cal.plus{border-left-style:dashed;background:#faf9f7}
+.cal.plus .lab{color:var(--muted)}
+
+/* --- révision express --- */
+.ess{background:var(--card);border:1px solid var(--accent);border-radius:10px;padding:4px 24px 20px;margin:1.6em 0}
+.ess h3{margin-top:1.3em}
+.rec{background:var(--card);border:1px dashed var(--accent);border-radius:10px;padding:4px 24px 18px;margin:1.6em 0}
+.rec ol{counter-reset:none}
+
+/* --- impression / PDF --- */
+@media print{
+ .nav{display:none}
+ body{padding:0;background:#fff;font-size:11.2pt;line-height:1.55}
+ main{max-width:none}
+ h1{font-size:23pt}h2{font-size:15pt;margin-top:1.5em}h3{font-size:12.6pt}
+ h2,h3,h4{break-after:avoid;page-break-after:avoid}
+ table,.cal,blockquote{break-inside:avoid;page-break-inside:avoid}
+ table{display:table;font-size:9.6pt}
+ details.cor{border:1px solid var(--line);background:#fcfbfa}
+ details.cor>summary{display:none}
+ details.cor .in{padding-top:10px}
+ .cal,.ex,.ess,.rec{box-shadow:none}
+ a{color:var(--ink);text-decoration:none}
+}
+@page{margin:16mm 15mm 18mm}
+
+/* --- exemples travaillés --- */
+.exm{background:#fcfbfa;border:1px solid var(--line);border-radius:10px;padding:2px 20px 14px;margin:1.5em 0}
+.exm>h4:first-child{margin:14px 0 .5em;color:var(--accent);font-size:13px;text-transform:uppercase;letter-spacing:.07em}
+
+
+/* --- pastilles de priorité (conventions des fiches de l'app) --- */
+h2[data-prio], h3[data-prio], h4[data-prio]{position:relative}
+h2[data-prio]::before,h3[data-prio]::before,h4[data-prio]::before{
+ content:"";display:inline-block;width:9px;height:9px;border-radius:50%;
+ margin-right:9px;vertical-align:middle;background:var(--muted)}
+[data-prio="must"]::before{background:var(--warn)}
+[data-prio="high"]::before{background:#d98324}
+[data-prio="mid"]::before{background:#c9a227}
+[data-prio="low"]::before{background:var(--ok)}
+/* corrigés des fiches de l'app : même traitement que les corrigés des séries */
+details.cor>summary::after{content:""}
+</style></head><body>
+<div class="nav"><a href="00_COMMENCER_ICI.html">Commencer ici</a><a href="01_NOTATIONS_le-decodeur.html">Notations</a><a href="02_EXERCICES_Serie-0.html">Série 0 — Remise en route</a><a href="03_EXERCICES_Serie-1.html">Série 1 — Convexité</a><a href="04_EXERCICES_Serie-2.html">Série 2 — KKT</a><a href="05_AUTO-EVALUATION.html">Auto-évaluation (quiz)</a><a href="06_FICHE_Optimisation-deux-variables.html">Fiche — Optimisation à 2 variables</a></div>
+<main><h1>Fiche 408 — Régression linéaire : MLE, MAP, régression bayésienne, projection orthogonale</h1>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Matière</strong></td>
+<td>Maths · Apprentissage automatique</td>
+</tr>
+<tr>
+<td><strong>Cours source</strong></td>
+<td>Deisenroth, Faisal &amp; Ong, <em>Mathematics for Machine Learning</em>, Cambridge University Press — chapitre 9 « Linear Regression » (p. 289-320)</td>
+</tr>
+<tr>
+<td><strong>Difficulté</strong></td>
+<td> Avancé — le <strong>premier pilier</strong>, celui qui mobilise les six fondations d'un coup</td>
+</tr>
+<tr>
+<td><strong>Temps d'étude estimé</strong></td>
+<td>140 min</td>
+</tr>
+<tr>
+<td><strong>Prérequis</strong></td>
+<td>Fiche 402 (projection orthogonale, équation normale) · Fiche 405 (gaussiennes, conjugaison) · Fiche 407 (MLE, MAP, régularisation)</td>
+</tr>
+<tr>
+<td><strong>Concepts clés</strong></td>
+<td>Modèle de régression, vraisemblance gaussienne, bruit i.i.d., linéarité <strong>en les paramètres</strong>, matrice de conception, estimateur du maximum de vraisemblance, équations normales, application d'attributs, régression polynomiale, matrice d'attributs, estimation de la variance du bruit, RMSE, surapprentissage, estimation MAP, a priori gaussien, moindres carrés régularisés, LASSO, régression linéaire bayésienne, prédictions a priori, loi a posteriori des paramètres, prédictions a posteriori, loi sur les fonctions, vraisemblance marginale, projection orthogonale</td>
+</tr>
+<tr>
+<td><strong>Poids à l'examen</strong></td>
+<td>$\theta_{\text{ML}}=(\Phi^\top\Phi)^{-1}\Phi^\top y$ · $\theta_{\text{MAP}}=\big(\Phi^\top\Phi+\tfrac{\sigma^2}{b^2}I\big)^{-1}\Phi^\top y$ · $\sigma^2_{\text{ML}}=\tfrac1N\sum_n(y_n-\phi^\top(x_n)\theta)^2$ · le <strong>théorème 9.1</strong> ($S_N$, $m_N$) · $p(y_*\mid\mathcal X,\mathcal Y,x_*)=\mathcal N\big(\phi^\top(x_*)m_N,\ \phi^\top(x_*)S_N\phi(x_*)+\sigma^2\big)$ · <strong>MLE $=$ PROJECTION ORTHOGONALE</strong>.</td>
+</tr>
+</tbody></table>
+<h2>Vue d'ensemble</h2>
+<pre><code>LE FIL DU CHAPITRE : trois niveaux de sophistication sur le MÊME modèle
+
+  §9.1 FORMULATION      y = f(x) + ε ,  ε ~ N(0, σ²)  i.i.d.
+        VRAISEMBLANCE   p(y | x, θ) = N(y | φᵀ(x)θ, σ²)
+        ⚠️ « LINÉAIRE » veut dire LINÉAIRE EN LES PARAMÈTRES — pas en x
+  §9.2 ESTIMATION PONCTUELLE
+        MLE   L(θ) = (1/2σ²)‖y − Φθ‖²        →  θML = (ΦᵀΦ)⁻¹ Φᵀ y   ← ÉQUATIONS NORMALES
+              σ²ML = (1/N) Σn (yn − φᵀ(xn)θ)²
+              ⚠️ SURAPPRENTISSAGE : à M = N−1 le polynôme passe par CHAQUE point
+              RMSE = √((1/N)‖y − Φθ‖²)   ← comparable entre jeux, MÊMES UNITÉS que y
+        MAP   a priori N(0, b²I)   →  θMAP = (ΦᵀΦ + (σ²/b²) I)⁻¹ Φᵀ y
+              ⚠️ SEULE différence : le terme (σ²/b²)I qui rend l'inverse TOUJOURS possible
+        RLS   min ‖y − Φθ‖² + λ‖θ‖²  →  θRLS = (ΦᵀΦ + λI)⁻¹ Φᵀ y
+              ⚠️ IDENTIQUE au MAP pour λ = σ²/b²
+  §9.3 RÉGRESSION LINÉAIRE BAYÉSIENNE — on ne fixe PLUS aucun paramètre
+        MODÈLE      p(θ) = N(m0, S0)      p(y|x,θ) = N(y | φᵀ(x)θ, σ²)
+        A PRIORI    p(y* | x*) = N(φᵀ(x*)m0 , φᵀ(x*)S0φ(x*) + σ²)
+        A POSTERIORI (Th. 9.1)   SN = (S0⁻¹ + σ⁻² ΦᵀΦ)⁻¹ ,  mN = SN(S0⁻¹m0 + σ⁻²Φᵀy)
+        PRÉDICTION  p(y*|X,Y,x*) = N(φᵀ(x*)mN , φᵀ(x*)SN φ(x*) + σ²)
+                    ⚠️ la MOYENNE prédictive COÏNCIDE avec la prédiction du MAP
+        SANS BRUIT  même moyenne, variance SANS le +σ²
+        VRAISEMBLANCE MARGINALE   p(Y|X) = N(y | X m0 , X S0 Xᵀ + σ²I)
+  §9.4 GÉOMÉTRIE      MLE = PROJECTION ORTHOGONALE de y sur l'espace des COLONNES de Φ
+        Pπ = Φ(ΦᵀΦ)⁻¹Φᵀ    ·   si les φk sont ORTHONORMÉES, Pπ = ΦΦᵀ
+
+LA HIÉRARCHIE DES TROIS RÉPONSES
+  MLE   un point                  · sur-apprend en régime de petites données
+  MAP   un point BIAISÉ           · l'a priori JOUE le rôle du régularisateur
+  BAYES une LOI COMPLÈTE          · aucune estimation, on MOYENNE sur tous les θ plausibles
+</code></pre>
+<blockquote>
+<p><strong>Le programme du chapitre.</strong> Après le pont du chapitre 8, la régression linéaire est le <strong>premier pilier</strong> — et le seul où <strong>tout est calculable en forme fermée</strong>. Elle mobilise l'<strong>algèbre linéaire</strong> (ch. 2), la <strong>projection orthogonale</strong> (ch. 3), le <strong>calcul de gradients</strong> (ch. 5), les <strong>gaussiennes et la conjugaison</strong> (ch. 6) et l'<strong>optimisation</strong> (ch. 7).</p>
+</blockquote>
+<h2 data-prio="must">Concept 1 — La formulation du problème (§9.1)</h2>
+<h3>1.1 Le modèle</h3>
+<p>$$\boxed{\;p(y\mid x)=\mathcal N\big(y\mid f(x),\ \sigma^2\big)\quad\Longleftrightarrow\quad y=f(x)+\epsilon,\qquad\epsilon\sim\mathcal N(0,\sigma^2)\;}$$</p>
+<p>avec $x\in\mathbb R^D$ les <strong>entrées</strong> et $y\in\mathbb R$ les <strong>valeurs de fonction bruitées</strong> (les <strong>cibles</strong>). Le bruit $\epsilon$ est <strong>i.i.d. gaussien</strong> de moyenne $0$ et variance $\sigma^2$.</p>
+<blockquote>
+<p><strong>L'objectif.</strong> <em>« Trouver une fonction <strong>PROCHE de la fonction INCONNUE $f$</strong> qui a généré les données et <strong>qui GÉNÉRALISE bien</strong>. »</em></p>
+</blockquote>
+<p><strong>Le cas linéaire :</strong></p>
+<p>$$\boxed{\;p(y\mid x,\theta)=\mathcal N\big(y\mid x^\top\theta,\ \sigma^2\big)\quad\Longleftrightarrow\quad y=x^\top\theta+\epsilon\;}$$</p>
+<blockquote>
+<p class="cal piege"> <strong>LA DÉFINITION EXACTE DE « LINÉAIRE ».</strong> *« La régression linéaire désigne les modèles qui sont <strong>"LINÉAIRES EN LES PARAMÈTRES"</strong>, c'est-à-dire les modèles qui décrivent une fonction par une <strong>COMBINAISON LINÉAIRE D'ATTRIBUTS d'entrée</strong>. »* Un <strong>attribut</strong> est une <strong>représentation $\phi(x)$</strong> des entrées $x$.
+$$\boxed{\;y=\phi^\top(x)\theta+\epsilon\ \text{ EST une régression linéaire, même si }\phi\text{ est NON LINÉAIRE}\;}$$</p>
+</blockquote>
+<p><strong>Exemple 9.1.</strong> Pour $x,\theta\in\mathbb R$, le modèle décrit des <strong>droites passant par l'origine</strong>, et $\theta$ est la <strong>PENTE</strong>.</p>
+<blockquote>
+<p class="cal piege"> <strong>La seule source d'incertitude.</strong> <em>« La seule source d'incertitude vient du <strong>BRUIT D'OBSERVATION</strong> (puisque $x$ et $\theta$ sont supposés connus). <strong>Sans bruit d'observation</strong>, la relation entre $x$ et $y$ serait <strong>DÉTERMINISTE</strong> et la vraisemblance serait un <strong>DELTA DE DIRAC</strong> »</em> — une fonction nulle partout sauf en un point, d'intégrale 1, qu'on peut voir comme une gaussienne à la limite $\sigma^2\to0$.</p>
+</blockquote>
+<p><strong>Les hypothèses de travail :</strong> on considère des <strong>modèles PARAMÉTRIQUES</strong>, et <em>« pour le moment, on suppose que la variance du bruit $\sigma^2$ est <strong>CONNUE</strong> »</em>.</p>
+<h3>1.2 La factorisation de la vraisemblance</h3>
+<p>Avec $\mathcal D:=\{(x_1,y_1),\dots,(x_N,y_N)\}$ :</p>
+<blockquote>
+<p> <strong>La clé graphique.</strong> <em>« $y_i$ et $y_j$ sont <strong>CONDITIONNELLEMENT INDÉPENDANTES sachant leurs entrées respectives</strong> $x_i,x_j$, de sorte que la vraisemblance <strong>SE FACTORISE</strong> »</em> :</p>
+</blockquote>
+<p>$$\boxed{\;p(\mathcal Y\mid\mathcal X,\theta)=\prod_{n=1}^{N}p(y_n\mid x_n,\theta)=\prod_{n=1}^{N}\mathcal N\big(y_n\mid x_n^\top\theta,\ \sigma^2\big)\;}$$</p>
+<p>Et une fois $\theta^*$ trouvé, la prédiction en une entrée de test $x_*$ est</p>
+<p>$$p(y_*\mid x_*,\theta^*)=\mathcal N\big(y_*\mid x_*^\top\theta^*,\ \sigma^2\big)$$</p>
+<p><em>Le modèle graphique (figure 9.3) : $\theta$ et $\sigma$ en haut, une <strong>plaque</strong> sur $n=1,\dots,N$ contenant $x_n$ et $y_n$ ;  les variables <strong>observées</strong> sont <strong>grisées</strong>, les valeurs <strong>déterministes/connues</strong> sont <strong>sans cercle</strong>.</em></p>
+<h2 data-prio="must">Concept 2 — Le maximum de vraisemblance (§9.2.1)</h2>
+<h3>2.1 La dérivation</h3>
+<p>$$\theta_{\text{ML}}\in\arg\max_\theta p(\mathcal Y\mid\mathcal X,\theta)$$</p>
+<blockquote>
+<p class="cal piege"> <strong>LA REMARQUE À CONNAÎTRE.</strong> *« La vraisemblance $p(y\mid x,\theta)$ <strong>n'est PAS une loi de probabilité en $\theta$</strong> : c'est simplement une <strong>FONCTION</strong> des paramètres, elle <strong>n'intègre PAS à 1</strong> (elle est non normalisée), et elle <strong>peut même ne pas être INTÉGRABLE</strong> par rapport à $\theta$. En revanche, la vraisemblance <strong>EST une loi normalisée en $y$</strong>. »*</p>
+</blockquote>
+<div class="cal intu"><span class="lab">Pourquoi la transformation logarithmique</span>
+<p>  (deux raisons données) :</p>
+<ul>
+<li><strong>(a)</strong> <em>« Elle <strong>ne souffre PAS de SOUS-DÉBORDEMENT NUMÉRIQUE</strong> (<em>underflow</em>) »</em> — un produit de $N$ densités devient vite inférieur à la précision machine.</li>
+<li><strong>(b)</strong> <em>« Les règles de dérivation se révéleront <strong>PLUS SIMPLES</strong> »</em> — un produit devient une somme.</li>
+</ul>
+</div>
+<p><strong>La log-vraisemblance négative :</strong></p>
+<p>$$\boxed{\;L(\theta):=\frac{1}{2\sigma^2}\sum_{n=1}^{N}(y_n-x_n^\top\theta)^2=\frac{1}{2\sigma^2}(y-X\theta)^\top(y-X\theta)=\frac{1}{2\sigma^2}\lVert y-X\theta\rVert^2\;}$$</p>
+<p><em>« La log-vraisemblance négative est aussi appelée la <strong>FONCTION D'ERREUR</strong>. »</em></p>
+<table>
+<thead>
+<tr>
+<th>Objet</th>
+<th>Définition</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Matrice de conception</strong> (<em>design matrix</em>)</td>
+<td>$X:=[x_1,\dots,x_N]^\top\in\mathbb R^{N\times D}$ —  <strong>la $n$-ième LIGNE est l'entrée $x_n$</strong></td>
+</tr>
+<tr>
+<td>Vecteur des cibles</td>
+<td>$y:=[y_1,\dots,y_N]^\top\in\mathbb R^N$</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p> <strong>L'observation décisive.</strong> *« $L$ est <strong>QUADRATIQUE en $\theta$</strong>. Cela signifie qu'on peut trouver une <strong>solution GLOBALE UNIQUE</strong> $\theta_{\text{ML}}$. »*</p>
+</blockquote>
+<p><strong>Le gradient :</strong></p>
+<p>$$\frac{dL}{d\theta}=\frac{1}{2\sigma^2}\frac{d}{d\theta}\big(y^\top y-2y^\top X\theta+\theta^\top X^\top X\theta\big)=\frac{1}{\sigma^2}\big(-y^\top X+\theta^\top X^\top X\big)\in\mathbb R^{1\times D}$$</p>
+<p><strong>L'annulation :</strong></p>
+<p>$$\frac{dL}{d\theta}=0^\top\iff\theta_{\text{ML}}^\top X^\top X=y^\top X\iff\theta_{\text{ML}}^\top=y^\top X(X^\top X)^{-1}$$</p>
+<p>$$\boxed{\;\theta_{\text{ML}}=(X^\top X)^{-1}X^\top y\;}$$</p>
+<blockquote>
+<p class="cal piege"> <strong>Les trois justifications à ne pas sauter :</strong></p>
+<ol>
+<li><em>« On a pu multiplier à droite par $(X^\top X)^{-1}$ parce que <strong>$X^\top X$ est DÉFINIE POSITIVE si $\operatorname{rk}(X)=D$</strong> »</em> — ce qui est le cas si $N\geqslant D$ <em>« en ignorant la possibilité de points de données dupliqués »</em>.</li>
+<li><em>« Annuler le gradient est une condition <strong>NÉCESSAIRE ET SUFFISANTE</strong>, et l'on obtient un <strong>MINIMUM GLOBAL</strong> puisque la hessienne $\nabla^2_\theta L(\theta)=X^\top X$ est <strong>définie positive</strong>. »</em></li>
+<li><em>« La solution requiert de résoudre un <strong>système linéaire</strong> $A\theta=b$ avec $A=X^\top X$ et $b=X^\top y$. »</em>  En pratique on <strong>résout le système</strong>, on <strong>n'inverse pas</strong> la matrice.</li>
+</ol>
+</blockquote>
+<h3>2.2 La régression polynomiale — Exemple 9.3</h3>
+<p><strong>L'application d'attributs.</strong> <em>« On "<strong>SOULÈVE</strong>" l'espace d'entrée unidimensionnel original dans un espace d'attributs de dimension $K$ constitué de <strong>tous les MONÔMES</strong> $x^k$ »</em> :</p>
+<p>$$\phi(x)=\big[\phi_0(x),\phi_1(x),\dots,\phi_{K-1}(x)\big]^\top=\big[1,x,x^2,x^3,\dots,x^{K-1}\big]^\top\in\mathbb R^K$$</p>
+<p>$$\boxed{\;f(x)=\sum_{k=0}^{K-1}\theta_kx^k=\phi^\top(x)\theta\;}$$</p>
+<p><strong>La matrice d'attributs</strong> (aussi appelée <strong>matrice de conception</strong>) :</p>
+<p>$$\boxed{\;\Phi:=\begin{bmatrix}\phi^\top(x_1)\\\vdots\\\phi^\top(x_N)\end{bmatrix}=\begin{bmatrix}\phi_0(x_1)&amp;\cdots&amp;\phi_{K-1}(x_1)\\\vdots&amp;&amp;\vdots\\\phi_0(x_N)&amp;\cdots&amp;\phi_{K-1}(x_N)\end{bmatrix}\in\mathbb R^{N\times K},\qquad\Phi_{ij}=\phi_j(x_i)\;}$$</p>
+<p><strong>La conséquence — il n'y a RIEN à refaire :</strong></p>
+<p>$$-\log p(\mathcal Y\mid\mathcal X,\theta)=\frac{1}{2\sigma^2}(y-\Phi\theta)^\top(y-\Phi\theta)+\text{const}$$</p>
+<blockquote>
+<p> <em>« En comparant avec la log-vraisemblance négative du modèle "sans attributs", on voit immédiatement qu'il suffit de <strong>REMPLACER $X$ par $\Phi$</strong> »</em> :</p>
+</blockquote>
+<p>$$\boxed{\;\theta_{\text{ML}}=(\Phi^\top\Phi)^{-1}\Phi^\top y\;}$$</p>
+<p class="cal piege"> <strong>La condition devient</strong> $\operatorname{rk}(\Phi)=K$, pour que $\Phi^\top\Phi\in\mathbb R^{K\times K}$ soit <strong>inversible</strong>.</p>
+<h3>2.3 Estimer la variance du bruit</h3>
+<p>Même procédure : écrire la log-vraisemblance, dériver <strong>par rapport à $\sigma^2$</strong>, annuler, résoudre.</p>
+<p>$$\log p(\mathcal Y\mid\mathcal X,\theta,\sigma^2)=-\frac N2\log\sigma^2-\frac{1}{2\sigma^2}\underbrace{\sum_{n=1}^{N}(y_n-\phi^\top(x_n)\theta)^2}_{=:s}+\text{const}$$</p>
+<p>$$\frac{\partial}{\partial\sigma^2}=-\frac{N}{2\sigma^2}+\frac{1}{2\sigma^4}s=0\iff\frac{N}{2\sigma^2}=\frac{s}{2\sigma^4}$$</p>
+<p>$$\boxed{\;\sigma^2_{\text{ML}}=\frac sN=\frac1N\sum_{n=1}^{N}\big(y_n-\phi^\top(x_n)\theta\big)^2\;}$$</p>
+<blockquote>
+<p> <strong>L'interprétation.</strong> <em>« L'estimation du maximum de vraisemblance de la variance du bruit est la <strong>MOYENNE EMPIRIQUE des DISTANCES au CARRÉ</strong> entre les valeurs de fonction <strong>SANS BRUIT</strong> $\phi^\top(x_n)\theta$ et les observations <strong>BRUITÉES</strong> correspondantes $y_n$. »</em></p>
+</blockquote>
+<details class="cor">
+<summary> Contrôle numérique : $\sqrt{\sigma^2_{\text{ML}}}$ est exactement la RMSE d'entraînement</summary><div class="in">
+
+<p>Sur un jeu simulé de $N=10$ points ($f(x)=\sin x+0{,}3x$, bruit $\sigma=0{,}4$), ajustement polynomial de degré 4 :</p>
+<p>$$\sigma^2_{\text{ML}}=0{,}094126\qquad\sqrt{\sigma^2_{\text{ML}}}=0{,}3068$$</p>
+<p>et la RMSE d'entraînement calculée indépendamment vaut <strong>$0{,}3068$</strong>  — les deux quantités <strong>coïncident par construction</strong>.</p>
+</div></details>
+
+<h3>2.4 La RMSE et le surapprentissage</h3>
+<p>$$\boxed{\;\text{RMSE}=\sqrt{\frac1N\lVert y-\Phi\theta\rVert^2}=\sqrt{\frac1N\sum_{n=1}^{N}\big(y_n-\phi^\top(x_n)\theta\big)^2}\;}$$</p>
+<blockquote>
+<p> <strong>Ses deux vertus.</strong> <em>« (a) Elle permet de <strong>COMPARER les erreurs de jeux de TAILLES DIFFÉRENTES</strong> ; (b) elle a <strong>la MÊME ÉCHELLE et les MÊMES UNITÉS</strong> que les valeurs observées $y_n$. »</em> L'exemple du livre : si l'on ajuste un modèle codes postaux $\to$ prix immobiliers en EUR, <em>« la RMSE est <strong>aussi en EUR</strong>, alors que l'erreur quadratique est en <strong>EUR au CARRÉ</strong> »</em>.  <em>« La log-vraisemblance négative, elle, est <strong>SANS UNITÉ</strong>. »</em></p>
+</blockquote>
+<p><strong>L'expérience de la figure 9.5-9.6</strong> ($N=10$ points, test sur <strong>200 points</strong> sur une grille linéaire de $[-5,5]$) :</p>
+<table>
+<thead>
+<tr>
+<th>Degré $M$</th>
+<th>Ce qu'on observe</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$M=0,1$</td>
+<td><em>« Ajustent <strong>MAL</strong> les données, mauvaises représentations de la vraie fonction »</em> — <strong>SOUS-AJUSTEMENT</strong></td>
+</tr>
+<tr>
+<td>$M=3,\dots,6$</td>
+<td><em>« Les ajustements semblent <strong>PLAUSIBLES</strong> et interpolent les données de façon <strong>LISSE</strong> »</em></td>
+</tr>
+<tr>
+<td>$M$ grand</td>
+<td><em>« Ils ajustent les données <strong>de mieux en mieux</strong> »</em> — sur l'entraînement</td>
+</tr>
+<tr>
+<td>$M=N-1=9$</td>
+<td> <em>« La fonction <strong>PASSE PAR CHAQUE point de donnée</strong>. Mais ces polynômes de haut degré <strong>OSCILLENT SAUVAGEMENT</strong> et sont une mauvaise représentation de la fonction sous-jacente : on souffre de <strong>SURAPPRENTISSAGE</strong>. »</em></td>
+</tr>
+</tbody></table>
+<p><strong>L'erreur de TEST, elle, raconte une autre histoire :</strong> <em>« elle <strong>décroît d'abord</strong>... pour les polynômes d'ordre 4 elle est relativement basse et reste constante jusqu'au degré 5. <strong>Mais à partir du degré 6 elle AUGMENTE SIGNIFICATIVEMENT</strong>, et les polynômes d'ordre élevé ont de <strong>très mauvaises propriétés de généralisation</strong>. »</em></p>
+<details class="cor">
+<summary> Reproduction indépendante de la courbe train/test</summary><div class="in">
+
+<p>Simulation ($N=10$ points d'entraînement, 200 de test, $\sigma=0{,}4$) :</p>
+<table>
+<thead>
+<tr>
+<th>$M$</th>
+<th>RMSE entraînement</th>
+<th>RMSE test</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$0$</td>
+<td>$1{,}2148$</td>
+<td>$1{,}1032$</td>
+</tr>
+<tr>
+<td>$1$</td>
+<td>$0{,}8094$</td>
+<td>$0{,}8764$</td>
+</tr>
+<tr>
+<td>$3$</td>
+<td>$0{,}3339$</td>
+<td>$0{,}8436$</td>
+</tr>
+<tr>
+<td>$5$</td>
+<td>$0{,}1255$</td>
+<td><strong>$0{,}7795$</strong> ← minimum</td>
+</tr>
+<tr>
+<td>$7$</td>
+<td>$0{,}1071$</td>
+<td>$1{,}1490$</td>
+</tr>
+<tr>
+<td>$8$</td>
+<td>$0{,}0056$</td>
+<td>$8{,}5955$</td>
+</tr>
+<tr>
+<td>$9$</td>
+<td> <strong>$0{,}0000$</strong></td>
+<td> <strong>$9{,}0400$</strong></td>
+</tr>
+</tbody></table>
+<p class="cal piege"> <strong>Les deux signatures du surapprentissage sont là</strong> : l'erreur d'entraînement <strong>décroît MONOTONEMENT</strong> jusqu'à $0$ exactement en $M=N-1=9$, tandis que l'erreur de test <strong>explose d'un facteur $\sim12$</strong> à partir du degré 8.</p>
+</div></details>
+
+<blockquote>
+<p class="cal piege"> <strong>Le cas $M=N-1$ est extrême</strong> <em>« au sens où, autrement, le NOYAU du système linéaire correspondant serait non trivial et l'on aurait une INFINITÉ de solutions optimales »</em>. Et pour $M\geqslant N$ : <em>« on aurait <strong>plus de paramètres que de points de données</strong> et il faudrait résoudre un <strong>système SOUS-DÉTERMINÉ</strong> — $\Phi^\top\Phi$ ne serait <strong>plus inversible</strong> — donc une <strong>infinité</strong> d'estimateurs du maximum de vraisemblance. »</em></p>
+</blockquote>
+<h2 data-prio="must">Concept 3 — Le maximum a posteriori (§9.2.3-9.2.4)</h2>
+<h3>3.1 La dérivation</h3>
+<blockquote>
+<p><strong>Le diagnostic.</strong> <em>« On observe souvent que la <strong>MAGNITUDE des valeurs des paramètres devient RELATIVEMENT GRANDE</strong> en cas de surapprentissage »</em> (Bishop, 2006). *« Pour atténuer l'effet d'énormes valeurs de paramètres, on peut placer une <strong>loi A PRIORI $p(\theta)$</strong>. »*</p>
+</blockquote>
+<blockquote>
+<p> <strong>La lecture concrète d'un a priori.</strong> <em>« Un a priori gaussien $p(\theta)=\mathcal N(0,1)$ sur un paramètre unique $\theta$ encode que les valeurs sont attendues dans l'intervalle $[-2,2]$ »</em> — <strong>deux écarts-types</strong> autour de la moyenne.</p>
+</blockquote>
+<p>$$p(\theta\mid\mathcal X,\mathcal Y)=\frac{p(\mathcal Y\mid\mathcal X,\theta)p(\theta)}{p(\mathcal Y\mid\mathcal X)}$$</p>
+<p>$$\log p(\theta\mid\mathcal X,\mathcal Y)=\log p(\mathcal Y\mid\mathcal X,\theta)+\log p(\theta)+\text{const}$$</p>
+<blockquote>
+<p> <strong>Le compromis rendu visible.</strong> <em>« La log-a-posteriori est la <strong>SOMME</strong> de la log-vraisemblance et du <strong>LOG-A-PRIORI</strong>, de sorte que l'estimation MAP sera un <strong>"COMPROMIS" entre l'A PRIORI</strong> (notre suggestion de valeurs plausibles <strong>avant</strong> d'observer les données) <strong>et la VRAISEMBLANCE dépendante des données</strong>. »</em></p>
+</blockquote>
+<p>$$\theta_{\text{MAP}}\in\arg\min_\theta\big\{-\log p(\mathcal Y\mid\mathcal X,\theta)-\log p(\theta)\big\}$$</p>
+<p><strong>Avec l'a priori conjugué gaussien $p(\theta)=\mathcal N(0,b^2I)$</strong> :</p>
+<p>$$\boxed{\;\theta_{\text{MAP}}=\left(\Phi^\top\Phi+\frac{\sigma^2}{b^2}I\right)^{-1}\Phi^\top y\;}$$</p>
+<blockquote>
+<p> <strong>LA COMPARAISON À RETENIR.</strong> <em>« En comparant avec l'estimation du maximum de vraisemblance $\theta_{\text{ML}}=(\Phi^\top\Phi)^{-1}\Phi^\top y$, on voit que <strong>la SEULE différence entre les deux solutions est le terme additionnel $\frac{\sigma^2}{b^2}I$</strong> dans la matrice à inverser. »</em></p>
+</blockquote>
+<div class="cal intu"><span class="lab">Pourquoi ce terme est décisif.</span>
+<p class="cal piege">  <em>« $\Phi^\top\Phi$ est symétrique et <strong>SEMI</strong>-définie positive. Le terme additionnel est <strong>STRICTEMENT DÉFINI POSITIF</strong>, de sorte que <strong>l'INVERSE EXISTE</strong> »</em> — la somme $\Phi^\top\Phi+\frac{\sigma^2}{b^2}I$ est <em>« symétrique et <strong>strictement définie positive</strong> : son inverse existe, et l'estimation MAP est <strong>l'UNIQUE solution</strong> d'un système linéaire. De plus, <strong>elle reflète l'impact du RÉGULARISATEUR</strong>. »</em></p>
+</div>
+<p>$$\boxed{\;\text{L'a priori RÉSOUT à la fois le SURAPPRENTISSAGE ET l'éventuelle NON-INVERSIBILITÉ.}\;}$$</p>
+<h3>3.2 MAP $=$ moindres carrés régularisés</h3>
+<p><strong>Les moindres carrés régularisés :</strong></p>
+<p>$$\boxed{\;\min_\theta\ \underbrace{\lVert y-\Phi\theta\rVert^2}_{\text{terme d'AJUSTEMENT (\emph{misfit})}}+\underbrace{\lambda\lVert\theta\rVert_2^2}_{\text{RÉGULARISATEUR}}\;}$$</p>
+<p>avec $\lambda\geqslant0$ contrôlant <em>« la "<strong>SÉVÉRITÉ</strong>" de la régularisation »</em>. Le premier terme est <em>« <strong>proportionnel à la log-vraisemblance négative</strong> »</em>.</p>
+<p><strong>La solution :</strong></p>
+<p>$$\boxed{\;\theta_{\text{RLS}}=(\Phi^\top\Phi+\lambda I)^{-1}\Phi^\top y\;}$$</p>
+<p><strong>L'IDENTITÉ EXACTE.</strong> Avec $p(\theta)=\mathcal N(0,b^2I)$, le log-a-priori gaussien négatif vaut</p>
+<p>$$-\log p(\theta)=\frac{1}{2b^2}\lVert\theta\rVert_2^2+\text{const}$$</p>
+<p>$$\boxed{\;\text{Pour }\lambda=\frac{1}{2b^2},\ \text{le régularisateur ET le log-a-priori négatif sont IDENTIQUES}\;}$$</p>
+<p class="cal piege"> Et en comparant les deux solutions : $\theta_{\text{RLS}}=\theta_{\text{MAP}}$ <strong>exactement</strong> lorsque $\lambda=\dfrac{\sigma^2}{b^2}$.</p>
+<blockquote>
+<p> <strong>Le choix de la norme.</strong> *« Au lieu de la norme euclidienne, on peut choisir <strong>n'importe quelle $p$-norme</strong>. En pratique, des <strong>valeurs plus PETITES de $p$</strong> conduisent à des solutions <strong>plus PARCIMONIEUSES</strong> — "parcimonieux" signifiant que <strong>beaucoup de $\theta_d=0$</strong>, ce qui est utile pour la <strong>SÉLECTION DE VARIABLES</strong>. Pour $p=1$, le régularisateur s'appelle le <strong>LASSO</strong> (<em>least absolute shrinkage and selection operator</em>), proposé par <strong>Tibshirani (1996)</strong>. »*</p>
+</blockquote>
+<details class="cor">
+<summary> Double vérification numérique</summary><div class="in">
+
+<p><strong>1. L'a priori réduit bien la magnitude.</strong> Ajustement polynomial de degré 9 sur $N=10$ points :</p>
+<p>$$\lVert\theta_{\text{ML}}\rVert=1{,}7638\qquad\lVert\theta_{\text{MAP}}\rVert=0{,}8652$$</p>
+<p class="cal piege"> La norme est <strong>divisée par 2</strong> — exactement l'effet annoncé par le livre.</p>
+<p><strong>2. MAP $=$ RLS, à la précision machine.</strong> Avec $\lambda=\sigma^2/b^2=0{,}125$ et $K=5$, les deux calculs donnent</p>
+<p>$$\theta=[-0{,}155749\ ;\ 1{,}030929\ ;\ 0{,}091578\ ;\ -0{,}058583\ ;\ -0{,}005083]$$</p>
+<p>et la comparaison bit à bit renvoie <strong>True</strong> </p>
+</div></details>
+
+<h2 data-prio="must">Concept 4 — La régression linéaire bayésienne (§9.3)</h2>
+<h3>4.1 Le changement de perspective</h3>
+<blockquote>
+<p> <strong>LE SAUT CONCEPTUEL.</strong> <em>« La régression linéaire bayésienne pousse l'idée de l'a priori <strong>UN CRAN PLUS LOIN</strong> et <strong>n'essaie même PAS de calculer une estimation ponctuelle</strong> des paramètres : c'est la <strong>LOI A POSTERIORI COMPLÈTE</strong> qui est prise en compte pour faire des prédictions. <strong>On n'AJUSTE aucun paramètre</strong>, on calcule une <strong>MOYENNE sur TOUS les réglages plausibles</strong> (selon l'a posteriori). »</em></p>
+</blockquote>
+<p><strong>Le modèle :</strong></p>
+<p>$$\boxed{\;\text{a priori : }p(\theta)=\mathcal N(m_0,S_0)\qquad\text{vraisemblance : }p(y\mid x,\theta)=\mathcal N\big(y\mid\phi^\top(x)\theta,\ \sigma^2\big)\;}$$</p>
+<p class="cal piege"> <em>« On place explicitement un a priori gaussien sur $\theta$, ce qui <strong>TRANSFORME le vecteur de paramètres en VARIABLE ALÉATOIRE</strong>. »</em> Le modèle probabiliste complet est la <strong>loi jointe</strong> :</p>
+<p>$$p(y,\theta\mid x)=p(y\mid x,\theta)\,p(\theta)$$</p>
+<h3>4.2 Les prédictions a priori</h3>
+<p>$$\boxed{\;p(y_*\mid x_*)=\int p(y_*\mid x_*,\theta)\,p(\theta)\,d\theta=\mathbb E_\theta\big[p(y_*\mid x_*,\theta)\big]\;}$$</p>
+<p><em>« La <strong>prédiction MOYENNE</strong> de $y_*\mid x_*,\theta$ pour tous les $\theta$ plausibles selon l'a priori. »</em>  <em>« Les prédictions avec l'a priori ne requièrent de spécifier que l'entrée $x_*$, <strong>AUCUNE donnée d'entraînement</strong>. »</em></p>
+<p><strong>Le résultat, en forme fermée grâce à la conjugaison :</strong></p>
+<p>$$\boxed{\;p(y_*\mid x_*)=\mathcal N\Big(\phi^\top(x_*)m_0,\ \ \phi^\top(x_*)S_0\phi(x_*)+\sigma^2\Big)\;}$$</p>
+<p><strong>Les trois ingrédients de la dérivation :</strong></p>
+<ol>
+<li>La prédiction est <strong>gaussienne</strong> par <strong>CONJUGAISON</strong> (§6.6) et par la propriété de <strong>MARGINALISATION</strong> des gaussiennes (§6.5).</li>
+<li>Le bruit gaussien est <strong>indépendant</strong>, donc $\mathbb V[y_*]=\mathbb V_\theta[\phi^\top(x_*)\theta]+\mathbb V_\epsilon[\epsilon]$.</li>
+<li>$y_*$ est une <strong>transformation LINÉAIRE de $\theta$</strong> : on applique (6.50) et (6.51), soit $A\mu$ et $A\Sigma A^\top$.</li>
+</ol>
+<p class="cal piege"> <strong>Le terme $\phi^\top(x_*)S_0\phi(x_*)$</strong> est la contribution de l'incertitude <strong>sur les paramètres</strong> ; le $+\sigma^2$ est celle du <strong>bruit de mesure</strong>.</p>
+<h3>4.3 L'a posteriori des paramètres — le théorème 9.1</h3>
+<div class="cal formel"><span class="lab">Théorème 9.1 (A posteriori des paramètres).</span>
+<p> Dans le modèle (9.35), l'a posteriori se calcule <strong>EN FORME FERMÉE</strong> :
+$$\boxed{\;p(\theta\mid\mathcal X,\mathcal Y)=\mathcal N(\theta\mid m_N,S_N)\;}$$
+$$\boxed{\;S_N=\big(S_0^{-1}+\sigma^{-2}\Phi^\top\Phi\big)^{-1}\;}$$
+$$\boxed{\;m_N=S_N\big(S_0^{-1}m_0+\sigma^{-2}\Phi^\top y\big)\;}$$
+<em>« L'indice $N$ indique la <strong>TAILLE de l'ensemble d'entraînement</strong>. »</em></p>
+</div>
+<p><strong>La vraisemblance marginale (évidence) au dénominateur :</strong></p>
+<p>$$p(\mathcal Y\mid\mathcal X)=\int p(\mathcal Y\mid\mathcal X,\theta)p(\theta)\,d\theta=\mathbb E_\theta\big[p(\mathcal Y\mid\mathcal X,\theta)\big]$$</p>
+<p class="cal piege"> <em>« Elle est <strong>indépendante de $\theta$</strong> et assure que l'a posteriori est <strong>NORMALISÉ</strong>. On peut y penser comme à la <strong>vraisemblance MOYENNÉE sur tous les réglages possibles</strong> de paramètres (selon l'a priori). »</em></p>
+<p><strong>La lecture des deux formules :</strong></p>
+<table>
+<thead>
+<tr>
+<th>Formule</th>
+<th>Lecture</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$S_N^{-1}=S_0^{-1}+\sigma^{-2}\Phi^\top\Phi$</td>
+<td>Les <strong>PRÉCISIONS S'AJOUTENT</strong> : celle de l'a priori <strong>plus</strong> celle apportée par les données.  La covariance a posteriori <strong>ne peut que DIMINUER</strong></td>
+</tr>
+<tr>
+<td>$m_N=S_N(S_0^{-1}m_0+\sigma^{-2}\Phi^\top y)$</td>
+<td>Une <strong>moyenne PONDÉRÉE par les précisions</strong> entre l'a priori $m_0$ et le terme de données $\Phi^\top y$</td>
+</tr>
+</tbody></table>
+<p class="cal piege"> <strong>Le cas limite</strong> : si $S_0=b^2I$ et $m_0=0$, on retrouve $m_N=\big(\Phi^\top\Phi+\frac{\sigma^2}{b^2}I\big)^{-1}\Phi^\top y=\theta_{\text{MAP}}$.</p>
+<details class="cor">
+<summary> Vérification que $m_N=\theta_{\text{MAP}}$ exactement</summary><div class="in">
+
+<p>Avec $K=4$, $\sigma^2=0{,}16$, $b^2=1$, $m_0=0$, $S_0=I$ :</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Valeurs</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$m_N$ (par le théorème 9.1)</td>
+<td>$[-0{,}00698999\ ;\ 1{,}02724769\ ;\ 0{,}0096369\ ;\ -0{,}0583119]$</td>
+</tr>
+<tr>
+<td>$\theta_{\text{MAP}}$ (par la formule 9.31)</td>
+<td>$[-0{,}00698999\ ;\ 1{,}02724769\ ;\ 0{,}0096369\ ;\ -0{,}0583119]$</td>
+</tr>
+</tbody></table>
+<p><strong>Écart maximal : $0{,}0$</strong>  Les deux voies de calcul — inversion de $S_0^{-1}+\sigma^{-2}\Phi^\top\Phi$ d'un côté, formule directe de l'autre — <strong>coïncident à la précision machine</strong>.</p>
+</div></details>
+
+<h3>4.4 Les prédictions a posteriori</h3>
+<p>$$\boxed{\;p(y_*\mid\mathcal X,\mathcal Y,x_*)=\int p(y_*\mid x_*,\theta)\,p(\theta\mid\mathcal X,\mathcal Y)\,d\theta=\mathcal N\Big(\phi^\top(x_*)m_N,\ \ \phi^\top(x_*)S_N\phi(x_*)+\sigma^2\Big)\;}$$</p>
+<blockquote>
+<p> <strong>LE PONT AVEC LE MAP.</strong> <em>« La <strong>MOYENNE prédictive $\phi^\top(x_*)m_N$ COÏNCIDE avec les prédictions faites avec l'estimation MAP</strong> $\theta_{\text{MAP}}$. »</em>
+$$\boxed{\;\mathbb E[y_*\mid\mathcal X,\mathcal Y,x_*]=\phi^\top(x_*)m_N=\phi^\top(x_*)\theta_{\text{MAP}}\;}$$
+ <strong>Ce que le MAP perd</strong>, c'est donc <strong>uniquement la VARIANCE</strong> — le terme $\phi^\top(x_*)S_N\phi(x_*)$, qui <em>« reflète l'incertitude a posteriori associée aux paramètres »</em>.  Noter que $S_N$ <strong>dépend des entrées d'entraînement</strong> via $\Phi$.</p>
+</blockquote>
+<p><strong>Les valeurs de fonction SANS bruit.</strong> Pour $f(x_*)=\phi^\top(x_*)\theta$ :</p>
+<p>$$\mathbb E[f(x_*)\mid\mathcal X,\mathcal Y]=\phi^\top(x_*)m_N\qquad\mathbb V_\theta[f(x_*)\mid\mathcal X,\mathcal Y]=\phi^\top(x_*)S_N\phi(x_*)$$</p>
+<blockquote>
+<p> <em>« La moyenne prédictive est <strong>LA MÊME</strong> que pour les observations bruitées, puisque le bruit est de moyenne $0$. La variance prédictive ne diffère que de <strong>$\sigma^2$</strong> : quand on prédit des valeurs <strong>bruitées</strong>, il faut inclure $\sigma^2$ comme <strong>source d'incertitude</strong>, mais <strong>PAS</strong> pour les prédictions sans bruit — la seule incertitude restante vient alors de <strong>l'a posteriori des paramètres</strong>. »</em></p>
+</blockquote>
+<blockquote>
+<p> <strong>UNE LOI SUR LES FONCTIONS.</strong> <em>« Le fait qu'on <strong>INTÈGRE les paramètres INDUIT une LOI SUR LES FONCTIONS</strong> : si l'on échantillonne $\theta_i\sim p(\theta\mid\mathcal X,\mathcal Y)$, on obtient <strong>une réalisation de fonction</strong> $\theta_i^\top\phi(\cdot)$. »</em> C'est le germe des <strong>processus gaussiens</strong>.</p>
+</blockquote>
+<blockquote>
+<p class="cal piege"> <strong>Marginale contre prédictive a posteriori — les DEUX différences.</strong> *« (i) La vraisemblance marginale peut être vue comme <strong>prédisant les cibles d'ENTRAÎNEMENT $y$</strong>, et <strong>non</strong> les cibles de test $y_*$ ; (ii) la vraisemblance marginale moyenne <strong>par rapport à l'A PRIORI</strong>, et non à l'a posteriori. »*</p>
+</blockquote>
+<h3>4.5 La vraisemblance marginale</h3>
+<p><strong>Le processus génératif :</strong> $\theta\sim\mathcal N(m_0,S_0)$, puis $y_n\mid x_n,\theta\sim\mathcal N(x_n^\top\theta,\sigma^2)$.</p>
+<p><strong>Le calcul en deux étapes.</strong></p>
+<p><strong>Étape 1 — montrer qu'elle est GAUSSIENNE.</strong> <em>« (i) Le <strong>produit de deux gaussiennes</strong> est une gaussienne (non normalisée) ; (ii) une <strong>transformation LINÉAIRE</strong> d'une gaussienne est gaussienne. »</em> L'intégrale se résout alors en forme fermée et <em>« le résultat est <strong>la CONSTANTE DE NORMALISATION</strong> du produit des deux gaussiennes — laquelle a elle-même une forme gaussienne »</em>.</p>
+<p><strong>Étape 2 — moyenne et covariance</strong>, par les règles des transformations affines (§6.4.4) :</p>
+<p>$$\mathbb E[\mathcal Y\mid\mathcal X]=\mathbb E_{\theta,\epsilon}[X\theta+\epsilon]=X\,\mathbb E_\theta[\theta]=Xm_0$$</p>
+<p>$$\operatorname{Cov}[\mathcal Y\mid\mathcal X]=\operatorname{Cov}_\theta[X\theta]+\sigma^2I=X\operatorname{Cov}_\theta[\theta]X^\top+\sigma^2I=XS_0X^\top+\sigma^2I$$</p>
+<p>$$\boxed{\;p(\mathcal Y\mid\mathcal X)=\mathcal N\big(y\mid Xm_0,\ XS_0X^\top+\sigma^2I\big)\;}$$</p>
+<blockquote>
+<p> <em>« Étant donné la proximité avec la loi prédictive a posteriori, la <strong>forme fonctionnelle</strong> de la vraisemblance marginale <strong>ne devrait pas trop surprendre</strong>. »</em></p>
+</blockquote>
+<h2 data-prio="must">Concept 5 — Le MLE comme projection orthogonale (§9.4)</h2>
+<h3>5.1 Le cas unidimensionnel</h3>
+<p>Pour $y=x\theta+\epsilon$ — des droites $f:\mathbb R\to\mathbb R$ <strong>passant par l'origine</strong> :</p>
+<p>$$\theta_{\text{ML}}=(X^\top X)^{-1}X^\top y=\frac{X^\top y}{X^\top X}\in\mathbb R$$</p>
+<p><strong>La reconstruction optimale</strong> des cibles d'entraînement :</p>
+<p>$$\boxed{\;X\theta_{\text{ML}}=X\frac{X^\top y}{X^\top X}=\underbrace{\frac{XX^\top}{X^\top X}}_{\text{MATRICE DE PROJECTION}}\,y\;}$$</p>
+<blockquote>
+<p> <strong>L'IDENTIFICATION, terme à terme avec le §3.8.</strong> <em>« La régression linéaire par maximum de vraisemblance effectue une <strong>PROJECTION ORTHOGONALE</strong>. »</em></p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>Objet de la régression</th>
+<th>Objet géométrique du chapitre 3</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$\dfrac{XX^\top}{X^\top X}$</td>
+<td>La <strong>MATRICE DE PROJECTION</strong> $P_\pi$</td>
+</tr>
+<tr>
+<td>$\theta_{\text{ML}}$</td>
+<td>Les <strong>COORDONNÉES</strong> de la projection dans le sous-espace de dimension 1 engendré par $X$</td>
+</tr>
+<tr>
+<td>$X\theta_{\text{ML}}$</td>
+<td>La <strong>PROJECTION ORTHOGONALE de $y$</strong> sur ce sous-espace</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p> <strong>La conclusion.</strong> <em>« La solution du maximum de vraisemblance fournit aussi une <strong>solution GÉOMÉTRIQUEMENT OPTIMALE</strong> : elle trouve les vecteurs, dans le sous-espace engendré par $X$, qui sont <strong>"LES PLUS PROCHES" des observations $y$</strong> — "proche" au sens de la <strong>plus petite distance QUADRATIQUE</strong>. C'est ce qu'accomplissent les projections orthogonales. »</em></p>
+</blockquote>
+<p class="cal piege"> <em>« La régression linéaire peut donc être vue comme une <strong>méthode pour RÉSOUDRE des systèmes d'équations linéaires</strong> »</em> — insoluble exactement, résolu au sens des moindres carrés (fiche 402, §3.8).</p>
+<h3>5.2 Le cas général et le cas orthonormé</h3>
+<p>Pour $y=\phi^\top(x)\theta+\epsilon$ avec $\phi(x)\in\mathbb R^K$ :</p>
+<p>$$y\approx\Phi\theta_{\text{ML}},\qquad\theta_{\text{ML}}=(\Phi^\top\Phi)^{-1}\Phi^\top y$$</p>
+<p>$$\boxed{\;P_\pi=\Phi(\Phi^\top\Phi)^{-1}\Phi^\top\;}$$</p>
+<p><em>« Une projection sur un sous-espace de dimension $K$ de $\mathbb R^N$, engendré par <strong>les COLONNES de la matrice d'attributs $\Phi$</strong> »</em> (§3.8.2).</p>
+<p><strong>Le cas particulier ORTHONORMÉ.</strong> <em>« Si les fonctions d'attributs $\phi_k$ sont <strong>ORTHONORMÉES</strong>, les colonnes de $\Phi$ forment une <strong>base orthonormée</strong>, si bien que $\Phi^\top\Phi=I$ »</em> :</p>
+<p>$$\boxed{\;\Phi(\Phi^\top\Phi)^{-1}\Phi^\top y=\Phi\Phi^\top y\;}$$</p>
+<p class="cal piege"> <strong>Plus aucune inversion</strong> — c'est exactement la simplification annoncée à la fiche 402 pour les bases orthonormées.</p>
+<details class="cor">
+<summary> Vérification des quatre propriétés de $P_\pi$</summary><div class="in">
+
+<p>Sur les données simulées avec $K=4$ attributs polynomiaux et $N=10$ points :</p>
+<table>
+<thead>
+<tr>
+<th>Propriété</th>
+<th>Test</th>
+<th>Résultat</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Idempotence</strong> $P_\pi^2=P_\pi$</td>
+<td>$\max\lvert P_\pi^2-P_\pi\rvert$</td>
+<td>$0{,}0$ </td>
+</tr>
+<tr>
+<td><strong>Symétrie</strong> $P_\pi=P_\pi^\top$</td>
+<td>$\max\lvert P_\pi-P_\pi^\top\rvert$</td>
+<td>$0{,}0$ </td>
+</tr>
+<tr>
+<td><strong>Trace $=$ rang</strong></td>
+<td>$\operatorname{tr}(P_\pi)$</td>
+<td>$4{,}0=K$ </td>
+</tr>
+<tr>
+<td><strong>Résidu orthogonal</strong></td>
+<td>$\max_j\lvert(\Phi^\top r)_j\rvert$ avec $r=y-\Phi\theta_{\text{ML}}$</td>
+<td>$0{,}0$ </td>
+</tr>
+</tbody></table>
+<p class="cal piege"> La dernière ligne <strong>EST</strong> l'équation normale : $\Phi^\top(y-\Phi\theta)=0\iff\Phi^\top\Phi\theta=\Phi^\top y$. <strong>La condition d'optimalité du MLE et la condition d'orthogonalité de la projection sont LA MÊME ÉQUATION.</strong></p>
+</div></details>
+
+<h2>Comment reconnaître le type d'exercice</h2>
+<table>
+<thead>
+<tr>
+<th>L'énoncé dit...</th>
+<th>Le type</th>
+<th>La méthode</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>« Ce modèle est-il une régression linéaire ? »</td>
+<td><strong>§9.1</strong></td>
+<td> Vérifier la linéarité <strong>EN LES PARAMÈTRES</strong> — $\phi$ peut être non linéaire</td>
+</tr>
+<tr>
+<td>« Écrire la vraisemblance »</td>
+<td><strong>§9.1</strong></td>
+<td>$\prod_n\mathcal N(y_n\mid\phi^\top(x_n)\theta,\sigma^2)$ — la <strong>conditionnelle indépendance</strong> justifie la factorisation</td>
+</tr>
+<tr>
+<td>« Trouver $\theta_{\text{ML}}$ »</td>
+<td><strong>§9.2.1</strong></td>
+<td>$\theta_{\text{ML}}=(\Phi^\top\Phi)^{-1}\Phi^\top y$ ;  en pratique <strong>résoudre</strong> $\Phi^\top\Phi\theta=\Phi^\top y$</td>
+</tr>
+<tr>
+<td>« Régression polynomiale de degré $M$ »</td>
+<td><strong>Ex. 9.3</strong></td>
+<td>$\phi(x)=[1,x,\dots,x^M]^\top$, $K=M+1$ ; <strong>remplacer $X$ par $\Phi$</strong></td>
+</tr>
+<tr>
+<td>« Estimer la variance du bruit »</td>
+<td><strong>§9.2.1</strong></td>
+<td>$\sigma^2_{\text{ML}}=\frac1N\sum_n(y_n-\phi^\top(x_n)\theta)^2$</td>
+</tr>
+<tr>
+<td>« Comparer deux modèles »</td>
+<td><strong>RMSE</strong></td>
+<td>$\sqrt{\frac1N\lVert y-\Phi\theta\rVert^2}$ ;  <strong>mêmes unités que $y$</strong></td>
+</tr>
+<tr>
+<td>« Le modèle sur-apprend »</td>
+<td><strong>§9.2.2</strong></td>
+<td>Signes :  <strong>$\lVert\theta\rVert$ grande</strong> · train $\to0$ · <strong>test qui explose</strong></td>
+</tr>
+<tr>
+<td>« Trouver $\theta_{\text{MAP}}$ »</td>
+<td><strong>§9.2.3</strong></td>
+<td>$\big(\Phi^\top\Phi+\frac{\sigma^2}{b^2}I\big)^{-1}\Phi^\top y$</td>
+</tr>
+<tr>
+<td>« Moindres carrés régularisés »</td>
+<td><strong>§9.2.4</strong></td>
+<td>$\theta_{\text{RLS}}=(\Phi^\top\Phi+\lambda I)^{-1}\Phi^\top y$ ;  <strong>identique au MAP</strong> pour $\lambda=\sigma^2/b^2$</td>
+</tr>
+<tr>
+<td>« On veut des solutions parcimonieuses »</td>
+<td><strong>§9.2.4</strong></td>
+<td>Norme $\ell_1$ : le <strong>LASSO</strong></td>
+</tr>
+<tr>
+<td>« Prédire sans données d'entraînement »</td>
+<td><strong>§9.3.2</strong></td>
+<td>Prédiction <strong>a priori</strong> : $\mathcal N(\phi^\top(x_*)m_0,\ \phi^\top(x_*)S_0\phi(x_*)+\sigma^2)$</td>
+</tr>
+<tr>
+<td>« Calculer l'a posteriori des paramètres »</td>
+<td><strong>Th. 9.1</strong></td>
+<td>$S_N=(S_0^{-1}+\sigma^{-2}\Phi^\top\Phi)^{-1}$, $m_N=S_N(S_0^{-1}m_0+\sigma^{-2}\Phi^\top y)$</td>
+</tr>
+<tr>
+<td>« Prédire avec incertitude »</td>
+<td><strong>§9.3.4</strong></td>
+<td>$\mathcal N(\phi^\top(x_*)m_N,\ \phi^\top(x_*)S_N\phi(x_*)+\sigma^2)$</td>
+</tr>
+<tr>
+<td>« Valeurs de fonction sans bruit »</td>
+<td><strong>§9.3.4</strong></td>
+<td> <strong>Même moyenne</strong>, variance <strong>sans le $+\sigma^2$</strong></td>
+</tr>
+<tr>
+<td>« Calculer la vraisemblance marginale »</td>
+<td><strong>§9.3.5</strong></td>
+<td>$\mathcal N(y\mid Xm_0,\ XS_0X^\top+\sigma^2I)$</td>
+</tr>
+<tr>
+<td>« Interpréter géométriquement »</td>
+<td><strong>§9.4</strong></td>
+<td> <strong>PROJECTION ORTHOGONALE</strong> de $y$ sur l'espace des colonnes de $\Phi$</td>
+</tr>
+<tr>
+<td>« Les attributs sont orthonormés »</td>
+<td><strong>§9.4</strong></td>
+<td>$\Phi^\top\Phi=I$, donc $P_\pi=\Phi\Phi^\top$ — <strong>plus d'inversion</strong></td>
+</tr>
+</tbody></table>
+<h2>Comment résoudre : les cinq méthodes pas-à-pas</h2>
+<p><strong>Méthode A — Ajuster un modèle par maximum de vraisemblance.</strong></p>
+<ol>
+<li>Choisir les <strong>attributs</strong> $\phi$ ; construire $\Phi\in\mathbb R^{N\times K}$ ligne par ligne.</li>
+<li><strong>Vérifier</strong> $\operatorname{rk}(\Phi)=K$ (sinon $\Phi^\top\Phi$ n'est pas inversible).</li>
+<li>Former $A=\Phi^\top\Phi$ et $b=\Phi^\top y$.</li>
+<li><strong>Résoudre</strong> $A\theta=b$ ( pas d'inversion explicite).</li>
+<li><strong>Contrôles</strong> : la hessienne $\Phi^\top\Phi$ est définie positive $\Rightarrow$ minimum <strong>global</strong> ; le résidu $y-\Phi\theta$ doit être <strong>orthogonal à toutes les colonnes</strong> de $\Phi$.</li>
+<li>Si nécessaire : $\sigma^2_{\text{ML}}=\frac1N\lVert y-\Phi\theta\rVert^2$.</li>
+</ol>
+<p><strong>Méthode B — Diagnostiquer et corriger le surapprentissage.</strong></p>
+<ol>
+<li>Calculer la <strong>RMSE d'entraînement ET de test</strong> pour plusieurs degrés $M$.</li>
+<li>Chercher le <strong>point de divergence</strong> : train qui continue de baisser, test qui remonte.</li>
+<li> Vérifier $\lVert\theta\rVert$ : elle <strong>explose</strong> en surapprentissage.</li>
+<li>Placer un a priori $\mathcal N(0,b^2I)$ ou ajouter $\lambda\lVert\theta\rVert^2$.</li>
+<li>Recalculer $\theta_{\text{MAP}}=(\Phi^\top\Phi+\frac{\sigma^2}{b^2}I)^{-1}\Phi^\top y$.</li>
+<li><strong>Contrôle</strong> : $\lVert\theta_{\text{MAP}}\rVert&lt;\lVert\theta_{\text{ML}}\rVert$.</li>
+</ol>
+<p><strong>Méthode C — Régression bayésienne complète.</strong></p>
+<ol>
+<li>Fixer l'a priori $(m_0,S_0)$ et $\sigma^2$.</li>
+<li>Construire $\Phi$.</li>
+<li>$S_N^{-1}=S_0^{-1}+\sigma^{-2}\Phi^\top\Phi$, puis <strong>inverser</strong> pour $S_N$.</li>
+<li>$m_N=S_N(S_0^{-1}m_0+\sigma^{-2}\Phi^\top y)$.</li>
+<li>Prédire : moyenne $\phi^\top(x_*)m_N$, variance $\phi^\top(x_*)S_N\phi(x_*)+\sigma^2$.</li>
+<li><strong>Contrôles</strong> : $S_N\preceq S_0$ (l'observation <strong>réduit</strong> l'incertitude) ; si $m_0=0$ et $S_0=b^2I$, alors $m_N=\theta_{\text{MAP}}$.</li>
+</ol>
+<p><strong>Méthode D — Passer d'un langage à l'autre.</strong></p>
+<ol>
+<li>Perte quadratique $\longleftrightarrow$ <strong>vraisemblance gaussienne</strong>.</li>
+<li>$\lambda\lVert\theta\rVert^2$ $\longleftrightarrow$ <strong>a priori $\mathcal N(0,b^2I)$</strong>, avec $\lambda=\frac{1}{2b^2}$ pour les objectifs et $\lambda=\frac{\sigma^2}{b^2}$ pour les solutions.</li>
+<li>$\theta_{\text{ML}}$ $\longleftrightarrow$ <strong>projection orthogonale</strong>.</li>
+<li>Équation normale $\longleftrightarrow$ <strong>condition d'orthogonalité du résidu</strong>.</li>
+<li>$\theta_{\text{MAP}}$ $\longleftrightarrow$ <strong>moyenne a posteriori $m_N$</strong>.</li>
+</ol>
+<p><strong>Méthode E — Vérification géométrique.</strong></p>
+<ol>
+<li>Calculer $P_\pi=\Phi(\Phi^\top\Phi)^{-1}\Phi^\top$.</li>
+<li><strong>Idempotence</strong> : $P_\pi^2=P_\pi$.</li>
+<li><strong>Symétrie</strong> : $P_\pi=P_\pi^\top$.</li>
+<li> <strong>Trace $=$ rang $=K$</strong>.</li>
+<li><strong>Résidu</strong> : $\Phi^\top(y-\Phi\theta_{\text{ML}})=0$.</li>
+<li>Si attributs orthonormés : vérifier $\Phi^\top\Phi=I$ et $P_\pi=\Phi\Phi^\top$.</li>
+</ol>
+<h2 data-prio="must">Common mistakes</h2>
+<table>
+<thead>
+<tr>
+<th>Erreur</th>
+<th>Correction</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Croire que « linéaire » veut dire linéaire en $x$</td>
+<td> Cela veut dire <strong>LINÉAIRE EN LES PARAMÈTRES</strong> — $\phi$ peut être un polynôme, une sinusoïde…</td>
+</tr>
+<tr>
+<td>Traiter la vraisemblance comme une loi en $\theta$</td>
+<td> Elle <strong>n'intègre PAS à 1</strong> en $\theta$ et <strong>peut même ne pas être intégrable</strong></td>
+</tr>
+<tr>
+<td>Ne pas passer au logarithme</td>
+<td> <strong>SOUS-DÉBORDEMENT numérique</strong> garanti pour $N$ grand, et dérivées inutilement compliquées</td>
+</tr>
+<tr>
+<td>Ranger les $x_n$ en colonnes de $X$</td>
+<td> La <strong>$n$-ième LIGNE</strong> de $X$ est $x_n$ — $X\in\mathbb R^{N\times D}$</td>
+</tr>
+<tr>
+<td>Inverser $\Phi^\top\Phi$ explicitement</td>
+<td> <strong>Résoudre le système</strong> $\Phi^\top\Phi\theta=\Phi^\top y$ est plus stable</td>
+</tr>
+<tr>
+<td>Oublier de vérifier $\operatorname{rk}(\Phi)=K$</td>
+<td> Sinon <strong>pas d'inverse</strong> et une <strong>infinité</strong> de solutions</td>
+</tr>
+<tr>
+<td>Prendre $K&gt;N$</td>
+<td> Système <strong>SOUS-DÉTERMINÉ</strong> : infinité d'estimateurs</td>
+</tr>
+<tr>
+<td>Croire que $M=N-1$ est le meilleur ajustement</td>
+<td> Le polynôme <strong>passe par chaque point</strong> (train $=0$) mais <strong>oscille sauvagement</strong></td>
+</tr>
+<tr>
+<td>Juger un modèle sur l'erreur d'entraînement</td>
+<td> Elle <strong>décroît MONOTONEMENT</strong> avec $M$ — elle ne détecte <strong>jamais</strong> le surapprentissage</td>
+</tr>
+<tr>
+<td>Comparer des erreurs quadratiques brutes</td>
+<td> Utiliser la <strong>RMSE</strong> : comparable entre tailles, <strong>mêmes unités que $y$</strong></td>
+</tr>
+<tr>
+<td>Croire la log-vraisemblance interprétable en unités</td>
+<td> Elle est <strong>SANS UNITÉ</strong></td>
+</tr>
+<tr>
+<td>Oublier le $\frac1N$ dans $\sigma^2_{\text{ML}}$</td>
+<td>C'est une <strong>moyenne empirique</strong> des carrés des résidus</td>
+</tr>
+<tr>
+<td>Écrire $\theta_{\text{MAP}}=(\Phi^\top\Phi)^{-1}\Phi^\top y+\text{qqch}$</td>
+<td> Le terme s'ajoute <strong>DANS l'inverse</strong> : $\big(\Phi^\top\Phi+\frac{\sigma^2}{b^2}I\big)^{-1}$</td>
+</tr>
+<tr>
+<td>Croire que $\Phi^\top\Phi$ est toujours inversible</td>
+<td> Elle est <strong>SEMI</strong>-définie positive ; c'est <strong>le terme de régularisation</strong> qui garantit l'inverse</td>
+</tr>
+<tr>
+<td>Confondre $\lambda=\frac{1}{2b^2}$ et $\lambda=\frac{\sigma^2}{b^2}$</td>
+<td> Le premier identifie les <strong>objectifs</strong>, le second les <strong>solutions</strong></td>
+</tr>
+<tr>
+<td>Croire que la norme $\ell_2$ donne de la parcimonie</td>
+<td> <strong>NON</strong> — il faut $p$ petit ; $p=1$ est le <strong>LASSO</strong></td>
+</tr>
+<tr>
+<td>Croire que la régression bayésienne ajuste des paramètres</td>
+<td> <em>« On <strong>n'ajuste AUCUN paramètre</strong> »</em> — on <strong>moyenne</strong> sur tous les $\theta$ plausibles</td>
+</tr>
+<tr>
+<td>Oublier le $+\sigma^2$ dans la variance prédictive</td>
+<td> Il représente le <strong>bruit de mesure</strong> ; il <strong>disparaît</strong> pour les valeurs de fonction sans bruit</td>
+</tr>
+<tr>
+<td>Croire $S_N$ indépendante des données</td>
+<td> Elle dépend des <strong>entrées d'entraînement</strong> via $\Phi$ (mais <strong>pas</strong> des cibles $y$)</td>
+</tr>
+<tr>
+<td>Croire que la variance prédictive est constante</td>
+<td> $\phi^\top(x_*)S_N\phi(x_*)$ <strong>dépend de $x_*$</strong> : l'incertitude <strong>grandit loin des données</strong></td>
+</tr>
+<tr>
+<td>Croire que MAP et bayésien donnent la même chose</td>
+<td> <strong>Même MOYENNE prédictive</strong>, mais le MAP <strong>perd toute la VARIANCE</strong></td>
+</tr>
+<tr>
+<td>Confondre vraisemblance marginale et prédictive a posteriori</td>
+<td> La marginale prédit les cibles <strong>d'ENTRAÎNEMENT</strong> et moyenne selon <strong>l'A PRIORI</strong></td>
+</tr>
+<tr>
+<td>Croire que la projection orthogonale est une analogie</td>
+<td> C'est une <strong>IDENTITÉ</strong> : l'équation normale <strong>EST</strong> la condition d'orthogonalité du résidu</td>
+</tr>
+<tr>
+<td>Oublier que $P_\pi$ est singulière</td>
+<td> $P_\pi^2=P_\pi$ et $P_\pi\neq I$ : $\det P_\pi=0$, $\operatorname{tr}P_\pi=K&lt;N$</td>
+</tr>
+<tr>
+<td>Inverser $\Phi^\top\Phi$ quand les attributs sont orthonormés</td>
+<td> $\Phi^\top\Phi=I$ : la projection est <strong>simplement $\Phi\Phi^\top$</strong></td>
+</tr>
+</tbody></table>
+<h2>Ultimate Review</h2>
+<pre><code>════════ LES HUIT FORMULES À SAVOIR SANS HÉSITER ════════
+  1.  MODÈLE     y = φᵀ(x)θ + ε ,  ε ~ N(0,σ²)  i.i.d.
+      ⚠️ « linéaire » = LINÉAIRE EN LES PARAMÈTRES
+  2.  ERREUR     L(θ) = (1/2σ²) ‖y − Φθ‖²
+  3.  MLE        θML  = (ΦᵀΦ)⁻¹ Φᵀ y            ← ÉQUATIONS NORMALES
+      BRUIT      σ²ML = (1/N) ‖y − Φθ‖²
+      RMSE       √((1/N) ‖y − Φθ‖²)
+  4.  MAP        θMAP = (ΦᵀΦ + (σ²/b²) I)⁻¹ Φᵀ y
+      RLS        θRLS = (ΦᵀΦ + λ I)⁻¹ Φᵀ y      ← IDENTIQUE pour λ = σ²/b²
+  5.  A POSTERIORI (Th. 9.1)
+      SN = (S0⁻¹ + σ⁻² ΦᵀΦ)⁻¹      mN = SN (S0⁻¹ m0 + σ⁻² Φᵀ y)
+  6.  PRÉDICTION A PRIORI     N(φᵀ(x*)m0 , φᵀ(x*)S0φ(x*) + σ²)
+      PRÉDICTION A POSTERIORI N(φᵀ(x*)mN , φᵀ(x*)SN φ(x*) + σ²)
+      ⚠️ moyenne prédictive = φᵀ(x*) θMAP
+  7.  VRAISEMBLANCE MARGINALE  N(y | X m0 , X S0 Xᵀ + σ² I)
+  8.  GÉOMÉTRIE   Pπ = Φ(ΦᵀΦ)⁻¹Φᵀ   ·  attributs ORTHONORMÉS → Pπ = ΦΦᵀ
+═════════════════════════════════════════════════════════
+</code></pre>
+<p><strong>LES TROIS NIVEAUX, terme à terme :</strong></p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th><strong>MLE</strong></th>
+<th><strong>MAP</strong></th>
+<th><strong>BAYÉSIEN</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Ce qu'on obtient</td>
+<td>Un <strong>point</strong></td>
+<td>Un <strong>point biaisé</strong></td>
+<td>Une <strong>LOI COMPLÈTE</strong></td>
+</tr>
+<tr>
+<td>A priori</td>
+<td>Aucun</td>
+<td>$\mathcal N(0,b^2I)$</td>
+<td>$\mathcal N(m_0,S_0)$</td>
+</tr>
+<tr>
+<td>Solution</td>
+<td>$(\Phi^\top\Phi)^{-1}\Phi^\top y$</td>
+<td>$(\Phi^\top\Phi+\frac{\sigma^2}{b^2}I)^{-1}\Phi^\top y$</td>
+<td>$\mathcal N(m_N,S_N)$</td>
+</tr>
+<tr>
+<td>Inversibilité</td>
+<td> exige $\operatorname{rk}\Phi=K$</td>
+<td> <strong>toujours</strong> garantie</td>
+<td> toujours</td>
+</tr>
+<tr>
+<td>Surapprentissage</td>
+<td> <strong>oui</strong>, surtout si $N$ petit</td>
+<td>atténué</td>
+<td> <strong>intrinsèquement traité</strong></td>
+</tr>
+<tr>
+<td>Incertitude prédictive</td>
+<td>$\sigma^2$ seul</td>
+<td>$\sigma^2$ seul</td>
+<td>$\phi^\top S_N\phi+\sigma^2$</td>
+</tr>
+<tr>
+<td>Coût</td>
+<td>Un système linéaire</td>
+<td>Un système linéaire</td>
+<td>Une <strong>inversion de $K\times K$</strong></td>
+</tr>
+</tbody></table>
+<p><strong>LE DICTIONNAIRE PROBABILISTE / GÉOMÉTRIQUE / OPTIMISATION :</strong></p>
+<table>
+<thead>
+<tr>
+<th>Probabiliste (ch. 6, 8)</th>
+<th>Géométrique (ch. 3)</th>
+<th>Optimisation (ch. 7)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Vraisemblance gaussienne</td>
+<td>Distance quadratique</td>
+<td>Objectif quadratique</td>
+</tr>
+<tr>
+<td>Maximiser la vraisemblance</td>
+<td><strong>Projection orthogonale</strong></td>
+<td>Minimum global (hessienne $\succ0$)</td>
+</tr>
+<tr>
+<td>A priori $\mathcal N(0,b^2I)$</td>
+<td>—</td>
+<td><strong>Régularisation</strong> $\lambda\lVert\theta\rVert^2$</td>
+</tr>
+<tr>
+<td>Annuler le gradient</td>
+<td> <strong>Résidu $\perp$ colonnes de $\Phi$</strong></td>
+<td>Condition d'optimalité</td>
+</tr>
+<tr>
+<td>Conjugaison gaussienne</td>
+<td>—</td>
+<td>Forme fermée</td>
+</tr>
+</tbody></table>
+<p><strong>Ce que chaque chapitre antérieur apporte ici :</strong></p>
+<table>
+<thead>
+<tr>
+<th>Chapitre</th>
+<th>Ce qu'il fournit</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>2</strong> — algèbre linéaire</td>
+<td>Matrice de conception, rang, systèmes linéaires</td>
+</tr>
+<tr>
+<td><strong>3</strong> — géométrie</td>
+<td> <strong>Projection orthogonale</strong>, équation normale, pseudo-inverse</td>
+</tr>
+<tr>
+<td><strong>4</strong> — décompositions</td>
+<td>Définie positivité de $\Phi^\top\Phi$, inversibilité</td>
+</tr>
+<tr>
+<td><strong>5</strong> — calcul vectoriel</td>
+<td>Le gradient de $\lVert y-\Phi\theta\rVert^2$, la hessienne</td>
+</tr>
+<tr>
+<td><strong>6</strong> — probabilités</td>
+<td>Gaussiennes, conjugaison, transformations affines des moments</td>
+</tr>
+<tr>
+<td><strong>7</strong> — optimisation</td>
+<td>Minimum global d'un objectif quadratique</td>
+</tr>
+<tr>
+<td><strong>8</strong> — le pont</td>
+<td>MLE, MAP, régularisation, surapprentissage</td>
+</tr>
+</tbody></table>
+<div class="rec"><h2>Active Recall</h2><p><strong>Formulation</strong></p><ol>
+<li>Écrire le modèle de régression et la vraisemblance.</li>
+<li>Que signifie exactement « linéaire » en régression linéaire ?</li>
+<li>Quelle est la seule source d'incertitude ? Que se passerait-il sans bruit ?</li>
+<li>Pourquoi la vraisemblance se factorise-t-elle ?</li>
+<li>Que représente $\theta$ dans l'exemple 9.1 ?</li>
+</ol><p><strong>Maximum de vraisemblance</strong>
+6. Pourquoi la vraisemblance n'est-elle pas une loi en $\theta$ ?
+7. Donner les deux raisons de la transformation logarithmique.
+8. Écrire la log-vraisemblance négative sous ses trois formes.
+9. Qu'est-ce que la matrice de conception ? Comment sont rangés les $x_n$ ?
+10. Calculer le gradient et en déduire $\theta_{\text{ML}}$.
+11. Donner les trois justifications de la dérivation.
+12. Qu'est-ce qu'une application d'attributs ? Écrire $\phi$ pour la régression polynomiale.
+13. Que devient $\theta_{\text{ML}}$ avec des attributs ? Quelle condition de rang ?
+14. Dériver $\sigma^2_{\text{ML}}$ et l'interpréter.
+15. Écrire la RMSE. Donner ses deux vertus.
+16. Décrire l'expérience des figures 9.5-9.6. Que se passe-t-il à $M=N-1$ ?
+17. Pourquoi $M\geqslant N$ est-il impossible ?</p><p><strong>MAP et régularisation</strong>
+18. Quel est le signe empirique du surapprentissage ?
+19. Que signifie concrètement un a priori $\mathcal N(0,1)$ ?
+20. Écrire la log-a-posteriori. Pourquoi parle-t-on de « compromis » ?
+21. Écrire $\theta_{\text{MAP}}$. Quelle est la seule différence avec $\theta_{\text{ML}}$ ?
+22. Quelles sont les DEUX choses que ce terme additionnel résout ?
+23. Écrire les moindres carrés régularisés et leur solution.
+24. Pour quelle valeur de $\lambda$ le régularisateur et le log-a-priori négatif coïncident-ils ?
+25. Qu'apporte la norme $\ell_1$ ? Comment s'appelle-t-elle ?</p><p><strong>Régression bayésienne</strong>
+26. En quoi la régression bayésienne diffère-t-elle du MAP ?
+27. Écrire le modèle (a priori et vraisemblance).
+28. Écrire la prédiction a priori. Que faut-il fournir ?
+29. Donner les trois ingrédients de sa dérivation.
+30. Énoncer le théorème 9.1.
+31. Comment lire $S_N^{-1}$ ? et $m_N$ ?
+32. Que vaut $m_N$ quand $m_0=0$ et $S_0=b^2I$ ?
+33. Écrire la prédiction a posteriori. Que vaut sa moyenne ?
+34. Que change-t-on pour des valeurs de fonction sans bruit ?
+35. Qu'est-ce qu'une « loi sur les fonctions » ?
+36. Donner les deux différences entre vraisemblance marginale et prédictive a posteriori.
+37. Dériver la vraisemblance marginale en deux étapes.</p><p><strong>Géométrie</strong>
+38. Écrire $X\theta_{\text{ML}}$ dans le cas 1D et identifier les trois objets géométriques.
+39. Quelle est la formule générale de $P_\pi$ ?
+40. Que devient-elle si les attributs sont orthonormés ?
+41. Quelles sont les quatre propriétés de $P_\pi$ ?
+42. Pourquoi l'équation normale et la condition d'orthogonalité sont-elles la même équation ?</p></div>
+
+
+
+
+
+
+<h2>Flashcards</h2>
+<table>
+<thead>
+<tr>
+<th>Question</th>
+<th>Réponse</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Le modèle de régression ?</td>
+<td>$y=f(x)+\epsilon$ avec $\epsilon\sim\mathcal N(0,\sigma^2)$ <strong>i.i.d.</strong></td>
+</tr>
+<tr>
+<td>La vraisemblance ?</td>
+<td>$p(y\mid x,\theta)=\mathcal N(y\mid\phi^\top(x)\theta,\ \sigma^2)$</td>
+</tr>
+<tr>
+<td>Que signifie « linéaire » ?</td>
+<td> <strong>LINÉAIRE EN LES PARAMÈTRES</strong> — une <strong>combinaison linéaire d'ATTRIBUTS</strong></td>
+</tr>
+<tr>
+<td>$y=\phi^\top(x)\theta$ avec $\phi$ non linéaire est-il linéaire ?</td>
+<td> <strong>OUI</strong> — c'est bien une régression linéaire</td>
+</tr>
+<tr>
+<td>La seule source d'incertitude ?</td>
+<td> Le <strong>BRUIT D'OBSERVATION</strong></td>
+</tr>
+<tr>
+<td>Sans bruit ?</td>
+<td> Relation <strong>DÉTERMINISTE</strong> ; la vraisemblance serait un <strong>DELTA DE DIRAC</strong></td>
+</tr>
+<tr>
+<td>Delta de Dirac ?</td>
+<td>Nul partout sauf en un point, d'intégrale 1 — une gaussienne à la limite $\sigma^2\to0$</td>
+</tr>
+<tr>
+<td>Pourquoi la vraisemblance se factorise-t-elle ?</td>
+<td> Les $y_i$ sont <strong>conditionnellement indépendantes sachant leurs $x_i$</strong></td>
+</tr>
+<tr>
+<td>Que représente $\theta$ pour $x,\theta\in\mathbb R$ ?</td>
+<td>La <strong>PENTE</strong> de la droite (passant par l'origine)</td>
+</tr>
+<tr>
+<td>La vraisemblance est-elle une loi en $\theta$ ?</td>
+<td> <strong>NON</strong> — non normalisée, <strong>peut même ne pas être intégrable</strong></td>
+</tr>
+<tr>
+<td>En $y$ ?</td>
+<td> <strong>OUI</strong>, elle est normalisée</td>
+</tr>
+<tr>
+<td>Les deux raisons du logarithme ?</td>
+<td>Éviter le <strong>SOUS-DÉBORDEMENT numérique</strong> · <strong>simplifier les dérivées</strong></td>
+</tr>
+<tr>
+<td>La log-vraisemblance négative ?</td>
+<td>$L(\theta)=\frac{1}{2\sigma^2}\lVert y-X\theta\rVert^2$</td>
+</tr>
+<tr>
+<td>Son autre nom ?</td>
+<td>La <strong>FONCTION D'ERREUR</strong></td>
+</tr>
+<tr>
+<td>Matrice de conception ?</td>
+<td>$X=[x_1,\dots,x_N]^\top\in\mathbb R^{N\times D}$ —  la <strong>$n$-ième LIGNE</strong> est $x_n$</td>
+</tr>
+<tr>
+<td>Le gradient de $L$ ?</td>
+<td>$\frac{1}{\sigma^2}(-y^\top X+\theta^\top X^\top X)\in\mathbb R^{1\times D}$</td>
+</tr>
+<tr>
+<td>L'estimateur du maximum de vraisemblance ?</td>
+<td>$\theta_{\text{ML}}=(X^\top X)^{-1}X^\top y$</td>
+</tr>
+<tr>
+<td>Le nom de cette équation ?</td>
+<td>Les <strong>ÉQUATIONS NORMALES</strong></td>
+</tr>
+<tr>
+<td>Pourquoi peut-on inverser $X^\top X$ ?</td>
+<td> Elle est <strong>définie positive</strong> si $\operatorname{rk}(X)=D$</td>
+</tr>
+<tr>
+<td>Nécessaire et suffisant ?</td>
+<td> <strong>OUI</strong> — la hessienne $X^\top X$ est <strong>définie positive</strong>, donc <strong>minimum GLOBAL</strong></td>
+</tr>
+<tr>
+<td>Que faut-il faire en pratique ?</td>
+<td> <strong>Résoudre</strong> $A\theta=b$, <strong>pas inverser</strong></td>
+</tr>
+<tr>
+<td>L'application d'attributs polynomiale ?</td>
+<td>$\phi(x)=[1,x,x^2,\dots,x^{K-1}]^\top$</td>
+</tr>
+<tr>
+<td>Ce qu'elle fait ?</td>
+<td> Elle <strong>SOULÈVE</strong> l'espace 1D en un espace de dimension $K$ de <strong>MONÔMES</strong></td>
+</tr>
+<tr>
+<td>Matrice d'attributs ?</td>
+<td>$\Phi\in\mathbb R^{N\times K}$ avec $\Phi_{ij}=\phi_j(x_i)$</td>
+</tr>
+<tr>
+<td>$\theta_{\text{ML}}$ avec attributs ?</td>
+<td>$(\Phi^\top\Phi)^{-1}\Phi^\top y$ —  <strong>il suffit de remplacer $X$ par $\Phi$</strong></td>
+</tr>
+<tr>
+<td>La condition de rang ?</td>
+<td>$\operatorname{rk}(\Phi)=K$</td>
+</tr>
+<tr>
+<td>$\sigma^2_{\text{ML}}$ ?</td>
+<td>$\frac1N\sum_n(y_n-\phi^\top(x_n)\theta)^2$</td>
+</tr>
+<tr>
+<td>Son interprétation ?</td>
+<td>La <strong>moyenne empirique des distances au carré</strong> entre valeurs <strong>sans bruit</strong> et observations <strong>bruitées</strong></td>
+</tr>
+<tr>
+<td>La RMSE ?</td>
+<td>$\sqrt{\frac1N\lVert y-\Phi\theta\rVert^2}$</td>
+</tr>
+<tr>
+<td>Ses deux vertus ?</td>
+<td>Comparer des jeux de <strong>tailles différentes</strong> ·  <strong>mêmes unités que $y$</strong></td>
+</tr>
+<tr>
+<td>La log-vraisemblance a-t-elle des unités ?</td>
+<td> <strong>NON</strong> — elle est <strong>sans unité</strong></td>
+</tr>
+<tr>
+<td>Que se passe-t-il à $M=N-1$ ?</td>
+<td> Le polynôme <strong>PASSE PAR CHAQUE POINT</strong> ; RMSE d'entraînement $=0$</td>
+</tr>
+<tr>
+<td>Et pour la généralisation ?</td>
+<td> <strong>Oscillations sauvages</strong> — mauvaise représentation, <strong>SURAPPRENTISSAGE</strong></td>
+</tr>
+<tr>
+<td>À partir de quel degré le test se dégrade-t-il ?</td>
+<td> <strong>Degré 6</strong> dans l'expérience du livre</td>
+</tr>
+<tr>
+<td>Pourquoi $M\geqslant N$ est-il impossible ?</td>
+<td> Système <strong>SOUS-DÉTERMINÉ</strong> ; $\Phi^\top\Phi$ <strong>non inversible</strong> ; <strong>infinité</strong> de solutions</td>
+</tr>
+<tr>
+<td>Le signe empirique du surapprentissage ?</td>
+<td> La <strong>MAGNITUDE des paramètres devient GRANDE</strong></td>
+</tr>
+<tr>
+<td>Que signifie l'a priori $\mathcal N(0,1)$ ?</td>
+<td>Les valeurs sont attendues dans $[-2,2]$ — <strong>deux écarts-types</strong></td>
+</tr>
+<tr>
+<td>La log-a-posteriori ?</td>
+<td>$\log p(\mathcal Y\mid\mathcal X,\theta)+\log p(\theta)+\text{const}$</td>
+</tr>
+<tr>
+<td>Pourquoi un « compromis » ?</td>
+<td>C'est une <strong>SOMME</strong> : l'a priori <strong>plus</strong> la vraisemblance</td>
+</tr>
+<tr>
+<td>$\theta_{\text{MAP}}$ ?</td>
+<td>$\big(\Phi^\top\Phi+\frac{\sigma^2}{b^2}I\big)^{-1}\Phi^\top y$</td>
+</tr>
+<tr>
+<td>La seule différence avec le MLE ?</td>
+<td> Le terme $\frac{\sigma^2}{b^2}I$ <strong>DANS l'inverse</strong></td>
+</tr>
+<tr>
+<td>Les DEUX problèmes qu'il résout ?</td>
+<td>Le <strong>surapprentissage</strong> ET  l'<strong>existence de l'INVERSE</strong></td>
+</tr>
+<tr>
+<td>Pourquoi ?</td>
+<td>$\Phi^\top\Phi$ est <strong>SEMI</strong>-définie positive ; le terme ajouté est <strong>STRICTEMENT</strong> défini positif</td>
+</tr>
+<tr>
+<td>Les moindres carrés régularisés ?</td>
+<td>$\min_\theta\lVert y-\Phi\theta\rVert^2+\lambda\lVert\theta\rVert_2^2$</td>
+</tr>
+<tr>
+<td>Le nom du premier terme ?</td>
+<td>Le terme d'<strong>AJUSTEMENT</strong> (<em>misfit</em>)</td>
+</tr>
+<tr>
+<td>$\theta_{\text{RLS}}$ ?</td>
+<td>$(\Phi^\top\Phi+\lambda I)^{-1}\Phi^\top y$</td>
+</tr>
+<tr>
+<td>Quand RLS $=$ MAP ?</td>
+<td> Pour $\lambda=\dfrac{\sigma^2}{b^2}$</td>
+</tr>
+<tr>
+<td>Quand le régularisateur $=$ le log-a-priori négatif ?</td>
+<td> Pour $\lambda=\dfrac{1}{2b^2}$</td>
+</tr>
+<tr>
+<td>Qu'apporte une norme $p$ petite ?</td>
+<td> Des solutions <strong>PARCIMONIEUSES</strong> (beaucoup de $\theta_d=0$) — utile pour la <strong>sélection de variables</strong></td>
+</tr>
+<tr>
+<td>Le régularisateur $\ell_1$ ?</td>
+<td>Le <strong>LASSO</strong> (Tibshirani, 1996)</td>
+</tr>
+<tr>
+<td>Ce que fait la régression bayésienne ?</td>
+<td> Elle <strong>n'ajuste AUCUN paramètre</strong> — elle <strong>MOYENNE</strong> sur tous les $\theta$ plausibles</td>
+</tr>
+<tr>
+<td>Le modèle bayésien ?</td>
+<td>$p(\theta)=\mathcal N(m_0,S_0)$ et $p(y\mid x,\theta)=\mathcal N(y\mid\phi^\top(x)\theta,\sigma^2)$</td>
+</tr>
+<tr>
+<td>Que devient $\theta$ ?</td>
+<td> Une <strong>VARIABLE ALÉATOIRE</strong></td>
+</tr>
+<tr>
+<td>La prédiction a priori ?</td>
+<td>$\mathcal N\big(\phi^\top(x_*)m_0,\ \phi^\top(x_*)S_0\phi(x_*)+\sigma^2\big)$</td>
+</tr>
+<tr>
+<td>Que faut-il fournir ?</td>
+<td> <strong>Seulement $x_*$</strong> — <strong>aucune donnée d'entraînement</strong></td>
+</tr>
+<tr>
+<td>Les trois ingrédients de sa dérivation ?</td>
+<td><strong>Conjugaison</strong> + marginalisation gaussienne · <strong>indépendance</strong> du bruit · <strong>transformation linéaire</strong> de gaussienne</td>
+</tr>
+<tr>
+<td>Théorème 9.1, la covariance ?</td>
+<td>$S_N=\big(S_0^{-1}+\sigma^{-2}\Phi^\top\Phi\big)^{-1}$</td>
+</tr>
+<tr>
+<td>Théorème 9.1, la moyenne ?</td>
+<td>$m_N=S_N\big(S_0^{-1}m_0+\sigma^{-2}\Phi^\top y\big)$</td>
+</tr>
+<tr>
+<td>Comment lire $S_N^{-1}$ ?</td>
+<td> Les <strong>PRÉCISIONS S'AJOUTENT</strong> : a priori <strong>plus</strong> données</td>
+</tr>
+<tr>
+<td>Comment lire $m_N$ ?</td>
+<td>Une <strong>moyenne pondérée par les PRÉCISIONS</strong></td>
+</tr>
+<tr>
+<td>$m_N$ si $m_0=0$ et $S_0=b^2I$ ?</td>
+<td> <strong>$=\theta_{\text{MAP}}$ exactement</strong></td>
+</tr>
+<tr>
+<td>Rôle de la vraisemblance marginale ?</td>
+<td> Elle <strong>NORMALISE</strong> l'a posteriori ; c'est la vraisemblance <strong>moyennée sur l'a priori</strong></td>
+</tr>
+<tr>
+<td>La prédiction a posteriori ?</td>
+<td>$\mathcal N\big(\phi^\top(x_*)m_N,\ \phi^\top(x_*)S_N\phi(x_*)+\sigma^2\big)$</td>
+</tr>
+<tr>
+<td>Sa moyenne ?</td>
+<td> <strong>$=\phi^\top(x_*)\theta_{\text{MAP}}$</strong> — le MAP ne perd que la <strong>VARIANCE</strong></td>
+</tr>
+<tr>
+<td>Que reflète $\phi^\top(x_*)S_N\phi(x_*)$ ?</td>
+<td>L'<strong>incertitude a posteriori sur les PARAMÈTRES</strong></td>
+</tr>
+<tr>
+<td>$S_N$ dépend-elle des données ?</td>
+<td> <strong>De $\Phi$ oui</strong> (les entrées), <strong>des cibles $y$ non</strong></td>
+</tr>
+<tr>
+<td>Valeurs de fonction sans bruit ?</td>
+<td> <strong>Même moyenne</strong>, variance <strong>SANS le $+\sigma^2$</strong></td>
+</tr>
+<tr>
+<td>Pourquoi la moyenne est-elle la même ?</td>
+<td> Le <strong>bruit est de moyenne $0$</strong></td>
+</tr>
+<tr>
+<td>Loi sur les fonctions ?</td>
+<td> Échantillonner $\theta_i\sim p(\theta\mid\mathcal X,\mathcal Y)$ donne <strong>une réalisation de FONCTION</strong> $\theta_i^\top\phi(\cdot)$</td>
+</tr>
+<tr>
+<td>Marginale contre prédictive a posteriori ?</td>
+<td>La marginale prédit les cibles <strong>d'ENTRAÎNEMENT</strong> · elle moyenne sur <strong>l'A PRIORI</strong></td>
+</tr>
+<tr>
+<td>La vraisemblance marginale ?</td>
+<td>$\mathcal N\big(y\mid Xm_0,\ XS_0X^\top+\sigma^2I\big)$</td>
+</tr>
+<tr>
+<td>Sa moyenne ?</td>
+<td>$\mathbb E_{\theta,\epsilon}[X\theta+\epsilon]=Xm_0$</td>
+</tr>
+<tr>
+<td>Sa covariance ?</td>
+<td>$X S_0X^\top+\sigma^2I$</td>
+</tr>
+<tr>
+<td>$X\theta_{\text{ML}}$ en 1D ?</td>
+<td>$\dfrac{XX^\top}{X^\top X}y$</td>
+</tr>
+<tr>
+<td>Les trois identifications géométriques ?</td>
+<td>$\frac{XX^\top}{X^\top X}=P_\pi$ · $\theta_{\text{ML}}=$ <strong>coordonnées</strong> · $X\theta_{\text{ML}}=$ <strong>projection orthogonale</strong></td>
+</tr>
+<tr>
+<td>Que fait le MLE, géométriquement ?</td>
+<td> Une <strong>PROJECTION ORTHOGONALE</strong> de $y$ sur l'espace des <strong>COLONNES</strong> de $\Phi$</td>
+</tr>
+<tr>
+<td>$P_\pi$ dans le cas général ?</td>
+<td>$\Phi(\Phi^\top\Phi)^{-1}\Phi^\top$</td>
+</tr>
+<tr>
+<td>Sur quel sous-espace projette-t-on ?</td>
+<td>Le sous-espace de <strong>dimension $K$</strong> de $\mathbb R^N$ engendré par les <strong>colonnes de $\Phi$</strong></td>
+</tr>
+<tr>
+<td>Si les attributs sont orthonormés ?</td>
+<td> $\Phi^\top\Phi=I$, donc $P_\pi=\Phi\Phi^\top$ — <strong>plus d'inversion</strong></td>
+</tr>
+<tr>
+<td>Les quatre propriétés de $P_\pi$ ?</td>
+<td><strong>Idempotente</strong> · <strong>symétrique</strong> · $\operatorname{tr}=\operatorname{rang}=K$ ·  <strong>singulière</strong></td>
+</tr>
+<tr>
+<td>Le lien entre équation normale et orthogonalité ?</td>
+<td> $\Phi^\top(y-\Phi\theta)=0\iff\Phi^\top\Phi\theta=\Phi^\top y$ — <strong>la MÊME équation</strong></td>
+</tr>
+<tr>
+<td>Ce qu'est fondamentalement la régression linéaire ?</td>
+<td> Une <strong>méthode pour résoudre des SYSTÈMES d'équations linéaires</strong> insolubles, au sens des moindres carrés</td>
+</tr>
+</tbody></table>
+</main>
+
+
+
+
+</body></html>

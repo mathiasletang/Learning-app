@@ -1,0 +1,1425 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fiche 319 — Écrire un paquet : structure, DESCRIPTION, NAMESPACE, check</title>
+<script>
+window.MathJax={tex:{inlineMath:[["$","$"]],displayMath:[["$$","$$"]],processEscapes:true},
+ options:{skipHtmlTags:["script","noscript","style","textarea","pre","code"]},
+ svg:{fontCache:"global"},
+ startup:{pageReady:()=>MathJax.startup.defaultPageReady().then(()=>{document.body.classList.add("ready")})}};
+setTimeout(function(){document.body.classList.add("ready")},2500);
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+/* ============================================================
+   MathiasLearn — feuille de style des fiches
+   Reprise intégrale des tokens de 00_PARCOURS/*.html
+   + blocs pédagogiques (callouts, méthode, essentiels, recall)
+   ============================================================ */
+:root{--bg:#faf9f7;--card:#fff;--ink:#1a1a1a;--muted:#6b6b6b;--line:#e5e2dd;--accent:#8b5e34;
+ --hl:#fdf8ef;--ok:#2d7d4f;--okbg:#f0f7f3;--warn:#b3402f;--warnbg:#fdf3f1;--blue:#2f5d8b;--bluebg:#f1f5fa}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+ font:17px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;padding:0 16px 100px}
+.nav{position:sticky;top:0;background:rgba(250,249,247,.96);backdrop-filter:blur(8px);
+ border-bottom:1px solid var(--line);margin:0 -16px 30px;padding:11px 16px;z-index:50;
+ display:flex;gap:6px;flex-wrap:wrap;font-size:13px}
+.nav a{color:var(--muted);text-decoration:none;padding:4px 9px;border-radius:5px;white-space:nowrap}
+.nav a:hover{background:var(--line);color:var(--ink)}
+.nav a.on{background:var(--accent);color:#fff}
+main{max-width:780px;margin:0 auto}
+h1{font-size:31px;letter-spacing:-.02em;margin:.4em 0 .5em;line-height:1.25}
+h2{font-size:23px;margin:2.2em 0 .7em;padding-bottom:.3em;border-bottom:1px solid var(--line)}
+h3{font-size:19px;margin:1.9em 0 .5em;color:var(--accent)}
+h4{font-size:17px;margin:1.5em 0 .4em}
+p{margin:.8em 0} a{color:var(--accent)} hr{border:0;border-top:1px solid var(--line);margin:2.6em 0}
+table{border-collapse:collapse;width:100%;margin:1.3em 0;font-size:15.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+th{background:#f3f0eb;font-weight:600}
+tr:nth-child(even) td{background:#fcfbfa}
+code{font-family:"SF Mono",Menlo,Consolas,monospace;font-size:.88em;background:#f2efea;padding:2px 6px;border-radius:4px;overflow-wrap:break-word}
+pre{background:#f2efea;padding:14px 16px;border-radius:8px;overflow-x:auto}
+pre code{background:none;padding:0;white-space:pre}
+blockquote{border-left:3px solid var(--accent);background:var(--hl);margin:1.4em 0;padding:14px 20px;border-radius:0 8px 8px 0}
+blockquote p:first-child{margin-top:0} blockquote p:last-child{margin-bottom:0}
+ul,ol{padding-left:1.5em} li{margin:.35em 0} em{color:#4a4a4a}
+mjx-container[display="true"]{margin:1.1em 0!important;overflow-x:auto;overflow-y:hidden;padding:2px 0}
+mjx-container svg{max-width:100%}
+body:not(.ready) main{opacity:0} main{opacity:1;transition:opacity .25s}
+
+/* --- bandeau de tête de fiche --- */
+.cours{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--accent);
+ border-radius:0 10px 10px 0;padding:18px 22px;margin:0 0 34px}
+.cours h4{margin:0 0 4px;font-size:14px;text-transform:uppercase;letter-spacing:.07em;color:var(--accent)}
+.cours .cs{color:var(--muted);font-size:14.5px;margin:0 0 14px}
+
+/* --- exercices / corrigés --- */
+.ex{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:6px 24px 20px;margin:18px 0}
+.ex>h3:first-child{margin-top:14px}
+details.cor{margin-top:18px;border:1px solid var(--line);border-radius:8px;background:#fcfbfa;overflow:hidden}
+details.cor>summary{cursor:pointer;padding:12px 16px;font-weight:600;font-size:15px;color:var(--accent);
+ list-style:none;display:flex;align-items:center;gap:9px;user-select:none;transition:.15s;min-height:44px}
+details.cor>summary::-webkit-details-marker{display:none}
+details.cor>summary:hover{background:var(--hl)}
+details.cor>summary::before{content:"\25B6";font-size:10px;transition:transform .18s;display:inline-block}
+details.cor[open]>summary::before{transform:rotate(90deg)}
+details.cor[open]>summary{background:var(--okbg);color:var(--ok);border-bottom:1px solid var(--line)}
+.cor .in{padding:4px 20px 16px}
+.cor .in>*:first-child{margin-top:.9em}
+
+/* --- blocs pédagogiques (callouts) ---
+   Générés depuis une citation Markdown dont le premier **gras** commence
+   par un mot-clé : DÉFINITION, THÉORÈME, MÉTHODE, PIÈGE, INTUITION… */
+.cal{border:1px solid var(--line);border-left:4px solid var(--accent);background:var(--card);
+ border-radius:0 10px 10px 0;padding:15px 20px;margin:1.5em 0}
+.cal>p:first-child{margin-top:0}.cal>p:last-child,.cal>ul:last-child,.cal>ol:last-child{margin-bottom:0}
+.cal .lab{display:block;font-size:12.5px;text-transform:uppercase;letter-spacing:.08em;
+ font-weight:700;color:var(--accent);margin-bottom:6px}
+.cal.formel{background:var(--hl)}
+.cal.piege{border-left-color:var(--warn);background:var(--warnbg)}
+.cal.piege .lab{color:var(--warn)}
+.cal.methode{border-left-color:var(--ok);background:var(--okbg)}
+.cal.methode .lab{color:var(--ok)}
+.cal.intu{border-left-color:var(--blue);background:var(--bluebg)}
+.cal.intu .lab{color:var(--blue)}
+.cal.plus{border-left-style:dashed;background:#faf9f7}
+.cal.plus .lab{color:var(--muted)}
+
+/* --- révision express --- */
+.ess{background:var(--card);border:1px solid var(--accent);border-radius:10px;padding:4px 24px 20px;margin:1.6em 0}
+.ess h3{margin-top:1.3em}
+.rec{background:var(--card);border:1px dashed var(--accent);border-radius:10px;padding:4px 24px 18px;margin:1.6em 0}
+.rec ol{counter-reset:none}
+
+/* --- impression / PDF --- */
+@media print{
+ .nav{display:none}
+ body{padding:0;background:#fff;font-size:11.2pt;line-height:1.55}
+ main{max-width:none}
+ h1{font-size:23pt}h2{font-size:15pt;margin-top:1.5em}h3{font-size:12.6pt}
+ h2,h3,h4{break-after:avoid;page-break-after:avoid}
+ table,.cal,blockquote{break-inside:avoid;page-break-inside:avoid}
+ table{display:table;font-size:9.6pt}
+ details.cor{border:1px solid var(--line);background:#fcfbfa}
+ details.cor>summary{display:none}
+ details.cor .in{padding-top:10px}
+ .cal,.ex,.ess,.rec{box-shadow:none}
+ a{color:var(--ink);text-decoration:none}
+}
+@page{margin:16mm 15mm 18mm}
+
+/* --- exemples travaillés --- */
+.exm{background:#fcfbfa;border:1px solid var(--line);border-radius:10px;padding:2px 20px 14px;margin:1.5em 0}
+.exm>h4:first-child{margin:14px 0 .5em;color:var(--accent);font-size:13px;text-transform:uppercase;letter-spacing:.07em}
+
+
+/* --- pastilles de priorité (conventions des fiches de l'app) --- */
+h2[data-prio], h3[data-prio], h4[data-prio]{position:relative}
+h2[data-prio]::before,h3[data-prio]::before,h4[data-prio]::before{
+ content:"";display:inline-block;width:9px;height:9px;border-radius:50%;
+ margin-right:9px;vertical-align:middle;background:var(--muted)}
+[data-prio="must"]::before{background:var(--warn)}
+[data-prio="high"]::before{background:#d98324}
+[data-prio="mid"]::before{background:#c9a227}
+[data-prio="low"]::before{background:var(--ok)}
+/* corrigés des fiches de l'app : même traitement que les corrigés des séries */
+details.cor>summary::after{content:""}
+</style></head><body>
+<div class="nav"><a href="00_COMMENCER_ICI.html">Commencer ici</a><a href="01_NOTATIONS_le-decodeur.html">Notations</a><a href="02_EXERCICES_Serie-0.html">Série 0 — Remise en route</a><a href="03_EXERCICES_Serie-1.html">Série 1 — Convexité</a><a href="04_EXERCICES_Serie-2.html">Série 2 — KKT</a><a href="05_AUTO-EVALUATION.html">Auto-évaluation (quiz)</a><a href="06_FICHE_Optimisation-deux-variables.html">Fiche — Optimisation à 2 variables</a></div>
+<main><h1>Fiche 319 — Écrire un paquet : structure, <code>DESCRIPTION</code>, <code>NAMESPACE</code>, <code>check</code></h1>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Matière</strong></td>
+<td>Code · Langage R</td>
+</tr>
+<tr>
+<td><strong>Cours source</strong></td>
+<td>R Core Team, <em>Writing R Extensions</em> 4.6.1 — chapitre 1 « Creating R packages » (§1.1 structure, §1.1.1 <code>DESCRIPTION</code>, §1.1.3 dépendances, §1.1.5 sous-répertoires, §1.3 vérifier et construire, §1.5 espaces de noms) et chapitre 2 « Writing R documentation files » (§2.1 format Rd)</td>
+</tr>
+<tr>
+<td><strong>Difficulté</strong></td>
+<td> Avancé — beaucoup de conventions, peu de concepts</td>
+</tr>
+<tr>
+<td><strong>Temps d'étude estimé</strong></td>
+<td>1 h 45</td>
+</tr>
+<tr>
+<td><strong>Prérequis</strong></td>
+<td>Fiches 309, 310, 311, 315, 317</td>
+</tr>
+<tr>
+<td><strong>Concepts clés</strong></td>
+<td><strong>paquet source</strong>, <strong>tarball</strong>, <strong>paquet installé</strong>, <strong>paquet binaire</strong>, paquet ≠ <strong>library</strong>, installer / construire / vérifier, <strong>chargement paresseux</strong>, <code>DESCRIPTION</code> au format <strong>Debian Control File</strong>, les <strong>sept champs obligatoires</strong>, <code>Depends</code> / <code>Imports</code> / <code>Suggests</code> / <code>Enhances</code>, <code>NAMESPACE</code> <strong>scellé</strong>, <code>export</code> / <code>exportPattern</code> / <code>import</code> / <code>importFrom</code>, <strong><code>S3method</code></strong>, <code>.onLoad</code> / <code>.onAttach</code>, <code>useDynLib</code>, <code>R CMD check</code>, <code>R CMD build</code>, format <strong>Rd</strong></td>
+</tr>
+<tr>
+<td><strong>À retenir en priorité</strong></td>
+<td><strong>Un paquet n'est pas une bibliothèque</strong> · <strong>la version n'est pas un nombre décimal</strong> · <strong>les trois règles <code>Depends</code>/<code>Imports</code></strong> · <strong><code>S3method</code> dispense d'exporter</strong> · <strong><code>check</code> et <code>build</code> tournent en <code>--vanilla</code></strong>.</td>
+</tr>
+</tbody></table>
+<h2>Vue d'ensemble</h2>
+<pre><code>QUATRE FORMES     paquet SOURCE   -&gt;  TARBALL  -&gt;  paquet INSTALLE
+                                                   (+ paquet BINAIRE)
+
+QUATRE OPERATIONS install  R CMD INSTALL / install.packages()
+                  build    cree le tarball, nettoie, fabrique la doc des vignettes
+                  check    installe, teste, verifie la coherence et la portabilite
+                  compile  !! terme INEXACT pour un paquet -- c'est le CODE C/C++/
+                           Fortran qui se compile, ou le BYTE-COMPILE du code R
+
+!! UN PAQUET N'EST PAS UNE « LIBRARY »
+   library = 1. le REPERTOIRE ou les paquets sont installes
+             2. la bibliotheque partagee du systeme (DLL, .so, .dylib)
+
+STRUCTURE MINIMALE   DESCRIPTION   NAMESPACE
+   sous-repertoires  R  data  demo  exec  inst  man  po  src  tests  tools
+                     vignettes      (absents possibles, VIDES interdits)
+
+DESCRIPTION       format « Debian Control File » ; noms de champs SENSIBLES A LA CASSE
+   OBLIGATOIRES   Package  Version  License  Description  Title  Author  Maintainer
+   !! Version n'est PAS un decimal :  0.9 &lt; 0.75  car  9 &lt; 75
+
+DEPENDANCES   Depends   attaches AVANT le paquet
+              Imports   espace de noms importe, PAS attache  &lt;- le cas normal
+              Suggests  exemples, demos, tests, vignettes
+              Enhances  paquets « enrichis » par le votre
+   « A package should be listed in ONLY ONE of these fields. »
+
+NAMESPACE     export(f, g)      exportPattern("^[^.]")
+              import(foo)       importFrom(foo, f, g)
+              S3method(print, foo)   &lt;- pas besoin d'exporter print.foo
+              useDynLib(foo)
+   !! « Namespaces are SEALED once they are loaded. »
+
+DOCUMENTATION  format Rd -- en-tete (OBLIGATOIRE) + corps + pied de mots-cles
+</code></pre>
+<p><strong>Le problème posé.</strong> <em>« <strong>Packages provide a mechanism for loading optional code, data and documentation as needed.</strong> The R distribution itself includes <strong>about 30 packages</strong>. »</em> (§1)</p>
+<div class="cal intu"><span class="lab">Intuition — ce chapitre est un contrat.</span>
+<p> La fiche 315 décrivait les paquets <strong>du point de vue de l'utilisateur</strong> — <em>« Here, we will describe them from a user's point of view »</em>, disait le §13. Le présent chapitre décrit <strong>ce qu'il faut fournir</strong> pour qu'un paquet fonctionne : une structure de répertoires, deux fichiers de métadonnées, un format de documentation. <strong>Presque tout y est convention</strong> ; la difficulté n'est pas conceptuelle, elle est dans le nombre de règles.</p>
+</div>
+<p class="cal piege"> <em>« In the following, <strong>we assume that you know the <code>library()</code> command, including its <code>lib.loc</code> argument, and we also assume basic knowledge of the <code>R CMD INSTALL</code> utility</strong>. »</em> — les prérequis sont explicites (fiches 300 et 315).</p>
+<h2 data-prio="must">Concept 1 — Le vocabulaire, et le contresens à éviter</h2>
+<div class="cal formel"><span class="lab">Définition (§1).</span>
+<p> <em>« <strong>A package is a directory of files which extend R</strong>, <strong>a source package</strong> (the master files of a package), or <strong>a tarball containing the files of a source package</strong>, or <strong>an installed package</strong>, the result of running <code>R CMD INSTALL</code> on a source package. On some platforms … there are also <strong>binary packages</strong>, a zip file or tarball containing the files of an installed package <strong>which can be unpacked rather than installing from sources</strong>. »</em></p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Forme</th>
+<th>Ce que c'est</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>paquet source</strong></td>
+<td><em>« the <strong>master files</strong> of a package »</em></td>
+</tr>
+<tr>
+<td><strong>tarball</strong></td>
+<td>l'archive du paquet source, <strong>prête à distribuer</strong></td>
+</tr>
+<tr>
+<td><strong>paquet installé</strong></td>
+<td><em>« the result of running <strong><code>R CMD INSTALL</code></strong> on a source package »</em></td>
+</tr>
+<tr>
+<td><strong>paquet binaire</strong></td>
+<td><em>« can be <strong>unpacked rather than installing from sources</strong> »</em> — macOS, Windows x86_64</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p class="cal piege"> <strong>Le contresens (§1).</strong> <em>« <strong>A package is not a library.</strong> The latter is used <strong>in two senses</strong> in R documentation »</em> :</p>
+<ol>
+<li><em>« <strong>A directory into which packages are installed</strong>, e.g. <code>/usr/lib/R/library</code> : in that sense it is sometimes referred to as <strong>a library directory or library tree</strong> »</em> ;</li>
+<li>*« <strong>That used by the operating system, as a shared, dynamic or static library or (especially on Windows) a DLL</strong>, where <strong>the second L stands for "library"</strong>. »*</li>
+</ol>
+<p><em>(note 1 : « <strong>although this is a persistent mis-usage. It seems to stem from S</strong>, whose analogues of R's packages were officially known as <strong>library sections</strong> and later as <strong>chapters</strong>, but almost always referred to as <strong>libraries</strong>. »)</em></p>
+<p><strong>L'erreur est donc historique et tenace</strong> — d'où l'ironie que la commande de chargement s'appelle <code>library()</code>.</p>
+<p class="cal piege"> <em>« macOS distinguishes between <strong>shared objects (extension <code>.so</code>)</strong> and <strong>dynamic libraries (extension <code>.dylib</code>)</strong> »</em>, là où ailleurs <em>« these concepts are interchangeable »</em>.</p>
+</blockquote>
+<h3>1.1 Les opérations</h3>
+<div class="cal formel"><span class="lab">Définition (§1).</span>
+<p> <em>« There are <strong>a number of well-defined operations on source packages</strong>. »</em></p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Opération</th>
+<th>Ce qu'elle fait</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>installation</strong></td>
+<td><em>« the most common … <strong>using <code>R CMD INSTALL</code> or <code>install.packages</code></strong> »</em></td>
+</tr>
+<tr>
+<td><strong>build</strong></td>
+<td><em>« taking a source directory and <strong>creating a tarball ready for distribution</strong>, including <strong>cleaning it up and creating PDF/HTML documentation from any vignettes</strong> »</em></td>
+</tr>
+<tr>
+<td><strong>check</strong></td>
+<td><em>« <strong>a test installation is done and tested (including running its examples)</strong> ; also, <strong>the contents of the package are tested in various ways for consistency and portability</strong> »</em></td>
+</tr>
+<tr>
+<td><strong>compilation</strong></td>
+<td> <em>« <strong>Compilation is not a correct term for a package.</strong> »</em></td>
+</tr>
+</tbody></table>
+<blockquote>
+<p class="cal piege"> <strong>Le point sur la compilation (§1).</strong> <em>« <strong>Installing a source package which contains C, C++ or Fortran code will involve compiling that code.</strong> There is also the possibility of <strong>"byte" compiling the R code in a package</strong> (using the facilities of package <code>compiler</code>) : <strong>nowadays this is enabled by default for all packages</strong>. <strong>So compiling a package may come to mean byte-compiling its R code.</strong> »</em></p>
+</blockquote>
+<blockquote>
+<p><strong>Charger et attacher (§1).</strong> <em>« <strong>It used to be unambiguous to talk about loading an installed package using <code>library()</code>, but since the advent of package namespaces this has been less clear</strong> : people now often talk about <strong>loading the package's namespace</strong> and then <strong>attaching the package so it becomes visible on the search path</strong>. <strong>Function <code>library</code> performs both steps, but a package's namespace can be loaded without the package being attached</strong> (for example by calls like <code>splines::ns</code>). »</em></p>
+<p><strong>C'est l'explication exacte</strong> du <code>loadedNamespaces()</code> de la fiche 315 : <em>« some packages may be loaded but not available on the search list »</em>.</p>
+</blockquote>
+<blockquote>
+<p><strong>Le chargement paresseux (§1).</strong> <em>« <strong>This is part of the installation, always selected for R code but optional for data.</strong> When used, <strong>the R objects of the package are created at installation time and stored in a database in the <code>R</code> directory of the installed package, being loaded into the session at first use.</strong> <strong>This makes the R session start up faster and use less (virtual) memory.</strong> »</em></p>
+</blockquote>
+<h2 data-prio="must">Concept 2 — La structure d'un paquet</h2>
+<div class="cal formel"><span class="lab">Définition (§1.1).</span>
+<p> <em>« <strong>The sources of an R package consist of a subdirectory containing the files <code>DESCRIPTION</code> and <code>NAMESPACE</code>, and the subdirectories <code>R</code>, <code>data</code>, <code>demo</code>, <code>exec</code>, <code>inst</code>, <code>man</code>, <code>po</code>, <code>src</code>, <code>tests</code>, <code>tools</code> and <code>vignettes</code></strong> ( <strong>some of which can be missing, but which should not be empty</strong>). »</em></p>
+<p>*« The package subdirectory <strong>may also contain files <code>INDEX</code>, <code>configure</code>, <code>cleanup</code>, <code>LICENSE</code>, <code>LICENCE</code> and <code>NEWS</code></strong>. <strong>Other files such as <code>INSTALL</code>, <code>README</code>/<code>README.md</code>, or <code>ChangeLog</code> will be ignored by R, but may be useful to end users.</strong> »*</p>
+</div>
+<p class="cal piege"> <em>« <strong>Except where specifically mentioned, packages should not contain Unix-style "hidden" files/directories</strong> (that is, those whose name starts with a dot). »</em> — les exceptions étant <code>.Rbuildignore</code>, <code>.Rinstignore</code> et <code>vignettes/.install_extras</code>.</p>
+<div class="cal methode"><span class="lab">Méthode (§1.1).</span>
+<p> <em>« <strong>The R function <code>package.skeleton</code> can help to create the structure for a new package</strong> : see its help page for details. »</em></p>
+</div>
+<h3>2.1 Les contraintes sur les noms</h3>
+<blockquote>
+<p class="cal piege"> <strong>Règle (§1.1).</strong> *« <strong>The package subdirectory should be given the same name as the package.</strong> <strong>Because some file systems (e.g., those on Windows and by default on macOS) are not case-sensitive, to maintain portability it is strongly recommended that case distinctions not be used to distinguish different packages.</strong> For example, <strong>if you have a package named <code>foo</code>, do not also create a package named <code>Foo</code></strong>. »*</p>
+</blockquote>
+<p>C'est le premier piège de portabilité de la fiche 318, appliqué aux noms de paquets.</p>
+<blockquote>
+<p><strong>Règle (§1.1).</strong> <em>« To ensure that file names are valid across file systems and supported operating systems, <strong>the ASCII control characters as well as the characters <code>"</code>, <code>*</code>, <code>:</code>, <code>/</code>, <code>&lt;</code>, <code>&gt;</code>, <code>?</code>, <code>\</code>, and <code>|</code> are not allowed in file names</strong>. In addition, <strong>files with names <code>con</code>, <code>prn</code>, <code>aux</code>, <code>clock$</code>, <code>nul</code>, <code>com1</code> to <code>com9</code>, and <code>lpt1</code> to <code>lpt9</code></strong> after conversion to lower case and stripping possible "extensions" <strong>are disallowed</strong>. Also, <strong>file names in the same directory must not differ only by case</strong>. »</em></p>
+<p>*« In addition, <strong>the basenames of <code>.Rd</code> files may be used in URLs and so must be ASCII and not contain <code>%</code></strong>. <strong>For maximal portability filenames should only contain ASCII characters</strong> … <strong>we exclude space as many utilities do not accept spaces in file paths</strong> … <strong>It would be good practice to avoid the shell metacharacters <code>(){}'[]$~</code>.</strong> »*</p>
+<p class="cal piege"> <em>« <strong>Packages are normally distributed as tarballs, and these have a limit on path lengths</strong> … <strong>for maximal portability, 100 bytes.</strong> »</em></p>
+</blockquote>
+<blockquote>
+<p class="cal piege"> <strong>Pas de binaires (§1.1).</strong> <em>« <strong>A source package if possible should not contain binary executable files : they are not portable, and a security risk if they are of the appropriate architecture.</strong> <code>R CMD check</code> will warn about them unless they are listed … in a file <code>BinaryFiles</code>. <strong>Note that CRAN will not accept submissions containing binary files even if they are listed.</strong> »</em></p>
+</blockquote>
+<h2 data-prio="must">Concept 3 — Le fichier <code>DESCRIPTION</code></h2>
+<div class="cal formel"><span class="lab">Définition (§1.1.1).</span>
+<p> <em>« <strong>The <code>DESCRIPTION</code> file contains basic information about the package.</strong> »</em> L'exemple du manuel :</p>
+</div>
+<pre><code>Package: pkgname
+Version: 0.5-1
+Date: 2015-01-01
+Title: My First Collection of Functions
+Authors@R: c(person("Joe", "Developer", role = c("aut", "cre"),
+                    email = "Joe.Developer@some.domain.net",
+                    comment = c(ORCID = "nnnn-nnnn-nnnn-nnnn")),
+             person("Pat", "Developer", role = "aut"),
+             person("A.", "User", role = "ctb",
+                    email = "A.User@whereever.net"))
+Author: Joe Developer [aut, cre],
+  Pat Developer [aut],
+  A. User [ctb]
+Maintainer: Joe Developer &lt;Joe.Developer@some.domain.net&gt;
+Depends: R (&gt;= 3.1.0), nlme
+Suggests: MASS
+Description: A (one paragraph) description of what
+  the package does and why it may be useful.
+License: GPL (&gt;= 2)
+URL: https://www.r-project.org, http://www.another.url
+BugReports: https://pkgname.bugtracker.url
+</code></pre>
+<blockquote>
+<p><strong>Le format (§1.1.1).</strong> <em>« <strong>The format is that of a version of a "Debian Control File"</strong> … <strong>Fields start with an ASCII name immediately followed by a colon : the value starts after the colon and a space.</strong> <strong>Continuation lines (for example, for descriptions longer than one line) start with a space or tab.</strong>  <strong>Field names are case-sensitive : all those used by R are capitalized.</strong> »</em></p>
+<p><em>« <strong>For maximal portability, the <code>DESCRIPTION</code> file should be written entirely in ASCII</strong> — if this is not possible <strong>it must contain an <code>Encoding</code> field</strong>. »</em></p>
+</blockquote>
+<h3>3.1 Les sept champs obligatoires</h3>
+<blockquote>
+<p><strong>Règle (§1.1.1).</strong> <em>« <strong>The <code>Package</code>, <code>Version</code>, <code>License</code>, <code>Description</code>, <code>Title</code>, <code>Author</code>, and <code>Maintainer</code> fields are mandatory, all other fields are optional.</strong> <strong>Fields <code>Author</code> and <code>Maintainer</code> can be auto-generated from <code>Authors@R</code>, and may be omitted if the latter is provided.</strong> »</em></p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>Champ</th>
+<th>Contrainte</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong><code>Package</code></strong></td>
+<td><em>« only (ASCII) letters, numbers and dot, <strong>have at least two characters and start with a letter and not end in a dot</strong> »</em></td>
+</tr>
+<tr>
+<td><strong><code>Version</code></strong></td>
+<td><em>« <strong>a sequence of at least two (and usually three) non-negative integers</strong> separated by single <code>.</code> or <code>-</code> »</em></td>
+</tr>
+<tr>
+<td><strong><code>License</code></strong></td>
+<td>traité au §1.1.2</td>
+</tr>
+<tr>
+<td><strong><code>Title</code></strong></td>
+<td><em>« a <strong>short</strong> description … <strong>may truncate the title to 65 characters</strong> … <strong>use title case</strong> … <strong>not use any markup, not have any continuation lines, and not end in a period</strong> …  <strong>Do not repeat the package name</strong> »</em></td>
+</tr>
+<tr>
+<td><strong><code>Description</code></strong></td>
+<td><em>« a <strong>comprehensive</strong> description … <strong>several (complete) sentences, but only one paragraph</strong> … <strong>It is good practice not to start with the package name, "This package" or similar</strong> … <strong>URLs should be enclosed in angle brackets</strong> »</em></td>
+</tr>
+<tr>
+<td><strong><code>Author</code></strong></td>
+<td><em>« <strong>a plain text field intended for human readers</strong>, but <strong>not for automatic processing</strong> …  <strong>all significant contributors must be included</strong> »</em></td>
+</tr>
+<tr>
+<td><strong><code>Maintainer</code></strong></td>
+<td><em>« <strong>a single name followed by a valid (RFC 2822) email address in angle brackets</strong> …  <strong>For a CRAN package it should be a person, not a mailing list and not a corporate entity</strong> »</em></td>
+</tr>
+</tbody></table>
+<blockquote>
+<p class="cal piege"> <strong>Le piège de la version (§1.1.1).</strong> *« <strong>It is not a decimal number</strong>, so for example <strong><code>0.9 &lt; 0.75</code> since <code>9 &lt; 75</code></strong>. »* Et : <em>« <strong>a version such as <code>0.01</code> or <code>0.01.0</code> will be handled as if it were <code>0.1-0</code></strong> »</em>.</p>
+<p><strong>Chaque composante est un entier comparé séparément.</strong> La version 0.9 vient <strong>avant</strong> la 0.75 — l'inverse de l'intuition arithmétique. C'est la même convention que pour les numéros de version de logiciels en général, et elle surprend à chaque fois.</p>
+</blockquote>
+<p><strong>Deux conventions typographiques du manuel</strong> : <em>« <strong>Refer to other packages and external software in single quotes, and to book titles (and similar) in double quotes.</strong> »</em> — pour <code>Title</code> comme pour <code>Description</code>.</p>
+<h2 data-prio="must">Concept 4 — Les quatre champs de dépendance</h2>
+<div class="cal formel"><span class="lab">Définition (§1.1.3).</span>
+<p> <em>« <strong>The <code>Depends</code> field gives a comma-separated list of package names which this package depends on. Those packages will be attached before the current package when <code>library</code> or <code>require</code> is called.</strong> Each package name may be optionally followed by <strong>a comment in parentheses specifying a version requirement</strong> — e.g. <code>MASS (&gt;= 3.1-20)</code>. »</em></p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Champ</th>
+<th>Rôle</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong><code>Depends</code></strong></td>
+<td><em>« <strong>attached before the current package</strong> »</em></td>
+</tr>
+<tr>
+<td><strong><code>Imports</code></strong></td>
+<td><em>« packages <strong>whose namespaces are imported from</strong> … <strong>but which do not need to be attached</strong> »</em></td>
+</tr>
+<tr>
+<td><strong><code>Suggests</code></strong></td>
+<td><em>« packages that are <strong>not necessarily needed</strong> … <strong>used only in examples, demos, tests or vignettes</strong>, and <strong>packages loaded in the body of functions</strong> »</em></td>
+</tr>
+<tr>
+<td><strong><code>Enhances</code></strong></td>
+<td><em>« packages <strong>"enhanced" by the package at hand</strong>, e.g. by <strong>providing methods for classes from these packages</strong> »</em></td>
+</tr>
+</tbody></table>
+<blockquote>
+<p class="cal piege"> <strong>Les précisions sur <code>Imports</code> (§1.1.3).</strong> <em>« <strong>Namespaces accessed by the <code>::</code> and <code>:::</code> operators must be listed here, or in <code>Suggests</code> or <code>Enhances</code>.</strong> <strong>Ideally this field will include all the standard packages that are used</strong>, and <strong>it is important to include S4-using packages</strong> (as their class definitions can change …). <strong>Packages declared in the <code>Depends</code> field should not also be in the <code>Imports</code> field.</strong> »</em></p>
+</blockquote>
+<blockquote>
+<p><strong>Les trois règles générales (§1.1.3).</strong></p>
+<ol>
+<li><em>« <strong>A package should be listed in only one of these fields.</strong> »</em></li>
+<li><em>« <strong>Packages whose namespace only is needed to load the package using <code>library(pkgname)</code> should be listed in the <code>Imports</code> field and not in the <code>Depends</code> field.</strong> <strong>Packages listed in <code>import</code> or <code>importFrom</code> directives in the <code>NAMESPACE</code> file should almost always be in <code>Imports</code> and not <code>Depends</code>.</strong> »</em></li>
+<li><em>« <strong>Packages that need to be attached to successfully load the package using <code>library(pkgname)</code> must be listed in the <code>Depends</code> field.</strong> »</em></li>
+</ol>
+</blockquote>
+<div class="cal intu"><span class="lab">En clair — la règle de décision.</span>
+<p> La question à se poser est : <em>« l'utilisateur de mon paquet doit-il <strong>voir</strong> les fonctions de cet autre paquet ? »</em> Si <strong>non</strong> — le cas de loin le plus fréquent —, c'est <strong><code>Imports</code></strong>. Si <strong>oui</strong>, c'est <code>Depends</code>. Les règles 2 et 3 disent exactement cela, et la règle 1 interdit de couvrir ses arrières en le mettant partout.</p>
+</div>
+<p><strong>La dépendance à R lui-même (§1.1.3)</strong> : *« if the package works only with R version 4.0.0 or later, include <strong><code>R (&gt;= 4.0)</code></strong> in the <code>Depends</code> field. (<strong>As here, trailing zeroes can be dropped and it is recommended that they are.</strong>) »*</p>
+<p class="cal piege"> <em>« <strong>It makes no sense to declare a dependence on R without a version specification, nor on the package <code>base</code></strong> : this is an R package and package <code>base</code> is always available. »</em> Et : <em>« <strong>It is inadvisable to use a dependence on R with patch level (the third digit) other than zero.</strong> »</em></p>
+<p class="cal piege"> <em>« <strong>Both <code>library</code> and the R package checking facilities use this field : hence it is an error to use improper syntax or misuse the <code>Depends</code> field for comments on other software that might be needed.</strong> »</em></p>
+<h2 data-prio="high">Concept 5 — Les sous-répertoires</h2>
+<blockquote>
+<p><strong>Règle — le répertoire <code>R</code> (§1.1.5).</strong> <em>« <strong>The <code>R</code> subdirectory contains R code files, only.</strong> The code files … <strong>must start with an ASCII letter or digit and have one of the extensions <code>.R</code>, <code>.S</code>, <code>.q</code>, <code>.r</code>, or <code>.s</code>. We recommend using <code>.R</code>.</strong> <strong>It should be possible to read in the files using <code>source()</code>, so R objects must be created by assignments.</strong>  <strong>Note that there need be no connection between the name of the file and the R objects created by it.</strong> »</em></p>
+<p class="cal piege"> <em>« <strong>Ideally, the R code files should only directly assign R objects and definitely should not call functions with side effects such as <code>require</code> and <code>options</code>.</strong> »</em></p>
+<p><em>«  <strong>Extreme care is needed if top-level computations are made to depend on availability or not of other packages</strong> … <strong>Nor should they depend on the availability of external resources such as downloads.</strong> »</em></p>
+</blockquote>
+<p><strong>Deux exceptions</strong> : <code>R/sysdata.rda</code> — <em>« <strong>lazy-loaded into the namespace environment</strong> — this is intended for <strong>system datasets that are not intended to be user-accessible via <code>data</code></strong> »</em> — et les fichiers en <code>.in</code>, pour un script <code>configure</code>.</p>
+<blockquote>
+<p><strong>Règle — l'encodage (§1.1.5).</strong> <em>« <strong>Only ASCII characters (and the control characters tab, form feed, LF and CR) should be used in code files.</strong> Other characters are accepted <strong>in comments</strong>, but then <strong>the comments may not be readable in e.g. a UTF-8 locale</strong>. <strong>Non-ASCII characters in object names will normally fail when the package is installed.</strong> <strong>Any byte will be allowed in a quoted character string but <code>\uxxxx</code> escapes should be used for non-ASCII characters.</strong> »</em></p>
+</blockquote>
+<blockquote>
+<p><strong>Règle — le répertoire <code>man</code> (§1.1.5).</strong> *« <strong>The <code>man</code> subdirectory should contain (only) documentation files for the objects in the package in R documentation (Rd) format.</strong> … <strong>the names must be valid in <code>file://</code> URLs, which means they must be entirely ASCII and not contain <code>%</code></strong>. »*</p>
+<p class="cal piege"> <em>« <strong>Note that all user-level objects in a package should be documented</strong> ; if a package <code>pkg</code> contains <strong>user-level objects which are for "internal" use only</strong>, it should provide <strong>a file <code>pkg-internal.Rd</code></strong> which documents all such objects, and <strong>clearly states that these are not meant to be called by the user</strong>. <strong>Note that packages which use internal objects extensively should not export those objects from their namespace, when they do not need to be documented.</strong> »</em></p>
+<p><em>« <strong>Having a <code>man</code> directory containing no documentation files may give an installation error.</strong> »</em></p>
+</blockquote>
+<blockquote>
+<p><strong>Règle — le répertoire <code>src</code> (§1.1.5).</strong> *« <strong>The sources and headers for the compiled code are in <code>src</code></strong>, plus optionally <strong>a file <code>Makevars</code> or <code>Makefile</code></strong>. <strong>When a package is installed using <code>R CMD INSTALL</code>, <code>make</code> is used to control compilation and linking into a shared object</strong> … <strong>providing support for C, C++, fixed- or free-form Fortran, Objective C and Objective C++</strong> with extensions <strong><code>.c</code>, <code>.cc</code> or <code>.cpp</code>, <code>.f</code>, <code>.f90</code> or <code>.f95</code>, <code>.m</code>, and <code>.mm</code></strong>. <strong>We recommend using <code>.h</code> for headers.</strong> »* — voir fiche 320.</p>
+</blockquote>
+<p>*« The <code>R</code> and <code>man</code> subdirectories <strong>may contain OS-specific subdirectories named <code>unix</code> or <code>windows</code></strong>. »*</p>
+<h2 data-prio="must">Concept 6 — Le fichier <code>NAMESPACE</code></h2>
+<div class="cal formel"><span class="lab">Définition (§1.5).</span>
+<p> <em>« <strong>R has a namespace management system for code in packages. This system allows the package writer to specify which variables in the package should be exported to make them available to package users, and which variables should be imported from other packages.</strong> »</em></p>
+<p><em>« <strong>The namespace for a package is specified by the <code>NAMESPACE</code> file in the top level package directory.</strong>  <strong>Note that although the file looks like R code (and often has R-style comments) it is not processed as R code. Only very simple conditional processing of <code>if</code> statements is implemented.</strong> »</em></p>
+</div>
+<blockquote>
+<p class="cal piege"> <strong>Le scellement (§1.5).</strong> <em>« <strong>Namespaces are sealed once they are loaded. Sealing means that imports and exports cannot be changed and that internal variable bindings cannot be changed.</strong> <strong>Sealing allows a simpler implementation strategy</strong> … <strong>and allows code analysis and compilation tools to accurately identify the definition corresponding to a global variable reference in a function body.</strong> »</em></p>
+<p><strong>C'est la contrepartie de la garantie de la fiche 315</strong> : si un paquet ne peut pas être perturbé de l'extérieur, c'est parce que son espace de noms est <strong>verrouillé</strong>.</p>
+</blockquote>
+<blockquote>
+<p><strong>La stratégie de recherche (§1.5).</strong> <em>« <strong>If not found locally, R searches the package namespace first, then the imports, then the base namespace and then the normal search path</strong> ( <strong>so the base namespace precedes the normal search rather than being at the end of it</strong>). »</em></p>
+<p>C'est la chaîne de la fiche 310 (<em>R Language Definition</em> §3.5.4), <strong>redonnée du côté de l'auteur</strong>.</p>
+</blockquote>
+<h3>6.1 Les directives</h3>
+<table>
+<thead>
+<tr>
+<th>Directive (§1.5.1)</th>
+<th>Effet</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong><code>export(f, g)</code></strong></td>
+<td><em>« specifies that the variables <code>f</code> and <code>g</code> are to be exported »</em> —  <em>« <strong>variable names may be quoted, and reserved words and non-standard names such as <code>[&lt;-.fractions</code> must be</strong> »</em></td>
+</tr>
+<tr>
+<td><strong><code>exportPattern("^[^.]")</code></strong></td>
+<td><em>« exports <strong>all variables that do not start with a period</strong> »</em> — une <strong>expression régulière POSIX étendue</strong></td>
+</tr>
+<tr>
+<td><strong><code>import(foo, bar)</code></strong></td>
+<td><em>« <strong>all exported variables</strong> in the packages <code>foo</code> and <code>bar</code> are to be imported »</em></td>
+</tr>
+<tr>
+<td><strong><code>importFrom(foo, f, g)</code></strong></td>
+<td><em>« the exported variables <code>f</code> and <code>g</code> of the package <code>foo</code> »</em></td>
+</tr>
+</tbody></table>
+<blockquote>
+<p class="cal piege"> <strong>La recommandation (§1.5.1).</strong> <em>« <strong>Using <code>importFrom</code> selectively rather than <code>import</code> is good practice and recommended notably when importing from packages with more than a dozen exports and especially from those written by others (so what they export can change in future).</strong> »</em></p>
+<p>Et sur <code>exportPattern</code> : <em>« <strong>such broad patterns are not recommended for production code : it is better to list all exports or use narrowly-defined groups</strong> … <strong>Beware of patterns which include names starting with a period : some of these are internal-only variables and should never be exported.</strong> »</em></p>
+</blockquote>
+<p><em>« <strong>Packages implicitly import the base namespace.</strong> »</em></p>
+<h3>6.2 Enregistrer les méthodes S3</h3>
+<div class="cal formel"><span class="lab">Problème (§1.5.2).</span>
+<p class="cal piege">  <em>« <strong>The standard method for S3-style <code>UseMethod</code> dispatching might fail to locate methods defined in a package that is imported but not attached to the search path.</strong> <strong>To ensure that these methods are available the packages defining the methods should ensure that the generics are imported and register the methods using <code>S3method</code> directives.</strong> »</em></p>
+</div>
+<pre><code>S3method(print, foo)
+</code></pre>
+<p><em>« <strong>ensures that the method is registered and available for <code>UseMethod</code> dispatch, and the function <code>print.foo</code> does not need to be exported.</strong> <strong>Since the generic <code>print</code> is defined in <code>base</code> it does not need to be imported explicitly.</strong> »</em></p>
+<p><strong>C'est le complément indispensable de la fiche 311.</strong> Le dispatch cherche <code>generic.class</code> <strong>par le nom</strong> ; si le paquet n'est pas attaché, le nom n'est visible nulle part. <strong><code>S3method</code> inscrit la méthode dans un registre</strong> — et permet de la garder <strong>non exportée</strong>, ce qui est exactement ce que recommandait le §1.1.5 pour les objets internes.</p>
+<p><em>« It is possible to specify <strong>a third argument to <code>S3method</code>, the function to be used as the method</strong> »</em>, par exemple <code>S3method(print, check_so_symbols, .print.via.format)</code>.</p>
+<p><em>« As from R 3.6.0 one can also use <code>S3method()</code> directives to perform <strong>delayed registration</strong> »</em> — <code>S3method(pkg::gen, cls)</code> dans un <code>if</code>, pour n'enregistrer que <strong>quand l'espace de noms de <code>pkg</code> est chargé</strong>.</p>
+<h3>6.3 Les points d'entrée</h3>
+<div class="cal formel"><span class="lab">Définition (§1.5.3).</span>
+<p> <em>« <strong>There are a number of hooks called as packages are loaded, attached, detached, and unloaded.</strong> <strong>Since loading and attaching are distinct operations, separate hooks are provided for each. These hook functions are called <code>.onLoad</code> and <code>.onAttach</code>.</strong> They both take arguments <code>libname</code> and <code>pkgname</code> ;  <strong>they should be defined in the namespace but not exported.</strong> »</em></p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Moment</th>
+<th>Fonction</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>chargement</strong> de l'espace de noms</td>
+<td><strong><code>.onLoad</code></strong></td>
+</tr>
+<tr>
+<td><strong>attachement</strong> au chemin de recherche</td>
+<td><strong><code>.onAttach</code></strong></td>
+</tr>
+<tr>
+<td><strong>détachement</strong></td>
+<td><strong><code>.onDetach</code></strong> ou <strong><code>.Last.lib</code></strong> ( celle-ci <strong>doit être exportée</strong>)</td>
+</tr>
+<tr>
+<td><strong>déchargement</strong> de l'espace de noms</td>
+<td><strong><code>.onUnload</code></strong></td>
+</tr>
+</tbody></table>
+<blockquote>
+<p class="cal piege"> <strong>Les erreurs fréquentes, énumérées par le manuel (§1.5.3).</strong> <em>« <strong>These hooks are often used incorrectly. People forget to export <code>.Last.lib</code>. Compiled code should be loaded in <code>.onLoad</code> (or via a <code>useDynLib</code> directive) and unloaded in <code>.onUnload</code>.</strong> <strong>Do remember that a package's namespace can be loaded without the namespace being attached (e.g. by <code>pkgname::fun</code>) and that a package can be detached and re-attached whilst its namespace remains loaded.</strong> »</em></p>
+<p><em>« <strong>Packages are not likely to need <code>.onAttach</code> (except perhaps for a start-up banner)</strong> ; <strong>code to set options and load shared objects should be placed in a <code>.onLoad</code> function</strong>. »</em></p>
+<p><em>« <strong>It is good practice for these functions to be quiet. Any messages should use <code>packageStartupMessage</code> so users (including check scripts) can suppress them if desired.</strong> »</em></p>
+</blockquote>
+<p><strong>Et <code>useDynLib</code></strong> : <em>« A <code>NAMESPACE</code> file can contain one or more <strong><code>useDynLib</code></strong> directives which allows shared objects that need to be loaded. »</em></p>
+<details class="cor">
+<summary><strong>L'exemple complet du manuel (§1.5.5) — deux paquets, et un résultat surprenant</strong></summary><div class="in">
+
+<p><strong>Le paquet <code>foo</code></strong>, fichier <code>foo.R</code> :</p>
+<pre><code class="language-r">x &lt;- 1
+f &lt;- function(y) c(x, y)
+foo &lt;- function(x) .Call("foo", x, PACKAGE = "foo")
+print.foo &lt;- function(x, ...) cat("&lt;a foo&gt;\n")
+</code></pre>
+<p>et son <code>NAMESPACE</code> :</p>
+<pre><code>useDynLib(foo)
+export(f, foo)
+S3method(print, foo)
+</code></pre>
+<p><strong>Le paquet <code>bar</code></strong>, fichier <code>bar.R</code> :</p>
+<pre><code class="language-r">c &lt;- function(...) sum(...)
+g &lt;- function(y) f(c(y, 7))
+h &lt;- function(y) y + 9
+</code></pre>
+<p>et son <code>NAMESPACE</code> :</p>
+<pre><code>import(foo)
+export(g, h)
+</code></pre>
+<p><strong>Le résultat annoncé par le manuel :</strong></p>
+<pre><code class="language-r">&gt; g(6)
+[1] 1 13
+</code></pre>
+<p><em>Étape 1 — ce que fait <code>library(bar)</code>.</em> <em>« <strong>Calling <code>library(bar)</code> loads <code>bar</code> and attaches its exports to the search path. Package <code>foo</code> is also loaded but not attached to the search path.</strong> »</em> — l'<code>import(foo)</code> <strong>charge</strong> <code>foo</code> sans le rendre visible (concept 1).</p>
+<p><em>Étape 2 — dérouler <code>g(6)</code>.</em> <code>g &lt;- function(y) f(c(y, 7))</code>. On évalue d'abord <code>c(6, 7)</code>.</p>
+<p><em>Étape 3 — quel <code>c</code> ?</em>  <strong>On est dans le corps de <code>g</code>, donc dans l'espace de noms de <code>bar</code></strong>, où <code>c &lt;- function(...) sum(...)</code>. La recherche commence <strong>par le paquet lui-même</strong> (§1.5). Donc <code>c(6, 7)</code> vaut <strong><code>sum(6, 7) = 13</code></strong>.</p>
+<p><em>Étape 4 — appeler <code>f(13)</code>.</em> <code>f</code> vient de <code>foo</code> : <code>f &lt;- function(y) c(x, y)</code>.</p>
+<p><em>Étape 5 — quel <code>c</code>, cette fois ?</em> <strong>On est maintenant dans l'espace de noms de <code>foo</code></strong>, qui <strong>ne définit pas</strong> <code>c</code>. La recherche continue : imports de <code>foo</code>, puis <strong><code>base</code></strong> — où <code>c</code> est la concaténation. Donc <code>c(x, 13)</code> avec <code>x &lt;- 1</code> de <code>foo</code>, soit <strong><code>c(1, 13)</code></strong>.</p>
+<p><em>Étape 6 — le résultat.</em> <strong><code>[1] 1 13</code></strong>. </p>
+<p><em>Étape 7 — ce que le manuel en conclut.</em> <em>« <strong>This is consistent with the definitions of <code>c</code> in the two settings : in <code>bar</code> the function <code>c</code> is defined to be equivalent to <code>sum</code>, but in <code>foo</code> the variable <code>c</code> refers to the standard function <code>c</code> in <code>base</code>.</strong> »</em></p>
+<p><em>Étape 8 — la leçon.</em> <strong>Chaque fonction cherche ses noms depuis son propre paquet.</strong> Redéfinir <code>c</code> dans <code>bar</code> ne perturbe <strong>ni <code>foo</code>, ni <code>base</code></strong> — c'est exactement la garantie de la fiche 315 : <em>« objects cannot be masked by objects of the same name in the global environment or in other packages »</em>. Et cela vaut <strong>entre paquets</strong>, pas seulement contre l'utilisateur.</p>
+<p><em>Étape 9 — remarquer aussi.</em> <code>print.foo</code> <strong>n'est pas exportée</strong> : seule la directive <strong><code>S3method(print, foo)</code></strong> la rend accessible au dispatch. C'est le patron recommandé du §1.5.2.</p>
+</div></details>
+
+<h2 data-prio="high">Concept 7 — Vérifier et construire</h2>
+<blockquote>
+<p class="cal piege"> <strong>La note préliminaire (§1.3).</strong> *« <strong><code>R CMD check</code> and <code>R CMD build</code> run R processes with <code>--vanilla</code> in which none of the user's startup files are read.</strong> <strong>If you need <code>R_LIBS</code> set (to find packages in a non-standard library) you can set it in the environment</strong> : also you can use <strong>the check and build environment files</strong> (<code>R_CHECK_ENVIRON</code> et <code>R_BUILD_ENVIRON</code> ; à défaut <strong><code>~/.R/check.Renviron</code></strong> et <strong><code>~/.R/build.Renviron</code></strong>). »*</p>
+<p><strong>C'est l'explication de la mise en garde de la fiche 300</strong> : <em>« <code>R CMD</code> does not of itself use any R startup files »</em>. <strong>Le « ça marche chez moi » vient de là</strong>, et le manuel donne ici <strong>la solution</strong> : passer par ces fichiers d'environnement dédiés.</p>
+</blockquote>
+<p class="cal piege"> <em>« <strong>You may need to set the environment variable <code>TMPDIR</code> to point to a suitable writable directory with a path not containing spaces</strong> — <strong>use forward slashes for the separators</strong>. Also, <strong>the directory needs to be on a case-honouring file system</strong>. »</em></p>
+<div class="cal formel"><span class="lab">Définition (§1.3.1).</span>
+<p> <em>« <strong>Using <code>R CMD check</code>, the R package checker, one can test whether source R packages work correctly.</strong> It can be run on one or more directories, or compressed package tar archives.  <strong>It is strongly recommended that the final checks are run on a tar archive prepared by <code>R CMD build</code>.</strong> »</em></p>
+</div>
+<p><strong>Ce que <code>check</code> vérifie</strong> — extrait de la liste du §1.3.1, dans l'ordre :</p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Vérification</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td><em>« <strong>The package is installed.</strong> This will warn about <strong>missing cross-references and duplicate aliases</strong> in help files »</em></td>
+</tr>
+<tr>
+<td>2</td>
+<td><em>« <strong>The file names are checked to be valid across file systems and supported operating system platforms</strong> »</em></td>
+</tr>
+<tr>
+<td>4</td>
+<td><em>« The files are checked for <strong>binary executables</strong> »</em></td>
+</tr>
+<tr>
+<td>5</td>
+<td><em>« <strong>The <code>DESCRIPTION</code> file is checked for completeness</strong> … <strong>all packages mentioned in <code>library</code> or <code>requires</code> or from which the <code>NAMESPACE</code> file imports or are called via <code>::</code> or <code>:::</code> are listed</strong> »</em></td>
+</tr>
+<tr>
+<td>8</td>
+<td><em>« <strong>The R files are checked for syntax errors.</strong>  <strong>Bytes which are non-ASCII are reported as warnings, but these should be regarded as errors</strong> »</em></td>
+</tr>
+<tr>
+<td>9</td>
+<td><em>« it is checked that <strong>the package can be loaded</strong> … <strong>first with the usual default packages and then only with package <code>base</code> already loaded</strong> »</em></td>
+</tr>
+<tr>
+<td>10</td>
+<td><em>« The R code is checked … using <strong><code>codetools</code></strong> … <strong>whether S3 methods have all the arguments of the corresponding generic</strong>, and <strong>whether the final argument of replacement functions is called <code>value</code></strong> … <strong>all foreign function calls … are tested to see if they have a <code>PACKAGE</code> argument</strong> »</em></td>
+</tr>
+<tr>
+<td>11</td>
+<td><em>« <strong>The Rd files are checked for correct syntax and metadata, including the presence of the mandatory fields (<code>\name</code>, <code>\alias</code>, <code>\title</code> and <code>\description</code>)</strong> »</em></td>
+</tr>
+<tr>
+<td>12</td>
+<td><em>« <strong>A check is made for missing documentation entries, such as undocumented user-level objects</strong> »</em></td>
+</tr>
+<tr>
+<td>14</td>
+<td><em>« <strong>whether all function arguments given in <code>\usage</code> sections … are documented in the corresponding <code>\arguments</code> section</strong> »</em></td>
+</tr>
+<tr>
+<td>16</td>
+<td><em>« C, C++ and Fortran source and header files are tested for <strong>portable (LF-only) line endings</strong> »</em></td>
+</tr>
+</tbody></table>
+<div class="cal intu"><span class="lab">Contrôle — deux points de cette liste recoupent des fiches précédentes.</span>
+<p> Le point 10 vérifie que <em>« <strong>the final argument of replacement functions is called <code>value</code></strong> »</em> — c'est exactement la règle du §3.4.4 (fiche 302). Et <em>« <strong>S3 methods have all the arguments of the corresponding generic</strong> »</em> — la règle de la fiche 311, ici <strong>contrôlée automatiquement</strong>.</p>
+</div>
+<div class="cal formel"><span class="lab">Définition (§1.3.2).</span>
+<p> <em>« <strong>Using <code>R CMD build</code>, the R package builder, one can build R package tarballs from their sources.</strong> <strong>It is recommended that packages are built for release by the current release version of R or "r-patched", to avoid inadvertently picking up new features of a development version of R.</strong> »</em></p>
+<p><em>« Prior to actually building the package … <strong>it is tested whether object indices exist and can be assumed to be up-to-date, and C, C++ and Fortran source files … are tested and converted to LF line-endings if necessary</strong>. »</em></p>
+<p class="cal piege"> <em>« <strong>Run-time checks whether the package works correctly should be performed using <code>R CMD check</code> prior to invoking the final build procedure.</strong> »</em></p>
+</div>
+<blockquote>
+<p><strong>Exclure des fichiers (§1.3.2).</strong> <em>« <strong>To exclude files from being put into the package, one can specify a list of exclude patterns in file <code>.Rbuildignore</code> in the top-level source directory. These patterns should be Perl-like regular expressions, one per line, to be matched case-insensitively.</strong> »</em> Sont exclus <strong>par défaut</strong> : les répertoires de contrôle de version, ceux nommés <code>check</code>, <code>chm</code>, finissant en <code>.Rcheck</code>, <code>Old</code> ou <code>old</code>, et les fichiers <code>GNUMakefile</code>, <code>Read-and-delete-me</code>, ou dont le nom commence par <code>.#</code>, ou finit par <code>~</code>, <code>.bak</code> ou <code>.swp</code>.</p>
+</blockquote>
+<h2 data-prio="mid">Concept 8 — Le format Rd</h2>
+<div class="cal formel"><span class="lab">Définition (§2.1).</span>
+<p> <em>« <strong>R objects are documented in files written in "R documentation" (Rd) format, a simple markup language much of which closely resembles (La)TeX, which can be processed into a variety of formats, including LaTeX, HTML and plain text.</strong> <strong>The translation is carried out by functions in the <code>tools</code> package called by the script <code>Rdconv</code>.</strong> »</em></p>
+<p><em>« <strong>The R distribution contains more than 1400 such files</strong> which can be found in the <code>src/library/pkg/man</code> directories. »</em></p>
+</div>
+<p><strong>L'exemple du manuel</strong> — une version simplifiée de <code>load.Rd</code> :</p>
+<pre><code>\name{load}
+\alias{load}
+\title{Reload Saved Datasets}
+\description{
+  Reload datasets written with the function \code{save}.
+}
+\usage{
+load(file, envir = parent.frame(), verbose = FALSE)
+}
+\arguments{
+  \item{file}{a (readable binary-mode) \link{connection}
+    or a character string giving the name of the file to load
+    (when \link{tilde expansion} is done).}
+  \item{envir}{the environment where the data should be loaded.}
+  \item{verbose}{should item names be printed during loading?}
+}
+\value{
+  A character vector of the names of objects created, invisibly.
+}
+\seealso{
+  \code{\link{save}}.
+}
+\examples{
+## save all data
+save(list = ls(all.names = TRUE), file = "all.RData")
+## restore the saved values to the current environment
+load("all.RData")
+}
+\keyword{file}
+</code></pre>
+<blockquote>
+<p><strong>La structure (§2.1).</strong> <em>« <strong>An Rd file consists of three parts.</strong> <strong>The header gives basic information about the name of the file, the topics documented, a title, a short textual description and R usage information for the objects documented.</strong> <strong>The body gives further information</strong> (for example, on the function's arguments and return value). <strong>Finally, there is an optional footer with keyword information.</strong>  <strong>The header is mandatory.</strong> »</em></p>
+<p><em>« <strong>Information is given within a series of sections with standard names</strong> (and <strong>user-defined sections are also allowed</strong>). <strong>Unless otherwise specified these should occur only once in an Rd file.</strong> »</em></p>
+</blockquote>
+<p><strong>Les quatre champs obligatoires</strong>, tels que <code>R CMD check</code> les vérifie (point 11 du §1.3.1) : <strong><code>\name</code></strong>, <strong><code>\alias</code></strong>, <strong><code>\title</code></strong>, <strong><code>\description</code></strong>.</p>
+<h2>Comment reconnaître le type d'exercice</h2>
+<table>
+<thead>
+<tr>
+<th>Le signal dans l'énoncé</th>
+<th>Ce qu'il faut mobiliser</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>« créer la structure d'un paquet »</td>
+<td><strong><code>package.skeleton()</code></strong></td>
+</tr>
+<tr>
+<td>« quels fichiers sont obligatoires ? »</td>
+<td><strong><code>DESCRIPTION</code></strong> et <strong><code>NAMESPACE</code></strong></td>
+</tr>
+<tr>
+<td>« un sous-répertoire vide »</td>
+<td> <strong>interdit</strong> — absent, oui ; vide, non</td>
+</tr>
+<tr>
+<td>« ma version 0.9 est vue comme antérieure à 0.75 »</td>
+<td> <strong>ce n'est pas un décimal</strong></td>
+</tr>
+<tr>
+<td>« quel champ pour cette dépendance ? »</td>
+<td><strong><code>Imports</code></strong> dans le cas normal</td>
+</tr>
+<tr>
+<td>« l'utilisateur doit voir les fonctions de l'autre paquet »</td>
+<td><strong><code>Depends</code></strong></td>
+</tr>
+<tr>
+<td>« utilisé seulement dans les exemples »</td>
+<td><strong><code>Suggests</code></strong></td>
+</tr>
+<tr>
+<td>« j'ajoute des méthodes pour ses classes »</td>
+<td><strong><code>Enhances</code></strong></td>
+</tr>
+<tr>
+<td>« puis-je le mettre dans deux champs ? »</td>
+<td> <strong>non</strong> — <em>« only one of these fields »</em></td>
+</tr>
+<tr>
+<td>« exporter une fonction »</td>
+<td><strong><code>export(f)</code></strong></td>
+</tr>
+<tr>
+<td>« exporter un nom non standard »</td>
+<td> <strong>des guillemets</strong> sont obligatoires</td>
+</tr>
+<tr>
+<td>« importer seulement deux fonctions »</td>
+<td><strong><code>importFrom</code></strong>, recommandé sur <code>import</code></td>
+</tr>
+<tr>
+<td>« ma méthode S3 n'est pas trouvée »</td>
+<td><strong><code>S3method(generic, class)</code></strong></td>
+</tr>
+<tr>
+<td>« faut-il exporter <code>print.foo</code> ? »</td>
+<td><strong>non</strong>, si <code>S3method</code> est présent</td>
+</tr>
+<tr>
+<td>« faire quelque chose au chargement »</td>
+<td><strong><code>.onLoad</code></strong>, pas <code>.onAttach</code></td>
+</tr>
+<tr>
+<td>« afficher un message de démarrage »</td>
+<td><strong><code>.onAttach</code></strong> + <strong><code>packageStartupMessage</code></strong></td>
+</tr>
+<tr>
+<td>« charger du code compilé »</td>
+<td><strong><code>useDynLib</code></strong> ou <code>.onLoad</code></td>
+</tr>
+<tr>
+<td>« ça marche chez moi, pas sous <code>check</code> »</td>
+<td> <strong><code>--vanilla</code></strong> → <code>~/.R/check.Renviron</code></td>
+</tr>
+<tr>
+<td>« exclure un fichier du tarball »</td>
+<td><strong><code>.Rbuildignore</code></strong></td>
+</tr>
+<tr>
+<td>« documenter une fonction »</td>
+<td>un fichier <strong><code>.Rd</code></strong> dans <strong><code>man</code></strong></td>
+</tr>
+<tr>
+<td>« des objets internes non documentés »</td>
+<td>un fichier <strong><code>pkg-internal.Rd</code></strong>, ou <strong>ne pas les exporter</strong></td>
+</tr>
+</tbody></table>
+<h2>Comment résoudre ce type d'exercice</h2>
+<p><strong>Protocole « créer un paquet » — 6 étapes.</strong></p>
+<ol>
+<li><strong><code>package.skeleton()</code></strong> pour la structure, ou créer à la main : <code>DESCRIPTION</code>, <code>NAMESPACE</code>, <code>R/</code>, <code>man/</code>.</li>
+<li>Remplir <strong>les sept champs obligatoires</strong> du <code>DESCRIPTION</code>, en <strong>ASCII</strong>, en respectant la forme de <code>Version</code>.</li>
+<li>Mettre le code dans <strong><code>R/</code></strong> — <strong>des assignations seulement</strong>, aucun effet de bord, <strong>pas de <code>require</code> ni d'<code>options</code></strong>.</li>
+<li>Déclarer les dépendances <strong>dans un seul champ</strong>, en privilégiant <strong><code>Imports</code></strong>.</li>
+<li>Écrire le <strong><code>NAMESPACE</code></strong> : <code>export</code> explicite, <strong><code>importFrom</code></strong> sélectif, <strong><code>S3method</code></strong> pour chaque méthode.</li>
+<li>Documenter <strong>chaque objet de niveau utilisateur</strong> dans <code>man/</code>.</li>
+</ol>
+<p><strong>Protocole « livrer » — 4 étapes.</strong></p>
+<ol>
+<li><strong>Installer d'abord</strong> : <em>« please check that your package can be installed … you may get <strong>more detailed error messages</strong> doing the install directly »</em>.</li>
+<li><strong><code>R CMD check</code></strong> sur le répertoire, puis corriger.</li>
+<li><strong><code>R CMD build</code></strong> pour produire le tarball.</li>
+<li> <strong>Relancer <code>check</code> sur le tarball</strong> — <em>« <strong>it is strongly recommended that the final checks are run on a tar archive prepared by <code>R CMD build</code></strong> »</em>.</li>
+</ol>
+<p><strong>Protocole « déboguer un <code>check</code> qui échoue alors que tout marche » — 3 étapes.</strong></p>
+<ol>
+<li>Se rappeler que <strong><code>check</code> tourne en <code>--vanilla</code></strong> : ni <code>.Rprofile</code>, ni <code>.Renviron</code>, ni <code>.RData</code> (fiche 300).</li>
+<li>Si des paquets sont dans une bibliothèque non standard, <strong>poser <code>R_LIBS</code> dans l'environnement</strong> ou utiliser <strong><code>~/.R/check.Renviron</code></strong>.</li>
+<li>Vérifier que <strong>tout paquet utilisé</strong> — <code>library</code>, <code>require</code>, <code>::</code>, <code>:::</code>, <code>NAMESPACE</code> — <strong>est déclaré</strong> dans <code>Depends</code>, <code>Imports</code> ou <code>Suggests</code> : c'est la vérification n° 5.</li>
+</ol>
+<h2 data-prio="must">Common mistakes</h2>
+<table>
+<thead>
+<tr>
+<th>Erreur</th>
+<th>Correction</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Appeler un paquet une « bibliothèque »</td>
+<td> <em>« <strong>A package is not a library</strong> »</em></td>
+</tr>
+<tr>
+<td>Dire qu'on « compile » un paquet</td>
+<td><em>« <strong>Compilation is not a correct term for a package</strong> »</em></td>
+</tr>
+<tr>
+<td>Laisser un sous-répertoire <strong>vide</strong></td>
+<td>absent, oui ; <strong>vide, non</strong></td>
+</tr>
+<tr>
+<td>Créer <code>foo</code> et <code>Foo</code></td>
+<td><strong>fortement déconseillé</strong> — systèmes insensibles à la casse</td>
+</tr>
+<tr>
+<td>Traiter <code>Version</code> comme un nombre</td>
+<td> <strong><code>0.9 &lt; 0.75</code></strong></td>
+</tr>
+<tr>
+<td>Terminer le <code>Title</code> par un point</td>
+<td><em>« <strong>not end in a period</strong> »</em></td>
+</tr>
+<tr>
+<td>Répéter le nom du paquet dans le <code>Title</code></td>
+<td><em>« <strong>Do not repeat the package name</strong> »</em></td>
+</tr>
+<tr>
+<td>Commencer la <code>Description</code> par « This package »</td>
+<td><em>« <strong>good practice not to</strong> »</em></td>
+</tr>
+<tr>
+<td>Mettre plusieurs paragraphes dans <code>Description</code></td>
+<td><em>« <strong>only one paragraph</strong> »</em></td>
+</tr>
+<tr>
+<td>Mettre une liste de diffusion en <code>Maintainer</code></td>
+<td><em>« <strong>should be a person</strong> »</em></td>
+</tr>
+<tr>
+<td>Déclarer un paquet dans deux champs</td>
+<td> <em>« <strong>only one of these fields</strong> »</em></td>
+</tr>
+<tr>
+<td>Mettre en <code>Depends</code> ce qui suffit en <code>Imports</code></td>
+<td>règle 2 du §1.1.3</td>
+</tr>
+<tr>
+<td>Oublier de déclarer un paquet appelé par <code>::</code></td>
+<td> <strong><code>check</code> le signale</strong> (point 5)</td>
+</tr>
+<tr>
+<td>Déclarer <code>Depends: R</code> sans version</td>
+<td><em>« <strong>makes no sense</strong> »</em></td>
+</tr>
+<tr>
+<td>Dépendre d'un niveau de correctif non nul</td>
+<td><em>« <strong>inadvisable</strong> »</em></td>
+</tr>
+<tr>
+<td>Appeler <code>require</code> ou <code>options</code> dans <code>R/</code></td>
+<td> <em>« <strong>definitely should not</strong> »</em></td>
+</tr>
+<tr>
+<td>Croire le nom du fichier lié aux objets créés</td>
+<td><em>« <strong>there need be no connection</strong> »</em></td>
+</tr>
+<tr>
+<td>Utiliser des caractères non ASCII dans le code</td>
+<td><em>« <strong>will normally fail when the package is installed</strong> »</em></td>
+</tr>
+<tr>
+<td>Exporter une méthode S3 au lieu de l'enregistrer</td>
+<td><strong><code>S3method</code></strong> suffit et vaut mieux</td>
+</tr>
+<tr>
+<td>Utiliser <code>exportPattern</code> largement</td>
+<td><em>« <strong>not recommended for production code</strong> »</em></td>
+</tr>
+<tr>
+<td>Préférer <code>import</code> à <code>importFrom</code></td>
+<td><em>« <strong>using <code>importFrom</code> selectively … is good practice</strong> »</em></td>
+</tr>
+<tr>
+<td>Oublier d'exporter <code>.Last.lib</code></td>
+<td> le manuel le cite comme <strong>erreur fréquente</strong></td>
+</tr>
+<tr>
+<td>Charger du code compilé dans <code>.onAttach</code></td>
+<td>ce doit être <strong><code>.onLoad</code></strong> ou <code>useDynLib</code></td>
+</tr>
+<tr>
+<td>Afficher un message avec <code>cat</code> au chargement</td>
+<td><strong><code>packageStartupMessage</code></strong></td>
+</tr>
+<tr>
+<td>S'attendre à ce que <code>check</code> lise votre <code>.Rprofile</code></td>
+<td> <strong><code>--vanilla</code></strong></td>
+</tr>
+<tr>
+<td>Ne vérifier que le répertoire source</td>
+<td><strong>relancer <code>check</code> sur le tarball</strong></td>
+</tr>
+<tr>
+<td>Laisser des objets utilisateur non documentés</td>
+<td><code>check</code> le signale (point 12)</td>
+</tr>
+<tr>
+<td>Nommer autrement que <code>value</code> le dernier argument d'une fonction de remplacement</td>
+<td><code>check</code> le signale (point 10)</td>
+</tr>
+</tbody></table>
+<h2>Ultimate Review</h2>
+<p><strong>Vocabulaire.</strong> <strong>Paquet source</strong> (les fichiers maîtres) → <strong>tarball</strong> → <strong>paquet installé</strong> (<em>« the result of running <code>R CMD INSTALL</code> »</em>) ; plus les <strong>paquets binaires</strong>, <em>« unpacked rather than installing from sources »</em>.  <em>« <strong>A package is not a library</strong> »</em> — le mot désigne soit <strong>le répertoire d'installation</strong>, soit <strong>la bibliothèque partagée du système</strong>. <em>(macOS distingue <code>.so</code> et <code>.dylib</code>.)</em></p>
+<p><strong>Quatre opérations.</strong> <strong>install</strong> · <strong>build</strong> (<em>« creating a tarball ready for distribution, including cleaning it up and creating PDF/HTML documentation from any vignettes »</em>) · <strong>check</strong> (<em>« a test installation is done and tested … consistency and portability »</em>) ·  <em>« <strong>compilation is not a correct term for a package</strong> »</em> — c'est le code C/C++/Fortran qui se compile, ou <strong>le byte-compilage du code R</strong>, <em>« <strong>enabled by default for all packages</strong> »</em>.</p>
+<p><strong>Charger contre attacher.</strong> <em>« <strong><code>library</code> performs both steps, but a package's namespace can be loaded without the package being attached</strong> »</em>. <strong>Chargement paresseux</strong> : <em>« <strong>the R objects … are created at installation time and stored in a database</strong> … <strong>loaded into the session at first use</strong> … <strong>makes the R session start up faster and use less memory</strong> »</em>.</p>
+<p><strong>Structure.</strong> <strong><code>DESCRIPTION</code></strong> et <strong><code>NAMESPACE</code></strong>, plus <strong><code>R data demo exec inst man po src tests tools vignettes</code></strong> —  <em>« <strong>some of which can be missing, but which should not be empty</strong> »</em> · fichiers optionnels <strong><code>INDEX configure cleanup LICENSE NEWS</code></strong> ·  <strong>pas de fichiers cachés</strong> · <strong><code>package.skeleton</code></strong> aide à démarrer.</p>
+<p><strong>Noms.</strong> Le répertoire porte <strong>le nom du paquet</strong> ·  <strong>ne pas distinguer deux paquets par la casse</strong> · caractères interdits <code>" * : / &lt; &gt; ? \ |</code> et les noms réservés Windows (<code>con</code>, <code>prn</code>, <code>aux</code>, <code>nul</code>, <code>com1</code>-<code>com9</code>, <code>lpt1</code>-<code>lpt9</code>) · noms de <code>.Rd</code> <strong>ASCII sans <code>%</code></strong> · <strong>100 octets</strong> de chemin, pour les tarballs · <strong>pas de binaires exécutables</strong> — <em>« <strong>CRAN will not accept submissions containing binary files even if they are listed</strong> »</em>.</p>
+<p><strong><code>DESCRIPTION</code>.</strong> Format <strong>Debian Control File</strong> ; <strong>noms de champs sensibles à la casse</strong>, tous <strong>capitalisés</strong> ; continuation par <strong>espace ou tabulation</strong> ; <strong>tout en ASCII</strong>, sinon champ <strong><code>Encoding</code></strong>. <strong>Sept champs obligatoires</strong> : <strong><code>Package</code></strong> (≥ 2 caractères, commence par une lettre, ne finit pas par un point) · <strong><code>Version</code></strong> ( <strong>au moins deux entiers</strong>, <em>« <strong>it is not a decimal number</strong> »</em> — <code>0.9 &lt; 0.75</code>) · <strong><code>License</code></strong> · <strong><code>Title</code></strong> (<strong>title case</strong>, <strong>65 caractères</strong>, sans balisage, <strong>sans point final</strong>, <strong>ne répète pas le nom</strong>) · <strong><code>Description</code></strong> (<strong>un seul paragraphe</strong>, URL <strong>entre chevrons</strong>) · <strong><code>Author</code></strong> (<em>« <strong>all significant contributors must be included</strong> »</em>) · <strong><code>Maintainer</code></strong> (<strong>une personne</strong>, adresse <strong>entre chevrons</strong>). <code>Author</code> et <code>Maintainer</code> <strong>se déduisent d'<code>Authors@R</code></strong>.</p>
+<p><strong>Dépendances.</strong> <strong><code>Depends</code></strong> — <em>« <strong>attached before the current package</strong> »</em> · <strong><code>Imports</code></strong> — <em>« namespaces are imported from … <strong>but which do not need to be attached</strong> »</em>,  <strong>obligatoire pour tout <code>::</code> ou <code>:::</code></strong> · <strong><code>Suggests</code></strong> — <em>« examples, demos, tests or vignettes »</em> et <em>« packages loaded in the body of functions »</em> · <strong><code>Enhances</code></strong>. <strong>Trois règles</strong> : (1) <strong>un seul champ</strong> ; (2) espace de noms seul → <strong><code>Imports</code></strong> ; (3) attachement nécessaire → <strong><code>Depends</code></strong>.  <em>« <strong>It makes no sense to declare a dependence on R without a version specification, nor on the package <code>base</code></strong> »</em>.</p>
+<p><strong>Sous-répertoire <code>R</code>.</strong> <em>« <strong>R code files, only</strong> »</em>, extensions <strong><code>.R</code></strong> recommandée · <em>« <strong>must be possible to read in the files using <code>source()</code>, so R objects must be created by assignments</strong> »</em> ·  <em>« <strong>there need be no connection between the name of the file and the R objects created by it</strong> »</em> ·  <em>« <strong>definitely should not call functions with side effects such as <code>require</code> and <code>options</code></strong> »</em> · <strong>ASCII seulement</strong> ; <code>\uxxxx</code> dans les chaînes · exceptions : <strong><code>sysdata.rda</code></strong> et les fichiers <strong><code>.in</code></strong>.</p>
+<p><strong>Sous-répertoire <code>man</code>.</strong> <em>« (only) documentation files … in Rd format »</em> ·  <em>« <strong>all user-level objects in a package should be documented</strong> »</em> ; les objets internes → <strong><code>pkg-internal.Rd</code></strong>, ou <strong>ne pas les exporter</strong> · <em>« <strong>Having a <code>man</code> directory containing no documentation files may give an installation error</strong> »</em>.</p>
+<p><strong><code>NAMESPACE</code>.</strong>  <em>« <strong>although the file looks like R code … it is not processed as R code</strong> »</em> ·  <em>« <strong>Namespaces are sealed once they are loaded</strong> … <strong>imports and exports cannot be changed</strong> »</em> · recherche : <strong>le paquet → les imports → <code>base</code> → le chemin normal</strong> (<em>« <strong>so the base namespace precedes the normal search</strong> »</em>) · <strong><code>export</code></strong> (guillemets pour les noms non standard) · <strong><code>exportPattern</code></strong> ( <em>« not recommended for production code »</em>) · <strong><code>import</code></strong> et <strong><code>importFrom</code></strong> ( <em>« <strong>using <code>importFrom</code> selectively … is good practice</strong> »</em>) · <strong>le namespace de <code>base</code> est importé implicitement</strong>.</p>
+<p><strong>Méthodes S3.</strong>  <em>« <strong>The standard method for S3-style <code>UseMethod</code> dispatching might fail to locate methods defined in a package that is imported but not attached</strong> »</em> → <strong><code>S3method(print, foo)</code></strong>, qui <em>« <strong>ensures that the method is registered</strong> … <strong>and the function <code>print.foo</code> does not need to be exported</strong> »</em> · troisième argument possible · <strong>enregistrement différé</strong> depuis R 3.6.0.</p>
+<p><strong>Points d'entrée.</strong> <strong><code>.onLoad</code></strong> (chargement) et <strong><code>.onAttach</code></strong> (attachement) — <em>« <strong>defined in the namespace but not exported</strong> »</em> · <strong><code>.onDetach</code></strong> / <strong><code>.Last.lib</code></strong> ( <strong>celle-ci doit être exportée</strong>) · <strong><code>.onUnload</code></strong> · <em>« <strong>code to set options and load shared objects should be placed in a <code>.onLoad</code></strong> »</em> · <em>« <strong>It is good practice for these functions to be quiet</strong> … <strong><code>packageStartupMessage</code></strong> »</em> · <strong><code>useDynLib</code></strong> pour les objets partagés.</p>
+<p><strong>Vérifier et construire.</strong>  <em>« <strong><code>R CMD check</code> and <code>R CMD build</code> run R processes with <code>--vanilla</code></strong> »</em> → <strong><code>R_LIBS</code></strong> dans l'environnement, ou <strong><code>~/.R/check.Renviron</code></strong> · <strong><code>TMPDIR</code></strong> sans espace, <strong>slashs avant</strong>, système <strong>respectant la casse</strong> ·  <em>« <strong>the final checks are run on a tar archive prepared by <code>R CMD build</code></strong> »</em> · <code>check</code> contrôle notamment <strong>la complétude du <code>DESCRIPTION</code></strong>, <strong>les paquets non déclarés</strong>, <strong>la syntaxe R</strong>, <strong>le chargement avec <code>base</code> seul</strong>, <strong>les arguments des méthodes S3</strong>, <strong>le <code>value</code> des fonctions de remplacement</strong>, <strong>le <code>PACKAGE</code> des appels étrangers</strong>, <strong>les champs Rd obligatoires</strong>, <strong>les objets non documentés</strong>, <strong>les fins de ligne LF</strong> · <strong><code>.Rbuildignore</code></strong> pour exclure.</p>
+<p><strong>Format Rd.</strong> <em>« <strong>a simple markup language much of which closely resembles (La)TeX</strong> »</em>, converti par <strong><code>Rdconv</code></strong> ; <strong>plus de 1400 fichiers</strong> dans la distribution · <strong>trois parties</strong> : <strong>en-tête (obligatoire)</strong>, <strong>corps</strong>, <strong>pied de mots-clés (optionnel)</strong> · champs obligatoires <strong><code>\name</code>, <code>\alias</code>, <code>\title</code>, <code>\description</code></strong> · <em>« <strong>sections with standard names</strong> … <strong>user-defined sections are also allowed</strong> … <strong>should occur only once</strong> »</em>.</p>
+<div class="rec"><h2>Active Recall</h2><details class="cor">
+<summary>Quelles sont les quatre formes d'un paquet, et pourquoi « bibliothèque » est-il un contresens ?</summary><div class="in">
+
+<p><em>« <strong>A package is a directory of files which extend R</strong>, <strong>a source package</strong> (the master files), or <strong>a tarball containing the files of a source package</strong>, or <strong>an installed package</strong>, the result of running <code>R CMD INSTALL</code>. On some platforms there are also <strong>binary packages</strong> … <strong>which can be unpacked rather than installing from sources</strong>. »</em> (§1)</p>
+<p class="cal piege"> *« <strong>A package is not a library.</strong> The latter is used <strong>in two senses</strong> : <strong>a directory into which packages are installed</strong> … [et] <strong>that used by the operating system, as a shared, dynamic or static library or … a DLL, where the second L stands for "library"</strong>. »*</p>
+<p><em>« <strong>although this is a persistent mis-usage. It seems to stem from S</strong>, whose analogues of R's packages were officially known as <strong>library sections</strong> … but almost always referred to as <strong>libraries</strong>. »</em></p>
+<p><strong>D'où l'ironie</strong> : la commande de chargement s'appelle <code>library()</code>.</p>
+</div></details><details class="cor">
+<summary>Pourquoi le manuel dit-il qu'on ne « compile » pas un paquet ?</summary><div class="in">
+
+<p><em>«  <strong>Compilation is not a correct term for a package. Installing a source package which contains C, C++ or Fortran code will involve compiling that code. There is also the possibility of "byte" compiling the R code in a package (using the facilities of package <code>compiler</code>) : nowadays this is enabled by default for all packages. So compiling a package may come to mean byte-compiling its R code.</strong> »</em> (§1)</p>
+<p><strong>Deux choses différentes portent le même mot</strong> : la compilation du code <strong>C/Fortran</strong> du répertoire <code>src</code>, et le <strong>byte-compilage</strong> du code <strong>R</strong> — ce dernier étant désormais <strong>automatique</strong>.</p>
+<p>Les opérations correctement nommées sont : <strong>install</strong>, <strong>build</strong>, <strong>check</strong>.</p>
+</div></details><details class="cor">
+<summary>Quels fichiers et sous-répertoires composent un paquet source ?</summary><div class="in">
+
+<p><em>« <strong>The sources of an R package consist of a subdirectory containing the files <code>DESCRIPTION</code> and <code>NAMESPACE</code>, and the subdirectories <code>R</code>, <code>data</code>, <code>demo</code>, <code>exec</code>, <code>inst</code>, <code>man</code>, <code>po</code>, <code>src</code>, <code>tests</code>, <code>tools</code> and <code>vignettes</code></strong> ( <strong>some of which can be missing, but which should not be empty</strong>). »</em> (§1.1)</p>
+<p>Fichiers optionnels : <strong><code>INDEX</code>, <code>configure</code>, <code>cleanup</code>, <code>LICENSE</code>, <code>LICENCE</code>, <code>NEWS</code></strong>. Ignorés par R mais utiles : <code>INSTALL</code>, <code>README</code>, <code>ChangeLog</code>.</p>
+<p class="cal piege"> <em>« <strong>packages should not contain Unix-style "hidden" files/directories</strong> »</em> — sauf <code>.Rbuildignore</code>, <code>.Rinstignore</code> et <code>vignettes/.install_extras</code>.</p>
+<p>Et <strong><code>package.skeleton</code></strong> <em>« can help to create the structure for a new package »</em>.</p>
+</div></details><details class="cor">
+<summary>Quels sont les sept champs obligatoires du <code>DESCRIPTION</code>, et quel piège comporte <code>Version</code> ?</summary><div class="in">
+
+<p><em>« <strong>The <code>Package</code>, <code>Version</code>, <code>License</code>, <code>Description</code>, <code>Title</code>, <code>Author</code>, and <code>Maintainer</code> fields are mandatory, all other fields are optional.</strong> <strong>Fields <code>Author</code> and <code>Maintainer</code> can be auto-generated from <code>Authors@R</code>.</strong> »</em> (§1.1.1)</p>
+<p class="cal piege"> <strong>Le piège</strong> : <em>« <strong>The mandatory <code>Version</code> field</strong> … is <strong>a sequence of at least two (and usually three) non-negative integers</strong> …  <strong>It is not a decimal number, so for example <code>0.9 &lt; 0.75</code> since <code>9 &lt; 75</code>.</strong> »</em></p>
+<p><strong>Chaque composante est comparée comme un entier séparé.</strong> La version 0.9 précède la 0.75.</p>
+<p>Et : <em>« <strong>a version such as <code>0.01</code> or <code>0.01.0</code> will be handled as if it were <code>0.1-0</code></strong> »</em>.</p>
+</div></details><details class="cor">
+<summary>Comment choisir entre <code>Depends</code>, <code>Imports</code>, <code>Suggests</code> et <code>Enhances</code> ?</summary><div class="in">
+
+<p><strong>Les trois règles générales du §1.1.3 :</strong></p>
+<ol>
+<li><em>« <strong>A package should be listed in only one of these fields.</strong> »</em></li>
+<li><em>« <strong>Packages whose namespace only is needed to load the package using <code>library(pkgname)</code> should be listed in the <code>Imports</code> field and not in the <code>Depends</code> field.</strong> »</em></li>
+<li><em>« <strong>Packages that need to be attached to successfully load the package … must be listed in the <code>Depends</code> field.</strong> »</em></li>
+</ol>
+<p><strong>La question de décision</strong> : l'utilisateur doit-il <strong>voir</strong> les fonctions de l'autre paquet ? Non → <strong><code>Imports</code></strong> (le cas normal). Oui → <code>Depends</code>.</p>
+<p><strong><code>Suggests</code></strong> couvre <em>« packages used only in <strong>examples, demos, tests or vignettes</strong> »</em> et <em>« <strong>packages loaded in the body of functions</strong> »</em>. <strong><code>Enhances</code></strong> : <em>« packages <strong>"enhanced" by the package at hand</strong> »</em>.</p>
+<p class="cal piege"> <em>« <strong>Namespaces accessed by the <code>::</code> and <code>:::</code> operators must be listed</strong> »</em> — et <code>R CMD check</code> le vérifie.</p>
+</div></details><details class="cor">
+<summary>Que doit et ne doit pas contenir le répertoire <code>R</code> ?</summary><div class="in">
+
+<p><em>« <strong>The <code>R</code> subdirectory contains R code files, only</strong> … <strong>It should be possible to read in the files using <code>source()</code>, so R objects must be created by assignments.</strong> »</em> (§1.1.5)</p>
+<p class="cal piege"> <em>« <strong>Note that there need be no connection between the name of the file and the R objects created by it.</strong> »</em></p>
+<p class="cal piege"> <em>« <strong>Ideally, the R code files should only directly assign R objects and definitely should not call functions with side effects such as <code>require</code> and <code>options</code>.</strong> »</em> Et : <em>« <strong>Extreme care is needed if top-level computations are made to depend on availability or not of other packages</strong> … <strong>Nor should they depend on the availability of external resources such as downloads.</strong> »</em></p>
+<p><strong>L'encodage</strong> : <em>« <strong>Only ASCII characters … should be used</strong> … <strong>Non-ASCII characters in object names will normally fail when the package is installed</strong> … <strong><code>\uxxxx</code> escapes should be used</strong> »</em> dans les chaînes.</p>
+<p><strong>Deux exceptions</strong> : <code>sysdata.rda</code> et les fichiers <code>.in</code>.</p>
+</div></details><details class="cor">
+<summary>Que signifie « les espaces de noms sont scellés », et quelle est la stratégie de recherche ?</summary><div class="in">
+
+<p><em>« <strong>Namespaces are sealed once they are loaded. Sealing means that imports and exports cannot be changed and that internal variable bindings cannot be changed. Sealing allows a simpler implementation strategy … and allows code analysis and compilation tools to accurately identify the definition corresponding to a global variable reference in a function body.</strong> »</em> (§1.5)</p>
+<p><strong>C'est la contrepartie technique</strong> de la garantie décrite en fiche 315 : un paquet ne peut pas être perturbé de l'extérieur <strong>parce qu'il est verrouillé</strong>.</p>
+<p><strong>La recherche</strong> : <em>« <strong>If not found locally, R searches the package namespace first, then the imports, then the base namespace and then the normal search path</strong> ( <strong>so the base namespace precedes the normal search rather than being at the end of it</strong>). »</em></p>
+<p class="cal piege"> Et : <em>« <strong>although the file looks like R code … it is not processed as R code. Only very simple conditional processing of <code>if</code> statements is implemented.</strong> »</em></p>
+</div></details><details class="cor">
+<summary>Pourquoi faut-il enregistrer les méthodes S3, et qu'est-ce que cela dispense de faire ?</summary><div class="in">
+
+<p class="cal piege"> <em>« <strong>The standard method for S3-style <code>UseMethod</code> dispatching might fail to locate methods defined in a package that is imported but not attached to the search path.</strong> <strong>To ensure that these methods are available the packages defining the methods should … register the methods using <code>S3method</code> directives.</strong> »</em> (§1.5.2)</p>
+<p><strong>Le dispatch de la fiche 311 cherche <code>generic.class</code> par le nom.</strong> Si le paquet est <strong>chargé sans être attaché</strong> — le cas de tout <code>Imports</code> —, le nom n'est visible nulle part.</p>
+<pre><code>S3method(print, foo)
+</code></pre>
+<p><em>« <strong>ensures that the method is registered and available for <code>UseMethod</code> dispatch, and the function <code>print.foo</code> does not need to be exported.</strong> »</em></p>
+<p><strong>Cela dispense d'exporter la méthode</strong> — ce qui rejoint la recommandation du §1.1.5 : les objets internes qu'on n'exporte pas n'ont pas à être documentés.</p>
+</div></details><details class="cor">
+<summary>Dérouler l'exemple <code>foo</code>/<code>bar</code> : pourquoi <code>g(6)</code> vaut-il <code>1 13</code> ?</summary><div class="in">
+
+<p>Dans <code>bar</code> : <code>c &lt;- function(...) sum(...)</code> et <code>g &lt;- function(y) f(c(y, 7))</code>. Dans <code>foo</code> : <code>x &lt;- 1</code> et <code>f &lt;- function(y) c(x, y)</code>.</p>
+<ol>
+<li><code>g(6)</code> évalue <code>c(6, 7)</code>. <strong>On est dans l'espace de noms de <code>bar</code></strong>, où <code>c</code> vaut <code>sum</code> → <strong>13</strong>.</li>
+<li><code>f(13)</code> : <code>f</code> vient de <code>foo</code>. <strong>On est maintenant dans l'espace de noms de <code>foo</code></strong>, qui ne définit pas <code>c</code> — la recherche continue vers <strong><code>base</code></strong>, où <code>c</code> concatène.</li>
+<li><code>c(x, 13)</code> avec <code>x &lt;- 1</code> de <code>foo</code> → <strong><code>c(1, 13)</code></strong>.</li>
+</ol>
+<p><em>« <strong>This is consistent with the definitions of <code>c</code> in the two settings : in <code>bar</code> the function <code>c</code> is defined to be equivalent to <code>sum</code>, but in <code>foo</code> the variable <code>c</code> refers to the standard function <code>c</code> in <code>base</code>.</strong> »</em> (§1.5.5)</p>
+<p><strong>Chaque fonction cherche ses noms depuis son propre paquet</strong> — la garantie vaut <strong>entre paquets</strong>, pas seulement contre l'utilisateur.</p>
+<p>Et : <em>« <strong>Calling <code>library(bar)</code> loads <code>bar</code> and attaches its exports</strong> … <strong>Package <code>foo</code> is also loaded but not attached</strong> »</em>.</p>
+</div></details><details class="cor">
+<summary>Quels sont les points d'entrée d'un paquet, et quelles erreurs le manuel signale-t-il ?</summary><div class="in">
+
+<p><em>« <strong>Since loading and attaching are distinct operations, separate hooks are provided for each. These hook functions are called <code>.onLoad</code> and <code>.onAttach</code></strong> …  <strong>they should be defined in the namespace but not exported.</strong> »</em> (§1.5.3)</p>
+<p>Plus <strong><code>.onDetach</code></strong> ou <strong><code>.Last.lib</code></strong> au détachement, et <strong><code>.onUnload</code></strong> au déchargement.</p>
+<p class="cal piege"> <strong>Les erreurs énumérées</strong> : <em>« <strong>These hooks are often used incorrectly. People forget to export <code>.Last.lib</code>. Compiled code should be loaded in <code>.onLoad</code> (or via a <code>useDynLib</code> directive) and unloaded in <code>.onUnload</code>. Do remember that a package's namespace can be loaded without the namespace being attached … and that a package can be detached and re-attached whilst its namespace remains loaded.</strong> »</em></p>
+<p><em>« <strong>Packages are not likely to need <code>.onAttach</code> (except perhaps for a start-up banner)</strong> »</em>, et <em>« <strong>It is good practice for these functions to be quiet. Any messages should use <code>packageStartupMessage</code>.</strong> »</em></p>
+</div></details><details class="cor">
+<summary>Pourquoi un paquet peut-il passer l'installation et échouer à <code>R CMD check</code> ?</summary><div class="in">
+
+<p class="cal piege"> <em>« <strong><code>R CMD check</code> and <code>R CMD build</code> run R processes with <code>--vanilla</code> in which none of the user's startup files are read.</strong> »</em> (§1.3)</p>
+<p><strong>C'est l'explication de la mise en garde de la fiche 300</strong> : ni <code>.Rprofile</code>, ni <code>.Renviron</code>, ni <code>.RData</code>. Tout ce qui dépendait d'un <code>library()</code> posé dans un profil, d'un <code>R_LIBS</code> personnalisé ou d'un objet venant de <code>.RData</code> <strong>n'existe pas</strong>.</p>
+<p><strong>La solution donnée par le manuel</strong> : <em>« <strong>If you need <code>R_LIBS</code> set … you can set it in the environment</strong> : also you can use <strong>the check and build environment files</strong> … <code>~/.R/check.Renviron</code> and <code>~/.R/build.Renviron</code>. »</em></p>
+<p>Et une seconde cause fréquente : la vérification n° 5 exige que <strong>tout paquet appelé</strong> — par <code>library</code>, <code>require</code>, <code>::</code>, <code>:::</code> ou le <code>NAMESPACE</code> — <strong>soit déclaré</strong>.</p>
+</div></details><details class="cor">
+<summary>Citer cinq vérifications faites par <code>R CMD check</code> qui recoupent des règles vues ailleurs.</summary><div class="in">
+
+<p>Extraites de la liste du §1.3.1 :</p>
+<ul>
+<li><strong>Point 5</strong> — <em>« <strong>all packages mentioned in <code>library</code> or <code>requires</code> or from which the <code>NAMESPACE</code> file imports or are called via <code>::</code> or <code>:::</code> are listed</strong> »</em> (fiche 315).</li>
+<li><strong>Point 10</strong> — <em>« <strong>whether S3 methods have all the arguments of the corresponding generic</strong> »</em> (fiche 311) et <em>« <strong>whether the final argument of replacement functions is called <code>value</code></strong> »</em> (fiche 302, §3.4.4).</li>
+<li><strong>Point 10</strong> aussi — <em>« <strong>all foreign function calls (<code>.C</code>, <code>.Fortran</code>, <code>.Call</code> and <code>.External</code>) are tested to see if they have a <code>PACKAGE</code> argument</strong> »</em> (fiche 320).</li>
+<li><strong>Point 11</strong> — <em>« <strong>the presence of the mandatory fields (<code>\name</code>, <code>\alias</code>, <code>\title</code> and <code>\description</code>)</strong> »</em>.</li>
+<li><strong>Point 12</strong> — <em>« <strong>missing documentation entries, such as undocumented user-level objects</strong> »</em> (§1.1.5).</li>
+</ul>
+<p><strong><code>check</code> est donc la mise en application automatique de règles disséminées</strong> dans tous les manuels.</p>
+</div></details><details class="cor">
+<summary>Quelle est la bonne séquence pour livrer un paquet ?</summary><div class="in">
+
+<ol>
+<li><em>« <strong>Before using these tools, please check that your package can be installed. <code>R CMD check</code> will inter alia do this, but you may get more detailed error messages doing the install directly.</strong> »</em> (§1.3)</li>
+<li><strong><code>R CMD check</code></strong> sur le répertoire source.</li>
+<li><strong><code>R CMD build</code></strong> — <em>« <strong>It is recommended that packages are built for release by the current release version of R or "r-patched", to avoid inadvertently picking up new features of a development version.</strong> »</em></li>
+<li> <strong><code>R CMD check</code> sur le tarball</strong> — <em>« <strong>It is strongly recommended that the final checks are run on a tar archive prepared by <code>R CMD build</code>.</strong> »</em></li>
+</ol>
+<p>Et : <em>« <strong>Run-time checks whether the package works correctly should be performed using <code>R CMD check</code> prior to invoking the final build procedure.</strong> »</em></p>
+<p>Pour exclure des fichiers : <strong><code>.Rbuildignore</code></strong>, <em>« Perl-like regular expressions … one per line, to be matched case-insensitively »</em>.</p>
+</div></details><details class="cor">
+<summary>Quelle est la structure d'un fichier Rd ?</summary><div class="in">
+
+<p><em>« <strong>An Rd file consists of three parts.</strong> <strong>The header gives basic information about the name of the file, the topics documented, a title, a short textual description and R usage information.</strong> <strong>The body gives further information</strong> (for example, on the function's arguments and return value). <strong>Finally, there is an optional footer with keyword information.</strong>  <strong>The header is mandatory.</strong> »</em> (§2.1)</p>
+<p>Sur l'exemple <code>load.Rd</code> : l'en-tête est <code>\name</code>, <code>\alias</code>, <code>\title</code>, <code>\description</code>, <code>\usage</code> ; le corps <code>\arguments</code>, <code>\value</code>, <code>\seealso</code>, <code>\examples</code> ; le pied <code>\keyword</code>.</p>
+<p><em>« <strong>Information is given within a series of sections with standard names</strong> (and <strong>user-defined sections are also allowed</strong>) … <strong>should occur only once in an Rd file</strong>. »</em></p>
+<p>Le format est <em>« <strong>a simple markup language much of which closely resembles (La)TeX</strong> »</em>, converti par <strong><code>Rdconv</code></strong> ; la distribution en contient <strong>plus de 1400</strong> exemples.</p>
+</div></details></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h2>Flashcards</h2>
+<table>
+<thead>
+<tr>
+<th>Question</th>
+<th>Réponse</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Combien de paquets dans la distribution R ?</td>
+<td><strong>Environ 30</strong></td>
+</tr>
+<tr>
+<td>Les quatre formes d'un paquet ?</td>
+<td><strong>Source</strong>, <strong>tarball</strong>, <strong>installé</strong>, <strong>binaire</strong></td>
+</tr>
+<tr>
+<td>Un paquet est-il une bibliothèque ?</td>
+<td> <strong>Non</strong></td>
+</tr>
+<tr>
+<td>Les deux sens de « library » ?</td>
+<td>Le <strong>répertoire d'installation</strong> · la <strong>bibliothèque partagée</strong></td>
+</tr>
+<tr>
+<td>D'où vient la confusion ?</td>
+<td>De <strong>S</strong> — <em>« library sections »</em></td>
+</tr>
+<tr>
+<td>Que distingue macOS ?</td>
+<td><strong><code>.so</code></strong> et <strong><code>.dylib</code></strong></td>
+</tr>
+<tr>
+<td>Les trois opérations bien nommées ?</td>
+<td><strong>install</strong>, <strong>build</strong>, <strong>check</strong></td>
+</tr>
+<tr>
+<td>Pourquoi pas « compiler » ?</td>
+<td>Ce terme <strong>n'est pas correct</strong> pour un paquet</td>
+</tr>
+<tr>
+<td>Qu'est-ce qui est byte-compilé ?</td>
+<td><strong>Le code R</strong>, par défaut</td>
+</tr>
+<tr>
+<td><code>library()</code> fait combien d'étapes ?</td>
+<td><strong>Deux</strong> — charger <strong>et</strong> attacher</td>
+</tr>
+<tr>
+<td>Peut-on charger sans attacher ?</td>
+<td><strong>Oui</strong> — par <code>pkg::fun</code></td>
+</tr>
+<tr>
+<td>Qu'est-ce que le chargement paresseux ?</td>
+<td>Objets <strong>créés à l'installation</strong>, chargés <strong>au premier usage</strong></td>
+</tr>
+<tr>
+<td>Son bénéfice ?</td>
+<td>Démarrage <strong>plus rapide</strong>, <strong>moins de mémoire</strong></td>
+</tr>
+<tr>
+<td>Les deux fichiers obligatoires ?</td>
+<td><strong><code>DESCRIPTION</code></strong> et <strong><code>NAMESPACE</code></strong></td>
+</tr>
+<tr>
+<td>Un sous-répertoire peut-il être absent ?</td>
+<td><strong>Oui</strong> — mais <strong>pas vide</strong></td>
+</tr>
+<tr>
+<td>Les fichiers cachés sont-ils permis ?</td>
+<td> <strong>Non</strong>, sauf exceptions listées</td>
+</tr>
+<tr>
+<td>Quelle fonction aide à démarrer ?</td>
+<td><strong><code>package.skeleton</code></strong></td>
+</tr>
+<tr>
+<td>Peut-on avoir <code>foo</code> et <code>Foo</code> ?</td>
+<td> <strong>Fortement déconseillé</strong></td>
+</tr>
+<tr>
+<td>Longueur de chemin recommandée ?</td>
+<td><strong>100 octets</strong></td>
+</tr>
+<tr>
+<td>Les binaires exécutables ?</td>
+<td><strong>Interdits</strong> — et <strong>CRAN les refuse</strong></td>
+</tr>
+<tr>
+<td>Le format du <code>DESCRIPTION</code> ?</td>
+<td>Un <strong>Debian Control File</strong></td>
+</tr>
+<tr>
+<td>Les noms de champs sont-ils sensibles à la casse ?</td>
+<td><strong>Oui</strong> — tous <strong>capitalisés</strong></td>
+</tr>
+<tr>
+<td>Comment continue-t-on une ligne ?</td>
+<td>Par une <strong>espace ou une tabulation</strong></td>
+</tr>
+<tr>
+<td>Combien de champs obligatoires ?</td>
+<td><strong>Sept</strong></td>
+</tr>
+<tr>
+<td>Lesquels ?</td>
+<td><code>Package</code> <code>Version</code> <code>License</code> <code>Description</code> <code>Title</code> <code>Author</code> <code>Maintainer</code></td>
+</tr>
+<tr>
+<td>Lesquels peuvent être déduits ?</td>
+<td><strong><code>Author</code></strong> et <strong><code>Maintainer</code></strong>, d'<code>Authors@R</code></td>
+</tr>
+<tr>
+<td>Contraintes sur <code>Package</code> ?</td>
+<td>Au moins <strong>2 caractères</strong>, commence par <strong>une lettre</strong>, ne finit pas par un point</td>
+</tr>
+<tr>
+<td><code>Version</code> est-elle un décimal ?</td>
+<td> <strong>Non</strong> — <code>0.9 &lt; 0.75</code></td>
+</tr>
+<tr>
+<td>Longueur d'affichage du <code>Title</code> ?</td>
+<td>Tronqué à <strong>65 caractères</strong></td>
+</tr>
+<tr>
+<td>Le <code>Title</code> finit-il par un point ?</td>
+<td><strong>Non</strong></td>
+</tr>
+<tr>
+<td>Doit-il répéter le nom du paquet ?</td>
+<td><strong>Non</strong></td>
+</tr>
+<tr>
+<td>Combien de paragraphes pour <code>Description</code> ?</td>
+<td><strong>Un seul</strong></td>
+</tr>
+<tr>
+<td>Comment y écrire une URL ?</td>
+<td><strong>Entre chevrons</strong></td>
+</tr>
+<tr>
+<td>Le <code>Maintainer</code> peut-il être une liste de diffusion ?</td>
+<td><strong>Non</strong> — une <strong>personne</strong></td>
+</tr>
+<tr>
+<td>Que fait <code>Depends</code> ?</td>
+<td>Les paquets sont <strong>attachés avant</strong></td>
+</tr>
+<tr>
+<td>Que fait <code>Imports</code> ?</td>
+<td>L'espace de noms est <strong>importé, non attaché</strong></td>
+</tr>
+<tr>
+<td>Où déclarer un paquet appelé par <code>::</code> ?</td>
+<td><strong><code>Imports</code></strong>, <code>Suggests</code> ou <code>Enhances</code></td>
+</tr>
+<tr>
+<td>Que couvre <code>Suggests</code> ?</td>
+<td><strong>Exemples, démos, tests, vignettes</strong></td>
+</tr>
+<tr>
+<td>Et <code>Enhances</code> ?</td>
+<td>Les paquets <strong>enrichis</strong> par le vôtre</td>
+</tr>
+<tr>
+<td>Règle 1 des dépendances ?</td>
+<td><strong>Un seul champ</strong> par paquet</td>
+</tr>
+<tr>
+<td>Règle 2 ?</td>
+<td>Espace de noms seul → <strong><code>Imports</code></strong></td>
+</tr>
+<tr>
+<td>Règle 3 ?</td>
+<td>Attachement nécessaire → <strong><code>Depends</code></strong></td>
+</tr>
+<tr>
+<td>Déclarer <code>Depends: R</code> sans version ?</td>
+<td><strong>N'a aucun sens</strong></td>
+</tr>
+<tr>
+<td>Que contient le répertoire <code>R</code> ?</td>
+<td><strong>Du code R, uniquement</strong></td>
+</tr>
+<tr>
+<td>Quelle extension recommandée ?</td>
+<td><strong><code>.R</code></strong></td>
+</tr>
+<tr>
+<td>Que doit permettre le fichier ?</td>
+<td>D'être lu par <strong><code>source()</code></strong></td>
+</tr>
+<tr>
+<td>Le nom du fichier et les objets créés ?</td>
+<td><strong>Aucun lien nécessaire</strong></td>
+</tr>
+<tr>
+<td>Que ne doit-on pas y appeler ?</td>
+<td><strong><code>require</code></strong> et <strong><code>options</code></strong></td>
+</tr>
+<tr>
+<td>Quel encodage ?</td>
+<td><strong>ASCII</strong></td>
+</tr>
+<tr>
+<td>Deux exceptions dans <code>R/</code> ?</td>
+<td><strong><code>sysdata.rda</code></strong> et les fichiers <strong><code>.in</code></strong></td>
+</tr>
+<tr>
+<td>Que contient <code>man</code> ?</td>
+<td>Les fichiers <strong>Rd</strong>, uniquement</td>
+</tr>
+<tr>
+<td>Quels objets doivent être documentés ?</td>
+<td><strong>Tous ceux de niveau utilisateur</strong></td>
+</tr>
+<tr>
+<td>Où documenter les objets internes ?</td>
+<td><strong><code>pkg-internal.Rd</code></strong> — ou <strong>ne pas les exporter</strong></td>
+</tr>
+<tr>
+<td>Un <code>man</code> vide ?</td>
+<td>Peut donner une <strong>erreur d'installation</strong></td>
+</tr>
+<tr>
+<td>Le <code>NAMESPACE</code> est-il du code R ?</td>
+<td> <strong>Non</strong></td>
+</tr>
+<tr>
+<td>Que signifie « scellé » ?</td>
+<td>Imports, exports et liaisons <strong>inchangeables</strong></td>
+</tr>
+<tr>
+<td>L'ordre de recherche d'un paquet ?</td>
+<td>Paquet → <strong>imports</strong> → <strong><code>base</code></strong> → chemin normal</td>
+</tr>
+<tr>
+<td>Que fait <code>export(f, g)</code> ?</td>
+<td>Il <strong>exporte</strong> <code>f</code> et <code>g</code></td>
+</tr>
+<tr>
+<td>Quand faut-il des guillemets ?</td>
+<td>Pour les <strong>noms non standard</strong></td>
+</tr>
+<tr>
+<td>Que fait <code>exportPattern("^[^.]")</code> ?</td>
+<td>Il exporte tout <strong>ne commençant pas par un point</strong></td>
+</tr>
+<tr>
+<td>Est-ce recommandé ?</td>
+<td> <strong>Pas en production</strong></td>
+</tr>
+<tr>
+<td><code>import</code> ou <code>importFrom</code> ?</td>
+<td><strong><code>importFrom</code></strong>, sélectivement</td>
+</tr>
+<tr>
+<td>Quel espace de noms est importé implicitement ?</td>
+<td><strong><code>base</code></strong></td>
+</tr>
+<tr>
+<td>Pourquoi enregistrer une méthode S3 ?</td>
+<td>Le dispatch <strong>peut ne pas la trouver</strong></td>
+</tr>
+<tr>
+<td>Quelle directive ?</td>
+<td><strong><code>S3method(generic, class)</code></strong></td>
+</tr>
+<tr>
+<td>Faut-il exporter la méthode ?</td>
+<td><strong>Non</strong></td>
+</tr>
+<tr>
+<td>Le point d'entrée au chargement ?</td>
+<td><strong><code>.onLoad</code></strong></td>
+</tr>
+<tr>
+<td>À l'attachement ?</td>
+<td><strong><code>.onAttach</code></strong></td>
+</tr>
+<tr>
+<td>Au déchargement ?</td>
+<td><strong><code>.onUnload</code></strong></td>
+</tr>
+<tr>
+<td>Laquelle doit être exportée ?</td>
+<td> <strong><code>.Last.lib</code></strong></td>
+</tr>
+<tr>
+<td>Où charger le code compilé ?</td>
+<td>Dans <strong><code>.onLoad</code></strong> ou par <strong><code>useDynLib</code></strong></td>
+</tr>
+<tr>
+<td>Comment afficher un message ?</td>
+<td><strong><code>packageStartupMessage</code></strong></td>
+</tr>
+<tr>
+<td>Sous quelle option tournent <code>check</code> et <code>build</code> ?</td>
+<td> <strong><code>--vanilla</code></strong></td>
+</tr>
+<tr>
+<td>Comment leur passer <code>R_LIBS</code> ?</td>
+<td>Par l'environnement ou <strong><code>~/.R/check.Renviron</code></strong></td>
+</tr>
+<tr>
+<td>Sur quoi lancer les vérifications finales ?</td>
+<td>Le <strong>tarball</strong> produit par <code>build</code></td>
+</tr>
+<tr>
+<td>Comment exclure un fichier du tarball ?</td>
+<td><strong><code>.Rbuildignore</code></strong></td>
+</tr>
+<tr>
+<td>Qu'est-ce que le format Rd ?</td>
+<td>Un <strong>langage de balisage proche de (La)TeX</strong></td>
+</tr>
+<tr>
+<td>Quel script le convertit ?</td>
+<td><strong><code>Rdconv</code></strong></td>
+</tr>
+<tr>
+<td>Combien de fichiers Rd dans la distribution ?</td>
+<td>Plus de <strong>1400</strong></td>
+</tr>
+<tr>
+<td>Les trois parties d'un fichier Rd ?</td>
+<td><strong>En-tête</strong>, <strong>corps</strong>, <strong>pied de mots-clés</strong></td>
+</tr>
+<tr>
+<td>Laquelle est obligatoire ?</td>
+<td>L'<strong>en-tête</strong></td>
+</tr>
+<tr>
+<td>Les quatre champs vérifiés par <code>check</code> ?</td>
+<td><code>\name</code> · <code>\alias</code> · <code>\title</code> · <code>\description</code></td>
+</tr>
+</tbody></table>
+</main>
+
+
+
+
+</body></html>

@@ -1,0 +1,1082 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fiche 310 — Portée lexicale, environnements et état mutable</title>
+<script>
+window.MathJax={tex:{inlineMath:[["$","$"]],displayMath:[["$$","$$"]],processEscapes:true},
+ options:{skipHtmlTags:["script","noscript","style","textarea","pre","code"]},
+ svg:{fontCache:"global"},
+ startup:{pageReady:()=>MathJax.startup.defaultPageReady().then(()=>{document.body.classList.add("ready")})}};
+setTimeout(function(){document.body.classList.add("ready")},2500);
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+/* ============================================================
+   MathiasLearn — feuille de style des fiches
+   Reprise intégrale des tokens de 00_PARCOURS/*.html
+   + blocs pédagogiques (callouts, méthode, essentiels, recall)
+   ============================================================ */
+:root{--bg:#faf9f7;--card:#fff;--ink:#1a1a1a;--muted:#6b6b6b;--line:#e5e2dd;--accent:#8b5e34;
+ --hl:#fdf8ef;--ok:#2d7d4f;--okbg:#f0f7f3;--warn:#b3402f;--warnbg:#fdf3f1;--blue:#2f5d8b;--bluebg:#f1f5fa}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+ font:17px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;padding:0 16px 100px}
+.nav{position:sticky;top:0;background:rgba(250,249,247,.96);backdrop-filter:blur(8px);
+ border-bottom:1px solid var(--line);margin:0 -16px 30px;padding:11px 16px;z-index:50;
+ display:flex;gap:6px;flex-wrap:wrap;font-size:13px}
+.nav a{color:var(--muted);text-decoration:none;padding:4px 9px;border-radius:5px;white-space:nowrap}
+.nav a:hover{background:var(--line);color:var(--ink)}
+.nav a.on{background:var(--accent);color:#fff}
+main{max-width:780px;margin:0 auto}
+h1{font-size:31px;letter-spacing:-.02em;margin:.4em 0 .5em;line-height:1.25}
+h2{font-size:23px;margin:2.2em 0 .7em;padding-bottom:.3em;border-bottom:1px solid var(--line)}
+h3{font-size:19px;margin:1.9em 0 .5em;color:var(--accent)}
+h4{font-size:17px;margin:1.5em 0 .4em}
+p{margin:.8em 0} a{color:var(--accent)} hr{border:0;border-top:1px solid var(--line);margin:2.6em 0}
+table{border-collapse:collapse;width:100%;margin:1.3em 0;font-size:15.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+th{background:#f3f0eb;font-weight:600}
+tr:nth-child(even) td{background:#fcfbfa}
+code{font-family:"SF Mono",Menlo,Consolas,monospace;font-size:.88em;background:#f2efea;padding:2px 6px;border-radius:4px;overflow-wrap:break-word}
+pre{background:#f2efea;padding:14px 16px;border-radius:8px;overflow-x:auto}
+pre code{background:none;padding:0;white-space:pre}
+blockquote{border-left:3px solid var(--accent);background:var(--hl);margin:1.4em 0;padding:14px 20px;border-radius:0 8px 8px 0}
+blockquote p:first-child{margin-top:0} blockquote p:last-child{margin-bottom:0}
+ul,ol{padding-left:1.5em} li{margin:.35em 0} em{color:#4a4a4a}
+mjx-container[display="true"]{margin:1.1em 0!important;overflow-x:auto;overflow-y:hidden;padding:2px 0}
+mjx-container svg{max-width:100%}
+body:not(.ready) main{opacity:0} main{opacity:1;transition:opacity .25s}
+
+/* --- bandeau de tête de fiche --- */
+.cours{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--accent);
+ border-radius:0 10px 10px 0;padding:18px 22px;margin:0 0 34px}
+.cours h4{margin:0 0 4px;font-size:14px;text-transform:uppercase;letter-spacing:.07em;color:var(--accent)}
+.cours .cs{color:var(--muted);font-size:14.5px;margin:0 0 14px}
+
+/* --- exercices / corrigés --- */
+.ex{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:6px 24px 20px;margin:18px 0}
+.ex>h3:first-child{margin-top:14px}
+details.cor{margin-top:18px;border:1px solid var(--line);border-radius:8px;background:#fcfbfa;overflow:hidden}
+details.cor>summary{cursor:pointer;padding:12px 16px;font-weight:600;font-size:15px;color:var(--accent);
+ list-style:none;display:flex;align-items:center;gap:9px;user-select:none;transition:.15s;min-height:44px}
+details.cor>summary::-webkit-details-marker{display:none}
+details.cor>summary:hover{background:var(--hl)}
+details.cor>summary::before{content:"\25B6";font-size:10px;transition:transform .18s;display:inline-block}
+details.cor[open]>summary::before{transform:rotate(90deg)}
+details.cor[open]>summary{background:var(--okbg);color:var(--ok);border-bottom:1px solid var(--line)}
+.cor .in{padding:4px 20px 16px}
+.cor .in>*:first-child{margin-top:.9em}
+
+/* --- blocs pédagogiques (callouts) ---
+   Générés depuis une citation Markdown dont le premier **gras** commence
+   par un mot-clé : DÉFINITION, THÉORÈME, MÉTHODE, PIÈGE, INTUITION… */
+.cal{border:1px solid var(--line);border-left:4px solid var(--accent);background:var(--card);
+ border-radius:0 10px 10px 0;padding:15px 20px;margin:1.5em 0}
+.cal>p:first-child{margin-top:0}.cal>p:last-child,.cal>ul:last-child,.cal>ol:last-child{margin-bottom:0}
+.cal .lab{display:block;font-size:12.5px;text-transform:uppercase;letter-spacing:.08em;
+ font-weight:700;color:var(--accent);margin-bottom:6px}
+.cal.formel{background:var(--hl)}
+.cal.piege{border-left-color:var(--warn);background:var(--warnbg)}
+.cal.piege .lab{color:var(--warn)}
+.cal.methode{border-left-color:var(--ok);background:var(--okbg)}
+.cal.methode .lab{color:var(--ok)}
+.cal.intu{border-left-color:var(--blue);background:var(--bluebg)}
+.cal.intu .lab{color:var(--blue)}
+.cal.plus{border-left-style:dashed;background:#faf9f7}
+.cal.plus .lab{color:var(--muted)}
+
+/* --- révision express --- */
+.ess{background:var(--card);border:1px solid var(--accent);border-radius:10px;padding:4px 24px 20px;margin:1.6em 0}
+.ess h3{margin-top:1.3em}
+.rec{background:var(--card);border:1px dashed var(--accent);border-radius:10px;padding:4px 24px 18px;margin:1.6em 0}
+.rec ol{counter-reset:none}
+
+/* --- impression / PDF --- */
+@media print{
+ .nav{display:none}
+ body{padding:0;background:#fff;font-size:11.2pt;line-height:1.55}
+ main{max-width:none}
+ h1{font-size:23pt}h2{font-size:15pt;margin-top:1.5em}h3{font-size:12.6pt}
+ h2,h3,h4{break-after:avoid;page-break-after:avoid}
+ table,.cal,blockquote{break-inside:avoid;page-break-inside:avoid}
+ table{display:table;font-size:9.6pt}
+ details.cor{border:1px solid var(--line);background:#fcfbfa}
+ details.cor>summary{display:none}
+ details.cor .in{padding-top:10px}
+ .cal,.ex,.ess,.rec{box-shadow:none}
+ a{color:var(--ink);text-decoration:none}
+}
+@page{margin:16mm 15mm 18mm}
+
+/* --- exemples travaillés --- */
+.exm{background:#fcfbfa;border:1px solid var(--line);border-radius:10px;padding:2px 20px 14px;margin:1.5em 0}
+.exm>h4:first-child{margin:14px 0 .5em;color:var(--accent);font-size:13px;text-transform:uppercase;letter-spacing:.07em}
+
+
+/* --- pastilles de priorité (conventions des fiches de l'app) --- */
+h2[data-prio], h3[data-prio], h4[data-prio]{position:relative}
+h2[data-prio]::before,h3[data-prio]::before,h4[data-prio]::before{
+ content:"";display:inline-block;width:9px;height:9px;border-radius:50%;
+ margin-right:9px;vertical-align:middle;background:var(--muted)}
+[data-prio="must"]::before{background:var(--warn)}
+[data-prio="high"]::before{background:#d98324}
+[data-prio="mid"]::before{background:#c9a227}
+[data-prio="low"]::before{background:var(--ok)}
+/* corrigés des fiches de l'app : même traitement que les corrigés des séries */
+details.cor>summary::after{content:""}
+</style></head><body>
+<div class="nav"><a href="00_COMMENCER_ICI.html">Commencer ici</a><a href="01_NOTATIONS_le-decodeur.html">Notations</a><a href="02_EXERCICES_Serie-0.html">Série 0 — Remise en route</a><a href="03_EXERCICES_Serie-1.html">Série 1 — Convexité</a><a href="04_EXERCICES_Serie-2.html">Série 2 — KKT</a><a href="05_AUTO-EVALUATION.html">Auto-évaluation (quiz)</a><a href="06_FICHE_Optimisation-deux-variables.html">Fiche — Optimisation à 2 variables</a></div>
+<main><h1>Fiche 310 — Portée lexicale, environnements et état mutable</h1>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Matière</strong></td>
+<td>Code · Langage R</td>
+</tr>
+<tr>
+<td><strong>Cours source</strong></td>
+<td>R Core Team, <em>An Introduction to R</em> 4.6.1 — §10.7 « Scope », §10.8 « Customizing the environment »</td>
+</tr>
+<tr>
+<td><strong>Sources d'appoint</strong></td>
+<td><em>R Language Definition</em> 4.6.1, §3.5 « Scope of variables » (§3.5.1 environnement global, §3.5.2 environnement lexical, §3.5.3 <strong>la pile d'appels</strong>, §3.5.4 chemin de recherche), §4.3.4 « Scope », §2.1.10 « Environments », §2.1.5 « Function objects »</td>
+</tr>
+<tr>
+<td><strong>Difficulté</strong></td>
+<td> Avancé — <em>« one of the major differences between S-Plus and R »</em></td>
+</tr>
+<tr>
+<td><strong>Temps d'étude estimé</strong></td>
+<td>1 h 30</td>
+</tr>
+<tr>
+<td><strong>Prérequis</strong></td>
+<td>Fiches 303, 306, 309 (attributs, chemin de recherche, fonctions)</td>
+</tr>
+<tr>
+<td><strong>Concepts clés</strong></td>
+<td>paramètre formel, variable <strong>locale</strong>, variable <strong>libre</strong>, <strong>portée lexicale</strong> contre <strong>statique</strong>, <strong>fermeture</strong> (<em>closure</em>), <em>frame</em> contre <em>environment</em>, <strong>enclos</strong>, <code>&lt;&lt;-</code>, <strong>état mutable</strong>, <code>environment()</code>, portée <strong>dynamique</strong> et pile d'appels, famille <code>sys.*</code>, <code>parent.frame()</code>, chemin de recherche et <strong>espaces de noms</strong>, <code>.First()</code> et <code>.Last()</code>, <code>Rprofile.site</code>, <code>.Rprofile</code></td>
+</tr>
+<tr>
+<td><strong>À retenir en priorité</strong></td>
+<td>Les <strong>trois classes de symboles</strong> · <strong>portée lexicale = l'environnement de <em>création</em>, pas celui d'appel</strong> · <strong><code>&lt;&lt;-</code> remonte les enclos</strong> · le fait qu'<strong>un environnement n'est pas copié</strong>.</td>
+</tr>
+</tbody></table>
+<h2>Vue d'ensemble</h2>
+<pre><code>TROIS CLASSES DE SYMBOLES dans le corps d'une fonction
+   PARAMETRES FORMELS   ceux de la liste d'arguments
+   VARIABLES LOCALES    definies par une assignation dans le corps
+   VARIABLES LIBRES     ni l'un ni l'autre
+   « Free variables BECOME LOCAL VARIABLES IF THEY ARE ASSIGNED TO. »
+
+LA REGLE               « In R the free variable bindings are resolved by FIRST
+                         LOOKING IN THE ENVIRONMENT IN WHICH THE FUNCTION WAS
+                         CREATED. This is called LEXICAL SCOPE. »
+
+                       S-Plus (portee STATIQUE)  -&gt; cherche une variable GLOBALE
+                       R      (portee LEXICALE)  -&gt; cherche la ou la fonction est NEE
+
+VOCABULAIRE            un FRAME    = un ensemble de variables
+                       un ENVIRONMENT = un emboitement de frames
+                                      = frame le plus interne + ENCLOS
+
+UNE FERMETURE          code + environnement de creation
+                       « NOTICE THAT THIS IS NOT NECESSARILY THE ENVIRONMENT
+                         OF THE CALLER! »
+
+LA RECHERCHE           environnement d'evaluation -&gt; enclos -&gt; enclos de l'enclos
+                       -&gt; environnement global ou d'un paquet
+                       -&gt; chemin de recherche -&gt; base -&gt; environnement VIDE -&gt; echec
+
+&lt;&lt;-                    remonte les ENCLOS jusqu'a trouver le symbole
+                       et REMPLACE la valeur LA-BAS
+                       s'il n'existe nulle part -&gt; CREE au niveau global
+
+DEMARRAGE              Rprofile.site -&gt; profil utilisateur -&gt; .RData -&gt; .First()
+                       « A definition in later files will MASK definitions in
+                         earlier files. »
+</code></pre>
+<p><strong>Le problème posé.</strong> <em>« The discussion in this section is <strong>somewhat more technical</strong> than in other parts of this document. <strong>However, it details one of the major differences between S-Plus and R.</strong> »</em> (§10.7)</p>
+<p>Le cours prévient rarement de la sorte. Ce paragraphe n'est pas un raffinement : c'est <strong>ce qui distingue R de son modèle</strong>, et ce qui rend possibles des constructions impossibles ailleurs.</p>
+<h2 data-prio="must">Concept 1 — Trois classes de symboles</h2>
+<div class="cal formel"><span class="lab">Définition (§10.7).</span>
+<p> <em>« <strong>The symbols which occur in the body of a function can be divided into three classes : formal parameters, local variables and free variables.</strong> »</em></p>
+<ul>
+<li><em>« <strong>The formal parameters</strong> of a function are <strong>those occurring in the argument list</strong>. <strong>Their values are determined by the process of binding the actual function arguments to the formal parameters.</strong> »</em></li>
+<li><em>« <strong>Local variables</strong> are those <strong>whose values are determined by the evaluation of expressions in the body</strong> of the function. »</em></li>
+<li><em>« Variables which are <strong>neither formal parameters nor local variables</strong> are called <strong>free variables</strong>. <strong>Free variables become local variables if they are assigned to.</strong> »</em></li>
+</ul>
+</div>
+<pre><code class="language-r">f &lt;- function(x) {
+  y &lt;- 2*x
+  print(x)
+  print(y)
+  print(z)
+}
+</code></pre>
+<p><em>« In this function, <strong><code>x</code> is a formal parameter</strong>, <strong><code>y</code> is a local variable</strong> and <strong><code>z</code> is a free variable</strong>. »</em></p>
+<blockquote>
+<p class="cal piege"> <strong>La dernière phrase de la définition est la plus lourde de conséquences.</strong> <em>« <strong>Free variables become local variables if they are assigned to.</strong> »</em></p>
+<p>Une variable n'est pas libre ou locale <strong>par nature</strong> : elle l'est <strong>selon ce que fait le corps</strong>. Ajouter quelque part un <code>z &lt;- 0</code> transforme <code>z</code> de libre en locale, <strong>dans toute la fonction</strong> — y compris avant la ligne d'assignation. Le comportement de la fonction change alors du tout au tout, et rien dans le message d'erreur ne le signale.</p>
+</blockquote>
+<div class="cal plus"><span class="lab">Complément (R Language Definition §4.3.4).</span>
+<p> <em>« <strong>Because R has no formal definition of variables, they are simply used as needed, it can be difficult to determine whether a variable is local or not. Local variables must first be defined, this is typically done by having them on the left-hand side of an assignment.</strong> »</em></p>
+</div>
+<h2 data-prio="must">Concept 2 — Portée lexicale contre portée statique</h2>
+<blockquote>
+<p><strong>Règle (§10.7).</strong> <em>« <strong>In R the free variable bindings are resolved by first looking in the environment in which the function was created. This is called lexical scope.</strong> »</em></p>
+</blockquote>
+<p><strong>L'exemple qui prouve la différence (§10.7) :</strong></p>
+<pre><code class="language-r">cube &lt;- function(n) {
+  sq &lt;- function() n*n
+  n*sq()
+}
+</code></pre>
+<p>*« The variable <code>n</code> in the function <code>sq</code> <strong>is not an argument to that function. Therefore it is a free variable</strong> and the scoping rules must be used to ascertain the value that is to be associated with it. <strong>Under static scope (S-Plus) the value is that associated with a global variable named <code>n</code>. Under lexical scope (R) it is the parameter to the function <code>cube</code></strong>, since that is <strong>the active binding for the variable <code>n</code> at the time the function <code>sq</code> was defined</strong>. »*</p>
+<p><strong>Le résultat, tel que le cours le montre :</strong></p>
+<pre><code>## d'abord dans S
+S&gt; cube(2)
+Error in sq(): Object "n" not found
+Dumped
+S&gt; n &lt;- 3
+S&gt; cube(2)
+[1] 18
+
+## puis la meme fonction dans R
+R&gt; cube(2)
+[1] 8
+</code></pre>
+<div class="cal intu"><span class="lab">Contrôle — retrouver les deux nombres.</span>
+<p> Sous <strong>R</strong> : <code>sq()</code> voit <code>n = 2</code> (le paramètre de <code>cube</code>), donc <code>sq()</code> vaut $4$ et <code>cube(2)</code> vaut $2\times4 = \mathbf{8}$. Sous <strong>S-Plus</strong> avec <code>n &lt;- 3</code> en global : <code>sq()</code> voit <code>n = 3</code>, donc <code>sq()</code> vaut $9$, et <code>n*sq()</code> utilise… <strong>le <code>n</code> local</strong>, soit $2$ — d'où $2\times9 = \mathbf{18}$. </p>
+<p><strong>Le même code, deux résultats, et aucun message.</strong> C'est pourquoi le cours qualifie ce paragraphe de <em>« one of the major differences »</em>.</p>
+</div>
+<p><em>« The difference … is that <strong>S-Plus looks for a global variable called <code>n</code> while R first looks for a variable called <code>n</code> in the environment created when <code>cube</code> was invoked</strong>. »</em></p>
+<div class="cal plus"><span class="lab">Complément — la règle complète (R Language Definition §3.5.2).</span>
+<p> <em>« when a variable is requested inside a function, it is <strong>first sought in the evaluation environment</strong>, then in <strong>the enclosure</strong>, <strong>the enclosure of the enclosure</strong>, etc. ; once <strong>the global environment or the environment of a package</strong> is reached, the search continues <strong>up the search path</strong> to the environment of <strong>the base package</strong>. If the variable is not found there, the search will proceed next to <strong>the empty environment, and will fail</strong>. »</em></p>
+</div>
+<h2 data-prio="must">Concept 3 — Frame, environnement, fermeture</h2>
+<div class="cal formel"><span class="lab">Définition (R Language Definition §3.5.2).</span>
+<p> <em>« <strong>Every call to a function creates a frame which contains the local variables created in the function, and is evaluated in an environment, which in combination creates a new environment.</strong> »</em></p>
+<p class="cal piege"> <em>« <strong>Notice the terminology : a frame is a set of variables, an environment is a nesting of frames</strong> (or equivalently : <strong>the innermost frame plus the enclosing environment</strong>). »</em></p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Terme</th>
+<th>Définition</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Frame</strong></td>
+<td><strong>un ensemble de variables</strong> — des paires symbole-valeur</td>
+</tr>
+<tr>
+<td><strong>Environment</strong></td>
+<td><strong>un emboîtement de frames</strong> = le frame le plus interne <strong>+ l'enclos</strong></td>
+</tr>
+<tr>
+<td><strong>Enclosure</strong></td>
+<td><strong>le pointeur vers l'environnement englobant</strong></td>
+</tr>
+</tbody></table>
+<div class="cal formel"><span class="lab">Définition — la fermeture (§3.5.2).</span>
+<p> *« <strong>A closure (mode <code>"function"</code>) object will contain the environment in which it is created as part of its definition</strong> (by default ; <strong>the environment can be manipulated using <code>environment&lt;-</code></strong>). When the function is subsequently called, <strong>its evaluation environment is created with the closure's environment as enclosure</strong>. <strong> Notice that this is not necessarily the environment of the caller!</strong> »*</p>
+</div>
+<p><strong>C'est la phrase qui résume toute la fiche.</strong> Une fonction ne cherche <strong>pas</strong> ses variables libres là où on l'appelle : elle les cherche <strong>là où elle est née</strong>.</p>
+<div class="cal plus"><span class="lab">Complément (§2.1.5, fiche 303).</span>
+<p> *« Functions (or more precisely, <strong>function closures</strong>) have <strong>three basic components : a formal argument list, a body and an environment</strong>. … <strong>A function's environment is the environment that was active at the time that the function was created. Any symbols bound in that environment are captured and available to the function.</strong> <strong>This combination of the code of the function and the bindings in its environment is called a "function closure"</strong>, a term from functional programming theory. »*</p>
+<p><em>« It is possible to <strong>extract and manipulate the three parts</strong> of a closure object using <strong><code>formals</code>, <code>body</code>, and <code>environment</code></strong> (<strong>all three can also be used on the left hand side of assignments</strong>). <strong>The last of these can be used to remove unwanted environment capture.</strong> »</em></p>
+</div>
+<blockquote>
+<p class="cal piege"> <strong>Et le rappel décisif (§3.5.2).</strong> <em>« Environments may be assigned to variables or be contained in other objects. <strong>However, notice that they are not standard objects — in particular, they are not copied on assignment.</strong> »</em> — c'est l'unique exception à la sémantique de copie (fiches 302, 303, 309).</p>
+</blockquote>
+<h2 data-prio="must">Concept 4 — <code>&lt;&lt;-</code> et l'état mutable</h2>
+<div class="cal formel"><span class="lab">Définition (§10.7).</span>
+<p> <em>« <strong>The special assignment operator, <code>&lt;&lt;-</code>, is used to change the value associated with <code>total</code>.</strong> <strong>This operator looks back in enclosing environments for an environment that contains the symbol <code>total</code>, and when it finds such an environment it replaces the value, in that environment, with the value of right hand side.</strong> <strong>If the global or top-level environment is reached without finding the symbol <code>total</code> then that variable is created and assigned to there.</strong> »</em></p>
+</div>
+<p><strong>Les deux comportements, à ne pas confondre :</strong></p>
+<table>
+<thead>
+<tr>
+<th>Situation</th>
+<th>Ce que fait <code>&lt;&lt;-</code></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Le symbole existe dans <strong>un enclos</strong></td>
+<td>il <strong>remplace sa valeur là-bas</strong></td>
+</tr>
+<tr>
+<td>Le symbole n'existe <strong>nulle part</strong></td>
+<td>il le <strong>crée au niveau global</strong></td>
+</tr>
+</tbody></table>
+<blockquote>
+<p class="cal piege"> <em>« <strong>For most users <code>&lt;&lt;-</code> creates a global variable and assigns the value of the right hand side to it.</strong> <strong>Only when <code>&lt;&lt;-</code> has been used in a function that was returned as the value of another function will the special behavior described here occur.</strong> »</em> (§10.7)</p>
+<p>Autrement dit : dans une fonction ordinaire, <code>&lt;&lt;-</code> <strong>pollue l'espace de travail</strong>. Son intérêt véritable apparaît <strong>uniquement</strong> dans une fonction <strong>renvoyée par une autre</strong> — la construction du concept suivant.</p>
+<p><em>(Note 2 du §10.7 : « In some sense this mimics the behavior in S-Plus since in S-Plus this operator <strong>always</strong> creates or assigns to a global variable. »)</em></p>
+</blockquote>
+<h3>4.1 Le compte en banque — l'exemple complet du cours</h3>
+<blockquote>
+<p><strong>Énoncé (§10.7).</strong> <em>« <strong>Lexical scope can also be used to give functions mutable state.</strong> In the following example we show <strong>how R can be used to mimic a bank account</strong>. A functioning bank account needs to have <strong>a balance or total</strong>, <strong>a function for making withdrawals</strong>, <strong>a function for making deposits</strong> and <strong>a function for stating the current balance</strong>. <strong>We achieve this by creating the three functions within <code>account</code> and then returning a list containing them.</strong> … <strong>Because these functions are defined in an environment which contains <code>total</code>, they will have access to its value.</strong> »</em></p>
+</blockquote>
+<pre><code class="language-r">open.account &lt;- function(total) {
+  list(
+    deposit = function(amount) {
+      if (amount &lt;= 0)
+        stop("Deposits must be positive!\n")
+      total &lt;&lt;- total + amount
+      cat(amount, "deposited. Your balance is", total, "\n\n")
+    },
+    withdraw = function(amount) {
+      if (amount &gt; total)
+        stop("You don't have that much money!\n")
+      total &lt;&lt;- total - amount
+      cat(amount, "withdrawn. Your balance is", total, "\n\n")
+    },
+    balance = function() {
+      cat("Your balance is", total, "\n\n")
+    }
+  )
+}
+
+ross   &lt;- open.account(100)
+robert &lt;- open.account(200)
+
+ross$withdraw(30)
+ross$balance()
+robert$balance()
+
+ross$deposit(50)
+ross$balance()
+ross$withdraw(500)
+</code></pre>
+<details class="cor">
+<summary><strong>Exercice résolu — dérouler la séance du compte en banque, ligne par ligne</strong></summary><div class="in">
+
+<p><em>Étape 1 — ce que crée <code>open.account(100)</code>.</em> L'appel crée <strong>un environnement d'évaluation</strong> contenant le paramètre formel <code>total = 100</code>. Les trois fonctions y sont <strong>définies</strong>, donc chacune <strong>capture cet environnement</strong> comme le sien (§2.1.5 : <em>« a function's environment is the environment that was active at the time that the function was created »</em>). Le résultat est <strong>une liste</strong> de trois fermetures.</p>
+<p><em>Étape 2 — pourquoi <code>total</code> survit à la fin de <code>open.account</code>.</em> L'appel est terminé, mais <strong>les trois fonctions renvoyées pointent encore vers son environnement</strong>. Tant qu'elles existent, <strong>il existe</strong>. C'est ce que le cours appelle <em>« mutable state »</em>.</p>
+<p><em>Étape 3 — deux comptes indépendants.</em> <code>robert &lt;- open.account(200)</code> déclenche <strong>un second appel</strong>, donc <strong>un second environnement</strong>, avec son propre <code>total</code>. Les deux jeux de fermetures ne se voient pas.</p>
+<p><em>Étape 4 — <code>ross$withdraw(30)</code>.</em> Le garde-fou <code>if (amount &gt; total) stop(...)</code> : $30 \le 100$, on passe. Puis <code>total &lt;&lt;- total - amount</code>. Le <code>&lt;&lt;-</code> <em>« looks back in enclosing environments for an environment that contains the symbol <code>total</code> »</em> — et il le trouve <strong>au premier enclos</strong>, celui de l'appel à <code>open.account</code>. <strong>Le solde de <code>ross</code> passe à 70.</strong> Affichage : « 30 withdrawn. Your balance is 70 ».</p>
+<p><em>Étape 5 — <code>ross$balance()</code> puis <code>robert$balance()</code>.</em> <strong>70</strong> et <strong>200</strong>. La preuve que les deux environnements sont distincts.</p>
+<p><em>Étape 6 — <code>ross$deposit(50)</code>.</em> $50 &gt; 0$, on passe. <code>total &lt;&lt;- total + 50</code> → <strong>120</strong>.</p>
+<p><em>Étape 7 — <code>ross$withdraw(500)</code>.</em> $500 &gt; 120$ : <code>stop("You don't have that much money!\n")</code>. L'exécution est <strong>interrompue</strong> — et, point important, <strong><code>total</code> n'a pas bougé</strong> : le <code>stop</code> précède l'assignation. C'est pourquoi le garde-fou est écrit <strong>en premier</strong>.</p>
+<p><em>Étape 8 — pourquoi <code>&lt;-</code> ne marcherait pas.</em> Avec <code>total &lt;- total - amount</code>, l'assignation serait <strong>locale à <code>withdraw</code></strong> (fiche 309, §10.5 : <em>« local and temporary and lost after exit »</em>). Le solde reviendrait à sa valeur initiale au retrait suivant. <strong><code>&lt;&lt;-</code> est ce qui rend l'état persistant.</strong></p>
+<p><em>Étape 9 — la leçon.</em> Ce mécanisme est <strong>l'objet, sans système d'objets</strong> : des données privées (<code>total</code>), une interface publique (les trois fonctions), et <strong>aucun moyen d'accéder au solde autrement que par elles</strong>. C'est ce que la fiche 311 comparera à S3.</p>
+</div></details>
+
+<h2 data-prio="mid">Concept 5 — La portée dynamique et la pile d'appels</h2>
+<div class="cal formel"><span class="lab">Définition (R Language Definition §3.5.3).</span>
+<p> <em>« <strong>Every time a function is invoked a new evaluation frame is created.</strong> At any point in time during the computation <strong>the currently active environments are accessible through the call stack</strong>. Each time a function is invoked <strong>a special construct called a context is created internally and is placed on a list of contexts</strong>. <strong>When a function has finished evaluating its context is removed from the call stack.</strong> »</em></p>
+</div>
+<div class="cal formel"><span class="lab">Définition — l'autre portée (§3.5.3).</span>
+<p> <em>« <strong>Making variables defined higher up the call stack available is called dynamic scope.</strong> The binding for a variable is then determined by <strong>the most recent (in time) definition</strong> of the variable. <strong>This contradicts the default scoping rules in R, which use the bindings in the environment in which the function was defined (lexical scope).</strong> <strong>Some functions, particularly those that use and manipulate model formulas, need to simulate dynamic scope by directly accessing the call stack.</strong> »</em></p>
+</div>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Portée <strong>lexicale</strong> (le défaut)</th>
+<th>Portée <strong>dynamique</strong> (simulée)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Où l'on cherche</td>
+<td>l'environnement <strong>de définition</strong></td>
+<td><strong>la pile d'appels</strong></td>
+</tr>
+<tr>
+<td>Ce qui décide</td>
+<td><strong>le lieu</strong> d'écriture</td>
+<td><strong>le moment</strong> de l'appel</td>
+</tr>
+<tr>
+<td>Qui l'utilise</td>
+<td>tout R</td>
+<td>les fonctions <strong>de formules de modèle</strong></td>
+</tr>
+</tbody></table>
+<p><strong>C'est l'explication technique</strong> du comportement de <code>lm(y ~ x, data = dummy)</code> (fiche 313) : la formule <code>y ~ x</code> doit être évaluée <strong>dans le contexte de l'appelant</strong>, pas dans celui de <code>lm</code>.</p>
+<div class="cal formel"><span class="lab">Notation (§3.5.3).</span>
+<p> <em>« Access to the call stack is provided through <strong>a family of functions which have names that start with <code>sys.</code></strong> »</em> :</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Fonction</th>
+<th>Rôle</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>sys.call</code></td>
+<td><em>« Get <strong>the call</strong> for the specified context »</em></td>
+</tr>
+<tr>
+<td><code>sys.frame</code></td>
+<td><em>« Get <strong>the evaluation frame</strong> for the specified context »</em></td>
+</tr>
+<tr>
+<td><code>sys.nframe</code></td>
+<td><em>« Get <strong>the environment frame</strong> for all active contexts »</em></td>
+</tr>
+<tr>
+<td><code>sys.function</code></td>
+<td><em>« Get <strong>the function being invoked</strong> in the specified context »</em></td>
+</tr>
+<tr>
+<td><code>sys.parent</code></td>
+<td><em>« Get <strong>the parent</strong> of the current function invocation »</em></td>
+</tr>
+<tr>
+<td><code>sys.calls</code> / <code>sys.frames</code> / <code>sys.parents</code></td>
+<td>les mêmes, <strong>pour tous les contextes actifs</strong></td>
+</tr>
+<tr>
+<td><code>sys.on.exit</code></td>
+<td><em>« Set a function to be executed <strong>when the specified context is exited</strong> »</em></td>
+</tr>
+<tr>
+<td><code>sys.status</code></td>
+<td><em>« Calls <code>sys.frames</code>, <code>sys.parents</code> and <code>sys.calls</code> »</em></td>
+</tr>
+<tr>
+<td><strong><code>parent.frame</code></strong></td>
+<td><em>« Get the evaluation frame for <strong>the specified parent context</strong> »</em></td>
+</tr>
+</tbody></table>
+<h2 data-prio="high">Concept 6 — Le chemin de recherche et les espaces de noms</h2>
+<div class="cal formel"><span class="lab">Définition (R Language Definition §3.5.1).</span>
+<p> <em>« <strong>The global environment is the root of the user workspace.</strong> <strong>An assignment operation from the command line will cause the relevant object to belong to the global environment.</strong> <strong>Its enclosing environment is the next environment on the search path</strong>, and so on <strong>back to the empty environment that is the enclosure of the base environment</strong>. »</em></p>
+</div>
+<div class="cal formel"><span class="lab">Définition (§3.5.4).</span>
+<p> <em>« In addition to the evaluation environment structure, <strong>R has a search path of environments which are searched for variables not found elsewhere</strong>. <strong>This is used for two things : packages of functions and attached user data.</strong> »</em></p>
+<p><em>« <strong>The first element of the search path is the global environment and the last is the base package.</strong> <strong>An <code>Autoloads</code> environment is used for holding proxy objects that may be loaded on demand.</strong> <strong>Other environments are inserted in the path using <code>attach</code> or <code>library</code>.</strong> »</em></p>
+</div>
+<p>C'est exactement ce que montrait <code>search()</code> en fiche 306 : <code>.GlobalEnv</code>, <code>Autoloads</code>, <code>package:base</code>.</p>
+<blockquote>
+<p class="cal piege"> <strong>L'exception des espaces de noms (§3.5.4).</strong> <em>« <strong>Packages which have a namespace have a different search path.</strong> When a search for an R object is started from an object in such a package, <strong>the package itself is searched first, then its imports, then the base namespace and finally the global environment and the rest of the regular search path.</strong> <strong>The effect is that references to other objects in the same package will be resolved to the package, and objects cannot be masked by objects of the same name in the global environment or in other packages.</strong> »</em></p>
+</blockquote>
+<p><strong>C'est la solution du problème de masquage</strong> rencontré en fiche 306. Un paquet à espace de noms est <strong>immunisé</strong> : redéfinir <code>mean</code> dans votre espace de travail <strong>ne change rien</strong> au comportement interne du paquet. Voir fiches 315 et 319.</p>
+<h2 data-prio="high">Concept 7 — Personnaliser son environnement</h2>
+<blockquote>
+<p><strong>Règle (§10.8).</strong> <em>« Users can customize their environment in several different ways. <strong>There is a site initialization file and every directory can have its own special initialization file. Finally, the special functions <code>.First</code> and <code>.Last</code> can be used.</strong> »</em></p>
+</blockquote>
+<p><strong>La cascade, telle que le §10.8 la décrit</strong> — la même que celle de l'annexe B (fiche 300), vue cette fois du côté de l'utilisateur :</p>
+<table>
+<thead>
+<tr>
+<th>Fichier</th>
+<th>Où R le cherche</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Profil de site</strong></td>
+<td>la valeur de <strong><code>R_PROFILE</code></strong> ; si non défini, <strong><code>Rprofile.site</code></strong> dans le sous-répertoire <strong><code>etc</code></strong> du répertoire d'installation. <em>« This file should contain the commands that you want to execute <strong>every time R is started under your system</strong> »</em></td>
+</tr>
+<tr>
+<td><strong>Profil personnel</strong></td>
+<td><strong><code>.Rprofile</code></strong> — <em>« can be placed in <strong>any directory</strong>. <strong>If R is invoked in that directory then that file will be sourced.</strong> »</em> Sinon, R en cherche un <strong>dans le répertoire personnel</strong>. Si <strong><code>R_PROFILE_USER</code></strong> est défini, <strong>c'est ce fichier qui est utilisé à la place</strong></td>
+</tr>
+</tbody></table>
+<p><em>« This file gives <strong>individual users control over their workspace</strong> and <strong>allows for different startup procedures in different working directories</strong>. »</em> (note 3 : <em>« So it is hidden under UNIX »</em>.)</p>
+<div class="cal formel"><span class="lab">Définition — .First() (§10.8).</span>
+<p> <em>« <strong>Any function named <code>.First()</code> in either of the two profile files or in the <code>.RData</code> image has a special status. It is automatically performed at the beginning of an R session and may be used to initialize the environment.</strong> »</em></p>
+</div>
+<blockquote>
+<p class="cal piege"> <strong>La règle d'ordre, et sa conséquence (§10.8).</strong> *« Thus, <strong>the sequence in which files are executed is : <code>Rprofile.site</code>, the user profile, <code>.RData</code> and then <code>.First()</code></strong>. <strong>A definition in later files will mask definitions in earlier files.</strong> »*</p>
+<p>C'est la séquence de la fiche 300, avec la précision qui manquait : <strong>le dernier chargé l'emporte</strong>. Un <code>.RData</code> peut donc écraser une définition du profil de site — et le faire <strong>silencieusement</strong>.</p>
+</blockquote>
+<p><strong>L'exemple du cours :</strong></p>
+<pre><code class="language-r">.First &lt;- function() {
+  options(prompt = "$ ", continue = "+\t")   # $ est l'invite
+  options(digits = 5, length = 999)          # nombres et affichage
+  x11()                                      # pour les graphiques
+  par(pch = "+")                             # caractere de trace
+  source(file.path(Sys.getenv("HOME"), "R", "mystuff.R"))
+                                             # mes fonctions personnelles
+  library(MASS)                              # attacher un paquet
+}
+</code></pre>
+<p><em>« Similarly <strong>a function <code>.Last()</code>, if defined, is (normally) executed at the very end of the session</strong> »</em> :</p>
+<pre><code class="language-r">.Last &lt;- function() {          # a small safety measure.
+  graphics.off()               # Is it time for lunch?
+  cat(paste(date(), "\nAdios\n"))
+}
+</code></pre>
+<h2>Comment reconnaître le type d'exercice</h2>
+<table>
+<thead>
+<tr>
+<th>Le signal dans l'énoncé</th>
+<th>Ce qu'il faut mobiliser</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>« d'où vient la valeur de cette variable ? »</td>
+<td>classer le symbole : <strong>formel, local, libre</strong></td>
+</tr>
+<tr>
+<td>« le même code donne un autre résultat en S »</td>
+<td><strong>portée lexicale contre statique</strong></td>
+</tr>
+<tr>
+<td>« la fonction interne voit-elle <code>n</code> ? »</td>
+<td>oui, si <code>n</code> existait <strong>là où elle a été définie</strong></td>
+</tr>
+<tr>
+<td>« ajouter une ligne casse tout »</td>
+<td><em>« <strong>free variables become local variables if they are assigned to</strong> »</em></td>
+</tr>
+<tr>
+<td>« garder un état entre deux appels »</td>
+<td>une <strong>fermeture</strong> + <strong><code>&lt;&lt;-</code></strong></td>
+</tr>
+<tr>
+<td>« deux compteurs indépendants »</td>
+<td><strong>deux appels</strong> = deux environnements</td>
+</tr>
+<tr>
+<td>« <code>&lt;&lt;-</code> crée une variable globale »</td>
+<td>c'est le cas <strong>hors fermeture</strong></td>
+</tr>
+<tr>
+<td>« mon objet est modifié à distance »</td>
+<td>c'est <strong>un environnement</strong> — non copié</td>
+</tr>
+<tr>
+<td>« la fonction doit voir le contexte de l'appelant »</td>
+<td><strong>portée dynamique</strong> → <code>parent.frame()</code>, famille <code>sys.*</code></td>
+</tr>
+<tr>
+<td>« pourquoi <code>lm</code> trouve-t-il mes colonnes ? »</td>
+<td>il <strong>simule la portée dynamique</strong></td>
+</tr>
+<tr>
+<td>« redéfinir <code>mean</code> casse-t-il un paquet ? »</td>
+<td><strong>non</strong>, s'il a un <strong>espace de noms</strong></td>
+</tr>
+<tr>
+<td>« exécuter du code au démarrage »</td>
+<td><strong><code>.Rprofile</code></strong> et <strong><code>.First()</code></strong></td>
+</tr>
+<tr>
+<td>« ma définition est écrasée »</td>
+<td><em>« <strong>a definition in later files will mask definitions in earlier files</strong> »</em></td>
+</tr>
+</tbody></table>
+<h2>Comment résoudre ce type d'exercice</h2>
+<p><strong>Protocole « d'où vient cette valeur ? » — 4 étapes.</strong></p>
+<ol>
+<li><strong>Classer le symbole</strong> : est-il dans la liste d'arguments (<strong>formel</strong>) ? assigné dans le corps (<strong>local</strong>) ? ni l'un ni l'autre (<strong>libre</strong>) ?</li>
+<li>Si libre, <strong>remonter les enclos</strong> — <em>« first sought in the evaluation environment, then in the enclosure, the enclosure of the enclosure »</em>.</li>
+<li>Puis <strong>le chemin de recherche</strong> jusqu'à <code>base</code>, puis <strong>l'environnement vide</strong> → échec.</li>
+<li>Se rappeler que <strong>l'enclos est l'environnement de définition, pas celui d'appel</strong>.</li>
+</ol>
+<p><strong>Protocole « fabriquer un état mutable » — 4 étapes.</strong></p>
+<ol>
+<li>Écrire <strong>une fonction fabrique</strong> dont les paramètres portent l'état.</li>
+<li><strong>Définir à l'intérieur</strong> les fonctions qui manipuleront cet état.</li>
+<li>Utiliser <strong><code>&lt;&lt;-</code></strong> pour l'écrire — jamais <code>&lt;-</code>, qui resterait local.</li>
+<li><strong>Renvoyer une liste</strong> de ces fonctions. Chaque appel de la fabrique produit <strong>un état indépendant</strong>.</li>
+</ol>
+<p><strong>Protocole « diagnostiquer un masquage » — 4 étapes.</strong></p>
+<ol>
+<li><strong><code>search()</code></strong> pour l'ordre des positions, <strong><code>ls(n)</code></strong> pour leur contenu (fiche 306).</li>
+<li>Vérifier si le paquet a <strong>un espace de noms</strong> — auquel cas son fonctionnement interne est protégé.</li>
+<li>Devant un comportement de démarrage inexplicable : <strong><code>--vanilla</code></strong> (fiche 300), puis remonter la cascade <code>Rprofile.site</code> → profil utilisateur → <code>.RData</code> → <code>.First()</code>.</li>
+<li>Ne pas oublier que <strong><code>.RData</code> passe après les profils</strong> et peut donc les écraser.</li>
+</ol>
+<h2 data-prio="must">Common mistakes</h2>
+<table>
+<thead>
+<tr>
+<th>Erreur</th>
+<th>Correction</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Croire qu'une fonction voit les variables <strong>de l'appelant</strong></td>
+<td> <em>« <strong>not necessarily the environment of the caller!</strong> »</em></td>
+</tr>
+<tr>
+<td>Croire une variable définitivement libre</td>
+<td>elle <strong>devient locale</strong> si on l'assigne <strong>quelque part</strong></td>
+</tr>
+<tr>
+<td>Porter du code S-Plus sans vérifier la portée</td>
+<td>le même <code>cube(2)</code> rend <strong>8</strong> en R, <strong>18</strong> en S</td>
+</tr>
+<tr>
+<td>Utiliser <code>&lt;-</code> pour maintenir un état</td>
+<td>il est <strong>local et perdu à la sortie</strong></td>
+</tr>
+<tr>
+<td>Utiliser <code>&lt;&lt;-</code> dans une fonction ordinaire</td>
+<td>il <strong>crée une variable globale</strong></td>
+</tr>
+<tr>
+<td>Croire <code>&lt;&lt;-</code> toujours global</td>
+<td>dans une fermeture, il <strong>écrit dans l'enclos</strong></td>
+</tr>
+<tr>
+<td>Assigner avant le garde-fou</td>
+<td>mettre <strong><code>stop()</code> en premier</strong></td>
+</tr>
+<tr>
+<td>Croire un environnement copié à l'assignation</td>
+<td><em>« <strong>they are not copied on assignment</strong> »</em></td>
+</tr>
+<tr>
+<td>Confondre <em>frame</em> et <em>environment</em></td>
+<td>frame = <strong>des variables</strong> ; environment = <strong>frame + enclos</strong></td>
+</tr>
+<tr>
+<td>Attendre la portée dynamique par défaut</td>
+<td>R est <strong>lexical</strong> ; la dynamique se <strong>simule</strong></td>
+</tr>
+<tr>
+<td>Croire qu'on peut masquer une fonction interne d'un paquet</td>
+<td><strong>pas s'il a un espace de noms</strong></td>
+</tr>
+<tr>
+<td>Croire le profil de site prioritaire</td>
+<td><em>« <strong>a definition in later files will mask</strong> »</em> — <code>.RData</code> passe après</td>
+</tr>
+<tr>
+<td>Oublier que <code>.First()</code> peut venir de <code>.RData</code></td>
+<td>et que <strong><code>ls()</code> ne montre pas</strong> les noms à point</td>
+</tr>
+</tbody></table>
+<h2>Ultimate Review</h2>
+<p><strong>Trois classes de symboles.</strong> <strong>Formels</strong> — ceux de la liste d'arguments, liés au moment de l'appel · <strong>locaux</strong> — <em>« whose values are determined by the evaluation of expressions in the body »</em> · <strong>libres</strong> — ni l'un ni l'autre.  <em>« <strong>Free variables become local variables if they are assigned to.</strong> »</em> Et : <em>« <strong>Local variables must first be defined</strong>, typically by having them <strong>on the left-hand side of an assignment</strong> »</em>.</p>
+<p><strong>La règle.</strong> <em>« <strong>In R the free variable bindings are resolved by first looking in the environment in which the function was created. This is called lexical scope.</strong> »</em> S-Plus, en portée <strong>statique</strong>, cherche <strong>une variable globale</strong>. D'où <code>cube(2)</code> = <strong>8</strong> en R et <strong>18</strong> en S-Plus après <code>n &lt;- 3</code>.</p>
+<p><strong>La chaîne de recherche.</strong> environnement d'évaluation → <strong>enclos</strong> → enclos de l'enclos → environnement <strong>global ou de paquet</strong> → <strong>chemin de recherche</strong> → <strong>base</strong> → <strong>environnement vide</strong> → <strong>échec</strong>.</p>
+<p><strong>Vocabulaire.</strong> <em>« <strong>A frame is a set of variables, an environment is a nesting of frames</strong> (or equivalently : <strong>the innermost frame plus the enclosing environment</strong>). »</em></p>
+<p><strong>La fermeture.</strong> <em>« <strong>A closure … will contain the environment in which it is created as part of its definition</strong> »</em> — modifiable par <strong><code>environment&lt;-</code></strong> · à l'appel, <em>« <strong>its evaluation environment is created with the closure's environment as enclosure</strong> »</em> ·  <em>« <strong>Notice that this is not necessarily the environment of the caller!</strong> »</em> · trois composantes accessibles par <strong><code>formals</code>, <code>body</code>, <code>environment</code></strong>, toutes trois <strong>utilisables à gauche d'une assignation</strong> ·  les environnements <strong>ne sont pas copiés</strong>.</p>
+<p><strong><code>&lt;&lt;-</code>.</strong> <em>« <strong>looks back in enclosing environments for an environment that contains the symbol</strong> … and <strong>replaces the value, in that environment</strong> »</em> · si le symbole n'est trouvé nulle part, il est <strong>créé au niveau global</strong> ·  <em>« <strong>For most users <code>&lt;&lt;-</code> creates a global variable</strong> … <strong>Only when <code>&lt;&lt;-</code> has been used in a function that was returned as the value of another function will the special behavior … occur.</strong> »</em></p>
+<p><strong>L'état mutable.</strong> <em>« <strong>Lexical scope can also be used to give functions mutable state.</strong> »</em> Le patron : une <strong>fabrique</strong> dont le paramètre porte l'état, des fonctions <strong>définies dedans</strong>, <strong><code>&lt;&lt;-</code></strong> pour écrire, une <strong>liste</strong> en retour. Chaque appel de la fabrique crée <strong>un état indépendant</strong> — <code>ross</code> et <code>robert</code> ne se voient pas. Et <strong>le garde-fou avant l'assignation</strong> : <code>ross$withdraw(500)</code> s'arrête sans toucher au solde.</p>
+<p><strong>Portée dynamique.</strong> <em>« <strong>Making variables defined higher up the call stack available is called dynamic scope</strong> … determined by <strong>the most recent (in time) definition</strong> … <strong>This contradicts the default scoping rules in R</strong> … <strong>Some functions, particularly those that use and manipulate model formulas, need to simulate dynamic scope by directly accessing the call stack.</strong> »</em> Outils : la famille <strong><code>sys.*</code></strong> (<code>sys.call</code>, <code>sys.frame</code>, <code>sys.function</code>, <code>sys.parent</code>, <code>sys.calls</code>, <code>sys.frames</code>, <code>sys.parents</code>, <code>sys.on.exit</code>, <code>sys.status</code>) et <strong><code>parent.frame</code></strong>.</p>
+<p><strong>Chemin de recherche.</strong> <em>« <strong>The global environment is the root of the user workspace</strong> … <strong>Its enclosing environment is the next environment on the search path</strong> … back to <strong>the empty environment</strong> »</em> · premier élément <strong><code>.GlobalEnv</code></strong>, dernier <strong><code>base</code></strong>, plus <strong><code>Autoloads</code></strong> pour les objets chargés à la demande · on insère avec <strong><code>attach</code></strong> ou <strong><code>library</code></strong>.</p>
+<p><strong>Espaces de noms.</strong> <em>« <strong>Packages which have a namespace have a different search path</strong> : the package itself, <strong>then its imports, then the base namespace and finally the global environment</strong> … <strong>objects cannot be masked by objects of the same name in the global environment or in other packages.</strong> »</em></p>
+<p><strong>Personnalisation.</strong> <strong><code>Rprofile.site</code></strong> (via <code>R_PROFILE</code>, sinon <code>etc/Rprofile.site</code>) → <strong>profil utilisateur</strong> (<code>.Rprofile</code> du répertoire courant, sinon du répertoire personnel, sinon <code>R_PROFILE_USER</code>) → <strong><code>.RData</code></strong> → <strong><code>.First()</code></strong>.  <em>« <strong>A definition in later files will mask definitions in earlier files.</strong> »</em> Et <strong><code>.Last()</code></strong> <em>« is (normally) executed at the very end of the session »</em>.</p>
+<div class="rec"><h2>Active Recall</h2><details class="cor">
+<summary>Quelles sont les trois classes de symboles d'un corps de fonction, et pourquoi la distinction n'est-elle pas figée ?</summary><div class="in">
+
+<p><em>« <strong>The symbols which occur in the body of a function can be divided into three classes : formal parameters, local variables and free variables.</strong> »</em> (§10.7)</p>
+<ul>
+<li><strong>Formels</strong> : ceux de la liste d'arguments ; <em>« their values are determined by <strong>the process of binding the actual function arguments</strong> »</em>.</li>
+<li><strong>Locaux</strong> : <em>« those <strong>whose values are determined by the evaluation of expressions in the body</strong> »</em>.</li>
+<li><strong>Libres</strong> : <em>« variables which are <strong>neither</strong> formal parameters <strong>nor</strong> local variables »</em>.</li>
+</ul>
+<p class="cal piege"> <strong>La distinction n'est pas figée</strong> : <em>« <strong>Free variables become local variables if they are assigned to.</strong> »</em> Ajouter un <code>z &lt;- 0</code> n'importe où dans le corps rend <code>z</code> <strong>locale partout</strong> — y compris avant la ligne d'assignation. Le comportement change du tout au tout, sans message.</p>
+<p>Et (§4.3.4) : <em>« Because R has <strong>no formal definition of variables</strong>, they are simply used as needed, <strong>it can be difficult to determine whether a variable is local or not</strong> »</em>.</p>
+</div></details><details class="cor">
+<summary>Énoncer la règle de portée de R, et expliquer pourquoi <code>cube(2)</code> rend 8 en R et 18 en S-Plus.</summary><div class="in">
+
+<p><em>« <strong>In R the free variable bindings are resolved by first looking in the environment in which the function was created. This is called lexical scope.</strong> »</em> (§10.7)</p>
+<pre><code class="language-r">cube &lt;- function(n) {
+  sq &lt;- function() n*n
+  n*sq()
+}
+</code></pre>
+<p>*« Under <strong>static scope (S-Plus)</strong> the value is <strong>that associated with a global variable named <code>n</code></strong>. Under <strong>lexical scope (R)</strong> it is <strong>the parameter to the function <code>cube</code></strong>, since that is <strong>the active binding for the variable <code>n</code> at the time the function <code>sq</code> was defined</strong>. »*</p>
+<p><strong>En R</strong> : <code>sq()</code> voit <code>n = 2</code> → $2\times4 = \mathbf{8}$.
+<strong>En S-Plus</strong> avec <code>n &lt;- 3</code> en global : <code>sq()</code> voit <code>n = 3</code> → $9$, et <code>n*sq()</code> utilise le <code>n</code> local, $2$ → $2\times9 = \mathbf{18}$.</p>
+<p>Et sans <code>n</code> global, S-Plus <strong>échoue</strong> : <code>Error in sq(): Object "n" not found</code>.</p>
+</div></details><details class="cor">
+<summary>Quelle est la différence entre un <em>frame</em> et un <em>environment</em> ?</summary><div class="in">
+
+<p><em>« <strong>Notice the terminology : a frame is a set of variables, an environment is a nesting of frames</strong> (or equivalently : <strong>the innermost frame plus the enclosing environment</strong>). »</em> (<em>R Language Definition</em> §3.5.2)</p>
+<p>Un <strong>frame</strong> est plat : des paires symbole-valeur. Un <strong>environnement</strong> est <strong>chaîné</strong> : un frame <strong>plus un pointeur</strong> vers l'environnement englobant — l'<strong>enclos</strong>.</p>
+<p>C'est ce qui donne la chaîne de recherche du §3.5.2 : <em>« first sought in <strong>the evaluation environment</strong>, then in <strong>the enclosure</strong>, <strong>the enclosure of the enclosure</strong>, etc. »</em></p>
+<p>Le §2.1.10 (fiche 303) le disait déjà : <em>« Environments can be thought of as consisting of two things : <strong>a frame</strong> … and <strong>an enclosure</strong>, a pointer to an enclosing environment. »</em></p>
+</div></details><details class="cor">
+<summary>Qu'est-ce qu'une fermeture, et quelle est la phrase du manuel qu'il ne faut pas manquer ?</summary><div class="in">
+
+<p><em>« <strong>A closure (mode <code>"function"</code>) object will contain the environment in which it is created as part of its definition</strong> … When the function is subsequently called, <strong>its evaluation environment is created with the closure's environment as enclosure.</strong> »</em> (§3.5.2)</p>
+<p class="cal piege"> <strong>La phrase :</strong> <em>« <strong>Notice that this is not necessarily the environment of the caller!</strong> »</em></p>
+<p>Une fonction cherche ses variables libres <strong>là où elle est née</strong>, pas <strong>là où on l'appelle</strong>. C'est toute la différence entre portée lexicale et portée dynamique.</p>
+<p>Et (§2.1.5) : <em>« Functions … have <strong>three basic components : a formal argument list, a body and an environment</strong> … <strong>This combination of the code of the function and the bindings in its environment is called a "function closure"</strong> »</em>, accessibles par <strong><code>formals</code>, <code>body</code>, <code>environment</code></strong> — <em>« <strong>all three can also be used on the left hand side of assignments</strong> »</em>.</p>
+</div></details><details class="cor">
+<summary>Que fait exactement <code>&lt;&lt;-</code> ? Dans quels deux cas se comporte-t-il différemment ?</summary><div class="in">
+
+<p><em>« <strong>This operator looks back in enclosing environments for an environment that contains the symbol</strong> <code>total</code>, <strong>and when it finds such an environment it replaces the value, in that environment</strong>, with the value of right hand side. <strong>If the global or top-level environment is reached without finding the symbol then that variable is created and assigned to there.</strong> »</em> (§10.7)</p>
+<table>
+<thead>
+<tr>
+<th>Cas</th>
+<th>Effet</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Le symbole existe <strong>dans un enclos</strong></td>
+<td>la valeur y est <strong>remplacée</strong></td>
+</tr>
+<tr>
+<td>Il n'existe <strong>nulle part</strong></td>
+<td>il est <strong>créé au niveau global</strong></td>
+</tr>
+</tbody></table>
+<p class="cal piege"> <em>« <strong>For most users <code>&lt;&lt;-</code> creates a global variable</strong> … <strong>Only when <code>&lt;&lt;-</code> has been used in a function that was returned as the value of another function will the special behavior described here occur.</strong> »</em></p>
+<p>Dans une fonction ordinaire, <code>&lt;&lt;-</code> <strong>pollue l'espace de travail</strong>. Son intérêt réel est <strong>dans une fermeture</strong>.</p>
+</div></details><details class="cor">
+<summary>Expliquer comment <code>open.account</code> crée un état mutable, et pourquoi <code>&lt;-</code> ne suffirait pas.</summary><div class="in">
+
+<p><em>« <strong>Lexical scope can also be used to give functions mutable state.</strong> … <strong>We achieve this by creating the three functions within <code>account</code> and then returning a list containing them.</strong> … <strong>Because these functions are defined in an environment which contains <code>total</code>, they will have access to its value.</strong> »</em> (§10.7)</p>
+<p><strong>Le mécanisme.</strong> L'appel <code>open.account(100)</code> crée un environnement contenant <code>total</code>. Les trois fonctions y sont <strong>définies</strong>, donc le <strong>capturent</strong>. L'appel se termine, mais l'environnement <strong>survit</strong> tant que les fonctions le référencent.</p>
+<p><strong>Pourquoi pas <code>&lt;-</code>.</strong> Une assignation ordinaire est <em>« <strong>local and temporary and lost after exit</strong> »</em> (§10.5, fiche 309) : le solde reviendrait à sa valeur initiale au retrait suivant. <strong><code>&lt;&lt;-</code> écrit dans l'enclos</strong>, donc là où <code>total</code> vit réellement.</p>
+<p><strong>Deux comptes indépendants</strong> : <code>ross &lt;- open.account(100)</code> et <code>robert &lt;- open.account(200)</code> déclenchent <strong>deux appels</strong>, donc <strong>deux environnements</strong> — d'où <code>70</code> et <code>200</code> aux appels de <code>balance()</code>.</p>
+</div></details><details class="cor">
+<summary>Dans <code>withdraw</code>, pourquoi le <code>stop()</code> est-il écrit avant l'assignation ?</summary><div class="in">
+
+<pre><code class="language-r">withdraw = function(amount) {
+  if (amount &gt; total)
+    stop("You don't have that much money!\n")
+  total &lt;&lt;- total - amount
+  cat(amount, "withdrawn. Your balance is", total, "\n\n")
+}
+</code></pre>
+<p>Parce que <code>stop()</code> <strong>interrompt l'exécution</strong> : la ligne <code>total &lt;&lt;- total - amount</code> <strong>n'est jamais atteinte</strong>. Le solde reste donc <strong>intact</strong> après un <code>ross$withdraw(500)</code>.</p>
+<p>Si le garde-fou venait après, <code>total</code> serait déjà devenu négatif — et <strong><code>&lt;&lt;-</code> l'aurait écrit dans l'enclos</strong>, donc de façon <strong>permanente</strong>. L'ordre des lignes est ici <strong>une garantie d'intégrité</strong>, pas un choix de style.</p>
+<p>Même logique dans <code>deposit</code> : <code>if (amount &lt;= 0) stop("Deposits must be positive!\n")</code> précède l'écriture.</p>
+</div></details><details class="cor">
+<summary>Qu'est-ce que la portée dynamique, et quelles fonctions de R en ont besoin ?</summary><div class="in">
+
+<p><em>« <strong>Making variables defined higher up the call stack available is called dynamic scope.</strong> The binding for a variable is then determined by <strong>the most recent (in time) definition</strong> of the variable. <strong>This contradicts the default scoping rules in R, which use the bindings in the environment in which the function was defined (lexical scope).</strong> »</em> (§3.5.3)</p>
+<p><em>« <strong>Some functions, particularly those that use and manipulate model formulas, need to simulate dynamic scope by directly accessing the call stack.</strong> »</em></p>
+<p>C'est l'explication technique de <code>lm(y ~ x, data = dummy)</code> (fiche 313) : la formule doit être évaluée <strong>là où elle a été écrite</strong>, c'est-à-dire chez l'appelant.</p>
+<p>Les outils : la famille <strong><code>sys.*</code></strong> — <code>sys.call</code>, <code>sys.frame</code>, <code>sys.function</code>, <code>sys.parent</code>, <code>sys.calls</code>, <code>sys.frames</code>, <code>sys.parents</code>, <code>sys.on.exit</code>, <code>sys.status</code> — et <strong><code>parent.frame</code></strong>.</p>
+</div></details><details class="cor">
+<summary>En quoi le chemin de recherche d'un paquet à espace de noms diffère-t-il, et qu'est-ce que cela protège ?</summary><div class="in">
+
+<p><em>« <strong>Packages which have a namespace have a different search path.</strong> When a search for an R object is started from an object in such a package, <strong>the package itself is searched first, then its imports, then the base namespace and finally the global environment and the rest of the regular search path.</strong> »</em> (§3.5.4)</p>
+<p><em>« <strong>The effect is that references to other objects in the same package will be resolved to the package, and objects cannot be masked by objects of the same name in the global environment or in other packages.</strong> »</em></p>
+<p><strong>C'est la solution du problème de masquage</strong> de la fiche 306. Redéfinir <code>mean</code> dans votre espace de travail <strong>ne change rien</strong> au fonctionnement interne d'un paquet à espace de noms : il trouve <strong>son</strong> <code>mean</code> avant le vôtre.</p>
+<p>Sans espace de noms, l'ordre est celui de <code>search()</code> — et le premier trouvé gagne.</p>
+</div></details><details class="cor">
+<summary>Quelle est la séquence exacte des fichiers de démarrage, et quelle règle de priorité s'applique ?</summary><div class="in">
+
+<p>*« Thus, <strong>the sequence in which files are executed is : <code>Rprofile.site</code>, the user profile, <code>.RData</code> and then <code>.First()</code></strong>.  <strong>A definition in later files will mask definitions in earlier files.</strong> »* (§10.8)</p>
+<table>
+<thead>
+<tr>
+<th>Étape</th>
+<th>Détail</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong><code>Rprofile.site</code></strong></td>
+<td>via <strong><code>R_PROFILE</code></strong> ; sinon <code>etc/Rprofile.site</code> du répertoire d'installation</td>
+</tr>
+<tr>
+<td><strong>profil utilisateur</strong></td>
+<td><strong><code>.Rprofile</code></strong> du répertoire <strong>courant</strong>, sinon du répertoire <strong>personnel</strong> ; <strong><code>R_PROFILE_USER</code></strong> l'emporte</td>
+</tr>
+<tr>
+<td><strong><code>.RData</code></strong></td>
+<td>l'espace de travail sauvegardé</td>
+</tr>
+<tr>
+<td><strong><code>.First()</code></strong></td>
+<td><em>« <strong>automatically performed at the beginning of an R session</strong> »</em></td>
+</tr>
+</tbody></table>
+<p class="cal piege"> <strong>Le dernier chargé l'emporte</strong> : un <code>.RData</code> peut donc écraser une définition du profil de site, <strong>silencieusement</strong> — d'autant que <code>ls()</code> ne montre pas les noms commençant par un point (fiche 300).</p>
+<p><code>.Rprofile</code> <em>« gives individual users control over their workspace and <strong>allows for different startup procedures in different working directories</strong> »</em>. Et <strong><code>.Last()</code></strong> <em>« is (normally) executed at the very end of the session »</em>.</p>
+</div></details><details class="cor">
+<summary>Quelle est l'unique catégorie d'objets qui n'est pas copiée, et quelle conséquence cela a-t-il ici ?</summary><div class="in">
+
+<p><em>« Environments may be assigned to variables or be contained in other objects. <strong>However, notice that they are not standard objects — in particular, they are not copied on assignment.</strong> »</em> (§3.5.2)</p>
+<p>Et (§2.1.10, fiche 303) : <em>« <strong>if you assign the same environment to several symbols and change one, the others will change too</strong> »</em>.</p>
+<p><strong>La conséquence ici est exactement ce qui rend <code>open.account</code> possible.</strong> Les trois fermetures de <code>ross</code> <strong>partagent</strong> le même environnement — elles n'en ont pas chacune une copie. C'est pourquoi un dépôt fait par <code>deposit</code> est visible par <code>balance</code>.</p>
+<p>Si les environnements étaient copiés comme le reste (fiche 302), l'état mutable serait <strong>impossible</strong>.</p>
+</div></details><details class="cor">
+<summary>Décrire la chaîne complète de recherche d'un symbole non lié.</summary><div class="in">
+
+<p><em>« when a variable is requested inside a function, it is <strong>first sought in the evaluation environment</strong>, then in <strong>the enclosure</strong>, <strong>the enclosure of the enclosure</strong>, etc. ; once <strong>the global environment or the environment of a package</strong> is reached, the search continues <strong>up the search path</strong> to the environment of <strong>the base package</strong>. If the variable is not found there, the search will proceed next to <strong>the empty environment, and will fail</strong>. »</em> (§3.5.2)</p>
+<pre><code>environnement d'evaluation
+  -&gt; enclos  (= environnement de DEFINITION de la fonction)
+    -&gt; enclos de l'enclos ...
+      -&gt; .GlobalEnv  ou  environnement d'un paquet
+        -&gt; chemin de recherche (attaches, Autoloads)
+          -&gt; package:base
+            -&gt; environnement VIDE  -&gt; ECHEC
+</code></pre>
+<p class="cal piege"> L'<strong>enclos</strong> est l'environnement <strong>de définition</strong>, pas celui de l'appelant — c'est toute la portée lexicale.</p>
+</div></details></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h2>Flashcards</h2>
+<table>
+<thead>
+<tr>
+<th>Question</th>
+<th>Réponse</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Comment le cours qualifie-t-il le §10.7 ?</td>
+<td><em>« <strong>one of the major differences between S-Plus and R</strong> »</em></td>
+</tr>
+<tr>
+<td>Les trois classes de symboles ?</td>
+<td><strong>Formels</strong>, <strong>locaux</strong>, <strong>libres</strong></td>
+</tr>
+<tr>
+<td>Qu'est-ce qu'un paramètre formel ?</td>
+<td>Un symbole <strong>de la liste d'arguments</strong></td>
+</tr>
+<tr>
+<td>Une variable locale ?</td>
+<td>Définie <strong>par une expression du corps</strong></td>
+</tr>
+<tr>
+<td>Une variable libre ?</td>
+<td><strong>Ni formelle ni locale</strong></td>
+</tr>
+<tr>
+<td>Que devient une variable libre assignée ?</td>
+<td>Elle devient <strong>locale</strong></td>
+</tr>
+<tr>
+<td>Comment R définit-il ses variables ?</td>
+<td>Il n'a <strong>pas de définition formelle</strong> — elles s'utilisent</td>
+</tr>
+<tr>
+<td>Comment une locale se reconnaît-elle ?</td>
+<td>Par sa présence <strong>à gauche d'une assignation</strong></td>
+</tr>
+<tr>
+<td>Le nom de la règle de portée de R ?</td>
+<td>La <strong>portée lexicale</strong></td>
+</tr>
+<tr>
+<td>Où cherche-t-elle les variables libres ?</td>
+<td>Dans l'environnement <strong>de création</strong></td>
+</tr>
+<tr>
+<td>Et S-Plus ?</td>
+<td>Dans une variable <strong>globale</strong> — portée <strong>statique</strong></td>
+</tr>
+<tr>
+<td>Que vaut <code>cube(2)</code> en R ?</td>
+<td><strong>8</strong></td>
+</tr>
+<tr>
+<td>En S-Plus avec <code>n &lt;- 3</code> ?</td>
+<td><strong>18</strong></td>
+</tr>
+<tr>
+<td>Et sans <code>n</code> global en S-Plus ?</td>
+<td><strong>Une erreur</strong></td>
+</tr>
+<tr>
+<td>Qu'est-ce qu'un <em>frame</em> ?</td>
+<td><strong>Un ensemble de variables</strong></td>
+</tr>
+<tr>
+<td>Qu'est-ce qu'un <em>environment</em> ?</td>
+<td>Un <strong>emboîtement de frames</strong></td>
+</tr>
+<tr>
+<td>Autre formulation ?</td>
+<td>Frame <strong>le plus interne</strong> + <strong>enclos</strong></td>
+</tr>
+<tr>
+<td>Qu'est-ce qu'une fermeture ?</td>
+<td>Le <strong>code</strong> + son <strong>environnement de création</strong></td>
+</tr>
+<tr>
+<td>Ses trois composantes ?</td>
+<td><strong><code>formals</code></strong>, <strong><code>body</code></strong>, <strong><code>environment</code></strong></td>
+</tr>
+<tr>
+<td>Sont-elles modifiables ?</td>
+<td><strong>Oui</strong> — à gauche d'une assignation</td>
+</tr>
+<tr>
+<td>L'enclos d'un appel, c'est ?</td>
+<td>L'environnement <strong>de la fermeture</strong></td>
+</tr>
+<tr>
+<td>Est-ce celui de l'appelant ?</td>
+<td> <em>« <strong>not necessarily</strong> »</em></td>
+</tr>
+<tr>
+<td>Les environnements sont-ils copiés ?</td>
+<td><strong>Non</strong></td>
+</tr>
+<tr>
+<td>Où commence la recherche d'un symbole ?</td>
+<td>L'environnement <strong>d'évaluation</strong></td>
+</tr>
+<tr>
+<td>Puis ?</td>
+<td>L'<strong>enclos</strong>, puis l'enclos de l'enclos</td>
+</tr>
+<tr>
+<td>Puis ?</td>
+<td>Le <strong>chemin de recherche</strong> jusqu'à <code>base</code></td>
+</tr>
+<tr>
+<td>Et enfin ?</td>
+<td>L'<strong>environnement vide</strong> — <strong>échec</strong></td>
+</tr>
+<tr>
+<td>Que fait <code>&lt;&lt;-</code> s'il trouve le symbole ?</td>
+<td>Il <strong>remplace la valeur</strong> dans cet enclos</td>
+</tr>
+<tr>
+<td>S'il ne le trouve pas ?</td>
+<td>Il le <strong>crée au niveau global</strong></td>
+</tr>
+<tr>
+<td>Que fait-il pour la plupart des usages ?</td>
+<td>Il <strong>crée une variable globale</strong></td>
+</tr>
+<tr>
+<td>Quand a-t-il son comportement intéressant ?</td>
+<td>Dans une fonction <strong>renvoyée par une autre</strong></td>
+</tr>
+<tr>
+<td>À quoi sert la portée lexicale, au-delà de la portée ?</td>
+<td>À donner aux fonctions <strong>un état mutable</strong></td>
+</tr>
+<tr>
+<td>Le patron de l'état mutable ?</td>
+<td>Fabrique + fonctions internes + <strong><code>&lt;&lt;-</code></strong> + <strong>liste</strong></td>
+</tr>
+<tr>
+<td>Deux appels de la fabrique donnent ?</td>
+<td><strong>Deux états indépendants</strong></td>
+</tr>
+<tr>
+<td>Pourquoi <code>stop()</code> avant l'assignation ?</td>
+<td>Pour que l'état <strong>ne soit pas modifié</strong></td>
+</tr>
+<tr>
+<td>Qu'est-ce que la portée dynamique ?</td>
+<td>Chercher <strong>plus haut dans la pile d'appels</strong></td>
+</tr>
+<tr>
+<td>Qu'est-ce qui détermine la liaison ?</td>
+<td>La définition <strong>la plus récente dans le temps</strong></td>
+</tr>
+<tr>
+<td>Qui en a besoin en R ?</td>
+<td>Les fonctions de <strong>formules de modèle</strong></td>
+</tr>
+<tr>
+<td>Comment y accède-t-on ?</td>
+<td>La famille <strong><code>sys.*</code></strong> et <strong><code>parent.frame</code></strong></td>
+</tr>
+<tr>
+<td>Que rend <code>sys.call</code> ?</td>
+<td><strong>L'appel</strong> du contexte indiqué</td>
+</tr>
+<tr>
+<td>Que rend <code>sys.parent</code> ?</td>
+<td>Le <strong>parent</strong> de l'invocation courante</td>
+</tr>
+<tr>
+<td>Que fait <code>sys.on.exit</code> ?</td>
+<td>Pose une fonction à exécuter <strong>à la sortie du contexte</strong></td>
+</tr>
+<tr>
+<td>Qu'est-ce que l'environnement global ?</td>
+<td>La <strong>racine de l'espace de travail</strong></td>
+</tr>
+<tr>
+<td>Où va un objet assigné en ligne de commande ?</td>
+<td>Dans l'<strong>environnement global</strong></td>
+</tr>
+<tr>
+<td>Premier élément du chemin de recherche ?</td>
+<td><strong><code>.GlobalEnv</code></strong></td>
+</tr>
+<tr>
+<td>Dernier ?</td>
+<td>Le paquet <strong><code>base</code></strong></td>
+</tr>
+<tr>
+<td>À quoi sert <code>Autoloads</code> ?</td>
+<td>Aux objets <strong>chargés à la demande</strong></td>
+</tr>
+<tr>
+<td>Comment insère-t-on un environnement ?</td>
+<td><strong><code>attach</code></strong> ou <strong><code>library</code></strong></td>
+</tr>
+<tr>
+<td>L'ordre de recherche dans un paquet à espace de noms ?</td>
+<td>Le paquet, ses <strong>imports</strong>, <code>base</code>, puis le global</td>
+</tr>
+<tr>
+<td>Que cela empêche-t-il ?</td>
+<td>Le <strong>masquage</strong> par un objet de même nom</td>
+</tr>
+<tr>
+<td>Les trois moyens de personnaliser l'environnement ?</td>
+<td>Fichier de <strong>site</strong>, fichier <strong>par répertoire</strong>, <strong><code>.First</code>/<code>.Last</code></strong></td>
+</tr>
+<tr>
+<td>Où est le fichier de site ?</td>
+<td><strong><code>R_PROFILE</code></strong>, sinon <strong><code>etc/Rprofile.site</code></strong></td>
+</tr>
+<tr>
+<td>Où est le profil personnel ?</td>
+<td><strong><code>.Rprofile</code></strong> — courant, puis personnel</td>
+</tr>
+<tr>
+<td>Quelle variable l'emporte sur lui ?</td>
+<td><strong><code>R_PROFILE_USER</code></strong></td>
+</tr>
+<tr>
+<td>L'ordre d'exécution ?</td>
+<td><code>Rprofile.site</code> → profil utilisateur → <code>.RData</code> → <code>.First()</code></td>
+</tr>
+<tr>
+<td>Quelle règle de priorité ?</td>
+<td><em>« <strong>later files will mask</strong> definitions in earlier files »</em></td>
+</tr>
+<tr>
+<td>Quand <code>.Last()</code> est-elle exécutée ?</td>
+<td><strong>À la toute fin</strong> de la session</td>
+</tr>
+<tr>
+<td>D'où <code>.First()</code> peut-elle venir ?</td>
+<td>Des profils <strong>ou de <code>.RData</code></strong></td>
+</tr>
+</tbody></table>
+</main>
+
+
+
+
+</body></html>

@@ -1,0 +1,1955 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fiche 403 — Décompositions matricielles : déterminant, valeurs propres, Cholesky, SVD</title>
+<script>
+window.MathJax={tex:{inlineMath:[["$","$"]],displayMath:[["$$","$$"]],processEscapes:true},
+ options:{skipHtmlTags:["script","noscript","style","textarea","pre","code"]},
+ svg:{fontCache:"global"},
+ startup:{pageReady:()=>MathJax.startup.defaultPageReady().then(()=>{document.body.classList.add("ready")})}};
+setTimeout(function(){document.body.classList.add("ready")},2500);
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+/* ============================================================
+   MathiasLearn — feuille de style des fiches
+   Reprise intégrale des tokens de 00_PARCOURS/*.html
+   + blocs pédagogiques (callouts, méthode, essentiels, recall)
+   ============================================================ */
+:root{--bg:#faf9f7;--card:#fff;--ink:#1a1a1a;--muted:#6b6b6b;--line:#e5e2dd;--accent:#8b5e34;
+ --hl:#fdf8ef;--ok:#2d7d4f;--okbg:#f0f7f3;--warn:#b3402f;--warnbg:#fdf3f1;--blue:#2f5d8b;--bluebg:#f1f5fa}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+ font:17px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;padding:0 16px 100px}
+.nav{position:sticky;top:0;background:rgba(250,249,247,.96);backdrop-filter:blur(8px);
+ border-bottom:1px solid var(--line);margin:0 -16px 30px;padding:11px 16px;z-index:50;
+ display:flex;gap:6px;flex-wrap:wrap;font-size:13px}
+.nav a{color:var(--muted);text-decoration:none;padding:4px 9px;border-radius:5px;white-space:nowrap}
+.nav a:hover{background:var(--line);color:var(--ink)}
+.nav a.on{background:var(--accent);color:#fff}
+main{max-width:780px;margin:0 auto}
+h1{font-size:31px;letter-spacing:-.02em;margin:.4em 0 .5em;line-height:1.25}
+h2{font-size:23px;margin:2.2em 0 .7em;padding-bottom:.3em;border-bottom:1px solid var(--line)}
+h3{font-size:19px;margin:1.9em 0 .5em;color:var(--accent)}
+h4{font-size:17px;margin:1.5em 0 .4em}
+p{margin:.8em 0} a{color:var(--accent)} hr{border:0;border-top:1px solid var(--line);margin:2.6em 0}
+table{border-collapse:collapse;width:100%;margin:1.3em 0;font-size:15.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+th{background:#f3f0eb;font-weight:600}
+tr:nth-child(even) td{background:#fcfbfa}
+code{font-family:"SF Mono",Menlo,Consolas,monospace;font-size:.88em;background:#f2efea;padding:2px 6px;border-radius:4px;overflow-wrap:break-word}
+pre{background:#f2efea;padding:14px 16px;border-radius:8px;overflow-x:auto}
+pre code{background:none;padding:0;white-space:pre}
+blockquote{border-left:3px solid var(--accent);background:var(--hl);margin:1.4em 0;padding:14px 20px;border-radius:0 8px 8px 0}
+blockquote p:first-child{margin-top:0} blockquote p:last-child{margin-bottom:0}
+ul,ol{padding-left:1.5em} li{margin:.35em 0} em{color:#4a4a4a}
+mjx-container[display="true"]{margin:1.1em 0!important;overflow-x:auto;overflow-y:hidden;padding:2px 0}
+mjx-container svg{max-width:100%}
+body:not(.ready) main{opacity:0} main{opacity:1;transition:opacity .25s}
+
+/* --- bandeau de tête de fiche --- */
+.cours{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--accent);
+ border-radius:0 10px 10px 0;padding:18px 22px;margin:0 0 34px}
+.cours h4{margin:0 0 4px;font-size:14px;text-transform:uppercase;letter-spacing:.07em;color:var(--accent)}
+.cours .cs{color:var(--muted);font-size:14.5px;margin:0 0 14px}
+
+/* --- exercices / corrigés --- */
+.ex{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:6px 24px 20px;margin:18px 0}
+.ex>h3:first-child{margin-top:14px}
+details.cor{margin-top:18px;border:1px solid var(--line);border-radius:8px;background:#fcfbfa;overflow:hidden}
+details.cor>summary{cursor:pointer;padding:12px 16px;font-weight:600;font-size:15px;color:var(--accent);
+ list-style:none;display:flex;align-items:center;gap:9px;user-select:none;transition:.15s;min-height:44px}
+details.cor>summary::-webkit-details-marker{display:none}
+details.cor>summary:hover{background:var(--hl)}
+details.cor>summary::before{content:"\25B6";font-size:10px;transition:transform .18s;display:inline-block}
+details.cor[open]>summary::before{transform:rotate(90deg)}
+details.cor[open]>summary{background:var(--okbg);color:var(--ok);border-bottom:1px solid var(--line)}
+.cor .in{padding:4px 20px 16px}
+.cor .in>*:first-child{margin-top:.9em}
+
+/* --- blocs pédagogiques (callouts) ---
+   Générés depuis une citation Markdown dont le premier **gras** commence
+   par un mot-clé : DÉFINITION, THÉORÈME, MÉTHODE, PIÈGE, INTUITION… */
+.cal{border:1px solid var(--line);border-left:4px solid var(--accent);background:var(--card);
+ border-radius:0 10px 10px 0;padding:15px 20px;margin:1.5em 0}
+.cal>p:first-child{margin-top:0}.cal>p:last-child,.cal>ul:last-child,.cal>ol:last-child{margin-bottom:0}
+.cal .lab{display:block;font-size:12.5px;text-transform:uppercase;letter-spacing:.08em;
+ font-weight:700;color:var(--accent);margin-bottom:6px}
+.cal.formel{background:var(--hl)}
+.cal.piege{border-left-color:var(--warn);background:var(--warnbg)}
+.cal.piege .lab{color:var(--warn)}
+.cal.methode{border-left-color:var(--ok);background:var(--okbg)}
+.cal.methode .lab{color:var(--ok)}
+.cal.intu{border-left-color:var(--blue);background:var(--bluebg)}
+.cal.intu .lab{color:var(--blue)}
+.cal.plus{border-left-style:dashed;background:#faf9f7}
+.cal.plus .lab{color:var(--muted)}
+
+/* --- révision express --- */
+.ess{background:var(--card);border:1px solid var(--accent);border-radius:10px;padding:4px 24px 20px;margin:1.6em 0}
+.ess h3{margin-top:1.3em}
+.rec{background:var(--card);border:1px dashed var(--accent);border-radius:10px;padding:4px 24px 18px;margin:1.6em 0}
+.rec ol{counter-reset:none}
+
+/* --- impression / PDF --- */
+@media print{
+ .nav{display:none}
+ body{padding:0;background:#fff;font-size:11.2pt;line-height:1.55}
+ main{max-width:none}
+ h1{font-size:23pt}h2{font-size:15pt;margin-top:1.5em}h3{font-size:12.6pt}
+ h2,h3,h4{break-after:avoid;page-break-after:avoid}
+ table,.cal,blockquote{break-inside:avoid;page-break-inside:avoid}
+ table{display:table;font-size:9.6pt}
+ details.cor{border:1px solid var(--line);background:#fcfbfa}
+ details.cor>summary{display:none}
+ details.cor .in{padding-top:10px}
+ .cal,.ex,.ess,.rec{box-shadow:none}
+ a{color:var(--ink);text-decoration:none}
+}
+@page{margin:16mm 15mm 18mm}
+
+/* --- exemples travaillés --- */
+.exm{background:#fcfbfa;border:1px solid var(--line);border-radius:10px;padding:2px 20px 14px;margin:1.5em 0}
+.exm>h4:first-child{margin:14px 0 .5em;color:var(--accent);font-size:13px;text-transform:uppercase;letter-spacing:.07em}
+
+
+/* --- pastilles de priorité (conventions des fiches de l'app) --- */
+h2[data-prio], h3[data-prio], h4[data-prio]{position:relative}
+h2[data-prio]::before,h3[data-prio]::before,h4[data-prio]::before{
+ content:"";display:inline-block;width:9px;height:9px;border-radius:50%;
+ margin-right:9px;vertical-align:middle;background:var(--muted)}
+[data-prio="must"]::before{background:var(--warn)}
+[data-prio="high"]::before{background:#d98324}
+[data-prio="mid"]::before{background:#c9a227}
+[data-prio="low"]::before{background:var(--ok)}
+/* corrigés des fiches de l'app : même traitement que les corrigés des séries */
+details.cor>summary::after{content:""}
+</style></head><body>
+<div class="nav"><a href="00_COMMENCER_ICI.html">Commencer ici</a><a href="01_NOTATIONS_le-decodeur.html">Notations</a><a href="02_EXERCICES_Serie-0.html">Série 0 — Remise en route</a><a href="03_EXERCICES_Serie-1.html">Série 1 — Convexité</a><a href="04_EXERCICES_Serie-2.html">Série 2 — KKT</a><a href="05_AUTO-EVALUATION.html">Auto-évaluation (quiz)</a><a href="06_FICHE_Optimisation-deux-variables.html">Fiche — Optimisation à 2 variables</a></div>
+<main><h1>Fiche 403 — Décompositions matricielles : déterminant, valeurs propres, Cholesky, SVD</h1>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Matière</strong></td>
+<td>Maths · Apprentissage automatique</td>
+</tr>
+<tr>
+<td><strong>Cours source</strong></td>
+<td>Deisenroth, Faisal &amp; Ong, <em>Mathematics for Machine Learning</em>, Cambridge University Press — chapitre 4 « Matrix Decompositions » (p. 97-140)</td>
+</tr>
+<tr>
+<td><strong>Difficulté</strong></td>
+<td> Avancé — le chapitre le plus outillé de la partie I</td>
+</tr>
+<tr>
+<td><strong>Temps d'étude estimé</strong></td>
+<td>150 min</td>
+</tr>
+<tr>
+<td><strong>Prérequis</strong></td>
+<td>Fiche 401 (algèbre linéaire) · Fiche 402 (matrices symétriques définies positives, matrices orthogonales, Gram-Schmidt)</td>
+</tr>
+<tr>
+<td><strong>Concepts clés</strong></td>
+<td>Déterminant, règle de Sarrus, développement de Laplace, mineur, cofacteur, matrice triangulaire, volume signé, trace, polynôme caractéristique, valeur propre, vecteur propre, espace propre, spectre, multiplicité algébrique, multiplicité géométrique, matrice défective, théorème spectral, décomposition de Cholesky, facteur de Cholesky, matrice diagonalisable, décomposition en valeurs propres, SVD, valeurs singulières, vecteurs singuliers gauches et droits, SVD réduite et tronquée, approximation de rang $k$, norme spectrale, théorème d'Eckart-Young, phylogénie des matrices</td>
+</tr>
+<tr>
+<td><strong>Poids à l'examen</strong></td>
+<td>$\det(A)\neq0\iff\operatorname{rk}(A)=n\iff A$ <strong>inversible</strong> · le <strong>développement de Laplace</strong> · $p_A(\lambda)=\det(A-\lambda I)$ · $\det A=\prod\lambda_i$ et $\operatorname{tr}A=\sum\lambda_i$ · le <strong>théorème spectral</strong> · $A=PDP^{-1}$ · $A=U\Sigma V^\top$ (existe <strong>toujours</strong>) · $A^{(k)}=\sum_{i=1}^k\sigma_iu_iv_i^\top$ et <strong>Eckart-Young</strong>.</td>
+</tr>
+</tbody></table>
+<h2>Vue d'ensemble</h2>
+<pre><code>LE FIL DU CHAPITRE : caractériser une matrice, puis la FACTORISER
+
+  §4.1 DÉTERMINANT &amp; TRACE
+        det : matrices CARRÉES seulement · VOLUME SIGNÉ du parallélépipède des colonnes
+        det(A) ≠ 0 ⟺ rk(A) = n ⟺ A inversible                        (Th. 4.1 / 4.3)
+        Sarrus (3×3) · LAPLACE (récursif) · triangulaire → produit des diagonaux
+        tr(A) = Σ aii  ·  tr(AB) = tr(BA)  ·  INVARIANTE par changement de base
+        POLYNÔME CARACTÉRISTIQUE  pA(λ) := det(A − λI)   c0 = det A , cn−1 = (−1)^(n−1) tr A
+  §4.2 VALEURS ET VECTEURS PROPRES        Ax = λx  ,  x ≠ 0
+        λ vp ⟺ racine de pA ⟺ rk(A − λI) &lt; n ⟺ det(A − λI) = 0
+        Eλ = ker(A − λI)   ·   mult. GÉOMÉTRIQUE ≤ mult. ALGÉBRIQUE
+        DÉFECTIVE = moins de n vecteurs propres indépendants
+        THÉORÈME SPECTRAL : A symétrique ⟹ ONB de vecteurs propres, vp RÉELLES
+        det A = Π λi        tr A = Σ λi
+  §4.3 CHOLESKY            A sym. déf. pos.  ⟹  A = LLᵀ , L triangulaire inf., diag &gt; 0
+  §4.4 EIGENDECOMPOSITION  A = P D P⁻¹   ⟺  les vecteurs propres forment une BASE
+        A symétrique ⟹ TOUJOURS diagonalisable, et P orthogonale : A = P D Pᵀ
+        A^k = P D^k P⁻¹        det A = Π dii
+  §4.5 SVD                 A = U Σ Vᵀ    ⚠️ EXISTE POUR TOUTE MATRICE m×n
+        vi = vecteurs propres de AᵀA  ·  ui = vecteurs propres de AAᵀ  ·  σi = √λi
+        ÉQUATION SINGULIÈRE  A vi = σi ui
+  §4.6 APPROXIMATION       A = Σ σi ui viᵀ   →   A(k) = Σ_{i≤k} σi ui viᵀ
+        ‖A‖2 = σ1 (norme spectrale) · ECKART-YOUNG : ‖A − A(k)‖2 = σ_{k+1}, et c'est le MINIMUM
+  §4.7 PHYLOGÉNIE          non carrée → SVD ; carrée → det → régulière → normale → orthogonale
+                           symétrique → déf. positive → Cholesky ; diagonale → identité
+
+LES DEUX FACTORISATIONS EN UN COUP D'ŒIL
+  EIGEN  A = P D P⁻¹   carrée · non défective · P pas forcément orthogonale · D peut être complexe
+  SVD    A = U Σ Vᵀ    TOUTE matrice · U,V ORTHOGONALES · Σ réelle ≥ 0 · deux bases DIFFÉRENTES
+</code></pre>
+<blockquote>
+<p><strong>La phrase-programme du chapitre.</strong> Après les vecteurs (ch. 2) et la géométrie (ch. 3), <em>« nous regardons les caractéristiques fondamentales des matrices et des applications linéaires »</em> : trois façons de <strong>résumer</strong> une matrice (déterminant, trace, spectre) et quatre façons de la <strong>factoriser</strong> (Cholesky, eigendécomposition, SVD, approximation de rang faible).</p>
+</blockquote>
+<h2 data-prio="must">Concept 1 — Le déterminant (§4.1)</h2>
+<h3>1.1 Ce que c'est</h3>
+<blockquote>
+<p><strong>Le déterminant</strong> d'une matrice <strong>carrée</strong> $A\in\mathbb R^{n\times n}$ est une fonction qui envoie $A$ sur un <strong>nombre réel</strong>. On le note $\det(A)$ ou $|A|$.</p>
+</blockquote>
+<blockquote>
+<p class="cal piege"> <strong>Deux restrictions immédiates.</strong> (i) <em>« Les déterminants ne sont définis QUE pour les matrices carrées »</em> ; (ii) <em>« la notation $|A|$ ne doit pas être confondue avec la valeur absolue. »</em></p>
+</blockquote>
+<p><strong>Exemple 4.1 — le déterminant naît du test d'inversibilité.</strong></p>
+<table>
+<thead>
+<tr>
+<th>Taille</th>
+<th>Inverse</th>
+<th>Condition</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$1\times1$</td>
+<td>$A=a\Rightarrow A^{-1}=\tfrac1a$</td>
+<td>$a\neq0$</td>
+</tr>
+<tr>
+<td>$2\times2$</td>
+<td>$A^{-1}=\dfrac{1}{a_{11}a_{22}-a_{12}a_{21}}\begin{bmatrix}a_{22}&amp;-a_{12}\\-a_{21}&amp;a_{11}\end{bmatrix}$</td>
+<td>$a_{11}a_{22}-a_{12}a_{21}\neq0$</td>
+</tr>
+</tbody></table>
+<div class="cal formel"><span class="lab">Théorème 4.1.</span>
+<p> Pour toute matrice carrée $A\in\mathbb R^{n\times n}$ : $A$ est <strong>inversible si et seulement si $\det(A)\neq0$</strong>.</p>
+</div>
+<h3>1.2 Les formules explicites</h3>
+<p><strong>$n=1$ :</strong> $\det(A)=a_{11}$.</p>
+<p><strong>$n=2$ :</strong></p>
+<p>$$\boxed{\;\begin{vmatrix}a_{11}&amp;a_{12}\\a_{21}&amp;a_{22}\end{vmatrix}=a_{11}a_{22}-a_{12}a_{21}\;}$$</p>
+<p><strong>$n=3$ — la règle de Sarrus :</strong></p>
+<p>$$\boxed{\;\begin{aligned}\begin{vmatrix}a_{11}&amp;a_{12}&amp;a_{13}\\a_{21}&amp;a_{22}&amp;a_{23}\\a_{31}&amp;a_{32}&amp;a_{33}\end{vmatrix}&amp;=a_{11}a_{22}a_{33}+a_{21}a_{32}a_{13}+a_{31}a_{12}a_{23}\\&amp;\quad-a_{31}a_{22}a_{13}-a_{11}a_{32}a_{23}-a_{21}a_{12}a_{33}\end{aligned}\;}$$</p>
+<p><strong>Matrices triangulaires.</strong> $T$ est <strong>triangulaire supérieure</strong> si $T_{ij}=0$ pour $i&gt;j$ (zéros <strong>sous</strong> la diagonale) ; <strong>triangulaire inférieure</strong> si les zéros sont <strong>au-dessus</strong>. Dans les deux cas :</p>
+<p>$$\boxed{\;\det(T)=\prod_{i=1}^{n}T_{ii}\;}$$</p>
+<blockquote>
+<p class="cal piege"> La règle de Sarrus <strong>ne se généralise PAS</strong> au-delà de $3\times3$. Pour $n&gt;3$ il faut Laplace ou Gauss.</p>
+</blockquote>
+<h3>1.3 Le déterminant comme volume signé — Exemple 4.2</h3>
+<blockquote>
+<p> <strong>L'intuition centrale.</strong> <em>« Le déterminant $\det(A)$ est le <strong>VOLUME SIGNÉ</strong> d'un parallélépipède de dimension $n$ formé par les COLONNES de la matrice $A$. »</em></p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>Dimension</th>
+<th>Objet</th>
+<th>Quantité</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$n=2$</td>
+<td><strong>Parallélogramme</strong> de sommets $0,b,g,b+g$</td>
+<td>$|\det[b,g]|$ = son <strong>aire</strong></td>
+</tr>
+<tr>
+<td>$n=3$</td>
+<td><strong>Parallélépipède</strong> d'arêtes $r,b,g$</td>
+<td>$|\det[r,b,g]|$ = son <strong>volume</strong></td>
+</tr>
+</tbody></table>
+<p><strong>Les faits à retenir :</strong></p>
+<ul>
+<li>Quand l'angle entre les vecteurs <strong>diminue</strong>, l'aire <strong>diminue</strong> aussi.</li>
+<li>Si $b,g$ sont <strong>linéairement dépendants</strong> ($b=\lambda g$), ils ne forment plus un parallélogramme de dimension 2 : <strong>l'aire vaut $0$</strong>.</li>
+<li>Si $b=[b,0]^\top$ et $g=[0,g]^\top$ (multiples de la base canonique), $\det=bg-0=bg$ — la formule familière <strong>aire $=$ hauteur $\times$ longueur</strong>.</li>
+<li><strong>Le SIGNE indique l'ORIENTATION</strong> des vecteurs générateurs relativement à la base canonique. Échanger l'ordre en $g,b$ échange les colonnes et <strong>renverse l'orientation</strong>.</li>
+</ul>
+<p><strong>Le calcul numérique.</strong> Avec</p>
+<p>$$r=\begin{bmatrix}2\\0\\-8\end{bmatrix},\quad g=\begin{bmatrix}6\\1\\0\end{bmatrix},\quad b=\begin{bmatrix}1\\4\\-1\end{bmatrix}\qquad A=[r,g,b]=\begin{bmatrix}2&amp;6&amp;1\\0&amp;1&amp;4\\-8&amp;0&amp;-1\end{bmatrix}$$</p>
+<p>$$\boxed{\;V=|\det(A)|=186\;}$$</p>
+<details class="cor">
+<summary> Recalcul par développement sur la première ligne</summary><div class="in">
+
+<p>$\det A=2(1\cdot(-1)-4\cdot0)-6(0\cdot(-1)-4\cdot(-8))+1(0\cdot0-1\cdot(-8))$
+$=2(-1)-6(0+32)+1(8)=-2-192+8=-186$</p>
+<p>Donc $|\det A|=186$  Le <strong>signe négatif</strong> indique que $(r,g,b)$ a l'orientation <strong>opposée</strong> à la base canonique.</p>
+</div></details>
+
+<h3>1.4 Le développement de Laplace</h3>
+<div class="cal formel"><span class="lab">Théorème 4.2 (Développement de Laplace).</span>
+<p> Pour $A\in\mathbb R^{n\times n}$ et tout $j=1,\dots,n$ :
+<strong>1. Développement selon la COLONNE $j$</strong>
+$$\det(A)=\sum_{k=1}^{n}(-1)^{k+j}a_{kj}\det(A_{k,j})$$
+<strong>2. Développement selon la LIGNE $j$</strong>
+$$\det(A)=\sum_{k=1}^{n}(-1)^{k+j}a_{jk}\det(A_{j,k})$$
+Ici $A_{k,j}\in\mathbb R^{(n-1)\times(n-1)}$ est la <strong>sous-matrice</strong> obtenue en <strong>supprimant la ligne $k$ et la colonne $j$</strong>.</p>
+</div>
+<p><strong>Vocabulaire :</strong> $\det(A_{k,j})$ est un <strong>MINEUR</strong> ; $(-1)^{k+j}\det(A_{k,j})$ est un <strong>COFACTEUR</strong>.</p>
+<blockquote>
+<p> <strong>La puissance du théorème.</strong> Il <strong>réduit</strong> le calcul d'un déterminant $n\times n$ à des déterminants $(n-1)\times(n-1)$. En l'appliquant <strong>récursivement</strong>, on descend jusqu'à des déterminants $2\times2$.</p>
+</blockquote>
+<p><strong>Exemple 4.3.</strong> Pour</p>
+<p>$$A=\begin{bmatrix}1&amp;2&amp;3\\3&amp;1&amp;2\\0&amp;0&amp;1\end{bmatrix}$$</p>
+<p>Développement selon la <strong>première ligne</strong> :</p>
+<p>$$\det(A)=(-1)^{1+1}\cdot1\begin{vmatrix}1&amp;2\\0&amp;1\end{vmatrix}+(-1)^{1+2}\cdot2\begin{vmatrix}3&amp;2\\0&amp;1\end{vmatrix}+(-1)^{1+3}\cdot3\begin{vmatrix}3&amp;1\\0&amp;0\end{vmatrix}$$</p>
+<p>$$=1(1-0)-2(3-0)+3(0-0)=1-6+0=-5$$</p>
+<p><strong>Contrôle par Sarrus :</strong></p>
+<p>$$\det(A)=1\cdot1\cdot1+3\cdot0\cdot3+0\cdot2\cdot2-0\cdot1\cdot3-1\cdot0\cdot2-3\cdot2\cdot1=1-6=-5\quad\text{}$$</p>
+<details class="cor">
+<summary> Les deux calculs recalculés indépendamment</summary><div class="in">
+
+<p>Laplace : $1\cdot(1\cdot1-2\cdot0)-2\cdot(3\cdot1-2\cdot0)+3\cdot(3\cdot0-1\cdot0)=1-6+0=\mathbf{-5}$ </p>
+<p>Sarrus : $1+0+0-0-0-6=\mathbf{-5}$  Les deux méthodes concordent.</p>
+</div></details>
+
+<h3>1.5 Les sept propriétés du déterminant</h3>
+<table>
+<thead>
+<tr>
+<th>Propriété</th>
+<th>Énoncé</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Produit</strong></td>
+<td>$\det(AB)=\det(A)\det(B)$</td>
+</tr>
+<tr>
+<td><strong>Transposition</strong></td>
+<td>$\det(A)=\det(A^\top)$ — le déterminant est <strong>invariant par transposition</strong></td>
+</tr>
+<tr>
+<td><strong>Inverse</strong></td>
+<td>Si $A$ est régulière, $\det(A^{-1})=\dfrac{1}{\det(A)}$</td>
+</tr>
+<tr>
+<td><strong>Similitude</strong></td>
+<td>Des matrices <strong>semblables</strong> ont le <strong>même déterminant</strong>.  Conséquence : pour une application linéaire $\Phi:V\to V$, <strong>toutes</strong> les matrices de transformation $A_\Phi$ ont le <strong>même déterminant</strong> — le déterminant est <strong>invariant par changement de base</strong></td>
+</tr>
+<tr>
+<td><strong>Combinaison</strong></td>
+<td>Ajouter un multiple d'une colonne/ligne à une autre <strong>ne change pas</strong> $\det(A)$</td>
+</tr>
+<tr>
+<td><strong>Mise à l'échelle</strong></td>
+<td>Multiplier une colonne/ligne par $\lambda$ multiplie $\det(A)$ par $\lambda$. En particulier $\boxed{\det(\lambda A)=\lambda^n\det(A)}$</td>
+</tr>
+<tr>
+<td><strong>Échange</strong></td>
+<td>Échanger deux lignes/colonnes <strong>change le SIGNE</strong> de $\det(A)$</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p> <strong>La conséquence pratique des trois dernières.</strong> <em>« On peut utiliser l'élimination de Gauss pour calculer $\det(A)$ en amenant $A$ en forme échelonnée. On peut s'arrêter quand $A$ est <strong>triangulaire</strong>, et le déterminant est alors le produit des éléments diagonaux. »</em></p>
+</blockquote>
+<div class="cal formel"><span class="lab">Théorème 4.3.</span>
+<p> $A\in\mathbb R^{n\times n}$ a $\det(A)\neq0$ <strong>si et seulement si</strong> $\operatorname{rk}(A)=n$. Autrement dit, <strong>$A$ est inversible si et seulement si elle est de RANG PLEIN</strong>.</p>
+</div>
+<blockquote>
+<p class="cal piege"> <strong>La mise en perspective du livre.</strong> <em>« Quand les mathématiques se faisaient surtout à la main, le calcul du déterminant était une façon essentielle d'analyser l'inversibilité. Mais les approches contemporaines en apprentissage automatique utilisent des <strong>méthodes numériques directes</strong> qui ont supplanté le calcul explicite du déterminant. »</em> L'intérêt du déterminant est donc <strong>théorique</strong> — surtout via le <strong>polynôme caractéristique</strong>.</p>
+</blockquote>
+<h2 data-prio="must">Concept 2 — Trace et polynôme caractéristique</h2>
+<h3>2.1 La trace</h3>
+<div class="cal formel"><span class="lab">Définition 4.4 (Trace).</span>
+<p> Pour $A\in\mathbb R^{n\times n}$ :
+$$\boxed{\;\operatorname{tr}(A):=\sum_{i=1}^{n}a_{ii}\;}$$
+C'est la <strong>somme des éléments diagonaux</strong>.</p>
+</div>
+<p><strong>Les quatre propriétés :</strong></p>
+<p>$$\operatorname{tr}(A+B)=\operatorname{tr}(A)+\operatorname{tr}(B),\qquad A,B\in\mathbb R^{n\times n}$$
+$$\operatorname{tr}(\alpha A)=\alpha\operatorname{tr}(A),\qquad\alpha\in\mathbb R$$
+$$\operatorname{tr}(I_n)=n$$
+$$\boxed{\;\operatorname{tr}(AB)=\operatorname{tr}(BA)\quad\text{pour } A\in\mathbb R^{n\times k},\ B\in\mathbb R^{k\times n}\;}$$</p>
+<blockquote>
+<p> <strong>Un fait remarquable.</strong> <em>« On peut montrer qu'une <strong>SEULE</strong> fonction satisfait ces quatre propriétés ensemble — la trace. »</em></p>
+</blockquote>
+<p><strong>L'invariance cyclique</strong>, plus générale :</p>
+<p>$$\boxed{\;\operatorname{tr}(AKL)=\operatorname{tr}(KLA)\;}$$</p>
+<p>pour $A\in\mathbb R^{a\times k}$, $K\in\mathbb R^{k\times l}$, $L\in\mathbb R^{l\times a}$ — et cela s'étend à un <strong>nombre arbitraire</strong> de matrices. Cas particulier, pour $x,y\in\mathbb R^n$ :</p>
+<p>$$\operatorname{tr}(xy^\top)=\operatorname{tr}(y^\top x)=y^\top x\in\mathbb R$$</p>
+<p><strong>L'invariance par changement de base.</strong> Si $B=S^{-1}AS$ (changement de base, §2.7.2) :</p>
+<p>$$\operatorname{tr}(B)=\operatorname{tr}(S^{-1}AS)=\operatorname{tr}(ASS^{-1})=\operatorname{tr}(A)$$</p>
+<blockquote>
+<p> <em>« Alors que les représentations matricielles d'applications linéaires <strong>dépendent de la base</strong>, la TRACE d'une application linéaire $\Phi$ est <strong>INDÉPENDANTE de la base</strong>. »</em> Comme le déterminant et le spectre.</p>
+</blockquote>
+<h3>2.2 Le polynôme caractéristique</h3>
+<div class="cal formel"><span class="lab">Définition 4.5 (Polynôme caractéristique).</span>
+<p> Pour $\lambda\in\mathbb R$ et $A\in\mathbb R^{n\times n}$ :
+$$\boxed{\;p_A(\lambda):=\det(A-\lambda I)=c_0+c_1\lambda+c_2\lambda^2+\dots+c_{n-1}\lambda^{n-1}+(-1)^n\lambda^n\;}$$
+avec $c_0,\dots,c_{n-1}\in\mathbb R$. En particulier :
+$$\boxed{\;c_0=\det(A)\qquad\qquad c_{n-1}=(-1)^{n-1}\operatorname{tr}(A)\;}$$</p>
+</div>
+<blockquote>
+<p class="cal piege"> <strong>Le coefficient dominant est $(-1)^n$</strong>, pas $1$ : le polynôme caractéristique n'est <strong>pas unitaire</strong> avec cette convention.</p>
+</blockquote>
+<h2 data-prio="must">Concept 3 — Valeurs propres et vecteurs propres (§4.2)</h2>
+<h3>3.1 Définitions</h3>
+<div class="cal formel"><span class="lab">Définition 4.6.</span>
+<p> Soit $A\in\mathbb R^{n\times n}$ carrée. Alors $\lambda\in\mathbb R$ est une <strong>VALEUR PROPRE</strong> de $A$ et $x\in\mathbb R^n\setminus\{0\}$ le <strong>VECTEUR PROPRE</strong> correspondant si
+$$\boxed{\;Ax=\lambda x\;}$$
+C'est l'<strong>équation aux valeurs propres</strong>.</p>
+</div>
+<p><em>« <strong>Eigen</strong> est un mot allemand signifiant « caractéristique », « propre » ou « à soi ». »</em></p>
+<blockquote>
+<p class="cal piege"> <strong>$x\neq0$ est obligatoire</strong> : sinon $A\cdot0=\lambda\cdot0$ serait vrai pour tout $\lambda$ et la notion serait vide.</p>
+</blockquote>
+<blockquote>
+<p class="cal piege"> <strong>Sur l'ordre.</strong> <em>« Dans la littérature et les logiciels, il est souvent conventionnel de trier les valeurs propres par ordre DÉCROISSANT... Cependant les manuels et publications peuvent avoir des notions d'ordre différentes ou aucune. Nous ne présumons pas d'un ordre dans ce livre si ce n'est pas explicitement précisé. »</em></p>
+</blockquote>
+<p><strong>Les QUATRE énoncés ÉQUIVALENTS</strong> — à savoir enchaîner :</p>
+<p>$$\boxed{\;\lambda\text{ est valeur propre de }A\iff\exists x\neq0:\ (A-\lambda I_n)x=0\iff\operatorname{rk}(A-\lambda I_n)&lt;n\iff\det(A-\lambda I_n)=0\;}$$</p>
+<div class="cal formel"><span class="lab">Définition 4.7 (Colinéarité et codirection).</span>
+<p> Deux vecteurs pointant dans la <strong>même</strong> direction sont <strong>codirigés</strong>. Deux vecteurs sont <strong>colinéaires</strong> s'ils pointent dans la <strong>même OU l'opposée</strong> direction.</p>
+</div>
+<blockquote>
+<p class="cal piege"> <strong>Non-unicité des vecteurs propres.</strong> Si $x$ est vecteur propre pour $\lambda$, alors pour tout $c\in\mathbb R\setminus\{0\}$ :
+$$A(cx)=cAx=c\lambda x=\lambda(cx)$$
+Donc <strong>tous les vecteurs colinéaires à $x$ sont aussi vecteurs propres</strong> de $A$.</p>
+</blockquote>
+<div class="cal formel"><span class="lab">Théorème 4.8.</span>
+<p> $\lambda\in\mathbb R$ est une valeur propre de $A$ <strong>si et seulement si</strong> $\lambda$ est une <strong>RACINE</strong> du polynôme caractéristique $p_A(\lambda)$.</p>
+</div>
+<div class="cal formel"><span class="lab">Définition 4.9 (Multiplicité algébrique).</span>
+<p> La <strong>multiplicité algébrique</strong> de $\lambda_i$ est le <strong>nombre de fois que la racine apparaît</strong> dans le polynôme caractéristique.</p>
+</div>
+<div class="cal formel"><span class="lab">Définition 4.10 (Espace propre et spectre).</span>
+<p> L'ensemble de tous les vecteurs propres de $A$ associés à $\lambda$ <strong>engendre un sous-espace</strong> de $\mathbb R^n$, appelé l'<strong>ESPACE PROPRE</strong> de $A$ relativement à $\lambda$, noté $E_\lambda$. L'ensemble de toutes les valeurs propres est l'<strong>EIGENSPECTRE</strong> (ou simplement le <strong>spectre</strong>) de $A$.</p>
+</div>
+<p>$$\boxed{\;E_\lambda=\ker(A-\lambda I)\;}$$</p>
+<blockquote>
+<p> <strong>L'interprétation géométrique.</strong> <em>« Le vecteur propre correspondant à une valeur propre non nulle pointe dans une direction qui est <strong>ÉTIRÉE</strong> par l'application linéaire. <strong>La valeur propre est le FACTEUR d'étirement.</strong> Si la valeur propre est <strong>négative</strong>, la direction de l'étirement est <strong>RETOURNÉE</strong>. »</em></p>
+</blockquote>
+<p><strong>Exemple 4.4 — le cas de l'identité.</strong> $p_I(\lambda)=\det(I-\lambda I)=(1-\lambda)^n=0$ : <strong>une seule</strong> valeur propre $\lambda=1$, de multiplicité $n$. Comme $Ix=1\cdot x$ pour <strong>tout</strong> $x\neq0$, l'unique espace propre $E_1$ est de <strong>dimension $n$</strong>, et <strong>les $n$ vecteurs de la base canonique</strong> sont vecteurs propres de $I$.</p>
+<h3>3.2 Quatre propriétés utiles</h3>
+<ul>
+<li> <em>« $A$ et $A^\top$ possèdent <strong>les mêmes valeurs propres</strong>, mais <strong>pas nécessairement les mêmes vecteurs propres</strong>. »</em></li>
+<li>$E_\lambda=\ker(A-\lambda I)$, puisque $Ax=\lambda x\iff(A-\lambda I)x=0\iff x\in\ker(A-\lambda I)$.</li>
+<li>Des <strong>matrices semblables</strong> possèdent les <strong>mêmes valeurs propres</strong>. Donc les valeurs propres d'une application linéaire sont <strong>indépendantes du choix de la base</strong> — comme le déterminant et la trace, ce sont des <strong>paramètres caractéristiques</strong> invariants par changement de base.</li>
+<li> <strong>Les matrices symétriques définies positives ont toujours des valeurs propres RÉELLES et POSITIVES.</strong></li>
+</ul>
+<h3>3.3 Exemple 4.5 — la procédure en trois étapes</h3>
+<p>Pour</p>
+<p>$$A=\begin{bmatrix}4&amp;2\\1&amp;3\end{bmatrix}$$</p>
+<p><strong>Étape 1 — le polynôme caractéristique.</strong> Puisque $x\neq0$, le noyau de $A-\lambda I$ doit contenir plus que $0$, donc $A-\lambda I$ <strong>n'est pas inversible</strong>, donc $\det(A-\lambda I)=0$.</p>
+<p><strong>Étape 2 — les valeurs propres.</strong></p>
+<p>$$p_A(\lambda)=\det\begin{bmatrix}4-\lambda&amp;2\\1&amp;3-\lambda\end{bmatrix}=(4-\lambda)(3-\lambda)-2\cdot1=10-7\lambda+\lambda^2=(2-\lambda)(5-\lambda)$$</p>
+<p>$$\boxed{\;\lambda_1=2,\qquad\lambda_2=5\;}$$</p>
+<p><strong>Étape 3 — les vecteurs propres et espaces propres.</strong> On résout $(A-\lambda I)x=0$.</p>
+<p>Pour $\lambda=5$ :</p>
+<p>$$\begin{bmatrix}-1&amp;2\\1&amp;-2\end{bmatrix}x=0\quad\Longrightarrow\quad E_5=\operatorname{span}\left[\begin{bmatrix}2\\1\end{bmatrix}\right]$$</p>
+<p>Pour $\lambda=2$ :</p>
+<p>$$\begin{bmatrix}2&amp;2\\1&amp;1\end{bmatrix}x=0\quad\Longrightarrow\quad E_2=\operatorname{span}\left[\begin{bmatrix}1\\-1\end{bmatrix}\right]$$</p>
+<p>Les deux espaces propres sont <strong>de dimension 1</strong> (un seul vecteur de base chacun).</p>
+<details class="cor">
+<summary> Contrôle direct de l'équation aux valeurs propres</summary><div class="in">
+
+<p>$\lambda=5$ : $A[2,1]^\top=[4\cdot2+2\cdot1,\ 1\cdot2+3\cdot1]^\top=[10,5]^\top=5[2,1]^\top$ </p>
+<p>$\lambda=2$ : $A[1,-1]^\top=[4-2,\ 1-3]^\top=[2,-2]^\top=2[1,-1]^\top$ </p>
+<p>Contrôles globaux : $\det A=12-2=10=2\times5$  (Th. 4.16) ; $\operatorname{tr}A=4+3=7=2+5$  (Th. 4.17)</p>
+</div></details>
+
+<h3>3.4 Multiplicité géométrique et matrices défectives</h3>
+<div class="cal formel"><span class="lab">Définition 4.11 (Multiplicité géométrique).</span>
+<p> La <strong>multiplicité géométrique</strong> de $\lambda_i$ est le <strong>nombre de vecteurs propres linéairement indépendants</strong> associés à $\lambda_i$ — autrement dit la <strong>DIMENSION de l'espace propre</strong> $E_{\lambda_i}$.</p>
+</div>
+<blockquote>
+<p class="cal piege"> <strong>L'encadrement à connaître par cœur :</strong>
+$$\boxed{\;1\leqslant\text{multiplicité GÉOMÉTRIQUE}\leqslant\text{multiplicité ALGÉBRIQUE}\;}$$
+<em>« Elle est au moins 1 car toute valeur propre a au moins un vecteur propre associé. Elle <strong>ne peut pas excéder</strong> la multiplicité algébrique, mais elle peut être <strong>inférieure</strong>. »</em></p>
+</blockquote>
+<p><strong>Exemple 4.6 — la matrice de cisaillement.</strong></p>
+<p>$$A=\begin{bmatrix}2&amp;1\\0&amp;2\end{bmatrix}$$</p>
+<p>a <strong>deux valeurs propres répétées</strong> $\lambda_1=\lambda_2=2$, donc une multiplicité <strong>algébrique</strong> de 2. Mais elle n'a qu'<strong>un seul</strong> vecteur propre unitaire distinct $x_1=[1,0]^\top$, donc une multiplicité <strong>géométrique</strong> de <strong>1</strong>.</p>
+<p><em>(Les propriétés de préservation d'aire de ce type de cisaillement parallèle à un axe s'appellent en géométrie le <strong>principe de Cavalieri</strong> d'égalité des aires pour les parallélogrammes.)</em></p>
+<div class="cal formel"><span class="lab">Définition 4.13 (Matrice défective).</span>
+<p> $A\in\mathbb R^{n\times n}$ est <strong>DÉFECTIVE</strong> si elle possède <strong>moins de $n$ vecteurs propres linéairement indépendants</strong>.</p>
+</div>
+<p><strong>Caractérisation.</strong> Une matrice non défective ne demande pas $n$ valeurs propres <strong>distinctes</strong>, mais que les vecteurs propres forment une <strong>base</strong> de $\mathbb R^n$. Pour une matrice défective, <strong>la somme des dimensions des espaces propres est $&lt;n$</strong> : il existe au moins une $\lambda_i$ de multiplicité algébrique $m&gt;1$ et de multiplicité géométrique $&lt;m$.</p>
+<div class="cal formel"><span class="lab">Théorème 4.12.</span>
+<p> Les vecteurs propres $x_1,\dots,x_n$ d'une matrice $A\in\mathbb R^{n\times n}$ ayant <strong>$n$ valeurs propres DISTINCTES</strong> sont <strong>linéairement indépendants</strong>. Ils forment donc une base de $\mathbb R^n$.</p>
+</div>
+<div class="cal formel"><span class="lab">Corollaire.</span>
+<p class="cal piege">  <em>« Une matrice défective ne peut pas avoir $n$ valeurs propres distinctes, puisque des valeurs propres distinctes ont des vecteurs propres linéairement indépendants. »</em></p>
+</div>
+<h3>3.5 L'intuition graphique en deux dimensions — les cinq matrices de la figure 4.4</h3>
+<table>
+<thead>
+<tr>
+<th>Matrice</th>
+<th>Valeurs propres</th>
+<th>$\det$</th>
+<th>Effet</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$A_1=\begin{bmatrix}\tfrac12&amp;0\\0&amp;2\end{bmatrix}$</td>
+<td>$\lambda_1=2$, $\lambda_2=\tfrac12$</td>
+<td>$1$</td>
+<td>Vecteurs propres = <strong>axes canoniques</strong> ; vertical <strong>étiré $\times2$</strong>, horizontal <strong>comprimé $\times\tfrac12$</strong>.  <strong>Préserve l'aire</strong></td>
+</tr>
+<tr>
+<td>$A_2=\begin{bmatrix}1&amp;\tfrac12\\0&amp;1\end{bmatrix}$</td>
+<td>$\lambda_1=\lambda_2=1$</td>
+<td>$1$</td>
+<td><strong>CISAILLEMENT</strong> horizontal. Vecteurs propres <strong>colinéaires</strong> : l'application n'agit que <strong>selon UNE direction</strong>. Préserve l'aire</td>
+</tr>
+<tr>
+<td>$A_3=\begin{bmatrix}\cos\frac\pi6&amp;-\sin\frac\pi6\\\sin\frac\pi6&amp;\cos\frac\pi6\end{bmatrix}=\frac12\begin{bmatrix}\sqrt3&amp;-1\\1&amp;\sqrt3\end{bmatrix}$</td>
+<td>$0{,}87\mp0{,}5i$ —  <strong>COMPLEXES</strong></td>
+<td>$1$</td>
+<td><strong>ROTATION</strong> de $\frac\pi6$ rad $=30^\circ$. Pas de vecteur propre réel — une rotation <strong>doit</strong> préserver le volume</td>
+</tr>
+<tr>
+<td>$A_4=\begin{bmatrix}1&amp;-1\\-1&amp;1\end{bmatrix}$</td>
+<td>$\lambda_1=0$, $\lambda_2=2$</td>
+<td>$\mathbf 0$</td>
+<td><strong>EFFONDREMENT</strong> de $\mathbb R^2$ sur une dimension. La direction de $\lambda_1=0$ s'effondre ; l'orthogonale est étirée $\times2$.  <strong>Aire de l'image nulle</strong></td>
+</tr>
+<tr>
+<td>$A_5=\begin{bmatrix}1&amp;\tfrac12\\\tfrac12&amp;1\end{bmatrix}$</td>
+<td>$\lambda_1=0{,}5$, $\lambda_2=1{,}5$</td>
+<td>$0{,}75$</td>
+<td><strong>Cisaillement-étirement</strong> : l'espace est ramené à <strong>75 %</strong>. Étiré $\times1{,}5$ selon un vecteur propre, comprimé $\times0{,}5$ selon l'orthogonal</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p> <strong>Les trois leçons.</strong> (i) $\det=1\Rightarrow$ <strong>aire préservée</strong>. (ii) $\det=0\Rightarrow$ <strong>effondrement dimensionnel</strong>, et $0$ est valeur propre. (iii) Des valeurs propres <strong>complexes</strong> signalent une <strong>rotation</strong> — aucune direction réelle n'est simplement étirée.</p>
+</blockquote>
+<h2 data-prio="must">Concept 4 — Le théorème spectral et les liens det/trace</h2>
+<div class="cal formel"><span class="lab">Théorème 4.14.</span>
+<p> Étant donnée $A\in\mathbb R^{m\times n}$, on peut <strong>toujours</strong> obtenir une matrice <strong>symétrique semi-définie positive</strong> $S\in\mathbb R^{n\times n}$ en posant
+$$\boxed{\;S:=A^\top A\;}$$
+ Si $\operatorname{rk}(A)=n$, alors $S$ est symétrique <strong>définie positive</strong>.</p>
+</div>
+<details class="cor">
+<summary> La preuve, en deux lignes (donnée par le livre)</summary><div class="in">
+
+<p><strong>Symétrie</strong> : $S=A^\top A=A^\top(A^\top)^\top=(A^\top A)^\top=S^\top$ </p>
+<p><strong>Semi-définie positivité</strong> : $x^\top Sx=x^\top A^\top Ax=(x^\top A^\top)(Ax)=(Ax)^\top(Ax)\geqslant0$, <em>« parce que le produit scalaire calcule une somme de carrés, qui sont eux-mêmes non négatifs. »</em> </p>
+</div></details>
+
+<div class="cal formel"><span class="lab">Théorème 4.15 (THÉORÈME SPECTRAL).</span>
+<p> Si $A\in\mathbb R^{n\times n}$ est <strong>SYMÉTRIQUE</strong>, il existe une <strong>BASE ORTHONORMÉE</strong> de l'espace vectoriel correspondant, <strong>constituée de vecteurs propres de $A$</strong>, et <strong>chaque valeur propre est RÉELLE</strong>.</p>
+</div>
+<blockquote>
+<p> <strong>L'implication directe.</strong> L'eigendécomposition d'une matrice symétrique <strong>existe</strong> (avec des valeurs propres réelles), et on peut trouver une <strong>ONB de vecteurs propres</strong>, si bien que
+$$\boxed{\;A=PDP^\top\;}$$
+où $D$ est diagonale et les colonnes de $P$ contiennent les vecteurs propres.</p>
+</blockquote>
+<p><strong>Exemple 4.8 — le théorème spectral en action.</strong></p>
+<p>$$A=\begin{bmatrix}3&amp;2&amp;2\\2&amp;3&amp;2\\2&amp;2&amp;3\end{bmatrix},\qquad p_A(\lambda)=-(\lambda-1)^2(\lambda-7)$$</p>
+<p>Valeurs propres $\lambda_1=1$ (<strong>répétée</strong>) et $\lambda_2=7$. Espaces propres :</p>
+<p>$$E_1=\operatorname{span}\left[\underbrace{\begin{bmatrix}-1\\1\\0\end{bmatrix}}_{=:x_1},\underbrace{\begin{bmatrix}-1\\0\\1\end{bmatrix}}_{=:x_2}\right],\qquad E_7=\operatorname{span}\left[\underbrace{\begin{bmatrix}1\\1\\1\end{bmatrix}}_{=:x_3}\right]$$</p>
+<p class="cal piege"> <strong>Le problème.</strong> $x_3$ est orthogonal à $x_1$ et $x_2$, mais $x_1^\top x_2=1\neq0$ : $x_1$ et $x_2$ <strong>ne sont PAS orthogonaux</strong>. Le théorème spectral affirme qu'une base orthogonale existe — mais <strong>celle-ci n'en est pas une</strong>.</p>
+<p><strong>La solution — Gram-Schmidt.</strong> L'argument-clé : pour tous $\alpha,\beta\in\mathbb R$,</p>
+<p>$$A(\alpha x_1+\beta x_2)=Ax_1\alpha+Ax_2\beta=\lambda(\alpha x_1+\beta x_2)$$</p>
+<p>Donc <strong>toute combinaison linéaire de $x_1$ et $x_2$ est encore un vecteur propre associé à $\lambda$</strong>. On peut donc appliquer Gram-Schmidt sans quitter $E_1$ :</p>
+<p>$$x_1'=\begin{bmatrix}-1\\1\\0\end{bmatrix},\qquad x_2'=\frac12\begin{bmatrix}-1\\-1\\2\end{bmatrix}$$</p>
+<p>qui sont <strong>orthogonaux entre eux</strong>, <strong>orthogonaux à $x_3$</strong>, et <strong>vecteurs propres de $A$</strong> pour $\lambda_1=1$.</p>
+<details class="cor">
+<summary> Vérification intégrale</summary><div class="in">
+
+<p><strong>Vecteurs propres</strong> : $A[-1,1,0]^\top=[-3+2,\,-2+3,\,-2+2]^\top=[-1,1,0]^\top=1\cdot x_1$  ; $A[-1,0,1]^\top=[-1,0,1]^\top$  ; $A[1,1,1]^\top=[7,7,7]^\top=7x_3$ </p>
+<p><strong>Non-orthogonalité</strong> : $x_1^\top x_2=1+0+0=1\neq0$  (alors que $x_1^\top x_3=0$ et $x_2^\top x_3=0$)</p>
+<p><strong>Gram-Schmidt</strong> : $\lambda=\dfrac{x_1^\top x_2}{x_1^\top x_1}=\dfrac12$, donc $x_2'=x_2-\tfrac12x_1=[-1,0,1]^\top-[-\tfrac12,\tfrac12,0]^\top=[-\tfrac12,-\tfrac12,1]^\top=\tfrac12[-1,-1,2]^\top$ </p>
+<p><strong>$x_2'$ est bien vecteur propre</strong> : $A[-\tfrac12,-\tfrac12,1]^\top=[-\tfrac32-1+2,\ -1-\tfrac32+2,\ -1-1+3]^\top=[-\tfrac12,-\tfrac12,1]^\top=1\cdot x_2'$ </p>
+<p><strong>Contrôles globaux</strong> : $\det A=1\cdot1\cdot7=7$ et $\operatorname{tr}A=3+3+3=9=1+1+7$ </p>
+</div></details>
+
+<h3>4.2 Déterminant et trace via le spectre</h3>
+<div class="cal formel"><span class="lab">Théorème 4.16.</span>
+<p> Le déterminant d'une matrice $A\in\mathbb R^{n\times n}$ est le <strong>PRODUIT de ses valeurs propres</strong> :
+$$\boxed{\;\det(A)=\prod_{i=1}^{n}\lambda_i\;}$$
+où les $\lambda_i\in\mathbb C$ sont les valeurs propres (<strong>éventuellement répétées</strong>).</p>
+</div>
+<div class="cal formel"><span class="lab">Théorème 4.17.</span>
+<p> La trace d'une matrice $A\in\mathbb R^{n\times n}$ est la <strong>SOMME de ses valeurs propres</strong> :
+$$\boxed{\;\operatorname{tr}(A)=\sum_{i=1}^{n}\lambda_i\;}$$</p>
+</div>
+<blockquote>
+<p> <strong>L'intuition géométrique (figure 4.6).</strong> Soit $A\in\mathbb R^{2\times2}$ avec deux vecteurs propres $x_1,x_2$ formant une <strong>ONB</strong> — le carré qu'ils engendrent a une aire de $1$.</p>
+<ul>
+<li>Les images $v_1=Ax_1=\lambda_1x_1$ et $v_2=Ax_2=\lambda_2x_2$ restent <strong>orthogonales</strong>, et le rectangle qu'elles engendrent a une aire de $\boxed{|\lambda_1\lambda_2|}$ — c'est le <strong>déterminant</strong>.</li>
+<li>Le périmètre passe de $2(1+1)$ à $\boxed{2(|\lambda_1|+|\lambda_2|)}$ — <strong>la somme des valeurs absolues des valeurs propres dit comment le périmètre change</strong>.</li>
+</ul>
+</blockquote>
+<p><strong>Exemple 4.9 — le PageRank de Google.</strong> Google utilise <strong>le vecteur propre associé à la valeur propre MAXIMALE</strong> d'une matrice $A$ pour classer une page. L'idée (Larry Page et Sergey Brin, Stanford, 1996) : <em>« l'importance de toute page web peut être approchée par l'importance des pages qui pointent vers elle. »</em></p>
+<ul>
+<li>Tous les sites forment un <strong>graphe orienté</strong> géant : qui pointe vers qui.</li>
+<li>Le poids (importance) $x_i\geqslant0$ d'un site $a_i$ compte le nombre de pages pointant vers $a_i$, <strong>pondéré par l'importance de celles-ci</strong>.</li>
+<li>Le comportement de navigation est modélisé par une <strong>matrice de transition</strong> $A$ : la probabilité (de clic) d'aboutir sur un autre site.</li>
+<li> <strong>La propriété clé</strong> : pour tout vecteur de rang initial $x$, la suite $x,\ Ax,\ A^2x,\dots$ <strong>converge</strong> vers un vecteur $x_*$, le <strong>PageRank</strong>, qui satisfait</li>
+</ul>
+<p>$$\boxed{\;Ax_*=x_*\;}$$</p>
+<p>c'est-à-dire un <strong>vecteur propre de valeur propre $1$</strong>. Après normalisation ($\lVert x_*\rVert=1$), on interprète les entrées comme des <strong>probabilités</strong>.</p>
+<h2 data-prio="high">Concept 5 — La décomposition de Cholesky (§4.3)</h2>
+<blockquote>
+<p><strong>L'analogie du livre.</strong> <em>« Dans les réels positifs, on a l'opération racine carrée qui donne une décomposition du nombre en composantes identiques, par exemple $9=3\cdot3$. Pour les matrices, il faut faire attention à ne calculer une opération de type racine carrée que sur des quantités positives. »</em></p>
+</blockquote>
+<div class="cal formel"><span class="lab">Théorème 4.18 (Décomposition de Cholesky).</span>
+<p> Une matrice <strong>symétrique DÉFINIE POSITIVE</strong> $A$ peut être factorisée en
+$$\boxed{\;A=LL^\top\;}$$
+où $L$ est <strong>triangulaire INFÉRIEURE</strong> à <strong>éléments diagonaux POSITIFS</strong>. $L$ est le <strong>facteur de Cholesky</strong> de $A$, et <strong>il est UNIQUE</strong>.</p>
+</div>
+<p><strong>Exemple 4.10 — la construction en $3\times3$.</strong> On cherche</p>
+<p>$$A=\begin{bmatrix}a_{11}&amp;a_{21}&amp;a_{31}\\a_{21}&amp;a_{22}&amp;a_{32}\\a_{31}&amp;a_{32}&amp;a_{33}\end{bmatrix}=LL^\top=\begin{bmatrix}l_{11}&amp;0&amp;0\\l_{21}&amp;l_{22}&amp;0\\l_{31}&amp;l_{32}&amp;l_{33}\end{bmatrix}\begin{bmatrix}l_{11}&amp;l_{21}&amp;l_{31}\\0&amp;l_{22}&amp;l_{32}\\0&amp;0&amp;l_{33}\end{bmatrix}$$</p>
+<p>En développant le membre de droite :</p>
+<p>$$LL^\top=\begin{bmatrix}l_{11}^2&amp;l_{21}l_{11}&amp;l_{31}l_{11}\\l_{21}l_{11}&amp;l_{21}^2+l_{22}^2&amp;l_{31}l_{21}+l_{32}l_{22}\\l_{31}l_{11}&amp;l_{31}l_{21}+l_{32}l_{22}&amp;l_{31}^2+l_{32}^2+l_{33}^2\end{bmatrix}$$</p>
+<p><strong>Le motif sur la DIAGONALE :</strong></p>
+<p>$$\boxed{\;l_{11}=\sqrt{a_{11}},\qquad l_{22}=\sqrt{a_{22}-l_{21}^2},\qquad l_{33}=\sqrt{a_{33}-(l_{31}^2+l_{32}^2)}\;}$$</p>
+<p><strong>Le motif SOUS la diagonale</strong> ($l_{ij}$, $i&gt;j$) :</p>
+<p>$$\boxed{\;l_{21}=\frac{1}{l_{11}}a_{21},\qquad l_{31}=\frac{1}{l_{11}}a_{31},\qquad l_{32}=\frac{1}{l_{22}}(a_{32}-l_{31}l_{21})\;}$$</p>
+<blockquote>
+<p> <strong>La réalisation-clé.</strong> <em>« On peut calculer À REBOURS ce que les composantes $l_{ij}$ de $L$ doivent être, à partir des valeurs $a_{ij}$ de $A$ et des valeurs de $l_{ij}$ <strong>précédemment calculées</strong>. »</em> C'est un algorithme <strong>séquentiel</strong> : colonne par colonne, de gauche à droite et de haut en bas.</p>
+</blockquote>
+<p><strong>Les trois usages en apprentissage automatique :</strong></p>
+<ol>
+<li><strong>Échantillonner une gaussienne.</strong> La <strong>matrice de covariance</strong> d'une gaussienne multivariée (§6.5) est symétrique définie positive ; sa factorisation de Cholesky permet de <strong>générer des échantillons</strong> de la loi.</li>
+<li><strong>Transformer linéairement des variables aléatoires</strong> — lourdement exploité pour calculer des <strong>gradients dans les modèles stochastiques profonds</strong>, comme l'<strong>auto-encodeur variationnel</strong> (Jimenez Rezende <em>et al.</em> 2014 ; Kingma &amp; Welling 2014).</li>
+<li><strong>Calculer un déterminant très efficacement</strong> :</li>
+</ol>
+<p>$$\det(A)=\det(L)\det(L^\top)=\det(L)^2=\prod_i l_{ii}^2$$</p>
+<p>puisque $L$ est <strong>triangulaire</strong>. <em>« De nombreux logiciels numériques utilisent la décomposition de Cholesky pour rendre les calculs plus efficaces. »</em></p>
+<h2 data-prio="must">Concept 6 — Décomposition en valeurs propres et diagonalisation (§4.4)</h2>
+<h3>6.1 Pourquoi les matrices diagonales</h3>
+<p>Une <strong>matrice diagonale</strong> $D=\operatorname{diag}(c_1,\dots,c_n)$ permet un calcul <strong>rapide</strong> de trois choses :</p>
+<table>
+<thead>
+<tr>
+<th>Quantité</th>
+<th>Formule</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Déterminant</strong></td>
+<td>Le <strong>produit</strong> des entrées diagonales</td>
+</tr>
+<tr>
+<td><strong>Puissance</strong> $D^k$</td>
+<td>Chaque élément diagonal <strong>élevé à la puissance $k$</strong></td>
+</tr>
+<tr>
+<td><strong>Inverse</strong> $D^{-1}$</td>
+<td>Le <strong>réciproque</strong> de chaque élément diagonal, si tous sont non nuls</td>
+</tr>
+</tbody></table>
+<div class="cal formel"><span class="lab">Définition 4.19 (Diagonalisable).</span>
+<p> $A\in\mathbb R^{n\times n}$ est <strong>diagonalisable</strong> si elle est <strong>semblable</strong> à une matrice diagonale, c'est-à-dire s'il existe $P\in\mathbb R^{n\times n}$ inversible telle que $D=P^{-1}AP$.</p>
+</div>
+<h3>6.2 Le mécanisme</h3>
+<p>Soient $\lambda_1,\dots,\lambda_n$ des scalaires, $p_1,\dots,p_n\in\mathbb R^n$, $P:=[p_1,\dots,p_n]$ et $D=\operatorname{diag}(\lambda_1,\dots,\lambda_n)$. Alors</p>
+<p>$$AP=PD$$</p>
+<p><strong>si et seulement si</strong> les $\lambda_i$ sont les valeurs propres de $A$ et les $p_i$ les vecteurs propres correspondants. En effet :</p>
+<p>$$AP=A[p_1,\dots,p_n]=[Ap_1,\dots,Ap_n]$$
+$$PD=[p_1,\dots,p_n]\operatorname{diag}(\lambda_1,\dots,\lambda_n)=[\lambda_1p_1,\dots,\lambda_np_n]$$</p>
+<p>L'égalité colonne par colonne donne exactement $Ap_i=\lambda_ip_i$.</p>
+<p class="cal piege"> La définition exige que $P$ soit <strong>inversible</strong>, donc de <strong>rang plein</strong> (Th. 4.3) : il faut <strong>$n$ vecteurs propres linéairement indépendants</strong>, formant une base de $\mathbb R^n$.</p>
+<div class="cal formel"><span class="lab">Théorème 4.20 (Décomposition en valeurs propres).</span>
+<p> $A\in\mathbb R^{n\times n}$ se factorise en
+$$\boxed{\;A=PDP^{-1}\;}$$
+où $D$ est diagonale avec les valeurs propres de $A$ sur la diagonale, <strong>si et seulement si les vecteurs propres de $A$ forment une BASE de $\mathbb R^n$</strong>.</p>
+</div>
+<div class="cal intu"><span class="lab">Ce que le théorème implique</span>
+<p class="cal piege">  : <em>« seules les matrices NON DÉFECTIVES peuvent être diagonalisées »</em>, et les <strong>colonnes de $P$ sont les $n$ vecteurs propres</strong> de $A$.</p>
+</div>
+<div class="cal formel"><span class="lab">Théorème 4.21.</span>
+<p> Une matrice <strong>SYMÉTRIQUE</strong> $S\in\mathbb R^{n\times n}$ peut <strong>TOUJOURS</strong> être diagonalisée.</p>
+</div>
+<p>Cela découle directement du théorème spectral. De plus, comme l'ONB de vecteurs propres rend $P$ <strong>orthogonale</strong>, on a $P^{-1}=P^\top$ et donc</p>
+<p>$$\boxed{\;D=P^\top AP\qquad\text{et}\qquad A=PDP^\top\;}$$</p>
+<blockquote>
+<p class="cal piege"> <strong>Le cas défectif.</strong> <em>« La forme normale de Jordan offre une décomposition qui fonctionne pour les matrices défectives (Lang, 1987), mais elle dépasse le cadre de ce livre. »</em></p>
+</blockquote>
+<h3>6.3 L'intuition géométrique en trois temps (figure 4.7)</h3>
+<p>$$\underbrace{P^{-1}}_{\text{3. changement de base : canonique}\to\text{propre}}\quad\underbrace{D}_{\text{2. mise à l'échelle par les }\lambda_i}\quad\underbrace{P}_{\text{1. retour à la base canonique}}$$</p>
+<p>Lu de droite à gauche dans $A=PDP^{-1}$, appliqué à un vecteur :</p>
+<ol>
+<li><strong>$P^{-1}$</strong> effectue un <strong>changement de base</strong> de la base canonique vers la <strong>base propre</strong> (une opération de type rotation).</li>
+<li><strong>$D$</strong> effectue une <strong>mise à l'échelle</strong> le long de ces axes remappés, par les valeurs propres $\lambda_i$ — un cercle devient une <strong>ellipse</strong>.</li>
+<li><strong>$P$</strong> <strong>défait</strong> le changement de base et restitue le repère original, donnant $\lambda_ip_i$.</li>
+</ol>
+<h3>6.4 Exemple 4.11 — la procédure complète</h3>
+<p>$$A=\frac12\begin{bmatrix}5&amp;-2\\-2&amp;5\end{bmatrix}$$</p>
+<p><strong>Étape 1 — valeurs et vecteurs propres.</strong></p>
+<p>$$\det(A-\lambda I)=\left(\tfrac52-\lambda\right)^2-1=\lambda^2-5\lambda+\tfrac{21}{4}=\left(\lambda-\tfrac72\right)\left(\lambda-\tfrac32\right)$$</p>
+<p>$$\lambda_1=\tfrac72,\qquad\lambda_2=\tfrac32$$</p>
+<p>Vecteurs propres <strong>normalisés</strong>, via $Ap_1=\tfrac72p_1$ et $Ap_2=\tfrac32p_2$ :</p>
+<p>$$p_1=\frac{1}{\sqrt2}\begin{bmatrix}1\\-1\end{bmatrix},\qquad p_2=\frac{1}{\sqrt2}\begin{bmatrix}1\\1\end{bmatrix}$$</p>
+<p><strong>Étape 2 — vérifier l'existence.</strong> $p_1,p_2$ forment une base de $\mathbb R^2$, donc $A$ est diagonalisable.</p>
+<p><strong>Étape 3 — construire $P$.</strong></p>
+<p>$$P=[p_1,p_2]=\frac{1}{\sqrt2}\begin{bmatrix}1&amp;1\\-1&amp;1\end{bmatrix}\qquad\Longrightarrow\qquad P^{-1}AP=\begin{bmatrix}\tfrac72&amp;0\\0&amp;\tfrac32\end{bmatrix}=D$$</p>
+<p>Et, puisque $p_1,p_2$ forment ici une <strong>ONB</strong>, $P^{-1}=P^\top$ :</p>
+<p>$$\frac12\begin{bmatrix}5&amp;-2\\-2&amp;5\end{bmatrix}=\frac{1}{\sqrt2}\begin{bmatrix}1&amp;1\\-1&amp;1\end{bmatrix}\begin{bmatrix}\tfrac72&amp;0\\0&amp;\tfrac32\end{bmatrix}\frac{1}{\sqrt2}\begin{bmatrix}1&amp;-1\\1&amp;1\end{bmatrix}$$</p>
+<details class="cor">
+<summary> Contrôles numériques</summary><div class="in">
+
+<p>$Ap_1$ avec $p_1=\tfrac{1}{\sqrt2}[1,-1]^\top$ : $A[0{,}7071,-0{,}7071]^\top=[2{,}4749,-2{,}4749]^\top$ et $\tfrac72p_1=[2{,}4749,-2{,}4749]^\top$ </p>
+<p>$Ap_2$ : $[1{,}0607,1{,}0607]^\top=\tfrac32p_2$ </p>
+<p>$\det A=\tfrac{25}{4}-1=\tfrac{21}{4}=5{,}25=\tfrac72\cdot\tfrac32$  ; $\operatorname{tr}A=5=\tfrac72+\tfrac32$ </p>
+</div></details>
+
+<h3>6.5 Les deux gains de l'eigendécomposition</h3>
+<p><strong>Puissances de matrices.</strong></p>
+<p>$$\boxed{\;A^k=(PDP^{-1})^k=PD^kP^{-1}\;}$$</p>
+<p><em>« Calculer $D^k$ est efficace car on applique l'opération individuellement à chaque élément diagonal. »</em></p>
+<p><strong>Déterminants.</strong></p>
+<p>$$\det(A)=\det(P)\det(D)\det(P^{-1})=\det(D)=\prod_i d_{ii}$$</p>
+<p class="cal piege"> Les deux facteurs $\det(P)$ et $\det(P^{-1})$ <strong>se compensent exactement</strong>.</p>
+<h2 data-prio="must">Concept 7 — La décomposition en valeurs singulières (§4.5)</h2>
+<h3>7.1 Le théorème</h3>
+<blockquote>
+<p><strong>Le statut de la SVD.</strong> <em>« Elle a été appelée le "<strong>théorème fondamental de l'algèbre linéaire</strong>" (Strang, 1993) parce qu'elle s'applique à <strong>TOUTES les matrices</strong>, pas seulement aux matrices carrées, et qu'elle <strong>existe TOUJOURS</strong>. »</em></p>
+</blockquote>
+<div class="cal formel"><span class="lab">Théorème 4.22 (Théorème de la SVD).</span>
+<p> Soit $A\in\mathbb R^{m\times n}$ une matrice rectangulaire de rang $r\in[0,\min(m,n)]$. La <strong>SVD</strong> de $A$ est une décomposition de la forme
+$$\boxed{\;A=U\Sigma V^\top\;}$$
+avec :</p>
+<ul>
+<li>$U\in\mathbb R^{m\times m}$ <strong>ORTHOGONALE</strong>, de colonnes $u_i$, $i=1,\dots,m$ ;</li>
+<li>$V\in\mathbb R^{n\times n}$ <strong>ORTHOGONALE</strong>, de colonnes $v_j$, $j=1,\dots,n$ ;</li>
+<li>$\Sigma\in\mathbb R^{m\times n}$ avec $\Sigma_{ii}=\sigma_i\geqslant0$ et $\Sigma_{ij}=0$ pour $i\neq j$.</li>
+</ul>
+<p>Les $\sigma_i$ sont les <strong>VALEURS SINGULIÈRES</strong>, les $u_i$ les <strong>vecteurs singuliers GAUCHES</strong>, les $v_j$ les <strong>vecteurs singuliers DROITS</strong>. Par convention, elles sont <strong>ordonnées</strong> : $\sigma_1\geqslant\sigma_2\geqslant\dots\geqslant\sigma_r\geqslant0$.</p>
+</div>
+<blockquote>
+<p class="cal piege"> <strong>Le point délicat de $\Sigma$.</strong> *« $\Sigma$ est <strong>RECTANGULAIRE</strong>, de la <strong>même taille que $A$</strong>. Elle a donc une sous-matrice diagonale contenant les valeurs singulières, et a besoin d'un <strong>REMPLISSAGE PAR DES ZÉROS</strong>. »*</p>
+<ul>
+<li>Si $m&gt;n$ : structure diagonale jusqu'à la ligne $n$, puis des lignes de $0^\top$ des lignes $n+1$ à $m$.</li>
+<li>Si $m&lt;n$ : structure diagonale jusqu'à la colonne $m$, puis des colonnes de $0$ des colonnes $m+1$ à $n$.</li>
+</ul>
+</blockquote>
+<blockquote>
+<p> <strong>La matrice $\Sigma$ est UNIQUE.</strong> Ce n'est pas le cas de $U$ et $V$ en général.</p>
+</blockquote>
+<h3>7.2 L'intuition géométrique — trois opérations</h3>
+<p>La SVD décompose l'application linéaire $\Phi:\mathbb R^n\to\mathbb R^m$ en <strong>trois opérations</strong> :</p>
+<p><strong>1. $V^\top$ — changement de base dans le DOMAINE $\mathbb R^n$.</strong> $V$ passe de $\tilde B$ à la base canonique $B$ ; $V^\top=V^{-1}$ fait l'inverse, de $B$ vers $\tilde B$. Les vecteurs sont <strong>alignés sur la base canonique</strong>.</p>
+<p><strong>2. $\Sigma$ — mise à l'échelle ET changement de dimension.</strong> Les nouvelles coordonnées sont mises à l'échelle par les $\sigma_i$, et des dimensions sont <strong>ajoutées ou supprimées</strong>. $\Sigma$ est la matrice de transformation de $\Phi$ relativement à $\tilde B$ et $\tilde C$.</p>
+<p><strong>3. $U$ — changement de base dans le CODOMAINE $\mathbb R^m$.</strong> De $\tilde C$ vers la base canonique de $\mathbb R^m$ — une rotation qui sort les vecteurs du plan $e_1e_2$.</p>
+<blockquote>
+<p class="cal piege"> <strong>Le contraste crucial avec l'eigendécomposition.</strong> *« La SVD exprime un changement de base <strong>DANS LE DOMAINE ET DANS LE CODOMAINE</strong>. C'est en contraste avec l'eigendécomposition, qui opère <strong>dans le même espace vectoriel</strong>, où <strong>le même changement de base est appliqué puis défait</strong>. Ce qui rend la SVD spéciale, c'est que ces <strong>DEUX bases DIFFÉRENTES</strong> sont <strong>simultanément liées par la matrice des valeurs singulières $\Sigma$</strong>. »*</p>
+</blockquote>
+<p><strong>Exemple 4.12.</strong> Pour une grille de vecteurs de $\mathbb R^2$ dans une boîte $2\times2$ centrée à l'origine, avec</p>
+<p>$$A=\begin{bmatrix}1&amp;-0{,}8\\0&amp;1\\1&amp;0\end{bmatrix}=U\Sigma V^\top$$</p>
+<p>$$U=\begin{bmatrix}-0{,}79&amp;0&amp;-0{,}62\\0{,}38&amp;-0{,}78&amp;-0{,}49\\-0{,}48&amp;-0{,}62&amp;0{,}62\end{bmatrix},\quad\Sigma=\begin{bmatrix}1{,}62&amp;0\\0&amp;1{,}0\\0&amp;0\end{bmatrix},\quad V^\top=\begin{bmatrix}-0{,}78&amp;-0{,}62\\0{,}62&amp;-0{,}78\end{bmatrix}$$</p>
+<p>Le trajet : $V^\top$ <strong>fait tourner</strong> $\mathcal X$ ; $\Sigma$ envoie dans $\mathbb R^3$ en <strong>étirant</strong> —  <strong>la troisième coordonnée est toujours $0$</strong>, tous les vecteurs restent dans le plan $x_1x_2$ ; $U$ effectue une <strong>rotation dans $\mathbb R^3$</strong> qui sort les vecteurs de ce plan (ils restent néanmoins <strong>sur un plan</strong>).</p>
+<details class="cor">
+<summary> Contrôle des valeurs singulières</summary><div class="in">
+
+<p>$A^\top A=\begin{bmatrix}2&amp;-0{,}8\\-0{,}8&amp;1{,}64\end{bmatrix}$, $\operatorname{tr}=3{,}64$, $\det=3{,}28-0{,}64=2{,}64$.</p>
+<p>Valeurs propres : $\lambda=\dfrac{3{,}64\pm\sqrt{3{,}64^2-4\cdot2{,}64}}{2}$, donc $\lambda_1=2{,}64$ et $\lambda_2=1{,}0$.</p>
+<p>$\sigma_1=\sqrt{2{,}64}=1{,}6248$ et $\sigma_2=1{,}0$  Cohérent avec les $1{,}62$ et $1{,}0$ imprimés (arrondis à deux décimales).</p>
+</div></details>
+
+<h3>7.3 La construction de la SVD</h3>
+<blockquote>
+<p><strong>Le lien fondateur.</strong> Comparer l'eigendécomposition d'une matrice <strong>SDP</strong> $S=S^\top=PDP^\top$ avec sa SVD $S=U\Sigma V^\top$ : en posant $U=P=V$ et $D=\Sigma$, on voit que
+$$\boxed{\;\text{la SVD d'une matrice SDP EST son eigendécomposition}\;}$$</p>
+</blockquote>
+<p><strong>Le plan de construction (dans l'ordre du livre) :</strong></p>
+<p><strong>Étape 1 — les vecteurs singuliers DROITS $v_1,\dots,v_n\in\mathbb R^n$.</strong> Par le théorème 4.14, $A^\top A\in\mathbb R^{n\times n}$ est <strong>toujours</strong> symétrique semi-définie positive ; par le théorème spectral elle est <strong>diagonalisable</strong> avec une ONB de vecteurs propres :</p>
+<p>$$A^\top A=PDP^\top$$</p>
+<p>En injectant la SVD supposée :</p>
+<p>$$A^\top A=(U\Sigma V^\top)^\top(U\Sigma V^\top)=V\Sigma^\top U^\top U\Sigma V^\top=V\Sigma^\top\Sigma V^\top=V\operatorname{diag}(\sigma_1^2,\dots,\sigma_n^2)V^\top$$</p>
+<p class="cal piege"> <strong>Donc $V=P$</strong> : <em>« les vecteurs propres de $A^\top A$ sont les vecteurs singuliers DROITS. »</em> Et $\sigma_i^2=\lambda_i$.</p>
+<p><strong>Étape 2 — les vecteurs singuliers GAUCHES.</strong> Le même raisonnement sur $AA^\top\in\mathbb R^{m\times m}$ donne $AA^\top=U\operatorname{diag}(\sigma_1^2,\dots,\sigma_m^2)U^\top$ : <em>« les vecteurs propres orthonormés de $AA^\top$ sont les vecteurs singuliers GAUCHES $U$. »</em></p>
+<blockquote>
+<p> <em>« Puisque $AA^\top$ et $A^\top A$ ont <strong>les mêmes valeurs propres non nulles</strong>, les entrées non nulles des matrices $\Sigma$ sont <strong>les mêmes dans les deux cas</strong>. »</em></p>
+</blockquote>
+<p><strong>Étape 3 — le lien.</strong> Les images des $v_i$ sous $A$ sont <strong>orthogonales</strong> : pour $i\neq j$,</p>
+<p>$$(Av_i)^\top(Av_j)=v_i^\top(A^\top A)v_j=v_i^\top(\lambda_jv_j)=\lambda_jv_i^\top v_j=0$$</p>
+<p>Pour $m\geqslant r$, $\{Av_1,\dots,Av_r\}$ est une base d'un sous-espace de dimension $r$ de $\mathbb R^m$. On <strong>normalise</strong> :</p>
+<p>$$\boxed{\;u_i:=\frac{Av_i}{\lVert Av_i\rVert}=\frac{1}{\sqrt{\lambda_i}}Av_i=\frac{1}{\sigma_i}Av_i\;}$$</p>
+<p>D'où l'<strong>ÉQUATION SINGULIÈRE</strong> :</p>
+<p>$$\boxed{\;Av_i=\sigma_iu_i,\qquad i=1,\dots,r\;}$$</p>
+<blockquote>
+<p> <em>« Les vecteurs propres de $A^\top A$ — les vecteurs singuliers droits $v_i$ — et leurs images normalisées sous $A$ — les vecteurs singuliers gauches $u_i$ — forment <strong>deux ONB auto-cohérentes</strong>, connectées par la matrice des valeurs singulières $\Sigma$. »</em></p>
+</blockquote>
+<h3>7.4 Exemple 4.13 — le calcul complet</h3>
+<p>$$A=\begin{bmatrix}1&amp;0&amp;1\\-2&amp;1&amp;0\end{bmatrix}$$</p>
+<p><strong>Étape 1 — vecteurs singuliers droits comme base propre de $A^\top A$.</strong></p>
+<p>$$A^\top A=\begin{bmatrix}5&amp;-2&amp;1\\-2&amp;1&amp;0\\1&amp;0&amp;1\end{bmatrix}=PDP^\top$$</p>
+<p>avec $D=\operatorname{diag}(6,1,0)$ et</p>
+<p>$$V=P=\begin{bmatrix}\tfrac{5}{\sqrt{30}}&amp;0&amp;\tfrac{-1}{\sqrt6}\\[3pt]\tfrac{-2}{\sqrt{30}}&amp;\tfrac{1}{\sqrt5}&amp;\tfrac{-2}{\sqrt6}\\[3pt]\tfrac{1}{\sqrt{30}}&amp;\tfrac{2}{\sqrt5}&amp;\tfrac{1}{\sqrt6}\end{bmatrix}$$</p>
+<p><strong>Étape 2 — la matrice des valeurs singulières.</strong> Les $\sigma_i$ sont les <strong>racines carrées</strong> des valeurs propres de $A^\top A$. Comme $\operatorname{rk}(A)=2$, il n'y a que <strong>deux</strong> valeurs singulières non nulles :</p>
+<p>$$\sigma_1=\sqrt6,\qquad\sigma_2=1\qquad\Longrightarrow\qquad\Sigma=\begin{bmatrix}\sqrt6&amp;0&amp;0\\0&amp;1&amp;0\end{bmatrix}$$</p>
+<p class="cal piege"> $\Sigma$ doit avoir <strong>la même taille que $A$</strong> ($2\times3$), d'où la colonne de zéros.</p>
+<p><strong>Étape 3 — vecteurs singuliers gauches comme images normalisées.</strong></p>
+<p>$$u_1=\frac{1}{\sigma_1}Av_1=\frac{1}{\sqrt5}\begin{bmatrix}1\\-2\end{bmatrix},\qquad u_2=\frac{1}{\sigma_2}Av_2=\frac{1}{\sqrt5}\begin{bmatrix}2\\1\end{bmatrix}$$</p>
+<p>$$U=[u_1,u_2]=\frac{1}{\sqrt5}\begin{bmatrix}1&amp;2\\-2&amp;1\end{bmatrix}$$</p>
+<details class="cor">
+<summary> Vérification intégrale</summary><div class="in">
+
+<p>$A^\top A=\begin{bmatrix}5&amp;-2&amp;1\\-2&amp;1&amp;0\\1&amp;0&amp;1\end{bmatrix}$  ; $\det(A^\top A)=0$  (rang 2, donc une valeur propre nulle) ; $\operatorname{tr}(A^\top A)=7=6+1+0$ </p>
+<p>$AA^\top=\begin{bmatrix}2&amp;-2\\-2&amp;5\end{bmatrix}$, $\operatorname{tr}=7$, $\det=10-4=6$, valeurs propres $6$ et $1$  — <strong>les mêmes valeurs propres non nulles que $A^\top A$</strong>, comme annoncé.</p>
+<p>$Av_1=[1{,}09545,-2{,}19089]^\top$, de norme $2{,}44949=\sqrt6=\sigma_1$ 
+$Av_2=[0{,}89443,0{,}44721]^\top$, de norme $1{,}0=\sigma_2$ 
+$Av_3=[0,0]^\top$  — $v_3$ engendre $\ker A$, cohérent avec $\sigma_3=0$.</p>
+<p>$u_1=Av_1/\sqrt6=[0{,}44721,-0{,}89443]^\top=\tfrac{1}{\sqrt5}[1,-2]^\top$ 
+$u_2=Av_2/1=[0{,}89443,0{,}44721]^\top=\tfrac{1}{\sqrt5}[2,1]^\top$ </p>
+</div></details>
+
+<blockquote>
+<p class="cal piege"> <strong>L'avertissement numérique du livre.</strong> *« Sur un ordinateur, l'approche illustrée ici a un <strong>mauvais comportement numérique</strong>, et la SVD de $A$ est normalement calculée <strong>SANS recourir à la décomposition en valeurs propres de $A^\top A$</strong>. »*</p>
+</blockquote>
+<h3>7.5 Eigendécomposition contre SVD — le tableau décisif</h3>
+<table>
+<thead>
+<tr>
+<th></th>
+<th><strong>Eigendécomposition</strong> $A=PDP^{-1}$</th>
+<th><strong>SVD</strong> $A=U\Sigma V^\top$</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Existence</strong></td>
+<td>Seulement pour des matrices <strong>carrées</strong>, et seulement si une base de vecteurs propres existe</td>
+<td> <strong>TOUJOURS</strong>, pour toute $A\in\mathbb R^{m\times n}$</td>
+</tr>
+<tr>
+<td><strong>Orthogonalité des bases</strong></td>
+<td>Les colonnes de $P$ <strong>ne sont pas nécessairement orthogonales</strong> — le changement de base n'est pas une simple rotation-échelle</td>
+<td>$U$ et $V$ sont <strong>orthonormées</strong> : elles représentent bien des <strong>rotations</strong></td>
+</tr>
+<tr>
+<td><strong>Espaces</strong></td>
+<td>Domaine = codomaine, <strong>le même</strong></td>
+<td> Domaine et codomaine peuvent être de <strong>DIMENSIONS DIFFÉRENTES</strong></td>
+</tr>
+<tr>
+<td><strong>Relation entre les deux matrices de base</strong></td>
+<td>$P$ et $P^{-1}$ sont <strong>inverses l'une de l'autre</strong></td>
+<td>$U$ et $V$ ne sont <strong>généralement PAS inverses</strong> (bases dans des espaces différents)</td>
+</tr>
+<tr>
+<td><strong>Diagonale</strong></td>
+<td>$D$ peut contenir des valeurs <strong>complexes ou négatives</strong></td>
+<td> $\Sigma$ est <strong>réelle et NON NÉGATIVE</strong></td>
+</tr>
+<tr>
+<td><strong>Structure commune</strong></td>
+<td>Trois applications : <strong>1.</strong> changement de base dans le domaine <strong>2.</strong> mise à l'échelle indépendante de chaque nouveau vecteur de base + envoi domaine → codomaine <strong>3.</strong> changement de base dans le codomaine</td>
+<td>idem</td>
+</tr>
+</tbody></table>
+<p><strong>Les trois liens entre les deux :</strong></p>
+<p>$$\boxed{\;u_i\text{ = vecteurs propres de }AA^\top\qquad v_i\text{ = vecteurs propres de }A^\top A\qquad\sigma_i=\sqrt{\lambda_i}\;}$$</p>
+<p>où les $\lambda_i$ sont les valeurs propres <strong>non nulles</strong> de $AA^\top$ <strong>et</strong> de $A^\top A$ (les mêmes).</p>
+<blockquote>
+<p> <strong>Le cas de coïncidence.</strong> <em>« Pour les matrices SYMÉTRIQUES $A\in\mathbb R^{n\times n}$, la décomposition en valeurs propres et la SVD sont <strong>une seule et même chose</strong>, ce qui découle du théorème spectral 4.15. »</em></p>
+</blockquote>
+<h3>7.6 Les trois conventions de SVD</h3>
+<table>
+<thead>
+<tr>
+<th>Nom</th>
+<th>Forme</th>
+<th>Avantage</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>SVD complète</strong> (<em>full SVD</em>) — celle du livre</td>
+<td>$U\in\mathbb R^{m\times m}$, $\Sigma\in\mathbb R^{m\times n}$, $V\in\mathbb R^{n\times n}$</td>
+<td>Les deux matrices de vecteurs singuliers sont <strong>carrées</strong></td>
+</tr>
+<tr>
+<td><strong>SVD réduite</strong> (<em>reduced SVD</em>)</td>
+<td>Pour $m\geqslant n$ : $U\in\mathbb R^{m\times n}$, $\Sigma\in\mathbb R^{n\times n}$, $V\in\mathbb R^{n\times n}$</td>
+<td>$\Sigma$ est <strong>diagonale</strong>, comme dans l'eigendécomposition</td>
+</tr>
+<tr>
+<td><strong>SVD tronquée</strong> (<em>truncated SVD</em>) — §4.6</td>
+<td>Pour $\operatorname{rk}(A)=r$ : $U\in\mathbb R^{m\times r}$, $\Sigma\in\mathbb R^{r\times r}$, $V\in\mathbb R^{r\times n}$</td>
+<td>$\Sigma$ n'a <strong>que des entrées non nulles</strong> sur la diagonale</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p class="cal piege"> <em>« Ces différences peuvent prêter à confusion, mais <strong>les mathématiques restent invariantes</strong>. »</em> Et : <em>« la restriction $m&gt;n$ est pratiquement inutile ; quand $m&lt;n$, la SVD donne un $\Sigma$ avec <strong>plus de colonnes nulles que de lignes</strong>, et les valeurs singulières $\sigma_{m+1},\dots,\sigma_n$ sont $0$. »</em></p>
+</blockquote>
+<p><strong>Exemple 4.14 — les notes de films.</strong> Trois spectateurs (Ali, Beatrix, Chandra) notent quatre films (<em>Star Wars</em>, <em>Blade Runner</em>, <em>Amélie</em>, <em>Delicatessen</em>) de $0$ à $5$, dans une matrice $A\in\mathbb R^{4\times3}$ (lignes = films, colonnes = utilisateurs).</p>
+<p><strong>Les trois hypothèses que fait la SVD ici :</strong></p>
+<ol>
+<li><strong>Tous</strong> les spectateurs notent les films de façon cohérente, avec la <strong>même application linéaire</strong>.</li>
+<li>Les erreurs ou effets de bruit sont ignorés.</li>
+<li>On suppose que les vecteurs singuliers gauches $u_i$ sont des <strong>films stéréotypiques</strong> et les vecteurs singuliers droits $v_j$ des <strong>spectateurs stéréotypiques</strong>.</li>
+</ol>
+<p><strong>L'interprétation.</strong></p>
+<table>
+<thead>
+<tr>
+<th>Objet</th>
+<th>Lecture</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$u_1$</td>
+<td>Grandes valeurs absolues pour les <strong>deux films de science-fiction</strong> → un <strong>thème science-fiction</strong></td>
+</tr>
+<tr>
+<td>$\sigma_1=9{,}6438$</td>
+<td>La grande valeur singulière associée : ce thème <strong>domine</strong></td>
+</tr>
+<tr>
+<td>$v_1$</td>
+<td>Grandes valeurs absolues pour <strong>Ali et Beatrix</strong>, qui notent haut la science-fiction → $v_1$ reflète le <strong>« amateur de science-fiction »</strong></td>
+</tr>
+<tr>
+<td>$u_2$</td>
+<td>Un thème <strong>film d'art et essai français</strong></td>
+</tr>
+<tr>
+<td>$\sigma_2=6{,}3639$</td>
+<td>La deuxième valeur singulière</td>
+</tr>
+<tr>
+<td>$v_2$</td>
+<td><strong>Chandra</strong> est proche de l'amateur idéalisé de ces films</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p> *« Un amateur idéalisé de science-fiction est un <strong>puriste</strong> : il donne une note de zéro à tout sauf à la science-fiction — cette logique est <strong>impliquée par la sous-structure DIAGONALE de $\Sigma$</strong>. »* Un film est donc représenté par sa <strong>décomposition linéaire en films stéréotypiques</strong> ; une personne par sa décomposition en <strong>thèmes de films</strong>.</p>
+</blockquote>
+<blockquote>
+<p class="cal piege"> <strong>La condition de validité.</strong> <em>« Ces deux "espaces" ne sont significativement engendrés par les données de spectateurs et de films que si les données elles-mêmes couvrent une <strong>DIVERSITÉ SUFFISANTE</strong> de spectateurs et de films. »</em></p>
+</blockquote>
+<h2 data-prio="must">Concept 8 — Approximation matricielle (§4.6)</h2>
+<h3>8.1 La somme de matrices de rang 1</h3>
+<p>Les <strong>matrices de rang 1</strong> $A_i:=u_iv_i^\top$ permettent de réécrire la SVD :</p>
+<p>$$\boxed{\;A=\sum_{i=1}^{r}\sigma_iu_iv_i^\top=\sum_{i=1}^{r}\sigma_iA_i\;}$$</p>
+<p><strong>Pourquoi.</strong> <em>« La structure diagonale de $\Sigma$ ne multiplie que les vecteurs singuliers gauches et droits <strong>correspondants</strong> $u_iv_i^\top$ et les met à l'échelle par $\sigma_i$. Tous les termes $\Sigma_{ij}u_iv_j^\top$ <strong>s'annulent pour $i\neq j$</strong> puisque $\Sigma$ est diagonale. Tous les termes $i&gt;r$ s'annulent car les valeurs singulières correspondantes sont $0$. »</em></p>
+<h3>8.2 L'approximation de rang $k$</h3>
+<p>$$\boxed{\;A^{(k)}:=\sum_{i=1}^{k}\sigma_iu_iv_i^\top=\sum_{i=1}^{k}\sigma_iA_i,\qquad\operatorname{rk}\big(A^{(k)}\big)=k\;}$$</p>
+<p><strong>Le calcul de compression de l'image de Stonehenge (figure 4.12).</strong></p>
+<table>
+<thead>
+<tr>
+<th>Quantité</th>
+<th>Valeur</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Image originale $A$</td>
+<td>$1\,432\times1\,910=\mathbf{2\,735\,120}$ nombres</td>
+</tr>
+<tr>
+<td>Approximation de rang 5</td>
+<td>$5\cdot(1\,432+1\,910+1)=\mathbf{16\,715}$ nombres</td>
+</tr>
+<tr>
+<td>Ratio</td>
+<td> <strong>juste au-dessus de $0{,}6\,\%$</strong> de l'original</td>
+</tr>
+</tbody></table>
+<p><em>« La forme des rochers devient de plus en plus visible et clairement reconnaissable dès l'approximation de rang 5. »</em></p>
+<details class="cor">
+<summary> Vérification du décompte</summary><div class="in">
+
+<p>Pour chaque $i\leqslant k$ on stocke : le vecteur $u_i$ ($1\,432$ nombres), le vecteur $v_i$ ($1\,910$ nombres) et la valeur singulière $\sigma_i$ ($1$ nombre), soit $3\,343$ par terme.</p>
+<p>$5\times3\,343=16\,715$  et $16\,715/2\,735\,120=0{,}00611=0{,}611\,\%$ </p>
+</div></details>
+
+<h3>8.3 La norme spectrale et Eckart-Young</h3>
+<div class="cal formel"><span class="lab">Définition 4.23 (Norme spectrale).</span>
+<p> Pour $x\in\mathbb R^n\setminus\{0\}$, la <strong>norme spectrale</strong> de $A\in\mathbb R^{m\times n}$ est
+$$\boxed{\;\lVert A\rVert_2:=\max_x\frac{\lVert Ax\rVert_2}{\lVert x\rVert_2}\;}$$</p>
+</div>
+<p><em>« La norme spectrale détermine <strong>de combien un vecteur $x$ peut au plus s'allonger</strong> quand il est multiplié par $A$. »</em></p>
+<div class="cal formel"><span class="lab">Théorème 4.24.</span>
+<p> $\boxed{\lVert A\rVert_2=\sigma_1}$ — <strong>la norme spectrale de $A$ est sa plus grande valeur singulière.</strong></p>
+</div>
+<div class="cal formel"><span class="lab">Théorème 4.25 (Théorème d'ECKART-YOUNG, 1936).</span>
+<p> Soit $A\in\mathbb R^{m\times n}$ de rang $r$ et $B\in\mathbb R^{m\times n}$ de rang $k$. Pour tout $k\leqslant r$, avec $A^{(k)}=\sum_{i=1}^{k}\sigma_iu_iv_i^\top$ :
+$$\boxed{\;A^{(k)}=\operatorname*{argmin}_{\operatorname{rk}(B)=k}\lVert A-B\rVert_2\;}$$
+$$\boxed{\;\big\lVert A-A^{(k)}\big\rVert_2=\sigma_{k+1}\;}$$</p>
+</div>
+<blockquote>
+<p> <strong>L'interprétation.</strong> <em>« Le théorème d'Eckart-Young énonce <strong>explicitement l'erreur</strong> qu'on introduit en approchant $A$ par une approximation de rang $k$. On peut interpréter cette approximation comme une <strong>PROJECTION</strong> de la matrice de rang plein $A$ sur un espace de dimension inférieure de matrices de rang au plus $k$. <strong>De toutes les projections possibles, la SVD MINIMISE l'erreur</strong> (au sens de la norme spectrale). »</em></p>
+</blockquote>
+<details class="cor">
+<summary> Pourquoi (4.95) est vraie — la démonstration en une ligne</summary><div class="in">
+
+<p>$$A-A^{(k)}=\sum_{i=k+1}^{r}\sigma_iu_iv_i^\top$$</p>
+<p>C'est <strong>exactement la SVD de la matrice différence</strong>, dont la plus grande valeur singulière est $\sigma_{k+1}$ (les $\sigma_i$ étant ordonnées décroissantes). Par le théorème 4.24, $\lVert A-A^{(k)}\rVert_2=\sigma_{k+1}$ </p>
+</div></details>
+
+<p><strong>Exemple 4.15 — retour aux notes de films.</strong> L'approximation de rang 1 $A_1=u_1v_1^\top$ <em>« nous dit qu'Ali et Beatrix aiment les films de science-fiction comme Star Wars et Blade Runner (entrées $&gt;0{,}4$), mais <strong>échoue à capturer les notes des autres films par Chandra</strong>. »</em> La deuxième, $A_2=u_2v_2^\top$, <em>« capture bien les notes et types de films de Chandra, mais pas les films de science-fiction »</em>. C'est en <strong>combinant</strong> les deux, dans $A^{(2)}=\sigma_1A_1+\sigma_2A_2$, qu'on retrouve l'essentiel de la structure.</p>
+<h2 data-prio="high">Concept 9 — La phylogénie des matrices (§4.7)</h2>
+<blockquote>
+<p><em>« Le mot "phylogénétique" décrit comment on capture les relations entre individus ou groupes ; il dérive des mots grecs pour "<strong>tribu</strong>" et "<strong>source</strong>". »</em> Les flèches noires de la figure 4.13 signifient « <strong>est un sous-ensemble de</strong> ».</p>
+</blockquote>
+<pre><code>                    A ∈ R^(n×m)  TOUTES les matrices réelles
+                              │
+                  n ≠ m ──────┴────── n = m (CARRÉE)
+                    │                      │
+                   SVD               det(A) ≠ 0 ?
+              (existe toujours)            │
+                                    RÉGULIÈRE (inversible)  ∃ A⁻¹
+                                           │
+                              n vecteurs propres indépendants ?
+                                           │
+                                  NON DÉFECTIVE → EIGENDÉCOMPOSITION
+                                           │
+                                  AᵀA = AAᵀ  →  NORMALE
+                                           │
+                          ┌────────────────┴────────────────┐
+                  AᵀA = AAᵀ = I                        S = Sᵀ
+                  ORTHOGONALE                        SYMÉTRIQUE
+                  Aᵀ = A⁻¹                        (vp toutes RÉELLES)
+                       │                                  │
+                   ROTATION              ┌────────────────┴──────────┐
+                                  xᵀPx &gt; 0                      DIAGONALE
+                              DÉFINIE POSITIVE                       │
+                              CHOLESKY, vp &gt; 0                   IDENTITÉ
+                              toujours inversible
+</code></pre>
+<p><strong>Les points à ne pas manquer :</strong></p>
+<ul>
+<li> <em>« <strong>Non singulière</strong> et <strong>non défective</strong> ne sont pas la même chose.</em>* Par exemple, une <strong>matrice de ROTATION</strong> sera inversible (déterminant non nul) mais <strong>NON diagonalisable dans les réels</strong> (les valeurs propres ne sont pas garanties réelles). »*</li>
+<li>Une matrice est <strong>NORMALE</strong> si $A^\top A=AA^\top$. Si la condition plus restrictive $A^\top A=AA^\top=I$ tient, elle est <strong>ORTHOGONALE</strong>. Les matrices orthogonales sont un <strong>sous-ensemble des matrices régulières</strong> et satisfont $A^\top=A^{-1}$.</li>
+<li>Les <strong>matrices symétriques</strong> sont un sous-ensemble fréquent des matrices normales ; elles n'ont <strong>que des valeurs propres RÉELLES</strong>.</li>
+<li>Les <strong>définies positives</strong> $P$ ($x^\top Px&gt;0$ pour tout $x\neq0$) sont un sous-ensemble des symétriques : elles admettent une <strong>décomposition de Cholesky UNIQUE</strong>, n'ont que des <strong>valeurs propres POSITIVES</strong> et sont <strong>toujours inversibles</strong>.</li>
+<li> Les <strong>matrices diagonales</strong> sont fermées pour la multiplication et l'addition, mais <strong>ne forment pas nécessairement un groupe</strong> — seulement si toutes les entrées diagonales sont non nulles (donc la matrice inversible). Cas spécial : l'<strong>identité</strong>.</li>
+</ul>
+<h2>Comment reconnaître le type d'exercice</h2>
+<table>
+<thead>
+<tr>
+<th>L'énoncé dit...</th>
+<th>Le type</th>
+<th>La méthode</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>« Calculer $\det(A)$ pour $n=3$ »</td>
+<td><strong>Sarrus</strong></td>
+<td>Six produits de trois termes, trois positifs et trois négatifs</td>
+</tr>
+<tr>
+<td>« Calculer $\det(A)$ pour $n\geqslant4$ »</td>
+<td><strong>Laplace ou Gauss</strong></td>
+<td>Développer sur la ligne/colonne ayant <strong>le plus de zéros</strong>, ou trianguler par Gauss</td>
+</tr>
+<tr>
+<td>« $A$ est-elle inversible ? »</td>
+<td><strong>Th. 4.1 / 4.3</strong></td>
+<td>$\det(A)\neq0\iff\operatorname{rk}(A)=n\iff$ inversible</td>
+</tr>
+<tr>
+<td>« Quel est le volume engendré ? »</td>
+<td><strong>Ex. 4.2</strong></td>
+<td>$|\det[v_1,\dots,v_n]|$ —  la <strong>valeur absolue</strong></td>
+</tr>
+<tr>
+<td>« Calculer le polynôme caractéristique »</td>
+<td><strong>Déf. 4.5</strong></td>
+<td>$p_A(\lambda)=\det(A-\lambda I)$ ; contrôle : $c_0=\det A$, $c_{n-1}=(-1)^{n-1}\operatorname{tr}A$</td>
+</tr>
+<tr>
+<td>« Trouver les valeurs propres »</td>
+<td><strong>Th. 4.8</strong></td>
+<td>Racines de $p_A$ ; contrôle par $\sum\lambda_i=\operatorname{tr}A$ et $\prod\lambda_i=\det A$</td>
+</tr>
+<tr>
+<td>« Trouver les vecteurs propres / l'espace propre »</td>
+<td><strong>Déf. 4.10</strong></td>
+<td>Résoudre $(A-\lambda I)x=0$ ; $E_\lambda=\ker(A-\lambda I)$</td>
+</tr>
+<tr>
+<td>« $A$ est-elle défective ? »</td>
+<td><strong>Déf. 4.13</strong></td>
+<td>Comparer mult. <strong>géométrique</strong> et <strong>algébrique</strong> de chaque $\lambda_i$ ; défective si une géométrique est <strong>strictement inférieure</strong></td>
+</tr>
+<tr>
+<td>« $A$ est-elle diagonalisable ? »</td>
+<td><strong>Th. 4.20 / 4.21</strong></td>
+<td>Oui $\iff$ les vecteurs propres forment une base.  <strong>$A$ symétrique $\Rightarrow$ TOUJOURS oui</strong></td>
+</tr>
+<tr>
+<td>« Diagonaliser $A$ »</td>
+<td><strong>Ex. 4.11</strong></td>
+<td>1. vp et vecteurs propres 2. vérifier l'existence 3. $P=[p_1,\dots,p_n]$, $D=\operatorname{diag}(\lambda_i)$ ; contrôle $AP=PD$</td>
+</tr>
+<tr>
+<td>« Calculer $A^k$ »</td>
+<td><strong>§4.4</strong></td>
+<td>$A^k=PD^kP^{-1}$ — élever <strong>seulement la diagonale</strong> à la puissance $k$</td>
+</tr>
+<tr>
+<td>« Décomposition de Cholesky de $A$ »</td>
+<td><strong>Th. 4.18</strong></td>
+<td>Vérifier symétrique <strong>et</strong> définie positive, puis appliquer les motifs $l_{ii}$ et $l_{ij}$ ; contrôle $LL^\top=A$</td>
+</tr>
+<tr>
+<td>« Calculer la SVD »</td>
+<td><strong>Ex. 4.13</strong></td>
+<td>1. $V$ = base propre de $A^\top A$ 2. $\sigma_i=\sqrt{\lambda_i}$, $\Sigma$ <strong>de la taille de $A$</strong> 3. $u_i=Av_i/\sigma_i$</td>
+</tr>
+<tr>
+<td>« Meilleure approximation de rang $k$ »</td>
+<td><strong>Eckart-Young</strong></td>
+<td>$A^{(k)}=\sum_{i\leqslant k}\sigma_iu_iv_i^\top$ ; erreur $=\sigma_{k+1}$</td>
+</tr>
+<tr>
+<td>« Norme spectrale de $A$ »</td>
+<td><strong>Th. 4.24</strong></td>
+<td>$\lVert A\rVert_2=\sigma_1$</td>
+</tr>
+<tr>
+<td>« Quel est le taux de compression ? »</td>
+<td><strong>§4.6</strong></td>
+<td>$k(m+n+1)$ nombres contre $mn$</td>
+</tr>
+</tbody></table>
+<h2>Comment résoudre : les cinq méthodes pas-à-pas</h2>
+<p><strong>Méthode A — Déterminant d'une matrice $n\times n$.</strong></p>
+<ol>
+<li>Si triangulaire : <strong>produit des diagonaux</strong>. Fin.</li>
+<li>Si $n\leqslant3$ : formule directe / Sarrus.</li>
+<li>Sinon : chercher la <strong>ligne ou colonne avec le plus de zéros</strong>, développer par Laplace le long de celle-ci.</li>
+<li>Alternative : Gauss jusqu'à forme triangulaire, en <strong>comptant les échanges</strong> (chacun change le signe) et les <strong>mises à l'échelle</strong> (chacune multiplie).</li>
+<li>Contrôle : $\det(A^\top)=\det(A)$.</li>
+</ol>
+<p><strong>Méthode B — Diagonaliser une matrice.</strong></p>
+<ol>
+<li>$p_A(\lambda)=\det(A-\lambda I)$ ; factoriser.</li>
+<li>Racines $\Rightarrow$ valeurs propres avec leurs <strong>multiplicités algébriques</strong>.</li>
+<li>Pour chaque $\lambda_i$ : $E_{\lambda_i}=\ker(A-\lambda_iI)$ par Gauss ; noter la <strong>multiplicité géométrique</strong>.</li>
+<li><strong>Test d'existence</strong> : $\sum$ des multiplicités géométriques $=n$ ? Si non, <strong>défective</strong>, non diagonalisable.</li>
+<li>$P=[p_1,\dots,p_n]$ (colonnes = vecteurs propres, <strong>dans le même ordre</strong> que $D$), $D=\operatorname{diag}(\lambda_1,\dots,\lambda_n)$.</li>
+<li>Contrôles : $AP=PD$ ; $\prod\lambda_i=\det A$ ; $\sum\lambda_i=\operatorname{tr}A$.</li>
+<li>Si $A$ <strong>symétrique</strong> : normaliser (et Gram-Schmidter les vecteurs d'un même espace propre) pour obtenir $P$ orthogonale et $A=PDP^\top$.</li>
+</ol>
+<p><strong>Méthode C — Cholesky.</strong></p>
+<ol>
+<li>Vérifier $A=A^\top$ et $A$ définie positive.</li>
+<li>$l_{11}=\sqrt{a_{11}}$, puis toute la <strong>première colonne</strong> : $l_{i1}=a_{i1}/l_{11}$.</li>
+<li>$l_{22}=\sqrt{a_{22}-l_{21}^2}$, puis la deuxième colonne : $l_{i2}=(a_{i2}-l_{i1}l_{21})/l_{22}$.</li>
+<li>Répéter : $l_{jj}=\sqrt{a_{jj}-\sum_{k&lt;j}l_{jk}^2}$ et $l_{ij}=\big(a_{ij}-\sum_{k&lt;j}l_{ik}l_{jk}\big)/l_{jj}$.</li>
+<li>Contrôle : $LL^\top=A$ ;  un $l_{jj}$ <strong>imaginaire</strong> signale que $A$ n'est pas définie positive.</li>
+</ol>
+<p><strong>Méthode D — SVD à la main.</strong></p>
+<ol>
+<li>Calculer $A^\top A$ (taille $n\times n$).</li>
+<li>Ses valeurs propres $\lambda_i\geqslant0$ ; ses vecteurs propres orthonormés forment <strong>$V$</strong>.</li>
+<li>$\sigma_i=\sqrt{\lambda_i}$, triées <strong>décroissantes</strong>. Construire $\Sigma$ <strong>de la taille de $A$</strong>, avec remplissage par des zéros.</li>
+<li>Pour $i\leqslant r$ : $u_i=Av_i/\sigma_i$.</li>
+<li>Si $r&lt;m$, compléter $U$ en une ONB de $\mathbb R^m$ (Gram-Schmidt).</li>
+<li>Contrôles : $U^\top U=I$, $V^\top V=I$, $U\Sigma V^\top=A$, $\lVert Av_i\rVert=\sigma_i$.</li>
+<li><strong>Raccourci</strong> : si $m&lt;n$, il est plus court de partir de $AA^\top$.</li>
+</ol>
+<p><strong>Méthode E — Approximation de rang faible.</strong></p>
+<ol>
+<li>SVD de $A$.</li>
+<li>$A^{(k)}=\sum_{i=1}^{k}\sigma_iu_iv_i^\top$ —  chaque terme est un <strong>produit extérieur</strong> $m\times n$ de rang 1.</li>
+<li>Erreur $=\sigma_{k+1}$ (Eckart-Young).</li>
+<li>Choix de $k$ : regarder la <strong>décroissance du spectre</strong> ($\sigma_{k+1}/\sigma_1$).</li>
+<li>Coût de stockage : $k(m+n+1)$ contre $mn$.</li>
+</ol>
+<h2 data-prio="must">Common mistakes</h2>
+<table>
+<thead>
+<tr>
+<th>Erreur</th>
+<th>Correction</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Calculer un déterminant de matrice non carrée</td>
+<td> Le déterminant n'est défini <strong>QUE pour les matrices carrées</strong></td>
+</tr>
+<tr>
+<td>Confondre $|A|$ et la valeur absolue</td>
+<td> $|A|=\det(A)$ peut être <strong>négatif</strong> — le livre le signale explicitement</td>
+</tr>
+<tr>
+<td>Étendre Sarrus au-delà de $3\times3$</td>
+<td> <strong>Faux</strong>. Utiliser Laplace ou Gauss</td>
+</tr>
+<tr>
+<td>Écrire $\det(\lambda A)=\lambda\det(A)$</td>
+<td> C'est $\det(\lambda A)=\lambda^n\det(A)$</td>
+</tr>
+<tr>
+<td>Écrire $\det(A+B)=\det A+\det B$</td>
+<td> Faux. Seul $\det(AB)=\det(A)\det(B)$ est vrai</td>
+</tr>
+<tr>
+<td>Oublier le signe $(-1)^{k+j}$ dans Laplace</td>
+<td> Le <strong>cofacteur</strong> porte ce signe, pas le <strong>mineur</strong></td>
+</tr>
+<tr>
+<td>Oublier que l'échange de deux lignes change le signe</td>
+<td> Erreur fatale quand on calcule un déterminant par Gauss</td>
+</tr>
+<tr>
+<td>Croire $\operatorname{tr}(ABC)=\operatorname{tr}(ACB)$</td>
+<td> Seules les permutations <strong>CYCLIQUES</strong> sont permises : $\operatorname{tr}(ABC)=\operatorname{tr}(BCA)=\operatorname{tr}(CAB)$</td>
+</tr>
+<tr>
+<td>Accepter $x=0$ comme vecteur propre</td>
+<td> La définition 4.6 exige $x\in\mathbb R^n\setminus\{0\}$</td>
+</tr>
+<tr>
+<td>Croire que $A$ et $A^\top$ ont les mêmes vecteurs propres</td>
+<td> Elles ont les mêmes <strong>valeurs propres</strong>, pas nécessairement les mêmes vecteurs</td>
+</tr>
+<tr>
+<td>Confondre multiplicité algébrique et géométrique</td>
+<td> $1\leqslant$ géométrique $\leqslant$ algébrique. Exemple 4.6 : algébrique 2, géométrique <strong>1</strong></td>
+</tr>
+<tr>
+<td>Croire qu'une matrice inversible est diagonalisable</td>
+<td> <strong>Non</strong> : une matrice de <strong>rotation</strong> est inversible mais pas diagonalisable dans $\mathbb R$</td>
+</tr>
+<tr>
+<td>Croire qu'une matrice non diagonalisable est singulière</td>
+<td> Idem : $\begin{bmatrix}2&amp;1\\0&amp;2\end{bmatrix}$ a $\det=4\neq0$ et est <strong>défective</strong></td>
+</tr>
+<tr>
+<td>Exiger $n$ valeurs propres <strong>distinctes</strong> pour diagonaliser</td>
+<td> Il suffit que les vecteurs propres forment <strong>une base</strong> — l'identité a une seule valeur propre et est diagonale</td>
+</tr>
+<tr>
+<td>Mélanger l'ordre des colonnes de $P$ et de $D$</td>
+<td> La colonne $i$ de $P$ doit être le vecteur propre de $\lambda_i$, <strong>la $i$-ème entrée de $D$</strong></td>
+</tr>
+<tr>
+<td>Appliquer Cholesky à une matrice non définie positive</td>
+<td> Le théorème 4.18 exige symétrique <strong>ET</strong> définie positive ; sinon on obtient une racine d'un nombre négatif</td>
+</tr>
+<tr>
+<td>Écrire $A=L^\top L$</td>
+<td> C'est $A=LL^\top$ avec $L$ <strong>triangulaire INFÉRIEURE</strong></td>
+</tr>
+<tr>
+<td>Croire que $\Sigma$ est carrée</td>
+<td> Dans la SVD <strong>complète</strong>, $\Sigma$ a <strong>la même taille que $A$</strong>, avec remplissage par des zéros</td>
+</tr>
+<tr>
+<td>Croire que $U$ et $V$ sont inverses l'une de l'autre</td>
+<td> Elles agissent dans des <strong>espaces différents</strong> ($\mathbb R^m$ et $\mathbb R^n$)</td>
+</tr>
+<tr>
+<td>Croire que la SVD n'existe que pour certaines matrices</td>
+<td> Elle <strong>EXISTE TOUJOURS</strong>, pour <strong>toute</strong> matrice $m\times n$</td>
+</tr>
+<tr>
+<td>Accepter des $\sigma_i$ négatives</td>
+<td> Les valeurs singulières sont <strong>toujours $\geqslant0$</strong> — ce sont des racines carrées</td>
+</tr>
+<tr>
+<td>Prendre $\sigma_i=\lambda_i$</td>
+<td> $\sigma_i=\sqrt{\lambda_i}$, où $\lambda_i$ est valeur propre de $A^\top A$</td>
+</tr>
+<tr>
+<td>Calculer la SVD numériquement via $A^\top A$</td>
+<td> Le livre l'écrit : <strong>mauvais comportement numérique</strong>. Les bibliothèques ne le font pas</td>
+</tr>
+<tr>
+<td>Croire que l'erreur de $A^{(k)}$ est $\sigma_k$</td>
+<td> C'est $\sigma_{k+1}$ — <strong>la première valeur singulière ABANDONNÉE</strong></td>
+</tr>
+<tr>
+<td>Oublier que $A^{(k)}$ est <strong>optimale</strong></td>
+<td>Eckart-Young : <strong>aucune</strong> matrice de rang $k$ ne fait mieux en norme spectrale</td>
+</tr>
+<tr>
+<td>Croire que « normale » implique « symétrique »</td>
+<td> L'inverse : symétrique $\Rightarrow$ normale. Une matrice de rotation est normale sans être symétrique</td>
+</tr>
+</tbody></table>
+<h2>Ultimate Review</h2>
+<pre><code>═════════════ LES DIX FORMULES À SAVOIR SANS HÉSITER ═════════════
+  1.  det(A) ≠ 0  ⟺  rk(A) = n  ⟺  A inversible          (Th. 4.1 / 4.3)
+  2.  LAPLACE   det(A) = Σ_k (−1)^(k+j) a_kj det(A_k,j)
+  3.  det(AB) = det(A)det(B)   det(Aᵀ) = det(A)   det(λA) = λⁿ det(A)
+  4.  tr(AB) = tr(BA)          tr(S⁻¹AS) = tr(A)      ← invariance
+  5.  pA(λ) := det(A − λI)     c0 = det A     c_{n−1} = (−1)^(n−1) tr A
+  6.  Ax = λx ,  x ≠ 0         Eλ = ker(A − λI)
+  7.  det A = Π λi             tr A = Σ λi          (Th. 4.16 / 4.17)
+  8.  CHOLESKY  A = LLᵀ  ,  det A = Π lii²
+  9.  EIGEN     A = P D P⁻¹  ,  A^k = P D^k P⁻¹  ; A sym ⟹ A = P D Pᵀ
+ 10.  SVD       A = U Σ Vᵀ  ,  A vi = σi ui  ,  σi = √λi(AᵀA)
+      A(k) = Σ_{i≤k} σi ui viᵀ    ‖A‖2 = σ1    ‖A − A(k)‖2 = σ_{k+1}
+══════════════════════════════════════════════════════════════════
+</code></pre>
+<p><strong>Les trois invariants d'une application linéaire</strong> (indépendants de la base choisie) :</p>
+<p>$$\boxed{\;\det\qquad\operatorname{tr}\qquad\text{le SPECTRE}\;}$$</p>
+<p><strong>Le tableau des multiplicités :</strong></p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Définition</th>
+<th>Valeurs possibles</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Algébrique</strong></td>
+<td>Nombre de fois que $\lambda_i$ est racine de $p_A$</td>
+<td>$\geqslant1$</td>
+</tr>
+<tr>
+<td><strong>Géométrique</strong></td>
+<td>$\dim E_{\lambda_i}$ = nombre de vecteurs propres indépendants</td>
+<td>$1\leqslant\text{géo}\leqslant\text{alg}$</td>
+</tr>
+<tr>
+<td><strong>Défective</strong></td>
+<td>Somme des géométriques $&lt;n$</td>
+<td>Non diagonalisable</td>
+</tr>
+</tbody></table>
+<p><strong>L'arbre de décision « quelle décomposition utiliser ? » :</strong></p>
+<table>
+<thead>
+<tr>
+<th>Situation</th>
+<th>Décomposition</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$A$ <strong>non carrée</strong></td>
+<td> <strong>SVD</strong> — la seule option</td>
+</tr>
+<tr>
+<td>$A$ carrée <strong>défective</strong></td>
+<td>SVD (ou forme normale de Jordan, hors cadre)</td>
+</tr>
+<tr>
+<td>$A$ carrée <strong>non défective</strong></td>
+<td><strong>Eigendécomposition</strong> $A=PDP^{-1}$</td>
+</tr>
+<tr>
+<td>$A$ <strong>symétrique</strong></td>
+<td>Eigendécomposition <strong>orthogonale</strong> $A=PDP^\top$ (= sa SVD)</td>
+</tr>
+<tr>
+<td>$A$ <strong>symétrique définie positive</strong></td>
+<td><strong>Cholesky</strong> $A=LL^\top$ (la plus efficace numériquement)</td>
+</tr>
+<tr>
+<td>Il faut <strong>compresser / réduire le rang</strong></td>
+<td><strong>SVD tronquée</strong> $A^{(k)}$ (optimale par Eckart-Young)</td>
+</tr>
+</tbody></table>
+<p><strong>Ce que chaque décomposition coûte et rapporte :</strong></p>
+<table>
+<thead>
+<tr>
+<th>Décomposition</th>
+<th>Existe pour</th>
+<th>Ce qu'elle donne</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Cholesky</strong></td>
+<td>Symétriques définies positives</td>
+<td>$\det$ facile, échantillonnage gaussien, transformations de variables aléatoires</td>
+</tr>
+<tr>
+<td><strong>Eigen</strong></td>
+<td>Carrées non défectives</td>
+<td>Puissances $A^k$, $\det$, interprétation en directions étirées</td>
+</tr>
+<tr>
+<td><strong>SVD</strong></td>
+<td> <strong>TOUTES</strong></td>
+<td>Rang, norme spectrale, pseudo-inverse, meilleure approximation de rang faible</td>
+</tr>
+</tbody></table>
+<p><strong>Où chaque notion resservira dans le livre :</strong></p>
+<table>
+<thead>
+<tr>
+<th>Notion du ch. 4</th>
+<th>Suite</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Matrices symétriques définies positives, Cholesky</td>
+<td><strong>Gaussienne multivariée</strong> (§6.5), auto-encodeurs variationnels</td>
+</tr>
+<tr>
+<td>Eigendécomposition, théorème spectral</td>
+<td><strong>ACP</strong> (ch. 10), <strong>estimation de densité</strong> (ch. 11)</td>
+</tr>
+<tr>
+<td>SVD, approximation de rang faible</td>
+<td><strong>Réduction de dimension</strong> (ch. 10)</td>
+</tr>
+<tr>
+<td>Déterminant</td>
+<td>Changement de variables, <strong>jacobien</strong> (ch. 6)</td>
+</tr>
+<tr>
+<td>Trace, invariance cyclique</td>
+<td>Calcul de gradients matriciels (ch. 5)</td>
+</tr>
+</tbody></table>
+<div class="rec"><h2>Active Recall</h2><p><strong>Déterminant</strong></p><ol>
+<li>Pour quelles matrices le déterminant est-il défini ?</li>
+<li>Énoncer le théorème 4.1 et le théorème 4.3.</li>
+<li>Écrire la formule $2\times2$ et la règle de Sarrus.</li>
+<li>Que vaut le déterminant d'une matrice triangulaire ?</li>
+<li>Quelle est l'interprétation géométrique de $|\det(A)|$ ? Et de son <strong>signe</strong> ?</li>
+<li>Que vaut $|\det[r,g,b]|$ dans l'exemple 4.2 ?</li>
+<li>Énoncer le développement de Laplace. Que sont un mineur et un cofacteur ?</li>
+<li>Donner les sept propriétés du déterminant.</li>
+<li>Comment Gauss permet-il de calculer un déterminant ?</li>
+<li>Pourquoi le livre dit-il que le déterminant est aujourd'hui surtout <strong>théorique</strong> ?</li>
+</ol><p><strong>Trace et polynôme caractéristique</strong>
+11. Définir la trace. Donner ses quatre propriétés.
+12. Qu'est-ce que l'invariance cyclique ? Que vaut $\operatorname{tr}(xy^\top)$ ?
+13. Pourquoi la trace d'une application linéaire est-elle indépendante de la base ?
+14. Écrire le polynôme caractéristique. Que valent $c_0$ et $c_{n-1}$ ?</p><p><strong>Valeurs propres</strong>
+15. Écrire l'équation aux valeurs propres. Quelle contrainte pèse sur $x$ ?
+16. Donner les quatre énoncés équivalents à « $\lambda$ est valeur propre ».
+17. Distinguer colinéaire et codirigé.
+18. Pourquoi les vecteurs propres ne sont-ils pas uniques ?
+19. Que sont l'espace propre et le spectre ? Comment $E_\lambda$ s'écrit-il ?
+20. Quelle est l'interprétation géométrique d'une valeur propre ? D'une valeur propre négative ?
+21. Quel est le spectre de $I_n$ ? Quelle est la dimension de son espace propre ?
+22. Détailler les trois étapes de l'exemple 4.5.
+23. Distinguer multiplicité algébrique et géométrique. Quelle inégalité les relie ?
+24. Donner l'exemple 4.6 et ses deux multiplicités.
+25. Qu'est-ce qu'une matrice défective ? Peut-elle avoir $n$ valeurs propres distinctes ?
+26. Énoncer le théorème 4.12.
+27. Que signale un déterminant nul dans la figure 4.4 ? Des valeurs propres complexes ?</p><p><strong>Théorème spectral</strong>
+28. Énoncer le théorème 4.14 et sa preuve en deux lignes.
+29. Énoncer le théorème spectral. Que garantit-il exactement ?
+30. Dans l'exemple 4.8, quel est le problème et comment le livre le résout-il ?
+31. Pourquoi peut-on appliquer Gram-Schmidt à l'intérieur d'un espace propre ?
+32. Énoncer les théorèmes 4.16 et 4.17 et leur intuition géométrique.
+33. Expliquer le PageRank en termes de valeur propre.</p><p><strong>Cholesky</strong>
+34. Énoncer le théorème 4.18. Quelles sont les trois conditions sur $L$ ?
+35. $L$ est-elle unique ?
+36. Écrire les motifs pour $l_{11}$, $l_{22}$, $l_{33}$ et pour $l_{21}$, $l_{31}$, $l_{32}$.
+37. Citer les trois usages en apprentissage automatique.
+38. Comment Cholesky donne-t-il le déterminant ?</p><p><strong>Eigendécomposition</strong>
+39. Que permettent de calculer rapidement les matrices diagonales ?
+40. Définir « diagonalisable ».
+41. Montrer que $AP=PD$ équivaut à « les $p_i$ sont vecteurs propres ».
+42. Énoncer le théorème 4.20 et le théorème 4.21.
+43. Décrire les trois temps de l'intuition géométrique (figure 4.7).
+44. Détailler les trois étapes de l'exemple 4.11.
+45. Écrire $A^k$ et $\det(A)$ via l'eigendécomposition.</p><p><strong>SVD</strong>
+46. Énoncer le théorème 4.22. Quelles matrices sont orthogonales ?
+47. Quelle est la taille de $\Sigma$ ? Pourquoi ?
+48. Quelle matrice de la SVD est unique ?
+49. Décrire les trois opérations géométriques de la SVD.
+50. Quelle est la différence essentielle avec l'eigendécomposition ?
+51. Comment se construisent $V$, puis $\Sigma$, puis $U$ ?
+52. Écrire l'équation singulière.
+53. Détailler les trois étapes de l'exemple 4.13.
+54. Donner les trois liens entre SVD et eigendécomposition.
+55. Quand les deux coïncident-elles ?
+56. Distinguer SVD complète, réduite et tronquée.
+57. Quelles hypothèses fait la SVD dans l'exemple des notes de films ?</p><p><strong>Approximation</strong>
+58. Écrire $A$ comme somme de matrices de rang 1.
+59. Écrire $A^{(k)}$. Quel est son rang ?
+60. Quel est le taux de compression de l'exemple de Stonehenge ?
+61. Définir la norme spectrale. Que vaut-elle ?
+62. Énoncer le théorème d'Eckart-Young et son interprétation.
+63. Pourquoi $\lVert A-A^{(k)}\rVert_2=\sigma_{k+1}$ ?</p><p><strong>Phylogénie</strong>
+64. Qu'est-ce qu'une matrice normale ? orthogonale ?
+65. « Non singulière » et « non défective » sont-ils synonymes ? Donner le contre-exemple du livre.
+66. Les matrices diagonales forment-elles un groupe ?</p></div>
+
+
+
+
+
+
+
+
+
+
+<h2>Flashcards</h2>
+<table>
+<thead>
+<tr>
+<th>Question</th>
+<th>Réponse</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Le déterminant est défini pour quelles matrices ?</td>
+<td> <strong>CARRÉES uniquement</strong></td>
+</tr>
+<tr>
+<td>$\det(A)\neq0$ équivaut à ?</td>
+<td>$\operatorname{rk}(A)=n$, c'est-à-dire <strong>$A$ inversible</strong> (Th. 4.1 / 4.3)</td>
+</tr>
+<tr>
+<td>Formule $2\times2$ ?</td>
+<td>$a_{11}a_{22}-a_{12}a_{21}$</td>
+</tr>
+<tr>
+<td>Règle de Sarrus ?</td>
+<td>$a_{11}a_{22}a_{33}+a_{21}a_{32}a_{13}+a_{31}a_{12}a_{23}-a_{31}a_{22}a_{13}-a_{11}a_{32}a_{23}-a_{21}a_{12}a_{33}$</td>
+</tr>
+<tr>
+<td>S'étend-elle à $4\times4$ ?</td>
+<td> <strong>NON</strong></td>
+</tr>
+<tr>
+<td>Déterminant d'une triangulaire ?</td>
+<td>Le <strong>produit des éléments diagonaux</strong></td>
+</tr>
+<tr>
+<td>Triangulaire supérieure ?</td>
+<td>$T_{ij}=0$ pour $i&gt;j$ — zéros <strong>sous</strong> la diagonale</td>
+</tr>
+<tr>
+<td>Interprétation géométrique de $|\det A|$ ?</td>
+<td> Le <strong>VOLUME</strong> du parallélépipède engendré par les <strong>COLONNES</strong></td>
+</tr>
+<tr>
+<td>Interprétation du signe ?</td>
+<td>L'<strong>ORIENTATION</strong> relativement à la base canonique</td>
+</tr>
+<tr>
+<td>$|\det|$ de l'exemple 4.2 ?</td>
+<td>$186$</td>
+</tr>
+<tr>
+<td>Si les colonnes sont dépendantes ?</td>
+<td> Le volume, donc le déterminant, vaut <strong>$0$</strong></td>
+</tr>
+<tr>
+<td>Développement de Laplace ?</td>
+<td>$\det(A)=\sum_{k}(-1)^{k+j}a_{kj}\det(A_{k,j})$ (colonne $j$) ou selon la ligne</td>
+</tr>
+<tr>
+<td>Qu'est-ce que $A_{k,j}$ ?</td>
+<td>La sous-matrice obtenue en <strong>supprimant la ligne $k$ et la colonne $j$</strong></td>
+</tr>
+<tr>
+<td>Mineur contre cofacteur ?</td>
+<td>Mineur $=\det(A_{k,j})$ · cofacteur $=(-1)^{k+j}\det(A_{k,j})$</td>
+</tr>
+<tr>
+<td>$\det(AB)$ ?</td>
+<td>$\det(A)\det(B)$</td>
+</tr>
+<tr>
+<td>$\det(A^\top)$ ?</td>
+<td>$\det(A)$ — <strong>invariant par transposition</strong></td>
+</tr>
+<tr>
+<td>$\det(A^{-1})$ ?</td>
+<td>$1/\det(A)$</td>
+</tr>
+<tr>
+<td>$\det(\lambda A)$ ?</td>
+<td> $\lambda^n\det(A)$</td>
+</tr>
+<tr>
+<td>Effet d'un échange de lignes ?</td>
+<td> <strong>Change le SIGNE</strong></td>
+</tr>
+<tr>
+<td>Effet d'ajouter un multiple d'une ligne à une autre ?</td>
+<td><strong>Aucun</strong></td>
+</tr>
+<tr>
+<td>Matrices semblables et déterminant ?</td>
+<td> <strong>Même déterminant</strong> — invariant par changement de base</td>
+</tr>
+<tr>
+<td>Définition de la trace ?</td>
+<td>$\operatorname{tr}(A)=\sum_i a_{ii}$</td>
+</tr>
+<tr>
+<td>$\operatorname{tr}(AB)$ ?</td>
+<td>$\operatorname{tr}(BA)$</td>
+</tr>
+<tr>
+<td>Invariance cyclique ?</td>
+<td>$\operatorname{tr}(AKL)=\operatorname{tr}(KLA)$</td>
+</tr>
+<tr>
+<td>$\operatorname{tr}(xy^\top)$ ?</td>
+<td>$y^\top x\in\mathbb R$</td>
+</tr>
+<tr>
+<td>La trace dépend-elle de la base ?</td>
+<td> <strong>NON</strong> : $\operatorname{tr}(S^{-1}AS)=\operatorname{tr}(A)$</td>
+</tr>
+<tr>
+<td>Combien de fonctions vérifient les 4 propriétés de la trace ?</td>
+<td> <strong>Une seule</strong> — la trace</td>
+</tr>
+<tr>
+<td>Polynôme caractéristique ?</td>
+<td>$p_A(\lambda):=\det(A-\lambda I)$</td>
+</tr>
+<tr>
+<td>Coefficient dominant ?</td>
+<td>$(-1)^n$</td>
+</tr>
+<tr>
+<td>$c_0$ ?</td>
+<td>$\det(A)$</td>
+</tr>
+<tr>
+<td>$c_{n-1}$ ?</td>
+<td>$(-1)^{n-1}\operatorname{tr}(A)$</td>
+</tr>
+<tr>
+<td>Équation aux valeurs propres ?</td>
+<td>$Ax=\lambda x$ avec  <strong>$x\neq0$</strong></td>
+</tr>
+<tr>
+<td>Que signifie « eigen » ?</td>
+<td> Allemand : « <strong>caractéristique</strong> », « <strong>propre</strong> », « <strong>à soi</strong> »</td>
+</tr>
+<tr>
+<td>Les quatre équivalences ?</td>
+<td>$\lambda$ vp $\iff\exists x\neq0:(A-\lambda I)x=0\iff\operatorname{rk}(A-\lambda I)&lt;n\iff\det(A-\lambda I)=0$</td>
+</tr>
+<tr>
+<td>Colinéaire ?</td>
+<td>Même direction <strong>OU</strong> direction opposée</td>
+</tr>
+<tr>
+<td>Codirigé ?</td>
+<td> <strong>Même</strong> direction seulement</td>
+</tr>
+<tr>
+<td>Les vecteurs propres sont-ils uniques ?</td>
+<td> <strong>NON</strong> — tout multiple $cx$, $c\neq0$, en est un</td>
+</tr>
+<tr>
+<td>Espace propre $E_\lambda$ ?</td>
+<td>$\ker(A-\lambda I)$</td>
+</tr>
+<tr>
+<td>Spectre ?</td>
+<td>L'<strong>ensemble de toutes les valeurs propres</strong></td>
+</tr>
+<tr>
+<td>Interprétation géométrique de $\lambda$ ?</td>
+<td>Le <strong>FACTEUR D'ÉTIREMENT</strong> de la direction propre</td>
+</tr>
+<tr>
+<td>Si $\lambda&lt;0$ ?</td>
+<td> La direction de l'étirement est <strong>RETOURNÉE</strong></td>
+</tr>
+<tr>
+<td>Spectre de $I_n$ ?</td>
+<td>Une seule valeur propre $\lambda=1$, de multiplicité $n$ ; $\dim E_1=n$</td>
+</tr>
+<tr>
+<td>$A$ et $A^\top$ ?</td>
+<td> <strong>Mêmes valeurs propres</strong>, pas forcément les mêmes vecteurs</td>
+</tr>
+<tr>
+<td>Matrices semblables et spectre ?</td>
+<td><strong>Mêmes valeurs propres</strong></td>
+</tr>
+<tr>
+<td>Valeurs propres d'une matrice SDP ?</td>
+<td> <strong>Réelles ET positives</strong></td>
+</tr>
+<tr>
+<td>Valeurs propres de l'exemple 4.5 ?</td>
+<td>$\lambda_1=2$, $\lambda_2=5$, avec $E_5=\operatorname{span}[[2,1]^\top]$ et $E_2=\operatorname{span}[[1,-1]^\top]$</td>
+</tr>
+<tr>
+<td>Multiplicité algébrique ?</td>
+<td>Le nombre de fois que la racine apparaît dans $p_A$</td>
+</tr>
+<tr>
+<td>Multiplicité géométrique ?</td>
+<td>$\dim E_{\lambda_i}$ = nombre de vecteurs propres <strong>indépendants</strong></td>
+</tr>
+<tr>
+<td>L'inégalité entre les deux ?</td>
+<td> $1\leqslant$ <strong>géométrique</strong> $\leqslant$ <strong>algébrique</strong></td>
+</tr>
+<tr>
+<td>L'exemple 4.6 ?</td>
+<td>$\begin{bmatrix}2&amp;1\\0&amp;2\end{bmatrix}$ : algébrique <strong>2</strong>, géométrique <strong>1</strong></td>
+</tr>
+<tr>
+<td>Matrice défective ?</td>
+<td>Moins de $n$ vecteurs propres <strong>linéairement indépendants</strong></td>
+</tr>
+<tr>
+<td>Une défective peut-elle avoir $n$ vp distinctes ?</td>
+<td> <strong>NON</strong> (Th. 4.12)</td>
+</tr>
+<tr>
+<td>Théorème 4.12 ?</td>
+<td>$n$ valeurs propres <strong>distinctes</strong> $\Rightarrow$ vecteurs propres <strong>indépendants</strong></td>
+</tr>
+<tr>
+<td>$\det=1$ dans la figure 4.4 signifie ?</td>
+<td> <strong>Aire préservée</strong></td>
+</tr>
+<tr>
+<td>$\det=0$ signifie ?</td>
+<td> <strong>Effondrement</strong> dimensionnel ; $0$ est valeur propre</td>
+</tr>
+<tr>
+<td>Valeurs propres complexes ?</td>
+<td> Une <strong>ROTATION</strong> — aucune direction réelle simplement étirée</td>
+</tr>
+<tr>
+<td>Théorème 4.14 ?</td>
+<td>$S:=A^\top A$ est <strong>toujours</strong> symétrique semi-définie positive</td>
+</tr>
+<tr>
+<td>Quand $A^\top A$ est-elle définie positive ?</td>
+<td> Si $\operatorname{rk}(A)=n$</td>
+</tr>
+<tr>
+<td>Théorème spectral ?</td>
+<td>$A$ <strong>symétrique</strong> $\Rightarrow$ <strong>ONB de vecteurs propres</strong>, valeurs propres <strong>RÉELLES</strong></td>
+</tr>
+<tr>
+<td>Son implication ?</td>
+<td>$A=PDP^\top$ avec $P$ <strong>orthogonale</strong></td>
+</tr>
+<tr>
+<td>Le problème de l'exemple 4.8 ?</td>
+<td>Les deux vecteurs propres de $E_1$ ne sont <strong>pas orthogonaux</strong> ($x_1^\top x_2=1$)</td>
+</tr>
+<tr>
+<td>La solution ?</td>
+<td> <strong>Gram-Schmidt à l'intérieur de l'espace propre</strong> — toute combinaison reste vecteur propre</td>
+</tr>
+<tr>
+<td>Théorème 4.16 ?</td>
+<td>$\det(A)=\prod_i\lambda_i$</td>
+</tr>
+<tr>
+<td>Théorème 4.17 ?</td>
+<td>$\operatorname{tr}(A)=\sum_i\lambda_i$</td>
+</tr>
+<tr>
+<td>L'intuition géométrique ?</td>
+<td>Aire du carré unité $\times|\lambda_1\lambda_2|$ ; périmètre $\times$ selon $|\lambda_1|+|\lambda_2|$</td>
+</tr>
+<tr>
+<td>PageRank ?</td>
+<td>Le vecteur propre de <strong>valeur propre maximale</strong> ; $Ax_*=x_*$, donc $\lambda=1$</td>
+</tr>
+<tr>
+<td>Ses inventeurs ?</td>
+<td><strong>Larry Page et Sergey Brin</strong>, Stanford, <strong>1996</strong></td>
+</tr>
+<tr>
+<td>Théorème de Cholesky ?</td>
+<td>$A$ symétrique <strong>définie positive</strong> $\Rightarrow A=LL^\top$, $L$ triangulaire <strong>inférieure</strong>, diagonale <strong>positive</strong></td>
+</tr>
+<tr>
+<td>$L$ est-elle unique ?</td>
+<td> <strong>OUI</strong></td>
+</tr>
+<tr>
+<td>Le motif diagonal ?</td>
+<td>$l_{jj}=\sqrt{a_{jj}-\sum_{k&lt;j}l_{jk}^2}$</td>
+</tr>
+<tr>
+<td>Le motif sous-diagonal ?</td>
+<td>$l_{ij}=\big(a_{ij}-\sum_{k&lt;j}l_{ik}l_{jk}\big)/l_{jj}$</td>
+</tr>
+<tr>
+<td>$\det(A)$ via Cholesky ?</td>
+<td>$\prod_i l_{ii}^2$</td>
+</tr>
+<tr>
+<td>Les trois usages ML ?</td>
+<td><strong>Échantillonner une gaussienne</strong> · transformer des <strong>variables aléatoires</strong> (VAE) · <strong>déterminants efficaces</strong></td>
+</tr>
+<tr>
+<td>Ce que permet une matrice diagonale ?</td>
+<td>$\det$ = produit · $D^k$ élément par élément · $D^{-1}$ = réciproques</td>
+</tr>
+<tr>
+<td>Diagonalisable ?</td>
+<td>Semblable à une diagonale : $\exists P$ inversible avec $D=P^{-1}AP$</td>
+</tr>
+<tr>
+<td>Théorème 4.20 ?</td>
+<td>$A=PDP^{-1}$  <strong>si et seulement si</strong> les vecteurs propres forment une <strong>base</strong></td>
+</tr>
+<tr>
+<td>Que contient $P$ ?</td>
+<td>Les <strong>$n$ vecteurs propres</strong>, en colonnes</td>
+</tr>
+<tr>
+<td>Théorème 4.21 ?</td>
+<td> Une matrice <strong>symétrique</strong> peut <strong>TOUJOURS</strong> être diagonalisée</td>
+</tr>
+<tr>
+<td>Et alors $P$ est ?</td>
+<td><strong>Orthogonale</strong>, donc $D=P^\top AP$</td>
+</tr>
+<tr>
+<td>Le cas défectif ?</td>
+<td>La <strong>forme normale de Jordan</strong> (hors cadre du livre)</td>
+</tr>
+<tr>
+<td>Les trois temps géométriques ?</td>
+<td>$P^{-1}$ <strong>change de base</strong> vers la base propre · $D$ <strong>met à l'échelle</strong> · $P$ <strong>revient</strong></td>
+</tr>
+<tr>
+<td>Valeurs propres de l'exemple 4.11 ?</td>
+<td>$\lambda_1=\tfrac72$, $\lambda_2=\tfrac32$, avec $p_1=\tfrac{1}{\sqrt2}[1,-1]^\top$, $p_2=\tfrac{1}{\sqrt2}[1,1]^\top$</td>
+</tr>
+<tr>
+<td>$A^k$ ?</td>
+<td>$PD^kP^{-1}$</td>
+</tr>
+<tr>
+<td>$\det(A)$ via l'eigendécomposition ?</td>
+<td>$\prod_i d_{ii}$ — les $\det(P)$ <strong>se compensent</strong></td>
+</tr>
+<tr>
+<td>Théorème de la SVD ?</td>
+<td>$A=U\Sigma V^\top$, $U$ et $V$ <strong>orthogonales</strong>, $\Sigma_{ii}=\sigma_i\geqslant0$</td>
+</tr>
+<tr>
+<td>Pour quelles matrices existe-t-elle ?</td>
+<td> <strong>TOUTES</strong>, y compris rectangulaires — le « théorème fondamental de l'algèbre linéaire »</td>
+</tr>
+<tr>
+<td>Taille de $\Sigma$ ?</td>
+<td> <strong>La même que $A$</strong>, avec remplissage par des zéros</td>
+</tr>
+<tr>
+<td>Quelle matrice est unique ?</td>
+<td> <strong>$\Sigma$</strong></td>
+</tr>
+<tr>
+<td>Convention d'ordre ?</td>
+<td>$\sigma_1\geqslant\sigma_2\geqslant\dots\geqslant\sigma_r\geqslant0$</td>
+</tr>
+<tr>
+<td>Les trois opérations ?</td>
+<td>$V^\top$ change de base dans le <strong>domaine</strong> · $\Sigma$ <strong>met à l'échelle et change de dimension</strong> · $U$ change de base dans le <strong>codomaine</strong></td>
+</tr>
+<tr>
+<td>La différence essentielle avec l'eigendécomposition ?</td>
+<td> La SVD change de base dans <strong>DEUX espaces différents</strong>, liés par $\Sigma$</td>
+</tr>
+<tr>
+<td>D'où viennent les $v_i$ ?</td>
+<td>Ce sont les <strong>vecteurs propres de $A^\top A$</strong></td>
+</tr>
+<tr>
+<td>D'où viennent les $u_i$ ?</td>
+<td>Ce sont les <strong>vecteurs propres de $AA^\top$</strong></td>
+</tr>
+<tr>
+<td>Relation entre $\sigma_i$ et $\lambda_i$ ?</td>
+<td>$\sigma_i=\sqrt{\lambda_i}$</td>
+</tr>
+<tr>
+<td>Équation singulière ?</td>
+<td>$Av_i=\sigma_iu_i$ pour $i=1,\dots,r$</td>
+</tr>
+<tr>
+<td>Formule pour $u_i$ ?</td>
+<td>$u_i=\dfrac{Av_i}{\lVert Av_i\rVert}=\dfrac{1}{\sigma_i}Av_i$</td>
+</tr>
+<tr>
+<td>SVD de l'exemple 4.13 ?</td>
+<td>$\sigma_1=\sqrt6$, $\sigma_2=1$ ; $U=\tfrac{1}{\sqrt5}\begin{bmatrix}1&amp;2\\-2&amp;1\end{bmatrix}$</td>
+</tr>
+<tr>
+<td>Doit-on calculer la SVD via $A^\top A$ ?</td>
+<td> <strong>NON</strong> en pratique — mauvais comportement numérique</td>
+</tr>
+<tr>
+<td>Quand SVD et eigendécomposition coïncident-elles ?</td>
+<td> Pour les matrices <strong>SYMÉTRIQUES</strong></td>
+</tr>
+<tr>
+<td>SVD réduite ?</td>
+<td>Pour $m\geqslant n$ : $U\in\mathbb R^{m\times n}$, $\Sigma\in\mathbb R^{n\times n}$ — $\Sigma$ <strong>diagonale</strong></td>
+</tr>
+<tr>
+<td>SVD tronquée ?</td>
+<td>$U\in\mathbb R^{m\times r}$, $\Sigma\in\mathbb R^{r\times r}$, $V\in\mathbb R^{r\times n}$</td>
+</tr>
+<tr>
+<td>$A$ comme somme ?</td>
+<td>$A=\sum_{i=1}^{r}\sigma_iu_iv_i^\top$ — somme de <strong>matrices de rang 1</strong></td>
+</tr>
+<tr>
+<td>Approximation de rang $k$ ?</td>
+<td>$A^{(k)}=\sum_{i=1}^{k}\sigma_iu_iv_i^\top$, de rang exactement $k$</td>
+</tr>
+<tr>
+<td>Compression de Stonehenge ?</td>
+<td>$16\,715$ nombres contre $2\,735\,120$, soit  <strong>$0{,}6\,\%$</strong></td>
+</tr>
+<tr>
+<td>Coût de stockage de $A^{(k)}$ ?</td>
+<td>$k(m+n+1)$ nombres</td>
+</tr>
+<tr>
+<td>Norme spectrale ?</td>
+<td>$\lVert A\rVert_2=\max_x\dfrac{\lVert Ax\rVert_2}{\lVert x\rVert_2}$</td>
+</tr>
+<tr>
+<td>Que vaut-elle ?</td>
+<td> $\sigma_1$, la <strong>plus grande valeur singulière</strong> (Th. 4.24)</td>
+</tr>
+<tr>
+<td>Ce qu'elle mesure ?</td>
+<td>De combien un vecteur peut <strong>au plus s'allonger</strong> sous $A$</td>
+</tr>
+<tr>
+<td>Théorème d'Eckart-Young ?</td>
+<td>$A^{(k)}=\operatorname{argmin}_{\operatorname{rk}(B)=k}\lVert A-B\rVert_2$ et $\lVert A-A^{(k)}\rVert_2=\sigma_{k+1}$</td>
+</tr>
+<tr>
+<td>Son année ?</td>
+<td><strong>1936</strong></td>
+</tr>
+<tr>
+<td>Pourquoi $\sigma_{k+1}$ ?</td>
+<td>Car $A-A^{(k)}=\sum_{i&gt;k}\sigma_iu_iv_i^\top$, dont la plus grande valeur singulière est $\sigma_{k+1}$</td>
+</tr>
+<tr>
+<td>Matrice normale ?</td>
+<td>$A^\top A=AA^\top$</td>
+</tr>
+<tr>
+<td>Matrice orthogonale ?</td>
+<td>$A^\top A=AA^\top=I$, donc $A^\top=A^{-1}$</td>
+</tr>
+<tr>
+<td>Valeurs propres d'une symétrique ?</td>
+<td> Toutes <strong>RÉELLES</strong></td>
+</tr>
+<tr>
+<td>« Non singulière » = « non défective » ?</td>
+<td> <strong>NON</strong> : une <strong>rotation</strong> est inversible mais non diagonalisable dans $\mathbb R$</td>
+</tr>
+<tr>
+<td>Les diagonales forment-elles un groupe ?</td>
+<td> Seulement si <strong>toutes</strong> les entrées diagonales sont non nulles</td>
+</tr>
+<tr>
+<td>Origine du mot « phylogénétique » ?</td>
+<td>Grec : « <strong>tribu</strong> » et « <strong>source</strong> »</td>
+</tr>
+</tbody></table>
+</main>
+
+
+
+
+</body></html>

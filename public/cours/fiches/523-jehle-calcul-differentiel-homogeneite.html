@@ -1,0 +1,2477 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fiche 523 — Calcul différentiel : gradient, hessienne, courbure et fonctions homogènes</title>
+<script>
+window.MathJax={tex:{inlineMath:[["$","$"]],displayMath:[["$$","$$"]],processEscapes:true},
+ options:{skipHtmlTags:["script","noscript","style","textarea","pre","code"]},
+ svg:{fontCache:"global"},
+ startup:{pageReady:()=>MathJax.startup.defaultPageReady().then(()=>{document.body.classList.add("ready")})}};
+setTimeout(function(){document.body.classList.add("ready")},2500);
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+/* ============================================================
+   MathiasLearn — feuille de style des fiches
+   Reprise intégrale des tokens de 00_PARCOURS/*.html
+   + blocs pédagogiques (callouts, méthode, essentiels, recall)
+   ============================================================ */
+:root{--bg:#faf9f7;--card:#fff;--ink:#1a1a1a;--muted:#6b6b6b;--line:#e5e2dd;--accent:#8b5e34;
+ --hl:#fdf8ef;--ok:#2d7d4f;--okbg:#f0f7f3;--warn:#b3402f;--warnbg:#fdf3f1;--blue:#2f5d8b;--bluebg:#f1f5fa}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+ font:17px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;padding:0 16px 100px}
+.nav{position:sticky;top:0;background:rgba(250,249,247,.96);backdrop-filter:blur(8px);
+ border-bottom:1px solid var(--line);margin:0 -16px 30px;padding:11px 16px;z-index:50;
+ display:flex;gap:6px;flex-wrap:wrap;font-size:13px}
+.nav a{color:var(--muted);text-decoration:none;padding:4px 9px;border-radius:5px;white-space:nowrap}
+.nav a:hover{background:var(--line);color:var(--ink)}
+.nav a.on{background:var(--accent);color:#fff}
+main{max-width:780px;margin:0 auto}
+h1{font-size:31px;letter-spacing:-.02em;margin:.4em 0 .5em;line-height:1.25}
+h2{font-size:23px;margin:2.2em 0 .7em;padding-bottom:.3em;border-bottom:1px solid var(--line)}
+h3{font-size:19px;margin:1.9em 0 .5em;color:var(--accent)}
+h4{font-size:17px;margin:1.5em 0 .4em}
+p{margin:.8em 0} a{color:var(--accent)} hr{border:0;border-top:1px solid var(--line);margin:2.6em 0}
+table{border-collapse:collapse;width:100%;margin:1.3em 0;font-size:15.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+th{background:#f3f0eb;font-weight:600}
+tr:nth-child(even) td{background:#fcfbfa}
+code{font-family:"SF Mono",Menlo,Consolas,monospace;font-size:.88em;background:#f2efea;padding:2px 6px;border-radius:4px;overflow-wrap:break-word}
+pre{background:#f2efea;padding:14px 16px;border-radius:8px;overflow-x:auto}
+pre code{background:none;padding:0;white-space:pre}
+blockquote{border-left:3px solid var(--accent);background:var(--hl);margin:1.4em 0;padding:14px 20px;border-radius:0 8px 8px 0}
+blockquote p:first-child{margin-top:0} blockquote p:last-child{margin-bottom:0}
+ul,ol{padding-left:1.5em} li{margin:.35em 0} em{color:#4a4a4a}
+mjx-container[display="true"]{margin:1.1em 0!important;overflow-x:auto;overflow-y:hidden;padding:2px 0}
+mjx-container svg{max-width:100%}
+body:not(.ready) main{opacity:0} main{opacity:1;transition:opacity .25s}
+
+/* --- bandeau de tête de fiche --- */
+.cours{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--accent);
+ border-radius:0 10px 10px 0;padding:18px 22px;margin:0 0 34px}
+.cours h4{margin:0 0 4px;font-size:14px;text-transform:uppercase;letter-spacing:.07em;color:var(--accent)}
+.cours .cs{color:var(--muted);font-size:14.5px;margin:0 0 14px}
+
+/* --- exercices / corrigés --- */
+.ex{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:6px 24px 20px;margin:18px 0}
+.ex>h3:first-child{margin-top:14px}
+details.cor{margin-top:18px;border:1px solid var(--line);border-radius:8px;background:#fcfbfa;overflow:hidden}
+details.cor>summary{cursor:pointer;padding:12px 16px;font-weight:600;font-size:15px;color:var(--accent);
+ list-style:none;display:flex;align-items:center;gap:9px;user-select:none;transition:.15s;min-height:44px}
+details.cor>summary::-webkit-details-marker{display:none}
+details.cor>summary:hover{background:var(--hl)}
+details.cor>summary::before{content:"\25B6";font-size:10px;transition:transform .18s;display:inline-block}
+details.cor[open]>summary::before{transform:rotate(90deg)}
+details.cor[open]>summary{background:var(--okbg);color:var(--ok);border-bottom:1px solid var(--line)}
+.cor .in{padding:4px 20px 16px}
+.cor .in>*:first-child{margin-top:.9em}
+
+/* --- blocs pédagogiques (callouts) ---
+   Générés depuis une citation Markdown dont le premier **gras** commence
+   par un mot-clé : DÉFINITION, THÉORÈME, MÉTHODE, PIÈGE, INTUITION… */
+.cal{border:1px solid var(--line);border-left:4px solid var(--accent);background:var(--card);
+ border-radius:0 10px 10px 0;padding:15px 20px;margin:1.5em 0}
+.cal>p:first-child{margin-top:0}.cal>p:last-child,.cal>ul:last-child,.cal>ol:last-child{margin-bottom:0}
+.cal .lab{display:block;font-size:12.5px;text-transform:uppercase;letter-spacing:.08em;
+ font-weight:700;color:var(--accent);margin-bottom:6px}
+.cal.formel{background:var(--hl)}
+.cal.piege{border-left-color:var(--warn);background:var(--warnbg)}
+.cal.piege .lab{color:var(--warn)}
+.cal.methode{border-left-color:var(--ok);background:var(--okbg)}
+.cal.methode .lab{color:var(--ok)}
+.cal.intu{border-left-color:var(--blue);background:var(--bluebg)}
+.cal.intu .lab{color:var(--blue)}
+.cal.plus{border-left-style:dashed;background:#faf9f7}
+.cal.plus .lab{color:var(--muted)}
+
+/* --- révision express --- */
+.ess{background:var(--card);border:1px solid var(--accent);border-radius:10px;padding:4px 24px 20px;margin:1.6em 0}
+.ess h3{margin-top:1.3em}
+.rec{background:var(--card);border:1px dashed var(--accent);border-radius:10px;padding:4px 24px 18px;margin:1.6em 0}
+.rec ol{counter-reset:none}
+
+/* --- impression / PDF --- */
+@media print{
+ .nav{display:none}
+ body{padding:0;background:#fff;font-size:11.2pt;line-height:1.55}
+ main{max-width:none}
+ h1{font-size:23pt}h2{font-size:15pt;margin-top:1.5em}h3{font-size:12.6pt}
+ h2,h3,h4{break-after:avoid;page-break-after:avoid}
+ table,.cal,blockquote{break-inside:avoid;page-break-inside:avoid}
+ table{display:table;font-size:9.6pt}
+ details.cor{border:1px solid var(--line);background:#fcfbfa}
+ details.cor>summary{display:none}
+ details.cor .in{padding-top:10px}
+ .cal,.ex,.ess,.rec{box-shadow:none}
+ a{color:var(--ink);text-decoration:none}
+}
+@page{margin:16mm 15mm 18mm}
+
+/* --- exemples travaillés --- */
+.exm{background:#fcfbfa;border:1px solid var(--line);border-radius:10px;padding:2px 20px 14px;margin:1.5em 0}
+.exm>h4:first-child{margin:14px 0 .5em;color:var(--accent);font-size:13px;text-transform:uppercase;letter-spacing:.07em}
+
+
+/* --- pastilles de priorité (conventions des fiches de l'app) --- */
+h2[data-prio], h3[data-prio], h4[data-prio]{position:relative}
+h2[data-prio]::before,h3[data-prio]::before,h4[data-prio]::before{
+ content:"";display:inline-block;width:9px;height:9px;border-radius:50%;
+ margin-right:9px;vertical-align:middle;background:var(--muted)}
+[data-prio="must"]::before{background:var(--warn)}
+[data-prio="high"]::before{background:#d98324}
+[data-prio="mid"]::before{background:#c9a227}
+[data-prio="low"]::before{background:var(--ok)}
+/* corrigés des fiches de l'app : même traitement que les corrigés des séries */
+details.cor>summary::after{content:""}
+</style></head><body>
+<div class="nav"><a href="00_COMMENCER_ICI.html">Commencer ici</a><a href="01_NOTATIONS_le-decodeur.html">Notations</a><a href="02_EXERCICES_Serie-0.html">Série 0 — Remise en route</a><a href="03_EXERCICES_Serie-1.html">Série 1 — Convexité</a><a href="04_EXERCICES_Serie-2.html">Série 2 — KKT</a><a href="05_AUTO-EVALUATION.html">Auto-évaluation (quiz)</a><a href="06_FICHE_Optimisation-deux-variables.html">Fiche — Optimisation à 2 variables</a></div>
+<main><h1>Fiche 523 — Calcul différentiel : gradient, hessienne, courbure et fonctions homogènes</h1>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Matière</strong></td>
+<td>Maths · Microéconomie avancée</td>
+</tr>
+<tr>
+<td><strong>Cours source</strong></td>
+<td>Jehle &amp; Reny, <em>Advanced Microeconomic Theory</em>, 3ᵉ éd., Pearson 2011 — appendice mathématique, §A2.1 « Calculus » (p. 551-566)</td>
+</tr>
+<tr>
+<td><strong>Difficulté</strong></td>
+<td> Intermédiaire — l'outillage analytique de toute l'optimisation</td>
+</tr>
+<tr>
+<td><strong>Temps d'étude estimé</strong></td>
+<td>125 min</td>
+</tr>
+<tr>
+<td><strong>Prérequis</strong></td>
+<td><a href="522-jehle-fonctions-reelles-concavite.md">Fiche 522</a> — concavité, convexité, ensembles de niveau · <a href="521-jehle-ensembles-applications.md">Fiche 521</a> — ensembles convexes, continuité</td>
+</tr>
+<tr>
+<td><strong>Concepts clés</strong></td>
+<td>Différentiabilité, dérivée, dérivée seconde, fonction $C^n$, règles de dérivation, courbure, droite tangente, dérivée partielle, dérivée directionnelle, gradient, dérivée partielle seconde, matrice hessienne, théorème de Young, forme quadratique, matrice semi-définie négative, matrice définie négative, matrice semi-définie positive, fonction homogène, homogénéité linéaire, homogénéité de degré zéro, fonction Cobb-Douglas, théorème d'Euler</td>
+</tr>
+<tr>
+<td><strong>Poids à l'examen</strong></td>
+<td>Le <strong>théorème A2.1</strong> <em>(concavité $\iff$ $f''\leq0$ $\iff$ inégalité de la tangente)</em> · la <strong>définition A2.1</strong> et le calcul pratique des partielles · la <strong>dérivée directionnelle</strong> $g'(0)=\nabla f(\mathbf{x})\mathbf{z}$ · la <strong>matrice HESSIENNE</strong> et le <strong>théorème A2.2 de YOUNG</strong> · le <strong>théorème A2.3</strong> <em>(le pont une variable / plusieurs variables)</em> · le <strong>théorème A2.4</strong> <em>(concavité $\iff$ hessienne SEMI-DÉFINIE NÉGATIVE)</em> avec sa preuve · le <strong>théorème A2.5</strong> · la <strong>définition A2.2</strong> et le <strong>théorème A2.6</strong> · le <strong>THÉORÈME A2.7 D'EULER</strong> avec sa preuve complète.</td>
+</tr>
+</tbody></table>
+<h2>Vue d'ensemble</h2>
+<pre><code>LE FIL DU §A2.1 : de la derivee a la HESSIENNE, puis a EULER
+
+  §A2.1.1  UNE SEULE VARIABLE
+
+     DIFFERENTIABLE = « CONTINUE ET LISSE, SANS CASSURES NI PLIS »
+     « La differentiabilite est une exigence PLUS STRINGENTE
+       que la continuite. »
+
+     dy/dx = f'(x)     d2y/dx2 = f''(x)
+     f est de classe C^n si f', f'', ..., f^(n) sont CONTINUES
+
+     LA COURBURE :  f'' donne « LE TAUX AUQUEL LA PENTE CHANGE »
+
+     THEOREME A2.1  les TROIS enonces EQUIVALENTS :
+        1.  f est CONCAVE
+        2.  f''(x) &lt;= 0  pour tout x non-extremite
+        3.  f(x) &lt;= f(x0) + f'(x0)(x - x0)   -&gt;  LA TANGENTE
+            EST TOUJOURS AU-DESSUS DU GRAPHE
+        4.  si f''(x) &lt; 0 partout, alors f est STRICTEMENT concave
+            ( ... et LA RECIPROQUE DE 4 EST FAUSSE )
+
+  §A2.1.2  PLUSIEURS VARIABLES
+
+     DEF. A2.1  DERIVEE PARTIELLE : la derivee ordinaire par
+     rapport a x_i, EN TRAITANT LES AUTRES COMME DES CONSTANTES
+
+     LA DERIVEE DIRECTIONNELLE :  g(t) = f(x + tz)
+        g'(0) = SOMME_i f_i(x) z_i = GRADIENT(f)(x) z
+
+     « TOUTES les derivees PARTIELLES ne sont que des derivees
+       DIRECTIONNELLES d'un genre PARTICULIER. »
+
+     LA MATRICE HESSIENNE H(x) = toutes les partielles SECONDES
+     THEOREME A2.2 (YOUNG)  L'ORDRE NE COMPTE PAS -&gt; H SYMETRIQUE
+
+     THEOREME A2.3  f CONCAVE  &lt;=&gt;  g(t) = f(x + tz) concave
+                    POUR TOUT x ET TOUT z
+                    -&gt; « IL SUFFIT DE VERIFIER SUR LES DROITES »
+
+     SEMI-DEFINIE NEGATIVE :  z' A z &lt;= 0  pour tout z
+     DEFINIE NEGATIVE      :  z' A z &lt; 0   pour tout z NON NUL
+
+     THEOREME A2.4  les TROIS enonces EQUIVALENTS :
+        1.  f est CONCAVE
+        2.  H(x) est SEMI-DEFINIE NEGATIVE partout
+        3.  f(x) &lt;= f(x0) + GRADIENT(f)(x0)(x - x0)
+        4.  si H(x) est DEFINIE NEGATIVE, f est STRICTEMENT concave
+
+     THEOREME A2.5  f concave =&gt; f_ii &lt;= 0    ( NECESSAIRE
+                    MAIS PAS SUFFISANT )
+
+  §A2.1.3  LES FONCTIONS HOMOGENES
+
+     DEF. A2.2  f(tx) = t^k f(x)  pour tout t &gt; 0
+        k = 1  -&gt;  HOMOGENE LINEAIRE
+        k = 0  -&gt;  « les changements EQUIPROPORTIONNELS
+                     LAISSENT LA VALEUR INCHANGEE »
+
+     COBB-DOUGLAS  A x1^a x2^b   est homogene de degre  a + b
+
+     THEOREME A2.6  les DERIVEES PARTIELLES d'une fonction
+                    homogene de degre k sont homogenes
+                    de degre  k - 1
+
+     THEOREME A2.7 (EULER, « le theoreme d'ADDITIVITE ») :
+        f est homogene de degre k   SI ET SEULEMENT SI
+             k f(x) = SOMME_i  ( df/dx_i ) x_i
+
+        pour k = 1 :   f(x) = SOMME_i ( df/dx_i ) x_i
+</code></pre>
+<blockquote>
+<p class="cal piege"> <strong>Note de transcription — spécifique à ce chapitre.</strong> Le PDF  <strong>PERD LES SYMBOLES « PRIME »</strong> : <em>« la dérivée, $f(x)$ »</em> signifie <strong>$f'(x)$</strong>, et l'énoncé 2 du théorème A2.1, <em>« $f(x)\leq0$ »</em>, signifie <strong>$f''(x)\leq0$</strong>. Il exporte aussi  <strong>le symbole de PRODUIT $\times$ comme un « + »</strong> : <em>« une matrice $n+n$ »</em> signifie <strong>$n\times n$</strong>, et <em>« $n+n=n^2$ dérivées partielles secondes »</em> signifie <strong>$n\times n=n^2$</strong>. Il <strong>PERD $\sum$</strong>, <strong>déplace le radical $\sqrt{\ }$</strong> <em>(le texte imprime « real-v√alued » à la place de « $y=\sqrt{z^2+w^2}$ »)</em>, et perd le barré de $\neq$ <em>(« $x_j$, $j=i$ » signifie $j\neq i$)</em>. Les symboles ont été restitués <strong>à partir de la prose du livre elle-même</strong>, qui les explicite mot pour mot. <strong>Il s'agit d'une réparation de transcription, non d'un ajout de contenu.</strong></p>
+</blockquote>
+<h2 data-prio="high">Concept 1 — §A2.1.1 : la dérivée et la classe $C^n$</h2>
+<h3>1.1 Ce qu'est la différentiabilité</h3>
+<blockquote>
+<p><em>« Grossièrement parlant, <strong>une fonction $y=f(x)$ est DIFFÉRENTIABLE si elle est À LA FOIS CONTINUE ET « LISSE », SANS CASSURES NI PLIS.</strong> »</em></p>
+</blockquote>
+<p><em>(Fig. A2.1 : <strong>(a)</strong> est <strong>non différentiable en $x^0$</strong> — elle y présente un pli — tandis que <strong>(b)</strong> est <strong>partout différentiable</strong>.)</em></p>
+<blockquote>
+<p class="cal piege"> <em>« <strong>La différentiabilité est donc une exigence PLUS STRINGENTE que la continuité. C'est aussi une exigence que NOUS IMPOSONS SOUVENT parce qu'elle nous permet d'utiliser les outils familiers du calcul.</strong> »</em></p>
+</blockquote>
+<h3>1.2 Dérivée première et seconde</h3>
+<blockquote>
+<p><em>« <strong>Le concept de la dérivée, $f'(x)$, vous est sans doute familier. LA DÉRIVÉE EST UNE FONCTION, ELLE AUSSI</strong>, donnant, en chaque valeur de $x$, <strong>LA PENTE ou LE TAUX DE VARIATION INSTANTANÉ</strong> de $f(x)$. »</em></p>
+</blockquote>
+<p>$$\frac{dy}{dx}=f'(x) \tag{A2.1}$$</p>
+<blockquote>
+<p><em>« pour indiquer que $f'(x)$ nous donne <strong>le montant (instantané) $dy$ dont $y$ varie PAR UNITÉ de variation $dx$ de $x$</strong> »</em>.</p>
+</blockquote>
+<blockquote>
+<p><em>« <strong>Si la dérivée (première) est une fonction différentiable, nous pouvons prendre SA dérivée aussi</strong>, obtenant la dérivée seconde de la fonction d'origine »</em> :</p>
+</blockquote>
+<p>$$\frac{d^2y}{dx^2}=f''(x) \tag{A2.2}$$</p>
+<div class="cal formel"><span class="lab">DÉFINITION (énoncée dans le texte) — Fonctions $C^n$</span>
+<p>
+<em>« Si une fonction possède <strong>des dérivées CONTINUES $f',f'',\dots,f^{(n)}$, elle est appelée $n$-FOIS CONTINÛMENT DIFFÉRENTIABLE, ou UNE FONCTION $C^n$.</strong> »</em></p>
+</div>
+<h3>1.3 Les règles de dérivation (figure A2.2)</h3>
+<table>
+<thead>
+<tr>
+<th>La règle</th>
+<th>La formule</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Constantes</strong></td>
+<td>$\dfrac{d}{dx}(\alpha)=0$</td>
+</tr>
+<tr>
+<td><strong>Sommes</strong></td>
+<td>$\dfrac{d}{dx}\big[f(x)\pm g(x)\big]=f'(x)\pm g'(x)$</td>
+</tr>
+<tr>
+<td><strong>Puissances</strong></td>
+<td>$\dfrac{d}{dx}\big(\alpha x^n\big)=n\alpha x^{n-1}$</td>
+</tr>
+<tr>
+<td><strong>Produit</strong></td>
+<td>$\dfrac{d}{dx}\big[f(x)g(x)\big]=f(x)g'(x)+f'(x)g(x)$</td>
+</tr>
+<tr>
+<td><strong>Quotient</strong></td>
+<td>$\dfrac{d}{dx}\left[\dfrac{f(x)}{g(x)}\right]=\dfrac{g(x)f'(x)-f(x)g'(x)}{[g(x)]^2}$</td>
+</tr>
+<tr>
+<td> <strong>Composition</strong></td>
+<td>$\dfrac{d}{dx}\big[f(g(x))\big]=f'(g(x))\,g'(x)$</td>
+</tr>
+</tbody></table>
+<h2 data-prio="high">Concept 2 — La courbure et la dérivée seconde</h2>
+<h3>2.1 Ce que mesure $f''$</h3>
+<blockquote>
+<p><em>« De même que la dérivée $f'(x)$ donne <strong>le taux de variation de $f(x)$</strong> par unité de variation de $x$, <strong>la dérivée seconde $f''(x)$ donne LE TAUX DE VARIATION DE $f'(x)$</strong> par unité de variation de $x$. C'est-à-dire que <strong>$f''(x)$ donne LE TAUX AUQUEL LA PENTE DE $f$ EST EN TRAIN DE CHANGER. Par conséquent, LA DÉRIVÉE SECONDE EST LIÉE À LA COURBURE de la fonction $f$.</strong> »</em></p>
+</blockquote>
+<h3>2.2 L'observation de la figure A2.3</h3>
+<blockquote>
+<p><em>« La fig. A2.3 représente <strong>une fonction CONCAVE</strong>. Le fait qu'elle soit <strong>« COURBÉE VERS LE BAS » est capturé par le fait que LA PENTE DE LA FONCTION DÉCROÎT quand $x$ augmente</strong>, c'est-à-dire <strong>par le fait que sa dérivée seconde est NON POSITIVE</strong>. (Notez que $f'(x^0)$, la pente de la droite $l_0$, <strong>est plus grande que</strong> $f'(x^1)$, la pente de la droite $l_1$.) »</em></p>
+</blockquote>
+<blockquote>
+<p><em>« Il apparaît qu'<strong>une fonction est concave PRÉCISÉMENT QUAND sa dérivée seconde est TOUJOURS NON POSITIVE</strong>. […] <strong>Dessinez quelques fonctions concaves pour vous en convaincre.</strong> »</em></p>
+</blockquote>
+<h3 data-prio="must">2.3  La seconde observation — la tangente est AU-DESSUS</h3>
+<blockquote>
+<p><em>« <strong>Mais quelque chose d'AUTRE est aussi apparent</strong> sur la fig. A2.3. <strong>Notez que LES DEUX DROITES TANGENTES, $l_0$ et $l_1$, se trouvent ENTIÈREMENT AU-DESSUS (parfois seulement FAIBLEMENT au-dessus) de la fonction $f$.</strong> »</em></p>
+</blockquote>
+<p><strong>La construction</strong> : $l_0$ est <em>« une droite de pente $f'(x^0)$ passant par le point $(x^0,f(x^0))$ »</em>, donc</p>
+<p>$$l_0(x)=f'(x^0)\,(x-x^0)+f(x^0)$$</p>
+<blockquote>
+<p class="cal piege"> *« Or, dire que <strong>la droite $l_0$ se trouve AU-DESSUS de $f$</strong>, c'est simplement dire que $l_0(x)\geq f(x)$ pour tout $x$. Mais <strong>ceci dit alors que</strong> »*</p>
+</blockquote>
+<p>$$\boxed{\;f(x)\ \leq\ f(x^0)+f'(x^0)\,(x-x^0)\qquad\textbf{pour tout } x\;}$$</p>
+<blockquote>
+<p>*« Ainsi, <strong>cette inégalité semble DÉCOULER DE LA CONCAVITÉ de $f$</strong>. »*</p>
+</blockquote>
+<h2 data-prio="must">Concept 3 — Le théorème A2.1</h2>
+<h3>3.1 L'énoncé</h3>
+<blockquote>
+<p><em>« Le théorème A2.1, <strong>que nous énonçons SANS PREUVE</strong>, réunit les observations précédentes pour <strong>caractériser les fonctions concaves d'une seule variable DE DEUX FAÇONS : l'une en termes de LA DÉRIVÉE SECONDE, et l'autre en termes de LA DÉRIVÉE PREMIÈRE et des DROITES TANGENTES qu'elle engendre.</strong> »</em></p>
+</blockquote>
+<div class="cal formel"><span class="lab">THÉORÈME A2.1 — Concavité et dérivées première et seconde</span>
+<p>
+Soit $D$ un <strong>intervalle NON DÉGÉNÉRÉ</strong> de réels sur l'intérieur duquel $f$ est <strong>deux fois continûment différentiable</strong>. Les énoncés 1 à 3 sont <strong>équivalents</strong> :
+<strong>1.</strong> $f$ est <strong>concave</strong>.
+<strong>2.</strong> $f''(x)\leq0$ pour <strong>tout $x\in D$ qui n'est pas une extrémité</strong>.
+<strong>3.</strong> Pour tout $x^0\in D$ : $\ f(x)\leq f(x^0)+f'(x^0)(x-x^0)$ <strong>pour tout $x\in D$</strong>.
+De plus :
+<strong>4.</strong>  <strong>Si $f''(x)&lt;0$ pour tout $x\in D$ non-extrémité, alors $f$ est STRICTEMENT CONCAVE.</strong></p>
+</div>
+<h3>3.2 Le cas convexe — gratuit</h3>
+<blockquote>
+<p><em>« Parce qu'<strong>une fonction est convexe si sa NÉGATIVE est concave</strong> <em>(théorème A1.16)</em>, <strong>le théorème A2.1 donne AUSSI une caractérisation des fonctions CONVEXES. Remplacez simplement le mot « CONCAVE » par « CONVEXE », ET RENVERSEZ LE SENS DE TOUTES LES INÉGALITÉS.</strong> »</em></p>
+</blockquote>
+<p>$$f \textbf{ CONVEXE} \iff f''(x)\geq0 \iff f(x)\geq f(x^0)+f'(x^0)(x-x^0)$$</p>
+<h3 data-prio="must">3.3  L'avertissement sur la réciproque de l'énoncé 4</h3>
+<blockquote>
+<p><em>« <strong>On pourrait penser que LA RÉCIPROQUE de l'énoncé 4 est vraie</strong>, c'est-à-dire que si $f$ est strictement concave, alors <strong>sa dérivée seconde doit être STRICTEMENT NÉGATIVE PARTOUT. Il vous est demandé, à l'exercice A2.20, de montrer QUE CE N'EST PAS LE CAS.</strong> »</em></p>
+</blockquote>
+<details class="cor">
+<summary><strong> Le contre-exemple de l'exercice A2.20 — et une coquille du livre</strong></summary><div class="in">
+
+<p><strong>L'énoncé A2.20, mot pour mot</strong> : <em>« Montrez que <strong>les réciproques de l'énoncé 4 des théorèmes A2.1 et A2.4 ne sont PAS vraies</strong>, en montrant que <strong>$f(x)=-x^4$ est STRICTEMENT CONCAVE sur $\mathbb{R}$, mais que sa dérivée seconde n'est PAS partout STRICTEMENT POSITIVE</strong>. »</em></p>
+<div class="cal plus"><span class="lab">Enrichissement pédagogique (hors cours) — une coquille probable.</span>
+<p> L'énoncé 4 du théorème A2.1 porte sur la condition <strong>$f''&lt;0$</strong> ; la réciproque à réfuter est donc <em>« $f$ strictement concave $\Rightarrow$ $f''$ <strong>strictement NÉGATIVE</strong> partout »</em>. Le mot <strong>« positive »</strong> de l'énoncé est <strong>manifestement une coquille pour « négative »</strong> — et <strong>le contre-exemple, lui, fonctionne parfaitement</strong> :</p>
+<p>$$f(x)=-x^4 \qquad f''(x)=-12x^2$$</p>
+<p class="cal piege"> <strong>$f$ EST strictement concave sur $\mathbb{R}$</strong>,  <strong>mais $f''(0)=0$ — donc $f''$ n'est PAS strictement négative partout.</strong> </p>
+<p><strong>La leçon</strong> : la condition 4 est <strong>SUFFISANTE mais PAS NÉCESSAIRE</strong> pour la concavité stricte — exactement le genre d'asymétrie que le livre souligne pour tous ses théorèmes d'existence <em>(cf. <a href="521-jehle-ensembles-applications.md">fiche 521</a>, §A1.3.2)</em>.</p>
+</div>
+</div></details>
+
+<h2 data-prio="high">Concept 4 — §A2.1.2 : les dérivées partielles</h2>
+<h3>4.1 Pourquoi $n$ pentes plutôt qu'une</h3>
+<blockquote>
+<p><em>« Dans le cas à une variable, il est facile de penser la dérivée comme <strong>donnant LA pente</strong>. […] <strong>Cependant, avec des fonctions réelles de $n$ variables, $y$ dépend de la valeur de TOUTES les $n$ variables. Il est donc PLUS DIFFICILE de penser la pente AU SINGULIER.</strong> »</em></p>
+</blockquote>
+<blockquote>
+<p class="cal piege"> <em>« <strong>Il est tout naturel, en revanche, de penser LA PENTE QUAND $x_1$ VARIE, et LA PENTE QUAND $x_2$ VARIE, et ainsi de suite. Plutôt que d'avoir UNE SEULE pente, une fonction de $n$ variables peut être pensée comme ayant $n$ PENTES PARTIELLES, chacune ne donnant que le taux auquel $y$ varierait SI UN SEUL $x_i$ VARIAIT.</strong> »</em></p>
+</blockquote>
+<h3>4.2 La définition A2.1</h3>
+<div class="cal formel"><span class="lab">DÉFINITION A2.1 — Dérivées partielles</span>
+<p>
+Soit $D\subset\mathbb{R}^n$ et $f:D\to\mathbb{R}$. Si $\mathbf{x}$ est <strong>un point INTÉRIEUR de $D$</strong>, alors la <strong>dérivée partielle de $f$ par rapport à $x_i$ en $\mathbf{x}$</strong> est définie par
+$$\frac{\partial f(\mathbf{x})}{\partial x_i}\ \equiv\ \lim_{h\to0}\frac{f(x_1,\dots,x_i+h,\dots,x_n)-f(x_1,\dots,x_i,\dots,x_n)}{h}$$</p>
+</div>
+<blockquote>
+<p><em>« Diverses autres notations sont parfois utilisées. <strong>Parmi les plus communes : $\partial y/\partial x_i$ ou simplement $f_i(\mathbf{x})$.</strong> »</em></p>
+</blockquote>
+<h3 data-prio="must">4.3  Les trois remarques du livre</h3>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>La remarque, mot pour mot</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>1</strong></td>
+<td><em>« <strong>il y en a $n$, UNE POUR CHAQUE variable $x_i$</strong> »</em></td>
+</tr>
+<tr>
+<td><strong>2</strong></td>
+<td> <em>« comme la dérivée dans le cas à une variable, <strong>CHAQUE DÉRIVÉE PARTIELLE EST ELLE-MÊME UNE FONCTION. En particulier, chaque dérivée partielle est une fonction QUI DÉPEND DE LA VALEUR PRISE PAR TOUTES les variables $x_1,\dots,x_n$.</strong> »</em></td>
+</tr>
+<tr>
+<td><strong>3</strong></td>
+<td> <em>« la dérivée partielle est définie <strong>pour mesurer comment la valeur de la fonction change quand UN $x_i$ change, LAISSANT LES VALEURS DES $(n-1)$ AUTRES INCHANGÉES</strong> »</em></td>
+</tr>
+</tbody></table>
+<p>$$\boxed{\;\textbf{« Pour calculer la partielle par rapport à $x_i$, on prend simplement LA DÉRIVÉE}\\\textbf{ORDINAIRE par rapport à $x_i$, EN TRAITANT TOUTES LES AUTRES VARIABLES}\\\textbf{$x_j$, $j\neq i$, COMME DES CONSTANTES. »}\;}$$</p>
+<details class="cor">
+<summary><strong>EXEMPLE A2.1 — le calcul, pas à pas</strong></summary><div class="in">
+
+<p>Soit $f(x_1,x_2)=x_1^2+3x_1x_2-x_2^2$.</p>
+<p><strong>La partielle par rapport à $x_1$</strong> — <em>« en traitant chaque apparition de $x_2$ comme si c'était une constante »</em> :</p>
+<p>$$\frac{\partial f(x_1,x_2)}{\partial x_1}=2x_1+3x_2$$</p>
+<blockquote>
+<p><em>« Dans <strong>le DEUXIÈME terme</strong>, nous avons traité <strong>les deux facteurs 3 ET $x_2$ comme des constantes</strong>. Dans <strong>le TROISIÈME terme</strong>, <strong>$x_1$ n'apparaît pas du tout</strong>, donc <strong>le terme entier est traité comme une constante. Parce que la dérivée d'une constante est ZÉRO, il contribue ZÉRO.</strong> »</em></p>
+</blockquote>
+<p><strong>La partielle par rapport à $x_2$</strong> — <em>« cette fois en traitant toutes les occurrences de $x_1$ comme des constantes »</em> :</p>
+<p>$$\frac{\partial f(x_1,x_2)}{\partial x_2}=3x_1-2x_2$$</p>
+<p class="cal piege"> <strong>Le point à retenir</strong> : <em>« <strong>chaque partielle est une fonction DES DEUX variables. La valeur prise par chaque partielle sera donc DIFFÉRENTE en des valeurs différentes de $x_1$ et $x_2$.</strong> »</em></p>
+<table>
+<thead>
+<tr>
+<th>Le point</th>
+<th>$f_1$</th>
+<th>$f_2$</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$(1,2)$</td>
+<td>$f_1(1,2)=2(1)+3(2)=\mathbf{8}$</td>
+<td>$f_2(1,2)=3(1)-2(2)=\mathbf{-1}$</td>
+</tr>
+<tr>
+<td>$(2,1)$</td>
+<td>$f_1(2,1)=2(2)+3(1)=\mathbf{7}$</td>
+<td>$f_2(2,1)=3(2)-2(1)=\mathbf{4}$</td>
+</tr>
+</tbody></table>
+</div></details>
+
+<h2 data-prio="must">Concept 5 — La dérivée directionnelle et le gradient</h2>
+<h3>5.1 Le problème posé</h3>
+<blockquote>
+<p><em>« Chaque dérivée partielle nous dit si la fonction monte ou descend <strong>quand nous changeons UNE variable seule</strong>. Mais ceci revient à nous dire <strong>comment la valeur change quand nous nous déplaçons DANS LA DIRECTION D'UN DES $n$ VECTEURS UNITAIRES. Il est parfois utile de savoir si la valeur monte ou descend quand nous nous déplaçons dans D'AUTRES DIRECTIONS.</strong> »</em></p>
+</blockquote>
+<h3 data-prio="must">5.2  L'astuce : ramener à UNE variable</h3>
+<p><strong>Fixer $\mathbf{x}$ et une direction $\mathbf{z}=(z_1,\dots,z_n)$, puis définir</strong></p>
+<p>$$g(t)=f(\mathbf{x}+t\mathbf{z}),\qquad t\in\mathbb{R}$$</p>
+<blockquote>
+<p><em>« Notez que <strong>$g(t)$ prend la valeur $f(\mathbf{x})$ quand $t=0$, et que lorsque $t$ augmente à partir de zéro, $\mathbf{x}+t\mathbf{z}$ SE DÉPLACE DANS LA DIRECTION $\mathbf{z}$.</strong> Par conséquent, <strong>si $g(t)$ AUGMENTE quand $t$ passe de zéro à positif, alors nous savons que $f$ AUGMENTE quand nous nous éloignons de $\mathbf{x}$ dans la direction $\mathbf{z}$.</strong> Ainsi, <strong>nous nous intéressons à savoir si $g'(0)$ est positif, négatif ou nul.</strong> »</em></p>
+</blockquote>
+<h3>5.3 Le calcul heuristique de $g'(0)$</h3>
+<blockquote>
+<p><em>« Nous donnons maintenant <strong>une description HEURISTIQUE</strong> de la manière de calculer $g'(0)$. »</em></p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>Pas</th>
+<th>L'argument, mot pour mot</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>1</strong></td>
+<td><em>« par définition, <strong>$g'(0)$ est juste LE TAUX AUQUEL $f$ CHANGE par unité de variation de $t$</strong> »</em></td>
+</tr>
+<tr>
+<td><strong>2</strong></td>
+<td><em>« la $i$-ème coordonnée du domaine <strong>augmente au taux $z_i$ par unité de variation de $t$</strong> »</em></td>
+</tr>
+<tr>
+<td><strong>3</strong></td>
+<td><em>« le taux auquel $f$ change par unité de variation de la $i$-ème coordonnée <strong>est juste $f_i(\mathbf{x})$</strong> »</em></td>
+</tr>
+<tr>
+<td><strong>4</strong></td>
+<td>⟹ <em>« le taux auquel $f$ change par unité de $t$ <strong>DÛ AU CHANGEMENT DE LA $i$-ÈME COORDONNÉE est $f_i(\mathbf{x})z_i$</strong> »</em></td>
+</tr>
+<tr>
+<td><strong>5</strong></td>
+<td> <em>« <strong>Le taux de variation TOTAL de $f$ est alors juste LA SOMME de tous les changements induits par CHACUNE des $n$ coordonnées</strong> »</em></td>
+</tr>
+</tbody></table>
+<p>$$g'(0)=\sum_{i=1}^{n}f_i(\mathbf{x})\,z_i$$</p>
+<blockquote>
+<p>*« Le terme de droite est connu comme <strong>LA DÉRIVÉE DIRECTIONNELLE de $f$ en $\mathbf{x}$ dans la direction $\mathbf{z}$</strong>. »*
+<em>(Note 1.)</em>  <em>« <strong>À strictement parler, pour que ce calcul soit correct, $f$ doit être CONTINÛMENT DIFFÉRENTIABLE.</strong> »</em></p>
+</blockquote>
+<h3 data-prio="must">5.4  Le gradient</h3>
+<p><strong>La convention du livre sur les vecteurs</strong> : <em>« <strong>tous les vecteurs doivent être supposés être des VECTEURS COLONNES sauf mention contraire explicite. Dans le texte, nous écrivons $\mathbf{x}=(x_1,\dots,x_n)$ même si $\mathbf{x}$ peut être un vecteur colonne. Ceci nous épargne l'usage incommode et constant de la notation de TRANSPOSITION.</strong> »</em></p>
+<blockquote>
+<p><em>« Assemblez toutes les $n$ dérivées partielles précédentes <strong>en un VECTEUR LIGNE</strong> »</em> :</p>
+</blockquote>
+<p>$$\boxed{\;\nabla f(\mathbf{x})\equiv\big(f_1(\mathbf{x}),\dots,f_n(\mathbf{x})\big) \qquad\textbf{— LE GRADIENT de $f$ en $\mathbf{x}$}\;}$$</p>
+<p>$$g'(0)=\nabla f(\mathbf{x})\,\mathbf{z} \tag{A2.3}$$</p>
+<h3 data-prio="must">5.5  Les deux lectures de (A2.3)</h3>
+<blockquote>
+<p>*« Notez que <strong>la dérivée partielle de $f$ par rapport à $x_i$ n'est alors QUE la dérivée directionnelle de $f$ dans la direction $(0,\dots,0,1,0,\dots,0)$</strong>, où le 1 apparaît en $i$-ème position. <strong>Ainsi, TOUTES LES DÉRIVÉES PARTIELLES NE SONT QUE DES SORTES PARTICULIÈRES DE DÉRIVÉES DIRECTIONNELLES.</strong> »*</p>
+</blockquote>
+<blockquote>
+<p class="cal piege"> <em>« D'un autre côté, <strong>(A2.3) nous dit que LE TAUX AUQUEL $f$ CHANGE DANS N'IMPORTE QUELLE DIRECTION EST DÉTERMINÉ PAR LE VECTEUR DES DÉRIVÉES PARTIELLES, c'est-à-dire par LE GRADIENT de $f$.</strong> »</em></p>
+</blockquote>
+<blockquote>
+<p>*« Ainsi, <strong>il est utile de penser le gradient $\nabla f$ comme ANALOGUE À LA DÉRIVÉE d'une fonction d'une variable. Comme auparavant, le gradient EST LUI-MÊME UNE FONCTION</strong>, car il envoie chaque $\mathbf{x}$ du domaine sur <strong>un vecteur de $n$ « PENTES PARTIELLES »</strong>. »*</p>
+</blockquote>
+<h2 data-prio="must">Concept 6 — Les partielles secondes et la matrice hessienne</h2>
+<h3>6.1 La construction</h3>
+<blockquote>
+<p><em>« Considérons <strong>l'une des dérivées partielles</strong>, par exemple celle par rapport à $x_1$. Nous notons d'abord que $\partial f(x_1,\dots,x_n)/\partial x_1$ <strong>est ELLE-MÊME une fonction de $n$ variables. Des changements de N'IMPORTE LEQUEL des $x_i$ pourraient en principe affecter sa valeur. Ainsi, $f_1(\mathbf{x})$ A LUI-MÊME $n$ DÉRIVÉES PARTIELLES.</strong> »</em></p>
+</blockquote>
+<blockquote>
+<p><em>« Il n'y a <strong>aucune difficulté particulière</strong> à les calculer : chacune est calculée <strong>en traitant toutes les autres variables comme des constantes</strong> et en appliquant les règles familières. »</em></p>
+</blockquote>
+<p><strong>Les trois notations</strong> de la partielle seconde de $f$ par rapport à $x_1$ puis $x_i$ :</p>
+<p>$$\frac{\partial}{\partial x_i}\left[\frac{\partial f(\mathbf{x})}{\partial x_1}\right] \qquad\text{ou}\qquad \frac{\partial^2f(\mathbf{x})}{\partial x_i\,\partial x_1} \qquad\text{ou}\qquad f_{1i}(\mathbf{x})$$</p>
+<p><strong>Le gradient de $f_1$</strong> :</p>
+<p>$$\nabla f_1(\mathbf{x})=\left(\frac{\partial^2f(\mathbf{x})}{\partial x_1\partial x_1},\dots,\frac{\partial^2f(\mathbf{x})}{\partial x_n\partial x_1}\right)\equiv\big(f_{11}(\mathbf{x}),\dots,f_{1n}(\mathbf{x})\big)$$</p>
+<h3>6.2 La matrice hessienne</h3>
+<blockquote>
+<p>*« En essence, <strong>nous prenons LE « GRADIENT DU GRADIENT » de la fonction d'origine $f$</strong>, en gardant simplement à l'esprit que <strong>chaque partielle du $n$-vecteur gradient A ELLE-MÊME $n$ PARTIELLES</strong>. Si nous arrangeons tous les $\nabla f_i(\mathbf{x})$ <strong>en une MATRICE, en les EMPILANT l'un sur l'autre</strong>, nous obtenons »* :</p>
+</blockquote>
+<p>$$H(\mathbf{x})=\begin{pmatrix} f_{11}(\mathbf{x}) &amp; f_{12}(\mathbf{x}) &amp; \cdots &amp; f_{1n}(\mathbf{x})\\ f_{21}(\mathbf{x}) &amp; f_{22}(\mathbf{x}) &amp; \cdots &amp; f_{2n}(\mathbf{x})\\ \vdots &amp; \vdots &amp; \ddots &amp; \vdots\\ f_{n1}(\mathbf{x}) &amp; f_{n2}(\mathbf{x}) &amp; \cdots &amp; f_{nn}(\mathbf{x}) \end{pmatrix}$$</p>
+<blockquote>
+<p><em>« <strong>$H(\mathbf{x})$ contient TOUTES les dérivées partielles secondes possibles</strong> de la fonction d'origine. $H(\mathbf{x})$ est appelée <strong>LA MATRICE HESSIENNE</strong> de $f(\mathbf{x})$. »</em></p>
+</blockquote>
+<blockquote>
+<p class="cal piege"> <em>« <strong>En se souvenant que la hessienne a été obtenue en prenant LE GRADIENT DU GRADIENT, nous pouvons penser $H(\mathbf{x})$ comme ANALOGUE À LA DÉRIVÉE SECONDE d'une fonction d'une seule variable.</strong> »</em></p>
+</blockquote>
+<p class="cal piege"> <strong>La hessienne est elle aussi une FONCTION</strong> : <em>« elle envoie chaque $\mathbf{x}$ du domaine sur $n\times n=n^2$ dérivées partielles secondes, et <strong>les valeurs prises par chacun de ces éléments seront généralement DIFFÉRENTES en chaque $\mathbf{x}$</strong> »</em>.</p>
+<h3>6.3 Le théorème A2.2 de Young</h3>
+<blockquote>
+<p><em>« Il y a <strong>un théorème important</strong> auquel nous aurons occasion de nous référer. Il dit que <strong>L'ORDRE DANS LEQUEL LES DÉRIVÉES PARTIELLES SONT DIFFÉRENTIÉES NE FAIT AUCUNE DIFFÉRENCE. Le théorème est offert ici SANS PREUVE.</strong> »</em></p>
+</blockquote>
+<div class="cal formel"><span class="lab">THÉORÈME A2.2 — Théorème de Young</span>
+<p>
+Pour toute fonction <strong>deux fois continûment différentiable</strong> $f(\mathbf{x})$ :
+$$\boxed{\;\frac{\partial^2f(\mathbf{x})}{\partial x_i\,\partial x_j}=\frac{\partial^2f(\mathbf{x})}{\partial x_j\,\partial x_i}\qquad\textbf{pour tous } i \textbf{ et } j\;}$$</p>
+</div>
+<p class="cal piege"> <strong>La conséquence structurelle</strong> : <em>« <strong>le théorème de Young nous dit que LA HESSIENNE SERA SYMÉTRIQUE</strong> »</em>.</p>
+<details class="cor">
+<summary><strong>EXEMPLE A2.2 — la vérification</strong></summary><div class="in">
+
+<p>Soit $f(x_1,x_2)=x_1x_2^2+x_1x_2$.</p>
+<p><strong>Les deux partielles premières</strong> :</p>
+<p>$$f_1(\mathbf{x})=x_2^2+x_2 \qquad\qquad f_2(\mathbf{x})=2x_1x_2+x_1$$</p>
+<p><strong>En différentiant $f_1$ par rapport à $x_2$</strong> :</p>
+<p>$$\frac{\partial^2f}{\partial x_2\,\partial x_1}\equiv f_{12}(\mathbf{x})=2x_2+1$$</p>
+<p><strong>En différentiant $f_2$ par rapport à $x_1$</strong> :</p>
+<p>$$\frac{\partial^2f}{\partial x_1\,\partial x_2}\equiv f_{21}(\mathbf{x})=2x_2+1$$</p>
+<blockquote>
+<p><em>« <strong>Clairement, $f_{12}=f_{21}$ pour tout $\mathbf{x}$, EXACTEMENT COMME LE PROMETTAIT LE THÉORÈME DE YOUNG.</strong> »</em> </p>
+</blockquote>
+</div></details>
+
+<h2 data-prio="must">Concept 7 — Le théorème A2.3 : le pont entre une et plusieurs variables</h2>
+<h3>7.1 L'idée</h3>
+<blockquote>
+<p><em>« Dans le cas à une variable, <strong>le théorème A2.1 a établi que la courbure d'une fonction concave était exprimée par sa dérivée seconde ainsi que par la relation de la fonction à ses droites tangentes. LES MÊMES CONCLUSIONS VALENT AUSSI DANS LE CAS MULTIVARIÉ. Une manière simple de le voir est de comprendre d'abord LE RÉSULTAT SUIVANT.</strong> »</em></p>
+</blockquote>
+<div class="cal formel"><span class="lab">THÉORÈME A2.3 — Concavité à une variable et à plusieurs variables</span>
+<p>
+Soit $f$ une fonction réelle définie sur le sous-ensemble <strong>convexe</strong> $D$ de $\mathbb{R}^n$. Alors <strong>$f$ est (strictement) concave SI ET SEULEMENT SI, pour tout $\mathbf{x}\in D$ et tout $\mathbf{z}\in\mathbb{R}^n$ NON NUL, la fonction</strong>
+$$g(t)=f(\mathbf{x}+t\mathbf{z})$$
+<strong>est (strictement) concave sur $\{t\in\mathbb{R}\mid\mathbf{x}+t\mathbf{z}\in D\}$.</strong></p>
+</div>
+<h3>7.2 La preuve</h3>
+<details class="cor">
+<summary><strong>Le sens « $f$ concave ⟹ $g$ concave »</strong></summary><div class="in">
+
+<blockquote>
+<p><em>« <strong>Nous prouvons UNE SEULE direction pour le cas concave, laissant le reste à l'exercice A2.21.</strong> »</em></p>
+</blockquote>
+<p>Soit $C=\{t\in\mathbb{R}\mid\mathbf{x}+t\mathbf{z}\in D\}$. Choisir $t_0,t_1\in C$ et $\alpha\in[0,1]$. <strong>Il faut montrer</strong></p>
+<p>$$g\big(\alpha t_0+(1-\alpha)t_1\big)\geq\alpha g(t_0)+(1-\alpha)g(t_1) \tag{P.1}$$</p>
+<p class="cal piege"> <strong>D'abord</strong> : <em>« <strong>notez que $C$ est un ensemble CONVEXE</strong>, de sorte que $\alpha t_0+(1-\alpha)t_1\in C$ et <strong>$g$ y est donc DÉFINIE</strong> »</em>.</p>
+<p><strong>La chaîne de calcul</strong> — <em>« pour établir l'inégalité voulue, <strong>nous appliquons SIMPLEMENT LA DÉFINITION de $g$</strong> »</em> :</p>
+<p>$$\begin{aligned} g\big(\alpha t_0+(1-\alpha)t_1\big) &amp;= f\big(\mathbf{x}+(\alpha t_0+(1-\alpha)t_1)\mathbf{z}\big)\\ &amp;\underbrace{=}_{\ \text{le regroupement}} f\big(\alpha(\mathbf{x}+t_0\mathbf{z})+(1-\alpha)(\mathbf{x}+t_1\mathbf{z})\big)\\ &amp;\underbrace{\geq}_{\ f\ \text{CONCAVE}} \alpha f(\mathbf{x}+t_0\mathbf{z})+(1-\alpha)f(\mathbf{x}+t_1\mathbf{z})\\ &amp;= \alpha g(t_0)+(1-\alpha)g(t_1) \end{aligned}$$</p>
+<p><em>« <strong>(Notez que parce que $t_i\in C$, $\mathbf{x}+t_i\mathbf{z}\in D$.)</strong> »</em> $\blacksquare$</p>
+<p class="cal piege"> <strong>Le pivot du calcul</strong> : l'égalité $\ \mathbf{x}+\big(\alpha t_0+(1-\alpha)t_1\big)\mathbf{z}=\alpha(\mathbf{x}+t_0\mathbf{z})+(1-\alpha)(\mathbf{x}+t_1\mathbf{z})$, qui tient parce que $\alpha+(1-\alpha)=1$.</p>
+</div></details>
+
+<h3 data-prio="must">7.3  Ce que le théorème permet</h3>
+<blockquote>
+<p><em>« Le théorème A2.3 dit, en effet, que <strong>pour vérifier qu'une fonction MULTIVARIÉE est concave, IL SUFFIT DE VÉRIFIER, pour chaque point $\mathbf{x}$ du domaine et chaque direction $\mathbf{z}$, que LA FONCTION D'UNE SEULE VARIABLE définie par les valeurs prises par $f$ SUR LA DROITE passant par $\mathbf{x}$ dans la direction $\mathbf{z}$ EST CONCAVE.</strong> »</em></p>
+</blockquote>
+<blockquote>
+<p><em>« Parce que <strong>le théorème A2.1 caractérise les fonctions concaves d'une seule variable, nous pouvons alors METTRE LES THÉORÈMES A2.1 ET A2.3 ENSEMBLE</strong> pour caractériser les fonctions concaves de plusieurs variables. »</em></p>
+</blockquote>
+<h2 data-prio="must">Concept 8 — Formes quadratiques et définitude</h2>
+<h3>8.1 Le vocabulaire matriciel</h3>
+<blockquote>
+<p><em>« Avant de réunir les deux théorèmes, <strong>il sera commode d'introduire un peu de terminologie d'ALGÈBRE MATRICIELLE.</strong> »</em></p>
+</blockquote>
+<div class="cal formel"><span class="lab">DÉFINITIONS (énoncées dans le texte)</span>
+<p>
+Une matrice $n\times n$ $A$ est <strong>SEMI-DÉFINIE NÉGATIVE</strong> si, <strong>pour tous les vecteurs $\mathbf{z}\in\mathbb{R}^n$</strong>,
+$$\mathbf{z}^{T}A\,\mathbf{z}\ \leq\ 0$$
+ <strong>Si l'inégalité est STRICTE pour tout $\mathbf{z}$ NON NUL</strong>, alors $A$ est <strong>DÉFINIE NÉGATIVE</strong>.
+$A$ est <strong>SEMI-DÉFINIE POSITIVE</strong> <em>(respectivement DÉFINIE POSITIVE)</em> si <strong>$-A$ est semi-définie négative</strong> <em>(définie négative)</em>.</p>
+</div>
+<blockquote>
+<p><em>(Note 2.)</em> <em>« Si $a_{ij}$ désigne l'élément de la $i$-ème ligne et $j$-ème colonne de $A$, alors »</em></p>
+</blockquote>
+<p>$$\mathbf{z}^{T}A\,\mathbf{z}=\sum_{i=1}^{n}\sum_{j=1}^{n}z_i\,a_{ij}\,z_j$$</p>
+<h3 data-prio="must">8.2  L'analogie à garder en tête</h3>
+<blockquote>
+<p><em>« <strong>Pensez la semi-définitude négative comme LA GÉNÉRALISATION AUX MATRICES de la notion de NOMBRE NON POSITIF. En effet, notez qu'une matrice $1\times1$ (c'est-à-dire UN NOMBRE) est semi-définie négative SI ET SEULEMENT SI son unique entrée est non positive.</strong> »</em></p>
+</blockquote>
+<p>$$\boxed{\;\textbf{« L'analogue d'une DÉRIVÉE SECONDE NON POSITIVE d'une fonction d'une variable}\\\textbf{serait une MATRICE HESSIENNE SEMI-DÉFINIE NÉGATIVE. »}\;}$$</p>
+<h2 data-prio="must">Concept 9 — Le théorème A2.4</h2>
+<h3>9.1 L'énoncé</h3>
+<div class="cal formel"><span class="lab">THÉORÈME A2.4 — Pente, courbure et concavité en plusieurs variables</span>
+<p>
+Soit $D$ un sous-ensemble <strong>convexe</strong> de $\mathbb{R}^n$ <strong>d'intérieur non vide</strong> sur lequel $f$ est <strong>deux fois continûment différentiable</strong>. Les énoncés 1 à 3 sont <strong>équivalents</strong> :
+<strong>1.</strong> $f$ est <strong>concave</strong>.
+<strong>2.</strong>  <strong>$H(\mathbf{x})$ est SEMI-DÉFINIE NÉGATIVE pour tout $\mathbf{x}$ dans l'intérieur de $D$.</strong>
+<strong>3.</strong> Pour tout $\mathbf{x}^0\in D$ : $\ f(\mathbf{x})\leq f(\mathbf{x}^0)+\nabla f(\mathbf{x}^0)(\mathbf{x}-\mathbf{x}^0)$ <strong>pour tout $\mathbf{x}\in D$</strong>.
+De plus :
+<strong>4.</strong>  <strong>Si $H(\mathbf{x})$ est DÉFINIE NÉGATIVE pour tout $\mathbf{x}$ de $D$, alors $f$ est STRICTEMENT CONCAVE.</strong></p>
+</div>
+<p class="cal piege"> <strong>C'est EXACTEMENT le théorème A2.1, avec $f''\to H$ et $f'\to\nabla f$.</strong></p>
+<h3>9.2 La preuve</h3>
+<details class="cor">
+<summary><strong>Le montage — et les deux formules clés (P.3) et (P.4)</strong></summary><div class="in">
+
+<blockquote>
+<p><em>« Parce que $f$ est <strong>deux fois continûment différentiable, il suffit d'établir le théorème SUR L'INTÉRIEUR de $D$. LA CONTINUITÉ S'OCCUPERA ALORS DES POINTS FRONTIÈRE.</strong> »</em></p>
+</blockquote>
+<p><strong>Le montage</strong> : fixer $\mathbf{x}\in\operatorname{int}D$ et $\mathbf{z}\in\mathbb{R}^n$ ; poser $C=\{t\mid\mathbf{x}+t\mathbf{z}\in D\}$ et $g(t)=f(\mathbf{x}+t\mathbf{z})$.  <em>« <strong>Notez que $g$ HÉRITE de $f$ la double différentiabilité continue.</strong> »</em></p>
+<p><strong>Si 1 tient</strong> <em>($f$ concave)</em>, <strong>le théorème A2.3</strong> donne $g$ concave sur $C$, et comme $\mathbf{x}$ est intérieur,  <strong>$C$ est un INTERVALLE NON DÉGÉNÉRÉ</strong>, donc <strong>le théorème A2.1</strong> s'applique :</p>
+<p>$$g''(t)\leq0\ \ \forall\,t\in C \tag{P.1}$$
+$$g(t)\leq g(t_0)+g'(t_0)(t-t_0)\ \ \forall\,t,t_0\in C \tag{P.2}$$</p>
+<p class="cal piege"> <strong>LA PREMIÈRE FORMULE CLÉ</strong> — <em>« $g'(t)$ est simplement <strong>LA DÉRIVÉE DIRECTIONNELLE de $f$ au point $\mathbf{x}+t\mathbf{z}$ dans la direction $\mathbf{z}$</strong> »</em> :</p>
+<p>$$g'(t)=\nabla f(\mathbf{x}+t\mathbf{z})\,\mathbf{z} \tag{P.3}$$</p>
+<p class="cal piege"> <strong>LA SECONDE FORMULE CLÉ</strong> — <em>« pour calculer $g''(t)$, <strong>il est plus simple d'écrire d'abord $g'(t)=\sum_i f_i(\mathbf{x}+t\mathbf{z})z_i$, puis de différentier la somme TERME À TERME</strong> »</em>. La dérivée de $f_i(\mathbf{x}+t\mathbf{z})$ par rapport à $t$ est <strong>la dérivée directionnelle de $f_i$ dans la direction $\mathbf{z}$</strong>, soit $\sum_j f_{ij}(\mathbf{x}+t\mathbf{z})z_j$. <em>« <strong>En multipliant chacune par $z_i$ et en sommant sur $i$</strong> »</em> :</p>
+<p>$$g''(t)=\sum_{i=1}^{n}\sum_{j=1}^{n}z_i\,f_{ij}(\mathbf{x}+t\mathbf{z})\,z_j \qquad\text{c'est-à-dire}\qquad \boxed{\;g''(t)=\mathbf{z}^{T}H(\mathbf{x}+t\mathbf{z})\,\mathbf{z}\;} \tag{P.4}$$</p>
+</div></details>
+
+<details class="cor">
+<summary><strong>1 ⟹ 2, et la preuve simultanée de 4</strong></summary><div class="in">
+
+<table>
+<thead>
+<tr>
+<th>Pas</th>
+<th>L'argument</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>1</strong></td>
+<td> <em>« notez que <strong>$0\in C$</strong> »</em> ⟹ <strong>par (P.1)</strong>, $g''(0)\leq0$</td>
+</tr>
+<tr>
+<td><strong>2</strong></td>
+<td><strong>Par (P.4)</strong> avec $t=0$ : $\ \mathbf{z}^{T}H(\mathbf{x})\,\mathbf{z}\leq0$</td>
+</tr>
+<tr>
+<td><strong>3</strong></td>
+<td> <em>« <strong>Mais parce que $\mathbf{z}$ ET $\mathbf{x}$ étaient ARBITRAIRES, ceci signifie que $H(\mathbf{x})$ est semi-définie négative POUR TOUT $\mathbf{x}$.</strong> »</em> </td>
+</tr>
+</tbody></table>
+<blockquote>
+<p class="cal piege"> *« <strong>Notez que ceci prouve AUSSI l'énoncé 4</strong>, car si $H(\mathbf{x})$ est DÉFINIE NÉGATIVE pour tout $\mathbf{x}$, alors <strong>quels que soient les $\mathbf{x}$ et $\mathbf{z}$ choisis, POURVU QUE $\mathbf{z}$ SOIT NON NUL, $g''(t)&lt;0$ pour tout $t$</strong>, de sorte que <strong>par le théorème A2.3, $f$ doit être STRICTEMENT concave</strong>. »*</p>
+</blockquote>
+</div></details>
+
+<details class="cor">
+<summary><strong> 1 ⟹ 3 — le choix astucieux de la direction</strong></summary><div class="in">
+
+<blockquote>
+<p><em>« Pour voir que 1 ⟹ 3, <strong>nous devons utiliser (P.2). Choisissez n'importe quel $\mathbf{x}^0\in D$ et LAISSEZ LE $\mathbf{z}$ PRÉCÉDENT ÊTRE DONNÉ PAR $\mathbf{x}^0-\mathbf{x}$. (Rappelez-vous que $\mathbf{z}\in\mathbb{R}^n$ était ARBITRAIRE.)</strong> »</em></p>
+</blockquote>
+<p class="cal piege"> <strong>Avec ce choix, $\mathbf{0}$ ET $\mathbf{1}$ appartiennent tous deux à $C$</strong> — car $\mathbf{x}+0\cdot\mathbf{z}=\mathbf{x}\in D$ et $\mathbf{x}+1\cdot\mathbf{z}=\mathbf{x}^0\in D$.</p>
+<p><strong>(P.2) avec $t=0$ et $t_0=1$</strong> donne alors</p>
+<p>$$g(0)\leq g(1)-g'(1)$$</p>
+<p><strong>En utilisant (P.3) et la définition de $g$</strong> — $g(0)=f(\mathbf{x})$, $g(1)=f(\mathbf{x}^0)$, $g'(1)=\nabla f(\mathbf{x}^0)\mathbf{z}=\nabla f(\mathbf{x}^0)(\mathbf{x}^0-\mathbf{x})$ — <em>« <strong>ceci dit juste que</strong> »</em> :</p>
+<p>$$f(\mathbf{x})\ \leq\ f(\mathbf{x}^0)+\nabla f(\mathbf{x}^0)\,(\mathbf{x}-\mathbf{x}^0)$$</p>
+<blockquote>
+<p><em>« Donc <strong>l'énoncé 3 tient parce que $\mathbf{x}$ ET $\mathbf{x}^0$ étaient ARBITRAIRES</strong>. »</em> $\blacksquare$</p>
+</blockquote>
+<blockquote>
+<p><em>« <strong>Les preuves que 2 ⟹ 1 et 3 ⟹ 1 sont SEMBLABLES, et nous les laissons en exercice</strong> <em>(A2.22)</em>. »</em></p>
+</blockquote>
+</div></details>
+
+<h3 data-prio="must">9.3  Le résumé du livre</h3>
+<blockquote>
+<p><em>« Selon le théorème, <strong>une fonction est CONCAVE ssi sa hessienne est SEMI-DÉFINIE NÉGATIVE en tous les points du domaine. Elle est donc CONVEXE ssi sa hessienne est SEMI-DÉFINIE POSITIVE en tous les points. En même temps, nous savons que la fonction sera STRICTEMENT concave (convexe) quand la hessienne est DÉFINIE négative (positive) sur le domaine, BIEN QUE LA RÉCIPROQUE DE CECI NE SOIT PAS VRAIE.</strong> »</em></p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>$f$ est…</th>
+<th>$\iff$ $H(\mathbf{x})$ est…</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>CONCAVE</strong></td>
+<td><strong>SEMI-DÉFINIE NÉGATIVE</strong> partout</td>
+</tr>
+<tr>
+<td><strong>CONVEXE</strong></td>
+<td><strong>SEMI-DÉFINIE POSITIVE</strong> partout</td>
+</tr>
+<tr>
+<td> <strong>STRICTEMENT concave</strong></td>
+<td>$\Longleftarrow$ <strong>DÉFINIE NÉGATIVE</strong> <em>( sens unique)</em></td>
+</tr>
+<tr>
+<td> <strong>STRICTEMENT convexe</strong></td>
+<td>$\Longleftarrow$ <strong>DÉFINIE POSITIVE</strong> <em>( sens unique)</em></td>
+</tr>
+</tbody></table>
+<h3 data-prio="must">9.4  Le renvoi du livre</h3>
+<blockquote>
+<p><em>« Il y a <strong>BEAUCOUP DE TESTS</strong> que l'on peut effectuer directement sur la matrice $H(\mathbf{x})$ pour déterminer la concavité, la convexité, la quasiconcavité ou la quasiconvexité de la fonction. <strong>LES RÈGLES ET RÉGLEMENTATIONS DANS CE DOMAINE SONT NOTOIREMENT COMPLIQUÉES. Leur plus grande applicabilité surgit dans le contexte des PROBLÈMES D'OPTIMISATION, à considérer plus tard. Il semble donc préférable de REPORTER LES DÉTAILS de ces tests jusque-là.</strong> »</em></p>
+</blockquote>
+<p><em>(Ces tests — les mineurs principaux du théorème A2.11 — sont traités en §A2.2.2.)</em></p>
+<h2 data-prio="high">Concept 10 — Le théorème A2.5</h2>
+<h3>10.1 L'énoncé</h3>
+<blockquote>
+<p><em>« <strong>Une relation assez INTUITIVE entre la concavité/convexité d'une fonction et ses dérivées partielles secondes semble mériter d'être notée ici.</strong> Dans le cas à une variable, une condition <strong>NÉCESSAIRE ET SUFFISANTE</strong> est que la dérivée seconde ne soit pas positive (négative). <strong>Dans le cas multivarié, nous pouvons noter une condition NÉCESSAIRE, MAIS PAS SUFFISANTE, en termes des signes de toutes les dérivées partielles secondes « PROPRES ». La preuve est laissée en exercice</strong> <em>(A2.23)</em>. »</em></p>
+</blockquote>
+<div class="cal formel"><span class="lab">THÉORÈME A2.5 — Concavité, convexité et dérivées partielles secondes propres</span>
+<p>
+Soit $f:D\to\mathbb{R}$ <strong>deux fois différentiable</strong>.
+<strong>1.</strong> Si $f$ est <strong>CONCAVE</strong>, alors $f_{ii}(\mathbf{x})\leq0$ pour tout $\mathbf{x}$ de l'intérieur de $D$, $i=1,\dots,n$.
+<strong>2.</strong> Si $f$ est <strong>CONVEXE</strong>, alors $f_{ii}(\mathbf{x})\geq0$ pour tout $\mathbf{x}$ de l'intérieur de $D$, $i=1,\dots,n$.</p>
+</div>
+<p class="cal piege"> <strong>NÉCESSAIRE, PAS SUFFISANT</strong> : des partielles propres toutes négatives <strong>ne garantissent PAS</strong> la concavité — <strong>les termes croisés peuvent tout ruiner</strong>.</p>
+<details class="cor">
+<summary><strong>Enrichissement pédagogique (hors cours) — la preuve suggérée par l'exercice A2.23</strong></summary><div class="in">
+
+<blockquote>
+<p><strong>L'indication du livre</strong> <em>(exercice A2.23)</em> : <em>« <strong>Utilisez la partie 2 du théorème A2.4 pour prouver le théorème A2.5. En particulier, considérez le produit $\mathbf{z}^{T}H(\mathbf{x})\mathbf{z}$ quand $\mathbf{z}$ est L'UN DES $n$ VECTEURS UNITAIRES de $\mathbb{R}^n$.</strong> »</em></p>
+</blockquote>
+<p><strong>Le calcul</strong> : prendre $\mathbf{z}=\mathbf{e}_i=(0,\dots,0,1,0,\dots,0)$. Alors</p>
+<p>$$\mathbf{e}_i^{T}H(\mathbf{x})\,\mathbf{e}_i=f_{ii}(\mathbf{x})$$</p>
+<p><strong>Si $f$ est concave</strong>, le théorème A2.4(2) donne $\mathbf{z}^{T}H\mathbf{z}\leq0$ <strong>pour TOUT $\mathbf{z}$</strong>, donc <strong>en particulier pour $\mathbf{e}_i$</strong> ⟹ $f_{ii}(\mathbf{x})\leq0$ </p>
+<p class="cal piege"> <strong>Pourquoi ce n'est PAS suffisant</strong> : la semi-définitude négative exige l'inégalité pour <strong>TOUS</strong> les $\mathbf{z}$, pas seulement pour les $n$ vecteurs unitaires. <em>(L'exercice A2.6 demande la version convexe : « prouvez que les dérivées partielles secondes propres d'une fonction convexe doivent toujours être non négatives ».)</em></p>
+</div></details>
+
+<h2 data-prio="must">Concept 11 — §A2.1.3 : les fonctions homogènes</h2>
+<h3>11.1 La définition A2.2</h3>
+<blockquote>
+<p><em>« <strong>Les fonctions réelles HOMOGÈNES surgissent ASSEZ SOUVENT dans les applications microéconomiques.</strong> Dans cette section, nous considérons brièvement les fonctions de ce type <strong>et utilisons NOS OUTILS DE CALCUL pour établir certaines de leurs propriétés importantes.</strong> »</em></p>
+</blockquote>
+<div class="cal formel"><span class="lab">DÉFINITION A2.2 — Fonctions homogènes</span>
+<p>
+Une fonction réelle $f(\mathbf{x})$ est dite <strong>homogène de degré $k$</strong> si
+$$\boxed{\;f(t\mathbf{x})\equiv t^{k}f(\mathbf{x}) \qquad\textbf{pour tout } t&gt;0\;}$$</p>
+</div>
+<blockquote>
+<p><em>« <strong>Deux cas particuliers méritent d'être notés</strong> : $f(\mathbf{x})$ est <strong>homogène de degré 1, ou HOMOGÈNE LINÉAIRE</strong>, si $f(t\mathbf{x})\equiv tf(\mathbf{x})$ pour tout $t&gt;0$ ; elle est <strong>homogène de degré ZÉRO</strong> si $f(t\mathbf{x})\equiv f(\mathbf{x})$ pour tout $t&gt;0$. »</em></p>
+</blockquote>
+<h3 data-prio="must">11.2  La lecture économique</h3>
+<blockquote>
+<p><em>« Les fonctions homogènes affichent <strong>UN COMPORTEMENT TRÈS RÉGULIER quand toutes les variables sont augmentées SIMULTANÉMENT ET DANS LA MÊME PROPORTION.</strong> »</em></p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>Le degré</th>
+<th>Ce que dit le livre</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>$k=1$</strong></td>
+<td> <em>« <strong>DOUBLER ou TRIPLER toutes les variables DOUBLE ou TRIPLE la valeur de la fonction</strong> »</em></td>
+</tr>
+<tr>
+<td><strong>$k=0$</strong></td>
+<td> <em>« <strong>les changements ÉQUIPROPORTIONNELS de toutes les variables LAISSENT LA VALEUR DE LA FONCTION INCHANGÉE</strong> »</em></td>
+</tr>
+</tbody></table>
+<details class="cor">
+<summary><strong>EXEMPLE A2.3 — la fonction Cobb-Douglas</strong></summary><div class="in">
+
+<p>$$f(x_1,x_2)\equiv A\,x_1^{\alpha}x_2^{\beta},\qquad A&gt;0,\ \alpha&gt;0,\ \beta&gt;0$$</p>
+<blockquote>
+<p><em>« est connue comme <strong>LA FONCTION COBB-DOUGLAS</strong>. Nous pouvons vérifier si elle est homogène <strong>en multipliant toutes les variables par le même facteur $t$ et en voyant ce que nous obtenons.</strong> »</em></p>
+</blockquote>
+<p>$$f(tx_1,tx_2)\equiv A(tx_1)^{\alpha}(tx_2)^{\beta}\equiv t^{\alpha}t^{\beta}A\,x_1^{\alpha}x_2^{\beta}=t^{\alpha+\beta}f(x_1,x_2)$$</p>
+<blockquote>
+<p class="cal piege"> <em>« Selon la définition, <strong>la Cobb-Douglas est homogène de degré $\alpha+\beta$. Si les coefficients sont choisis de sorte que $\alpha+\beta=1$, ELLE EST HOMOGÈNE LINÉAIRE.</strong> »</em></p>
+</blockquote>
+</div></details>
+
+<h2 data-prio="must">Concept 12 — Le théorème A2.6</h2>
+<h3>12.1 L'énoncé</h3>
+<blockquote>
+<p><em>« <strong>Les dérivées partielles des fonctions homogènes sont ELLES AUSSI homogènes.</strong> »</em></p>
+</blockquote>
+<div class="cal formel"><span class="lab">THÉORÈME A2.6 — Dérivées partielles des fonctions homogènes</span>
+<p>
+$$\boxed{\;f(\mathbf{x}) \textbf{ homogène de degré } k \ \Longrightarrow\ \textbf{ses dérivées partielles sont homogènes de degré } k-1\;}$$</p>
+</div>
+<details class="cor">
+<summary><strong>La preuve — trois lignes</strong></summary><div class="in">
+
+<p>Supposons $f(t\mathbf{x})\equiv t^{k}f(\mathbf{x})$ pour tout $t&gt;0$ <strong>(P.1)</strong>.</p>
+<p><strong>Différentier LE MEMBRE DE GAUCHE par rapport à $x_i$</strong> —  <strong>par la règle de composition, avec $\partial(tx_i)/\partial x_i=t$</strong> :</p>
+<p>$$\frac{\partial}{\partial x_i}\big(f(t\mathbf{x})\big)=\frac{\partial f(t\mathbf{x})}{\partial(tx_i)}\cdot\frac{\partial(tx_i)}{\partial x_i}=\frac{\partial f(t\mathbf{x})}{\partial x_i}\cdot t \tag{P.2}$$</p>
+<p><strong>Différentier LE MEMBRE DE DROITE par rapport à $x_i$</strong> :</p>
+<p>$$\frac{\partial}{\partial x_i}\big(t^{k}f(\mathbf{x})\big)=t^{k}\frac{\partial f(\mathbf{x})}{\partial x_i} \tag{P.3}$$</p>
+<p class="cal piege"> <em>« <strong>Parce que (P.1) est UNE IDENTITÉ, (P.2) doit égaler (P.3)</strong> »</em> :</p>
+<p>$$\frac{\partial f(t\mathbf{x})}{\partial x_i}\,t=t^{k}\frac{\partial f(\mathbf{x})}{\partial x_i} \qquad\xrightarrow{\ \div\,t\ }\qquad \boxed{\;\frac{\partial f(t\mathbf{x})}{\partial x_i}=t^{k-1}\frac{\partial f(\mathbf{x})}{\partial x_i}\;}$$</p>
+<p><em>« pour $i=1,\dots,n$ et $t&gt;0$, <strong>comme nous cherchions à le montrer</strong> »</em>. $\blacksquare$</p>
+<p class="cal piege"> <strong>Le ressort</strong> : c'est <strong>le mot « IDENTITÉ »</strong> qui autorise à différentier les deux membres.</p>
+</div></details>
+
+<h3 data-prio="must">12.2  Le cas $k=1$</h3>
+<blockquote>
+<p><em>« <strong>Une application FRÉQUENTE surgit dans le cas des fonctions homogènes de degré 1.</strong> Le théorème nous dit que leurs dérivées partielles satisfont »</em></p>
+</blockquote>
+<p>$$\frac{\partial f(t\mathbf{x})}{\partial x_i}=\frac{\partial f(\mathbf{x})}{\partial x_i}\qquad\forall\,t&gt;0$$</p>
+<blockquote>
+<p class="cal piege"> <em>« Ceci dit qu'<strong>AUGMENTER (ou diminuer) TOUTES les variables DANS LA MÊME PROPORTION LAISSE LES $n$ DÉRIVÉES PARTIELLES INCHANGÉES.</strong> »</em></p>
+</blockquote>
+<details class="cor">
+<summary><strong>EXEMPLE A2.4 — la vérification sur la Cobb-Douglas</strong></summary><div class="in">
+
+<p>Soit $f(x_1,x_2)\equiv A\,x_1^{\alpha}x_2^{\beta}$ avec $\alpha+\beta=1$ <em>(homogène linéaire)</em>. La partielle par rapport à $x_1$ est</p>
+<p>$$\frac{\partial f(x_1,x_2)}{\partial x_1}=\alpha A\,x_1^{\alpha-1}x_2^{\beta}$$</p>
+<p><strong>En évaluant en $(tx_1,tx_2)$</strong> :</p>
+<p>$$\frac{\partial f(tx_1,tx_2)}{\partial x_1}=\alpha A(tx_1)^{\alpha-1}(tx_2)^{\beta}=t^{\alpha+\beta-1}\,\alpha A\,x_1^{\alpha-1}x_2^{\beta}=\frac{\partial f(x_1,x_2)}{\partial x_1}$$</p>
+<blockquote>
+<p class="cal piege"> <em>« <strong>comme requis, parce que $\alpha+\beta=1$ et $t^{\alpha+\beta-1}=t^{0}=1$</strong> »</em>. </p>
+</blockquote>
+<p><em>(L'exercice A2.7 demande de <strong>compléter l'exemple pour la partielle par rapport à $x_2$</strong> — le calcul est identique et donne $t^{\alpha+\beta-1}\beta Ax_1^{\alpha}x_2^{\beta-1}$.)</em></p>
+</div></details>
+
+<h2 data-prio="must">Concept 13 — Le théorème A2.7 d'Euler</h2>
+<h3>13.1 L'énoncé</h3>
+<blockquote>
+<p><em>« Enfin, <strong>LE THÉORÈME D'EULER — parfois appelé LE THÉORÈME D'ADDITIVITÉ (« adding-up theorem ») — nous donne UNE MANIÈRE INTÉRESSANTE DE CARACTÉRISER COMPLÈTEMENT les fonctions homogènes. Il dit qu'une fonction est homogène SI ET SEULEMENT SI elle peut toujours être écrite EN TERMES DE SES PROPRES DÉRIVÉES PARTIELLES ET DU DEGRÉ D'HOMOGÉNÉITÉ.</strong> »</em></p>
+</blockquote>
+<div class="cal formel"><span class="lab">THÉORÈME A2.7 — Théorème d'Euler</span>
+<p>
+$$\boxed{\;f(\mathbf{x}) \textbf{ est homogène de degré } k \quad\Longleftrightarrow\quad k\,f(\mathbf{x})=\sum_{i=1}^{n}\frac{\partial f(\mathbf{x})}{\partial x_i}\,x_i \quad\textbf{pour tout } \mathbf{x}\;}$$</p>
+</div>
+<h3>13.2 La preuve complète</h3>
+<details class="cor">
+<summary><strong>Le montage — la fonction auxiliaire $g(t)$</strong></summary><div class="in">
+
+<blockquote>
+<p><em>« <strong>Il sera utile de définir la fonction de $t$</strong> »</em></p>
+</blockquote>
+<p>$$g(t)\equiv f(t\mathbf{x}) \tag{P.1}$$</p>
+<p><em>« et <strong>d'en noter quelques propriétés</strong>. Spécifiquement, <strong>pour $\mathbf{x}$ FIXÉ</strong>, différentier par rapport à $t$ »</em> :</p>
+<p>$$g'(t)=\sum_{i=1}^{n}\frac{\partial f(t\mathbf{x})}{\partial x_i}\,x_i \tag{P.2}$$</p>
+<p><strong>et donc, en $t=1$</strong> :</p>
+<p>$$g'(1)=\sum_{i=1}^{n}\frac{\partial f(\mathbf{x})}{\partial x_i}\,x_i \tag{P.3}$$</p>
+<blockquote>
+<p><em>(Note 3.)</em>  <em>« <strong>Au cas où ce ne serait pas parfaitement clair, rappelez-vous que parce que $g(t)\equiv f(tx_1,\dots,tx_n)$, $t$ MULTIPLIE LES $n$ VARIABLES, de sorte que son effet entre SÉPARÉMENT PAR CHACUNE D'ELLES. Pour obtenir la dérivée de $g(\cdot)$ par rapport à $t$, nous devons donc SOMMER LES EFFETS SÉPARÉS qu'un changement de $t$ aura sur $f(\cdot)$ par toutes ces avenues séparées. De plus, en calculant chacun d'eux, nous devons nous souvenir D'APPLIQUER LA RÈGLE DE COMPOSITION.</strong> Ainsi »</em>
+$$g'(t)=\sum_{i=1}^{n}\frac{\partial f(tx_1,\dots,tx_n)}{\partial x_i}\cdot\frac{\partial(tx_i)}{\partial t}$$
+ <em>« <strong>Mais $\partial(tx_i)/\partial t=x_i$, d'où (P.2).</strong> »</em></p>
+</blockquote>
+</div></details>
+
+<details class="cor">
+<summary><strong>La NÉCESSITÉ — homogène ⟹ la formule d'Euler</strong></summary><div class="in">
+
+<p>Supposons $f$ homogène de degré $k$, donc $f(t\mathbf{x})=t^{k}f(\mathbf{x})$.</p>
+<table>
+<thead>
+<tr>
+<th>Pas</th>
+<th>L'argument</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>1</strong></td>
+<td><strong>Par (P.1)</strong>, $g(t)=t^{k}f(\mathbf{x})$</td>
+</tr>
+<tr>
+<td><strong>2</strong></td>
+<td> <strong>Différentier</strong> <em>(à $\mathbf{x}$ fixé, donc $f(\mathbf{x})$ est une CONSTANTE)</em> : $\ g'(t)=k\,t^{k-1}f(\mathbf{x})$</td>
+</tr>
+<tr>
+<td><strong>3</strong></td>
+<td><strong>Évaluer en $t=1$</strong> : $\ g'(1)=k\,f(\mathbf{x})$</td>
+</tr>
+<tr>
+<td><strong>4</strong></td>
+<td> <strong>Comparer avec (P.3)</strong> : $$k\,f(\mathbf{x})=\sum_{i=1}^{n}\frac{\partial f(\mathbf{x})}{\partial x_i}\,x_i \tag{P.4}$$</td>
+</tr>
+</tbody></table>
+<p><em>« <strong>ce qui prouve la nécessité</strong> »</em>. </p>
+</div></details>
+
+<details class="cor">
+<summary><strong> La SUFFISANCE — la formule d'Euler ⟹ homogène</strong></summary><div class="in">
+
+<p>Supposons (P.4).  <strong>Évaluer en $t\mathbf{x}$</strong> <em>(et non en $\mathbf{x}$)</em> :</p>
+<p>$$k\,f(t\mathbf{x})=\sum_{i=1}^{n}\frac{\partial f(t\mathbf{x})}{\partial x_i}\,t\,x_i \tag{P.5}$$</p>
+<table>
+<thead>
+<tr>
+<th>Pas</th>
+<th>L'argument</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>1</strong></td>
+<td><em>« <strong>Multiplier les deux membres de (P.2) par $t$, comparer à (P.5)</strong> »</em> ⟹ $\ t\,g'(t)=k\,f(t\mathbf{x})$</td>
+</tr>
+<tr>
+<td><strong>2</strong></td>
+<td><strong>Substituer (P.1)</strong> : $$t\,g'(t)=k\,g(t) \tag{P.6}$$</td>
+</tr>
+<tr>
+<td><strong>3</strong></td>
+<td> <strong>LE TOUR DE FORCE</strong> : <em>« considérez la fonction $t^{-k}g(t)$. Si nous la différentions par rapport à $t$, nous obtenons »</em> $$\frac{d}{dt}\big[t^{-k}g(t)\big]=t^{-k-1}\big[t\,g'(t)-k\,g(t)\big]$$</td>
+</tr>
+<tr>
+<td><strong>4</strong></td>
+<td> <em>« <strong>Au vu de (P.6), CETTE DÉRIVÉE DOIT ÊTRE NULLE</strong>, donc nous concluons que $t^{-k}g(t)=c$ pour une certaine CONSTANTE $c$. » ⟹ $g(t)=t^{k}c$</em></td>
+</tr>
+<tr>
+<td><strong>5</strong></td>
+<td><em>« <strong>Pour trouver $c$, évaluer en $t=1$</strong> et noter $g(1)=c$. Puis <strong>utiliser la définition (P.1)</strong> pour obtenir $c=f(\mathbf{x})$ »</em></td>
+</tr>
+<tr>
+<td><strong>6</strong></td>
+<td>⟹ $g(t)=t^{k}f(\mathbf{x})$, et <strong>en substituant (P.1) une fois de plus</strong> : $\ f(t\mathbf{x})=t^{k}f(\mathbf{x})$ </td>
+</tr>
+</tbody></table>
+<p><em>« pour tout $\mathbf{x}$, <strong>la preuve est donc complète</strong> »</em>. $\blacksquare$</p>
+<p class="cal piege"> <strong>La clé de la suffisance</strong> : reconnaître que <strong>(P.6) est une équation différentielle</strong> dont la solution générale est $g(t)=ct^{k}$ — le livre l'exploite en montrant que <strong>$t^{-k}g(t)$ a une dérivée nulle, donc est constante</strong>.</p>
+</div></details>
+
+<h3 data-prio="must">13.3  Le cas $k=1$ — la version « additivité »</h3>
+<blockquote>
+<p><em>« <strong>Une fois encore, nous devrions noter les implications pour les fonctions HOMOGÈNES LINÉAIRES. Pour $k=1$, le théorème d'Euler nous dit que nous pouvons écrire $f(\mathbf{x})$ en termes de ses dérivées partielles ainsi :</strong> »</em></p>
+</blockquote>
+<p>$$\boxed{\;f(\mathbf{x})=\sum_{i=1}^{n}\frac{\partial f(\mathbf{x})}{\partial x_i}\,x_i\;}$$</p>
+<p class="cal piege"> <strong>C'est le « théorème d'ADDITIVITÉ »</strong> : <em>la valeur totale se répartit exactement entre les $n$ facteurs, chacun rémunéré à sa productivité marginale.</em></p>
+<details class="cor">
+<summary><strong>EXEMPLE A2.5 — la vérification sur la Cobb-Douglas</strong></summary><div class="in">
+
+<p>Soit $f(x_1,x_2)=A\,x_1^{\alpha}x_2^{\beta}$ avec $\alpha+\beta=1$. Les partielles sont</p>
+<p>$$\frac{\partial f}{\partial x_1}=\alpha A\,x_1^{\alpha-1}x_2^{\beta} \qquad\qquad \frac{\partial f}{\partial x_2}=\beta A\,x_1^{\alpha}x_2^{\beta-1}$$</p>
+<blockquote>
+<p><em>« <strong>Multiplier la première par $x_1$, la seconde par $x_2$, additionner, et utiliser le fait que $\alpha+\beta=1$</strong> »</em> :</p>
+</blockquote>
+<p>$$\frac{\partial f}{\partial x_1}x_1+\frac{\partial f}{\partial x_2}x_2=\alpha A\,x_1^{\alpha}x_2^{\beta}+\beta A\,x_1^{\alpha}x_2^{\beta}=(\alpha+\beta)A\,x_1^{\alpha}x_2^{\beta}=A\,x_1^{\alpha}x_2^{\beta}=f(x_1,x_2)$$</p>
+<p class="cal piege"> <strong>Exactement la formule d'Euler pour $k=1$.</strong> </p>
+</div></details>
+
+<h2>Comment reconnaître le type d'exercice</h2>
+<table>
+<thead>
+<tr>
+<th>Signal dans l'énoncé</th>
+<th>Famille</th>
+<th>Marche à suivre</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>« dérivez la fonction suivante »</td>
+<td><strong>§A2.1.1</strong></td>
+<td>Appliquer les six règles de la <strong>fig. A2.2</strong></td>
+</tr>
+<tr>
+<td>« la fonction est-elle croissante en $x=2$ ? »</td>
+<td><strong>§A2.1.1</strong></td>
+<td> <strong>Le SIGNE de $f'(2)$</strong></td>
+</tr>
+<tr>
+<td>« localement concave ou convexe ? »</td>
+<td><strong>Théorème A2.1</strong></td>
+<td> <strong>Le SIGNE de $f''(2)$</strong></td>
+</tr>
+<tr>
+<td>« montrez que la tangente est au-dessus »</td>
+<td><strong>Théorème A2.1(3)</strong></td>
+<td>$f(x)\leq f(x^0)+f'(x^0)(x-x^0)$</td>
+</tr>
+<tr>
+<td>« $f$ strictement concave ⟹ $f''&lt;0$ ? »</td>
+<td><strong> NON</strong></td>
+<td>Le contre-exemple <strong>$-x^4$</strong> <em>(A2.20)</em></td>
+</tr>
+<tr>
+<td>« trouvez toutes les partielles premières »</td>
+<td><strong>Déf. A2.1</strong></td>
+<td> <strong>Traiter les autres variables comme des CONSTANTES</strong></td>
+</tr>
+<tr>
+<td>« le taux de variation dans la direction $\mathbf{z}$ »</td>
+<td><strong>(A2.3)</strong></td>
+<td>$\nabla f(\mathbf{x})\mathbf{z}$</td>
+</tr>
+<tr>
+<td>« trouvez la matrice hessienne »</td>
+<td><strong>§A2.1.2</strong></td>
+<td> <strong>Toutes les partielles SECONDES ; elle est SYMÉTRIQUE</strong></td>
+</tr>
+<tr>
+<td>« construisez la forme quadratique »</td>
+<td><strong>§A2.1.2</strong></td>
+<td>$\mathbf{z}^{T}H(\mathbf{x})\mathbf{z}=\sum_i\sum_j z_ia_{ij}z_j$</td>
+</tr>
+<tr>
+<td>« vérifiez que $f_{12}=f_{21}$ »</td>
+<td><strong>Théorème A2.2</strong></td>
+<td> <strong>YOUNG</strong></td>
+</tr>
+<tr>
+<td>« $f$ est-elle concave ? » <em>(plusieurs variables)</em></td>
+<td><strong>Théorème A2.4</strong></td>
+<td> <strong>$H$ SEMI-DÉFINIE NÉGATIVE partout</strong></td>
+</tr>
+<tr>
+<td>« $f$ est-elle strictement concave ? »</td>
+<td><strong>Théorème A2.4(4)</strong></td>
+<td> <strong>$H$ DÉFINIE NÉGATIVE suffit</strong> <em>(mais n'est pas nécessaire)</em></td>
+</tr>
+<tr>
+<td>« les partielles propres sont-elles $\leq0$ ? »</td>
+<td><strong>Théorème A2.5</strong></td>
+<td> <strong>NÉCESSAIRE, pas SUFFISANT</strong></td>
+</tr>
+<tr>
+<td>« cette fonction est-elle homogène ? de quel degré ? »</td>
+<td><strong>Déf. A2.2</strong></td>
+<td> <strong>Remplacer $\mathbf{x}$ par $t\mathbf{x}$ et FACTORISER $t^k$</strong></td>
+</tr>
+<tr>
+<td>« degré de $f\cdot g$ ? de $g(f,f)$ ? »</td>
+<td><strong>Déf. A2.2</strong></td>
+<td> <strong>Le produit ADDITIONNE les degrés, la composition les MULTIPLIE</strong></td>
+</tr>
+<tr>
+<td>« vérifiez le théorème d'Euler »</td>
+<td><strong>Théorème A2.7</strong></td>
+<td>$\sum_i(\partial f/\partial x_i)x_i=k\,f(\mathbf{x})$</td>
+</tr>
+<tr>
+<td>« fonction HOMOTHÉTIQUE »</td>
+<td><strong>Exercice A2.10</strong></td>
+<td>$h=g(f)$, $g$ <strong>strictement croissante</strong>, $f$ <strong>homogène de degré 1</strong></td>
+</tr>
+</tbody></table>
+<p><strong>Les trois réflexes de cadrage :</strong></p>
+<ol>
+<li><strong>Pour la concavité en plusieurs variables, ne jamais partir de la définition.</strong> Le chemin du livre est <strong>théorème A2.3 puis A2.1</strong>, ce qui donne <strong>le théorème A2.4</strong> : on regarde <strong>la hessienne</strong>, pas les combinaisons convexes.</li>
+<li><strong>Pour l'homogénéité, TOUJOURS substituer $t\mathbf{x}$ et factoriser.</strong> C'est le test en une ligne de la définition A2.2.</li>
+<li><strong>Se souvenir que les conditions 4 des théorèmes A2.1 et A2.4 sont à SENS UNIQUE.</strong> <em>« La réciproque de ceci n'est pas vraie. »</em></li>
+</ol>
+<h2>Comment résoudre ce type d'exercice — les cinq méthodes</h2>
+<h3>Méthode 1 — Classer une fonction d'une variable en un point</h3>
+<table>
+<thead>
+<tr>
+<th>Pas</th>
+<th>L'action</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>1</strong></td>
+<td><strong>Calculer $f'(x)$</strong> avec les règles de la fig. A2.2</td>
+</tr>
+<tr>
+<td><strong>2</strong></td>
+<td><strong>Évaluer $f'$ au point</strong> ⟹ $&gt;0$ <strong>croissante</strong> · $&lt;0$ <strong>décroissante</strong> · $=0$  <strong>CONSTANTE (stationnaire)</strong></td>
+</tr>
+<tr>
+<td><strong>3</strong></td>
+<td><strong>Calculer $f''(x)$</strong> et l'évaluer</td>
+</tr>
+<tr>
+<td><strong>4</strong></td>
+<td>⟹ $f''&lt;0$ <strong>localement CONCAVE</strong> · $f''&gt;0$ <strong>localement CONVEXE</strong> · $f''=0$ <strong>localement LINÉAIRE</strong></td>
+</tr>
+</tbody></table>
+<h3>Méthode 2 — Calculer une hessienne et sa forme quadratique</h3>
+<ol>
+<li><strong>Calculer les $n$ partielles premières</strong> $f_i(\mathbf{x})$.</li>
+<li><strong>Dériver chacune par rapport à chacune des $n$ variables</strong> ⟹ $n^2$ partielles secondes.</li>
+<li><strong>Les ranger en matrice</strong> —  <strong>YOUNG garantit la symétrie, donc il n'y a que $n(n+1)/2$ calculs distincts.</strong></li>
+<li><strong>Former</strong> $\mathbf{z}^{T}H\mathbf{z}=\sum_i\sum_j z_i f_{ij}z_j$.</li>
+<li> <strong>Chercher à l'écrire comme UNE SOMME DE CARRÉS</strong> pour conclure au signe.</li>
+</ol>
+<h3>Méthode 3 — Décider de la concavité par la hessienne</h3>
+<table>
+<thead>
+<tr>
+<th>Le verdict sur $\mathbf{z}^{T}H(\mathbf{x})\mathbf{z}$</th>
+<th>La conclusion</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$\leq0$ <strong>pour tout $\mathbf{z}$, en tout $\mathbf{x}$</strong></td>
+<td> <strong>$f$ est CONCAVE</strong> <em>(thm A2.4(2))</em></td>
+</tr>
+<tr>
+<td>$&lt;0$ <strong>pour tout $\mathbf{z}\neq\mathbf{0}$, en tout $\mathbf{x}$</strong></td>
+<td> <strong>$f$ est STRICTEMENT concave</strong> <em>(thm A2.4(4))</em></td>
+</tr>
+<tr>
+<td>$\geq0$ partout</td>
+<td><strong>$f$ est CONVEXE</strong></td>
+</tr>
+<tr>
+<td><strong>de signe variable</strong></td>
+<td> <strong>$f$ n'est NI concave NI convexe</strong></td>
+</tr>
+</tbody></table>
+<p class="cal piege"> <strong>Le test rapide de RÉFUTATION</strong> : si <strong>une seule</strong> partielle propre $f_{ii}$ est $&gt;0$ quelque part, <strong>$f$ n'est PAS concave</strong> <em>(thm A2.5, en contraposée)</em>.</p>
+<h3>Méthode 4 — Tester l'homogénéité et trouver le degré</h3>
+<ol>
+<li><strong>Écrire $f(t\mathbf{x})$</strong> en remplaçant chaque $x_i$ par $tx_i$.</li>
+<li><strong>Factoriser toutes les puissances de $t$.</strong></li>
+<li><strong>Si l'on obtient $t^{k}f(\mathbf{x})$</strong>, $f$ est <strong>homogène de degré $k$</strong> ; <strong>sinon, elle n'est pas homogène</strong>.</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th>La combinaison</th>
+<th>Le degré résultant</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$f$ de degré $m$, $g$ de degré $n$ ⟹ <strong>$f\cdot g$</strong></td>
+<td> <strong>$m+n$</strong></td>
+</tr>
+<tr>
+<td>$f$ de degré $m$, $g$ de degré $n$ ⟹ <strong>$k(\mathbf{x})=g\big(f(\mathbf{x}),f(\mathbf{x})\big)$</strong></td>
+<td> <strong>$m\cdot n$</strong> <em>(exercice A2.9(e))</em></td>
+</tr>
+<tr>
+<td>$f$ de degré $k$ ⟹ <strong>ses PARTIELLES</strong></td>
+<td> <strong>$k-1$</strong> <em>(thm A2.6)</em></td>
+</tr>
+</tbody></table>
+<h3>Méthode 5 — Appliquer le théorème d'Euler</h3>
+<table>
+<thead>
+<tr>
+<th>Pas</th>
+<th>L'action</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>1</strong></td>
+<td><strong>Établir le degré $k$</strong> par la méthode 4</td>
+</tr>
+<tr>
+<td><strong>2</strong></td>
+<td><strong>Calculer les $n$ partielles</strong> $\partial f/\partial x_i$</td>
+</tr>
+<tr>
+<td><strong>3</strong></td>
+<td><strong>Former $\sum_i(\partial f/\partial x_i)x_i$</strong></td>
+</tr>
+<tr>
+<td><strong>4</strong></td>
+<td> <strong>Vérifier que la somme vaut $k\,f(\mathbf{x})$</strong></td>
+</tr>
+<tr>
+<td><strong>5</strong></td>
+<td> <strong>Pour $k=1$, la somme vaut $f(\mathbf{x})$ LUI-MÊME</strong> — c'est « l'additivité »</td>
+</tr>
+</tbody></table>
+<h2>Les exercices du livre (§A2.6) — ceux qui portent sur §A2.1</h2>
+<blockquote>
+<p class="cal piege"> <strong>Le livre NE FOURNIT PAS de corrigé.</strong> Les énoncés sont <strong>ceux de Jehle &amp; Reny</strong> <em>(exercices A2.1 à A2.10, plus A2.20 à A2.23)</em>. <strong>Les pistes de résolution sont un ENRICHISSEMENT PÉDAGOGIQUE.</strong></p>
+</blockquote>
+<details class="cor">
+<summary><strong>A2.1 — dériver et classer en $x=2$</strong></summary><div class="in">
+
+<blockquote>
+<p><em>« <strong>Dérivez les fonctions suivantes. Dites si la fonction est CROISSANTE, DÉCROISSANTE ou CONSTANTE au point $x=2$. Classez chacune comme localement CONCAVE, CONVEXE ou LINÉAIRE au point $x=2$.</strong> »</em>
+<strong>(a)</strong> $11x^3-6x+8$ · <strong>(b)</strong> $(3x^2-x)(6x+1)$ · <strong>(c)</strong> $x^2-(1/x^3)$ · <strong>(d)</strong> $(x^2+2x)^3$ · <strong>(e)</strong> $\big[3x/(x^3+1)\big]^2$ · <strong>(f)</strong> $\big[(1/x^2+2)-(1/x-2)\big]^4$ · <strong>(g)</strong> $\displaystyle\int_{x}^{1}e^{t^2}\,dt$</p>
+</blockquote>
+<blockquote>
+<p><strong>Piste (hors cours) — le tableau complet.</strong></p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>$f'(x)$</th>
+<th>$f'(2)$</th>
+<th>Sens</th>
+<th>$f''(2)$</th>
+<th>Courbure</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>(a)</strong></td>
+<td>$33x^2-6$</td>
+<td>$\mathbf{126}$</td>
+<td><strong>croissante</strong></td>
+<td>$66x\to\mathbf{132}$</td>
+<td><strong>CONVEXE</strong></td>
+</tr>
+<tr>
+<td><strong>(b)</strong></td>
+<td> <em>(développer d'abord :</em> $18x^3-3x^2-x$<em>)</em> $54x^2-6x-1$</td>
+<td>$\mathbf{203}$</td>
+<td><strong>croissante</strong></td>
+<td>$108x-6\to\mathbf{210}$</td>
+<td><strong>CONVEXE</strong></td>
+</tr>
+<tr>
+<td><strong>(c)</strong></td>
+<td>$2x+3x^{-4}$</td>
+<td>$\mathbf{4{,}1875}$</td>
+<td><strong>croissante</strong></td>
+<td>$2-12x^{-5}\to\mathbf{1{,}625}$</td>
+<td><strong>CONVEXE</strong></td>
+</tr>
+<tr>
+<td><strong>(d)</strong></td>
+<td>$3(x^2+2x)^2(2x+2)$</td>
+<td>$3(64)(6)=\mathbf{1152}$</td>
+<td><strong>croissante</strong></td>
+<td>$\mathbf{2112}$</td>
+<td><strong>CONVEXE</strong></td>
+</tr>
+<tr>
+<td><strong>(e)</strong></td>
+<td>$2u\,u'$ avec $u=\tfrac{3x}{x^3+1}$</td>
+<td>$2\big(\tfrac23\big)\big(-\tfrac59\big)=\mathbf{-\tfrac{20}{27}}$</td>
+<td> <strong>DÉCROISSANTE</strong></td>
+<td>$\tfrac{114}{81}&gt;0$</td>
+<td><strong>CONVEXE</strong></td>
+</tr>
+<tr>
+<td><strong>(f)</strong></td>
+<td>$4u^3u'$ avec $u=x^{-2}-x^{-1}+4$</td>
+<td> $u'(2)=-\tfrac28+\tfrac14=\mathbf{0}$</td>
+<td> <strong>CONSTANTE</strong></td>
+<td>$4u^3u''=4\big(\tfrac{15}{4}\big)^3\big(\tfrac18\big)\approx\mathbf{26{,}4}$</td>
+<td><strong>CONVEXE</strong></td>
+</tr>
+<tr>
+<td><strong>(g)</strong></td>
+<td> <strong>$-e^{x^2}$</strong> <em>(théorème fondamental — l'inconnue est la borne INFÉRIEURE, d'où le signe moins)</em></td>
+<td>$-e^{4}\approx\mathbf{-54{,}6}$</td>
+<td> <strong>DÉCROISSANTE</strong></td>
+<td>$-2xe^{x^2}\to-4e^{4}$</td>
+<td> <strong>CONCAVE</strong></td>
+</tr>
+</tbody></table>
+<p class="cal piege"> <strong>Le cas (f) est le piège volontaire</strong> : $u'(2)=0$ <strong>exactement</strong>, d'où la réponse <strong>« constante »</strong> que l'énoncé annonce comme possible.
+ <strong>Le cas (g) teste la règle de Leibniz</strong> : puisque $x$ est <strong>la borne du BAS</strong>, $\ \frac{d}{dx}\int_x^1 h(t)\,dt=-h(x)$.</p>
+</blockquote>
+</div></details>
+
+<details class="cor">
+<summary><strong>A2.2 — toutes les partielles premières</strong></summary><div class="in">
+
+<blockquote>
+<p><em>« <strong>Trouvez toutes les dérivées partielles premières.</strong> »</em></p>
+</blockquote>
+<blockquote>
+<p><strong>Piste (hors cours).</strong></p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>La fonction</th>
+<th>$f_1$</th>
+<th>$f_2$</th>
+<th>$f_3$</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>(a)</strong></td>
+<td>$2x_1-x_1^2-x_2^2$</td>
+<td>$2-2x_1$</td>
+<td>$-2x_2$</td>
+<td></td>
+</tr>
+<tr>
+<td><strong>(b)</strong></td>
+<td>$x_1^2+2x_2^2-4x_2$</td>
+<td>$2x_1$</td>
+<td>$4x_2-4$</td>
+<td></td>
+</tr>
+<tr>
+<td><strong>(c)</strong></td>
+<td>$x_1^3-x_2^2-2x_2$</td>
+<td>$3x_1^2$</td>
+<td>$-2x_2-2$</td>
+<td></td>
+</tr>
+<tr>
+<td><strong>(d)</strong></td>
+<td>$4x_1+2x_2-x_1^2+x_1x_2-x_2^2$</td>
+<td>$4-2x_1+x_2$</td>
+<td>$2+x_1-2x_2$</td>
+<td></td>
+</tr>
+<tr>
+<td><strong>(e)</strong></td>
+<td>$x_1^3-6x_1x_2+x_2^3$</td>
+<td>$3x_1^2-6x_2$</td>
+<td>$-6x_1+3x_2^2$</td>
+<td></td>
+</tr>
+<tr>
+<td><strong>(f)</strong></td>
+<td>$3x_1^2-x_1x_2+x_2$</td>
+<td>$6x_1-x_2$</td>
+<td>$-x_1+1$</td>
+<td></td>
+</tr>
+<tr>
+<td><strong>(g)</strong></td>
+<td>$\ln\big(x_1^2-x_2x_3-x_3^2\big)$</td>
+<td>$\dfrac{2x_1}{D}$</td>
+<td>$\dfrac{-x_3}{D}$</td>
+<td>$\dfrac{-x_2-2x_3}{D}$</td>
+</tr>
+</tbody></table>
+<p class="cal piege"> <strong>Pour (g)</strong>, $D\equiv x_1^2-x_2x_3-x_3^2$ — c'est <strong>la règle de composition</strong> appliquée à $\ln$.</p>
+</blockquote>
+</div></details>
+
+<details class="cor">
+<summary><strong>A2.3 et A2.4 — deux identités à établir</strong></summary><div class="in">
+
+<p><strong>A2.3</strong> <em>« Soit $g(x_a,x_b)=f(x_a+x_b,\ x_a-x_b)$, où $f$ est une fonction différentiable de deux variables, disons $f=f(x_u,x_v)$. <strong>Montrez que</strong> »</em></p>
+<p>$$\frac{\partial g}{\partial x_a}\cdot\frac{\partial g}{\partial x_b}=\left(\frac{\partial f}{\partial x_u}\right)^2-\left(\frac{\partial f}{\partial x_v}\right)^2$$</p>
+<p><strong>A2.4</strong> <em>« <strong>Montrez que $y=x_1^2x_2+x_2^2x_3+x_3^2x_1$ satisfait l'équation</strong> »</em></p>
+<p>$$\frac{\partial y}{\partial x_1}+\frac{\partial y}{\partial x_2}+\frac{\partial y}{\partial x_3}=(x_1+x_2+x_3)^2$$</p>
+<blockquote>
+<p><strong>Piste (hors cours).</strong>
+<strong>A2.3</strong> —  <strong>la règle de composition avec $x_u=x_a+x_b$ et $x_v=x_a-x_b$</strong> :
+$$\frac{\partial g}{\partial x_a}=f_u\cdot1+f_v\cdot1=f_u+f_v \qquad\qquad \frac{\partial g}{\partial x_b}=f_u\cdot1+f_v\cdot(-1)=f_u-f_v$$
+ <strong>Leur produit est L'IDENTITÉ REMARQUABLE</strong> $(f_u+f_v)(f_u-f_v)=f_u^2-f_v^2$ 
+<strong>A2.4</strong> — les trois partielles :
+$$\frac{\partial y}{\partial x_1}=2x_1x_2+x_3^2 \qquad \frac{\partial y}{\partial x_2}=x_1^2+2x_2x_3 \qquad \frac{\partial y}{\partial x_3}=x_2^2+2x_3x_1$$
+ <strong>Leur somme</strong> $=x_1^2+x_2^2+x_3^2+2x_1x_2+2x_2x_3+2x_3x_1=(x_1+x_2+x_3)^2$ </p>
+</blockquote>
+</div></details>
+
+<details class="cor">
+<summary><strong>A2.5 et A2.6 — hessiennes et formes quadratiques</strong></summary><div class="in">
+
+<p><strong>A2.5</strong> <em>« <strong>Trouvez la matrice hessienne et construisez la forme quadratique $\mathbf{z}^{T}H(\mathbf{x})\mathbf{z}$</strong> quand… »</em>
+<strong>A2.6</strong> <em>« <strong>Prouvez que les dérivées partielles secondes PROPRES d'une fonction CONVEXE doivent toujours être NON NÉGATIVES.</strong> »</em></p>
+<blockquote>
+<p><strong>Piste (hors cours) — A2.5.</strong></p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>$H(\mathbf{x})$</th>
+<th>$\mathbf{z}^{T}H\mathbf{z}$</th>
+<th>Le verdict</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>(a)</strong> $2x_1-x_1^2-x_2^2$</td>
+<td>$\begin{pmatrix}-2&amp;0\\0&amp;-2\end{pmatrix}$</td>
+<td>$-2z_1^2-2z_2^2$</td>
+<td> <strong>DÉFINIE NÉGATIVE</strong> ⟹ strictement concave</td>
+</tr>
+<tr>
+<td><strong>(b)</strong> $x_1^2+2x_2^2-4x_2$</td>
+<td>$\begin{pmatrix}2&amp;0\\0&amp;4\end{pmatrix}$</td>
+<td>$2z_1^2+4z_2^2$</td>
+<td> <strong>DÉFINIE POSITIVE</strong> ⟹ strictement convexe</td>
+</tr>
+<tr>
+<td><strong>(c)</strong> $x_1^3-x_2^2+2x_2$</td>
+<td>$\begin{pmatrix}6x_1&amp;0\\0&amp;-2\end{pmatrix}$</td>
+<td>$6x_1z_1^2-2z_2^2$</td>
+<td> <strong>le signe DÉPEND de $x_1$</strong> ⟹ ni concave ni convexe sur $\mathbb{R}^2$</td>
+</tr>
+<tr>
+<td><strong>(d)</strong> $4x_1+2x_2-x_1^2+x_1x_2-x_2^2$</td>
+<td>$\begin{pmatrix}-2&amp;1\\1&amp;-2\end{pmatrix}$</td>
+<td>$-2z_1^2+2z_1z_2-2z_2^2$</td>
+<td> $=-\big[(z_1-z_2)^2+z_1^2+z_2^2\big]$ ⟹ <strong>DÉFINIE NÉGATIVE</strong></td>
+</tr>
+<tr>
+<td><strong>(e)</strong> $x_1^3-6x_1x_2+x_2^3$</td>
+<td>$\begin{pmatrix}6x_1&amp;-6\\-6&amp;6x_2\end{pmatrix}$</td>
+<td>$6x_1z_1^2-12z_1z_2+6x_2z_2^2$</td>
+<td> <strong>dépend de $\det=36(x_1x_2-1)$</strong></td>
+</tr>
+</tbody></table>
+<p class="cal piege"> <strong>Toutes ces hessiennes sont SYMÉTRIQUES — le théorème de YOUNG à l'œuvre.</strong></p>
+<p><strong>A2.6</strong> — c'est <strong>le théorème A2.5(2)</strong>. La preuve <em>(indication de l'exercice A2.23)</em> : appliquer <strong>le théorème A2.4(2) au cas convexe</strong> avec $\mathbf{z}=\mathbf{e}_i$, ce qui donne $\ \mathbf{e}_i^{T}H\mathbf{e}_i=f_{ii}(\mathbf{x})\geq0$ </p>
+</blockquote>
+</div></details>
+
+<details class="cor">
+<summary><strong>A2.7 à A2.9 — homogénéité et Euler</strong></summary><div class="in">
+
+<p><strong>A2.7</strong> <em>« <strong>Complétez l'exemple A2.4 pour la partielle par rapport à $x_2$.</strong> »</em>
+<strong>A2.8</strong> <em>« Supposons $f(x_1,x_2)=\sqrt{x_1^2+x_2^2}$. <strong>(a)</strong> Montrez qu'elle est <strong>homogène de degré 1</strong>. <strong>(b)</strong> Selon le théorème d'Euler, nous devrions avoir $f=(\partial f/\partial x_1)x_1+(\partial f/\partial x_2)x_2$. <strong>Vérifiez-le.</strong> »</em>
+<strong>A2.9</strong> <em>« Supposons $f(x_1,x_2)=(x_1x_2)^2$ et $g(x_1,x_2)=(x_1^2x_2)^3$. <strong>(a)</strong> Degré de $f$ ? <strong>(b)</strong> Degré de $g$ ? <strong>(c)</strong> Degré de $h=f\cdot g$ ? <strong>(d)</strong> Degré de $k(x_1,x_2)=g\big(f(x_1,x_2),f(x_1,x_2)\big)$ ? <strong>(e)</strong> Prouvez que si $f$ est homogène de degré $m$ et $g$ de degré $n$, alors $k$ est homogène de degré $mn$.</em>* »*</p>
+<blockquote>
+<p class="cal piege"> <strong>Note de transcription pour A2.8.</strong> Le PDF exporte l'énoncé comme <em>« $f(x_1,x_2)=x_1^2+x_2^2$ »</em>, <strong>sans le RADICAL</strong> — le même glyphe que le livre perd ailleurs <em>(le texte de §A1.4 imprime « real-v√alued » à la place de « $y=\sqrt{z^2+w^2}$ »)</em>.  <strong>Or $x_1^2+x_2^2$ est homogène de degré 2, pas 1</strong>, alors que l'énoncé demande explicitement le degré 1 — la fonction visée est donc <strong>$\sqrt{x_1^2+x_2^2}$</strong>, qui est précisément <strong>le deuxième exemple de fonction réelle donné par le livre en §A1.4</strong>. <em>(Reconstruction de transcription, signalée comme telle.)</em></p>
+</blockquote>
+<blockquote>
+<p><strong>Piste (hors cours).</strong>
+<strong>A2.7</strong> : $\partial f/\partial x_2=\beta Ax_1^{\alpha}x_2^{\beta-1}$ ; en $(tx_1,tx_2)$ cela vaut $t^{\alpha+\beta-1}\beta Ax_1^{\alpha}x_2^{\beta-1}$,  <strong>égal à la partielle de départ puisque $\alpha+\beta=1$</strong> 
+<strong>A2.8(a)</strong> : $f(tx_1,tx_2)=\sqrt{t^2x_1^2+t^2x_2^2}=t\sqrt{x_1^2+x_2^2}=t\,f(x_1,x_2)$ 
+<strong>A2.8(b)</strong> : $\ \dfrac{\partial f}{\partial x_i}=\dfrac{x_i}{\sqrt{x_1^2+x_2^2}}$, donc
+$$\frac{\partial f}{\partial x_1}x_1+\frac{\partial f}{\partial x_2}x_2=\frac{x_1^2+x_2^2}{\sqrt{x_1^2+x_2^2}}=\sqrt{x_1^2+x_2^2}=f(x_1,x_2) \quad$$
+<strong>A2.9</strong> :</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Le calcul</th>
+<th>Le degré</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>(a)</strong></td>
+<td>$f=x_1^2x_2^2$</td>
+<td> <strong>4</strong></td>
+</tr>
+<tr>
+<td><strong>(b)</strong></td>
+<td>$g=x_1^6x_2^3$</td>
+<td> <strong>9</strong></td>
+</tr>
+<tr>
+<td><strong>(c)</strong></td>
+<td>$h=f\cdot g$</td>
+<td> <strong>13</strong> <em>(les degrés s'ADDITIONNENT)</em></td>
+</tr>
+<tr>
+<td><strong>(d)</strong></td>
+<td>$k(t\mathbf{x})=g\big(t^4f,\ t^4f\big)=(t^4)^9\,k(\mathbf{x})$</td>
+<td> <strong>36</strong> $=4\times9$</td>
+</tr>
+</tbody></table>
+<p><strong>(e) La preuve générale</strong> : $\ k(t\mathbf{x})=g\big(f(t\mathbf{x}),f(t\mathbf{x})\big)=g\big(t^{m}f(\mathbf{x}),\,t^{m}f(\mathbf{x})\big)=\big(t^{m}\big)^{n}g\big(f(\mathbf{x}),f(\mathbf{x})\big)=t^{mn}k(\mathbf{x})$ 
+ <strong>La règle</strong> : <strong>le PRODUIT additionne les degrés · la COMPOSITION les MULTIPLIE.</strong></p>
+</blockquote>
+</div></details>
+
+<details class="cor">
+<summary><strong>A2.10 —  les fonctions HOMOTHÉTIQUES</strong></summary><div class="in">
+
+<blockquote>
+<p>*« Une fonction réelle $h$ sur $D\subset\mathbb{R}^n$ est dite *<em>HOMOTHÉTIQUE si elle peut s'écrire sous la forme $g(f(\mathbf{x}))$, où $g:\mathbb{R}\to\mathbb{R}$ est STRICTEMENT CROISSANTE et $f:D\to\mathbb{R}$ est HOMOGÈNE DE DEGRÉ 1. Montrez que si la fonction différentiable $h$ est homothétique, alors pour tout $\mathbf{x}\in D$ et tous $i$ et $j$,</em>
+$$\frac{\partial h(t\mathbf{x})/\partial x_i}{\partial h(t\mathbf{x})/\partial x_j}$$
+<em>est CONSTANT en $t&gt;0$. <strong>QUE CELA DIT-IL DES ENSEMBLES DE NIVEAU de la fonction $h$ ?</strong> »</em></p>
+</blockquote>
+<blockquote>
+<p><strong>Piste (hors cours).</strong></p>
+<table>
+<thead>
+<tr>
+<th>Pas</th>
+<th>L'argument</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>1</strong></td>
+<td><strong>Par la règle de composition</strong> : $\ \dfrac{\partial h(t\mathbf{x})}{\partial x_i}=g'\big(f(t\mathbf{x})\big)\cdot\dfrac{\partial f(t\mathbf{x})}{\partial x_i}$</td>
+</tr>
+<tr>
+<td><strong>2</strong></td>
+<td> <strong>$f$ homogène de degré 1</strong> ⟹ <strong>par le THÉORÈME A2.6</strong>, ses partielles sont <strong>homogènes de degré 0</strong> : $\ \dfrac{\partial f(t\mathbf{x})}{\partial x_i}=\dfrac{\partial f(\mathbf{x})}{\partial x_i}$</td>
+</tr>
+<tr>
+<td><strong>3</strong></td>
+<td>⟹ <strong>dans le RAPPORT, le facteur $g'(f(t\mathbf{x}))$ SE SIMPLIFIE</strong> : $$\frac{\partial h(t\mathbf{x})/\partial x_i}{\partial h(t\mathbf{x})/\partial x_j}=\frac{\partial f(\mathbf{x})/\partial x_i}{\partial f(\mathbf{x})/\partial x_j}$$</td>
+</tr>
+<tr>
+<td><strong>4</strong></td>
+<td> <strong>Le membre de droite ne dépend PAS de $t$</strong> </td>
+</tr>
+</tbody></table>
+<p class="cal piege"> <strong>La réponse à la question finale</strong> : ce rapport est <strong>le TAUX MARGINAL DE SUBSTITUTION</strong>, c'est-à-dire <strong>la PENTE de l'ensemble de niveau</strong>. Qu'il soit constant en $t$ signifie que <strong>le long de N'IMPORTE QUEL RAYON PARTANT DE L'ORIGINE, tous les ensembles de niveau ont LA MÊME PENTE.</strong></p>
+<p>$$\boxed{\;\textbf{Les ensembles de niveau d'une fonction HOMOTHÉTIQUE sont des}\\\textbf{DILATATIONS RADIALES les uns des autres.}\;}$$</p>
+<p><em>(C'est exactement la propriété qui rend les demandes homothétiques linéaires en revenu — la « loi d'Engel » linéaire du chapitre 1.)</em></p>
+</blockquote>
+</div></details>
+
+<details class="cor">
+<summary><strong>A2.20 à A2.23 — compléter les preuves du cours</strong></summary><div class="in">
+
+<p><strong>A2.20</strong> *« Montrez que <strong>les réciproques de l'énoncé 4 des théorèmes A2.1 et A2.4 ne sont pas vraies</strong>, en montrant que $f(x)=-x^4$ <strong>est STRICTEMENT CONCAVE sur $\mathbb{R}$, mais que sa dérivée seconde n'est pas partout strictement [négative]</strong>. »*
+<strong>A2.21</strong> <em>« <strong>Complétez la preuve du théorème A2.3.</strong> »</em>
+<strong>A2.22</strong> <em>« <strong>Complétez la preuve du théorème A2.4.</strong> »</em>
+<strong>A2.23</strong> <em>« <strong>Utilisez la partie 2 du théorème A2.4 pour prouver le théorème A2.5. En particulier, considérez le produit $\mathbf{z}^{T}H(\mathbf{x})\mathbf{z}$ quand $\mathbf{z}$ est L'UN DES $n$ VECTEURS UNITAIRES de $\mathbb{R}^n$.</strong> »</em></p>
+<blockquote>
+<p><strong>Piste (hors cours).</strong>
+<strong>A2.20</strong> : $f''(x)=-12x^2$ ⟹  <strong>$f''(0)=0$</strong>, donc $f''$ <strong>n'est pas strictement négative partout</strong> — bien que $-x^4$ <strong>soit</strong> strictement concave. <em>(Voir la note du concept 3 sur la coquille « positive » de l'énoncé imprimé.)</em>
+<strong>A2.21</strong> : il reste <strong>le sens $g$ concave $\Rightarrow$ $f$ concave</strong>, et <strong>les deux cas STRICTS</strong>.  <strong>Pour le sens manquant</strong> : donnés $\mathbf{x}^1,\mathbf{x}^2\in D$, poser $\mathbf{x}=\mathbf{x}^2$ et $\mathbf{z}=\mathbf{x}^1-\mathbf{x}^2$ ; alors $g(t)=f(\mathbf{x}^2+t(\mathbf{x}^1-\mathbf{x}^2))$ satisfait $g(1)=f(\mathbf{x}^1)$, $g(0)=f(\mathbf{x}^2)$ et $g(t)=f(\mathbf{x}^t)$ — <strong>la concavité de $g$ EST exactement celle de $f$ sur la corde</strong>.
+<strong>A2.22</strong> : il reste <strong>2 ⟹ 1 et 3 ⟹ 1</strong>.  Le montage est <strong>identique</strong> — on repart de (P.3) et (P.4) et on <strong>remonte</strong> par les théorèmes A2.1 puis A2.3.
+<strong>A2.23</strong> : voir l'enrichissement du concept 10 — <strong>$\mathbf{e}_i^{T}H\mathbf{e}_i=f_{ii}(\mathbf{x})$</strong>.</p>
+</blockquote>
+</div></details>
+
+<h2 data-prio="must">Common mistakes</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>L'erreur</th>
+<th>Pourquoi c'est faux</th>
+<th>Ce qu'il faut écrire</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>Croire que continu $=$ différentiable</td>
+<td> <em>« la différentiabilité est une exigence <strong>PLUS STRINGENTE</strong> que la continuité »</em></td>
+<td>Fig. A2.1(a) : <strong>continue mais pliée</strong></td>
+</tr>
+<tr>
+<td>2</td>
+<td>Oublier que $f'$ est <strong>une fonction</strong></td>
+<td> <em>« <strong>LA DÉRIVÉE EST UNE FONCTION, ELLE AUSSI</strong> »</em></td>
+<td>Sa valeur change avec $x$</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Confondre $C^n$ et « $n$ fois dérivable »</td>
+<td> <strong>$C^n$ exige des dérivées CONTINUES</strong></td>
+<td>Définition du texte</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Se tromper dans la règle du quotient</td>
+<td> $\dfrac{g f'-f g'}{g^2}$ — <strong>le numérateur commence par $g$</strong></td>
+<td>Fig. A2.2</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Oublier $g'(x)$ dans la composition</td>
+<td> $\big[f(g(x))\big]'=f'(g(x))\,g'(x)$</td>
+<td>Fig. A2.2</td>
+</tr>
+<tr>
+<td>6</td>
+<td>Croire que $f''$ donne la pente</td>
+<td> <strong>$f''$ donne LE TAUX AUQUEL LA PENTE CHANGE</strong></td>
+<td>C'est <strong>la COURBURE</strong></td>
+</tr>
+<tr>
+<td>7</td>
+<td>Croire que la tangente est sous une concave</td>
+<td> <strong>Les tangentes d'une CONCAVE sont AU-DESSUS</strong></td>
+<td>Thm A2.1(3)</td>
+</tr>
+<tr>
+<td>8</td>
+<td>Croire que « $f$ strictement concave » ⟹ $f''&lt;0$ partout</td>
+<td> <strong>FAUX</strong> — $-x^4$</td>
+<td>Exercice A2.20</td>
+</tr>
+<tr>
+<td>9</td>
+<td>Oublier de renverser les inégalités pour le cas convexe</td>
+<td> <em>« <strong>remplacez « concave » par « convexe » ET RENVERSEZ LE SENS DE TOUTES LES INÉGALITÉS</strong> »</em></td>
+<td></td>
+</tr>
+<tr>
+<td>10</td>
+<td>Croire qu'une partielle ne dépend que de $x_i$</td>
+<td> <em>« chaque partielle est une fonction <strong>QUI DÉPEND DE TOUTES les variables</strong> »</em></td>
+<td>Exemple A2.1</td>
+</tr>
+<tr>
+<td>11</td>
+<td>Ne pas traiter les autres variables comme constantes</td>
+<td> <strong>C'est LA règle de calcul</strong></td>
+<td>Déf. A2.1</td>
+</tr>
+<tr>
+<td>12</td>
+<td>Oublier que la déf. A2.1 exige un point INTÉRIEUR</td>
+<td> <em>« <strong>si $\mathbf{x}$ est UN POINT INTÉRIEUR de $D$</strong> »</em></td>
+<td>Sinon la limite n'est pas définie</td>
+</tr>
+<tr>
+<td>13</td>
+<td>Confondre dérivée directionnelle et partielle</td>
+<td> <strong>Les partielles sont les directionnelles dans les directions UNITAIRES</strong></td>
+<td><em>« des sortes PARTICULIÈRES »</em></td>
+</tr>
+<tr>
+<td>14</td>
+<td>Écrire le gradient en colonne</td>
+<td> <em>« <strong>le VECTEUR LIGNE $\nabla f(\mathbf{x})$</strong> »</em> — d'où $\nabla f(\mathbf{x})\mathbf{z}$ sans transposée</td>
+<td>Convention du livre</td>
+</tr>
+<tr>
+<td>15</td>
+<td>Croire que $\nabla f$ est un vecteur fixe</td>
+<td> <em>« <strong>le gradient EST LUI-MÊME UNE FONCTION</strong> »</em></td>
+<td>Il varie avec $\mathbf{x}$</td>
+</tr>
+<tr>
+<td>16</td>
+<td>Se tromper d'ordre dans $f_{1i}$</td>
+<td> $f_{1i}=\partial^2f/\partial x_i\partial x_1$</td>
+<td>Mais <strong>Young</strong> rend l'ordre indifférent</td>
+</tr>
+<tr>
+<td>17</td>
+<td>Oublier que $H$ est symétrique</td>
+<td> <strong>YOUNG</strong> <em>(thm A2.2)</em></td>
+<td>Cela DIVISE PAR DEUX les calculs</td>
+</tr>
+<tr>
+<td>18</td>
+<td>Appliquer Young sans hypothèse</td>
+<td> Il exige $f$ <strong>DEUX FOIS CONTINÛMENT différentiable</strong></td>
+<td></td>
+</tr>
+<tr>
+<td>19</td>
+<td>Croire que la hessienne est une matrice constante</td>
+<td> <em>« <strong>les valeurs seront GÉNÉRALEMENT DIFFÉRENTES en chaque $\mathbf{x}$</strong> »</em></td>
+<td>C'est une fonction</td>
+</tr>
+<tr>
+<td>20</td>
+<td>Confondre semi-définie et définie</td>
+<td> <strong>SEMI : $\leq0$ pour tout $\mathbf{z}$ · DÉFINIE : $&lt;0$ pour tout $\mathbf{z}\neq\mathbf{0}$</strong></td>
+<td></td>
+</tr>
+<tr>
+<td>21</td>
+<td>Oublier « $\mathbf{z}$ non nul » dans la définitude</td>
+<td> <strong>En $\mathbf{z}=\mathbf{0}$ la forme vaut 0</strong> — la définition serait impossible</td>
+<td></td>
+</tr>
+<tr>
+<td>22</td>
+<td>Confondre semi-définie positive et négative</td>
+<td> $A$ semi-déf. <strong>positive</strong> ssi <strong>$-A$</strong> semi-déf. négative</td>
+<td></td>
+</tr>
+<tr>
+<td>23</td>
+<td>Croire que le thm A2.3 exige de tester une seule droite</td>
+<td> <strong>Il faut TOUT $\mathbf{x}$ ET TOUT $\mathbf{z}$</strong></td>
+<td></td>
+</tr>
+<tr>
+<td>24</td>
+<td>Oublier que $C$ est convexe dans la preuve A2.3</td>
+<td> Sans cela <strong>$g$ n'est pas définie au point intermédiaire</strong></td>
+<td></td>
+</tr>
+<tr>
+<td>25</td>
+<td>Se tromper de formule pour $g''$</td>
+<td> $g''(t)=\mathbf{z}^{T}H(\mathbf{x}+t\mathbf{z})\mathbf{z}$ <strong>(P.4)</strong></td>
+<td>Le pivot de la preuve A2.4</td>
+</tr>
+<tr>
+<td>26</td>
+<td>Oublier d'évaluer en $t=0$</td>
+<td> <em>« notez que <strong>$0\in C$</strong> »</em> ⟹ $g''(0)\leq0$</td>
+<td></td>
+</tr>
+<tr>
+<td>27</td>
+<td>Rater le choix $\mathbf{z}=\mathbf{x}^0-\mathbf{x}$</td>
+<td> <strong>C'est ce qui met $0$ ET $1$ dans $C$</strong></td>
+<td>Preuve de 1 ⟹ 3</td>
+</tr>
+<tr>
+<td>28</td>
+<td>Croire que $H$ définie négative est nécessaire</td>
+<td> <em>« <strong>la réciproque de ceci N'EST PAS VRAIE</strong> »</em></td>
+<td>Sens unique</td>
+</tr>
+<tr>
+<td>29</td>
+<td>Conclure la concavité des seules $f_{ii}\leq0$</td>
+<td> <strong>NÉCESSAIRE, PAS SUFFISANT</strong> <em>(thm A2.5)</em></td>
+<td>Les <strong>croisées</strong> comptent</td>
+</tr>
+<tr>
+<td>30</td>
+<td>Tester l'homogénéité sur une seule variable</td>
+<td> <strong>Il faut multiplier TOUTES les variables par $t$</strong></td>
+<td>Déf. A2.2</td>
+</tr>
+<tr>
+<td>31</td>
+<td>Oublier « pour tout $t&gt;0$ »</td>
+<td> L'identité doit valoir <strong>pour TOUT $t$ positif</strong></td>
+<td></td>
+</tr>
+<tr>
+<td>32</td>
+<td>Croire homogène de degré 1 $=$ linéaire</td>
+<td> <strong>NON</strong> — la Cobb-Douglas avec $\alpha+\beta=1$ est <strong>homogène linéaire mais PAS linéaire</strong></td>
+<td>Vocabulaire</td>
+</tr>
+<tr>
+<td>33</td>
+<td>Se tromper de degré pour la Cobb-Douglas</td>
+<td> <strong>$\alpha+\beta$</strong></td>
+<td>Exemple A2.3</td>
+</tr>
+<tr>
+<td>34</td>
+<td>Croire que les partielles gardent le degré $k$</td>
+<td> <strong>Elles sont de degré $k-1$</strong> <em>(thm A2.6)</em></td>
+<td></td>
+</tr>
+<tr>
+<td>35</td>
+<td>Oublier le $t$ de la règle de composition dans la preuve A2.6</td>
+<td> $\partial(tx_i)/\partial x_i=t$</td>
+<td>Le pas (P.2)</td>
+</tr>
+<tr>
+<td>36</td>
+<td>Écrire Euler sans le facteur $k$</td>
+<td> $k\,f(\mathbf{x})=\sum_i f_i(\mathbf{x})x_i$</td>
+<td>Le $k$ <strong>ne disparaît que si $k=1$</strong></td>
+</tr>
+<tr>
+<td>37</td>
+<td>Évaluer (P.4) en $\mathbf{x}$ au lieu de $t\mathbf{x}$</td>
+<td> <strong>La suffisance exige d'évaluer EN $t\mathbf{x}$</strong></td>
+<td>Le pas (P.5)</td>
+</tr>
+<tr>
+<td>38</td>
+<td>Rater l'astuce de $t^{-k}g(t)$</td>
+<td> <strong>Sa dérivée est nulle ⟹ elle est CONSTANTE</strong></td>
+<td>Le cœur de la suffisance</td>
+</tr>
+<tr>
+<td>39</td>
+<td>Additionner les degrés dans une composition</td>
+<td> <strong>La composition MULTIPLIE</strong> <em>(exercice A2.9(e))</em></td>
+<td>Le produit additionne</td>
+</tr>
+<tr>
+<td>40</td>
+<td>Confondre homogène et homothétique</td>
+<td> <strong>HOMOTHÉTIQUE $=$ $g(f)$ avec $g$ strictement croissante et $f$ homogène de degré 1</strong></td>
+<td>Exercice A2.10</td>
+</tr>
+</tbody></table>
+<h2>Ultimate Review</h2>
+<p><strong>§A2.1.1 — UNE VARIABLE.</strong></p>
+<p><strong>DIFFÉRENTIABLE</strong> $=$ <em>« <strong>continue ET LISSE, sans cassures ni plis</strong> »</em> —  <em>« une exigence <strong>PLUS STRINGENTE</strong> que la continuité »</em>.</p>
+<p>$\dfrac{dy}{dx}=f'(x)$ · $\dfrac{d^2y}{dx^2}=f''(x)$ · <strong>$C^n$</strong> $=$ <strong>dérivées $f',\dots,f^{(n)}$ CONTINUES</strong>.</p>
+<p class="cal piege"> <strong>$f''$ donne « LE TAUX AUQUEL LA PENTE DE $f$ EST EN TRAIN DE CHANGER »</strong> — c'est <strong>la COURBURE</strong>.</p>
+<p><strong>THÉORÈME A2.1</strong> — les trois énoncés <strong>équivalents</strong> :</p>
+<p>$$\boxed{\;f \textbf{ CONCAVE} \iff f''(x)\leq0 \iff f(x)\leq f(x^0)+f'(x^0)(x-x^0)\;}$$</p>
+<p class="cal piege"> <strong>L'énoncé 3 dit que LES TANGENTES SONT AU-DESSUS DU GRAPHE.</strong>
+ <strong>L'énoncé 4</strong> : $f''&lt;0$ <strong>partout ⟹ strictement concave</strong> — <em><strong>« la réciproque N'EST PAS vraie »</strong></em> <em>(le contre-exemple $-x^4$)</em>.
+ <strong>Pour le cas CONVEXE</strong> : <em>« remplacez « concave » par « convexe » <strong>et RENVERSEZ toutes les inégalités</strong> »</em>.</p>
+<p><strong>§A2.1.2 — PLUSIEURS VARIABLES.</strong></p>
+<p class="cal piege"> <em>« Une fonction de $n$ variables peut être pensée comme ayant <strong>$n$ PENTES PARTIELLES</strong> »</em>.</p>
+<p><strong>DÉF. A2.1</strong> : $\ \dfrac{\partial f(\mathbf{x})}{\partial x_i}\equiv\lim_{h\to0}\dfrac{f(\dots,x_i+h,\dots)-f(\dots,x_i,\dots)}{h}$ —  <strong>$\mathbf{x}$ doit être INTÉRIEUR</strong>.</p>
+<p class="cal piege"> <strong>La règle de calcul</strong> : <em>« la dérivée ordinaire par rapport à $x_i$, <strong>en traitant toutes les autres variables comme des CONSTANTES</strong> »</em>.</p>
+<p><strong>LA DÉRIVÉE DIRECTIONNELLE</strong> : avec $g(t)=f(\mathbf{x}+t\mathbf{z})$,</p>
+<p>$$g'(0)=\sum_{i=1}^{n}f_i(\mathbf{x})z_i=\nabla f(\mathbf{x})\,\mathbf{z} \tag{A2.3}$$</p>
+<p class="cal piege"> <strong>$\nabla f(\mathbf{x})\equiv(f_1(\mathbf{x}),\dots,f_n(\mathbf{x}))$ est UN VECTEUR LIGNE</strong> — <em>« LE GRADIENT »</em>,  <em>« <strong>ANALOGUE À LA DÉRIVÉE</strong> d'une fonction d'une variable »</em>, et <strong>lui-même une fonction</strong>.</p>
+<p class="cal piege"> <em>« <strong>TOUTES les dérivées PARTIELLES ne sont que des dérivées DIRECTIONNELLES d'un genre PARTICULIER</strong> »</em> — celles dans les directions <strong>unitaires</strong>.</p>
+<p><strong>LA HESSIENNE</strong> $H(\mathbf{x})=\big(f_{ij}(\mathbf{x})\big)_{i,j}$ —  <em>« <strong>le GRADIENT DU GRADIENT</strong> »</em>, <strong>analogue à $f''$</strong>, contenant $n\times n=n^2$ partielles secondes.</p>
+<p><strong>THÉORÈME A2.2 (YOUNG)</strong> : $\ \dfrac{\partial^2f}{\partial x_i\partial x_j}=\dfrac{\partial^2f}{\partial x_j\partial x_i}$ ⟹  <strong>$H$ EST SYMÉTRIQUE</strong>.</p>
+<p><strong>THÉORÈME A2.3</strong> :  <strong>$f$ concave $\iff$ $g(t)=f(\mathbf{x}+t\mathbf{z})$ concave POUR TOUT $\mathbf{x}$ ET TOUT $\mathbf{z}$</strong> — <em>« <strong>il suffit de vérifier SUR LES DROITES</strong> »</em>.</p>
+<p><strong>LA DÉFINITUDE</strong> : $\ \mathbf{z}^{T}A\mathbf{z}\leq0$ <strong>partout</strong> $\Rightarrow$ <strong>SEMI-DÉFINIE NÉGATIVE</strong> · $&lt;0$ <strong>pour $\mathbf{z}\neq\mathbf{0}$</strong> $\Rightarrow$ <strong>DÉFINIE NÉGATIVE</strong>.</p>
+<p class="cal piege"> <em>« Pensez la semi-définitude négative comme <strong>LA GÉNÉRALISATION AUX MATRICES DE LA NOTION DE NOMBRE NON POSITIF</strong> »</em>.</p>
+<p><strong>THÉORÈME A2.4</strong> — les trois énoncés <strong>équivalents</strong> :</p>
+<p>$$\boxed{\;f \textbf{ CONCAVE} \iff H(\mathbf{x}) \textbf{ SEMI-DÉFINIE NÉGATIVE} \iff f(\mathbf{x})\leq f(\mathbf{x}^0)+\nabla f(\mathbf{x}^0)(\mathbf{x}-\mathbf{x}^0)\;}$$</p>
+<p><em>Les deux formules de la preuve</em> : $\ g'(t)=\nabla f(\mathbf{x}+t\mathbf{z})\mathbf{z}$ <strong>(P.3)</strong> et  $\ g''(t)=\mathbf{z}^{T}H(\mathbf{x}+t\mathbf{z})\mathbf{z}$ <strong>(P.4)</strong>.</p>
+<p><strong>THÉORÈME A2.5</strong> : $f$ concave $\Rightarrow$ $f_{ii}\leq0$ —  <strong>NÉCESSAIRE, PAS SUFFISANT</strong>.</p>
+<p><strong>§A2.1.3 — HOMOGÉNÉITÉ.</strong></p>
+<p><strong>DÉF. A2.2</strong> : $\ f(t\mathbf{x})\equiv t^{k}f(\mathbf{x})$ pour <strong>tout $t&gt;0$</strong>.</p>
+<table>
+<thead>
+<tr>
+<th>$k$</th>
+<th>Ce que cela signifie</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>1</strong></td>
+<td> <em>« <strong>doubler ou tripler toutes les variables DOUBLE ou TRIPLE la valeur</strong> »</em></td>
+</tr>
+<tr>
+<td><strong>0</strong></td>
+<td> <em>« <strong>les changements ÉQUIPROPORTIONNELS LAISSENT LA VALEUR INCHANGÉE</strong> »</em></td>
+</tr>
+</tbody></table>
+<p><strong>COBB-DOUGLAS</strong> $A x_1^{\alpha}x_2^{\beta}$ :  <strong>homogène de degré $\alpha+\beta$</strong> ; <strong>homogène LINÉAIRE si $\alpha+\beta=1$</strong>.</p>
+<p><strong>THÉORÈME A2.6</strong> :  <strong>les partielles d'une fonction homogène de degré $k$ sont homogènes de degré $k-1$</strong> ⟹ pour $k=1$, <em>« augmenter toutes les variables <strong>laisse les partielles INCHANGÉES</strong> »</em>.</p>
+<p><strong>THÉORÈME A2.7 (EULER, « l'ADDITIVITÉ »)</strong> :</p>
+<p>$$\boxed{\;f \textbf{ homogène de degré } k \iff k\,f(\mathbf{x})=\sum_{i=1}^{n}\frac{\partial f(\mathbf{x})}{\partial x_i}x_i \qquad\qquad k=1:\ f(\mathbf{x})=\sum_i f_i(\mathbf{x})\,x_i\;}$$</p>
+<p><em>Les ressorts de la preuve</em> : poser $g(t)\equiv f(t\mathbf{x})$ ⟹ $g'(1)=\sum_i f_i(\mathbf{x})x_i$ <strong>(P.3)</strong> · <strong>nécessité</strong> : $g'(t)=kt^{k-1}f(\mathbf{x})$ ⟹ $g'(1)=kf(\mathbf{x})$ ·  <strong>suffisance</strong> : évaluer en $t\mathbf{x}$, obtenir $tg'(t)=kg(t)$ <strong>(P.6)</strong>, puis constater que <strong>$\dfrac{d}{dt}\big[t^{-k}g(t)\big]=0$ ⟹ $t^{-k}g(t)$ est CONSTANTE</strong>.</p>
+<div class="rec"><h2>Active Recall</h2><details class="cor">
+<summary><strong>1. Définir la différentiabilité et la comparer à la continuité.</strong></summary><div class="in">
+
+<blockquote>
+<p><em>« <strong>Une fonction $y=f(x)$ est DIFFÉRENTIABLE si elle est À LA FOIS CONTINUE ET « LISSE », SANS CASSURES NI PLIS.</strong> »</em></p>
+</blockquote>
+<blockquote>
+<p class="cal piege"> <em>« <strong>La différentiabilité est donc une exigence PLUS STRINGENTE que la continuité. C'est aussi une exigence que NOUS IMPOSONS SOUVENT parce qu'elle nous permet d'utiliser les outils familiers du calcul.</strong> »</em></p>
+</blockquote>
+<p><em>(Fig. A2.1(a) : <strong>non différentiable en $x^0$</strong> ; (b) : <strong>partout différentiable</strong>.)</em></p>
+</div></details><details class="cor">
+<summary><strong>2. Rappeler ce qu'est la dérivée et ce qu'est une fonction $C^n$.</strong></summary><div class="in">
+
+<blockquote>
+<p><em>« <strong>LA DÉRIVÉE EST UNE FONCTION, ELLE AUSSI</strong>, donnant, en chaque valeur de $x$, <strong>LA PENTE ou LE TAUX DE VARIATION INSTANTANÉ</strong> »</em>.</p>
+</blockquote>
+<p>$$\frac{dy}{dx}=f'(x) \qquad\qquad \frac{d^2y}{dx^2}=f''(x)$$</p>
+<p class="cal piege"> *« Si une fonction possède <strong>des dérivées CONTINUES $f',f'',\dots,f^{(n)}$</strong>, elle est appelée <strong>$n$-fois continûment différentiable, ou UNE FONCTION $C^n$</strong> »*.</p>
+</div></details><details class="cor">
+<summary><strong>3. Réciter les six règles de dérivation (fig. A2.2).</strong></summary><div class="in">
+
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Constantes</strong></td>
+<td>$\dfrac{d}{dx}(\alpha)=0$</td>
+</tr>
+<tr>
+<td><strong>Sommes</strong></td>
+<td>$f'(x)\pm g'(x)$</td>
+</tr>
+<tr>
+<td><strong>Puissances</strong></td>
+<td>$\dfrac{d}{dx}(\alpha x^n)=n\alpha x^{n-1}$</td>
+</tr>
+<tr>
+<td><strong>Produit</strong></td>
+<td>$f(x)g'(x)+f'(x)g(x)$</td>
+</tr>
+<tr>
+<td><strong>Quotient</strong></td>
+<td>$\dfrac{g(x)f'(x)-f(x)g'(x)}{[g(x)]^2}$</td>
+</tr>
+<tr>
+<td> <strong>Composition</strong></td>
+<td>$f'(g(x))\,g'(x)$</td>
+</tr>
+</tbody></table>
+</div></details><details class="cor">
+<summary><strong>4.  Que mesure la dérivée seconde ?</strong></summary><div class="in">
+
+<blockquote>
+<p><em>« <strong>$f''(x)$ donne LE TAUX AUQUEL LA PENTE DE $f$ EST EN TRAIN DE CHANGER. Par conséquent, LA DÉRIVÉE SECONDE EST LIÉE À LA COURBURE de la fonction.</strong> »</em></p>
+</blockquote>
+<p><strong>Sur la fig. A2.3</strong> <em>(fonction concave)</em> : <em>« le fait qu'elle soit <strong>« COURBÉE VERS LE BAS » est capturé par le fait que LA PENTE DÉCROÎT quand $x$ augmente</strong>, c'est-à-dire par le fait que <strong>sa dérivée seconde est NON POSITIVE</strong> »</em> —  $f'(x^0)&gt;f'(x^1)$.</p>
+</div></details><details class="cor">
+<summary><strong>5.  Établir l'inégalité de la tangente.</strong></summary><div class="in">
+
+<p>La tangente en $x^0$ est $\ l_0(x)=f'(x^0)(x-x^0)+f(x^0)$.</p>
+<blockquote>
+<p><em>« <strong>Les deux droites tangentes se trouvent ENTIÈREMENT AU-DESSUS de la fonction $f$.</strong> […] Dire que la droite $l_0$ se trouve au-dessus de $f$, <strong>c'est juste dire que $l_0(x)\geq f(x)$ pour tout $x$</strong> »</em> ⟹</p>
+</blockquote>
+<p>$$f(x)\leq f(x^0)+f'(x^0)(x-x^0)$$</p>
+<p class="cal piege"> <strong>Cette inégalité DÉCOULE de la concavité — et lui est même ÉQUIVALENTE</strong> <em>(thm A2.1(3))</em>.</p>
+</div></details><details class="cor">
+<summary><strong>6. Énoncer le théorème A2.1.</strong></summary><div class="in">
+
+<p>Sur un <strong>intervalle NON DÉGÉNÉRÉ</strong> $D$, avec $f$ <strong>deux fois continûment différentiable</strong>, les énoncés <strong>1 à 3 sont ÉQUIVALENTS</strong> :</p>
+<p><strong>1.</strong> $f$ <strong>concave</strong> · <strong>2.</strong> $f''(x)\leq0$ <strong>pour tout $x$ non-extrémité</strong> · <strong>3.</strong> $f(x)\leq f(x^0)+f'(x^0)(x-x^0)$.</p>
+<p><strong>De plus, 4.</strong>  <strong>$f''(x)&lt;0$ partout ⟹ $f$ STRICTEMENT concave.</strong></p>
+<p class="cal piege"> <strong>Le livre l'énonce SANS PREUVE.</strong></p>
+</div></details><details class="cor">
+<summary><strong>7.  Comment obtenir le cas convexe, et quelle est la limite de l'énoncé 4 ?</strong></summary><div class="in">
+
+<blockquote>
+<p><em>« <strong>Remplacez simplement le mot « CONCAVE » par « CONVEXE », ET RENVERSEZ LE SENS DE TOUTES LES INÉGALITÉS.</strong> »</em></p>
+</blockquote>
+<blockquote>
+<p class="cal piege"> <em>« On pourrait penser que <strong>la réciproque de l'énoncé 4 est vraie</strong> […] <strong>Il vous est demandé, à l'exercice A2.20, de montrer QUE CE N'EST PAS LE CAS.</strong> »</em></p>
+</blockquote>
+<p><strong>Le contre-exemple</strong> : $f(x)=-x^4$ est <strong>strictement concave</strong>,  <strong>mais $f''(0)=0$</strong>.</p>
+</div></details><details class="cor">
+<summary><strong>8.  Pourquoi $n$ pentes plutôt qu'une ?</strong></summary><div class="in">
+
+<blockquote>
+<p><em>« Avec des fonctions réelles de $n$ variables, <strong>$y$ dépend de la valeur de TOUTES les $n$ variables. Il est donc PLUS DIFFICILE de penser la pente AU SINGULIER.</strong> »</em></p>
+</blockquote>
+<blockquote>
+<p><em>« <strong>Plutôt que d'avoir UNE SEULE pente, une fonction de $n$ variables peut être pensée comme ayant $n$ PENTES PARTIELLES, chacune ne donnant que le taux auquel $y$ varierait SI UN SEUL $x_i$ VARIAIT.</strong> »</em></p>
+</blockquote>
+</div></details><details class="cor">
+<summary><strong>9. Énoncer la définition A2.1 et la règle de calcul.</strong></summary><div class="in">
+
+<p>$$\frac{\partial f(\mathbf{x})}{\partial x_i}\equiv\lim_{h\to0}\frac{f(x_1,\dots,x_i+h,\dots,x_n)-f(x_1,\dots,x_i,\dots,x_n)}{h}$$</p>
+<p class="cal piege"> <strong>$\mathbf{x}$ doit être UN POINT INTÉRIEUR de $D$.</strong> Notations : $\partial y/\partial x_i$ ou $f_i(\mathbf{x})$.</p>
+<blockquote>
+<p><em>« Pour calculer la partielle par rapport à $x_i$, <strong>on prend simplement LA DÉRIVÉE ORDINAIRE par rapport à $x_i$, EN TRAITANT TOUTES LES AUTRES VARIABLES $x_j$, $j\neq i$, COMME DES CONSTANTES.</strong> »</em></p>
+</blockquote>
+</div></details><details class="cor">
+<summary><strong>10.  Les trois remarques du livre sur les partielles.</strong></summary><div class="in">
+
+<p><strong>1.</strong> <em>« <strong>il y en a $n$, une pour chaque variable</strong> »</em>
+<strong>2.</strong>  <em>« <strong>CHAQUE DÉRIVÉE PARTIELLE EST ELLE-MÊME UNE FONCTION […] QUI DÉPEND DE LA VALEUR PRISE PAR TOUTES les variables</strong> »</em>
+<strong>3.</strong>  <em>« elle mesure comment la valeur change quand <strong>UN $x_i$ change, LAISSANT LES $(n-1)$ AUTRES INCHANGÉES</strong> »</em></p>
+<p><strong>Exemple A2.1</strong> : $f=x_1^2+3x_1x_2-x_2^2$ ⟹ $f_1=2x_1+3x_2$, $f_2=3x_1-2x_2$ ; en $(1,2)$ : <strong>$8$ et $-1$</strong> ; en $(2,1)$ : <strong>$7$ et $4$</strong>.</p>
+</div></details><details class="cor">
+<summary><strong>11.  Construire la dérivée directionnelle.</strong></summary><div class="in">
+
+<p><strong>Poser</strong> $g(t)=f(\mathbf{x}+t\mathbf{z})$.</p>
+<blockquote>
+<p>*« $g(t)$ prend la valeur $f(\mathbf{x})$ <strong>quand $t=0$</strong>, et quand $t$ augmente, <strong>$\mathbf{x}+t\mathbf{z}$ SE DÉPLACE DANS LA DIRECTION $\mathbf{z}$</strong> […] <strong>nous nous intéressons à savoir si $g'(0)$ est positif, négatif ou nul.</strong> »*</p>
+</blockquote>
+<p><strong>Le raisonnement heuristique</strong> : la $i$-ème coordonnée <strong>augmente au taux $z_i$</strong>, $f$ change au taux $f_i(\mathbf{x})$ par unité de cette coordonnée ⟹ <strong>la contribution est $f_i(\mathbf{x})z_i$</strong> ⟹  <strong>le total est LA SOMME</strong> :</p>
+<p>$$g'(0)=\sum_{i=1}^{n}f_i(\mathbf{x})z_i$$</p>
+<p><em>(Note 1 : « <strong>à strictement parler, $f$ doit être CONTINÛMENT DIFFÉRENTIABLE</strong> ».)</em></p>
+</div></details><details class="cor">
+<summary><strong>12.  Définir le gradient et donner les deux lectures de (A2.3).</strong></summary><div class="in">
+
+<p>$$\nabla f(\mathbf{x})\equiv\big(f_1(\mathbf{x}),\dots,f_n(\mathbf{x})\big) \qquad\textbf{— UN VECTEUR LIGNE} \qquad\qquad g'(0)=\nabla f(\mathbf{x})\,\mathbf{z}$$</p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>La lecture</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>1</strong></td>
+<td> <em>« <strong>TOUTES les dérivées PARTIELLES ne sont que des sortes PARTICULIÈRES de dérivées DIRECTIONNELLES</strong> »</em> — dans les directions $(0,\dots,1,\dots,0)$</td>
+</tr>
+<tr>
+<td><strong>2</strong></td>
+<td> <em>« <strong>LE TAUX AUQUEL $f$ CHANGE DANS N'IMPORTE QUELLE DIRECTION EST DÉTERMINÉ PAR LE GRADIENT</strong> »</em></td>
+</tr>
+</tbody></table>
+<p class="cal piege"> <em>« Il est utile de penser le gradient <strong>comme ANALOGUE À LA DÉRIVÉE</strong> d'une fonction d'une variable. […] <strong>Le gradient EST LUI-MÊME UNE FONCTION.</strong> »</em></p>
+</div></details><details class="cor">
+<summary><strong>13. Construire la matrice hessienne.</strong></summary><div class="in">
+
+<p>Chaque $f_i(\mathbf{x})$ <strong>a elle-même $n$ partielles</strong> $f_{ij}(\mathbf{x})$, rangées en $\nabla f_i(\mathbf{x})$. En <strong>empilant les $n$ gradients</strong> :</p>
+<p>$$H(\mathbf{x})=\begin{pmatrix} f_{11} &amp; f_{12} &amp; \cdots &amp; f_{1n}\\ f_{21} &amp; f_{22} &amp; \cdots &amp; f_{2n}\\ \vdots &amp; \vdots &amp; \ddots &amp; \vdots\\ f_{n1} &amp; f_{n2} &amp; \cdots &amp; f_{nn} \end{pmatrix}$$</p>
+<blockquote>
+<p class="cal piege"> *« Nous prenons *<em>LE « GRADIENT DU GRADIENT » ** […] nous pouvons penser $H(\mathbf{x})$ comme <strong>ANALOGUE À LA DÉRIVÉE SECONDE</strong> »</em>.</p>
+</blockquote>
+<p class="cal piege"> <strong>Elle est elle-même une fonction</strong> : $n\times n=n^2$ entrées, <em>« généralement différentes en chaque $\mathbf{x}$ »</em>.</p>
+</div></details><details class="cor">
+<summary><strong>14. Énoncer et illustrer le théorème A2.2.</strong></summary><div class="in">
+
+<blockquote>
+<p><strong>YOUNG</strong> : pour toute $f$ <strong>deux fois continûment différentiable</strong>,
+$$\frac{\partial^2f(\mathbf{x})}{\partial x_i\,\partial x_j}=\frac{\partial^2f(\mathbf{x})}{\partial x_j\,\partial x_i}\qquad\forall\,i,j$$</p>
+</blockquote>
+<p class="cal piege"> <em>« <strong>L'ORDRE DANS LEQUEL LES PARTIELLES SONT DIFFÉRENTIÉES NE FAIT AUCUNE DIFFÉRENCE.</strong> »</em> ⟹ <strong>$H$ EST SYMÉTRIQUE</strong>.</p>
+<p><strong>Exemple A2.2</strong> : $f=x_1x_2^2+x_1x_2$ ⟹ $f_1=x_2^2+x_2$, $f_2=2x_1x_2+x_1$ ⟹  <strong>$f_{12}=f_{21}=2x_2+1$</strong> </p>
+</div></details><details class="cor">
+<summary><strong>15.  Énoncer et démontrer le théorème A2.3.</strong></summary><div class="in">
+
+<p><strong>$f$ (strictement) concave $\iff$ $g(t)=f(\mathbf{x}+t\mathbf{z})$ est (strictement) concave, POUR TOUT $\mathbf{x}\in D$ et TOUT $\mathbf{z}\neq\mathbf{0}$.</strong></p>
+<p><strong>La preuve du sens ⟹</strong> repose sur  <strong>UNE SEULE identité algébrique</strong> :</p>
+<p>$$\mathbf{x}+\big(\alpha t_0+(1-\alpha)t_1\big)\mathbf{z}=\alpha\big(\mathbf{x}+t_0\mathbf{z}\big)+(1-\alpha)\big(\mathbf{x}+t_1\mathbf{z}\big)$$</p>
+<p>⟹ <strong>la concavité de $f$ donne directement (P.1)</strong>. <em>(Notez aussi que <strong>$C$ est CONVEXE</strong>, donc $g$ y est définie.)</em></p>
+<p><strong>La portée</strong> :  <em>« <strong>pour vérifier qu'une fonction MULTIVARIÉE est concave, IL SUFFIT DE VÉRIFIER […] SUR LA DROITE passant par $\mathbf{x}$ dans la direction $\mathbf{z}$</strong> »</em>.</p>
+</div></details><details class="cor">
+<summary><strong>16.  Définir semi-définie et définie négative, et l'analogie du livre.</strong></summary><div class="in">
+
+<p>$A$ ($n\times n$) est <strong>SEMI-DÉFINIE NÉGATIVE</strong> si $\ \mathbf{z}^{T}A\mathbf{z}\leq0$ <strong>pour tous les $\mathbf{z}$</strong> ; <strong>DÉFINIE NÉGATIVE</strong> si  <strong>l'inégalité est STRICTE pour tout $\mathbf{z}$ NON NUL</strong>. $A$ est <strong>(semi-)définie POSITIVE</strong> si <strong>$-A$</strong> est (semi-)définie négative.</p>
+<p>$$\mathbf{z}^{T}A\mathbf{z}=\sum_{i=1}^{n}\sum_{j=1}^{n}z_i\,a_{ij}\,z_j$$</p>
+<blockquote>
+<p class="cal piege"> <em>« <strong>Pensez la semi-définitude négative comme LA GÉNÉRALISATION AUX MATRICES de la notion de NOMBRE NON POSITIF. Une matrice $1\times1$ (c'est-à-dire un NOMBRE) est semi-définie négative SSI son unique entrée est non positive.</strong> »</em></p>
+</blockquote>
+</div></details><details class="cor">
+<summary><strong>17. Énoncer le théorème A2.4.</strong></summary><div class="in">
+
+<p>Sur $D$ <strong>convexe d'intérieur non vide</strong>, $f$ <strong>deux fois continûment différentiable</strong>, les énoncés <strong>1 à 3 sont équivalents</strong> :</p>
+<p><strong>1.</strong> $f$ <strong>concave</strong> · <strong>2.</strong>  <strong>$H(\mathbf{x})$ SEMI-DÉFINIE NÉGATIVE sur $\operatorname{int}D$</strong> · <strong>3.</strong> $f(\mathbf{x})\leq f(\mathbf{x}^0)+\nabla f(\mathbf{x}^0)(\mathbf{x}-\mathbf{x}^0)$.</p>
+<p><strong>4.</strong>  <strong>$H$ DÉFINIE NÉGATIVE ⟹ $f$ STRICTEMENT concave</strong> <em>(sens unique)</em>.</p>
+<p class="cal piege"> <strong>C'est le théorème A2.1 avec $f''\to H$ et $f'\to\nabla f$.</strong></p>
+</div></details><details class="cor">
+<summary><strong>18.  Les deux formules clés de la preuve du théorème A2.4.</strong></summary><div class="in">
+
+<p>Avec $g(t)=f(\mathbf{x}+t\mathbf{z})$ :</p>
+<p>$$g'(t)=\nabla f(\mathbf{x}+t\mathbf{z})\,\mathbf{z} \tag{P.3}$$</p>
+<p>$$g''(t)=\sum_i\sum_j z_i f_{ij}(\mathbf{x}+t\mathbf{z})z_j=\mathbf{z}^{T}H(\mathbf{x}+t\mathbf{z})\,\mathbf{z} \tag{P.4}$$</p>
+<p class="cal piege"> <strong>Comment obtenir (P.4)</strong> : <em>« <strong>écrire d'abord $g'(t)=\sum_i f_i(\mathbf{x}+t\mathbf{z})z_i$, puis différentier la somme TERME À TERME</strong> »</em> — chaque terme donnant la <strong>dérivée directionnelle de $f_i$</strong>.</p>
+</div></details><details class="cor">
+<summary><strong>19.  Démontrer 1 ⟹ 2 et 1 ⟹ 3 (théorème A2.4).</strong></summary><div class="in">
+
+<p><strong>1 ⟹ 2</strong> : $f$ concave ⟹ <em>(thm A2.3)</em> $g$ concave ⟹ <em>(thm A2.1)</em> $g''(t)\leq0$ <strong>(P.1)</strong>.  <strong>Comme $0\in C$</strong>, $g''(0)\leq0$, ce qui par <strong>(P.4)</strong> donne $\mathbf{z}^{T}H(\mathbf{x})\mathbf{z}\leq0$.  <em>« <strong>Mais parce que $\mathbf{z}$ et $\mathbf{x}$ étaient ARBITRAIRES</strong> »</em> ⟹ semi-définitude négative partout. </p>
+<p><strong>1 ⟹ 3</strong> :  <strong>choisir $\mathbf{z}=\mathbf{x}^0-\mathbf{x}$</strong>, de sorte que <strong>$0$ ET $1$ soient dans $C$</strong>. (P.2) avec $t=0$, $t_0=1$ donne $g(0)\leq g(1)-g'(1)$, c'est-à-dire</p>
+<p>$$f(\mathbf{x})\leq f(\mathbf{x}^0)+\nabla f(\mathbf{x}^0)(\mathbf{x}-\mathbf{x}^0) \quad$$</p>
+<p><em>(2 ⟹ 1 et 3 ⟹ 1 sont laissés en exercice A2.22.)</em></p>
+</div></details><details class="cor">
+<summary><strong>20. Résumer le lien hessienne / courbure.</strong></summary><div class="in">
+
+<table>
+<thead>
+<tr>
+<th>$f$ est…</th>
+<th>$H(\mathbf{x})$ est…</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>CONCAVE</strong></td>
+<td><strong>SEMI-DÉFINIE NÉGATIVE</strong> partout</td>
+</tr>
+<tr>
+<td><strong>CONVEXE</strong></td>
+<td><strong>SEMI-DÉFINIE POSITIVE</strong> partout</td>
+</tr>
+<tr>
+<td><strong>STRICTEMENT concave</strong></td>
+<td> $\Longleftarrow$ <strong>DÉFINIE NÉGATIVE</strong></td>
+</tr>
+<tr>
+<td><strong>STRICTEMENT convexe</strong></td>
+<td> $\Longleftarrow$ <strong>DÉFINIE POSITIVE</strong></td>
+</tr>
+</tbody></table>
+<p class="cal piege"> <em>« <strong>bien que LA RÉCIPROQUE DE CECI NE SOIT PAS VRAIE</strong> »</em>.</p>
+<p><em>(Le livre REPORTE les tests pratiques sur $H$ — <em>« les règles et réglementations dans ce domaine sont <strong>NOTOIREMENT COMPLIQUÉES</strong> »</em> — jusqu'aux problèmes d'optimisation.)</em></p>
+</div></details><details class="cor">
+<summary><strong>21. Énoncer le théorème A2.5 et sa portée exacte.</strong></summary><div class="in">
+
+<p><strong>1.</strong> $f$ <strong>concave</strong> ⟹ $f_{ii}(\mathbf{x})\leq0$ · <strong>2.</strong> $f$ <strong>convexe</strong> ⟹ $f_{ii}(\mathbf{x})\geq0$, sur $\operatorname{int}D$.</p>
+<p class="cal piege"> <em>« Dans le cas multivarié, nous pouvons noter une condition <strong>NÉCESSAIRE, MAIS PAS SUFFISANTE</strong>, en termes des signes de toutes les dérivées partielles secondes « PROPRES ». »</em></p>
+<p><strong>La preuve</strong> <em>(exercice A2.23)</em> : prendre $\mathbf{z}=\mathbf{e}_i$ dans le théorème A2.4(2) ⟹  <strong>$\mathbf{e}_i^{T}H\mathbf{e}_i=f_{ii}(\mathbf{x})\leq0$</strong> </p>
+</div></details><details class="cor">
+<summary><strong>22. Énoncer la définition A2.2 et ses deux cas particuliers.</strong></summary><div class="in">
+
+<p>$$f(t\mathbf{x})\equiv t^{k}f(\mathbf{x})\qquad\textbf{pour tout } t&gt;0$$</p>
+<table>
+<thead>
+<tr>
+<th>Le cas</th>
+<th>Le nom</th>
+<th>La lecture</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$k=1$</td>
+<td> <strong>HOMOGÈNE LINÉAIRE</strong></td>
+<td><em>« <strong>doubler ou tripler toutes les variables DOUBLE ou TRIPLE la valeur</strong> »</em></td>
+</tr>
+<tr>
+<td>$k=0$</td>
+<td><strong>homogène de degré zéro</strong></td>
+<td> <em>« <strong>les changements ÉQUIPROPORTIONNELS LAISSENT LA VALEUR INCHANGÉE</strong> »</em></td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><em>« Les fonctions homogènes affichent <strong>UN COMPORTEMENT TRÈS RÉGULIER quand toutes les variables sont augmentées SIMULTANÉMENT ET DANS LA MÊME PROPORTION</strong> »</em>.</p>
+</blockquote>
+</div></details><details class="cor">
+<summary><strong>23. Traiter l'exemple A2.3 (Cobb-Douglas).</strong></summary><div class="in">
+
+<p>$$f(x_1,x_2)\equiv Ax_1^{\alpha}x_2^{\beta},\quad A&gt;0,\ \alpha&gt;0,\ \beta&gt;0$$</p>
+<blockquote>
+<p><em>« Nous pouvons vérifier <strong>en multipliant toutes les variables par le même facteur $t$</strong> »</em> :</p>
+</blockquote>
+<p>$$f(tx_1,tx_2)\equiv A(tx_1)^{\alpha}(tx_2)^{\beta}\equiv t^{\alpha}t^{\beta}Ax_1^{\alpha}x_2^{\beta}=t^{\alpha+\beta}f(x_1,x_2)$$</p>
+<p class="cal piege"> <strong>Homogène de degré $\alpha+\beta$</strong> ; <strong>homogène LINÉAIRE si $\alpha+\beta=1$</strong>.</p>
+</div></details><details class="cor">
+<summary><strong>24.  Énoncer et démontrer le théorème A2.6.</strong></summary><div class="in">
+
+<p><strong>$f$ homogène de degré $k$ ⟹ ses partielles sont homogènes de degré $k-1$.</strong></p>
+<p><strong>La preuve</strong> : de l'identité $f(t\mathbf{x})\equiv t^{k}f(\mathbf{x})$ <strong>(P.1)</strong>, différentier les deux membres par rapport à $x_i$ :</p>
+<p>$$\underbrace{\frac{\partial f(t\mathbf{x})}{\partial x_i}\cdot t}_{\text{(P.2), par la règle de composition}}=\underbrace{t^{k}\frac{\partial f(\mathbf{x})}{\partial x_i}}_{\text{(P.3)}} \qquad\xrightarrow{\ \div\,t\ }\qquad \frac{\partial f(t\mathbf{x})}{\partial x_i}=t^{k-1}\frac{\partial f(\mathbf{x})}{\partial x_i}$$</p>
+<p class="cal piege"> <strong>C'est le mot « IDENTITÉ » qui autorise à différentier les deux membres</strong>, et $\partial(tx_i)/\partial x_i=t$ qui fournit le facteur $t$.</p>
+</div></details><details class="cor">
+<summary><strong>25.  Le cas $k=1$ du théorème A2.6, et l'exemple A2.4.</strong></summary><div class="in">
+
+<p>$$\frac{\partial f(t\mathbf{x})}{\partial x_i}=\frac{\partial f(\mathbf{x})}{\partial x_i}\qquad\forall\,t&gt;0$$</p>
+<blockquote>
+<p class="cal piege"> <em>« <strong>augmenter (ou diminuer) TOUTES les variables DANS LA MÊME PROPORTION LAISSE LES $n$ DÉRIVÉES PARTIELLES INCHANGÉES</strong> »</em>.</p>
+</blockquote>
+<p><strong>Exemple A2.4</strong> <em>(Cobb-Douglas avec $\alpha+\beta=1$)</em> :</p>
+<p>$$\frac{\partial f(tx_1,tx_2)}{\partial x_1}=\alpha A(tx_1)^{\alpha-1}(tx_2)^{\beta}=t^{\alpha+\beta-1}\alpha Ax_1^{\alpha-1}x_2^{\beta}=\frac{\partial f(x_1,x_2)}{\partial x_1}$$</p>
+<p class="cal piege"> <em>« <strong>parce que $\alpha+\beta=1$ et $t^{\alpha+\beta-1}=t^{0}=1$</strong> »</em> </p>
+</div></details><details class="cor">
+<summary><strong>26. Énoncer le théorème A2.7 d'Euler.</strong></summary><div class="in">
+
+<blockquote>
+<p><em>« <strong>LE THÉORÈME D'EULER — parfois appelé LE THÉORÈME D'ADDITIVITÉ — nous donne une manière intéressante de CARACTÉRISER COMPLÈTEMENT les fonctions homogènes. Il dit qu'une fonction est homogène SSI elle peut toujours être écrite EN TERMES DE SES PROPRES DÉRIVÉES PARTIELLES ET DU DEGRÉ D'HOMOGÉNÉITÉ.</strong> »</em></p>
+</blockquote>
+<p>$$f \textbf{ homogène de degré } k \iff k\,f(\mathbf{x})=\sum_{i=1}^{n}\frac{\partial f(\mathbf{x})}{\partial x_i}\,x_i \quad\textbf{pour tout } \mathbf{x}$$</p>
+</div></details><details class="cor">
+<summary><strong>27.  Démontrer la NÉCESSITÉ d'Euler.</strong></summary><div class="in">
+
+<p><strong>Le montage</strong> : $g(t)\equiv f(t\mathbf{x})$ <strong>(P.1)</strong>, d'où par la règle de composition <em>(note 3 : « <strong>$t$ MULTIPLIE LES $n$ VARIABLES, donc son effet entre SÉPARÉMENT PAR CHACUNE</strong> »)</em> :</p>
+<p>$$g'(t)=\sum_i\frac{\partial f(t\mathbf{x})}{\partial x_i}x_i \tag{P.2} \qquad\qquad g'(1)=\sum_i\frac{\partial f(\mathbf{x})}{\partial x_i}x_i \tag{P.3}$$</p>
+<p><strong>La nécessité</strong> : si $f$ est homogène, $g(t)=t^{k}f(\mathbf{x})$ ⟹  <strong>$g'(t)=kt^{k-1}f(\mathbf{x})$</strong> ⟹ $g'(1)=kf(\mathbf{x})$. <strong>En comparant à (P.3)</strong> :</p>
+<p>$$k\,f(\mathbf{x})=\sum_i\frac{\partial f(\mathbf{x})}{\partial x_i}x_i \tag{P.4}$$</p>
+</div></details><details class="cor">
+<summary><strong>28.  Démontrer la SUFFISANCE d'Euler — l'astuce de $t^{-k}g(t)$.</strong></summary><div class="in">
+
+<table>
+<thead>
+<tr>
+<th>Pas</th>
+<th>L'argument</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>1</strong></td>
+<td> <strong>Évaluer (P.4) EN $t\mathbf{x}$</strong> : $\ kf(t\mathbf{x})=\sum_i\dfrac{\partial f(t\mathbf{x})}{\partial x_i}\,t\,x_i$ <strong>(P.5)</strong></td>
+</tr>
+<tr>
+<td><strong>2</strong></td>
+<td><em>« <strong>multiplier (P.2) par $t$, comparer à (P.5)</strong> »</em> ⟹ $tg'(t)=kf(t\mathbf{x})$, puis <strong>(P.1)</strong> ⟹ $\ t\,g'(t)=k\,g(t)$ <strong>(P.6)</strong></td>
+</tr>
+<tr>
+<td><strong>3</strong></td>
+<td> <strong>Considérer $t^{-k}g(t)$</strong> : $\ \dfrac{d}{dt}\big[t^{-k}g(t)\big]=t^{-k-1}\big[tg'(t)-kg(t)\big]$</td>
+</tr>
+<tr>
+<td><strong>4</strong></td>
+<td> <em>« <strong>Au vu de (P.6), cette dérivée doit être NULLE</strong> »</em> ⟹ $t^{-k}g(t)=c$ <strong>CONSTANTE</strong> ⟹ $g(t)=t^{k}c$</td>
+</tr>
+<tr>
+<td><strong>5</strong></td>
+<td><strong>En $t=1$</strong> : $g(1)=c$, et <strong>(P.1)</strong> donne $c=f(\mathbf{x})$ ⟹ $g(t)=t^{k}f(\mathbf{x})$ ⟹ <strong>$f(t\mathbf{x})=t^{k}f(\mathbf{x})$</strong> </td>
+</tr>
+</tbody></table>
+<p>$\blacksquare$</p>
+</div></details><details class="cor">
+<summary><strong>29.  Le cas $k=1$ d'Euler et l'exemple A2.5.</strong></summary><div class="in">
+
+<p>$$f(\mathbf{x})=\sum_{i=1}^{n}\frac{\partial f(\mathbf{x})}{\partial x_i}\,x_i$$</p>
+<p><strong>Exemple A2.5</strong> <em>(Cobb-Douglas, $\alpha+\beta=1$)</em> : <em>« <strong>multiplier la première partielle par $x_1$, la seconde par $x_2$, additionner, et utiliser $\alpha+\beta=1$</strong> »</em> :</p>
+<p>$$\alpha Ax_1^{\alpha}x_2^{\beta}+\beta Ax_1^{\alpha}x_2^{\beta}=(\alpha+\beta)Ax_1^{\alpha}x_2^{\beta}=f(x_1,x_2) \quad$$</p>
+<p class="cal piege"> <strong>C'est le « théorème d'ADDITIVITÉ »</strong> : la valeur totale se répartit exactement entre les $n$ facteurs.</p>
+</div></details><details class="cor">
+<summary><strong>30.  Qu'est-ce qu'une fonction HOMOTHÉTIQUE, et que dit-on de ses niveaux ?</strong></summary><div class="in">
+
+<p><em>(Exercice A2.10.)</em> $h$ est <strong>homothétique</strong> si $h=g(f(\mathbf{x}))$ avec <strong>$g$ STRICTEMENT CROISSANTE</strong> et <strong>$f$ HOMOGÈNE DE DEGRÉ 1</strong>.</p>
+<p><strong>Le résultat</strong> : par le <strong>théorème A2.6</strong>, les partielles de $f$ sont <strong>de degré 0</strong>, donc le facteur $g'$ <strong>se simplifie dans le rapport</strong> :</p>
+<p>$$\frac{\partial h(t\mathbf{x})/\partial x_i}{\partial h(t\mathbf{x})/\partial x_j}=\frac{\partial f(\mathbf{x})/\partial x_i}{\partial f(\mathbf{x})/\partial x_j} \qquad\textbf{— CONSTANT en } t$$</p>
+<p class="cal piege"> <strong>La conclusion sur les ensembles de niveau</strong> : <strong>le long de tout rayon issu de l'origine, la PENTE des niveaux est la MÊME</strong> — les ensembles de niveau sont <strong>des DILATATIONS RADIALES les uns des autres</strong>.</p>
+</div></details></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h2>Flashcards</h2>
+<table>
+<thead>
+<tr>
+<th>Question</th>
+<th>Réponse</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Ce qu'est « différentiable » ?</td>
+<td> <em>« <strong>continue ET LISSE, sans cassures ni plis</strong> »</em></td>
+</tr>
+<tr>
+<td>Différentiabilité vs continuité ?</td>
+<td> <em>« <strong>PLUS STRINGENTE</strong> »</em></td>
+</tr>
+<tr>
+<td>La dérivée est-elle un nombre ?</td>
+<td> <strong>NON — c'est UNE FONCTION</strong></td>
+</tr>
+<tr>
+<td>$C^n$ ?</td>
+<td>Dérivées $f',\dots,f^{(n)}$  <strong>CONTINUES</strong></td>
+</tr>
+<tr>
+<td>Règle du produit ?</td>
+<td>$fg'+f'g$</td>
+</tr>
+<tr>
+<td>Règle du quotient ?</td>
+<td>$\dfrac{gf'-fg'}{g^2}$</td>
+</tr>
+<tr>
+<td>Règle de composition ?</td>
+<td> $f'(g(x))\,g'(x)$</td>
+</tr>
+<tr>
+<td>Ce que mesure $f''$ ?</td>
+<td> <strong>Le TAUX AUQUEL LA PENTE CHANGE</strong> — la COURBURE</td>
+</tr>
+<tr>
+<td>Équation de la tangente en $x^0$ ?</td>
+<td>$l_0(x)=f'(x^0)(x-x^0)+f(x^0)$</td>
+</tr>
+<tr>
+<td>Où sont les tangentes d'une concave ?</td>
+<td> <strong>AU-DESSUS du graphe</strong></td>
+</tr>
+<tr>
+<td>Théorème A2.1, énoncé 2 ?</td>
+<td>$f''(x)\leq0$</td>
+</tr>
+<tr>
+<td>Théorème A2.1, énoncé 3 ?</td>
+<td>$f(x)\leq f(x^0)+f'(x^0)(x-x^0)$</td>
+</tr>
+<tr>
+<td>Théorème A2.1, énoncé 4 ?</td>
+<td> $f''&lt;0$ <strong>⟹ STRICTEMENT concave</strong></td>
+</tr>
+<tr>
+<td> Sa réciproque ?</td>
+<td> <strong>FAUSSE</strong> — le contre-exemple $-x^4$</td>
+</tr>
+<tr>
+<td>Comment obtenir le cas convexe ?</td>
+<td> <strong>RENVERSER TOUTES les inégalités</strong></td>
+</tr>
+<tr>
+<td>Pourquoi $n$ pentes ?</td>
+<td> <em>« il est <strong>PLUS DIFFICILE</strong> de penser la pente <strong>AU SINGULIER</strong> »</em></td>
+</tr>
+<tr>
+<td>Définition A2.1 ?</td>
+<td>La limite du taux d'accroissement <strong>en $x_i$ seul</strong></td>
+</tr>
+<tr>
+<td> L'hypothèse cachée de la déf. A2.1 ?</td>
+<td> <strong>$\mathbf{x}$ doit être INTÉRIEUR</strong></td>
+</tr>
+<tr>
+<td>La règle de calcul ?</td>
+<td> <strong>Traiter les autres variables comme CONSTANTES</strong></td>
+</tr>
+<tr>
+<td>Une partielle dépend-elle de toutes les variables ?</td>
+<td> <strong>OUI</strong></td>
+</tr>
+<tr>
+<td>Notations alternatives ?</td>
+<td>$\partial y/\partial x_i$ ou $f_i(\mathbf{x})$</td>
+</tr>
+<tr>
+<td>La fonction auxiliaire de la dérivée directionnelle ?</td>
+<td>$g(t)=f(\mathbf{x}+t\mathbf{z})$</td>
+</tr>
+<tr>
+<td>Sa dérivée en 0 ?</td>
+<td>$g'(0)=\sum_i f_i(\mathbf{x})z_i$</td>
+</tr>
+<tr>
+<td>Le gradient ?</td>
+<td> $\nabla f(\mathbf{x})=(f_1,\dots,f_n)$ — <strong>UN VECTEUR LIGNE</strong></td>
+</tr>
+<tr>
+<td>La formule (A2.3) ?</td>
+<td>$g'(0)=\nabla f(\mathbf{x})\mathbf{z}$</td>
+</tr>
+<tr>
+<td> Les partielles sont… ?</td>
+<td> <strong>Des directionnelles dans les directions UNITAIRES</strong></td>
+</tr>
+<tr>
+<td>Le gradient est analogue à… ?</td>
+<td> <strong>La DÉRIVÉE</strong> d'une fonction d'une variable</td>
+</tr>
+<tr>
+<td>La hessienne est analogue à… ?</td>
+<td> <strong>La DÉRIVÉE SECONDE</strong></td>
+</tr>
+<tr>
+<td>Comment la construit-on ?</td>
+<td> <strong>Le GRADIENT DU GRADIENT</strong>, empilé</td>
+</tr>
+<tr>
+<td>Combien d'entrées ?</td>
+<td>$n\times n=n^2$</td>
+</tr>
+<tr>
+<td>Théorème A2.2 ?</td>
+<td> <strong>YOUNG — l'ordre ne compte pas</strong></td>
+</tr>
+<tr>
+<td>Sa conséquence ?</td>
+<td> <strong>$H$ est SYMÉTRIQUE</strong></td>
+</tr>
+<tr>
+<td>Son hypothèse ?</td>
+<td> <strong>Deux fois CONTINÛMENT différentiable</strong></td>
+</tr>
+<tr>
+<td>Théorème A2.3 ?</td>
+<td> <strong>$f$ concave $\iff$ $g(t)=f(\mathbf{x}+t\mathbf{z})$ concave pour TOUT $\mathbf{x}$, $\mathbf{z}$</strong></td>
+</tr>
+<tr>
+<td>Sa portée ?</td>
+<td> <em>« <strong>il suffit de vérifier SUR LES DROITES</strong> »</em></td>
+</tr>
+<tr>
+<td>L'identité de sa preuve ?</td>
+<td>$\mathbf{x}+(\alpha t_0+(1-\alpha)t_1)\mathbf{z}=\alpha(\mathbf{x}+t_0\mathbf{z})+(1-\alpha)(\mathbf{x}+t_1\mathbf{z})$</td>
+</tr>
+<tr>
+<td>Semi-définie négative ?</td>
+<td>$\mathbf{z}^{T}A\mathbf{z}\leq0$ <strong>pour tout $\mathbf{z}$</strong></td>
+</tr>
+<tr>
+<td> Définie négative ?</td>
+<td> $&lt;0$ <strong>pour tout $\mathbf{z}$ NON NUL</strong></td>
+</tr>
+<tr>
+<td>Semi-définie positive ?</td>
+<td> <strong>$-A$ semi-définie négative</strong></td>
+</tr>
+<tr>
+<td>L'analogie du livre ?</td>
+<td> <strong>La généralisation matricielle du NOMBRE NON POSITIF</strong></td>
+</tr>
+<tr>
+<td>Théorème A2.4, énoncé 2 ?</td>
+<td> <strong>$H(\mathbf{x})$ SEMI-DÉFINIE NÉGATIVE</strong></td>
+</tr>
+<tr>
+<td>Théorème A2.4, énoncé 3 ?</td>
+<td>$f(\mathbf{x})\leq f(\mathbf{x}^0)+\nabla f(\mathbf{x}^0)(\mathbf{x}-\mathbf{x}^0)$</td>
+</tr>
+<tr>
+<td> La formule (P.4) ?</td>
+<td> $g''(t)=\mathbf{z}^{T}H(\mathbf{x}+t\mathbf{z})\mathbf{z}$</td>
+</tr>
+<tr>
+<td> Le choix de $\mathbf{z}$ pour prouver 1 ⟹ 3 ?</td>
+<td> <strong>$\mathbf{z}=\mathbf{x}^0-\mathbf{x}$</strong></td>
+</tr>
+<tr>
+<td>$f$ convexe $\iff$ $H$… ?</td>
+<td><strong>SEMI-DÉFINIE POSITIVE</strong></td>
+</tr>
+<tr>
+<td>$H$ définie négative est-elle nécessaire ?</td>
+<td> <strong>NON</strong></td>
+</tr>
+<tr>
+<td>Théorème A2.5 ?</td>
+<td>$f$ concave ⟹ $f_{ii}\leq0$</td>
+</tr>
+<tr>
+<td>Sa portée ?</td>
+<td> <strong>NÉCESSAIRE, PAS SUFFISANT</strong></td>
+</tr>
+<tr>
+<td>L'astuce de sa preuve ?</td>
+<td> <strong>$\mathbf{z}=\mathbf{e}_i$</strong> ⟹ $\mathbf{e}_i^{T}H\mathbf{e}_i=f_{ii}$</td>
+</tr>
+<tr>
+<td>Définition A2.2 ?</td>
+<td>$f(t\mathbf{x})\equiv t^{k}f(\mathbf{x})$  <strong>pour tout $t&gt;0$</strong></td>
+</tr>
+<tr>
+<td>$k=1$ ?</td>
+<td> <strong>HOMOGÈNE LINÉAIRE</strong></td>
+</tr>
+<tr>
+<td>$k=0$ ?</td>
+<td> <em>« les changements <strong>ÉQUIPROPORTIONNELS laissent la valeur INCHANGÉE</strong> »</em></td>
+</tr>
+<tr>
+<td>Degré de $Ax_1^{\alpha}x_2^{\beta}$ ?</td>
+<td> <strong>$\alpha+\beta$</strong></td>
+</tr>
+<tr>
+<td>Théorème A2.6 ?</td>
+<td> <strong>Les partielles sont de degré $k-1$</strong></td>
+</tr>
+<tr>
+<td>Le pivot de sa preuve ?</td>
+<td> $\partial(tx_i)/\partial x_i=t$, et <strong>(P.1) est une IDENTITÉ</strong></td>
+</tr>
+<tr>
+<td>Le cas $k=1$ ?</td>
+<td> <strong>Les partielles sont INCHANGÉES</strong></td>
+</tr>
+<tr>
+<td>Théorème A2.7 ?</td>
+<td> <strong>EULER</strong> : $k f(\mathbf{x})=\sum_i f_i(\mathbf{x})x_i$</td>
+</tr>
+<tr>
+<td>Son autre nom ?</td>
+<td> <strong>Le théorème d'ADDITIVITÉ</strong></td>
+</tr>
+<tr>
+<td>La fonction auxiliaire ?</td>
+<td>$g(t)\equiv f(t\mathbf{x})$</td>
+</tr>
+<tr>
+<td>La nécessité en une ligne ?</td>
+<td>$g'(t)=kt^{k-1}f(\mathbf{x})$ ⟹ $g'(1)=kf(\mathbf{x})$</td>
+</tr>
+<tr>
+<td> L'astuce de la suffisance ?</td>
+<td> <strong>$\dfrac{d}{dt}\big[t^{-k}g(t)\big]=0$ ⟹ CONSTANTE</strong></td>
+</tr>
+<tr>
+<td>L'équation (P.6) ?</td>
+<td>$t\,g'(t)=k\,g(t)$</td>
+</tr>
+<tr>
+<td>Euler pour $k=1$ ?</td>
+<td>$f(\mathbf{x})=\sum_i f_i(\mathbf{x})x_i$</td>
+</tr>
+<tr>
+<td>Degré de $f\cdot g$ ?</td>
+<td> <strong>$m+n$</strong></td>
+</tr>
+<tr>
+<td> Degré de $g(f,f)$ ?</td>
+<td> <strong>$m\cdot n$</strong></td>
+</tr>
+<tr>
+<td>Fonction HOMOTHÉTIQUE ?</td>
+<td> <strong>$g(f)$, $g$ strictement croissante, $f$ homogène de degré 1</strong></td>
+</tr>
+<tr>
+<td> Ce qu'on en déduit sur ses niveaux ?</td>
+<td> <strong>Des DILATATIONS RADIALES les uns des autres</strong></td>
+</tr>
+</tbody></table>
+</main>
+
+
+
+
+</body></html>

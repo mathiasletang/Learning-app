@@ -1,0 +1,1658 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fiche 313 — Modèles statistiques : formules, lm, aov, glm, nls</title>
+<script>
+window.MathJax={tex:{inlineMath:[["$","$"]],displayMath:[["$$","$$"]],processEscapes:true},
+ options:{skipHtmlTags:["script","noscript","style","textarea","pre","code"]},
+ svg:{fontCache:"global"},
+ startup:{pageReady:()=>MathJax.startup.defaultPageReady().then(()=>{document.body.classList.add("ready")})}};
+setTimeout(function(){document.body.classList.add("ready")},2500);
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+/* ============================================================
+   MathiasLearn — feuille de style des fiches
+   Reprise intégrale des tokens de 00_PARCOURS/*.html
+   + blocs pédagogiques (callouts, méthode, essentiels, recall)
+   ============================================================ */
+:root{--bg:#faf9f7;--card:#fff;--ink:#1a1a1a;--muted:#6b6b6b;--line:#e5e2dd;--accent:#8b5e34;
+ --hl:#fdf8ef;--ok:#2d7d4f;--okbg:#f0f7f3;--warn:#b3402f;--warnbg:#fdf3f1;--blue:#2f5d8b;--bluebg:#f1f5fa}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+ font:17px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;padding:0 16px 100px}
+.nav{position:sticky;top:0;background:rgba(250,249,247,.96);backdrop-filter:blur(8px);
+ border-bottom:1px solid var(--line);margin:0 -16px 30px;padding:11px 16px;z-index:50;
+ display:flex;gap:6px;flex-wrap:wrap;font-size:13px}
+.nav a{color:var(--muted);text-decoration:none;padding:4px 9px;border-radius:5px;white-space:nowrap}
+.nav a:hover{background:var(--line);color:var(--ink)}
+.nav a.on{background:var(--accent);color:#fff}
+main{max-width:780px;margin:0 auto}
+h1{font-size:31px;letter-spacing:-.02em;margin:.4em 0 .5em;line-height:1.25}
+h2{font-size:23px;margin:2.2em 0 .7em;padding-bottom:.3em;border-bottom:1px solid var(--line)}
+h3{font-size:19px;margin:1.9em 0 .5em;color:var(--accent)}
+h4{font-size:17px;margin:1.5em 0 .4em}
+p{margin:.8em 0} a{color:var(--accent)} hr{border:0;border-top:1px solid var(--line);margin:2.6em 0}
+table{border-collapse:collapse;width:100%;margin:1.3em 0;font-size:15.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+th{background:#f3f0eb;font-weight:600}
+tr:nth-child(even) td{background:#fcfbfa}
+code{font-family:"SF Mono",Menlo,Consolas,monospace;font-size:.88em;background:#f2efea;padding:2px 6px;border-radius:4px;overflow-wrap:break-word}
+pre{background:#f2efea;padding:14px 16px;border-radius:8px;overflow-x:auto}
+pre code{background:none;padding:0;white-space:pre}
+blockquote{border-left:3px solid var(--accent);background:var(--hl);margin:1.4em 0;padding:14px 20px;border-radius:0 8px 8px 0}
+blockquote p:first-child{margin-top:0} blockquote p:last-child{margin-bottom:0}
+ul,ol{padding-left:1.5em} li{margin:.35em 0} em{color:#4a4a4a}
+mjx-container[display="true"]{margin:1.1em 0!important;overflow-x:auto;overflow-y:hidden;padding:2px 0}
+mjx-container svg{max-width:100%}
+body:not(.ready) main{opacity:0} main{opacity:1;transition:opacity .25s}
+
+/* --- bandeau de tête de fiche --- */
+.cours{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--accent);
+ border-radius:0 10px 10px 0;padding:18px 22px;margin:0 0 34px}
+.cours h4{margin:0 0 4px;font-size:14px;text-transform:uppercase;letter-spacing:.07em;color:var(--accent)}
+.cours .cs{color:var(--muted);font-size:14.5px;margin:0 0 14px}
+
+/* --- exercices / corrigés --- */
+.ex{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:6px 24px 20px;margin:18px 0}
+.ex>h3:first-child{margin-top:14px}
+details.cor{margin-top:18px;border:1px solid var(--line);border-radius:8px;background:#fcfbfa;overflow:hidden}
+details.cor>summary{cursor:pointer;padding:12px 16px;font-weight:600;font-size:15px;color:var(--accent);
+ list-style:none;display:flex;align-items:center;gap:9px;user-select:none;transition:.15s;min-height:44px}
+details.cor>summary::-webkit-details-marker{display:none}
+details.cor>summary:hover{background:var(--hl)}
+details.cor>summary::before{content:"\25B6";font-size:10px;transition:transform .18s;display:inline-block}
+details.cor[open]>summary::before{transform:rotate(90deg)}
+details.cor[open]>summary{background:var(--okbg);color:var(--ok);border-bottom:1px solid var(--line)}
+.cor .in{padding:4px 20px 16px}
+.cor .in>*:first-child{margin-top:.9em}
+
+/* --- blocs pédagogiques (callouts) ---
+   Générés depuis une citation Markdown dont le premier **gras** commence
+   par un mot-clé : DÉFINITION, THÉORÈME, MÉTHODE, PIÈGE, INTUITION… */
+.cal{border:1px solid var(--line);border-left:4px solid var(--accent);background:var(--card);
+ border-radius:0 10px 10px 0;padding:15px 20px;margin:1.5em 0}
+.cal>p:first-child{margin-top:0}.cal>p:last-child,.cal>ul:last-child,.cal>ol:last-child{margin-bottom:0}
+.cal .lab{display:block;font-size:12.5px;text-transform:uppercase;letter-spacing:.08em;
+ font-weight:700;color:var(--accent);margin-bottom:6px}
+.cal.formel{background:var(--hl)}
+.cal.piege{border-left-color:var(--warn);background:var(--warnbg)}
+.cal.piege .lab{color:var(--warn)}
+.cal.methode{border-left-color:var(--ok);background:var(--okbg)}
+.cal.methode .lab{color:var(--ok)}
+.cal.intu{border-left-color:var(--blue);background:var(--bluebg)}
+.cal.intu .lab{color:var(--blue)}
+.cal.plus{border-left-style:dashed;background:#faf9f7}
+.cal.plus .lab{color:var(--muted)}
+
+/* --- révision express --- */
+.ess{background:var(--card);border:1px solid var(--accent);border-radius:10px;padding:4px 24px 20px;margin:1.6em 0}
+.ess h3{margin-top:1.3em}
+.rec{background:var(--card);border:1px dashed var(--accent);border-radius:10px;padding:4px 24px 18px;margin:1.6em 0}
+.rec ol{counter-reset:none}
+
+/* --- impression / PDF --- */
+@media print{
+ .nav{display:none}
+ body{padding:0;background:#fff;font-size:11.2pt;line-height:1.55}
+ main{max-width:none}
+ h1{font-size:23pt}h2{font-size:15pt;margin-top:1.5em}h3{font-size:12.6pt}
+ h2,h3,h4{break-after:avoid;page-break-after:avoid}
+ table,.cal,blockquote{break-inside:avoid;page-break-inside:avoid}
+ table{display:table;font-size:9.6pt}
+ details.cor{border:1px solid var(--line);background:#fcfbfa}
+ details.cor>summary{display:none}
+ details.cor .in{padding-top:10px}
+ .cal,.ex,.ess,.rec{box-shadow:none}
+ a{color:var(--ink);text-decoration:none}
+}
+@page{margin:16mm 15mm 18mm}
+
+/* --- exemples travaillés --- */
+.exm{background:#fcfbfa;border:1px solid var(--line);border-radius:10px;padding:2px 20px 14px;margin:1.5em 0}
+.exm>h4:first-child{margin:14px 0 .5em;color:var(--accent);font-size:13px;text-transform:uppercase;letter-spacing:.07em}
+
+
+/* --- pastilles de priorité (conventions des fiches de l'app) --- */
+h2[data-prio], h3[data-prio], h4[data-prio]{position:relative}
+h2[data-prio]::before,h3[data-prio]::before,h4[data-prio]::before{
+ content:"";display:inline-block;width:9px;height:9px;border-radius:50%;
+ margin-right:9px;vertical-align:middle;background:var(--muted)}
+[data-prio="must"]::before{background:var(--warn)}
+[data-prio="high"]::before{background:#d98324}
+[data-prio="mid"]::before{background:#c9a227}
+[data-prio="low"]::before{background:var(--ok)}
+/* corrigés des fiches de l'app : même traitement que les corrigés des séries */
+details.cor>summary::after{content:""}
+</style></head><body>
+<div class="nav"><a href="00_COMMENCER_ICI.html">Commencer ici</a><a href="01_NOTATIONS_le-decodeur.html">Notations</a><a href="02_EXERCICES_Serie-0.html">Série 0 — Remise en route</a><a href="03_EXERCICES_Serie-1.html">Série 1 — Convexité</a><a href="04_EXERCICES_Serie-2.html">Série 2 — KKT</a><a href="05_AUTO-EVALUATION.html">Auto-évaluation (quiz)</a><a href="06_FICHE_Optimisation-deux-variables.html">Fiche — Optimisation à 2 variables</a></div>
+<main><h1>Fiche 313 — Modèles statistiques : formules, <code>lm</code>, <code>aov</code>, <code>glm</code>, <code>nls</code></h1>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Matière</strong></td>
+<td>Code · Langage R</td>
+</tr>
+<tr>
+<td><strong>Cours source</strong></td>
+<td>R Core Team, <em>An Introduction to R</em> 4.6.1 — chapitre 11 « Statistical models in R » (§11.1 formules, §11.1.1 contrastes, §11.2 modèles linéaires, §11.3 fonctions extractrices, §11.4 analyse de variance, §11.5 mise à jour, §11.6 modèles linéaires généralisés, §11.7 moindres carrés non linéaires et maximum de vraisemblance, §11.8 modèles non standard)</td>
+</tr>
+<tr>
+<td><strong>Difficulté</strong></td>
+<td> Avancé — le chapitre le plus dense du manuel</td>
+</tr>
+<tr>
+<td><strong>Temps d'étude estimé</strong></td>
+<td>2 h 15</td>
+</tr>
+<tr>
+<td><strong>Prérequis</strong></td>
+<td>Fiches 304, 306, 309, 311, 312 (facteurs, data frames, fonctions, S3, tests)</td>
+</tr>
+<tr>
+<td><strong>Concepts clés</strong></td>
+<td><strong>formule</strong> <code>~</code>, opérateurs <code>+ - : %in% * / ^ I()</code>, <strong>contrastes</strong> de traitement et polynomiaux, <code>lm()</code>, argument <strong><code>data =</code></strong>, <strong>fonctions extractrices</strong>, <code>anova()</code>, <code>aov()</code> et <strong>strates d'erreur</strong>, <strong>l'ordre des termes</strong>, <code>update()</code> et le point, <code>glm()</code>, <strong>familles et liens</strong>, LD50, quasi-vraisemblance, <code>nls()</code>, <code>nlm()</code>, <code>optim()</code>, erreurs types par la <strong>hessienne</strong></td>
+</tr>
+<tr>
+<td><strong>À retenir en priorité</strong></td>
+<td><strong>La sortie est minimale — on interroge par des extractrices</strong> · <strong><code>I()</code> isole</strong> · <strong>les contrastes par défaut de R diffèrent de S</strong> · <strong>l'ordre des termes compte dans une table d'ANOVA</strong> · les <strong>deux formules d'erreur type</strong> selon qu'on minimise une SSE ou une log-vraisemblance.</td>
+</tr>
+</tbody></table>
+<h2>Vue d'ensemble</h2>
+<pre><code>LE PATRON       formule + fonction d'ajustement + fonctions EXTRACTRICES
+                « the basic output is MINIMAL, and one needs to ASK FOR THE
+                  DETAILS by calling extractor functions »
+
+UNE FORMULE     reponse ~ terme1 + terme2 - terme3 ...
+                1 = l'ordonnee a l'origine, INCLUSE PAR DEFAUT ; -1 ou +0 l'ote
+
+LES OPERATEURS  +   inclure          -    retirer
+                :   produit tensoriel (interaction)
+                %in% imbrication      *    A + B + A:B
+                /   A + B %in% A      ^n   interactions jusqu'a l'ordre n
+                I() ISOLER : a l'interieur, sens ARITHMETIQUE normal
+
+POURQUOI « : » ET NON « . » ?   « the period is A VALID NAME CHARACTER in R »
+
+CONTRASTES      facteur NON ordonne -&gt; k-1 indicatrices, reference = 1er niveau
+                facteur ORDONNE     -&gt; k-1 polynomes orthogonaux
+                defaut R : c("contr.treatment", "contr.poly")
+                defaut S : contr.helmert   &lt;- DIFFERENCE DELIBEREE
+
+AJUSTER         lm(formule, data = df)        aov(formule, data = df)
+                glm(formule, family = ..., data = df)
+                nls(y ~ SSmicmen(x, Vm, K), df)     nlm(fn, p = ...)
+
+EXTRAIRE        coef  resid  fitted  predict  summary  anova  deviance
+                vcov  plot  formula  step  add1  drop1  effects  family
+
+METTRE A JOUR   update(ancien, . ~ . + x6)   -- le POINT = « la partie correspondante »
+                update(fm6, sqrt(.) ~ .)     -- transformer la reponse
+
+ATTENTION       « only for ORTHOGONAL EXPERIMENTS will the ORDER OF INCLUSION
+                  be INCONSEQUENTIAL »
+</code></pre>
+<p><strong>Le problème posé.</strong> <em>« <strong>The requirements for fitting statistical models are sufficiently well defined to make it possible to construct general tools that apply in a broad spectrum of problems.</strong> R provides <strong>an interlocking suite of facilities</strong> that make fitting statistical models very simple. <strong>As we mention in the introduction, the basic output is minimal, and one needs to ask for the details by calling extractor functions.</strong> »</em> (§11)</p>
+<div class="cal intu"><span class="lab">Intuition — la promesse du §1.3 est ici tenue.</span>
+<p> La fiche 300 citait : <em>« R will give <strong>minimal output</strong> and <strong>store the results in a fit object</strong> for subsequent interrogation by further R functions »</em>. Ce chapitre est le lieu où cette philosophie se déploie : <strong>une formule</strong> décrit le modèle, <strong>une fonction</strong> l'ajuste et rend <strong>un objet</strong>, <strong>des génériques</strong> (fiche 311) l'interrogent.</p>
+</div>
+<p class="cal piege"> <em>« This section <strong>presumes the reader has some familiarity with statistical methodology</strong>, in particular with regression analysis and the analysis of variance. Later we make some <strong>rather more ambitious presumptions</strong>. »</em> (§11)</p>
+<h2 data-prio="must">Concept 1 — Le modèle de référence et la formule</h2>
+<div class="cal formel"><span class="lab">Définition (§11.1).</span>
+<p> <em>« <strong>The template for a statistical model is a linear regression model with independent, homoscedastic errors</strong> »</em> :
+$$y_i=\sum_{j=0}^{p}\beta_j x_{ij}+e_i,\qquad e_i\sim \mathrm{NID}(0,\sigma^2),\quad i=1,\dots,n$$
+<em>« In matrix terms this would be written »</em>
+$$y = X\beta + e$$
+<em>« where <strong><code>y</code> is the response vector</strong>, <strong><code>X</code> is the model matrix or design matrix</strong> and has columns $x_0, x_1, \dots, x_p$, <strong>the determining variables</strong>. <strong>Very often $x_0$ will be a column of ones defining an intercept term.</strong> »</em></p>
+</div>
+<div class="cal formel"><span class="lab">Définition (§11.1).</span>
+<p> <em>« <strong>The operator <code>~</code> is used to define a model formula in R.</strong> The form, for an ordinary linear model, is »</em></p>
+<pre><code>response ~ op_1 term_1 op_2 term_2 op_3 term_3 ...
+</code></pre>
+<ul>
+<li><strong><code>response</code></strong> : <em>« a vector or matrix, (or expression evaluating to a vector or matrix) »</em> ;</li>
+<li><strong><code>op_i</code></strong> : *« an operator, <strong>either <code>+</code> or <code>-</code></strong>, implying <strong>the inclusion or exclusion of a term</strong> (<strong>the first is optional</strong>) »* ;</li>
+<li><strong><code>term_i</code></strong> : <em>« <strong>a vector or matrix expression, or <code>1</code></strong> ; <strong>a factor</strong> ; or <strong>a formula expression consisting of factors, vectors or matrices connected by formula operators</strong>. »</em></li>
+</ul>
+<p class="cal piege"> <em>« <strong>In all cases each term defines a collection of columns either to be added to or removed from the model matrix. A <code>1</code> stands for an intercept column and is by default included in the model matrix unless explicitly removed.</strong> »</em></p>
+</div>
+<h2 data-prio="must">Concept 2 — Le catalogue des formules</h2>
+<blockquote>
+<p><strong>Exemples (§11.1).</strong> <em>« Suppose <code>y</code>, <code>x</code>, <code>x0</code>, <code>x1</code>, <code>x2</code>, … are <strong>numeric variables</strong>, <code>X</code> is <strong>a matrix</strong> and <code>A</code>, <code>B</code>, <code>C</code>, … are <strong>factors</strong>. »</em></p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>Formule</th>
+<th>Modèle</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>y ~ x</code> · <code>y ~ 1 + x</code></td>
+<td><em>« Both imply <strong>the same simple linear regression</strong> … The first has <strong>an implicit intercept term</strong>, and the second <strong>an explicit one</strong>. »</em></td>
+</tr>
+<tr>
+<td><code>y ~ 0 + x</code> · <code>y ~ -1 + x</code> · <code>y ~ x - 1</code></td>
+<td><em>« Simple linear regression of <code>y</code> on <code>x</code> <strong>through the origin</strong> (that is, <strong>without an intercept term</strong>). »</em></td>
+</tr>
+<tr>
+<td><code>log(y) ~ x1 + x2</code></td>
+<td><em>« Multiple regression of <strong>the transformed variable</strong> <code>log(y)</code> on <code>x1</code> and <code>x2</code> (with an implicit intercept). »</em></td>
+</tr>
+<tr>
+<td><code>y ~ poly(x,2)</code> · <code>y ~ 1 + x + I(x^2)</code></td>
+<td><em>« <strong>Polynomial regression of degree 2.</strong> <strong>The first form uses orthogonal polynomials, and the second uses explicit powers, as basis.</strong> »</em></td>
+</tr>
+<tr>
+<td><code>y ~ X + poly(x,2)</code></td>
+<td><em>« model matrix consisting of <strong>the matrix <code>X</code></strong> as well as polynomial terms in <code>x</code> to degree 2 »</em></td>
+</tr>
+<tr>
+<td><code>y ~ A</code></td>
+<td><em>« <strong>Single classification analysis of variance</strong> … with classes determined by <code>A</code> »</em></td>
+</tr>
+<tr>
+<td><code>y ~ A + x</code></td>
+<td><em>« <strong>Single classification analysis of covariance</strong> … with covariate <code>x</code> »</em></td>
+</tr>
+<tr>
+<td><code>y ~ A*B</code> · <code>y ~ A + B + A:B</code> · <code>y ~ B %in% A</code> · <code>y ~ A/B</code></td>
+<td><em>« <strong>Two factor non-additive model.</strong> The <strong>first two</strong> specify <strong>the same crossed classification</strong> and the <strong>second two</strong> specify <strong>the same nested classification</strong>.  <strong>In abstract terms all four specify the same model subspace.</strong> »</em></td>
+</tr>
+<tr>
+<td><code>y ~ (A + B + C)^2</code> · <code>y ~ A*B*C - A:B:C</code></td>
+<td><em>« Three factor experiment but with a model containing <strong>main effects and two factor interactions only</strong>. <strong>Both formulae specify the same model.</strong> »</em></td>
+</tr>
+<tr>
+<td><code>y ~ A*x</code> · <code>y ~ A/x</code> · <code>y ~ A/(1 + x) - 1</code></td>
+<td><em>« <strong>Separate simple linear regression models of <code>y</code> on <code>x</code> within the levels of <code>A</code>, with different codings.</strong> <strong>The last form produces explicit estimates of as many different intercepts and slopes as there are levels in <code>A</code>.</strong> »</em></td>
+</tr>
+<tr>
+<td><code>y ~ A*B + Error(C)</code></td>
+<td><em>« An experiment with <strong>two treatment factors</strong> and <strong>error strata determined by factor <code>C</code></strong> — for example <strong>a split plot experiment</strong>. »</em></td>
+</tr>
+</tbody></table>
+<div class="cal intu"><span class="lab">En clair — la leçon des lignes 8 et 9.</span>
+<p> Plusieurs écritures <strong>différentes</strong> décrivent <strong>le même sous-espace de modèle</strong> mais <strong>pas le même codage</strong> : <em>« with different codings »</em>. Les prédictions sont identiques ; <strong>les coefficients ne le sont pas</strong>, et leur interprétation non plus. <code>y ~ A/(1 + x) - 1</code> est la forme qui donne <em>« <strong>explicit estimates of as many different intercepts and slopes as there are levels in <code>A</code></strong> »</em> — c'est-à-dire des coefficients <strong>lisibles directement</strong>, plutôt que des écarts à une référence.</p>
+</div>
+<h2 data-prio="must">Concept 3 — La grammaire des opérateurs</h2>
+<div class="cal formel"><span class="lab">Notation (§11.1).</span>
+<p> <em>« The formula operators are <strong>similar in effect to the Wilkinson and Rogers notation</strong> used by such programs as <strong>Glim and Genstat</strong>.  <strong>One inevitable change is that the operator <code>.</code> becomes <code>:</code> since the period is a valid name character in R.</strong> »</em></p>
+<p><em>« The notation is summarized below (<strong>based on Chambers &amp; Hastie, 1992, p. 29</strong>) »</em> :</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Écriture</th>
+<th>Signification</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>Y ~ M</code></td>
+<td><em>« <code>Y</code> is <strong>modeled as</strong> <code>M</code>. »</em></td>
+</tr>
+<tr>
+<td><code>M_1 + M_2</code></td>
+<td><em>« <strong>Include</strong> <code>M_1</code> and <code>M_2</code>. »</em></td>
+</tr>
+<tr>
+<td><code>M_1 - M_2</code></td>
+<td><em>« Include <code>M_1</code> <strong>leaving out terms of</strong> <code>M_2</code>. »</em></td>
+</tr>
+<tr>
+<td><code>M_1 : M_2</code></td>
+<td><em>« <strong>The tensor product</strong> of <code>M_1</code> and <code>M_2</code>. <strong>If both terms are factors, then the "subclasses" factor.</strong> »</em></td>
+</tr>
+<tr>
+<td><code>M_1 %in% M_2</code></td>
+<td><em>« <strong>Similar to <code>M_1:M_2</code>, but with a different coding.</strong> »</em></td>
+</tr>
+<tr>
+<td><code>M_1 * M_2</code></td>
+<td><code>M_1 + M_2 + M_1:M_2</code></td>
+</tr>
+<tr>
+<td><code>M_1 / M_2</code></td>
+<td><code>M_1 + M_2 %in% M_1</code></td>
+</tr>
+<tr>
+<td><code>M^n</code></td>
+<td><em>« <strong>All terms in <code>M</code> together with "interactions" up to order <code>n</code></strong> »</em></td>
+</tr>
+<tr>
+<td><code>I(M)</code></td>
+<td><em>« <strong>Insulate <code>M</code>.</strong> <strong>Inside <code>M</code> all operators have their normal arithmetic meaning</strong>, and <strong>that term appears in the model matrix</strong>. »</em></td>
+</tr>
+</tbody></table>
+<blockquote>
+<p class="cal piege"> <strong>La raison du <code>:</code> est une leçon de langage.</strong> Dans la notation de Wilkinson et Rogers, l'interaction se note par un point. En R, <strong>le point est un caractère de nom ordinaire</strong> (fiche 300) : <code>A.B</code> serait lu comme <strong>un identifiant</strong>, pas comme une interaction. Le changement est donc <em>« inevitable »</em> — imposé par la syntaxe des noms, pas par un choix de style.</p>
+</blockquote>
+<blockquote>
+<p><strong>Règle — l'isolation par <code>I()</code> (§11.1).</strong> <em>« Note that <strong>inside the parentheses that usually enclose function arguments all operators have their normal arithmetic meaning</strong>. <strong>The function <code>I()</code> is an identity function used to allow terms in model formulae to be defined using arithmetic operators.</strong> »</em></p>
+</blockquote>
+<p><strong>C'est le point le plus piégeux du chapitre.</strong> Dans une formule, <code>+</code>, <code>*</code>, <code>^</code>, <code>-</code> <strong>ne sont pas</strong> des opérations arithmétiques :</p>
+<table>
+<thead>
+<tr>
+<th>Écriture</th>
+<th>Ce qu'elle signifie <strong>dans une formule</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>y ~ x1 + x2</code></td>
+<td>deux <strong>termes</strong> — et non la somme <code>x1 + x2</code></td>
+</tr>
+<tr>
+<td><code>y ~ x^2</code></td>
+<td><code>x</code> <strong>et ses interactions jusqu'à l'ordre 2</strong>, soit <code>x</code> seul</td>
+</tr>
+<tr>
+<td><code>y ~ I(x^2)</code></td>
+<td>le <strong>carré arithmétique</strong> de <code>x</code>, comme colonne</td>
+</tr>
+<tr>
+<td><code>y ~ I(x1 + x2)</code></td>
+<td>la <strong>somme</strong> des deux variables, comme <strong>une seule</strong> colonne</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p class="cal piege"> <strong>La remarque finale du §11.1, souvent négligée.</strong> <em>« <strong>Note particularly that the model formulae specify the columns of the model matrix, the specification of the parameters being implicit.</strong> <strong>This is not the case in other contexts, for example in specifying nonlinear models.</strong> »</em></p>
+<p>Une formule décrit <strong>des colonnes</strong>, pas <strong>des paramètres</strong>. C'est pourquoi le nombre de coefficients d'un modèle à facteurs n'est pas lisible sur la formule — il dépend des <strong>contrastes</strong>.</p>
+</blockquote>
+<h2 data-prio="must">Concept 4 — Les contrastes : comment un facteur devient des colonnes</h2>
+<blockquote>
+<p><strong>Cadrage (§11.1.1).</strong> <em>« <strong>We need at least some idea how the model formulae specify the columns of the model matrix.</strong> This is easy if we have <strong>continuous variables</strong>, as <strong>each provides one column</strong> (and the intercept will provide a column of ones if included). »</em></p>
+</blockquote>
+<blockquote>
+<p><strong>Règle — le cas d'un facteur à $k$ niveaux (§11.1.1).</strong> <em>« <strong>The answer differs for unordered and ordered factors.</strong> »</em></p>
+<ul>
+<li>*« For <strong>unordered factors</strong> $k-1$ <strong>columns are generated for the indicators of the second, …, $k$-th levels</strong> of the factor. (<strong>Thus the implicit parameterization is to contrast the response at each level with that at the first.</strong>) »*</li>
+<li><em>« For <strong>ordered factors</strong> the $k-1$ columns are <strong>the orthogonal polynomials on $1,\dots,k$, omitting the constant term</strong>. »</em></li>
+</ul>
+</blockquote>
+<p><strong>Voilà la seconde différence entre <code>factor()</code> et <code>ordered()</code></strong> annoncée en fiche 304 — <em>« the contrasts generated for them in fitting linear models are different »</em>. Elle est ici explicitée : <strong>indicatrices</strong> contre <strong>polynômes orthogonaux</strong>.</p>
+<blockquote>
+<p class="cal piege"> <strong>Deux complications (§11.1.1).</strong>
+<em>« <strong>First, if the intercept is omitted in a model that contains a factor term, the first such term is encoded into $k$ columns giving the indicators for all the levels.</strong> »</em>
+<em>« <strong>Second, the whole behavior can be changed by the <code>options</code> setting for <code>contrasts</code>.</strong> »</em></p>
+</blockquote>
+<pre><code class="language-r">options(contrasts = c("contr.treatment", "contr.poly"))   # le defaut de R
+</code></pre>
+<blockquote>
+<p class="cal piege"> <strong>La différence avec S, et pourquoi elle existe (§11.1.1).</strong> <em>« The main reason for mentioning this is that <strong>R and S have different defaults for unordered factors, S using Helmert contrasts</strong>. So <strong>if you need to compare your results to those of a textbook or paper which used S-Plus, you will need to set</strong> »</em> :</p>
+<pre><code class="language-r">options(contrasts = c("contr.helmert", "contr.poly"))
+</code></pre>
+<p><em>« <strong>This is a deliberate difference, as treatment contrasts (R's default) are thought easier for newcomers to interpret.</strong> »</em></p>
+<p><strong>C'est une source majeure de résultats « qui ne correspondent pas au livre ».</strong> Les prédictions sont identiques ; <strong>les coefficients diffèrent</strong>, parce que la paramétrisation diffère.</p>
+</blockquote>
+<p>*« We have still not finished, as <strong>the contrast scheme to be used can be set for each term in the model using the functions <code>contrasts</code> and <code>C</code></strong>. »*</p>
+<p><em>« We have not yet considered <strong>interaction terms : these generate the products of the columns introduced for their component terms</strong>. »</em></p>
+<blockquote>
+<p class="cal piege"> <strong>La règle de marginalité, à retenir (§11.1.1).</strong> <em>« Although the details are complicated, <strong>model formulae in R will normally generate the models that an expert statistician would expect, provided that marginality is preserved</strong>. <strong>Fitting, for example, a model with an interaction but not the corresponding main effects will in general lead to surprising results, and is for experts only.</strong> »</em></p>
+</blockquote>
+<h2 data-prio="must">Concept 5 — <code>lm()</code> et les fonctions extractrices</h2>
+<div class="cal formel"><span class="lab">Définition (§11.2).</span>
+<p> <em>« The basic function for fitting ordinary multiple models is <strong><code>lm()</code></strong> »</em> :</p>
+</div>
+<pre><code class="language-r">fitted.model &lt;- lm(formula, data = data.frame)
+fm2 &lt;- lm(y ~ x1 + x2, data = production)
+</code></pre>
+<blockquote>
+<p class="cal piege"> <strong>L'argument <code>data =</code> (§11.2).</strong> <em>« The important (<strong>but technically optional</strong>) parameter <code>data = production</code> specifies that <strong>any variables needed to construct the model should come first from the <code>production</code> data frame</strong>. <strong>This is the case regardless of whether data frame <code>production</code> has been attached on the search path or not.</strong> »</em></p>
+<p><strong>C'est ce qui rend <code>attach()</code> inutile ici</strong> (fiche 306). Le <code>data =</code> est <strong>plus sûr</strong> : il dit explicitement où chercher, et ne dépend pas de l'état du chemin de recherche.</p>
+</blockquote>
+<div class="cal formel"><span class="lab">Définition (§11.3).</span>
+<p> *« <strong>The value of <code>lm()</code> is a fitted model object ; technically a list of results of class <code>"lm"</code>.</strong> Information about the fitted model can then be <strong>displayed, extracted, plotted and so on by using generic functions that orient themselves to objects of class <code>"lm"</code></strong>. »*</p>
+</div>
+<p><strong>La liste complète du cours</strong> : <code>add1</code>, <code>alias</code>, <code>anova</code>, <code>coef</code>, <code>deviance</code>, <code>drop1</code>, <code>effects</code>, <code>family</code>, <code>formula</code>, <code>kappa</code>, <code>labels</code>, <code>plot</code>, <code>predict</code>, <code>print</code>, <code>proj</code>, <code>residuals</code>, <code>step</code>, <code>summary</code>, <code>vcov</code>.</p>
+<table>
+<thead>
+<tr>
+<th>Fonction</th>
+<th>Ce qu'elle rend (§11.3)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>anova(obj1, obj2)</code></td>
+<td><em>« <strong>Compare a submodel with an outer model</strong> and produce an analysis of variance table. »</em></td>
+</tr>
+<tr>
+<td><code>coef(obj)</code></td>
+<td><em>« Extract the <strong>regression coefficient (matrix)</strong> »</em> — forme longue <strong><code>coefficients()</code></strong></td>
+</tr>
+<tr>
+<td><code>deviance(obj)</code></td>
+<td><em>« <strong>Residual sum of squares</strong>, weighted if appropriate »</em></td>
+</tr>
+<tr>
+<td><code>formula(obj)</code></td>
+<td><em>« Extract <strong>the model formula</strong> »</em></td>
+</tr>
+<tr>
+<td><code>plot(obj)</code></td>
+<td><em>« Produce <strong>four plots</strong>, showing residuals, fitted values and some diagnostics »</em></td>
+</tr>
+<tr>
+<td><code>predict(obj, newdata=df)</code></td>
+<td> <em>« <strong>The data frame supplied must have variables specified with the same labels as the original.</strong> »</em></td>
+</tr>
+<tr>
+<td><code>print(obj)</code></td>
+<td><em>« a <strong>concise</strong> version … <strong>Most often used implicitly</strong> »</em></td>
+</tr>
+<tr>
+<td><code>residuals(obj)</code></td>
+<td><em>« the (matrix of) residuals, weighted as appropriate »</em> — forme courte <strong><code>resid()</code></strong></td>
+</tr>
+<tr>
+<td><code>step(obj)</code></td>
+<td><em>« <strong>Select a suitable model by adding or dropping terms and preserving hierarchies.</strong> The model with <strong>the smallest value of AIC</strong> … is returned »</em></td>
+</tr>
+<tr>
+<td><code>summary(obj)</code></td>
+<td><em>« Print <strong>a comprehensive summary</strong> of the results »</em></td>
+</tr>
+<tr>
+<td><code>vcov(obj)</code></td>
+<td><em>« the <strong>variance-covariance matrix</strong> of the main parameters »</em></td>
+</tr>
+</tbody></table>
+<div class="cal intu"><span class="lab">En clair.</span>
+<p> Ces noms sont <strong>des génériques</strong> (fiche 311). <code>coef</code> s'écrit <code>function(object, ...) UseMethod("coef")</code> — c'est l'exemple même que donnait le §10.9. <strong>Le même verbe fonctionne sur un <code>lm</code>, un <code>glm</code>, un <code>aov</code>, un <code>nls</code>.</strong> C'est ce que le §11 appelle <em>« an interlocking suite of facilities »</em>.</p>
+</div>
+<h2 data-prio="high">Concept 6 — <code>aov()</code>, les strates d'erreur et l'ordre des termes</h2>
+<div class="cal formel"><span class="lab">Définition (§11.4).</span>
+<p> *« The model fitting function <strong><code>aov(formula, data=data.frame)</code></strong> operates at the simplest level <strong>in a very similar way to <code>lm()</code></strong>, and <strong>most of the generic functions</strong> listed … <strong>apply</strong>. »*</p>
+<p><em>« It should be noted that <strong>in addition <code>aov()</code> allows an analysis of models with multiple error strata</strong> such as <strong>split plot experiments</strong>, or <strong>balanced incomplete block designs with recovery of inter-block information</strong>. »</em></p>
+</div>
+<pre><code>response ~ mean.formula + Error(strata.formula)
+</code></pre>
+<p><em>« In the simplest case, <strong><code>strata.formula</code> is simply a factor</strong>, when it defines <strong>a two strata experiment, namely between and within the levels of the factor</strong>. »</em></p>
+<pre><code class="language-r">fm &lt;- aov(yield ~ v + n*p*k + Error(farms/blocks), data = farm.data)
+</code></pre>
+<p>*« would typically be used to describe an experiment with <strong>mean model <code>v + n*p*k</code></strong> and <strong>three error strata</strong>, namely <strong>"between farms"</strong>, <strong>"within farms, between blocks"</strong> and <strong>"within blocks"</strong>. »*</p>
+<div class="cal intu"><span class="lab">Contrôle — d'où viennent les trois strates.</span>
+<p> <code>Error(farms/blocks)</code> se développe, par la règle <code>M_1 / M_2</code> = <code>M_1 + M_2 %in% M_1</code>, en <strong><code>farms + blocks %in% farms</code></strong> — deux termes, donc <strong>deux strates explicites</strong>, plus <strong>la strate résiduelle</strong> (« within blocks »). Total : <strong>trois</strong>.  La grammaire du concept 3 s'applique <strong>aussi</strong> dans <code>Error()</code>.</p>
+</div>
+<h3>6.1 Ce que dit vraiment une table d'ANOVA</h3>
+<blockquote>
+<p class="cal piege"> <strong>Règle (§11.4.1).</strong> <em>« Note also that <strong>the analysis of variance table (or tables) are for a sequence of fitted models</strong>. <strong>The sums of squares shown are the decrease in the residual sums of squares resulting from an inclusion of that term in the model at that place in the sequence.</strong> <strong>Hence only for orthogonal experiments will the order of inclusion be inconsequential.</strong> »</em></p>
+</blockquote>
+<p><strong>C'est l'avertissement le plus important du chapitre.</strong> Une table d'ANOVA par défaut est <strong>séquentielle</strong> : chaque ligne mesure ce que le terme apporte <strong>sachant ceux qui le précèdent</strong>. Changer l'ordre des termes dans la formule <strong>change les sommes de carrés</strong> — sauf si le plan est <strong>orthogonal</strong>.</p>
+<p><em>« For <strong>multistratum experiments</strong> the procedure is <strong>first to project the response onto the error strata, again in sequence, and to fit the mean model to each projection</strong>. »</em></p>
+<div class="cal methode"><span class="lab">Méthode — la voie plus sûre (§11.4.1).</span>
+<p> <em>« <strong>A more flexible alternative to the default full ANOVA table is to compare two or more models directly using the <code>anova()</code> function</strong> »</em> :</p>
+<pre><code class="language-r">anova(fitted.model.1, fitted.model.2, ...)
+</code></pre>
+<p><em>« The display is then an ANOVA table <strong>showing the differences between the fitted models when fitted in sequence</strong>. <strong>The fitted models being compared would usually be an hierarchical sequence.</strong> <strong>This does not give different information to the default, but rather makes it easier to comprehend and control.</strong> »</em></p>
+<p><strong>« Easier to comprehend and control » est l'argument</strong> : en comparant deux modèles <strong>explicites</strong>, on sait exactement ce qui est testé — au lieu de dépendre de l'ordre d'écriture des termes.</p>
+</div>
+<h2 data-prio="high">Concept 7 — <code>update()</code> et le point</h2>
+<div class="cal formel"><span class="lab">Définition (§11.5).</span>
+<p> <em>« <strong>The <code>update()</code> function is largely a convenience function that allows a model to be fitted that differs from one previously fitted usually by just a few additional or removed terms.</strong> »</em></p>
+<pre><code class="language-r">new.model &lt;- update(old.model, new.formula)
+</code></pre>
+<p>*« In the <code>new.formula</code> <strong>the special name consisting of a period, <code>.</code>, only, can be used to stand for "the corresponding part of the old model formula"</strong>. »*</p>
+</div>
+<pre><code class="language-r">fm05 &lt;- lm(y ~ x1 + x2 + x3 + x4 + x5, data = production)
+fm6  &lt;- update(fm05, . ~ . + x6)      # AJOUTER un regresseur
+smf6 &lt;- update(fm6, sqrt(.) ~ .)      # TRANSFORMER la reponse
+</code></pre>
+<div class="cal intu"><span class="lab">Contrôle — lire les deux points.</span>
+<p> Dans <code>. ~ . + x6</code>, le point <strong>de gauche</strong> est <strong>la réponse <code>y</code></strong>, le point <strong>de droite</strong> est <strong>tout le prédicteur</strong> <code>x1 + … + x5</code>. Dans <code>sqrt(.) ~ .</code>, le point de gauche est repris <strong>à l'intérieur d'une fonction</strong> : la réponse devient <code>sqrt(y)</code>.</p>
+<p>C'est exactement le <code>update(fm, . ~ . - Run)</code> de l'annexe A (fiche 300) — « même réponse, mêmes prédicteurs, <strong>moins <code>Run</code></strong> ».</p>
+</div>
+<blockquote>
+<p class="cal piege"> <strong>Le détail qui économise du travail (§11.5).</strong> <em>« <strong>Note especially that if the <code>data=</code> argument is specified on the original call to the model fitting function, this information is passed on through the fitted model object to <code>update()</code> and its allies.</strong> »</em></p>
+</blockquote>
+<blockquote>
+<p class="cal piege"> <strong>L'autre sens du point (§11.5).</strong> *« <strong>The name <code>.</code> can also be used in other contexts, but with slightly different meaning.</strong> For example <code>fmfull &lt;- lm(y ~ . , data = production)</code> <strong>would fit a model with response <code>y</code> and regressor variables all other variables in the data frame <code>production</code></strong>. »*</p>
+<p><strong>Deux sens à ne pas confondre</strong> : dans <code>update()</code>, le point est <strong>« la partie correspondante de l'ancienne formule »</strong> ; dans une formule neuve avec <code>data =</code>, il est <strong>« toutes les autres variables du data frame »</strong>.</p>
+</blockquote>
+<p>*« Other functions for exploring incremental sequences of models are <strong><code>add1()</code>, <code>drop1()</code> and <code>step()</code></strong>. »*</p>
+<h2 data-prio="must">Concept 8 — Les modèles linéaires généralisés</h2>
+<blockquote>
+<p><strong>Cadrage (§11.6).</strong> <em>« <strong>Generalized linear modeling is a development of linear models to accommodate both non-normal response distributions and transformations to linearity in a clean and straightforward way.</strong> »</em></p>
+</blockquote>
+<div class="cal formel"><span class="lab">Définition — les quatre hypothèses (§11.6).</span>
+
+<ol>
+<li><em>« There is <strong>a response, <code>y</code>, of interest</strong> and <strong>stimulus variables</strong> $x_1, x_2,\dots$ whose values <strong>influence the distribution of the response</strong>. »</em></li>
+<li><em>« <strong>The stimulus variables influence the distribution of <code>y</code> through a single linear function, only.</strong> This linear function is called <strong>the linear predictor</strong> »</em>
+$$\eta=\beta_1x_1+\beta_2x_2+\dots+\beta_px_p$$
+*« hence <strong>$x_i$ has no influence on the distribution of <code>y</code> if and only if $\beta_i = 0$</strong>. »*</li>
+<li><em>« <strong>The distribution of <code>y</code> is of the form</strong> »</em>
+$$f_Y(y;\mu,\varphi)=\exp\left[\frac{A}{\varphi}\bigl\{y\,\lambda(\mu)-\gamma(\lambda(\mu))\bigr\}+\tau(y,\varphi/A)\right]$$
+*« where <strong>$\varphi$ is a scale parameter (possibly known), and is constant for all observations</strong>, <strong>$A$ represents a prior weight, assumed known but possibly varying with the observations</strong>, and <strong>$\mu$ is the mean of <code>y</code></strong>. <strong>So it is assumed that the distribution of <code>y</code> is determined by its mean and possibly a scale parameter as well.</strong> »*</li>
+<li><em>« <strong>The mean, $\mu$, is a smooth invertible function of the linear predictor</strong> »</em> : $\mu = m(\eta)$, $\eta = m^{-1}(\mu) = \ell(\mu)$, <em>« and <strong>this inverse function, $\ell(\cdot)$, is called the link function</strong> »</em>.</li>
+</ol>
+<p><em>« These assumptions are <strong>loose enough to encompass a wide class of models</strong> useful in statistical practice, <strong>but tight enough to allow the development of a unified methodology</strong> of estimation and inference, at least approximately. »</em> Références citées : <strong>McCullagh &amp; Nelder (1989)</strong> et <strong>Dobson (1990)</strong>.</p>
+</div>
+<h3>8.1 Familles et liens</h3>
+<div class="cal formel"><span class="lab">Définition (§11.6.1).</span>
+<p> <em>« The class of generalized linear models handled by facilities supplied in R includes <strong>gaussian, binomial, poisson, inverse gaussian and gamma</strong> response distributions and also <strong>quasi-likelihood models where the response distribution is not explicitly specified</strong>. <strong>In the latter case the variance function must be specified as a function of the mean</strong>, but in other cases <strong>this function is implied by the response distribution</strong>. »</em></p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Famille</th>
+<th>Fonctions de lien disponibles</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong><code>binomial</code></strong></td>
+<td><code>logit</code>, <code>probit</code>, <code>log</code>, <code>cloglog</code></td>
+</tr>
+<tr>
+<td><strong><code>gaussian</code></strong></td>
+<td><code>identity</code>, <code>log</code>, <code>inverse</code></td>
+</tr>
+<tr>
+<td><strong><code>Gamma</code></strong></td>
+<td><code>identity</code>, <code>inverse</code>, <code>log</code></td>
+</tr>
+<tr>
+<td><strong><code>inverse.gaussian</code></strong></td>
+<td><code>1/mu^2</code>, <code>identity</code>, <code>inverse</code>, <code>log</code></td>
+</tr>
+<tr>
+<td><strong><code>poisson</code></strong></td>
+<td><code>identity</code>, <code>log</code>, <code>sqrt</code></td>
+</tr>
+<tr>
+<td><strong><code>quasi</code></strong></td>
+<td><code>logit</code>, <code>probit</code>, <code>cloglog</code>, <code>identity</code>, <code>inverse</code>, <code>log</code>, <code>1/mu^2</code>, <code>sqrt</code></td>
+</tr>
+</tbody></table>
+<div class="cal formel"><span class="lab">Définition (§11.6.1).</span>
+<p> <em>« <strong>The combination of a response distribution, a link function and various other pieces of information that are needed to carry out the modeling exercise is called the family of the generalized linear model.</strong> »</em></p>
+</div>
+<h3>8.2 <code>glm()</code></h3>
+<pre><code class="language-r">fitted.model &lt;- glm(formula, family = family.generator, data = data.frame)
+</code></pre>
+<div class="cal formel"><span class="lab">Définition (§11.6.2).</span>
+<p> *« <strong>The only new feature is the <code>family.generator</code></strong>, which is the instrument by which the family is described. <strong>It is the name of a function that generates a list of functions and expressions that together define and control the model and estimation process.</strong> »*</p>
+<p><em>« <strong>Where there is a choice of links, the name of the link may also be supplied with the family name, in parentheses as a parameter.</strong> In the case of the <code>quasi</code> family, <strong>the variance function may also be specified in this way</strong>. »</em></p>
+</div>
+<blockquote>
+<p class="cal piege"> <strong>La famille gaussienne (§11.6.2).</strong> <em>« A call such as <code>glm(y ~ x1 + x2, family = gaussian, data = sales)</code> <strong>achieves the same result as <code>lm(y ~ x1+x2, data=sales)</code> but much less efficiently.</strong> <strong>Note how the gaussian family is not automatically provided with a choice of links, so no parameter is allowed.</strong> <strong>If a problem requires a gaussian family with a nonstandard link, this can usually be achieved through the <code>quasi</code> family.</strong> »</em></p>
+</blockquote>
+<details class="cor">
+<summary><strong>Exemple travaillé du cours — la cécité à Kalythos et l'estimation de la DL50</strong></summary><div class="in">
+
+<blockquote>
+<p><strong>Énoncé (§11.6.2, d'après Silvey 1970).</strong> <em>« On the Aegean island of Kalythos <strong>the male inhabitants suffer from a congenital eye disease, the effects of which become more marked with increasing age</strong>. Samples of islander males of various ages were tested for blindness. »</em></p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>Âge</th>
+<th>20</th>
+<th>35</th>
+<th>45</th>
+<th>55</th>
+<th>70</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Nombre testé</strong></td>
+<td>50</td>
+<td>50</td>
+<td>50</td>
+<td>50</td>
+<td>50</td>
+</tr>
+<tr>
+<td><strong>Nombre d'aveugles</strong></td>
+<td>6</td>
+<td>17</td>
+<td>26</td>
+<td>37</td>
+<td>44</td>
+</tr>
+</tbody></table>
+<p>*« The problem we consider is <strong>to fit both logistic and probit models to this data</strong>, and <strong>to estimate for each model the LD50, that is the age at which the chance of blindness for a male inhabitant is 50 %</strong>. »*</p>
+<p><em>Étape 1 — le modèle.</em> <em>« If <code>y</code> is the number of blind at age <code>x</code> and <code>n</code> the number tested, <strong>both models have the form</strong> »</em>
+$$y \sim B\bigl(n,\;F(\beta_0+\beta_1 x)\bigr)$$
+*« where <strong>for the probit case, $F(z)=\Phi(z)$ is the standard normal distribution function</strong>, and <strong>in the logit case (the default), $F(z)=e^z/(1+e^z)$</strong>. »*</p>
+<p><em>Étape 2 — la quantité cherchée.</em> <em>« In both cases <strong>the LD50 is</strong> »</em>
+$$\mathrm{LD}_{50} = -\beta_0/\beta_1$$
+<em>« that is, <strong>the point at which the argument of the distribution function is zero</strong> »</em> — car $F(0) = 0{,}5$ pour les deux fonctions considérées, $\Phi$ étant symétrique et $e^0/(1+e^0) = 1/2$. </p>
+<p><em>Étape 3 — mettre les données en data frame.</em></p>
+<pre><code class="language-r">kalythos &lt;- data.frame(x = c(20,35,45,55,70), n = rep(50,5),
+                       y = c(6,17,26,37,44))
+</code></pre>
+<p><em>Étape 4 — les trois formes de réponse admises.</em> Le cours les énumère : <em>« <strong>If the response is a vector it is assumed to hold binary data, and so must be a 0/1 vector.</strong> <strong>If the response is a two-column matrix it is assumed that the first column holds the number of successes for the trial and the second holds the number of failures.</strong> <strong>If the response is a factor, its first level is taken as failure (0) and all other levels as "success" (1).</strong> »</em></p>
+<p><em>Étape 5 — choisir la deuxième.</em> <em>« Here we need the second of these conventions, <strong>so we add a matrix to our data frame</strong> »</em> :</p>
+<pre><code class="language-r">kalythos$Ymat &lt;- cbind(kalythos$y, kalythos$n - kalythos$y)
+</code></pre>
+<p class="cal piege"> <strong>La deuxième colonne est le nombre d'échecs</strong>, <code>n - y</code>, <strong>pas</strong> le nombre testé. C'est l'erreur la plus fréquente sur cette convention.</p>
+<p><em>Étape 6 — ajuster les deux modèles.</em></p>
+<pre><code class="language-r">fmp &lt;- glm(Ymat ~ x, family = binomial(link = probit), data = kalythos)
+fml &lt;- glm(Ymat ~ x, family = binomial,                data = kalythos)
+</code></pre>
+<p><em>« <strong>Since the logit link is the default the parameter may be omitted on the second call.</strong> »</em></p>
+<p><em>Étape 7 — regarder.</em> <code>summary(fmp)</code> et <code>summary(fml)</code>. <em>« <strong>Both models fit (all too) well.</strong> »</em> — la parenthèse est du cours : cinq points, deux paramètres, un ajustement excellent n'a rien d'un exploit.</p>
+<p><em>Étape 8 — la DL50, par une fonction d'une ligne.</em></p>
+<pre><code class="language-r">ld50 &lt;- function(b) -b[1]/b[2]
+ldp &lt;- ld50(coef(fmp)); ldl &lt;- ld50(coef(fml)); c(ldp, ldl)
+</code></pre>
+<p><em>« <strong>The actual estimates from this data are 43.663 years and 43.601 years respectively.</strong> »</em></p>
+<p><em>Étape 9 — interpréter l'écart.</em> <strong>Six centièmes d'année</strong> séparent les deux liens, soit environ <strong>trois semaines</strong> sur une échelle de 20 à 70 ans. Logit et probit <strong>diffèrent surtout dans les queues</strong> ; au centre de la courbe — et la DL50 <strong>est</strong> le centre — ils coïncident presque. <strong>Le choix du lien est ici sans conséquence pratique</strong>, et c'est une information utile.</p>
+<p><em>Étape 10 — le patron à retenir.</em> <code>coef()</code> extrait, une fonction d'une ligne transforme. La quantité d'intérêt n'était <strong>pas</strong> un coefficient : elle s'en déduit. C'est le <em>« interrogation by further R functions »</em> du §1.3.</p>
+</div></details>
+
+<h3>8.3 Poisson et quasi-vraisemblance</h3>
+<blockquote>
+<p><strong>Règle (§11.6.2).</strong> <em>« <strong>With the Poisson family the default link is the log</strong>, and <strong>in practice the major use of this family is to fit surrogate Poisson log-linear models to frequency data, whose actual distribution is often multinomial.</strong> <strong>This is a large and important subject we will not discuss further here.</strong> »</em></p>
+</blockquote>
+<p><em>« Occasionally genuinely Poisson data arises in practice and <strong>in the past it was often analyzed as gaussian data after either a log or a square-root transformation</strong>. <strong>As a graceful alternative to the latter</strong>, a Poisson generalized linear model may be fitted as »</em> :</p>
+<pre><code class="language-r">fmod &lt;- glm(y ~ A + B + x, family = poisson(link = sqrt), data = worm.counts)
+</code></pre>
+<blockquote>
+<p><strong>Règle — la quasi-vraisemblance (§11.6.2).</strong> <em>« For all families <strong>the variance of the response will depend on the mean</strong> and <strong>will have the scale parameter as a multiplier</strong>. <strong>The form of dependence of the variance on the mean is a characteristic of the response distribution</strong> ; for example for the Poisson distribution $\operatorname{Var}[y]=\mu$. »</em></p>
+<p><em>« For quasi-likelihood estimation and inference <strong>the precise response distribution is not specified, but rather only a link function and the form of the variance function as it depends on the mean</strong>. <strong>Since quasi-likelihood estimation uses formally identical techniques to those for the gaussian distribution, this family provides a way of fitting gaussian models with non-standard link functions or variance functions.</strong> »</em></p>
+</blockquote>
+<p><strong>L'exemple du cours</strong> — une régression non linéaire ramenée à un GLM :</p>
+<p>$$y=\frac{\theta_1 z_1}{z_2-\theta_2}+e \qquad\Longleftrightarrow\qquad y=\frac{1}{\beta_1x_1+\beta_2x_2}+e$$</p>
+<p><em>« where $x_1 = z_2/z_1$, $x_2 = -1/z_1$, $\beta_1 = 1/\theta_1$ and $\beta_2 = \theta_2/\theta_1$ »</em>.</p>
+<pre><code class="language-r">nlfit &lt;- glm(y ~ x1 + x2 - 1,
+             family = quasi(link = inverse, variance = constant),
+             data = biochem)
+</code></pre>
+<div class="cal intu"><span class="lab">Contrôle — vérifier la réécriture.</span>
+<p> En partant de $\dfrac{\theta_1z_1}{z_2-\theta_2}$, on divise numérateur et dénominateur par $\theta_1 z_1$ :
+$$\frac{\theta_1z_1}{z_2-\theta_2}=\frac{1}{\dfrac{z_2-\theta_2}{\theta_1z_1}}=\frac{1}{\dfrac{1}{\theta_1}\cdot\dfrac{z_2}{z_1}+\dfrac{\theta_2}{\theta_1}\cdot\left(-\dfrac{1}{z_1}\right)}=\frac{1}{\beta_1x_1+\beta_2x_2}$$
+ conforme aux substitutions annoncées. <strong>Le lien <code>inverse</code> est exactement ce qui absorbe le $1/(\cdot)$</strong>, et <code>- 1</code> retire l'ordonnée à l'origine puisque le dénominateur n'a pas de constante.</p>
+</div>
+<h2 data-prio="high">Concept 9 — Modèles non linéaires</h2>
+<blockquote>
+<p><strong>Cadrage (§11.7).</strong> <em>« Certain forms of nonlinear model can be fitted by Generalized Linear Models. But <strong>in the majority of cases we have to approach the nonlinear curve fitting problem as one of nonlinear optimization</strong>. <strong>R's nonlinear optimization routines are <code>optim()</code>, <code>nlm()</code> and <code>nlminb()</code>.</strong> »</em></p>
+<p class="cal piege"> <em>« <strong>Unlike linear regression for example, there is no guarantee that the procedure will converge on satisfactory estimates. All the methods require initial guesses about what parameter values to try, and convergence may depend critically upon the quality of the starting values.</strong> »</em></p>
+</blockquote>
+<details class="cor">
+<summary><strong>Exemple travaillé du cours — Michaelis-Menten par <code>nlm()</code> puis par <code>nls()</code></strong></summary><div class="in">
+
+<blockquote>
+<p><strong>Énoncé (§11.7.1, d'après Bates &amp; Watts 1988, p. 51).</strong> *« One way to fit a nonlinear model is by <strong>minimizing the sum of the squared errors (SSE)</strong>. <strong>This method makes sense if the observed errors could have plausibly arisen from a normal distribution.</strong> »*</p>
+</blockquote>
+<pre><code class="language-r">x &lt;- c(0.02, 0.02, 0.06, 0.06, 0.11, 0.11, 0.22, 0.22, 0.56, 0.56, 1.10, 1.10)
+y &lt;- c(76, 47, 97, 107, 123, 139, 159, 152, 191, 201, 207, 200)
+
+fn &lt;- function(p) sum((y - (p[1] * x)/(p[2] + x))^2)
+</code></pre>
+<p><em>Étape 1 — reconnaître le modèle.</em> $\hat y = \dfrac{V_m x}{K + x}$ : c'est <strong>le modèle de Michaelis-Menten</strong>, comme le cours le dira plus bas. <code>p[1]</code> est $V_m$ (l'asymptote), <code>p[2]</code> est $K$ (l'abscisse à mi-hauteur).</p>
+<p><em>Étape 2 — trouver des valeurs de départ.</em> <em>« <strong>One way to find sensible starting values is to plot the data, guess some parameter values, and superimpose the model curve using those values.</strong> »</em></p>
+<pre><code class="language-r">plot(x, y)
+xfit &lt;- seq(.02, 1.1, .05)
+yfit &lt;- 200 * xfit/(0.1 + xfit)
+lines(spline(xfit, yfit))
+</code></pre>
+<p><em>« <strong>We could do better, but these starting values of 200 and 0.1 seem adequate.</strong> »</em> — $200$ parce que les $y$ plafonnent autour de 200, $0{,}1$ parce que la moitié de ce plateau est atteinte vers $x\approx0{,}1$. <strong>Les deux paramètres se lisent sur le graphique.</strong></p>
+<p><em>Étape 3 — ajuster.</em></p>
+<pre><code class="language-r">out &lt;- nlm(fn, p = c(200, 0.1), hessian = TRUE)
+</code></pre>
+<p><em>« After the fitting, <strong><code>out$minimum</code> is the SSE</strong>, and <strong><code>out$estimate</code> are the least squares estimates</strong> of the parameters. »</em></p>
+<p><em>Étape 4 — les erreurs types.</em></p>
+<pre><code class="language-r">sqrt(diag(2*out$minimum/(length(y) - 2) * solve(out$hessian)))
+</code></pre>
+<p><em>« <strong>The 2 which is subtracted in the line above represents the number of parameters.</strong> <strong>A 95 % confidence interval would be the parameter estimate ± 1.96 SE.</strong> »</em></p>
+<div class="cal intu"><span class="lab">Contrôle — d'où vient cette formule.</span>
+<p> <code>out$minimum</code> est la <strong>SSE</strong>, donc $\hat\sigma^2 = \mathrm{SSE}/(n-p)$ avec $n = 12$ et $p = 2$ : c'est le <code>out$minimum/(length(y) - 2)</code>. Le facteur <strong>2</strong> vient de ce que <code>fn</code> est la <strong>somme des carrés</strong> et non sa moitié : sa hessienne vaut approximativement $2\,J^{\mathsf T}J$, donc $(J^{\mathsf T}J)^{-1} = 2\,H^{-1}$. D'où $\widehat{\operatorname{Cov}} = \hat\sigma^2\cdot 2\,H^{-1}$, et l'écart-type est la racine de la diagonale.  <strong>Comparer avec le concept 9.1 : la formule du maximum de vraisemblance n'a pas ce facteur.</strong></p>
+</div>
+<p><em>Étape 5 — superposer l'ajustement.</em></p>
+<pre><code class="language-r">plot(x, y)
+xfit &lt;- seq(.02, 1.1, .05)
+yfit &lt;- 212.68384222 * xfit/(0.06412146 + xfit)
+lines(spline(xfit, yfit))
+</code></pre>
+<p><em>Étape 6 — la voie professionnelle.</em> <em>« <strong>The standard package <code>stats</code> provides much more extensive facilities for fitting non-linear models by least squares. The model we have just fitted is the Michaelis-Menten model</strong>, so we can use »</em> :</p>
+<pre><code class="language-r">df  &lt;- data.frame(x = x, y = y)
+fit &lt;- nls(y ~ SSmicmen(x, Vm, K), df)
+fit
+# Nonlinear regression model
+#   model: y ~ SSmicmen(x, Vm, K)
+#    data: df
+#           Vm            K
+# 212.68370711   0.06412123
+# residual sum-of-squares: 1195.449
+</code></pre>
+<p><strong><code>SSmicmen</code></strong> est un <strong>modèle auto-démarrant</strong> : il calcule lui-même ses valeurs initiales. Les étapes 2 et 3 disparaissent.</p>
+<p><em>Étape 7 — le résumé complet.</em></p>
+<pre><code>Parameters:
+    Estimate Std. Error t value Pr(&gt;|t|)
+Vm 2.127e+02  6.947e+00  30.615 3.24e-11
+K  6.412e-02  8.281e-03   7.743 1.57e-05
+
+Residual standard error: 10.93 on 10 degrees of freedom
+
+Correlation of Parameter Estimates:
+      Vm
+K 0.7651
+</code></pre>
+<div class="cal intu"><span class="lab">Contrôle — trois vérifications.</span>
+
+<ul>
+<li><strong>Degrés de liberté</strong> : $n - p = 12 - 2 = \mathbf{10}$. </li>
+<li><strong>Valeurs $t$</strong> : $212{,}7/6{,}947 = \mathbf{30{,}62}$ et $0{,}06412/0{,}008281 = \mathbf{7{,}74}$. </li>
+<li><strong>Écart-type résiduel</strong> : $\sqrt{1195{,}449/10} = \sqrt{119{,}54} = \mathbf{10{,}93}$. </li>
+</ul>
+<p>Et les estimations de <code>nlm</code> (<strong>212,68384</strong>, <strong>0,06412146</strong>) et de <code>nls</code> (<strong>212,68371</strong>, <strong>0,06412123</strong>) <strong>coïncident à cinq chiffres significatifs</strong> — deux algorithmes différents, un même optimum.</p>
+</div>
+<p><em>Étape 8 — lire la corrélation.</em> <strong>0,7651</strong> entre $\hat V_m$ et $\hat K$ : les deux paramètres sont <strong>fortement liés</strong>. Surestimer l'asymptote se compense en surestimant la constante de demi-saturation. C'est une information que <code>summary</code> d'un <code>lm</code> ne donne pas d'office, et que <code>nls</code> affiche <strong>parce qu'elle compte</strong> en non linéaire.</p>
+</div></details>
+
+<h3>9.1 Maximum de vraisemblance</h3>
+<blockquote>
+<p><strong>Cadrage (§11.7.2).</strong> <em>« <strong>Maximum likelihood is a method of nonlinear model fitting that applies even if the errors are not normal.</strong> The method <strong>finds the parameter values which maximize the log likelihood, or equivalently which minimize the negative log-likelihood</strong>. »</em> Exemple <em>« from Dobson (1990), pp. 108-111 … <strong>which clearly could also be fit by <code>glm()</code></strong> »</em>.</p>
+</blockquote>
+<pre><code class="language-r">x &lt;- c(1.6907, 1.7242, 1.7552, 1.7842, 1.8113, 1.8369, 1.8610, 1.8839)
+y &lt;- c( 6, 13, 18, 28, 52, 53, 61, 60)
+n &lt;- c(59, 60, 62, 56, 63, 59, 62, 60)
+
+fn &lt;- function(p)
+  sum( - (y*(p[1]+p[2]*x) - n*log(1+exp(p[1]+p[2]*x))
+          + log(choose(n, y)) ))
+
+out &lt;- nlm(fn, p = c(-50, 20), hessian = TRUE)
+</code></pre>
+<p><em>« After the fitting, <strong><code>out$minimum</code> is the negative log-likelihood</strong>, and <strong><code>out$estimate</code> are the maximum likelihood estimates</strong>. »</em></p>
+<pre><code class="language-r">sqrt(diag(solve(out$hessian)))
+</code></pre>
+<blockquote>
+<p class="cal piege"> <strong>La comparaison des deux formules d'erreur type est le point à retenir.</strong></p>
+<table>
+<thead>
+<tr>
+<th>Méthode</th>
+<th>Ce que <code>fn</code> minimise</th>
+<th>Erreur type</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Moindres carrés</strong> (§11.7.1)</td>
+<td>la <strong>SSE</strong></td>
+<td><code>sqrt(diag(2*out$minimum/(n-p) * solve(out$hessian)))</code></td>
+</tr>
+<tr>
+<td><strong>Maximum de vraisemblance</strong> (§11.7.2)</td>
+<td>la <strong>log-vraisemblance négative</strong></td>
+<td><strong><code>sqrt(diag(solve(out$hessian)))</code></strong></td>
+</tr>
+</tbody></table>
+<p><strong>Pourquoi la seconde est plus simple</strong> : la hessienne d'une log-vraisemblance négative <strong>est l'information observée</strong>, dont l'inverse <strong>est</strong> la matrice de covariance asymptotique. Aucun facteur d'échelle n'est nécessaire. Dans le cas des moindres carrés, il faut <strong>estimer $\sigma^2$</strong> et corriger le facteur 2.</p>
+<p class="cal piege"> <strong>Utiliser la mauvaise formule donne des erreurs types fausses sans aucun message.</strong></p>
+</blockquote>
+<p><em>« <strong>A 95 % confidence interval would be the parameter estimate ± 1.96 SE.</strong> »</em></p>
+<h2 data-prio="low">Concept 10 — Les modèles non standard</h2>
+<blockquote>
+<p><strong>Panorama (§11.8).</strong> <em>« We conclude this chapter with <strong>just a brief mention of some of the other facilities available in R</strong> »</em> :</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>Famille de modèles</th>
+<th>Fonctions et paquets</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Modèles mixtes</strong></td>
+<td><em>« The recommended <strong><code>nlme</code></strong> package provides <strong><code>lme()</code> and <code>nlme()</code></strong> for linear and non-linear mixed-effects models, that is <strong>regressions in which some of the coefficients correspond to random effects</strong>. <strong>These functions make heavy use of formulae.</strong> »</em></td>
+</tr>
+<tr>
+<td><strong>Régressions locales</strong></td>
+<td><strong><code>loess()</code></strong> — <em>« fits a nonparametric regression by using a locally weighted regression … useful for <strong>highlighting a trend in messy data</strong> or for <strong>data reduction</strong> »</em>. Dans le paquet <strong><code>stats</code></strong>, <em>« together with code for <strong>projection pursuit regression</strong> »</em></td>
+</tr>
+<tr>
+<td><strong>Régression robuste</strong></td>
+<td><em>« resistant to the influence of <strong>extreme outliers</strong> »</em> : <strong><code>lqs</code></strong> dans <strong><code>MASS</code></strong> — <em>« state-of-art algorithms for <strong>highly-resistant</strong> fits »</em> — et <strong><code>rlm</code></strong>, <em>« less resistant but <strong>statistically more efficient</strong> »</em></td>
+</tr>
+<tr>
+<td><strong>Modèles additifs</strong></td>
+<td><strong><code>avas</code></strong> et <strong><code>ace</code></strong> (paquet <code>acepack</code>), <strong><code>bruto</code></strong> et <strong><code>mars</code></strong> (paquet <code>mda</code>) ; extension GAM dans <strong><code>gam</code></strong> et <strong><code>mgcv</code></strong></td>
+</tr>
+<tr>
+<td><strong>Modèles à base d'arbres</strong></td>
+<td><em>« seek to <strong>bifurcate the data, recursively, at critical points</strong> … to partition the data into groups <strong>as homogeneous as possible within, and as heterogeneous as possible between</strong> »</em> · <strong><code>tree()</code></strong>, paquets <strong><code>rpart</code></strong> et <strong><code>tree</code></strong> · <em>« <strong>Models are again specified in the ordinary linear model form</strong> »</em></td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>La phrase qui justifie les arbres (§11.8).</strong> <em>« <strong>The results often lead to insights that other data analysis methods tend not to yield.</strong> »</em></p>
+</blockquote>
+<h2>Comment reconnaître le type d'exercice</h2>
+<table>
+<thead>
+<tr>
+<th>Le signal dans l'énoncé</th>
+<th>Ce qu'il faut mobiliser</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>« régresser <code>y</code> sur <code>x</code> »</td>
+<td><strong><code>lm(y ~ x, data = df)</code></strong></td>
+</tr>
+<tr>
+<td>« sans constante », « par l'origine »</td>
+<td><strong><code>y ~ x - 1</code></strong>, <code>y ~ 0 + x</code>, <code>y ~ -1 + x</code></td>
+</tr>
+<tr>
+<td>« une régression polynomiale »</td>
+<td><strong><code>poly(x, 2)</code></strong> (orthogonaux) ou <strong><code>I(x^2)</code></strong> (puissances)</td>
+</tr>
+<tr>
+<td>« le carré de <code>x</code> »</td>
+<td> <strong><code>I(x^2)</code></strong> — <code>x^2</code> seul signifie autre chose</td>
+</tr>
+<tr>
+<td>« la somme de deux variables comme prédicteur »</td>
+<td><strong><code>I(x1 + x2)</code></strong></td>
+</tr>
+<tr>
+<td>« analyse de variance à un facteur »</td>
+<td><strong><code>y ~ A</code></strong></td>
+</tr>
+<tr>
+<td>« analyse de covariance »</td>
+<td><strong><code>y ~ A + x</code></strong></td>
+</tr>
+<tr>
+<td>« avec interaction »</td>
+<td><strong><code>y ~ A*B</code></strong> = <code>A + B + A:B</code></td>
+</tr>
+<tr>
+<td>« effets principaux et interactions d'ordre 2 »</td>
+<td><strong><code>(A+B+C)^2</code></strong> ou <code>A*B*C - A:B:C</code></td>
+</tr>
+<tr>
+<td>« classification emboîtée »</td>
+<td><strong><code>%in%</code></strong> ou <strong><code>/</code></strong></td>
+</tr>
+<tr>
+<td>« une droite par niveau de <code>A</code> »</td>
+<td><strong><code>y ~ A/(1 + x) - 1</code></strong> pour des estimations explicites</td>
+</tr>
+<tr>
+<td>« toutes les autres variables »</td>
+<td><strong><code>y ~ .</code></strong> avec <code>data =</code></td>
+</tr>
+<tr>
+<td>« plan en parcelles divisées »</td>
+<td><strong><code>Error(strata)</code></strong> dans <code>aov()</code></td>
+</tr>
+<tr>
+<td>« mes coefficients ne collent pas au livre »</td>
+<td>les <strong>contrastes</strong> — S utilise <strong>Helmert</strong></td>
+</tr>
+<tr>
+<td>« la table d'ANOVA change si je réordonne »</td>
+<td>c'est <strong>normal</strong> hors plan orthogonal</td>
+</tr>
+<tr>
+<td>« comparer deux modèles »</td>
+<td><strong><code>anova(m1, m2)</code></strong> — <em>« easier to comprehend and control »</em></td>
+</tr>
+<tr>
+<td>« ajouter une variable au modèle précédent »</td>
+<td><strong><code>update(m, . ~ . + x6)</code></strong></td>
+</tr>
+<tr>
+<td>« transformer la réponse »</td>
+<td><strong><code>update(m, sqrt(.) ~ .)</code></strong></td>
+</tr>
+<tr>
+<td>« réponse binaire, proportion »</td>
+<td><strong><code>glm(..., family = binomial)</code></strong></td>
+</tr>
+<tr>
+<td>« des comptages »</td>
+<td><strong><code>family = poisson</code></strong> — lien <strong>log</strong> par défaut</td>
+</tr>
+<tr>
+<td>« nombre de succès et d'échecs »</td>
+<td>une <strong>matrice à deux colonnes</strong> : succès, <strong>échecs</strong></td>
+</tr>
+<tr>
+<td>« la dose à 50 % »</td>
+<td><strong>$-\beta_0/\beta_1$</strong></td>
+</tr>
+<tr>
+<td>« seulement le lien et la variance sont connus »</td>
+<td><strong><code>family = quasi(link = , variance = )</code></strong></td>
+</tr>
+<tr>
+<td>« modèle non linéaire »</td>
+<td><strong><code>nls()</code></strong>, ou <code>nlm()</code>/<code>optim()</code></td>
+</tr>
+<tr>
+<td>« des valeurs de départ »</td>
+<td><strong>les lire sur un graphique</strong></td>
+</tr>
+<tr>
+<td>« les erreurs types de <code>nlm</code> »</td>
+<td> <strong>deux formules</strong> — SSE ou log-vraisemblance</td>
+</tr>
+<tr>
+<td>« résister aux valeurs aberrantes »</td>
+<td><strong><code>lqs</code></strong> ou <strong><code>rlm</code></strong> (paquet <code>MASS</code>)</td>
+</tr>
+<tr>
+<td>« effets aléatoires »</td>
+<td><strong><code>lme()</code>/<code>nlme()</code></strong></td>
+</tr>
+</tbody></table>
+<h2>Comment résoudre ce type d'exercice</h2>
+<p><strong>Protocole « ajuster et exploiter un modèle linéaire » — 5 étapes.</strong></p>
+<ol>
+<li><strong>Écrire la formule</strong> : réponse à gauche, termes à droite ; se demander si l'ordonnée à l'origine doit y être.</li>
+<li><strong>Ajuster</strong> avec <strong><code>data =</code></strong> — jamais en s'appuyant sur <code>attach()</code>.</li>
+<li><strong>Interroger</strong> : <code>summary()</code>, <code>coef()</code>, <code>resid()</code>, <code>fitted()</code>, <strong><code>plot()</code></strong> (les quatre diagnostics).</li>
+<li><strong>Comparer</strong> : <code>anova(m1, m2)</code> sur une <strong>séquence hiérarchique</strong>, plutôt que de lire la table par défaut.</li>
+<li><strong>Itérer</strong> avec <code>update()</code>, <code>add1()</code>, <code>drop1()</code>, <code>step()</code>.</li>
+</ol>
+<p><strong>Protocole « écrire une formule sans se tromper » — 4 étapes.</strong></p>
+<ol>
+<li>Se rappeler que <strong><code>+ - * / ^</code> ne sont pas arithmétiques</strong> dans une formule.</li>
+<li>Tout calcul arithmétique doit être <strong>enveloppé dans <code>I()</code></strong> — ou fait avant.</li>
+<li>Vérifier <strong>la marginalité</strong> : pas d'interaction sans les effets principaux correspondants.</li>
+<li>Vérifier <strong>l'ordonnée à l'origine</strong> — présente par défaut, retirée par <code>-1</code> ou <code>+0</code>.</li>
+</ol>
+<p><strong>Protocole « ajuster un GLM » — 5 étapes.</strong></p>
+<ol>
+<li>Identifier <strong>la loi de la réponse</strong> → la famille.</li>
+<li>Identifier <strong>le lien</strong> — souvent le défaut convient (logit pour <code>binomial</code>, log pour <code>poisson</code>).</li>
+<li>Mettre la réponse <strong>sous la bonne forme</strong> : 0/1, matrice succès-échecs, ou facteur.</li>
+<li><code>glm(formule, family = famille(link = ...), data = df)</code>.</li>
+<li><strong>Extraire ce qui intéresse</strong> — souvent une <strong>transformation</strong> des coefficients, comme $-\beta_0/\beta_1$.</li>
+</ol>
+<p><strong>Protocole « ajuster un modèle non linéaire » — 5 étapes.</strong></p>
+<ol>
+<li>Chercher d'abord <strong>une reparamétrisation linéaire</strong> ou un <strong>GLM</strong> — l'exemple de la quasi-vraisemblance le montre.</li>
+<li>Sinon, <strong>tracer les données</strong> et lire des valeurs de départ sur le graphique.</li>
+<li>Préférer <strong><code>nls()</code></strong> avec un modèle <strong>auto-démarrant</strong> (<code>SSmicmen</code>…) quand il existe.</li>
+<li>En passant par <code>nlm()</code>/<code>optim()</code>, <strong>poser <code>hessian = TRUE</code></strong> et choisir <strong>la bonne formule d'erreur type</strong>.</li>
+<li> <strong>Vérifier la convergence</strong> : <em>« there is <strong>no guarantee</strong> that the procedure will converge on satisfactory estimates »</em>.</li>
+</ol>
+<h2 data-prio="must">Common mistakes</h2>
+<table>
+<thead>
+<tr>
+<th>Erreur</th>
+<th>Correction</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Écrire <code>y ~ x^2</code> pour un terme carré</td>
+<td>c'est <strong><code>I(x^2)</code></strong></td>
+</tr>
+<tr>
+<td>Écrire <code>y ~ x1 + x2</code> pour la somme des deux</td>
+<td>c'est <strong><code>I(x1 + x2)</code></strong></td>
+</tr>
+<tr>
+<td>Oublier que l'ordonnée à l'origine est implicite</td>
+<td>la retirer par <strong><code>-1</code></strong> ou <strong><code>+0</code></strong></td>
+</tr>
+<tr>
+<td>Écrire <code>A.B</code> pour une interaction</td>
+<td>c'est <strong><code>A:B</code></strong> — le point est <strong>un caractère de nom</strong></td>
+</tr>
+<tr>
+<td>Ajuster une interaction sans les effets principaux</td>
+<td><strong>viole la marginalité</strong> — <em>« for experts only »</em></td>
+</tr>
+<tr>
+<td>Comparer ses coefficients à un manuel S-Plus</td>
+<td><strong>contrastes différents</strong> → <code>contr.helmert</code></td>
+</tr>
+<tr>
+<td>Croire l'ordre des termes indifférent</td>
+<td><em>« <strong>only for orthogonal experiments</strong> »</em></td>
+</tr>
+<tr>
+<td>Lire la table d'ANOVA par défaut sans réfléchir</td>
+<td>préférer <strong><code>anova(m1, m2)</code></strong></td>
+</tr>
+<tr>
+<td>Compter sur <code>attach()</code> au lieu de <code>data =</code></td>
+<td><code>data =</code> fonctionne <strong>quel que soit le chemin de recherche</strong></td>
+</tr>
+<tr>
+<td>Donner à <code>predict()</code> des variables aux noms différents</td>
+<td> <em>« <strong>must have variables specified with the same labels</strong> »</em></td>
+</tr>
+<tr>
+<td>Mettre <code>n</code> en seconde colonne de la matrice binomiale</td>
+<td>c'est <strong><code>n - y</code></strong>, les <strong>échecs</strong></td>
+</tr>
+<tr>
+<td>Passer un lien à <code>family = gaussian</code></td>
+<td><em>« <strong>no parameter is allowed</strong> »</em></td>
+</tr>
+<tr>
+<td>Utiliser <code>glm(..., family = gaussian)</code> au lieu de <code>lm</code></td>
+<td><em>« <strong>much less efficiently</strong> »</em></td>
+</tr>
+<tr>
+<td>Oublier <code>variance =</code> avec <code>quasi</code></td>
+<td><em>« <strong>the variance function must be specified</strong> »</em></td>
+</tr>
+<tr>
+<td>Appliquer la formule SSE des erreurs types à une log-vraisemblance</td>
+<td> <strong>deux formules distinctes</strong></td>
+</tr>
+<tr>
+<td>Lancer <code>nlm</code> sans valeurs de départ réfléchies</td>
+<td><em>« <strong>convergence may depend critically</strong> upon … starting values »</em></td>
+</tr>
+<tr>
+<td>Supposer la convergence acquise</td>
+<td><em>« <strong>there is no guarantee</strong> »</em></td>
+</tr>
+<tr>
+<td>Croire le point d'<code>update()</code> et celui de <code>y ~ .</code> identiques</td>
+<td><em>« <strong>slightly different meaning</strong> »</em></td>
+</tr>
+</tbody></table>
+<h2>Ultimate Review</h2>
+<p><strong>Le patron.</strong> Formule → fonction d'ajustement → <strong>fonctions extractrices</strong>. <em>« the basic output is <strong>minimal</strong>, and one needs to <strong>ask for the details</strong> by calling extractor functions »</em>.</p>
+<p><strong>Le modèle de référence.</strong> $y = X\beta + e$, $e_i \sim \mathrm{NID}(0,\sigma^2)$ ; <code>X</code> est <strong>la matrice du modèle</strong>, $x_0$ <strong>une colonne de uns</strong>.</p>
+<p><strong>La formule.</strong> <code>response ~ op_1 term_1 op_2 term_2 …</code> · opérateurs <strong><code>+</code></strong> ou <strong><code>-</code></strong> (le premier <strong>optionnel</strong>) · un terme est <strong>un vecteur/matrice ou <code>1</code></strong>, <strong>un facteur</strong>, ou <strong>une expression de formule</strong> ·  <strong><code>1</code> est inclus par défaut sauf retrait explicite</strong>.</p>
+<p><strong>Les opérateurs (Chambers &amp; Hastie 1992, p. 29).</strong> <strong><code>:</code></strong> produit tensoriel — le point de Wilkinson-Rogers, changé <em>« since <strong>the period is a valid name character in R</strong> »</em> · <strong><code>%in%</code></strong> — comme <code>:</code> <strong>mais codage différent</strong> · <strong><code>*</code></strong> = <code>M1 + M2 + M1:M2</code> · <strong><code>/</code></strong> = <code>M1 + M2 %in% M1</code> · <strong><code>^n</code></strong> = tous les termes <strong>et interactions jusqu'à l'ordre <code>n</code></strong> · <strong><code>I()</code></strong> = <strong>isoler</strong>, sens arithmétique normal.</p>
+<p><strong>Contrastes.</strong> Facteur <strong>non ordonné</strong> → $k-1$ <strong>indicatrices</strong> des niveaux $2,\dots,k$, <em>« <strong>contrast the response at each level with that at the first</strong> »</em> · facteur <strong>ordonné</strong> → $k-1$ <strong>polynômes orthogonaux</strong> sur $1,\dots,k$ ·  <strong>sans ordonnée à l'origine, le premier facteur reçoit $k$ colonnes</strong> · défaut R <strong><code>c("contr.treatment", "contr.poly")</code></strong>, défaut S <strong>Helmert</strong> — <em>« <strong>a deliberate difference</strong> »</em> · réglage par terme via <strong><code>contrasts</code></strong> et <strong><code>C</code></strong> · les interactions <strong>multiplient les colonnes</strong> ·  <strong>préserver la marginalité</strong>.</p>
+<p><strong><code>lm()</code>.</strong> <code>lm(formula, data = df)</code> · <strong><code>data =</code></strong> est <em>« technically optional »</em> mais décisif : il agit <em>« <strong>regardless of whether the data frame has been attached</strong> »</em> · la valeur est <strong>une liste de classe <code>"lm"</code></strong>.</p>
+<p><strong>Extractrices.</strong> <code>anova</code> <code>coef</code>/<code>coefficients</code> <code>deviance</code> (<strong>SCR</strong>) <code>formula</code> <code>plot</code> (<strong>quatre diagnostics</strong>) <code>predict</code> ( <strong>mêmes noms de variables</strong>) <code>print</code> <code>residuals</code>/<code>resid</code> <code>step</code> (<strong>plus petit AIC</strong>) <code>summary</code> <code>vcov</code> · plus <code>add1</code> <code>alias</code> <code>drop1</code> <code>effects</code> <code>family</code> <code>kappa</code> <code>labels</code> <code>proj</code>.</p>
+<p><strong><code>aov()</code>.</strong> Comme <code>lm()</code>, plus <strong>les strates d'erreur multiples</strong> : <code>response ~ mean.formula + Error(strata.formula)</code> · <code>Error(farms/blocks)</code> → <strong>trois strates</strong> ·  <strong>la table d'ANOVA est séquentielle</strong> : <em>« the sums of squares shown are <strong>the decrease in the residual sums of squares resulting from an inclusion of that term … at that place in the sequence</strong> »</em>, donc <em>« <strong>only for orthogonal experiments will the order of inclusion be inconsequential</strong> »</em> · préférer <strong><code>anova(m1, m2, …)</code></strong>, <em>« <strong>easier to comprehend and control</strong> »</em>.</p>
+<p><strong><code>update()</code>.</strong> <code>update(old, . ~ . + x6)</code> — le point est <em>« <strong>the corresponding part of the old model formula</strong> »</em> · <code>sqrt(.) ~ .</code> transforme la réponse · <strong><code>data =</code> est transmis</strong> par l'objet ajusté ·  dans <code>y ~ .</code> <strong>avec <code>data =</code></strong>, le point signifie <strong>toutes les autres variables</strong>.</p>
+<p><strong>GLM — quatre hypothèses.</strong> Une réponse <code>y</code> ; <strong>un seul prédicteur linéaire</strong> $\eta = \sum\beta_ix_i$, d'où <em>« $x_i$ <strong>has no influence … if and only if</strong> $\beta_i = 0$ »</em> ; une loi de <strong>famille exponentielle</strong> de paramètre d'échelle $\varphi$ <strong>constant</strong> et de poids $A$ <strong>connu</strong> ; <strong>$\mu = m(\eta)$</strong>, dont l'inverse $\ell$ est <strong>la fonction de lien</strong>.</p>
+<p><strong>Familles et liens.</strong> <code>binomial</code> (<strong>logit</strong> par défaut, probit, log, cloglog) · <code>gaussian</code> (<strong>aucun paramètre de lien admis</strong>) · <code>Gamma</code> · <code>inverse.gaussian</code> · <code>poisson</code> (<strong>log</strong> par défaut) · <strong><code>quasi</code></strong> ( <strong>la fonction de variance doit être spécifiée</strong>). <em>« <strong>The combination of a response distribution, a link function and various other pieces of information … is called the family.</strong> »</em></p>
+<p><strong>Réponse binomiale — trois formes.</strong> <strong>vecteur 0/1</strong> · <strong>matrice à deux colonnes : succès, échecs</strong> · <strong>facteur</strong> dont <em>« the first level is taken as failure »</em>.</p>
+<p><strong>Kalythos.</strong> $y \sim B(n, F(\beta_0+\beta_1x))$ · $\mathrm{LD}_{50} = -\beta_0/\beta_1$ · estimations <strong>43,663</strong> (probit) et <strong>43,601</strong> (logit) · <em>« Both models fit (<strong>all too</strong>) well. »</em></p>
+<p><strong>Non linéaire.</strong> <strong><code>optim()</code>, <code>nlm()</code>, <code>nlminb()</code></strong> ·  <em>« <strong>no guarantee that the procedure will converge</strong> … <strong>convergence may depend critically upon the quality of the starting values</strong> »</em> · valeurs de départ <strong>lues sur un graphique</strong> · <strong><code>nls()</code></strong> et les modèles auto-démarrants (<strong><code>SSmicmen</code></strong>) · Michaelis-Menten : $V_m = 212{,}68$, $K = 0{,}06412$, <strong>SCR 1195,449</strong>, écart-type résiduel <strong>10,93</strong> sur <strong>10</strong> degrés de liberté, corrélation <strong>0,7651</strong>.</p>
+<p class="cal piege"><strong> Les deux formules d'erreur type.</strong> SSE : <code>sqrt(diag(2*out$minimum/(length(y)-2) * solve(out$hessian)))</code> — <em>« <strong>the 2 which is subtracted … represents the number of parameters</strong> »</em> · log-vraisemblance négative : <strong><code>sqrt(diag(solve(out$hessian)))</code></strong> · IC à 95 % : <strong>estimation ± 1,96 SE</strong>.</p>
+<p><strong>Non standard.</strong> <strong><code>nlme</code></strong> (mixtes) · <strong><code>loess</code></strong> et <em>projection pursuit</em> (dans <code>stats</code>) · <strong><code>lqs</code></strong> et <strong><code>rlm</code></strong> (<code>MASS</code>) · <strong><code>acepack</code></strong>, <strong><code>mda</code></strong>, <strong><code>gam</code></strong>, <strong><code>mgcv</code></strong> (additifs) · <strong><code>rpart</code></strong> et <strong><code>tree</code></strong> (arbres) — <em>« <strong>insights that other data analysis methods tend not to yield</strong> »</em>.</p>
+<div class="rec"><h2>Active Recall</h2><details class="cor">
+<summary>Quelle est la philosophie d'ajustement de modèle en R, et d'où vient-elle ?</summary><div class="in">
+
+<p><em>« R provides <strong>an interlocking suite of facilities</strong> that make fitting statistical models very simple. <strong>As we mention in the introduction, the basic output is minimal, and one needs to ask for the details by calling extractor functions.</strong> »</em> (§11)</p>
+<p>C'est la promesse du §1.3 (fiche 300), tenue : <em>« R will give <strong>minimal output</strong> and <strong>store the results in a fit object</strong> for subsequent interrogation by further R functions »</em>.</p>
+<p><strong>Trois temps</strong> : une <strong>formule</strong> décrit le modèle ; une <strong>fonction d'ajustement</strong> rend <strong>un objet</strong> ; des <strong>génériques</strong> (fiche 311) l'interrogent — <code>summary</code>, <code>coef</code>, <code>resid</code>, <code>anova</code>, <code>predict</code>.</p>
+<p>Le mot <em>« interlocking »</em> est important : les mêmes verbes fonctionnent sur <code>lm</code>, <code>glm</code>, <code>aov</code>, <code>nls</code>.</p>
+</div></details><details class="cor">
+<summary>Pourquoi l'interaction se note-t-elle <code>:</code> en R et non <code>.</code> ?</summary><div class="in">
+
+<p><em>« The formula operators are <strong>similar in effect to the Wilkinson and Rogers notation</strong> used by such programs as Glim and Genstat.  <strong>One inevitable change is that the operator <code>.</code> becomes <code>:</code> since the period is a valid name character in R.</strong> »</em> (§11.1)</p>
+<p><strong>Le point est un caractère d'identifiant en R</strong> (fiche 300) : <code>A.B</code> serait lu comme <strong>un nom de variable</strong>, exactement comme <code>data.frame</code> ou <code>is.na</code>. Le parseur ne pourrait pas distinguer un nom d'une interaction.</p>
+<p>Le changement est donc <strong>imposé par la syntaxe des noms</strong>, non choisi — d'où <em>« inevitable »</em>. C'est aussi la même racine que le piège de nommage des méthodes S3 (fiche 311) : <code>gen.cl</code>.</p>
+</div></details><details class="cor">
+<summary>Que signifie <code>y ~ x^2</code>, et comment obtient-on vraiment le carré de <code>x</code> ?</summary><div class="in">
+
+<p><code>y ~ x^2</code> signifie <em>« <strong>all terms in <code>M</code> together with "interactions" up to order <code>n</code></strong> »</em> — donc, <code>x</code> étant un seul terme, cela revient à <strong><code>y ~ x</code></strong>. <strong>Aucun carré n'est introduit.</strong></p>
+<p>Pour le carré arithmétique, il faut <strong>isoler</strong> : <em>« <strong><code>I(M)</code> : Insulate <code>M</code>. Inside <code>M</code> all operators have their normal arithmetic meaning, and that term appears in the model matrix.</strong> »</em></p>
+<pre><code class="language-r">y ~ 1 + x + I(x^2)     # regression polynomiale de degre 2, puissances explicites
+y ~ poly(x, 2)         # la meme, en polynomes ORTHOGONAUX
+</code></pre>
+<p class="cal piege"> La même règle vaut pour <code>+</code>, <code>*</code>, <code>-</code> : <code>y ~ I(x1 + x2)</code> est <strong>une</strong> colonne, la somme ; <code>y ~ x1 + x2</code> est <strong>deux</strong> termes.</p>
+<p>Et <em>« inside the parentheses that usually enclose function arguments <strong>all operators have their normal arithmetic meaning</strong> »</em> — d'où <code>log(y) ~ x</code> qui fonctionne sans <code>I()</code>.</p>
+</div></details><details class="cor">
+<summary>Comment un facteur à <em>k</em> niveaux devient-il des colonnes de la matrice du modèle ?</summary><div class="in">
+
+<p><em>« <strong>The answer differs for unordered and ordered factors.</strong> »</em> (§11.1.1)</p>
+<ul>
+<li><strong>Non ordonné</strong> : <em>« $k-1$ <strong>columns are generated for the indicators of the second, …, $k$-th levels</strong> … <strong>Thus the implicit parameterization is to contrast the response at each level with that at the first.</strong> »</em></li>
+<li><strong>Ordonné</strong> : <em>« the $k-1$ columns are <strong>the orthogonal polynomials on $1,\dots,k$, omitting the constant term</strong> »</em>.</li>
+</ul>
+<p><strong>C'est la seconde différence entre <code>factor()</code> et <code>ordered()</code></strong> annoncée en fiche 304.</p>
+<p class="cal piege"> Deux complications : <em>« <strong>if the intercept is omitted in a model that contains a factor term, the first such term is encoded into $k$ columns</strong> giving the indicators for <strong>all</strong> the levels »</em> ; et <em>« <strong>the whole behavior can be changed by the <code>options</code> setting for <code>contrasts</code></strong> »</em>.</p>
+<p>Et les interactions <em>« <strong>generate the products of the columns</strong> introduced for their component terms »</em>.</p>
+</div></details><details class="cor">
+<summary>Pourquoi mes coefficients ne correspondent-ils pas à ceux d'un manuel écrit avec S-Plus ?</summary><div class="in">
+
+<p><em>« The main reason for mentioning this is that <strong>R and S have different defaults for unordered factors, S using Helmert contrasts</strong>. So <strong>if you need to compare your results to those of a textbook or paper which used S-Plus, you will need to set</strong> »</em> (§11.1.1) :</p>
+<pre><code class="language-r">options(contrasts = c("contr.helmert", "contr.poly"))
+</code></pre>
+<p>Le défaut de R est <code>c("contr.treatment", "contr.poly")</code>.</p>
+<p><em>« <strong>This is a deliberate difference, as treatment contrasts (R's default) are thought easier for newcomers to interpret.</strong> »</em></p>
+<p class="cal piege"> <strong>Les prédictions sont identiques</strong> — c'est le même sous-espace de modèle. <strong>Seuls les coefficients diffèrent</strong>, parce que la paramétrisation diffère. Un coefficient de traitement se lit « écart au premier niveau » ; un coefficient de Helmert, non.</p>
+</div></details><details class="cor">
+<summary>Pourquoi l'ordre des termes change-t-il une table d'ANOVA ?</summary><div class="in">
+
+<p><em>« Note also that <strong>the analysis of variance table (or tables) are for a sequence of fitted models. The sums of squares shown are the decrease in the residual sums of squares resulting from an inclusion of that term in the model at that place in the sequence.</strong>  <strong>Hence only for orthogonal experiments will the order of inclusion be inconsequential.</strong> »</em> (§11.4.1)</p>
+<p>La table est <strong>séquentielle</strong> : chaque ligne mesure ce que le terme apporte <strong>sachant tous ceux qui le précèdent</strong>. Si deux prédicteurs sont corrélés, ce qu'ils apportent dépend de l'ordre dans lequel on les entre.</p>
+<p><strong>Le remède du cours</strong> : <em>« <strong>A more flexible alternative … is to compare two or more models directly using the <code>anova()</code> function</strong> … <strong>This does not give different information to the default, but rather makes it easier to comprehend and control.</strong> »</em> En comparant deux modèles explicites, <strong>on sait ce qu'on teste</strong>.</p>
+</div></details><details class="cor">
+<summary>Que fait le point dans <code>update()</code> ? Et dans <code>y ~ .</code> ?</summary><div class="in">
+
+<p><strong>Dans <code>update()</code></strong> : <em>« the special name consisting of <strong>a period, <code>.</code>, only</strong>, can be used to stand for <strong>"the corresponding part of the old model formula"</strong> »</em> (§11.5).</p>
+<pre><code class="language-r">fm6  &lt;- update(fm05, . ~ . + x6)    # meme reponse, memes predicteurs, PLUS x6
+smf6 &lt;- update(fm6, sqrt(.) ~ .)    # reponse TRANSFORMEE, memes predicteurs
+</code></pre>
+<p><strong>Dans une formule neuve avec <code>data =</code></strong> :  <em>« The name <code>.</code> can also be used in other contexts, <strong>but with slightly different meaning</strong> »</em> :</p>
+<pre><code class="language-r">fmfull &lt;- lm(y ~ . , data = production)   # TOUTES les autres variables du data frame
+</code></pre>
+<p><strong>Deux sens distincts</strong> : « la partie correspondante de l'ancienne formule » contre « toutes les autres colonnes ».</p>
+<p>Et le détail utile : <em>« <strong>if the <code>data=</code> argument is specified on the original call … this information is passed on through the fitted model object to <code>update()</code></strong> »</em>.</p>
+</div></details><details class="cor">
+<summary>Énoncer les quatre hypothèses d'un modèle linéaire généralisé.</summary><div class="in">
+
+<p>(§11.6)</p>
+<ol>
+<li><em>« There is <strong>a response, <code>y</code>, of interest</strong> and <strong>stimulus variables</strong> whose values <strong>influence the distribution of the response</strong>. »</em></li>
+<li><em>« The stimulus variables influence the distribution of <code>y</code> <strong>through a single linear function, only</strong> »</em> — <strong>le prédicteur linéaire</strong> $\eta = \beta_1x_1+\dots+\beta_px_p$, d'où <em>« $x_i$ <strong>has no influence … if and only if</strong> $\beta_i = 0$ »</em>.</li>
+<li><em>« <strong>The distribution of <code>y</code> is of the form</strong> »</em> d'une famille exponentielle, où <em>« <strong>$\varphi$ is a scale parameter (possibly known), and is constant for all observations</strong> »</em>, <em>« <strong>$A$ represents a prior weight, assumed known but possibly varying</strong> »</em>, et <em>« <strong>$\mu$ is the mean of <code>y</code></strong> »</em>. Donc <em>« <strong>the distribution of <code>y</code> is determined by its mean and possibly a scale parameter as well</strong> »</em>.</li>
+<li><em>« <strong>The mean, $\mu$, is a smooth invertible function of the linear predictor</strong> »</em> : $\mu = m(\eta)$, et <strong>$\ell = m^{-1}$ est la fonction de lien</strong>.</li>
+</ol>
+<p><em>« <strong>loose enough to encompass a wide class of models</strong> … <strong>tight enough to allow … a unified methodology</strong> »</em>.</p>
+</div></details><details class="cor">
+<summary>Quelles sont les trois formes admises pour la réponse d'un modèle binomial ?</summary><div class="in">
+
+<p><em>« To fit a binomial model using <code>glm()</code> there are <strong>three possibilities for the response</strong> »</em> (§11.6.2) :</p>
+<ol>
+<li><em>« <strong>If the response is a vector it is assumed to hold binary data, and so must be a 0/1 vector.</strong> »</em></li>
+<li><em>« <strong>If the response is a two-column matrix it is assumed that the first column holds the number of successes for the trial and the second holds the number of failures.</strong> »</em></li>
+<li><em>« <strong>If the response is a factor, its first level is taken as failure (0) and all other levels as "success" (1).</strong> »</em></li>
+</ol>
+<p>Sur Kalythos, c'est la deuxième qui convient :</p>
+<pre><code class="language-r">kalythos$Ymat &lt;- cbind(kalythos$y, kalythos$n - kalythos$y)
+</code></pre>
+<p class="cal piege"> <strong>La seconde colonne est <code>n - y</code>, le nombre d'échecs</strong> — pas <code>n</code>. C'est l'erreur la plus fréquente, et elle ne produit <strong>aucun message</strong> : le modèle s'ajuste, sur des données fausses.</p>
+</div></details><details class="cor">
+<summary>Comment estime-t-on la DL50, et que vaut-elle sur les données de Kalythos ?</summary><div class="in">
+
+<p>Le modèle est $y \sim B\bigl(n, F(\beta_0+\beta_1x)\bigr)$, avec $F = \Phi$ (probit) ou $F(z) = e^z/(1+e^z)$ (logit, <strong>le défaut</strong>).</p>
+<p>*« In both cases <strong>the LD50 is $-\beta_0/\beta_1$</strong>, that is, <strong>the point at which the argument of the distribution function is zero</strong>. »* — car $F(0) = 0{,}5$ dans les deux cas.</p>
+<pre><code class="language-r">fmp &lt;- glm(Ymat ~ x, family = binomial(link = probit), data = kalythos)
+fml &lt;- glm(Ymat ~ x, family = binomial,                data = kalythos)
+ld50 &lt;- function(b) -b[1]/b[2]
+c(ld50(coef(fmp)), ld50(coef(fml)))
+</code></pre>
+<p><em>« <strong>The actual estimates from this data are 43.663 years and 43.601 years respectively.</strong> »</em></p>
+<p><strong>Six centièmes d'année d'écart</strong> — environ trois semaines. Logit et probit diffèrent <strong>dans les queues</strong>, non au centre ; et la DL50 <strong>est</strong> le centre. Le choix du lien est ici sans conséquence.</p>
+</div></details><details class="cor">
+<summary>À quoi sert la famille <code>quasi</code>, et que doit-on lui spécifier ?</summary><div class="in">
+
+<p><em>« For quasi-likelihood estimation and inference <strong>the precise response distribution is not specified, but rather only a link function and the form of the variance function as it depends on the mean</strong>. <strong>Since quasi-likelihood estimation uses formally identical techniques to those for the gaussian distribution, this family provides a way of fitting gaussian models with non-standard link functions or variance functions.</strong> »</em> (§11.6.2)</p>
+<p class="cal piege"> <strong>Il faut spécifier la fonction de variance</strong> : <em>« <strong>In the latter case the variance function must be specified as a function of the mean</strong> »</em>.</p>
+<p>L'exemple du cours ramène une régression <strong>non linéaire</strong> à un GLM :</p>
+<pre><code class="language-r">nlfit &lt;- glm(y ~ x1 + x2 - 1,
+             family = quasi(link = inverse, variance = constant),
+             data = biochem)
+</code></pre>
+<p>Le lien <strong><code>inverse</code></strong> absorbe le $1/(\cdot)$ du modèle $y = 1/(\beta_1x_1+\beta_2x_2)$, et <strong><code>- 1</code></strong> retire la constante puisque le dénominateur n'en a pas.</p>
+</div></details><details class="cor">
+<summary>Comment trouve-t-on des valeurs de départ pour un ajustement non linéaire ?</summary><div class="in">
+
+<p><em>« <strong>One way to find sensible starting values is to plot the data, guess some parameter values, and superimpose the model curve using those values.</strong> »</em> (§11.7.1)</p>
+<pre><code class="language-r">plot(x, y)
+xfit &lt;- seq(.02, 1.1, .05)
+yfit &lt;- 200 * xfit/(0.1 + xfit)
+lines(spline(xfit, yfit))
+</code></pre>
+<p><em>« <strong>We could do better, but these starting values of 200 and 0.1 seem adequate.</strong> »</em></p>
+<p><strong>Les deux valeurs se lisent sur le graphique</strong> : $200$ est le plateau des $y$, $0{,}1$ l'abscisse à mi-plateau — ce sont précisément $V_m$ et $K$ du modèle de Michaelis-Menten.</p>
+<p class="cal piege"> Et l'avertissement du §11.7 : <em>« <strong>there is no guarantee that the procedure will converge on satisfactory estimates</strong> … <strong>convergence may depend critically upon the quality of the starting values</strong> »</em>.</p>
+<p><strong>La voie plus sûre</strong> est <code>nls()</code> avec un modèle <strong>auto-démarrant</strong> : <code>nls(y ~ SSmicmen(x, Vm, K), df)</code> calcule ses propres valeurs initiales.</p>
+</div></details><details class="cor">
+<summary>Pourquoi les erreurs types se calculent-elles différemment selon qu'on minimise une SSE ou une log-vraisemblance ?</summary><div class="in">
+
+<table>
+<thead>
+<tr>
+<th>Méthode</th>
+<th><code>fn</code> minimise</th>
+<th>Erreur type</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Moindres carrés</strong></td>
+<td>la <strong>SSE</strong></td>
+<td><code>sqrt(diag(2*out$minimum/(length(y)-2) * solve(out$hessian)))</code></td>
+</tr>
+<tr>
+<td><strong>Maximum de vraisemblance</strong></td>
+<td>la <strong>log-vraisemblance négative</strong></td>
+<td><strong><code>sqrt(diag(solve(out$hessian)))</code></strong></td>
+</tr>
+</tbody></table>
+<p><strong>La raison</strong> : la hessienne d'une <strong>log-vraisemblance négative</strong> est <strong>l'information observée</strong>, dont l'inverse <strong>est</strong> directement la covariance asymptotique — aucun facteur d'échelle.</p>
+<p>Pour les moindres carrés, il faut deux corrections : estimer $\hat\sigma^2 = \mathrm{SSE}/(n-p)$ — d'où le <code>out$minimum/(length(y) - 2)</code>, où <em>« <strong>the 2 … represents the number of parameters</strong> »</em> — et compenser le facteur <strong>2</strong> dû à ce que <code>fn</code> est la somme des carrés et non sa moitié.</p>
+<p class="cal piege"> <strong>Se tromper de formule donne des erreurs types fausses sans aucun message.</strong> Dans les deux cas, <em>« <strong>A 95 % confidence interval would be the parameter estimate ± 1.96 SE</strong> »</em>.</p>
+</div></details><details class="cor">
+<summary>Vérifier la cohérence de la sortie de <code>nls</code> sur l'exemple de Michaelis-Menten.</summary><div class="in">
+
+<pre><code>Parameters:
+    Estimate Std. Error t value Pr(&gt;|t|)
+Vm 2.127e+02  6.947e+00  30.615 3.24e-11
+K  6.412e-02  8.281e-03   7.743 1.57e-05
+Residual standard error: 10.93 on 10 degrees of freedom
+residual sum-of-squares: 1195.449
+</code></pre>
+<p><strong>Trois contrôles.</strong></p>
+<ul>
+<li><strong>Degrés de liberté</strong> : $n - p = 12 - 2 = \mathbf{10}$. </li>
+<li><strong>Valeurs $t$</strong> : $212{,}7 / 6{,}947 = \mathbf{30{,}62}$ ; $0{,}06412 / 0{,}008281 = \mathbf{7{,}74}$. </li>
+<li><strong>Écart-type résiduel</strong> : $\sqrt{1195{,}449/10} = \sqrt{119{,}54} = \mathbf{10{,}93}$. </li>
+</ul>
+<p>Et les deux méthodes concordent : <code>nlm</code> donne <strong>212,68384</strong> / <strong>0,06412146</strong>, <code>nls</code> donne <strong>212,68371</strong> / <strong>0,06412123</strong> — <strong>cinq chiffres significatifs communs</strong>.</p>
+<p class="cal piege"> La <strong>corrélation de 0,7651</strong> entre les deux estimations signale qu'elles sont <strong>fortement liées</strong> : surestimer l'asymptote se compense en surestimant $K$.</p>
+</div></details><details class="cor">
+<summary>Que sont les strates d'erreur, et combien <code>Error(farms/blocks)</code> en produit-il ?</summary><div class="in">
+
+<p><em>« <strong><code>aov()</code> allows an analysis of models with multiple error strata</strong> such as <strong>split plot experiments</strong>, or <strong>balanced incomplete block designs with recovery of inter-block information</strong> »</em> (§11.4), via</p>
+<pre><code>response ~ mean.formula + Error(strata.formula)
+</code></pre>
+<pre><code class="language-r">fm &lt;- aov(yield ~ v + n*p*k + Error(farms/blocks), data = farm.data)
+</code></pre>
+<p>*« would typically be used to describe an experiment with mean model <code>v + n*p*k</code> and <strong>three error strata</strong>, namely <strong>"between farms"</strong>, <strong>"within farms, between blocks"</strong> and <strong>"within blocks"</strong> »*.</p>
+<p><strong>Pourquoi trois</strong> : par la règle <code>M_1 / M_2</code> = <code>M_1 + M_2 %in% M_1</code>, <code>farms/blocks</code> se développe en <strong><code>farms + blocks %in% farms</code></strong> — deux strates explicites — <strong>plus la strate résiduelle</strong>. La grammaire des formules s'applique <strong>aussi dans <code>Error()</code></strong>.</p>
+<p><em>« In the simplest case, <strong><code>strata.formula</code> is simply a factor</strong>, when it defines <strong>a two strata experiment</strong> »</em>.</p>
+</div></details></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h2>Flashcards</h2>
+<table>
+<thead>
+<tr>
+<th>Question</th>
+<th>Réponse</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Comment R rend-il ses résultats de modèle ?</td>
+<td><strong>Sortie minimale</strong> + <strong>fonctions extractrices</strong></td>
+</tr>
+<tr>
+<td>L'opérateur qui définit une formule ?</td>
+<td><strong><code>~</code></strong></td>
+</tr>
+<tr>
+<td>Les deux opérateurs de terme ?</td>
+<td><strong><code>+</code></strong> (inclure) et <strong><code>-</code></strong> (retirer)</td>
+</tr>
+<tr>
+<td>L'ordonnée à l'origine est-elle implicite ?</td>
+<td><strong>Oui</strong> — le terme <code>1</code></td>
+</tr>
+<tr>
+<td>Trois façons de l'ôter ?</td>
+<td><code>y ~ 0 + x</code> · <code>y ~ -1 + x</code> · <code>y ~ x - 1</code></td>
+</tr>
+<tr>
+<td>Que signifie <code>M_1 : M_2</code> ?</td>
+<td>Le <strong>produit tensoriel</strong> — l'interaction</td>
+</tr>
+<tr>
+<td>Que signifie <code>M_1 * M_2</code> ?</td>
+<td><code>M_1 + M_2 + M_1:M_2</code></td>
+</tr>
+<tr>
+<td>Que signifie <code>M_1 / M_2</code> ?</td>
+<td><code>M_1 + M_2 %in% M_1</code></td>
+</tr>
+<tr>
+<td>Que signifie <code>M^n</code> ?</td>
+<td>Tous les termes + <strong>interactions jusqu'à l'ordre <code>n</code></strong></td>
+</tr>
+<tr>
+<td>Que fait <code>I(M)</code> ?</td>
+<td>Il <strong>isole</strong> — sens arithmétique normal</td>
+</tr>
+<tr>
+<td>Pourquoi <code>:</code> et non <code>.</code> ?</td>
+<td>Le point est <strong>un caractère de nom</strong> en R</td>
+</tr>
+<tr>
+<td>Que signifie <code>y ~ x^2</code> ?</td>
+<td><strong><code>y ~ x</code></strong> — pas de carré</td>
+</tr>
+<tr>
+<td>Comment obtenir le carré ?</td>
+<td><strong><code>I(x^2)</code></strong></td>
+</tr>
+<tr>
+<td>Deux formes de régression polynomiale ?</td>
+<td><code>poly(x,2)</code> (orthogonaux) · <code>1 + x + I(x^2)</code> (puissances)</td>
+</tr>
+<tr>
+<td>Que décrit <code>y ~ A</code> ?</td>
+<td>Une <strong>analyse de variance</strong> à un facteur</td>
+</tr>
+<tr>
+<td>Et <code>y ~ A + x</code> ?</td>
+<td>Une <strong>analyse de covariance</strong></td>
+</tr>
+<tr>
+<td>Combien d'écritures pour un modèle à deux facteurs non additif ?</td>
+<td><strong>Quatre</strong> — même sous-espace, codages différents</td>
+</tr>
+<tr>
+<td>Que produit <code>y ~ A/(1 + x) - 1</code> ?</td>
+<td>Des <strong>ordonnées et pentes explicites</strong> par niveau</td>
+</tr>
+<tr>
+<td>Combien de colonnes pour un facteur non ordonné à $k$ niveaux ?</td>
+<td><strong>$k-1$</strong> indicatrices</td>
+</tr>
+<tr>
+<td>Quelle est la référence ?</td>
+<td>Le <strong>premier niveau</strong></td>
+</tr>
+<tr>
+<td>Et pour un facteur ordonné ?</td>
+<td><strong>$k-1$ polynômes orthogonaux</strong></td>
+</tr>
+<tr>
+<td>Que se passe-t-il sans ordonnée à l'origine ?</td>
+<td>Le premier facteur reçoit <strong>$k$ colonnes</strong></td>
+</tr>
+<tr>
+<td>Le défaut de contrastes en R ?</td>
+<td><code>c("contr.treatment", "contr.poly")</code></td>
+</tr>
+<tr>
+<td>Le défaut en S ?</td>
+<td><strong>Helmert</strong></td>
+</tr>
+<tr>
+<td>Est-ce un oubli ?</td>
+<td><strong>Non</strong> — <em>« a deliberate difference »</em></td>
+</tr>
+<tr>
+<td>Deux fonctions pour régler un terme ?</td>
+<td><strong><code>contrasts</code></strong> et <strong><code>C</code></strong></td>
+</tr>
+<tr>
+<td>Que génèrent les interactions ?</td>
+<td>Les <strong>produits des colonnes</strong></td>
+</tr>
+<tr>
+<td>Quelle règle préserver ?</td>
+<td>La <strong>marginalité</strong></td>
+</tr>
+<tr>
+<td>La fonction de base d'ajustement linéaire ?</td>
+<td><strong><code>lm()</code></strong></td>
+</tr>
+<tr>
+<td>Que fait <code>data =</code> ?</td>
+<td>Cherche les variables <strong>d'abord dans ce data frame</strong></td>
+</tr>
+<tr>
+<td>Dépend-il du chemin de recherche ?</td>
+<td><strong>Non</strong></td>
+</tr>
+<tr>
+<td>De quelle classe est le résultat ?</td>
+<td><strong><code>"lm"</code></strong> — une <strong>liste</strong></td>
+</tr>
+<tr>
+<td>Que rend <code>deviance()</code> ?</td>
+<td>La <strong>somme des carrés résiduels</strong></td>
+</tr>
+<tr>
+<td>Combien de graphiques rend <code>plot()</code> ?</td>
+<td><strong>Quatre</strong></td>
+</tr>
+<tr>
+<td>Que doit respecter <code>predict(newdata=)</code> ?</td>
+<td><strong>Les mêmes noms de variables</strong></td>
+</tr>
+<tr>
+<td>Sur quel critère <code>step()</code> choisit-il ?</td>
+<td>Le <strong>plus petit AIC</strong></td>
+</tr>
+<tr>
+<td>Que rend <code>vcov()</code> ?</td>
+<td>La <strong>matrice de variance-covariance</strong></td>
+</tr>
+<tr>
+<td>La forme courte de <code>residuals</code> ?</td>
+<td><strong><code>resid</code></strong></td>
+</tr>
+<tr>
+<td>La forme longue de <code>coef</code> ?</td>
+<td><strong><code>coefficients</code></strong></td>
+</tr>
+<tr>
+<td>Que permet <code>aov()</code> en plus de <code>lm()</code> ?</td>
+<td>Les <strong>strates d'erreur multiples</strong></td>
+</tr>
+<tr>
+<td>La syntaxe des strates ?</td>
+<td><code>reponse ~ moyenne + Error(strates)</code></td>
+</tr>
+<tr>
+<td>Combien de strates pour <code>Error(farms/blocks)</code> ?</td>
+<td><strong>Trois</strong></td>
+</tr>
+<tr>
+<td>Comment se lit une table d'ANOVA ?</td>
+<td><strong>Séquentiellement</strong></td>
+</tr>
+<tr>
+<td>Quand l'ordre est-il sans effet ?</td>
+<td>Pour un <strong>plan orthogonal</strong></td>
+</tr>
+<tr>
+<td>L'alternative recommandée ?</td>
+<td><strong><code>anova(m1, m2)</code></strong></td>
+</tr>
+<tr>
+<td>Pourquoi ?</td>
+<td><em>« <strong>easier to comprehend and control</strong> »</em></td>
+</tr>
+<tr>
+<td>Que signifie le point dans <code>update()</code> ?</td>
+<td>La <strong>partie correspondante</strong> de l'ancienne formule</td>
+</tr>
+<tr>
+<td>Et dans <code>y ~ .</code> avec <code>data =</code> ?</td>
+<td><strong>Toutes les autres variables</strong></td>
+</tr>
+<tr>
+<td><code>data =</code> est-il transmis à <code>update()</code> ?</td>
+<td><strong>Oui</strong></td>
+</tr>
+<tr>
+<td>Trois fonctions d'exploration incrémentale ?</td>
+<td><code>add1()</code> · <code>drop1()</code> · <code>step()</code></td>
+</tr>
+<tr>
+<td>Qu'est-ce que le prédicteur linéaire ?</td>
+<td>$\eta = \beta_1x_1+\dots+\beta_px_p$</td>
+</tr>
+<tr>
+<td>Quand $x_i$ est-il sans influence ?</td>
+<td><strong>Si et seulement si $\beta_i = 0$</strong></td>
+</tr>
+<tr>
+<td>Qu'est-ce que la fonction de lien ?</td>
+<td><strong>L'inverse</strong> de $\mu = m(\eta)$</td>
+</tr>
+<tr>
+<td>Le paramètre $\varphi$ ?</td>
+<td><strong>Un paramètre d'échelle</strong>, constant</td>
+</tr>
+<tr>
+<td>Le poids $A$ ?</td>
+<td><strong>Connu</strong>, éventuellement variable</td>
+</tr>
+<tr>
+<td>Qu'est-ce qu'une « famille » ?</td>
+<td><strong>Loi + lien + information de contrôle</strong></td>
+</tr>
+<tr>
+<td>Le lien par défaut de <code>binomial</code> ?</td>
+<td><strong>logit</strong></td>
+</tr>
+<tr>
+<td>Ses autres liens ?</td>
+<td>probit · log · cloglog</td>
+</tr>
+<tr>
+<td>Le lien par défaut de <code>poisson</code> ?</td>
+<td><strong>log</strong></td>
+</tr>
+<tr>
+<td>Quel lien peut-on passer à <code>gaussian</code> ?</td>
+<td><strong>Aucun</strong></td>
+</tr>
+<tr>
+<td>Comment faire un gaussien à lien non standard ?</td>
+<td>Par la famille <strong><code>quasi</code></strong></td>
+</tr>
+<tr>
+<td>Que faut-il spécifier avec <code>quasi</code> ?</td>
+<td>La <strong>fonction de variance</strong></td>
+</tr>
+<tr>
+<td><code>glm(family = gaussian)</code> contre <code>lm</code> ?</td>
+<td>Même résultat, <em>« <strong>much less efficiently</strong> »</em></td>
+</tr>
+<tr>
+<td>Les trois formes de réponse binomiale ?</td>
+<td>Vecteur <strong>0/1</strong> · matrice <strong>succès/échecs</strong> · <strong>facteur</strong></td>
+</tr>
+<tr>
+<td>Que contient la 2ᵉ colonne de la matrice ?</td>
+<td>Le nombre d'<strong>échecs</strong></td>
+</tr>
+<tr>
+<td>La formule de la DL50 ?</td>
+<td><strong>$-\beta_0/\beta_1$</strong></td>
+</tr>
+<tr>
+<td>Pourquoi ?</td>
+<td>Le point où <strong>l'argument de $F$ est nul</strong></td>
+</tr>
+<tr>
+<td>Les deux estimations sur Kalythos ?</td>
+<td><strong>43,663</strong> (probit) et <strong>43,601</strong> (logit)</td>
+</tr>
+<tr>
+<td>Que dit le cours de l'ajustement ?</td>
+<td><em>« Both models fit (<strong>all too</strong>) well. »</em></td>
+</tr>
+<tr>
+<td>Les trois routines d'optimisation ?</td>
+<td><strong><code>optim()</code></strong>, <strong><code>nlm()</code></strong>, <strong><code>nlminb()</code></strong></td>
+</tr>
+<tr>
+<td>Y a-t-il garantie de convergence ?</td>
+<td> <strong>Non</strong></td>
+</tr>
+<tr>
+<td>De quoi dépend-elle ?</td>
+<td>De <strong>la qualité des valeurs de départ</strong></td>
+</tr>
+<tr>
+<td>Comment trouver ces valeurs ?</td>
+<td><strong>Tracer</strong> et deviner sur le graphique</td>
+</tr>
+<tr>
+<td>La fonction dédiée aux moindres carrés non linéaires ?</td>
+<td><strong><code>nls()</code></strong></td>
+</tr>
+<tr>
+<td>Qu'est-ce que <code>SSmicmen</code> ?</td>
+<td>Un modèle <strong>auto-démarrant</strong> (Michaelis-Menten)</td>
+</tr>
+<tr>
+<td>Que vaut $V_m$ ?</td>
+<td><strong>212,68</strong></td>
+</tr>
+<tr>
+<td>Que vaut $K$ ?</td>
+<td><strong>0,06412</strong></td>
+</tr>
+<tr>
+<td>La somme des carrés résiduels ?</td>
+<td><strong>1195,449</strong></td>
+</tr>
+<tr>
+<td>L'écart-type résiduel et ses df ?</td>
+<td><strong>10,93</strong> sur <strong>10</strong></td>
+</tr>
+<tr>
+<td>La corrélation des estimations ?</td>
+<td><strong>0,7651</strong></td>
+</tr>
+<tr>
+<td>L'erreur type en moindres carrés ?</td>
+<td><code>sqrt(diag(2*min/(n-2) * solve(hessian)))</code></td>
+</tr>
+<tr>
+<td>Que représente le 2 soustrait ?</td>
+<td>Le <strong>nombre de paramètres</strong></td>
+</tr>
+<tr>
+<td>L'erreur type en maximum de vraisemblance ?</td>
+<td><strong><code>sqrt(diag(solve(hessian)))</code></strong></td>
+</tr>
+<tr>
+<td>Pourquoi plus simple ?</td>
+<td>La hessienne <strong>est</strong> l'information observée</td>
+</tr>
+<tr>
+<td>L'intervalle à 95 % ?</td>
+<td>Estimation <strong>± 1,96 SE</strong></td>
+</tr>
+<tr>
+<td>Le paquet des modèles mixtes ?</td>
+<td><strong><code>nlme</code></strong> — <code>lme()</code> et <code>nlme()</code></td>
+</tr>
+<tr>
+<td>La régression locale ?</td>
+<td><strong><code>loess()</code></strong>, dans <code>stats</code></td>
+</tr>
+<tr>
+<td>Deux fonctions de régression robuste ?</td>
+<td><strong><code>lqs</code></strong> et <strong><code>rlm</code></strong> (paquet <code>MASS</code>)</td>
+</tr>
+<tr>
+<td>Deux paquets d'arbres ?</td>
+<td><strong><code>rpart</code></strong> et <strong><code>tree</code></strong></td>
+</tr>
+<tr>
+<td>Ce que les arbres apportent ?</td>
+<td><em>« <strong>insights that other methods tend not to yield</strong> »</em></td>
+</tr>
+</tbody></table>
+</main>
+
+
+
+
+</body></html>

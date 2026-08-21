@@ -1,0 +1,1399 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fiche 303 — Objets, modes et attributs : ce dont R est fait</title>
+<script>
+window.MathJax={tex:{inlineMath:[["$","$"]],displayMath:[["$$","$$"]],processEscapes:true},
+ options:{skipHtmlTags:["script","noscript","style","textarea","pre","code"]},
+ svg:{fontCache:"global"},
+ startup:{pageReady:()=>MathJax.startup.defaultPageReady().then(()=>{document.body.classList.add("ready")})}};
+setTimeout(function(){document.body.classList.add("ready")},2500);
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+/* ============================================================
+   MathiasLearn — feuille de style des fiches
+   Reprise intégrale des tokens de 00_PARCOURS/*.html
+   + blocs pédagogiques (callouts, méthode, essentiels, recall)
+   ============================================================ */
+:root{--bg:#faf9f7;--card:#fff;--ink:#1a1a1a;--muted:#6b6b6b;--line:#e5e2dd;--accent:#8b5e34;
+ --hl:#fdf8ef;--ok:#2d7d4f;--okbg:#f0f7f3;--warn:#b3402f;--warnbg:#fdf3f1;--blue:#2f5d8b;--bluebg:#f1f5fa}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+ font:17px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;padding:0 16px 100px}
+.nav{position:sticky;top:0;background:rgba(250,249,247,.96);backdrop-filter:blur(8px);
+ border-bottom:1px solid var(--line);margin:0 -16px 30px;padding:11px 16px;z-index:50;
+ display:flex;gap:6px;flex-wrap:wrap;font-size:13px}
+.nav a{color:var(--muted);text-decoration:none;padding:4px 9px;border-radius:5px;white-space:nowrap}
+.nav a:hover{background:var(--line);color:var(--ink)}
+.nav a.on{background:var(--accent);color:#fff}
+main{max-width:780px;margin:0 auto}
+h1{font-size:31px;letter-spacing:-.02em;margin:.4em 0 .5em;line-height:1.25}
+h2{font-size:23px;margin:2.2em 0 .7em;padding-bottom:.3em;border-bottom:1px solid var(--line)}
+h3{font-size:19px;margin:1.9em 0 .5em;color:var(--accent)}
+h4{font-size:17px;margin:1.5em 0 .4em}
+p{margin:.8em 0} a{color:var(--accent)} hr{border:0;border-top:1px solid var(--line);margin:2.6em 0}
+table{border-collapse:collapse;width:100%;margin:1.3em 0;font-size:15.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+th{background:#f3f0eb;font-weight:600}
+tr:nth-child(even) td{background:#fcfbfa}
+code{font-family:"SF Mono",Menlo,Consolas,monospace;font-size:.88em;background:#f2efea;padding:2px 6px;border-radius:4px;overflow-wrap:break-word}
+pre{background:#f2efea;padding:14px 16px;border-radius:8px;overflow-x:auto}
+pre code{background:none;padding:0;white-space:pre}
+blockquote{border-left:3px solid var(--accent);background:var(--hl);margin:1.4em 0;padding:14px 20px;border-radius:0 8px 8px 0}
+blockquote p:first-child{margin-top:0} blockquote p:last-child{margin-bottom:0}
+ul,ol{padding-left:1.5em} li{margin:.35em 0} em{color:#4a4a4a}
+mjx-container[display="true"]{margin:1.1em 0!important;overflow-x:auto;overflow-y:hidden;padding:2px 0}
+mjx-container svg{max-width:100%}
+body:not(.ready) main{opacity:0} main{opacity:1;transition:opacity .25s}
+
+/* --- bandeau de tête de fiche --- */
+.cours{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--accent);
+ border-radius:0 10px 10px 0;padding:18px 22px;margin:0 0 34px}
+.cours h4{margin:0 0 4px;font-size:14px;text-transform:uppercase;letter-spacing:.07em;color:var(--accent)}
+.cours .cs{color:var(--muted);font-size:14.5px;margin:0 0 14px}
+
+/* --- exercices / corrigés --- */
+.ex{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:6px 24px 20px;margin:18px 0}
+.ex>h3:first-child{margin-top:14px}
+details.cor{margin-top:18px;border:1px solid var(--line);border-radius:8px;background:#fcfbfa;overflow:hidden}
+details.cor>summary{cursor:pointer;padding:12px 16px;font-weight:600;font-size:15px;color:var(--accent);
+ list-style:none;display:flex;align-items:center;gap:9px;user-select:none;transition:.15s;min-height:44px}
+details.cor>summary::-webkit-details-marker{display:none}
+details.cor>summary:hover{background:var(--hl)}
+details.cor>summary::before{content:"\25B6";font-size:10px;transition:transform .18s;display:inline-block}
+details.cor[open]>summary::before{transform:rotate(90deg)}
+details.cor[open]>summary{background:var(--okbg);color:var(--ok);border-bottom:1px solid var(--line)}
+.cor .in{padding:4px 20px 16px}
+.cor .in>*:first-child{margin-top:.9em}
+
+/* --- blocs pédagogiques (callouts) ---
+   Générés depuis une citation Markdown dont le premier **gras** commence
+   par un mot-clé : DÉFINITION, THÉORÈME, MÉTHODE, PIÈGE, INTUITION… */
+.cal{border:1px solid var(--line);border-left:4px solid var(--accent);background:var(--card);
+ border-radius:0 10px 10px 0;padding:15px 20px;margin:1.5em 0}
+.cal>p:first-child{margin-top:0}.cal>p:last-child,.cal>ul:last-child,.cal>ol:last-child{margin-bottom:0}
+.cal .lab{display:block;font-size:12.5px;text-transform:uppercase;letter-spacing:.08em;
+ font-weight:700;color:var(--accent);margin-bottom:6px}
+.cal.formel{background:var(--hl)}
+.cal.piege{border-left-color:var(--warn);background:var(--warnbg)}
+.cal.piege .lab{color:var(--warn)}
+.cal.methode{border-left-color:var(--ok);background:var(--okbg)}
+.cal.methode .lab{color:var(--ok)}
+.cal.intu{border-left-color:var(--blue);background:var(--bluebg)}
+.cal.intu .lab{color:var(--blue)}
+.cal.plus{border-left-style:dashed;background:#faf9f7}
+.cal.plus .lab{color:var(--muted)}
+
+/* --- révision express --- */
+.ess{background:var(--card);border:1px solid var(--accent);border-radius:10px;padding:4px 24px 20px;margin:1.6em 0}
+.ess h3{margin-top:1.3em}
+.rec{background:var(--card);border:1px dashed var(--accent);border-radius:10px;padding:4px 24px 18px;margin:1.6em 0}
+.rec ol{counter-reset:none}
+
+/* --- impression / PDF --- */
+@media print{
+ .nav{display:none}
+ body{padding:0;background:#fff;font-size:11.2pt;line-height:1.55}
+ main{max-width:none}
+ h1{font-size:23pt}h2{font-size:15pt;margin-top:1.5em}h3{font-size:12.6pt}
+ h2,h3,h4{break-after:avoid;page-break-after:avoid}
+ table,.cal,blockquote{break-inside:avoid;page-break-inside:avoid}
+ table{display:table;font-size:9.6pt}
+ details.cor{border:1px solid var(--line);background:#fcfbfa}
+ details.cor>summary{display:none}
+ details.cor .in{padding-top:10px}
+ .cal,.ex,.ess,.rec{box-shadow:none}
+ a{color:var(--ink);text-decoration:none}
+}
+@page{margin:16mm 15mm 18mm}
+
+/* --- exemples travaillés --- */
+.exm{background:#fcfbfa;border:1px solid var(--line);border-radius:10px;padding:2px 20px 14px;margin:1.5em 0}
+.exm>h4:first-child{margin:14px 0 .5em;color:var(--accent);font-size:13px;text-transform:uppercase;letter-spacing:.07em}
+
+
+/* --- pastilles de priorité (conventions des fiches de l'app) --- */
+h2[data-prio], h3[data-prio], h4[data-prio]{position:relative}
+h2[data-prio]::before,h3[data-prio]::before,h4[data-prio]::before{
+ content:"";display:inline-block;width:9px;height:9px;border-radius:50%;
+ margin-right:9px;vertical-align:middle;background:var(--muted)}
+[data-prio="must"]::before{background:var(--warn)}
+[data-prio="high"]::before{background:#d98324}
+[data-prio="mid"]::before{background:#c9a227}
+[data-prio="low"]::before{background:var(--ok)}
+/* corrigés des fiches de l'app : même traitement que les corrigés des séries */
+details.cor>summary::after{content:""}
+</style></head><body>
+<div class="nav"><a href="00_COMMENCER_ICI.html">Commencer ici</a><a href="01_NOTATIONS_le-decodeur.html">Notations</a><a href="02_EXERCICES_Serie-0.html">Série 0 — Remise en route</a><a href="03_EXERCICES_Serie-1.html">Série 1 — Convexité</a><a href="04_EXERCICES_Serie-2.html">Série 2 — KKT</a><a href="05_AUTO-EVALUATION.html">Auto-évaluation (quiz)</a><a href="06_FICHE_Optimisation-deux-variables.html">Fiche — Optimisation à 2 variables</a></div>
+<main><h1>Fiche 303 — Objets, modes et attributs : ce dont R est fait</h1>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Matière</strong></td>
+<td>Code · Langage R</td>
+</tr>
+<tr>
+<td><strong>Cours source</strong></td>
+<td>R Core Team, <em>An Introduction to R</em> 4.6.1 — chapitre 3 « Objects, their modes and attributes » (§3.1 attributs intrinsèques, §3.2 changer la longueur, §3.3 lire et poser les attributs, §3.4 la classe)</td>
+</tr>
+<tr>
+<td><strong>Sources d'appoint</strong></td>
+<td><em>R Language Definition</em> 4.6.1, chapitre 2 « Objects » — §2.1 types de base, §2.2 attributs, §2.3 objets composés spéciaux</td>
+</tr>
+<tr>
+<td><strong>Difficulté</strong></td>
+<td> Fondamental — la fiche qui explique <em>pourquoi</em> R se comporte comme il se comporte</td>
+</tr>
+<tr>
+<td><strong>Temps d'étude estimé</strong></td>
+<td>1 h 30</td>
+</tr>
+<tr>
+<td><strong>Prérequis</strong></td>
+<td>Fiches 300 à 302</td>
+</tr>
+<tr>
+<td><strong>Concepts clés</strong></td>
+<td>objet, structure <strong>atomique</strong> contre <strong>récursive</strong>, les <strong>six</strong> types de vecteurs, <code>mode()</code> contre <code>typeof()</code> contre <code>storage.mode()</code>, attributs <strong>intrinsèques</strong>, coercition et <code>as.quelquechose()</code>, allongement et troncature, <code>length(x) &lt;- n</code>, <code>attributes()</code> / <code>attr()</code>, les attributs spéciaux <strong><code>names</code></strong>, <strong><code>dim</code></strong>, <strong><code>dimnames</code></strong>, <strong><code>class</code></strong>, <strong><code>tsp</code></strong>, ordre <strong>colonne-majeur</strong>, copie des attributs, <code>class()</code> et <code>unclass()</code>, <code>NULL</code>, environnements <strong>non copiés</strong></td>
+</tr>
+<tr>
+<td><strong>À retenir en priorité</strong></td>
+<td><strong>Une matrice est un vecteur plus un <code>dim</code></strong> · <strong><code>mode</code> ≠ <code>typeof</code> ≠ <code>storage.mode</code></strong> · <strong>la coercition perd les attributs</strong> · <strong>les environnements ne sont pas copiés</strong> · <code>unclass()</code> pour voir ce qu'il y a dessous.</td>
+</tr>
+</tbody></table>
+<h2>Vue d'ensemble</h2>
+<pre><code>UN OBJET = DES DONNEES + DES ATTRIBUTS
+
+ATOMIQUE (tous les elements du MEME mode)   RECURSIF (elements quelconques)
+   logical  integer  double                     list
+   complex  character  raw                      function   expression
+
+DEUX ATTRIBUTS INTRINSEQUES     mode(x)   length(x)
+
+TROIS QUESTIONS, TROIS REPONSES
+   typeof(1:3)        "integer"    &lt;- ce que R stocke VRAIMENT
+   mode(1:3)          "numeric"    &lt;- au sens de Becker-Chambers-Wilks (S)
+   storage.mode(1:3)  "integer"    &lt;- pour appeler du C ou du Fortran
+
+LES ATTRIBUTS SPECIAUX
+   names      etiqueter les elements
+   dim        FAIT d'un vecteur une matrice   (ordre COLONNE-MAJEUR)
+   dimnames   une LISTE de vecteurs de caracteres, elle-meme nommable
+   class      la base des methodes generiques ; modifiable SANS controle
+   tsp        start, end, frequency d'une serie temporelle
+
+LA REGLE QUI RESUME TOUT
+   « Matrices and arrays are SIMPLY VECTORS with the attribute dim
+     and optionally dimnames attached to the vector. »
+
+COPIE DES ATTRIBUTS
+   fonction scalaire   -&gt; preserve
+   operation binaire   -&gt; copie depuis le PLUS LONG
+   sous-ensemble       -&gt; LAISSE TOMBER tout sauf names/dim/dimnames
+   sous-assignation    -&gt; preserve
+   coercition          -&gt; LAISSE TOUT TOMBER
+</code></pre>
+<p><strong>Le problème posé.</strong> <em>« The entities R operates on are technically known as <strong>objects</strong>. »</em> (§3.1) Jusqu'ici, les vecteurs semblaient être <em>les</em> données. Ce chapitre montre qu'un objet R est en réalité <strong>deux choses</strong> : des données brutes, et <strong>un jeu d'attributs</strong> qui dit comment les lire. C'est de là que vient l'unité du langage — et c'est aussi ce qui explique les comportements les plus déroutants des fiches précédentes.</p>
+<div class="cal intu"><span class="lab">Intuition — la phrase qui vaut tout le chapitre.</span>
+<p> <em>« <strong>Matrices and arrays are simply vectors with the attribute <code>dim</code> and optionally <code>dimnames</code> attached to the vector.</strong> »</em> (<em>R Language Definition</em> §2.2) Il n'y a <strong>pas</strong> de type matrice en R. Il y a des vecteurs, et un attribut qui dit « lis-moi en 10 par 10 ». C'est pourquoi <code>m[1]</code> a un sens (fiche 302), pourquoi <code>length(m)</code> rend le nombre de <strong>cases</strong>, et pourquoi <code>attr(z, "dim") &lt;- c(10,10)</code> suffit à transformer un vecteur en matrice.</p>
+</div>
+<h2 data-prio="must">Concept 1 — Atomique contre récursif</h2>
+<div class="cal formel"><span class="lab">Définition (§3.1).</span>
+<p> *Les objets sont par exemple des vecteurs de valeurs <strong>numériques (réelles)</strong> ou <strong>complexes</strong>, des vecteurs de valeurs <strong>logiques</strong>, des vecteurs de <strong>chaînes de caractères</strong>. *« These are known as <strong>"atomic" structures</strong> since <strong>their components are all of the same type, or mode</strong>, namely <strong><code>numeric</code>, <code>complex</code>, <code>logical</code>, <code>character</code> and <code>raw</code></strong>. »**</p>
+</div>
+<blockquote>
+<p><strong>Règle (§3.1).</strong> <em>« <strong>Vectors must have their values all of the same mode.</strong> Thus <strong>any given vector must be unambiguously either logical, numeric, complex, character or raw</strong>. »</em></p>
+<p>*« (The only <strong>apparent</strong> exception to this rule is the special "value" listed as <strong><code>NA</code></strong> for quantities not available, but <strong>in fact there are several types of <code>NA</code></strong>.) »* — le complément déjà rencontré en fiche 301 : <code>NA</code> n'est pas une entorse à la règle, c'est <strong>une famille de valeurs typées</strong>.</p>
+</blockquote>
+<p class="cal piege"> <strong>Un vecteur vide a quand même un mode (§3.1).</strong> *« Note that a vector <strong>can be empty and still have a mode</strong>. For example the empty character string vector is listed as <strong><code>character(0)</code></strong> and the empty numeric vector as <strong><code>numeric(0)</code></strong>. »* Le vide n'est pas l'absence de type — d'où l'affichage <code>character(0)</code> plutôt qu'un silence.</p>
+<h3>1.1 Les structures récursives</h3>
+<div class="cal formel"><span class="lab">Définition (§3.1).</span>
+<p> *« R also operates on objects called <strong>lists</strong>, which are of mode <strong><code>list</code></strong>. These are <strong>ordered sequences of objects</strong> which <strong>individually can be of any mode</strong>. Lists are known as <strong>"recursive" rather than atomic</strong> structures since <strong>their components can themselves be lists in their own right</strong>. »*</p>
+<p><em>« <strong>The other recursive structures are those of mode <code>function</code> and <code>expression</code>.</strong> »</em></p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Famille</th>
+<th>Modes</th>
+<th>Propriété</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Atomique</strong></td>
+<td><code>logical</code>, <code>numeric</code>, <code>complex</code>, <code>character</code>, <code>raw</code></td>
+<td>tous les éléments <strong>du même mode</strong></td>
+</tr>
+<tr>
+<td><strong>Récursif</strong></td>
+<td><code>list</code>, <code>function</code>, <code>expression</code></td>
+<td>les éléments <strong>peuvent être n'importe quoi</strong>, y compris des objets de la même sorte</td>
+</tr>
+</tbody></table>
+<p><em>« <strong>Functions</strong> are the objects that form part of the R system along with similar user written functions »</em> — la fiche 309. <em>« <strong>Expressions</strong> as objects form an advanced part of R which will not be discussed in this guide, except indirectly when we discuss formulae used with modeling »</em> — la fiche 317.</p>
+<div class="cal plus"><span class="lab">Complément (R Language Definition §2.1.2).</span>
+<p> <em>« <strong>Lists are vectors</strong>, and the basic vector types are referred to as <strong>atomic vectors</strong> where it is necessary to exclude lists. »</em> Une liste <strong>est</strong> un vecteur : un « vecteur générique ». C'est pourquoi <code>length()</code>, <code>[</code>, <code>names()</code> marchent dessus exactement comme sur un vecteur numérique.</p>
+</div>
+<h3>1.2 Les deux attributs intrinsèques</h3>
+<div class="cal formel"><span class="lab">Définition (§3.1).</span>
+<p> <em>« By the <strong>mode</strong> of an object we mean <strong>the basic type of its fundamental constituents</strong>. This is a special case of a "property" of an object. <strong>Another property of every object is its <code>length</code>.</strong> The functions <strong><code>mode(object)</code></strong> and <strong><code>length(object)</code></strong> can be used to find out the mode and length of any defined structure. »</em></p>
+<p>*« Further properties of an object are usually provided by <strong><code>attributes(object)</code></strong>. <strong>Because of this, <code>mode</code> and <code>length</code> are also called "intrinsic attributes" of an object.</strong> »*</p>
+</div>
+<p><strong>L'exemple du cours.</strong> <em>« if <code>z</code> is a complex vector of length 100, then in an expression <strong><code>mode(z)</code> is the character string <code>"complex"</code></strong> and <strong><code>length(z)</code> is 100</strong>. »</em></p>
+<p class="cal piege"> <strong>La note 2 du §3.1 tempère.</strong> <em>« Note however that <strong><code>length(object)</code> does not always contain intrinsic useful information</strong>, e.g. when <code>object</code> is a function. »</em></p>
+<p class="cal piege"> <strong>La note 1 du §3.1 annonce le concept 2.</strong> <em>« <strong><code>numeric</code> mode is actually an amalgam of two distinct modes, namely <code>integer</code> and <code>double precision</code></strong> »</em>. C'est la raison d'être de <code>typeof()</code> et de <code>storage.mode()</code>.</p>
+<h2 data-prio="must">Concept 2 — <code>mode</code>, <code>typeof</code>, <code>storage.mode</code> : trois questions différentes</h2>
+<p>Le cours d'introduction ne parle que de <code>mode</code>. La <em>R Language Definition</em> (chapitre 2) explique pourquoi cela ne suffit pas.</p>
+<div class="cal formel"><span class="lab">Définition (R Language Definition §2).</span>
+<p> *« The R specific function <strong><code>typeof</code> returns the type of an R object</strong>. Note that in the C code underlying R, <strong>all objects are pointers to a structure with <code>typedef SEXPREC</code></strong> ; the different R data types are represented in C by <strong><code>SEXPTYPE</code></strong>, which determines how the information in the various parts of the structure is used. »*</p>
+<p>*« Function <strong><code>mode</code></strong> gives information about the mode of an object <strong>in the sense of Becker, Chambers &amp; Wilks (1988)</strong>, and is <strong>more compatible with other implementations of the S language</strong>. Finally, the function <strong><code>storage.mode</code></strong> returns the storage mode … <strong>It is generally used when calling functions written in another language, such as C or FORTRAN</strong>, to ensure that R objects have the data type expected by the routine being called. (<strong>In the S language, vectors with integer or real values are both of mode <code>"numeric"</code>, so their storage modes need to be distinguished.</strong>) »*</p>
+</div>
+<p><strong>L'exemple du manuel, qui montre les trois réponses sur le même objet :</strong></p>
+<pre><code class="language-r">x &lt;- 1:3
+typeof(x)         # "integer"
+mode(x)           # "numeric"
+storage.mode(x)   # "integer"
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>Fonction</th>
+<th>Répond à la question</th>
+<th>Sert à</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong><code>typeof()</code></strong></td>
+<td><em>qu'est-ce que R stocke <strong>vraiment</strong> ?</em></td>
+<td>comprendre, déboguer</td>
+</tr>
+<tr>
+<td><strong><code>mode()</code></strong></td>
+<td><em>quel est le type <strong>au sens de S</strong> ?</em></td>
+<td>la compatibilité, le code hérité</td>
+</tr>
+<tr>
+<td><strong><code>storage.mode()</code></strong></td>
+<td><em>sous quelle <strong>forme mémoire</strong> ?</em></td>
+<td>appeler du <strong>C ou du Fortran</strong> (fiche 320)</td>
+</tr>
+</tbody></table>
+<h3>2.1 Les six types de vecteurs</h3>
+<blockquote>
+<p><strong>Règle (§2.1.1).</strong> *« R has <strong>six basic ("atomic") vector types</strong> : <strong><code>logical</code>, <code>integer</code>, <code>real</code>, <code>complex</code>, <code>character</code></strong> (in C aka <code>string</code>) <strong>and <code>raw</code></strong>. »*</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th><code>typeof</code></th>
+<th><code>mode</code></th>
+<th><code>storage.mode</code></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>logical</code></td>
+<td><code>logical</code></td>
+<td><code>logical</code></td>
+</tr>
+<tr>
+<td><code>integer</code></td>
+<td><strong><code>numeric</code></strong></td>
+<td><code>integer</code></td>
+</tr>
+<tr>
+<td><code>double</code></td>
+<td><strong><code>numeric</code></strong></td>
+<td><code>double</code></td>
+</tr>
+<tr>
+<td><code>complex</code></td>
+<td><code>complex</code></td>
+<td><code>complex</code></td>
+</tr>
+<tr>
+<td><code>character</code></td>
+<td><code>character</code></td>
+<td><code>character</code></td>
+</tr>
+<tr>
+<td><code>raw</code></td>
+<td><code>raw</code></td>
+<td><code>raw</code></td>
+</tr>
+</tbody></table>
+<p><strong>Les deux lignes qui expliquent tout</strong> sont <code>integer</code> et <code>double</code> : deux <code>typeof</code> distincts pour <strong>un seul</strong> <code>mode</code>. C'est exactement la note 1 du §3.1 d'<em>An Introduction to R</em> — <em>« <code>numeric</code> mode is actually an amalgam of two distinct modes »</em>.</p>
+<blockquote>
+<p><strong>La phrase qui ferme la question (§2.1.1).</strong> <em>« <strong>Single numbers, such as <code>4.2</code>, and strings, such as <code>"four point two"</code> are still vectors, of length 1 ; there are no more basic types.</strong> Vectors with length zero are possible (<strong>and useful</strong>). »</em></p>
+<p><em>« Vectors can be thought of as <strong>contiguous cells containing data</strong>. Cells are accessed through <strong>indexing operations</strong> such as <code>x[5]</code>. »</em></p>
+</blockquote>
+<h3>2.2 Le tableau complet des <code>typeof</code></h3>
+<div class="cal formel"><span class="lab">Notation (R Language Definition §2).</span>
+<p> <em>« The following table describes the possible values returned by <code>typeof</code> and what they are. »</em></p>
+</div>
+<table>
+<thead>
+<tr>
+<th><code>typeof</code></th>
+<th>Ce que c'est</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>"NULL"</code></td>
+<td><code>NULL</code></td>
+</tr>
+<tr>
+<td><code>"symbol"</code></td>
+<td><strong>un nom de variable</strong></td>
+</tr>
+<tr>
+<td><code>"pairlist"</code></td>
+<td>un objet <strong>pairlist</strong> (<em>mainly internal</em>)</td>
+</tr>
+<tr>
+<td><code>"closure"</code></td>
+<td><strong>une fonction</strong></td>
+</tr>
+<tr>
+<td><code>"environment"</code></td>
+<td><strong>un environnement</strong></td>
+</tr>
+<tr>
+<td><code>"promise"</code></td>
+<td>un objet <strong>servant à l'évaluation paresseuse</strong></td>
+</tr>
+<tr>
+<td><code>"language"</code></td>
+<td><strong>une construction du langage R</strong></td>
+</tr>
+<tr>
+<td><code>"special"</code></td>
+<td>une fonction interne qui <strong>n'évalue pas</strong> ses arguments</td>
+</tr>
+<tr>
+<td><code>"builtin"</code></td>
+<td>une fonction interne qui <strong>évalue</strong> ses arguments</td>
+</tr>
+<tr>
+<td><code>"char"</code></td>
+<td>une chaîne « scalaire » <strong>(interne seulement)</strong> </td>
+</tr>
+<tr>
+<td><code>"logical"</code></td>
+<td>un vecteur de valeurs <strong>logiques</strong></td>
+</tr>
+<tr>
+<td><code>"integer"</code></td>
+<td>un vecteur de valeurs <strong>entières</strong></td>
+</tr>
+<tr>
+<td><code>"double"</code></td>
+<td>un vecteur de valeurs <strong>réelles</strong></td>
+</tr>
+<tr>
+<td><code>"complex"</code></td>
+<td>un vecteur de valeurs <strong>complexes</strong></td>
+</tr>
+<tr>
+<td><code>"character"</code></td>
+<td>un vecteur de valeurs <strong>caractères</strong></td>
+</tr>
+<tr>
+<td><code>"..."</code></td>
+<td>la variable spéciale <strong>à nombre variable d'arguments</strong> </td>
+</tr>
+<tr>
+<td><code>"any"</code></td>
+<td>un type spécial qui <strong>apparie tous les types</strong> — <em>« there are no objects of this type »</em></td>
+</tr>
+<tr>
+<td><code>"expression"</code></td>
+<td>un objet <strong>expression</strong></td>
+</tr>
+<tr>
+<td><code>"list"</code></td>
+<td><strong>une liste</strong></td>
+</tr>
+<tr>
+<td><code>"bytecode"</code></td>
+<td>du <strong>code-octet</strong> <em>(interne seulement)</em> </td>
+</tr>
+<tr>
+<td><code>"externalptr"</code></td>
+<td>un <strong>pointeur externe</strong></td>
+</tr>
+<tr>
+<td><code>"weakref"</code></td>
+<td>une <strong>référence faible</strong></td>
+</tr>
+<tr>
+<td><code>"raw"</code></td>
+<td>un vecteur <strong>d'octets</strong></td>
+</tr>
+<tr>
+<td><code>"S4"</code></td>
+<td>un objet <strong>S4 qui n'est pas un objet simple</strong></td>
+</tr>
+</tbody></table>
+<p> <em>« Users <strong>cannot easily get hold of objects</strong> of types marked with a <code>***</code>. »</em></p>
+<div class="cal formel"><span class="lab">Remarque de lecture.</span>
+<p> Cette table est la carte du langage entier. Trois entrées méritent d'être repérées dès maintenant, parce que les fiches suivantes s'appuient dessus : <strong><code>closure</code></strong> (une fonction est un objet — fiche 309), <strong><code>promise</code></strong> (l'évaluation paresseuse — fiche 309), <strong><code>environment</code></strong> (la portée — fiche 310).</p>
+</div>
+<h2 data-prio="must">Concept 3 — La coercition</h2>
+<blockquote>
+<p><strong>Règle (§3.1).</strong> <em>« R caters for <strong>changes of mode almost anywhere it could be considered sensible to do so</strong> (and a few where it might not be). »</em></p>
+</blockquote>
+<p><strong>L'aller-retour du cours :</strong></p>
+<pre><code class="language-r">z &lt;- 0:9
+digits &lt;- as.character(z)   # c("0", "1", "2", ..., "9")
+d &lt;- as.integer(digits)     # « Now d and z are the same. »
+</code></pre>
+<p><em>« There is a <strong>large collection of functions of the form <code>as.something()</code></strong> for <strong>either coercion from one mode to another, or for investing an object with some other attribute it may not already possess</strong>. The reader should consult the different help files to become familiar with them. »</em></p>
+<blockquote>
+<p class="cal piege"> <strong>Le piège numérique, en note 3 du §3.1.</strong> <em>« In general, <strong>coercion from numeric to character and back again will not be exactly reversible</strong>, because of <strong>roundoff errors in the character representation</strong>. »</em></p>
+<p>L'aller-retour du cours est réversible <strong>parce que <code>0:9</code> sont des entiers</strong>. Avec des réels, l'écriture en caractères passe par un arrondi d'affichage, et le retour ne redonne pas exactement le même nombre. <strong>Ne jamais faire transiter des réels par une chaîne</strong> pour les manipuler.</p>
+</blockquote>
+<blockquote>
+<p class="cal piege"> <strong>La coercition efface tout (<em>R Language Definition</em> §2.2.6).</strong> <em>« <strong>Coercion drops all attributes.</strong> »</em> Coercer une matrice, c'est perdre son <code>dim</code> ; coercer un facteur, c'est perdre ses <code>levels</code>. C'est la règle la plus radicale du chapitre — et le concept 6 la remet dans son contexte.</p>
+</blockquote>
+<div class="cal plus"><span class="lab">Enrichissement pédagogique (hors cours) — la hiérarchie de coercition implicite.</span>
+<p> <em>An Introduction to R</em> décrit la coercition <strong>explicite</strong> (<code>as.…</code>). Il ne donne pas la règle de la coercition <strong>implicite</strong>, celle qui s'applique quand <code>c()</code> reçoit des modes mélangés. Elle se déduit néanmoins de la règle du §3.1 (« un vecteur doit être d'un seul mode ») : R choisit <strong>le mode le plus général capable de tout représenter</strong>, dans l'ordre
+$$\texttt{logical} \;\to\; \texttt{integer} \;\to\; \texttt{double} \;\to\; \texttt{complex} \;\to\; \texttt{character}$$
+Ainsi <code>c(TRUE, 1L)</code> est entier, <code>c(1L, 2.5)</code> est double, et <strong><code>c(1, "a")</code> est caractère</strong> — le <code>1</code> devient <code>"1"</code>. C'est la cause la plus fréquente d'une colonne « qui devrait être numérique » et ne l'est pas. <strong>Ce raisonnement n'est pas dans le cours ; il en est la conséquence.</strong></p>
+</div>
+<h2 data-prio="high">Concept 4 — Changer la longueur d'un objet</h2>
+<blockquote>
+<p><strong>Règle (§3.2).</strong> <em>« An "empty" object <strong>may still have a mode</strong>. »</em></p>
+</blockquote>
+<pre><code class="language-r">e &lt;- numeric()     # un vecteur VIDE de mode numerique
+</code></pre>
+<h3>4.1 Allonger — en écrivant hors des bornes</h3>
+<div class="cal methode"><span class="lab">Méthode (§3.2).</span>
+<p> <em>« Once an object of any size has been created, <strong>new components may be added to it simply by giving it an index value outside its previous range</strong>. »</em></p>
+</div>
+<pre><code class="language-r">e[3] &lt;- 17
+</code></pre>
+<p>*« now makes <code>e</code> a vector of <strong>length 3</strong>, (<strong>the first two components of which are at this point both <code>NA</code></strong>). »*</p>
+<p class="cal piege"> <strong>La condition (§3.2).</strong> <em>« This applies to <strong>any structure at all</strong>, <strong>provided the mode of the additional component(s) agrees with the mode of the object in the first place</strong>. »</em> Si le mode ne concorde pas, il n'y a pas d'erreur — il y a <strong>coercition de tout l'objet</strong> (concept 3).</p>
+<p><em>« This <strong>automatic adjustment of lengths</strong> of an object is used often, for example <strong>in the <code>scan()</code> function for input</strong> »</em> — fiche 307.</p>
+<h3>4.2 Raccourcir — par assignation ou par <code>length&lt;-</code></h3>
+<div class="cal methode"><span class="lab">Méthode (§3.2).</span>
+<p> <em>« Conversely, <strong>to truncate the size of an object requires only an assignment</strong> to do so. »</em></p>
+</div>
+<pre><code class="language-r">alpha &lt;- alpha[2 * 1:5]   # les composantes d'INDICE PAIR ; longueur 10 -&gt; 5
+length(alpha) &lt;- 3        # on ne garde que les trois premieres
+</code></pre>
+<p>*« makes it an object of length 5 consisting of just the former components <strong>with even index</strong>. (<strong>The old indices are not retained, of course.</strong>) »* Puis : <em>« and <strong>vectors can be extended (by missing values) in the same way</strong> »</em> — <code>length(alpha) &lt;- 20</code> allonge, en remplissant de <code>NA</code>.</p>
+<div class="cal intu"><span class="lab">Contrôle — vérifier 2 * 1:5.</span>
+<p> Le <code>:</code> étant prioritaire (fiche 301), <code>2 * 1:5</code> vaut <code>2 * c(1,2,3,4,5)</code> = <code>c(2,4,6,8,10)</code> — bien <strong>les indices pairs</strong>. Écrit <code>2 * (1:5)</code>, ce serait identique ; écrit <code>(2*1):5</code>, ce serait <code>2:5</code>. Le cours choisit l'écriture courte, mais elle repose entièrement sur la règle de priorité.</p>
+</div>
+<p><strong><code>length(x) &lt;- n</code> est une fonction de remplacement</strong> (fiche 302) : <code>`length&lt;-`(x, value = n)</code>. Elle <strong>tronque</strong> si <code>n</code> est plus petit, <strong>allonge par des <code>NA</code></strong> s'il est plus grand.</p>
+<h2 data-prio="must">Concept 5 — Les attributs</h2>
+<div class="cal formel"><span class="lab">Définition (§3.3).</span>
+<p> <em>« The function <strong><code>attributes(object)</code></strong> returns a <strong>list of all the non-intrinsic attributes</strong> currently defined for that object. The function <strong><code>attr(object, name)</code></strong> can be used to select a specific attribute. »</em></p>
+<p><em>« These functions are <strong>rarely used</strong>, except in rather special circumstances when some new attribute is being created for some particular purpose, for example <strong>to associate a creation date or an operator with an R object</strong>. <strong>The concept, however, is very important.</strong> »</em></p>
+<p class="cal piege"> <em>« <strong>Some care should be exercised when assigning or deleting attributes</strong> since they are <strong>an integral part of the object system used in R</strong>. »</em></p>
+</div>
+<p><strong>L'exemple qui fabrique une matrice à partir de rien (§3.3) :</strong></p>
+<pre><code class="language-r">attr(z, "dim") &lt;- c(10, 10)
+</code></pre>
+<p><em>« allows R to <strong>treat <code>z</code> as if it were a 10-by-10 matrix</strong>. »</em> Une ligne, un attribut — et <code>z</code> n'a pas bougé d'un octet.</p>
+<div class="cal plus"><span class="lab">Complément (R Language Definition §2.2).</span>
+<p> *« <strong>All objects except <code>NULL</code> can have one or more attributes</strong> attached to them. Attributes are <strong>stored as a pairlist where all elements are named</strong>, but should be thought of as <strong>a set of <code>name=value</code> pairs</strong>. A listing of the attributes can be obtained using <strong><code>attributes</code></strong> and set by <strong><code>attributes&lt;-</code></strong> ; individual components are accessed using <strong><code>attr</code></strong> and <strong><code>attr&lt;-</code></strong>. »*</p>
+<p class="cal piege"> <em>« Some attributes have <strong>special accessor functions</strong> (e.g. <strong><code>levels&lt;-</code></strong> for factors) and <strong>these should be used when available</strong>. In addition to <strong>hiding details of implementation</strong> they may <strong>perform additional operations</strong>. <strong>R attempts to intercept calls to <code>attr&lt;-</code> and to <code>attributes&lt;-</code> that involve the special attributes and enforces the consistency checks.</strong> »</em></p>
+</div>
+<p><strong>La règle pratique</strong> : passer par l'accesseur dédié (<code>names&lt;-</code>, <code>dim&lt;-</code>, <code>levels&lt;-</code>, <code>class&lt;-</code>) plutôt que par <code>attr&lt;-</code>. Non par élégance, mais parce que <strong>l'accesseur vérifie la cohérence</strong> et que <code>attr&lt;-</code> ne le fait qu'en partie.</p>
+<h3>5.1 Les cinq attributs spéciaux</h3>
+<p><strong><code>names</code> (§2.2.1).</strong> *« A <code>names</code> attribute, <strong>when present, labels the individual elements of a vector or list</strong>. When an object is printed the <code>names</code> attribute, when present, <strong>is used to label the elements</strong>. The <code>names</code> attribute <strong>can also be used for indexing purposes</strong>, for example <strong><code>quantile(x)["25%"]</code></strong>. »*</p>
+<p><em>« One may get and set the names using <code>names</code> and <code>names&lt;-</code> constructions. <strong>The latter will perform the necessary consistency checks</strong> to ensure that the <code>names</code> attribute has <strong>the proper type and length</strong>. »</em></p>
+<p class="cal piege"> <em>« <strong>Pairlists and one-dimensional arrays are treated specially.</strong> For pairlist objects, <strong>a virtual <code>names</code> attribute is used</strong> ; the <code>names</code> attribute is really <strong>constructed from the tags</strong> of the list components. <strong>For one-dimensional arrays the <code>names</code> attribute really accesses <code>dimnames[[1]]</code>.</strong> »</em> — le complément exact de ce qu'annonçait la fiche 302 sur les tableaux à une dimension.</p>
+<p><strong><code>dim</code> (§2.2.2).</strong> <em>« The <code>dim</code> attribute is used to <strong>implement arrays</strong>. The content of the array is <strong>stored in a vector in column-major order</strong> and the <code>dim</code> attribute is <strong>a vector of integers specifying the respective extents</strong> of the array. <strong>R ensures that the length of the vector is the product of the lengths of the dimensions.</strong> The length of <strong>one or more dimensions may be zero</strong>. »</em></p>
+<p class="cal piege"> <em>« <strong>A vector is not the same as a one-dimensional array</strong> since the latter <strong>has a <code>dim</code> attribute of length one</strong>, whereas the former <strong>has no <code>dim</code> attribute</strong>. »</em></p>
+<div class="cal intu"><span class="lab">En clair — « colonne-majeur ».</span>
+<p> Une matrice $2\times2$ remplie de <code>1:4</code> se lit <strong>colonne par colonne</strong> :
+$$\begin{pmatrix}1 &amp; 3\\ 2 &amp; 4\end{pmatrix}$$
+C'est ce que montrait l'exemple <code>matrix(1:4, 2)</code> de la fiche 302. C'est aussi ce qui rend <code>m[1]</code> prévisible : le premier élément <strong>du vecteur sous-jacent</strong> est en haut à gauche, le deuxième <strong>en dessous</strong>, pas à droite.</p>
+</div>
+<p><strong><code>dimnames</code> (§2.2.3).</strong> <em>« Arrays <strong>may name each dimension separately</strong> using the <code>dimnames</code> attribute which is <strong>a list of character vectors</strong>. <strong>The <code>dimnames</code> list may itself have names</strong>, which are then <strong>used for extent headings when printing arrays</strong>. »</em> — l'explication de l'en-tête d'un <code>table()</code>.</p>
+<p><strong><code>class</code> (§2.2.4).</strong> <em>« R has an <strong>elaborate class system</strong>, principally controlled via the <code>class</code> attribute. This attribute is <strong>a character vector containing the list of classes that an object inherits from</strong>. <strong>This forms the basis of the "generic methods" functionality in R.</strong> »</em></p>
+<blockquote>
+<p class="cal piege"> <strong>L'avertissement le plus fort du chapitre.</strong> <em>« This attribute <strong>can be accessed and manipulated virtually without restriction by users</strong>. <strong>There is no checking that an object actually contains the components that class methods expect.</strong> Thus, <strong>altering the <code>class</code> attribute should be done with caution</strong>, and <strong>when they are available specific creation and coercion functions should be preferred</strong>. »</em></p>
+<p>Poser <code>class(x) &lt;- "data.frame"</code> sur un objet quelconque ne le rend pas data frame : cela <strong>fait chercher à R les méthodes des data frames</strong> sur un objet qui n'a pas leurs composantes. La panne survient <strong>au premier appel générique</strong>, loin de la ligne fautive.</p>
+</blockquote>
+<p><strong><code>tsp</code> (§2.2.5).</strong> <em>« The <code>tsp</code> attribute is used to hold <strong>parameters of time series : start, end, and frequency</strong>. This construction is mainly used to handle <strong>series with periodic substructure</strong> such as monthly or quarterly data. »</em></p>
+<details class="cor">
+<summary><strong>Exercice résolu — fabriquer une matrice sans <code>matrix()</code>, et retrouver le vecteur</strong></summary><div class="in">
+
+<p><strong>Énoncé.</strong> Partant de <code>z &lt;- 1:100</code>, en faire une matrice 10 × 10 en n'utilisant que des attributs. Puis revenir au vecteur.</p>
+<p><em>Étape 1 — l'état initial.</em> <code>z</code> est un vecteur <code>integer</code> de longueur 100, <strong>sans aucun attribut</strong> : <code>attributes(z)</code> rend <code>NULL</code>.</p>
+<p><em>Étape 2 — poser <code>dim</code>, exactement comme au §3.3.</em></p>
+<pre><code class="language-r">attr(z, "dim") &lt;- c(10, 10)
+</code></pre>
+<p><em>« allows R to treat <code>z</code> as if it were a 10-by-10 matrix ».</em></p>
+<p><em>Étape 3 — vérifier la contrainte de cohérence.</em> <em>« R ensures that <strong>the length of the vector is the product of the lengths of the dimensions</strong> »</em> (§2.2.2). Ici $10\times10 = 100 = \texttt{length(z)}$ : la pose réussit. Avec <code>c(10, 11)</code>, elle échouerait — c'est le contrôle de cohérence dont parle le §2.2.</p>
+<p><em>Étape 4 — constater ce qui a changé.</em> Rien, dans les données. <code>typeof(z)</code> vaut toujours <code>"integer"</code>, <code>length(z)</code> toujours <code>100</code>. Mais <code>class(z)</code> rend désormais <code>"matrix" "array"</code>, et l'affichage devient tabulaire. <strong>L'attribut a changé la lecture, pas le contenu.</strong></p>
+<p><em>Étape 5 — l'ordre de remplissage.</em> <em>« The content of the array is stored in a vector <strong>in column-major order</strong> »</em>. Donc <code>z[1,1]</code> vaut 1, <code>z[2,1]</code> vaut <strong>2</strong>, et <code>z[1,2]</code> vaut <strong>11</strong>. C'est bien la <strong>première colonne</strong> qui se remplit d'abord.</p>
+<p><em>Étape 6 — l'écriture recommandée.</em> Le §2.2 le dit : <em>« some attributes have <strong>special accessor functions</strong> … <strong>these should be used when available</strong> »</em>. La forme préférable est donc</p>
+<pre><code class="language-r">dim(z) &lt;- c(10, 10)
+</code></pre>
+<p>qui est <strong><code>`dim&lt;-`(z, value = c(10,10))</code></strong> (fiche 302) et applique les mêmes contrôles de façon explicite.</p>
+<p><em>Étape 7 — revenir au vecteur.</em> Il suffit de <strong>retirer l'attribut</strong>, en lui assignant <code>NULL</code> :</p>
+<pre><code class="language-r">dim(z) &lt;- NULL      # z redevient un vecteur de longueur 100
+</code></pre>
+<p><em>Étape 8 — la leçon.</em> La matrice n'a jamais existé comme <strong>type</strong>. Elle a existé comme <strong>lecture</strong>. C'est cela, la phrase du §2.2 : <em>« Matrices and arrays are <strong>simply vectors</strong> with the attribute <code>dim</code> … attached »</em>.</p>
+</div></details>
+
+<h2 data-prio="high">Concept 6 — Quand les attributs survivent, et quand ils disparaissent</h2>
+<blockquote>
+<p><strong>Règle (<em>R Language Definition</em> §2.2.6).</strong> <em>« Whether attributes should be copied when an object is altered is <strong>a complex area</strong>, but <strong>there are some general rules</strong> (Becker, Chambers &amp; Wilks, 1988, pp. 144–6). »</em></p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>Opération</th>
+<th>Ce qui arrive aux attributs</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Fonction scalaire</strong> — <em>« those which operate element-by-element on a vector and whose output is similar to the input »</em></td>
+<td>*« should <strong>preserve attributes</strong> (<strong>except perhaps <code>class</code></strong>) »*</td>
+</tr>
+<tr>
+<td><strong>Opération binaire</strong></td>
+<td><em>« normally <strong>copy most attributes from the longer argument</strong> (and if they are of the same length <strong>from both, preferring the values on the first</strong>) »</em>. Ici <em>« most »</em> signifie <strong>tout sauf <code>names</code>, <code>dim</code> et <code>dimnames</code></strong>, qui sont <strong>posés comme il convient par le code de l'opérateur</strong></td>
+</tr>
+<tr>
+<td><strong>Sous-ensemble</strong> (autre que par un index vide)</td>
+<td>*« generally <strong>drops all attributes except <code>names</code>, <code>dim</code> and <code>dimnames</code></strong>, which are <strong>reset as appropriate</strong> »*</td>
+</tr>
+<tr>
+<td><strong>Sous-assignation</strong></td>
+<td><em>« generally <strong>preserves attributes even if the length is changed</strong> »</em></td>
+</tr>
+<tr>
+<td><strong>Coercition</strong></td>
+<td> <em>« <strong>drops all attributes</strong> »</em></td>
+</tr>
+<tr>
+<td><strong>Tri</strong> (méthode par défaut)</td>
+<td>*« <strong>drops all attributes except <code>names</code></strong>, which are <strong>sorted along with the object</strong> »*</td>
+</tr>
+</tbody></table>
+<div class="cal intu"><span class="lab">En clair — pourquoi cette table est utile.</span>
+<p> Elle répond à la question « où sont passés mes attributs ? » avant même qu'on se la pose. Les deux lignes à retenir sont <strong>la coercition</strong> (elle efface <strong>tout</strong>) et <strong>le sous-ensemble</strong> (il n'épargne que <code>names</code>, <code>dim</code>, <code>dimnames</code>). Un attribut maison — une date de création, une unité de mesure — <strong>ne survit pas à un <code>x[1:5]</code></strong>.</p>
+<p>Et la ligne <strong>sous-assignation</strong> est son contraire exact : <code>x[1:5] &lt;- v</code> <strong>préserve</strong> les attributs, <em>« even if the length is changed »</em>. Lire et écrire ne se comportent pas pareil.</p>
+</div>
+<h2 data-prio="must">Concept 7 — La classe</h2>
+<div class="cal formel"><span class="lab">Définition (§3.4).</span>
+<p> *« <strong>All objects in R have a class</strong>, reported by the function <strong><code>class</code></strong>. <strong>For simple vectors this is just the mode</strong> — for example <code>"numeric"</code>, <code>"logical"</code>, <code>"character"</code> or <code>"list"</code> — but <strong><code>"matrix"</code>, <code>"array"</code>, <code>"factor"</code> and <code>"data.frame"</code> are other possible values.</strong> »*</p>
+</div>
+<div class="cal formel"><span class="lab">Définition (§3.4).</span>
+<p> <em>« <strong>A special attribute known as the class of the object is used to allow for an object-oriented style of programming in R.</strong> For example if an object has class <code>"data.frame"</code>, <strong>it will be printed in a certain way</strong>, the <strong><code>plot()</code></strong> function will display it graphically <strong>in a certain way</strong>, and other so-called <strong>generic functions</strong> such as <strong><code>summary()</code></strong> will <strong>react to it as an argument in a way sensitive to its class</strong>. »</em></p>
+</div>
+<p>C'est la mécanique déjà observée à l'annexe A (fiche 300) : <code>plot(Expt, Speed)</code> produit des boîtes à moustaches <strong>parce que <code>Expt</code> est un facteur</strong>. La fonction est la même ; <strong>la classe choisit la méthode</strong>. Voir fiche 311.</p>
+<p><em>« A different style using <strong>"formal" or "S4" classes</strong> is provided in package <code>methods</code>. »</em> (note 4)</p>
+<h3>7.1 <code>unclass()</code> — regarder dessous</h3>
+<div class="cal methode"><span class="lab">Méthode (§3.4).</span>
+<p> <em>« <strong>To remove temporarily the effects of class, use the function <code>unclass()</code>.</strong> »</em></p>
+</div>
+<pre><code class="language-r">winter             # affiche « in data frame form, which is rather like a matrix »
+unclass(winter)    # affiche « as an ordinary list »
+</code></pre>
+<p><em>« <strong>Only in rather special situations do you need to use this facility</strong>, but <strong>one is when you are learning to come to terms with the idea of class and generic functions</strong>. »</em></p>
+<div class="cal methode"><span class="lab">Méthode — l'usage pédagogique que le cours recommande explicitement.</span>
+<p> <code>unclass()</code> est <strong>l'outil d'apprentissage</strong> du chapitre : il montre qu'un data frame <strong>est une liste</strong>, qu'un facteur <strong>est un vecteur d'entiers</strong>, qu'une matrice <strong>est un vecteur</strong>. Chaque fois qu'un objet R paraît magique, <code>unclass()</code> — ou <code>attributes()</code> — dissipe la magie.</p>
+</div>
+<h2 data-prio="mid">Concept 8 — Trois objets à connaître dès maintenant</h2>
+<h3>8.1 <code>NULL</code> — l'absence, pas le vide</h3>
+<div class="cal formel"><span class="lab">Définition (R Language Definition §2.1.6).</span>
+<p> *« There is a special object called <strong><code>NULL</code></strong>. It is used <strong>whenever there is a need to indicate or specify that an object is absent</strong>. <strong>It should not be confused with a vector or list of zero length.</strong> »*</p>
+<p>*« The <code>NULL</code> object <strong>has no type and no modifiable properties</strong>. <strong>There is only one <code>NULL</code> object in R</strong>, to which all instances refer. To test for <code>NULL</code> use <strong><code>is.null</code></strong>. <strong>You cannot set attributes on <code>NULL</code>.</strong> »*</p>
+</div>
+<table>
+<thead>
+<tr>
+<th></th>
+<th><code>NULL</code></th>
+<th><code>numeric(0)</code></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Ce que c'est</td>
+<td><strong>l'absence d'objet</strong></td>
+<td><strong>un vecteur numérique vide</strong></td>
+</tr>
+<tr>
+<td>A-t-il un type ?</td>
+<td><strong>non</strong></td>
+<td>oui — <code>"double"</code></td>
+</tr>
+<tr>
+<td><code>length()</code></td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr>
+<td>Peut porter des attributs ?</td>
+<td><strong>non</strong></td>
+<td>oui</td>
+</tr>
+</tbody></table>
+<p class="cal piege"> Les deux ont une <strong>longueur nulle</strong>, et ce sont <strong>deux choses différentes</strong>. C'est pourquoi <code>x$inexistant</code> rend <code>NULL</code> (fiche 302) et non <code>character(0)</code> : l'élément <strong>n'est pas là</strong>, il n'est pas <em>vide</em>.</p>
+<h3>8.2 Les environnements — la seule chose que R ne copie pas</h3>
+<blockquote>
+<p class="cal piege"> <strong>Règle (<em>R Language Definition</em> §2.1.10).</strong> <em>« <strong>Unlike most other R objects, environments are not copied when passed to functions or used in assignments.</strong> Thus, <strong>if you assign the same environment to several symbols and change one, the others will change too.</strong> In particular, <strong>assigning attributes to an environment can lead to surprises.</strong> »</em></p>
+</blockquote>
+<p>C'est <strong>l'exception à la sémantique de copie</strong> décrite en fiche 302 (le mécanisme <code>`*tmp*`</code>). Tout le reste de R se comporte par valeur ; les environnements se comportent <strong>par référence</strong>. La conséquence est double : ils servent à contourner l'absence d'effet de bord quand on en a besoin, et ils produisent des bugs impossibles à comprendre quand on ne sait pas qu'ils sont là. Voir fiche 310.</p>
+<p>*« Environments can be thought of as consisting of two things : <strong>a frame</strong>, consisting of a set of <strong>symbol-value pairs</strong>, and <strong>an enclosure</strong>, a pointer to an enclosing environment. … <strong>Environments form a tree structure</strong> in which the enclosures play the role of parents. The tree of environments <strong>is rooted in an empty environment</strong>, available through <strong><code>emptyenv()</code></strong>, which has no parent. It is the direct parent of <strong>the environment of the base package</strong> (<code>baseenv()</code>). »*</p>
+<h3>8.3 Les promesses — pourquoi les arguments ne sont pas évalués tout de suite</h3>
+<div class="cal formel"><span class="lab">Définition (§2.1.8).</span>
+<p> <em>« <strong>Promise objects are part of R's lazy evaluation mechanism.</strong> They contain <strong>three slots : a value, an expression, and an environment.</strong> When a function is called the arguments are matched and then <strong>each of the formal arguments is bound to a promise</strong>. The expression that was given for that formal argument <strong>and a pointer to the environment the function was called from</strong> are stored in the promise. »</em></p>
+<p><em>« <strong>Until that argument is accessed there is no value associated with the promise.</strong> When the argument is accessed, <strong>the stored expression is evaluated in the stored environment</strong>, and the result is returned. <strong>The result is also saved by the promise.</strong> »</em></p>
+</div>
+<p>C'est le mécanisme qui explique qu'un argument jamais utilisé puisse être invalide sans conséquence, et que <strong><code>substitute</code></strong> puisse retrouver <strong>le texte</strong> de ce qui a été passé : <em>« The <code>substitute</code> function will <strong>extract the content of the expression slot</strong> »</em> (fiche 317).</p>
+<p class="cal piege"> <em>« There is <strong>generally no way in R code to check whether an object is a promise or not</strong>, nor is there a way to use R code to determine the environment of a promise. »</em></p>
+<h2 data-prio="low">Concept 9 — Les objets composés spéciaux</h2>
+<p>Le chapitre 2 de la <em>R Language Definition</em> se clôt sur deux structures que les fiches 304 et 306 traiteront en détail. Leur <strong>définition en termes d'attributs</strong> appartient toutefois à cette fiche-ci.</p>
+<div class="cal formel"><span class="lab">Définition — un facteur (§2.3.1).</span>
+<p> <em>« Factors are used to describe items that can have <strong>a finite number of values</strong> (gender, social class, etc.). <strong>A factor has a <code>levels</code> attribute and class <code>"factor"</code>.</strong> Optionally, it may also contain a <strong><code>contrasts</code></strong> attribute which controls the parametrisation used when the factor is used in a modeling function. »</em></p>
+<p>*« A factor may be <strong>purely nominal</strong> or may have <strong>ordered categories</strong>. In the latter case, it should be defined as such and have <strong>a class vector <code>c("ordered", "factor")</code></strong>. »*</p>
+<p class="cal piege"> <em>« Factors are currently implemented using <strong>an integer array to specify the actual levels</strong> and a second array of names that are mapped to the integers. <strong>Rather unfortunately users often make use of the implementation in order to make some calculations easier. This, however, is an implementation issue and is not guaranteed to hold in all implementations of R.</strong> »</em></p>
+</div>
+<p><strong>Cette mise en garde est la source du piège de la fiche 302</strong> — indexer par un facteur revient à <code>x[as.integer(i)]</code>. Le manuel dit ici que <strong>s'appuyer là-dessus est une faute</strong>, même si cela marche.</p>
+<div class="cal formel"><span class="lab">Définition — un data frame (§2.3.2).</span>
+<p> <em>« Data frames are the R structures which <strong>most closely mimic the SAS or SPSS data set</strong>, i.e. <strong>a "cases by variables" matrix of data</strong>. »</em></p>
+<p><em>« <strong>A data frame is a list of vectors, factors, and/or matrices all having the same length</strong> (number of rows in the case of matrices). In addition, a data frame generally has a <strong><code>names</code></strong> attribute labeling <strong>the variables</strong> and a <strong><code>row.names</code></strong> attribute for labeling <strong>the cases</strong>. »</em></p>
+<p><em>« A data frame <strong>can contain a list</strong> that is the same length as the other components. The list can contain elements of <strong>differing lengths</strong>, thereby providing a data structure for <strong>ragged arrays</strong>. <strong>However, as of this writing such arrays are not generally handled correctly.</strong> »</em></p>
+</div>
+<h2>Comment reconnaître le type d'exercice</h2>
+<table>
+<thead>
+<tr>
+<th>Le signal dans l'énoncé</th>
+<th>Ce qu'il faut mobiliser</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>« quel est le type de cet objet ? »</td>
+<td><strong>trois réponses possibles</strong> : <code>typeof</code>, <code>mode</code>, <code>storage.mode</code></td>
+</tr>
+<tr>
+<td>« pourquoi <code>mode</code> dit <code>numeric</code> et <code>typeof</code> dit <code>integer</code> ? »</td>
+<td><code>numeric</code> est <strong>un amalgame</strong> d'<code>integer</code> et de <code>double</code></td>
+</tr>
+<tr>
+<td>« je prépare un appel à du C »</td>
+<td><strong><code>storage.mode()</code></strong></td>
+</tr>
+<tr>
+<td>« ma colonne numérique est devenue du texte »</td>
+<td><strong>coercition implicite</strong> : un vecteur n'a <strong>qu'un seul mode</strong></td>
+</tr>
+<tr>
+<td>« mon aller-retour numérique ne redonne pas la même valeur »</td>
+<td><em>« will <strong>not be exactly reversible</strong>, because of <strong>roundoff errors</strong> »</em></td>
+</tr>
+<tr>
+<td>« où sont passés mes attributs ? »</td>
+<td>table de <strong>la copie des attributs</strong> — coercition et sous-ensemble effacent</td>
+</tr>
+<tr>
+<td>« comment faire une matrice à partir d'un vecteur ? »</td>
+<td>poser <strong><code>dim</code></strong> — <em>« matrices are <strong>simply vectors</strong> with the attribute <code>dim</code> »</em></td>
+</tr>
+<tr>
+<td>« pourquoi <code>m[1,2]</code> n'est pas le deuxième élément ? »</td>
+<td>ordre <strong>colonne-majeur</strong></td>
+</tr>
+<tr>
+<td>« <code>length()</code> de ma matrice rend le mauvais nombre »</td>
+<td>il rend le <strong>nombre de cases</strong> — le produit des extensions</td>
+</tr>
+<tr>
+<td>« pourquoi mon objet s'affiche bizarrement ? »</td>
+<td>son <strong><code>class</code></strong> — voir dessous avec <strong><code>unclass()</code></strong></td>
+</tr>
+<tr>
+<td>« je change la classe et tout casse »</td>
+<td><em>« <strong>there is no checking</strong> that an object actually contains the components that class methods expect »</em></td>
+</tr>
+<tr>
+<td>« allonger un vecteur »</td>
+<td>écrire <strong>hors des bornes</strong>, ou <code>length(x) &lt;- n</code></td>
+</tr>
+<tr>
+<td>« les premiers éléments sont <code>NA</code> »</td>
+<td>l'allongement remplit <strong>de <code>NA</code></strong></td>
+</tr>
+<tr>
+<td>« <code>NULL</code> ou vecteur vide ? »</td>
+<td><strong>absence</strong> contre <strong>vide typé</strong> — <code>is.null()</code></td>
+</tr>
+<tr>
+<td>« je modifie un objet dans une fonction et l'original change »</td>
+<td>c'est <strong>un environnement</strong> — la seule chose non copiée</td>
+</tr>
+<tr>
+<td>« à quoi sert <code>substitute</code> ? »</td>
+<td>à lire <strong>la fente expression</strong> d'une <strong>promesse</strong></td>
+</tr>
+</tbody></table>
+<h2>Comment résoudre ce type d'exercice</h2>
+<p><strong>Protocole « disséquer un objet inconnu » — 5 étapes.</strong></p>
+<ol>
+<li><strong><code>class(x)</code></strong> — comment R va le traiter.</li>
+<li><strong><code>typeof(x)</code></strong> — ce qu'il est réellement en mémoire.</li>
+<li><strong><code>length(x)</code></strong> — combien d'éléments <strong>du vecteur sous-jacent</strong>.</li>
+<li><strong><code>attributes(x)</code></strong> — tout ce qui n'est pas intrinsèque : <code>dim</code>, <code>names</code>, <code>levels</code>, <code>class</code>…</li>
+<li><strong><code>unclass(x)</code></strong> ou <code>str(x)</code> — regarder dessous. <em>« one [situation] is when you are learning to come to terms with the idea of class and generic functions »</em>.</li>
+</ol>
+<p><strong>Protocole « poser ou retirer un attribut » — 4 étapes.</strong></p>
+<ol>
+<li>Préférer <strong>l'accesseur dédié</strong> (<code>names&lt;-</code>, <code>dim&lt;-</code>, <code>levels&lt;-</code>, <code>class&lt;-</code>) à <code>attr&lt;-</code> : il <strong>vérifie la cohérence</strong> et peut faire davantage.</li>
+<li>Vérifier la <strong>contrainte de longueur</strong> : pour <code>dim</code>, <em>« the length of the vector is <strong>the product</strong> of the lengths of the dimensions »</em>.</li>
+<li>Pour <strong>retirer</strong> un attribut, lui assigner <strong><code>NULL</code></strong>.</li>
+<li>Se rappeler que <strong><code>NULL</code> n'accepte aucun attribut</strong> et qu'un attribut maison <strong>ne survit pas à un sous-ensemble</strong>.</li>
+</ol>
+<p><strong>Protocole « diagnostiquer une coercition non voulue » — 4 étapes.</strong></p>
+<ol>
+<li><strong><code>typeof()</code></strong> avant et après l'opération suspecte.</li>
+<li>Chercher <strong>le mélange de modes</strong> : un seul <code>"a"</code> dans un <code>c()</code> fait passer <strong>tout</strong> le vecteur en caractère.</li>
+<li>Vérifier si l'opération est <strong>de la famille qui efface</strong> : coercition (tout), sous-ensemble (tout sauf <code>names</code>/<code>dim</code>/<code>dimnames</code>), tri (tout sauf <code>names</code>).</li>
+<li>Corriger <strong>à la source</strong> — au moment de la construction du vecteur — plutôt qu'après coup par un <code>as.numeric()</code> qui peut introduire des <code>NA</code>.</li>
+</ol>
+<h2 data-prio="must">Common mistakes</h2>
+<table>
+<thead>
+<tr>
+<th>Erreur</th>
+<th>Correction</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Croire que <code>mode</code> et <code>typeof</code> disent la même chose</td>
+<td><code>mode</code> <strong>amalgame</strong> <code>integer</code> et <code>double</code> sous <code>numeric</code></td>
+</tr>
+<tr>
+<td>Utiliser <code>mode()</code> pour préparer un appel C</td>
+<td>c'est <strong><code>storage.mode()</code></strong></td>
+</tr>
+<tr>
+<td>Croire qu'un vecteur peut mélanger les modes</td>
+<td><em>« <strong>must have their values all of the same mode</strong> »</em> — sinon <strong>coercition</strong></td>
+</tr>
+<tr>
+<td>Croire qu'un vecteur vide n'a pas de mode</td>
+<td><code>character(0)</code>, <code>numeric(0)</code> — <strong>le vide est typé</strong></td>
+</tr>
+<tr>
+<td>Faire transiter des réels par une chaîne</td>
+<td><em>« <strong>not exactly reversible</strong>, because of roundoff errors »</em></td>
+</tr>
+<tr>
+<td>S'attendre à retrouver ses attributs après un <code>as.…</code></td>
+<td><em>« <strong>coercion drops all attributes</strong> »</em></td>
+</tr>
+<tr>
+<td>S'attendre à les retrouver après <code>x[1:5]</code></td>
+<td>seuls <strong><code>names</code>, <code>dim</code>, <code>dimnames</code></strong> survivent</td>
+</tr>
+<tr>
+<td>Croire que la sous-assignation efface comme le sous-ensemble</td>
+<td>elle <strong>préserve</strong>, <em>« even if the length is changed »</em></td>
+</tr>
+<tr>
+<td>Croire qu'une matrice est un type</td>
+<td>c'est <strong>un vecteur + <code>dim</code></strong></td>
+</tr>
+<tr>
+<td>Attendre un remplissage ligne par ligne</td>
+<td>l'ordre est <strong>colonne-majeur</strong></td>
+</tr>
+<tr>
+<td>Croire <code>length(m)</code> égal au nombre de lignes</td>
+<td>c'est le <strong>produit des extensions</strong></td>
+</tr>
+<tr>
+<td>Confondre vecteur et tableau à une dimension</td>
+<td>le second <strong>a un <code>dim</code> de longueur 1</strong></td>
+</tr>
+<tr>
+<td>Poser <code>dim</code> incohérent avec la longueur</td>
+<td><em>« R <strong>ensures</strong> that the length … is the product »</em> → erreur</td>
+</tr>
+<tr>
+<td>Utiliser <code>attr&lt;-</code> là où existe un accesseur</td>
+<td>l'accesseur <strong>contrôle la cohérence</strong> et fait parfois plus</td>
+</tr>
+<tr>
+<td>Changer <code>class</code> pour « convertir » un objet</td>
+<td><em>« there is <strong>no checking</strong> … »</em> — panne <strong>différée</strong></td>
+</tr>
+<tr>
+<td>Croire <code>NULL</code> équivalent à un vecteur vide</td>
+<td><em>« <strong>should not be confused</strong> with a vector or list of zero length »</em></td>
+</tr>
+<tr>
+<td>Poser un attribut sur <code>NULL</code></td>
+<td><strong>impossible</strong></td>
+</tr>
+<tr>
+<td>Croire que tout est copié en R</td>
+<td><strong>les environnements ne le sont pas</strong></td>
+</tr>
+<tr>
+<td>Compter sur le codage entier des facteurs</td>
+<td><em>« an <strong>implementation issue</strong> … <strong>not guaranteed</strong> »</em></td>
+</tr>
+<tr>
+<td>Croire qu'un data frame est une matrice</td>
+<td>c'est <strong>une liste</strong> de vecteurs de même longueur</td>
+</tr>
+<tr>
+<td>Croire <code>length()</code> toujours informatif</td>
+<td><em>« does <strong>not always</strong> contain intrinsic useful information, e.g. when object is a function »</em></td>
+</tr>
+</tbody></table>
+<h2>Ultimate Review</h2>
+<p><strong>Atomique contre récursif.</strong> <strong>Atomique</strong> : <code>logical</code>, <code>numeric</code>, <code>complex</code>, <code>character</code>, <code>raw</code> — <em>« their components are <strong>all of the same type, or mode</strong> »</em>. <strong>Récursif</strong> : <code>list</code>, <code>function</code>, <code>expression</code> — <em>« their components can themselves be lists in their own right »</em>. <strong>Une liste est un vecteur</strong> (« vecteur générique ») ; on dit <em>vecteur atomique</em> quand il faut exclure les listes. <strong>Un vecteur vide a un mode</strong> : <code>character(0)</code>, <code>numeric(0)</code>.</p>
+<p><strong>Attributs intrinsèques.</strong> <strong><code>mode()</code></strong> et <strong><code>length()</code></strong>. <em>« Because of this, mode and length are also called <strong>intrinsic attributes</strong> »</em>.  <code>length()</code> n'est pas toujours informatif (une fonction).</p>
+<p><strong>Trois fonctions, trois questions.</strong> <strong><code>typeof</code></strong> = ce que R stocke (<code>SEXPTYPE</code>) · <strong><code>mode</code></strong> = au sens de Becker-Chambers-Wilks, compatible S · <strong><code>storage.mode</code></strong> = pour <strong>C et Fortran</strong>. Sur <code>1:3</code> : <code>"integer"</code>, <code>"numeric"</code>, <code>"integer"</code>.</p>
+<p><strong>Les six types atomiques.</strong> <code>logical</code> · <code>integer</code> et <code>double</code> (tous deux de <strong>mode <code>numeric</code></strong>) · <code>complex</code> · <code>character</code> · <code>raw</code>. <em>« Single numbers … and strings … <strong>are still vectors, of length 1</strong> ; <strong>there are no more basic types</strong>. »</em></p>
+<p><strong>Coercition.</strong> <em>« R caters for changes of mode <strong>almost anywhere it could be considered sensible</strong> »</em> · famille <strong><code>as.quelquechose()</code></strong> ·  <strong>numérique → caractère → numérique n'est pas exactement réversible</strong> (arrondis) ·  <strong>la coercition efface tous les attributs</strong>.</p>
+<p><strong>Longueur.</strong> <strong>Allonger</strong> : écrire <strong>hors des bornes</strong> (<code>e[3] &lt;- 17</code>, les deux premiers deviennent <code>NA</code>), <em>« provided <strong>the mode of the additional component(s) agrees</strong> »</em> ; utilisé par <strong><code>scan()</code></strong>. <strong>Raccourcir</strong> : une assignation (<code>alpha &lt;- alpha[2*1:5]</code>) ou <strong><code>length(alpha) &lt;- 3</code></strong>, qui <strong>allonge aussi</strong>, par des <code>NA</code>.</p>
+<p><strong>Attributs.</strong> <strong><code>attributes()</code></strong> liste, <strong><code>attr()</code></strong> sélectionne, <strong><code>attr&lt;-</code></strong> pose · <em>« rarely used … <strong>The concept, however, is very important</strong> »</em> · <strong>tout objet sauf <code>NULL</code></strong> peut en porter · <strong>préférer les accesseurs dédiés</strong> — ils <strong>vérifient la cohérence</strong> · retirer un attribut = lui assigner <strong><code>NULL</code></strong>.</p>
+<p><strong>Les cinq spéciaux.</strong> <strong><code>names</code></strong> — étiquette les éléments, sert à l'indexation (<code>quantile(x)["25%"]</code>) ; sur un tableau 1-D il <strong>accède en fait à <code>dimnames[[1]]</code></strong>. <strong><code>dim</code></strong> — <strong>implémente les tableaux</strong>, contenu en <strong>ordre colonne-majeur</strong>, <strong>longueur = produit des extensions</strong>, une extension <strong>peut être nulle</strong> ; <strong>un vecteur n'a pas de <code>dim</code></strong>, un tableau 1-D en a un <strong>de longueur 1</strong>. <strong><code>dimnames</code></strong> — <strong>une liste de vecteurs de caractères</strong>, <strong>elle-même nommable</strong> (d'où les en-têtes). <strong><code>class</code></strong> — <strong>le vecteur des classes dont l'objet hérite</strong>, base des méthodes génériques, <strong>modifiable sans contrôle</strong> → prudence. <strong><code>tsp</code></strong> — <strong>start, end, frequency</strong>.</p>
+<p><strong>La phrase-clé.</strong> <em>« <strong>Matrices and arrays are simply vectors with the attribute <code>dim</code> and optionally <code>dimnames</code> attached to the vector.</strong> »</em></p>
+<p><strong>Copie des attributs (Becker-Chambers-Wilks, pp. 144-6).</strong> Fonction <strong>scalaire</strong> → <strong>préserve</strong> (sauf peut-être <code>class</code>) · <strong>binaire</strong> → copie depuis <strong>le plus long</strong> (à égalité, <strong>le premier</strong>), sauf <code>names</code>/<code>dim</code>/<code>dimnames</code> que <strong>l'opérateur pose lui-même</strong> · <strong>sous-ensemble</strong> → <strong>efface tout sauf</strong> <code>names</code>/<code>dim</code>/<code>dimnames</code> · <strong>sous-assignation</strong> → <strong>préserve</strong>, même si la longueur change · <strong>coercition</strong> → <strong>efface tout</strong> · <strong>tri</strong> → efface tout sauf <strong><code>names</code></strong>, triés avec l'objet.</p>
+<p><strong>Classe.</strong> <strong>Tout objet a une classe</strong> ; pour un vecteur simple <strong>c'est le mode</strong> ; sinon <code>"matrix"</code>, <code>"array"</code>, <code>"factor"</code>, <code>"data.frame"</code>… · elle commande <strong>l'affichage</strong>, <strong><code>plot()</code></strong>, <strong><code>summary()</code></strong> et les autres génériques · <strong><code>unclass()</code></strong> retire temporairement l'effet — <em>« one [use] is when you are <strong>learning to come to terms with the idea of class</strong> »</em> · <strong>S4</strong> vit dans le paquet <strong><code>methods</code></strong>.</p>
+<p><strong>Trois objets à connaître.</strong> <strong><code>NULL</code></strong> — <strong>l'absence</strong>, pas le vide ; <strong>un seul</strong> objet <code>NULL</code> ; <strong>aucun type</strong>, <strong>aucun attribut possible</strong> ; <code>is.null()</code>. <strong>Environnements</strong> — <strong>frame + enclosure</strong>, arbre enraciné dans <strong><code>emptyenv()</code></strong>, parent direct de <strong><code>baseenv()</code></strong> ;  <strong>non copiés</strong> lors d'un passage à une fonction ou d'une assignation. <strong>Promesses</strong> — <strong>valeur, expression, environnement</strong> ; chaque argument formel y est lié ; <strong>rien n'est évalué avant l'accès</strong>, puis <strong>le résultat est mémorisé</strong> ; <strong><code>substitute</code></strong> lit la fente expression.</p>
+<p><strong>Objets composés.</strong> <strong>Facteur</strong> = attribut <strong><code>levels</code></strong> + classe <strong><code>"factor"</code></strong> (+ <code>contrasts</code> optionnel) ; ordonné → <strong><code>c("ordered", "factor")</code></strong> ;  le codage entier est <strong>un détail d'implémentation, non garanti</strong>. <strong>Data frame</strong> = <strong>une liste</strong> de vecteurs, facteurs et/ou matrices <strong>de même longueur</strong>, avec <strong><code>names</code></strong> (variables) et <strong><code>row.names</code></strong> (cas) ; peut contenir une liste pour des <strong>tableaux irréguliers</strong>, <em>« <strong>not generally handled correctly</strong> »</em>.</p>
+<div class="rec"><h2>Active Recall</h2><details class="cor">
+<summary>Qu'est-ce qu'une structure atomique, une structure récursive, et à quelle famille appartient une liste ?</summary><div class="in">
+
+<p><em>« These are known as <strong>"atomic" structures</strong> since <strong>their components are all of the same type, or mode</strong> »</em> — les cinq modes atomiques étant <code>numeric</code>, <code>complex</code>, <code>logical</code>, <code>character</code> et <code>raw</code> (§3.1).</p>
+<p>*« <strong>Lists</strong> … are known as <strong>"recursive" rather than atomic</strong> structures since <strong>their components can themselves be lists in their own right</strong>. … The other recursive structures are those of mode <strong><code>function</code></strong> and <strong><code>expression</code></strong>. »*</p>
+<p class="cal piege"> Et la précision de la <em>R Language Definition</em> (§2.1.2) : <em>« <strong>Lists are vectors</strong>, and the basic vector types are referred to as <strong>atomic vectors</strong> where it is necessary to exclude lists. »</em> Une liste <strong>est</strong> un vecteur — un vecteur générique.</p>
+</div></details><details class="cor">
+<summary>Pourquoi <code>mode(1:3)</code> et <code>typeof(1:3)</code> ne répondent-ils pas la même chose ?</summary><div class="in">
+
+<pre><code class="language-r">x &lt;- 1:3
+typeof(x)         # "integer"
+mode(x)           # "numeric"
+storage.mode(x)   # "integer"
+</code></pre>
+<p>La note 1 du §3.1 d'<em>An Introduction to R</em> le dit : <em>« <strong><code>numeric</code> mode is actually an amalgam of two distinct modes, namely <code>integer</code> and <code>double precision</code></strong> »</em>.</p>
+<p>Et la <em>R Language Definition</em> (§2) explique le partage des rôles : <code>typeof</code> rend <strong>le type R réel</strong> (le <code>SEXPTYPE</code>) ; <code>mode</code> rend le type <em>« in the sense of Becker, Chambers &amp; Wilks (1988) »</em>, <strong>plus compatible avec les autres implémentations de S</strong> ; <code>storage.mode</code> sert <em>« when calling functions written in another language, such as C or FORTRAN »</em>.</p>
+</div></details><details class="cor">
+<summary>Un vecteur peut-il mélanger les modes ? Que se passe-t-il si on essaie ?</summary><div class="in">
+
+<p>Non : <em>« <strong>Vectors must have their values all of the same mode.</strong> Thus any given vector must be <strong>unambiguously</strong> either logical, numeric, complex, character or raw. »</em> (§3.1)</p>
+<p>Le <code>NA</code> semble faire exception ; le cours répond : <em>« in fact <strong>there are several types of <code>NA</code></strong> »</em>.</p>
+<p>Quand on mélange, R <strong>coerce</strong> — <em>« R caters for changes of mode almost anywhere it could be considered sensible to do so »</em>. Le mode retenu est <strong>le plus général capable de tout représenter</strong> : $\texttt{logical}\to\texttt{integer}\to\texttt{double}\to\texttt{complex}\to\texttt{character}$. <em>(Cette hiérarchie est une conséquence de la règle, pas une citation du cours.)</em> D'où <code>c(1, "a")</code> qui vaut <code>c("1", "a")</code>.</p>
+</div></details><details class="cor">
+<summary>Pourquoi ne faut-il pas faire transiter des réels par une chaîne de caractères ?</summary><div class="in">
+
+<p>Note 3 du §3.1 : <em>« In general, <strong>coercion from numeric to character and back again will not be exactly reversible</strong>, because of <strong>roundoff errors in the character representation</strong>. »</em></p>
+<p>L'aller-retour donné par le cours — <code>z &lt;- 0:9</code> ; <code>digits &lt;- as.character(z)</code> ; <code>d &lt;- as.integer(digits)</code> — fonctionne <strong>parce que ce sont des entiers</strong>, dont l'écriture décimale est exacte. Un <code>double</code> passe par une représentation d'affichage tronquée, et le retour ne redonne pas exactement le même nombre.</p>
+<p class="cal piege"> Et il y a pire : <em>« <strong>coercion drops all attributes</strong> »</em> (§2.2.6). L'aller-retour perd aussi <code>dim</code>, <code>names</code>, <code>class</code>…</p>
+</div></details><details class="cor">
+<summary>Comment transformer un vecteur de 100 nombres en matrice 10 × 10 sans <code>matrix()</code> ?</summary><div class="in">
+
+<p>L'exemple du §3.3 :</p>
+<pre><code class="language-r">attr(z, "dim") &lt;- c(10, 10)
+</code></pre>
+<p><em>« allows R to <strong>treat <code>z</code> as if it were a 10-by-10 matrix</strong> »</em>. Rien n'a été copié ni converti : <strong>un attribut a été posé</strong>.</p>
+<p><strong>L'écriture préférable</strong> est <code>dim(z) &lt;- c(10, 10)</code> : le §2.2 recommande les accesseurs dédiés, <em>« in addition to <strong>hiding details of implementation</strong> they may <strong>perform additional operations</strong> »</em>, et R <strong>contrôle la cohérence</strong> — <em>« R ensures that <strong>the length of the vector is the product of the lengths of the dimensions</strong> »</em>.</p>
+<p>Pour revenir en arrière : <strong><code>dim(z) &lt;- NULL</code></strong>.</p>
+</div></details><details class="cor">
+<summary>Qu'est-ce que l'ordre « colonne-majeur », et quelles conséquences a-t-il ?</summary><div class="in">
+
+<p><em>« The content of the array is <strong>stored in a vector in column-major order</strong> »</em> (§2.2.2) : la matrice se remplit <strong>colonne par colonne</strong>. Pour <code>matrix(1:4, 2)</code> :</p>
+<p>$$\begin{pmatrix}1 &amp; 3\\ 2 &amp; 4\end{pmatrix}$$</p>
+<p><strong>Trois conséquences.</strong> (1) <code>m[2]</code> est l'élément <strong>sous</strong> <code>m[1]</code>, pas à sa droite. (2) <code>m[1]</code> a un sens et vaut <code>c(m)[1]</code> (fiche 302). (3) <code>length(m)</code> rend <strong>le produit des extensions</strong> — le nombre de <strong>cases</strong> —, jamais le nombre de lignes.</p>
+</div></details><details class="cor">
+<summary>Après quelles opérations un attribut maison survit-il, et après lesquelles disparaît-il ?</summary><div class="in">
+
+<p>Les règles du §2.2.6 (Becker, Chambers &amp; Wilks, pp. 144-6) :</p>
+<table>
+<thead>
+<tr>
+<th>Opération</th>
+<th>Attributs</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>fonction <strong>scalaire</strong></td>
+<td><strong>préservés</strong> (sauf peut-être <code>class</code>)</td>
+</tr>
+<tr>
+<td>opération <strong>binaire</strong></td>
+<td>copiés depuis <strong>le plus long</strong> ; à égalité, <strong>le premier</strong> — sauf <code>names</code>/<code>dim</code>/<code>dimnames</code></td>
+</tr>
+<tr>
+<td><strong>sous-ensemble</strong></td>
+<td><strong>tout tombe sauf</strong> <code>names</code>, <code>dim</code>, <code>dimnames</code></td>
+</tr>
+<tr>
+<td><strong>sous-assignation</strong></td>
+<td><strong>préservés</strong>, même si la longueur change</td>
+</tr>
+<tr>
+<td><strong>coercition</strong></td>
+<td> <strong>tout tombe</strong></td>
+</tr>
+<tr>
+<td><strong>tri</strong></td>
+<td>tout tombe <strong>sauf <code>names</code></strong>, triés avec l'objet</td>
+</tr>
+</tbody></table>
+<p>Un attribut maison — une unité, une date de création — <strong>ne survit donc pas à <code>x[1:5]</code></strong>, mais survit à <code>x[1:5] &lt;- v</code>.</p>
+</div></details><details class="cor">
+<summary>Pourquoi changer l'attribut <code>class</code> d'un objet est-il dangereux ?</summary><div class="in">
+
+<p><em>« This attribute <strong>can be accessed and manipulated virtually without restriction by users</strong>. <strong>There is no checking that an object actually contains the components that class methods expect.</strong> Thus, <strong>altering the <code>class</code> attribute should be done with caution</strong>, and <strong>when they are available specific creation and coercion functions should be preferred</strong>. »</em> (§2.2.4)</p>
+<p>Poser <code>class(x) &lt;- "data.frame"</code> <strong>ne convertit rien</strong> : cela dit seulement à R de chercher les méthodes des data frames. Comme <code>x</code> n'a ni <code>names</code> ni <code>row.names</code> ni colonnes, la panne survient <strong>au premier appel générique</strong> — affichage, <code>summary()</code>, <code>plot()</code> — <strong>loin de la ligne fautive</strong>.</p>
+</div></details><details class="cor">
+<summary>À quoi sert <code>unclass()</code>, et pourquoi le cours en recommande-t-il l'usage aux débutants ?</summary><div class="in">
+
+<p><em>« <strong>To remove temporarily the effects of class, use the function <code>unclass()</code>.</strong> »</em> Un data frame <code>winter</code> s'affiche <em>« in data frame form, which is rather like a matrix »</em> ; <code>unclass(winter)</code> l'affiche <em>« <strong>as an ordinary list</strong> »</em>.</p>
+<p><em>« <strong>Only in rather special situations do you need to use this facility, but one is when you are learning to come to terms with the idea of class and generic functions.</strong> »</em> (§3.4)</p>
+<p>C'est l'outil qui montre qu'<strong>un data frame est une liste</strong>, qu'<strong>un facteur est un vecteur d'entiers</strong>, qu'<strong>une matrice est un vecteur</strong>. Avec <code>attributes()</code>, il dissipe toute la magie apparente des objets R.</p>
+</div></details><details class="cor">
+<summary>Quelle est la différence entre <code>NULL</code> et <code>numeric(0)</code> ?</summary><div class="in">
+
+<p><em>« There is a special object called <code>NULL</code>. It is used <strong>whenever there is a need to indicate or specify that an object is absent</strong>. <strong>It should not be confused with a vector or list of zero length.</strong> … The <code>NULL</code> object <strong>has no type and no modifiable properties</strong>. <strong>There is only one <code>NULL</code> object in R.</strong> … <strong>You cannot set attributes on <code>NULL</code>.</strong> »</em> (§2.1.6)</p>
+<p><strong><code>NULL</code> = l'absence</strong> ; <strong><code>numeric(0)</code> = un vecteur numérique vide</strong>, qui a un type et peut porter des attributs. Les deux ont <code>length()</code> nul.</p>
+<p>C'est pourquoi <code>x$inexistant</code> rend <strong><code>NULL</code></strong> (fiche 302) : la composante <strong>n'est pas là</strong>, elle n'est pas <em>vide</em>. Le test est <strong><code>is.null()</code></strong>.</p>
+</div></details><details class="cor">
+<summary>Quelle est la seule catégorie d'objets que R ne copie pas ? Quelles conséquences ?</summary><div class="in">
+
+<p><em>« <strong>Unlike most other R objects, environments are not copied when passed to functions or used in assignments.</strong> Thus, <strong>if you assign the same environment to several symbols and change one, the others will change too.</strong> In particular, <strong>assigning attributes to an environment can lead to surprises.</strong> »</em> (§2.1.10)</p>
+<p>C'est <strong>l'exception</strong> à la sémantique de copie que décrit le mécanisme <code>`*tmp*`</code> (fiche 302). Tout R se comporte <strong>par valeur</strong>, sauf les environnements, qui se comportent <strong>par référence</strong>.</p>
+<p>Double conséquence : ils permettent délibérément l'effet de bord quand on en a besoin, et ils produisent des bugs incompréhensibles quand on ignore leur présence.</p>
+</div></details><details class="cor">
+<summary>Qu'est-ce qu'une promesse, et à quoi sert-elle ?</summary><div class="in">
+
+<p><em>« <strong>Promise objects are part of R's lazy evaluation mechanism.</strong> They contain <strong>three slots : a value, an expression, and an environment.</strong> When a function is called … <strong>each of the formal arguments is bound to a promise</strong>. The expression that was given for that formal argument <strong>and a pointer to the environment the function was called from</strong> are stored in the promise. »</em> (§2.1.8)</p>
+<p><em>« <strong>Until that argument is accessed there is no value associated with the promise.</strong> When the argument is accessed, the stored expression is <strong>evaluated in the stored environment</strong> … <strong>The result is also saved by the promise.</strong> »</em></p>
+<p><strong>Deux conséquences pratiques</strong> : un argument jamais utilisé n'est <strong>jamais évalué</strong> — il peut donc être invalide sans conséquence ; et <strong><code>substitute</code></strong> peut retrouver <strong>le texte</strong> de ce qui a été passé, puisqu'il <em>« will extract the content of the expression slot »</em>.</p>
+<p class="cal piege"> <em>« There is <strong>generally no way in R code to check whether an object is a promise</strong> »</em>.</p>
+</div></details><details class="cor">
+<summary>Comment un facteur et un data frame se définissent-ils en termes d'attributs ?</summary><div class="in">
+
+<p><strong>Facteur (§2.3.1)</strong> : *« A factor <strong>has a <code>levels</code> attribute and class <code>"factor"</code></strong>. Optionally, it may also contain a <strong><code>contrasts</code></strong> attribute »*. Ordonné : <em>« it should be defined as such and have <strong>a class vector <code>c("ordered", "factor")</code></strong> »</em>.</p>
+<p class="cal piege"> <em>« Factors are <strong>currently implemented</strong> using <strong>an integer array</strong> … <strong>Rather unfortunately users often make use of the implementation</strong> … <strong>This, however, is an implementation issue and is not guaranteed to hold in all implementations of R.</strong> »</em></p>
+<p><strong>Data frame (§2.3.2)</strong> : <em>« <strong>A data frame is a list of vectors, factors, and/or matrices all having the same length</strong> (number of rows in the case of matrices). In addition, a data frame generally has a <strong><code>names</code></strong> attribute labeling <strong>the variables</strong> and a <strong><code>row.names</code></strong> attribute for labeling <strong>the cases</strong>. »</em></p>
+</div></details><details class="cor">
+<summary>Comment allonge-t-on et raccourcit-on un objet ?</summary><div class="in">
+
+<p><strong>Allonger</strong> : <em>« new components may be added to it <strong>simply by giving it an index value outside its previous range</strong> »</em> (§3.2). <code>e &lt;- numeric()</code> puis <code>e[3] &lt;- 17</code> donne un vecteur de <strong>longueur 3</strong>, <em>« the first two components of which are at this point <strong>both <code>NA</code></strong> »</em>.</p>
+<p class="cal piege"> La condition : <em>« <strong>provided the mode of the additional component(s) agrees with the mode of the object</strong> in the first place »</em> — sinon, coercition de <strong>tout</strong> l'objet.</p>
+<p><strong>Raccourcir</strong> : <em>« <strong>to truncate the size of an object requires only an assignment</strong> »</em>. <code>alpha &lt;- alpha[2*1:5]</code> garde les indices <strong>pairs</strong> (<code>2*1:5</code> = <code>c(2,4,6,8,10)</code>, le <code>:</code> étant prioritaire) ; <code>length(alpha) &lt;- 3</code> garde les trois premiers, <em>« and vectors <strong>can be extended (by missing values) in the same way</strong> »</em>.</p>
+<p>Ce mécanisme <em>« is used often, for example in the <strong><code>scan()</code></strong> function for input »</em>.</p>
+</div></details><details class="cor">
+<summary>Que sont les « attributs intrinsèques », et pourquoi ce nom ?</summary><div class="in">
+
+<p>*« By the <strong>mode</strong> of an object we mean the basic type of its fundamental constituents. <strong>This is a special case of a "property" of an object.</strong> Another property of every object is <strong>its <code>length</code></strong>. »* (§3.1)</p>
+<p><em>« <strong>Further properties of an object are usually provided by <code>attributes(object)</code>.</strong> <strong>Because of this, <code>mode</code> and <code>length</code> are also called "intrinsic attributes" of an object.</strong> »</em></p>
+<p>Autrement dit : <code>mode</code> et <code>length</code> sont des propriétés que <strong>tout</strong> objet possède <strong>par construction</strong>, tandis que les autres attributs sont <strong>attachés</strong>. C'est pourquoi <code>attributes(x)</code> ne les liste pas — il rend <em>« a list of all the <strong>non-intrinsic</strong> attributes »</em>.</p>
+<p class="cal piege"> <em>« <code>length(object)</code> <strong>does not always contain intrinsic useful information</strong>, e.g. when <code>object</code> is a function. »</em></p>
+</div></details></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h2>Flashcards</h2>
+<table>
+<thead>
+<tr>
+<th>Question</th>
+<th>Réponse</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Comment R appelle-t-il ce sur quoi il opère ?</td>
+<td>Des <strong>objets</strong></td>
+</tr>
+<tr>
+<td>Une structure atomique ?</td>
+<td>Tous les composants <strong>du même mode</strong></td>
+</tr>
+<tr>
+<td>Les cinq modes atomiques ?</td>
+<td><code>numeric</code> · <code>complex</code> · <code>logical</code> · <code>character</code> · <code>raw</code></td>
+</tr>
+<tr>
+<td>Une structure récursive ?</td>
+<td>Ses composants <strong>peuvent être n'importe quoi</strong></td>
+</tr>
+<tr>
+<td>Les trois modes récursifs ?</td>
+<td><code>list</code> · <code>function</code> · <code>expression</code></td>
+</tr>
+<tr>
+<td>Une liste est-elle un vecteur ?</td>
+<td><strong>Oui</strong> — un « vecteur générique »</td>
+</tr>
+<tr>
+<td>Comment appelle-t-on un vecteur non-liste ?</td>
+<td>Un <strong>vecteur atomique</strong></td>
+</tr>
+<tr>
+<td>Un vecteur vide a-t-il un mode ?</td>
+<td><strong>Oui</strong> : <code>character(0)</code>, <code>numeric(0)</code></td>
+</tr>
+<tr>
+<td>Les deux attributs intrinsèques ?</td>
+<td><strong><code>mode</code></strong> et <strong><code>length</code></strong></td>
+</tr>
+<tr>
+<td>Pourquoi « intrinsèques » ?</td>
+<td>Les autres viennent d'<strong><code>attributes()</code></strong></td>
+</tr>
+<tr>
+<td><code>length()</code> est-il toujours informatif ?</td>
+<td><strong>Non</strong> — par exemple sur une fonction</td>
+</tr>
+<tr>
+<td>Que rend <code>typeof()</code> ?</td>
+<td>Le <strong>type réel</strong> (le <code>SEXPTYPE</code>)</td>
+</tr>
+<tr>
+<td>Que rend <code>mode()</code> ?</td>
+<td>Le type <strong>au sens de Becker-Chambers-Wilks</strong></td>
+</tr>
+<tr>
+<td>Que rend <code>storage.mode()</code> ?</td>
+<td>Le mode de <strong>stockage</strong> — pour C et Fortran</td>
+</tr>
+<tr>
+<td><code>typeof(1:3)</code> ?</td>
+<td><strong><code>"integer"</code></strong></td>
+</tr>
+<tr>
+<td><code>mode(1:3)</code> ?</td>
+<td><strong><code>"numeric"</code></strong></td>
+</tr>
+<tr>
+<td>Pourquoi cette différence ?</td>
+<td><code>numeric</code> <strong>amalgame</strong> <code>integer</code> et <code>double</code></td>
+</tr>
+<tr>
+<td>Les six types de vecteurs ?</td>
+<td><code>logical</code> <code>integer</code> <code>real</code> <code>complex</code> <code>character</code> <code>raw</code></td>
+</tr>
+<tr>
+<td><code>4.2</code> est-il un scalaire ?</td>
+<td><strong>Non</strong> — un vecteur de <strong>longueur 1</strong></td>
+</tr>
+<tr>
+<td>La structure C sous-jacente ?</td>
+<td><strong><code>SEXPREC</code></strong> ; les types sont des <strong><code>SEXPTYPE</code></strong></td>
+</tr>
+<tr>
+<td><code>typeof</code> d'une fonction ?</td>
+<td><strong><code>"closure"</code></strong></td>
+</tr>
+<tr>
+<td><code>typeof</code> d'un argument non encore évalué ?</td>
+<td><strong><code>"promise"</code></strong></td>
+</tr>
+<tr>
+<td>Différence <code>builtin</code> / <code>special</code> ?</td>
+<td>Le premier <strong>évalue</strong> ses arguments, le second <strong>non</strong></td>
+</tr>
+<tr>
+<td>La famille des fonctions de conversion ?</td>
+<td><strong><code>as.quelquechose()</code></strong></td>
+</tr>
+<tr>
+<td>Aller-retour numérique → caractère → numérique ?</td>
+<td><strong>Pas exactement réversible</strong> (arrondis)</td>
+</tr>
+<tr>
+<td>Que fait la coercition aux attributs ?</td>
+<td>Elle les <strong>efface tous</strong></td>
+</tr>
+<tr>
+<td>Comment allonger un vecteur ?</td>
+<td>Écrire <strong>hors des bornes</strong></td>
+</tr>
+<tr>
+<td>Que valent les cases intermédiaires ?</td>
+<td><strong><code>NA</code></strong></td>
+</tr>
+<tr>
+<td>À quelle condition ?</td>
+<td>Que <strong>le mode concorde</strong></td>
+</tr>
+<tr>
+<td>Quelle fonction utilise ce mécanisme ?</td>
+<td><strong><code>scan()</code></strong></td>
+</tr>
+<tr>
+<td>Comment tronquer ?</td>
+<td>Une <strong>assignation</strong>, ou <strong><code>length(x) &lt;- n</code></strong></td>
+</tr>
+<tr>
+<td><code>length(x) &lt;- n</code> peut-il allonger ?</td>
+<td><strong>Oui</strong>, par des <strong>valeurs manquantes</strong></td>
+</tr>
+<tr>
+<td>Lister les attributs ?</td>
+<td><strong><code>attributes(x)</code></strong></td>
+</tr>
+<tr>
+<td>En lire un seul ?</td>
+<td><strong><code>attr(x, "nom")</code></strong></td>
+</tr>
+<tr>
+<td>En retirer un ?</td>
+<td>Lui assigner <strong><code>NULL</code></strong></td>
+</tr>
+<tr>
+<td>Qui peut porter des attributs ?</td>
+<td><strong>Tout sauf <code>NULL</code></strong></td>
+</tr>
+<tr>
+<td>Comment sont-ils stockés ?</td>
+<td>Comme une <strong>pairlist entièrement nommée</strong></td>
+</tr>
+<tr>
+<td>Pourquoi préférer <code>names&lt;-</code> à <code>attr&lt;-</code> ?</td>
+<td>L'accesseur <strong>vérifie la cohérence</strong></td>
+</tr>
+<tr>
+<td>Les cinq attributs spéciaux ?</td>
+<td><code>names</code> · <code>dim</code> · <code>dimnames</code> · <code>class</code> · <code>tsp</code></td>
+</tr>
+<tr>
+<td>À quoi sert <code>names</code> ?</td>
+<td><strong>Étiqueter</strong> les éléments — et <strong>indexer</strong></td>
+</tr>
+<tr>
+<td>Exemple d'indexation par nom ?</td>
+<td><strong><code>quantile(x)["25%"]</code></strong></td>
+</tr>
+<tr>
+<td><code>names</code> sur un tableau 1-D ?</td>
+<td>Accède en fait à <strong><code>dimnames[[1]]</code></strong></td>
+</tr>
+<tr>
+<td>Qu'implémente <code>dim</code> ?</td>
+<td><strong>Les tableaux</strong></td>
+</tr>
+<tr>
+<td>Dans quel ordre le contenu est-il stocké ?</td>
+<td>En <strong>colonne-majeur</strong></td>
+</tr>
+<tr>
+<td>Quelle contrainte R impose-t-il ?</td>
+<td><code>length</code> = <strong>produit des extensions</strong></td>
+</tr>
+<tr>
+<td>Une extension peut-elle être nulle ?</td>
+<td><strong>Oui</strong></td>
+</tr>
+<tr>
+<td>Vecteur contre tableau 1-D ?</td>
+<td>Le second a un <strong><code>dim</code> de longueur 1</strong></td>
+</tr>
+<tr>
+<td>Qu'est-ce que <code>dimnames</code> ?</td>
+<td>Une <strong>liste de vecteurs de caractères</strong></td>
+</tr>
+<tr>
+<td>Que permet le nommage de cette liste ?</td>
+<td>Les <strong>en-têtes d'extension</strong> à l'affichage</td>
+</tr>
+<tr>
+<td>Qu'est-ce que <code>class</code> ?</td>
+<td>Le <strong>vecteur des classes dont l'objet hérite</strong></td>
+</tr>
+<tr>
+<td>Que fonde-t-il ?</td>
+<td>Les <strong>méthodes génériques</strong></td>
+</tr>
+<tr>
+<td>Est-il contrôlé ?</td>
+<td> <strong>Non</strong> — <em>« there is no checking »</em></td>
+</tr>
+<tr>
+<td>Que contient <code>tsp</code> ?</td>
+<td><strong>start</strong>, <strong>end</strong>, <strong>frequency</strong></td>
+</tr>
+<tr>
+<td>La phrase sur les matrices ?</td>
+<td><em>« <strong>simply vectors</strong> with the attribute <code>dim</code> … attached »</em></td>
+</tr>
+<tr>
+<td>Une fonction scalaire et les attributs ?</td>
+<td>Elle les <strong>préserve</strong> (sauf peut-être <code>class</code>)</td>
+</tr>
+<tr>
+<td>Une opération binaire ?</td>
+<td>Copie depuis <strong>le plus long</strong> ; à égalité, <strong>le premier</strong></td>
+</tr>
+<tr>
+<td>Que pose l'opérateur lui-même ?</td>
+<td><code>names</code>, <code>dim</code>, <code>dimnames</code></td>
+</tr>
+<tr>
+<td>Un sous-ensemble ?</td>
+<td><strong>Efface tout sauf</strong> <code>names</code>/<code>dim</code>/<code>dimnames</code></td>
+</tr>
+<tr>
+<td>Une sous-assignation ?</td>
+<td><strong>Préserve</strong>, même si la longueur change</td>
+</tr>
+<tr>
+<td>Un tri ?</td>
+<td>Efface tout <strong>sauf <code>names</code></strong>, triés avec l'objet</td>
+</tr>
+<tr>
+<td>Tout objet a-t-il une classe ?</td>
+<td><strong>Oui</strong></td>
+</tr>
+<tr>
+<td>Classe d'un vecteur simple ?</td>
+<td><strong>Son mode</strong></td>
+</tr>
+<tr>
+<td>Quatre autres valeurs possibles ?</td>
+<td><code>"matrix"</code> <code>"array"</code> <code>"factor"</code> <code>"data.frame"</code></td>
+</tr>
+<tr>
+<td>Trois génériques sensibles à la classe ?</td>
+<td>L'<strong>affichage</strong>, <strong><code>plot()</code></strong>, <strong><code>summary()</code></strong></td>
+</tr>
+<tr>
+<td>Comment voir dessous ?</td>
+<td><strong><code>unclass()</code></strong></td>
+</tr>
+<tr>
+<td>Quand le cours le recommande-t-il ?</td>
+<td>Quand on <strong>apprend</strong> la notion de classe et de générique</td>
+</tr>
+<tr>
+<td>Où vivent les classes S4 ?</td>
+<td>Le paquet <strong><code>methods</code></strong></td>
+</tr>
+<tr>
+<td>Qu'est-ce que <code>NULL</code> ?</td>
+<td><strong>L'absence</strong> d'objet</td>
+</tr>
+<tr>
+<td>Combien y en a-t-il ?</td>
+<td><strong>Un seul</strong>, partagé</td>
+</tr>
+<tr>
+<td>A-t-il un type ?</td>
+<td><strong>Non</strong>, ni de propriété modifiable</td>
+</tr>
+<tr>
+<td>Peut-il porter un attribut ?</td>
+<td><strong>Non</strong></td>
+</tr>
+<tr>
+<td>Comment le tester ?</td>
+<td><strong><code>is.null()</code></strong></td>
+</tr>
+<tr>
+<td>De quoi ne faut-il pas le confondre ?</td>
+<td>D'un <strong>vecteur ou d'une liste de longueur nulle</strong></td>
+</tr>
+<tr>
+<td>De quoi est fait un environnement ?</td>
+<td>D'un <strong>frame</strong> et d'une <strong>enclosure</strong></td>
+</tr>
+<tr>
+<td>La racine de l'arbre ?</td>
+<td><strong><code>emptyenv()</code></strong></td>
+</tr>
+<tr>
+<td>Son enfant direct ?</td>
+<td>L'environnement du paquet <strong>base</strong> (<code>baseenv()</code>)</td>
+</tr>
+<tr>
+<td>Les environnements sont-ils copiés ?</td>
+<td> <strong>Non</strong> — les seuls objets dans ce cas</td>
+</tr>
+<tr>
+<td>Les trois fentes d'une promesse ?</td>
+<td><strong>valeur</strong>, <strong>expression</strong>, <strong>environnement</strong></td>
+</tr>
+<tr>
+<td>Quand la valeur est-elle calculée ?</td>
+<td><strong>À l'accès</strong>, puis <strong>mémorisée</strong></td>
+</tr>
+<tr>
+<td>Quelle fonction lit la fente expression ?</td>
+<td><strong><code>substitute</code></strong></td>
+</tr>
+<tr>
+<td>Peut-on tester si un objet est une promesse ?</td>
+<td><strong>Généralement non</strong></td>
+</tr>
+<tr>
+<td>Les deux attributs d'un facteur ?</td>
+<td><strong><code>levels</code></strong> et <strong><code>class = "factor"</code></strong></td>
+</tr>
+<tr>
+<td>Un facteur ordonné ?</td>
+<td>Classe <strong><code>c("ordered", "factor")</code></strong></td>
+</tr>
+<tr>
+<td>Peut-on compter sur son codage entier ?</td>
+<td> <strong>Non</strong> — <em>« an implementation issue »</em></td>
+</tr>
+<tr>
+<td>Qu'est-ce qu'un data frame, au fond ?</td>
+<td><strong>Une liste</strong> de vecteurs de <strong>même longueur</strong></td>
+</tr>
+<tr>
+<td>Ses deux attributs de nommage ?</td>
+<td><strong><code>names</code></strong> (variables) et <strong><code>row.names</code></strong> (cas)</td>
+</tr>
+<tr>
+<td>Quelle structure R imite-t-il ?</td>
+<td>Le jeu de données <strong>SAS ou SPSS</strong> — « cas par variables »</td>
+</tr>
+</tbody></table>
+</main>
+
+
+
+
+</body></html>

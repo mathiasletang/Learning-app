@@ -1,0 +1,1192 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fiche 410 — Estimation de densité par mélanges gaussiens : responsabilités et algorithme EM</title>
+<script>
+window.MathJax={tex:{inlineMath:[["$","$"]],displayMath:[["$$","$$"]],processEscapes:true},
+ options:{skipHtmlTags:["script","noscript","style","textarea","pre","code"]},
+ svg:{fontCache:"global"},
+ startup:{pageReady:()=>MathJax.startup.defaultPageReady().then(()=>{document.body.classList.add("ready")})}};
+setTimeout(function(){document.body.classList.add("ready")},2500);
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+/* ============================================================
+   MathiasLearn — feuille de style des fiches
+   Reprise intégrale des tokens de 00_PARCOURS/*.html
+   + blocs pédagogiques (callouts, méthode, essentiels, recall)
+   ============================================================ */
+:root{--bg:#faf9f7;--card:#fff;--ink:#1a1a1a;--muted:#6b6b6b;--line:#e5e2dd;--accent:#8b5e34;
+ --hl:#fdf8ef;--ok:#2d7d4f;--okbg:#f0f7f3;--warn:#b3402f;--warnbg:#fdf3f1;--blue:#2f5d8b;--bluebg:#f1f5fa}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+ font:17px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;padding:0 16px 100px}
+.nav{position:sticky;top:0;background:rgba(250,249,247,.96);backdrop-filter:blur(8px);
+ border-bottom:1px solid var(--line);margin:0 -16px 30px;padding:11px 16px;z-index:50;
+ display:flex;gap:6px;flex-wrap:wrap;font-size:13px}
+.nav a{color:var(--muted);text-decoration:none;padding:4px 9px;border-radius:5px;white-space:nowrap}
+.nav a:hover{background:var(--line);color:var(--ink)}
+.nav a.on{background:var(--accent);color:#fff}
+main{max-width:780px;margin:0 auto}
+h1{font-size:31px;letter-spacing:-.02em;margin:.4em 0 .5em;line-height:1.25}
+h2{font-size:23px;margin:2.2em 0 .7em;padding-bottom:.3em;border-bottom:1px solid var(--line)}
+h3{font-size:19px;margin:1.9em 0 .5em;color:var(--accent)}
+h4{font-size:17px;margin:1.5em 0 .4em}
+p{margin:.8em 0} a{color:var(--accent)} hr{border:0;border-top:1px solid var(--line);margin:2.6em 0}
+table{border-collapse:collapse;width:100%;margin:1.3em 0;font-size:15.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+th{background:#f3f0eb;font-weight:600}
+tr:nth-child(even) td{background:#fcfbfa}
+code{font-family:"SF Mono",Menlo,Consolas,monospace;font-size:.88em;background:#f2efea;padding:2px 6px;border-radius:4px;overflow-wrap:break-word}
+pre{background:#f2efea;padding:14px 16px;border-radius:8px;overflow-x:auto}
+pre code{background:none;padding:0;white-space:pre}
+blockquote{border-left:3px solid var(--accent);background:var(--hl);margin:1.4em 0;padding:14px 20px;border-radius:0 8px 8px 0}
+blockquote p:first-child{margin-top:0} blockquote p:last-child{margin-bottom:0}
+ul,ol{padding-left:1.5em} li{margin:.35em 0} em{color:#4a4a4a}
+mjx-container[display="true"]{margin:1.1em 0!important;overflow-x:auto;overflow-y:hidden;padding:2px 0}
+mjx-container svg{max-width:100%}
+body:not(.ready) main{opacity:0} main{opacity:1;transition:opacity .25s}
+
+/* --- bandeau de tête de fiche --- */
+.cours{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--accent);
+ border-radius:0 10px 10px 0;padding:18px 22px;margin:0 0 34px}
+.cours h4{margin:0 0 4px;font-size:14px;text-transform:uppercase;letter-spacing:.07em;color:var(--accent)}
+.cours .cs{color:var(--muted);font-size:14.5px;margin:0 0 14px}
+
+/* --- exercices / corrigés --- */
+.ex{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:6px 24px 20px;margin:18px 0}
+.ex>h3:first-child{margin-top:14px}
+details.cor{margin-top:18px;border:1px solid var(--line);border-radius:8px;background:#fcfbfa;overflow:hidden}
+details.cor>summary{cursor:pointer;padding:12px 16px;font-weight:600;font-size:15px;color:var(--accent);
+ list-style:none;display:flex;align-items:center;gap:9px;user-select:none;transition:.15s;min-height:44px}
+details.cor>summary::-webkit-details-marker{display:none}
+details.cor>summary:hover{background:var(--hl)}
+details.cor>summary::before{content:"\25B6";font-size:10px;transition:transform .18s;display:inline-block}
+details.cor[open]>summary::before{transform:rotate(90deg)}
+details.cor[open]>summary{background:var(--okbg);color:var(--ok);border-bottom:1px solid var(--line)}
+.cor .in{padding:4px 20px 16px}
+.cor .in>*:first-child{margin-top:.9em}
+
+/* --- blocs pédagogiques (callouts) ---
+   Générés depuis une citation Markdown dont le premier **gras** commence
+   par un mot-clé : DÉFINITION, THÉORÈME, MÉTHODE, PIÈGE, INTUITION… */
+.cal{border:1px solid var(--line);border-left:4px solid var(--accent);background:var(--card);
+ border-radius:0 10px 10px 0;padding:15px 20px;margin:1.5em 0}
+.cal>p:first-child{margin-top:0}.cal>p:last-child,.cal>ul:last-child,.cal>ol:last-child{margin-bottom:0}
+.cal .lab{display:block;font-size:12.5px;text-transform:uppercase;letter-spacing:.08em;
+ font-weight:700;color:var(--accent);margin-bottom:6px}
+.cal.formel{background:var(--hl)}
+.cal.piege{border-left-color:var(--warn);background:var(--warnbg)}
+.cal.piege .lab{color:var(--warn)}
+.cal.methode{border-left-color:var(--ok);background:var(--okbg)}
+.cal.methode .lab{color:var(--ok)}
+.cal.intu{border-left-color:var(--blue);background:var(--bluebg)}
+.cal.intu .lab{color:var(--blue)}
+.cal.plus{border-left-style:dashed;background:#faf9f7}
+.cal.plus .lab{color:var(--muted)}
+
+/* --- révision express --- */
+.ess{background:var(--card);border:1px solid var(--accent);border-radius:10px;padding:4px 24px 20px;margin:1.6em 0}
+.ess h3{margin-top:1.3em}
+.rec{background:var(--card);border:1px dashed var(--accent);border-radius:10px;padding:4px 24px 18px;margin:1.6em 0}
+.rec ol{counter-reset:none}
+
+/* --- impression / PDF --- */
+@media print{
+ .nav{display:none}
+ body{padding:0;background:#fff;font-size:11.2pt;line-height:1.55}
+ main{max-width:none}
+ h1{font-size:23pt}h2{font-size:15pt;margin-top:1.5em}h3{font-size:12.6pt}
+ h2,h3,h4{break-after:avoid;page-break-after:avoid}
+ table,.cal,blockquote{break-inside:avoid;page-break-inside:avoid}
+ table{display:table;font-size:9.6pt}
+ details.cor{border:1px solid var(--line);background:#fcfbfa}
+ details.cor>summary{display:none}
+ details.cor .in{padding-top:10px}
+ .cal,.ex,.ess,.rec{box-shadow:none}
+ a{color:var(--ink);text-decoration:none}
+}
+@page{margin:16mm 15mm 18mm}
+
+/* --- exemples travaillés --- */
+.exm{background:#fcfbfa;border:1px solid var(--line);border-radius:10px;padding:2px 20px 14px;margin:1.5em 0}
+.exm>h4:first-child{margin:14px 0 .5em;color:var(--accent);font-size:13px;text-transform:uppercase;letter-spacing:.07em}
+
+
+/* --- pastilles de priorité (conventions des fiches de l'app) --- */
+h2[data-prio], h3[data-prio], h4[data-prio]{position:relative}
+h2[data-prio]::before,h3[data-prio]::before,h4[data-prio]::before{
+ content:"";display:inline-block;width:9px;height:9px;border-radius:50%;
+ margin-right:9px;vertical-align:middle;background:var(--muted)}
+[data-prio="must"]::before{background:var(--warn)}
+[data-prio="high"]::before{background:#d98324}
+[data-prio="mid"]::before{background:#c9a227}
+[data-prio="low"]::before{background:var(--ok)}
+/* corrigés des fiches de l'app : même traitement que les corrigés des séries */
+details.cor>summary::after{content:""}
+</style></head><body>
+<div class="nav"><a href="00_COMMENCER_ICI.html">Commencer ici</a><a href="01_NOTATIONS_le-decodeur.html">Notations</a><a href="02_EXERCICES_Serie-0.html">Série 0 — Remise en route</a><a href="03_EXERCICES_Serie-1.html">Série 1 — Convexité</a><a href="04_EXERCICES_Serie-2.html">Série 2 — KKT</a><a href="05_AUTO-EVALUATION.html">Auto-évaluation (quiz)</a><a href="06_FICHE_Optimisation-deux-variables.html">Fiche — Optimisation à 2 variables</a></div>
+<main><h1>Fiche 410 — Estimation de densité par mélanges gaussiens : responsabilités et algorithme EM</h1>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Matière</strong></td>
+<td>Maths · Apprentissage automatique</td>
+</tr>
+<tr>
+<td><strong>Cours source</strong></td>
+<td>Deisenroth, Faisal &amp; Ong, <em>Mathematics for Machine Learning</em>, Cambridge University Press — chapitre 11 « Density Estimation with Gaussian Mixture Models » (p. 348-370)</td>
+</tr>
+<tr>
+<td><strong>Difficulté</strong></td>
+<td> Avancé — le <strong>troisième pilier</strong>, et le premier où <strong>aucune solution fermée n'existe</strong></td>
+</tr>
+<tr>
+<td><strong>Temps d'étude estimé</strong></td>
+<td>130 min</td>
+</tr>
+<tr>
+<td><strong>Prérequis</strong></td>
+<td>Fiche 405 (gaussiennes, Bayes) · Fiche 406 (multiplicateurs de Lagrange) · Fiche 407 (MLE, variables latentes)</td>
+</tr>
+<tr>
+<td><strong>Concepts clés</strong></td>
+<td>Estimation de densité, modèle de mélange, combinaison convexe, poids de mélange, mélange gaussien (GMM), multimodalité, log-vraisemblance non factorisable, responsabilité, affectation douce, responsabilité totale $N_k$, mise à jour des moyennes, des covariances, des poids, algorithme espérance-maximisation, étape E, étape M, monotonie, variable indicatrice binaire, encodage one-hot, représentation 1-parmi-$K$, multinoulli, marginalisation des latentes, a posteriori latente</td>
+</tr>
+<tr>
+<td><strong>Poids à l'examen</strong></td>
+<td>$p(x\mid\theta)=\sum_k\pi_k\mathcal N(x\mid\mu_k,\Sigma_k)$ avec $\sum_k\pi_k=1$ · la <strong>responsabilité</strong> $r_{nk}$ · les <strong>trois mises à jour</strong> $\mu_k$, $\Sigma_k$, $\pi_k$ · le cycle <strong>E-step / M-step</strong> · <strong>la responsabilité EST l'a posteriori $p(z_k=1\mid x)$</strong>.</td>
+</tr>
+</tbody></table>
+<h2>Vue d'ensemble</h2>
+<pre><code>LE FIL DU CHAPITRE : quand une SEULE gaussienne ne suffit plus
+
+  §11.1 MODÈLE DE MÉLANGE      p(x) = Σk πk pk(x) ,  0 ≤ πk ≤ 1 ,  Σk πk = 1
+        ⚠️ COMBINAISON CONVEXE de lois de base → permet la MULTIMODALITÉ
+        GMM :  p(x | θ) = Σk πk N(x | µk, Σk)      θ = {πk, µk, Σk}
+  §11.2 APPRENTISSAGE PAR MAXIMUM DE VRAISEMBLANCE
+        L = Σn log ( Σk πk N(xn | µk, Σk) )
+        ⚠️ le LOG NE PEUT PAS ENTRER dans la somme → PAS de solution fermée
+        RESPONSABILITÉ  r_nk = πk N(xn|µk,Σk) / Σj πj N(xn|µj,Σj)
+              ⚠️ vecteur de PROBABILITÉ : Σk r_nk = 1  →  AFFECTATION DOUCE
+              N_k := Σn r_nk = responsabilité TOTALE de la composante k
+        MISE À JOUR DES MOYENNES     µk = (1/Nk) Σn r_nk xn
+        MISE À JOUR DES COVARIANCES  Σk = (1/Nk) Σn r_nk (xn − µk)(xn − µk)ᵀ
+        MISE À JOUR DES POIDS        πk = Nk / N          ← via LAGRANGE
+        ⚠️ les trois dépendent des r_nk, qui dépendent des trois → ITÉRER
+  §11.3 ALGORITHME EM  (Dempster et al., 1977)
+        1. INITIALISER  µk, Σk, πk
+        2. ÉTAPE E : évaluer les r_nk avec les paramètres COURANTS
+        3. ÉTAPE M : réestimer µk, Σk, πk avec les r_nk COURANTES
+        4. répéter jusqu'à convergence
+        ⚠️ CHAQUE étape AUGMENTE la log-vraisemblance (Neal &amp; Hinton, 1999)
+  §11.4 PERSPECTIVE VARIABLE LATENTE — latente DISCRÈTE (contraste avec l'ACP)
+        z ∈ {0,1}^K , ONE-HOT ,  p(zk = 1) = πk ,  p(x | zk = 1) = N(x | µk, Σk)
+        VRAISEMBLANCE  p(x|θ) = Σz p(x|θ,z) p(z|θ) = Σk πk N(x|µk,Σk)   ← LE MÊME MODÈLE
+        A POSTERIORI   p(zk = 1 | x) = πk N(x|µk,Σk) / Σj πj N(x|µj,Σj)
+        ⚠️⚠️ C'EST EXACTEMENT LA RESPONSABILITÉ
+
+LA LEÇON CENTRALE   La RESPONSABILITÉ n'est pas une astuce de calcul :
+                    c'est la LOI A POSTERIORI de la variable latente.
+</code></pre>
+<blockquote>
+<p><strong>La motivation.</strong> <em>« En estimation de densité, on représente les données <strong>de façon COMPACTE</strong> par une densité d'une famille paramétrique. »</em>  Mais <em>« la gaussienne (comme toutes les lois rencontrées jusqu'ici) a des <strong>capacités de modélisation LIMITÉES</strong> : une approximation gaussienne de la densité qui a généré les données de la figure 11.1 serait une <strong>MAUVAISE approximation</strong>. »</em></p>
+</blockquote>
+<h2 data-prio="must">Concept 1 — Le modèle de mélange (§11.1)</h2>
+<p>$$\boxed{\;p(x)=\sum_{k=1}^{K}\pi_kp_k(x),\qquad 0\leqslant\pi_k\leqslant1,\qquad\sum_{k=1}^{K}\pi_k=1\;}$$</p>
+<p><em>« Une <strong>COMBINAISON CONVEXE</strong> de $K$ lois simples (de base). »</em> Les $p_k$ appartiennent à une famille de base (gaussiennes, Bernoulli, gamma…) et les $\pi_k$ sont les <strong>POIDS DE MÉLANGE</strong>.</p>
+<blockquote>
+<p> <strong>LA raison d'être.</strong> *« Les modèles de mélange sont <strong>PLUS EXPRESSIFS</strong> que les lois de base correspondantes, car ils permettent des représentations <strong>MULTIMODALES</strong> : ils peuvent décrire des jeux de données à <strong>plusieurs "CLUSTERS"</strong>. »*</p>
+</blockquote>
+<p><strong>Le mélange gaussien (GMM) :</strong></p>
+<p>$$\boxed{\;p(x\mid\theta)=\sum_{k=1}^{K}\pi_k\,\mathcal N(x\mid\mu_k,\Sigma_k),\qquad\theta:=\{\pi_k,\mu_k,\Sigma_k:k=1,\dots,K\}\;}$$</p>
+<p><strong>L'exemple de la figure 11.2</strong> — un mélange à trois composantes :</p>
+<p>$$p(x\mid\theta)=0{,}5\,\mathcal N\!\left(x\ \middle|\ -2,\ \tfrac12\right)+0{,}2\,\mathcal N(x\mid1,\ 2)+0{,}3\,\mathcal N(x\mid4,\ 1)$$</p>
+<details class="cor">
+<summary> Contrôles : normalisation et moyenne du mélange</summary><div class="in">
+
+<p>Intégration numérique sur $[-30,40]$ avec $400\,000$ points (règle du point milieu) :</p>
+<p>$$\int p(x)\,dx=1{,}00000000\quad\text{}$$
+$$\mathbb E[x]_{\text{numérique}}=0{,}400000\qquad\text{formule : }0{,}5(-2)+0{,}2(1)+0{,}3(4)=0{,}4\quad\text{}$$</p>
+<p class="cal piege"> Un mélange de <strong>densités</strong> est bien une densité — mais <strong>la moyenne n'est PAS un mode</strong> : ici $0{,}4$ tombe dans un <strong>creux</strong> entre les composantes.</p>
+</div></details>
+
+<h2 data-prio="must">Concept 2 — Pourquoi il n'y a pas de solution fermée (§11.2)</h2>
+<p><strong>La vraisemblance factorisée</strong> (hypothèse i.i.d.) :</p>
+<p>$$p(\mathcal X\mid\theta)=\prod_{n=1}^{N}p(x_n\mid\theta),\qquad p(x_n\mid\theta)=\sum_{k=1}^{K}\pi_k\mathcal N(x_n\mid\mu_k,\Sigma_k)$$</p>
+<p><strong>La log-vraisemblance :</strong></p>
+<p>$$\boxed{\;\mathcal L=\log p(\mathcal X\mid\theta)=\sum_{n=1}^{N}\log\underbrace{\left(\sum_{k=1}^{K}\pi_k\mathcal N(x_n\mid\mu_k,\Sigma_k)\right)}_{\text{ une SOMME sous le LOG}}\;}$$</p>
+<blockquote>
+<p class="cal piege"> <strong>LE BLOCAGE, expliqué par le livre.</strong> <em>« Notre procédure "<strong>NORMALE</strong>" serait de calculer le gradient $d\mathcal L/d\theta$, l'annuler et résoudre. Mais contrairement aux exemples précédents (la régression linéaire du §9.2), <strong>on ne peut PAS obtenir de solution en FORME FERMÉE</strong>. »</em></p>
+</blockquote>
+<blockquote>
+<p> <strong>La comparaison qui éclaire tout.</strong> <em>« Si l'on considérait une <strong>SEULE gaussienne</strong>, la somme sur $k$ <strong>DISPARAÎT</strong> et le log peut s'appliquer <strong>DIRECTEMENT</strong> à la composante gaussienne »</em> :
+$$\log\mathcal N(x\mid\mu,\Sigma)=-\frac D2\log(2\pi)-\frac12\log\det\Sigma-\frac12(x-\mu)^\top\Sigma^{-1}(x-\mu)$$
+ <strong>Tout est alors quadratique et se résout d'un coup.</strong> C'est <strong>la somme sur $k$ à l'intérieur du log</strong> qui casse cette possibilité.</p>
+</blockquote>
+<blockquote>
+<p> <strong>La parade.</strong> <em>« On peut exploiter un <strong>SCHÉMA ITÉRATIF</strong>... <strong>L'IDÉE CLÉ est de mettre à jour UN paramètre à la fois en GARDANT les autres FIXÉS.</strong> »</em></p>
+</blockquote>
+<p><strong>L'exemple courant du chapitre</strong> (figure 11.3) :</p>
+<p>$$\mathcal X=\{-3,\ -2{,}5,\ -1,\ 0,\ 2,\ 4,\ 5\}\qquad(N=7,\ K=3)$$
+$$p_1=\mathcal N(x\mid-4,\ 1),\quad p_2=\mathcal N(x\mid0,\ 0{,}2),\quad p_3=\mathcal N(x\mid8,\ 3),\quad\pi_1=\pi_2=\pi_3=\tfrac13$$</p>
+<h2 data-prio="must">Concept 3 — Les responsabilités (§11.2.1)</h2>
+<p>$$\boxed{\;r_{nk}:=\frac{\pi_k\mathcal N(x_n\mid\mu_k,\Sigma_k)}{\sum_{j=1}^{K}\pi_j\mathcal N(x_n\mid\mu_j,\Sigma_j)}\;}$$</p>
+<blockquote>
+<p><strong>La définition.</strong> <em>« La <strong>RESPONSABILITÉ</strong> de la $k$-ième composante pour le $n$-ième point. Elle est <strong>PROPORTIONNELLE À LA VRAISEMBLANCE</strong> $\pi_k\mathcal N(x_n\mid\mu_k,\Sigma_k)$ de la composante étant donné le point. Les composantes ont donc une <strong>haute responsabilité</strong> pour un point quand celui-ci <strong>pourrait être un échantillon PLAUSIBLE</strong> de cette composante. »</em></p>
+</blockquote>
+<p><strong>Les trois propriétés :</strong></p>
+<table>
+<thead>
+<tr>
+<th>Propriété</th>
+<th>Énoncé</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Vecteur de probabilité</strong></td>
+<td>$r_n:=[r_{n1},\dots,r_{nK}]^\top\in\mathbb R^K$ avec $\sum_kr_{nk}=1$ et $r_{nk}\geqslant0$</td>
+</tr>
+<tr>
+<td><strong>Affectation douce</strong></td>
+<td> <em>« Ce vecteur <strong>DISTRIBUE la masse de probabilité</strong> parmi les $K$ composantes : on peut penser à $r_n$ comme à une <strong>"AFFECTATION DOUCE" (<em>soft assignment</em>)</strong> de $x_n$ »</em></td>
+</tr>
+<tr>
+<td><strong>Interprétation probabiliste</strong></td>
+<td> <em>« $r_{nk}$ représente la <strong>PROBABILITÉ que $x_n$ ait été GÉNÉRÉ par la $k$-ième composante</strong> »</em></td>
+</tr>
+</tbody></table>
+<p><strong>La responsabilité totale :</strong></p>
+<p>$$\boxed{\;N_k:=\sum_{n=1}^{N}r_{nk}\qquad\text{avec}\qquad\sum_{k=1}^{K}N_k=N\;}$$</p>
+<p><strong>Exemple 11.2 — la matrice des responsabilités.</strong> Pour le jeu courant, $R\in\mathbb R^{7\times3}$ :</p>
+<p>$$R=\begin{bmatrix}1{,}0&amp;0{,}0&amp;0{,}0\\1{,}0&amp;0{,}0&amp;0{,}0\\0{,}057&amp;0{,}943&amp;0{,}0\\0{,}001&amp;0{,}999&amp;0{,}0\\0{,}0&amp;0{,}066&amp;0{,}934\\0{,}0&amp;0{,}0&amp;1{,}0\\0{,}0&amp;0{,}0&amp;1{,}0\end{bmatrix}$$</p>
+<p><strong>La lecture, ligne et colonne :</strong></p>
+<table>
+<thead>
+<tr>
+<th>Lecture</th>
+<th>Ce qu'elle donne</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Une LIGNE $n$</strong></td>
+<td>Les responsabilités de <strong>toutes</strong> les composantes pour $x_n$ ;  <strong>elle somme à 1</strong></td>
+</tr>
+<tr>
+<td><strong>Une COLONNE $k$</strong></td>
+<td>Un aperçu de la responsabilité de la composante $k$ <strong>sur tout le jeu</strong></td>
+</tr>
+<tr>
+<td><strong>Somme d'une colonne</strong></td>
+<td> <strong>$N_k$</strong>, la responsabilité totale</td>
+</tr>
+</tbody></table>
+<p><em>« On voit que la <strong>troisième composante n'est responsable d'AUCUN des quatre premiers points</strong>, mais prend <strong>beaucoup</strong> de responsabilité des points restants. »</em></p>
+<details class="cor">
+<summary> Reproduction exacte de la matrice, et une petite divergence dans $N_k$</summary><div class="in">
+
+<p>Recalcul à pleine précision depuis les paramètres initiaux :</p>
+<table>
+<thead>
+<tr>
+<th>$x_n$</th>
+<th>$r_{n1}$</th>
+<th>$r_{n2}$</th>
+<th>$r_{n3}$</th>
+<th>somme</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$-3{,}0$</td>
+<td>$0{,}9999999977$</td>
+<td>$\approx0$</td>
+<td>$\approx0$</td>
+<td>$1{,}0$ </td>
+</tr>
+<tr>
+<td>$-2{,}5$</td>
+<td>$0{,}9999988536$</td>
+<td>$\approx0$</td>
+<td>$\approx0$</td>
+<td>$1{,}0$ </td>
+</tr>
+<tr>
+<td>$-1{,}0$</td>
+<td>$0{,}0570694724$</td>
+<td>$0{,}9429$</td>
+<td>$\approx0$</td>
+<td>$1{,}0$ </td>
+</tr>
+<tr>
+<td>$0{,}0$</td>
+<td>$0{,}0001500000$</td>
+<td>$0{,}9999$</td>
+<td>$\approx0$</td>
+<td>$1{,}0$ </td>
+</tr>
+<tr>
+<td>$2{,}0$</td>
+<td>$0{,}0000099371$</td>
+<td>$0{,}0662$</td>
+<td>$0{,}9338$</td>
+<td>$1{,}0$ </td>
+</tr>
+<tr>
+<td>$4{,}0$</td>
+<td>$\approx0$</td>
+<td>$\approx0$</td>
+<td>$1{,}0$</td>
+<td>$1{,}0$ </td>
+</tr>
+<tr>
+<td>$5{,}0$</td>
+<td>$\approx0$</td>
+<td>$\approx0$</td>
+<td>$1{,}0$</td>
+<td>$1{,}0$ </td>
+</tr>
+</tbody></table>
+<p class="cal piege"> <strong>La matrice est reproduite à l'identique</strong> aux arrondis du livre près.</p>
+<p><strong>Une divergence de troisième décimale sur $N_k$.</strong> Calcul exact : $N_1=2{,}057228$, $N_2=2{,}009008$, $N_3=2{,}933763$. Le livre imprime $N_1=2{,}058$, $N_2=2{,}008$, $N_3=2{,}934$.  Noter que <strong>la somme de la première colonne de la matrice IMPRIMÉE par le livre</strong> vaut $1{,}0+1{,}0+0{,}057=2{,}057$ — donc le $2{,}058$ annoncé <strong>ne concorde ni avec la matrice du livre ni avec le calcul exact</strong>. Les deux jeux somment bien à $7=N$ et <strong>toutes les mises à jour en aval concordent</strong>, donc c'est sans conséquence.</p>
+</div></details>
+
+<h2 data-prio="must">Concept 4 — Les trois mises à jour (§11.2.2-11.2.4)</h2>
+<h3>4.1 Les moyennes — Théorème 11.1</h3>
+<p>$$\boxed{\;\mu_k^{\text{nouveau}}=\frac{\sum_{n=1}^{N}r_{nk}x_n}{\sum_{n=1}^{N}r_{nk}}=\frac{1}{N_k}\sum_{n=1}^{N}r_{nk}x_n\;}$$</p>
+<p><strong>Le pas clé de la preuve</strong> — seule la $k$-ième composante dépend de $\mu_k$ :</p>
+<p>$$\frac{\partial p(x_n\mid\theta)}{\partial\mu_k}=\pi_k\frac{\partial\mathcal N(x_n\mid\mu_k,\Sigma_k)}{\partial\mu_k}=\pi_k(x_n-\mu_k)^\top\Sigma_k^{-1}\mathcal N(x_n\mid\mu_k,\Sigma_k)$$</p>
+<blockquote>
+<p> <strong>LES TROIS INTERPRÉTATIONS, données par le livre.</strong></p>
+<ol>
+<li><strong>Estimateur de Monte-Carlo pondéré par importance</strong> : <em>« les poids d'importance du point $x_n$ sont les <strong>responsabilités</strong> $r_{nk}$ »</em>.</li>
+<li><strong>Attraction</strong> :  *« La moyenne $\mu_k$ est <strong>TIRÉE VERS un point $x_n$ avec une FORCE donnée par $r_{nk}$</strong>. Les moyennes sont tirées <strong>plus fortement</strong> vers les points pour lesquels la composante a une <strong>haute responsabilité</strong>. »*</li>
+<li><strong>Espérance sous une loi induite</strong> : avec $r_k:=[r_{1k},\dots,r_{Nk}]^\top/N_k$, un vecteur de probabilité normalisé,
+$$\boxed{\;\mu_k\leftarrow\mathbb E_{r_k}[\mathcal X]\;}$$</li>
+</ol>
+</blockquote>
+<blockquote>
+<p class="cal piege"> <strong>La remarque qui explique tout le chapitre.</strong> <em>« La mise à jour des $\mu_k$ <strong>dépend de TOUTES les moyennes, covariances et poids</strong> via $r_{nk}$. On <strong>NE PEUT DONC PAS</strong> obtenir de solution fermée pour tous les $\mu_k$ <strong>d'un coup</strong>. »</em></p>
+</blockquote>
+<p><strong>Exemple 11.3 :</strong> $\mu_1:-4\to-2{,}7$ ; $\mu_2:0\to-0{,}4$ ; $\mu_3:8\to3{,}7$. <em>« Les moyennes de la première et de la troisième composante <strong>se déplacent vers le régime des données</strong>, alors que celle de la deuxième <strong>ne change pas si dramatiquement</strong>. »</em></p>
+<h3>4.2 Les covariances — Théorème 11.2</h3>
+<p>$$\boxed{\;\Sigma_k^{\text{nouveau}}=\frac{1}{N_k}\sum_{n=1}^{N}r_{nk}(x_n-\mu_k)(x_n-\mu_k)^\top\;}$$</p>
+<blockquote>
+<p> <strong>L'interprétation parallèle.</strong> <em>« Comme pour $\mu_k$, on peut interpréter cette mise à jour comme une <strong>espérance PONDÉRÉE PAR IMPORTANCE du CARRÉ des données CENTRÉES</strong> $\tilde{\mathcal X}_k:=\{x_1-\mu_k,\dots,x_N-\mu_k\}$. »</em></p>
+</blockquote>
+<p><strong>Exemple 11.4 :</strong> $\sigma_1^2:1\to0{,}14$ ; $\sigma_2^2:0{,}2\to0{,}44$ ; $\sigma_3^2:3\to1{,}53$. <em>« Les variances de la première et de la troisième composante <strong>RÉTRÉCISSENT significativement</strong>, alors que celle de la deuxième <strong>AUGMENTE légèrement</strong>. »</em></p>
+<h3>4.3 Les poids — Théorème 11.3</h3>
+<p>$$\boxed{\;\pi_k^{\text{nouveau}}=\frac{N_k}{N}\;}$$</p>
+<blockquote>
+<p> <strong>Le seul endroit où Lagrange intervient.</strong> <em>« Pour trouver la dérivée partielle par rapport aux $\pi_k$, on doit <strong>tenir compte de la CONTRAINTE $\sum_k\pi_k=1$</strong> en utilisant les <strong>MULTIPLICATEURS DE LAGRANGE</strong> (§7.2) »</em> :
+$$\mathfrak L=\mathcal L+\lambda\left(\sum_{k=1}^{K}\pi_k-1\right)$$</p>
+</blockquote>
+<p class="cal piege"> La formule est d'une simplicité remarquable : <strong>la fraction de responsabilité totale</strong>.</p>
+<p><strong>Exemple 11.5 :</strong> $\pi_1:\tfrac13\to0{,}29$ ; $\pi_2:\tfrac13\to0{,}29$ ; $\pi_3:\tfrac13\to0{,}42$. <em>« La troisième composante gagne <strong>plus de poids/importance</strong>. »</em></p>
+<details class="cor">
+<summary> Reproduction exacte des trois mises à jour</summary><div class="in">
+
+<table>
+<thead>
+<tr>
+<th>Paramètre</th>
+<th>Calcul à pleine précision</th>
+<th>Valeur du livre</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$\mu$</td>
+<td>$[-2{,}7012\ ;\ -0{,}4034\ ;\ 3{,}7043]$</td>
+<td>$[-2{,}7\ ;\ -0{,}4\ ;\ 3{,}7]$ </td>
+</tr>
+<tr>
+<td>$\sigma^2$</td>
+<td>$[0{,}1440\ ;\ 0{,}4385\ ;\ 1{,}5266]$</td>
+<td>$[0{,}14\ ;\ 0{,}44\ ;\ 1{,}53]$ </td>
+</tr>
+<tr>
+<td>$\pi$</td>
+<td>$[0{,}2939\ ;\ 0{,}2870\ ;\ 0{,}4191]$</td>
+<td>$[0{,}29\ ;\ 0{,}29\ ;\ 0{,}42]$ </td>
+</tr>
+</tbody></table>
+<p class="cal piege"> <strong>Les trois arrondissent EXACTEMENT</strong> aux valeurs annoncées, et $\sum_k\pi_k=1{,}0$ à la précision machine.  <strong>L'ordre compte</strong> : les variances de l'exemple 11.4 se calculent avec les <strong>NOUVELLES</strong> moyennes de l'exemple 11.3.</p>
+</div></details>
+
+<h2 data-prio="must">Concept 5 — L'algorithme EM (§11.3)</h2>
+<blockquote>
+<p><strong>Le diagnostic.</strong> <em>« Les mises à jour <strong>NE CONSTITUENT PAS une solution en forme fermée</strong>, parce que les responsabilités $r_{nk}$ <strong>dépendent de ces paramètres de façon COMPLEXE</strong>. Mais les résultats <strong>SUGGÈRENT un schéma ITÉRATIF simple</strong>. »</em></p>
+</blockquote>
+<p>*L'algorithme d'<strong>ESPÉRANCE-MAXIMISATION</strong> a été proposé par <strong>Dempster</strong> et al. <strong>(1977)</strong> ; c'est <em>« un schéma itératif GÉNÉRAL pour apprendre les paramètres (maximum de vraisemblance ou MAP) dans les modèles de mélange et, <strong>plus généralement, les modèles à VARIABLES LATENTES</strong> »</em>.</p>
+<p><strong>L'algorithme pour un GMM :</strong></p>
+<p><strong>Étape 1 — INITIALISER</strong> $\mu_k$, $\Sigma_k$, $\pi_k$.</p>
+<p><strong>Étape 2 — ÉTAPE E.</strong> <em>« Évaluer les responsabilités $r_{nk}$ pour chaque point avec les paramètres COURANTS »</em> — c'est la <strong>probabilité A POSTERIORI que le point $n$ appartienne à la composante $k$</strong> :</p>
+<p>$$\boxed{\;r_{nk}=\frac{\pi_k\mathcal N(x_n\mid\mu_k,\Sigma_k)}{\sum_j\pi_j\mathcal N(x_n\mid\mu_j,\Sigma_j)}\;}$$</p>
+<p><strong>Étape 3 — ÉTAPE M.</strong> <em>« Réestimer les paramètres avec les responsabilités COURANTES »</em> :</p>
+<p>$$\mu_k=\frac{1}{N_k}\sum_nr_{nk}x_n,\qquad\Sigma_k=\frac{1}{N_k}\sum_nr_{nk}(x_n-\mu_k)(x_n-\mu_k)^\top,\qquad\pi_k=\frac{N_k}{N}$$</p>
+<p><strong>Étape 4 — répéter jusqu'à convergence.</strong></p>
+<blockquote>
+<p> <strong>LA GARANTIE.</strong> <em>« <strong>CHAQUE étape de l'algorithme EM AUGMENTE la fonction de LOG-VRAISEMBLANCE</strong> (Neal et Hinton, 1999). »</em>  <em>« Pour la convergence, on peut vérifier <strong>la log-vraisemblance ou les paramètres directement</strong>. »</em></p>
+</blockquote>
+<p><strong>Exemple 11.6.</strong> <em>« Après <strong>CINQ itérations</strong>, l'algorithme EM converge. »</em></p>
+<details class="cor">
+<summary> Reproduction de la trajectoire EM et test de monotonie</summary><div class="in">
+
+<p>Log-vraisemblance <strong>négative</strong> (plus bas est meilleur) par itération :</p>
+<table>
+<thead>
+<tr>
+<th>Itération</th>
+<th>$-\mathcal L$</th>
+<th>$\mu$</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$0$</td>
+<td>$28{,}3255$</td>
+<td>$[-4{,}000\ ;\ 0{,}000\ ;\ 8{,}000]$</td>
+</tr>
+<tr>
+<td>$1$</td>
+<td>$14{,}4105$</td>
+<td>$[-2{,}701\ ;\ -0{,}403\ ;\ 3{,}704]$</td>
+</tr>
+<tr>
+<td>$2$</td>
+<td>$13{,}9771$</td>
+<td>$[-2{,}750\ ;\ -0{,}501\ ;\ 3{,}655]$</td>
+</tr>
+<tr>
+<td>$3$</td>
+<td>$13{,}9733$</td>
+<td>$[-2{,}750\ ;\ -0{,}504\ ;\ 3{,}647]$</td>
+</tr>
+<tr>
+<td>$4$</td>
+<td>$13{,}9733$</td>
+<td>$[-2{,}750\ ;\ -0{,}504\ ;\ 3{,}645]$</td>
+</tr>
+<tr>
+<td>$5$</td>
+<td>$13{,}9733$</td>
+<td>$[-2{,}750\ ;\ -0{,}504\ ;\ 3{,}645]$</td>
+</tr>
+</tbody></table>
+<p class="cal piege"> <strong>La convergence en cinq itérations est confirmée</strong> — la log-vraisemblance est stable à quatre décimales dès l'itération 3, et les paramètres dès l'itération 4. Cohérent avec la figure 11.8(b).</p>
+<p><strong>Test de MONOTONIE</strong> : sur <strong>30 itérations</strong>, aucune violation de $\mathcal L^{(t+1)}\geqslant\mathcal L^{(t)}$  — la garantie de Neal et Hinton est vérifiée numériquement.</p>
+<p class="cal piege"> Noter aussi le <strong>saut initial énorme</strong> : la première itération fait chuter $-\mathcal L$ de $28{,}33$ à $14{,}41$, soit <strong>plus de la moitié du gain total</strong> en une seule passe.</p>
+</div></details>
+
+<p><strong>Le second exemple (figures 11.9-11.10) — un jeu bidimensionnel, 3 composantes, convergence en 62 itérations.</strong> *« Alors qu'une <strong>SEULE</strong> composante est clairement responsable des données de gauche, le <strong>CHEVAUCHEMENT des deux clusters de droite</strong> pourrait avoir été généré par <strong>DEUX</strong> composantes. Il devient clair qu'il y a des points <strong>qui ne peuvent PAS être affectés de façon UNIQUE</strong> à une seule composante — les responsabilités de ces deux clusters sont alors <strong>autour de $0{,}5$</strong>. »*</p>
+<h2 data-prio="must">Concept 6 — La perspective variable latente (§11.4)</h2>
+<h3>6.1 Le contraste avec l'ACP</h3>
+<blockquote>
+<p> <strong>La différence structurelle.</strong> *« On peut voir le GMM comme un modèle à variable latente <strong>DISCRÈTE</strong> — où $z$ ne peut prendre qu'un <strong>ensemble FINI de valeurs</strong>. C'est <strong>en CONTRASTE avec l'ACP</strong>, où les variables latentes étaient des nombres <strong>CONTINUS dans $\mathbb R^M$</strong>. »*</p>
+</blockquote>
+<h3>6.2 Le processus génératif</h3>
+<blockquote>
+<p><strong>L'hypothèse fondatrice.</strong> <em>« Un point $x$ peut être généré par <strong>EXACTEMENT UNE</strong> composante de mélange. »</em></p>
+</blockquote>
+<p>On introduit une <strong>variable indicatrice BINAIRE</strong> $z_k\in\{0,1\}$ :</p>
+<p>$$\boxed{\;p(x\mid z_k=1)=\mathcal N(x\mid\mu_k,\Sigma_k)\;}$$</p>
+<p>$$\boxed{\;z:=[z_1,\dots,z_K]^\top\in\mathbb R^K\ \text{avec }K-1\text{ zéros et EXACTEMENT UN }1\;}$$</p>
+<p class="cal piege"> Par exemple pour $K=3$, $z=[0,1,0]^\top$ <strong>sélectionne la deuxième composante</strong>. Comme $\sum_kz_k=1$, $z$ est un <strong>ENCODAGE ONE-HOT</strong> (aussi : <strong>représentation 1-parmi-$K$</strong>).</p>
+<blockquote>
+<p class="cal piege"> <strong>Le nom de cette loi.</strong> <em>« Ce genre de loi est parfois appelé "<strong>MULTINOULLI</strong>", une généralisation de la Bernoulli à <strong>plus de deux valeurs</strong> »</em> (Murphy, 2012).</p>
+</blockquote>
+<p><strong>L'a priori sur la latente :</strong></p>
+<p>$$\boxed{\;p(z)=\pi=[\pi_1,\dots,\pi_K]^\top,\qquad\sum_k\pi_k=1,\qquad\pi_k=p(z_k=1)\;}$$</p>
+<p><em>« $\pi_k$ décrit la <strong>PROBABILITÉ que la $k$-ième composante ait généré</strong> le point $x$. »</em></p>
+<h3>6.3 La vraisemblance — le modèle est le même</h3>
+<p>On <strong>marginalise la latente</strong> (§8.4.3) :</p>
+<p>$$p(x\mid\theta)=\sum_zp(x\mid\theta,z)\,p(z\mid\theta)$$</p>
+<blockquote>
+<p> <strong>Le pas de simplification.</strong> <em>« Puisqu'il n'y a qu'<strong>UNE SEULE entrée non nulle</strong> dans chaque $z$, il n'y a que <strong>$K$ configurations possibles</strong>. Sommer sur toutes les configurations <strong>équivaut à regarder l'entrée non nulle</strong> »</em> :</p>
+</blockquote>
+<p>$$p(x\mid\theta)=\sum_{k=1}^{K}p(x\mid\theta,z_k=1)\,p(z_k=1\mid\theta)$$</p>
+<p>$$\boxed{\;p(x\mid\theta)=\sum_{k=1}^{K}\pi_k\,\mathcal N(x\mid\mu_k,\Sigma_k)\;}$$</p>
+<p class="cal piege"> <em>« qu'on <strong>IDENTIFIE au modèle GMM</strong> de (11.3). »</em> Et sur tout le jeu :</p>
+<p>$$p(\mathcal X\mid\theta)=\prod_{n=1}^{N}\sum_{k=1}^{K}\pi_k\mathcal N(x_n\mid\mu_k,\Sigma_k)$$</p>
+<p>$$\boxed{\;\text{Le modèle à indicateurs latents est une façon ÉQUIVALENTE de penser un GMM.}\;}$$</p>
+<h3>6.4 L'a posteriori — LA révélation</h3>
+<p>Par le théorème de Bayes :</p>
+<p>$$p(z_k=1\mid x)=\frac{p(z_k=1)\,p(x\mid z_k=1)}{\sum_{j=1}^{K}p(z_j=1)\,p(x\mid z_j=1)}$$</p>
+<p>$$\boxed{\;p(z_k=1\mid x)=\frac{\pi_k\mathcal N(x\mid\mu_k,\Sigma_k)}{\sum_{j=1}^{K}\pi_j\mathcal N(x\mid\mu_j,\Sigma_j)}\;}$$</p>
+<blockquote>
+<p> <strong>LE POINT CULMINANT DU CHAPITRE.</strong> <em>« ...qu'on <strong>IDENTIFIE comme la RESPONSABILITÉ</strong> de la $k$-ième composante pour le point $x$. »</em>
+$$\boxed{\;r_{nk}=p(z_{nk}=1\mid x_n)\;}$$
+ La responsabilité <strong>n'était donc pas une astuce de calcul</strong> : c'est <strong>la LOI A POSTERIORI de la variable latente</strong>. C'est exactement pourquoi l'étape E s'appelle l'étape « <strong>espérance</strong> ».</p>
+</blockquote>
+<h3>6.5 Extension à tout le jeu de données</h3>
+<p><em>« Dans l'interprétation probabiliste, <strong>chaque point $x_n$ possède SA PROPRE variable latente</strong> $z_n=[z_{n1},\dots,z_{nK}]^\top\in\mathbb R^K$. »</em>  <em>« On <strong>PARTAGE le même a priori $\pi$</strong> entre toutes les variables latentes $z_n$ »</em> — d'où la <strong>notation en PLAQUES</strong> de la figure 11.12 : $\pi$ hors de la plaque, $z_n$ et $x_n$ dedans, $\mu_k$ et $\Sigma_k$ dans une plaque sur $k$.</p>
+<p>$$p(x_1,\dots,x_N\mid z_1,\dots,z_N)=\prod_{n=1}^{N}p(x_n\mid z_n)$$</p>
+<h2>Comment reconnaître le type d'exercice</h2>
+<table>
+<thead>
+<tr>
+<th>L'énoncé dit...</th>
+<th>Le type</th>
+<th>La méthode</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>« Une gaussienne ne suffit pas »</td>
+<td><strong>§11.1</strong></td>
+<td>Passer à un <strong>mélange</strong> : $\sum_k\pi_kp_k(x)$</td>
+</tr>
+<tr>
+<td>« Vérifier que c'est une densité »</td>
+<td><strong>§11.1</strong></td>
+<td> $\pi_k\geqslant0$ <strong>et</strong> $\sum_k\pi_k=1$ — c'est une <strong>combinaison CONVEXE</strong></td>
+</tr>
+<tr>
+<td>« Écrire la log-vraisemblance »</td>
+<td><strong>§11.2</strong></td>
+<td>$\sum_n\log\big(\sum_k\pi_k\mathcal N\big)$ ;  <strong>le log ne rentre PAS</strong></td>
+</tr>
+<tr>
+<td>« Pourquoi pas de solution fermée ? »</td>
+<td><strong>§11.2</strong></td>
+<td> La <strong>somme sur $k$ SOUS le log</strong> ; les $r_{nk}$ dépendent de tous les paramètres</td>
+</tr>
+<tr>
+<td>« Calculer les responsabilités »</td>
+<td><strong>§11.2.1</strong></td>
+<td>$r_{nk}=\dfrac{\pi_k\mathcal N(x_n\mid\mu_k,\Sigma_k)}{\sum_j\pi_j\mathcal N(x_n\mid\mu_j,\Sigma_j)}$ ;  <strong>contrôle : chaque ligne somme à 1</strong></td>
+</tr>
+<tr>
+<td>« Que vaut $N_k$ ? »</td>
+<td><strong>§11.2.1</strong></td>
+<td>La <strong>somme d'une COLONNE</strong> de $R$ ;  $\sum_kN_k=N$</td>
+</tr>
+<tr>
+<td>« Mettre à jour les moyennes »</td>
+<td><strong>Th. 11.1</strong></td>
+<td>$\mu_k=\frac{1}{N_k}\sum_nr_{nk}x_n$</td>
+</tr>
+<tr>
+<td>« Mettre à jour les covariances »</td>
+<td><strong>Th. 11.2</strong></td>
+<td>$\Sigma_k=\frac{1}{N_k}\sum_nr_{nk}(x_n-\mu_k)(x_n-\mu_k)^\top$ ;  avec les <strong>NOUVELLES</strong> $\mu_k$</td>
+</tr>
+<tr>
+<td>« Mettre à jour les poids »</td>
+<td><strong>Th. 11.3</strong></td>
+<td>$\pi_k=N_k/N$ ;  dérivé par <strong>LAGRANGE</strong></td>
+</tr>
+<tr>
+<td>« Décrire l'algorithme EM »</td>
+<td><strong>§11.3</strong></td>
+<td>Initialiser · <strong>E</strong> (responsabilités) · <strong>M</strong> (paramètres) · répéter</td>
+</tr>
+<tr>
+<td>« L'algorithme converge-t-il ? »</td>
+<td><strong>§11.3</strong></td>
+<td> <strong>Chaque étape AUGMENTE</strong> la log-vraisemblance ; vers un <strong>optimum LOCAL</strong></td>
+</tr>
+<tr>
+<td>« Écrire le modèle latent »</td>
+<td><strong>§11.4.1</strong></td>
+<td>$z$ <strong>one-hot</strong>, $p(z_k=1)=\pi_k$, $p(x\mid z_k=1)=\mathcal N(\mu_k,\Sigma_k)$</td>
+</tr>
+<tr>
+<td>« Retrouver le GMM depuis le modèle latent »</td>
+<td><strong>§11.4.2</strong></td>
+<td><strong>Marginaliser $z$</strong> : la somme sur les $K$ configurations donne le mélange</td>
+</tr>
+<tr>
+<td>« Que vaut $p(z_k=1\mid x)$ ? »</td>
+<td><strong>§11.4.3</strong></td>
+<td> <strong>EXACTEMENT la responsabilité</strong> $r_{nk}$</td>
+</tr>
+<tr>
+<td>« Dessiner le modèle graphique »</td>
+<td><strong>§11.4.4</strong></td>
+<td>$\pi\to z_n\to x_n$ ; plaque sur $n$ ; $\mu_k,\Sigma_k$ dans une plaque sur $k$</td>
+</tr>
+</tbody></table>
+<h2>Comment résoudre : les quatre méthodes pas-à-pas</h2>
+<p><strong>Méthode A — Un tour complet d'EM à la main.</strong></p>
+<ol>
+<li>Écrire les paramètres courants $\{\pi_k,\mu_k,\Sigma_k\}$.</li>
+<li><strong>Étape E</strong> : pour chaque $n$ et $k$, calculer $\pi_k\mathcal N(x_n\mid\mu_k,\Sigma_k)$.</li>
+<li><strong>Normaliser chaque ligne</strong> pour obtenir $r_{nk}$ ;  <strong>contrôler que chaque ligne somme à 1</strong>.</li>
+<li>Calculer $N_k=\sum_nr_{nk}$ ;  <strong>contrôler $\sum_kN_k=N$</strong>.</li>
+<li><strong>Étape M</strong> : $\mu_k$ d'abord, <strong>puis</strong> $\Sigma_k$ avec ces nouvelles $\mu_k$, <strong>puis</strong> $\pi_k=N_k/N$.</li>
+<li><strong>Contrôle</strong> : la log-vraisemblance doit avoir <strong>augmenté</strong>.</li>
+</ol>
+<p><strong>Méthode B — Diagnostiquer un GMM.</strong></p>
+<ol>
+<li>Regarder la matrice $R$ : des lignes <strong>proches de $[1,0,0]$</strong> signalent une affectation <strong>nette</strong> ; des lignes proches de <strong>$[0{,}5;0{,}5]$</strong> un <strong>chevauchement</strong>.</li>
+<li>Regarder les $N_k$ : un $N_k$ <strong>très petit</strong> signale une composante <strong>mourante</strong>.</li>
+<li>Regarder les $\Sigma_k$ : une variance qui <strong>tend vers $0$</strong> signale une composante <strong>collapsée sur un point</strong> (singularité classique du MLE des GMM).</li>
+<li>Tracer la log-vraisemblance par itération : elle doit être <strong>monotone</strong>.</li>
+</ol>
+<p><strong>Méthode C — Passer du mélange au modèle latent.</strong></p>
+<ol>
+<li>Introduire $z$ <strong>one-hot</strong> de dimension $K$.</li>
+<li>Poser l'a priori $p(z_k=1)=\pi_k$.</li>
+<li>Poser la conditionnelle $p(x\mid z_k=1)=\mathcal N(\mu_k,\Sigma_k)$.</li>
+<li><strong>Marginaliser</strong> : $\sum_zp(x\mid z)p(z)=\sum_k\pi_k\mathcal N(\mu_k,\Sigma_k)$.</li>
+<li><strong>Conditionner</strong> (Bayes) pour retrouver <strong>la responsabilité</strong>.</li>
+</ol>
+<p><strong>Méthode D — Vérifier une densité de mélange.</strong></p>
+<ol>
+<li>Chaque $p_k$ est-elle une densité ?</li>
+<li>$\pi_k\geqslant0$ pour tout $k$ ?</li>
+<li>$\sum_k\pi_k=1$ ?</li>
+<li> <strong>Contrôle numérique</strong> : intégrer $p(x)$ et vérifier $=1$.</li>
+<li>Moyenne du mélange : $\sum_k\pi_k\mu_k$ ;  <strong>elle peut tomber dans un CREUX</strong>.</li>
+</ol>
+<h2 data-prio="must">Common mistakes</h2>
+<table>
+<thead>
+<tr>
+<th>Erreur</th>
+<th>Correction</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Croire qu'un mélange de gaussiennes est gaussien</td>
+<td> <strong>NON</strong> — c'est précisément ce qui le rend <strong>MULTIMODAL</strong> et expressif</td>
+</tr>
+<tr>
+<td>Oublier la contrainte $\sum_k\pi_k=1$</td>
+<td> Sans elle $p(x)$ <strong>n'intègre pas à 1</strong> ; c'est aussi elle qui <strong>impose Lagrange</strong></td>
+</tr>
+<tr>
+<td>Faire entrer le log dans la somme</td>
+<td> $\log\sum_k\neq\sum_k\log$ — <strong>c'est LA raison</strong> de l'absence de solution fermée</td>
+</tr>
+<tr>
+<td>Croire qu'une seule gaussienne pose le même problème</td>
+<td> <strong>NON</strong> : la somme disparaît, le log s'applique directement, tout devient <strong>quadratique</strong></td>
+</tr>
+<tr>
+<td>Oublier de normaliser les responsabilités</td>
+<td> Chaque <strong>LIGNE</strong> de $R$ doit sommer à $1$</td>
+</tr>
+<tr>
+<td>Sommer les responsabilités par ligne pour obtenir $N_k$</td>
+<td> $N_k$ est la somme d'une <strong>COLONNE</strong></td>
+</tr>
+<tr>
+<td>Croire $N_k$ entier</td>
+<td> C'est une <strong>affectation DOUCE</strong> : $N_k$ est un réel</td>
+</tr>
+<tr>
+<td>Traiter les $r_{nk}$ comme des constantes lors de la dérivation</td>
+<td> Elles dépendent de <strong>tous</strong> les paramètres — d'où l'itération</td>
+</tr>
+<tr>
+<td>Calculer $\Sigma_k$ avec les anciennes moyennes</td>
+<td> Utiliser les <strong>NOUVELLES</strong> $\mu_k$ (ordre de l'étape M)</td>
+</tr>
+<tr>
+<td>Diviser par $N$ au lieu de $N_k$ dans $\mu_k$ et $\Sigma_k$</td>
+<td> C'est $N_k$ — la <strong>responsabilité TOTALE de la composante</strong></td>
+</tr>
+<tr>
+<td>Diviser par $N_k$ dans $\pi_k$</td>
+<td> C'est $\pi_k=N_k/\mathbf N$ — le <strong>nombre total de points</strong></td>
+</tr>
+<tr>
+<td>Oublier Lagrange pour les poids</td>
+<td> Sans la contrainte, la maximisation <strong>ne donnerait pas</strong> $N_k/N$</td>
+</tr>
+<tr>
+<td>Croire qu'EM converge vers l'optimum global</td>
+<td> <strong>Optimum LOCAL</strong> — le résultat dépend de <strong>l'initialisation</strong></td>
+</tr>
+<tr>
+<td>Croire qu'EM peut faire baisser la vraisemblance</td>
+<td> <strong>Chaque étape l'AUGMENTE</strong> (Neal &amp; Hinton, 1999) — une baisse signale un <strong>bug</strong></td>
+</tr>
+<tr>
+<td>Confondre étapes E et M</td>
+<td><strong>E</strong> = calculer les <strong>responsabilités</strong> (les latentes) · <strong>M</strong> = réestimer les <strong>paramètres</strong></td>
+</tr>
+<tr>
+<td>Croire les responsabilités binaires</td>
+<td> <strong>Affectation DOUCE</strong> : un point ambigu a des responsabilités <strong>autour de $0{,}5$</strong></td>
+</tr>
+<tr>
+<td>Croire la latente du GMM continue</td>
+<td> Elle est <strong>DISCRÈTE</strong> (one-hot) — c'est le <strong>contraste avec l'ACP</strong></td>
+</tr>
+<tr>
+<td>Croire que $z$ peut avoir plusieurs $1$</td>
+<td> <strong>Exactement UN</strong> : $\sum_kz_k=1$</td>
+</tr>
+<tr>
+<td>Sommer sur $2^K$ configurations de $z$</td>
+<td> Il n'y a que <strong>$K$</strong> configurations one-hot valides</td>
+</tr>
+<tr>
+<td>Croire que le modèle latent est un modèle différent</td>
+<td> <em>« Une façon <strong>ÉQUIVALENTE</strong> de penser un GMM »</em></td>
+</tr>
+<tr>
+<td>Croire que la responsabilité est une astuce de calcul</td>
+<td> C'est <strong>LA LOI A POSTERIORI</strong> $p(z_k=1\mid x)$</td>
+</tr>
+<tr>
+<td>Donner un $\pi$ différent à chaque point</td>
+<td> <em>« On <strong>PARTAGE le même a priori $\pi$</strong> »</em> — d'où la plaque</td>
+</tr>
+<tr>
+<td>Croire que la moyenne du mélange est un mode</td>
+<td> Elle peut tomber dans un <strong>CREUX</strong> entre composantes</td>
+</tr>
+</tbody></table>
+<h2>Ultimate Review</h2>
+<pre><code>════════ LES SIX FORMULES À SAVOIR SANS HÉSITER ════════
+  1.  MÉLANGE   p(x) = Σk πk pk(x) ,  πk ≥ 0 ,  Σk πk = 1
+      GMM       p(x|θ) = Σk πk N(x | µk, Σk)
+  2.  LOG-VRAISEMBLANCE   L = Σn log( Σk πk N(xn | µk, Σk) )
+      ⚠️ le LOG ne rentre PAS → PAS de solution fermée
+  3.  RESPONSABILITÉ   r_nk = πk N(xn|µk,Σk) / Σj πj N(xn|µj,Σj)
+      Σk r_nk = 1  (par LIGNE)      N_k = Σn r_nk  (par COLONNE) ,  Σk N_k = N
+  4.  ÉTAPE M   µk = (1/Nk) Σn r_nk xn
+                Σk = (1/Nk) Σn r_nk (xn − µk)(xn − µk)ᵀ
+                πk = Nk / N                          ← via LAGRANGE
+  5.  EM   initialiser → E (responsabilités) → M (paramètres) → répéter
+           ⚠️ chaque étape AUGMENTE la log-vraisemblance
+  6.  LATENT   z one-hot ,  p(zk = 1) = πk ,  p(x | zk = 1) = N(µk, Σk)
+      MARGINALISER → le GMM      CONDITIONNER → la RESPONSABILITÉ
+═════════════════════════════════════════════════════════
+</code></pre>
+<p><strong>LES TROIS PILIERS COMPARÉS :</strong></p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th><strong>Régression</strong> (ch. 9)</th>
+<th><strong>ACP</strong> (ch. 10)</th>
+<th><strong>GMM</strong> (ch. 11)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Tâche</td>
+<td>Prédire $y$</td>
+<td>Compresser $x$</td>
+<td><strong>Estimer une densité</strong></td>
+</tr>
+<tr>
+<td>Latente</td>
+<td>— (ou $\theta$ en bayésien)</td>
+<td><strong>Continue</strong> $z\in\mathbb R^M$</td>
+<td> <strong>Discrète</strong> one-hot</td>
+</tr>
+<tr>
+<td>Solution</td>
+<td> <strong>Fermée</strong> ($\theta_{\text{ML}}$)</td>
+<td> <strong>Fermée</strong> (vecteurs propres)</td>
+<td> <strong>ITÉRATIVE (EM)</strong></td>
+</tr>
+<tr>
+<td>Obstacle</td>
+<td>—</td>
+<td>—</td>
+<td> Le <strong>log d'une somme</strong></td>
+</tr>
+<tr>
+<td>Optimum</td>
+<td><strong>Global</strong> (objectif quadratique)</td>
+<td><strong>Global</strong> (spectral)</td>
+<td> <strong>LOCAL</strong></td>
+</tr>
+</tbody></table>
+<p><strong>LE CYCLE EM, terme à terme :</strong></p>
+<table>
+<thead>
+<tr>
+<th>Étape</th>
+<th>Ce qu'on fixe</th>
+<th>Ce qu'on calcule</th>
+<th>Nature</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>E</strong></td>
+<td>Les paramètres $\theta$</td>
+<td>Les <strong>responsabilités</strong> $r_{nk}$</td>
+<td> <strong>A posteriori</strong> des latentes</td>
+</tr>
+<tr>
+<td><strong>M</strong></td>
+<td>Les responsabilités $r_{nk}$</td>
+<td>Les paramètres $\mu_k,\Sigma_k,\pi_k$</td>
+<td><strong>Maximum de vraisemblance pondéré</strong></td>
+</tr>
+</tbody></table>
+<p><strong>Les trois lectures d'une responsabilité :</strong></p>
+<table>
+<thead>
+<tr>
+<th>Lecture</th>
+<th>Énoncé</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Algorithmique</strong></td>
+<td>Un <strong>poids d'importance</strong> dans les moyennes pondérées de l'étape M</td>
+</tr>
+<tr>
+<td><strong>Géométrique</strong></td>
+<td>La <strong>force d'attraction</strong> de $x_n$ sur $\mu_k$</td>
+</tr>
+<tr>
+<td><strong>Probabiliste</strong></td>
+<td> <strong>LA LOI A POSTERIORI</strong> $p(z_{nk}=1\mid x_n)$</td>
+</tr>
+</tbody></table>
+<p><strong>Ce que chaque chapitre antérieur apporte ici :</strong></p>
+<table>
+<thead>
+<tr>
+<th>Chapitre</th>
+<th>Ce qu'il fournit</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>5</strong> — calcul vectoriel</td>
+<td>Les <strong>gradients</strong> des trois preuves</td>
+</tr>
+<tr>
+<td><strong>6</strong> — probabilités</td>
+<td>La <strong>gaussienne</strong>, le <strong>théorème de Bayes</strong>, la <strong>marginalisation</strong></td>
+</tr>
+<tr>
+<td><strong>7</strong> — optimisation</td>
+<td> Les <strong>multiplicateurs de LAGRANGE</strong> pour les poids</td>
+</tr>
+<tr>
+<td><strong>8</strong> — modèles et données</td>
+<td><strong>MLE</strong>, <strong>variables latentes</strong>, <strong>modèles graphiques</strong>, <strong>plaques</strong></td>
+</tr>
+<tr>
+<td><strong>10</strong> — ACP</td>
+<td>Le <strong>contraste</strong> latente continue / latente discrète</td>
+</tr>
+</tbody></table>
+<div class="rec"><h2>Active Recall</h2><p><strong>Modèle de mélange</strong></p><ol>
+<li>Pourquoi une gaussienne ne suffit-elle pas toujours ?</li>
+<li>Écrire un modèle de mélange et ses deux contraintes.</li>
+<li>Pourquoi les mélanges sont-ils plus expressifs ?</li>
+<li>Écrire un GMM. Quels sont ses paramètres ?</li>
+<li>Donner le mélange de la figure 11.2.</li>
+</ol><p><strong>Le blocage</strong>
+6. Écrire la vraisemblance factorisée et la log-vraisemblance.
+7. Pourquoi la procédure « normale » échoue-t-elle ?
+8. Que se passerait-il avec une seule gaussienne ?
+9. Quelle est l'idée clé de la parade ?
+10. Donner le jeu de données et l'initialisation de l'exemple courant.</p><p><strong>Responsabilités</strong>
+11. Écrire $r_{nk}$. À quoi est-elle proportionnelle ?
+12. Quelles sont ses trois propriétés ?
+13. Que signifie « affectation douce » ?
+14. Comment lit-on une ligne ? une colonne ?
+15. Écrire $N_k$. Que vaut $\sum_kN_k$ ?
+16. Donner les $N_k$ de l'exemple 11.2.</p><p><strong>Les trois mises à jour</strong>
+17. Énoncer le théorème 11.1. Quelle est la remarque qui l'accompagne ?
+18. Donner les trois interprétations de la mise à jour des moyennes.
+19. Énoncer le théorème 11.2 et son interprétation.
+20. Énoncer le théorème 11.3. Quel outil sa preuve exige-t-elle ?
+21. Donner les valeurs numériques des exemples 11.3, 11.4 et 11.5.
+22. Dans quel ordre effectue-t-on les trois mises à jour ?</p><p><strong>EM</strong>
+23. Qui a proposé l'algorithme EM et quand ?
+24. Décrire les quatre étapes.
+25. Que fait l'étape E ? l'étape M ?
+26. Quelle est la garantie de convergence ? Vers quel type d'optimum ?
+27. Comment vérifier la convergence ?
+28. En combien d'itérations converge l'exemple 11.6 ?
+29. Que révèle la figure 11.10(b) sur les points ambigus ?</p><p><strong>Perspective latente</strong>
+30. En quoi la latente du GMM diffère-t-elle de celle de l'ACP ?
+31. Écrire $z$ et ses propriétés. Comment s'appelle cet encodage ?
+32. Qu'est-ce qu'une loi « multinoulli » ?
+33. Écrire l'a priori et la conditionnelle.
+34. Dériver la vraisemblance par marginalisation. Combien de configurations ?
+35. Écrire l'a posteriori. Que reconnaît-on ?
+36. Comment le modèle s'étend-il à $N$ points ? Que partage-t-on ?</p></div>
+
+
+
+
+
+
+
+<h2>Flashcards</h2>
+<table>
+<thead>
+<tr>
+<th>Question</th>
+<th>Réponse</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Le troisième pilier ?</td>
+<td>L'<strong>ESTIMATION DE DENSITÉ</strong></td>
+</tr>
+<tr>
+<td>Pourquoi une gaussienne ne suffit pas ?</td>
+<td> Capacités de modélisation <strong>LIMITÉES</strong> — elle est <strong>unimodale</strong></td>
+</tr>
+<tr>
+<td>Modèle de mélange ?</td>
+<td>$p(x)=\sum_k\pi_kp_k(x)$</td>
+</tr>
+<tr>
+<td>Les deux contraintes ?</td>
+<td>$0\leqslant\pi_k\leqslant1$ <strong>et</strong> $\sum_k\pi_k=1$</td>
+</tr>
+<tr>
+<td>Le nom de cette combinaison ?</td>
+<td>Une combinaison <strong>CONVEXE</strong></td>
+</tr>
+<tr>
+<td>Pourquoi plus expressif ?</td>
+<td> Il permet des représentations <strong>MULTIMODALES</strong> — plusieurs <strong>clusters</strong></td>
+</tr>
+<tr>
+<td>Un GMM ?</td>
+<td>$p(x\mid\theta)=\sum_k\pi_k\mathcal N(x\mid\mu_k,\Sigma_k)$</td>
+</tr>
+<tr>
+<td>Ses paramètres ?</td>
+<td>$\theta=\{\pi_k,\mu_k,\Sigma_k:k=1,\dots,K\}$</td>
+</tr>
+<tr>
+<td>La log-vraisemblance ?</td>
+<td>$\mathcal L=\sum_n\log\big(\sum_k\pi_k\mathcal N(x_n\mid\mu_k,\Sigma_k)\big)$</td>
+</tr>
+<tr>
+<td>Pourquoi pas de solution fermée ?</td>
+<td> <strong>Le LOG d'une SOMME</strong> — il ne peut pas entrer</td>
+</tr>
+<tr>
+<td>Avec une seule gaussienne ?</td>
+<td> La somme <strong>disparaît</strong>, le log s'applique <strong>directement</strong>, tout est <strong>quadratique</strong></td>
+</tr>
+<tr>
+<td>L'idée clé de la parade ?</td>
+<td> <strong>Mettre à jour UN paramètre à la fois</strong> en gardant les autres fixés</td>
+</tr>
+<tr>
+<td>Le jeu de l'exemple courant ?</td>
+<td>$\{-3;-2{,}5;-1;0;2;4;5\}$, $N=7$, $K=3$</td>
+</tr>
+<tr>
+<td>L'initialisation ?</td>
+<td>$\mathcal N(-4,1)$, $\mathcal N(0;0{,}2)$, $\mathcal N(8,3)$, $\pi_k=\tfrac13$</td>
+</tr>
+<tr>
+<td>La responsabilité ?</td>
+<td>$r_{nk}=\dfrac{\pi_k\mathcal N(x_n\mid\mu_k,\Sigma_k)}{\sum_j\pi_j\mathcal N(x_n\mid\mu_j,\Sigma_j)}$</td>
+</tr>
+<tr>
+<td>À quoi est-elle proportionnelle ?</td>
+<td>À la <strong>VRAISEMBLANCE</strong> $\pi_k\mathcal N(x_n\mid\mu_k,\Sigma_k)$</td>
+</tr>
+<tr>
+<td>Quand est-elle élevée ?</td>
+<td>Quand le point <strong>pourrait être un échantillon PLAUSIBLE</strong> de la composante</td>
+</tr>
+<tr>
+<td>Que somme à 1 ?</td>
+<td> Chaque <strong>LIGNE</strong> : $\sum_kr_{nk}=1$</td>
+</tr>
+<tr>
+<td>Son autre nom ?</td>
+<td>Une <strong>AFFECTATION DOUCE</strong> (<em>soft assignment</em>)</td>
+</tr>
+<tr>
+<td>Son sens probabiliste ?</td>
+<td> La <strong>probabilité que $x_n$ ait été GÉNÉRÉ par la composante $k$</strong></td>
+</tr>
+<tr>
+<td>$N_k$ ?</td>
+<td>$\sum_nr_{nk}$ — la <strong>responsabilité TOTALE</strong> de la composante $k$</td>
+</tr>
+<tr>
+<td>Comment l'obtenir sur la matrice ?</td>
+<td> En sommant une <strong>COLONNE</strong></td>
+</tr>
+<tr>
+<td>$\sum_kN_k$ ?</td>
+<td> <strong>$N$</strong></td>
+</tr>
+<tr>
+<td>$N_k$ est-il entier ?</td>
+<td> <strong>NON</strong> — affectation <strong>douce</strong></td>
+</tr>
+<tr>
+<td>Les $N_k$ de l'exemple 11.2 ?</td>
+<td>$2{,}058$ ; $2{,}008$ ; $2{,}934$ (somme $=7$)</td>
+</tr>
+<tr>
+<td>Mise à jour des moyennes ?</td>
+<td>$\mu_k^{\text{new}}=\dfrac{1}{N_k}\sum_nr_{nk}x_n$</td>
+</tr>
+<tr>
+<td>Interprétation 1 ?</td>
+<td>Un estimateur de <strong>Monte-Carlo PONDÉRÉ PAR IMPORTANCE</strong></td>
+</tr>
+<tr>
+<td>Interprétation 2 ?</td>
+<td> $\mu_k$ est <strong>TIRÉE vers $x_n$ avec une FORCE $r_{nk}$</strong></td>
+</tr>
+<tr>
+<td>Interprétation 3 ?</td>
+<td>$\mu_k\leftarrow\mathbb E_{r_k}[\mathcal X]$ avec $r_k=[r_{1k},\dots,r_{Nk}]^\top/N_k$</td>
+</tr>
+<tr>
+<td>Pourquoi pas de solution fermée pour les $\mu_k$ ?</td>
+<td> Les $r_{nk}$ dépendent de <strong>TOUS</strong> les paramètres</td>
+</tr>
+<tr>
+<td>Mise à jour des covariances ?</td>
+<td>$\Sigma_k^{\text{new}}=\dfrac{1}{N_k}\sum_nr_{nk}(x_n-\mu_k)(x_n-\mu_k)^\top$</td>
+</tr>
+<tr>
+<td>Son interprétation ?</td>
+<td>Une espérance pondérée du <strong>CARRÉ des données CENTRÉES</strong></td>
+</tr>
+<tr>
+<td>Mise à jour des poids ?</td>
+<td> $\pi_k^{\text{new}}=\dfrac{N_k}{N}$</td>
+</tr>
+<tr>
+<td>Quel outil pour la démontrer ?</td>
+<td> Les <strong>MULTIPLICATEURS DE LAGRANGE</strong> (contrainte $\sum_k\pi_k=1$)</td>
+</tr>
+<tr>
+<td>L'ordre des mises à jour ?</td>
+<td> $\mu_k$ <strong>d'abord</strong>, <strong>puis</strong> $\Sigma_k$ avec les nouvelles $\mu_k$, <strong>puis</strong> $\pi_k$</td>
+</tr>
+<tr>
+<td>Les moyennes de l'exemple 11.3 ?</td>
+<td>$-4\to-2{,}7$ · $0\to-0{,}4$ · $8\to3{,}7$</td>
+</tr>
+<tr>
+<td>Les variances de l'exemple 11.4 ?</td>
+<td>$1\to0{,}14$ · $0{,}2\to0{,}44$ · $3\to1{,}53$</td>
+</tr>
+<tr>
+<td>Les poids de l'exemple 11.5 ?</td>
+<td>$\tfrac13\to0{,}29$ · $\tfrac13\to0{,}29$ · $\tfrac13\to0{,}42$</td>
+</tr>
+<tr>
+<td>Qui a proposé EM ?</td>
+<td><strong>Dempster</strong> et al. <strong>(1977)</strong></td>
+</tr>
+<tr>
+<td>Les quatre étapes ?</td>
+<td><strong>1.</strong> initialiser <strong>2.</strong> étape <strong>E</strong> <strong>3.</strong> étape <strong>M</strong> <strong>4.</strong> répéter</td>
+</tr>
+<tr>
+<td>Que fait l'étape E ?</td>
+<td>Évaluer les <strong>responsabilités</strong> avec les paramètres <strong>courants</strong></td>
+</tr>
+<tr>
+<td>Que fait l'étape M ?</td>
+<td>Réestimer $\mu_k,\Sigma_k,\pi_k$ avec les responsabilités <strong>courantes</strong></td>
+</tr>
+<tr>
+<td>Que garantit chaque étape ?</td>
+<td> Elle <strong>AUGMENTE la log-vraisemblance</strong> (Neal &amp; Hinton, 1999)</td>
+</tr>
+<tr>
+<td>Vers quel optimum ?</td>
+<td> Un optimum <strong>LOCAL</strong></td>
+</tr>
+<tr>
+<td>Comment vérifier la convergence ?</td>
+<td>La <strong>log-vraisemblance</strong> ou les <strong>paramètres</strong> directement</td>
+</tr>
+<tr>
+<td>Convergence de l'exemple 11.6 ?</td>
+<td> En <strong>CINQ itérations</strong></td>
+</tr>
+<tr>
+<td>À quoi sert EM au-delà des GMM ?</td>
+<td>À <strong>tous les modèles à VARIABLES LATENTES</strong></td>
+</tr>
+<tr>
+<td>Ce que montre la figure 11.10(b) ?</td>
+<td> Des points <strong>NON affectables uniquement</strong> — responsabilités <strong>autour de $0{,}5$</strong></td>
+</tr>
+<tr>
+<td>La latente du GMM ?</td>
+<td> <strong>DISCRÈTE</strong> — un ensemble <strong>FINI</strong> de valeurs</td>
+</tr>
+<tr>
+<td>Le contraste avec l'ACP ?</td>
+<td> L'ACP a une latente <strong>CONTINUE</strong> dans $\mathbb R^M$</td>
+</tr>
+<tr>
+<td>L'hypothèse fondatrice ?</td>
+<td>Un point est généré par <strong>EXACTEMENT UNE</strong> composante</td>
+</tr>
+<tr>
+<td>La forme de $z$ ?</td>
+<td>$K-1$ zéros et <strong>exactement un $1$</strong></td>
+</tr>
+<tr>
+<td>Le nom de cet encodage ?</td>
+<td> <strong>ONE-HOT</strong> (ou représentation <strong>1-parmi-$K$</strong>)</td>
+</tr>
+<tr>
+<td>Le nom de cette loi ?</td>
+<td> <strong>MULTINOULLI</strong> — généralisation de la Bernoulli</td>
+</tr>
+<tr>
+<td>L'a priori latent ?</td>
+<td>$p(z)=\pi$, avec $\pi_k=p(z_k=1)$</td>
+</tr>
+<tr>
+<td>La conditionnelle ?</td>
+<td>$p(x\mid z_k=1)=\mathcal N(x\mid\mu_k,\Sigma_k)$</td>
+</tr>
+<tr>
+<td>Combien de configurations de $z$ ?</td>
+<td> <strong>$K$</strong> seulement (une entrée non nulle)</td>
+</tr>
+<tr>
+<td>Ce que donne la marginalisation ?</td>
+<td> <strong>EXACTEMENT le GMM</strong> $\sum_k\pi_k\mathcal N(x\mid\mu_k,\Sigma_k)$</td>
+</tr>
+<tr>
+<td>L'a posteriori $p(z_k=1\mid x)$ ?</td>
+<td> <strong>EXACTEMENT la RESPONSABILITÉ</strong></td>
+</tr>
+<tr>
+<td>Pourquoi l'étape E porte ce nom ?</td>
+<td> Parce que la responsabilité <strong>EST l'a posteriori de la latente</strong></td>
+</tr>
+<tr>
+<td>Combien de latentes pour $N$ points ?</td>
+<td><strong>$N$</strong> — chacune $z_n\in\mathbb R^K$</td>
+</tr>
+<tr>
+<td>Que partage-t-on entre elles ?</td>
+<td> <strong>Le même a priori $\pi$</strong></td>
+</tr>
+<tr>
+<td>Comment le représenter graphiquement ?</td>
+<td>Avec une <strong>PLAQUE</strong> sur $n$ ; $\pi$ <strong>hors</strong> de la plaque</td>
+</tr>
+<tr>
+<td>Le modèle latent est-il un autre modèle ?</td>
+<td> <strong>NON</strong> — une façon <strong>ÉQUIVALENTE</strong> de penser le GMM</td>
+</tr>
+</tbody></table>
+</main>
+
+
+
+
+</body></html>

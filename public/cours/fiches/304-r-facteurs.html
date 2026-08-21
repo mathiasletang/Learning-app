@@ -1,0 +1,1028 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fiche 304 — Facteurs : classification discrète, tapply() et tableaux irréguliers</title>
+<script>
+window.MathJax={tex:{inlineMath:[["$","$"]],displayMath:[["$$","$$"]],processEscapes:true},
+ options:{skipHtmlTags:["script","noscript","style","textarea","pre","code"]},
+ svg:{fontCache:"global"},
+ startup:{pageReady:()=>MathJax.startup.defaultPageReady().then(()=>{document.body.classList.add("ready")})}};
+setTimeout(function(){document.body.classList.add("ready")},2500);
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+/* ============================================================
+   MathiasLearn — feuille de style des fiches
+   Reprise intégrale des tokens de 00_PARCOURS/*.html
+   + blocs pédagogiques (callouts, méthode, essentiels, recall)
+   ============================================================ */
+:root{--bg:#faf9f7;--card:#fff;--ink:#1a1a1a;--muted:#6b6b6b;--line:#e5e2dd;--accent:#8b5e34;
+ --hl:#fdf8ef;--ok:#2d7d4f;--okbg:#f0f7f3;--warn:#b3402f;--warnbg:#fdf3f1;--blue:#2f5d8b;--bluebg:#f1f5fa}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+ font:17px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;padding:0 16px 100px}
+.nav{position:sticky;top:0;background:rgba(250,249,247,.96);backdrop-filter:blur(8px);
+ border-bottom:1px solid var(--line);margin:0 -16px 30px;padding:11px 16px;z-index:50;
+ display:flex;gap:6px;flex-wrap:wrap;font-size:13px}
+.nav a{color:var(--muted);text-decoration:none;padding:4px 9px;border-radius:5px;white-space:nowrap}
+.nav a:hover{background:var(--line);color:var(--ink)}
+.nav a.on{background:var(--accent);color:#fff}
+main{max-width:780px;margin:0 auto}
+h1{font-size:31px;letter-spacing:-.02em;margin:.4em 0 .5em;line-height:1.25}
+h2{font-size:23px;margin:2.2em 0 .7em;padding-bottom:.3em;border-bottom:1px solid var(--line)}
+h3{font-size:19px;margin:1.9em 0 .5em;color:var(--accent)}
+h4{font-size:17px;margin:1.5em 0 .4em}
+p{margin:.8em 0} a{color:var(--accent)} hr{border:0;border-top:1px solid var(--line);margin:2.6em 0}
+table{border-collapse:collapse;width:100%;margin:1.3em 0;font-size:15.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+th{background:#f3f0eb;font-weight:600}
+tr:nth-child(even) td{background:#fcfbfa}
+code{font-family:"SF Mono",Menlo,Consolas,monospace;font-size:.88em;background:#f2efea;padding:2px 6px;border-radius:4px;overflow-wrap:break-word}
+pre{background:#f2efea;padding:14px 16px;border-radius:8px;overflow-x:auto}
+pre code{background:none;padding:0;white-space:pre}
+blockquote{border-left:3px solid var(--accent);background:var(--hl);margin:1.4em 0;padding:14px 20px;border-radius:0 8px 8px 0}
+blockquote p:first-child{margin-top:0} blockquote p:last-child{margin-bottom:0}
+ul,ol{padding-left:1.5em} li{margin:.35em 0} em{color:#4a4a4a}
+mjx-container[display="true"]{margin:1.1em 0!important;overflow-x:auto;overflow-y:hidden;padding:2px 0}
+mjx-container svg{max-width:100%}
+body:not(.ready) main{opacity:0} main{opacity:1;transition:opacity .25s}
+
+/* --- bandeau de tête de fiche --- */
+.cours{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--accent);
+ border-radius:0 10px 10px 0;padding:18px 22px;margin:0 0 34px}
+.cours h4{margin:0 0 4px;font-size:14px;text-transform:uppercase;letter-spacing:.07em;color:var(--accent)}
+.cours .cs{color:var(--muted);font-size:14.5px;margin:0 0 14px}
+
+/* --- exercices / corrigés --- */
+.ex{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:6px 24px 20px;margin:18px 0}
+.ex>h3:first-child{margin-top:14px}
+details.cor{margin-top:18px;border:1px solid var(--line);border-radius:8px;background:#fcfbfa;overflow:hidden}
+details.cor>summary{cursor:pointer;padding:12px 16px;font-weight:600;font-size:15px;color:var(--accent);
+ list-style:none;display:flex;align-items:center;gap:9px;user-select:none;transition:.15s;min-height:44px}
+details.cor>summary::-webkit-details-marker{display:none}
+details.cor>summary:hover{background:var(--hl)}
+details.cor>summary::before{content:"\25B6";font-size:10px;transition:transform .18s;display:inline-block}
+details.cor[open]>summary::before{transform:rotate(90deg)}
+details.cor[open]>summary{background:var(--okbg);color:var(--ok);border-bottom:1px solid var(--line)}
+.cor .in{padding:4px 20px 16px}
+.cor .in>*:first-child{margin-top:.9em}
+
+/* --- blocs pédagogiques (callouts) ---
+   Générés depuis une citation Markdown dont le premier **gras** commence
+   par un mot-clé : DÉFINITION, THÉORÈME, MÉTHODE, PIÈGE, INTUITION… */
+.cal{border:1px solid var(--line);border-left:4px solid var(--accent);background:var(--card);
+ border-radius:0 10px 10px 0;padding:15px 20px;margin:1.5em 0}
+.cal>p:first-child{margin-top:0}.cal>p:last-child,.cal>ul:last-child,.cal>ol:last-child{margin-bottom:0}
+.cal .lab{display:block;font-size:12.5px;text-transform:uppercase;letter-spacing:.08em;
+ font-weight:700;color:var(--accent);margin-bottom:6px}
+.cal.formel{background:var(--hl)}
+.cal.piege{border-left-color:var(--warn);background:var(--warnbg)}
+.cal.piege .lab{color:var(--warn)}
+.cal.methode{border-left-color:var(--ok);background:var(--okbg)}
+.cal.methode .lab{color:var(--ok)}
+.cal.intu{border-left-color:var(--blue);background:var(--bluebg)}
+.cal.intu .lab{color:var(--blue)}
+.cal.plus{border-left-style:dashed;background:#faf9f7}
+.cal.plus .lab{color:var(--muted)}
+
+/* --- révision express --- */
+.ess{background:var(--card);border:1px solid var(--accent);border-radius:10px;padding:4px 24px 20px;margin:1.6em 0}
+.ess h3{margin-top:1.3em}
+.rec{background:var(--card);border:1px dashed var(--accent);border-radius:10px;padding:4px 24px 18px;margin:1.6em 0}
+.rec ol{counter-reset:none}
+
+/* --- impression / PDF --- */
+@media print{
+ .nav{display:none}
+ body{padding:0;background:#fff;font-size:11.2pt;line-height:1.55}
+ main{max-width:none}
+ h1{font-size:23pt}h2{font-size:15pt;margin-top:1.5em}h3{font-size:12.6pt}
+ h2,h3,h4{break-after:avoid;page-break-after:avoid}
+ table,.cal,blockquote{break-inside:avoid;page-break-inside:avoid}
+ table{display:table;font-size:9.6pt}
+ details.cor{border:1px solid var(--line);background:#fcfbfa}
+ details.cor>summary{display:none}
+ details.cor .in{padding-top:10px}
+ .cal,.ex,.ess,.rec{box-shadow:none}
+ a{color:var(--ink);text-decoration:none}
+}
+@page{margin:16mm 15mm 18mm}
+
+/* --- exemples travaillés --- */
+.exm{background:#fcfbfa;border:1px solid var(--line);border-radius:10px;padding:2px 20px 14px;margin:1.5em 0}
+.exm>h4:first-child{margin:14px 0 .5em;color:var(--accent);font-size:13px;text-transform:uppercase;letter-spacing:.07em}
+
+
+/* --- pastilles de priorité (conventions des fiches de l'app) --- */
+h2[data-prio], h3[data-prio], h4[data-prio]{position:relative}
+h2[data-prio]::before,h3[data-prio]::before,h4[data-prio]::before{
+ content:"";display:inline-block;width:9px;height:9px;border-radius:50%;
+ margin-right:9px;vertical-align:middle;background:var(--muted)}
+[data-prio="must"]::before{background:var(--warn)}
+[data-prio="high"]::before{background:#d98324}
+[data-prio="mid"]::before{background:#c9a227}
+[data-prio="low"]::before{background:var(--ok)}
+/* corrigés des fiches de l'app : même traitement que les corrigés des séries */
+details.cor>summary::after{content:""}
+</style></head><body>
+<div class="nav"><a href="00_COMMENCER_ICI.html">Commencer ici</a><a href="01_NOTATIONS_le-decodeur.html">Notations</a><a href="02_EXERCICES_Serie-0.html">Série 0 — Remise en route</a><a href="03_EXERCICES_Serie-1.html">Série 1 — Convexité</a><a href="04_EXERCICES_Serie-2.html">Série 2 — KKT</a><a href="05_AUTO-EVALUATION.html">Auto-évaluation (quiz)</a><a href="06_FICHE_Optimisation-deux-variables.html">Fiche — Optimisation à 2 variables</a></div>
+<main><h1>Fiche 304 — Facteurs : classification discrète, <code>tapply()</code> et tableaux irréguliers</h1>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Matière</strong></td>
+<td>Code · Langage R</td>
+</tr>
+<tr>
+<td><strong>Cours source</strong></td>
+<td>R Core Team, <em>An Introduction to R</em> 4.6.1 — chapitre 4 « Ordered and unordered factors » (§4.1 un exemple, §4.2 <code>tapply()</code> et tableaux irréguliers, §4.3 facteurs ordonnés)</td>
+</tr>
+<tr>
+<td><strong>Sources d'appoint</strong></td>
+<td><em>R Language Definition</em> 4.6.1, §2.3.1 « Factors » ; §3.4.1 « Indexing by vectors » (le piège de l'index facteur)</td>
+</tr>
+<tr>
+<td><strong>Difficulté</strong></td>
+<td> Intermédiaire — court chapitre, mais deux pièges majeurs</td>
+</tr>
+<tr>
+<td><strong>Temps d'étude estimé</strong></td>
+<td>1 h</td>
+</tr>
+<tr>
+<td><strong>Prérequis</strong></td>
+<td>Fiches 301 à 303 (vecteurs, indexation, attributs)</td>
+</tr>
+<tr>
+<td><strong>Concepts clés</strong></td>
+<td>classification discrète, <code>factor()</code>, attribut <strong><code>levels</code></strong>, classe <code>"factor"</code>, ordre <strong>alphabétique</strong> des niveaux, <code>levels()</code>, affichage particulier, <code>tapply()</code>, coercition automatique par <code>as.factor()</code>, <strong>tableau irrégulier</strong> (<em>ragged array</em>), <code>ordered()</code>, classe <code>c("ordered", "factor")</code>, <code>contrasts</code>, implémentation par entiers</td>
+</tr>
+<tr>
+<td><strong>À retenir en priorité</strong></td>
+<td><strong>Les niveaux sont alphabétiques par défaut</strong> · <strong><code>tapply()</code> = « appliquer par groupe »</strong> · <strong><code>sd()</code> n'est pas l'erreur type</strong> · <strong>ne jamais s'appuyer sur le codage entier</strong>.</td>
+</tr>
+</tbody></table>
+<h2>Vue d'ensemble</h2>
+<pre><code>UN FACTEUR      un vecteur qui specifie une CLASSIFICATION DISCRETE (un groupage)
+                des composantes d'autres vecteurs DE MEME LONGUEUR
+
+CE QU'IL EST    un vecteur d'ENTIERS + attribut levels + class "factor"
+                (mais NE PAS s'appuyer la-dessus : detail d'implementation)
+
+CREER           statef &lt;- factor(state)
+LES NIVEAUX     levels(statef)   -&gt; ordre ALPHABETIQUE par defaut
+                                    ou celui donne explicitement a factor()
+
+L'OUTIL         tapply(donnees, facteur, fonction)
+                « appliquer la fonction a CHAQUE GROUPE defini par les niveaux »
+                resultat : un vecteur de la LONGUEUR DE levels, etiquete par eux
+
+TABLEAU IRREGULIER   vecteur + facteur d'etiquetage, sous-classes de tailles
+                     POSSIBLEMENT DIFFERENTES  (« ragged array »)
+
+ORDONNE         ordered()  -- identique a factor() SAUF
+                  * l'affichage montre l'ordre des niveaux
+                  * les CONTRASTES engendres pour les modeles lineaires different
+
+PIEGES          x[facteur]  =  x[as.integer(facteur)]   les NIVEAUX NE SERVENT PAS
+                sd()  N'EST PAS  l'erreur type
+</code></pre>
+<p><strong>Le problème posé.</strong> <em>« A factor is <strong>a vector object used to specify a discrete classification (grouping) of the components of other vectors of the same length</strong>. »</em> (§4.1) Un facteur ne porte pas les données : il porte <strong>l'appartenance</strong> des données à des groupes. C'est un objet <strong>relationnel</strong> — il n'a de sens que rapporté à un autre vecteur.</p>
+<div class="cal intu"><span class="lab">Intuition — pourquoi ce chapitre paraît mineur et ne l'est pas.</span>
+<p> <em>« While the <strong>"real" application of factors is with model formulae</strong> (see §11.1.1 Contrasts), we here look at a specific example. »</em> (§4.1) Le cours prévient : ce qu'on voit ici — <code>tapply()</code> et des moyennes par groupe — n'est <strong>pas</strong> la raison d'être des facteurs. Leur vraie fonction est de dire à <code>lm()</code> et à <code>aov()</code> <em>« cette variable est catégorielle, engendre-lui des indicatrices »</em> (fiche 313). Le facteur est <strong>le pont entre les données et les modèles</strong>.</p>
+</div>
+<h2 data-prio="must">Concept 1 — Créer un facteur, et ce qu'il devient</h2>
+<div class="cal formel"><span class="lab">Définition (R Language Definition §2.3.1).</span>
+<p> <em>« Factors are used to describe items that can have <strong>a finite number of values</strong> (gender, social class, etc.). <strong>A factor has a <code>levels</code> attribute and class <code>"factor"</code>.</strong> Optionally, it may also contain a <strong><code>contrasts</code></strong> attribute which controls <strong>the parametrisation used when the factor is used in a modeling function</strong>. »</em></p>
+</div>
+<p><strong>L'exemple qui court dans tout le chapitre (§4.1).</strong> <em>« Suppose we have a sample of <strong>30 tax accountants from all the states and territories of Australia</strong> and their individual <strong>state of origin</strong> is specified by a character vector of state mnemonics. »</em></p>
+<pre><code class="language-r">state &lt;- c("tas", "sa",  "qld", "nsw", "nsw", "nt",  "wa",  "wa",
+           "qld", "vic", "nsw", "vic", "qld", "qld", "sa",  "tas",
+           "sa",  "nt",  "wa",  "vic", "qld", "nsw", "nsw", "wa",
+           "sa",  "act", "nsw", "vic", "vic", "act")
+</code></pre>
+<p><em>« Notice that in the case of <strong>a character vector, "sorted" means sorted in alphabetical order</strong>. »</em> — la phrase qui explique l'ordre des niveaux au concept 2.</p>
+<pre><code class="language-r">statef &lt;- factor(state)
+</code></pre>
+<div class="cal intu"><span class="lab">Ce que fait print() (§4.1).</span>
+<p> <em>« The <code>print()</code> function handles factors <strong>slightly differently from other objects</strong> »</em> :</p>
+</div>
+<pre><code> [1] tas sa  qld nsw nsw nt  wa  wa  qld vic nsw vic qld qld sa
+[16] tas sa  nt  wa  vic qld nsw nsw wa  sa  act nsw vic vic act
+Levels: act nsw nt qld sa tas vic wa
+</code></pre>
+<p><strong>Trois différences visibles avec un vecteur de caractères</strong> : pas de guillemets ; une ligne <strong><code>Levels:</code></strong> ; et cette ligne montre <strong>tous</strong> les niveaux, y compris ceux qui n'apparaîtraient pas dans les données affichées.</p>
+<p><em>« To find out the levels of a factor <strong>the function <code>levels()</code> can be used</strong>. »</em></p>
+<pre><code class="language-r">levels(statef)
+# [1] "act" "nsw" "nt"  "qld" "sa"  "tas" "vic" "wa"
+</code></pre>
+<p class="cal piege"> <em>(Note 1 du §4.1)</em> <em>« Readers should note that <strong>there are eight states and territories in Australia</strong> »</em> — l'Australian Capital Territory, la Nouvelle-Galles du Sud, le Territoire du Nord, le Queensland, l'Australie-Méridionale, la Tasmanie, le Victoria et l'Australie-Occidentale. Le facteur a donc <strong>exactement 8 niveaux pour 30 observations</strong> : c'est bien une classification, pas une identification.</p>
+<h3>1.1 Sous le capot</h3>
+<div class="cal intu"><span class="lab">Ce que le manuel dit — et ce qu'il interdit d'en faire (§2.3.1).</span>
+<p class="cal piege">  <em>« Factors are <strong>currently implemented</strong> using <strong>an integer array to specify the actual levels</strong> and <strong>a second array of names that are mapped to the integers</strong>. <strong>Rather unfortunately users often make use of the implementation in order to make some calculations easier. This, however, is an implementation issue and is not guaranteed to hold in all implementations of R.</strong> »</em></p>
+</div>
+<p>Un facteur <strong>est donc</strong>, aujourd'hui, un vecteur d'entiers muni de <code>levels</code> et de <code>class</code>. On peut le vérifier :</p>
+<pre><code class="language-r">unclass(statef)   # montre les codes entiers et l'attribut levels
+</code></pre>
+<p><strong>Mais le manuel demande explicitement de ne pas s'appuyer là-dessus.</strong> La distinction est importante : <code>unclass()</code> sert à <strong>comprendre</strong> (fiche 303), pas à <strong>calculer</strong>.</p>
+<blockquote>
+<p class="cal piege"> <strong>Le piège qui découle directement de cette implémentation</strong> (<em>R Language Definition</em> §3.4.1, fiche 302). *« <strong>Factor.</strong> The result [de <code>x[i]</code> avec <code>i</code> facteur] is <strong>identical to <code>x[as.integer(i)]</code></strong>. <strong>The factor levels are never used.</strong> If so desired, use <strong><code>x[as.character(i)]</code></strong> »*.</p>
+<p>Indexer par un facteur indexe donc <strong>par des positions</strong>, que rien à l'écran ne laisse deviner — puisque le facteur <strong>s'affiche avec ses étiquettes</strong>. Le résultat a la bonne longueur et il est faux.</p>
+</blockquote>
+<h2 data-prio="must">Concept 2 — L'ordre des niveaux</h2>
+<blockquote>
+<p><strong>Règle (§4.3).</strong> <em>« <strong>The levels of factors are stored in alphabetical order</strong>, <strong>or in the order they were specified to <code>factor</code> if they were specified explicitly.</strong> »</em></p>
+</blockquote>
+<p>C'est une règle en deux temps, et la seconde moitié est ce qui sauve :</p>
+<pre><code class="language-r"># ordre par defaut : alphabetique
+levels(factor(c("moyen", "fort", "faible")))
+# "faible" "fort"   "moyen"        &lt;- alphabetique, donc DENUE DE SENS ici
+
+# ordre impose
+levels(factor(c("moyen", "fort", "faible"),
+              levels = c("faible", "moyen", "fort")))
+# "faible" "moyen"  "fort"         &lt;- l'ordre voulu
+</code></pre>
+<p class="cal piege"> <strong>Pourquoi cela compte au-delà de l'esthétique.</strong> L'ordre des niveaux détermine : l'ordre des colonnes d'un <code>table()</code>, l'ordre des boîtes d'un <code>boxplot</code>, l'ordre des barres d'un graphique — et surtout <strong>quel niveau sert de référence</strong> dans un modèle linéaire (fiche 313). Le premier niveau est celui auquel tous les autres sont comparés. Le laisser à l'alphabet, c'est laisser l'alphabet choisir la modalité de référence.</p>
+<h2 data-prio="must">Concept 3 — <code>tapply()</code> : appliquer une fonction par groupe</h2>
+<div class="cal formel"><span class="lab">Définition (§4.2).</span>
+<p> <em>« The function <code>tapply()</code> is used to <strong>apply a function</strong> — here <code>mean()</code> — <strong>to each group of components of the first argument</strong> — here <code>incomes</code> — <strong>defined by the levels of the second component</strong> — here <code>statef</code> — <strong>as if they were separate vector structures</strong>. <strong>The result is a structure of the same length as the <code>levels</code> attribute of the factor</strong> containing the results. »</em></p>
+</div>
+<p><strong>Les données de revenus (§4.2)</strong>, <em>« in suitably large units of money »</em> :</p>
+<pre><code class="language-r">incomes &lt;- c(60, 49, 40, 61, 64, 60, 59, 54, 62, 69, 70, 42, 56,
+             61, 61, 61, 58, 51, 48, 65, 49, 49, 41, 48, 52, 46,
+             59, 46, 58, 43)
+
+incmeans &lt;- tapply(incomes, statef, mean)
+</code></pre>
+<p><em>« giving a means vector with the components <strong>labelled by the levels</strong> »</em> :</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>act</th>
+<th>nsw</th>
+<th>nt</th>
+<th>qld</th>
+<th>sa</th>
+<th>tas</th>
+<th>vic</th>
+<th>wa</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>moyenne</strong></td>
+<td>44,500</td>
+<td>57,333</td>
+<td>55,500</td>
+<td>53,600</td>
+<td>55,000</td>
+<td>60,500</td>
+<td>56,000</td>
+<td>52,250</td>
+</tr>
+</tbody></table>
+<div class="cal intu"><span class="lab">En clair — le mécanisme, tel que le cours le décrit (§4.2).</span>
+<p> <em>« <strong>The values in the vector are collected into groups corresponding to the distinct entries in the factor. The function is then applied to each of these groups individually. The value is a vector of function results, labelled by the levels attribute of the factor.</strong> »</em></p>
+<p>Trois temps : <strong>regrouper</strong>, <strong>appliquer</strong>, <strong>étiqueter</strong>. C'est le patron de toute l'analyse par sous-groupes en R.</p>
+</div>
+<p class="cal piege"> <strong>Le deuxième argument n'a pas besoin d'être un facteur</strong> (note 2, §4.2) : *« Note that <code>tapply()</code> <strong>also works in this case when its second argument is not a factor</strong>, e.g. <code>tapply(incomes, state)</code>, and <strong>this is true for quite a few other functions, since arguments are coerced to factors when necessary (using <code>as.factor()</code>)</strong>. »* Commode — et dangereux, puisque la coercition silencieuse applique <strong>l'ordre alphabétique</strong> du concept 2.</p>
+<p><em>« The function <code>tapply()</code> <strong>can also be used to handle more complicated indexing of a vector by multiple categories</strong>. For example, we might wish to <strong>split the tax accountants by both state and sex</strong>. »</em></p>
+<details class="cor">
+<summary><strong>Exercice résolu — refaire à la main la moyenne d'un état, et vérifier le tableau du cours</strong></summary><div class="in">
+
+<p><strong>Énoncé.</strong> Vérifier, sans <code>tapply()</code>, que la moyenne de l'état <code>qld</code> vaut bien <strong>53,600</strong>.</p>
+<p><em>Étape 1 — repérer les positions.</em> Dans <code>state</code>, <code>"qld"</code> occupe les positions <strong>3, 9, 13, 14, 21</strong>.</p>
+<p><em>Étape 2 — extraire les revenus correspondants.</em> C'est exactement une indexation logique (fiche 302) :</p>
+<pre><code class="language-r">incomes[state == "qld"]
+# 40 62 56 61 49
+</code></pre>
+<p><em>Étape 3 — sommer.</em> $40 + 62 + 56 + 61 + 49 = 268$.</p>
+<p><em>Étape 4 — diviser par l'effectif.</em> $268 / 5 = \mathbf{53{,}6}$.  conforme au tableau du cours.</p>
+<p><em>Étape 5 — comprendre ce que <code>tapply()</code> a fait de plus.</em> Rien de mystérieux : il a répété les étapes 2 à 4 <strong>pour chacun des huit niveaux</strong>, puis a <strong>étiqueté</strong> le résultat. La formulation du cours — <em>« as if they were separate vector structures »</em> — est littérale.</p>
+<p><em>Étape 6 — le point qui compte.</em> La boucle sur les niveaux est <strong>écrite par <code>tapply()</code></strong>, comme la boucle sur les éléments est écrite par la vectorisation (fiche 301). Le patron « regrouper, appliquer, étiqueter » remplace ici la boucle <code>for</code> imbriquée que l'on écrirait dans un autre langage.</p>
+</div></details>
+
+<h3>3.1 L'erreur type — et le piège <code>sd()</code></h3>
+<div class="cal methode"><span class="lab">Méthode (§4.2).</span>
+<p> <em>« Suppose further we needed to calculate <strong>the standard errors of the state income means</strong>. To do this we need to <strong>write an R function to calculate the standard error for any given vector</strong>. Since there is a builtin function <code>var()</code> to calculate the sample variance, such a function is <strong>a very simple one liner</strong> »</em> :</p>
+</div>
+<pre><code class="language-r">stdError &lt;- function(x) sqrt(var(x)/length(x))
+</code></pre>
+<p>$$\operatorname{se}(\bar x)=\sqrt{\frac{\operatorname{var}(x)}{n}}=\frac{s}{\sqrt n}$$</p>
+<blockquote>
+<p class="cal piege"> <strong>La mise en garde du cours, en une parenthèse.</strong> <em>« <strong>Note that R's builtin function <code>sd()</code> is something different.</strong> »</em> (§4.2)</p>
+<p><strong><code>sd(x)</code> est l'écart-type de l'échantillon</strong>, soit $s=\sqrt{\operatorname{var}(x)}$ ; <strong>l'erreur type de la moyenne</strong> est $s/\sqrt n$. Les deux diffèrent d'un facteur $\sqrt n$ — sur <code>nsw</code> ($n=6$), d'un facteur $2{,}449$. Confondre les deux, c'est publier un intervalle de confiance <strong>deux fois et demie trop large</strong>.</p>
+</blockquote>
+<pre><code class="language-r">incster &lt;- tapply(incomes, statef, stdError)
+</code></pre>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>act</th>
+<th>nsw</th>
+<th>nt</th>
+<th>qld</th>
+<th>sa</th>
+<th>tas</th>
+<th>vic</th>
+<th>wa</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>erreur type</strong></td>
+<td>1,5</td>
+<td>4,3102</td>
+<td>4,5</td>
+<td>4,1061</td>
+<td>2,7386</td>
+<td>0,5</td>
+<td>5,244</td>
+<td>2,6575</td>
+</tr>
+</tbody></table>
+<div class="cal intu"><span class="lab">Contrôle — vérifier une valeur du tableau.</span>
+<p> Pour <code>act</code>, les deux revenus sont <strong>46</strong> et <strong>43</strong>, de moyenne <strong>44,5</strong>. La variance d'échantillon vaut
+$$\operatorname{var}=\frac{(46-44{,}5)^2+(43-44{,}5)^2}{2-1}=\frac{2{,}25+2{,}25}{1}=4{,}5$$
+et l'erreur type $\sqrt{4{,}5/2}=\sqrt{2{,}25}=\mathbf{1{,}5}$.  Même vérification pour <code>tas</code> (60 et 61) : $\operatorname{var}=0{,}5$, $\sqrt{0{,}5/2}=\mathbf{0{,}5}$. </p>
+</div>
+<details class="cor">
+<summary><strong>Exercice du cours — les limites de confiance à 95 % des revenus moyens par état</strong></summary><div class="in">
+
+<blockquote>
+<p><strong>Énoncé (§4.2, textuel).</strong> <em>« <strong>As an exercise you may care to find the usual 95 % confidence limits for the state mean incomes.</strong> To do this you could use <code>tapply()</code> once more <strong>with the <code>length()</code> function to find the sample sizes</strong>, and <strong>the <code>qt()</code> function to find the percentage points of the appropriate t-distributions</strong>. (You could also investigate R's facilities for t-tests.) »</em></p>
+<p class="cal piege"> <strong>Le cours ne donne pas de corrigé.</strong> Celui qui suit est <strong>une correction pédagogique</strong> construite à partir des indications qu'il fournit (<code>tapply</code>, <code>length</code>, <code>qt</code>) et de la théorie standard de l'intervalle de Student. Les valeurs numériques sont recalculées à partir des données du chapitre.</p>
+</blockquote>
+<p><em>Étape 1 — les effectifs, comme le cours le suggère.</em></p>
+<pre><code class="language-r">n &lt;- tapply(incomes, statef, length)
+</code></pre>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>act</th>
+<th>nsw</th>
+<th>nt</th>
+<th>qld</th>
+<th>sa</th>
+<th>tas</th>
+<th>vic</th>
+<th>wa</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>effectif</strong></td>
+<td>2</td>
+<td>6</td>
+<td>2</td>
+<td>5</td>
+<td>4</td>
+<td>2</td>
+<td>5</td>
+<td>4</td>
+</tr>
+</tbody></table>
+<p>Contrôle : $2+6+2+5+4+2+5+4 = \mathbf{30}$, l'effectif total. </p>
+<p><em>Étape 2 — la formule.</em> L'intervalle de Student à $1-\alpha$ pour une moyenne, l'écart-type étant estimé, est
+$$\bar x \;\pm\; t_{1-\alpha/2,\;n-1}\cdot \frac{s}{\sqrt n}$$
+où $s/\sqrt n$ est <strong>exactement</strong> ce que calcule <code>stdError</code> de l'étape précédente.</p>
+<p><em>Étape 3 — les points de pourcentage, avec <code>qt()</code> comme indiqué.</em> Le degré de liberté est $n-1$, <strong>différent pour chaque état</strong> — c'est le point délicat de l'exercice.</p>
+<pre><code class="language-r">t &lt;- qt(0.975, df = n - 1)
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>effectif $n$</th>
+<th>2</th>
+<th>4</th>
+<th>5</th>
+<th>6</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$\nu = n-1$</td>
+<td>1</td>
+<td>3</td>
+<td>4</td>
+<td>5</td>
+</tr>
+<tr>
+<td>$t_{0{,}975,\nu}$</td>
+<td><strong>12,706</strong></td>
+<td>3,182</td>
+<td>2,776</td>
+<td><strong>2,571</strong></td>
+</tr>
+</tbody></table>
+<p><em>Étape 4 — assembler.</em></p>
+<pre><code class="language-r">bas  &lt;- incmeans - t * incster
+haut &lt;- incmeans + t * incster
+</code></pre>
+<p><em>Étape 5 — deux résultats à lire attentivement.</em></p>
+<p><strong>Pour <code>nsw</code></strong> ($n=6$) : $57{,}333 \pm 2{,}571 \times 4{,}3102 = 57{,}333 \pm 11{,}08$, soit $[\,46{,}25\;;\;68{,}41\,]$.</p>
+<p><strong>Pour <code>act</code></strong> ($n=2$) : $44{,}5 \pm 12{,}706 \times 1{,}5 = 44{,}5 \pm 19{,}06$, soit $[\,25{,}44\;;\;63{,}56\,]$.</p>
+<p><em>Étape 6 — interpréter.</em> L'erreur type de <code>act</code> (<strong>1,5</strong>) est <strong>la plus petite du tableau</strong>, et son intervalle est pourtant <strong>le plus large</strong>. La raison est le facteur $t$ : avec $\nu=1$ degré de liberté, $t_{0{,}975}$ vaut <strong>12,706</strong> au lieu de 2,571. <strong>Deux observations ne suffisent pas</strong> — l'incertitude sur $s$ lui-même écrase tout.</p>
+<p><em>Étape 7 — la leçon de méthode.</em> Une petite erreur type n'est pas un signe de précision si l'effectif est minuscule. <strong><code>tapply(incomes, statef, length)</code> doit toujours accompagner <code>tapply(incomes, statef, mean)</code></strong> : un groupe de taille 2 dans un tableau de moyennes est une valeur qu'on ne peut pas commenter.</p>
+<p><em>Étape 8 — le renvoi du cours.</em> <em>« You could also investigate R's facilities for t-tests »</em> — <code>t.test()</code>, qui produit directement l'intervalle. Voir fiche 312.</p>
+</div></details>
+
+<h2 data-prio="high">Concept 4 — Le tableau irrégulier (<em>ragged array</em>)</h2>
+<div class="cal formel"><span class="lab">Définition (§4.2).</span>
+<p> <em>« <strong>The combination of a vector and a labelling factor is an example of what is sometimes called a ragged array</strong>, since <strong>the subclass sizes are possibly irregular</strong>. <strong>When the subclass sizes are all the same the indexing may be done implicitly and much more efficiently</strong>, as we see in the next section. »</em></p>
+</div>
+<p>C'est le concept-charnière du chapitre, et il explique <strong>pourquoi les facteurs existent</strong> :</p>
+<table>
+<thead>
+<tr>
+<th>Structure</th>
+<th>Tailles des sous-classes</th>
+<th>Comment on indexe</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Vecteur + facteur</strong> (tableau irrégulier)</td>
+<td><strong>quelconques</strong></td>
+<td>par les <strong>niveaux</strong> — <code>tapply()</code></td>
+</tr>
+<tr>
+<td><strong>Tableau (<code>array</code>)</strong></td>
+<td><strong>toutes égales</strong></td>
+<td><strong>implicitement</strong>, par les dimensions — fiche 305</td>
+</tr>
+</tbody></table>
+<p>Un tableau à deux dimensions <strong>impose</strong> que chaque groupe ait le même effectif : c'est ce qui permet le calcul d'adresse direct (<code>dim</code>, fiche 303) et donc l'efficacité. Un facteur <strong>lève cette contrainte</strong>, au prix d'une indexation explicite. <strong>Le chapitre 5 est la suite naturelle de cette phrase.</strong></p>
+<div class="cal plus"><span class="lab">Complément (R Language Definition §2.3.2).</span>
+<p> Le data frame reprend la même idée : <em>« A data frame <strong>can contain a list</strong> that is the same length as the other components. The list can contain elements of <strong>differing lengths</strong>, thereby <strong>providing a data structure for ragged arrays</strong>. <strong>However, as of this writing such arrays are not generally handled correctly.</strong> »</em> — la mise en garde vaut d'être connue avant d'essayer.</p>
+</div>
+<h2 data-prio="high">Concept 5 — Facteurs ordonnés</h2>
+<div class="cal formel"><span class="lab">Définition (§4.3).</span>
+<p> <em>« Sometimes <strong>the levels will have a natural ordering that we want to record and want our statistical analysis to make use of</strong>. <strong>The <code>ordered()</code> function creates such ordered factors but is otherwise identical to <code>factor</code>.</strong> »</em></p>
+</div>
+<blockquote>
+<p><strong>Règle — les deux seules différences (§4.3).</strong> <em>« <strong>For most purposes the only difference between ordered and unordered factors is that the former are printed showing the ordering of the levels, but the contrasts generated for them in fitting linear models are different.</strong> »</em></p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th></th>
+<th><code>factor()</code></th>
+<th><code>ordered()</code></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Création</td>
+<td>identique</td>
+<td>identique</td>
+</tr>
+<tr>
+<td><strong>Affichage</strong></td>
+<td><code>Levels: a b c</code></td>
+<td><code>Levels: a &lt; b &lt; c</code></td>
+</tr>
+<tr>
+<td><strong>Contrastes</strong> en modèle linéaire</td>
+<td>traitement (indicatrices)</td>
+<td><strong>différents</strong> — polynomiaux</td>
+</tr>
+<tr>
+<td>Classe (<em>R Language Definition</em> §2.3.1)</td>
+<td><code>"factor"</code></td>
+<td><strong><code>c("ordered", "factor")</code></strong></td>
+</tr>
+</tbody></table>
+<blockquote>
+<p class="cal piege"> <strong>Ne pas se laisser tromper par « the only difference ».</strong> La seconde différence est <strong>considérable</strong>. Les contrastes déterminent <strong>la paramétrisation</strong> du modèle : avec un facteur non ordonné, les coefficients comparent chaque niveau <strong>au niveau de référence</strong> ; avec un facteur ordonné, ils décrivent une <strong>tendance</strong> (linéaire, quadratique…) le long des niveaux. Ce ne sont pas les mêmes coefficients, ni les mêmes hypothèses. Voir fiche 313 (§11.1.1 « Contrasts »).</p>
+</blockquote>
+<p><em>« A factor may be <strong>purely nominal</strong> or may have <strong>ordered categories</strong>. In the latter case, <strong>it should be defined as such</strong> »</em> (<em>R Language Definition</em> §2.3.1) — le manuel dit <strong>doit</strong>, pas <em>peut</em>.</p>
+<h2>Comment reconnaître le type d'exercice</h2>
+<table>
+<thead>
+<tr>
+<th>Le signal dans l'énoncé</th>
+<th>Ce qu'il faut mobiliser</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>« une variable catégorielle », « des groupes »</td>
+<td>un <strong>facteur</strong> — <code>factor()</code></td>
+</tr>
+<tr>
+<td>« la moyenne par état », « par catégorie »</td>
+<td><strong><code>tapply(donnees, facteur, fonction)</code></strong></td>
+</tr>
+<tr>
+<td>« les effectifs par groupe »</td>
+<td><code>tapply(..., length)</code> — ou <code>table()</code></td>
+</tr>
+<tr>
+<td>« mes barres sont dans le mauvais ordre »</td>
+<td>les niveaux sont <strong>alphabétiques</strong> → argument <code>levels =</code></td>
+</tr>
+<tr>
+<td>« quel niveau sert de référence ? »</td>
+<td><strong>le premier</strong> — donc celui que l'alphabet a choisi</td>
+</tr>
+<tr>
+<td>« faible / moyen / fort »</td>
+<td>des catégories <strong>ordonnées</strong> → <strong><code>ordered()</code></strong></td>
+</tr>
+<tr>
+<td>« les coefficients de mon modèle sont bizarres »</td>
+<td>facteur <strong>ordonné</strong> → <strong>contrastes polynomiaux</strong></td>
+</tr>
+<tr>
+<td>« l'erreur type de la moyenne »</td>
+<td>$s/\sqrt n$ — <strong><code>sqrt(var(x)/length(x))</code></strong>, pas <code>sd()</code></td>
+</tr>
+<tr>
+<td>« un intervalle de confiance par groupe »</td>
+<td><code>tapply(..., length)</code> + <strong><code>qt(0.975, n-1)</code></strong></td>
+</tr>
+<tr>
+<td>« des groupes de tailles inégales »</td>
+<td>un <strong>tableau irrégulier</strong> — vecteur + facteur</td>
+</tr>
+<tr>
+<td>« des groupes de tailles égales »</td>
+<td>un <strong>tableau</strong> (<code>array</code>) — indexation implicite, fiche 305</td>
+</tr>
+<tr>
+<td>« croiser deux variables catégorielles »</td>
+<td><code>tapply()</code> accepte <strong>plusieurs</strong> facteurs</td>
+</tr>
+<tr>
+<td>« mon sous-ensemble est faux et de bonne longueur »</td>
+<td> <strong>indexation par un facteur</strong> → <code>as.character()</code></td>
+</tr>
+</tbody></table>
+<h2>Comment résoudre ce type d'exercice</h2>
+<p><strong>Protocole « analyser par groupes » — 5 étapes.</strong></p>
+<ol>
+<li><strong>Construire le facteur</strong> — et <strong>fixer l'ordre des niveaux</strong> si l'alphabet ne convient pas.</li>
+<li><strong><code>tapply(x, f, length)</code></strong> d'abord : connaître <strong>les effectifs</strong> avant de commenter les moyennes.</li>
+<li><strong><code>tapply(x, f, mean)</code></strong>, ou toute autre statistique.</li>
+<li>Pour la dispersion, écrire <strong>la fonction dont on a besoin</strong> — le cours montre qu'un one-liner suffit — et se souvenir que <strong><code>sd()</code> n'est pas l'erreur type</strong>.</li>
+<li><strong>Vérifier que le résultat a autant d'éléments que de niveaux</strong> : <em>« a structure of the same length as the <code>levels</code> attribute »</em>.</li>
+</ol>
+<p><strong>Protocole « choisir entre <code>factor</code> et <code>ordered</code> » — 3 étapes.</strong></p>
+<ol>
+<li>Les catégories ont-elles <strong>un ordre naturel</strong> ? Non → <code>factor()</code>.</li>
+<li>Oui, et cet ordre doit-il <strong>entrer dans l'analyse</strong> ? Oui → <code>ordered()</code>, en donnant <code>levels =</code> <strong>dans le bon ordre</strong>.</li>
+<li>Vérifier l'affichage : <code>Levels: a &lt; b &lt; c</code> confirme l'ordre enregistré.</li>
+</ol>
+<p><strong>Protocole « intervalle de confiance par groupe » — 4 étapes.</strong></p>
+<ol>
+<li><code>n &lt;- tapply(x, f, length)</code> — <strong>les degrés de liberté diffèrent d'un groupe à l'autre</strong>.</li>
+<li><code>se &lt;- tapply(x, f, function(v) sqrt(var(v)/length(v)))</code>.</li>
+<li><code>t &lt;- qt(0.975, df = n - 1)</code> — <strong>vectorisé sur <code>n</code></strong> (fiche 301).</li>
+<li><code>moyenne ± t * se</code>, puis <strong>relire les groupes de petit effectif</strong> : $t_{0{,}975,1}=12{,}7$.</li>
+</ol>
+<h2 data-prio="must">Common mistakes</h2>
+<table>
+<thead>
+<tr>
+<th>Erreur</th>
+<th>Correction</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Laisser l'ordre alphabétique des niveaux</td>
+<td><em>« or in the order they were <strong>specified to <code>factor</code></strong> »</em> → argument <code>levels =</code></td>
+</tr>
+<tr>
+<td>Croire que l'ordre des niveaux n'est qu'esthétique</td>
+<td>il fixe <strong>la modalité de référence</strong> d'un modèle</td>
+</tr>
+<tr>
+<td>Utiliser <code>sd()</code> comme erreur type</td>
+<td>l'erreur type est <strong>$s/\sqrt n$</strong></td>
+</tr>
+<tr>
+<td>Commenter des moyennes sans les effectifs</td>
+<td><code>tapply(..., length)</code> <strong>d'abord</strong></td>
+</tr>
+<tr>
+<td>Croire une petite erreur type synonyme de précision</td>
+<td>avec $n=2$, $t_{0{,}975}=\mathbf{12{,}7}$</td>
+</tr>
+<tr>
+<td>Indexer par un facteur</td>
+<td>c'est <strong><code>x[as.integer(f)]</code></strong> → <code>x[as.character(f)]</code></td>
+</tr>
+<tr>
+<td>Calculer sur les codes entiers d'un facteur</td>
+<td><em>« an <strong>implementation issue</strong> … <strong>not guaranteed</strong> »</em></td>
+</tr>
+<tr>
+<td>Convertir un facteur numérique par <code>as.numeric()</code></td>
+<td>cela rend <strong>les codes</strong>, pas les étiquettes</td>
+</tr>
+<tr>
+<td>Croire <code>ordered()</code> purement cosmétique</td>
+<td>il change <strong>les contrastes</strong> du modèle</td>
+</tr>
+<tr>
+<td>Oublier <code>levels =</code> avec <code>ordered()</code></td>
+<td>sans lui, l'ordre reste <strong>alphabétique</strong></td>
+</tr>
+<tr>
+<td>Passer un vecteur de caractères à <code>tapply()</code> sans y penser</td>
+<td>il est <strong>coercé</strong> par <code>as.factor()</code> — donc <strong>ordre alphabétique</strong></td>
+</tr>
+<tr>
+<td>Attendre d'un tableau irrégulier l'efficacité d'un <code>array</code></td>
+<td><em>« when the subclass sizes are all the same the indexing may be done <strong>implicitly and much more efficiently</strong> »</em></td>
+</tr>
+<tr>
+<td>Confondre le nombre de niveaux et le nombre d'observations</td>
+<td>8 niveaux, <strong>30</strong> observations</td>
+</tr>
+</tbody></table>
+<h2>Ultimate Review</h2>
+<p><strong>Définition.</strong> <em>« A factor is <strong>a vector object used to specify a discrete classification (grouping) of the components of other vectors of the same length</strong>. »</em> Il porte <strong>l'appartenance</strong>, pas les données.</p>
+<p><strong>Sa vraie fonction.</strong> <em>« The <strong>"real" application of factors is with model formulae</strong> »</em> — les contrastes, fiche 313. <code>tapply()</code> n'en est qu'une illustration.</p>
+<p><strong>Structure.</strong> Attribut <strong><code>levels</code></strong> + classe <strong><code>"factor"</code></strong> (+ <strong><code>contrasts</code></strong> en option). Implémenté par <strong>un tableau d'entiers</strong> et un tableau de noms —  <em>« an implementation issue and <strong>is not guaranteed</strong> »</em>.</p>
+<p><strong>Création et affichage.</strong> <code>factor(x)</code> · <code>levels(f)</code> pour lire les niveaux · <code>print()</code> traite les facteurs <strong>différemment</strong> : pas de guillemets, et une ligne <strong><code>Levels:</code></strong> listant <strong>tous</strong> les niveaux.</p>
+<p><strong>L'ordre des niveaux.</strong> <em>« stored in <strong>alphabetical order</strong>, or <strong>in the order they were specified to <code>factor</code> if they were specified explicitly</strong> »</em>. Pour les caractères, <em>« "sorted" means sorted in <strong>alphabetical order</strong> »</em>. L'ordre commande l'affichage, les tableaux, les graphiques — <strong>et la modalité de référence</strong> d'un modèle.</p>
+<p><strong><code>tapply()</code>.</strong> <em>« apply a function … <strong>to each group of components of the first argument, defined by the levels of the second</strong>, <strong>as if they were separate vector structures</strong> »</em>. Résultat : <em>« a structure of <strong>the same length as the <code>levels</code> attribute</strong> »</em>, <strong>étiqueté par les niveaux</strong>. Mécanisme en trois temps : <strong>regrouper, appliquer, étiqueter</strong>.  Le deuxième argument <strong>n'a pas besoin d'être un facteur</strong> — il est coercé par <strong><code>as.factor()</code></strong>. Accepte <strong>plusieurs catégories</strong>.</p>
+<p><strong>Erreur type.</strong> <code>stdError &lt;- function(x) sqrt(var(x)/length(x))</code> —  <em>« <strong>R's builtin function <code>sd()</code> is something different</strong> »</em>. Écart d'un facteur $\sqrt n$.</p>
+<p><strong>Les chiffres du chapitre.</strong> <strong>30</strong> comptables, <strong>8</strong> états et territoires · moyennes : act <strong>44,500</strong> · nsw <strong>57,333</strong> · nt <strong>55,500</strong> · qld <strong>53,600</strong> · sa <strong>55,000</strong> · tas <strong>60,500</strong> · vic <strong>56,000</strong> · wa <strong>52,250</strong> · erreurs types : <strong>1,5</strong> · 4,3102 · <strong>4,5</strong> · 4,1061 · 2,7386 · <strong>0,5</strong> · 5,244 · 2,6575 · effectifs : 2, 6, 2, 5, 4, 2, 5, 4.</p>
+<p><strong>Tableau irrégulier.</strong> <em>« The combination of <strong>a vector and a labelling factor</strong> … since <strong>the subclass sizes are possibly irregular</strong> »</em>. Quand les sous-classes sont <strong>de même taille</strong>, <em>« the indexing may be done <strong>implicitly and much more efficiently</strong> »</em> — c'est le tableau (fiche 305).</p>
+<p><strong>Facteurs ordonnés.</strong> <strong><code>ordered()</code></strong> — <em>« otherwise <strong>identical</strong> to <code>factor</code> »</em>. Deux différences : <strong>l'affichage montre l'ordre</strong> (<code>a &lt; b &lt; c</code>) et <strong>les contrastes engendrés en modèle linéaire diffèrent</strong>. Classe <strong><code>c("ordered", "factor")</code></strong>. <em>« In the latter case, <strong>it should be defined as such</strong> »</em>.</p>
+<div class="rec"><h2>Active Recall</h2><details class="cor">
+<summary>Qu'est-ce qu'un facteur, exactement ? Et quelle est sa « vraie » raison d'être selon le cours ?</summary><div class="in">
+
+<p><em>« A factor is <strong>a vector object used to specify a discrete classification (grouping) of the components of other vectors of the same length</strong>. »</em> (§4.1)</p>
+<p>Deux points dans cette définition : il <strong>classe</strong> (il ne mesure pas), et il classe <strong>les composantes d'autres vecteurs de même longueur</strong> — c'est un objet <strong>relationnel</strong>, sans intérêt seul.</p>
+<p><strong>Sa vraie fonction</strong> : <em>« While the <strong>"real" application of factors is with model formulae</strong> (see Contrasts), <strong>we here look at a specific example</strong>. »</em> Le chapitre 4 est une illustration ; les facteurs existent pour dire aux fonctions de modélisation qu'une variable est catégorielle.</p>
+</div></details><details class="cor">
+<summary>Comment sont ordonnés les niveaux d'un facteur, et pourquoi est-ce important ?</summary><div class="in">
+
+<p><em>« <strong>The levels of factors are stored in alphabetical order</strong>, <strong>or in the order they were specified to <code>factor</code> if they were specified explicitly.</strong> »</em> (§4.3)</p>
+<p><strong>Pourquoi cela compte</strong> : l'ordre des niveaux détermine l'ordre d'un <code>table()</code>, l'ordre des boîtes d'un <code>boxplot</code>, l'ordre des barres — et surtout <strong>quel niveau sert de référence</strong> dans un modèle linéaire. Le premier niveau est celui auquel les autres sont comparés.</p>
+<p>Sur des catégories comme <code>faible/moyen/fort</code>, l'ordre alphabétique donne <code>faible, fort, moyen</code> — <strong>dénué de sens</strong>. La correction est l'argument <strong><code>levels =</code></strong>.</p>
+</div></details><details class="cor">
+<summary>Expliquer ce que fait <code>tapply(incomes, statef, mean)</code>, en reprenant les mots du cours.</summary><div class="in">
+
+<p><em>« The function <code>tapply()</code> is used to <strong>apply a function</strong>, here <code>mean()</code>, <strong>to each group of components of the first argument</strong>, here <code>incomes</code>, <strong>defined by the levels of the second component</strong>, here <code>statef</code>, <strong>as if they were separate vector structures</strong>. <strong>The result is a structure of the same length as the <code>levels</code> attribute of the factor</strong> containing the results. »</em> (§4.2)</p>
+<p>Et la description du mécanisme : <em>« <strong>The values in the vector are collected into groups</strong> corresponding to the distinct entries in the factor. <strong>The function is then applied to each of these groups individually.</strong> <strong>The value is a vector of function results, labelled by the levels attribute of the factor.</strong> »</em></p>
+<p>Trois temps : <strong>regrouper, appliquer, étiqueter</strong>.</p>
+</div></details><details class="cor">
+<summary>Le deuxième argument de <code>tapply()</code> doit-il être un facteur ?</summary><div class="in">
+
+<p>Non. Note 2 du §4.2 : *« Note that <code>tapply()</code> <strong>also works in this case when its second argument is not a factor</strong>, e.g. <code>tapply(incomes, state)</code>, and <strong>this is true for quite a few other functions, since arguments are coerced to factors when necessary (using <code>as.factor()</code>)</strong>. »*</p>
+<p class="cal piege"> <strong>Mais c'est un confort risqué</strong> : la coercition silencieuse crée un facteur <strong>aux niveaux alphabétiques</strong>. Si l'ordre importe — et il importe dès qu'un graphique ou un modèle suit — il faut construire le facteur <strong>explicitement</strong>, avec <code>levels =</code>.</p>
+</div></details><details class="cor">
+<summary>Pourquoi le cours écrit-il que <code>sd()</code> « is something different » ?</summary><div class="in">
+
+<p>Parce que la fonction demandée est <strong>l'erreur type de la moyenne</strong> :</p>
+<pre><code class="language-r">stdError &lt;- function(x) sqrt(var(x)/length(x))
+</code></pre>
+<p>$$\operatorname{se}(\bar x)=\frac{s}{\sqrt n} \qquad\text{alors que}\qquad \texttt{sd}(x)=s$$</p>
+<p>Les deux diffèrent d'un facteur <strong>$\sqrt n$</strong>. Sur <code>nsw</code> ($n=6$), <code>sd</code> vaudrait $4{,}3102\times\sqrt 6 = 10{,}56$ contre une erreur type de <strong>4,3102</strong>. Confondre les deux produit un intervalle de confiance <strong>2,45 fois trop large</strong>.</p>
+<p>C'est aussi pourquoi le cours fait <strong>écrire</strong> la fonction : elle n'existe pas en standard.</p>
+</div></details><details class="cor">
+<summary>Vérifier à la main l'erreur type de l'état <code>act</code>.</summary><div class="in">
+
+<p>Les deux revenus de <code>act</code> sont <strong>46</strong> et <strong>43</strong> (positions 26 et 30), de moyenne <strong>44,5</strong>.</p>
+<p>$$\operatorname{var}=\frac{(46-44{,}5)^2+(43-44{,}5)^2}{2-1}=\frac{2{,}25+2{,}25}{1}=4{,}5$$</p>
+<p>$$\operatorname{se}=\sqrt{\frac{4{,}5}{2}}=\sqrt{2{,}25}=\mathbf{1{,}5}$$</p>
+<p> conforme au tableau du cours. Même contrôle pour <code>tas</code> (60 et 61) : $\operatorname{var}=0{,}5$ et $\operatorname{se}=\sqrt{0{,}25}=\mathbf{0{,}5}$.</p>
+</div></details><details class="cor">
+<summary>Pourquoi l'état ayant la plus petite erreur type a-t-il l'intervalle de confiance le plus large ?</summary><div class="in">
+
+<p><code>act</code> a l'erreur type <strong>la plus petite du tableau</strong> (1,5) et l'intervalle <strong>le plus large</strong>.</p>
+<p>La raison est le <strong>degré de liberté</strong>. L'intervalle est $\bar x \pm t_{0{,}975,\,n-1}\cdot \operatorname{se}$, et pour $n=2$ :</p>
+<p>$$t_{0{,}975,\,1}=\mathbf{12{,}706} \qquad\text{contre}\qquad t_{0{,}975,\,5}=2{,}571$$</p>
+<p>Donc $44{,}5 \pm 12{,}706 \times 1{,}5 = 44{,}5 \pm 19{,}06$, soit $[\,25{,}44\,;\,63{,}56\,]$ — bien plus large que $[\,46{,}25\,;\,68{,}41\,]$ pour <code>nsw</code>.</p>
+<p><strong>La leçon</strong> : deux observations ne suffisent pas. <strong><code>tapply(x, f, length)</code> doit toujours accompagner <code>tapply(x, f, mean)</code>.</strong></p>
+<p><em>(Correction pédagogique : le cours pose cet exercice au §4.2 sans en donner la solution.)</em></p>
+</div></details><details class="cor">
+<summary>Qu'est-ce qu'un tableau irrégulier, et qu'est-ce qui le distingue d'un tableau ordinaire ?</summary><div class="in">
+
+<p><em>« <strong>The combination of a vector and a labelling factor is an example of what is sometimes called a ragged array</strong>, since <strong>the subclass sizes are possibly irregular</strong>. <strong>When the subclass sizes are all the same the indexing may be done implicitly and much more efficiently</strong>, as we see in the next section. »</em> (§4.2)</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Tailles des sous-classes</th>
+<th>Indexation</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Vecteur + facteur</td>
+<td><strong>quelconques</strong></td>
+<td><strong>explicite</strong>, par les niveaux</td>
+</tr>
+<tr>
+<td>Tableau (<code>array</code>)</td>
+<td><strong>toutes égales</strong></td>
+<td><strong>implicite</strong>, par les dimensions</td>
+</tr>
+</tbody></table>
+<p>Un <code>array</code> <strong>impose</strong> l'égalité des effectifs, ce qui permet un calcul d'adresse direct via <code>dim</code> (fiche 303) — d'où l'efficacité. Le facteur <strong>lève cette contrainte</strong>, au prix d'une indexation explicite.</p>
+</div></details><details class="cor">
+<summary>Quelles sont les différences entre <code>factor()</code> et <code>ordered()</code> ?</summary><div class="in">
+
+<p><em>« <strong>The <code>ordered()</code> function creates such ordered factors but is otherwise identical to <code>factor</code>.</strong> For most purposes <strong>the only difference</strong> between ordered and unordered factors is that <strong>the former are printed showing the ordering of the levels</strong>, but <strong>the contrasts generated for them in fitting linear models are different</strong>. »</em> (§4.3)</p>
+<ol>
+<li><strong>L'affichage</strong> : <code>Levels: a &lt; b &lt; c</code> au lieu de <code>Levels: a b c</code>.</li>
+<li><strong>Les contrastes</strong> en modèle linéaire — ce qui est <strong>tout sauf mineur</strong> : avec un facteur non ordonné, les coefficients comparent chaque niveau au <strong>niveau de référence</strong> ; avec un facteur ordonné, ils décrivent une <strong>tendance</strong> le long des niveaux.</li>
+</ol>
+<p>Et la classe diffère : <strong><code>c("ordered", "factor")</code></strong> (<em>R Language Definition</em> §2.3.1), qui ajoute <em>« it <strong>should</strong> be defined as such »</em> quand l'ordre existe.</p>
+</div></details><details class="cor">
+<summary>Que se passe-t-il si on indexe un vecteur par un facteur ?</summary><div class="in">
+
+<p>*« <strong>Factor.</strong> The result is <strong>identical to <code>x[as.integer(i)]</code></strong>. <strong>The factor levels are never used.</strong> If so desired, use <strong><code>x[as.character(i)]</code></strong> or a similar construction. »* (<em>R Language Definition</em> §3.4.1)</p>
+<p>C'est le piège le plus vicieux du chapitre : le facteur <strong>s'affiche avec ses étiquettes</strong> mais <strong>vaut ses codes entiers</strong>. On indexe donc <strong>par des positions 1, 2, 3…</strong> que rien à l'écran ne laisse deviner. Le résultat a <strong>la bonne longueur</strong> et il est <strong>faux</strong>.</p>
+<p>Le remède est <strong><code>as.character()</code></strong>.</p>
+</div></details><details class="cor">
+<summary>Peut-on s'appuyer sur le fait qu'un facteur est un vecteur d'entiers ?</summary><div class="in">
+
+<p>Non, et le manuel est explicite : <em>« Factors are <strong>currently implemented</strong> using an integer array to specify the actual levels and a second array of names that are mapped to the integers. <strong>Rather unfortunately users often make use of the implementation in order to make some calculations easier. This, however, is an implementation issue and is not guaranteed to hold in all implementations of R.</strong> »</em> (<em>R Language Definition</em> §2.3.1)</p>
+<p><code>unclass(f)</code> <strong>montre</strong> les codes — c'est l'outil pédagogique du §3.4 d'<em>An Introduction to R</em> — mais montrer n'est pas <strong>calculer avec</strong>.</p>
+<p class="cal piege"> Le corollaire pratique le plus coûteux : sur un facteur dont les étiquettes sont des nombres, <strong><code>as.numeric(f)</code> rend les codes, pas les valeurs</strong>. Il faut <code>as.numeric(as.character(f))</code>.</p>
+</div></details><details class="cor">
+<summary>Combien y a-t-il de niveaux dans <code>statef</code>, et pourquoi le cours le précise-t-il en note ?</summary><div class="in">
+
+<p><strong>Huit</strong> — <code>act</code>, <code>nsw</code>, <code>nt</code>, <code>qld</code>, <code>sa</code>, <code>tas</code>, <code>vic</code>, <code>wa</code> — pour <strong>30</strong> observations.</p>
+<p>Le cours ajoute en note 1 : <em>« Readers should note that <strong>there are eight states and territories in Australia</strong> »</em>. La précision sert à confirmer que <strong>tous</strong> les niveaux possibles sont représentés : le facteur n'a pas de niveau vide, et l'échantillon couvre l'ensemble du territoire.</p>
+<p>Elle rappelle surtout la distinction <strong>niveaux / observations</strong> : un facteur classe <strong>beaucoup</strong> d'observations dans <strong>peu</strong> de catégories. Si les deux nombres étaient proches, ce ne serait pas une classification mais une identification — et <code>tapply()</code> n'aurait aucun sens.</p>
+</div></details></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h2>Flashcards</h2>
+<table>
+<thead>
+<tr>
+<th>Question</th>
+<th>Réponse</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Qu'est-ce qu'un facteur ?</td>
+<td>Un vecteur qui <strong>classe</strong> les composantes d'autres vecteurs <strong>de même longueur</strong></td>
+</tr>
+<tr>
+<td>Sa « vraie » application selon le cours ?</td>
+<td>Les <strong>formules de modèle</strong> — les contrastes</td>
+</tr>
+<tr>
+<td>Ses deux attributs obligatoires ?</td>
+<td><strong><code>levels</code></strong> et <strong><code>class = "factor"</code></strong></td>
+</tr>
+<tr>
+<td>Un attribut optionnel ?</td>
+<td><strong><code>contrasts</code></strong></td>
+</tr>
+<tr>
+<td>Comment le créer ?</td>
+<td><strong><code>factor(x)</code></strong></td>
+</tr>
+<tr>
+<td>Comment lire ses niveaux ?</td>
+<td><strong><code>levels(f)</code></strong></td>
+</tr>
+<tr>
+<td>Comment <code>print()</code> traite-t-il un facteur ?</td>
+<td><strong>Sans guillemets</strong>, avec une ligne <strong><code>Levels:</code></strong></td>
+</tr>
+<tr>
+<td>L'ordre par défaut des niveaux ?</td>
+<td><strong>Alphabétique</strong></td>
+</tr>
+<tr>
+<td>Comment l'imposer ?</td>
+<td>L'argument <strong><code>levels =</code></strong> de <code>factor()</code></td>
+</tr>
+<tr>
+<td>Pourquoi cet ordre compte-t-il ?</td>
+<td>Il fixe la <strong>modalité de référence</strong> d'un modèle</td>
+</tr>
+<tr>
+<td>Pour un vecteur de caractères, « trié » signifie ?</td>
+<td><strong>Par ordre alphabétique</strong></td>
+</tr>
+<tr>
+<td>Combien de niveaux dans l'exemple ?</td>
+<td><strong>8</strong> états et territoires</td>
+</tr>
+<tr>
+<td>Pour combien d'observations ?</td>
+<td><strong>30</strong> comptables</td>
+</tr>
+<tr>
+<td>À quoi sert <code>tapply()</code> ?</td>
+<td><strong>Appliquer une fonction à chaque groupe</strong> défini par les niveaux</td>
+</tr>
+<tr>
+<td>Ses trois arguments dans l'exemple ?</td>
+<td><code>incomes</code>, <code>statef</code>, <code>mean</code></td>
+</tr>
+<tr>
+<td>Longueur du résultat ?</td>
+<td>Celle de <strong>l'attribut <code>levels</code></strong></td>
+</tr>
+<tr>
+<td>Comment est-il étiqueté ?</td>
+<td><strong>Par les niveaux</strong></td>
+</tr>
+<tr>
+<td>Les trois temps du mécanisme ?</td>
+<td><strong>Regrouper</strong>, <strong>appliquer</strong>, <strong>étiqueter</strong></td>
+</tr>
+<tr>
+<td>Le 2ᵉ argument doit-il être un facteur ?</td>
+<td><strong>Non</strong> — coercé par <strong><code>as.factor()</code></strong></td>
+</tr>
+<tr>
+<td>Quel risque cela crée-t-il ?</td>
+<td>Des niveaux en <strong>ordre alphabétique</strong></td>
+</tr>
+<tr>
+<td><code>tapply()</code> accepte-t-il plusieurs catégories ?</td>
+<td><strong>Oui</strong></td>
+</tr>
+<tr>
+<td>La formule de l'erreur type ?</td>
+<td><strong><code>sqrt(var(x)/length(x))</code></strong></td>
+</tr>
+<tr>
+<td>Que vaut-elle en notation mathématique ?</td>
+<td>$s/\sqrt n$</td>
+</tr>
+<tr>
+<td><code>sd()</code> est-elle l'erreur type ?</td>
+<td> <strong>Non</strong> — c'est <strong>$s$</strong></td>
+</tr>
+<tr>
+<td>Facteur entre les deux ?</td>
+<td><strong>$\sqrt n$</strong></td>
+</tr>
+<tr>
+<td>Moyenne de <code>qld</code> ?</td>
+<td><strong>53,600</strong></td>
+</tr>
+<tr>
+<td>Moyenne de <code>act</code> ?</td>
+<td><strong>44,500</strong></td>
+</tr>
+<tr>
+<td>Erreur type de <code>act</code> ?</td>
+<td><strong>1,5</strong></td>
+</tr>
+<tr>
+<td>Erreur type de <code>tas</code> ?</td>
+<td><strong>0,5</strong></td>
+</tr>
+<tr>
+<td>Erreur type la plus grande ?</td>
+<td><strong>5,244</strong> (<code>vic</code>)</td>
+</tr>
+<tr>
+<td>Effectif de <code>act</code> ?</td>
+<td><strong>2</strong></td>
+</tr>
+<tr>
+<td>Effectif de <code>nsw</code> ?</td>
+<td><strong>6</strong></td>
+</tr>
+<tr>
+<td>Quelle fonction pour les effectifs ?</td>
+<td><strong><code>tapply(x, f, length)</code></strong></td>
+</tr>
+<tr>
+<td>Quelle fonction pour les points de Student ?</td>
+<td><strong><code>qt()</code></strong></td>
+</tr>
+<tr>
+<td>Degré de liberté d'un groupe de taille <code>n</code> ?</td>
+<td><strong><code>n - 1</code></strong></td>
+</tr>
+<tr>
+<td>$t_{0{,}975}$ pour $\nu=1$ ?</td>
+<td><strong>12,706</strong></td>
+</tr>
+<tr>
+<td>$t_{0{,}975}$ pour $\nu=5$ ?</td>
+<td><strong>2,571</strong></td>
+</tr>
+<tr>
+<td>Pourquoi <code>act</code> a-t-il l'intervalle le plus large ?</td>
+<td><strong>Un seul degré de liberté</strong></td>
+</tr>
+<tr>
+<td>La formule de l'intervalle ?</td>
+<td>$\bar x \pm t_{1-\alpha/2,\,n-1}\cdot s/\sqrt n$</td>
+</tr>
+<tr>
+<td>Autre piste suggérée par le cours ?</td>
+<td>Les <strong>facilités de test t</strong> de R</td>
+</tr>
+<tr>
+<td>Qu'est-ce qu'un tableau irrégulier ?</td>
+<td><strong>Un vecteur + un facteur d'étiquetage</strong></td>
+</tr>
+<tr>
+<td>Pourquoi « irrégulier » ?</td>
+<td>Les <strong>tailles des sous-classes</strong> peuvent différer</td>
+</tr>
+<tr>
+<td>Que gagne-t-on si elles sont égales ?</td>
+<td>Une indexation <strong>implicite et bien plus efficace</strong></td>
+</tr>
+<tr>
+<td>Quelle structure permet cela ?</td>
+<td>Le <strong>tableau</strong> (<code>array</code>) — fiche 305</td>
+</tr>
+<tr>
+<td>Un data frame peut-il porter un tableau irrégulier ?</td>
+<td>Oui, via une <strong>liste</strong> — mais <em>« not generally handled correctly »</em></td>
+</tr>
+<tr>
+<td>Comment créer un facteur ordonné ?</td>
+<td><strong><code>ordered()</code></strong></td>
+</tr>
+<tr>
+<td>En quoi diffère-t-il de <code>factor()</code> ?</td>
+<td><em>« <strong>otherwise identical</strong> »</em></td>
+</tr>
+<tr>
+<td>Sa première différence ?</td>
+<td><strong>L'affichage montre l'ordre</strong> : <code>a &lt; b &lt; c</code></td>
+</tr>
+<tr>
+<td>Sa seconde différence ?</td>
+<td>Les <strong>contrastes</strong> en modèle linéaire</td>
+</tr>
+<tr>
+<td>Sa classe ?</td>
+<td><strong><code>c("ordered", "factor")</code></strong></td>
+</tr>
+<tr>
+<td>Le manuel dit-il « peut » ou « doit » ?</td>
+<td><em>« <strong>it should be defined as such</strong> »</em></td>
+</tr>
+<tr>
+<td>Comment est implémenté un facteur ?</td>
+<td>Un tableau <strong>d'entiers</strong> + un tableau de <strong>noms</strong></td>
+</tr>
+<tr>
+<td>Peut-on s'appuyer dessus ?</td>
+<td> <strong>Non</strong> — <em>« an implementation issue … not guaranteed »</em></td>
+</tr>
+<tr>
+<td>Que rend <code>x[f]</code> avec <code>f</code> facteur ?</td>
+<td><strong><code>x[as.integer(f)]</code></strong> — les niveaux ne servent pas</td>
+</tr>
+<tr>
+<td>Comment indexer par les étiquettes ?</td>
+<td><strong><code>x[as.character(f)]</code></strong></td>
+</tr>
+<tr>
+<td>Que rend <code>as.numeric(f)</code> sur des étiquettes numériques ?</td>
+<td><strong>Les codes</strong>, pas les valeurs</td>
+</tr>
+<tr>
+<td>La bonne conversion ?</td>
+<td><strong><code>as.numeric(as.character(f))</code></strong></td>
+</tr>
+<tr>
+<td>Comment voir un facteur « à nu » ?</td>
+<td><strong><code>unclass(f)</code></strong></td>
+</tr>
+</tbody></table>
+</main>
+
+
+
+
+</body></html>

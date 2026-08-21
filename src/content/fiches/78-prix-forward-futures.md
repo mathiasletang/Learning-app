@@ -45,7 +45,12 @@ VALEUR    f = (F₀ − K) e^{−rT}      PORTAGE   c = r − revenu + stockage 
 
 ⚠️ **Le vendeur à découvert doit reverser tout revenu.** *Un investisseur en position courte doit payer au courtier tout revenu — dividendes ou intérêts — qui serait normalement perçu sur les titres shortés.* Le courtier le transfère au client prêteur.
 
-<details><summary>**Exercice résolu — le miroir exact (tableau 5.1)**</summary>
+<details class="details--riche">
+<summary>
+
+**Exercice résolu — le miroir exact (tableau 5.1)**
+
+</summary>
 
 **Situation.** Short de 500 actions en **avril** à **120**, dénoué en **juillet** à **100**. Dividende de **1 par action** payé en **mai**. Pas de frais d'emprunt.
 
@@ -81,7 +86,12 @@ VALEUR    f = (F₀ − K) e^{−rT}      PORTAGE   c = r − revenu + stockage 
 
 ### 3.1 Actif sans revenu
 
-<details><summary>**La construction de l'arbitrage dans les deux sens (tableau 5.2)**</summary>
+<details class="details--riche">
+<summary>
+
+**La construction de l'arbitrage dans les deux sens (tableau 5.2)**
+
+</summary>
 
 **Données.** Action sans dividende à **40**, taux 3 mois **5 %**, forward 3 mois.
 
@@ -109,7 +119,12 @@ $$\boxed{F_0=S_0e^{rT}}\;\text{(5.1)}$$
 
 **Et si la vente à découvert est impossible ?** *Cela ne change rien.* Il n'est **pas nécessaire de pouvoir shorter** : il suffit *qu'un nombre significatif de personnes détiennent l'actif purement pour l'investissement* — ce qui est **vrai par définition** d'un actif d'investissement. Si le forward est trop bas, **ils vendront leur actif et prendront une position longue en forward**, améliorant leur situation de $S_0e^{rT}-F_0$.
 
-<details><summary>**Exercice résolu — forward sur zéro-coupon (exemple 5.1)**</summary>
+<details class="details--riche">
+<summary>
+
+**Exercice résolu — forward sur zéro-coupon (exemple 5.1)**
+
+</summary>
 
 **Énoncé.** Forward **4 mois** pour acheter une obligation zéro-coupon échéant dans **1 an** (donc **8 mois** restants à la maturité du forward). Prix actuel **930**. Taux sans risque 4 mois continu **6 %**.
 
@@ -125,7 +140,12 @@ $$\boxed{F_0=(S_0-I)e^{rT}}\;\text{(5.2)}$$
 
 où $I$ est la **valeur actuelle** de tout le revenu versé pendant la vie du contrat. *Exemples : actions à dividendes connus, obligations à coupon.*
 
-<details><summary>**Exercice résolu — l'obligation à coupon (tableau 5.3)**</summary>
+<details class="details--riche">
+<summary>
+
+**Exercice résolu — l'obligation à coupon (tableau 5.3)**
+
+</summary>
 
 **Données.** Obligation à **900**, forward **9 mois**, coupon de **40** attendu dans **4 mois**. Taux continus : **3 %** à 4 mois, **4 %** à 9 mois.
 
@@ -151,7 +171,12 @@ Le revenu est connu **exprimé en pourcentage du prix de l'actif au moment où i
 
 $$\boxed{F_0=S_0e^{(r-q)T}}\;\text{(5.3)}$$
 
-<details><summary>**Exercice résolu — le piège de la conversion de rendement (exemple 5.3)**</summary>
+<details class="details--riche">
+<summary>
+
+**Exercice résolu — le piège de la conversion de rendement (exemple 5.3)**
+
+</summary>
 
 **Énoncé.** Forward **6 mois**, l'actif verse **2 % de son prix une fois** pendant les 6 mois. Taux sans risque continu **10 %**. Prix **25**.
 
@@ -183,7 +208,12 @@ $$\boxed{f=(F_0-K)e^{-rT}}\;\text{(5.4)}\qquad\text{(long)}\qquad\qquad f=(K-F_0
 
 $$f=S_0-Ke^{-rT}\;\text{(5.5)}\qquad f=S_0-I-Ke^{-rT}\;\text{(5.6)}\qquad f=S_0e^{-qT}-Ke^{-rT}\;\text{(5.7)}$$
 
-<details><summary>**Exercice résolu — valoriser un forward en cours de vie (exemple 5.4)**</summary>
+<details class="details--riche">
+<summary>
+
+**Exercice résolu — valoriser un forward en cours de vie (exemple 5.4)**
+
+</summary>
 
 **Énoncé.** Forward long sur action sans dividende, conclu autrefois, **6 mois restants**. Taux **10 %** continu, action à **25**, prix de livraison **24**.
 
@@ -224,7 +254,12 @@ $$\boxed{F_0=S_0e^{(r-q)T}}\;\text{(5.8)}$$
 
 **L'arbitrage d'indice.** Si $F_0>S_0e^{(r-q)T}$ : **acheter les actions** de l'indice au comptant et **vendre** les futures. Si $F_0<S_0e^{(r-q)T}$ : l'inverse. *Quand $F_0<S_0e^{(r-q)T}$, l'arbitrage est souvent réalisé par un **fonds de pension** détenant un portefeuille indiciel ; quand $F_0>S_0e^{(r-q)T}$, par une **entreprise** détenant des placements monétaires court terme.* Pour les indices à nombreuses composantes, on utilise un **échantillon représentatif** ; l'exécution passe par le ***program trading*** (génération automatique des ordres).
 
-<details><summary>**Quand l'arbitrage devient impossible — octobre 1987**</summary>
+<details class="details--riche">
+<summary>
+
+**Quand l'arbitrage devient impossible — octobre 1987**
+
+</summary>
 
 **La condition nécessaire.** *Pour faire de l'arbitrage d'indice, un trader doit pouvoir négocier **très rapidement** à la fois le futures et le portefeuille d'actions, aux prix affichés.* En conditions normales, le *program trading* le permet et (5.8) tient bien.
 
@@ -259,7 +294,12 @@ C'est la **parité des taux d'intérêt** de la finance internationale.
 
 *En l'absence d'opportunité d'arbitrage, les deux stratégies doivent donner le même résultat*, d'où $1\,000e^{r_fT}F_0=1\,000S_0e^{rT}$, c'est-à-dire (5.9).
 
-<details><summary>**Exercice résolu — l'arbitrage de parité, dans les deux sens (exemple 5.6)**</summary>
+<details class="details--riche">
+<summary>
+
+**Exercice résolu — l'arbitrage de parité, dans les deux sens (exemple 5.6)**
+
+</summary>
 
 **Données.** Taux 2 ans : **Australie 5 %**, **États-Unis 7 %**. Spot **0,6200 USD par AUD**.
 
@@ -292,7 +332,12 @@ C'est la **parité des taux d'intérêt** de la finance internationale.
 >
 > $$\boxed{F_0=(S_0+U)e^{rT}}\;\text{(5.11)}\qquad\qquad\text{ou, en proportion }u\text{ du prix :}\qquad \boxed{F_0=S_0e^{(r+u)T}}\;\text{(5.12)}$$
 
-<details><summary>**Exercice résolu — un actif avec coût de stockage (exemple 5.8)**</summary>
+<details class="details--riche">
+<summary>
+
+**Exercice résolu — un actif avec coût de stockage (exemple 5.8)**
+
+</summary>
 
 **Énoncé.** Futures **1 an** sur un actif d'investissement **sans revenu**. Stockage : **2 par unité, payé en fin d'année**. Spot **450**, taux **7 %** toutes maturités.
 
@@ -480,7 +525,12 @@ L'**écart entre le prix forward et le prix comptant** d'un strip — c'est-à-d
 
 </details>
 
-<details><summary>Démontrer $f=(F_0-K)e^{-rT}$.</summary>
+<details class="details--riche">
+<summary>
+
+Démontrer $f=(F_0-K)e^{-rT}$.
+
+</summary>
 
 Comparer deux forwards longs identiques sauf le prix de livraison : $F_0$ pour l'un, $K$ pour l'autre. Ils ne diffèrent **que** par le montant payé en $T$, soit $F_0-K$, ce qui vaut $(F_0-K)e^{-rT}$ aujourd'hui. Le contrat de prix $F_0$ vaut **zéro par définition** (c'est le prix de marché courant). Donc le contrat de prix $K$ vaut $(F_0-K)e^{-rT}$.
 

@@ -82,7 +82,12 @@ $$z(T)-z(0)=\sum_{i=1}^N\varepsilon_i\sqrt{\Delta t}\;\text{(13.2)}\qquad\Longri
 
 **Exemple 13.1.** $z$ vaut initialement **25**. Au bout d'**un an** : normale de moyenne **25** et écart-type **1,0**. Au bout de **5 ans** : moyenne **25**, écart-type $\sqrt5=\mathbf{2{,}236}$. *Notre incertitude, mesurée par l'écart-type, croît comme **la racine carrée** de l'horizon.*
 
-<details><summary>**Pourquoi la trajectoire d'un processus de Wiener est « déchiquetée » — et deux propriétés stupéfiantes**</summary>
+<details class="details--riche">
+<summary>
+
+**Pourquoi la trajectoire d'un processus de Wiener est « déchiquetée » — et deux propriétés stupéfiantes**
+
+</summary>
 
 *Étape 1 — comparer les deux échelles.* L'écart-type du mouvement sur $\Delta t$ vaut $\sqrt{\Delta t}$. *Étape 2 — le rapport décisif.* Quand $\Delta t$ est petit, $\sqrt{\Delta t}$ est **beaucoup plus grand** que $\Delta t$. Exemple : $\Delta t=10^{-4}$ donne $\sqrt{\Delta t}=10^{-2}$, soit **cent fois** plus. *Étape 3 — la conséquence.* Le déplacement **vertical** domine le déplacement **horizontal** à toute échelle : la trajectoire ne « s'aplatit » jamais en zoomant. Elle n'est **nulle part dérivable**.
 
@@ -149,7 +154,12 @@ $$\frac{\Delta S}{S}=\mu\Delta t+\sigma\varepsilon\sqrt{\Delta t}\;\text{(13.7)}
 
 *Le terme $\mu\Delta t$ est la **valeur espérée** du rendement ; $\sigma\varepsilon\sqrt{\Delta t}$ en est la **composante stochastique**, de variance $\sigma^2\Delta t$ — **cohérent avec la définition de $\sigma$** de la section 12.7.*
 
-<details><summary>**Exercice résolu — simulation de Monte-Carlo d'une trajectoire (exemple 13.3 et tableau 13.1)**</summary>
+<details class="details--riche">
+<summary>
+
+**Exercice résolu — simulation de Monte-Carlo d'une trajectoire (exemple 13.3 et tableau 13.1)**
+
+</summary>
 
 **Données.** Action sans dividende, $\sigma=30\,\%$, $\mu=15\,\%$ (continu). Pas de **1 semaine** $=0{,}0192$ an.
 
@@ -224,7 +234,12 @@ $$\boxed{dG=\left(\frac{\partial G}{\partial S}\mu S+\frac{\partial G}{\partial 
 
 ⚠️ **Le terme qui n'existe pas en calcul ordinaire** est $\frac12\frac{\partial^2G}{\partial x^2}b^2\,dt$. Il vient de ce que $(dz)^2$ est d'ordre $dt$, et non $dt^2$ — la propriété $\sqrt{\Delta t}\gg\Delta t$ du concept 2. (Démonstration détaillée en fiche 56.)
 
-<details><summary>**Exercice résolu A — le processus suivi par un prix forward**</summary>
+<details class="details--riche">
+<summary>
+
+**Exercice résolu A — le processus suivi par un prix forward**
+
+</summary>
 
 **Question.** Que devient le **prix forward** d'une action sans dividende quand le temps passe ? Taux sans risque $r$ **constant**.
 
@@ -252,7 +267,12 @@ $$\boxed{dF=(\mu-r)F\,dt+\sigma F\,dz}\;\text{(13.16)}$$
 
 ## 🔴 Concept 7 — La propriété log-normale
 
-<details><summary>**Exercice résolu B — le calcul le plus important du chapitre : $G=\ln S$**</summary>
+<details class="details--riche">
+<summary>
+
+**Exercice résolu B — le calcul le plus important du chapitre : $G=\ln S$**
+
+</summary>
 
 *Étape 1 — poser $G=\ln S$ et calculer les dérivées.*
 
@@ -395,7 +415,12 @@ Le calcul ordinaire donnerait seulement les deux premiers termes de dérive. **L
 
 </details>
 
-<details><summary>Appliquer le lemme d'Itô à $F=Se^{r(T-t)}$ et interpréter.</summary>
+<details class="details--riche">
+<summary>
+
+Appliquer le lemme d'Itô à $F=Se^{r(T-t)}$ et interpréter.
+
+</summary>
 
 $\dfrac{\partial F}{\partial S}=e^{r(T-t)}$, $\dfrac{\partial^2F}{\partial S^2}=0$, $\dfrac{\partial F}{\partial t}=-rSe^{r(T-t)}$. D'où
 
@@ -405,7 +430,12 @@ $$dF=\big[e^{r(T-t)}\mu S-rSe^{r(T-t)}\big]dt+e^{r(T-t)}\sigma S\,dz=\boxed{(\mu
 
 </details>
 
-<details><summary>Appliquer le lemme à $\ln S$ et en déduire la loi de $S_T$.</summary>
+<details class="details--riche">
+<summary>
+
+Appliquer le lemme à $\ln S$ et en déduire la loi de $S_T$.
+
+</summary>
 
 $\dfrac{\partial G}{\partial S}=\dfrac1S$, $\dfrac{\partial^2G}{\partial S^2}=-\dfrac1{S^2}$, $\dfrac{\partial G}{\partial t}=0$, donc
 
@@ -419,7 +449,12 @@ $$\ln S_T\sim\phi\!\left(\ln S_0+\left(\mu-\frac{\sigma^2}{2}\right)T,\ \sigma^2
 
 </details>
 
-<details><summary>D'où vient le terme $-\sigma^2/2$, et que signifie-t-il ?</summary>
+<details class="details--riche">
+<summary>
+
+D'où vient le terme $-\sigma^2/2$, et que signifie-t-il ?
+
+</summary>
 
 **Uniquement du terme d'Itô** : $\frac12\left(-\frac1{S^2}\right)\sigma^2S^2=-\frac{\sigma^2}{2}$. Sans lui, on écrirait naïvement $d(\ln S)=\mu\,dt+\sigma\,dz$, ce qui est **faux**.
 
@@ -427,7 +462,12 @@ Sa signification : c'est l'écart entre le **rendement arithmétique espéré** 
 
 </details>
 
-<details><summary>Comment simuler deux variables de corrélation $\rho$ ?</summary>
+<details class="details--riche">
+<summary>
+
+Comment simuler deux variables de corrélation $\rho$ ?
+
+</summary>
 
 Tirer **deux** normales standard **indépendantes** $u$ et $v$, puis poser
 
@@ -437,7 +477,12 @@ On vérifie que $\varepsilon_2$ est standard normale ($\rho^2+1-\rho^2=1$) et qu
 
 </details>
 
-<details><summary>Pourquoi n'a-t-on pas besoin de connaître $\mu$ pour valoriser un dérivé ?</summary>
+<details class="details--riche">
+<summary>
+
+Pourquoi n'a-t-on pas besoin de connaître $\mu$ pour valoriser un dérivé ?
+
+</summary>
 
 Parce que *la valeur d'un dérivé dépendant d'une action est, **en général, indépendante de $\mu$***. La raison profonde a été vue en fiche 85 : on valorise **relativement au prix de l'action**, et les anticipations sont **déjà dans $S_0$**. En revanche *$\sigma$ est **d'une importance critique*** — et c'est le seul paramètre qu'il faut réellement estimer.
 

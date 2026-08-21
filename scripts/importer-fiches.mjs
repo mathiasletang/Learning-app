@@ -91,7 +91,7 @@ function desechappe(s) {
    espaces ferait un marqueur catastrophique. */
 const JETON = '\u0000';
 
-const MATH_RE = /\$\$[\s\S]*?\$\$|\$(?:\\.|[^$\\])+\$/g;
+const MATH_RE = /(?<!\\)\$\$[\s\S]*?(?<!\\)\$\$|(?<!\\)\$(?:\\.|[^$\\])+\$/g;
 
 function protege(texte, coffre) {
   return texte.replace(MATH_RE, (formule) => {
@@ -112,7 +112,13 @@ function enLigne(noeuds, coffre) {
     if (n.tag === '#texte') {
       // Le rendu accepte le HTML en ligne : un « < » resté nu ferait le début
       // d'une balise et emporterait la phrase. Les maths sont déjà à l'abri.
-      out += protege(desechappe(n.texte), coffre).replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      // Et un « $ » qui traîne hors formule (« coût 2 $ », l'opérateur R
+      // `$<-`) ouvrirait une formule fantôme qui avalerait la suite de la
+      // fiche : puisqu'il n'appartient à aucune paire, il s'échappe.
+      out += protege(desechappe(n.texte), coffre)
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/\$/g, '\\$');
     } else if (n.tag === 'strong' || n.tag === 'b') {
       const inner = enLigne(n.enfants, coffre).trim();
       out += inner ? `**${inner}**` : '';
@@ -120,7 +126,15 @@ function enLigne(noeuds, coffre) {
       const inner = enLigne(n.enfants, coffre).trim();
       out += inner ? `*${inner}*` : '';
     } else if (n.tag === 'code') {
-      out += `\`${desechappe(texteBrut(n))}\``;
+      /* Les fiches R citent des opérateurs entre accents graves — `` `[`(x, 2) ``
+         — et un simple accent grave se refermerait sur le premier venu, cassant
+         la fin de la phrase. La clôture compte donc un accent de plus que la
+         plus longue suite intérieure, et s'écarte d'une espace si le contenu
+         commence ou finit par un accent. */
+      const contenu = desechappe(texteBrut(n));
+      const cloture = '`'.repeat(Math.max(0, ...(contenu.match(/`+/g) ?? []).map((s) => s.length)) + 1);
+      const marge = /^`|`$/.test(contenu) ? ' ' : '';
+      out += `${cloture}${marge}${contenu}${marge}${cloture}`;
     } else if (n.tag === 'a') {
       out += `[${enLigne(n.enfants, coffre)}](${n.attrs.href ?? ''})`;
     } else if (n.tag === 'br') {
@@ -146,23 +160,44 @@ function ligne(noeuds) {
   return rend(brut.replace(/\s+/g, ' ').trim(), coffre);
 }
 
+/* Un bloc d'affichage ne porte qu'un seul numéro d'équation : KaTeX refuse le
+   second `\\tag`. Quand la source en aligne deux — deux formules côte à côte,
+   chacune numérotée — les numéros redeviennent du texte, posé contre sa
+   formule plutôt qu'à la marge. Rien ne disparaît. */
+function numeros(latex) {
+  const tags = latex.match(/\\tag\{[^}]*\}/g) ?? [];
+  if (tags.length < 2) return latex;
+  return latex.replace(/\\tag\{([^}]*)\}/g, (_, n) => `\\quad \\text{(${n})}`);
+}
+
 /** Isole les formules en bloc : `$$…$$` doit se voir, donc vivre seul. */
-function isoleBlocs(texte) {
+function propre(latex) {
+  const nu = numeros(latex).trim();
+  // « … \\ » : la barre oblique attendait son espace, le rognage l'a emportée.
+  return /(^|[^\\])\\$/.test(nu) ? `${nu} ` : nu;
+}
+
+function isoleBlocs(noeuds) {
+  /* On travaille sur les formules déjà mises de côté, jamais sur le texte
+     rendu : « $10\,\$$ » finit par deux dollars sans être un bloc d'affichage,
+     et une recherche de « $$ » dans le texte le couperait en deux. */
+  const coffre = [];
+  const brut = enLigne(noeuds, coffre).replace(/\s+/g, ' ').trim();
   const parts = [];
-  let reste = texte;
-  const re = /\$\$([\s\S]*?)\$\$/g;
+  const re = new RegExp(`${JETON}(\\d+)${JETON}`, 'g');
   let dernier = 0;
   let m;
-  while ((m = re.exec(texte))) {
-    const avant = texte.slice(dernier, m.index).trim();
-    if (avant) parts.push(avant);
-    parts.push(`$$${m[1].trim()}$$`);
+  while ((m = re.exec(brut))) {
+    const formule = coffre[Number(m[1])];
+    if (!formule.startsWith('$$')) continue; // en ligne : elle reste dans la phrase
+    const avant = brut.slice(dernier, m.index).trim();
+    if (avant) parts.push(rend(avant, coffre));
+    parts.push(`$$${propre(formule.slice(2, -2))}$$`);
     dernier = m.index + m[0].length;
   }
-  reste = texte.slice(dernier).trim();
-  if (parts.length === 0) return [texte.trim()];
-  if (reste) parts.push(reste);
-  return parts;
+  const reste = brut.slice(dernier).trim();
+  if (reste || parts.length === 0) parts.push(rend(reste, coffre));
+  return parts.filter(Boolean);
 }
 
 /* ----------------------------- rendu bloc ------------------------------- */
@@ -246,7 +281,7 @@ function blocs(noeuds, ctx = {}) {
       }
       case 'p': {
         const alerte = cls.includes('piege');
-        for (const part of isoleBlocs(ligne(n.enfants))) {
+        for (const part of isoleBlocs(n.enfants)) {
           if (!part) continue;
           out.push(alerte && !part.startsWith('$$') ? `⚠️ ${part}` : part);
         }
@@ -276,9 +311,19 @@ function blocs(noeuds, ctx = {}) {
       case 'details': {
         const resume = n.enfants.find((e) => e.tag === 'summary');
         const corps = n.enfants.filter((e) => e.tag !== 'summary');
+        const titre = resume ? ligne(resume.enfants) : 'Réponse';
+        /* « Réponse », « Correction » : une étiquette, elle tient sur la ligne
+           du <summary>. Mais les fiches importées y mettent souvent une phrase
+           entière, en gras et avec des formules — et sur la ligne d'ouverture
+           d'un bloc HTML, le Markdown n'est pas relu : on lirait « **Étape 1 —
+           $c$…** » tel quel. Ces résumés-là descendent donc dans un paragraphe
+           à eux, entouré de lignes vides, et se composent normalement. */
+        const riche = /[*`$]/.test(titre);
         out.push(
           [
-            `<details><summary>${resume ? ligne(resume.enfants) : 'Réponse'}</summary>`,
+            riche
+              ? `<details class="details--riche">\n<summary>\n\n${titre}\n\n</summary>`
+              : `<details><summary>${titre}</summary>`,
             ...blocs(corps),
             '</details>',
           ].join('\n\n'),
@@ -358,13 +403,20 @@ function difficulte(texte, minutesEstimees) {
   return minutesEstimees <= 105 ? 'intermediaire' : 'avance';
 }
 
-const MATIERES = {
-  'Maths · Optimisation': 'maths',
-  'Maths · Économétrie': 'maths',
-  'Maths · Finance de marché': 'cfa',
-  'Code · Langage R': 'code',
-  'Maths · Microéconomie avancée': 'maths',
-};
+/* La ligne « Matière » des fiches descend parfois à trois niveaux
+   (« Maths · Finance de marché · Produits de taux ») : on lit le domaine, pas
+   la chaîne entière. Tout ce qui touche à la finance rejoint la page CFA ·
+   Finance, le langage R la page Code, le reste — optimisation, économétrie,
+   apprentissage, microéconomie — la page Maths. */
+const MATIERES = [
+  [/^Code/, 'code'],
+  [/Finance/, 'cfa'],
+  [/./, 'maths'],
+];
+
+function matiere(texte) {
+  return (MATIERES.find(([re]) => re.test(texte)) ?? [null, 'maths'])[1];
+}
 
 /* Les huit cours d'où viennent ces fiches, nommés comme les trois premiers :
    « Auteur · Titre court ». Le libellé sert de titre de groupe dans les
@@ -378,6 +430,9 @@ const COURS = [
   [/18\.650/, 'Rigollet · Statistiques (18.650)'],
   [/15\.450/, 'Kogan · Analytics of Finance (15.450)'],
   [/Options, Futures/, 'Hull · Options, Futures, and Other Derivatives'],
+  [/R Core Team|Introduction to R|R Language Definition|Writing R Extensions/, 'R Core Team · Les manuels de R (4.6.1)'],
+  [/Mathematics for Machine Learning/, 'Deisenroth, Faisal & Ong · Mathematics for Machine Learning'],
+  [/Jehle/, 'Jehle & Reny · Advanced Microeconomic Theory'],
 ];
 
 /** Le cours source, réduit au libellé court qui range la fiche. */
@@ -391,7 +446,11 @@ function cours(texte) {
 /** Le chapitre : « Chapitre 2 · Convex sets », « Cours 12 · Simplex method ». */
 function chapitre(texte) {
   const nu = texte.replace(/\*/g, '');
-  const m = nu.match(/(chapitre|chapter|lecture|cours|§)\s*([\dIVX.]+(?:\s*(?:à|et)\s*§?[\d.]+)?)\s*(?:«\s*([^»]+?)\s*»)?/i);
+  // L'appendice mathématique de Jehle & Reny se repère à son §, pas à un numéro
+  // de chapitre : « appendice mathématique, §A2.1 » → « Appendice §A2.1 ».
+  const appendice = nu.match(/appendice[^§]{0,30}(§\s*[A-Z]?[\d.]+)/i);
+  if (appendice) return `Appendice ${appendice[1].replace(/\s+/g, '').replace(/\.$/, '')}`;
+  const m = nu.match(/(chapitres?|chapters?|lectures?|cours|§)\s*([A-Z]?[\dIVX.]+(?:\s*(?:à|et)\s*§?[\d.]+)?)\s*(?:«\s*([^»]+?)\s*»)?/i);
   if (!m) {
     // Des notes de cours : pas de chapitre, l'intitulé du polycopié en tient lieu.
     const notes = nu.match(/notes\s+pour\s+(\S+)/i);
@@ -433,7 +492,7 @@ for (const f of fichiers) {
     file: `${nom}.md`,
     title: titre,
     chapter: chapitre(champs['Cours source'] ?? ''),
-    subject: MATIERES[champs['Matière']] ?? 'maths',
+    subject: matiere(champs['Matière'] ?? ''),
     course: cours(champs['Cours source'] ?? ''),
     difficulty: difficulte(champs['Difficulté'] ?? '', dureeEstimee),
     minutes: dureeEstimee,

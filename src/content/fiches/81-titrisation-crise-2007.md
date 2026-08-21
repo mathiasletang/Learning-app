@@ -103,7 +103,12 @@ $$\boxed{\text{total AAA}=80\,\%+65\,\%\times15\,\%=80+9{,}75=\mathbf{89{,}75\,\
 
 ⚠️ ***Cela semble élevé — mais si la titrisation était poussée plus loin, avec un ABS créé à partir des tranches mezzanine d'ABS CDO (et cela est arrivé), le pourcentage serait poussé encore plus haut.***
 
-<details><summary>**Exercice résolu — propager une perte à travers les deux étages (tableau 8.1)**</summary>
+<details class="details--riche">
+<summary>
+
+**Exercice résolu — propager une perte à travers les deux étages (tableau 8.1)**
+
+</summary>
 
 **Le protocole général, en 4 étapes.**
 
@@ -177,7 +182,12 @@ $$\boxed{\text{l'emprunteur détient une option de vente américaine GRATUITE}}$
 
 *Il peut **à tout moment vendre la maison au prêteur pour le principal restant dû**. Cette caractéristique a encouragé l'activité spéculative et fait partie des causes de la bulle de 2000-2006.*
 
-<details><summary>**Le retournement, et l'exercice optimal de l'option**</summary>
+<details class="details--riche">
+<summary>
+
+**Le retournement, et l'exercice optimal de l'option**
+
+</summary>
 
 *Étape 1 — le déclencheur.* En **2007**, de nombreux emprunteurs découvrent qu'ils **ne peuvent plus payer** quand les taux d'appel prennent fin. *Étape 2 — la boucle de rétroaction.* Cela conduit à des **saisies** et à un **grand nombre de maisons mises sur le marché**, ce qui **fait baisser les prix**. *Étape 3 — le capital négatif.* Ceux qui avaient emprunté 100 % ou presque du prix découvrent qu'ils ont un ***capital négatif***. *Étape 4 — l'exercice.* *Les participants réalisèrent **tardivement** à quel point l'option de vente gratuite pouvait être coûteuse. Avec un capital négatif, la décision **optimale** était d'**échanger la maison contre le principal restant dû**.* La maison est alors vendue par le prêteur — **ce qui accentue la pression baissière**. La boucle se referme.
 
@@ -310,7 +320,12 @@ $$\boxed{\text{l'emprunteur détient une option de vente américaine GRATUITE}}$
 4. Repropager avec les points d'attachement du second étage.
 5. **Contrôler** avec un cas extrême : perte totale de la mezzanine ($L=b$) doit anéantir **toutes** les tranches de l'ABS CDO.
 
-<details><summary>**Exercice résolu — retrouver le seuil de 10,25 % par le calcul inverse**</summary>
+<details class="details--riche">
+<summary>
+
+**Exercice résolu — retrouver le seuil de 10,25 % par le calcul inverse**
+
+</summary>
 
 **Question.** À partir de quelle perte $L$ sur les actifs la tranche **senior de l'ABS CDO** commence-t-elle à perdre ?
 

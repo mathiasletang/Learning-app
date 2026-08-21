@@ -95,15 +95,36 @@ ailleurs et **importées**.
   `<div class="callout" data-kind="…">` avec son étiquette, `<details class="cor">`
   → le `<details>` des fiches écrites à la main, et un `$$…$$` pris au milieu
   d'un paragraphe est isolé sur sa ligne — sinon il ne serait pas encadré.
-- **Le contenu se charge à la demande.** Quatre-vingt-cinq fiches font plus de
-  trois méga-octets de Markdown : `import.meta.glob` sans `eager`, un morceau
+- **Le contenu se charge à la demande.** Cent soixante-six fiches font plus de
+  huit méga-octets de Markdown : `import.meta.glob` sans `eager`, un morceau
   par fiche. Ne pas revenir à un chargement global « pour simplifier ».
 - Le HTML d'origine est une **source de compilation**, pas une page : il est
   exclu du précache du service worker (`globIgnores`, `vite.config.ts`).
-- La garantie qui compte est dans `fiches.test.ts` : les 22 000 formules du
+- La garantie qui compte est dans `fiches.test.ts` : les 66 000 formules du
   corpus sont composées par KaTeX avec `throwOnError`. Ces fiches viennent d'un
   rendu MathJax, plus permissif — une macro inconnue s'afficherait en rouge en
   pleine page.
+
+### Les quatre pièges de la conversion, tous déjà payés
+
+1. **Le dollar qui n'est pas une formule.** « coût 2 $ », l'opérateur R `$<-`,
+   un montant `\$` : un `$` isolé ouvre une formule fantôme qui avale la moitié
+   de la fiche. Hors formule il s'échappe (`\$`) ; et toute recherche de
+   formule doit refuser de démarrer sur un `$` déjà échappé — d'où les
+   `(?<!\\)` du convertisseur **et** du test.
+2. **Le Markdown ne se relit pas sur la ligne d'ouverture d'un bloc HTML.** Un
+   `<details><summary>**Étape 1 — $c$…**</summary>` afficherait ses astérisques
+   et son LaTeX en clair. Les résumés qui portent du balisage descendent dans
+   un paragraphe entouré de lignes vides (`details--riche`).
+3. **Un accent grave dans un accent grave.** Les fiches R citent `` `[`(x, 2) ``
+   ; la clôture d'un code en ligne compte un accent de plus que la plus longue
+   suite intérieure.
+4. **KaTeX n'accepte qu'un `\tag` par bloc.** Deux formules numérotées côte à
+   côte deviennent deux `\text{(n)}`, posés contre leur formule.
+
+Ces quatre-là ne se voient pas dans le diff : ils se voient dans le rendu. D'où
+le test qui regarde le **texte tel qu'il arrive à l'écran** — ni `**`, ni `$$`,
+ni `katex-error` — en plus du test qui compose les formules.
 
 ## Couleurs d'accent — ce n'est pas une incohérence
 

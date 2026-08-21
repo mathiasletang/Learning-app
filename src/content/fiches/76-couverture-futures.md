@@ -34,7 +34,12 @@ ROULEMENT  stack and roll — et le piège de trésorerie de Metallgesellschaft
 | Quand ? | on **possède** l'actif et on le vendra plus tard — ou on le possédera (exportateur qui recevra des euros) | on **devra acheter** l'actif et on veut **fixer le prix maintenant** |
 | Exemples du livre | éleveur de porcs prêts dans deux mois · producteur de pétrole · exportateur américain payé en euros | fabricant de cuivre · compagnie aérienne achetant du kérosène |
 
-<details><summary>**Exercice résolu A — la couverture courte du producteur de pétrole**</summary>
+<details class="details--riche">
+<summary>
+
+**Exercice résolu A — la couverture courte du producteur de pétrole**
+
+</summary>
 
 **Données.** 15 mai. Un producteur vient de signer la vente de **1 million de barils** au **prix de marché du 15 août**. Spot le 15 mai : **80 dollars** ; futures août : **79 dollars**. Taille du contrat : **1 000 barils**.
 
@@ -42,7 +47,12 @@ ROULEMENT  stack and roll — et le piège de trésorerie de Metallgesellschaft
 
 </details>
 
-<details><summary>**Exercice résolu B — la couverture longue du transformateur de cuivre**</summary>
+<details class="details--riche">
+<summary>
+
+**Exercice résolu B — la couverture longue du transformateur de cuivre**
+
+</summary>
 
 **Données.** 15 janvier. Il aura besoin de **100 000 livres** de cuivre le 15 mai. Spot : **340 cents/livre** ; futures mai : **320 cents/livre**. Contrat COMEX : **25 000 livres**.
 
@@ -146,7 +156,12 @@ Le premier terme est la base qui existerait si l'actif couvert était **le même
 
 **Et de manière générale :** *le risque de base augmente à mesure que l'écart de temps entre l'expiration de la couverture et le mois de livraison augmente.*
 
-<details><summary>**Exercice résolu C — couverture courte en yens (exemple 3.1)**</summary>
+<details class="details--riche">
+<summary>
+
+**Exercice résolu C — couverture courte en yens (exemple 3.1)**
+
+</summary>
 
 **Données.** 1ᵉʳ mars. Une entreprise américaine recevra **50 millions de yens** fin juillet. Échéances des futures yen CME : mars, juin, septembre, décembre. Contrat : **12,5 millions de yens**. $F_1=0{,}7800$ cent/yen. Au dénouement : $S_2=0{,}7200$, $F_2=0{,}7250$.
 
@@ -158,7 +173,12 @@ $$S_2+\text{gain}=0{,}7200+0{,}0550=\mathbf{0{,}7750}\qquad\text{ou}\qquad F_1+b
 
 </details>
 
-<details><summary>**Exercice résolu D — couverture longue en pétrole (exemple 3.2)**</summary>
+<details class="details--riche">
+<summary>
+
+**Exercice résolu D — couverture longue en pétrole (exemple 3.2)**
+
+</summary>
 
 **Données.** 8 juin. Achat de **20 000 barils** prévu **en octobre ou novembre** (date incertaine). Contrats mensuels NYMEX, taille **1 000 barils**. $F_1=68{,}00$. Achat effectif le **10 novembre**, où $S_2=70{,}00$ et $F_2=69{,}10$.
 
@@ -209,7 +229,12 @@ $$\boxed{N^\ast=\frac{h^\ast Q_A}{Q_F}};	ext{(3.2)}$$
 
 où $Q_A$ = taille de la position couverte (unités) et $Q_F$ = taille d'un contrat (unités).
 
-<details><summary>**Exercice résolu E — la compagnie aérienne et le fioul domestique (exemple 3.3)**</summary>
+<details class="details--riche">
+<summary>
+
+**Exercice résolu E — la compagnie aérienne et le fioul domestique (exemple 3.3)**
+
+</summary>
 
 **Données.** Achat prévu de **2 millions de gallons** de kérosène dans **1 mois** ; couverture par futures **fioul domestique** NYMEX (**42 000 gallons** par contrat). Quinze mois de variations mensuelles :
 
@@ -299,7 +324,12 @@ $$\boxed{N^\ast=\beta\,\frac{V_A}{V_F}};	ext{(3.5)}$$
 
 ⚠️ **La formule (3.5) suppose que la maturité du futures est proche de celle de la couverture.**
 
-<details><summary>**Exercice résolu F — la couverture d'un portefeuille de bêta 1,5 (tableau 3.4)**</summary>
+<details class="details--riche">
+<summary>
+
+**Exercice résolu F — la couverture d'un portefeuille de bêta 1,5 (tableau 3.4)**
+
+</summary>
 
 **Données.** Indice S&P 500 = **1 000** · futures = **1 010** (4 mois de maturité, couverture sur 3 mois) · portefeuille = **5 050 000 dollars** · taux sans risque **4 % par an** · rendement du dividende de l'indice **1 % par an** · $\beta=1{,}5$ · contrat = 250 × indice.
 
@@ -343,7 +373,12 @@ $$\boxed{\beta>\beta^\ast:\ \text{VENDRE}\ (\beta-\beta^\ast)\frac{V_A}{V_F}\ \t
 
 Sur l'exemple ($V_A/V_F=20$, $\beta=1{,}5$) : couverture complète $\to$ **30 contrats vendus** ; ramener $\beta$ à **0,75** $\to$ **15** vendus ; porter $\beta$ à **2,0** $\to$ **10 contrats achetés**.
 
-<details><summary>**Exercice résolu G — verrouiller le bénéfice d'une bonne sélection de titres**</summary>
+<details class="details--riche">
+<summary>
+
+**Exercice résolu G — verrouiller le bénéfice d'une bonne sélection de titres**
+
+</summary>
 
 **Situation.** En avril, un investisseur détient **20 000 actions IBM** à **100 dollars**. Il pense que le marché sera **très volatil** sur trois mois mais qu'**IBM a de bonnes chances de le battre**. Futures S&P 500 août : **900**, contrat = 250 × indice. $\beta_{\text{IBM}}=1{,}1$.
 
@@ -367,7 +402,12 @@ $$\text{perte IBM}=20\,000\times(100-90)=\mathbf{-200\,000}\qquad \text{gain fut
 
 $$t_1:\ \text{vendre le contrat 1}\ \to\ t_2:\ \text{dénouer 1, vendre 2}\ \to\ \cdots\ \to\ t_n:\ \text{dénouer } n-1,\ \text{vendre } n\ \to\ T:\ \text{dénouer } n$$
 
-<details><summary>**Exercice résolu H — trois roulements sur le pétrole (tableau 3.5)**</summary>
+<details class="details--riche">
+<summary>
+
+**Exercice résolu H — trois roulements sur le pétrole (tableau 3.5)**
+
+</summary>
 
 **Données.** Avril 2011 : l'entreprise sait qu'elle aura **100 000 barils** à vendre en **juin 2012**, ratio de couverture **1,0** (sans *tailing*). Spot courant : **69**. Seuls les **six premiers mois de livraison** sont assez liquides.
 
@@ -503,7 +543,12 @@ La formule est **identique** pour une couverture courte et une couverture longue
 
 </details>
 
-<details><summary>Le prix du kérosène a $\sigma_S=0{,}0263$, le fioul $\sigma_F=0{,}0313$, $\rho=0{,}928$. Calculer $h^\ast$, $N^\ast$ pour 2 millions de gallons, et l'efficacité.</summary>
+<details class="details--riche">
+<summary>
+
+Le prix du kérosène a $\sigma_S=0{,}0263$, le fioul $\sigma_F=0{,}0313$, $\rho=0{,}928$. Calculer $h^\ast$, $N^\ast$ pour 2 millions de gallons, et l'efficacité.
+
+</summary>
 
 $h^\ast=0{,}928\times\dfrac{0{,}0263}{0{,}0313}=\mathbf{0{,}7777}$ ; $N^\ast=\dfrac{0{,}7777\times2\,000\,000}{42\,000}=37{,}03\to\mathbf{37}$ contrats ; efficacité $=\rho^2=0{,}928^2\approx\mathbf{86\,\%}$. Avec *tailing* (spot 1,94 ; futures 1,99) : $N^\ast=\dfrac{0{,}7777\times3\,880\,000}{83\,580}=36{,}10\to\mathbf{36}$.
 
@@ -521,7 +566,12 @@ Parce que dans ce secteur les **prix de vente** des bijoux suivent le prix de l'
 
 </details>
 
-<details><summary>Portefeuille de 5 050 000 dollars, $\beta=1{,}5$, futures S&P 500 à 1 010 (contrat 250 × indice). Combien de contrats pour ramener le bêta à 0,75 ?</summary>
+<details class="details--riche">
+<summary>
+
+Portefeuille de 5 050 000 dollars, $\beta=1{,}5$, futures S&P 500 à 1 010 (contrat 250 × indice). Combien de contrats pour ramener le bêta à 0,75 ?
+
+</summary>
 
 $V_F=250\times1\,010=252\,500$, donc $V_A/V_F=20$. Il faut **vendre**
 
@@ -531,7 +581,12 @@ soit exactement **la moitié** des 30 contrats d'une couverture complète — co
 
 </details>
 
-<details><summary>Un investisseur bon en sélection de titres détient 20 000 IBM à 100, $\beta=1{,}1$, futures S&P 500 à 900. Que fait-il et sur quoi parie-t-il réellement ?</summary>
+<details class="details--riche">
+<summary>
+
+Un investisseur bon en sélection de titres détient 20 000 IBM à 100, $\beta=1{,}1$, futures S&P 500 à 900. Que fait-il et sur quoi parie-t-il réellement ?
+
+</summary>
 
 Il **vend** $1{,}1\times\dfrac{2\,000\,000}{225\,000}=9{,}78\to\mathbf{10}$ contrats. Il **supprime le risque de marché** et ne conserve que la performance **relative** d'IBM par rapport à un portefeuille diversifié de même bêta. Dans le scénario du livre (IBM à 90, futures à 750), il perd 200 000 sur IBM et gagne 375 000 sur les futures : **+175 000**, uniquement parce qu'IBM a **moins baissé** qu'un portefeuille de bêta 1,1.
 

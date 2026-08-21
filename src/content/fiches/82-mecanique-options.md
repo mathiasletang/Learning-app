@@ -40,7 +40,12 @@ AJUSTEMENT n-pour-m :  K → K·m/n     nombre d'actions → ×n/m
 
 > ***Il y a deux côtés à chaque contrat d'option.*** *D'un côté l'investisseur qui a pris la position **longue** (il a acheté), de l'autre celui qui a pris la position **courte** (il a vendu, ou **écrit**). **Le vendeur reçoit du cash d'avance mais a des engagements potentiels plus tard.** Son profit ou sa perte est **l'exact opposé** de celui de l'acheteur.*
 
-<details><summary>**Exercice résolu A — un call européen, y compris le cas contre-intuitif**</summary>
+<details class="details--riche">
+<summary>
+
+**Exercice résolu A — un call européen, y compris le cas contre-intuitif**
+
+</summary>
 
 **Données.** Call européen, $K=100$, sur **100 actions**. Cours actuel **98**, échéance **4 mois**, prime **5 par action** → **investissement initial 500**.
 
@@ -50,7 +55,12 @@ AJUSTEMENT n-pour-m :  K → K·m/n     nombre d'actions → ×n/m
 
 </details>
 
-<details><summary>**Exercice résolu B — un put européen**</summary>
+<details class="details--riche">
+<summary>
+
+**Exercice résolu B — un put européen**
+
+</summary>
 
 **Données.** Put européen, $K=70$, sur **100 actions**. Cours actuel **65**, échéance **3 mois**, prime **7** → **investissement 700**.
 
@@ -143,7 +153,12 @@ AJUSTEMENT n-pour-m :  K → K·m/n     nombre d'actions → ×n/m
 >
 > *Si le cours baisse comme prévu, **les positions du vendeur et de l'acheteur restent inchangées**.*
 
-<details><summary>**Exercices résolus — division et dividende en actions (exemples 9.1 et 9.2)**</summary>
+<details class="details--riche">
+<summary>
+
+**Exercices résolus — division et dividende en actions (exemples 9.1 et 9.2)**
+
+</summary>
 
 **Exemple 9.1 — division 2 pour 1.** Call d'achat de **100 actions à 30**. *Étape 1.* $n=2$, $m=1$ → le cours devrait tomber à **la moitié**. *Étape 2.* Strike : $30\times\dfrac12=\mathbf{15}$. *Étape 3.* Nombre d'actions : $100\times\dfrac21=\mathbf{200}$. *Étape 4 — contrôle.* Engagement total avant : $100\times30=3\,000$ ; après : $200\times15=3\,000$ — **inchangé**.
 
@@ -174,7 +189,12 @@ AJUSTEMENT n-pour-m :  K → K·m/n     nombre d'actions → ×n/m
 
 **Position ouverte.** *Si aucun des deux investisseurs ne referme une position existante, l'open interest **augmente d'un contrat**. Si l'un referme et pas l'autre, il **reste le même**. Si les deux referment, il **diminue d'un contrat**.* Et **à l'exercice, il diminue d'un**.
 
-<details><summary>**Exercice résolu — commissions, et le biais qu'elles créent**</summary>
+<details class="details--riche">
+<summary>
+
+**Exercice résolu — commissions, et le biais qu'elles créent**
+
+</summary>
 
 **Barème d'un courtier à escompte.**
 
@@ -216,7 +236,12 @@ $$\boxed{\text{marge}=\max\left(\underbrace{100\,\%\ \text{prime}+20\,\%\,S-\tex
 
 ⚠️ **Le 20 % devient 15 %** pour les options sur un **indice largement diversifié**, *parce qu'un indice est habituellement **moins volatil** que le prix d'une action individuelle*.
 
-<details><summary>**Exercice résolu — marge sur options nues (exemple 9.3)**</summary>
+<details class="details--riche">
+<summary>
+
+**Exercice résolu — marge sur options nues (exemple 9.3)**
+
+</summary>
 
 **Données.** Un investisseur **écrit 4 contrats** de calls nus. Prime **5**, strike **40**, cours **38** → **400 actions**.
 
@@ -279,7 +304,12 @@ $$\text{investisseur}\to\text{courtier}\to\text{membre compensateur}\to\text{OCC
 
 > **La conséquence pratique, et elle est fine.** *Les opérations réduisant **seulement le risque de perte** ou **seulement l'opportunité de gain** ne devraient **pas** entraîner de vente constructive. Un investisseur détenant une action peut donc **acheter des puts dans la monnaie** sur cette action **sans déclencher** de vente constructive.*
 
-<details><summary>**La planification fiscale par les options — le montage à deux pays**</summary>
+<details class="details--riche">
+<summary>
+
+**La planification fiscale par les options — le montage à deux pays**
+
+</summary>
 
 **Le décor.** Le **pays A** taxe **peu** les intérêts et dividendes et **beaucoup** les plus-values. Le **pays B** fait l'inverse.
 
@@ -369,7 +399,12 @@ $$\text{investisseur}\to\text{courtier}\to\text{membre compensateur}\to\text{OCC
 
 ## 🧠 Active Recall
 
-<details><summary>Un call $K=100$ acheté 5 finit à $S_T=102$. Faut-il exercer, et pourquoi ?</summary>
+<details class="details--riche">
+<summary>
+
+Un call $K=100$ acheté 5 finit à $S_T=102$. Faut-il exercer, et pourquoi ?
+
+</summary>
 
 **Oui.** Exercer donne un gain de $100\times2=200$, soit une **perte globale de 300** après la prime de 500. Ne **pas** exercer donne une **perte de 500** — c'est **pire**. La prime est un **coût enfoui** qui n'entre pas dans la décision d'exercice. *En général, les calls doivent toujours être exercés à l'échéance si le cours est au-dessus du strike.*
 
@@ -407,7 +442,12 @@ $K\to30\times\dfrac12=\mathbf{15}$ et le nombre d'actions $\to100\times\dfrac21=
 
 </details>
 
-<details><summary>Un investisseur vend 4 calls nus, prime 5, $K=40$, $S=38$. Quelle est la marge ?</summary>
+<details class="details--riche">
+<summary>
+
+Un investisseur vend 4 calls nus, prime 5, $K=40$, $S=38$. Quelle est la marge ?
+
+</summary>
 
 400 actions ; l'option est **hors la monnaie de 2**. *Calcul 1* : $400\times(5+0{,}2\times38-2)=400\times10{,}6=\mathbf{4\,240}$. *Calcul 2* : $400\times(5+0{,}1\times38)=400\times8{,}8=3\,520$. **Marge = 4 240** (le maximum). S'il s'agissait d'un **put**, il serait **dans la monnaie de 2**, rien à retrancher : $400\times(5+0{,}2\times38)=\mathbf{5\,040}$.
 
@@ -425,7 +465,12 @@ Parce qu'**exercer coûte deux commissions sur l'action** (exercer **et** vendre
 
 </details>
 
-<details><summary>Expliquer la règle du *wash sale* et son extension aux options.</summary>
+<details class="details--riche">
+<summary>
+
+Expliquer la règle du *wash sale* et son extension aux options.
+
+</summary>
 
 Elle empêche de vendre à perte puis de racheter aussitôt pour réaliser fiscalement la perte : *si le rachat a lieu **dans les 30 jours** de la vente — fenêtre de **61 jours**, 30 avant et 30 après — **la perte n'est pas déductible***. **L'extension** : *l'interdiction s'applique aussi si, dans cette fenêtre, le contribuable conclut une **option ou un contrat similaire** pour acquérir l'action*. Vendre à perte puis acheter un **call** dans les 30 jours fait donc rejeter la perte. Elle ne s'applique **pas** à un professionnel des titres dans le cours normal de ses affaires.
 

@@ -36,7 +36,12 @@ UNIVERSALITÉ    une somme de papillons étroits approche N'IMPORTE QUEL payoff
 
 </div>
 
-<details><summary>**Exercice résolu — construire la note, puis démonter sa rentabilité (exemple 11.1)**</summary>
+<details class="details--riche">
+<summary>
+
+**Exercice résolu — construire la note, puis démonter sa rentabilité (exemple 11.1)**
+
+</summary>
 
 **Données.** Taux 3 ans **6 %** continu. Portefeuille d'actions valant **1 000**, rendement du dividende **1,5 %**.
 
@@ -124,7 +129,12 @@ $$p+S_0=c+Ke^{-rT}+D\;\text{(11.1)}$$
 | **2** | un dans la monnaie, un hors | intermédiaire |
 | **3** | les **deux** dans la monnaie | **le plus conservateur** |
 
-<details><summary>**Exercice résolu — bull spread par calls (exemple 11.2)**</summary>
+<details class="details--riche">
+<summary>
+
+**Exercice résolu — bull spread par calls (exemple 11.2)**
+
+</summary>
 
 **Données.** Achat d'un call européen 3 mois $K=30$ pour **3** ; vente d'un call 3 mois $K=35$ pour **1**.
 
@@ -152,7 +162,12 @@ $$p+S_0=c+Ke^{-rT}+D\;\text{(11.1)}$$
 | $K_1<S_T<K_2$ | $K_2-S_T$ | 0 | $\mathbf{K_2-S_T}$ |
 | $S_T\ge K_2$ | 0 | 0 | $\mathbf{0}$ |
 
-<details><summary>**Exercice résolu — bear spread par puts (exemple 11.3)**</summary>
+<details class="details--riche">
+<summary>
+
+**Exercice résolu — bear spread par puts (exemple 11.3)**
+
+</summary>
 
 **Données.** Achat d'un put 3 mois $K=35$ pour **3** ; vente d'un put 3 mois $K=30$ pour **1**. Coût **2**.
 
@@ -191,7 +206,12 @@ $$\boxed{\text{payoff}=K_2-K_1\ \text{toujours}\quad\Longrightarrow\quad\text{va
 | **trop bon marché** | **acheter** le box | acheter call $K_1$, acheter put $K_2$, vendre call $K_2$, vendre put $K_1$ |
 | **trop cher** | **vendre** le box | acheter call $K_2$, acheter put $K_1$, vendre call $K_1$, vendre put $K_2$ |
 
-<details><summary>**Exercice résolu — comment perdre de l'argent avec un box spread**</summary>
+<details class="details--riche">
+<summary>
+
+**Exercice résolu — comment perdre de l'argent avec un box spread**
+
+</summary>
 
 **L'offre.** $S=50$, $\sigma=30\,\%$, pas de dividende, $r=8\,\%$. Un trader vous propose de **vendre** au CBOE un box spread 2 mois de strikes **55 et 60** pour **5,10**. Faut-il le faire ?
 
@@ -227,7 +247,12 @@ $$5e^{-0{,}08\times2/12}=\mathbf{4{,}93}$$
 
 *(Les deux dernières lignes utilisent $K_2=0{,}5(K_1+K_3)$.)*
 
-<details><summary>**Exercice résolu — le papillon chiffré**</summary>
+<details class="details--riche">
+<summary>
+
+**Exercice résolu — le papillon chiffré**
+
+</summary>
 
 **Données.** Action à **61**. Calls européens 6 mois : $K=55$ à **10**, $K=60$ à **7**, $K=65$ à **5**. L'investisseur juge un mouvement significatif improbable.
 
@@ -249,7 +274,12 @@ $$10+5-(2\times7)=\mathbf{1}$$
 
 ⚠️ **Comment lire le diagramme.** *Les diagrammes de profit d'un spread calendaire sont produits de façon à montrer le profit **au moment où l'option courte expire**, en supposant que **l'option longue est dénouée à cet instant**.* Le profil ressemble à celui du papillon.
 
-<details><summary>**Pourquoi le profil du spread calendaire ressemble à un papillon**</summary>
+<details class="details--riche">
+<summary>
+
+**Pourquoi le profil du spread calendaire ressemble à un papillon**
+
+</summary>
 
 *Cas 1 — le cours est **très bas** à l'expiration de l'option courte.* L'option courte est **sans valeur** ; l'option longue vaut aussi **presque zéro**. L'investisseur subit une perte **proche du coût initial**. *Cas 2 — le cours $S_T$ est **très élevé**.* L'option courte coûte à l'investisseur $S_T-K$, et l'option longue vaut **presque exactement** $S_T-K$. Les deux se compensent : perte nette **proche du coût initial** à nouveau. *Cas 3 — $S_T$ est **proche de $K$**.* L'option courte coûte **peu ou rien**, *mais l'option longue est encore **assez précieuse*** — il lui reste de la valeur temps. **Profit net significatif.**
 
@@ -284,7 +314,12 @@ $$10+5-(2\times7)=\mathbf{1}$$
 
 *C'est-à-dire $|S_T-K|$.* *Il est approprié quand un investisseur **attend un grand mouvement mais ne sait pas dans quel sens**.*
 
-<details><summary>**Exercice résolu — le straddle chiffré**</summary>
+<details class="details--riche">
+<summary>
+
+**Exercice résolu — le straddle chiffré**
+
+</summary>
 
 **Données.** Action à **69**, mouvement important attendu sur 3 mois. Call $K=70$ à **4**, put $K=70$ à **3** → investissement **7**.
 
@@ -430,7 +465,12 @@ $$S_0-c=(Ke^{-rT}+D)-p$$
 
 </details>
 
-<details><summary>Un investisseur achète un call $K=30$ à 3 et vend un call $K=35$ à 1. Donner le profit par intervalle.</summary>
+<details class="details--riche">
+<summary>
+
+Un investisseur achète un call $K=30$ à 3 et vend un call $K=35$ à 1. Donner le profit par intervalle.
+
+</summary>
 
 Coût net $=2$. Payoffs : $0$ / $S_T-30$ / $5$. Profits :
 

@@ -147,7 +147,12 @@ Par livre : $S_T=1{,}5000\Rightarrow+0{,}0578$ ; $S_T=1{,}3500\Rightarrow-0{,}09
 
 **Trois propriétés lisibles directement sur ces tableaux :** le prix du **call décroît** en $K$ · le prix du **put croît** en $K$ · les **deux** types gagnent en valeur quand la **maturité s'allonge**.
 
-<details><summary>**Les deux transactions Google chiffrées pas à pas**</summary>
+<details class="details--riche">
+<summary>
+
+**Les deux transactions Google chiffrées pas à pas**
+
+</summary>
 
 **(a) Achat d'un contrat de calls décembre, $K=520$.**
 
@@ -266,7 +271,12 @@ C'est l'**axiome unique** de toute la valorisation : il donnera l'arbre binomial
 3. Chaque terme en $\max(0,\cdot)$ est une **option** : signe positif → position **longue**, signe négatif → position **courte**.
 4. Vérifier aux **points de rupture** (là où le payoff change de pente) que la somme reproduit l'énoncé.
 
-<details><summary>**Exercice résolu A — l'ICON de Bankers Trust (exercice 1.23)**</summary>
+<details class="details--riche">
+<summary>
+
+**Exercice résolu A — l'ICON de Bankers Trust (exercice 1.23)**
+
+</summary>
 
 **Énoncé.** Obligation sans intérêt. Si le taux yen/dollar $S_T>169$ à maturité, le porteur reçoit **1 000 dollars**. Sinon il reçoit
 
@@ -296,7 +306,12 @@ $$\boxed{P=\underbrace{1\,000}_{\text{obligation}}-\underbrace{169\,000\max\!\le
 
 </details>
 
-<details><summary>**Exercice résolu B — l'obligation Standard Oil (exercice 1.33)**</summary>
+<details class="details--riche">
+<summary>
+
+**Exercice résolu B — l'obligation Standard Oil (exercice 1.33)**
+
+</summary>
 
 **Énoncé.** Pas d'intérêt. À maturité : **1 000 dollars** plus $170\times$ l'excédent (s'il existe) du baril au-dessus de **25 dollars**. Supplément **plafonné à 2 550 dollars**.
 
@@ -310,7 +325,12 @@ $P_T=20$ : $1\,000$ · $P_T=30$ : $1\,000+850=1\,850$ · $P_T=60$ : $1\,000+5\,9
 
 </details>
 
-<details><summary>**Exercice résolu C — le tunnel du trésorier (exercice 1.34)**</summary>
+<details class="details--riche">
+<summary>
+
+**Exercice résolu C — le tunnel du trésorier (exercice 1.34)**
+
+</summary>
 
 **Énoncé.** « J'aurai £1 M à vendre dans 6 mois. Si le cours est inférieur à **1,41**, donnez-moi 1,41. S'il est supérieur à **1,47**, j'accepte 1,47. Entre les deux, je vends au cours du marché. »
 
@@ -322,7 +342,12 @@ $$\boxed{\text{acheter un put }K=1{,}41\ +\ \text{vendre un call }K=1{,}47\quad(
 
 </details>
 
-<details><summary>**Exercice résolu D — arbitrage spot/forward avec option (exercice 1.25)**</summary>
+<details class="details--riche">
+<summary>
+
+**Exercice résolu D — arbitrage spot/forward avec option (exercice 1.25)**
+
+</summary>
 
 **Énoncé.** Spot $=1{,}4580$ ; forward 90 jours $=1{,}4556$ ; forward 180 jours $=1{,}4518$. (a) Un call européen 180 jours d'achat de £1 à **1,42 dollars** coûte **2 cents**. (b) Un put européen 90 jours de vente de £1 à **1,49 dollars** coûte **2 cents**.
 
@@ -387,7 +412,12 @@ Par **arbitrage bilatéral**. Si $F>63$, disons 67 : emprunter 60, acheter l'act
 
 </details>
 
-<details><summary>Un investisseur vend un contrat de puts Google septembre $K=480$ au bid 22,20. L'action finit à 420. Calculer son résultat.</summary>
+<details class="details--riche">
+<summary>
+
+Un investisseur vend un contrat de puts Google septembre $K=480$ au bid 22,20. L'action finit à 420. Calculer son résultat.
+
+</summary>
 
 *Encaissement initial* : $100\times22{,}20=2\,220$ dollars. *Exercice* : il doit acheter 100 actions à 480 alors qu'elles valent 420 → $100\times(480-420)=6\,000$ dollars de perte brute. *Résultat net* : $2\,220-6\,000=\mathbf{-3\,780}$ dollars.
 

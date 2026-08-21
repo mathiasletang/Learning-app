@@ -37,7 +37,12 @@ GAIN COMP.   total = a − b   (a = écart en fixe, b = écart en variable)
 
 **Le taux variable est le LIBOR** — *le taux auquel une banque est prête à déposer auprès d'autres banques notées AA*. Sur une obligation à « LIBOR 6 mois + 0,5 % » sur 5 ans, *la vie de l'obligation est découpée en 10 périodes de 6 mois ; pour chaque période, le taux est fixé 0,5 % au-dessus du LIBOR 6 mois **au début** de la période, et l'intérêt est payé **à la fin***.
 
-<details><summary>**L'exemple canonique — Microsoft contre Intel**</summary>
+<details class="details--riche">
+<summary>
+
+**L'exemple canonique — Microsoft contre Intel**
+
+</summary>
 
 **Le contrat.** Swap **3 ans** initié le **5 mars 2012**. Microsoft paie **5 % par an** sur **100 millions** ; Intel paie le **LIBOR 6 mois** sur le même nominal. Paiements **semestriels**, taux fixe coté en capitalisation semestrielle. Microsoft = **payeur fixe** ; Intel = **payeur variable**.
 
@@ -149,7 +154,12 @@ $$\boxed{\text{gain total à partager}=a-b}$$
 
 où $a$ = écart en **fixe** et $b$ = écart en **variable**. Ici $1{,}2-0{,}7=\mathbf{0{,}5\,\%}$.
 
-<details><summary>**Exercice résolu — construire le swap, avec et sans intermédiaire**</summary>
+<details class="details--riche">
+<summary>
+
+**Exercice résolu — construire le swap, avec et sans intermédiaire**
+
+</summary>
 
 **Sans intermédiaire.** AAACorp emprunte **fixe à 4 %**, BBBCorp emprunte **variable à LIBOR + 0,6 %**. Le swap : AAACorp paie **LIBOR** à BBBCorp et reçoit **4,35 % fixe**.
 
@@ -224,7 +234,12 @@ $$\boxed{\text{les taux de swap définissent un ensemble d'obligations au pair}}
 
 *Ainsi, le rendement au pair LIBOR/swap à 2 ans est **6,045 %**, celui à 3 ans **6,225 %**, etc.*
 
-<details><summary>**Exercice résolu — bootstrap par un taux de swap (exemple 7.1)**</summary>
+<details class="details--riche">
+<summary>
+
+**Exercice résolu — bootstrap par un taux de swap (exemple 7.1)**
+
+</summary>
 
 **Énoncé.** Taux zéro LIBOR/swap 6, 12 et 18 mois : **4 %**, **4,5 %**, **4,8 %** (continus). Taux de swap **2 ans** (paiements **semestriels**) : **5 %**.
 
@@ -254,7 +269,12 @@ $$B_{\text{fl}}(t^{\ast-})=L+k^\ast\qquad\Longrightarrow\qquad\boxed{B_{\text{fl
 
 > **La conséquence pratique.** L'obligation à taux variable, **quelle que soit sa maturité résiduelle**, se réduit à **un seul flux** $L+k^\ast$ à la **prochaine** date. Toute la complexité disparaît.
 
-<details><summary>**Exercice résolu — valoriser par les obligations (exemple 7.2)**</summary>
+<details class="details--riche">
+<summary>
+
+**Exercice résolu — valoriser par les obligations (exemple 7.2)**
+
+</summary>
 
 **Énoncé.** Une institution **paie le LIBOR 6 mois** et **reçoit 8 %** (semestriel) sur **100 millions**. Vie résiduelle **1,25 an**. Taux LIBOR continus : **10 %** à 3 mois, **10,5 %** à 9 mois, **11 %** à 15 mois. Dernier LIBOR 6 mois fixé : **10,2 %** (semestriel).
 
@@ -286,7 +306,12 @@ $$V=98{,}238-102{,}505=\mathbf{-4{,}267}\ \text{millions}$$
 
 > **La procédure, en trois étapes** — *c'est la règle de la section 4.7 étendue* : **1.** Utiliser la courbe zéro LIBOR/swap pour calculer les **taux forward** de chacun des LIBOR qui détermineront les flux. **2.** Calculer les flux du swap **en supposant que les LIBOR égaleront les forwards**. **3.** **Actualiser** ces flux (avec la même courbe) pour obtenir la valeur.
 
-<details><summary>**Exercice résolu — la même valeur par les FRA (exemple 7.3)**</summary>
+<details class="details--riche">
+<summary>
+
+**Exercice résolu — la même valeur par les FRA (exemple 7.3)**
+
+</summary>
 
 **Mêmes données que l'exemple 7.2.**
 
@@ -336,7 +361,12 @@ Un **OIS** est un swap où un **taux fixe** pour une période (1 mois, 3 mois, 1
 
 </div>
 
-<details><summary>**Pourquoi le taux OIS est inférieur au LIBOR — et ce que l'écart mesure**</summary>
+<details class="details--riche">
+<summary>
+
+**Pourquoi le taux OIS est inférieur au LIBOR — et ce que l'écart mesure**
+
+</summary>
 
 **Le raisonnement.** La banque A peut :
 
@@ -373,7 +403,12 @@ $$\boxed{\text{spread LIBOR-OIS}=\text{LIBOR 3 mois}-\text{taux OIS 3 mois}}$$
 
 ⚠️ **La différence structurelle avec le swap de taux.** *Le swap de devises exige que le principal soit **spécifié dans chacune des deux devises**, et les montants de principal sont **habituellement échangés au début ET à la fin**. Ils sont choisis pour être approximativement équivalents au taux de change à l'initiation ; à l'échange final, leurs valeurs peuvent être **très différentes**.*
 
-<details><summary>**L'exemple canonique — IBM et British Petroleum (tableau 7.7)**</summary>
+<details class="details--riche">
+<summary>
+
+**L'exemple canonique — IBM et British Petroleum (tableau 7.7)**
+
+</summary>
 
 **Le contrat.** Swap **5 ans** signé le **1ᵉʳ février 2011**. IBM **paie 5 % en livres** et **reçoit 6 % en dollars**. Paiements **annuels**. Principaux : **18 millions de dollars** et **10 millions de livres**. C'est un swap **fixe contre fixe**.
 
@@ -408,7 +443,12 @@ Qantas paie **2 %** de plus en USD et seulement **0,4 %** de plus en AUD. Gain t
 
 ⚠️ **Différence essentielle avec le cas des taux.** *Dans le tableau 7.4, nous avons soutenu que les avantages comparatifs sont largement **illusoires**. Ici nous comparons des taux offerts dans **deux devises différentes**, et il est **plus probable que les avantages comparatifs soient réels**. Une source possible est la **fiscalité** : la position de GE peut être telle que des emprunts en USD conduisent à des impôts moindres sur son revenu mondial ; celle de Qantas peut être l'inverse.*
 
-<details><summary>**Exercice résolu — répartir le gain de 1,6 % (figure 7.11)**</summary>
+<details class="details--riche">
+<summary>
+
+**Exercice résolu — répartir le gain de 1,6 % (figure 7.11)**
+
+</summary>
 
 **Le montage.** GE veut **20 M AUD**, Qantas veut **15 M USD**, taux de change **0,7500 USD par AUD**. Chacune emprunte là où elle a son avantage : **GE emprunte USD**, **Qantas emprunte AUD**.
 
@@ -424,7 +464,12 @@ $$\boxed{V_{\text{swap}}=B_D-S_0B_F}\ \text{(on reçoit des dollars, on paie la 
 
 où $B_F$ est la valeur, **mesurée en devise étrangère**, de l'obligation définie par les flux étrangers, $B_D$ celle des flux domestiques, et $S_0$ le change comptant (**dollars par unité de devise étrangère**).
 
-<details><summary>**Exercice résolu — les deux méthodes, encore (exemples 7.4 et 7.5)**</summary>
+<details class="details--riche">
+<summary>
+
+**Exercice résolu — les deux méthodes, encore (exemples 7.4 et 7.5)**
+
+</summary>
 
 **Énoncé.** Courbes **plates** : **4 %** au Japon, **9 %** aux États-Unis (continus). Une institution **reçoit 5 % en yens** et **paie 8 % en dollars**, une fois par an. Principaux : **10 M USD** et **1 200 M JPY**. Vie résiduelle **3 ans**. Change : **110 yens = 1 dollar**.
 

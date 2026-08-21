@@ -100,7 +100,12 @@ $$\boxed{c\le S_0\quad\text{et}\quad C\le S_0}\;\text{(10.1)}\qquad\boxed{P\le K
 
 $$\boxed{c\ge\max(S_0-Ke^{-rT},\ 0)}\;\text{(10.4)}$$
 
-<details><summary>**L'arbitrage explicite, puis la démonstration formelle**</summary>
+<details class="details--riche">
+<summary>
+
+**L'arbitrage explicite, puis la démonstration formelle**
+
+</summary>
 
 **L'arbitrage.** $S_0=20$, $K=18$, $r=10\,\%$, $T=1$ an. La borne vaut $20-18e^{-0{,}1}=\mathbf{3{,}71}$. Supposez le call coté **3,00**.
 
@@ -131,7 +136,12 @@ $$51-50e^{-0{,}12\times0{,}5}=51-47{,}09=\mathbf{3{,}91}$$
 
 $$\boxed{p\ge\max(Ke^{-rT}-S_0,\ 0)}\;\text{(10.5)}$$
 
-<details><summary>**L'arbitrage explicite, puis la démonstration formelle**</summary>
+<details class="details--riche">
+<summary>
+
+**L'arbitrage explicite, puis la démonstration formelle**
+
+</summary>
 
 **L'arbitrage.** $S_0=37$, $K=40$, $r=5\,\%$, $T=0{,}5$. La borne vaut $40e^{-0{,}025}-37=\mathbf{2{,}01}$. Supposez le put coté **1,00**.
 
@@ -177,7 +187,12 @@ $$\boxed{c+Ke^{-rT}=p+S_0}\;\text{(10.6)}$$
 
 </div>
 
-<details><summary>**Exercice résolu — les deux arbitrages de la parité (tableau 10.3)**</summary>
+<details class="details--riche">
+<summary>
+
+**Exercice résolu — les deux arbitrages de la parité (tableau 10.3)**
+
+</summary>
 
 **Données communes.** $S_0=31$, $K=30$, $r=10\,\%$, $T=3$ mois, $c=3$.
 
@@ -201,7 +216,12 @@ $$31+1-3=\mathbf{29}$$
 
 </details>
 
-<details><summary>**Parité call-put et structure de capital — l'application de Black, Scholes et Merton**</summary>
+<details class="details--riche">
+<summary>
+
+**Parité call-put et structure de capital — l'application de Black, Scholes et Merton**
+
+</summary>
 
 *Les pionniers de la valorisation d'options — **Fischer Black, Myron Scholes et Robert Merton** — montrèrent au début des années 1970 que les options permettent de **caractériser la structure de capital** d'une entreprise. **Cette analyse est aujourd'hui largement utilisée par les institutions financières pour évaluer le risque de crédit d'une entreprise.***
 
@@ -231,7 +251,12 @@ $$c+\mathrm{VA}(K)=p+A_0$$
 
 $$\boxed{S_0-K\le C-P\le S_0-Ke^{-rT}}\;\text{(10.7)}$$
 
-<details><summary>**Exercice résolu — encadrer un put américain (exemple 10.3)**</summary>
+<details class="details--riche">
+<summary>
+
+**Exercice résolu — encadrer un put américain (exemple 10.3)**
+
+</summary>
 
 **Énoncé.** Call américain sans dividende, $K=20$, échéance **5 mois**, coté **1,50**. $S_0=19$, $r=10\,\%$.
 
@@ -291,7 +316,12 @@ $$\max(Ke^{-rT}-S_0,0)\ \le\ p\ \le\ Ke^{-rT}\qquad\qquad \boxed{\max(K-S_0,0)\ 
 
 ⚠️ **La condition $P\ge\max(K-S_0,0)$ est *plus forte* que celle du put européen**, *parce que l'option peut être exercée à tout moment*. Elle n'est pas actualisée.
 
-<details><summary>**Les trois conséquences graphiques, et pourquoi elles s'enchaînent**</summary>
+<details class="details--riche">
+<summary>
+
+**Les trois conséquences graphiques, et pourquoi elles s'enchaînent**
+
+</summary>
 
 *Étape 1 — le point de fusion.* *Pourvu que $r>0$, il est **toujours optimal** d'exercer un put américain immédiatement quand le cours est **suffisamment bas**. Quand l'exercice anticipé est optimal, la valeur de l'option est exactement $K-S_0$.* **La courbe du put américain se confond donc avec sa valeur intrinsèque en dessous d'un certain cours** (le point $A$ de la figure 10.6).
 
@@ -393,7 +423,12 @@ $$c+Ke^{-rT}=p+S_0\qquad c+D+Ke^{-rT}=p+S_0\qquad S_0-D-K\le C-P\le S_0-Ke^{-rT}
 
 ## 🧠 Active Recall
 
-<details><summary>Pourquoi une hausse de la volatilité fait-elle monter **à la fois** les calls et les puts ?</summary>
+<details class="details--riche">
+<summary>
+
+Pourquoi une hausse de la volatilité fait-elle monter **à la fois** les calls et les puts ?
+
+</summary>
 
 Parce que la volatilité augmente la chance que l'action fasse **très bien ou très mal**, et que **ces deux issues se compensent pour le détenteur de l'action, mais pas pour le détenteur d'une option**. Le détenteur d'un call **profite pleinement des hausses** mais son risque de baisse est **borné par la prime** ; symétriquement pour un put. L'asymétrie du payoff transforme donc une dispersion accrue en **valeur accrue**, quel que soit le sens.
 
@@ -405,19 +440,34 @@ Parce que la volatilité augmente la chance que l'action fasse **très bien ou t
 
 </details>
 
-<details><summary>Pourquoi $P\le K$ mais $p\le Ke^{-rT}$ ?</summary>
+<details class="details--riche">
+<summary>
+
+Pourquoi $P\le K$ mais $p\le Ke^{-rT}$ ?
+
+</summary>
 
 Parce qu'une option **américaine** peut être exercée **immédiatement** : elle peut donc valoir jusqu'à $K$ **aujourd'hui**. L'**européenne** ne peut rien rapporter avant $T$ ; comme elle ne peut valoir plus que $K$ **à l'échéance**, elle ne peut valoir plus que la **valeur actuelle** de $K$ aujourd'hui. Si $p>Ke^{-rT}$, un arbitragiste **vendrait l'option et placerait le produit** au taux sans risque.
 
 </details>
 
-<details><summary>Démontrer $c\ge S_0-Ke^{-rT}$ par les portefeuilles.</summary>
+<details class="details--riche">
+<summary>
+
+Démontrer $c\ge S_0-Ke^{-rT}$ par les portefeuilles.
+
+</summary>
 
 **A** = un call européen + un zéro-coupon payant $K$ en $T$ ; **B** = une action. En $T$ : si $S_T>K$, A vaut $(S_T-K)+K=S_T$ ; si $S_T<K$, A vaut $0+K=K$. Donc **A vaut $\max(S_T,K)$** et B vaut $S_T$ : **A vaut toujours au moins autant que B**. En l'absence d'arbitrage, c'est vrai aujourd'hui : $c+Ke^{-rT}\ge S_0$. Et comme $c\ge0$ (*le pire qui puisse arriver est d'expirer sans valeur*), on obtient $c\ge\max(S_0-Ke^{-rT},0)$.
 
 </details>
 
-<details><summary>Un call européen vaut 3,00 alors que $S_0=20$, $K=18$, $r=10\,\%$, $T=1$. Construire l'arbitrage.</summary>
+<details class="details--riche">
+<summary>
+
+Un call européen vaut 3,00 alors que $S_0=20$, $K=18$, $r=10\,\%$, $T=1$. Construire l'arbitrage.
+
+</summary>
 
 Borne : $20-18e^{-0{,}1}=\mathbf{3{,}71}>3{,}00$. **Shorter l'action** et **acheter le call** → $+17{,}00$, placés à 10 % → $17e^{0{,}1}=\mathbf{18{,}79}$. Si $S_T>18$ : exercer pour 18, refermer le short → **+0,79**. Si $S_T<18$ : racheter l'action **au marché**, moins cher → **davantage** ; à $S_T=17$, **+1,79**. **Profit strictement positif dans tous les cas.**
 
@@ -431,7 +481,12 @@ Pour les **américaines**, l'exercice anticipé **casse l'égalité des payoffs 
 
 </details>
 
-<details><summary>$S_0=31$, $K=30$, $r=10\,\%$, $T=0{,}25$, $c=3$, $p=2{,}25$. Y a-t-il arbitrage ?</summary>
+<details class="details--riche">
+<summary>
+
+$S_0=31$, $K=30$, $r=10\,\%$, $T=0{,}25$, $c=3$, $p=2{,}25$. Y a-t-il arbitrage ?
+
+</summary>
 
 $c+Ke^{-rT}=3+29{,}26=\mathbf{32{,}26}$ ; $p+S_0=\mathbf{33{,}25}$. **C est surévalué.** On **achète le call**, on **shorte le put et l'action** → $+30{,}25$, placés → $\mathbf{31{,}02}$. À l'échéance, **l'une des deux options est exercée** et l'on achète l'action **pour 30** dans les deux cas. Profit : $31{,}02-30=\mathbf{1{,}02}$, **déterministe**.
 

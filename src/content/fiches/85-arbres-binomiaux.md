@@ -33,7 +33,12 @@ AUTRES     a = e^{(r−q)Δt} (indice) · e^{(r−r_f)Δt} (devise) · a = 1 (fu
 >
 > ⚠️ ***Comme il y a deux titres — l'action et l'option — et seulement deux issues possibles, il est TOUJOURS possible de constituer le portefeuille sans risque.*** C'est cette coïncidence de dimensions qui fait fonctionner tout le chapitre.
 
-<details><summary>**Exercice résolu — le calcul complet, pas à pas**</summary>
+<details class="details--riche">
+<summary>
+
+**Exercice résolu — le calcul complet, pas à pas**
+
+</summary>
 
 *Étape 1 — poser le portefeuille.* **Long $\Delta$ actions, short 1 call.** *Étape 2 — écrire sa valeur dans les deux états.*
 
@@ -96,7 +101,12 @@ $$\boxed{\mathbb E(S_T)=S_0e^{rT}}\;\text{(12.4)}$$
 
 **La recette en trois temps.** *Calculer les **probabilités risque-neutres** des différentes issues · calculer le **payoff espéré** du dérivé · **actualiser au taux sans risque**.*
 
-<details><summary>**Exercice résolu — retrouver 0,633 par la voie risque-neutre**</summary>
+<details class="details--riche">
+<summary>
+
+**Exercice résolu — retrouver 0,633 par la voie risque-neutre**
+
+</summary>
 
 *Étape 1 — poser l'équation de croissance risque-neutre.* Le rendement espéré doit être **12 %** :
 
@@ -112,7 +122,12 @@ $$22p+18(1-p)=20e^{0{,}12\times0{,}25}$$
 
 **Le principe.** *Appliquer répétitivement les résultats précédents, **en remontant** de la fin vers le début.*
 
-<details><summary>**Exercice résolu — l'arbre à deux pas (figures 12.3 et 12.4)**</summary>
+<details class="details--riche">
+<summary>
+
+**Exercice résolu — l'arbre à deux pas (figures 12.3 et 12.4)**
+
+</summary>
 
 **Données.** $S_0=20$ ; à chaque pas $\pm10\,\%$ ; pas de **3 mois** ; $r=12\,\%$ ; call **6 mois**, $K=21$.
 
@@ -146,7 +161,12 @@ $$\boxed{f=e^{-2r\Delta t}\big[p^2f_{uu}+2p(1-p)f_{ud}+(1-p)^2f_{dd}\big]}\;\tex
 
 > *Les quantités $p^2$, $2p(1-p)$ et $(1-p)^2$ sont **les probabilités d'atteindre les nœuds terminaux** haut, milieu et bas. **Le prix de l'option est son payoff espéré en monde risque-neutre, actualisé au taux sans risque** — et ce reste vrai quel que soit le nombre de pas.*
 
-<details><summary>**Exercice résolu — un put européen à deux pas (figure 12.7)**</summary>
+<details class="details--riche">
+<summary>
+
+**Exercice résolu — un put européen à deux pas (figure 12.7)**
+
+</summary>
 
 **Données.** Put européen **2 ans**, $K=52$, $S_0=50$. Deux pas de **1 an**, $\pm20\,\%$, $r=5\,\%$.
 
@@ -174,7 +194,12 @@ $$f=e^{-0{,}05}(0{,}6282\times1{,}4147+0{,}3718\times9{,}4636)=\mathbf{4{,}1923}
 >
 > $$\boxed{f=\max\Big(\underbrace{e^{-r\Delta t}[pf_u+(1-p)f_d]}_{\text{valeur de continuation}},\ \underbrace{\text{payoff d'exercice immédiat}}_{K-S\ \text{ou}\ S-K}\Big)}$$
 
-<details><summary>**Exercice résolu — le même put, en américain (figure 12.8)**</summary>
+<details class="details--riche">
+<summary>
+
+**Exercice résolu — le même put, en américain (figure 12.8)**
+
+</summary>
 
 **Mêmes données.** Les prix de l'action, leurs probabilités et les valeurs terminales sont **inchangés**.
 
@@ -250,7 +275,12 @@ $$\boxed{u=e^{\sigma\sqrt{\Delta t}}}\;\text{(12.13)}\qquad\qquad\boxed{d=e^{-\s
 
 $$u=e^{\sigma\sqrt{\Delta t}}\qquad d=\frac1u\qquad \boxed{p=\frac{a-d}{u-d}}\;\text{(12.15)}\qquad \boxed{a=e^{r\Delta t}}\;\text{(12.16)}$$
 
-<details><summary>**Exercice résolu — le put américain avec un vrai calage (figure 12.10)**</summary>
+<details class="details--riche">
+<summary>
+
+**Exercice résolu — le put américain avec un vrai calage (figure 12.10)**
+
+</summary>
 
 **Données.** $S_0=50$, $K=52$, $r=5\,\%$, **2 ans**, **deux pas** ($\Delta t=1$), $\sigma=30\,\%$.
 
@@ -306,7 +336,12 @@ $$\boxed{u=e^{\sigma\sqrt{\Delta t}},\quad d=\frac1u,\quad p=\frac{a-d}{u-d}\qua
 | **Devise** | *une devise étrangère est un actif procurant un rendement au taux sans risque étranger* | $e^{(r-r_f)\Delta t}$ |
 | **Futures** | ***il ne coûte rien de prendre une position sur un futures : en monde risque-neutre, un prix futures doit avoir un taux de croissance espéré NUL*** | $\mathbf{1}$ |
 
-<details><summary>**Trois exercices résolus — indice, devise, futures**</summary>
+<details class="details--riche">
+<summary>
+
+**Trois exercices résolus — indice, devise, futures**
+
+</summary>
 
 **Exemple 12.1 — call européen sur indice.** Indice **810**, $\sigma=20\,\%$, $q=2\,\%$, $r=5\,\%$, call **6 mois** $K=800$, **deux pas**.
 
@@ -396,13 +431,23 @@ $$u=e^{\sigma\sqrt{\Delta t}}\qquad d=\frac1u\qquad p=\frac{a-d}{u-d}\qquad f=e^
 
 ## 🧠 Active Recall
 
-<details><summary>Pourquoi peut-on **toujours** construire un portefeuille sans risque dans un arbre à un pas ?</summary>
+<details class="details--riche">
+<summary>
+
+Pourquoi peut-on **toujours** construire un portefeuille sans risque dans un arbre à un pas ?
+
+</summary>
 
 Parce qu'*il y a **deux titres** — l'action et l'option — et seulement **deux issues possibles***. On a donc **une inconnue** ($\Delta$) et **une équation** (égalité des valeurs finales) : le système a toujours une solution. C'est cette coïncidence de dimensions qui rend le marché **complet** et fait fonctionner tout l'argument d'absence d'arbitrage.
 
 </details>
 
-<details><summary>Action à 20 → 22 ou 18 ; call $K=21$ ; $r=12\,\%$ ; 3 mois. Trouver $\Delta$ puis $f$.</summary>
+<details class="details--riche">
+<summary>
+
+Action à 20 → 22 ou 18 ; call $K=21$ ; $r=12\,\%$ ; 3 mois. Trouver $\Delta$ puis $f$.
+
+</summary>
 
 $22\Delta-1=18\Delta\Rightarrow\Delta=\mathbf{0{,}25}$. Portefeuille : $22(0{,}25)-1=18(0{,}25)=\mathbf{4{,}5}$ dans les deux cas. Valeur actuelle : $4{,}5e^{-0{,}03}=\mathbf{4{,}367}$. Coût de constitution $=20(0{,}25)-f=5-f$. Donc $f=5-4{,}367=\boxed{0{,}633}$.
 
@@ -422,7 +467,12 @@ Le miracle : *supposer un monde risque-neutre donne **le bon prix pour le monde 
 
 </details>
 
-<details><summary>Prouver que $p=(e^{rT}-d)/(u-d)$ est bien une probabilité risque-neutre.</summary>
+<details class="details--riche">
+<summary>
+
+Prouver que $p=(e^{rT}-d)/(u-d)$ est bien une probabilité risque-neutre.
+
+</summary>
 
 $$\mathbb E(S_T)=pS_0u+(1-p)S_0d=pS_0(u-d)+S_0d$$
 
@@ -448,7 +498,12 @@ Premier pas : $\dfrac{1{,}4147-9{,}4636}{60-40}=\mathbf{-0{,}4024}$. Second pas,
 
 </details>
 
-<details><summary>Comment cale-t-on $u$ et $d$ sur la volatilité, et pourquoi cela ne dépend-il pas de la mesure ?</summary>
+<details class="details--riche">
+<summary>
+
+Comment cale-t-on $u$ et $d$ sur la volatilité, et pourquoi cela ne dépend-il pas de la mesure ?
+
+</summary>
 
 On impose que la variance du rendement sur l'arbre égale $\sigma^2\Delta t$. En substituant $p^\ast=(e^{\mu\Delta t}-d)/(u-d)$, on obtient $e^{\mu\Delta t}(u+d)-ud-e^{2\mu\Delta t}=\sigma^2\Delta t$, dont une solution (en ignorant les termes en $\Delta t^2$) est
 
@@ -458,13 +513,23 @@ $$u=e^{\sigma\sqrt{\Delta t}},\qquad d=e^{-\sigma\sqrt{\Delta t}}=1/u$$
 
 </details>
 
-<details><summary>Que sont les mesures $P$ et $Q$ ?</summary>
+<details class="details--riche">
+<summary>
+
+Que sont les mesures $P$ et $Q$ ?
+
+</summary>
 
 $P$ est la **mesure du monde réel** — celle sous laquelle l'action croît au rendement espéré $\mu$, avec probabilité de hausse $p^\ast$. $Q$ est la **mesure risque-neutre** — celle sous laquelle l'action croît au taux $r$, avec probabilité de hausse $p$. *Passer de l'une à l'autre s'appelle **changer de mesure** ; cela **modifie les taux de croissance espérés mais laisse les volatilités inchangées**.*
 
 </details>
 
-<details><summary>Pourquoi le put calé sur $\sigma=30\,\%$ vaut-il 7,43 alors qu'il valait 5,0894 avec $u=1{,}2$ ?</summary>
+<details class="details--riche">
+<summary>
+
+Pourquoi le put calé sur $\sigma=30\,\%$ vaut-il 7,43 alors qu'il valait 5,0894 avec $u=1{,}2$ ?
+
+</summary>
 
 Parce que $u=1{,}2$ et $d=0{,}8$ étaient **arbitraires**. Le calage donne $u=e^{0{,}3}=\mathbf{1{,}3499}$ et $d=\mathbf{0{,}7408}$ — un arbre **beaucoup plus large**, donc une volatilité implicite bien supérieure, donc une option plus chère. **Écart : +46 %.** *Le calage n'est pas un raffinement : c'est ce qui fait que l'arbre représente le vrai sous-jacent.*
 

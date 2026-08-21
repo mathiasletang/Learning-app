@@ -318,6 +318,37 @@
   border-left-color: var(--warn);
   background: color-mix(in srgb, var(--warn) 6%, var(--surface));
 }
+/* Un encadré peut porter plusieurs paragraphes : c'est le blanc intérieur qui
+   les tient, pas une marge qui déborderait du filet. */
+.prose .callout > :first-child {
+  margin-top: 0;
+}
+.prose .callout > :last-child {
+  margin-bottom: 0;
+}
+/* L'étiquette d'un encadré (« Définition 2.4 », « Pourquoi c'est important »)
+   se lit comme une entrée de rubrique : petite, capitale, dans l'encre douce.
+   Elle ne prend pas de couleur — c'est le mot qui porte le sens. */
+.prose .callout__lab {
+  display: block;
+  margin-bottom: var(--s-2);
+  font-size: var(--fs-micro);
+  font-weight: 650;
+  letter-spacing: var(--ls-micro);
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+/* L'étiquette d'une mise en garde reste orange, mais elle est petite : le
+   jeton pur passe tout juste sous AA en thème clair. Une pointe d'encre la
+   remet du bon côté sans changer la couleur qu'on lit. */
+.prose .callout--warn .callout__lab {
+  color: color-mix(in srgb, var(--warn) 85%, var(--ink));
+}
+/* Un ajout signale ce qui n'est PAS dans le cours source : le filet se coupe,
+   pour qu'on ne prenne jamais un commentaire pour le texte d'origine. */
+.prose .callout[data-kind='plus'] {
+  border-left-style: dashed;
+}
 
 /* ----------------- Formules en bloc : on doit LES VOIR ------------------- */
 /* En parcourant la page sans lire, on retrouve « la formule ». */
@@ -331,6 +362,42 @@
 }
 .prose .katex-display .katex {
   font-size: 1.12em;
+}
+
+/* ------------- Ce qui déborde doit dire qu'il déborde -------------------- */
+/* Une formule de deux mètres, un tableau à huit colonnes, un schéma ASCII :
+   ils défilent déjà, mais rien ne le dit — la ligne s'arrête net au bord et on
+   la croit finie. Deux voiles par côté : celui qui couvre défile avec le
+   contenu (`local`), celui qui ombre reste collé au cadre (`scroll`). Au bout
+   de la course, le couvrant recouvre l'ombre et l'indice disparaît. Sans
+   script, et sans flèche ajoutée dans le texte. */
+.prose pre,
+.prose .katex-display {
+  --_ombre: color-mix(in srgb, var(--ink) 20%, transparent);
+  background-repeat: no-repeat;
+  background-size: var(--s-10) 100%, var(--s-10) 100%, var(--s-5) 100%, var(--s-5) 100%;
+  background-position: 0 0, 100% 0, 0 0, 100% 0;
+  background-attachment: local, local, scroll, scroll;
+  background-image:
+    linear-gradient(to right, var(--_voile) 55%, transparent),
+    linear-gradient(to left, var(--_voile) 55%, transparent),
+    linear-gradient(to right, var(--_ombre), transparent),
+    linear-gradient(to left, var(--_ombre), transparent);
+}
+.prose pre {
+  --_voile: var(--canvas-alt);
+}
+.prose .katex-display {
+  --_voile: var(--surface);
+}
+/* Le tableau, lui, n'a pas de fond propre : peindre le voile dessus laisserait
+   une plaque plate sur le dégradé de la page. Il garde donc l'autre indice, la
+   barre de défilement, rendue visible plutôt que fantôme. */
+.prose table,
+.prose pre,
+.prose .katex-display {
+  scrollbar-width: thin;
+  scrollbar-color: var(--hairline-strong) transparent;
 }
 
 /* -------------- Tableaux clé-valeur : empilés sur mobile ----------------- */

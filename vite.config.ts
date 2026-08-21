@@ -43,6 +43,10 @@ export default defineConfig({
       workbox: {
         // Cache tout l'app-shell + le contenu embarqué pour un vrai hors-ligne.
         globPatterns: ['**/*.{js,css,html,woff2,png,svg,json,md}'],
+        // Le HTML d'origine des fiches sert d'entrée à `npm run fiches` ; son
+        // contenu est déjà dans le paquet, en Markdown. Le précacher ferait
+        // télécharger 3,3 Mo deux fois.
+        globIgnores: ['**/cours/fiches/*.html'],
         maximumFileSizeToCacheInBytes: 8 * 1024 * 1024,
         cleanupOutdatedCaches: true,
         navigateFallback: 'index.html',

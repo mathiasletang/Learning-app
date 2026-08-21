@@ -1,7 +1,7 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { motion, useScroll, useSpring } from 'framer-motion';
-import { getFiche, fichesOfSubject, DIFFICULTY_LABEL } from '@/core/fiches';
+import { getFiche, fichesOfSubject, ficheMarkdown, DIFFICULTY_LABEL } from '@/core/fiches';
 import { SUBJECT_DEFS } from '@/core/subjects';
 import { renderMarkdown, decorateFiche } from '@/core/markdown';
 import { PageHead, Icon, Tag } from '@/ui';
@@ -15,7 +15,25 @@ export function FicheView() {
   const { scrollYProgress } = useScroll();
   const progress = useSpring(scrollYProgress, { stiffness: 120, damping: 30, restDelta: 0.001 });
 
-  const html = useMemo(() => (fiche ? decorateFiche(renderMarkdown(fiche.markdown)) : ''), [fiche]);
+  /* Le contenu arrive dans son propre morceau : on l'attend, sans rien
+     démonter — la fiche d'identité et le fil de lecture sont déjà là. */
+  const [markdown, setMarkdown] = useState('');
+  useEffect(() => {
+    if (!fiche) return;
+    let vivant = true;
+    setMarkdown('');
+    ficheMarkdown(fiche.file).then((md) => {
+      if (vivant) setMarkdown(md);
+    });
+    return () => {
+      vivant = false;
+    };
+  }, [fiche]);
+
+  const html = useMemo(
+    () => (markdown ? decorateFiche(renderMarkdown(markdown)) : ''),
+    [markdown],
+  );
 
   if (!fiche) {
     return (
@@ -51,7 +69,13 @@ export function FicheView() {
         <span className="micro">{fiche.course}</span>
       </p>
 
-      <article className="prose prose--fiche" dangerouslySetInnerHTML={{ __html: html }} />
+      {html ? (
+        <article className="prose prose--fiche" dangerouslySetInnerHTML={{ __html: html }} />
+      ) : (
+        <p className="micro" role="status">
+          Chargement de la fiche…
+        </p>
+      )}
 
       <footer className="reader__foot">
         <Link className="arrow-link" to={back}>

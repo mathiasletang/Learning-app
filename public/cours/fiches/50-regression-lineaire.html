@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fiche 50 — Analyse de régression : MCO, Gauss-Markov, MCG et maximum de vraisemblance</title>
+<script>
+window.MathJax={tex:{inlineMath:[["$","$"]],displayMath:[["$$","$$"]],processEscapes:true},
+ options:{skipHtmlTags:["script","noscript","style","textarea","pre","code"]},
+ svg:{fontCache:"global"},
+ startup:{pageReady:()=>MathJax.startup.defaultPageReady().then(()=>{document.body.classList.add("ready")})}};
+setTimeout(function(){document.body.classList.add("ready")},2500);
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+/* ============================================================
+   MathiasLearn — feuille de style des fiches
+   Reprise intégrale des tokens de 00_PARCOURS/*.html
+   + blocs pédagogiques (callouts, méthode, essentiels, recall)
+   ============================================================ */
+:root{--bg:#faf9f7;--card:#fff;--ink:#1a1a1a;--muted:#6b6b6b;--line:#e5e2dd;--accent:#8b5e34;
+ --hl:#fdf8ef;--ok:#2d7d4f;--okbg:#f0f7f3;--warn:#b3402f;--warnbg:#fdf3f1;--blue:#2f5d8b;--bluebg:#f1f5fa}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+ font:17px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;padding:0 16px 100px}
+.nav{position:sticky;top:0;background:rgba(250,249,247,.96);backdrop-filter:blur(8px);
+ border-bottom:1px solid var(--line);margin:0 -16px 30px;padding:11px 16px;z-index:50;
+ display:flex;gap:6px;flex-wrap:wrap;font-size:13px}
+.nav a{color:var(--muted);text-decoration:none;padding:4px 9px;border-radius:5px;white-space:nowrap}
+.nav a:hover{background:var(--line);color:var(--ink)}
+.nav a.on{background:var(--accent);color:#fff}
+main{max-width:780px;margin:0 auto}
+h1{font-size:31px;letter-spacing:-.02em;margin:.4em 0 .5em;line-height:1.25}
+h2{font-size:23px;margin:2.2em 0 .7em;padding-bottom:.3em;border-bottom:1px solid var(--line)}
+h3{font-size:19px;margin:1.9em 0 .5em;color:var(--accent)}
+h4{font-size:17px;margin:1.5em 0 .4em}
+p{margin:.8em 0} a{color:var(--accent)} hr{border:0;border-top:1px solid var(--line);margin:2.6em 0}
+table{border-collapse:collapse;width:100%;margin:1.3em 0;font-size:15.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+th{background:#f3f0eb;font-weight:600}
+tr:nth-child(even) td{background:#fcfbfa}
+code{font-family:"SF Mono",Menlo,Consolas,monospace;font-size:.88em;background:#f2efea;padding:2px 6px;border-radius:4px;white-space:nowrap}
+pre{background:#f2efea;padding:14px 16px;border-radius:8px;overflow-x:auto}
+pre code{background:none;padding:0;white-space:pre}
+blockquote{border-left:3px solid var(--accent);background:var(--hl);margin:1.4em 0;padding:14px 20px;border-radius:0 8px 8px 0}
+blockquote p:first-child{margin-top:0} blockquote p:last-child{margin-bottom:0}
+ul,ol{padding-left:1.5em} li{margin:.35em 0} em{color:#4a4a4a}
+mjx-container[display="true"]{margin:1.1em 0!important;overflow-x:auto;overflow-y:hidden;padding:2px 0}
+mjx-container svg{max-width:100%}
+body:not(.ready) main{opacity:0} main{opacity:1;transition:opacity .25s}
+
+/* --- bandeau de tête de fiche --- */
+.cours{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--accent);
+ border-radius:0 10px 10px 0;padding:18px 22px;margin:0 0 34px}
+.cours h4{margin:0 0 4px;font-size:14px;text-transform:uppercase;letter-spacing:.07em;color:var(--accent)}
+.cours .cs{color:var(--muted);font-size:14.5px;margin:0 0 14px}
+
+/* --- exercices / corrigés --- */
+.ex{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:6px 24px 20px;margin:18px 0}
+.ex>h3:first-child{margin-top:14px}
+details.cor{margin-top:18px;border:1px solid var(--line);border-radius:8px;background:#fcfbfa;overflow:hidden}
+details.cor>summary{cursor:pointer;padding:12px 16px;font-weight:600;font-size:15px;color:var(--accent);
+ list-style:none;display:flex;align-items:center;gap:9px;user-select:none;transition:.15s;min-height:44px}
+details.cor>summary::-webkit-details-marker{display:none}
+details.cor>summary:hover{background:var(--hl)}
+details.cor>summary::before{content:"\25B6";font-size:10px;transition:transform .18s;display:inline-block}
+details.cor[open]>summary::before{transform:rotate(90deg)}
+details.cor[open]>summary{background:var(--okbg);color:var(--ok);border-bottom:1px solid var(--line)}
+.cor .in{padding:4px 20px 16px}
+.cor .in>*:first-child{margin-top:.9em}
+
+/* --- blocs pédagogiques (callouts) ---
+   Générés depuis une citation Markdown dont le premier **gras** commence
+   par un mot-clé : DÉFINITION, THÉORÈME, MÉTHODE, PIÈGE, INTUITION… */
+.cal{border:1px solid var(--line);border-left:4px solid var(--accent);background:var(--card);
+ border-radius:0 10px 10px 0;padding:15px 20px;margin:1.5em 0}
+.cal>p:first-child{margin-top:0}.cal>p:last-child,.cal>ul:last-child,.cal>ol:last-child{margin-bottom:0}
+.cal .lab{display:block;font-size:12.5px;text-transform:uppercase;letter-spacing:.08em;
+ font-weight:700;color:var(--accent);margin-bottom:6px}
+.cal.formel{background:var(--hl)}
+.cal.piege{border-left-color:var(--warn);background:var(--warnbg)}
+.cal.piege .lab{color:var(--warn)}
+.cal.methode{border-left-color:var(--ok);background:var(--okbg)}
+.cal.methode .lab{color:var(--ok)}
+.cal.intu{border-left-color:var(--blue);background:var(--bluebg)}
+.cal.intu .lab{color:var(--blue)}
+.cal.plus{border-left-style:dashed;background:#faf9f7}
+.cal.plus .lab{color:var(--muted)}
+
+/* --- révision express --- */
+.ess{background:var(--card);border:1px solid var(--accent);border-radius:10px;padding:4px 24px 20px;margin:1.6em 0}
+.ess h3{margin-top:1.3em}
+.rec{background:var(--card);border:1px dashed var(--accent);border-radius:10px;padding:4px 24px 18px;margin:1.6em 0}
+.rec ol{counter-reset:none}
+
+/* --- impression / PDF --- */
+@media print{
+ .nav{display:none}
+ body{padding:0;background:#fff;font-size:11.2pt;line-height:1.55}
+ main{max-width:none}
+ h1{font-size:23pt}h2{font-size:15pt;margin-top:1.5em}h3{font-size:12.6pt}
+ h2,h3,h4{break-after:avoid;page-break-after:avoid}
+ table,.cal,blockquote{break-inside:avoid;page-break-inside:avoid}
+ table{display:table;font-size:9.6pt}
+ details.cor{border:1px solid var(--line);background:#fcfbfa}
+ details.cor>summary{display:none}
+ details.cor .in{padding-top:10px}
+ .cal,.ex,.ess,.rec{box-shadow:none}
+ a{color:var(--ink);text-decoration:none}
+}
+@page{margin:16mm 15mm 18mm}
+
+/* --- exemples travaillés --- */
+.exm{background:#fcfbfa;border:1px solid var(--line);border-radius:10px;padding:2px 20px 14px;margin:1.5em 0}
+.exm>h4:first-child{margin:14px 0 .5em;color:var(--accent);font-size:13px;text-transform:uppercase;letter-spacing:.07em}
+
+
+/* --- pastilles de priorité (conventions des fiches de l'app) --- */
+h2[data-prio], h3[data-prio], h4[data-prio]{position:relative}
+h2[data-prio]::before,h3[data-prio]::before,h4[data-prio]::before{
+ content:"";display:inline-block;width:9px;height:9px;border-radius:50%;
+ margin-right:9px;vertical-align:middle;background:var(--muted)}
+[data-prio="must"]::before{background:var(--warn)}
+[data-prio="high"]::before{background:#d98324}
+[data-prio="mid"]::before{background:#c9a227}
+[data-prio="low"]::before{background:var(--ok)}
+/* corrigés des fiches de l'app : même traitement que les corrigés des séries */
+details.cor>summary::after{content:""}
+</style></head><body>
+<div class="nav"><a href="00_COMMENCER_ICI.html">Commencer ici</a><a href="01_NOTATIONS_le-decodeur.html">Notations</a><a href="02_EXERCICES_Serie-0.html">Série 0 — Remise en route</a><a href="03_EXERCICES_Serie-1.html">Série 1 — Convexité</a><a href="04_EXERCICES_Serie-2.html">Série 2 — KKT</a><a href="05_AUTO-EVALUATION.html">Auto-évaluation (quiz)</a><a href="06_FICHE_Optimisation-deux-variables.html">Fiche — Optimisation à 2 variables</a></div>
+<main><h1>Fiche 50 — Analyse de régression : MCO, Gauss-Markov, MCG et maximum de vraisemblance</h1>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Matière</strong></td>
+<td>Maths · Optimisation</td>
+</tr>
+<tr>
+<td><strong>Cours source</strong></td>
+<td>Kempthorne, <em>18.S096 Topics in Mathematics with Applications in Finance</em>, MIT OpenCourseWare, automne 2013 — cours 6 « Regression Analysis »</td>
+</tr>
+<tr>
+<td><strong>Difficulté</strong></td>
+<td> Must know — le socle de toute l'économétrie</td>
+</tr>
+<tr>
+<td><strong>Temps d'étude estimé</strong></td>
+<td>2 h 30</td>
+</tr>
+<tr>
+<td><strong>Prérequis</strong></td>
+<td>Fiche 9 (matrices, rang, définie positive), fiche 39 (moindres carrés et équations normales)</td>
+</tr>
+<tr>
+<td><strong>Concepts clés</strong></td>
+<td>Modèle linéaire général, moindres carrés ordinaires, équations normales, matrice chapeau, théorème de Gauss-Markov, BLUE, moindres carrés généralisés, loi des estimateurs, test de Student, maximum de vraisemblance, M-estimation</td>
+</tr>
+<tr>
+<td><strong>Poids à l'examen</strong></td>
+<td>Trois résultats à savoir démontrer : les <strong>équations normales</strong>, le <strong>théorème de Gauss-Markov</strong>, et le fait que <strong>l'EMV coïncide avec les MCO</strong> sous normalité. La loi de $\hat\beta$ donne tous les tests.</td>
+</tr>
+</tbody></table>
+<h2>Vue d'ensemble</h2>
+<p>On dispose de $n$ observations : une <strong>variable de réponse</strong> $y_i$ et $p$ <strong>variables explicatives</strong> $x_i=(x_{i,1},\dots,x_{i,p})^T$. Le but de l'analyse de régression est d'<strong>extraire et exploiter la relation</strong> entre $y_i$ et $x_i$ — pour la <strong>prédiction</strong>, l'<strong>inférence causale</strong>, l'<strong>approximation</strong> ou l'étude de <strong>relations fonctionnelles</strong>.</p>
+<pre><code>MODÈLE       y = Xβ + ε
+CRITÈRE      Q(β) = ‖y − Xβ‖²         ← moindres carrés
+SOLUTION     XᵀXβ̂ = Xᵀy              ← équations normales
+GARANTIE     Gauss-Markov : β̂ est BLUE
+LOI          sous normalité : β̂ ~ N(β, σ²(XᵀX)⁻¹)  →  tests de Student
+</code></pre>
+<p>La force du chapitre est de <strong>séparer trois questions</strong> qu'on confond souvent : quel <strong>modèle</strong> ? quel <strong>critère</strong> d'estimation ? quelles <strong>hypothèses</strong> sur les erreurs ? Ces trois choix sont indépendants, et c'est leur combinaison qui détermine les propriétés de l'estimateur.</p>
+<h2 data-prio="mid">Concept 1 — Le modèle linéaire général</h2>
+<p>Pour chaque observation $i$, la distribution conditionnelle $[y_i\mid x_i]$ est donnée par
+$$y_i = \hat y_i + \varepsilon_i, \qquad \hat y_i = \beta_1x_{i,1}+\beta_2x_{i,2}+\dots+\beta_px_{i,p}$$
+où $\beta=(\beta_1,\dots,\beta_p)^T$ sont les $p$ <strong>paramètres de régression</strong> — <strong>constants sur toutes les observations</strong> — et $\varepsilon_i$ la <strong>variable résiduelle</strong>, qui varie d'une observation à l'autre.</p>
+<blockquote>
+<p><strong>La remarque décisive du cours.</strong> <em>La linéarité de $\hat y_i$ (en les <strong>paramètres</strong> de régression) est préservée avec des $x$ non linéaires.</em> Autrement dit, « régression <strong>linéaire</strong> » ne veut pas dire « relation linéaire entre $y$ et la variable observée » : cela veut dire <strong>linéaire en $\beta$</strong>.</p>
+</blockquote>
+<p><strong>D'où une étendue de modèles considérable :</strong></p>
+<table>
+<thead>
+<tr>
+<th>Modèle</th>
+<th>Choix des variables explicatives</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Approximation polynomiale</strong></td>
+<td>$x_{i,j}=(x_i)^j$ — différentes puissances d'une même variable</td>
+</tr>
+<tr>
+<td><strong>Série de Fourier</strong></td>
+<td>$x_{i,j}=\sin(jx_i)$ ou $\cos(jx_i)$</td>
+</tr>
+<tr>
+<td><strong>Régression sur séries temporelles</strong></td>
+<td>$i$ indexe le temps, et les explicatives incluent les <strong>valeurs retardées</strong> de la réponse</td>
+</tr>
+</tbody></table>
+<p class="cal piege"> Cette dernière ligne est capitale en finance : elle signifie qu'un modèle autorégressif $y_t = \phi_1y_{t-1}+\dots+\phi_py_{t-p}+\varepsilon_t$ <strong>est</strong> une régression linéaire, et que tout ce chapitre s'y applique — sous réserve de vérifier les hypothèses sur les erreurs, ce qui est précisément là que le bât blesse.</p>
+<h3>Les cinq étapes de l'ajustement d'un modèle</h3>
+<ol>
+<li><strong>Proposer un modèle</strong> : la variable de réponse $Y$ (en précisant l'échelle), les explicatives $X_1,\dots,X_p$ (en incluant si besoin différentes fonctions des explicatives), et les <strong>hypothèses sur la distribution de $\varepsilon$</strong>.</li>
+<li><strong>Spécifier un critère</strong> pour juger les différents estimateurs.</li>
+<li><strong>Caractériser le meilleur estimateur</strong> et l'appliquer aux données.</li>
+<li><strong>Vérifier les hypothèses</strong> faites en (1).</li>
+<li>Si nécessaire, <strong>modifier</strong> le modèle ou les hypothèses et retourner en (1).</li>
+</ol>
+<blockquote>
+<p><strong>Le point à ne pas manquer : l'étape (4).</strong> Un estimateur n'est « le meilleur » que <strong>relativement aux hypothèses</strong> de l'étape (1). Ne pas les vérifier, c'est revendiquer une optimalité qui n'existe peut-être pas.</p>
+</blockquote>
+<h2 data-prio="high">Concept 2 — Les trois choix indépendants</h2>
+<h3>Hypothèses sur la distribution des résidus</h3>
+<table>
+<thead>
+<tr>
+<th>Hypothèse</th>
+<th>Contenu</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Gauss-Markov</strong></td>
+<td>moyenne nulle, variance <strong>constante</strong>, <strong>non corrélés</strong></td>
+</tr>
+<tr>
+<td><strong>Modèles normaux-linéaires</strong></td>
+<td>les $\varepsilon_i$ sont i.i.d. de loi $N(0,\sigma^2)$</td>
+</tr>
+<tr>
+<td><strong>Gauss-Markov généralisé</strong></td>
+<td>moyenne nulle et <strong>matrice de covariance générale</strong> (possiblement corrélée, possiblement hétéroscédastique)</td>
+</tr>
+<tr>
+<td><strong>Lois non gaussiennes</strong></td>
+<td>Laplace, Pareto, <strong>normale contaminée</strong> : une fraction $1-\delta$ des $\varepsilon_i$ est i.i.d. $N(0,\sigma^2)$, la fraction restante $\delta$ suit une loi de contamination</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>La normale contaminée est le modèle mental de la finance.</strong> Les rendements ne sont pas gaussiens : ils ont des <strong>queues épaisses</strong>. Une petite fraction d'observations extrêmes suffit à ruiner un estimateur conçu sous normalité — d'où les estimateurs <strong>robustes</strong> du concept 8.</p>
+</blockquote>
+<h3>Critères d'estimation</h3>
+<p><strong>Moindres carrés</strong> · <strong>maximum de vraisemblance</strong> · <strong>robuste</strong> (résistant à la contamination) · <strong>bayésien</strong> (les $\beta_j$ sont des variables aléatoires de loi a priori connue) · accommodant des <strong>données manquantes</strong>.</p>
+<h3>Vérification des hypothèses</h3>
+<ul>
+<li><strong>Analyse des résidus.</strong> Point crucial : <em>les erreurs du modèle $\varepsilon_i$ sont <strong>inobservables</strong></em>. Ce qu'on observe, ce sont les <strong>résidus</strong> pour des paramètres ajustés $\tilde\beta_j$ :
+$$e_i = y_i - \big[\tilde\beta_1x_{i,1}+\dots+\tilde\beta_px_{i,p}\big]$$</li>
+<li><strong>Diagnostics d'influence</strong> : identifier les observations très « influentes ».</li>
+<li><strong>Détection d'observations aberrantes</strong>.</li>
+</ul>
+<p class="cal piege"> <strong>Ne jamais confondre erreur et résidu.</strong> $\varepsilon_i$ est une quantité théorique, non observée ; $e_i$ est une quantité calculée, qui dépend de l'estimateur. Leurs propriétés diffèrent : les $\varepsilon_i$ sont supposés non corrélés, les $e_i$ <strong>ne le sont jamais</strong> (ils sont liés par $p$ contraintes d'orthogonalité).</p>
+<h2 data-prio="must">Concept 3 — Les moindres carrés ordinaires</h2>
+<p><strong>Le critère.</strong> Pour $\beta=(\beta_1,\dots,\beta_p)^T$,
+$$Q(\beta)=\sum_{i=1}^n\big[y_i-\hat y_i\big]^2 = \sum_{i=1}^n\Big[y_i-\big(\beta_1x_{i,1}+\dots+\beta_px_{i,p}\big)\Big]^2$$
+L'<strong>estimateur des MCO</strong> $\hat\beta$ minimise $Q(\beta)$.</p>
+<p><strong>En notation matricielle</strong>, avec $y\in\mathbb{R}^n$, $X\in\mathbb{R}^{n\times p}$ et $\hat y = X\beta$ :
+$$Q(\beta)=(y-X\beta)^T(y-X\beta)$$</p>
+<p><strong>La dérivation des équations normales.</strong> $\hat\beta$ annule $\partial Q/\partial\beta_j$ pour tout $j$ :
+$$\frac{\partial Q}{\partial\beta_j} = \sum_{i=1}^n 2(-x_{i,j})\big[y_i-(x_{i,1}\beta_1+\dots+x_{i,p}\beta_p)\big] = -2\,X_{[j]}^T(y-X\beta)$$
+où $X_{[j]}$ est la $j$-ième <strong>colonne</strong> de $X$. En empilant sur $j$ :
+$$\nabla Q(\beta) = -2X^T(y-X\beta) = 0$$
+d'où les <strong>équations normales</strong> :
+$$\boxed{\ X^TX\hat\beta = X^Ty \qquad\Longrightarrow\qquad \hat\beta = (X^TX)^{-1}X^Ty\ }$$</p>
+<blockquote>
+<p><strong>Condition d'existence et d'unicité.</strong> <em>Pour que $\hat\beta$ existe (de façon unique), $X^TX$ doit être inversible, c'est-à-dire que $X$ doit être de <strong>rang colonne plein</strong>.</em> Si deux explicatives sont colinéaires — ou si $p&gt;n$ — l'estimateur n'est pas défini. C'est le problème de la <strong>multicolinéarité</strong>.</p>
+</blockquote>
+<h3>La matrice chapeau</h3>
+<p>$$\hat y = X\hat\beta = X(X^TX)^{-1}X^Ty = Hy, \qquad H = X(X^TX)^{-1}X^T$$
+$H$ est la <strong>matrice chapeau</strong> (<em>hat matrix</em>), de taille $n\times n$.</p>
+<blockquote>
+<p><strong>$H$ projette $\mathbb{R}^n$ sur l'espace engendré par les colonnes de $X$.</strong> C'est la lecture géométrique de tout le chapitre : ajuster par moindres carrés, c'est <strong>projeter orthogonalement</strong> le vecteur de données $y$ sur le sous-espace des combinaisons linéaires des explicatives.</p>
+</blockquote>
+<p><strong>Résidus.</strong>
+$$\hat\varepsilon = y-\hat y = (I_n-H)y$$
+et les équations normales se relisent
+$$X^T(y-X\hat\beta) = X^T\hat\varepsilon = 0_p$$</p>
+<blockquote>
+<p><em>Le vecteur des résidus des moindres carrés $\hat\varepsilon$ est <strong>orthogonal</strong> à l'espace des colonnes de $X$.</em> C'est <strong>le</strong> fait à retenir : la projection laisse un résidu perpendiculaire au sous-espace. En particulier, si $X$ contient une constante, les résidus sont de <strong>somme nulle</strong>.</p>
+</blockquote>
+<h2 data-prio="must">Concept 4 — Le théorème de Gauss-Markov</h2>
+<p><strong>Les hypothèses.</strong> Les données $(y,X)$ suivent un modèle linéaire satisfaisant les hypothèses de Gauss-Markov si $y$ est une réalisation d'un vecteur aléatoire $Y$ tel que
+$$\mathbb{E}(Y\mid X,\beta) = X\beta, \qquad \mathrm{Cov}(Y\mid X,\beta)=\sigma^2I_n \quad \text{pour un } \sigma^2&gt;0$$
+<em>C'est-à-dire que les variables aléatoires engendrant les observations sont <strong>non corrélées</strong> et de <strong>variance constante</strong> $\sigma^2$</em> (conditionnellement à $X$ et $\beta$).</p>
+<p><strong>Le cadre.</strong> Pour des constantes connues $c_1,\dots,c_p,c_{p+1}$, on veut estimer
+$$\theta = c_1\beta_1+\dots+c_p\beta_p+c_{p+1}$$
+L'estimateur $\hat\theta = c_1\hat\beta_1+\dots+c_p\hat\beta_p+c_{p+1}$ construit sur les MCO est :</p>
+<ol>
+<li>un estimateur <strong>sans biais</strong> de $\theta$ ;</li>
+<li>un estimateur <strong>linéaire</strong> de $\theta$, c'est-à-dire $\hat\theta=\sum_{i=1}^n b_iy_i$ pour des constantes $b_i$ connues (étant donné $X$).</li>
+</ol>
+<div class="cal formel"><span class="lab">Théorème de Gauss-Markov.</span>
+<p> <em>Sous les hypothèses de Gauss-Markov, l'estimateur $\hat\theta$ a la plus petite (<strong>Best</strong>) variance parmi tous les estimateurs <strong>Linéaires</strong> et <strong>Sans biais</strong> (<strong>Unbiased</strong>) de $\theta$ — c'est-à-dire que $\hat\theta$ est <strong>BLUE</strong>.</em></p>
+</div>
+<p><strong>Démonstration (celle du cours).</strong> Sans perte de généralité, $c_{p+1}=0$ et $c=(c_1,\dots,c_p)^T$. L'estimateur MCO de $\theta=c^T\beta$ est
+$$\hat\theta = c^T\hat\beta = c^T(X^TX)^{-1}X^Ty \equiv d^Ty$$
+un estimateur <strong>linéaire</strong> en $y$, de coefficients $d$. Considérons un estimateur linéaire alternatif $\tilde\theta=b^Ty$, et posons $f=b-d$, si bien que
+$$\tilde\theta = b^Ty=(d+f)^Ty=\hat\theta+f^Ty$$</p>
+<p><em>Étape 1 — que dit l'absence de biais ?</em> Si $\tilde\theta$ est sans biais, comme $\hat\theta$ l'est déjà,
+$$0=\mathbb{E}(f^Ty)=f^T\mathbb{E}(y)=f^T(X\beta) \qquad \text{pour tout } \beta\in\mathbb{R}^p$$
+donc <strong>$f$ est orthogonal à l'espace des colonnes de $X$</strong> — et en particulier à $d=X(X^TX)^{-1}c$, qui appartient à cet espace.</p>
+<p><em>Étape 2 — décomposer la variance.</em>
+$$\begin{aligned}\mathrm{Var}(\tilde\theta)&amp;=\mathrm{Var}(d^Ty+f^Ty)=\mathrm{Var}(d^Ty)+\mathrm{Var}(f^Ty)+2\,\mathrm{Cov}(d^Ty,f^Ty)\\ &amp;=\mathrm{Var}(\hat\theta)+\mathrm{Var}(f^Ty)+2\,d^T\mathrm{Cov}(y)f\\ &amp;=\mathrm{Var}(\hat\theta)+\mathrm{Var}(f^Ty)+2\sigma^2\,d^Tf\\ &amp;=\mathrm{Var}(\hat\theta)+\mathrm{Var}(f^Ty)+0 \ \geq\ \mathrm{Var}(\hat\theta)\end{aligned}$$
+$\blacksquare$</p>
+<blockquote>
+<p><strong>Où chaque hypothèse est utilisée.</strong> L'<strong>absence de corrélation et la variance constante</strong> ($\mathrm{Cov}(y)=\sigma^2I_n$) servent à la troisième ligne : sans elles, $d^T\mathrm{Cov}(y)f$ ne se simplifie pas en $\sigma^2d^Tf$ et le terme croisé ne s'annule pas. <strong>La normalité n'est utilisée nulle part</strong> — Gauss-Markov ne la suppose pas.</p>
+</blockquote>
+<h2 data-prio="high">Concept 5 — Les moindres carrés généralisés</h2>
+<p><strong>Le cadre généralisé.</strong> $Y = X\beta+\varepsilon$ avec
+$$\mathbb{E}[\varepsilon]=0_n, \qquad \mathbb{E}[\varepsilon\varepsilon^T]=\sigma^2\Sigma$$
+où $\sigma^2$ est un paramètre d'échelle inconnu et $\Sigma$ une matrice $(n\times n)$ <strong>définie positive connue</strong>, spécifiant les variances relatives et les corrélations des observations.</p>
+<p><strong>L'astuce : blanchir les données.</strong> On transforme
+$$Y^\ast = \Sigma^{-1/2}Y, \qquad X^\ast = \Sigma^{-1/2}X$$
+et le modèle devient
+$$Y^\ast = X^\ast\beta+\varepsilon^\ast, \qquad \mathbb{E}[\varepsilon^\ast]=0_n,\quad \mathbb{E}[\varepsilon^\ast(\varepsilon^\ast)^T]=\sigma^2I_n$$
+c'est-à-dire un modèle satisfaisant <strong>exactement</strong> les hypothèses de Gauss-Markov. Par le théorème, le BLUE est donc
+$$\boxed{\ \hat\beta_{\text{MCG}} = \big[(X^\ast)^TX^\ast\big]^{-1}(X^\ast)^TY^\ast = \big[X^T\Sigma^{-1}X\big]^{-1}X^T\Sigma^{-1}Y\ }$$</p>
+<blockquote>
+<p><strong>La leçon de méthode.</strong> On ne démontre pas un nouveau théorème : on <strong>transforme le problème</strong> pour se ramener au théorème déjà acquis. C'est exactement le mouvement de la fiche 36 (problèmes équivalents) et de la fiche 37 (mise en forme convexe d'un GP).</p>
+</blockquote>
+<p class="cal piege"> <strong>En pratique, $\Sigma$ est rarement connue.</strong> On l'estime — d'où les MCG <em>faisables</em>, dont les propriétés ne sont qu'asymptotiques. Les deux cas usuels en finance : <strong>hétéroscédasticité</strong> ($\Sigma$ diagonale à termes inégaux, volatilité variable) et <strong>autocorrélation</strong> ($\Sigma$ non diagonale, séries temporelles).</p>
+<h2 data-prio="must">Concept 6 — Loi des estimateurs sous normalité</h2>
+<p><strong>Le modèle normal-linéaire.</strong>
+$$y = X\beta+\varepsilon, \qquad \varepsilon\sim N_n(0_n,\ \sigma^2I_n) \quad\text{soit}\quad y\sim N_n(X\beta,\ \sigma^2I_n)$$</p>
+<p><strong>Le lemme de transformation.</strong> <em>Pour toute matrice $A$ de taille $(m\times n)$ et de rang $m\leq n$, le vecteur normal $y$ transformé par $A$,</em> $z=Ay$, <em>est encore un vecteur normal :</em>
+$$z\sim N_m(\mu_z,\Sigma_z), \qquad \mu_z=AX\beta,\quad \Sigma_z=\sigma^2AA^T$$
+En prenant $A=(X^TX)^{-1}X^T$ on obtient immédiatement la loi de $\hat\beta$.</p>
+<div class="cal formel"><span class="lab">Théorème.</span>
+<p> Pour le modèle normal-linéaire avec $X$ de rang $p$ :
+<strong>(a)</strong> $\hat\beta=(X^TX)^{-1}X^Ty$ et $\hat\varepsilon=y-X\hat\beta$ sont des variables aléatoires <strong>indépendantes</strong> ;
+<strong>(b)</strong> $\hat\beta\sim N_p\big(\beta,\ \sigma^2(X^TX)^{-1}\big)$ ;
+<strong>(c)</strong> $\displaystyle\sum_{i=1}^n\hat\varepsilon_i^2=\hat\varepsilon^T\hat\varepsilon\ \sim\ \sigma^2\chi^2_{n-p}$ ;
+<strong>(d)</strong> pour chaque $j$,
+$$\hat t_j=\frac{\hat\beta_j-\beta_j}{\hat\sigma\sqrt{C_{j,j}}}\ \sim\ t_{n-p}, \qquad \hat\sigma^2=\frac{1}{n-p}\sum_{i=1}^n\hat\varepsilon_i^2,\quad C_{j,j}=\big[(X^TX)^{-1}\big]_{j,j}$$</p>
+</div>
+<p><strong>Lois marginales.</strong> De (b) découle immédiatement $\hat\beta_j\sim N(\beta_j,\ \sigma^2C_{j,j})$.</p>
+<blockquote>
+<p><strong>C'est ce théorème qui produit toute l'inférence.</strong> Le point (d) donne les <strong>tests de Student</strong> sur chaque coefficient et les <strong>intervalles de confiance</strong> ; le point (c) donne l'estimateur <strong>sans biais</strong> $\hat\sigma^2$ de la variance (noter le diviseur $n-p$, pas $n$) ; et le point (a) — l'indépendance — est <strong>exactement</strong> ce qui permet de former le rapport de (d) et d'obtenir une loi de Student.</p>
+</blockquote>
+<h3>L'outil de la preuve : la décomposition QR</h3>
+<p>On écrit $X=QR$ où $Q$ est $(n\times p)$ <strong>orthonormale</strong> ($Q^TQ=I_p$) et $R$ est $(p\times p)$ <strong>triangulaire supérieure</strong>. Les colonnes de $Q$ se construisent par <strong>orthonormalisation de Gram-Schmidt</strong> sur celles de $X$.</p>
+<p><strong>Ce que la décomposition simplifie.</strong>
+$$\hat\beta=(X^TX)^{-1}X^Ty = R^{-1}Q^Ty, \qquad \mathrm{Cov}(\hat\beta)=\sigma^2R^{-1}(R^{-1})^T, \qquad H=QQ^T$$</p>
+<p><strong>Le principe de la preuve.</strong> On complète $Q$ en une matrice <strong>orthogonale</strong> $A=\binom{Q^T}{W^T}$ de taille $(n\times n)$, et l'on pose $z=Ay$, décomposé en $z_Q=Q^Ty$ et $z_W=W^Ty$, <strong>indépendants</strong> puisque $A$ est orthogonale et $y$ gaussien. On montre alors
+$$\hat\beta = R^{-1}z_Q, \qquad \hat\varepsilon = Wz_W$$
+— donc $\hat\beta$ et $\hat\varepsilon$ sont fonctions de <strong>vecteurs indépendants différents</strong>, ce qui donne (a) — puis $\hat\varepsilon^T\hat\varepsilon=z_W^Tz_W$ est une somme de $n-p$ carrés de variables i.i.d. $N(0,\sigma^2)$, ce qui donne (c).</p>
+<blockquote>
+<p><strong>La lecture géométrique.</strong> $Q$ engendre l'espace des colonnes de $X$ (dimension $p$), $W$ son orthogonal (dimension $n-p$). La rotation orthogonale $A$ <strong>sépare</strong> le signal du bruit : $p$ coordonnées portent $\hat\beta$, les $n-p$ autres portent les résidus. L'indépendance et le $\chi^2_{n-p}$ en découlent immédiatement — d'où le nom de « degrés de liberté ».</p>
+</blockquote>
+<h2 data-prio="must">Concept 7 — Maximum de vraisemblance</h2>
+<p><strong>Définitions.</strong> La <strong>fonction de vraisemblance</strong> est $L(\beta,\sigma^2)=p(y\mid X,\beta,\sigma^2)$, la densité jointe de $y$ conditionnellement aux données $X$ et aux paramètres inconnus. Les <strong>estimateurs du maximum de vraisemblance</strong> sont les valeurs qui maximisent $L$ — <em>celles qui rendent les données observées les plus vraisemblables au sens de leur densité</em>.</p>
+<p><strong>Le calcul.</strong> Les $y_i$ étant indépendants de loi $N(\mu_i,\sigma^2)$ avec $\mu_i=\sum_j\beta_jx_{i,j}$ :
+$$L(\beta,\sigma^2)=\prod_{i=1}^n\frac{1}{\sqrt{2\pi\sigma^2}}\,e^{-\frac{1}{2\sigma^2}\left(y_i-\sum_j\beta_jx_{i,j}\right)^2} = \frac{1}{(2\pi\sigma^2)^{n/2}}\,e^{-\frac12(y-X\beta)^T(\sigma^2I_n)^{-1}(y-X\beta)}$$
+En passant au logarithme et en supprimant les termes constants :
+$$\log L(\beta,\sigma^2) = -\frac n2\log(\sigma^2)-\frac{1}{2\sigma^2}\,\underbrace{(y-X\beta)^T(y-X\beta)}_{Q(\beta),\ \text{le critère des moindres carrés !}}$$</p>
+<blockquote>
+<p><strong>Le résultat central.</strong> <em>L'estimateur MCO $\hat\beta$ <strong>est aussi</strong> l'estimateur du maximum de vraisemblance.</em> Maximiser $\log L$ en $\beta$ revient à <strong>minimiser $Q(\beta)$</strong> — le critère des moindres carrés apparaît <strong>mécaniquement</strong> dès qu'on suppose les erreurs gaussiennes.</p>
+</blockquote>
+<p><strong>L'estimateur ML de la variance.</strong> En annulant $\partial\log L(\hat\beta,\sigma^2)/\partial(\sigma^2)$ :
+$$-\frac{n}{2}\cdot\frac{1}{\sigma^2}-\frac12(-1)(\sigma^2)^{-2}Q(\hat\beta)=0 \qquad\Longrightarrow\qquad \hat\sigma^2_{ML}=\frac{Q(\hat\beta)}{n}=\frac{1}{n}\sum_{i=1}^n\hat\varepsilon_i^2$$</p>
+<p class="cal piege"> <strong>Cet estimateur est BIAISÉ</strong>, comme le signale le cours. Le point (c) du théorème donne $\mathbb{E}[\hat\varepsilon^T\hat\varepsilon]=\sigma^2(n-p)$, donc $\mathbb{E}[\hat\sigma^2_{ML}]=\sigma^2(n-p)/n&lt;\sigma^2$. L'estimateur <strong>sans biais</strong> est celui de diviseur $n-p$ : c'est celui qu'on utilise dans les tests.</p>
+<div class="cal intu"><span class="lab">Pourquoi la connexion MCO / MV est importante.</span>
+<p> Elle explique pourquoi les moindres carrés sont <strong>partout</strong> : ils ne sont pas un choix arbitraire, mais l'estimateur du maximum de vraisemblance <strong>sous hypothèse gaussienne</strong>. Corollaire immédiat : si les erreurs ne sont <strong>pas</strong> gaussiennes — queues épaisses des rendements financiers — les MCO perdent leur justification en vraisemblance, même s'ils restent BLUE au sens de Gauss-Markov.</p>
+</div>
+<h2 data-prio="high">Concept 8 — M-estimation généralisée</h2>
+<p><strong>Le cadre unificateur.</strong> Pour ajuster $y_i=x_i^T\beta+\varepsilon_i$, on choisit $\hat\beta$ minimisant
+$$Q(\beta)=\sum_{i=1}^n h\big(y_i,x_i,\beta,\sigma^2\big)$$
+<strong>Le choix de la fonction $h$ distingue les différents estimateurs :</strong></p>
+<table>
+<thead>
+<tr>
+<th>Estimateur</th>
+<th>$h(y_i,x_i,\beta,\sigma^2)$</th>
+<th>Comportement</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Moindres carrés</strong></td>
+<td>$(y_i-x_i^T\beta)^2$</td>
+<td>pénalise le <strong>carré</strong> : très sensible aux aberrants</td>
+</tr>
+<tr>
+<td><strong>Écart absolu moyen (MAD)</strong></td>
+<td>$\lvert y_i-x_i^T\beta\rvert$</td>
+<td>pénalise linéairement : <strong>robuste</strong></td>
+</tr>
+<tr>
+<td><strong>Maximum de vraisemblance</strong></td>
+<td>$-\log p(y_i\mid\beta,x_i,\sigma^2)$</td>
+<td>optimal sous le modèle supposé</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>La lecture avec la fiche 25.</strong> Minimiser $\sum_i(y_i-x_i^T\beta)^2$ est un <strong>programme quadratique</strong> ; minimiser $\sum_i|y_i-x_i^T\beta|=\|y-X\beta\|_1$ est un <strong>programme linéaire</strong>. Le choix du critère est donc aussi un choix de <strong>classe de problème d'optimisation</strong> — et l'on retrouve exactement la comparaison des normes de la fiche 25 : la norme 1 laisse quelques gros résidus et colle au reste, la norme 2 les étale tous.</p>
+</blockquote>
+<h2>Comment résoudre l'exercice type (protocole)</h2>
+<ol>
+<li><strong>Écrire le modèle</strong> $y=X\beta+\varepsilon$ en précisant ce que contient chaque colonne de $X$ (constante ? retards ? puissances ?).</li>
+<li><strong>Vérifier le rang</strong> de $X$ : rang colonne plein, sinon $\hat\beta$ n'existe pas.</li>
+<li><strong>Énoncer les hypothèses</strong> sur $\varepsilon$ : Gauss-Markov, normale, ou covariance générale.</li>
+<li><strong>Calculer</strong> $\hat\beta=(X^TX)^{-1}X^Ty$, puis $\hat y=Hy$ et $\hat\varepsilon=(I-H)y$.</li>
+<li><strong>Estimer la variance</strong> par $\hat\sigma^2=\hat\varepsilon^T\hat\varepsilon/(n-p)$ — diviseur $n-p$, jamais $n$.</li>
+<li><strong>Faire l'inférence</strong> : $\hat t_j=(\hat\beta_j-\beta_j^0)/(\hat\sigma\sqrt{C_{j,j}})$ comparé à $t_{n-p}$.</li>
+<li><strong>Vérifier les hypothèses</strong> : graphique des résidus, hétéroscédasticité, autocorrélation, aberrants.</li>
+<li><strong>Corriger si besoin</strong> : MCG en cas de covariance non sphérique, estimateur robuste en cas de contamination.</li>
+</ol>
+<h3>Exercices progressifs</h3>
+<p><strong> Niveau 1</strong> — Pourquoi exige-t-on que $X$ soit de rang colonne plein ?</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p>Parce que $\hat\beta=(X^TX)^{-1}X^Ty$ requiert l'<strong>inversibilité</strong> de $X^TX$. Or $X^TX$ est inversible si et seulement si $X$ est de rang colonne plein : si une colonne est combinaison linéaire des autres, il existe $v\neq0$ avec $Xv=0$, donc $X^TXv=0$ et la matrice est singulière.</p>
+<p><strong>Interprétation.</strong> Deux explicatives parfaitement colinéaires portent la <strong>même information</strong> : on ne peut pas attribuer l'effet à l'une plutôt qu'à l'autre. Les équations normales ont alors une infinité de solutions, toutes donnant le même $\hat y$ — la <strong>projection</strong> $Hy$ reste bien définie, c'est seulement sa <strong>décomposition</strong> en coefficients qui ne l'est pas.</p>
+</div></details>
+
+<p><strong> Niveau 2</strong> — Que signifie géométriquement $X^T\hat\varepsilon=0$ ?</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p>Que le vecteur des résidus est <strong>orthogonal</strong> à toutes les colonnes de $X$, donc à l'espace qu'elles engendrent. Autrement dit, $\hat y=Hy$ est la <strong>projection orthogonale</strong> de $y$ sur cet espace, et $\hat\varepsilon=y-\hat y$ en est la composante perpendiculaire.</p>
+<p><strong>Deux conséquences pratiques.</strong> Si $X$ contient une colonne de $1$ (une constante), l'orthogonalité à cette colonne donne $\sum_i\hat\varepsilon_i=0$ : les résidus sont de <strong>somme nulle</strong>. Et l'orthogonalité à chaque explicative donne $\sum_i x_{i,j}\hat\varepsilon_i=0$ : les résidus sont <strong>non corrélés avec les régresseurs par construction</strong> — ce qui explique pourquoi on ne peut pas tester l'exogénéité en regardant cette corrélation.</p>
+</div></details>
+
+<p><strong> Niveau 3</strong> — On estime le modèle de marché $r_{i,t}=\alpha+\beta r_{m,t}+\varepsilon_t$ sur $n=60$ mois. On trouve $\hat\beta=1{,}2$ et $\hat\sigma\sqrt{C_{2,2}}=0{,}15$. Le titre est-il significativement plus risqué que le marché ?</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p>On teste $H_0:\beta=1$ contre $H_1:\beta&gt;1$ — « le titre amplifie-t-il les mouvements du marché ? ». La statistique du point (d) du théorème :
+$$\hat t=\frac{\hat\beta-1}{\hat\sigma\sqrt{C_{2,2}}}=\frac{1{,}2-1}{0{,}15}\approx1{,}33$$
+à comparer à une loi de Student à $n-p=60-2=58$ degrés de liberté. Le quantile à $95\,\%$ unilatéral vaut environ $1{,}67$.</p>
+<p>Comme $1{,}33&lt;1{,}67$, <strong>on ne rejette pas $H_0$</strong> : le bêta n'est pas significativement supérieur à $1$ au seuil de $5\,\%$. L'écart-type d'estimation de $0{,}15$ est trop grand pour trancher.</p>
+<p class="cal piege"> <strong>La validité du test suppose les hypothèses du modèle normal-linéaire</strong> : erreurs i.i.d. gaussiennes. Sur des rendements mensuels, l'hypothèse d'absence d'autocorrélation est plausible, mais la normalité et l'homoscédasticité le sont beaucoup moins (volatilité groupée) — voir les fiches sur la modélisation de la volatilité.</p>
+</div></details>
+
+<p><strong> Niveau 4 — type examen</strong> — Démontrez le théorème de Gauss-Markov et identifiez précisément où chaque hypothèse intervient.</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p><strong>Cadre.</strong> Estimer $\theta=c^T\beta$. L'estimateur MCO est $\hat\theta=c^T\hat\beta=c^T(X^TX)^{-1}X^Ty=d^Ty$ avec $d=X(X^TX)^{-1}c$. Soit $\tilde\theta=b^Ty$ un autre estimateur <strong>linéaire</strong>, et $f=b-d$, si bien que $\tilde\theta=\hat\theta+f^Ty$.</p>
+<p><strong>Étape 1 — l'absence de biais contraint $f$.</strong> $\hat\theta$ est sans biais (car $\mathbb{E}(y)=X\beta$ donne $\mathbb{E}(\hat\theta)=c^T\beta$). Si $\tilde\theta$ l'est aussi, alors
+$$0=\mathbb{E}(f^Ty)=f^TX\beta \qquad \textbf{pour tout } \beta\in\mathbb{R}^p$$
+Le « pour tout $\beta$ » est essentiel : il force $f^TX=0$, c'est-à-dire <strong>$f\perp$ espace des colonnes de $X$</strong>. Comme $d=X(X^TX)^{-1}c$ appartient à cet espace, $d^Tf=0$.
+<em>→ Ici intervient l'hypothèse $\mathbb{E}(Y\mid X,\beta)=X\beta$ : la <strong>bonne spécification</strong> du modèle.</em></p>
+<p><strong>Étape 2 — décomposer la variance.</strong>
+$$\mathrm{Var}(\tilde\theta)=\mathrm{Var}(\hat\theta)+\mathrm{Var}(f^Ty)+2\,\mathrm{Cov}(d^Ty,f^Ty)$$
+et le terme de covariance vaut
+$$\mathrm{Cov}(d^Ty,f^Ty)=d^T\mathrm{Cov}(y)\,f = d^T(\sigma^2I_n)f=\sigma^2\,d^Tf=0$$
+<em>→ Ici intervient l'hypothèse $\mathrm{Cov}(Y\mid X,\beta)=\sigma^2I_n$ : <strong>variance constante et absence de corrélation</strong>. Sans elle, $\mathrm{Cov}(y)=\sigma^2\Sigma$ et le terme croisé $\sigma^2d^T\Sigma f$ n'a aucune raison d'être nul.</em></p>
+<p><strong>Conclusion.</strong> $\mathrm{Var}(\tilde\theta)=\mathrm{Var}(\hat\theta)+\mathrm{Var}(f^Ty)\geq\mathrm{Var}(\hat\theta)$, avec égalité si et seulement si $f^Ty$ est de variance nulle. $\hat\theta$ est donc BLUE. $\blacksquare$</p>
+<p><strong>Ce que le théorème NE dit pas — la liste à connaître.</strong></p>
+<ul>
+<li>Il ne suppose <strong>pas la normalité</strong> : elle n'intervient nulle part dans la preuve.</li>
+<li>Il ne dit <strong>rien</strong> des estimateurs <strong>non linéaires</strong> : un estimateur non linéaire peut battre les MCO (c'est le cas des estimateurs robustes sur des données contaminées).</li>
+<li>Il ne dit <strong>rien</strong> des estimateurs <strong>biaisés</strong> : un estimateur biaisé peut avoir une erreur quadratique moyenne plus faible — c'est tout le principe de la <strong>régularisation</strong> (ridge, LASSO).</li>
+<li>Il <strong>tombe</strong> si $\mathrm{Cov}(y)\neq\sigma^2I_n$ — c'est exactement le cas que les MCG traitent, en <strong>blanchissant</strong> les données pour se ramener au cadre du théorème.</li></ul></div></details>
+
+<h2 data-prio="must">Common mistakes</h2>
+<ol>
+<li><strong>Croire que « linéaire » porte sur $x$</strong> — la linéarité est en <strong>$\beta$</strong> ; polynômes, Fourier et retards restent des régressions linéaires.</li>
+<li><strong>Confondre erreur $\varepsilon_i$ et résidu $\hat\varepsilon_i$</strong> — la première est inobservable, le second est calculé et satisfait $p$ contraintes d'orthogonalité.</li>
+<li><strong>Diviser par $n$ pour estimer $\sigma^2$</strong> — l'estimateur sans biais divise par $n-p$ ; celui du maximum de vraisemblance, qui divise par $n$, est <strong>biaisé</strong>.</li>
+<li><strong>Croire que Gauss-Markov exige la normalité</strong> — il ne l'exige pas ; c'est le calcul des <strong>lois</strong> et des <strong>tests</strong> qui en a besoin.</li>
+<li><strong>Oublier que BLUE se restreint aux estimateurs linéaires sans biais</strong> — hors de cette classe, on peut faire mieux.</li>
+<li><strong>Appliquer les MCO à des données hétéroscédastiques ou autocorrélées</strong> — ils restent sans biais mais <strong>ne sont plus BLUE</strong>, et les écarts-types calculés sont <strong>faux</strong>.</li>
+<li><strong>Tester l'exogénéité en corrélant résidus et régresseurs</strong> — cette corrélation est <strong>nulle par construction</strong> ($X^T\hat\varepsilon=0$).</li>
+<li><strong>Oublier de vérifier le rang de $X$</strong> — multicolinéarité ou $p&gt;n$ rendent $\hat\beta$ indéfini.</li>
+</ol>
+<h2>Ultimate Review</h2>
+<ol>
+<li>Modèle : $y=X\beta+\varepsilon$ ; <strong>linéaire en $\beta$</strong>, quelconque en $x$ (polynômes, Fourier, retards).</li>
+<li>Cinq étapes : modèle, critère, estimation, <strong>vérification des hypothèses</strong>, itération.</li>
+<li>Trois choix <strong>indépendants</strong> : forme du modèle, hypothèses sur $\varepsilon$, critère d'estimation.</li>
+<li><strong>MCO</strong> : $Q(\beta)=\|y-X\beta\|^2$ ; <strong>équations normales</strong> $X^TX\hat\beta=X^Ty$ ; $\hat\beta=(X^TX)^{-1}X^Ty$, existence ssi $X$ de rang colonne plein.</li>
+<li><strong>Matrice chapeau</strong> $H=X(X^TX)^{-1}X^T$ : projection sur l'espace des colonnes ; $\hat\varepsilon=(I-H)y$ <strong>orthogonal</strong> à cet espace.</li>
+<li><strong>Gauss-Markov</strong> : $\mathbb{E}(Y)=X\beta$, $\mathrm{Cov}(Y)=\sigma^2I_n$ $\Rightarrow$ $\hat\theta=c^T\hat\beta$ est <strong>BLUE</strong>. Pas de normalité requise.</li>
+<li><strong>MCG</strong> : $\mathrm{Cov}=\sigma^2\Sigma$, on blanchit par $\Sigma^{-1/2}$, d'où $\hat\beta_{\text{MCG}}=[X^T\Sigma^{-1}X]^{-1}X^T\Sigma^{-1}Y$.</li>
+<li><strong>Sous normalité</strong> : $\hat\beta\sim N_p(\beta,\sigma^2(X^TX)^{-1})$ ; $\hat\beta\perp\hat\varepsilon$ ; $\hat\varepsilon^T\hat\varepsilon\sim\sigma^2\chi^2_{n-p}$ ; $\hat t_j\sim t_{n-p}$.</li>
+<li><strong>QR</strong> : $X=QR$, $\hat\beta=R^{-1}Q^Ty$, $H=QQ^T$ ; la rotation orthogonale sépare signal ($p$) et bruit ($n-p$).</li>
+<li><strong>Maximum de vraisemblance</strong> : $\log L=-\frac n2\log\sigma^2-\frac{1}{2\sigma^2}Q(\beta)$ ; <strong>l'EMV de $\beta$ est l'estimateur MCO</strong> ; $\hat\sigma^2_{ML}=Q(\hat\beta)/n$ est <strong>biaisé</strong>.</li>
+<li><strong>M-estimation</strong> : le choix de $h$ distingue MCO (carré), MAD (valeur absolue, robuste), MV ($-\log p$).</li>
+</ol>
+<p><strong>Formulas to know</strong>
+$$\hat\beta=(X^TX)^{-1}X^Ty \qquad H=X(X^TX)^{-1}X^T \qquad \hat\beta_{\text{MCG}}=\big[X^T\Sigma^{-1}X\big]^{-1}X^T\Sigma^{-1}Y$$
+$$\hat\beta\sim N_p\big(\beta,\sigma^2(X^TX)^{-1}\big) \qquad \hat t_j=\frac{\hat\beta_j-\beta_j}{\hat\sigma\sqrt{C_{j,j}}}\sim t_{n-p} \qquad \hat\sigma^2=\frac{\hat\varepsilon^T\hat\varepsilon}{n-p}$$</p>
+<p><strong>Methods to know</strong> : le protocole en 8 étapes ; la dérivation des équations normales ; la preuve de Gauss-Markov et le rôle de chaque hypothèse ; le blanchiment des MCG.</p>
+<div class="rec"><h2>Active Recall</h2><p><strong>Basic</strong> — Écrivez les équations normales et donnez la condition d'existence de $\hat\beta$.</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p>$X^TX\hat\beta=X^Ty$, d'où $\hat\beta=(X^TX)^{-1}X^Ty$. L'existence et l'unicité exigent que $X^TX$ soit <strong>inversible</strong>, c'est-à-dire que $X$ soit de <strong>rang colonne plein</strong> — pas de colinéarité parfaite entre explicatives, et $n\geq p$.</p>
+</div></details><p><strong>Understanding</strong> — Que signifie « BLUE », et quelles hypothèses sont nécessaires ?</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p><strong>B</strong>est <strong>L</strong>inear <strong>U</strong>nbiased <strong>E</strong>stimator : de <strong>variance minimale</strong> parmi tous les estimateurs <strong>linéaires</strong> en $y$ et <strong>sans biais</strong>. Les hypothèses nécessaires sont celles de Gauss-Markov : $\mathbb{E}(Y\mid X,\beta)=X\beta$ (bonne spécification) et $\mathrm{Cov}(Y\mid X,\beta)=\sigma^2I_n$ (variance constante, absence de corrélation).</p>
+<p><strong>La normalité n'est pas requise</strong> — elle ne sert qu'à obtenir les <strong>lois</strong> des estimateurs, donc les tests.</p>
+</div></details><p><strong>Application</strong> — Les erreurs sont hétéroscédastiques. Les MCO restent-ils sans biais ? Restent-ils BLUE ?</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p><strong>Sans biais : oui.</strong> L'absence de biais ne dépend que de $\mathbb{E}(y)=X\beta$ : $\mathbb{E}(\hat\beta)=(X^TX)^{-1}X^T\mathbb{E}(y)=\beta$, quelle que soit la structure de covariance.</p>
+<p><strong>BLUE : non.</strong> La preuve de Gauss-Markov utilise $\mathrm{Cov}(y)=\sigma^2I_n$ pour annuler le terme croisé. Avec $\mathrm{Cov}(y)=\sigma^2\Sigma$, le BLUE devient l'estimateur des <strong>MCG</strong>, $\hat\beta_{\text{MCG}}=[X^T\Sigma^{-1}X]^{-1}X^T\Sigma^{-1}y$.</p>
+<p><strong>Et surtout :</strong> les écarts-types usuels $\hat\sigma^2(X^TX)^{-1}$ sont alors <strong>faux</strong>, donc tous les tests le sont aussi.</p>
+</div></details><p><strong>Comparison</strong> — MCO et maximum de vraisemblance : quand coïncident-ils ?</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p>Ils coïncident <strong>pour $\beta$</strong> dès que les erreurs sont supposées i.i.d. <strong>gaussiennes</strong> : la log-vraisemblance s'écrit $-\frac n2\log\sigma^2-\frac{1}{2\sigma^2}Q(\beta)$, et la maximiser en $\beta$ revient exactement à <strong>minimiser le critère des moindres carrés</strong> $Q(\beta)$.</p>
+<p>Ils <strong>diffèrent pour $\sigma^2$</strong> : l'EMV donne $Q(\hat\beta)/n$, <strong>biaisé</strong>, alors que l'estimateur usuel divise par $n-p$.</p>
+<p>Et ils diffèrent complètement <strong>hors du cas gaussien</strong> : sous une loi de Laplace, par exemple, l'EMV minimise $\sum_i|y_i-x_i^T\beta|$ — c'est l'estimateur MAD, pas les MCO.</p>
+</div></details><p><strong>Exam-style</strong> — Expliquez le rôle de la décomposition QR dans la théorie de la distribution.</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p>On écrit $X=QR$ avec $Q^TQ=I_p$ et $R$ triangulaire supérieure, puis on complète $Q$ en une matrice <strong>orthogonale</strong> $A=\binom{Q^T}{W^T}$ de taille $n\times n$. Comme $y$ est gaussien et $A$ orthogonale, les blocs $z_Q=Q^Ty$ et $z_W=W^Ty$ sont <strong>gaussiens et indépendants</strong>.</p>
+<p>On montre alors $\hat\beta=R^{-1}z_Q$ et $\hat\varepsilon=Wz_W$ : les deux quantités sont fonctions de <strong>vecteurs indépendants distincts</strong>, d'où <strong>(a)</strong> leur indépendance. La loi <strong>(b)</strong> de $\hat\beta$ s'obtient en appliquant le lemme de transformation avec $A=R^{-1}$. Et $\hat\varepsilon^T\hat\varepsilon=z_W^Tz_W$ est une somme de <strong>$n-p$</strong> carrés de variables i.i.d. $N(0,\sigma^2)$, d'où <strong>(c)</strong> le $\sigma^2\chi^2_{n-p}$. Le point <strong>(d)</strong> en découle immédiatement.</p>
+<p><strong>Géométriquement</strong>, la rotation $A$ sépare $\mathbb{R}^n$ en l'espace des colonnes de $X$ (dimension $p$, qui porte l'estimation) et son orthogonal (dimension $n-p$, qui porte le bruit) — d'où les $n-p$ « degrés de liberté ».</p>
+</div></details></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h2>Flashcards</h2>
+<table>
+<thead>
+<tr>
+<th>Question</th>
+<th>Réponse</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Le modèle linéaire général ?</td>
+<td>$y_i=\beta_1x_{i,1}+\dots+\beta_px_{i,p}+\varepsilon_i$</td>
+</tr>
+<tr>
+<td>« Linéaire » porte sur quoi ?</td>
+<td>Sur les <strong>paramètres</strong> $\beta$, pas sur $x$</td>
+</tr>
+<tr>
+<td>Critère des moindres carrés ?</td>
+<td>$Q(\beta)=(y-X\beta)^T(y-X\beta)$</td>
+</tr>
+<tr>
+<td>Équations normales ?</td>
+<td>$X^TX\hat\beta=X^Ty$</td>
+</tr>
+<tr>
+<td>Condition d'existence de $\hat\beta$ ?</td>
+<td>$X$ de <strong>rang colonne plein</strong></td>
+</tr>
+<tr>
+<td>Matrice chapeau ?</td>
+<td>$H=X(X^TX)^{-1}X^T$ — projette sur l'espace des colonnes</td>
+</tr>
+<tr>
+<td>Propriété des résidus MCO ?</td>
+<td>$X^T\hat\varepsilon=0$ : orthogonaux aux régresseurs</td>
+</tr>
+<tr>
+<td>Hypothèses de Gauss-Markov ?</td>
+<td>$\mathbb{E}(Y)=X\beta$ et $\mathrm{Cov}(Y)=\sigma^2I_n$</td>
+</tr>
+<tr>
+<td>Que dit le théorème ?</td>
+<td>$c^T\hat\beta$ est <strong>BLUE</strong></td>
+</tr>
+<tr>
+<td>La normalité est-elle requise ?</td>
+<td><strong>Non</strong> pour Gauss-Markov ; oui pour les lois et les tests</td>
+</tr>
+<tr>
+<td>Estimateur des MCG ?</td>
+<td>$[X^T\Sigma^{-1}X]^{-1}X^T\Sigma^{-1}Y$</td>
+</tr>
+<tr>
+<td>Comment l'obtient-on ?</td>
+<td>En <strong>blanchissant</strong> : $Y^\ast=\Sigma^{-1/2}Y$, $X^\ast=\Sigma^{-1/2}X$</td>
+</tr>
+<tr>
+<td>Loi de $\hat\beta$ sous normalité ?</td>
+<td>$N_p(\beta,\ \sigma^2(X^TX)^{-1})$</td>
+</tr>
+<tr>
+<td>Loi de $\hat\varepsilon^T\hat\varepsilon$ ?</td>
+<td>$\sigma^2\chi^2_{n-p}$</td>
+</tr>
+<tr>
+<td>Statistique de test sur $\beta_j$ ?</td>
+<td>$(\hat\beta_j-\beta_j)/(\hat\sigma\sqrt{C_{j,j}})\sim t_{n-p}$</td>
+</tr>
+<tr>
+<td>Estimateur sans biais de $\sigma^2$ ?</td>
+<td>$\hat\varepsilon^T\hat\varepsilon/(n-p)$</td>
+</tr>
+<tr>
+<td>L'EMV de $\beta$ sous normalité ?</td>
+<td>C'est <strong>l'estimateur MCO</strong></td>
+</tr>
+<tr>
+<td>L'EMV de $\sigma^2$ ?</td>
+<td>$Q(\hat\beta)/n$ — <strong>biaisé</strong></td>
+</tr>
+<tr>
+<td>M-estimation : quel $h$ pour les MCO ?</td>
+<td>$h=(y_i-x_i^T\beta)^2$</td>
+</tr>
+<tr>
+<td>Quel $h$ pour un estimateur robuste ?</td>
+<td>$h=\lvert y_i-x_i^T\beta\rvert$ (MAD)</td>
+</tr>
+</tbody></table>
+</main>
+
+
+
+
+</body></html>

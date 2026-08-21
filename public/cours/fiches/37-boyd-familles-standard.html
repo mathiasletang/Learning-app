@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fiche 37 — Les familles standard : LP, QP, SOCP, GP, SDP (Boyd, §4.3–4.7)</title>
+<script>
+window.MathJax={tex:{inlineMath:[["$","$"]],displayMath:[["$$","$$"]],processEscapes:true},
+ options:{skipHtmlTags:["script","noscript","style","textarea","pre","code"]},
+ svg:{fontCache:"global"},
+ startup:{pageReady:()=>MathJax.startup.defaultPageReady().then(()=>{document.body.classList.add("ready")})}};
+setTimeout(function(){document.body.classList.add("ready")},2500);
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+/* ============================================================
+   MathiasLearn — feuille de style des fiches
+   Reprise intégrale des tokens de 00_PARCOURS/*.html
+   + blocs pédagogiques (callouts, méthode, essentiels, recall)
+   ============================================================ */
+:root{--bg:#faf9f7;--card:#fff;--ink:#1a1a1a;--muted:#6b6b6b;--line:#e5e2dd;--accent:#8b5e34;
+ --hl:#fdf8ef;--ok:#2d7d4f;--okbg:#f0f7f3;--warn:#b3402f;--warnbg:#fdf3f1;--blue:#2f5d8b;--bluebg:#f1f5fa}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+ font:17px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;padding:0 16px 100px}
+.nav{position:sticky;top:0;background:rgba(250,249,247,.96);backdrop-filter:blur(8px);
+ border-bottom:1px solid var(--line);margin:0 -16px 30px;padding:11px 16px;z-index:50;
+ display:flex;gap:6px;flex-wrap:wrap;font-size:13px}
+.nav a{color:var(--muted);text-decoration:none;padding:4px 9px;border-radius:5px;white-space:nowrap}
+.nav a:hover{background:var(--line);color:var(--ink)}
+.nav a.on{background:var(--accent);color:#fff}
+main{max-width:780px;margin:0 auto}
+h1{font-size:31px;letter-spacing:-.02em;margin:.4em 0 .5em;line-height:1.25}
+h2{font-size:23px;margin:2.2em 0 .7em;padding-bottom:.3em;border-bottom:1px solid var(--line)}
+h3{font-size:19px;margin:1.9em 0 .5em;color:var(--accent)}
+h4{font-size:17px;margin:1.5em 0 .4em}
+p{margin:.8em 0} a{color:var(--accent)} hr{border:0;border-top:1px solid var(--line);margin:2.6em 0}
+table{border-collapse:collapse;width:100%;margin:1.3em 0;font-size:15.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+th{background:#f3f0eb;font-weight:600}
+tr:nth-child(even) td{background:#fcfbfa}
+code{font-family:"SF Mono",Menlo,Consolas,monospace;font-size:.88em;background:#f2efea;padding:2px 6px;border-radius:4px;white-space:nowrap}
+pre{background:#f2efea;padding:14px 16px;border-radius:8px;overflow-x:auto}
+pre code{background:none;padding:0;white-space:pre}
+blockquote{border-left:3px solid var(--accent);background:var(--hl);margin:1.4em 0;padding:14px 20px;border-radius:0 8px 8px 0}
+blockquote p:first-child{margin-top:0} blockquote p:last-child{margin-bottom:0}
+ul,ol{padding-left:1.5em} li{margin:.35em 0} em{color:#4a4a4a}
+mjx-container[display="true"]{margin:1.1em 0!important;overflow-x:auto;overflow-y:hidden;padding:2px 0}
+mjx-container svg{max-width:100%}
+body:not(.ready) main{opacity:0} main{opacity:1;transition:opacity .25s}
+
+/* --- bandeau de tête de fiche --- */
+.cours{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--accent);
+ border-radius:0 10px 10px 0;padding:18px 22px;margin:0 0 34px}
+.cours h4{margin:0 0 4px;font-size:14px;text-transform:uppercase;letter-spacing:.07em;color:var(--accent)}
+.cours .cs{color:var(--muted);font-size:14.5px;margin:0 0 14px}
+
+/* --- exercices / corrigés --- */
+.ex{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:6px 24px 20px;margin:18px 0}
+.ex>h3:first-child{margin-top:14px}
+details.cor{margin-top:18px;border:1px solid var(--line);border-radius:8px;background:#fcfbfa;overflow:hidden}
+details.cor>summary{cursor:pointer;padding:12px 16px;font-weight:600;font-size:15px;color:var(--accent);
+ list-style:none;display:flex;align-items:center;gap:9px;user-select:none;transition:.15s;min-height:44px}
+details.cor>summary::-webkit-details-marker{display:none}
+details.cor>summary:hover{background:var(--hl)}
+details.cor>summary::before{content:"\25B6";font-size:10px;transition:transform .18s;display:inline-block}
+details.cor[open]>summary::before{transform:rotate(90deg)}
+details.cor[open]>summary{background:var(--okbg);color:var(--ok);border-bottom:1px solid var(--line)}
+.cor .in{padding:4px 20px 16px}
+.cor .in>*:first-child{margin-top:.9em}
+
+/* --- blocs pédagogiques (callouts) ---
+   Générés depuis une citation Markdown dont le premier **gras** commence
+   par un mot-clé : DÉFINITION, THÉORÈME, MÉTHODE, PIÈGE, INTUITION… */
+.cal{border:1px solid var(--line);border-left:4px solid var(--accent);background:var(--card);
+ border-radius:0 10px 10px 0;padding:15px 20px;margin:1.5em 0}
+.cal>p:first-child{margin-top:0}.cal>p:last-child,.cal>ul:last-child,.cal>ol:last-child{margin-bottom:0}
+.cal .lab{display:block;font-size:12.5px;text-transform:uppercase;letter-spacing:.08em;
+ font-weight:700;color:var(--accent);margin-bottom:6px}
+.cal.formel{background:var(--hl)}
+.cal.piege{border-left-color:var(--warn);background:var(--warnbg)}
+.cal.piege .lab{color:var(--warn)}
+.cal.methode{border-left-color:var(--ok);background:var(--okbg)}
+.cal.methode .lab{color:var(--ok)}
+.cal.intu{border-left-color:var(--blue);background:var(--bluebg)}
+.cal.intu .lab{color:var(--blue)}
+.cal.plus{border-left-style:dashed;background:#faf9f7}
+.cal.plus .lab{color:var(--muted)}
+
+/* --- révision express --- */
+.ess{background:var(--card);border:1px solid var(--accent);border-radius:10px;padding:4px 24px 20px;margin:1.6em 0}
+.ess h3{margin-top:1.3em}
+.rec{background:var(--card);border:1px dashed var(--accent);border-radius:10px;padding:4px 24px 18px;margin:1.6em 0}
+.rec ol{counter-reset:none}
+
+/* --- impression / PDF --- */
+@media print{
+ .nav{display:none}
+ body{padding:0;background:#fff;font-size:11.2pt;line-height:1.55}
+ main{max-width:none}
+ h1{font-size:23pt}h2{font-size:15pt;margin-top:1.5em}h3{font-size:12.6pt}
+ h2,h3,h4{break-after:avoid;page-break-after:avoid}
+ table,.cal,blockquote{break-inside:avoid;page-break-inside:avoid}
+ table{display:table;font-size:9.6pt}
+ details.cor{border:1px solid var(--line);background:#fcfbfa}
+ details.cor>summary{display:none}
+ details.cor .in{padding-top:10px}
+ .cal,.ex,.ess,.rec{box-shadow:none}
+ a{color:var(--ink);text-decoration:none}
+}
+@page{margin:16mm 15mm 18mm}
+
+/* --- exemples travaillés --- */
+.exm{background:#fcfbfa;border:1px solid var(--line);border-radius:10px;padding:2px 20px 14px;margin:1.5em 0}
+.exm>h4:first-child{margin:14px 0 .5em;color:var(--accent);font-size:13px;text-transform:uppercase;letter-spacing:.07em}
+
+
+/* --- pastilles de priorité (conventions des fiches de l'app) --- */
+h2[data-prio], h3[data-prio], h4[data-prio]{position:relative}
+h2[data-prio]::before,h3[data-prio]::before,h4[data-prio]::before{
+ content:"";display:inline-block;width:9px;height:9px;border-radius:50%;
+ margin-right:9px;vertical-align:middle;background:var(--muted)}
+[data-prio="must"]::before{background:var(--warn)}
+[data-prio="high"]::before{background:#d98324}
+[data-prio="mid"]::before{background:#c9a227}
+[data-prio="low"]::before{background:var(--ok)}
+/* corrigés des fiches de l'app : même traitement que les corrigés des séries */
+details.cor>summary::after{content:""}
+</style></head><body>
+<div class="nav"><a href="24-lp-formulation.html">Programmation linéaire : formulation et géométrie</a><a href="25-lp-affine-par-morceaux.html">Optimisation affine par morceaux : tout ramener à un LP</a><a href="26-lp-polyedres.html">Polyèdres : faces, points extrêmes, test du rang</a><a href="27-lp-convexite-cones.html">Enveloppes convexes, cônes et décomposition d'un polyèdre</a><a href="28-lp-dualite.html">Dualité en programmation linéaire</a><a href="29-lp-sensibilite-jeux.html">Dualité II : sensibilité, prix implicites et jeux à somme nulle</a><a href="30-lp-simplexe.html">L'algorithme du simplexe</a><a href="31-lp-reseaux-unimodularite.html">Flots dans les réseaux et unimodularité totale</a><a href="32-lp-commande.html">Applications en automatique : suivi de consigne et robustesse</a><a href="33-lp-nombres-entiers.html">Programmation linéaire en nombres entiers et séparation-évaluation</a><a href="34-boyd-ensembles-convexes.html">Ensembles convexes</a><a href="35-boyd-fonctions-convexes.html">Fonctions convexes</a><a href="36-boyd-problemes-convexes.html">Problèmes d'optimisation convexe</a><a href="37-boyd-familles-standard.html" class="on">Les familles standard : LP, QP, SOCP, GP, SDP</a><a href="38-boyd-dualite.html">Dualité lagrangienne</a><a href="39-boyd-minimisation-sans-contrainte.html">Minimisation sans contrainte : gradient et Newton</a><a href="40-boyd-contraintes-egalite.html">Minimisation sous contraintes d'égalité</a><a href="41-boyd-points-interieurs.html">Méthodes de points intérieurs</a><a href="42-sous-gradients.html">Sous-gradients et sous-différentiel</a><a href="43-methode-sous-gradient.html">La méthode du sous-gradient</a></div>
+<main><h1>Fiche 37 — Les familles standard : LP, QP, SOCP, GP, SDP (Boyd, §4.3–4.7)</h1>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Matière</strong></td>
+<td>Maths · Optimisation</td>
+</tr>
+<tr>
+<td><strong>Cours source</strong></td>
+<td>Boyd &amp; Vandenberghe, <em>Convex Optimization</em>, §4.3 à §4.7, p. 146–182</td>
+</tr>
+<tr>
+<td><strong>Difficulté</strong></td>
+<td> Fondamental — la carte des problèmes que l'on sait résoudre</td>
+</tr>
+<tr>
+<td><strong>Temps d'étude estimé</strong></td>
+<td>2 h</td>
+</tr>
+<tr>
+<td><strong>Prérequis</strong></td>
+<td>Fiche 36 (forme standard convexe), fiche 34 (cône du second ordre, cône PSD)</td>
+</tr>
+<tr>
+<td><strong>Concepts clés</strong></td>
+<td>LP, QP, QCQP, SOCP, programmation géométrique, forme conique, SDP, optimisation vectorielle, optimum de Pareto, scalarisation</td>
+</tr>
+<tr>
+<td><strong>Poids à l'examen</strong></td>
+<td>La compétence évaluée est le <strong>classement</strong> : reconnaître à quelle famille appartient un problème, et savoir le ramener à la plus simple possible. Un problème correctement classé est un problème résolu — les solveurs font le reste.</td>
+</tr>
+</tbody></table>
+<h2>Vue d'ensemble</h2>
+<p>Le chapitre 4 se termine par un catalogue de <strong>familles emboîtées</strong>, de la plus simple à la plus générale. Chacune se résout par des algorithmes dédiés, d'autant plus rapides que la famille est étroite.</p>
+<pre><code>LP  ⊂  QP  ⊂  QCQP  ⊂  SOCP  ⊂  SDP        (chaîne principale)
+                              GP  →  convexe par changement de variable log
+                       forme conique : le cadre qui les unifie tous
+</code></pre>
+<p><strong>La compétence à acquérir</strong> n'est pas de connaître les algorithmes, mais de <strong>placer un problème dans cette chaîne le plus à gauche possible</strong>. Un problème écrit en SDP alors qu'il est un LP se résout des milliers de fois plus lentement.</p>
+<h2 data-prio="mid">Concept 1 — Programmes linéaires (§4.3)</h2>
+<p>Quand l'objectif <strong>et</strong> toutes les contraintes sont <strong>affines</strong>, le problème est un <strong>programme linéaire</strong> :
+$$\begin{array}{ll}\text{minimiser} &amp; c^Tx+d\\ \text{sous} &amp; Gx\preceq h\\ &amp; Ax=b\end{array} \tag{4.27}$$
+avec $G\in\mathbb{R}^{m\times n}$ et $A\in\mathbb{R}^{p\times n}$. Les LP sont évidemment des problèmes convexes.</p>
+<p>La constante $d$ ne change ni l'ensemble optimal ni l'argmin : on l'omet souvent. Les deux formes particulières habituelles (fiches 24 et 26) :</p>
+<table>
+<thead>
+<tr>
+<th>Forme</th>
+<th>Écriture</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>forme d'inégalités</strong></td>
+<td>$\min c^Tx$ s.c. $Ax\preceq b$</td>
+</tr>
+<tr>
+<td><strong>forme standard</strong></td>
+<td>$\min c^Tx$ s.c. $Ax=b$, $x\succeq0$</td>
+</tr>
+</tbody></table>
+<p><em>(Les fiches 24 à 33 sont entièrement consacrées à cette famille : géométrie, dualité, simplexe, réseaux, nombres entiers.)</em></p>
+<h2 data-prio="high">Concept 2 — Programmes quadratiques (§4.4)</h2>
+<p><strong>QP</strong> — objectif quadratique <strong>convexe</strong>, contraintes <strong>affines</strong> :
+$$\begin{array}{ll}\text{minimiser} &amp; \tfrac12x^TPx+q^Tx+r\\ \text{sous} &amp; Gx\preceq h\\ &amp; Ax=b\end{array} \tag{4.34}$$
+avec $P\in\mathbf{S}^n_+$. <em>On minimise une quadratique convexe sur un polyèdre.</em></p>
+<p class="cal piege"> La condition $P\succeq0$ est ce qui fait la convexité (§3.1.4, exemple 3.2). Avec $P$ indéfinie, le problème est un « QP non convexe » — objet nettement plus difficile, sans rapport avec cette famille.</p>
+<p><strong>QCQP</strong> — on autorise en plus des contraintes quadratiques convexes :
+$$\begin{array}{ll}\text{minimiser} &amp; \tfrac12x^TP_0x+q_0^Tx+r_0\\ \text{sous} &amp; \tfrac12x^TP_ix+q_i^Tx+r_i\leq0, \quad i=1,\dots,m\\ &amp; Ax=b\end{array}$$
+avec $P_i\in\mathbf{S}^n_+$. On minimise alors une quadratique convexe sur une intersection d'<strong>ellipsoïdes</strong>. Les QCQP contiennent les QP (prendre $P_i=0$), donc aussi les LP.</p>
+<p><strong>L'exemple canonique : les moindres carrés.</strong> Minimiser
+$$\|Ax-b\|_2^2 = x^TA^TAx - 2b^TAx + b^Tb$$
+est un QP <strong>sans contrainte</strong>. On l'appelle aussi régression ou approximation au sens des moindres carrés, et il se résout analytiquement par les équations normales $A^TAx=A^Tb$.</p>
+<h2 data-prio="must">Concept 3 — Programmes coniques du second ordre (§4.4.2)</h2>
+<p>$$\begin{array}{ll}\text{minimiser} &amp; f^Tx\\ \text{sous} &amp; \|A_ix+b_i\|_2 \leq c_i^Tx+d_i, \quad i=1,\dots,m\\ &amp; Fx = g\end{array} \tag{4.36}$$
+avec $A_i\in\mathbb{R}^{n_i\times n}$ et $F\in\mathbb{R}^{p\times n}$. Une contrainte de la forme
+$$\|Ax+b\|_2\leq c^Tx+d$$
+s'appelle <strong>contrainte conique du second ordre</strong> : elle exprime que le vecteur affine $(Ax+b,\ c^Tx+d)$ appartient au <strong>cône du second ordre</strong> (fiche 34).</p>
+<p><strong>Les cas particuliers, à savoir reconnaître.</strong></p>
+<table>
+<thead>
+<tr>
+<th>Si…</th>
+<th>on retrouve</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$c_i=0$ pour tout $i$</td>
+<td>un <strong>QCQP</strong> (les contraintes deviennent $\|A_ix+b_i\|_2\leq d_i$, des boules)</td>
+</tr>
+<tr>
+<td>$A_i=0$ pour tout $i$</td>
+<td>un <strong>LP</strong> (les contraintes deviennent affines)</td>
+</tr>
+</tbody></table>
+<div class="cal intu"><span class="lab">Pourquoi le SOCP compte.</span>
+<p> Il capture d'un coup les normes euclidiennes, les contraintes d'ellipsoïde, les quotients quadratiques et une bonne partie de l'optimisation <strong>robuste</strong> — tout en restant très efficacement résoluble par points intérieurs. C'est le bon niveau de généralité pour la plupart des applications d'ingénierie.</p>
+</div>
+<h2 data-prio="high">Concept 4 — Programmation géométrique (§4.5)</h2>
+<p>C'est la famille la plus surprenante : elle <strong>n'est pas convexe</strong> telle qu'écrite, et le devient par un changement de variable.</p>
+<p><strong>Monôme.</strong> Une fonction $f:\mathbb{R}^n\to\mathbb{R}$ de domaine $\mathbb{R}^n_{++}$ définie par
+$$f(x) = c\,x_1^{a_1}x_2^{a_2}\cdots x_n^{a_n} \tag{4.41}$$
+avec $c&gt;0$ et $a_i\in\mathbb{R}$ <strong>quelconques</strong> (fractionnaires ou négatifs autorisés). Le <strong>coefficient</strong>, lui, doit être <strong>strictement positif</strong>.</p>
+<p class="cal piege"> Boyd signale explicitement le conflit de vocabulaire : en algèbre, un monôme a des exposants entiers positifs. Ici, seul le coefficient est contraint.</p>
+<p><strong>Posynôme.</strong> Une <strong>somme</strong> de monômes :
+$$f(x) = \sum_{k=1}^K c_k\,x_1^{a_{1k}}x_2^{a_{2k}}\cdots x_n^{a_{nk}}, \qquad c_k&gt;0 \tag{4.42}$$</p>
+<p><strong>Programme géométrique (GP).</strong>
+$$\begin{array}{ll}\text{minimiser} &amp; f_0(x)\\ \text{sous} &amp; f_i(x)\leq1, \quad i=1,\dots,m\\ &amp; h_i(x)=1, \quad i=1,\dots,p\end{array} \tag{4.43}$$
+où $f_0,\dots,f_m$ sont des <strong>posynômes</strong> et $h_1,\dots,h_p$ des <strong>monômes</strong>. Le domaine est $\mathbb{R}^n_{++}$ : la contrainte $x\succ0$ est <strong>implicite</strong>.</p>
+<p><strong>La mise en forme convexe (§4.5.3).</strong> On pose $y_i=\log x_i$, donc $x_i=e^{y_i}$. Un monôme devient
+$$f(e^{y_1},\dots,e^{y_n}) = c\,(e^{y_1})^{a_1}\cdots(e^{y_n})^{a_n} = e^{a^Ty+b}, \qquad b=\log c$$
+c'est-à-dire l'<strong>exponentielle d'une fonction affine</strong>. Un posynôme devient une somme de telles exponentielles, et en prenant le <strong>logarithme</strong> de l'objectif et des contraintes, on obtient
+$$\begin{array}{ll}\text{minimiser} &amp; \log\sum_k e^{a_{0k}^Ty+b_{0k}}\\ \text{sous} &amp; \log\sum_k e^{a_{ik}^Ty+b_{ik}} \leq 0\\ &amp; g_i^Ty+h_i = 0\end{array}$$
+soit un problème <strong>convexe</strong> : l'objectif et les contraintes sont des <strong>log-sum-exp</strong> de fonctions affines (fiche 35), et les égalités sont affines.</p>
+<blockquote>
+<p><strong>La double transformation à retenir.</strong> Changement de variable $x = e^y$ <strong>et</strong> transformation croissante $\log$ de l'objectif et des contraintes — les deux mécanismes de la fiche 36, appliqués ensemble. C'est l'exemple le plus spectaculaire de « la convexité est une propriété de l'écriture ».</p>
+</blockquote>
+<h2 data-prio="must">Concept 5 — Forme conique et programmation semi-définie (§4.6)</h2>
+<p><strong>Problème sous forme conique (4.49)</strong> — objectif linéaire, une seule contrainte d'inégalité <strong>affine</strong> au sens d'un cône propre $K$ :
+$$\begin{array}{ll}\text{minimiser} &amp; c^Tx\\ \text{sous} &amp; Fx+g \preceq_K 0\\ &amp; Ax=b\end{array}$$
+Quand $K$ est l'<strong>orthant positif</strong>, on retrouve exactement un <strong>LP</strong>. On peut donc voir les problèmes coniques comme la généralisation des LP dans laquelle l'inégalité composante par composante est remplacée par une inégalité <strong>généralisée</strong>.</p>
+<p><strong>Programmation semi-définie (SDP).</strong> Lorsque $K=\mathbf{S}^k_+$, le problème conique s'écrit
+$$\begin{array}{ll}\text{minimiser} &amp; c^Tx\\ \text{sous} &amp; x_1F_1+\dots+x_nF_n+G \preceq 0\\ &amp; Ax=b\end{array} \tag{4.50}$$
+avec $G,F_1,\dots,F_n\in\mathbf{S}^k$ et $A\in\mathbb{R}^{p\times n}$. L'inégalité est une <strong>inégalité matricielle linéaire</strong> (LMI, exemple 2.10 — fiche 34).</p>
+<blockquote>
+<p><strong>Le fait qui situe le SDP.</strong> <em>Si les matrices $G,F_1,\dots,F_n$ sont toutes <strong>diagonales</strong>, la LMI équivaut à $n$ inégalités linéaires, et le SDP se réduit à un LP.</em> Un SDP est donc littéralement « un LP dont les nombres sont devenus des matrices ». C'est la façon la plus économique de retenir ce qu'est un SDP.</p>
+</blockquote>
+<p><strong>La chaîne complète.</strong>
+$$\text{LP} \subset \text{QP} \subset \text{QCQP} \subset \text{SOCP} \subset \text{SDP}$$
+Chaque inclusion s'obtient en écrivant les contraintes de la classe plus étroite comme un cas particulier de la plus large — par exemple une contrainte SOC $\|Ax+b\|_2\leq c^Tx+d$ s'écrit comme une LMI par complément de Schur.</p>
+<h2 data-prio="high">Concept 6 — Optimisation vectorielle et optimalité de Pareto (§4.7)</h2>
+<p><strong>Le problème (4.56).</strong>
+$$\begin{array}{ll}\text{minimiser (par rapport à } K) &amp; f_0(x)\\ \text{sous} &amp; f_i(x)\leq0, \quad i=1,\dots,m\\ &amp; h_i(x)=0, \quad i=1,\dots,p\end{array}$$
+où $K\subseteq\mathbb{R}^q$ est un <strong>cône propre</strong> et $f_0:\mathbb{R}^n\to\mathbb{R}^q$ est à valeurs <strong>vectorielles</strong>. La seule différence avec la forme standard est là : l'objectif a plusieurs composantes, que l'on compare via $\preceq_K$.</p>
+<p><strong>L'ensemble des valeurs atteignables</strong> est $\mathcal{O} = \{f_0(x)\mid x\text{ admissible}\}$.</p>
+<p><strong>Deux situations, celles de la fiche 34.</strong></p>
+<ul>
+<li>Si $\mathcal{O}$ possède un <strong>élément minimum</strong>, le problème a une solution <strong>optimale</strong> au sens fort : un point qui bat tous les autres sur <strong>tous</strong> les objectifs à la fois. C'est rare.</li>
+<li>Sinon — le cas usuel — on s'intéresse aux <strong>éléments minimaux</strong>.</li>
+</ul>
+<p><strong>Optimalité de Pareto.</strong> Un point admissible $x$ est <strong>Pareto optimal</strong> (ou <strong>efficace</strong>) si $f_0(x)$ est un élément <strong>minimal</strong> de $\mathcal{O}$. Autrement dit :
+$$\text{pour tout } y \text{ admissible}, \qquad f_0(y)\preceq_K f_0(x) \ \Longrightarrow\ f_0(y) = f_0(x)$$
+<em>Tout point admissible au moins aussi bon que $x$ a exactement la même valeur d'objectif.</em> On ne peut améliorer un critère qu'en dégradant un autre.</p>
+<p><strong>Scalarisation (§4.7.4).</strong> C'est la technique standard pour produire des points Pareto optimaux. On choisit $\lambda\succ_{K^\star}0$ — un vecteur <strong>strictement positif au sens de l'inégalité duale</strong> — et l'on résout le problème <strong>scalaire</strong>
+$$\begin{array}{ll}\text{minimiser} &amp; \lambda^Tf_0(x)\\ \text{sous} &amp; f_i(x)\leq0,\quad h_i(x)=0\end{array} \tag{4.60}$$
+Toute solution $x$ est alors <strong>Pareto optimale</strong> pour le problème vectoriel — c'est exactement la caractérisation duale des éléments minimaux de la fiche 34.</p>
+<p class="cal piege"> <strong>La réciproque exige la convexité, et reste incomplète.</strong> Pour un problème <strong>convexe</strong>, tout point Pareto optimal s'obtient par scalarisation avec un $\lambda\succeq_{K^\star}0$ <strong>non nul</strong> — mais pas nécessairement avec $\lambda\succ_{K^\star}0$. Certains points du front de Pareto ne sont donc atteints qu'avec des poids <strong>nuls</strong> sur certains objectifs. Et pour un problème <strong>non convexe</strong>, la scalarisation peut manquer des points Pareto optimaux entiers — ceux situés dans les « creux » du front.</p>
+<blockquote>
+<p><strong>En pratique.</strong> Faire varier $\lambda$ dans le simplexe et résoudre (4.60) à chaque fois <strong>trace le front de Pareto</strong>. C'est la méthode de base en optimisation multi-objectif : compromis rendement/risque en finance, coût/performance en ingénierie, ajustement/régularité en statistique.</p>
+</blockquote>
+<h3>Comment résoudre l'exercice type (protocole de classement)</h3>
+<ol>
+<li><strong>Mettre en forme standard convexe</strong> (fiche 36) : objectif convexe, inégalités convexes, égalités affines.</li>
+<li><strong>Regarder l'objectif</strong> : affine ? quadratique convexe ? autre ?</li>
+<li><strong>Regarder les contraintes</strong> : affines ? quadratiques convexes ? normes euclidiennes ? LMI ?</li>
+<li><strong>Classer le plus à gauche possible</strong> dans la chaîne LP ⊂ QP ⊂ QCQP ⊂ SOCP ⊂ SDP.</li>
+<li><strong>Si des monômes ou des posynômes apparaissent</strong> avec des contraintes $\leq1$ et des variables positives : c'est un <strong>GP</strong> — passer en $y=\log x$.</li>
+<li><strong>Si l'objectif est vectoriel</strong> : optimisation vectorielle — chercher les points <strong>Pareto optimaux</strong> par scalarisation.</li>
+<li><strong>Vérifier qu'aucune réécriture ne simplifie la classe</strong> : une contrainte de norme au carré, une valeur absolue, un maximum peuvent souvent redescendre d'un cran (fiche 25).</li>
+</ol>
+<h3>Le tableau de reconnaissance</h3>
+<table>
+<thead>
+<tr>
+<th>Objectif</th>
+<th>Contraintes</th>
+<th>Famille</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>affine</td>
+<td>affines</td>
+<td><strong>LP</strong></td>
+</tr>
+<tr>
+<td>quadratique convexe</td>
+<td>affines</td>
+<td><strong>QP</strong></td>
+</tr>
+<tr>
+<td>quadratique convexe</td>
+<td>quadratiques convexes</td>
+<td><strong>QCQP</strong></td>
+</tr>
+<tr>
+<td>affine</td>
+<td>$\|A_ix+b_i\|_2\leq c_i^Tx+d_i$</td>
+<td><strong>SOCP</strong></td>
+</tr>
+<tr>
+<td>posynôme</td>
+<td>posynômes $\leq1$, monômes $=1$, $x\succ0$</td>
+<td><strong>GP</strong></td>
+</tr>
+<tr>
+<td>affine</td>
+<td>LMI $\sum_ix_iF_i+G\preceq0$</td>
+<td><strong>SDP</strong></td>
+</tr>
+<tr>
+<td>vectoriel</td>
+<td>quelconques convexes</td>
+<td><strong>optimisation vectorielle</strong></td>
+</tr>
+</tbody></table>
+<h3>Exercices progressifs</h3>
+<p><strong> Niveau 1</strong> — Classez : $\min\ \|Ax-b\|_2^2$ s.c. $x\succeq0$.</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p>Objectif quadratique convexe ($P = 2A^TA\succeq0$), contraintes affines ($-x\preceq0$) : c'est un <strong>QP</strong>. On ne peut pas descendre à un LP, l'objectif n'étant pas affine.
+<em>(Ce problème s'appelle les moindres carrés à variables positives — NNLS — et sert en séparation de sources et en déconvolution.)</em></p>
+</div></details>
+
+<p><strong> Niveau 2</strong> — Classez : $\min\ \|Ax-b\|_2$ s.c. $\|x\|_1\leq1$.</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p>L'objectif est une <strong>norme euclidienne</strong>, non affine et non quadratique. On passe en forme épigraphe : $\min t$ s.c. $\|Ax-b\|_2\leq t$ — une contrainte <strong>conique du second ordre</strong>. La contrainte $\|x\|_1\leq1$ se linéarise en $2^n$ inégalités, ou mieux, avec $n$ auxiliaires : $-u\preceq x\preceq u$, $\mathbf1^Tu\leq1$ (fiche 25).
+On obtient donc un <strong>SOCP</strong>. <em>(C'est la formulation « LASSO contraint ».)</em></p>
+</div></details>
+
+<p><strong> Niveau 3</strong> — Montrez que $\min\ x_1^{-1}x_2^{-2}$ s.c. $x_1+x_2\leq1$, $x\succ0$ est un GP, et donnez sa forme convexe.</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p><strong>GP ?</strong> L'objectif $x_1^{-1}x_2^{-2}$ est un <strong>monôme</strong> (coefficient $1&gt;0$, exposants $-1$ et $-2$ — négatifs, ce qui est autorisé), donc un posynôme. La contrainte $x_1+x_2\leq1$ est un <strong>posynôme $\leq1$</strong> . Le domaine $x\succ0$ est implicite . C'est bien un <strong>GP</strong>.</p>
+<p><strong>Forme convexe.</strong> Avec $y_i=\log x_i$ :
+$$\text{objectif} : \log\big(e^{-y_1-2y_2}\big) = -y_1-2y_2 \qquad \text{(affine !)}$$
+$$\text{contrainte} : \log\big(e^{y_1}+e^{y_2}\big)\leq0$$
+Le problème convexe équivalent est donc
+$$\min\ -y_1-2y_2 \quad\text{s.c.}\quad \log(e^{y_1}+e^{y_2})\leq0$$
+— objectif <strong>affine</strong>, contrainte <strong>log-sum-exp</strong> convexe. <em>À noter : le logarithme d'un <strong>monôme</strong> devient toujours affine ; seuls les posynômes à plusieurs termes donnent du log-sum-exp.</em></p>
+</div></details>
+
+<p><strong> Niveau 4 — type examen</strong> — Montrez que la contrainte conique du second ordre $\|Ax+b\|_2\leq c^Tx+d$ s'écrit comme une LMI, et concluez sur l'inclusion SOCP $\subset$ SDP.</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p>Par le <strong>complément de Schur</strong> : pour $t&gt;0$, une matrice par blocs vérifie
+$$\begin{pmatrix} tI &amp; u\\ u^T &amp; t\end{pmatrix}\succeq0 \iff t\geq0 \ \text{ et } \ t^2 \geq u^Tu \iff t\geq\|u\|_2$$
+(le complément de Schur du bloc $tI$ est $t-u^T(tI)^{-1}u = t - \|u\|_2^2/t$, positif ssi $t^2\geq\|u\|_2^2$).</p>
+<p>En posant $u = Ax+b$ et $t = c^Tx+d$, la contrainte devient
+$$\begin{pmatrix} (c^Tx+d)I &amp; Ax+b\\ (Ax+b)^T &amp; c^Tx+d\end{pmatrix} \succeq 0$$
+et cette matrice dépend <strong>affinement</strong> de $x$ : c'est une <strong>LMI</strong>. $\blacksquare$</p>
+<p><strong>Conclusion.</strong> Toute contrainte SOC est une LMI, donc tout SOCP est un SDP. L'inclusion est <strong>stricte</strong> : le SDP capture des contraintes spectrales (par exemple $\lambda_{\max}(A(x))\leq t$) qu'aucun SOCP n'exprime.</p>
+<p><strong>La morale du protocole de classement.</strong> Un SOCP <em>peut</em> s'écrire en SDP, mais il ne <em>doit</em> pas : les solveurs SOC exploitent une structure bien plus étroite et vont beaucoup plus vite. Classer le plus à gauche possible n'est pas une élégance, c'est une question de temps de calcul.</p>
+</div></details>
+
+<h2 data-prio="must">Common mistakes</h2>
+<ol>
+<li><strong>Écrire un QP avec $P$ indéfinie</strong> — la convexité exige $P\succeq0$ ; sinon on quitte la famille et le problème devient difficile.</li>
+<li><strong>Croire qu'un monôme a des exposants entiers</strong> — en GP, les exposants sont quelconques ; c'est le <strong>coefficient</strong> qui doit être $&gt;0$.</li>
+<li><strong>Oublier la contrainte implicite $x\succ0$ d'un GP</strong> — sans elle, $\log x$ n'a pas de sens et la transformation s'effondre.</li>
+<li><strong>Écrire les contraintes d'un GP avec un second membre autre que $1$</strong> — la forme standard est $f_i(x)\leq1$ et $h_i(x)=1$, pas $\leq0$.</li>
+<li><strong>Classer trop à droite</strong> — écrire un LP en SDP est correct mais coûte des ordres de grandeur en temps de calcul.</li>
+<li><strong>Confondre optimal et Pareto optimal</strong> — l'optimal (élément <strong>minimum</strong>) bat tous les autres sur tous les critères ; le Pareto optimal (élément <strong>minimal</strong>) est seulement non dominé.</li>
+<li><strong>Croire que la scalarisation atteint tout le front de Pareto</strong> — il faut la convexité, et même alors certains points n'apparaissent qu'avec des poids $\lambda$ ayant des composantes <strong>nulles</strong>.</li>
+<li><strong>Prendre $\lambda$ au hasard</strong> — la scalarisation exige $\lambda\succ_{K^\star}0$, c'est-à-dire strictement positif au sens du <strong>cône dual</strong>.</li>
+</ol>
+<h2>Ultimate Review</h2>
+<ol>
+<li><strong>LP</strong> : objectif et contraintes <strong>affines</strong>, $\min c^Tx+d$ s.c. $Gx\preceq h$, $Ax=b$.</li>
+<li><strong>QP</strong> : objectif quadratique convexe ($P\succeq0$), contraintes affines — une quadratique sur un <strong>polyèdre</strong>.</li>
+<li><strong>QCQP</strong> : contraintes quadratiques convexes en plus — une quadratique sur une intersection d'<strong>ellipsoïdes</strong>.</li>
+<li><strong>SOCP</strong> : $\min f^Tx$ s.c. $\|A_ix+b_i\|_2\leq c_i^Tx+d_i$. $c_i=0\Rightarrow$ QCQP ; $A_i=0\Rightarrow$ LP.</li>
+<li><strong>GP</strong> : posynômes $\leq1$, monômes $=1$, $x\succ0$. Non convexe tel quel ; convexe après $y=\log x$ <strong>et</strong> passage au $\log$ — on obtient des <strong>log-sum-exp</strong>.</li>
+<li>Monôme $=cx_1^{a_1}\cdots x_n^{a_n}$ avec $c&gt;0$ et $a_i$ <strong>quelconques</strong> ; posynôme $=$ somme de monômes.</li>
+<li><strong>Forme conique</strong> : $\min c^Tx$ s.c. $Fx+g\preceq_K0$, $Ax=b$ — LP généralisé.</li>
+<li><strong>SDP</strong> : $K=\mathbf{S}^k_+$, contrainte LMI $\sum_ix_iF_i+G\preceq0$. Matrices <strong>diagonales</strong> $\Rightarrow$ on retombe sur un LP.</li>
+<li>Chaîne : $\text{LP}\subset\text{QP}\subset\text{QCQP}\subset\text{SOCP}\subset\text{SDP}$ — classer le plus à <strong>gauche</strong> possible.</li>
+<li><strong>Pareto optimal</strong> : $f_0(x)$ est un élément <strong>minimal</strong> de $\mathcal{O}$. <strong>Scalarisation</strong> : $\min\lambda^Tf_0(x)$ avec $\lambda\succ_{K^\star}0$ donne toujours un point Pareto optimal ; la réciproque exige la convexité et $\lambda\succeq_{K^\star}0$ non nul.</li>
+</ol>
+<p><strong>Formulas to know</strong>
+$$\|A_ix+b_i\|_2\leq c_i^Tx+d_i \qquad f(x)=cx_1^{a_1}\cdots x_n^{a_n},\ c&gt;0 \qquad x_1F_1+\dots+x_nF_n+G\preceq0 \qquad \min\ \lambda^Tf_0(x)$$</p>
+<p><strong>Methods to know</strong> : le protocole de classement en 7 étapes ; le tableau de reconnaissance ; la mise en forme convexe d'un GP ; le complément de Schur pour passer d'une contrainte SOC à une LMI.</p>
+<div class="rec"><h2>Active Recall</h2><p><strong>Basic</strong> — Donnez la forme générale d'un QP et la condition qui le rend convexe.</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p>$\min\ \tfrac12x^TPx+q^Tx+r$ s.c. $Gx\preceq h$, $Ax=b$. La convexité exige $P\in\mathbf{S}^n_+$, c'est-à-dire $P\succeq0$ — la hessienne de l'objectif est constante et vaut $P$ (exemple 3.2).</p>
+</div></details><p><strong>Understanding</strong> — Pourquoi un programme géométrique devient-il convexe après le changement $y=\log x$ ?</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p>Un monôme $cx_1^{a_1}\cdots x_n^{a_n}$ devient $e^{a^Ty+b}$ avec $b=\log c$ : l'exponentielle d'une <strong>affine</strong>. Un posynôme devient une somme de telles exponentielles, et son logarithme est un <strong>log-sum-exp</strong> de fonctions affines, <strong>convexe</strong> (fiche 35). Les contraintes $f_i\leq1$ deviennent $\log f_i\leq0$, et les égalités monomiales deviennent <strong>affines</strong>. Les deux transformations de la fiche 36 — changement de variable et transformation croissante — agissent ensemble.</p>
+</div></details><p><strong>Application</strong> — Le problème $\min\ \max_i(a_i^Tx+b_i)$ s.c. $Cx\preceq d$ : quelle famille ?</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p><strong>LP.</strong> L'objectif n'est pas affine, mais la forme épigraphe le rend affine (fiche 25) :
+$$\min\ t \quad\text{s.c.}\quad a_i^Tx+b_i\leq t \ \ \forall i, \qquad Cx\preceq d$$
+Objectif affine en $(x,t)$, contraintes affines : c'est un LP. <em>Réflexe : ne jamais classer sur l'écriture brute, toujours après réécriture.</em></p>
+</div></details><p><strong>Comparison</strong> — SOCP et SDP : lequel est plus général, et pourquoi ne pas toujours utiliser le plus général ?</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p>Le <strong>SDP</strong> est plus général : toute contrainte SOC s'écrit comme une LMI par complément de Schur, alors que le SDP capture en plus les contraintes spectrales. Mais résoudre un SOCP comme un SDP est <strong>beaucoup plus lent</strong> : les solveurs SOC exploitent la structure très particulière du cône du second ordre. Classer le plus à gauche possible est une exigence de performance, pas d'élégance.</p>
+</div></details><p><strong>Exam-style</strong> — Définissez l'optimalité de Pareto, et énoncez ce que garantit exactement la scalarisation.</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p><em>Pareto optimal.</em> $x$ admissible est Pareto optimal si $f_0(x)$ est un élément <strong>minimal</strong> de $\mathcal{O}=\{f_0(y)\mid y \text{ admissible}\}$ : pour tout $y$ admissible, $f_0(y)\preceq_Kf_0(x)$ entraîne $f_0(y)=f_0(x)$.</p>
+<p><em>Scalarisation.</em> Pour tout $\lambda\succ_{K^\star}0$, toute solution de $\min\lambda^Tf_0(x)$ sous les mêmes contraintes est <strong>Pareto optimale</strong> — c'est la caractérisation duale des éléments minimaux (§2.6.3).</p>
+<p><em>Réciproque.</em> Pour un problème <strong>convexe</strong>, tout point Pareto optimal est solution d'un tel problème pour un $\lambda\succeq_{K^\star}0$ <strong>non nul</strong> — mais pas forcément avec $\lambda$ strictement positif. Pour un problème non convexe, la réciproque est fausse : certains points Pareto optimaux échappent complètement à la scalarisation.</p>
+</div></details></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h2>Flashcards</h2>
+<table>
+<thead>
+<tr>
+<th>Question</th>
+<th>Réponse</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>LP ?</td>
+<td>$\min c^Tx+d$ s.c. $Gx\preceq h$, $Ax=b$ — tout est affine</td>
+</tr>
+<tr>
+<td>QP ?</td>
+<td>Objectif quadratique convexe ($P\succeq0$), contraintes affines</td>
+</tr>
+<tr>
+<td>QCQP ?</td>
+<td>Objectif <strong>et</strong> contraintes quadratiques convexes</td>
+</tr>
+<tr>
+<td>SOCP ?</td>
+<td>$\min f^Tx$ s.c. $\|A_ix+b_i\|_2\leq c_i^Tx+d_i$</td>
+</tr>
+<tr>
+<td>SOCP avec $c_i=0$ ?</td>
+<td>Un QCQP</td>
+</tr>
+<tr>
+<td>SOCP avec $A_i=0$ ?</td>
+<td>Un LP</td>
+</tr>
+<tr>
+<td>Monôme (au sens GP) ?</td>
+<td>$cx_1^{a_1}\cdots x_n^{a_n}$, $c&gt;0$, exposants <strong>quelconques</strong></td>
+</tr>
+<tr>
+<td>Posynôme ?</td>
+<td>Somme de monômes</td>
+</tr>
+<tr>
+<td>Forme standard d'un GP ?</td>
+<td>$\min f_0$ s.c. $f_i\leq1$ (posynômes), $h_i=1$ (monômes), $x\succ0$</td>
+</tr>
+<tr>
+<td>Comment rend-on un GP convexe ?</td>
+<td>$y=\log x$, puis $\log$ de l'objectif et des contraintes $\to$ log-sum-exp</td>
+</tr>
+<tr>
+<td>Problème sous forme conique ?</td>
+<td>$\min c^Tx$ s.c. $Fx+g\preceq_K0$, $Ax=b$</td>
+</tr>
+<tr>
+<td>SDP ?</td>
+<td>Forme conique avec $K=\mathbf{S}^k_+$ : LMI $\sum_ix_iF_i+G\preceq0$</td>
+</tr>
+<tr>
+<td>SDP à matrices diagonales ?</td>
+<td>Se réduit à un <strong>LP</strong></td>
+</tr>
+<tr>
+<td>La chaîne d'inclusions ?</td>
+<td>LP ⊂ QP ⊂ QCQP ⊂ SOCP ⊂ SDP</td>
+</tr>
+<tr>
+<td>Pareto optimal ?</td>
+<td>$f_0(x)$ est un élément <strong>minimal</strong> de l'ensemble des valeurs atteignables</td>
+</tr>
+<tr>
+<td>Scalarisation ?</td>
+<td>$\min\lambda^Tf_0(x)$ avec $\lambda\succ_{K^\star}0$ — donne un point Pareto optimal</td>
+</tr>
+<tr>
+<td>La scalarisation atteint-elle tout le front ?</td>
+<td>Non — il faut la convexité, et même alors certains points exigent $\lambda$ avec des zéros</td>
+</tr>
+</tbody></table>
+</main>
+
+
+
+
+</body></html>

@@ -1,0 +1,972 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fiche 66 — Modèles linéaires généralisés : famille exponentielle, lien canonique et IRLS</title>
+<script>
+window.MathJax={tex:{inlineMath:[["$","$"]],displayMath:[["$$","$$"]],processEscapes:true},
+ options:{skipHtmlTags:["script","noscript","style","textarea","pre","code"]},
+ svg:{fontCache:"global"},
+ startup:{pageReady:()=>MathJax.startup.defaultPageReady().then(()=>{document.body.classList.add("ready")})}};
+setTimeout(function(){document.body.classList.add("ready")},2500);
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+/* ============================================================
+   MathiasLearn — feuille de style des fiches
+   Reprise intégrale des tokens de 00_PARCOURS/*.html
+   + blocs pédagogiques (callouts, méthode, essentiels, recall)
+   ============================================================ */
+:root{--bg:#faf9f7;--card:#fff;--ink:#1a1a1a;--muted:#6b6b6b;--line:#e5e2dd;--accent:#8b5e34;
+ --hl:#fdf8ef;--ok:#2d7d4f;--okbg:#f0f7f3;--warn:#b3402f;--warnbg:#fdf3f1;--blue:#2f5d8b;--bluebg:#f1f5fa}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+ font:17px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;padding:0 16px 100px}
+.nav{position:sticky;top:0;background:rgba(250,249,247,.96);backdrop-filter:blur(8px);
+ border-bottom:1px solid var(--line);margin:0 -16px 30px;padding:11px 16px;z-index:50;
+ display:flex;gap:6px;flex-wrap:wrap;font-size:13px}
+.nav a{color:var(--muted);text-decoration:none;padding:4px 9px;border-radius:5px;white-space:nowrap}
+.nav a:hover{background:var(--line);color:var(--ink)}
+.nav a.on{background:var(--accent);color:#fff}
+main{max-width:780px;margin:0 auto}
+h1{font-size:31px;letter-spacing:-.02em;margin:.4em 0 .5em;line-height:1.25}
+h2{font-size:23px;margin:2.2em 0 .7em;padding-bottom:.3em;border-bottom:1px solid var(--line)}
+h3{font-size:19px;margin:1.9em 0 .5em;color:var(--accent)}
+h4{font-size:17px;margin:1.5em 0 .4em}
+p{margin:.8em 0} a{color:var(--accent)} hr{border:0;border-top:1px solid var(--line);margin:2.6em 0}
+table{border-collapse:collapse;width:100%;margin:1.3em 0;font-size:15.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+th{background:#f3f0eb;font-weight:600}
+tr:nth-child(even) td{background:#fcfbfa}
+code{font-family:"SF Mono",Menlo,Consolas,monospace;font-size:.88em;background:#f2efea;padding:2px 6px;border-radius:4px;white-space:nowrap}
+pre{background:#f2efea;padding:14px 16px;border-radius:8px;overflow-x:auto}
+pre code{background:none;padding:0;white-space:pre}
+blockquote{border-left:3px solid var(--accent);background:var(--hl);margin:1.4em 0;padding:14px 20px;border-radius:0 8px 8px 0}
+blockquote p:first-child{margin-top:0} blockquote p:last-child{margin-bottom:0}
+ul,ol{padding-left:1.5em} li{margin:.35em 0} em{color:#4a4a4a}
+mjx-container[display="true"]{margin:1.1em 0!important;overflow-x:auto;overflow-y:hidden;padding:2px 0}
+mjx-container svg{max-width:100%}
+body:not(.ready) main{opacity:0} main{opacity:1;transition:opacity .25s}
+
+/* --- bandeau de tête de fiche --- */
+.cours{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--accent);
+ border-radius:0 10px 10px 0;padding:18px 22px;margin:0 0 34px}
+.cours h4{margin:0 0 4px;font-size:14px;text-transform:uppercase;letter-spacing:.07em;color:var(--accent)}
+.cours .cs{color:var(--muted);font-size:14.5px;margin:0 0 14px}
+
+/* --- exercices / corrigés --- */
+.ex{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:6px 24px 20px;margin:18px 0}
+.ex>h3:first-child{margin-top:14px}
+details.cor{margin-top:18px;border:1px solid var(--line);border-radius:8px;background:#fcfbfa;overflow:hidden}
+details.cor>summary{cursor:pointer;padding:12px 16px;font-weight:600;font-size:15px;color:var(--accent);
+ list-style:none;display:flex;align-items:center;gap:9px;user-select:none;transition:.15s;min-height:44px}
+details.cor>summary::-webkit-details-marker{display:none}
+details.cor>summary:hover{background:var(--hl)}
+details.cor>summary::before{content:"\25B6";font-size:10px;transition:transform .18s;display:inline-block}
+details.cor[open]>summary::before{transform:rotate(90deg)}
+details.cor[open]>summary{background:var(--okbg);color:var(--ok);border-bottom:1px solid var(--line)}
+.cor .in{padding:4px 20px 16px}
+.cor .in>*:first-child{margin-top:.9em}
+
+/* --- blocs pédagogiques (callouts) ---
+   Générés depuis une citation Markdown dont le premier **gras** commence
+   par un mot-clé : DÉFINITION, THÉORÈME, MÉTHODE, PIÈGE, INTUITION… */
+.cal{border:1px solid var(--line);border-left:4px solid var(--accent);background:var(--card);
+ border-radius:0 10px 10px 0;padding:15px 20px;margin:1.5em 0}
+.cal>p:first-child{margin-top:0}.cal>p:last-child,.cal>ul:last-child,.cal>ol:last-child{margin-bottom:0}
+.cal .lab{display:block;font-size:12.5px;text-transform:uppercase;letter-spacing:.08em;
+ font-weight:700;color:var(--accent);margin-bottom:6px}
+.cal.formel{background:var(--hl)}
+.cal.piege{border-left-color:var(--warn);background:var(--warnbg)}
+.cal.piege .lab{color:var(--warn)}
+.cal.methode{border-left-color:var(--ok);background:var(--okbg)}
+.cal.methode .lab{color:var(--ok)}
+.cal.intu{border-left-color:var(--blue);background:var(--bluebg)}
+.cal.intu .lab{color:var(--blue)}
+.cal.plus{border-left-style:dashed;background:#faf9f7}
+.cal.plus .lab{color:var(--muted)}
+
+/* --- révision express --- */
+.ess{background:var(--card);border:1px solid var(--accent);border-radius:10px;padding:4px 24px 20px;margin:1.6em 0}
+.ess h3{margin-top:1.3em}
+.rec{background:var(--card);border:1px dashed var(--accent);border-radius:10px;padding:4px 24px 18px;margin:1.6em 0}
+.rec ol{counter-reset:none}
+
+/* --- impression / PDF --- */
+@media print{
+ .nav{display:none}
+ body{padding:0;background:#fff;font-size:11.2pt;line-height:1.55}
+ main{max-width:none}
+ h1{font-size:23pt}h2{font-size:15pt;margin-top:1.5em}h3{font-size:12.6pt}
+ h2,h3,h4{break-after:avoid;page-break-after:avoid}
+ table,.cal,blockquote{break-inside:avoid;page-break-inside:avoid}
+ table{display:table;font-size:9.6pt}
+ details.cor{border:1px solid var(--line);background:#fcfbfa}
+ details.cor>summary{display:none}
+ details.cor .in{padding-top:10px}
+ .cal,.ex,.ess,.rec{box-shadow:none}
+ a{color:var(--ink);text-decoration:none}
+}
+@page{margin:16mm 15mm 18mm}
+
+/* --- exemples travaillés --- */
+.exm{background:#fcfbfa;border:1px solid var(--line);border-radius:10px;padding:2px 20px 14px;margin:1.5em 0}
+.exm>h4:first-child{margin:14px 0 .5em;color:var(--accent);font-size:13px;text-transform:uppercase;letter-spacing:.07em}
+
+
+/* --- pastilles de priorité (conventions des fiches de l'app) --- */
+h2[data-prio], h3[data-prio], h4[data-prio]{position:relative}
+h2[data-prio]::before,h3[data-prio]::before,h4[data-prio]::before{
+ content:"";display:inline-block;width:9px;height:9px;border-radius:50%;
+ margin-right:9px;vertical-align:middle;background:var(--muted)}
+[data-prio="must"]::before{background:var(--warn)}
+[data-prio="high"]::before{background:#d98324}
+[data-prio="mid"]::before{background:#c9a227}
+[data-prio="low"]::before{background:var(--ok)}
+/* corrigés des fiches de l'app : même traitement que les corrigés des séries */
+details.cor>summary::after{content:""}
+</style></head><body>
+<div class="nav"><a href="00_COMMENCER_ICI.html">Commencer ici</a><a href="01_NOTATIONS_le-decodeur.html">Notations</a><a href="02_EXERCICES_Serie-0.html">Série 0 — Remise en route</a><a href="03_EXERCICES_Serie-1.html">Série 1 — Convexité</a><a href="04_EXERCICES_Serie-2.html">Série 2 — KKT</a><a href="05_AUTO-EVALUATION.html">Auto-évaluation (quiz)</a><a href="06_FICHE_Optimisation-deux-variables.html">Fiche — Optimisation à 2 variables</a></div>
+<main><h1>Fiche 66 — Modèles linéaires généralisés : famille exponentielle, lien canonique et IRLS</h1>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Matière</strong></td>
+<td>Maths · Économétrie</td>
+</tr>
+<tr>
+<td><strong>Cours source</strong></td>
+<td>Rigollet, <em>18.650 Statistics for Applications</em>, MIT OpenCourseWare, automne 2016 — chapitre 10 « Generalized Linear Models »</td>
+</tr>
+<tr>
+<td><strong>Difficulté</strong></td>
+<td> Must know — régression logistique, Poisson et tout le reste en une seule théorie</td>
+</tr>
+<tr>
+<td><strong>Temps d'étude estimé</strong></td>
+<td>2 h 45</td>
+</tr>
+<tr>
+<td><strong>Prérequis</strong></td>
+<td>Fiche 50 (modèle linéaire, MCG), fiche 64 (vraisemblance, information de Fisher), fiche 39 (Newton)</td>
+</tr>
+<tr>
+<td><strong>Concepts clés</strong></td>
+<td>Composante aléatoire et fonction de lien, famille exponentielle, forme canonique, paramètre de dispersion, $\mu=b'(\theta)$ et $\mathrm{var}=b''(\theta)\phi$, logit, probit, lien canonique, stricte concavité, Newton-Raphson, scores de Fisher, moindres carrés repondérés itérativement</td>
+</tr>
+<tr>
+<td><strong>Poids à l'examen</strong></td>
+<td>Trois choses : les <strong>deux identités</strong> donnant $\mu=b'(\theta)$ et $\mathrm{var}(Y)=b''(\theta)\phi$ ; le fait que le <strong>lien canonique de Bernoulli soit le logit</strong> ; et l'algorithme <strong>IRLS</strong> en quatre étapes.</td>
+</tr>
+</tbody></table>
+<h2>Vue d'ensemble</h2>
+<p><strong>Le modèle linéaire</strong> suppose
+$$Y\mid X\sim N\big(\mu(X),\sigma^2I\big) \qquad\text{et}\qquad \mathbb E(Y\mid X)=\mu(X)=X^\top\beta$$</p>
+<blockquote>
+<p><strong>Ses deux composantes — celles qu'on va relâcher.</strong></p>
+<ol>
+<li><strong>Composante aléatoire</strong> : la réponse $Y\mid X$ est <strong>continue</strong> et de loi <strong>normale</strong>, de moyenne $\mu=\mu(X)=\mathbb E(Y\mid X)$.</li>
+<li><strong>Lien</strong> entre l'aléatoire et les covariables $X=(X^{(1)},\dots,X^{(p)})^\top$ : $\mu(X)=X^\top\beta$.</li>
+</ol>
+</blockquote>
+<blockquote>
+<p><strong>La généralisation.</strong> Un <strong>modèle linéaire généralisé (GLM)</strong> généralise dans deux directions :</p>
+<ol>
+<li><strong>Composante aléatoire</strong> : $Y\sim$ une loi de <strong>famille exponentielle</strong> ;</li>
+<li><strong>Lien</strong> : $$g\big(\mu(X)\big)=X^\top\beta$$ où $g$ est la <strong>fonction de lien</strong> et $\mu=\mathbb E(Y\mid X)$.</li>
+</ol>
+</blockquote>
+<pre><code>MODÈLE LINÉAIRE     Y | X gaussienne      et    μ = Xᵀβ
+GLM                 Y | X exponentielle   et    g(μ) = Xᵀβ
+     ↓                                              ↓
+ Poisson, Bernoulli, Gamma…              log, logit, probit…
+CLÉ    forme canonique  f_θ(y) = exp[(yθ − b(θ))/φ + c(y,φ)]
+       ⟹ μ = b'(θ)   et   var(Y) = b''(θ)φ
+CALCUL Newton-Raphson → scores de Fisher → IRLS
+</code></pre>
+<h2 data-prio="mid">Concept 1 — Trois situations que le modèle linéaire ne sait pas traiter</h2>
+<p><strong>Exemple 1 — taux d'occurrence d'une maladie.</strong> <em>Au début d'une épidémie, le rythme d'apparition de nouveaux cas croît souvent exponentiellement. Si $\mu_i$ est le nombre espéré de nouveaux cas au jour $t_i$, un modèle de la forme</em>
+$$\mu_i=\gamma\exp(\delta t_i)$$
+<em>semble approprié.</em> On le met sous forme GLM par un <strong>lien logarithmique</strong> :
+$$\log(\mu_i)=\log(\gamma)+\delta t_i=\beta_0+\beta_1t_i$$
+<em>Comme il s'agit d'un <strong>comptage</strong>, la loi de <strong>Poisson</strong> (d'espérance $\mu_i$) est sans doute raisonnable.</em></p>
+<p><strong>Exemple 2 — taux de capture de proies.</strong> <em>Le taux de capture $y_i$ par un prédateur croît avec la densité de proies $x_i$, mais <strong>plafonne</strong> quand le prédateur attrape autant qu'il peut en traiter.</em> Un modèle adapté serait
+$$\mu_i=\frac{\alpha x_i}{h+x_i}$$
+<em>où $\alpha$ est le taux de capture maximal et $h$ la densité à laquelle le taux vaut la moitié du maximum.</em>
+<em>Ce modèle est manifestement <strong>non linéaire en ses paramètres</strong>, mais un <strong>lien réciproque</strong> rend le membre de droite linéaire :</em>
+$$g(\mu_i)=\frac{1}{\mu_i}=\frac1\alpha+\frac h\alpha\cdot\frac1{x_i}=\beta_0+\beta_1\frac1{x_i}$$
+<em>L'écart-type du taux de capture étant à peu près proportionnel au taux moyen, cela suggère une loi <strong>Gamma</strong> pour la réponse.</em></p>
+<p><strong>Exemple 3 — les données Kyphosis.</strong> <em>Mesures sur $81$ enfants après chirurgie corrective du rachis. La réponse <strong>binaire</strong> indique la présence ou l'absence d'une déformation post-opératoire. Les trois covariables sont l'âge en mois, le nombre de vertèbres concernées et le début de la plage vertébrale.</em></p>
+<ul>
+<li><em>La réponse est <strong>binaire</strong> : pas le choix, $Y\mid X$ est de Bernoulli, d'espérance $\mu(X)\in(0,1)$.</em></li>
+<li><em>On ne peut <strong>pas</strong> écrire $\mu(X)=X^\top\beta$, parce que le membre de droite parcourt tout $\mathbb R$.</em></li>
+<li><em>Il faut une fonction <strong>inversible</strong> $f$ telle que $f(X^\top\beta)\in(0,1)$.</em></li>
+</ul>
+<blockquote>
+<p><strong>Ces trois exemples couvrent les trois obstacles.</strong> Un <strong>domaine borné</strong> ($\mu&gt;0$ pour Poisson, $\mu\in(0,1)$ pour Bernoulli), une <strong>non-linéarité</strong> en les paramètres, et une <strong>variance non constante</strong> — dans l'exemple 2, l'écart-type croît avec la moyenne. Le modèle linéaire échoue sur les trois.</p>
+<p><strong>La motivation du cours :</strong> <em>il faut un cadre de régression plus général pour tenir compte de divers types de données de réponse — les lois de la <strong>famille exponentielle</strong> — et développer des méthodes d'ajustement et d'inférence dans ce cadre : l'<strong>estimation par maximum de vraisemblance</strong>.</em></p>
+</blockquote>
+<h2 data-prio="must">Concept 2 — La famille exponentielle</h2>
+<div class="cal formel"><span class="lab">Définition.</span>
+<p> Une famille de lois $\{P_\theta:\theta\in\Theta\}$, $\Theta\subset\mathbb R^k$, est une <strong>famille exponentielle à $k$ paramètres</strong> sur $\mathbb R^q$ s'il existe des fonctions réelles $\eta_1,\dots,\eta_k$ et $B$ de $\theta$, et $T_1,\dots,T_k$ et $h$ de $x\in\mathbb R^q$, telles que la densité (ou la fonction de masse) de $P_\theta$ s'écrive
+$$p_\theta(x)=\exp\left[\sum_{i=1}^k\eta_i(\theta)T_i(x)-B(\theta)\right]h(x)$$</p>
+</div>
+<p><strong>Exemple gaussien.</strong> Pour $X\sim N(\mu,\sigma^2)$ avec $\theta=(\mu,\sigma^2)$ :
+$$p_\theta(x)=\exp\left(\frac{\mu}{\sigma^2}x-\frac{1}{2\sigma^2}x^2-\frac{\mu^2}{2\sigma^2}\right)\frac{1}{\sigma\sqrt{2\pi}}$$
+ce qui forme une famille exponentielle <strong>à deux paramètres</strong>, avec
+$$\eta_1=\frac{\mu}{\sigma^2},\quad \eta_2=-\frac{1}{2\sigma^2},\quad T_1(x)=x,\quad T_2(x)=x^2,\quad B(\theta)=\frac{\mu^2}{2\sigma^2}+\log(\sigma\sqrt{2\pi}),\quad h(x)=1$$
+<em>Quand $\sigma^2$ est <strong>connue</strong>, cela devient une famille exponentielle <strong>à un paramètre</strong> sur $\mathbb R$ :</em>
+$$\eta=\frac{\mu}{\sigma^2},\quad T(x)=x,\quad B(\theta)=\frac{\mu^2}{2\sigma^2},\quad h(x)=\frac{e^{-x^2/2\sigma^2}}{\sigma\sqrt{2\pi}}$$</p>
+<p><strong>Les lois discrètes</strong> qui forment des familles exponentielles : <strong>Bernoulli$(p)$</strong> $p^x(1-p)^{1-x}$, $x\in\{0,1\}$ · <strong>Poisson$(\lambda)$</strong> $e^{-\lambda}\lambda^x/x!$.</p>
+<p><strong>Les lois continues</strong> : <strong>Gamma$(a,b)$</strong> $\frac{1}{\Gamma(a)b^a}x^{a-1}e^{-x/b}$, avec $a$ paramètre de forme et $b$ d'échelle, reparamétrable en $\mu=ab$ (paramètre de moyenne) ; <strong>Gamma inverse$(\alpha,\beta)$</strong> ; <strong>gaussienne inverse$(\mu,\sigma^2)$</strong>. <em>Autres : khi-deux, bêta, binomiale, binomiale négative.</em></p>
+<div class="cal intu"><span class="lab">Ce que la définition capture.</span>
+<p> Le paramètre $\theta$ et l'observation $x$ n'interagissent que par le <strong>produit $\eta_i(\theta)T_i(x)$</strong> — jamais de façon plus enchevêtrée. C'est cette séparation qui donne les statistiques exhaustives $T_i$, la concavité de la log-vraisemblance, et les identités du concept suivant. Presque toutes les lois usuelles rentrent dans ce moule.</p>
+</div>
+<h2 data-prio="must">Concept 3 — La forme canonique à un paramètre</h2>
+<div class="cal formel"><span class="lab">Définition.</span>
+<p> La <strong>famille exponentielle canonique</strong> pour $k=1$, $y\in\mathbb R$ :
+$$\boxed{\ f_\theta(y)=\exp\left(\frac{y\theta-b(\theta)}{\phi}+c(y,\phi)\right)\ }$$
+pour des fonctions connues $b(\cdot)$ et $c(\cdot,\cdot)$.</p>
+</div>
+<ul>
+<li>Si $\phi$ est <strong>connu</strong>, c'est une famille exponentielle à un paramètre, $\theta$ étant le <strong>paramètre canonique</strong>.</li>
+<li>Si $\phi$ est inconnu, cela peut ou non être une famille à deux paramètres ; $\phi$ s'appelle le <strong>paramètre de dispersion</strong>.</li>
+<li><em>Dans ce cours, on suppose toujours $\phi$ <strong>connu</strong>.</em></li>
+</ul>
+<p><strong>Le cas gaussien à variance connue.</strong>
+$$f_\theta(y)=\frac{1}{\sigma\sqrt{2\pi}}e^{-\frac{(y-\mu)^2}{2\sigma^2}}=\exp\left(\frac{y\mu-\frac12\mu^2}{\sigma^2}-\frac12\left(\frac{y^2}{\sigma^2}+\log(2\pi\sigma^2)\right)\right)$$
+d'où
+$$\theta=\mu, \qquad \phi=\sigma^2, \qquad b(\theta)=\frac{\theta^2}{2}, \qquad c(y,\phi)=-\frac12\left(\frac{y^2}{\phi}+\log(2\pi\phi)\right)$$</p>
+<p><strong>Le tableau des trois lois principales.</strong></p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th><strong>Normale</strong> $N(\mu,\sigma^2)$</th>
+<th><strong>Poisson</strong> $P(\mu)$</th>
+<th><strong>Bernoulli</strong> $B(p)$</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Domaine de $y$</td>
+<td>$(-\infty,\infty)$</td>
+<td>$\{0,1,2,\dots\}$</td>
+<td>$\{0,1\}$</td>
+</tr>
+<tr>
+<td>$\phi$</td>
+<td>$\sigma^2$</td>
+<td>$1$</td>
+<td>$1$</td>
+</tr>
+<tr>
+<td>$b(\theta)$</td>
+<td>$\theta^2/2$</td>
+<td>$e^\theta$</td>
+<td>$\log(1+e^\theta)$</td>
+</tr>
+<tr>
+<td>$c(y,\phi)$</td>
+<td>$-\frac12\big(\frac{y^2}{\phi}+\log(2\pi\phi)\big)$</td>
+<td>$-\log y!$</td>
+<td>$0$</td>
+</tr>
+</tbody></table>
+<h2 data-prio="must">Concept 4 — Moyenne et variance par les deux identités</h2>
+<p>Soit $\ell(\theta)=\log f_\theta(Y)$ la log-vraisemblance. La moyenne et la variance se déduisent de <strong>deux identités</strong>, toutes deux obtenues à partir de $\int f_\theta(y)\,dy\equiv1$ :</p>
+<blockquote>
+<p><strong>Première identité</strong> : $\displaystyle\mathbb E\left(\frac{\partial\ell}{\partial\theta}\right)=0$</p>
+<p><strong>Seconde identité</strong> : $\displaystyle\mathbb E\left(\frac{\partial^2\ell}{\partial\theta^2}\right)+\mathbb E\left(\frac{\partial\ell}{\partial\theta}\right)^2=0$</p>
+</blockquote>
+<p><strong>L'espérance.</strong> De $\ell(\theta)=\frac{Y\theta-b(\theta)}{\phi}+c(Y;\phi)$ on tire
+$$\frac{\partial\ell}{\partial\theta}=\frac{Y-b'(\theta)}{\phi}$$
+et la première identité donne
+$$0=\mathbb E\left(\frac{\partial\ell}{\partial\theta}\right)=\frac{\mathbb E(Y)-b'(\theta)}{\phi} \qquad\Longrightarrow\qquad \boxed{\ \mathbb E(Y)=\mu=b'(\theta)\ }$$</p>
+<p><strong>La variance.</strong> D'autre part,
+$$\frac{\partial^2\ell}{\partial\theta^2}+\left(\frac{\partial\ell}{\partial\theta}\right)^2=-\frac{b''(\theta)}{\phi}+\left(\frac{Y-b'(\theta)}{\phi}\right)^2$$
+et comme $\frac{Y-b'(\theta)}{\phi}=\frac{Y-\mathbb E(Y)}{\phi}$ d'après le résultat précédent, la seconde identité donne
+$$0=-\frac{b''(\theta)}{\phi}+\frac{\mathrm{var}(Y)}{\phi^2} \qquad\Longrightarrow\qquad \boxed{\ \mathrm{var}(Y)=V(Y)=b''(\theta)\phi\ }$$</p>
+<blockquote>
+<p><strong>Ces deux formules sont le cœur opératoire du chapitre.</strong> Toute la loi — moyenne <strong>et</strong> variance — est encodée dans <strong>une seule fonction</strong> $b$ et ses deux premières dérivées. Il suffit d'identifier $b$ pour tout connaître.</p>
+<p><strong>Et remarquez la conséquence majeure</strong> : la variance $b''(\theta)\phi$ est une <strong>fonction de la moyenne</strong>, puisque $\mu=b'(\theta)$. Dans un GLM, on ne choisit <strong>pas</strong> la variance indépendamment de la moyenne — elle est déterminée par la famille. C'est exactement ce que l'exemple 2 demandait (écart-type proportionnel à la moyenne, obtenu par la loi Gamma).</p>
+</blockquote>
+<p><strong>Exemple — la loi de Poisson.</strong>
+$$f(y)=\frac{\mu^ye^{-\mu}}{y!}=e^{y\log\mu-\mu-\log(y!)}$$
+d'où
+$$\theta=\log\mu, \quad b(\theta)=\mu=e^\theta, \quad c(y,\phi)=-\log(y!), \quad \phi=1$$
+et donc $b'(\theta)=e^\theta=\mu$  (l'espérance) et $b''(\theta)=e^\theta=\mu$  (la variance vaut aussi $\mu$, propriété caractéristique de Poisson).</p>
+<h2 data-prio="must">Concept 5 — La fonction de lien</h2>
+<div class="cal intu"><span class="lab">Pourquoi il en faut une.</span>
+<p> <em>$\beta$ est le paramètre d'intérêt, et il doit apparaître d'une façon ou d'une autre dans la vraisemblance pour qu'on puisse utiliser le maximum de vraisemblance.</em></p>
+</div>
+<div class="cal formel"><span class="lab">Définition.</span>
+<p> Une <strong>fonction de lien</strong> $g$ relie le prédicteur linéaire $X^\top\beta$ au paramètre de moyenne $\mu$ :
+$$X^\top\beta=g(\mu), \qquad \text{donc}\qquad \mu=g^{-1}(X^\top\beta)$$
+<em>$g$ doit être <strong>monotone croissante</strong> et <strong>dérivable</strong>.</em></p>
+</div>
+<p><strong>Les exemples.</strong></p>
+<table>
+<thead>
+<tr>
+<th>Type de réponse</th>
+<th>Contrainte</th>
+<th>Liens possibles</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Modèle linéaire</strong></td>
+<td>aucune</td>
+<td>$g=$ <strong>identité</strong></td>
+</tr>
+<tr>
+<td><strong>Poisson</strong> ($Y\mid X\sim\mathrm{Poiss}(\mu(X))$)</td>
+<td>$\mu(X)&gt;0$</td>
+<td>$\log(\mu(X))=X^\top\beta$</td>
+</tr>
+<tr>
+<td><strong>Bernoulli / binomiale</strong></td>
+<td>$0&lt;\mu&lt;1$</td>
+<td><strong>logit</strong>, <strong>probit</strong>, log-log complémentaire</td>
+</tr>
+</tbody></table>
+<p><em>Pour des données de comptage, une fonction de lien doit envoyer $(0,+\infty)$ sur $\mathbb R$ : le <strong>lien logarithmique</strong> est le choix naturel.</em></p>
+<p><em>Pour des données de Bernoulli, $g$ doit envoyer $(0,1)$ sur $\mathbb R$ — trois choix :</em>
+$$\textbf{1. logit : } \log\left(\frac{\mu(X)}{1-\mu(X)}\right)=X^\top\beta$$
+$$\textbf{2. probit : } \Phi^{-1}\big(\mu(X)\big)=X^\top\beta \quad\text{où } \Phi \text{ est la fonction de répartition normale}$$
+$$\textbf{3. log-log complémentaire : } \log\big(-\log(1-\mu(X))\big)=X^\top\beta$$
+<em>Le lien <strong>logit</strong> est le choix naturel.</em></p>
+<p><strong>Les fonctions inverses</strong> correspondantes sont $f_1(x)=\dfrac{e^x}{1+e^x}$ (logistique) et $f_2(x)=\Phi(x)$ (répartition gaussienne) — deux courbes en S très proches l'une de l'autre.</p>
+<h3>Le lien canonique</h3>
+<div class="cal formel"><span class="lab">Définition.</span>
+<p> <em>La fonction $g$ qui relie la moyenne $\mu$ au <strong>paramètre canonique</strong> $\theta$ s'appelle le <strong>lien canonique</strong> :</em>
+$$g(\mu)=\theta$$
+<em>Puisque $\mu=b'(\theta)$, le lien canonique est donné par</em>
+$$\boxed{\ g(\mu)=(b')^{-1}(\mu)\ }$$
+<em>Si $\phi&gt;0$, la fonction de lien canonique est <strong>strictement croissante</strong>. Pourquoi ?</em></p>
+</div>
+<p class="cal piege"> <strong>La réponse à la question du cours</strong> : $g=(b')^{-1}$ est croissante si et seulement si $b'$ l'est, c'est-à-dire si $b''&gt;0$. Or $b''(\theta)\phi=\mathrm{var}(Y)&gt;0$ et $\phi&gt;0$, donc $b''&gt;0$. <strong>La croissance stricte du lien canonique est une conséquence de la positivité de la variance.</strong></p>
+<p><strong>Exemple — la loi de Bernoulli.</strong> On vérifie $b(\theta)=\log(1+e^\theta)$, donc
+$$b'(\theta)=\frac{e^\theta}{1+e^\theta}=\mu \qquad\Longleftrightarrow\qquad \theta=\log\left(\frac{\mu}{1-\mu}\right)$$</p>
+<blockquote>
+<p><em><strong>Le lien canonique de la loi de Bernoulli est le lien logit.</strong></em></p>
+</blockquote>
+<p><strong>Le tableau des liens canoniques.</strong></p>
+<table>
+<thead>
+<tr>
+<th>Loi</th>
+<th>$b(\theta)$</th>
+<th>$g(\mu)$</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Normale</strong></td>
+<td>$\theta^2/2$</td>
+<td>$\mu$ (identité)</td>
+</tr>
+<tr>
+<td><strong>Poisson</strong></td>
+<td>$\exp(\theta)$</td>
+<td>$\log\mu$</td>
+</tr>
+<tr>
+<td><strong>Bernoulli</strong></td>
+<td>$\log(1+e^\theta)$</td>
+<td>$\log\dfrac{\mu}{1-\mu}$ (<strong>logit</strong>)</td>
+</tr>
+<tr>
+<td><strong>Gamma</strong></td>
+<td>$-\log(-\theta)$</td>
+<td>$-\dfrac1\mu$</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>Voilà la réponse à « pourquoi le logit plutôt que le probit ? ».</strong> Ce n'est pas une commodité de calcul ni une tradition : le logit <strong>est</strong> le lien canonique de la loi de Bernoulli, celui qui identifie le prédicteur linéaire au paramètre canonique. Le concept suivant montre les deux propriétés remarquables que cela entraîne.</p>
+</blockquote>
+<h2 data-prio="must">Concept 6 — Le modèle GLM complet</h2>
+<p><strong>Le cadre.</strong> Soient $(X_i,Y_i)\in\mathbb R^p\times\mathbb R$, $i=1,\dots,n$, des couples aléatoires <strong>indépendants</strong> tels que la loi conditionnelle de $Y_i$ sachant $X_i=x_i$ ait une densité dans la famille exponentielle canonique :
+$$f_{\theta_i}(y_i)=\exp\left(\frac{y_i\theta_i-b(\theta_i)}{\phi}+c(y_i,\phi)\right)$$
+La moyenne $\mu_i$ est reliée au paramètre canonique par $\mu_i=b'(\theta_i)$, et $\mu_i$ dépend <strong>linéairement</strong> des covariables par le lien :
+$$g(\mu_i)=X_i^\top\beta$$</p>
+<p><strong>Le retour à $\beta$.</strong> La relation entre $\beta$ et $\theta$ est
+$$\theta_i=(b')^{-1}(\mu_i)=(b')^{-1}\big(g^{-1}(X_i^\top\beta)\big)\equiv h\big(X_i^\top\beta\big), \qquad \boxed{\ h=(b')^{-1}\circ g^{-1}=(g\circ b')^{-1}\ }$$</p>
+<div class="cal formel"><span class="lab">Remarque décisive.</span>
+<p> <em>Si $g$ est le <strong>lien canonique</strong>, alors $h$ est l'<strong>identité</strong>.</em></p>
+</div>
+<p><strong>La log-vraisemblance</strong>, à une constante près :
+$$\ell_n(\beta;Y,X)=\sum_i\frac{Y_i\theta_i-b(\theta_i)}{\phi}=\sum_i\frac{Y_ih(X_i^\top\beta)-b\big(h(X_i^\top\beta)\big)}{\phi}$$
+<em>et avec le lien canonique, on obtient l'expression plus simple</em>
+$$\boxed{\ \ell_n(\beta,\phi;Y,X)=\sum_i\frac{Y_iX_i^\top\beta-b(X_i^\top\beta)}{\phi}\ }$$</p>
+<blockquote>
+<p><strong>La stricte concavité.</strong> <em>La log-vraisemblance $\ell(\theta)$ est <strong>strictement concave</strong> avec le lien canonique quand $\phi&gt;0$. Pourquoi ?</em>
+<em>En conséquence, l'<strong>estimateur du maximum de vraisemblance est unique</strong>.</em>
+<em>En revanche, si une autre paramétrisation est utilisée, la vraisemblance peut ne pas être strictement concave, ce qui conduit à <strong>plusieurs maxima locaux</strong>.</em></p>
+</blockquote>
+<p class="cal piege"> <strong>La réponse à la seconde question du cours.</strong> Avec le lien canonique, $\ell_n(\beta)=\sum_i\frac{Y_iX_i^\top\beta-b(X_i^\top\beta)}{\phi}$. Le premier terme est <strong>linéaire</strong> en $\beta$, donc de hessienne nulle ; le second a pour hessienne $-\frac1\phi\sum_ib''(X_i^\top\beta)X_iX_i^\top$. Comme $b''&gt;0$ et $\phi&gt;0$, cette matrice est <strong>définie négative</strong> dès que les $X_i$ engendrent $\mathbb R^p$. D'où la stricte concavité, et l'unicité du maximum par le concept 4 de la fiche 64.</p>
+<blockquote>
+<p><strong>C'est la seconde grande propriété du lien canonique</strong>, après la simplification de la log-vraisemblance : il <strong>garantit l'unicité de l'EMV</strong>. Avec un autre lien, plusieurs maxima locaux peuvent apparaître, et l'optimisation devient un problème.</p>
+</blockquote>
+<h2 data-prio="high">Concept 7 — Newton-Raphson et scores de Fisher</h2>
+<p><strong>Le problème.</strong> Étant donné $f$ définie sur $\mathcal X\subset\mathbb R^m$, trouver $x^\ast$ tel que $f(x^\ast)\geq f(x)$ pour tout $x$. <em>Trois méthodes : <strong>Newton-Raphson</strong>, <strong>scores de Fisher</strong>, <strong>moindres carrés repondérés itérativement</strong>.</em></p>
+<p><strong>Gradient et hessienne.</strong> $(\nabla f)=(\partial f/\partial x_1,\dots,\partial f/\partial x_m)^\top$ et $(H_f)_{ij}=\frac{\partial^2f}{\partial x_i\partial x_j}$. <em>Pour des fonctions régulières, la hessienne est <strong>symétrique</strong>. Si $f$ est strictement concave, $H_f(x)$ est <strong>définie négative</strong>.</em></p>
+<p><strong>L'approximation quadratique.</strong>
+$$f(x)\approx f(x_0)+\nabla f^\top(x_0)(x-x_0)+\tfrac12(x-x_0)^\top H_f(x_0)(x-x_0)$$
+d'où l'approximation du gradient $\nabla f(x)\approx\nabla f(x_0)+H_f(x_0)(x-x_0)$. Si $x^\ast$ est un maximum, $\nabla f(x^\ast)=0$, et l'on résout
+$$x^\ast=x_0-H_f(x_0)^{-1}\nabla f(x_0)$$</p>
+<div class="cal methode"><span class="lab">Méthode de Newton-Raphson.</span>
+<p> <em>Elle utilise ces approximations <strong>séquentiellement</strong></em> :
+$$x^{(k+1)}=x^{(k)}-H_f\big(x^{(k)}\big)^{-1}\nabla f\big(x^{(k)}\big)$$
+<em>L'algorithme est <strong>globalement convergent à vitesse quadratique</strong> dès que $f$ est concave et deux fois continûment dérivable.</em></p>
+</div>
+<div class="cal methode"><span class="lab">Méthode des scores de Fisher.</span>
+
+<ul>
+<li><em>Newton-Raphson fonctionne pour un cas <strong>déterministe</strong>, sans données aléatoires.</em></li>
+<li><em>Parfois, le calcul de la hessienne est assez compliqué.</em></li>
+<li><strong>But</strong> : <em>utiliser directement le fait qu'on minimise la divergence KL</em> — $KL\ \text{« }=\text{ »}-\mathbb E[\text{log-vraisemblance}]$.</li>
+<li><strong>Idée</strong> : <em>remplacer la hessienne par son <strong>espérance</strong></em>. Or $\mathbb E_\theta\big(H_{\ell_n}(\theta)\big)=-I(\theta)$ est l'<strong>information de Fisher</strong>.</li>
+<li><em>La matrice d'information de Fisher est <strong>définie positive</strong> et peut servir de substitut à la hessienne, d'où la mise à jour</em>
+$$\boxed{\ \theta^{(k+1)}=\theta^{(k)}+I\big(\theta^{(k)}\big)^{-1}\nabla\ell_n\big(\theta^{(k)}\big)\ }$$
+*C'est l'algorithme des <strong>scores de Fisher</strong>. Il a essentiellement les mêmes propriétés de convergence que Newton-Raphson, mais <strong>$I$ est souvent plus facile à calculer que $H_{\ell_n}$</strong>.*</li>
+</ul>
+</div>
+<p class="cal piege"> <strong>Notez le rappel du cours</strong> : <em>on minimise la divergence KL</em>. C'est le fil direct avec la fiche 64 — maximiser la vraisemblance <strong>est</strong> minimiser la KL empirique. Remplacer la hessienne empirique par son espérance revient à passer du critère empirique au critère théorique.</p>
+<h3>Exemple — la régression logistique</h3>
+<p>Soient $Y_i\sim\mathrm{Bernoulli}(p_i)$ indépendants et $X_i$ un vecteur $p\times1$ de prédicteurs. La log-vraisemblance est
+$$\ell_n(\theta\mid Y,X)=\sum_{i=1}^n\Big(Y_i\theta_i-\log\big(1+e^{\theta_i}\big)\Big)$$
+Avec le <strong>lien canonique</strong>, $\theta_i=\log\Big(\frac{p_i}{1-p_i}\Big)=X_i^\top\beta$, d'où
+$$\ell_n(\beta\mid Y,X)=\sum_{i=1}^n\Big(Y_iX_i^\top\beta-\log\big(1+e^{X_i^\top\beta}\big)\Big)$$</p>
+<p><strong>Le gradient.</strong>
+$$\nabla\ell_n(\beta)=\sum_{i=1}^n\left(Y_i-\frac{e^{X_i^\top\beta}}{1+e^{X_i^\top\beta}}\right)X_i$$</p>
+<p><strong>La hessienne.</strong>
+$$H_{\ell_n}(\beta)=-\sum_{i=1}^n\frac{e^{X_i^\top\beta}}{\big(1+e^{X_i^\top\beta}\big)^2}X_iX_i^\top$$</p>
+<p><strong>Trois observations du cours.</strong></p>
+<ul>
+<li>*La fonction de score est une <strong>combinaison linéaire des $X_i$</strong>, et la hessienne (ou la matrice d'information) une <strong>combinaison linéaire des $X_iX_i^\top$</strong>. C'est typique des modèles de régression en famille exponentielle.*</li>
+<li><em>La hessienne est <strong>définie négative</strong>, donc il y a un unique maximum local, qui est aussi le maximum global.</em></li>
+<li><em><strong>Les $Y_i$ n'apparaissent pas dans $H_{\ell_n}(\beta)$</strong></em>, ce qui donne
+$$H_{\ell_n}(\beta)=\mathbb E\big[H_{\ell_n}(\beta)\big]=-I(\beta)$$</li>
+</ul>
+<blockquote>
+<p><strong>Cette dernière observation est importante.</strong> Sous le lien canonique, la hessienne <strong>ne contient aucun aléa</strong> : elle est égale à son espérance. Donc <strong>Newton-Raphson et les scores de Fisher coïncident exactement</strong>. C'est le troisième avantage du lien canonique.</p>
+</blockquote>
+<h2 data-prio="must">Concept 8 — Les moindres carrés repondérés itérativement (IRLS)</h2>
+<blockquote>
+<p><em>IRLS est un algorithme d'ajustement des GLM obtenu par Newton-Raphson / scores de Fisher.</em></p>
+</blockquote>
+<p><strong>Les quantités à relier.</strong> Avec $\ell=\sum_{i=1}^n\frac{Y_i\theta_i-b(\theta_i)}{\phi}+c(Y_i,\phi)$ :
+$$\mu_i=b'(\theta_i), \qquad X_i^\top\beta=g(\mu_i), \qquad \frac{d\mu_i}{d\theta_i}=b''(\theta_i)\equiv V_i, \qquad \theta_i=h(X_i^\top\beta)$$</p>
+<p><strong>Le gradient par la règle de la chaîne.</strong>
+$$\frac{\partial\ell_n}{\partial\beta_j}=\sum_{i=1}^n\frac{\partial\ell_i}{\partial\theta_i}\frac{\partial\theta_i}{\partial\beta_j}=\sum_i\frac{Y_i-\mu_i}{\phi}h'(X_i^\top\beta)X_{ij}=\sum_i(\tilde Y_i-\tilde\mu_i)W_iX_{ij}$$
+où
+$$W_i=\frac{h'(X_i^\top\beta)}{g'(\mu_i)\phi}, \qquad \tilde Y=\big(g'(\mu_1)Y_1,\dots,g'(\mu_n)Y_n\big)^\top, \qquad \tilde\mu=\big(g'(\mu_1)\mu_1,\dots,g'(\mu_n)\mu_n\big)^\top$$</p>
+<p>En posant $W=\mathrm{diag}\{W_1,\dots,W_n\}$, le gradient s'écrit
+$$\boxed{\ \nabla\ell_n(\beta)=X^\top W\big(\tilde Y-\tilde\mu\big)\ }$$</p>
+<p><strong>L'information de Fisher.</strong> L'identité $g^{-1}(\cdot)=b'\circ h(\cdot)$ donne, en dérivant, $b''\circ h(\cdot)\cdot h'(\cdot)=\frac{1}{g'\circ g^{-1}(\cdot)}$, soit
+$$b''(\theta_i)\,h'(X_i^\top\beta)=\frac{1}{g'(\mu_i)}$$
+d'où
+$$\mathbb E\big(H_{\ell_n}(\beta)\big)=-\sum_i\frac{h'(X_i^\top\beta)}{g'(\mu_i)\phi}X_iX_i^\top \qquad\Longrightarrow\qquad \boxed{\ I(\beta)=-\mathbb E\big(H_{\ell_n}(\beta)\big)=X^\top WX\ }$$
+avec $W=\mathrm{diag}\Big(\frac{h'(X_i^\top\beta)}{g'(\mu_i)\phi}\Big)$.</p>
+<p><strong>La mise à jour par scores de Fisher.</strong>
+$$\beta^{(k+1)}=\beta^{(k)}+I\big(\beta^{(k)}\big)^{-1}\nabla\ell_n\big(\beta^{(k)}\big)=\beta^{(k)}+(X^\top WX)^{-1}X^\top W(\tilde Y-\tilde\mu)$$
+$$=(X^\top WX)^{-1}X^\top W\big(\tilde Y-\tilde\mu+X\beta^{(k)}\big)$$</p>
+<h3>La parenthèse : les moindres carrés pondérés</h3>
+<p><em>Supposons le modèle linéaire $Y=X\beta+\varepsilon$ avec $\varepsilon\sim N_n(0,W^{-1})$, $W^{-1}$ diagonale. <strong>Quand les variances sont différentes, la régression est dite hétéroscédastique</strong>.</em> L'EMV est la solution de
+$$\min_\beta\ (Y-X\beta)^\top W(Y-X\beta)$$
+<em>C'est un problème de <strong>moindres carrés pondérés</strong>, de solution</em>
+$$\hat\beta=(X^\top WX)^{-1}X^\top WY$$
+<em>Il est implémenté en routine dans les logiciels statistiques.</em></p>
+<blockquote>
+<p><strong>C'est exactement l'estimateur MCG de la fiche 50</strong>, avec $\Sigma^{-1}=W$. Le pont est explicite : les MCG sont des moindres carrés <strong>pondérés par l'inverse des variances</strong>.</p>
+</blockquote>
+<h3>La procédure IRLS</h3>
+<blockquote>
+<p><em>IRLS est une procédure itérative pour calculer l'EMV dans les GLM <strong>en utilisant les moindres carrés pondérés</strong>.</em> Pour passer de $\beta^{(k)}$ à $\beta^{(k+1)}$ :</p>
+<p><strong>1.</strong> Fixer $\beta^{(k)}$ et $\mu_i^{(k)}=g^{-1}\big(X_i^\top\beta^{(k)}\big)$.
+<strong>2.</strong> Calculer les <strong>réponses dépendantes ajustées</strong>
+$$Z_i^{(k)}=X_i^\top\beta^{(k)}+g'\big(\mu_i^{(k)}\big)\big(Y_i-\mu_i^{(k)}\big)$$
+<strong>3.</strong> Calculer les <strong>poids</strong>
+$$W^{(k)}=\mathrm{diag}\left(\frac{h'\big(X_i^\top\beta^{(k)}\big)}{g'\big(\mu_i^{(k)}\big)\phi}\right)$$
+<strong>4.</strong> <strong>Régresser $Z^{(k)}$ sur la matrice de design $X$ avec le poids $W^{(k)}$</strong> pour obtenir $\beta^{(k+1)}$.</p>
+<p>On répète jusqu'à convergence.</p>
+</blockquote>
+<p><strong>Deux remarques finales.</strong></p>
+<ul>
+<li><em>Pour cette procédure, il suffit de connaître $X$, $Y$, la <strong>fonction de lien</strong> $g$ et la <strong>fonction de variance</strong> $V(\mu)=b''(\theta)$. Une valeur de départ possible est $\mu^{(0)}=Y$.</em></li>
+<li><em>Si le <strong>lien canonique</strong> est utilisé, les scores de Fisher coïncident avec Newton-Raphson : $\mathbb E(H_{\ell_n})=H_{\ell_n}$, <strong>il n'y a pas de composante aléatoire ($Y$) dans la hessienne</strong>.</em></li>
+</ul>
+<blockquote>
+<p><strong>L'élégance d'IRLS tient en une phrase.</strong> Ajuster un modèle <strong>non linéaire</strong> — logistique, Poisson, Gamma — se ramène à une <strong>suite de régressions linéaires pondérées</strong>, chacune résoluble par une routine existante. On n'a jamais besoin d'un optimiseur général : la structure de famille exponentielle fournit à chaque pas une pondération et une réponse ajustée, et le reste est du moindre carré ordinaire.</p>
+</blockquote>
+<h2>Comment résoudre l'exercice type (protocole)</h2>
+<ol>
+<li><strong>Identifier la nature de la réponse</strong> : continue ⟹ normale · comptage ⟹ Poisson · binaire ⟹ Bernoulli · positive à variance croissante ⟹ Gamma.</li>
+<li><strong>Mettre la loi sous forme canonique</strong> $\exp\big(\frac{y\theta-b(\theta)}{\phi}+c(y,\phi)\big)$ et <strong>identifier $b$ et $\phi$</strong>.</li>
+<li><strong>En déduire</strong> $\mu=b'(\theta)$ et $\mathrm{var}(Y)=b''(\theta)\phi$.</li>
+<li><strong>Choisir le lien</strong> — de préférence le lien <strong>canonique</strong> $g=(b')^{-1}$, pour la simplification et l'unicité.</li>
+<li><strong>Écrire la log-vraisemblance</strong> : avec le lien canonique, $\ell_n=\sum_i\frac{Y_iX_i^\top\beta-b(X_i^\top\beta)}{\phi}$.</li>
+<li><strong>Calculer gradient et hessienne</strong>, ou directement $I(\beta)=X^\top WX$.</li>
+<li><strong>Estimer par IRLS</strong> : réponses ajustées, poids, régression pondérée, itérer.</li>
+<li><strong>Faire l'inférence</strong> : $I(\hat\beta)^{-1}$ donne les écarts-types, puis Wald ou rapport de vraisemblance (fiche 65).</li>
+</ol>
+<h3>Comment reconnaître qu'il faut utiliser cette méthode ?</h3>
+<table>
+<thead>
+<tr>
+<th>Indice dans l'énoncé</th>
+<th>Ce qu'il faut faire</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>réponse <strong>binaire</strong> (oui/non, succès/échec)</td>
+<td><strong>Bernoulli</strong> + lien <strong>logit</strong> ⟹ régression logistique</td>
+</tr>
+<tr>
+<td>réponse de <strong>comptage</strong></td>
+<td><strong>Poisson</strong> + lien <strong>log</strong></td>
+</tr>
+<tr>
+<td>« croissance exponentielle du nombre de cas »</td>
+<td>Poisson, $\log\mu=\beta_0+\beta_1t$</td>
+</tr>
+<tr>
+<td>« écart-type proportionnel à la moyenne »</td>
+<td><strong>Gamma</strong></td>
+</tr>
+<tr>
+<td>relation <strong>non linéaire en les paramètres</strong></td>
+<td>chercher un lien qui la linéarise</td>
+</tr>
+<tr>
+<td>« pourquoi le logit ? »</td>
+<td>c'est le <strong>lien canonique</strong> de Bernoulli</td>
+</tr>
+<tr>
+<td>« le maximum est-il unique ? »</td>
+<td>oui <strong>avec le lien canonique</strong> (stricte concavité)</td>
+</tr>
+<tr>
+<td>« comment ajuster numériquement ? »</td>
+<td><strong>IRLS</strong></td>
+</tr>
+<tr>
+<td>« variances différentes selon l'observation »</td>
+<td>moindres carrés <strong>pondérés</strong></td>
+</tr>
+</tbody></table>
+<h3>Exercices progressifs</h3>
+<p><strong> Niveau 1</strong> — Mettez la loi de Bernoulli sous forme canonique et déduisez-en le lien canonique.</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p><strong>La densité.</strong> $f(y)=p^y(1-p)^{1-y}$ pour $y\in\{0,1\}$. En passant à l'exponentielle du logarithme :
+$$f(y)=\exp\big(y\log p+(1-y)\log(1-p)\big)=\exp\left(y\log\frac{p}{1-p}+\log(1-p)\right)$$</p>
+<p><strong>L'identification.</strong> En comparant à $\exp\big(\frac{y\theta-b(\theta)}{\phi}+c(y,\phi)\big)$ :
+$$\theta=\log\frac{p}{1-p}, \qquad \phi=1, \qquad c(y,\phi)=0$$
+Il reste à exprimer $-\log(1-p)$ en fonction de $\theta$. De $\theta=\log\frac{p}{1-p}$ on tire $e^\theta=\frac{p}{1-p}$, donc $p=\frac{e^\theta}{1+e^\theta}$ et $1-p=\frac{1}{1+e^\theta}$, d'où
+$$b(\theta)=-\log(1-p)=\log(1+e^\theta)$$</p>
+<p><strong>Les moments.</strong>
+$$\mu=b'(\theta)=\frac{e^\theta}{1+e^\theta}=p \qquad\checkmark$$
+$$\mathrm{var}(Y)=b''(\theta)\phi=\frac{e^\theta}{(1+e^\theta)^2}=p(1-p) \qquad\checkmark$$
+Les deux formules retrouvent les moments connus de Bernoulli.</p>
+<p><strong>Le lien canonique.</strong> $g=(b')^{-1}$, et l'on a déjà inversé $b'$ :
+$$g(\mu)=\log\frac{\mu}{1-\mu}$$
+<strong>C'est le lien logit.</strong> Il envoie bien $(0,1)$ sur $\mathbb R$, comme l'exigeait l'exemple 3 du concept 1.</p>
+</div></details>
+
+<p><strong> Niveau 2</strong> — Pourquoi $\mu=b'(\theta)$ et $\mathrm{var}(Y)=b''(\theta)\phi$ ?</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p><strong>Les deux identités</strong>, conséquences de $\int f_\theta(y)dy\equiv1$ dérivée une puis deux fois sous l'intégrale :
+$$\mathbb E\left(\frac{\partial\ell}{\partial\theta}\right)=0, \qquad \mathbb E\left(\frac{\partial^2\ell}{\partial\theta^2}\right)+\mathbb E\left(\frac{\partial\ell}{\partial\theta}\right)^2=0$$</p>
+<p><strong>L'espérance.</strong> De $\ell(\theta)=\frac{Y\theta-b(\theta)}{\phi}+c(Y;\phi)$ :
+$$\frac{\partial\ell}{\partial\theta}=\frac{Y-b'(\theta)}{\phi}$$
+La première identité donne
+$$0=\frac{\mathbb E(Y)-b'(\theta)}{\phi} \qquad\Longrightarrow\qquad \mathbb E(Y)=b'(\theta)$$</p>
+<p><strong>La variance.</strong> On a $\frac{\partial^2\ell}{\partial\theta^2}=-\frac{b''(\theta)}{\phi}$, et, grâce au résultat précédent,
+$$\left(\frac{\partial\ell}{\partial\theta}\right)^2=\left(\frac{Y-\mathbb E(Y)}{\phi}\right)^2$$
+dont l'espérance vaut $\frac{\mathrm{var}(Y)}{\phi^2}$. La seconde identité donne
+$$0=-\frac{b''(\theta)}{\phi}+\frac{\mathrm{var}(Y)}{\phi^2} \qquad\Longrightarrow\qquad \mathrm{var}(Y)=b''(\theta)\phi$$</p>
+<p><strong>Ce qu'il faut retenir.</strong> <strong>Une seule fonction $b$ encode toute la loi</strong> : sa dérivée première donne la moyenne, sa dérivée seconde la variance. C'est ce qui rend la théorie des GLM si compacte.</p>
+<p><strong>Et la conséquence structurelle.</strong> Puisque $\mu=b'(\theta)$, la variance $b''(\theta)\phi$ est une <strong>fonction de la moyenne</strong> : $V(\mu)$. Dans un GLM, on ne choisit <strong>pas</strong> séparément la moyenne et la variance — la famille impose leur relation. Pour Poisson, $V(\mu)=\mu$ ; pour Bernoulli, $V(\mu)=\mu(1-\mu)$ ; pour la normale, $V(\mu)=\sigma^2$, constante. C'est précisément ce que l'exemple 2 du concept 1 exploitait en choisissant Gamma pour obtenir un écart-type proportionnel à la moyenne.</p>
+</div></details>
+
+<p><strong> Niveau 3</strong> — Quels sont les trois avantages du lien canonique ?</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p>Le lien canonique est $g=(b')^{-1}$, c'est-à-dire celui qui identifie le prédicteur linéaire au <strong>paramètre canonique</strong> : $\theta_i=X_i^\top\beta$.</p>
+<p><strong>Avantage 1 — la log-vraisemblance se simplifie.</strong> En général $\theta_i=h(X_i^\top\beta)$ avec $h=(g\circ b')^{-1}$, et
+$$\ell_n(\beta)=\sum_i\frac{Y_ih(X_i^\top\beta)-b\big(h(X_i^\top\beta)\big)}{\phi}$$
+Avec le lien canonique, <strong>$h$ est l'identité</strong> et
+$$\ell_n(\beta)=\sum_i\frac{Y_iX_i^\top\beta-b(X_i^\top\beta)}{\phi}$$</p>
+<p><strong>Avantage 2 — la stricte concavité, donc l'unicité.</strong> La hessienne vaut
+$$H_{\ell_n}(\beta)=-\frac1\phi\sum_ib''(X_i^\top\beta)X_iX_i^\top$$
+Comme $b''(\theta)\phi=\mathrm{var}(Y)&gt;0$ et $\phi&gt;0$, on a $b''&gt;0$, donc $H_{\ell_n}$ est <strong>définie négative</strong> dès que les $X_i$ engendrent $\mathbb R^p$. La log-vraisemblance est <strong>strictement concave</strong> et l'EMV est <strong>unique</strong>.</p>
+<p>Le cours souligne le contraste : <em>si une autre paramétrisation est utilisée, la vraisemblance peut ne pas être strictement concave, ce qui conduit à plusieurs maxima locaux.</em></p>
+<p><strong>Avantage 3 — Newton-Raphson $=$ scores de Fisher.</strong> La hessienne ci-dessus <strong>ne contient pas les $Y_i$</strong> : elle est déterministe, donc égale à son espérance :
+$$H_{\ell_n}(\beta)=\mathbb E\big[H_{\ell_n}(\beta)\big]=-I(\beta)$$
+Les deux algorithmes <strong>coïncident exactement</strong>, et l'on n'a pas à choisir.</p>
+<p><strong>La conclusion pratique.</strong> C'est pour ces trois raisons que le <strong>logit</strong> est le lien standard de la régression binaire, et le <strong>log</strong> celui de la régression de Poisson. Le probit reste utilisé — notamment en économétrie, pour son interprétation en variable latente gaussienne — mais il perd ces trois propriétés.</p>
+</div></details>
+
+<p><strong> Niveau 4 — type examen</strong> — Décrivez l'algorithme IRLS et expliquez pourquoi il fonctionne.</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p><strong>Le point de départ : les scores de Fisher.</strong>
+$$\beta^{(k+1)}=\beta^{(k)}+I\big(\beta^{(k)}\big)^{-1}\nabla\ell_n\big(\beta^{(k)}\big)$$</p>
+<p><strong>Les deux quantités, calculées par la règle de la chaîne.</strong> Avec $\mu_i=b'(\theta_i)$, $X_i^\top\beta=g(\mu_i)$ et $\theta_i=h(X_i^\top\beta)$ :
+$$\frac{\partial\ell_n}{\partial\beta_j}=\sum_i\frac{Y_i-\mu_i}{\phi}h'(X_i^\top\beta)X_{ij}=\sum_i(\tilde Y_i-\tilde\mu_i)W_iX_{ij}$$
+avec $W_i=\frac{h'(X_i^\top\beta)}{g'(\mu_i)\phi}$, $\tilde Y_i=g'(\mu_i)Y_i$ et $\tilde\mu_i=g'(\mu_i)\mu_i$. En posant $W=\mathrm{diag}(W_i)$ :
+$$\nabla\ell_n(\beta)=X^\top W(\tilde Y-\tilde\mu), \qquad I(\beta)=X^\top WX$$</p>
+<p><strong>La mise à jour devient donc</strong>
+$$\beta^{(k+1)}=\beta^{(k)}+(X^\top WX)^{-1}X^\top W(\tilde Y-\tilde\mu)=(X^\top WX)^{-1}X^\top W\big(\tilde Y-\tilde\mu+X\beta^{(k)}\big)$$</p>
+<p><strong>La reconnaissance décisive.</strong> Le membre de droite a <strong>exactement</strong> la forme de la solution des <strong>moindres carrés pondérés</strong>
+$$\hat\beta=(X^\top WX)^{-1}X^\top WZ$$
+avec $W$ pour matrice de poids et $Z=\tilde Y-\tilde\mu+X\beta^{(k)}$ pour réponse. <em>On peut donc obtenir $\beta^{(k+1)}$ par n'importe quel solveur de moindres carrés pondérés.</em></p>
+<p><strong>L'algorithme, en quatre étapes.</strong></p>
+<ol>
+<li>Fixer $\beta^{(k)}$ et $\mu_i^{(k)}=g^{-1}(X_i^\top\beta^{(k)})$.</li>
+<li>Calculer les <strong>réponses ajustées</strong> $Z_i^{(k)}=X_i^\top\beta^{(k)}+g'(\mu_i^{(k)})\big(Y_i-\mu_i^{(k)}\big)$.</li>
+<li>Calculer les <strong>poids</strong> $W^{(k)}=\mathrm{diag}\Big(\frac{h'(X_i^\top\beta^{(k)})}{g'(\mu_i^{(k)})\phi}\Big)$.</li>
+<li><strong>Régresser $Z^{(k)}$ sur $X$ avec les poids $W^{(k)}$</strong> ⟹ $\beta^{(k+1)}$. Répéter jusqu'à convergence.</li>
+</ol>
+<p><strong>Pourquoi cela fonctionne — l'interprétation des étapes 2 et 3.</strong></p>
+<ul>
+<li>La <strong>réponse ajustée</strong> $Z_i^{(k)}$ est le prédicteur linéaire courant, <strong>corrigé du résidu transporté sur l'échelle du lien</strong> par le facteur $g'(\mu_i)$. C'est une linéarisation locale du modèle : on ramène $Y_i$ sur l'échelle où le modèle est linéaire.</li>
+<li>Le <strong>poids</strong> $W_i$ est d'autant plus grand que l'observation est informative — il décroît quand la variance locale augmente. C'est la correction d'<strong>hétéroscédasticité</strong> de la fiche 50, appliquée localement : la variance d'un GLM dépend de la moyenne, donc varie d'une observation à l'autre.</li>
+</ul>
+<p><strong>Ce qu'il faut savoir ajouter.</strong></p>
+<ul>
+<li><em>Il suffit de connaître $X$, $Y$, la <strong>fonction de lien</strong> $g$ et la <strong>fonction de variance</strong> $V(\mu)=b''(\theta)$.</em> Un seul algorithme sert donc à toutes les familles — il suffit de changer $g$ et $V$. C'est ce qui explique l'universalité des implémentations (<code>glm</code> en R, etc.).</li>
+<li><em>Une valeur de départ possible est $\mu^{(0)}=Y$.</em></li>
+<li><em>Si le <strong>lien canonique</strong> est utilisé, les scores de Fisher coïncident avec Newton-Raphson</em>, puisque $\mathbb E(H_{\ell_n})=H_{\ell_n}$ — la hessienne ne contient pas $Y$.</li>
+</ul>
+<p><strong>La leçon de méthode.</strong> Un problème d'optimisation <strong>non linéaire</strong> est transformé en une <strong>suite de problèmes linéaires</strong> déjà résolus. C'est exactement l'esprit de Newton (fiche 39) : approcher localement par une forme quadratique, résoudre exactement l'approximation, itérer.</p>
+</div></details>
+
+<h2 data-prio="must">Common mistakes</h2>
+<ol>
+<li><strong>Écrire $\mu(X)=X^\top\beta$ pour une réponse bornée</strong> — le membre de droite parcourt $\mathbb R$, il faut un <strong>lien</strong>.</li>
+<li><strong>Confondre $\theta$ et $\mu$</strong> — $\theta$ est le paramètre <strong>canonique</strong>, $\mu=b'(\theta)$ la moyenne. Ils coïncident seulement pour la normale.</li>
+<li><strong>Croire qu'on choisit la variance librement</strong> — elle vaut $b''(\theta)\phi$, donc c'est une <strong>fonction de la moyenne</strong>.</li>
+<li><strong>Oublier le facteur $\phi$</strong> dans $\mathrm{var}(Y)=b''(\theta)\phi$.</li>
+<li><strong>Croire que logit et probit sont interchangeables</strong> — le <strong>logit est le lien canonique</strong> de Bernoulli, avec les trois avantages du concept 6.</li>
+<li><strong>Croire que la log-vraisemblance est toujours concave</strong> — c'est garanti <strong>avec le lien canonique</strong> ; sinon plusieurs maxima locaux sont possibles.</li>
+<li><strong>Confondre Newton-Raphson et scores de Fisher</strong> — le second remplace $H_{\ell_n}$ par $-I(\theta)$, son espérance. Ils <strong>coïncident</strong> sous le lien canonique.</li>
+<li><strong>Se tromper de signe dans les mises à jour</strong> — Newton : $x-H^{-1}\nabla$ ; Fisher : $\theta+I^{-1}\nabla$ (les signes se compensent, puisque $I=-\mathbb E[H]$).</li>
+<li><strong>Oublier la pondération dans IRLS</strong> — c'est elle qui corrige l'hétéroscédasticité propre au GLM.</li>
+</ol>
+<h2>Ultimate Review</h2>
+<ol>
+<li><strong>Modèle linéaire</strong> : $Y\mid X\sim N(\mu(X),\sigma^2I)$ et $\mu(X)=X^\top\beta$. Ses <strong>deux composantes</strong> : aléatoire (gaussienne) et lien (identité).</li>
+<li><strong>GLM</strong> : composante aléatoire dans une <strong>famille exponentielle</strong>, et lien $g(\mu(X))=X^\top\beta$.</li>
+<li><strong>Famille exponentielle à $k$ paramètres</strong> : $p_\theta(x)=\exp\big[\sum_i\eta_i(\theta)T_i(x)-B(\theta)\big]h(x)$.</li>
+<li><strong>Forme canonique à un paramètre</strong> : $f_\theta(y)=\exp\big(\frac{y\theta-b(\theta)}{\phi}+c(y,\phi)\big)$ ; $\theta$ <strong>canonique</strong>, $\phi$ <strong>dispersion</strong> (supposé connu).</li>
+<li><strong>Tableau</strong> : normale $b=\theta^2/2$, $\phi=\sigma^2$ · Poisson $b=e^\theta$, $\phi=1$ · Bernoulli $b=\log(1+e^\theta)$, $\phi=1$.</li>
+<li><strong>Deux identités</strong> : $\mathbb E(\partial_\theta\ell)=0$ et $\mathbb E(\partial^2_\theta\ell)+\mathbb E(\partial_\theta\ell)^2=0$, issues de $\int f_\theta=1$.</li>
+<li><strong>Les deux formules maîtresses</strong> : $\boxed{\mu=b'(\theta)}$ et $\boxed{\mathrm{var}(Y)=b''(\theta)\phi}$.</li>
+<li><strong>Fonction de lien</strong> : $X^\top\beta=g(\mu)$, $g$ monotone croissante et dérivable ; identité (normale), $\log$ (Poisson), <strong>logit / probit / log-log complémentaire</strong> (Bernoulli).</li>
+<li><strong>Lien canonique</strong> : $g=(b')^{-1}$, donc $g(\mu)=\theta$ ; <strong>strictement croissant</strong> car $b''&gt;0$.</li>
+<li><strong>Liens canoniques</strong> : normale $\mu$ · Poisson $\log\mu$ · Bernoulli $\log\frac{\mu}{1-\mu}$ · Gamma $-1/\mu$.</li>
+<li><strong>Le modèle</strong> : $\theta_i=h(X_i^\top\beta)$ avec $h=(g\circ b')^{-1}$ ; <strong>$h=$ identité</strong> si $g$ est canonique.</li>
+<li><strong>Log-vraisemblance</strong> : $\sum_i\frac{Y_ih(X_i^\top\beta)-b(h(X_i^\top\beta))}{\phi}$, qui devient $\sum_i\frac{Y_iX_i^\top\beta-b(X_i^\top\beta)}{\phi}$ sous lien canonique.</li>
+<li><strong>Stricte concavité</strong> sous lien canonique et $\phi&gt;0$ ⟹ <strong>EMV unique</strong>.</li>
+<li><strong>Newton-Raphson</strong> : $x^{(k+1)}=x^{(k)}-H_f^{-1}\nabla f$ ; convergence <strong>quadratique</strong> si $f$ concave.</li>
+<li><strong>Scores de Fisher</strong> : $\theta^{(k+1)}=\theta^{(k)}+I(\theta^{(k)})^{-1}\nabla\ell_n$ ; on remplace $H$ par $\mathbb E[H]=-I$, souvent plus facile à calculer.</li>
+<li><strong>Régression logistique</strong> : $\nabla\ell_n=\sum_i\big(Y_i-\frac{e^{X_i^\top\beta}}{1+e^{X_i^\top\beta}}\big)X_i$ et $H_{\ell_n}=-\sum_i\frac{e^{X_i^\top\beta}}{(1+e^{X_i^\top\beta})^2}X_iX_i^\top$ ; <strong>$Y$ absent de $H$</strong>.</li>
+<li><strong>IRLS</strong> : $\nabla\ell_n=X^\top W(\tilde Y-\tilde\mu)$, $I(\beta)=X^\top WX$, d'où $\beta^{(k+1)}=(X^\top WX)^{-1}X^\top W\big(\tilde Y-\tilde\mu+X\beta^{(k)}\big)$.</li>
+<li><strong>Moindres carrés pondérés</strong> : $\min_\beta(Y-X\beta)^\top W(Y-X\beta)$, de solution $(X^\top WX)^{-1}X^\top WY$ — les <strong>MCG</strong> de la fiche 50.</li>
+<li><strong>Procédure IRLS</strong> : $\mu^{(k)}$ · réponses ajustées $Z^{(k)}$ · poids $W^{(k)}$ · <strong>régression pondérée</strong> ⟹ $\beta^{(k+1)}$.</li>
+<li><strong>Ce qu'il suffit de connaître</strong> : $X$, $Y$, le lien $g$ et la <strong>fonction de variance</strong> $V(\mu)=b''(\theta)$ ; départ $\mu^{(0)}=Y$.</li>
+</ol>
+<p><strong>Formulas to know</strong>
+$$f_\theta(y)=\exp\left(\frac{y\theta-b(\theta)}{\phi}+c(y,\phi)\right) \qquad \mu=b'(\theta) \qquad \mathrm{var}(Y)=b''(\theta)\phi$$
+$$g(\mu)=X^\top\beta \qquad g_{\text{canonique}}=(b')^{-1} \qquad \text{logit}(\mu)=\log\frac{\mu}{1-\mu}$$
+$$\nabla\ell_n(\beta)=X^\top W(\tilde Y-\tilde\mu) \qquad I(\beta)=X^\top WX \qquad \beta^{(k+1)}=(X^\top WX)^{-1}X^\top WZ^{(k)}$$</p>
+<p><strong>Methods to know</strong> : mettre une loi sous forme canonique ; dériver $\mu$ et $\mathrm{var}$ par les deux identités ; établir que le logit est canonique pour Bernoulli ; la procédure IRLS en quatre étapes.</p>
+<div class="rec"><h2>Active Recall</h2><p><strong>Basic</strong> — Écrivez la forme canonique de la famille exponentielle et donnez moyenne et variance.</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p>$$f_\theta(y)=\exp\left(\frac{y\theta-b(\theta)}{\phi}+c(y,\phi)\right)$$
+où $\theta$ est le <strong>paramètre canonique</strong> et $\phi$ le <strong>paramètre de dispersion</strong> (supposé connu).</p>
+<p>Les moments s'obtiennent par les deux identités issues de $\int f_\theta=1$ :
+$$\mathbb E(Y)=\mu=b'(\theta), \qquad \mathrm{var}(Y)=b''(\theta)\,\phi$$</p>
+<p><strong>Une seule fonction $b$ encode toute la loi</strong> — et comme $\mu=b'(\theta)$, la variance est nécessairement une <strong>fonction de la moyenne</strong>.</p>
+</div></details><p><strong>Understanding</strong> — Pourquoi faut-il une fonction de lien ?</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p>Parce que le prédicteur linéaire $X^\top\beta$ parcourt <strong>tout $\mathbb R$</strong>, alors que la moyenne $\mu$ est souvent <strong>contrainte</strong> :</p>
+<ul>
+<li>Bernoulli : $\mu\in(0,1)$ ;</li>
+<li>Poisson : $\mu&gt;0$ ;</li>
+<li>Gamma : $\mu&gt;0$.</li>
+</ul>
+<p>Écrire $\mu(X)=X^\top\beta$ produirait des valeurs impossibles. Le cours le dit pour les données Kyphosis : <em>on ne peut pas écrire $\mu(X)=X^\top\beta$ parce que le membre de droite parcourt $\mathbb R$ ; il faut une fonction inversible $f$ telle que $f(X^\top\beta)\in(0,1)$.</em></p>
+<p><strong>La solution</strong> : une fonction $g$ <strong>monotone croissante et dérivable</strong> telle que
+$$g(\mu)=X^\top\beta \qquad\Longleftrightarrow\qquad \mu=g^{-1}(X^\top\beta)$$
+avec $g$ envoyant le domaine de $\mu$ sur $\mathbb R$ tout entier. Pour un comptage, $\log$ envoie $(0,\infty)$ sur $\mathbb R$ ; pour une proportion, le <strong>logit</strong> envoie $(0,1)$ sur $\mathbb R$.</p>
+<p><strong>Bonus</strong> : le lien peut aussi <strong>linéariser</strong> une relation non linéaire — c'est l'exemple 2 du cours, où le lien réciproque $1/\mu$ transforme $\mu=\frac{\alpha x}{h+x}$ en une relation affine en $1/x$.</p>
+</div></details><p><strong>Application</strong> — Quel GLM pour un nombre de sinistres par assuré ?</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p><strong>La réponse est un comptage</strong> : $Y\in\{0,1,2,\dots\}$. La loi naturelle est <strong>Poisson</strong>.</p>
+<p><strong>La forme canonique.</strong> $f(y)=\frac{\mu^ye^{-\mu}}{y!}=\exp\big(y\log\mu-\mu-\log(y!)\big)$, d'où
+$$\theta=\log\mu, \qquad b(\theta)=e^\theta, \qquad \phi=1, \qquad c(y,\phi)=-\log(y!)$$</p>
+<p><strong>Les moments.</strong> $b'(\theta)=e^\theta=\mu$  et $\mathrm{var}(Y)=b''(\theta)\phi=e^\theta=\mu$ — la variance <strong>égale</strong> la moyenne, propriété caractéristique de Poisson.</p>
+<p><strong>Le lien canonique.</strong> $g=(b')^{-1}$, soit $g(\mu)=\log\mu$. Le modèle s'écrit donc
+$$\log\big(\mu(X)\big)=X^\top\beta \qquad\Longleftrightarrow\qquad \mu(X)=e^{X^\top\beta}$$
+ce qui garantit $\mu&gt;0$ automatiquement.</p>
+<p><strong>L'interprétation, qui est le grand avantage du lien log.</strong> Les coefficients s'interprètent <strong>multiplicativement</strong> : augmenter $X^{(j)}$ d'une unité multiplie le nombre espéré de sinistres par $e^{\beta_j}$. C'est exactement le langage de la tarification en assurance.</p>
+<p class="cal piege"> <strong>La limite à connaître.</strong> Poisson impose $\mathrm{var}(Y)=\mu$. En assurance, on observe presque toujours une <strong>surdispersion</strong> — variance supérieure à la moyenne. On passe alors à une <strong>binomiale négative</strong> (elle aussi de famille exponentielle), ou l'on introduit un paramètre de dispersion $\phi&gt;1$.</p>
+</div></details><p><strong>Comparison</strong> — Newton-Raphson, scores de Fisher, IRLS : quelle différence ?</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<table>
+<thead>
+<tr>
+<th></th>
+<th><strong>Newton-Raphson</strong></th>
+<th><strong>Scores de Fisher</strong></th>
+<th><strong>IRLS</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Mise à jour</td>
+<td>$x-H_f^{-1}\nabla f$</td>
+<td>$\theta+I(\theta)^{-1}\nabla\ell_n$</td>
+<td>régression pondérée</td>
+</tr>
+<tr>
+<td>Matrice utilisée</td>
+<td>hessienne <strong>empirique</strong> $H_{\ell_n}$</td>
+<td>son <strong>espérance</strong> $-I(\theta)$</td>
+<td>$X^\top WX$</td>
+</tr>
+<tr>
+<td>Contient $Y$ ?</td>
+<td>oui en général</td>
+<td>non</td>
+<td>non</td>
+</tr>
+<tr>
+<td>Outil requis</td>
+<td>optimiseur</td>
+<td>optimiseur</td>
+<td><strong>solveur de MCP</strong></td>
+</tr>
+</tbody></table>
+<p><strong>Newton-Raphson</strong> est la méthode générale : approximation quadratique locale, résolution exacte, itération. Convergence <strong>quadratique</strong> si $f$ est concave.</p>
+<p><strong>Les scores de Fisher</strong> remplacent $H_{\ell_n}$ par son espérance $-I(\theta)$. Motivation du cours : <em>le calcul de la hessienne est parfois assez compliqué</em>, et $I$ est <strong>définie positive</strong>, donc un substitut sûr. Mêmes propriétés de convergence.</p>
+<p><strong>IRLS</strong> est la <strong>mise en œuvre concrète</strong> des scores de Fisher pour les GLM. En développant, on trouve
+$$\beta^{(k+1)}=(X^\top WX)^{-1}X^\top W\big(\tilde Y-\tilde\mu+X\beta^{(k)}\big)$$
+qui a exactement la forme d'une solution de <strong>moindres carrés pondérés</strong>. On n'a donc besoin d'aucun optimiseur : une routine de régression pondérée suffit.</p>
+<p><strong>Le cas particulier remarquable.</strong> Avec le <strong>lien canonique</strong>, la hessienne ne contient pas $Y$ :
+$$H_{\ell_n}(\beta)=\mathbb E[H_{\ell_n}(\beta)]=-I(\beta)$$
+et les trois méthodes <strong>coïncident</strong>.</p>
+</div></details><p><strong>Exam-style</strong> — Construisez complètement la régression logistique comme GLM.</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p><strong>1. La composante aléatoire.</strong> $Y_i\mid X_i\sim\mathrm{Bernoulli}(p_i)$, indépendants. La densité s'écrit
+$$f(y)=p^y(1-p)^{1-y}=\exp\left(y\log\frac{p}{1-p}+\log(1-p)\right)$$
+soit, sous forme canonique,
+$$\theta=\log\frac{p}{1-p}, \qquad b(\theta)=\log(1+e^\theta), \qquad \phi=1, \qquad c(y,\phi)=0$$</p>
+<p><strong>2. Les moments.</strong> $\mu=b'(\theta)=\frac{e^\theta}{1+e^\theta}=p$ et $\mathrm{var}(Y)=b''(\theta)\phi=\frac{e^\theta}{(1+e^\theta)^2}=p(1-p)$. </p>
+<p><strong>3. Le lien canonique.</strong> $g=(b')^{-1}$, donc
+$$g(\mu)=\log\frac{\mu}{1-\mu}=\text{logit}(\mu)$$
+Le modèle est $\text{logit}(p_i)=X_i^\top\beta$, soit $p_i=\frac{e^{X_i^\top\beta}}{1+e^{X_i^\top\beta}}\in(0,1)$ automatiquement.</p>
+<p><strong>4. La log-vraisemblance.</strong> Comme $h$ est l'identité sous lien canonique, $\theta_i=X_i^\top\beta$ et
+$$\ell_n(\beta\mid Y,X)=\sum_{i=1}^n\Big(Y_iX_i^\top\beta-\log\big(1+e^{X_i^\top\beta}\big)\Big)$$</p>
+<p><strong>5. Le gradient.</strong>
+$$\nabla\ell_n(\beta)=\sum_{i=1}^n\left(Y_i-\frac{e^{X_i^\top\beta}}{1+e^{X_i^\top\beta}}\right)X_i=\sum_i\big(Y_i-p_i\big)X_i=X^\top(Y-p)$$
+C'est une <strong>combinaison linéaire des $X_i$</strong>, pondérée par les résidus.</p>
+<p><strong>6. La hessienne.</strong>
+$$H_{\ell_n}(\beta)=-\sum_{i=1}^n\frac{e^{X_i^\top\beta}}{\big(1+e^{X_i^\top\beta}\big)^2}X_iX_i^\top=-\sum_ip_i(1-p_i)X_iX_i^\top=-X^\top WX$$
+avec $W=\mathrm{diag}\big(p_i(1-p_i)\big)$ — c'est <strong>exactement la fonction de variance</strong> $V(\mu)=\mu(1-\mu)$.</p>
+<p><strong>7. Les trois observations du cours.</strong></p>
+<ul>
+<li>Score linéaire en $X_i$, information linéaire en $X_iX_i^\top$ : <em>typique des modèles de régression en famille exponentielle</em>.</li>
+<li>Hessienne <strong>définie négative</strong> ⟹ maximum local unique, qui est le maximum global.</li>
+<li><strong>$Y$ n'apparaît pas dans $H_{\ell_n}$</strong> ⟹ $H_{\ell_n}(\beta)=\mathbb E[H_{\ell_n}(\beta)]=-I(\beta)$, donc <strong>Newton-Raphson $=$ scores de Fisher</strong>.</li>
+</ul>
+<p><strong>8. L'estimation par IRLS.</strong> Avec $g'(\mu)=\frac{1}{\mu(1-\mu)}$ :</p>
+<ul>
+<li>réponse ajustée : $Z_i^{(k)}=X_i^\top\beta^{(k)}+\dfrac{Y_i-p_i^{(k)}}{p_i^{(k)}(1-p_i^{(k)})}$ ;</li>
+<li>poids : $W_i^{(k)}=p_i^{(k)}(1-p_i^{(k)})$ ;</li>
+<li>régresser $Z^{(k)}$ sur $X$ avec les poids $W^{(k)}$, itérer.</li>
+</ul>
+<p><strong>9. L'inférence.</strong> $I(\hat\beta)=X^\top WX$ donne les écarts-types asymptotiques, d'où les tests de <strong>Wald</strong> et du <strong>rapport de vraisemblance</strong> de la fiche 65.</p>
+<p><strong>Le point d'interprétation à ne pas manquer.</strong> $\beta_j$ est l'effet sur le <strong>log-odds</strong> : augmenter $X^{(j)}$ d'une unité multiplie la cote $\frac{p}{1-p}$ par $e^{\beta_j}$. C'est l'<strong>odds ratio</strong>, la quantité universellement rapportée en épidémiologie et en économétrie du choix discret.</p>
+<p><strong>Et la remarque sur les poids.</strong> $W_i=p_i(1-p_i)$ est <strong>maximal en $p_i=1/2$</strong> et tend vers $0$ quand $p_i\to0$ ou $1$. Les observations dont l'issue est presque certaine apportent peu d'information — ce sont les cas « incertains » qui déterminent les coefficients.</p>
+</div></details></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h2>Flashcards</h2>
+<table>
+<thead>
+<tr>
+<th>Question</th>
+<th>Réponse</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Les deux composantes d'un modèle linéaire ?</td>
+<td>Composante <strong>aléatoire</strong> (gaussienne) et <strong>lien</strong> (identité)</td>
+</tr>
+<tr>
+<td>Ce que généralise un GLM ?</td>
+<td>La loi (famille exponentielle) et le lien $g(\mu)=X^\top\beta$</td>
+</tr>
+<tr>
+<td>Forme canonique de la famille exponentielle ?</td>
+<td>$\exp\big(\frac{y\theta-b(\theta)}{\phi}+c(y,\phi)\big)$</td>
+</tr>
+<tr>
+<td>Nom de $\theta$ ?</td>
+<td>Paramètre <strong>canonique</strong></td>
+</tr>
+<tr>
+<td>Nom de $\phi$ ?</td>
+<td>Paramètre de <strong>dispersion</strong></td>
+</tr>
+<tr>
+<td>Première identité ?</td>
+<td>$\mathbb E(\partial\ell/\partial\theta)=0$</td>
+</tr>
+<tr>
+<td>Seconde identité ?</td>
+<td>$\mathbb E(\partial^2\ell/\partial\theta^2)+\mathbb E(\partial\ell/\partial\theta)^2=0$</td>
+</tr>
+<tr>
+<td>Expression de la moyenne ?</td>
+<td>$\mu=b'(\theta)$</td>
+</tr>
+<tr>
+<td>Expression de la variance ?</td>
+<td>$\mathrm{var}(Y)=b''(\theta)\phi$</td>
+</tr>
+<tr>
+<td>$b(\theta)$ pour la normale ?</td>
+<td>$\theta^2/2$</td>
+</tr>
+<tr>
+<td>$b(\theta)$ pour Poisson ?</td>
+<td>$e^\theta$</td>
+</tr>
+<tr>
+<td>$b(\theta)$ pour Bernoulli ?</td>
+<td>$\log(1+e^\theta)$</td>
+</tr>
+<tr>
+<td>$\phi$ pour Poisson et Bernoulli ?</td>
+<td>$1$</td>
+</tr>
+<tr>
+<td>Rôle de la fonction de lien ?</td>
+<td>Relier $X^\top\beta\in\mathbb R$ à $\mu$ contrainte</td>
+</tr>
+<tr>
+<td>Propriétés exigées de $g$ ?</td>
+<td>Monotone <strong>croissante</strong> et <strong>dérivable</strong></td>
+</tr>
+<tr>
+<td>Lien naturel pour un comptage ?</td>
+<td>$\log$</td>
+</tr>
+<tr>
+<td>Les trois liens pour Bernoulli ?</td>
+<td><strong>logit</strong>, <strong>probit</strong>, log-log complémentaire</td>
+</tr>
+<tr>
+<td>Définition du lien canonique ?</td>
+<td>$g(\mu)=\theta$, soit $g=(b')^{-1}$</td>
+</tr>
+<tr>
+<td>Pourquoi est-il croissant ?</td>
+<td>Car $b''\phi=\mathrm{var}(Y)&gt;0$</td>
+</tr>
+<tr>
+<td>Lien canonique de Bernoulli ?</td>
+<td>Le <strong>logit</strong> $\log\frac{\mu}{1-\mu}$</td>
+</tr>
+<tr>
+<td>Lien canonique de Poisson ?</td>
+<td>$\log\mu$</td>
+</tr>
+<tr>
+<td>Lien canonique de Gamma ?</td>
+<td>$-1/\mu$</td>
+</tr>
+<tr>
+<td>Que vaut $h$ ?</td>
+<td>$(g\circ b')^{-1}$ ; l'<strong>identité</strong> si $g$ est canonique</td>
+</tr>
+<tr>
+<td>Log-vraisemblance sous lien canonique ?</td>
+<td>$\sum_i\frac{Y_iX_i^\top\beta-b(X_i^\top\beta)}{\phi}$</td>
+</tr>
+<tr>
+<td>Pourquoi l'EMV est-il unique ?</td>
+<td><strong>Stricte concavité</strong> sous lien canonique</td>
+</tr>
+<tr>
+<td>Mise à jour de Newton-Raphson ?</td>
+<td>$x^{(k+1)}=x^{(k)}-H_f^{-1}\nabla f$</td>
+</tr>
+<tr>
+<td>Mise à jour des scores de Fisher ?</td>
+<td>$\theta^{(k+1)}=\theta^{(k)}+I(\theta^{(k)})^{-1}\nabla\ell_n$</td>
+</tr>
+<tr>
+<td>Pourquoi préférer $I$ à $H$ ?</td>
+<td>Elle est <strong>définie positive</strong> et souvent plus simple</td>
+</tr>
+<tr>
+<td>Gradient de la logistique ?</td>
+<td>$\sum_i\big(Y_i-\frac{e^{X_i^\top\beta}}{1+e^{X_i^\top\beta}}\big)X_i$</td>
+</tr>
+<tr>
+<td>Particularité de sa hessienne ?</td>
+<td>Elle <strong>ne contient pas $Y$</strong> ⟹ Newton $=$ Fisher</td>
+</tr>
+<tr>
+<td>Gradient sous forme matricielle ?</td>
+<td>$X^\top W(\tilde Y-\tilde\mu)$</td>
+</tr>
+<tr>
+<td>Information de Fisher d'un GLM ?</td>
+<td>$I(\beta)=X^\top WX$</td>
+</tr>
+<tr>
+<td>Solution des moindres carrés pondérés ?</td>
+<td>$(X^\top WX)^{-1}X^\top WY$</td>
+</tr>
+<tr>
+<td>Les quatre étapes d'IRLS ?</td>
+<td>$\mu^{(k)}$ · réponses ajustées · poids · régression pondérée</td>
+</tr>
+<tr>
+<td>Réponse ajustée ?</td>
+<td>$Z_i=X_i^\top\beta+g'(\mu_i)(Y_i-\mu_i)$</td>
+</tr>
+<tr>
+<td>Que suffit-il de connaître pour IRLS ?</td>
+<td>$X$, $Y$, le lien $g$ et la variance $V(\mu)=b''(\theta)$</td>
+</tr>
+</tbody></table>
+</main>
+
+
+
+
+</body></html>

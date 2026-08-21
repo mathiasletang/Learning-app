@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fiche 41 — Méthodes de points intérieurs (Boyd, chapitre 11)</title>
+<script>
+window.MathJax={tex:{inlineMath:[["$","$"]],displayMath:[["$$","$$"]],processEscapes:true},
+ options:{skipHtmlTags:["script","noscript","style","textarea","pre","code"]},
+ svg:{fontCache:"global"},
+ startup:{pageReady:()=>MathJax.startup.defaultPageReady().then(()=>{document.body.classList.add("ready")})}};
+setTimeout(function(){document.body.classList.add("ready")},2500);
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+/* ============================================================
+   MathiasLearn — feuille de style des fiches
+   Reprise intégrale des tokens de 00_PARCOURS/*.html
+   + blocs pédagogiques (callouts, méthode, essentiels, recall)
+   ============================================================ */
+:root{--bg:#faf9f7;--card:#fff;--ink:#1a1a1a;--muted:#6b6b6b;--line:#e5e2dd;--accent:#8b5e34;
+ --hl:#fdf8ef;--ok:#2d7d4f;--okbg:#f0f7f3;--warn:#b3402f;--warnbg:#fdf3f1;--blue:#2f5d8b;--bluebg:#f1f5fa}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+ font:17px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;padding:0 16px 100px}
+.nav{position:sticky;top:0;background:rgba(250,249,247,.96);backdrop-filter:blur(8px);
+ border-bottom:1px solid var(--line);margin:0 -16px 30px;padding:11px 16px;z-index:50;
+ display:flex;gap:6px;flex-wrap:wrap;font-size:13px}
+.nav a{color:var(--muted);text-decoration:none;padding:4px 9px;border-radius:5px;white-space:nowrap}
+.nav a:hover{background:var(--line);color:var(--ink)}
+.nav a.on{background:var(--accent);color:#fff}
+main{max-width:780px;margin:0 auto}
+h1{font-size:31px;letter-spacing:-.02em;margin:.4em 0 .5em;line-height:1.25}
+h2{font-size:23px;margin:2.2em 0 .7em;padding-bottom:.3em;border-bottom:1px solid var(--line)}
+h3{font-size:19px;margin:1.9em 0 .5em;color:var(--accent)}
+h4{font-size:17px;margin:1.5em 0 .4em}
+p{margin:.8em 0} a{color:var(--accent)} hr{border:0;border-top:1px solid var(--line);margin:2.6em 0}
+table{border-collapse:collapse;width:100%;margin:1.3em 0;font-size:15.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+th{background:#f3f0eb;font-weight:600}
+tr:nth-child(even) td{background:#fcfbfa}
+code{font-family:"SF Mono",Menlo,Consolas,monospace;font-size:.88em;background:#f2efea;padding:2px 6px;border-radius:4px;white-space:nowrap}
+pre{background:#f2efea;padding:14px 16px;border-radius:8px;overflow-x:auto}
+pre code{background:none;padding:0;white-space:pre}
+blockquote{border-left:3px solid var(--accent);background:var(--hl);margin:1.4em 0;padding:14px 20px;border-radius:0 8px 8px 0}
+blockquote p:first-child{margin-top:0} blockquote p:last-child{margin-bottom:0}
+ul,ol{padding-left:1.5em} li{margin:.35em 0} em{color:#4a4a4a}
+mjx-container[display="true"]{margin:1.1em 0!important;overflow-x:auto;overflow-y:hidden;padding:2px 0}
+mjx-container svg{max-width:100%}
+body:not(.ready) main{opacity:0} main{opacity:1;transition:opacity .25s}
+
+/* --- bandeau de tête de fiche --- */
+.cours{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--accent);
+ border-radius:0 10px 10px 0;padding:18px 22px;margin:0 0 34px}
+.cours h4{margin:0 0 4px;font-size:14px;text-transform:uppercase;letter-spacing:.07em;color:var(--accent)}
+.cours .cs{color:var(--muted);font-size:14.5px;margin:0 0 14px}
+
+/* --- exercices / corrigés --- */
+.ex{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:6px 24px 20px;margin:18px 0}
+.ex>h3:first-child{margin-top:14px}
+details.cor{margin-top:18px;border:1px solid var(--line);border-radius:8px;background:#fcfbfa;overflow:hidden}
+details.cor>summary{cursor:pointer;padding:12px 16px;font-weight:600;font-size:15px;color:var(--accent);
+ list-style:none;display:flex;align-items:center;gap:9px;user-select:none;transition:.15s;min-height:44px}
+details.cor>summary::-webkit-details-marker{display:none}
+details.cor>summary:hover{background:var(--hl)}
+details.cor>summary::before{content:"\25B6";font-size:10px;transition:transform .18s;display:inline-block}
+details.cor[open]>summary::before{transform:rotate(90deg)}
+details.cor[open]>summary{background:var(--okbg);color:var(--ok);border-bottom:1px solid var(--line)}
+.cor .in{padding:4px 20px 16px}
+.cor .in>*:first-child{margin-top:.9em}
+
+/* --- blocs pédagogiques (callouts) ---
+   Générés depuis une citation Markdown dont le premier **gras** commence
+   par un mot-clé : DÉFINITION, THÉORÈME, MÉTHODE, PIÈGE, INTUITION… */
+.cal{border:1px solid var(--line);border-left:4px solid var(--accent);background:var(--card);
+ border-radius:0 10px 10px 0;padding:15px 20px;margin:1.5em 0}
+.cal>p:first-child{margin-top:0}.cal>p:last-child,.cal>ul:last-child,.cal>ol:last-child{margin-bottom:0}
+.cal .lab{display:block;font-size:12.5px;text-transform:uppercase;letter-spacing:.08em;
+ font-weight:700;color:var(--accent);margin-bottom:6px}
+.cal.formel{background:var(--hl)}
+.cal.piege{border-left-color:var(--warn);background:var(--warnbg)}
+.cal.piege .lab{color:var(--warn)}
+.cal.methode{border-left-color:var(--ok);background:var(--okbg)}
+.cal.methode .lab{color:var(--ok)}
+.cal.intu{border-left-color:var(--blue);background:var(--bluebg)}
+.cal.intu .lab{color:var(--blue)}
+.cal.plus{border-left-style:dashed;background:#faf9f7}
+.cal.plus .lab{color:var(--muted)}
+
+/* --- révision express --- */
+.ess{background:var(--card);border:1px solid var(--accent);border-radius:10px;padding:4px 24px 20px;margin:1.6em 0}
+.ess h3{margin-top:1.3em}
+.rec{background:var(--card);border:1px dashed var(--accent);border-radius:10px;padding:4px 24px 18px;margin:1.6em 0}
+.rec ol{counter-reset:none}
+
+/* --- impression / PDF --- */
+@media print{
+ .nav{display:none}
+ body{padding:0;background:#fff;font-size:11.2pt;line-height:1.55}
+ main{max-width:none}
+ h1{font-size:23pt}h2{font-size:15pt;margin-top:1.5em}h3{font-size:12.6pt}
+ h2,h3,h4{break-after:avoid;page-break-after:avoid}
+ table,.cal,blockquote{break-inside:avoid;page-break-inside:avoid}
+ table{display:table;font-size:9.6pt}
+ details.cor{border:1px solid var(--line);background:#fcfbfa}
+ details.cor>summary{display:none}
+ details.cor .in{padding-top:10px}
+ .cal,.ex,.ess,.rec{box-shadow:none}
+ a{color:var(--ink);text-decoration:none}
+}
+@page{margin:16mm 15mm 18mm}
+
+/* --- exemples travaillés --- */
+.exm{background:#fcfbfa;border:1px solid var(--line);border-radius:10px;padding:2px 20px 14px;margin:1.5em 0}
+.exm>h4:first-child{margin:14px 0 .5em;color:var(--accent);font-size:13px;text-transform:uppercase;letter-spacing:.07em}
+
+
+/* --- pastilles de priorité (conventions des fiches de l'app) --- */
+h2[data-prio], h3[data-prio], h4[data-prio]{position:relative}
+h2[data-prio]::before,h3[data-prio]::before,h4[data-prio]::before{
+ content:"";display:inline-block;width:9px;height:9px;border-radius:50%;
+ margin-right:9px;vertical-align:middle;background:var(--muted)}
+[data-prio="must"]::before{background:var(--warn)}
+[data-prio="high"]::before{background:#d98324}
+[data-prio="mid"]::before{background:#c9a227}
+[data-prio="low"]::before{background:var(--ok)}
+/* corrigés des fiches de l'app : même traitement que les corrigés des séries */
+details.cor>summary::after{content:""}
+</style></head><body>
+<div class="nav"><a href="24-lp-formulation.html">Programmation linéaire : formulation et géométrie</a><a href="25-lp-affine-par-morceaux.html">Optimisation affine par morceaux : tout ramener à un LP</a><a href="26-lp-polyedres.html">Polyèdres : faces, points extrêmes, test du rang</a><a href="27-lp-convexite-cones.html">Enveloppes convexes, cônes et décomposition d'un polyèdre</a><a href="28-lp-dualite.html">Dualité en programmation linéaire</a><a href="29-lp-sensibilite-jeux.html">Dualité II : sensibilité, prix implicites et jeux à somme nulle</a><a href="30-lp-simplexe.html">L'algorithme du simplexe</a><a href="31-lp-reseaux-unimodularite.html">Flots dans les réseaux et unimodularité totale</a><a href="32-lp-commande.html">Applications en automatique : suivi de consigne et robustesse</a><a href="33-lp-nombres-entiers.html">Programmation linéaire en nombres entiers et séparation-évaluation</a><a href="34-boyd-ensembles-convexes.html">Ensembles convexes</a><a href="35-boyd-fonctions-convexes.html">Fonctions convexes</a><a href="36-boyd-problemes-convexes.html">Problèmes d'optimisation convexe</a><a href="37-boyd-familles-standard.html">Les familles standard : LP, QP, SOCP, GP, SDP</a><a href="38-boyd-dualite.html">Dualité lagrangienne</a><a href="39-boyd-minimisation-sans-contrainte.html">Minimisation sans contrainte : gradient et Newton</a><a href="40-boyd-contraintes-egalite.html">Minimisation sous contraintes d'égalité</a><a href="41-boyd-points-interieurs.html" class="on">Méthodes de points intérieurs</a><a href="42-sous-gradients.html">Sous-gradients et sous-différentiel</a><a href="43-methode-sous-gradient.html">La méthode du sous-gradient</a></div>
+<main><h1>Fiche 41 — Méthodes de points intérieurs (Boyd, chapitre 11)</h1>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Matière</strong></td>
+<td>Maths · Optimisation</td>
+</tr>
+<tr>
+<td><strong>Cours source</strong></td>
+<td>Boyd &amp; Vandenberghe, <em>Convex Optimization</em>, chapitre 11 « Interior-point methods », p. 561–620</td>
+</tr>
+<tr>
+<td><strong>Difficulté</strong></td>
+<td> Must know — l'aboutissement algorithmique du livre</td>
+</tr>
+<tr>
+<td><strong>Temps d'étude estimé</strong></td>
+<td>2 h 15</td>
+</tr>
+<tr>
+<td><strong>Prérequis</strong></td>
+<td>Fiches 39 et 40 (Newton, système KKT), fiche 38 (dualité, KKT)</td>
+</tr>
+<tr>
+<td><strong>Concepts clés</strong></td>
+<td>Barrière logarithmique, chemin central, points duaux associés, saut de dualité $m/t$, méthode de barrière, compromis sur $\mu$, KKT modifiées, phase I, auto-concordance</td>
+</tr>
+<tr>
+<td><strong>Poids à l'examen</strong></td>
+<td>Deux résultats à savoir démontrer : <strong>le saut de dualité vaut exactement $m/t$</strong> sur le chemin central, et le <strong>nombre d'étapes de centrage</strong> $\log(m/(t^{(0)}\varepsilon))/\log\mu$. Plus l'interprétation des KKT <strong>relâchées</strong>.</td>
+</tr>
+</tbody></table>
+<h2>Vue d'ensemble</h2>
+<p>On veut enfin résoudre le problème <strong>complet</strong> :
+$$\min\ f_0(x) \quad\text{s.c.}\quad f_i(x)\leq0 \ (i=1,\dots,m), \quad Ax=b$$
+avec $f_0,\dots,f_m$ convexes et deux fois dérivables.</p>
+<p><strong>L'idée</strong> : remplacer chaque contrainte d'inégalité par un <strong>mur mou</strong> dans l'objectif — une barrière qui devient infinie au bord — puis durcir progressivement ce mur. Chaque problème intermédiaire n'a plus que des <strong>égalités</strong> : c'est le chapitre 10.</p>
+<pre><code>INDICATRICE I₋(u)   (mur infini, non différentiable)
+      ↓  approximée par
+BARRIÈRE  −(1/t)·log(−u)   (mur mou, C^∞, de plus en plus raide quand t croît)
+      ↓
+CENTRAGE : min t·f₀(x) + φ(x)  s.c.  Ax = b        ← Newton du chapitre 10
+      ↓  puis  t := μt  et on recommence
+SAUT DE DUALITÉ EXACT : f₀(x*(t)) − p* ≤ m/t
+</code></pre>
+<p><strong>La hiérarchie du livre est ainsi complète</strong> : quadratique à égalités (système linéaire) → Newton (suite de quadratiques) → points intérieurs (suite de problèmes à égalités).</p>
+<h2 data-prio="mid">Concept 1 — De l'indicatrice à la barrière</h2>
+<p>On rend d'abord les inégalités <strong>implicites</strong> :
+$$\min\ f_0(x) + \sum_{i=1}^m I_-\big(f_i(x)\big) \quad\text{s.c.}\quad Ax=b \tag{11.3}$$
+où $I_-(u)=0$ si $u\leq0$ et $+\infty$ sinon. C'est exact, mais l'objectif n'est <strong>pas différentiable</strong> : Newton est inapplicable.</p>
+<p><strong>L'approximation.</strong>
+$$\hat I_-(u) = -\frac1t\log(-u), \qquad \mathbf{dom}\,\hat I_- = -\mathbb{R}_{++}$$
+avec $t&gt;0$ réglant la précision. Comme $I_-$, la fonction $\hat I_-$ est <strong>convexe et croissante</strong>, et vaut $+\infty$ pour $u&gt;0$. Contrairement à $I_-$, elle est <strong>différentiable et fermée</strong> : elle croît vers $+\infty$ quand $u\to0^-$. <strong>Plus $t$ est grand, meilleure est l'approximation.</strong></p>
+<p><strong>La barrière logarithmique.</strong>
+$$\phi(x) = -\sum_{i=1}^m\log\big(-f_i(x)\big), \qquad \mathbf{dom}\,\phi = \{x \mid f_i(x)&lt;0 \ \forall i\} \tag{11.5}$$
+Son domaine est l'ensemble des points <strong>strictement admissibles</strong>. Quel que soit $t&gt;0$, la barrière croît sans borne dès qu'un $f_i(x)\to0$.</p>
+<p><strong>Ses dérivées, à savoir écrire.</strong>
+$$\nabla\phi(x) = \sum_{i=1}^m\frac{1}{-f_i(x)}\nabla f_i(x)$$
+$$\nabla^2\phi(x) = \sum_{i=1}^m\frac{1}{f_i(x)^2}\nabla f_i(x)\nabla f_i(x)^T + \sum_{i=1}^m\frac{1}{-f_i(x)}\nabla^2f_i(x)$$</p>
+<p><em>Cas d'un LP $\min c^Tx$ s.c. $Ax\preceq b$ (exemple 11.1).</em> Avec $d_i = 1/(b_i-a_i^Tx)$ :
+$$\nabla\phi(x) = A^Td, \qquad \nabla^2\phi(x) = A^T\mathbf{diag}(d)^2A$$
+La hessienne est inversible si et seulement si $\mathbf{rank}\,A=n$.</p>
+<p class="cal piege"> <strong>Le dilemme.</strong> Plus $t$ est grand, plus l'approximation est fidèle — mais plus $f_0+\frac1t\phi$ est <strong>difficile à minimiser par Newton</strong>, sa hessienne variant très vite près du bord. D'où la solution : ne pas prendre $t$ grand d'emblée, mais résoudre une <strong>suite</strong> de problèmes à $t$ croissant, en démarrant chaque minimisation <strong>au point trouvé pour le $t$ précédent</strong>.</p>
+<h2 data-prio="must">Concept 2 — Le chemin central</h2>
+<p>Il est commode de multiplier l'objectif par $t$ :
+$$\min\ t f_0(x)+\phi(x) \quad\text{s.c.}\quad Ax=b \tag{11.6}$$
+On note $x^\star(t)$ sa solution. L'ensemble $\{x^\star(t) \mid t&gt;0\}$ s'appelle le <strong>chemin central</strong>, et ses points les <strong>points centraux</strong>.</p>
+<p><strong>Caractérisation.</strong> $x^\star(t)$ est strictement admissible ($Ax^\star(t)=b$, $f_i(x^\star(t))&lt;0$) et il existe $\hat\nu$ tel que
+$$0 = t\nabla f_0(x^\star(t)) + \sum_{i=1}^m\frac{1}{-f_i(x^\star(t))}\nabla f_i(x^\star(t)) + A^T\hat\nu \tag{11.7}$$</p>
+<p><strong>Les points duaux associés.</strong> Posons
+$$\lambda_i^\star(t) = \frac{1}{-t\,f_i(x^\star(t))} \ (&gt;0), \qquad \nu^\star(t) = \frac{\hat\nu}{t}$$
+La condition (11.7) devient exactement la <strong>stationnarité du Lagrangien</strong> en $x^\star(t)$ :
+$$\nabla f_0(x^\star(t)) + \sum_i\lambda_i^\star(t)\nabla f_i(x^\star(t)) + A^T\nu^\star(t) = 0$$
+Donc $x^\star(t)$ <strong>minimise</strong> le Lagrangien pour ce couple dual, et $(\lambda^\star(t),\nu^\star(t))$ est <strong>dual admissible</strong> ($\lambda^\star(t)\succ0$).</p>
+<p><strong>Le résultat central du chapitre.</strong>
+$$g\big(\lambda^\star(t),\nu^\star(t)\big) = f_0(x^\star(t)) + \sum_i\lambda_i^\star(t)f_i(x^\star(t)) + \nu^\star(t)^T(Ax^\star(t)-b) = f_0(x^\star(t)) - \frac{m}{t}$$
+(chaque terme $\lambda_i^\star(t)f_i(x^\star(t))$ vaut $-1/t$, et il y en a $m$ ; le terme en $\nu$ est nul). D'où
+$$\boxed{\ f_0(x^\star(t)) - p^\star \ \leq\ \frac{m}{t}\ } \tag{11.11}$$</p>
+<blockquote>
+<p><strong>Ce résultat est remarquable.</strong> Il ne dit pas seulement que $x^\star(t)\to x^\star$ : il donne un <strong>certificat de sous-optimalité exact et gratuit</strong>. Après un centrage à la valeur $t$, on <strong>sait</strong> qu'on est à $m/t$ près de l'optimum, sans rien calculer de plus. Le paramètre $t$ n'est pas un réglage aveugle : c'est une <strong>précision garantie</strong>.</p>
+</blockquote>
+<h2 data-prio="must">Concept 3 — La méthode de barrière</h2>
+<p><strong>Algorithme 11.1 — méthode de barrière.</strong></p>
+<pre><code>donné un point strictement admissible x, t := t⁽⁰⁾ &gt; 0, μ &gt; 1, tolérance ε &gt; 0
+répéter
+  1. Centrage. Calculer x*(t) en minimisant t·f₀ + φ sous Ax = b,
+     en démarrant depuis x.                            ← Newton, chapitre 10
+  2. Mise à jour. x := x*(t)
+  3. Arrêt. terminer si m/t &lt; ε
+  4. Augmentation. t := μ·t
+</code></pre>
+<p><strong>Vocabulaire.</strong> Chaque exécution de l'étape 1 est une <strong>étape de centrage</strong> ou <strong>itération externe</strong> ; les itérations de Newton qu'elle contient sont les <strong>itérations internes</strong>. L'algorithme peut aussi renvoyer $\lambda^\star(t)$ et $\nu^\star(t)$ : un point dual $\varepsilon$-sous-optimal, <strong>certificat</strong> de la qualité de $x$.</p>
+<p><strong>Analyse de convergence (§11.3.3).</strong> Après le centrage initial et $k$ centrages supplémentaires, le saut de dualité vaut $m/(\mu^kt^{(0)})$. La précision $\varepsilon$ est donc atteinte après <strong>exactement</strong>
+$$\Big\lceil\frac{\log\big(m/(t^{(0)}\varepsilon)\big)}{\log\mu}\Big\rceil \ \text{ étapes de centrage} \tag{11.13}$$
+plus le centrage initial.</p>
+<p><strong>Le compromis sur $\mu$</strong>, qui est <em>le</em> point de conception de la méthode :</p>
+<table>
+<thead>
+<tr>
+<th>$\mu$</th>
+<th>Étapes externes</th>
+<th>Itérations de Newton par étape</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>petit</strong> (proche de 1)</td>
+<td><strong>beaucoup</strong></td>
+<td><strong>peu</strong> — le point de départ est déjà très bon</td>
+</tr>
+<tr>
+<td><strong>grand</strong> (10, 100…)</td>
+<td><strong>peu</strong></td>
+<td><strong>beaucoup</strong> — le point de départ est loin du nouveau centre</td>
+</tr>
+</tbody></table>
+<p>En pratique, le nombre <strong>total</strong> d'itérations de Newton est remarquablement <strong>plat</strong> pour $\mu$ entre $10$ et $100$ : le compromis se compense presque exactement. C'est ce qui rend la méthode robuste — le réglage de $\mu$ n'est pas critique.</p>
+<p class="cal piege"> La méthode exige un point <strong>strictement admissible</strong> pour démarrer. L'obtenir est l'objet de la <strong>phase I</strong> (concept 5).</p>
+<h2 data-prio="must">Concept 4 — Les conditions KKT modifiées</h2>
+<p>Le pas de Newton du centrage est donné par (fiche 40) :
+$$\begin{pmatrix} t\nabla^2f_0(x)+\nabla^2\phi(x) &amp; A^T\\ A &amp; 0\end{pmatrix}\begin{pmatrix}\Delta x_{\text{nt}}\\ \nu_{\text{nt}}\end{pmatrix} = -\begin{pmatrix}t\nabla f_0(x)+\nabla\phi(x)\\ 0\end{pmatrix} \tag{11.14}$$</p>
+<p><strong>La lecture profonde (§11.3.4).</strong> Ce pas s'interprète comme un pas de Newton pour résoudre directement les <strong>conditions KKT modifiées</strong> :
+$$\begin{cases}\nabla f_0(x)+\sum_i\lambda_i\nabla f_i(x)+A^T\nu = 0 &amp; \text{(stationnarité)}\\[2pt] -\lambda_i f_i(x) = 1/t, \quad i=1,\dots,m &amp; \text{(complémentarité \textbf{relâchée})}\\[2pt] Ax=b &amp; \text{(admissibilité)}\end{cases} \tag{11.15}$$</p>
+<p><strong>Comparez avec les KKT exactes</strong> (fiche 38) : la seule différence est la deuxième ligne. Les écarts complémentaires $\lambda_if_i(x)=0$ sont remplacés par
+$$-\lambda_if_i(x) = \frac1t$$</p>
+<blockquote>
+<p><strong>C'est toute l'idée des méthodes de points intérieurs, en une ligne.</strong> On refuse la complémentarité <strong>exacte</strong> — qui force chaque produit à être nul, donc pousse les itérés <strong>sur le bord</strong> où tout se dégrade numériquement — et on la remplace par une complémentarité <strong>relâchée</strong> à hauteur $1/t$. Quand $t\to\infty$, on retrouve les KKT exactes. Le chemin central est précisément le lieu des solutions de ces KKT relâchées.</p>
+</blockquote>
+<p>On peut d'ailleurs éliminer les $\lambda_i$ par $\lambda_i = -1/(t f_i(x))$, ce qui ramène (11.15) à $n+p$ équations en $(x,\nu)$ — et le pas de Newton de ce système est exactement (11.14).</p>
+<h2 data-prio="high">Concept 5 — Phase I : trouver un point strictement admissible</h2>
+<p><strong>Le problème.</strong> Étant donné $f_i(x)\leq0$ et $Ax=b$, trouver un point <strong>strictement</strong> admissible — ou établir qu'il n'en existe pas. On suppose disposer d'un $x^{(0)}\in\bigcap_i\mathbf{dom}\,f_i$ avec $Ax^{(0)}=b$.</p>
+<p><strong>Le problème de phase I (11.19).</strong>
+$$\begin{array}{ll}\text{minimiser} &amp; s\\ \text{sous} &amp; f_i(x)\leq s, \quad i=1,\dots,m\\ &amp; Ax=b\end{array}$$
+de variables $x\in\mathbb{R}^n$ <strong>et</strong> $s\in\mathbb{R}$. La variable $s$ borne l'<strong>infaisabilité maximale</strong> ; le but est de la faire passer sous zéro.</p>
+<p><strong>Pourquoi ça marche.</strong> Ce problème est <strong>toujours strictement admissible</strong> : on prend $x=x^{(0)}$ et n'importe quel $s&gt;\max_if_i(x^{(0)})$. On peut donc lui appliquer la méthode de barrière — sans avoir besoin d'une phase I pour la phase I.</p>
+<p><strong>Trois cas, selon le signe de la valeur optimale $\bar p^\star$.</strong></p>
+<table>
+<thead>
+<tr>
+<th>Signe</th>
+<th>Conclusion</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$\bar p^\star&lt;0$</td>
+<td>le système <strong>a</strong> une solution strictement admissible ; <strong>et l'on peut s'arrêter dès que $s&lt;0$</strong>, sans résoudre précisément</td>
+</tr>
+<tr>
+<td>$\bar p^\star&gt;0$</td>
+<td>le système est <strong>non admissible</strong> (aucun $x$ ne satisfait les inégalités)</td>
+</tr>
+<tr>
+<td>$\bar p^\star=0$</td>
+<td>cas limite : admissible mais <strong>pas strictement</strong> — la méthode de barrière ne démarre pas</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>Le point pratique.</strong> Dans le premier cas, on n'optimise pas : on <strong>s'arrête au premier $s&lt;0$ rencontré</strong>. La phase I est un problème de faisabilité déguisé en problème d'optimisation, et il n'y a aucune raison de le résoudre finement.</p>
+</blockquote>
+<p><strong>Variante (§11.4.2).</strong> On peut aussi utiliser directement la <strong>méthode de Newton à départ non admissible</strong> (fiche 40, §10.3), qui traite en une seule passe l'admissibilité et l'optimisation.</p>
+<h2 data-prio="low">Concept 6 — Complexité et auto-concordance (§11.5)</h2>
+<p>L'analyse du concept 3 montre que la méthode <strong>converge</strong>, mais ne dit rien du coût <strong>réel</strong> : les problèmes de centrage deviennent-ils de plus en plus durs quand $t$ croît ?</p>
+<p>La réponse passe par l'<strong>auto-concordance</strong> (§9.6) : si $tf_0+\phi$ est auto-concordante pour tout $t$, on borne le nombre d'itérations de Newton <strong>par étape de centrage</strong> indépendamment de $t$, et l'on obtient une <strong>borne de complexité polynomiale</strong> sur le nombre total d'itérations de Newton.</p>
+<blockquote>
+<p><strong>La conséquence historique.</strong> C'est cette analyse — Nesterov et Nemirovski, à la suite de Karmarkar (1984) — qui a établi que l'optimisation convexe est <strong>résoluble en temps polynomial</strong>, et qui a fait des points intérieurs la méthode dominante pour les LP de grande taille, les SOCP et les SDP.</p>
+</blockquote>
+<h3>Comment résoudre l'exercice type (protocole)</h3>
+<ol>
+<li><strong>Vérifier la forme</strong> : $f_0,\dots,f_m$ convexes $C^2$, égalités <strong>affines</strong>.</li>
+<li><strong>Écrire la barrière</strong> $\phi(x)=-\sum_i\log(-f_i(x))$ et son domaine (les points strictement admissibles).</li>
+<li><strong>Calculer $\nabla\phi$ et $\nabla^2\phi$</strong> — pour un LP, $A^Td$ et $A^T\mathbf{diag}(d)^2A$ avec $d_i=1/(b_i-a_i^Tx)$.</li>
+<li><strong>Trouver un point strictement admissible</strong> : par inspection, ou par la <strong>phase I</strong>.</li>
+<li><strong>Choisir $t^{(0)}$ et $\mu$</strong> ($\mu$ entre $10$ et $100$ en pratique).</li>
+<li><strong>Boucle externe</strong> : centrer par Newton (fiche 40), arrêter si $m/t&lt;\varepsilon$, sinon $t:=\mu t$.</li>
+<li><strong>Compter les étapes</strong> : $\lceil\log(m/(t^{(0)}\varepsilon))/\log\mu\rceil$.</li>
+<li><strong>Fournir le certificat dual</strong> : $\lambda_i^\star(t)=-1/(tf_i(x))$ et $\nu^\star(t)$, qui prouvent la $m/t$-sous-optimalité.</li>
+</ol>
+<h3>Exercices progressifs</h3>
+<p><strong> Niveau 1</strong> — Un problème a $m=100$ contraintes d'inégalité. Quel $t$ garantit une précision $\varepsilon=10^{-6}$ ?</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p>Le saut de dualité sur le chemin central vaut $m/t$, donc il faut
+$$\frac{100}{t}\leq10^{-6} \iff t\geq10^8$$
+<em>À noter :</em> la précision ne dépend <strong>que</strong> de $m/t$, pas de la dimension $n$ ni de la difficulté de $f_0$. C'est ce qui rend le critère d'arrêt si simple.</p>
+</div></details>
+
+<p><strong> Niveau 2</strong> — Écrivez la barrière logarithmique et son gradient pour $\min c^Tx$ s.c. $Ax\preceq b$.</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p>$$\phi(x) = -\sum_{i=1}^m\log(b_i-a_i^Tx), \qquad \mathbf{dom}\,\phi = \{x\mid Ax\prec b\}$$
+En posant $d_i = 1/(b_i-a_i^Tx)$ :
+$$\nabla\phi(x) = \sum_{i=1}^m d_i\,a_i = A^Td, \qquad \nabla^2\phi(x) = A^T\mathbf{diag}(d)^2A$$
+La condition de centralité (11.9) s'écrit alors $tc+A^Td = 0$. La hessienne est inversible si et seulement si $\mathbf{rank}\,A=n$.
+<em>C'est exactement la fonction « centre analytique » rencontrée au chapitre 9.</em></p>
+</div></details>
+
+<p><strong> Niveau 3</strong> — Démontrez que le saut de dualité au point $x^\star(t)$ vaut exactement $m/t$.</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p>Posons $\lambda_i^\star(t) = \dfrac{1}{-t f_i(x^\star(t))}$, strictement positif puisque $f_i(x^\star(t))&lt;0$, et $\nu^\star(t)=\hat\nu/t$. La condition de centralité (11.7), divisée par $t$, s'écrit
+$$\nabla f_0(x^\star(t)) + \sum_i\lambda_i^\star(t)\nabla f_i(x^\star(t)) + A^T\nu^\star(t) = 0$$
+donc $x^\star(t)$ <strong>minimise</strong> le Lagrangien $L(\cdot,\lambda^\star(t),\nu^\star(t))$, qui est convexe. Par conséquent
+$$g(\lambda^\star(t),\nu^\star(t)) = L\big(x^\star(t),\lambda^\star(t),\nu^\star(t)\big) = f_0(x^\star(t)) + \sum_i\lambda_i^\star(t)f_i(x^\star(t)) + \nu^\star(t)^T\underbrace{(Ax^\star(t)-b)}_{=0}$$
+Or $\lambda_i^\star(t)f_i(x^\star(t)) = -1/t$ pour <strong>chaque</strong> $i$, et il y en a $m$ :
+$$g(\lambda^\star(t),\nu^\star(t)) = f_0(x^\star(t)) - \frac{m}{t}$$
+Par dualité faible, $g\leq p^\star$, d'où $f_0(x^\star(t))-p^\star\leq m/t$. $\blacksquare$</p>
+</div></details>
+
+<p><strong> Niveau 4 — type examen</strong> — Un LP a $m=1000$ contraintes. On part de $t^{(0)}=1$ et l'on veut $\varepsilon=10^{-8}$. Combien d'étapes de centrage pour $\mu=2$, $\mu=10$, $\mu=100$ ? Commentez.</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p>La formule (11.13) donne $\lceil\log(m/(t^{(0)}\varepsilon))/\log\mu\rceil$ avec
+$$\frac{m}{t^{(0)}\varepsilon} = \frac{1000}{10^{-8}} = 10^{11}, \qquad \log(10^{11}) = 11\log 10 \approx 25{,}3$$</p>
+<table>
+<thead>
+<tr>
+<th>$\mu$</th>
+<th>$\log\mu$</th>
+<th>Étapes de centrage</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$2$</td>
+<td>$0{,}69$</td>
+<td>$\lceil 36{,}5\rceil = 37$</td>
+</tr>
+<tr>
+<td>$10$</td>
+<td>$2{,}30$</td>
+<td>$\lceil 11{,}0\rceil = 11$</td>
+</tr>
+<tr>
+<td>$100$</td>
+<td>$4{,}61$</td>
+<td>$\lceil 5{,}5\rceil = 6$</td>
+</tr>
+</tbody></table>
+<p><strong>Commentaire.</strong> Le nombre d'étapes <strong>externes</strong> chute vite avec $\mu$ — mais c'est trompeur : chaque centrage devient plus dur, car le point de départ (le centre précédent) est plus loin du nouveau centre, et Newton y fait davantage d'itérations <strong>internes</strong>. En pratique, le nombre <strong>total</strong> d'itérations de Newton est presque constant pour $\mu$ entre $10$ et $100$ : les deux effets se compensent.</p>
+<p><strong>Ce qu'il faut retenir.</strong> La dépendance en $\varepsilon$ est <strong>logarithmique</strong> : passer de $10^{-8}$ à $10^{-16}$ ne fait qu'ajouter quelques étapes. Et la dépendance en $m$ l'est aussi. C'est ce qui permet aux points intérieurs de résoudre des problèmes à des centaines de milliers de contraintes.</p>
+</div></details>
+
+<h2 data-prio="must">Common mistakes</h2>
+<ol>
+<li><strong>Prendre $t$ grand d'emblée</strong> — la hessienne de $tf_0+\phi$ varie violemment près du bord et Newton échoue. Tout l'art est de <strong>faire croître $t$ progressivement</strong>.</li>
+<li><strong>Démarrer d'un point non strictement admissible</strong> — le domaine de $\phi$ exige $f_i(x)&lt;0$ <strong>strictement</strong>. D'où la phase I.</li>
+<li><strong>Confondre itérations internes et externes</strong> — les externes sont les étapes de centrage ; les internes, les pas de Newton.</li>
+<li><strong>Oublier que le saut de dualité est <em>exact</em></strong> — $m/t$ n'est pas une estimation heuristique mais un certificat démontré.</li>
+<li><strong>Croire que $m$ est le nombre de variables</strong> — c'est le nombre de <strong>contraintes d'inégalité</strong> ; les égalités et la dimension $n$ n'entrent pas dans $m/t$.</li>
+<li><strong>Résoudre finement la phase I</strong> — on s'arrête dès que $s&lt;0$ ; on ne cherche pas $\bar p^\star$.</li>
+<li><strong>Croire les KKT modifiées approximatives</strong> — le chemin central les résout <strong>exactement</strong> ; c'est la complémentarité qui est délibérément relâchée à $1/t$.</li>
+<li><strong>Régler $\mu$ trop finement</strong> — le coût total est plat entre $10$ et $100$ ; ce n'est pas un paramètre critique.</li>
+</ol>
+<h2>Ultimate Review</h2>
+<ol>
+<li>Barrière logarithmique $\phi(x)=-\sum_i\log(-f_i(x))$, de domaine les points <strong>strictement admissibles</strong> ; elle approxime $\sum_iI_-(f_i(x))$ à $1/t$ près.</li>
+<li>Problème de centrage : $\min\ tf_0(x)+\phi(x)$ s.c. $Ax=b$ — <strong>que des égalités</strong>, donc Newton du chapitre 10.</li>
+<li><strong>Chemin central</strong> $\{x^\star(t)\mid t&gt;0\}$, caractérisé par (11.7).</li>
+<li>Points duaux associés : $\lambda_i^\star(t)=-1/(tf_i(x^\star(t)))$, $\nu^\star(t)=\hat\nu/t$ — <strong>dual admissibles</strong>.</li>
+<li><strong>Saut de dualité exact</strong> : $f_0(x^\star(t))-p^\star\leq m/t$ — un certificat gratuit.</li>
+<li><strong>Méthode de barrière</strong> : centrer, tester $m/t&lt;\varepsilon$, faire $t:=\mu t$, recommencer.</li>
+<li><strong>Nombre d'étapes de centrage</strong> : $\lceil\log(m/(t^{(0)}\varepsilon))/\log\mu\rceil$ ; compromis sur $\mu$, coût total plat entre $10$ et $100$.</li>
+<li><strong>KKT modifiées</strong> : $-\lambda_if_i(x)=1/t$ au lieu de $\lambda_if_i(x)=0$ — la <strong>complémentarité relâchée</strong>.</li>
+<li><strong>Phase I</strong> : $\min s$ s.c. $f_i(x)\leq s$, $Ax=b$ ; toujours strictement admissible ; arrêt dès $s&lt;0$ ; $\bar p^\star&gt;0$ signifie non admissible.</li>
+<li><strong>Auto-concordance</strong> : donne une borne de complexité <strong>polynomiale</strong> sur le nombre total d'itérations de Newton.</li>
+</ol>
+<p><strong>Formulas to know</strong>
+$$\phi(x)=-\sum_{i=1}^m\log(-f_i(x)) \qquad \min\ tf_0(x)+\phi(x) \ \text{ s.c. } Ax=b \qquad f_0(x^\star(t))-p^\star\leq\frac{m}{t}$$
+$$\lambda_i^\star(t)=\frac{1}{-t f_i(x^\star(t))} \qquad -\lambda_if_i(x)=\frac1t \qquad \Big\lceil\frac{\log(m/(t^{(0)}\varepsilon))}{\log\mu}\Big\rceil$$</p>
+<p><strong>Methods to know</strong> : le protocole en 8 étapes ; la démonstration du saut $m/t$ ; le calcul du nombre d'étapes de centrage ; la construction du problème de phase I.</p>
+<div class="rec"><h2>Active Recall</h2><p><strong>Basic</strong> — Écrivez la barrière logarithmique, son domaine, et le problème de centrage.</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p>$\phi(x)=-\sum_{i=1}^m\log(-f_i(x))$, de domaine $\{x\mid f_i(x)&lt;0\ \forall i\}$ — les points <strong>strictement</strong> admissibles. Problème de centrage : $\min\ tf_0(x)+\phi(x)$ sous $Ax=b$, qui ne comporte que des <strong>égalités</strong> et se résout par Newton (chapitre 10).</p>
+</div></details><p><strong>Understanding</strong> — Pourquoi ne prend-on pas simplement $t$ très grand dès la première itération ?</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p>Parce que $tf_0+\phi$ devient très difficile à minimiser par Newton quand $t$ est grand : sa hessienne <strong>varie très rapidement</strong> près du bord de l'ensemble admissible, et la méthode de Newton s'y comporte mal. On résout donc une <strong>suite</strong> de problèmes à $t$ croissant, en démarrant chaque minimisation au centre précédent — point déjà très proche du nouveau.</p>
+</div></details><p><strong>Application</strong> — Sur le chemin central, quelle relation vérifient $\lambda_i^\star(t)$ et $f_i(x^\star(t))$ ?</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p>$$\lambda_i^\star(t)\,f_i(x^\star(t)) = -\frac1t \qquad\text{pour chaque } i$$
+C'est la <strong>complémentarité relâchée</strong> : au lieu d'un produit nul (KKT exactes), chaque produit vaut exactement $-1/t$. En sommant sur les $m$ contraintes, on obtient le saut de dualité $m/t$.</p>
+</div></details><p><strong>Comparison</strong> — KKT exactes et KKT modifiées : qu'est-ce qui change, et pourquoi est-ce une bonne idée ?</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p>Seule la complémentarité change : $\lambda_if_i(x)=0$ devient $-\lambda_if_i(x)=1/t$. Les conditions de stationnarité et d'admissibilité sont identiques.</p>
+<p><strong>Pourquoi c'est une bonne idée :</strong> la complémentarité exacte force, pour chaque $i$, soit $\lambda_i=0$ soit $f_i(x)=0$ — donc pousse les itérés <strong>sur le bord</strong> de l'ensemble admissible, là où la barrière et sa hessienne dégénèrent. La version relâchée maintient les itérés <strong>strictement à l'intérieur</strong> (d'où le nom de la méthode), avec un compromis contrôlé par $t$, et l'on retrouve les KKT exactes à la limite $t\to\infty$.</p>
+</div></details><p><strong>Exam-style</strong> — Décrivez la méthode de barrière et justifiez son critère d'arrêt.</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p>Partant d'un point <strong>strictement admissible</strong> et de $t=t^{(0)}&gt;0$, on répète : <strong>(1)</strong> centrer, c'est-à-dire minimiser $tf_0+\phi$ sous $Ax=b$ par la méthode de Newton du chapitre 10, en démarrant au point courant ; <strong>(2)</strong> poser $x:=x^\star(t)$ ; <strong>(3)</strong> s'arrêter si $m/t&lt;\varepsilon$ ; <strong>(4)</strong> sinon $t:=\mu t$ et recommencer.</p>
+<p><em>Justification du critère.</em> Sur le chemin central, le couple $\lambda_i^\star(t)=-1/(tf_i(x^\star(t)))$, $\nu^\star(t)$ est <strong>dual admissible</strong>, et la valeur duale associée vaut exactement $f_0(x^\star(t))-m/t$. Par dualité faible, $f_0(x^\star(t))-p^\star\leq m/t$. Le test $m/t&lt;\varepsilon$ <strong>garantit</strong> donc une $\varepsilon$-sous-optimalité, et l'algorithme peut renvoyer $(\lambda^\star(t),\nu^\star(t))$ comme <strong>certificat</strong> vérifiable.</p>
+<p><em>Nombre d'étapes.</em> $\lceil\log(m/(t^{(0)}\varepsilon))/\log\mu\rceil$, plus le centrage initial.</p>
+</div></details></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h2>Flashcards</h2>
+<table>
+<thead>
+<tr>
+<th>Question</th>
+<th>Réponse</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Barrière logarithmique ?</td>
+<td>$\phi(x)=-\sum_i\log(-f_i(x))$</td>
+</tr>
+<tr>
+<td>Domaine de la barrière ?</td>
+<td>Les points <strong>strictement</strong> admissibles, $f_i(x)&lt;0$</td>
+</tr>
+<tr>
+<td>Que remplace la barrière ?</td>
+<td>L'indicatrice $I_-$, approximée par $-\frac1t\log(-u)$</td>
+</tr>
+<tr>
+<td>Problème de centrage ?</td>
+<td>$\min\ tf_0(x)+\phi(x)$ s.c. $Ax=b$</td>
+</tr>
+<tr>
+<td>Chemin central ?</td>
+<td>L'ensemble des $x^\star(t)$, $t&gt;0$</td>
+</tr>
+<tr>
+<td>Points duaux associés ?</td>
+<td>$\lambda_i^\star(t)=-1/(tf_i(x^\star(t)))$, $\nu^\star(t)=\hat\nu/t$</td>
+</tr>
+<tr>
+<td>Saut de dualité sur le chemin central ?</td>
+<td>Exactement $m/t$</td>
+</tr>
+<tr>
+<td>Critère d'arrêt de la méthode de barrière ?</td>
+<td>$m/t&lt;\varepsilon$</td>
+</tr>
+<tr>
+<td>Que vaut $m$ ?</td>
+<td>Le nombre de contraintes d'<strong>inégalité</strong></td>
+</tr>
+<tr>
+<td>Nombre d'étapes de centrage ?</td>
+<td>$\lceil\log(m/(t^{(0)}\varepsilon))/\log\mu\rceil$</td>
+</tr>
+<tr>
+<td>Effet d'un grand $\mu$ ?</td>
+<td>Moins d'étapes externes, plus d'itérations de Newton internes</td>
+</tr>
+<tr>
+<td>Valeur usuelle de $\mu$ ?</td>
+<td>Entre $10$ et $100$ — le coût total y est plat</td>
+</tr>
+<tr>
+<td>KKT modifiées ?</td>
+<td>$-\lambda_if_i(x)=1/t$ au lieu de $\lambda_if_i(x)=0$</td>
+</tr>
+<tr>
+<td>Pourquoi relâcher la complémentarité ?</td>
+<td>Pour garder les itérés <strong>strictement à l'intérieur</strong></td>
+</tr>
+<tr>
+<td>Problème de phase I ?</td>
+<td>$\min s$ s.c. $f_i(x)\leq s$, $Ax=b$</td>
+</tr>
+<tr>
+<td>Quand arrête-t-on la phase I ?</td>
+<td>Dès que $s&lt;0$</td>
+</tr>
+<tr>
+<td>$\bar p^\star&gt;0$ en phase I signifie ?</td>
+<td>Le système est <strong>non admissible</strong></td>
+</tr>
+<tr>
+<td>Que donne l'auto-concordance ?</td>
+<td>Une borne de complexité <strong>polynomiale</strong></td>
+</tr>
+</tbody></table>
+</main>
+
+
+
+
+</body></html>

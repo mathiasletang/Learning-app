@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fiche 64 — Maximum de vraisemblance : de Kullback-Leibler à l'information de Fisher</title>
+<script>
+window.MathJax={tex:{inlineMath:[["$","$"]],displayMath:[["$$","$$"]],processEscapes:true},
+ options:{skipHtmlTags:["script","noscript","style","textarea","pre","code"]},
+ svg:{fontCache:"global"},
+ startup:{pageReady:()=>MathJax.startup.defaultPageReady().then(()=>{document.body.classList.add("ready")})}};
+setTimeout(function(){document.body.classList.add("ready")},2500);
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+/* ============================================================
+   MathiasLearn — feuille de style des fiches
+   Reprise intégrale des tokens de 00_PARCOURS/*.html
+   + blocs pédagogiques (callouts, méthode, essentiels, recall)
+   ============================================================ */
+:root{--bg:#faf9f7;--card:#fff;--ink:#1a1a1a;--muted:#6b6b6b;--line:#e5e2dd;--accent:#8b5e34;
+ --hl:#fdf8ef;--ok:#2d7d4f;--okbg:#f0f7f3;--warn:#b3402f;--warnbg:#fdf3f1;--blue:#2f5d8b;--bluebg:#f1f5fa}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+ font:17px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;padding:0 16px 100px}
+.nav{position:sticky;top:0;background:rgba(250,249,247,.96);backdrop-filter:blur(8px);
+ border-bottom:1px solid var(--line);margin:0 -16px 30px;padding:11px 16px;z-index:50;
+ display:flex;gap:6px;flex-wrap:wrap;font-size:13px}
+.nav a{color:var(--muted);text-decoration:none;padding:4px 9px;border-radius:5px;white-space:nowrap}
+.nav a:hover{background:var(--line);color:var(--ink)}
+.nav a.on{background:var(--accent);color:#fff}
+main{max-width:780px;margin:0 auto}
+h1{font-size:31px;letter-spacing:-.02em;margin:.4em 0 .5em;line-height:1.25}
+h2{font-size:23px;margin:2.2em 0 .7em;padding-bottom:.3em;border-bottom:1px solid var(--line)}
+h3{font-size:19px;margin:1.9em 0 .5em;color:var(--accent)}
+h4{font-size:17px;margin:1.5em 0 .4em}
+p{margin:.8em 0} a{color:var(--accent)} hr{border:0;border-top:1px solid var(--line);margin:2.6em 0}
+table{border-collapse:collapse;width:100%;margin:1.3em 0;font-size:15.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+th{background:#f3f0eb;font-weight:600}
+tr:nth-child(even) td{background:#fcfbfa}
+code{font-family:"SF Mono",Menlo,Consolas,monospace;font-size:.88em;background:#f2efea;padding:2px 6px;border-radius:4px;white-space:nowrap}
+pre{background:#f2efea;padding:14px 16px;border-radius:8px;overflow-x:auto}
+pre code{background:none;padding:0;white-space:pre}
+blockquote{border-left:3px solid var(--accent);background:var(--hl);margin:1.4em 0;padding:14px 20px;border-radius:0 8px 8px 0}
+blockquote p:first-child{margin-top:0} blockquote p:last-child{margin-bottom:0}
+ul,ol{padding-left:1.5em} li{margin:.35em 0} em{color:#4a4a4a}
+mjx-container[display="true"]{margin:1.1em 0!important;overflow-x:auto;overflow-y:hidden;padding:2px 0}
+mjx-container svg{max-width:100%}
+body:not(.ready) main{opacity:0} main{opacity:1;transition:opacity .25s}
+
+/* --- bandeau de tête de fiche --- */
+.cours{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--accent);
+ border-radius:0 10px 10px 0;padding:18px 22px;margin:0 0 34px}
+.cours h4{margin:0 0 4px;font-size:14px;text-transform:uppercase;letter-spacing:.07em;color:var(--accent)}
+.cours .cs{color:var(--muted);font-size:14.5px;margin:0 0 14px}
+
+/* --- exercices / corrigés --- */
+.ex{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:6px 24px 20px;margin:18px 0}
+.ex>h3:first-child{margin-top:14px}
+details.cor{margin-top:18px;border:1px solid var(--line);border-radius:8px;background:#fcfbfa;overflow:hidden}
+details.cor>summary{cursor:pointer;padding:12px 16px;font-weight:600;font-size:15px;color:var(--accent);
+ list-style:none;display:flex;align-items:center;gap:9px;user-select:none;transition:.15s;min-height:44px}
+details.cor>summary::-webkit-details-marker{display:none}
+details.cor>summary:hover{background:var(--hl)}
+details.cor>summary::before{content:"\25B6";font-size:10px;transition:transform .18s;display:inline-block}
+details.cor[open]>summary::before{transform:rotate(90deg)}
+details.cor[open]>summary{background:var(--okbg);color:var(--ok);border-bottom:1px solid var(--line)}
+.cor .in{padding:4px 20px 16px}
+.cor .in>*:first-child{margin-top:.9em}
+
+/* --- blocs pédagogiques (callouts) ---
+   Générés depuis une citation Markdown dont le premier **gras** commence
+   par un mot-clé : DÉFINITION, THÉORÈME, MÉTHODE, PIÈGE, INTUITION… */
+.cal{border:1px solid var(--line);border-left:4px solid var(--accent);background:var(--card);
+ border-radius:0 10px 10px 0;padding:15px 20px;margin:1.5em 0}
+.cal>p:first-child{margin-top:0}.cal>p:last-child,.cal>ul:last-child,.cal>ol:last-child{margin-bottom:0}
+.cal .lab{display:block;font-size:12.5px;text-transform:uppercase;letter-spacing:.08em;
+ font-weight:700;color:var(--accent);margin-bottom:6px}
+.cal.formel{background:var(--hl)}
+.cal.piege{border-left-color:var(--warn);background:var(--warnbg)}
+.cal.piege .lab{color:var(--warn)}
+.cal.methode{border-left-color:var(--ok);background:var(--okbg)}
+.cal.methode .lab{color:var(--ok)}
+.cal.intu{border-left-color:var(--blue);background:var(--bluebg)}
+.cal.intu .lab{color:var(--blue)}
+.cal.plus{border-left-style:dashed;background:#faf9f7}
+.cal.plus .lab{color:var(--muted)}
+
+/* --- révision express --- */
+.ess{background:var(--card);border:1px solid var(--accent);border-radius:10px;padding:4px 24px 20px;margin:1.6em 0}
+.ess h3{margin-top:1.3em}
+.rec{background:var(--card);border:1px dashed var(--accent);border-radius:10px;padding:4px 24px 18px;margin:1.6em 0}
+.rec ol{counter-reset:none}
+
+/* --- impression / PDF --- */
+@media print{
+ .nav{display:none}
+ body{padding:0;background:#fff;font-size:11.2pt;line-height:1.55}
+ main{max-width:none}
+ h1{font-size:23pt}h2{font-size:15pt;margin-top:1.5em}h3{font-size:12.6pt}
+ h2,h3,h4{break-after:avoid;page-break-after:avoid}
+ table,.cal,blockquote{break-inside:avoid;page-break-inside:avoid}
+ table{display:table;font-size:9.6pt}
+ details.cor{border:1px solid var(--line);background:#fcfbfa}
+ details.cor>summary{display:none}
+ details.cor .in{padding-top:10px}
+ .cal,.ex,.ess,.rec{box-shadow:none}
+ a{color:var(--ink);text-decoration:none}
+}
+@page{margin:16mm 15mm 18mm}
+
+/* --- exemples travaillés --- */
+.exm{background:#fcfbfa;border:1px solid var(--line);border-radius:10px;padding:2px 20px 14px;margin:1.5em 0}
+.exm>h4:first-child{margin:14px 0 .5em;color:var(--accent);font-size:13px;text-transform:uppercase;letter-spacing:.07em}
+
+
+/* --- pastilles de priorité (conventions des fiches de l'app) --- */
+h2[data-prio], h3[data-prio], h4[data-prio]{position:relative}
+h2[data-prio]::before,h3[data-prio]::before,h4[data-prio]::before{
+ content:"";display:inline-block;width:9px;height:9px;border-radius:50%;
+ margin-right:9px;vertical-align:middle;background:var(--muted)}
+[data-prio="must"]::before{background:var(--warn)}
+[data-prio="high"]::before{background:#d98324}
+[data-prio="mid"]::before{background:#c9a227}
+[data-prio="low"]::before{background:var(--ok)}
+/* corrigés des fiches de l'app : même traitement que les corrigés des séries */
+details.cor>summary::after{content:""}
+</style></head><body>
+<div class="nav"><a href="00_COMMENCER_ICI.html">Commencer ici</a><a href="01_NOTATIONS_le-decodeur.html">Notations</a><a href="02_EXERCICES_Serie-0.html">Série 0 — Remise en route</a><a href="03_EXERCICES_Serie-1.html">Série 1 — Convexité</a><a href="04_EXERCICES_Serie-2.html">Série 2 — KKT</a><a href="05_AUTO-EVALUATION.html">Auto-évaluation (quiz)</a><a href="06_FICHE_Optimisation-deux-variables.html">Fiche — Optimisation à 2 variables</a></div>
+<main><h1>Fiche 64 — Maximum de vraisemblance : de Kullback-Leibler à l'information de Fisher</h1>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Matière</strong></td>
+<td>Maths · Économétrie</td>
+</tr>
+<tr>
+<td><strong>Cours source</strong></td>
+<td>Rigollet, <em>18.650 Statistics for Applications</em>, MIT OpenCourseWare, automne 2016 — chapitre 3 « Maximum Likelihood Estimation »</td>
+</tr>
+<tr>
+<td><strong>Difficulté</strong></td>
+<td> Must know — la méthode d'estimation universelle</td>
+</tr>
+<tr>
+<td><strong>Temps d'étude estimé</strong></td>
+<td>2 h 30</td>
+</tr>
+<tr>
+<td><strong>Prérequis</strong></td>
+<td>Fiche 50 (maximum de vraisemblance en régression), loi des grands nombres, dérivées secondes</td>
+</tr>
+<tr>
+<td><strong>Concepts clés</strong></td>
+<td>Modèle statistique, distance en variation totale, divergence de Kullback-Leibler, principe du maximum de vraisemblance, concavité, gradient et hessienne, vraisemblance discrète et continue, estimateur du maximum de vraisemblance, information de Fisher, normalité asymptotique</td>
+</tr>
+<tr>
+<td><strong>Poids à l'examen</strong></td>
+<td>Trois choses : la <strong>chaîne KL ⟹ maximum de vraisemblance</strong> — c'est <em>la</em> dérivation du chapitre ; l'<strong>information de Fisher</strong> sous ses deux formes ; et le <strong>théorème asymptotique</strong> avec ses hypothèses.</td>
+</tr>
+</tbody></table>
+<h2>Vue d'ensemble</h2>
+<p><strong>Le cadre.</strong> Soit $\big(E,(\mathbb P_\theta)_{\theta\in\Theta}\big)$ un <strong>modèle statistique</strong> associé à un échantillon de variables i.i.d. $X_1,\dots,X_n$. On suppose qu'il existe $\theta^\ast\in\Theta$ tel que $X_1\sim\mathbb P_{\theta^\ast}$ : $\theta^\ast$ est le <strong>vrai paramètre</strong>.</p>
+<blockquote>
+<p><strong>Le but du statisticien.</strong> <em>Étant donné $X_1,\dots,X_n$, trouver un estimateur $\hat\theta=\hat\theta(X_1,\dots,X_n)$ tel que $\mathbb P_{\hat\theta}$ soit <strong>proche</strong> de $\mathbb P_{\theta^\ast}$.</em> Cela signifie que $\lvert\mathbb P_{\hat\theta}(A)-\mathbb P_{\theta^\ast}(A)\rvert$ est petit <strong>pour tout</strong> $A\subset E$.</p>
+</blockquote>
+<pre><code>IDÉE         estimer θ* = rendre P_θ̂ proche de P_θ*
+DISTANCE 1   variation totale TV — belle, mais INESTIMABLE
+DISTANCE 2   divergence KL — asymétrique, et c'est ce qui la sauve
+CHAÎNE       min KL ⟺ max Σ log p_θ(Xᵢ) ⟺ max Π p_θ(Xᵢ)
+                                            ↑ le maximum de vraisemblance
+PRÉCISION    √n(θ̂ − θ*) → N(0, I(θ*)⁻¹)   ← information de Fisher
+</code></pre>
+<blockquote>
+<p><strong>La logique du chapitre est un raisonnement en trois temps.</strong> On veut minimiser une distance entre lois. La distance naturelle — la variation totale — <strong>ne s'estime pas</strong>. On la remplace par la divergence KL, qui, elle, s'estime <strong>grâce à son asymétrie</strong>. Et la minimisation de la KL estimée <strong>est exactement</strong> le maximum de vraisemblance. La méthode la plus utilisée de la statistique n'est donc pas un postulat : elle <strong>se déduit</strong>.</p>
+</blockquote>
+<h2 data-prio="must">Concept 1 — La distance en variation totale</h2>
+<div class="cal formel"><span class="lab">Définition.</span>
+<p> La <strong>distance en variation totale</strong> entre deux mesures de probabilité $\mathbb P_\theta$ et $\mathbb P_{\theta'}$ est
+$$TV(\mathbb P_\theta,\mathbb P_{\theta'})=\max_{A\subset E}\big\lvert\mathbb P_\theta(A)-\mathbb P_{\theta'}(A)\big\rvert$$</p>
+</div>
+<p><strong>Cas discret.</strong> Si $E$ est discret — fini ou dénombrable, ce qui inclut Bernoulli, binomiale, Poisson —, $X$ a une <strong>fonction de masse</strong> $\mathbb P(X=x)=p(x)$ avec $p(x)\geq0$ et $\sum_{x\in E}p(x)=1$. La variation totale est alors une fonction simple des fonctions de masse :
+$$TV(\mathbb P_\theta,\mathbb P_{\theta'})=\frac12\sum_{x\in E}\big\lvert p_\theta(x)-p_{\theta'}(x)\big\rvert$$</p>
+<p><strong>Cas continu.</strong> Si $E$ est continu — gaussienne, exponentielle… — et si $X$ a une densité $\mathbb P(X\in A)=\int_Af(x)dx$ avec $f\geq0$ et $\int_Ef=1$ :
+$$TV(\mathbb P_\theta,\mathbb P_{\theta'})=\frac12\int_E\big\lvert f_\theta(x)-f_{\theta'}(x)\big\rvert\,dx$$</p>
+<div class="cal formel"><span class="lab">Propriétés de la variation totale.</span>
+
+<ul>
+<li>$TV(\mathbb P_\theta,\mathbb P_{\theta'})=TV(\mathbb P_{\theta'},\mathbb P_\theta)$ — <strong>symétrique</strong></li>
+<li>$TV(\mathbb P_\theta,\mathbb P_{\theta'})\geq0$</li>
+<li>Si $TV(\mathbb P_\theta,\mathbb P_{\theta'})=0$ alors $\mathbb P_\theta=\mathbb P_{\theta'}$ — <strong>définie</strong></li>
+<li>$TV(\mathbb P_\theta,\mathbb P_{\theta'})\leq TV(\mathbb P_\theta,\mathbb P_{\theta''})+TV(\mathbb P_{\theta''},\mathbb P_{\theta'})$ — <strong>inégalité triangulaire</strong></li>
+</ul>
+<p><em>Ces propriétés impliquent que la variation totale est bien une <strong>distance</strong> entre distributions de probabilité.</em></p>
+</div>
+<p><strong>La stratégie d'estimation.</strong> <em>Construire un estimateur $\widehat{TV}(\mathbb P_\theta,\mathbb P_{\theta^\ast})$ pour tout $\theta\in\Theta$, puis trouver le $\hat\theta$ qui <strong>minimise</strong> la fonction $\theta\mapsto\widehat{TV}(\mathbb P_\theta,\mathbb P_{\theta^\ast})$.</em></p>
+<div class="cal formel"><span class="lab">Problème : on ne voit pas comment construire $\widehat{TV}(\mathbb P_\theta,\mathbb P_{\theta^\ast})$ !</span>
+<p class="cal piege"> </p>
+</div>
+<p class="cal piege"> <strong>Comprenez précisément l'obstacle, il détermine toute la suite.</strong> La variation totale est
+$$\frac12\int\big\lvert f_{\theta^\ast}(x)-f_\theta(x)\big\rvert\,dx$$
+Il faudrait estimer une intégrale de la <strong>valeur absolue d'une différence</strong> de densités. Or on ne dispose que d'un échantillon tiré selon $f_{\theta^\ast}$, et la loi des grands nombres n'estime que des quantités de la forme $E_{\theta^\ast}[h(X)]=\int f_{\theta^\ast}(x)h(x)dx$ — c'est-à-dire des intégrales <strong>pondérées par $f_{\theta^\ast}$</strong>. La valeur absolue empêche cette factorisation. <strong>C'est là que la symétrie de $TV$ devient un défaut.</strong></p>
+<h2 data-prio="must">Concept 2 — La divergence de Kullback-Leibler</h2>
+<blockquote>
+<p><em>Il existe de nombreuses distances entre mesures de probabilité pour remplacer la variation totale. Choisissons-en une qui soit <strong>plus commode</strong>.</em></p>
+</blockquote>
+<div class="cal formel"><span class="lab">Définition.</span>
+<p> La <strong>divergence de Kullback-Leibler (KL)</strong> entre deux mesures $\mathbb P_\theta$ et $\mathbb P_{\theta'}$ est
+$$KL(\mathbb P_\theta,\mathbb P_{\theta'})=\begin{cases}\displaystyle\sum_{x\in E}p_\theta(x)\log\left(\frac{p_\theta(x)}{p_{\theta'}(x)}\right) &amp; \text{si } E \text{ est discret}\\[12pt] \displaystyle\int_Ef_\theta(x)\log\left(\frac{f_\theta(x)}{f_{\theta'}(x)}\right)dx &amp; \text{si } E \text{ est continu}\end{cases}$$</p>
+</div>
+<div class="cal formel"><span class="lab">Propriétés de la divergence KL.</span>
+
+<ul>
+<li>$KL(\mathbb P_\theta,\mathbb P_{\theta'})\neq KL(\mathbb P_{\theta'},\mathbb P_\theta)$ <strong>en général</strong> — pas symétrique</li>
+<li>$KL(\mathbb P_\theta,\mathbb P_{\theta'})\geq0$</li>
+<li>Si $KL(\mathbb P_\theta,\mathbb P_{\theta'})=0$ alors $\mathbb P_\theta=\mathbb P_{\theta'}$ — <strong>définie</strong></li>
+<li>$KL(\mathbb P_\theta,\mathbb P_{\theta'})\not\leq KL(\mathbb P_\theta,\mathbb P_{\theta''})+KL(\mathbb P_{\theta''},\mathbb P_{\theta'})$ <strong>en général</strong> — pas d'inégalité triangulaire</li>
+</ul>
+<p><em>Ce n'est <strong>pas une distance</strong>. On l'appelle une <strong>divergence</strong>.</em></p>
+<blockquote>
+<p><em><strong>L'asymétrie est la clé de notre capacité à l'estimer !</strong></em></p>
+</blockquote>
+</div>
+<p class="cal piege"> <strong>Cette dernière phrase est le pivot du chapitre.</strong> On abandonne deux propriétés — symétrie et inégalité triangulaire — pour en gagner une seule : <strong>l'estimabilité</strong>. C'est un arbitrage délibéré, et c'est ce qui fait tout fonctionner. Le concept suivant montre pourquoi.</p>
+<h2 data-prio="must">Concept 3 — De KL au maximum de vraisemblance</h2>
+<p><strong>Étape 1 — écrire la KL comme une espérance sous la vraie loi.</strong>
+$$KL(\mathbb P_{\theta^\ast},\mathbb P_\theta)=\mathbb E_{\theta^\ast}\left[\log\left(\frac{p_{\theta^\ast}(X)}{p_\theta(X)}\right)\right]=\mathbb E_{\theta^\ast}\big[\log p_{\theta^\ast}(X)\big]-\mathbb E_{\theta^\ast}\big[\log p_\theta(X)\big]$$</p>
+<blockquote>
+<p><strong>Voilà pourquoi l'asymétrie sauve tout.</strong> En plaçant $\theta^\ast$ <strong>en premier argument</strong>, la pondération de l'intégrale est $f_{\theta^\ast}$ — exactement la loi dont on dispose d'un échantillon. La KL devient une <strong>espérance sous la vraie loi</strong>, donc estimable par moyenne empirique. La variation totale, symétrique, n'offrait pas ce choix.</p>
+</blockquote>
+<p><strong>Étape 2 — isoler la partie qui dépend de $\theta$.</strong> La fonction $\theta\mapsto KL(\mathbb P_{\theta^\ast},\mathbb P_\theta)$ est de la forme
+$$\text{« constante »}-\mathbb E_{\theta^\ast}\big[\log p_\theta(X)\big]$$
+Le premier terme ne dépend <strong>pas</strong> de $\theta$ : il est inconnu, mais il ne joue aucun rôle dans la minimisation.</p>
+<p><strong>Étape 3 — estimer par la loi des grands nombres.</strong> Puisque $\mathbb E_{\theta^\ast}[h(X)]\approx\frac1n\sum_{i=1}^nh(X_i)$ :
+$$\widehat{KL}(\mathbb P_{\theta^\ast},\mathbb P_\theta)=\text{« constante »}-\frac1n\sum_{i=1}^n\log p_\theta(X_i)$$</p>
+<p><strong>Étape 4 — la chaîne d'équivalences.</strong>
+$$\min_{\theta\in\Theta}\widehat{KL}(\mathbb P_{\theta^\ast},\mathbb P_\theta)\iff\min_{\theta\in\Theta}-\frac1n\sum_{i=1}^n\log p_\theta(X_i)\iff\max_{\theta\in\Theta}\frac1n\sum_{i=1}^n\log p_\theta(X_i)$$
+$$\iff\max_{\theta\in\Theta}\sum_{i=1}^n\log p_\theta(X_i)\iff\boxed{\ \max_{\theta\in\Theta}\prod_{i=1}^np_\theta(X_i)\ }$$</p>
+<blockquote>
+<p><em><strong>C'est le principe du maximum de vraisemblance.</strong></em></p>
+</blockquote>
+<blockquote>
+<p><strong>Relisez la chaîne : chaque flèche est élémentaire, et pourtant l'aboutissement est spectaculaire.</strong> On est parti d'un objectif abstrait — rapprocher deux lois — et l'on obtient une recette parfaitement concrète : <strong>maximiser la probabilité d'observer les données qu'on a observées</strong>.</p>
+<p><strong>Et cela répond à une question qu'on se pose rarement</strong> : pourquoi le maximum de vraisemblance ? Parce que c'est, exactement, la <strong>minimisation empirique de la divergence de Kullback-Leibler</strong> à la vraie loi. Ce n'est pas une heuristique séduisante, c'est une conséquence.</p>
+<p><strong>Le lien avec la fiche 50</strong> : on y avait constaté que l'EMV coïncide avec les MCO sous erreurs gaussiennes. On sait maintenant pourquoi les MCO sont légitimes — ils minimisent la KL au modèle gaussien.</p>
+</blockquote>
+<h2 data-prio="high">Concept 4 — Interlude : maximiser une fonction</h2>
+<p><em>Notons que $\min_{\theta\in\Theta}-h(\theta)\iff\max_{\theta\in\Theta}h(\theta)$. Dans ce cours, on se concentre sur la maximisation.</em> Or <em>maximiser une fonction arbitraire peut être difficile</em> — l'exemple donné est $\theta\mapsto\prod_{i=1}^n(\theta-X_i)$, dont le graphe oscille.</p>
+<div class="cal formel"><span class="lab">Définition.</span>
+<p> Une fonction deux fois dérivable $h:\Theta\subset\mathbb R\to\mathbb R$ est <strong>concave</strong> si
+$$h''(\theta)\leq0, \qquad \forall\theta\in\Theta$$
+Elle est <strong>strictement concave</strong> si l'inégalité est stricte : $h''(\theta)&lt;0$. Et $h$ est (strictement) <strong>convexe</strong> si $-h$ est (strictement) concave, c'est-à-dire $h''(\theta)\geq0$ (resp. $&gt;0$).</p>
+</div>
+<p><strong>Exemples du cours.</strong></p>
+<table>
+<thead>
+<tr>
+<th>$\Theta$</th>
+<th>$h(\theta)$</th>
+<th>Nature</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$\mathbb R$</td>
+<td>$-\theta^2$</td>
+<td>strictement concave</td>
+</tr>
+<tr>
+<td>$(0,\infty)$</td>
+<td>$\sqrt\theta$</td>
+<td>strictement concave</td>
+</tr>
+<tr>
+<td>$(0,\infty)$</td>
+<td>$\log\theta$</td>
+<td>strictement concave</td>
+</tr>
+<tr>
+<td>$[0,\pi]$</td>
+<td>$\sin(\theta)$</td>
+<td>concave</td>
+</tr>
+<tr>
+<td>$\mathbb R$</td>
+<td>$2\theta-3$</td>
+<td>concave <strong>et</strong> convexe (affine)</td>
+</tr>
+</tbody></table>
+<p><strong>Le cas multivarié.</strong> Pour $h:\Theta\subset\mathbb R^d\to\mathbb R$, $d\geq2$, on définit
+$$\textbf{le gradient : } \nabla h(\theta)=\begin{pmatrix}\frac{\partial h}{\partial\theta_1}(\theta)\\\vdots\\\frac{\partial h}{\partial\theta_d}(\theta)\end{pmatrix}\in\mathbb R^d, \qquad \textbf{la hessienne : } \nabla^2h(\theta)=\begin{pmatrix}\frac{\partial^2h}{\partial\theta_1\partial\theta_1}(\theta)&amp;\cdots&amp;\frac{\partial^2h}{\partial\theta_1\partial\theta_d}(\theta)\\\vdots&amp;\ddots&amp;\vdots\\\frac{\partial^2h}{\partial\theta_d\partial\theta_1}(\theta)&amp;\cdots&amp;\frac{\partial^2h}{\partial\theta_d\partial\theta_d}(\theta)\end{pmatrix}\in\mathbb R^{d\times d}$$</p>
+<blockquote>
+<p><strong>Caractérisation.</strong>
+$$h \text{ concave}\iff x^\top\nabla^2h(\theta)x\leq0\quad\forall x\in\mathbb R^d,\ \forall\theta\in\Theta$$
+$$h \text{ strictement concave}\iff x^\top\nabla^2h(\theta)x&lt;0\quad\forall x\in\mathbb R^d,\ \forall\theta\in\Theta$$</p>
+</blockquote>
+<p><strong>Exemples</strong> : $\Theta=\mathbb R^2$ avec $h(\theta)=-\theta_1^2-2\theta_2^2$ ou $h(\theta)=-(\theta_1-\theta_2)^2$ ; $h(\theta)=\log(\theta_1+\theta_2)$ sur $(0,\infty)$.</p>
+<div class="cal intu"><span class="lab">Pourquoi la concavité stricte est ce qu'on cherche.</span>
+<p> <em>Les fonctions strictement concaves sont <strong>faciles à maximiser</strong> : si elles ont un maximum, il est <strong>unique</strong>. C'est l'unique solution de</em>
+$$h'(\theta)=0 \qquad\text{ou, dans le cas multivarié,}\qquad \nabla h(\theta)=0\in\mathbb R^d$$
+<em>Il existe de nombreux algorithmes pour le trouver numériquement : c'est la théorie de l'<strong>optimisation convexe</strong>. Dans ce cours, on aura souvent une <strong>formule fermée</strong>.</em></p>
+</div>
+<p class="cal piege"> <strong>C'est le pont explicite avec les fiches 35 à 41.</strong> La condition $x^\top\nabla^2h(\theta)x\leq0$ dit que la hessienne est <strong>semi-définie négative</strong> — c'est la condition du second ordre de la fiche 35, au signe près. Et « il existe de nombreux algorithmes » renvoie au gradient et à Newton de la fiche 39. La statistique et l'optimisation convexe sont ici le même sujet.</p>
+<h2 data-prio="must">Concept 5 — La vraisemblance</h2>
+<h3>Cas discret</h3>
+<div class="cal formel"><span class="lab">Définition.</span>
+<p> La <strong>vraisemblance</strong> du modèle est l'application $L_n$ définie par
+$$L_n:E^n\times\Theta\to\mathbb R, \qquad (x_1,\dots,x_n,\theta)\mapsto\mathbb P_\theta\big[X_1=x_1,\dots,X_n=x_n\big]$$</p>
+</div>
+<p><strong>Exemple 1 — épreuves de Bernoulli.</strong> Si $X_1,\dots,X_n\overset{iid}\sim\mathrm{Ber}(p)$ pour $p\in(0,1)$ : $E=\{0,1\}$, $\Theta=(0,1)$, et pour tout $(x_1,\dots,x_n)\in\{0,1\}^n$,
+$$L(x_1,\dots,x_n,p)=\prod_{i=1}^n\mathbb P_p[X_i=x_i]=\prod_{i=1}^np^{x_i}(1-p)^{1-x_i}=p^{\sum_{i=1}^nx_i}(1-p)^{n-\sum_{i=1}^nx_i}$$</p>
+<p><strong>Exemple 2 — modèle de Poisson.</strong> Si $X_1,\dots,X_n\overset{iid}\sim\mathrm{Poiss}(\lambda)$ pour $\lambda&gt;0$ : $E=\mathbb N$, $\Theta=(0,\infty)$, et
+$$L(x_1,\dots,x_n,\lambda)=\prod_{i=1}^n\mathbb P_\lambda[X_i=x_i]=\prod_{i=1}^ne^{-\lambda}\frac{\lambda^{x_i}}{x_i!}=e^{-n\lambda}\frac{\lambda^{\sum_{i=1}^nx_i}}{x_1!\cdots x_n!}$$</p>
+<h3>Cas continu</h3>
+<div class="cal formel"><span class="lab">Définition.</span>
+<p> Si toutes les $\mathbb P_\theta$ ont une densité $f_\theta$, la vraisemblance est
+$$L:E^n\times\Theta\to\mathbb R, \qquad (x_1,\dots,x_n,\theta)\mapsto\prod_{i=1}^nf_\theta(x_i)$$</p>
+</div>
+<p><strong>Exemple 1 — modèle gaussien.</strong> Si $X_1,\dots,X_n\overset{iid}\sim N(\mu,\sigma^2)$ : $E=\mathbb R$, $\Theta=\mathbb R\times(0,\infty)$, et
+$$L(x_1,\dots,x_n,\mu,\sigma^2)=\frac{1}{(\sigma\sqrt{2\pi})^n}\exp\left(-\frac{1}{2\sigma^2}\sum_{i=1}^n(x_i-\mu)^2\right)$$</p>
+<blockquote>
+<p><strong>Notez la forme récurrente : un produit.</strong> C'est l'indépendance qui la produit, et c'est elle qui rend le logarithme naturel — il transforme le produit en somme, donc la maximisation en un problème d'analyse ordinaire.</p>
+<p><strong>Et l'on reconnaît la fiche 50</strong> : la vraisemblance gaussienne fait apparaître $\sum(x_i-\mu)^2$ — le critère des <strong>moindres carrés</strong>. C'est exactement la connexion établie là-bas.</p>
+</blockquote>
+<h2 data-prio="must">Concept 6 — L'estimateur du maximum de vraisemblance</h2>
+<div class="cal formel"><span class="lab">Définition.</span>
+<p> L'<strong>estimateur du maximum de vraisemblance</strong> de $\theta$ est
+$$\hat\theta_n^{MLE}=\underset{\theta\in\Theta}{\mathrm{argmax}}\ L(X_1,\dots,X_n,\theta)$$
+<em>sous réserve qu'il existe.</em></p>
+</div>
+<div class="cal formel"><span class="lab">Remarque — l'estimateur de log-vraisemblance.</span>
+<p> <em>En pratique, on utilise le fait que</em>
+$$\hat\theta_n^{MLE}=\underset{\theta\in\Theta}{\mathrm{argmax}}\ \log L(X_1,\dots,X_n,\theta)$$</p>
+</div>
+<p class="cal piege"> <strong>C'est légitime parce que $\log$ est strictement croissante</strong> : elle ne déplace pas l'argmax. Et c'est indispensable en pratique, pour deux raisons — le logarithme transforme le <strong>produit en somme</strong>, et il évite le <strong>sous-dépassement numérique</strong> (le produit de $n$ probabilités devient vite trop petit pour être représenté).</p>
+<p><strong>Les trois exemples.</strong></p>
+<table>
+<thead>
+<tr>
+<th>Modèle</th>
+<th>EMV</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Bernoulli</strong></td>
+<td>$\hat p_n^{MLE}=\bar X_n$</td>
+</tr>
+<tr>
+<td><strong>Poisson</strong></td>
+<td>$\hat\lambda_n^{MLE}=\bar X_n$</td>
+</tr>
+<tr>
+<td><strong>Gaussien</strong></td>
+<td>$(\hat\mu_n,\hat\sigma_n^2)=\big(\bar X_n,\ \hat S_n\big)$</td>
+</tr>
+</tbody></table>
+<p>où $\hat S_n=\frac1n\sum_{i=1}^n(X_i-\bar X_n)^2$ est la variance empirique.</p>
+<blockquote>
+<p><strong>Les trois donnent la moyenne empirique — ce n'est pas un hasard.</strong> Pour Bernoulli comme pour Poisson, le paramètre <strong>est</strong> l'espérance ; la vraisemblance ne dépend des données que par $\sum X_i$, et l'EMV renvoie donc naturellement $\bar X_n$.</p>
+<p class="cal piege"> <strong>Et retenez le diviseur $n$ pour la variance gaussienne</strong> : l'EMV de $\sigma^2$ est <strong>biaisé</strong>, comme signalé en fiche 50. L'estimateur sans biais divise par $n-1$.</p>
+</blockquote>
+<h2 data-prio="must">Concept 7 — L'information de Fisher</h2>
+<div class="cal formel"><span class="lab">Définition.</span>
+<p> Définissons la <strong>log-vraisemblance pour une observation</strong> :
+$$\ell(\theta)=\log L_1(X,\theta), \qquad \theta\in\Theta\subset\mathbb R^d$$
+Supposons $\ell$ presque sûrement deux fois dérivable. Sous certaines conditions de régularité, l'<strong>information de Fisher</strong> du modèle statistique est
+$$\boxed{\ I(\theta)=\mathbb E\big[\nabla\ell(\theta)\nabla\ell(\theta)^\top\big]-\mathbb E\big[\nabla\ell(\theta)\big]\,\mathbb E\big[\nabla\ell(\theta)\big]^\top=-\mathbb E\big[\nabla^2\ell(\theta)\big]\ }$$
+Si $\Theta\subset\mathbb R$, on obtient
+$$I(\theta)=\mathrm{var}\big[\ell'(\theta)\big]=-\mathbb E\big[\ell''(\theta)\big]$$</p>
+</div>
+<div class="cal methode"><span class="lab">Comment lire cette définition — deux visages du même objet.</span>
+
+<ul>
+<li><strong>Premier visage : une variance.</strong> $I(\theta)=\mathrm{var}[\ell'(\theta)]$ mesure combien la pente de la log-vraisemblance <strong>varie</strong> d'un échantillon à l'autre. Beaucoup de variation ⟹ les données discriminent fortement entre les valeurs de $\theta$.</li>
+<li><strong>Second visage : une courbure.</strong> $I(\theta)=-\mathbb E[\ell''(\theta)]$ mesure à quel point la log-vraisemblance est <strong>pointue</strong> au maximum. Un pic étroit ⟹ le maximum est bien localisé, donc l'estimation est précise.</li>
+</ul>
+<p><strong>Que ces deux quantités coïncident est un théorème</strong> — l'<strong>identité de l'information</strong> — et il repose sur les « conditions de régularité » mentionnées, dont la plus importante est que <strong>le support de $\mathbb P_\theta$ ne dépend pas de $\theta$</strong> (hypothèse 2 du concept 8).</p>
+</div>
+<p class="cal piege"> <strong>L'information de Fisher est déjà apparue en fiche 60</strong>, comme variance asymptotique de l'EMV dans les modèles espace-état. C'est le même objet, et le théorème suivant explique pourquoi il revient partout.</p>
+<h2 data-prio="must">Concept 8 — Le théorème asymptotique</h2>
+<div class="cal formel"><span class="lab">Théorème.</span>
+<p> <em>Soit $\theta^\ast\in\Theta$ le vrai paramètre. Supposons que :</em></p>
+<ol>
+<li><em>le modèle est <strong>identifié</strong> ;</em></li>
+<li><em>pour tout $\theta\in\Theta$, le <strong>support de $\mathbb P_\theta$ ne dépend pas de $\theta$</strong> ;</em></li>
+<li><em>$\theta^\ast$ <strong>n'est pas sur la frontière</strong> de $\Theta$ ;</em></li>
+<li><em>$I(\theta)$ est <strong>inversible</strong> dans un voisinage de $\theta^\ast$ ;</em></li>
+<li><em>quelques conditions techniques supplémentaires.</em></li>
+</ol>
+<p><em>Alors $\hat\theta_n^{MLE}$ satisfait :</em>
+$$\hat\theta_n^{MLE}\ \xrightarrow[n\to\infty]{\mathbb P}\ \theta^\ast \qquad \text{(par rapport à } \mathbb P_{\theta^\ast})$$
+$$\boxed{\ \sqrt n\big(\hat\theta_n^{MLE}-\theta^\ast\big)\ \xrightarrow[n\to\infty]{(d)}\ N\big(0,\ I(\theta^\ast)^{-1}\big) \qquad \text{(par rapport à } \mathbb P_{\theta^\ast})}$$</p>
+</div>
+<blockquote>
+<p><strong>Ce théorème est la raison pour laquelle le maximum de vraisemblance domine la statistique.</strong> Il donne, d'un coup :</p>
+<ul>
+<li>la <strong>consistance</strong> — l'estimateur converge vers la vérité ;</li>
+<li>la <strong>vitesse</strong> $1/\sqrt n$ — la vitesse standard ;</li>
+<li>la <strong>loi limite exacte</strong>, donc les intervalles de confiance et les tests ;</li>
+<li>et une <strong>variance asymptotique $I(\theta^\ast)^{-1}$</strong> qui, par la borne de Cramér-Rao, est la <strong>plus petite possible</strong> parmi les estimateurs réguliers. L'EMV est <strong>asymptotiquement efficace</strong>.</li>
+</ul>
+</blockquote>
+<p class="cal piege"> <strong>Chaque hypothèse écarte un contre-exemple précis — il faut savoir lequel.</strong></p>
+<table>
+<thead>
+<tr>
+<th>Hypothèse</th>
+<th>Ce qu'elle écarte</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>1. Modèle identifié</strong></td>
+<td>Sinon deux $\theta$ différents donnent la même loi : rien ne permet de les distinguer, à aucune taille d'échantillon.</td>
+</tr>
+<tr>
+<td><strong>2. Support indépendant de $\theta$</strong></td>
+<td>C'est l'hypothèse la plus souvent violée. Contre-exemple : le modèle uniforme $U[0,\theta]$, dont l'EMV est $\max_iX_i$ ; il converge à la vitesse $1/n$, <strong>pas</strong> $1/\sqrt n$, et sa loi limite est exponentielle, pas gaussienne.</td>
+</tr>
+<tr>
+<td><strong>3. $\theta^\ast$ à l'intérieur</strong></td>
+<td>Sur une frontière, la condition $\nabla\ell=0$ ne caractérise plus le maximum, et la loi limite devient une gaussienne <strong>tronquée</strong>.</td>
+</tr>
+<tr>
+<td><strong>4. $I(\theta)$ inversible</strong></td>
+<td>Sinon la variance asymptotique n'existe pas : certaines directions du paramètre ne sont pas informées par les données.</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>Le lien avec la fiche 50, maintenant complet.</strong> On y avait établi que, dans le modèle normal-linéaire, $\hat\beta\sim N_p(\beta,\sigma^2(X^TX)^{-1})$ — <strong>exactement</strong>, à distance finie. Le théorème ci-dessus dit que c'est un cas particulièrement heureux d'un phénomène <strong>général</strong> : tout EMV est asymptotiquement gaussien de variance $I(\theta^\ast)^{-1}$. Ici, $\sigma^2(X^TX)^{-1}$ <strong>est</strong> l'inverse de l'information de Fisher du modèle linéaire.</p>
+</blockquote>
+<h2>Comment résoudre l'exercice type (protocole)</h2>
+<ol>
+<li><strong>Écrire le modèle</strong> : $E$, $\Theta$, la famille $(\mathbb P_\theta)$, et vérifier l'<strong>identifiabilité</strong>.</li>
+<li><strong>Écrire la vraisemblance</strong> : produit des masses (discret) ou des densités (continu).</li>
+<li><strong>Passer au logarithme</strong> — le produit devient une somme.</li>
+<li><strong>Dériver</strong> : $\ell'(\theta)=0$, ou $\nabla\ell(\theta)=0$ en dimension $d$.</li>
+<li><strong>Vérifier la concavité</strong> : $\ell''&lt;0$, ou hessienne définie négative ⟹ le maximum est <strong>unique</strong>.</li>
+<li><strong>Calculer l'information de Fisher</strong> : $I(\theta)=-\mathbb E[\ell''(\theta)]$ pour <strong>une</strong> observation.</li>
+<li><strong>Conclure</strong> : $\sqrt n(\hat\theta_n-\theta^\ast)\to N(0,I(\theta^\ast)^{-1})$, d'où intervalles de confiance et tests.</li>
+<li><strong>Vérifier les hypothèses du théorème</strong> — surtout que le <strong>support ne dépend pas de $\theta$</strong>.</li>
+</ol>
+<h3>Comment reconnaître qu'il faut utiliser cette méthode ?</h3>
+<table>
+<thead>
+<tr>
+<th>Indice dans l'énoncé</th>
+<th>Ce qu'il faut faire</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>« estimer le paramètre d'un modèle paramétrique »</td>
+<td><strong>maximum de vraisemblance</strong></td>
+</tr>
+<tr>
+<td>« rapprocher deux lois »</td>
+<td>KL, puis EMV</td>
+</tr>
+<tr>
+<td>« pourquoi maximiser la vraisemblance ? »</td>
+<td>c'est minimiser la <strong>KL empirique</strong></td>
+</tr>
+<tr>
+<td>« le maximum est-il unique ? »</td>
+<td>vérifier la <strong>stricte concavité</strong></td>
+</tr>
+<tr>
+<td>« quelle précision ? »</td>
+<td><strong>information de Fisher</strong>, $I(\theta^\ast)^{-1}/n$</td>
+</tr>
+<tr>
+<td>« intervalle de confiance asymptotique »</td>
+<td>$\hat\theta\pm q_{\alpha/2}\sqrt{I(\hat\theta)^{-1}/n}$</td>
+</tr>
+<tr>
+<td>modèle $U[0,\theta]$ ou support mobile</td>
+<td> le théorème <strong>ne s'applique pas</strong></td>
+</tr>
+<tr>
+<td>$\theta^\ast$ au bord de $\Theta$</td>
+<td> hypothèse 3 violée</td>
+</tr>
+</tbody></table>
+<h3>Exercices progressifs</h3>
+<p><strong> Niveau 1</strong> — Calculez l'EMV du paramètre d'un modèle de Bernoulli.</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p><strong>La vraisemblance.</strong>
+$$L(x_1,\dots,x_n,p)=p^{\sum x_i}(1-p)^{n-\sum x_i}$$</p>
+<p><strong>La log-vraisemblance.</strong> En posant $S=\sum_{i=1}^nx_i$ :
+$$\log L=S\log p+(n-S)\log(1-p)$$</p>
+<p><strong>La dérivée.</strong>
+$$\frac{\partial\log L}{\partial p}=\frac Sp-\frac{n-S}{1-p}$$</p>
+<p><strong>L'annulation.</strong> $\frac Sp=\frac{n-S}{1-p}$ donne $S(1-p)=p(n-S)$, soit $S-Sp=pn-pS$, donc $S=pn$ et
+$$\hat p_n^{MLE}=\frac Sn=\bar X_n$$</p>
+<p><strong>La vérification de concavité.</strong>
+$$\frac{\partial^2\log L}{\partial p^2}=-\frac{S}{p^2}-\frac{n-S}{(1-p)^2}&lt;0$$
+strictement négative sur $(0,1)$ : la log-vraisemblance est <strong>strictement concave</strong>, le maximum est donc <strong>unique</strong>.</p>
+<p><strong>L'information de Fisher.</strong> Pour une observation, $\ell(p)=X\log p+(1-X)\log(1-p)$, donc
+$$\ell''(p)=-\frac{X}{p^2}-\frac{1-X}{(1-p)^2}, \qquad I(p)=-\mathbb E[\ell''(p)]=\frac{p}{p^2}+\frac{1-p}{(1-p)^2}=\frac1p+\frac1{1-p}=\frac{1}{p(1-p)}$$</p>
+<p><strong>La conclusion asymptotique.</strong>
+$$\sqrt n\big(\hat p_n-p\big)\ \xrightarrow{(d)}\ N\big(0,\ p(1-p)\big)$$
+— qu'on aurait aussi obtenue par le théorème central limite direct, puisque $\mathrm{var}(X_i)=p(1-p)$. Les deux méthodes concordent. </p>
+</div></details>
+
+<p><strong> Niveau 2</strong> — Pourquoi ne peut-on pas estimer la distance en variation totale, alors qu'on peut estimer la divergence KL ?</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p><strong>Le problème de la variation totale.</strong>
+$$TV(\mathbb P_{\theta^\ast},\mathbb P_\theta)=\frac12\int_E\big\lvert f_{\theta^\ast}(x)-f_\theta(x)\big\rvert\,dx$$
+On ne dispose que d'un échantillon tiré selon $f_{\theta^\ast}$. Or la loi des grands nombres ne permet d'estimer que des quantités de la forme
+$$\mathbb E_{\theta^\ast}[h(X)]=\int f_{\theta^\ast}(x)h(x)\,dx\ \approx\ \frac1n\sum_ih(X_i)$$
+c'est-à-dire des intégrales où $f_{\theta^\ast}$ apparaît <strong>en facteur</strong>. La <strong>valeur absolue</strong> $\lvert f_{\theta^\ast}-f_\theta\rvert$ empêche de mettre $f_{\theta^\ast}$ en facteur : on ne peut pas écrire $TV$ sous la forme $\mathbb E_{\theta^\ast}[h(X)]$.</p>
+<p><strong>Pourquoi la KL passe.</strong> Le logarithme transforme le quotient en différence, et $f_{\theta^\ast}$ se factorise :
+$$KL(\mathbb P_{\theta^\ast},\mathbb P_\theta)=\int f_{\theta^\ast}(x)\log\left(\frac{f_{\theta^\ast}(x)}{f_\theta(x)}\right)dx=\mathbb E_{\theta^\ast}\left[\log\frac{f_{\theta^\ast}(X)}{f_\theta(X)}\right]$$
+<strong>C'est bien une espérance sous la vraie loi</strong>, donc estimable par moyenne empirique.</p>
+<p><strong>Et l'asymétrie est ce qui rend ce choix possible.</strong> Il fallait que $\theta^\ast$ soit en <strong>premier</strong> argument pour que la pondération soit $f_{\theta^\ast}$. Une divergence symétrique n'aurait pas offert ce choix — c'est le sens de la phrase du cours : <em>l'asymétrie est la clé de notre capacité à l'estimer.</em></p>
+<p><strong>Le prix payé.</strong> On perd la symétrie et l'inégalité triangulaire : KL n'est <strong>pas une distance</strong>, seulement une <strong>divergence</strong>. On conserve l'essentiel — positivité et caractère défini — donc le minimum en $\theta$ est bien atteint en $\theta^\ast$, ce qui suffit pour estimer.</p>
+</div></details>
+
+<p><strong> Niveau 3</strong> — Interprétez l'information de Fisher sous ses deux formes.</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p><strong>Les deux expressions</strong>, pour $\Theta\subset\mathbb R$ :
+$$I(\theta)=\mathrm{var}\big[\ell'(\theta)\big]=-\mathbb E\big[\ell''(\theta)\big]$$</p>
+<p><strong>Première lecture — une variance.</strong> $\ell'(\theta)$ est le <strong>score</strong> : la pente de la log-vraisemblance au point $\theta$. Sa variance mesure combien cette pente <strong>change d'un échantillon à l'autre</strong>. Une grande variance signifie que chaque observation « pousse » fortement l'estimation dans une direction ou l'autre : les données sont <strong>informatives</strong> sur $\theta$.</p>
+<p><strong>Deuxième lecture — une courbure.</strong> $-\mathbb E[\ell''(\theta)]$ mesure à quel point la log-vraisemblance est <strong>pointue</strong> au maximum. Un pic étroit ⟹ un petit déplacement de $\theta$ fait chuter la vraisemblance ⟹ le maximum est <strong>bien localisé</strong> ⟹ estimation précise. Un pic plat ⟹ beaucoup de valeurs de $\theta$ sont presque aussi vraisemblables ⟹ estimation imprécise.</p>
+<p><strong>La conséquence quantitative.</strong>
+$$\mathrm{Var}\big(\hat\theta_n\big)\approx\frac{I(\theta^\ast)^{-1}}{n}$$
+<strong>Plus d'information, moins de variance</strong> — la relation est exactement inverse. Et par la borne de Cramér-Rao, c'est la <strong>plus petite variance atteignable</strong> par un estimateur régulier : l'EMV est <strong>asymptotiquement efficace</strong>.</p>
+<p><strong>Un exemple qui parle.</strong> Pour Bernoulli, $I(p)=\frac{1}{p(1-p)}$. Cette information est <strong>minimale</strong> en $p=1/2$ ($I=4$) et <strong>explose</strong> quand $p\to0$ ou $1$. Autrement dit : une pièce presque truquée est facile à identifier comme telle — une seule face rare observée est très informative —, alors qu'une pièce proche de l'équilibre demande beaucoup de lancers.</p>
+<p class="cal piege"> <strong>Que les deux expressions coïncident est un théorème</strong>, l'<strong>identité de l'information</strong>, et il exige les conditions de régularité — en particulier que le <strong>support ne dépende pas de $\theta$</strong>. Sur le modèle $U[0,\theta]$, l'identité tombe, et avec elle tout le théorème asymptotique.</p>
+</div></details>
+
+<p><strong> Niveau 4 — type examen</strong> — Dérivez le principe du maximum de vraisemblance à partir de la divergence KL, et énoncez le théorème asymptotique avec ses hypothèses.</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p><strong>Le point de départ.</strong> Le but est de trouver $\hat\theta$ tel que $\mathbb P_{\hat\theta}$ soit proche de $\mathbb P_{\theta^\ast}$. Il faut une notion de proximité <strong>estimable</strong>.</p>
+<p><strong>Pourquoi pas la variation totale.</strong> $TV(\mathbb P_\theta,\mathbb P_{\theta'})=\frac12\int\lvert f_\theta-f_{\theta'}\rvert$ est une vraie distance — symétrique, définie, triangulaire — mais la <strong>valeur absolue</strong> interdit de l'écrire comme une espérance sous $\mathbb P_{\theta^\ast}$, donc de l'estimer par moyenne empirique. <em>On ne voit pas comment construire $\widehat{TV}$.</em></p>
+<p><strong>Le remplacement.</strong> La divergence KL
+$$KL(\mathbb P_\theta,\mathbb P_{\theta'})=\int f_\theta(x)\log\frac{f_\theta(x)}{f_{\theta'}(x)}dx$$
+n'est <strong>pas</strong> une distance — ni symétrique, ni triangulaire — mais elle est <strong>positive</strong> et <strong>définie</strong>, ce qui suffit. Et <em>l'asymétrie est la clé de notre capacité à l'estimer</em>.</p>
+<p><strong>La dérivation, en quatre étapes.</strong></p>
+<p><em>Étape 1.</em> En plaçant $\theta^\ast$ en premier argument :
+$$KL(\mathbb P_{\theta^\ast},\mathbb P_\theta)=\mathbb E_{\theta^\ast}\left[\log\frac{p_{\theta^\ast}(X)}{p_\theta(X)}\right]=\underbrace{\mathbb E_{\theta^\ast}[\log p_{\theta^\ast}(X)]}_{\text{« constante »}}-\mathbb E_{\theta^\ast}[\log p_\theta(X)]$$</p>
+<p><em>Étape 2.</em> La constante ne dépend pas de $\theta$ : elle est inconnue mais <strong>sans effet</strong> sur l'argmin.</p>
+<p><em>Étape 3.</em> Par la loi des grands nombres, $\mathbb E_{\theta^\ast}[h(X)]\approx\frac1n\sum_ih(X_i)$, donc
+$$\widehat{KL}(\mathbb P_{\theta^\ast},\mathbb P_\theta)=\text{« constante »}-\frac1n\sum_{i=1}^n\log p_\theta(X_i)$$</p>
+<p><em>Étape 4 — la chaîne.</em>
+$$\min_\theta\widehat{KL}\iff\max_\theta\frac1n\sum_i\log p_\theta(X_i)\iff\max_\theta\sum_i\log p_\theta(X_i)\iff\max_\theta\prod_{i=1}^np_\theta(X_i)$$</p>
+<p><strong>C'est le principe du maximum de vraisemblance</strong> : maximiser la probabilité d'observer ce qu'on a effectivement observé.</p>
+<p><strong>Le théorème asymptotique.</strong> Sous les hypothèses :</p>
+<ol>
+<li>le modèle est <strong>identifié</strong> ;</li>
+<li>le <strong>support de $\mathbb P_\theta$ ne dépend pas de $\theta$</strong> ;</li>
+<li>$\theta^\ast$ n'est <strong>pas sur la frontière</strong> de $\Theta$ ;</li>
+<li>$I(\theta)$ est <strong>inversible</strong> au voisinage de $\theta^\ast$ ;</li>
+<li>quelques conditions techniques ;</li>
+</ol>
+<p>on a
+$$\hat\theta_n^{MLE}\xrightarrow{\mathbb P}\theta^\ast \qquad\text{et}\qquad \sqrt n\big(\hat\theta_n^{MLE}-\theta^\ast\big)\xrightarrow{(d)}N\big(0,I(\theta^\ast)^{-1}\big)$$
+où $I(\theta)=-\mathbb E[\nabla^2\ell(\theta)]$ est l'<strong>information de Fisher</strong>.</p>
+<p><strong>Ce qu'il faut savoir commenter.</strong></p>
+<p><strong>1. La méthode n'est pas heuristique, elle est dérivée.</strong> Le maximum de vraisemblance <strong>est</strong> la minimisation empirique de la KL à la vraie loi. C'est ce qui justifie son omniprésence.</p>
+<p><strong>2. Le théorème donne tout d'un coup</strong> : consistance, vitesse $1/\sqrt n$, loi limite, et donc intervalles de confiance et tests. Et par Cramér-Rao, la variance $I(\theta^\ast)^{-1}$ est <strong>optimale</strong> : l'EMV est asymptotiquement efficace.</p>
+<p><strong>3. L'hypothèse 2 est celle qui tombe le plus souvent.</strong> Sur $U[0,\theta]$, l'EMV est $\max_iX_i$ ; il converge à la vitesse $1/n$ — bien <strong>plus vite</strong> que $1/\sqrt n$ — et sa loi limite est <strong>exponentielle</strong>, pas gaussienne. Tout le théorème s'effondre, y compris l'identité $\mathrm{var}[\ell']=-\mathbb E[\ell'']$.</p>
+<p><strong>4. Le lien avec les fiches précédentes.</strong> La fiche 50 avait établi $\hat\beta\sim N_p(\beta,\sigma^2(X^TX)^{-1})$ pour la régression normale : c'est un cas particulier <strong>exact</strong> de ce théorème, où $\sigma^2(X^TX)^{-1}$ est l'inverse de l'information de Fisher. Et la fiche 60 utilisait déjà $\mathcal I_T^{-1}$ comme variance asymptotique de l'EMV en espace-état. Le même objet, partout.</p>
+</div></details>
+
+<h2 data-prio="must">Common mistakes</h2>
+<ol>
+<li><strong>Croire que la KL est une distance</strong> — elle n'est <strong>ni symétrique ni triangulaire</strong> : c'est une <strong>divergence</strong>.</li>
+<li><strong>Inverser les arguments de la KL</strong> — il faut $KL(\mathbb P_{\theta^\ast},\mathbb P_\theta)$, avec le <strong>vrai</strong> paramètre en premier, sinon l'espérance n'est pas estimable.</li>
+<li><strong>Oublier que la constante ne dépend pas de $\theta$</strong> — c'est ce qui permet de l'ignorer dans la minimisation.</li>
+<li><strong>Maximiser $L$ au lieu de $\log L$</strong> — mathématiquement équivalent, numériquement désastreux (sous-dépassement).</li>
+<li><strong>Oublier de vérifier la concavité</strong> — sans stricte concavité, $\nabla\ell=0$ ne garantit pas un maximum, ni son unicité.</li>
+<li><strong>Confondre $I(\theta)$ pour une observation et pour l'échantillon</strong> — l'information de l'échantillon vaut $nI(\theta)$, d'où le $1/n$ dans la variance.</li>
+<li><strong>Appliquer le théorème quand le support dépend de $\theta$</strong> — contre-exemple : $U[0,\theta]$, vitesse $1/n$ et loi exponentielle.</li>
+<li><strong>Oublier le biais de l'EMV de la variance gaussienne</strong> — diviseur $n$, pas $n-1$.</li>
+<li><strong>Croire que $\hat\theta$ est gaussien à distance finie</strong> — la normalité est <strong>asymptotique</strong>, sauf cas particuliers comme le modèle linéaire normal.</li>
+</ol>
+<h2>Ultimate Review</h2>
+<ol>
+<li><strong>Cadre</strong> : modèle $\big(E,(\mathbb P_\theta)_{\theta\in\Theta}\big)$, échantillon i.i.d., <strong>vrai paramètre</strong> $\theta^\ast$ ; but : $\mathbb P_{\hat\theta}$ proche de $\mathbb P_{\theta^\ast}$.</li>
+<li><strong>Variation totale</strong> : $TV=\max_A\lvert\mathbb P_\theta(A)-\mathbb P_{\theta'}(A)\rvert=\frac12\sum\lvert p_\theta-p_{\theta'}\rvert$ (discret) $=\frac12\int\lvert f_\theta-f_{\theta'}\rvert$ (continu).</li>
+<li><strong>C'est une distance</strong> : symétrique, positive, définie, triangulaire. <strong>Mais inestimable</strong> — la valeur absolue empêche l'écriture comme espérance.</li>
+<li><strong>Divergence KL</strong> : $\sum p_\theta\log(p_\theta/p_{\theta'})$ ou $\int f_\theta\log(f_\theta/f_{\theta'})$.</li>
+<li><strong>Ses propriétés</strong> : <strong>non symétrique</strong>, positive, définie, <strong>pas d'inégalité triangulaire</strong>. <em>L'asymétrie est la clé de notre capacité à l'estimer.</em></li>
+<li><strong>La décomposition</strong> : $KL(\mathbb P_{\theta^\ast},\mathbb P_\theta)=\text{constante}-\mathbb E_{\theta^\ast}[\log p_\theta(X)]$.</li>
+<li><strong>L'estimation</strong> : $\widehat{KL}=\text{constante}-\frac1n\sum_i\log p_\theta(X_i)$ par la LGN.</li>
+<li><strong>La chaîne</strong> : $\min\widehat{KL}\iff\max\frac1n\sum\log p_\theta(X_i)\iff\max\sum\log p_\theta(X_i)\iff\max\prod p_\theta(X_i)$.</li>
+<li><strong>Concavité</strong> : $h''\leq0$ ; strictement si $&lt;0$ ; multivarié : $x^\top\nabla^2h(\theta)x\leq0\ \forall x$.</li>
+<li><strong>Pourquoi elle importe</strong> : une fonction strictement concave a <strong>au plus un</strong> maximum, solution unique de $\nabla h(\theta)=0$.</li>
+<li><strong>Vraisemblance discrète</strong> : $L_n=\mathbb P_\theta[X_1=x_1,\dots,X_n=x_n]$ ; <strong>Bernoulli</strong> $p^{\sum x_i}(1-p)^{n-\sum x_i}$ ; <strong>Poisson</strong> $e^{-n\lambda}\lambda^{\sum x_i}/\prod x_i!$.</li>
+<li><strong>Vraisemblance continue</strong> : $L=\prod_if_\theta(x_i)$ ; <strong>gaussienne</strong> $\frac{1}{(\sigma\sqrt{2\pi})^n}\exp\big(-\frac{1}{2\sigma^2}\sum(x_i-\mu)^2\big)$.</li>
+<li><strong>EMV</strong> : $\hat\theta_n^{MLE}=\mathrm{argmax}_\theta L=\mathrm{argmax}_\theta\log L$.</li>
+<li><strong>Exemples</strong> : Bernoulli $\hat p=\bar X_n$ · Poisson $\hat\lambda=\bar X_n$ · gaussien $(\bar X_n,\hat S_n)$, la variance étant <strong>biaisée</strong>.</li>
+<li><strong>Information de Fisher</strong> : $\ell(\theta)=\log L_1(X,\theta)$ ;
+$$I(\theta)=\mathbb E[\nabla\ell\nabla\ell^\top]-\mathbb E[\nabla\ell]\mathbb E[\nabla\ell]^\top=-\mathbb E[\nabla^2\ell(\theta)]$$
+en dimension $1$ : $I(\theta)=\mathrm{var}[\ell'(\theta)]=-\mathbb E[\ell''(\theta)]$.</li>
+<li><strong>Ses deux lectures</strong> : <strong>variance du score</strong> (les données discriminent-elles ?) et <strong>courbure</strong> de la log-vraisemblance (le maximum est-il pointu ?).</li>
+<li><strong>Théorème</strong> — hypothèses : modèle <strong>identifié</strong> · <strong>support indépendant de $\theta$</strong> · $\theta^\ast$ à l'intérieur · $I(\theta)$ <strong>inversible</strong> · conditions techniques.</li>
+<li><strong>Conclusions</strong> : $\hat\theta_n\xrightarrow{\mathbb P}\theta^\ast$ et $\sqrt n(\hat\theta_n-\theta^\ast)\xrightarrow{(d)}N\big(0,I(\theta^\ast)^{-1}\big)$ ; l'EMV est <strong>asymptotiquement efficace</strong>.</li>
+</ol>
+<p><strong>Formulas to know</strong>
+$$TV=\frac12\int\lvert f_\theta-f_{\theta'}\rvert \qquad KL(\mathbb P_\theta,\mathbb P_{\theta'})=\int f_\theta\log\frac{f_\theta}{f_{\theta'}}$$
+$$KL(\mathbb P_{\theta^\ast},\mathbb P_\theta)=\text{cste}-\mathbb E_{\theta^\ast}[\log p_\theta(X)] \qquad \hat\theta_n^{MLE}=\underset{\theta}{\mathrm{argmax}}\prod_{i=1}^np_\theta(X_i)$$
+$$I(\theta)=-\mathbb E[\nabla^2\ell(\theta)] \qquad \sqrt n\big(\hat\theta_n-\theta^\ast\big)\xrightarrow{(d)}N\big(0,I(\theta^\ast)^{-1}\big)$$</p>
+<p><strong>Methods to know</strong> : la dérivation KL ⟹ maximum de vraisemblance en quatre étapes ; le protocole de calcul d'un EMV ; le calcul de $I(\theta)$ ; la vérification des hypothèses du théorème.</p>
+<div class="rec"><h2>Active Recall</h2><p><strong>Basic</strong> — Définissez la divergence de Kullback-Leibler et donnez ses propriétés.</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p>$$KL(\mathbb P_\theta,\mathbb P_{\theta'})=\sum_{x\in E}p_\theta(x)\log\frac{p_\theta(x)}{p_{\theta'}(x)} \quad\text{(discret)}, \qquad \int_Ef_\theta(x)\log\frac{f_\theta(x)}{f_{\theta'}(x)}dx \quad\text{(continu)}$$</p>
+<p><strong>Propriétés</strong> :</p>
+<ul>
+<li><strong>non symétrique</strong> en général ;</li>
+<li>$KL\geq0$ ;</li>
+<li><strong>définie</strong> : $KL=0\Rightarrow\mathbb P_\theta=\mathbb P_{\theta'}$ ;</li>
+<li><strong>pas d'inégalité triangulaire</strong> en général.</li>
+</ul>
+<p>Ce n'est donc <strong>pas une distance</strong> mais une <strong>divergence</strong>. Et <em>l'asymétrie est la clé de notre capacité à l'estimer</em> : en plaçant $\theta^\ast$ en premier argument, la KL devient une espérance sous la vraie loi.</p>
+</div></details><p><strong>Understanding</strong> — Pourquoi maximise-t-on la vraisemblance ?</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p>Parce que <strong>c'est exactement minimiser la divergence KL empirique</strong> à la vraie loi.</p>
+<p><strong>La chaîne complète :</strong>
+$$KL(\mathbb P_{\theta^\ast},\mathbb P_\theta)=\underbrace{\mathbb E_{\theta^\ast}[\log p_{\theta^\ast}(X)]}_{\text{indépendant de }\theta}-\mathbb E_{\theta^\ast}[\log p_\theta(X)]$$
+Par la loi des grands nombres, le second terme s'estime par $\frac1n\sum_i\log p_\theta(X_i)$, d'où
+$$\min_\theta\widehat{KL}\iff\max_\theta\sum_{i=1}^n\log p_\theta(X_i)\iff\max_\theta\prod_{i=1}^np_\theta(X_i)$$</p>
+<p><strong>Le maximum de vraisemblance n'est donc pas un principe posé a priori</strong> — c'est une <strong>conséquence</strong> du choix d'une divergence estimable. Et le choix de la KL plutôt que de la variation totale est dicté par le seul critère d'estimabilité.</p>
+</div></details><p><strong>Application</strong> — Calculez l'information de Fisher du modèle de Poisson.</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p><strong>La log-vraisemblance pour une observation.</strong> $X\sim\mathrm{Poiss}(\lambda)$ a pour masse $e^{-\lambda}\lambda^X/X!$, donc
+$$\ell(\lambda)=-\lambda+X\log\lambda-\log(X!)$$</p>
+<p><strong>Les dérivées.</strong>
+$$\ell'(\lambda)=-1+\frac X\lambda, \qquad \ell''(\lambda)=-\frac{X}{\lambda^2}$$</p>
+<p><strong>L'information de Fisher.</strong> Comme $\mathbb E[X]=\lambda$ :
+$$I(\lambda)=-\mathbb E[\ell''(\lambda)]=\frac{\mathbb E[X]}{\lambda^2}=\frac{\lambda}{\lambda^2}=\frac1\lambda$$</p>
+<p><strong>Vérification par l'autre formule.</strong> $\mathrm{var}[\ell'(\lambda)]=\mathrm{var}\big[\frac X\lambda\big]=\frac{\mathrm{var}(X)}{\lambda^2}=\frac{\lambda}{\lambda^2}=\frac1\lambda$  — les deux expressions coïncident, comme le prédit l'identité de l'information.</p>
+<p><strong>La conclusion asymptotique.</strong> Avec $\hat\lambda_n=\bar X_n$ :
+$$\sqrt n\big(\hat\lambda_n-\lambda\big)\ \xrightarrow{(d)}\ N\big(0,\ I(\lambda)^{-1}\big)=N(0,\lambda)$$
+ce qui est cohérent avec le TCL direct, puisque $\mathrm{var}(X_i)=\lambda$. </p>
+<p><strong>La lecture.</strong> $I(\lambda)=1/\lambda$ <strong>décroît</strong> avec $\lambda$ : plus l'intensité est grande, moins chaque observation est informative <strong>relativement</strong>. La variance de l'estimateur, $\lambda/n$, croît donc avec $\lambda$ — mais l'erreur <strong>relative</strong> $\sqrt{\lambda/n}/\lambda=1/\sqrt{n\lambda}$ diminue.</p>
+</div></details><p><strong>Comparison</strong> — Variation totale et divergence KL : que gagne-t-on, que perd-on ?</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<table>
+<thead>
+<tr>
+<th></th>
+<th><strong>Variation totale</strong></th>
+<th><strong>Divergence KL</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Symétrique</td>
+<td><strong>oui</strong></td>
+<td><strong>non</strong></td>
+</tr>
+<tr>
+<td>Positive</td>
+<td>oui</td>
+<td>oui</td>
+</tr>
+<tr>
+<td>Définie</td>
+<td>oui</td>
+<td>oui</td>
+</tr>
+<tr>
+<td>Inégalité triangulaire</td>
+<td><strong>oui</strong></td>
+<td><strong>non</strong></td>
+</tr>
+<tr>
+<td>Est-ce une distance ?</td>
+<td><strong>oui</strong></td>
+<td>non — une <strong>divergence</strong></td>
+</tr>
+<tr>
+<td><strong>Estimable ?</strong></td>
+<td><strong>non</strong></td>
+<td><strong>oui</strong></td>
+</tr>
+</tbody></table>
+<p><strong>Ce qu'on perd</strong> : la symétrie et l'inégalité triangulaire — donc le statut de distance.</p>
+<p><strong>Ce qu'on gagne</strong> : l'<strong>estimabilité</strong>, et c'est tout ce qui compte. La KL s'écrit comme une <strong>espérance sous la vraie loi</strong> :
+$$KL(\mathbb P_{\theta^\ast},\mathbb P_\theta)=\mathbb E_{\theta^\ast}\Big[\log\frac{p_{\theta^\ast}(X)}{p_\theta(X)}\Big]$$
+donc la loi des grands nombres s'applique. La valeur absolue de $TV$ interdit cette écriture.</p>
+<p><strong>Ce qui suffit pour estimer</strong> : la positivité et le caractère défini. Ces deux propriétés garantissent que $\theta\mapsto KL(\mathbb P_{\theta^\ast},\mathbb P_\theta)$ atteint son minimum — nul — <strong>exactement en $\theta^\ast$</strong>. Ni la symétrie ni la triangulaire ne servent à cela.</p>
+<p><strong>La leçon de méthode</strong> : on choisit ses outils en fonction de ce qu'on peut <strong>calculer</strong>, pas de leur élégance formelle.</p>
+</div></details><p><strong>Exam-style</strong> — Énoncez le théorème asymptotique de l'EMV et expliquez le rôle de chaque hypothèse.</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p><strong>Énoncé.</strong> Sous les cinq hypothèses, l'EMV vérifie
+$$\hat\theta_n^{MLE}\xrightarrow[n\to\infty]{\mathbb P}\theta^\ast \qquad\text{et}\qquad \sqrt n\big(\hat\theta_n^{MLE}-\theta^\ast\big)\xrightarrow[n\to\infty]{(d)}N\big(0,I(\theta^\ast)^{-1}\big)$$
+où $I(\theta)=-\mathbb E[\nabla^2\ell(\theta)]$ est l'information de Fisher pour <strong>une</strong> observation.</p>
+<p><strong>Les hypothèses et leur rôle.</strong></p>
+<p><strong>1. Le modèle est identifié.</strong> Sinon, deux valeurs distinctes de $\theta$ engendrent la même loi : aucune quantité de données ne permettra de les distinguer, et $\hat\theta$ ne peut converger vers un point unique.</p>
+<p><strong>2. Le support de $\mathbb P_\theta$ ne dépend pas de $\theta$.</strong> C'est <strong>l'hypothèse la plus souvent violée</strong>, et la plus destructrice. Elle est nécessaire pour dériver sous l'intégrale — donc pour l'<strong>identité de l'information</strong> $\mathrm{var}[\ell']=-\mathbb E[\ell'']$, sur laquelle tout repose.
+<em>Contre-exemple</em> : $X_i\sim U[0,\theta]$. L'EMV est $\hat\theta_n=\max_iX_i$. Il converge à la vitesse $1/n$, <strong>plus vite</strong> que $1/\sqrt n$, et $n(\theta-\hat\theta_n)$ tend vers une loi <strong>exponentielle</strong>, pas gaussienne. Le théorème est entièrement faux.</p>
+<p><strong>3. $\theta^\ast$ n'est pas sur la frontière de $\Theta$.</strong> Le raisonnement repose sur $\nabla\ell(\hat\theta)=0$ — la condition du premier ordre d'un maximum <strong>intérieur</strong>. Sur une frontière, le maximum peut être atteint sans annulation du gradient, et la loi limite devient une gaussienne <strong>tronquée</strong>.</p>
+<p><strong>4. $I(\theta)$ est inversible au voisinage de $\theta^\ast$.</strong> Sinon $I(\theta^\ast)^{-1}$ n'existe pas : certaines directions du paramètre ne sont <strong>pas informées</strong> par les données, et la variance asymptotique diverge dans ces directions.</p>
+<p><strong>5. Conditions techniques.</strong> Régularité suffisante pour justifier les développements de Taylor et les interversions limite-intégrale.</p>
+<p><strong>Ce qu'il faut savoir ajouter.</strong></p>
+<p><strong>La portée du théorème.</strong> Il donne d'un coup la consistance, la vitesse $1/\sqrt n$, la loi limite complète — donc les intervalles de confiance $\hat\theta_n\pm q_{\alpha/2}\sqrt{I(\hat\theta_n)^{-1}/n}$ et les tests. Et par la borne de <strong>Cramér-Rao</strong>, $I(\theta^\ast)^{-1}$ est la <strong>plus petite variance asymptotique</strong> possible : l'EMV est <strong>asymptotiquement efficace</strong>. C'est pourquoi il est la méthode par défaut de toute la statistique paramétrique.</p>
+<p><strong>Sa limite essentielle.</strong> Tout est <strong>asymptotique</strong>. À $n$ fini, l'EMV peut être biaisé — la variance gaussienne en est l'exemple canonique, avec son diviseur $n$ au lieu de $n-1$ — et sa loi peut être très éloignée d'une gaussienne. Le modèle linéaire normal de la fiche 50 est l'heureuse exception où la normalité est <strong>exacte</strong> à distance finie.</p>
+</div></details></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h2>Flashcards</h2>
+<table>
+<thead>
+<tr>
+<th>Question</th>
+<th>Réponse</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>But du statisticien ?</td>
+<td>Trouver $\hat\theta$ tel que $\mathbb P_{\hat\theta}$ soit proche de $\mathbb P_{\theta^\ast}$</td>
+</tr>
+<tr>
+<td>Définition de la variation totale ?</td>
+<td>$\max_{A\subset E}\lvert\mathbb P_\theta(A)-\mathbb P_{\theta'}(A)\rvert$</td>
+</tr>
+<tr>
+<td>Sa forme discrète ?</td>
+<td>$\frac12\sum_x\lvert p_\theta(x)-p_{\theta'}(x)\rvert$</td>
+</tr>
+<tr>
+<td>Sa forme continue ?</td>
+<td>$\frac12\int_E\lvert f_\theta-f_{\theta'}\rvert dx$</td>
+</tr>
+<tr>
+<td>Est-ce une distance ?</td>
+<td><strong>Oui</strong> — mais elle n'est pas estimable</td>
+</tr>
+<tr>
+<td>Pourquoi n'est-elle pas estimable ?</td>
+<td>La <strong>valeur absolue</strong> empêche de l'écrire comme une espérance</td>
+</tr>
+<tr>
+<td>Définition de la KL ?</td>
+<td>$\int f_\theta\log(f_\theta/f_{\theta'})$</td>
+</tr>
+<tr>
+<td>Est-ce une distance ?</td>
+<td><strong>Non</strong> — ni symétrique, ni triangulaire : une <strong>divergence</strong></td>
+</tr>
+<tr>
+<td>Quelle propriété la sauve ?</td>
+<td>L'<strong>asymétrie</strong>, qui la rend estimable</td>
+</tr>
+<tr>
+<td>Décomposition de $KL(\mathbb P_{\theta^\ast},\mathbb P_\theta)$ ?</td>
+<td>« constante » $-\ \mathbb E_{\theta^\ast}[\log p_\theta(X)]$</td>
+</tr>
+<tr>
+<td>Comment l'estime-t-on ?</td>
+<td>Par la <strong>loi des grands nombres</strong></td>
+</tr>
+<tr>
+<td>La chaîne d'équivalences ?</td>
+<td>$\min\widehat{KL}\iff\max\sum\log p_\theta(X_i)\iff\max\prod p_\theta(X_i)$</td>
+</tr>
+<tr>
+<td>Définition de la concavité ?</td>
+<td>$h''(\theta)\leq0$ pour tout $\theta$</td>
+</tr>
+<tr>
+<td>Cas multivarié ?</td>
+<td>$x^\top\nabla^2h(\theta)x\leq0$ pour tout $x$</td>
+</tr>
+<tr>
+<td>Pourquoi la stricte concavité ?</td>
+<td>Le maximum, s'il existe, est <strong>unique</strong></td>
+</tr>
+<tr>
+<td>Vraisemblance discrète ?</td>
+<td>$\mathbb P_\theta[X_1=x_1,\dots,X_n=x_n]$</td>
+</tr>
+<tr>
+<td>Vraisemblance de Bernoulli ?</td>
+<td>$p^{\sum x_i}(1-p)^{n-\sum x_i}$</td>
+</tr>
+<tr>
+<td>Vraisemblance de Poisson ?</td>
+<td>$e^{-n\lambda}\lambda^{\sum x_i}/(x_1!\cdots x_n!)$</td>
+</tr>
+<tr>
+<td>Vraisemblance continue ?</td>
+<td>$\prod_{i=1}^nf_\theta(x_i)$</td>
+</tr>
+<tr>
+<td>Vraisemblance gaussienne ?</td>
+<td>$\frac{1}{(\sigma\sqrt{2\pi})^n}\exp\big(-\frac{1}{2\sigma^2}\sum(x_i-\mu)^2\big)$</td>
+</tr>
+<tr>
+<td>Définition de l'EMV ?</td>
+<td>$\mathrm{argmax}_\theta L(X_1,\dots,X_n,\theta)$</td>
+</tr>
+<tr>
+<td>Pourquoi passer au log ?</td>
+<td>$\log$ croissante ⟹ même argmax ; produit ⟶ somme</td>
+</tr>
+<tr>
+<td>EMV de Bernoulli et Poisson ?</td>
+<td>$\bar X_n$ dans les deux cas</td>
+</tr>
+<tr>
+<td>EMV du modèle gaussien ?</td>
+<td>$(\bar X_n,\hat S_n)$ — la variance est <strong>biaisée</strong></td>
+</tr>
+<tr>
+<td>Log-vraisemblance pour une observation ?</td>
+<td>$\ell(\theta)=\log L_1(X,\theta)$</td>
+</tr>
+<tr>
+<td>Information de Fisher ?</td>
+<td>$-\mathbb E[\nabla^2\ell(\theta)]$</td>
+</tr>
+<tr>
+<td>Sa forme unidimensionnelle ?</td>
+<td>$\mathrm{var}[\ell'(\theta)]=-\mathbb E[\ell''(\theta)]$</td>
+</tr>
+<tr>
+<td>Ses deux interprétations ?</td>
+<td><strong>Variance du score</strong> · <strong>courbure</strong> de la log-vraisemblance</td>
+</tr>
+<tr>
+<td>Les cinq hypothèses du théorème ?</td>
+<td>Identifié · support fixe · intérieur · $I$ inversible · technique</td>
+</tr>
+<tr>
+<td>Les deux conclusions ?</td>
+<td>Consistance et $\sqrt n(\hat\theta_n-\theta^\ast)\to N(0,I(\theta^\ast)^{-1})$</td>
+</tr>
+<tr>
+<td>Quelle hypothèse tombe pour $U[0,\theta]$ ?</td>
+<td>Le <strong>support dépend de $\theta$</strong></td>
+</tr>
+<tr>
+<td>Que devient la vitesse dans ce cas ?</td>
+<td>$1/n$, et la loi limite est <strong>exponentielle</strong></td>
+</tr>
+<tr>
+<td>Que dit Cramér-Rao ?</td>
+<td>$I(\theta^\ast)^{-1}$ est la <strong>variance minimale</strong> — EMV efficace</td>
+</tr>
+</tbody></table>
+</main>
+
+
+
+
+</body></html>

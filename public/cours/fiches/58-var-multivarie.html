@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fiche 58 — Séries temporelles II : processus VAR, Kronecker et estimation multivariée</title>
+<script>
+window.MathJax={tex:{inlineMath:[["$","$"]],displayMath:[["$$","$$"]],processEscapes:true},
+ options:{skipHtmlTags:["script","noscript","style","textarea","pre","code"]},
+ svg:{fontCache:"global"},
+ startup:{pageReady:()=>MathJax.startup.defaultPageReady().then(()=>{document.body.classList.add("ready")})}};
+setTimeout(function(){document.body.classList.add("ready")},2500);
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+/* ============================================================
+   MathiasLearn — feuille de style des fiches
+   Reprise intégrale des tokens de 00_PARCOURS/*.html
+   + blocs pédagogiques (callouts, méthode, essentiels, recall)
+   ============================================================ */
+:root{--bg:#faf9f7;--card:#fff;--ink:#1a1a1a;--muted:#6b6b6b;--line:#e5e2dd;--accent:#8b5e34;
+ --hl:#fdf8ef;--ok:#2d7d4f;--okbg:#f0f7f3;--warn:#b3402f;--warnbg:#fdf3f1;--blue:#2f5d8b;--bluebg:#f1f5fa}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+ font:17px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;padding:0 16px 100px}
+.nav{position:sticky;top:0;background:rgba(250,249,247,.96);backdrop-filter:blur(8px);
+ border-bottom:1px solid var(--line);margin:0 -16px 30px;padding:11px 16px;z-index:50;
+ display:flex;gap:6px;flex-wrap:wrap;font-size:13px}
+.nav a{color:var(--muted);text-decoration:none;padding:4px 9px;border-radius:5px;white-space:nowrap}
+.nav a:hover{background:var(--line);color:var(--ink)}
+.nav a.on{background:var(--accent);color:#fff}
+main{max-width:780px;margin:0 auto}
+h1{font-size:31px;letter-spacing:-.02em;margin:.4em 0 .5em;line-height:1.25}
+h2{font-size:23px;margin:2.2em 0 .7em;padding-bottom:.3em;border-bottom:1px solid var(--line)}
+h3{font-size:19px;margin:1.9em 0 .5em;color:var(--accent)}
+h4{font-size:17px;margin:1.5em 0 .4em}
+p{margin:.8em 0} a{color:var(--accent)} hr{border:0;border-top:1px solid var(--line);margin:2.6em 0}
+table{border-collapse:collapse;width:100%;margin:1.3em 0;font-size:15.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+th{background:#f3f0eb;font-weight:600}
+tr:nth-child(even) td{background:#fcfbfa}
+code{font-family:"SF Mono",Menlo,Consolas,monospace;font-size:.88em;background:#f2efea;padding:2px 6px;border-radius:4px;white-space:nowrap}
+pre{background:#f2efea;padding:14px 16px;border-radius:8px;overflow-x:auto}
+pre code{background:none;padding:0;white-space:pre}
+blockquote{border-left:3px solid var(--accent);background:var(--hl);margin:1.4em 0;padding:14px 20px;border-radius:0 8px 8px 0}
+blockquote p:first-child{margin-top:0} blockquote p:last-child{margin-bottom:0}
+ul,ol{padding-left:1.5em} li{margin:.35em 0} em{color:#4a4a4a}
+mjx-container[display="true"]{margin:1.1em 0!important;overflow-x:auto;overflow-y:hidden;padding:2px 0}
+mjx-container svg{max-width:100%}
+body:not(.ready) main{opacity:0} main{opacity:1;transition:opacity .25s}
+
+/* --- bandeau de tête de fiche --- */
+.cours{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--accent);
+ border-radius:0 10px 10px 0;padding:18px 22px;margin:0 0 34px}
+.cours h4{margin:0 0 4px;font-size:14px;text-transform:uppercase;letter-spacing:.07em;color:var(--accent)}
+.cours .cs{color:var(--muted);font-size:14.5px;margin:0 0 14px}
+
+/* --- exercices / corrigés --- */
+.ex{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:6px 24px 20px;margin:18px 0}
+.ex>h3:first-child{margin-top:14px}
+details.cor{margin-top:18px;border:1px solid var(--line);border-radius:8px;background:#fcfbfa;overflow:hidden}
+details.cor>summary{cursor:pointer;padding:12px 16px;font-weight:600;font-size:15px;color:var(--accent);
+ list-style:none;display:flex;align-items:center;gap:9px;user-select:none;transition:.15s;min-height:44px}
+details.cor>summary::-webkit-details-marker{display:none}
+details.cor>summary:hover{background:var(--hl)}
+details.cor>summary::before{content:"\25B6";font-size:10px;transition:transform .18s;display:inline-block}
+details.cor[open]>summary::before{transform:rotate(90deg)}
+details.cor[open]>summary{background:var(--okbg);color:var(--ok);border-bottom:1px solid var(--line)}
+.cor .in{padding:4px 20px 16px}
+.cor .in>*:first-child{margin-top:.9em}
+
+/* --- blocs pédagogiques (callouts) ---
+   Générés depuis une citation Markdown dont le premier **gras** commence
+   par un mot-clé : DÉFINITION, THÉORÈME, MÉTHODE, PIÈGE, INTUITION… */
+.cal{border:1px solid var(--line);border-left:4px solid var(--accent);background:var(--card);
+ border-radius:0 10px 10px 0;padding:15px 20px;margin:1.5em 0}
+.cal>p:first-child{margin-top:0}.cal>p:last-child,.cal>ul:last-child,.cal>ol:last-child{margin-bottom:0}
+.cal .lab{display:block;font-size:12.5px;text-transform:uppercase;letter-spacing:.08em;
+ font-weight:700;color:var(--accent);margin-bottom:6px}
+.cal.formel{background:var(--hl)}
+.cal.piege{border-left-color:var(--warn);background:var(--warnbg)}
+.cal.piege .lab{color:var(--warn)}
+.cal.methode{border-left-color:var(--ok);background:var(--okbg)}
+.cal.methode .lab{color:var(--ok)}
+.cal.intu{border-left-color:var(--blue);background:var(--bluebg)}
+.cal.intu .lab{color:var(--blue)}
+.cal.plus{border-left-style:dashed;background:#faf9f7}
+.cal.plus .lab{color:var(--muted)}
+
+/* --- révision express --- */
+.ess{background:var(--card);border:1px solid var(--accent);border-radius:10px;padding:4px 24px 20px;margin:1.6em 0}
+.ess h3{margin-top:1.3em}
+.rec{background:var(--card);border:1px dashed var(--accent);border-radius:10px;padding:4px 24px 18px;margin:1.6em 0}
+.rec ol{counter-reset:none}
+
+/* --- impression / PDF --- */
+@media print{
+ .nav{display:none}
+ body{padding:0;background:#fff;font-size:11.2pt;line-height:1.55}
+ main{max-width:none}
+ h1{font-size:23pt}h2{font-size:15pt;margin-top:1.5em}h3{font-size:12.6pt}
+ h2,h3,h4{break-after:avoid;page-break-after:avoid}
+ table,.cal,blockquote{break-inside:avoid;page-break-inside:avoid}
+ table{display:table;font-size:9.6pt}
+ details.cor{border:1px solid var(--line);background:#fcfbfa}
+ details.cor>summary{display:none}
+ details.cor .in{padding-top:10px}
+ .cal,.ex,.ess,.rec{box-shadow:none}
+ a{color:var(--ink);text-decoration:none}
+}
+@page{margin:16mm 15mm 18mm}
+
+/* --- exemples travaillés --- */
+.exm{background:#fcfbfa;border:1px solid var(--line);border-radius:10px;padding:2px 20px 14px;margin:1.5em 0}
+.exm>h4:first-child{margin:14px 0 .5em;color:var(--accent);font-size:13px;text-transform:uppercase;letter-spacing:.07em}
+
+
+/* --- pastilles de priorité (conventions des fiches de l'app) --- */
+h2[data-prio], h3[data-prio], h4[data-prio]{position:relative}
+h2[data-prio]::before,h3[data-prio]::before,h4[data-prio]::before{
+ content:"";display:inline-block;width:9px;height:9px;border-radius:50%;
+ margin-right:9px;vertical-align:middle;background:var(--muted)}
+[data-prio="must"]::before{background:var(--warn)}
+[data-prio="high"]::before{background:#d98324}
+[data-prio="mid"]::before{background:#c9a227}
+[data-prio="low"]::before{background:var(--ok)}
+/* corrigés des fiches de l'app : même traitement que les corrigés des séries */
+details.cor>summary::after{content:""}
+</style></head><body>
+<div class="nav"><a href="00_COMMENCER_ICI.html">Commencer ici</a><a href="01_NOTATIONS_le-decodeur.html">Notations</a><a href="02_EXERCICES_Serie-0.html">Série 0 — Remise en route</a><a href="03_EXERCICES_Serie-1.html">Série 1 — Convexité</a><a href="04_EXERCICES_Serie-2.html">Série 2 — KKT</a><a href="05_AUTO-EVALUATION.html">Auto-évaluation (quiz)</a><a href="06_FICHE_Optimisation-deux-variables.html">Fiche — Optimisation à 2 variables</a></div>
+<main><h1>Fiche 58 — Séries temporelles II : processus VAR, Kronecker et estimation multivariée</h1>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Matière</strong></td>
+<td>Maths · Économétrie</td>
+</tr>
+<tr>
+<td><strong>Cours source</strong></td>
+<td>Kempthorne, <em>18.S096 Topics in Mathematics with Applications in Finance</em>, MIT OpenCourseWare, automne 2013 — cours 11 « Time Series Analysis II »</td>
+</tr>
+<tr>
+<td><strong>Difficulté</strong></td>
+<td> Must know — l'économétrie des systèmes, socle de la macro appliquée</td>
+</tr>
+<tr>
+<td><strong>Temps d'étude estimé</strong></td>
+<td>2 h 30</td>
+</tr>
+<tr>
+<td><strong>Prérequis</strong></td>
+<td>Fiche 50 (MCO, Gauss-Markov, MCG), fiche 52 (stationnarité, Wold, AR, AIC/BIC), fiche 54 (matrices de covariance)</td>
+</tr>
+<tr>
+<td><strong>Concepts clés</strong></td>
+<td>Stationnarité multivariée, matrices d'autocovariance croisée, avance et rétroaction, Wold multivarié, VAR($p$), matrice compagnon, régressions apparemment non reliées, produit de Kronecker, opérateur vec, optimalité des MCO par composante, critères AIC/BIC/HQ multivariés, normalité asymptotique</td>
+</tr>
+<tr>
+<td><strong>Poids à l'examen</strong></td>
+<td>Trois choses : la <strong>condition de stationnarité</strong> d'un VAR($p$) ; le <strong>théorème d'optimalité</strong> — pourquoi les MCO équation par équation suffisent — et savoir le <strong>démontrer</strong> par Kronecker ; la <strong>loi asymptotique</strong> $\sqrt n(\hat\beta-\beta)\to N(0,\Sigma\otimes\Gamma^{-1})$.</td>
+</tr>
+</tbody></table>
+<h2>Vue d'ensemble</h2>
+<p>Soit $\{X_t\}=\{\dots,X_{t-1},X_t,X_{t+1},\dots\}$ un processus stochastique de dimension $m$, constitué de $m$-vecteurs aléatoires
+$$X_t=(X_{1,t},X_{2,t},\dots,X_{m,t})^T, \qquad \text{vecteur aléatoire sur } \mathbb{R}^m$$
+$\{X_t\}$ est composé de $m$ <strong>séries temporelles composantes</strong> $\{X_{1,t}\},\{X_{2,t}\},\dots,\{X_{m,t}\}$.</p>
+<div class="cal formel"><span class="lab">Définition.</span>
+<p> <em>$\{X_t\}$ est <strong>stationnaire en covariance</strong> si <strong>chaque</strong> série temporelle composante est stationnaire en covariance.</em></p>
+</div>
+<pre><code>UNIVARIÉ (fiche 52)          MULTIVARIÉ (cette fiche)
+γ(k) scalaire          →     Γ_k matrice m×m, NON symétrique
+AR(p)                  →     VAR(p) : Φ_k matrices m×m
+racines de φ(z)        →     racines de det(I − Φ₁z − … − Φ_p z^p)
+                       →     NOUVEAU : avance, retard, rétroaction
+ESTIMATION             →     m régressions séparées… et c'est OPTIMAL
+</code></pre>
+<blockquote>
+<p><strong>La question qui structure la fiche.</strong> Passer de $1$ à $m$ séries fait apparaître les <strong>relations croisées</strong> — qui précède qui, qui rétroagit sur qui — mais fait aussi exploser le nombre de paramètres : $pm^2$ coefficients au lieu de $p$. La bonne nouvelle du chapitre est que, <strong>en l'absence de restrictions</strong>, l'estimation reste triviale : $m$ régressions MCO indépendantes, et c'est <strong>optimal</strong>.</p>
+</blockquote>
+<h2 data-prio="must">Concept 1 — Les moments d'une série multivariée</h2>
+<p><strong>Moment d'ordre 1.</strong>
+$$\mu=E[X_t]=\begin{pmatrix}E(X_{1,t})\\E(X_{2,t})\\\vdots\\E(X_{m,t})\end{pmatrix}=\begin{pmatrix}\mu_1\\\mu_2\\\vdots\\\mu_m\end{pmatrix} \qquad (m\times1)$$</p>
+<p><strong>Matrice de variance-covariance.</strong>
+$$\Gamma_0=\mathrm{Var}(X_t)=\begin{pmatrix}\mathrm{var}(X_{1,t})&amp;\mathrm{cov}(X_{1,t},X_{2,t})&amp;\cdots\\ \vdots&amp;\ddots&amp;\vdots\\ \mathrm{cov}(X_{m,t},X_{1,t})&amp;\mathrm{cov}(X_{m,t},X_{2,t})&amp;\cdots&amp;\mathrm{var}(X_{m,t})\end{pmatrix}$$</p>
+<p><strong>Matrice de corrélation.</strong>
+$$R_0=\mathrm{corr}(X_t)=D^{-1/2}\Gamma_0D^{-1/2}, \qquad \text{où } D=\mathrm{diag}(\Gamma_0)$$</p>
+<p><strong>Matrice d'autocovariance croisée au retard $k$.</strong>
+$$\Gamma_k=\mathrm{Cov}(X_t,X_{t-k})=E\big[(X_t-\mu)(X_{t-k}-\mu)^T\big]$$
+dont l'élément $(j,j')$ vaut $\mathrm{cov}(X_{j,t},X_{j',t-k})$.</p>
+<p><strong>Matrice de corrélation croisée au retard $k$.</strong>
+$$R_k=D^{-1/2}\Gamma_kD^{-1/2}, \qquad D=\mathrm{diag}(\Gamma_0)$$</p>
+<p><strong>Propriétés.</strong></p>
+<ul>
+<li>$\Gamma_0$ et $R_0$ sont des matrices $m\times m$ <strong>symétriques</strong>.</li>
+<li>$\Gamma_k$ et $R_k$ sont $m\times m$ mais <strong>non symétriques</strong>.</li>
+<li>$$\boxed{\ \Gamma_k=\Gamma_{-k}^T\ }$$</li>
+</ul>
+<p class="cal piege"> <strong>La non-symétrie de $\Gamma_k$ est LE fait nouveau du cas multivarié.</strong> En univarié, $\gamma(k)=\gamma(-k)$ : le passé et le futur se ressemblent. En multivarié, $\mathrm{cov}(X_{1,t},X_{2,t-1})$ et $\mathrm{cov}(X_{2,t},X_{1,t-1})$ sont deux quantités <strong>différentes</strong> — et c'est exactement cette différence qui porte l'information de causalité temporelle.</p>
+<h3>Avance, retard et rétroaction</h3>
+<blockquote>
+<ul>
+<li><em>Si $[\Gamma_k]_{j,j'}=\mathrm{Cov}(X_{t,j},X_{t-k,j'})\neq0$ pour un certain $k&gt;0$, on dit que <strong>« $\{X_{t,j'}\}$ précède $\{X_{t,j}\}$ »</strong> (<em>leads</em>).</em></li>
+<li><em>Si « $\{X_{t,j'}\}$ précède $\{X_{t,j}\}$ » <strong>et</strong> « $\{X_{t,j}\}$ précède $\{X_{t,j'}\}$ », alors il y a <strong>rétroaction</strong> (<em>feedback</em>).</em></li>
+</ul>
+</blockquote>
+<blockquote>
+<p><strong>La lecture économique.</strong> Un indicateur avancé (les commandes industrielles, les indices de confiance) « précède » l'activité. Une rétroaction signifie que les deux séries s'influencent mutuellement avec décalage — cas de figure standard entre taux d'intérêt et inflation. Ce vocabulaire est la version élémentaire de ce que la causalité au sens de Granger formalise.</p>
+</blockquote>
+<h2 data-prio="must">Concept 2 — Le théorème de Wold multivarié</h2>
+<div class="cal formel"><span class="lab">Théorème de représentation de Wold.</span>
+<p> <em>Toute série temporelle multivariée ($m$-variée) stationnaire en covariance $\{X_t\}$ peut être décomposée en</em>
+$$X_t=V_t+\eta_t+\Psi_1\eta_{t-1}+\Psi_2\eta_{t-2}+\cdots=V_t+\sum_{k=0}^\infty\Psi_k\eta_{t-k}$$
+<em>où :</em></p>
+<ul>
+<li><em>$\{V_t\}$ est un processus <strong>linéairement déterministe</strong> de dimension $m$ ;</em></li>
+<li><em>$\{\eta_t\}$ est un processus de <strong>bruit blanc multivarié</strong> :</em>
+$$E[\eta_t]=0_m, \qquad \mathrm{Var}[\eta_t]=E[\eta_t\eta_t^T]=\Sigma \ \text{ (}m\times m\text{, semi-définie positive)}$$
+$$\mathrm{Cov}[\eta_t,\eta_{t-k}]=E[\eta_t\eta_{t-k}^T]=0 \ \ (k\neq0), \qquad \mathrm{Cov}[\eta_t,V_{t-k}]=0 \ \ \forall k$$</li>
+<li><em>les $\{\Psi_k\}$ sont des matrices $m\times m$ telles que $\Psi_0=I_m$ et $\sum_{k=0}^\infty\Psi_k\Psi_k^T$ <strong>converge</strong>.</em></li>
+</ul>
+</div>
+<blockquote>
+<p><strong>C'est mot pour mot le théorème de la fiche 52</strong>, avec trois substitutions : les scalaires $\psi_k$ deviennent des <strong>matrices</strong> $m\times m$, la condition $\psi_0=1$ devient $\Psi_0=I_m$, et $\sum\psi_k^2&lt;\infty$ devient la convergence de $\sum\Psi_k\Psi_k^T$.</p>
+<p><strong>Et la même limite pratique subsiste</strong> : une infinité de matrices $\Psi_k$ est inestimable. D'où le VAR, qui les engendre à partir d'un nombre fini de paramètres — exactement comme ARMA le faisait en univarié.</p>
+</blockquote>
+<p class="cal piege"> <strong>Noter que $\Sigma$ n'est pas supposée diagonale.</strong> Les innovations des différentes composantes sont <strong>contemporainement corrélées</strong> : un choc sur les taux et un choc sur les actions peuvent survenir ensemble. Ce que le bruit blanc interdit, c'est la corrélation <strong>entre dates</strong> ($k\neq0$), pas entre composantes à une même date. Ce point est décisif pour le concept 7.</p>
+<h2 data-prio="must">Concept 3 — Les modèles VAR($p$)</h2>
+<div class="cal formel"><span class="lab">Définition.</span>
+<p> <em>La série multivariée $\{X_t\}$ de dimension $m$ suit le modèle <strong>VAR($p$)</strong> d'ordre autorégressif $p$ si</em>
+$$\boxed{\ X_t=C+\Phi_1X_{t-1}+\Phi_2X_{t-2}+\cdots+\Phi_pX_{t-p}+\eta_t\ }$$
+<em>où $C=(c_1,\dots,c_m)^T$ est un $m$-vecteur de constantes, $\Phi_1,\dots,\Phi_p$ sont des matrices $(m\times m)$ de coefficients, et $\{\eta_t\}$ est un bruit blanc multivarié $MVN(0_m,\Sigma)$.</em></p>
+</div>
+<p><strong>Ce que cela signifie composante par composante.</strong> Pour $j$ fixé, la série $\{X_{j,t}\}$ est une <strong>généralisation du modèle AR($p$)</strong> incluant des termes de régression retardés sur <strong>toutes les autres</strong> composantes :
+$$X_{j,t}=c_j+\sum_{k=1}^p[\Phi_k]_{j,j}X_{j,t-k}+\sum_{j'\neq j}\sum_{k=1}^p[\Phi_k]_{j,j'}X_{j',t-k}+\eta_{j,t}$$</p>
+<blockquote>
+<p><strong>Lisez la structure.</strong> Le premier terme est l'AR($p$) habituel de la série sur elle-même ; le second est <strong>nouveau</strong> : l'influence retardée des autres séries. C'est ce second bloc qui capture les avances et les rétroactions du concept 1 — et qui coûte $p\,m(m-1)$ paramètres supplémentaires.</p>
+</blockquote>
+<p class="cal piege"> <strong>Le coût en paramètres est le vrai obstacle du VAR.</strong> Il y a $pm^2$ coefficients dans les $\Phi_k$, plus $m$ constantes, plus $m(m+1)/2$ dans $\Sigma$. Pour $m=5$ et $p=4$ : $100$ coefficients autorégressifs à estimer. C'est pourquoi les VAR appliqués restent petits ($m\leq6$, $p\leq4$) et pourquoi la sélection d'ordre du concept 8 est cruciale.</p>
+<h2 data-prio="high">Concept 4 — La représentation VAR(1) d'un VAR($p$)</h2>
+<blockquote>
+<p><em>Un processus VAR($p$) est <strong>équivalent</strong> à un processus VAR(1).</em></p>
+</blockquote>
+<p>On définit les vecteurs empilés
+$$Z_t=(X_t^T,X_{t-1}^T,\dots,X_{t-p+1}^T)^T, \qquad Z_{t-1}=(X_{t-1}^T,X_{t-2}^T,\dots,X_{t-p}^T)^T$$
+Le processus $\{Z_t\}$, de dimension $(mp\times1)$, vérifie
+$$Z_t=D+AZ_{t-1}+F$$
+où $D$ et $F$ sont $(mp\times1)$ et $A$ est $(mp\times mp)$ :
+$$D=\begin{pmatrix}C\\0_m\\0_m\\\vdots\\0_m\end{pmatrix}, \qquad A=\begin{pmatrix}\Phi_1&amp;\Phi_2&amp;\Phi_3&amp;\cdots&amp;\Phi_p\\ I_m&amp;0&amp;0&amp;\cdots&amp;0\\ 0&amp;I_m&amp;0&amp;\cdots&amp;0\\ \vdots&amp;&amp;\ddots&amp;&amp;\vdots\\ 0&amp;0&amp;\cdots&amp;I_m&amp;0\end{pmatrix}, \qquad F=\begin{pmatrix}\eta_t\\0_m\\0_m\\\vdots\\0_m\end{pmatrix}$$
+$A$ est la <strong>matrice compagnon</strong>.</p>
+<blockquote>
+<p><strong>L'astuce est purement algébrique mais très utile.</strong> En empilant les $p$ derniers vecteurs en un seul « super-vecteur », un processus à mémoire $p$ devient un processus <strong>markovien</strong> à mémoire $1$. Les lignes de $I_m$ sous la première rangée ne font que <strong>recopier</strong> : $X_{t-1}=X_{t-1}$, etc.</p>
+<p><strong>Le bénéfice</strong> : tout ce qu'on sait des VAR(1) — condition de stationnarité, moments, prévision — s'applique immédiatement aux VAR($p$). C'est le même mouvement que la mise sous forme espace-état de la fiche 52.</p>
+</blockquote>
+<h2 data-prio="must">Concept 5 — Stationnarité et moyenne</h2>
+<blockquote>
+<p><strong>Un modèle VAR($p$) est stationnaire si l'une ou l'autre des conditions équivalentes est vérifiée :</strong></p>
+<ul>
+<li><em>toutes les <strong>valeurs propres de la matrice compagnon $A$</strong> ont un module strictement inférieur à $1$ ; ou</em></li>
+<li><em>toutes les racines de</em>
+$$\det\big(I_m-\Phi_1z-\Phi_2z^2-\cdots-\Phi_pz^p\big)=0$$
+<em>vues comme fonction de la variable complexe $z$, sont <strong>en dehors du cercle unité complexe</strong> $\{\lvert z\rvert\leq1\}$.</em></li>
+</ul>
+</blockquote>
+<p class="cal piege"> <strong>Les deux formulations sont équivalentes mais portent sur des objets inverses l'un de l'autre</strong> — exactement comme en fiche 52. Les valeurs propres de $A$ sont les <strong>inverses</strong> des racines du déterminant : « module $&lt;1$ » pour les unes, « hors du cercle unité » pour les autres. Vérifiez toujours laquelle est utilisée.</p>
+<p><strong>La moyenne d'un VAR($p$) stationnaire.</strong> En prenant l'espérance de l'équation :
+$$E[X_t]=C+\Phi_1E[X_{t-1}]+\cdots+\Phi_pE[X_{t-p}]+E[\eta_t]$$
+$$\mu=C+\sum_{k=1}^p\Phi_k\mu+0_m$$
+d'où
+$$\boxed{\ \mu=E[X_t]=(I-\Phi_1-\cdots-\Phi_p)^{-1}C\ } \qquad\text{et}\qquad C=(I-\Phi_1-\cdots-\Phi_p)\mu$$</p>
+<p><strong>La forme centrée.</strong>
+$$[X_t-\mu]=\Phi_1[X_{t-1}-\mu]+\Phi_2[X_{t-2}-\mu]+\cdots+\Phi_p[X_{t-p}-\mu]+\eta_t$$</p>
+<blockquote>
+<p><strong>L'inversibilité de $(I-\Phi_1-\cdots-\Phi_p)$ est garantie par la stationnarité</strong> : c'est le déterminant caractéristique évalué en $z=1$, et si $1$ était une racine, elle serait <strong>sur</strong> le cercle unité — donc le processus serait non stationnaire (racine unitaire multivariée). C'est le pendant exact de $c=\mu\phi(1)$ en fiche 52.</p>
+</blockquote>
+<h2 data-prio="must">Concept 6 — Le VAR($p$) comme système de régressions</h2>
+<p><strong>Les données.</strong> $n$ observations $x_t=(x_{1,t},\dots,x_{m,t})^T$, $t=1,\dots,n$, plus $p$ <strong>conditions initiales</strong> exprimées comme observations pré-échantillon $x_{-p+1},\dots,x_{-1},x_0$.</p>
+<p><strong>Les $m$ modèles de régression.</strong> On pose, pour chaque composante $j$ :
+$$y^{(j)}=Z\beta^{(j)}+\epsilon^{(j)}, \qquad j=1,2,\dots,m$$
+avec
+$$y^{(j)}=\begin{pmatrix}x_{j,1}\\x_{j,2}\\\vdots\\x_{j,n}\end{pmatrix}, \qquad Z=\begin{pmatrix}1&amp;z_0^T\\1&amp;z_1^T\\\vdots&amp;\vdots\\1&amp;z_{n-1}^T\end{pmatrix}, \qquad z_{t-1}=(x_{t-1}^T,x_{t-2}^T,\dots,x_{t-p}^T)^T$$</p>
+<blockquote>
+<p><em><strong>$y^{(j)}$ ne concerne qu'une seule composante, tandis que $Z$ inclut les retards de TOUTES les composantes.</strong></em> C'est la phrase-clé : la matrice de régresseurs est <strong>la même pour les $m$ équations</strong>. Retenez-la — c'est elle qui rend le théorème du concept 7 possible.</p>
+</blockquote>
+<ul>
+<li>$\beta^{(j)}$ est le vecteur de $(mp+1)$ paramètres de régression de la $j$-ième composante.</li>
+<li>$\epsilon^{(j)}$ est le $n$-vecteur des erreurs d'innovation, de loi $WN(0,\sigma_j^2)$ — <strong>la variance dépend de la composante $j$</strong>.</li>
+</ul>
+<p><strong>Le modèle multivarié.</strong> Les $m$ régressions s'écrivent ensemble
+$$\big[y^{(1)}\ y^{(2)}\ \cdots\ y^{(m)}\big]=Z\big[\beta^{(1)}\ \beta^{(2)}\ \cdots\ \beta^{(m)}\big]+\big[\epsilon^{(1)}\ \epsilon^{(2)}\ \cdots\ \epsilon^{(m)}\big]$$
+$$\boxed{\ Y=ZB+E\ }$$</p>
+<blockquote>
+<p><strong>Forme du modèle : régressions apparemment non reliées (SUR).</strong> Le nom, dû à Zellner, dit le paradoxe : les équations <strong>semblent</strong> indépendantes — chacune a sa propre variable expliquée et ses propres coefficients — mais elles sont <strong>liées par la corrélation contemporaine des erreurs</strong>, c'est-à-dire par $\Sigma$ non diagonale. En général, une telle corrélation appelle une estimation <strong>jointe</strong> par MCG. Le concept 7 explique pourquoi, <strong>ici précisément</strong>, ce n'est pas nécessaire.</p>
+</blockquote>
+<h2 data-prio="must">Concept 7 — MCO par composante, et pourquoi c'est optimal</h2>
+<p><strong>L'estimation.</strong> <em>Les paramètres $\hat\beta^{(j)}$ s'estiment facilement par MCO, en appliquant le même algorithme :</em>
+$$\hat\beta^{(j)}=(Z^TZ)^{-1}Z^Ty^{(j)}, \qquad j=1,\dots,m$$
+<em>Les résidus ont la formule habituelle :</em> $\hat\epsilon^{(j)}=y^{(j)}-Z\hat\beta^{(j)}$.</p>
+<p><strong>L'estimation de $\Sigma$.</strong> On identifie les estimations des innovations $\{\eta_t\}$ en <strong>transposant</strong> la matrice des résidus, puis
+$$\hat\Sigma=\frac{1}{n-pm}\sum_{t=1}^n\hat\eta_t\hat\eta_t^T=\frac{1}{n-pm}\,Y^T\big(I_n-Z(Z^TZ)^{-1}Z^T\big)Y$$
+qui est un estimateur <strong>sans biais</strong>.</p>
+<blockquote>
+<p><strong>Reconnaissez la matrice chapeau de la fiche 50</strong> : $I_n-Z(Z^TZ)^{-1}Z^T$ est le projecteur sur l'orthogonal de l'espace des colonnes de $Z$. Et le diviseur $n-pm$ compte les degrés de liberté perdus par équation.</p>
+</blockquote>
+<div class="cal formel"><span class="lab">Théorème — optimalité des MCO.</span>
+<p> <em>Pour le modèle VAR($p$) <strong>sans restriction</strong> sur les matrices de coefficients $\Phi_1,\dots,\Phi_p$ :</em></p>
+<ul>
+<li><em>les estimations MCO <strong>par composante</strong> sont <strong>égales</strong> aux estimations <strong>MCG</strong> tenant compte du cas général d'une matrice de covariance d'innovation $\Sigma$ $(m\times m)$ à variances possiblement inégales et corrélations non nulles ;</em></li>
+<li><em>sous l'hypothèse que les $\{\eta_t\}$ sont i.i.d. de loi gaussienne multivariée $MN(0_m,\Sigma)$, les estimations MCO par composante sont <strong>aussi les estimations du maximum de vraisemblance</strong>.</em></li>
+</ul>
+</div>
+<blockquote>
+<p><strong>C'est le résultat le plus utile du chapitre</strong>, et il est presque trop beau. Un système SUR avec erreurs corrélées appelle normalement des MCG — donc l'estimation jointe de toutes les équations et de $\Sigma$, avec des itérations. Ici, <strong>on peut ignorer $\Sigma$ complètement</strong> et faire $m$ régressions MCO séparées : le résultat est <strong>identique</strong>.</p>
+<p><strong>La raison tient en un mot : $Z$ est la même partout.</strong> Toutes les équations ont <strong>exactement les mêmes régresseurs</strong>. Dès qu'on impose une restriction — exclure un retard d'une seule équation, par exemple —, les régresseurs diffèrent, le théorème <strong>tombe</strong>, et les MCG redeviennent nécessaires.</p>
+</blockquote>
+<h2 data-prio="must">Concept 8 — Kronecker, vec et la démonstration</h2>
+<div class="cal formel"><span class="lab">Définition — produit de Kronecker.</span>
+<p> <em>Le produit de Kronecker de la matrice $(m\times n)$ $A$ et de la matrice $(p\times q)$ $B$ est la matrice $(mp\times qn)$</em>
+$$C=A\otimes B=\begin{pmatrix}a_{1,1}B&amp;a_{1,2}B&amp;\cdots&amp;a_{1,n}B\\ a_{2,1}B&amp;a_{2,2}B&amp;\cdots&amp;a_{2,n}B\\ \vdots&amp;\vdots&amp;\ddots&amp;\vdots\\ a_{m,1}B&amp;a_{m,2}B&amp;\cdots&amp;a_{m,n}B\end{pmatrix}$$</p>
+</div>
+<p><strong>Propriétés.</strong>
+$$(A\otimes B)^T=A^T\otimes B^T, \qquad (A\otimes B)(D\otimes F)=(AD)\otimes(BF)$$
+<em>(où $D$ a $n$ lignes et $F$ a $q$ lignes).</em></p>
+<div class="cal formel"><span class="lab">Définition — opérateur vec.</span>
+<p> <em>L'opérateur $\mathrm{vec}$ convertit une matrice rectangulaire en vecteur colonne en <strong>empilant les colonnes</strong>.</em> Pour $A$ $(n\times m)$ :
+$$\mathrm{vec}(A)=(a_{1,1},\dots,a_{n,1},\ a_{1,2},\dots,a_{n,2},\ \dots,\ a_{1,m},\dots,a_{n,m})^T$$</p>
+</div>
+<h3>Vectoriser le modèle</h3>
+<p>En partant de $Y=ZB+E$, on définit
+$$y=\mathrm{vec}(Y)\ (nm\times1), \qquad X=I_m\otimes Z\ \big(nm\times(1+pm^2)\big)$$
+$$\beta=\mathrm{vec}(B)\ \big((1+pm^2)\times1\big), \qquad \epsilon=\mathrm{vec}(E)\ (nm\times1)$$
+Le modèle devient
+$$y=X\beta+\epsilon, \qquad \epsilon\sim WN(0_{nm},\Omega) \ \text{ avec } \ \Omega=\Sigma\otimes I_n$$</p>
+<h3>La démonstration de l'optimalité</h3>
+<p>Par le cas MCG du théorème de Gauss-Markov (fiche 50), l'estimateur <strong>BLUE</strong> est
+$$\hat\beta=\big[X^T\Omega^{-1}X\big]^{-1}\big[X^T\Omega^{-1}y\big]$$</p>
+<p><strong>Étape 1 — calculer $X^T\Omega^{-1}X$.</strong> Avec $\Omega^{-1}=\Sigma^{-1}\otimes I_n$ :
+$$X^T\Omega^{-1}X=(I_m\otimes Z)^T(\Sigma^{-1}\otimes I_n)(I_m\otimes Z)=(I_m\otimes Z^T)(\Sigma^{-1}\otimes Z)=\Sigma^{-1}\otimes(Z^TZ)$$
+d'où
+$$\big[X^T\Omega^{-1}X\big]^{-1}=\big[\Sigma^{-1}\otimes(Z^TZ)\big]^{-1}=\Sigma\otimes(Z^TZ)^{-1}$$</p>
+<p><strong>Étape 2 — calculer $X^T\Omega^{-1}y$.</strong>
+$$X^T\Omega^{-1}y=(I_m\otimes Z)^T(\Sigma^{-1}\otimes I_n)y=(I_m\otimes Z^T)(\Sigma^{-1}\otimes I_n)y=(\Sigma^{-1}\otimes Z^T)y$$</p>
+<p><strong>Étape 3 — conclure.</strong>
+$$\hat\beta=\big[\Sigma\otimes(Z^TZ)^{-1}\big](\Sigma^{-1}\otimes Z^T)y=\big[(\Sigma\Sigma^{-1})\otimes\big((Z^TZ)^{-1}Z^T\big)\big]y=\big[I_m\otimes(Z^TZ)^{-1}Z^T\big]y$$
+$$\boxed{\ \hat\beta=\mathrm{vec}\big((Z^TZ)^{-1}Z^TY\big)\ }$$
+$\blacksquare$</p>
+<blockquote>
+<p><strong>Regardez où $\Sigma$ disparaît : à l'étape 3, dans le produit $\Sigma\Sigma^{-1}=I_m$.</strong> C'est toute la preuve. Et cette simplification n'est possible que parce que $X=I_m\otimes Z$ se <strong>factorise</strong> ainsi — c'est-à-dire, encore une fois, parce que toutes les équations partagent la <strong>même</strong> matrice de régresseurs $Z$.</p>
+<p>Le résultat final $\mathrm{vec}\big((Z^TZ)^{-1}Z^TY\big)$ est exactement l'empilement des $m$ estimations MCO $\hat\beta^{(j)}=(Z^TZ)^{-1}Z^Ty^{(j)}$. Les MCG <strong>sont</strong> les MCO.</p>
+</blockquote>
+<h2 data-prio="high">Concept 9 — Maximum de vraisemblance et sélection d'ordre</h2>
+<p><strong>La vraisemblance.</strong> Sous innovations gaussiennes, $\epsilon\sim N_{nm}(0_{nm},\Omega)$ avec $\Omega=\Sigma\otimes I_n$ :
+$$L(\beta,\Omega)=\frac{1}{(2\pi)^{nm/2}}\lvert\Omega\rvert^{-1/2}\exp\left(-\frac12(y-X\beta)^T\Omega^{-1}(y-X\beta)\right)$$</p>
+<p><strong>La log-vraisemblance</strong>, en utilisant $\lvert\Sigma\otimes I_n\rvert=\lvert\Sigma\rvert^n$ :
+$$\log L=-\frac{nm}{2}\log(2\pi)-\frac n2\log\lvert\Sigma\rvert-\frac12\mathrm{trace}\big[(Y-ZB)\Sigma^{-1}(Y-ZB)^T\big]$$
+$$=-\frac n2\log\lvert\Sigma\rvert-\frac12Q(\beta,\Sigma)+\text{const}$$</p>
+<blockquote>
+<p><em><strong>L'expression $Q(\beta,\Sigma)$ est le critère des moindres carrés généralisés, qui est minimisé par les estimations MCO composante par composante de $\beta$, pour <strong>toute</strong> matrice de covariance $\Sigma$ non singulière.</strong></em></p>
+</blockquote>
+<p><strong>La vraisemblance concentrée.</strong> Avec $\hat\beta=\mathrm{vec}(\hat B)$, l'EMV de $\Sigma$ minimise $\ell(\Sigma)=\log L(\hat\beta,\Sigma)$ :
+$$\log L(\hat\beta,\Sigma)=-\frac n2\log\lvert\Sigma\rvert-\frac12\mathrm{trace}\big[\Sigma^{-1}(Y-Z\hat B)^T(Y-Z\hat B)\big]=-\frac n2\log\lvert\Sigma\rvert-\frac n2\mathrm{trace}\big[\Sigma^{-1}\tilde\Sigma\big]$$
+où
+$$\tilde\Sigma=\frac1n(Y-Z\hat B)^T(Y-Z\hat B)$$</p>
+<div class="cal formel"><span class="lab">Théorème.</span>
+<p> <em>$\tilde\Sigma$ est l'EMV de $\Sigma$ (Anderson et Olkin, 1979).</em></p>
+</div>
+<p class="cal piege"> <strong>Noter le diviseur $n$ et non $n-pm$</strong> : comme toujours, l'EMV de la covariance est <strong>biaisé</strong> (fiche 50). L'estimateur sans biais du concept 7 divise par $n-pm$.</p>
+<h3>Sélection de l'ordre</h3>
+<p>Des critères statistiques servent à choisir l'ordre $p$ du processus VAR :</p>
+<ol>
+<li>Ajuster tous les modèles VAR($p$) avec $0\leq p\leq p_{\max}$.</li>
+<li>Soit $\tilde\Sigma(p)$ l'EMV de $\Sigma=E(\eta_t\eta_t^T)$.</li>
+<li>Choisir $p$ minimisant l'un de :</li>
+</ol>
+<p>$$\textbf{AIC}(p)=\log\big\lvert\tilde\Sigma(p)\big\rvert+2\cdot\frac{pm^2}{n}$$
+$$\textbf{BIC}(p)=\log\big\lvert\tilde\Sigma(p)\big\rvert+\log(n)\cdot\frac{pm^2}{n}$$
+$$\textbf{HQ}(p)=\log\big\lvert\tilde\Sigma(p)\big\rvert+2\log(\log(n))\cdot\frac{pm^2}{n}$$</p>
+<blockquote>
+<p><strong>C'est mot pour mot les critères de la fiche 52</strong>, avec deux substitutions : $\log\tilde\sigma^2$ devient $\log\lvert\tilde\Sigma\rvert$ — le déterminant remplace la variance scalaire — et le nombre de paramètres $p+q$ devient $pm^2$.</p>
+<p><strong>Et la pénalité en $m^2$ change tout en pratique.</strong> Passer de $p$ à $p+1$ ajoute $m^2$ paramètres, pas $1$. Pour $m=5$, chaque retard supplémentaire coûte $25$ paramètres : les critères sélectionnent donc des ordres <strong>très courts</strong>, typiquement $p=1$ ou $2$. Le BIC, plus sévère, est souvent préféré.</p>
+</blockquote>
+<h2 data-prio="high">Concept 10 — La distribution asymptotique</h2>
+<p><strong>Le cadre.</strong> Pour un VAR($p$) stationnaire en covariance, les estimations MCO sont celles d'un modèle linéaire stationnaire $y=X\beta+\epsilon$, $\epsilon\sim WN(0_{nm},\Omega)$ avec $\Omega=\Sigma\otimes I_n$, issu de la vectorisation de $Y=ZB+E$ ($Y$ et $E$ sont $(n\times m)$, $Z$ est $(n\times(mp+1))$).</p>
+<div class="cal formel"><span class="lab">Théorème.</span>
+<p> <em>Si le processus de bruit blanc $\{\eta_t\}$ a des <strong>moments d'ordre 4 finis et bornés</strong> et est <strong>indépendant</strong> entre dates, alors :</em></p>
+<ul>
+<li><em>la matrice $(mp+1)\times(mp+1)$</em>
+$$\Gamma:=\underset{n\to\infty}{\mathrm{plim}}\ \frac{Z^TZ}{n} \quad\text{existe et est non singulière ;}$$</li>
+<li><em>le vecteur $\hat\beta$, de dimension $m(mp+1)$, est <strong>asymptotiquement conjointement normal</strong> :</em>
+$$\boxed{\ \sqrt n\big(\hat\beta-\beta\big)\ \xrightarrow{\ d\ }\ N\big(0,\ \Sigma\otimes\Gamma^{-1}\big)\ }$$</li>
+</ul>
+</div>
+<p><strong>Les estimations à utiliser</strong> quand $n$ est grand :
+$$\hat\Gamma=\frac1nZ^TZ, \qquad \hat\Sigma=\frac1nY^T\big[I_n-Z(Z^TZ)^{-1}Z^T\big]Y$$</p>
+<blockquote>
+<p><em>Asymptotiquement, les estimations des moindres carrés sont distribuées <strong>identiquement</strong> aux estimations du maximum de vraisemblance pour le modèle supposant des innovations gaussiennes.</em></p>
+</blockquote>
+<p class="cal piege"> <strong>Deux remarques sur les hypothèses.</strong></p>
+<ul>
+<li>Les <strong>moments d'ordre 4</strong> sont exigés parce que les régresseurs sont eux-mêmes aléatoires : établir la loi de $\hat\beta$ demande de contrôler la variance de $Z^TZ$, donc des moments d'ordre $4$ de $X$.</li>
+<li>La conclusion est <strong>asymptotique et sans hypothèse gaussienne</strong> : la normalité de $\hat\beta$ ne vient pas d'une hypothèse sur $\eta_t$, mais d'un théorème central limite. C'est exactement la situation de la fiche 50 pour les MCO sur régresseurs aléatoires.</li>
+</ul>
+<blockquote>
+<p><strong>La structure de Kronecker de la variance asymptotique se lit très simplement</strong> : $\Sigma$ gouverne la partie « entre équations », $\Gamma^{-1}$ la partie « entre coefficients d'une même équation ». Pour tester un coefficient isolé $[\Phi_k]_{j,j'}$, on extrait l'élément diagonal correspondant : $\sigma_{jj}\cdot[\Gamma^{-1}]_{\ell\ell}/n$.</p>
+</blockquote>
+<h2>Comment résoudre l'exercice type (protocole)</h2>
+<ol>
+<li><strong>Vérifier la stationnarité</strong> de chaque composante, et différencier si nécessaire (fiche 52).</li>
+<li><strong>Choisir l'ordre $p$</strong> par AIC, BIC ou HQ — en gardant à l'esprit le coût de $m^2$ paramètres par retard.</li>
+<li><strong>Construire $Z$</strong> : colonne de $1$, puis les $p$ retards de <strong>toutes</strong> les composantes.</li>
+<li><strong>Estimer par MCO équation par équation</strong> : $\hat\beta^{(j)}=(Z^TZ)^{-1}Z^Ty^{(j)}$ — c'est optimal, inutile de faire des MCG.</li>
+<li><strong>Estimer $\Sigma$</strong> : $\hat\Sigma=\frac{1}{n-pm}Y^T(I_n-Z(Z^TZ)^{-1}Z^T)Y$ (sans biais), ou avec $\frac1n$ (EMV).</li>
+<li><strong>Vérifier la stationnarité estimée</strong> : valeurs propres de la matrice compagnon $\hat A$ de module $&lt;1$.</li>
+<li><strong>Faire l'inférence</strong> : $\sqrt n(\hat\beta-\beta)\to N(0,\Sigma\otimes\Gamma^{-1})$, avec $\hat\Gamma=Z^TZ/n$.</li>
+<li><strong>Diagnostiquer</strong> : les résidus $\hat\eta_t$ doivent être un bruit blanc <strong>multivarié</strong> — pas d'autocorrélation, à aucun retard, dans aucune équation croisée.</li>
+</ol>
+<h3>Comment reconnaître qu'il faut utiliser cette méthode ?</h3>
+<table>
+<thead>
+<tr>
+<th>Indice dans l'énoncé</th>
+<th>Ce qu'il faut faire</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>plusieurs séries s'influençant mutuellement</td>
+<td><strong>VAR($p$)</strong></td>
+</tr>
+<tr>
+<td>« telle série précède telle autre »</td>
+<td>regarder $[\Gamma_k]_{j,j'}$ pour $k&gt;0$</td>
+</tr>
+<tr>
+<td>« influence dans les deux sens »</td>
+<td><strong>rétroaction</strong></td>
+</tr>
+<tr>
+<td>« le système est-il stable ? »</td>
+<td>valeurs propres de la <strong>matrice compagnon</strong> $&lt;1$ en module</td>
+</tr>
+<tr>
+<td>« moyenne de long terme du système »</td>
+<td>$\mu=(I-\Phi_1-\cdots-\Phi_p)^{-1}C$</td>
+</tr>
+<tr>
+<td>« erreurs corrélées entre équations »</td>
+<td>SUR — mais ici <strong>MCO suffisent</strong></td>
+</tr>
+<tr>
+<td>« faut-il faire des MCG ? »</td>
+<td><strong>non</strong>, si aucune restriction sur les $\Phi_k$</td>
+</tr>
+<tr>
+<td>« combien de retards ? »</td>
+<td><strong>AIC / BIC / HQ</strong>, pénalité en $pm^2/n$</td>
+</tr>
+<tr>
+<td>« écart-type d'un coefficient »</td>
+<td>$\Sigma\otimes\Gamma^{-1}$ divisé par $n$</td>
+</tr>
+</tbody></table>
+<h3>Exercices progressifs</h3>
+<p><strong> Niveau 1</strong> — Combien de paramètres compte un VAR(2) à $m=4$ séries ?</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p><strong>Les coefficients autorégressifs.</strong> $p=2$ matrices $\Phi_k$ de taille $4\times4$ :
+$$pm^2=2\times16=32$$</p>
+<p><strong>Les constantes.</strong> $C$ est un $m$-vecteur : $4$ paramètres.</p>
+<p><strong>La covariance des innovations.</strong> $\Sigma$ est symétrique $4\times4$ : $m(m+1)/2=10$ paramètres.</p>
+<p><strong>Total</strong> : $32+4+10=\mathbf{46}$ paramètres.</p>
+<p><strong>La lecture pratique.</strong> Par équation, il y a $mp+1=9$ régresseurs. Avec $n=100$ observations trimestrielles (25 ans !), cela fait environ $11$ observations par paramètre estimé — juste acceptable. Avec $m=8$, le même calcul donnerait $17$ régresseurs par équation et $128$ coefficients autorégressifs : intenable.</p>
+<p class="cal piege"> <strong>C'est pourquoi les VAR appliqués restent petits.</strong> Au-delà de $6$ ou $7$ variables, on passe à des VAR <strong>bayésiens</strong> (avec a priori de rétrécissement, les <em>Minnesota priors</em>) ou à des <strong>VAR factoriels</strong>, qui résument l'information par quelques facteurs — exactement l'idée de la fiche 54.</p>
+</div></details>
+
+<p><strong> Niveau 2</strong> — Pourquoi $\Gamma_k$ n'est-elle pas symétrique, et qu'est-ce que cela apporte ?</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p><strong>Le calcul.</strong> $[\Gamma_k]_{j,j'}=\mathrm{cov}(X_{j,t},X_{j',t-k})$ tandis que $[\Gamma_k]_{j',j}=\mathrm{cov}(X_{j',t},X_{j,t-k})$. Ces deux quantités comparent des choses <strong>différentes</strong> : dans la première, c'est $j$ qui est au présent et $j'$ au passé ; dans la seconde, l'inverse. Il n'y a aucune raison qu'elles coïncident.</p>
+<p><strong>En revanche</strong> $\Gamma_k=\Gamma_{-k}^T$ : la symétrie perdue est remplacée par une relation entre retards opposés. Et $\Gamma_0$, elle, <strong>est</strong> symétrique — au retard nul, il n'y a plus de sens temporel.</p>
+<p><strong>Ce que cela apporte : la direction du temps.</strong> Supposons $[\Gamma_1]_{j,j'}\neq0$ mais $[\Gamma_1]_{j',j}=0$. Alors $X_{j'}$ d'hier explique $X_j$ d'aujourd'hui, mais pas l'inverse : <em>$\{X_{t,j'}\}$ <strong>précède</strong> $\{X_{t,j}\}$</em>. C'est un <strong>indicateur avancé</strong>.</p>
+<p>Si les deux sont non nulles, il y a <strong>rétroaction</strong> : chacune influence l'autre avec décalage.</p>
+<p><strong>Pourquoi c'est le vrai apport du multivarié.</strong> En univarié, la fonction d'autocovariance est paire et ne dit rien de la direction du temps. La matrice $\Gamma_k$, en étant asymétrique, <strong>encode une orientation</strong> — et c'est cette information que le VAR exploite, puis que la causalité au sens de Granger formalise en test.</p>
+<p class="cal piege"> <strong>Mais « précède » n'est pas « cause ».</strong> Une troisième variable non modélisée peut faire bouger $X_{j'}$ avant $X_j$ sans qu'il y ait aucun lien causal. La corrélation croisée décalée établit un ordre temporel, pas un mécanisme.</p>
+</div></details>
+
+<p><strong> Niveau 3</strong> — Démontrez que les MCG coïncident avec les MCO par composante.</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p><strong>Le cadre vectorisé.</strong> $y=X\beta+\epsilon$ avec $y=\mathrm{vec}(Y)$, $X=I_m\otimes Z$, $\beta=\mathrm{vec}(B)$ et $\mathrm{Cov}(\epsilon)=\Omega=\Sigma\otimes I_n$. Par Gauss-Markov généralisé (fiche 50), le BLUE est $\hat\beta=[X^T\Omega^{-1}X]^{-1}[X^T\Omega^{-1}y]$.</p>
+<p><strong>Étape 1.</strong> Avec $\Omega^{-1}=\Sigma^{-1}\otimes I_n$ et les propriétés $(A\otimes B)^T=A^T\otimes B^T$ et $(A\otimes B)(D\otimes F)=(AD)\otimes(BF)$ :
+$$X^T\Omega^{-1}X=(I_m\otimes Z^T)(\Sigma^{-1}\otimes I_n)(I_m\otimes Z)=(I_m\otimes Z^T)(\Sigma^{-1}\otimes Z)=\Sigma^{-1}\otimes(Z^TZ)$$</p>
+<p><strong>Étape 2.</strong> L'inverse d'un produit de Kronecker est le produit de Kronecker des inverses :
+$$\big[X^T\Omega^{-1}X\big]^{-1}=\Sigma\otimes(Z^TZ)^{-1}$$</p>
+<p><strong>Étape 3.</strong>
+$$X^T\Omega^{-1}y=(I_m\otimes Z^T)(\Sigma^{-1}\otimes I_n)y=(\Sigma^{-1}\otimes Z^T)y$$</p>
+<p><strong>Étape 4.</strong>
+$$\hat\beta=\big[\Sigma\otimes(Z^TZ)^{-1}\big]\big(\Sigma^{-1}\otimes Z^T\big)y=\big[(\Sigma\Sigma^{-1})\otimes\big((Z^TZ)^{-1}Z^T\big)\big]y=\big[I_m\otimes(Z^TZ)^{-1}Z^T\big]y$$</p>
+<p>En dé-vectorisant : $\hat B=(Z^TZ)^{-1}Z^TY$, dont la colonne $j$ est exactement $\hat\beta^{(j)}=(Z^TZ)^{-1}Z^Ty^{(j)}$. $\blacksquare$</p>
+<p><strong>Où est le cœur de la preuve ?</strong> À l'étape 4, dans $\Sigma\Sigma^{-1}=I_m$. La matrice de covariance des innovations <strong>s'annule contre elle-même</strong>, et il ne reste que le projecteur MCO.</p>
+<p><strong>Pourquoi cela est possible.</strong> Uniquement parce que $X=I_m\otimes Z$ <strong>se factorise</strong> en un bloc « équations » ($I_m$) et un bloc « régresseurs » ($Z$) — c'est-à-dire parce que <strong>toutes les équations partagent la même matrice $Z$</strong>.</p>
+<p class="cal piege"> <strong>Et voilà la condition du théorème, qu'il faut savoir énoncer</strong> : <em>« sans restriction sur les matrices de coefficients »</em>. Si l'on impose, par exemple, $[\Phi_2]_{1,3}=0$ dans la seule première équation, les régresseurs ne sont plus les mêmes partout, $X$ ne se factorise plus, et les MCG <strong>redeviennent strictement meilleurs</strong> que les MCO. C'est le cas général des systèmes SUR de Zellner.</p>
+</div></details>
+
+<p><strong> Niveau 4 — type examen</strong> — Énoncez la condition de stationnarité d'un VAR($p$), justifiez l'équivalence des deux formes, et dites ce qui se passe si elle échoue.</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p><strong>Les deux formes.</strong></p>
+<ol>
+<li>Toutes les <strong>valeurs propres de la matrice compagnon $A$</strong> ont un module $&lt;1$.</li>
+<li>Toutes les racines de $\det(I_m-\Phi_1z-\cdots-\Phi_pz^p)=0$ sont <strong>hors du cercle unité</strong> $\{\lvert z\rvert\leq1\}$.</li>
+</ol>
+<p><strong>Pourquoi la forme (1) est naturelle.</strong> En posant $Z_t=(X_t^T,\dots,X_{t-p+1}^T)^T$, le VAR($p$) devient le VAR(1)
+$$Z_t=D+AZ_{t-1}+F$$
+En itérant, $Z_t=\sum_{k\geq0}A^k(D+F_{t-k})$. Cette série converge si et seulement si $A^k\to0$, c'est-à-dire si le <strong>rayon spectral</strong> de $A$ est $&lt;1$. C'est la version matricielle exacte de la condition $\lvert\phi\rvert&lt;1$ pour l'AR(1) de la fiche 52.</p>
+<p><strong>Pourquoi (1) et (2) sont équivalentes.</strong> Le polynôme caractéristique de la matrice compagnon se calcule par blocs et donne
+$$\det(A-\lambda I_{mp})=\pm\lambda^{mp}\det\big(I_m-\Phi_1\lambda^{-1}-\cdots-\Phi_p\lambda^{-p}\big)$$
+Donc $\lambda$ est valeur propre de $A$ si et seulement si $z=1/\lambda$ annule $\det(I_m-\Phi_1z-\cdots-\Phi_pz^p)$. Les deux ensembles de nombres sont <strong>inverses</strong> l'un de l'autre : « module $&lt;1$ » pour les valeurs propres équivaut à « module $&gt;1$ » pour les racines, c'est-à-dire hors du cercle unité. $\blacksquare$</p>
+<p><strong>Ce qui se passe si la condition échoue.</strong></p>
+<ul>
+<li><strong>Une racine sur le cercle unité</strong> ($z=1$) : le système a une <strong>racine unitaire multivariée</strong>. La conséquence immédiate est que $(I-\Phi_1-\cdots-\Phi_p)$ est <strong>singulière</strong>, donc $\mu=(I-\Phi_1-\cdots-\Phi_p)^{-1}C$ n'existe pas : le système <strong>n'a pas de moyenne de long terme</strong>. Comme en fiche 52, les chocs deviennent <strong>permanents</strong> et la variance croît sans borne.</li>
+<li><strong>Une racine à l'intérieur du cercle</strong> : le système est <strong>explosif</strong>.</li>
+</ul>
+<p><strong>Le cas intéressant que le multivarié fait apparaître — la cointégration.</strong> Chaque série peut être individuellement $I(1)$ — non stationnaire — tandis que certaines <strong>combinaisons linéaires</strong> sont stationnaires. Le rang de $(I-\Phi_1-\cdots-\Phi_p)$ compte alors le nombre de ces relations d'équilibre de long terme. On sort du VAR standard pour entrer dans le <strong>modèle vectoriel à correction d'erreur (VECM)</strong>. C'est une situation sans équivalent univarié, et c'est le sujet naturel de la suite du cours.</p>
+<p><strong>En pratique, comment vérifier.</strong> Après estimation, on calcule les valeurs propres de $\hat A$ : toutes doivent être <strong>strictement à l'intérieur</strong> du disque unité. Une valeur propre proche de $1$ en module est un signal d'alerte — le système est presque non stationnaire, et l'inférence asymptotique du concept 10 devient peu fiable.</p>
+</div></details>
+
+<h2 data-prio="must">Common mistakes</h2>
+<ol>
+<li><strong>Croire que $\Gamma_k$ est symétrique</strong> — seule $\Gamma_0$ l'est ; on a $\Gamma_k=\Gamma_{-k}^T$.</li>
+<li><strong>Se tromper de côté sur les racines</strong> — valeurs propres de $A$ : module $&lt;1$ ; racines du déterminant : <strong>hors</strong> du cercle unité.</li>
+<li><strong>Croire qu'il faut des MCG</strong> — non, si aucune restriction n'est imposée sur les $\Phi_k$ : les MCO par composante <strong>sont</strong> les MCG.</li>
+<li><strong>Oublier que ce théorème tombe sous restrictions</strong> — dès que les équations n'ont plus les mêmes régresseurs, il faut des MCG.</li>
+<li><strong>Oublier que $Z$ est la même pour toutes les équations</strong> — c'est la condition qui rend l'optimalité possible.</li>
+<li><strong>Confondre les deux estimateurs de $\Sigma$</strong> — $\frac{1}{n-pm}$ (sans biais) contre $\frac1n$ (EMV, biaisé).</li>
+<li><strong>Sous-estimer le coût en paramètres</strong> — chaque retard supplémentaire coûte $m^2$ coefficients, pas $1$.</li>
+<li><strong>Interpréter « précède » comme « cause »</strong> — la corrélation croisée décalée établit un ordre, pas un mécanisme.</li>
+<li><strong>Oublier les conditions initiales</strong> — un VAR($p$) exige $p$ observations pré-échantillon.</li>
+<li><strong>Faire l'inférence asymptotique sur un système presque non stationnaire</strong> — les valeurs propres proches de $1$ invalident la normalité asymptotique.</li>
+</ol>
+<h2>Ultimate Review</h2>
+<ol>
+<li><strong>Stationnarité multivariée</strong> : $\{X_t\}$ est stationnaire en covariance si <strong>chaque composante</strong> l'est.</li>
+<li><strong>Moments</strong> : $\mu=E[X_t]$ ($m\times1$) · $\Gamma_0=\mathrm{Var}(X_t)$ · $R_0=D^{-1/2}\Gamma_0D^{-1/2}$ avec $D=\mathrm{diag}(\Gamma_0)$.</li>
+<li><strong>Croisés</strong> : $\Gamma_k=\mathrm{Cov}(X_t,X_{t-k})=E[(X_t-\mu)(X_{t-k}-\mu)^T]$, $R_k=D^{-1/2}\Gamma_kD^{-1/2}$.</li>
+<li><strong>Propriétés</strong> : $\Gamma_0,R_0$ <strong>symétriques</strong> ; $\Gamma_k,R_k$ <strong>non symétriques</strong> ; $\Gamma_k=\Gamma_{-k}^T$.</li>
+<li><strong>Avance et rétroaction</strong> : $[\Gamma_k]_{j,j'}\neq0$ pour $k&gt;0$ ⟹ $\{X_{t,j'}\}$ <strong>précède</strong> $\{X_{t,j}\}$ ; dans les deux sens ⟹ <strong>rétroaction</strong>.</li>
+<li><strong>Wold multivarié</strong> : $X_t=V_t+\sum_{k\geq0}\Psi_k\eta_{t-k}$, $\Psi_0=I_m$, $\sum\Psi_k\Psi_k^T$ converge, $\eta$ bruit blanc multivarié de covariance $\Sigma$.</li>
+<li><strong>VAR($p$)</strong> : $X_t=C+\Phi_1X_{t-1}+\cdots+\Phi_pX_{t-p}+\eta_t$, $\eta_t\sim MVN(0_m,\Sigma)$.</li>
+<li><strong>Composante $j$</strong> : AR($p$) sur soi-même <strong>plus</strong> régression sur les retards de toutes les autres.</li>
+<li><strong>Forme compagnon</strong> : $Z_t=D+AZ_{t-1}+F$, $A$ de taille $mp\times mp$ ⟹ tout VAR($p$) est un VAR(1).</li>
+<li><strong>Stationnarité</strong> : valeurs propres de $A$ de module $&lt;1$ ⟺ racines de $\det(I_m-\Phi_1z-\cdots-\Phi_pz^p)=0$ <strong>hors</strong> du cercle unité.</li>
+<li><strong>Moyenne</strong> : $\mu=(I-\Phi_1-\cdots-\Phi_p)^{-1}C$, et $C=(I-\Phi_1-\cdots-\Phi_p)\mu$.</li>
+<li><strong>Système de régressions</strong> : $y^{(j)}=Z\beta^{(j)}+\epsilon^{(j)}$ ; <strong>$Z$ identique pour tout $j$</strong> ; $Y=ZB+E$ ; forme <strong>SUR</strong>.</li>
+<li><strong>Estimation</strong> : $\hat\beta^{(j)}=(Z^TZ)^{-1}Z^Ty^{(j)}$ ; $\hat\Sigma=\frac{1}{n-pm}Y^T(I_n-Z(Z^TZ)^{-1}Z^T)Y$.</li>
+<li><strong>Théorème d'optimalité</strong> : sans restriction sur les $\Phi_k$, MCO par composante $=$ MCG $=$ EMV sous gaussienne.</li>
+<li><strong>Kronecker</strong> : $(A\otimes B)^T=A^T\otimes B^T$, $(A\otimes B)(D\otimes F)=(AD)\otimes(BF)$ ; <strong>vec</strong> empile les colonnes.</li>
+<li><strong>Vectorisation</strong> : $y=\mathrm{vec}(Y)$, $X=I_m\otimes Z$, $\beta=\mathrm{vec}(B)$, $\Omega=\Sigma\otimes I_n$ ⟹ $\hat\beta=\mathrm{vec}\big((Z^TZ)^{-1}Z^TY\big)$.</li>
+<li><strong>EMV</strong> : $\tilde\Sigma=\frac1n(Y-Z\hat B)^T(Y-Z\hat B)$ est l'EMV (Anderson et Olkin, 1979) — <strong>biaisé</strong>.</li>
+<li><strong>Sélection</strong> : $\log\lvert\tilde\Sigma(p)\rvert+c_n\cdot\frac{pm^2}{n}$, avec $c_n=2$ (AIC), $\log n$ (BIC), $2\log\log n$ (HQ).</li>
+<li><strong>Asymptotique</strong> : moments d'ordre 4 bornés et indépendance ⟹ $\Gamma=\mathrm{plim}\,Z^TZ/n$ non singulière et
+$$\sqrt n(\hat\beta-\beta)\xrightarrow{d}N(0,\Sigma\otimes\Gamma^{-1})$$</li>
+<li><strong>Estimations pratiques</strong> : $\hat\Gamma=Z^TZ/n$, $\hat\Sigma=\frac1nY^T[I_n-Z(Z^TZ)^{-1}Z^T]Y$.</li>
+</ol>
+<p><strong>Formulas to know</strong>
+$$\Gamma_k=\Gamma_{-k}^T \qquad X_t=C+\sum_{k=1}^p\Phi_kX_{t-k}+\eta_t \qquad \mu=(I-\Phi_1-\cdots-\Phi_p)^{-1}C$$
+$$\hat\beta^{(j)}=(Z^TZ)^{-1}Z^Ty^{(j)} \qquad \hat\Sigma=\frac{Y^T(I_n-Z(Z^TZ)^{-1}Z^T)Y}{n-pm} \qquad \Omega=\Sigma\otimes I_n$$
+$$AIC(p)=\log\lvert\tilde\Sigma(p)\rvert+2\frac{pm^2}{n} \qquad \sqrt n(\hat\beta-\beta)\xrightarrow{d}N(0,\Sigma\otimes\Gamma^{-1})$$</p>
+<p><strong>Methods to know</strong> : la construction de la matrice compagnon ; la dérivation de $\mu$ ; la démonstration MCG $=$ MCO par Kronecker en 4 étapes ; le décompte des paramètres.</p>
+<div class="rec"><h2>Active Recall</h2><p><strong>Basic</strong> — Écrivez le modèle VAR($p$) et donnez sa condition de stationnarité.</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p>$$X_t=C+\Phi_1X_{t-1}+\Phi_2X_{t-2}+\cdots+\Phi_pX_{t-p}+\eta_t, \qquad \eta_t\sim MVN(0_m,\Sigma)$$
+avec $C$ un $m$-vecteur et les $\Phi_k$ des matrices $(m\times m)$.</p>
+<p><strong>Stationnarité</strong> — deux formulations équivalentes :</p>
+<ul>
+<li>toutes les <strong>valeurs propres de la matrice compagnon $A$</strong> sont de module $&lt;1$ ;</li>
+<li>toutes les racines de $\det(I_m-\Phi_1z-\cdots-\Phi_pz^p)=0$ sont <strong>hors du cercle unité</strong>.</li></ul></div></details><p><strong>Understanding</strong> — Pourquoi les MCO équation par équation suffisent-ils, alors que les erreurs sont corrélées entre équations ?</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p>Parce que <strong>toutes les équations ont exactement la même matrice de régresseurs $Z$</strong> — celle qui contient les retards de toutes les composantes.</p>
+<p>Formellement, la vectorisation donne $X=I_m\otimes Z$ et $\Omega=\Sigma\otimes I_n$, si bien que dans le calcul MCG
+$$\hat\beta=\big[\Sigma\otimes(Z^TZ)^{-1}\big](\Sigma^{-1}\otimes Z^T)y=\big[I_m\otimes(Z^TZ)^{-1}Z^T\big]y$$
+la matrice $\Sigma$ <strong>s'annule contre son inverse</strong>. Le résultat est l'empilement des $m$ estimations MCO.</p>
+<p class="cal piege"> <strong>Ce résultat vaut « sans restriction sur les matrices de coefficients ».</strong> Dès qu'on contraint un coefficient dans une seule équation, les régresseurs diffèrent, $X$ ne se factorise plus, et les <strong>MCG redeviennent strictement meilleurs</strong>.</p>
+</div></details><p><strong>Application</strong> — Comment détecter qu'une série en précède une autre ?</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p>On examine les éléments hors diagonale de la matrice d'autocovariance croisée <strong>à retard positif</strong> :
+$$[\Gamma_k]_{j,j'}=\mathrm{Cov}(X_{t,j},X_{t-k,j'})\neq0 \ \text{ pour un } k&gt;0 \quad\Longrightarrow\quad \{X_{t,j'}\} \text{ **précède** } \{X_{t,j}\}$$
+Et si la relation vaut <strong>dans les deux sens</strong>, il y a <strong>rétroaction</strong>.</p>
+<p><strong>Ce qui rend cette lecture possible</strong>, c'est la <strong>non-symétrie</strong> de $\Gamma_k$ : $\mathrm{cov}(X_{1,t},X_{2,t-1})$ et $\mathrm{cov}(X_{2,t},X_{1,t-1})$ sont deux quantités différentes. En univarié, l'autocovariance est paire et ne dit rien de la direction du temps.</p>
+<p class="cal piege"> <strong>« Précède » n'est pas « cause »</strong> : une troisième variable non modélisée peut créer l'ordre temporel sans aucun lien causal.</p>
+</div></details><p><strong>Comparison</strong> — AR($p$) et VAR($p$) : qu'est-ce qui change vraiment ?</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<table>
+<thead>
+<tr>
+<th></th>
+<th><strong>AR($p$)</strong> (fiche 52)</th>
+<th><strong>VAR($p$)</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Coefficients</td>
+<td>$p$ scalaires $\phi_k$</td>
+<td>$p$ matrices $\Phi_k$ ⟹ $pm^2$</td>
+</tr>
+<tr>
+<td>Autocovariance</td>
+<td>$\gamma(k)$, <strong>paire</strong></td>
+<td>$\Gamma_k$, <strong>non symétrique</strong>, $\Gamma_k=\Gamma_{-k}^T$</td>
+</tr>
+<tr>
+<td>Stationnarité</td>
+<td>racines de $\phi(z)$ hors du cercle</td>
+<td>racines de $\det(I-\sum\Phi_kz^k)$ hors du cercle</td>
+</tr>
+<tr>
+<td>Moyenne</td>
+<td>$\mu=c/\phi(1)$</td>
+<td>$\mu=(I-\sum\Phi_k)^{-1}C$</td>
+</tr>
+<tr>
+<td>Estimation</td>
+<td>MCO</td>
+<td>MCO <strong>par composante</strong> — et c'est optimal</td>
+</tr>
+<tr>
+<td>Sélection</td>
+<td>$\log\tilde\sigma^2+c_n\frac{p+q}{n}$</td>
+<td>$\log\lvert\tilde\Sigma\rvert+c_n\frac{pm^2}{n}$</td>
+</tr>
+<tr>
+<td>Information nouvelle</td>
+<td>—</td>
+<td><strong>avance, retard, rétroaction</strong></td>
+</tr>
+</tbody></table>
+<p><strong>Ce qui change vraiment, en un mot</strong> : la <strong>direction du temps entre séries</strong>. C'est le seul contenu véritablement nouveau, et il est porté par la non-symétrie de $\Gamma_k$.</p>
+<p><strong>Ce qui ne change pas</strong> : la logique d'ensemble. Wold garantit une représentation MA($\infty$), le VAR la paramétrise en fini, la stationnarité se lit sur des racines, et les critères d'information choisissent l'ordre.</p>
+<p><strong>Le prix à payer</strong> : $m^2$ paramètres par retard au lieu de $1$. C'est ce qui limite les VAR appliqués à quelques variables et pousse vers les VAR bayésiens ou factoriels.</p>
+</div></details><p><strong>Exam-style</strong> — Expliquez la vectorisation par Kronecker et son rôle dans la théorie de l'estimation du VAR.</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p><strong>Les deux outils.</strong></p>
+<ul>
+<li>Le <strong>produit de Kronecker</strong> $A\otimes B$ remplace chaque élément $a_{i,j}$ de $A$ par le bloc $a_{i,j}B$. Ses deux propriétés utiles : $(A\otimes B)^T=A^T\otimes B^T$ et $(A\otimes B)(D\otimes F)=(AD)\otimes(BF)$.</li>
+<li>L'opérateur <strong>vec</strong> empile les <strong>colonnes</strong> d'une matrice en un seul vecteur.</li>
+</ul>
+<p><strong>La vectorisation.</strong> Le modèle multivarié $Y=ZB+E$ devient
+$$y=X\beta+\epsilon \quad\text{avec}\quad y=\mathrm{vec}(Y),\ X=I_m\otimes Z,\ \beta=\mathrm{vec}(B),\ \epsilon=\mathrm{vec}(E)$$
+et $\mathrm{Cov}(\epsilon)=\Omega=\Sigma\otimes I_n$.</p>
+<p><strong>Pourquoi c'est utile — trois raisons.</strong></p>
+<p><strong>1. Cela ramène le multivarié à du connu.</strong> Une fois vectorisé, le modèle est un <strong>modèle linéaire ordinaire</strong> de la fiche 50, avec une covariance non sphérique. Tout Gauss-Markov généralisé s'applique tel quel.</p>
+<p><strong>2. Cela permet la démonstration d'optimalité.</strong> Le calcul MCG donne
+$$X^T\Omega^{-1}X=\Sigma^{-1}\otimes(Z^TZ), \qquad X^T\Omega^{-1}y=(\Sigma^{-1}\otimes Z^T)y$$
+$$\hat\beta=\big[\Sigma\otimes(Z^TZ)^{-1}\big](\Sigma^{-1}\otimes Z^T)y=\big[I_m\otimes(Z^TZ)^{-1}Z^T\big]y=\mathrm{vec}\big((Z^TZ)^{-1}Z^TY\big)$$
+Le $\Sigma$ <strong>s'annule</strong> contre $\Sigma^{-1}$, et les MCG se réduisent aux MCO par composante. Sans le formalisme de Kronecker, ce calcul serait à peu près inécrivable.</p>
+<p><strong>3. Cela structure la variance asymptotique.</strong>
+$$\sqrt n(\hat\beta-\beta)\xrightarrow{d}N\big(0,\ \Sigma\otimes\Gamma^{-1}\big), \qquad \Gamma=\mathrm{plim}\,\frac{Z^TZ}{n}$$
+La forme Kronecker se lit directement : $\Sigma$ gouverne la dépendance <strong>entre équations</strong>, $\Gamma^{-1}$ la dépendance <strong>entre coefficients</strong> d'une même équation. Pour l'écart-type d'un coefficient isolé, on prend $\sqrt{\sigma_{jj}[\Gamma^{-1}]_{\ell\ell}/n}$.</p>
+<p><strong>Le point conceptuel à retenir.</strong> Le produit de Kronecker est exactement le langage des situations où <strong>deux structures indépendantes se superposent</strong> : ici, la structure « équations » et la structure « observations et régresseurs ». Chaque fois que $X=I_m\otimes Z$ — c'est-à-dire chaque fois que toutes les équations partagent les mêmes régresseurs —, les deux structures se découplent et l'estimation se simplifie radicalement.</p>
+</div></details></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h2>Flashcards</h2>
+<table>
+<thead>
+<tr>
+<th>Question</th>
+<th>Réponse</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Quand $\{X_t\}$ est-elle stationnaire en covariance ?</td>
+<td>Quand <strong>chaque composante</strong> l'est</td>
+</tr>
+<tr>
+<td>Matrice de corrélation $R_0$ ?</td>
+<td>$D^{-1/2}\Gamma_0D^{-1/2}$, $D=\mathrm{diag}(\Gamma_0)$</td>
+</tr>
+<tr>
+<td>Autocovariance croisée $\Gamma_k$ ?</td>
+<td>$E[(X_t-\mu)(X_{t-k}-\mu)^T]$</td>
+</tr>
+<tr>
+<td>$\Gamma_k$ est-elle symétrique ?</td>
+<td><strong>Non</strong> — seule $\Gamma_0$ l'est</td>
+</tr>
+<tr>
+<td>Relation entre $\Gamma_k$ et $\Gamma_{-k}$ ?</td>
+<td>$\Gamma_k=\Gamma_{-k}^T$</td>
+</tr>
+<tr>
+<td>Quand dit-on que $j'$ précède $j$ ?</td>
+<td>Si $[\Gamma_k]_{j,j'}\neq0$ pour un $k&gt;0$</td>
+</tr>
+<tr>
+<td>Qu'est-ce que la rétroaction ?</td>
+<td>Chacune précède l'autre</td>
+</tr>
+<tr>
+<td>Wold multivarié ?</td>
+<td>$X_t=V_t+\sum_k\Psi_k\eta_{t-k}$, $\Psi_0=I_m$</td>
+</tr>
+<tr>
+<td>Condition sur les $\Psi_k$ ?</td>
+<td>$\sum_k\Psi_k\Psi_k^T$ <strong>converge</strong></td>
+</tr>
+<tr>
+<td>Modèle VAR($p$) ?</td>
+<td>$X_t=C+\sum_{k=1}^p\Phi_kX_{t-k}+\eta_t$</td>
+</tr>
+<tr>
+<td>Nombre de coefficients autorégressifs ?</td>
+<td>$pm^2$</td>
+</tr>
+<tr>
+<td>Forme compagnon ?</td>
+<td>$Z_t=D+AZ_{t-1}+F$, $A$ de taille $mp\times mp$</td>
+</tr>
+<tr>
+<td>Stationnarité, forme 1 ?</td>
+<td>Valeurs propres de $A$ de module $&lt;1$</td>
+</tr>
+<tr>
+<td>Stationnarité, forme 2 ?</td>
+<td>Racines de $\det(I_m-\sum\Phi_kz^k)=0$ <strong>hors</strong> du cercle unité</td>
+</tr>
+<tr>
+<td>Moyenne d'un VAR stationnaire ?</td>
+<td>$(I-\Phi_1-\cdots-\Phi_p)^{-1}C$</td>
+</tr>
+<tr>
+<td>Que contient $Z$ ?</td>
+<td>Une constante et les $p$ retards de <strong>toutes</strong> les composantes</td>
+</tr>
+<tr>
+<td>$Z$ change-t-elle selon l'équation ?</td>
+<td><strong>Non</strong> — c'est la clé de l'optimalité</td>
+</tr>
+<tr>
+<td>Nom de la forme du modèle ?</td>
+<td><strong>SUR</strong> (régressions apparemment non reliées)</td>
+</tr>
+<tr>
+<td>Estimateur MCO ?</td>
+<td>$\hat\beta^{(j)}=(Z^TZ)^{-1}Z^Ty^{(j)}$</td>
+</tr>
+<tr>
+<td>Estimateur sans biais de $\Sigma$ ?</td>
+<td>$\frac{1}{n-pm}Y^T(I_n-Z(Z^TZ)^{-1}Z^T)Y$</td>
+</tr>
+<tr>
+<td>Le théorème d'optimalité ?</td>
+<td>MCO par composante $=$ MCG $=$ EMV (sans restriction)</td>
+</tr>
+<tr>
+<td>Sous quelle condition tombe-t-il ?</td>
+<td>Dès qu'on <strong>restreint</strong> les $\Phi_k$</td>
+</tr>
+<tr>
+<td>Propriétés du produit de Kronecker ?</td>
+<td>$(A\otimes B)^T=A^T\otimes B^T$ ; $(A\otimes B)(D\otimes F)=(AD)\otimes(BF)$</td>
+</tr>
+<tr>
+<td>Que fait l'opérateur vec ?</td>
+<td>Il <strong>empile les colonnes</strong></td>
+</tr>
+<tr>
+<td>$X$ et $\Omega$ après vectorisation ?</td>
+<td>$X=I_m\otimes Z$, $\Omega=\Sigma\otimes I_n$</td>
+</tr>
+<tr>
+<td>Résultat du calcul MCG ?</td>
+<td>$\hat\beta=\mathrm{vec}\big((Z^TZ)^{-1}Z^TY\big)$</td>
+</tr>
+<tr>
+<td>EMV de $\Sigma$ ?</td>
+<td>$\frac1n(Y-Z\hat B)^T(Y-Z\hat B)$ — <strong>biaisé</strong></td>
+</tr>
+<tr>
+<td>Qui a démontré ce résultat ?</td>
+<td><strong>Anderson et Olkin (1979)</strong></td>
+</tr>
+<tr>
+<td>Critère AIC multivarié ?</td>
+<td>$\log\lvert\tilde\Sigma(p)\rvert+2\,pm^2/n$</td>
+</tr>
+<tr>
+<td>Loi asymptotique de $\hat\beta$ ?</td>
+<td>$\sqrt n(\hat\beta-\beta)\xrightarrow{d}N(0,\Sigma\otimes\Gamma^{-1})$</td>
+</tr>
+<tr>
+<td>Que vaut $\Gamma$ ?</td>
+<td>$\mathrm{plim}\ Z^TZ/n$</td>
+</tr>
+<tr>
+<td>Quelle hypothèse sur les moments ?</td>
+<td>Moments d'ordre <strong>4</strong> finis et bornés, indépendance entre dates</td>
+</tr>
+</tbody></table>
+</main>
+
+
+
+
+</body></html>

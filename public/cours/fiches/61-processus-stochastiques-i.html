@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fiche 61 — Processus stochastiques I : marche aléatoire, chaînes de Markov et martingales</title>
+<script>
+window.MathJax={tex:{inlineMath:[["$","$"]],displayMath:[["$$","$$"]],processEscapes:true},
+ options:{skipHtmlTags:["script","noscript","style","textarea","pre","code"]},
+ svg:{fontCache:"global"},
+ startup:{pageReady:()=>MathJax.startup.defaultPageReady().then(()=>{document.body.classList.add("ready")})}};
+setTimeout(function(){document.body.classList.add("ready")},2500);
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+/* ============================================================
+   MathiasLearn — feuille de style des fiches
+   Reprise intégrale des tokens de 00_PARCOURS/*.html
+   + blocs pédagogiques (callouts, méthode, essentiels, recall)
+   ============================================================ */
+:root{--bg:#faf9f7;--card:#fff;--ink:#1a1a1a;--muted:#6b6b6b;--line:#e5e2dd;--accent:#8b5e34;
+ --hl:#fdf8ef;--ok:#2d7d4f;--okbg:#f0f7f3;--warn:#b3402f;--warnbg:#fdf3f1;--blue:#2f5d8b;--bluebg:#f1f5fa}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+ font:17px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;padding:0 16px 100px}
+.nav{position:sticky;top:0;background:rgba(250,249,247,.96);backdrop-filter:blur(8px);
+ border-bottom:1px solid var(--line);margin:0 -16px 30px;padding:11px 16px;z-index:50;
+ display:flex;gap:6px;flex-wrap:wrap;font-size:13px}
+.nav a{color:var(--muted);text-decoration:none;padding:4px 9px;border-radius:5px;white-space:nowrap}
+.nav a:hover{background:var(--line);color:var(--ink)}
+.nav a.on{background:var(--accent);color:#fff}
+main{max-width:780px;margin:0 auto}
+h1{font-size:31px;letter-spacing:-.02em;margin:.4em 0 .5em;line-height:1.25}
+h2{font-size:23px;margin:2.2em 0 .7em;padding-bottom:.3em;border-bottom:1px solid var(--line)}
+h3{font-size:19px;margin:1.9em 0 .5em;color:var(--accent)}
+h4{font-size:17px;margin:1.5em 0 .4em}
+p{margin:.8em 0} a{color:var(--accent)} hr{border:0;border-top:1px solid var(--line);margin:2.6em 0}
+table{border-collapse:collapse;width:100%;margin:1.3em 0;font-size:15.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+th{background:#f3f0eb;font-weight:600}
+tr:nth-child(even) td{background:#fcfbfa}
+code{font-family:"SF Mono",Menlo,Consolas,monospace;font-size:.88em;background:#f2efea;padding:2px 6px;border-radius:4px;white-space:nowrap}
+pre{background:#f2efea;padding:14px 16px;border-radius:8px;overflow-x:auto}
+pre code{background:none;padding:0;white-space:pre}
+blockquote{border-left:3px solid var(--accent);background:var(--hl);margin:1.4em 0;padding:14px 20px;border-radius:0 8px 8px 0}
+blockquote p:first-child{margin-top:0} blockquote p:last-child{margin-bottom:0}
+ul,ol{padding-left:1.5em} li{margin:.35em 0} em{color:#4a4a4a}
+mjx-container[display="true"]{margin:1.1em 0!important;overflow-x:auto;overflow-y:hidden;padding:2px 0}
+mjx-container svg{max-width:100%}
+body:not(.ready) main{opacity:0} main{opacity:1;transition:opacity .25s}
+
+/* --- bandeau de tête de fiche --- */
+.cours{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--accent);
+ border-radius:0 10px 10px 0;padding:18px 22px;margin:0 0 34px}
+.cours h4{margin:0 0 4px;font-size:14px;text-transform:uppercase;letter-spacing:.07em;color:var(--accent)}
+.cours .cs{color:var(--muted);font-size:14.5px;margin:0 0 14px}
+
+/* --- exercices / corrigés --- */
+.ex{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:6px 24px 20px;margin:18px 0}
+.ex>h3:first-child{margin-top:14px}
+details.cor{margin-top:18px;border:1px solid var(--line);border-radius:8px;background:#fcfbfa;overflow:hidden}
+details.cor>summary{cursor:pointer;padding:12px 16px;font-weight:600;font-size:15px;color:var(--accent);
+ list-style:none;display:flex;align-items:center;gap:9px;user-select:none;transition:.15s;min-height:44px}
+details.cor>summary::-webkit-details-marker{display:none}
+details.cor>summary:hover{background:var(--hl)}
+details.cor>summary::before{content:"\25B6";font-size:10px;transition:transform .18s;display:inline-block}
+details.cor[open]>summary::before{transform:rotate(90deg)}
+details.cor[open]>summary{background:var(--okbg);color:var(--ok);border-bottom:1px solid var(--line)}
+.cor .in{padding:4px 20px 16px}
+.cor .in>*:first-child{margin-top:.9em}
+
+/* --- blocs pédagogiques (callouts) ---
+   Générés depuis une citation Markdown dont le premier **gras** commence
+   par un mot-clé : DÉFINITION, THÉORÈME, MÉTHODE, PIÈGE, INTUITION… */
+.cal{border:1px solid var(--line);border-left:4px solid var(--accent);background:var(--card);
+ border-radius:0 10px 10px 0;padding:15px 20px;margin:1.5em 0}
+.cal>p:first-child{margin-top:0}.cal>p:last-child,.cal>ul:last-child,.cal>ol:last-child{margin-bottom:0}
+.cal .lab{display:block;font-size:12.5px;text-transform:uppercase;letter-spacing:.08em;
+ font-weight:700;color:var(--accent);margin-bottom:6px}
+.cal.formel{background:var(--hl)}
+.cal.piege{border-left-color:var(--warn);background:var(--warnbg)}
+.cal.piege .lab{color:var(--warn)}
+.cal.methode{border-left-color:var(--ok);background:var(--okbg)}
+.cal.methode .lab{color:var(--ok)}
+.cal.intu{border-left-color:var(--blue);background:var(--bluebg)}
+.cal.intu .lab{color:var(--blue)}
+.cal.plus{border-left-style:dashed;background:#faf9f7}
+.cal.plus .lab{color:var(--muted)}
+
+/* --- révision express --- */
+.ess{background:var(--card);border:1px solid var(--accent);border-radius:10px;padding:4px 24px 20px;margin:1.6em 0}
+.ess h3{margin-top:1.3em}
+.rec{background:var(--card);border:1px dashed var(--accent);border-radius:10px;padding:4px 24px 18px;margin:1.6em 0}
+.rec ol{counter-reset:none}
+
+/* --- impression / PDF --- */
+@media print{
+ .nav{display:none}
+ body{padding:0;background:#fff;font-size:11.2pt;line-height:1.55}
+ main{max-width:none}
+ h1{font-size:23pt}h2{font-size:15pt;margin-top:1.5em}h3{font-size:12.6pt}
+ h2,h3,h4{break-after:avoid;page-break-after:avoid}
+ table,.cal,blockquote{break-inside:avoid;page-break-inside:avoid}
+ table{display:table;font-size:9.6pt}
+ details.cor{border:1px solid var(--line);background:#fcfbfa}
+ details.cor>summary{display:none}
+ details.cor .in{padding-top:10px}
+ .cal,.ex,.ess,.rec{box-shadow:none}
+ a{color:var(--ink);text-decoration:none}
+}
+@page{margin:16mm 15mm 18mm}
+
+/* --- exemples travaillés --- */
+.exm{background:#fcfbfa;border:1px solid var(--line);border-radius:10px;padding:2px 20px 14px;margin:1.5em 0}
+.exm>h4:first-child{margin:14px 0 .5em;color:var(--accent);font-size:13px;text-transform:uppercase;letter-spacing:.07em}
+
+
+/* --- pastilles de priorité (conventions des fiches de l'app) --- */
+h2[data-prio], h3[data-prio], h4[data-prio]{position:relative}
+h2[data-prio]::before,h3[data-prio]::before,h4[data-prio]::before{
+ content:"";display:inline-block;width:9px;height:9px;border-radius:50%;
+ margin-right:9px;vertical-align:middle;background:var(--muted)}
+[data-prio="must"]::before{background:var(--warn)}
+[data-prio="high"]::before{background:#d98324}
+[data-prio="mid"]::before{background:#c9a227}
+[data-prio="low"]::before{background:var(--ok)}
+/* corrigés des fiches de l'app : même traitement que les corrigés des séries */
+details.cor>summary::after{content:""}
+</style></head><body>
+<div class="nav"><a href="00_COMMENCER_ICI.html">Commencer ici</a><a href="01_NOTATIONS_le-decodeur.html">Notations</a><a href="02_EXERCICES_Serie-0.html">Série 0 — Remise en route</a><a href="03_EXERCICES_Serie-1.html">Série 1 — Convexité</a><a href="04_EXERCICES_Serie-2.html">Série 2 — KKT</a><a href="05_AUTO-EVALUATION.html">Auto-évaluation (quiz)</a><a href="06_FICHE_Optimisation-deux-variables.html">Fiche — Optimisation à 2 variables</a></div>
+<main><h1>Fiche 61 — Processus stochastiques I : marche aléatoire, chaînes de Markov et martingales</h1>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Matière</strong></td>
+<td>Maths · Finance de marché</td>
+</tr>
+<tr>
+<td><strong>Cours source</strong></td>
+<td><em>18.S096 Topics in Mathematics with Applications in Finance</em>, MIT OpenCourseWare, automne 2013 — cours 5 « Stochastic Processes I »</td>
+</tr>
+<tr>
+<td><strong>Difficulté</strong></td>
+<td> High — la fondation discrète de tout le calcul stochastique</td>
+</tr>
+<tr>
+<td><strong>Temps d'étude estimé</strong></td>
+<td>2 h</td>
+</tr>
+<tr>
+<td><strong>Prérequis</strong></td>
+<td>Probabilités élémentaires, espérance conditionnelle</td>
+</tr>
+<tr>
+<td><strong>Concepts clés</strong></td>
+<td>Processus stochastique, marche aléatoire simple, accroissements indépendants et stationnaires, ruine du joueur, propriété de Markov, matrice de transition, distribution stationnaire, théorème de Perron-Frobenius, martingale, temps d'arrêt, théorème d'arrêt optionnel de Doob</td>
+</tr>
+<tr>
+<td><strong>Poids à l'examen</strong></td>
+<td>Trois choses : les <strong>trois propriétés</strong> de la marche aléatoire ; la <strong>distribution stationnaire</strong> comme vecteur propre de valeur propre $1$ ; et le <strong>théorème d'arrêt optionnel</strong> avec sa démonstration et son interprétation.</td>
+</tr>
+</tbody></table>
+<h2>Vue d'ensemble</h2>
+<div class="cal formel"><span class="lab">Définition.</span>
+<p> <em>Un <strong>processus stochastique</strong> est une collection de variables aléatoires <strong>indexées par le temps</strong>.</em></p>
+<p><em>Une vue alternative est que c'est une <strong>distribution de probabilité sur un espace de trajectoires</strong> ; cette trajectoire décrit souvent l'évolution d'une valeur ou d'un système aléatoire au cours du temps.</em></p>
+</div>
+<p>Dans un processus <strong>déterministe</strong>, il y a une trajectoire fixe que le processus suit ; dans un processus <strong>stochastique</strong>, on ne sait pas <em>a priori</em> quelle trajectoire nous sera donnée.</p>
+<blockquote>
+<p><em><strong>Il ne faut pas voir cela comme une absence d'information sur la trajectoire</strong></em>, puisque l'information sur la trajectoire est donnée par la <strong>distribution de probabilité</strong>. Si par exemple la distribution donne la probabilité $1$ à une seule trajectoire, c'est équivalent à un processus déterministe.</p>
+</blockquote>
+<p class="cal piege"> <strong>La remarque du cours sur le temps mérite attention.</strong> <em>On interprète souvent le processus comme évoluant au cours du temps. Cependant, du point de vue mathématique formel, une meilleure image est que l'on a une trajectoire sous-jacente (inconnue) et que l'on n'observe que son <strong>segment initial</strong>.</em> C'est exactement l'intuition de l'<strong>adaptation</strong> de la fiche 56 : on ne voit jamais le futur.</p>
+<p><strong>Un exemple minimal.</strong> La fonction $f:\mathbb{R}_{\geq0}\to\mathbb{R}$ donnée par $f(t)=t$ est un processus <strong>déterministe</strong> ; la « fonction aléatoire » donnée par $f(t)=t$ avec probabilité $1/2$ et $f(t)=-t$ avec probabilité $1/2$ est un processus <strong>stochastique</strong>.</p>
+<p><strong>Les trois types de questions qu'on se pose.</strong></p>
+<blockquote>
+<p><strong>(a)</strong> <em>On s'intéresse aux <strong>dépendances</strong> dans la suite de valeurs engendrées.</em> Par exemple : comment les prix futurs d'une action dépendent-ils de leurs valeurs passées ?
+<strong>(b)</strong> <em>On s'intéresse aux <strong>moyennes de long terme</strong> portant sur toute la suite.</em> Par exemple : quelle est la fraction du temps pendant laquelle une machine est à l'arrêt ?
+<strong>(c)</strong> <em>On s'intéresse aux <strong>événements de bord</strong>.</em> Par exemple : quelle est la probabilité qu'en une heure donnée tous les circuits d'un système téléphonique soient simultanément occupés ?</p>
+</blockquote>
+<p><strong>Temps discret / temps continu.</strong> Un processus est <strong>à temps discret</strong> si la variable de temps prend des valeurs entières positives, <strong>à temps continu</strong> si elle prend des valeurs réelles positives. <em>On commence par les processus à temps discret : ils peuvent être exprimés explicitement et sont donc plus « tangibles », plus faciles à visualiser.</em></p>
+<h2 data-prio="must">Concept 1 — La marche aléatoire simple</h2>
+<p><strong>Construction.</strong> Soient $Y_1,Y_2,\dots$ des variables i.i.d. telles que $Y_i=\pm1$ avec probabilité égale. On pose $X_0=0$ et
+$$X_k=Y_1+\cdots+Y_k, \qquad k\geq1$$
+Cela définit une distribution de probabilité sur les suites $\{X_0,X_1,\dots\}$, donc un processus stochastique à temps discret : la <strong>marche aléatoire simple</strong> unidimensionnelle.</p>
+<p><strong>Le lien avec le théorème central limite.</strong> Pour $n$ assez grand, la loi de $\frac{1}{\sqrt n}X_n$ <strong>converge vers la loi normale</strong> de moyenne $0$ et de variance $1$.</p>
+<blockquote>
+<p><strong>C'est le pont vers le mouvement brownien.</strong> Normaliser par $\sqrt n$ — et non par $n$ — est exactement ce qui produira $\Delta B_t\sim\sqrt{\Delta t}$ en fiche 56, donc la règle $(dB_t)^2=dt$ et tout le calcul d'Itô. La marche aléatoire est le brownien vu à travers une grille.</p>
+</blockquote>
+<div class="cal formel"><span class="lab">Proposition 2.1.</span>
+<p>
+<strong>(i)</strong> $E[X_k]=0$ pour tout $k$.
+<strong>(ii) (Accroissements indépendants)</strong> Pour tous $0=k_0\leq k_1\leq\cdots\leq k_r$, les variables $X_{k_{i+1}}-X_{k_i}$, $0\leq i\leq r-1$, sont <strong>mutuellement indépendantes</strong>.
+<strong>(iii) (Stationnarité)</strong> Pour tous $h\geq1$ et $k\geq0$, la loi de $X_{k+h}-X_k$ est <strong>la même</strong> que celle de $X_h$.</p>
+</div>
+<blockquote>
+<p><em>Les démonstrations sont immédiates et laissées en exercice. Noter que ces propriétés valent tant que les accroissements $Y_i$ sont <strong>identiques, indépendants et de moyenne nulle</strong>.</em></p>
+</blockquote>
+<p class="cal piege"> <strong>La dernière phrase est importante : rien n'exige que $Y_i=\pm1$.</strong> N'importe quelle suite i.i.d. centrée donne les trois propriétés. C'est pourquoi (ii) et (iii) sont <strong>exactement</strong> les propriétés du processus de Wiener énoncées en fiche 53 : accroissements gaussiens, indépendants sur intervalles disjoints, de loi ne dépendant que de la longueur de l'intervalle.</p>
+<p><strong>Les deux exemples du cours.</strong></p>
+<ul>
+<li><strong>(i)</strong> Un joueur mise à chaque tour sur un lancer de pièce non biaisée : il gagne $1$ si c'est face, perd $1$ si c'est pile. Si les lancers sont indépendants, le <strong>solde du joueur</strong> suit la loi de la marche aléatoire simple.</li>
+<li><strong>(ii)</strong> <em>La marche aléatoire peut aussi servir de modèle — plutôt inexact — du <strong>prix d'une action</strong>.</em></li>
+</ul>
+<h2 data-prio="must">Concept 2 — La ruine du joueur</h2>
+<blockquote>
+<p><strong>Le problème.</strong> Pour deux entiers positifs $A$ et $B$, quelle est la probabilité que la marche aléatoire atteigne $A$ <strong>avant</strong> d'atteindre $-B$ ?</p>
+</blockquote>
+<p><strong>La mise en équation.</strong> Soit $\tau$ le premier instant où la marche atteint $A$ ou $-B$ ; alors $X_\tau=A$ ou $-B$. On définit
+$$f(k)=\mathbb P\big(X_\tau=A\mid X_0=k\big)$$
+et l'on cherche $f(0)$.</p>
+<p><strong>La récurrence</strong>, obtenue en conditionnant sur le résultat du premier lancer :
+$$f(k)=\tfrac12f(k+1)+\tfrac12f(k-1)$$
+avec les <strong>conditions au bord</strong> $f(A)=1$ et $f(-B)=0$.</p>
+<p><strong>La résolution.</strong> Si l'on pose $f(-B+1)=\alpha$, il s'ensuit que
+$$f(-B+r)=\alpha r \qquad \text{pour tout } r\leq A+B$$
+Donc $\alpha(A+B)=f(A)=1$, soit $\alpha=\frac{1}{A+B}$, et
+$$\boxed{\ f(0)=\frac{B}{A+B}\ }$$</p>
+<div class="cal intu"><span class="lab">Pourquoi la solution est linéaire.</span>
+<p> La récurrence $f(k)=\frac12f(k+1)+\frac12f(k-1)$ se réécrit $f(k+1)-f(k)=f(k)-f(k-1)$ : les <strong>différences successives sont constantes</strong>. C'est la version discrète de $f''=0$ — on dit que $f$ est <strong>harmonique</strong> pour la marche. Deux conditions au bord suffisent alors à la déterminer entièrement.</p>
+</div>
+<p class="cal piege"> <strong>Lisez le résultat économiquement.</strong> La probabilité de gagner $A$ avant de perdre $B$ vaut $\frac{B}{A+B}$ : elle est <strong>proportionnelle à la mise que l'on est prêt à perdre</strong>. Vouloir gagner beaucoup ($A$ grand) avec peu de réserves ($B$ petit) donne une probabilité de succès qui tend vers zéro. C'est le fondement mathématique de la <strong>gestion de la taille des positions</strong> — et la raison pour laquelle un joueur à réserves finies face à un casino à réserves infinies est ruiné avec probabilité $1$.</p>
+<h2 data-prio="must">Concept 3 — Les chaînes de Markov</h2>
+<blockquote>
+<p><strong>L'observation de départ.</strong> <em>Une propriété importante de la marche aléatoire simple est que l'<strong>effet du passé sur le futur est résumé par le seul état courant</strong>, et non par toute l'histoire.</em> La loi de $X_{k+1}$ ne dépend que de la valeur de $X_k$, pas de l'ensemble $X_0,\dots,X_k$.</p>
+</blockquote>
+<p><strong>Formellement.</strong> Soit $X_0,X_1,\dots$ un processus à temps discret où chaque $X_i$ prend ses valeurs dans un ensemble <strong>discret</strong> $S$, appelé <strong>espace d'états</strong>. Le processus a la <strong>propriété de Markov</strong> si
+$$\mathbb P\big(X_{n+1}=i\mid X_n,X_{n-1},\dots,X_0\big)=\mathbb P\big(X_{n+1}=i\mid X_n\big)$$
+pour tous $n\geq0$ et $i\in S$. Un tel processus est une <strong>chaîne de Markov</strong>.</p>
+<p><strong>Les probabilités de transition.</strong> Pour $S$ fini, $S=[m]$ :
+$$p_{ij}=\mathbb P\big(X_{n+1}=j\mid X_n=i\big), \qquad i,j\in S, \qquad \sum_{j\in S}p_{ij}=1 \ \ \forall i\in S$$</p>
+<p><strong>La matrice de transition.</strong> Tous les éléments du modèle s'encodent dans
+$$A=\begin{pmatrix}p_{11}&amp;p_{21}&amp;\cdots&amp;p_{m1}\\ p_{12}&amp;p_{22}&amp;\cdots&amp;p_{m2}\\ \vdots&amp;\vdots&amp;\ddots&amp;\vdots\\ p_{1m}&amp;p_{2m}&amp;\cdots&amp;p_{mm}\end{pmatrix}$$</p>
+<blockquote>
+<p><em>Noter que la somme de chaque <strong>colonne</strong> vaut $1$.</em></p>
+</blockquote>
+<p class="cal piege"> <strong>Attention à la convention — c'est un piège classique.</strong> Le cours place $p_{ij}$ en <strong>ligne $j$, colonne $i$</strong> : la matrice $A$ est <strong>stochastique en colonnes</strong>. Beaucoup de manuels utilisent la convention transposée ($P$ stochastique en lignes, $P=A^T$). Les deux décrivent la même chaîne, mais <strong>tous les produits matriciels changent de côté</strong>. Vérifiez toujours quelle convention est employée avant d'écrire $A\pi$ ou $\pi P$.</p>
+<p><strong>Exemple 3.1.</strong></p>
+<blockquote>
+<p><strong>(i)</strong> <em>Une machine peut être <strong>en marche</strong> ou <strong>en panne</strong> un jour donné. Si elle est en marche, elle tombera en panne le lendemain avec probabilité $0{,}01$ et continuera de fonctionner avec probabilité $0{,}99$. Si elle est en panne, elle sera réparée et fonctionnera le lendemain avec probabilité $0{,}8$, et restera en panne avec probabilité $0{,}2$.</em> D'où la matrice de transition
+$$A=\begin{pmatrix}0{,}99&amp;0{,}8\\0{,}01&amp;0{,}2\end{pmatrix}$$
+<strong>(ii)</strong> <em>La marche aléatoire simple est un exemple de chaîne de Markov. Cependant, <strong>aucune matrice de transition ne lui est associée</strong>, puisque son espace d'états est de cardinal infini.</em></p>
+</blockquote>
+<blockquote>
+<p><strong>Vérifiez la lecture de la matrice.</strong> La <strong>colonne 1</strong> est « depuis l'état <em>en marche</em> » : $(0{,}99;\ 0{,}01)$ — reste en marche, ou tombe en panne. La <strong>colonne 2</strong> est « depuis l'état <em>en panne</em> » : $(0{,}8;\ 0{,}2)$. Chaque colonne somme bien à $1$.</p>
+</blockquote>
+<h2 data-prio="high">Concept 4 — Transitions à $n$ pas</h2>
+<p>Soit $r_{ij}(n)=\mathbb P(X_n=j\mid X_0=i)$ la <strong>probabilité de transition en $n$ pas</strong>. Ces probabilités vérifient la relation de récurrence
+$$r_{ij}(n)=\sum_{k=1}^mr_{ik}(n-1)\,p_{kj} \qquad \text{pour } n&gt;1, \qquad r_{ij}(1)=p_{ij}$$</p>
+<blockquote>
+<p><em>La matrice des probabilités de transition en $n$ pas est donc simplement $A^n$.</em></p>
+</blockquote>
+<blockquote>
+<p><strong>Ce sont les équations de Chapman-Kolmogorov.</strong> Elles disent : pour aller de $i$ à $j$ en $n$ pas, on passe nécessairement par un état intermédiaire $k$ après $n-1$ pas, et l'on <strong>somme sur tous les $k$ possibles</strong>. La propriété de Markov est ce qui autorise à multiplier $r_{ik}(n-1)$ par $p_{kj}$ sans se soucier du chemin parcouru avant $k$.</p>
+<p><strong>Conséquence pratique</strong> : toute question sur $n$ pas se réduit à une <strong>puissance de matrice</strong>, calculable par diagonalisation.</p>
+</blockquote>
+<h2 data-prio="must">Concept 5 — La distribution stationnaire</h2>
+<div class="cal formel"><span class="lab">Définition.</span>
+<p> Une <strong>distribution stationnaire</strong> d'une chaîne de Markov est une distribution de probabilité sur l'espace d'états $S$, avec $\mathbb P(X_0=j)=\pi_j$, telle que
+$$\pi_j=\sum_{k=1}^m\pi_k\,p_{kj} \qquad (\forall j\in S)$$</p>
+</div>
+<p><strong>Exemple 3.2.</strong> Soit $S=\mathbb Z_n$ et $X_0=0$. Considérons la chaîne telle que $X_{n+1}=X_n+1$ avec probabilité $\frac12$ et $X_{n+1}=X_n-1$ avec probabilité $\frac12$. Alors la distribution stationnaire est
+$$\pi_i=\frac1n \qquad \text{pour tout } i$$</p>
+<blockquote>
+<p><strong>La marche aléatoire sur un cycle est uniformément répartie à l'équilibre.</strong> C'est intuitif : aucun point du cercle n'est privilégié, la symétrie impose l'uniformité.</p>
+</blockquote>
+<p><strong>La lecture spectrale.</strong> *Noter que le vecteur $(\pi_1,\pi_2,\dots,\pi_m)$ est un <strong>vecteur propre de $A$ de valeur propre $1$</strong>.* On en déduit, via le théorème de Perron-Frobenius :</p>
+<div class="cal formel"><span class="lab">Théorème 3.3.</span>
+<p> <em>Si $p_{ij}&gt;0$ pour tous $i,j\in S$, alors il existe une <strong>unique</strong> distribution stationnaire du système. De plus,</em>
+$$\lim_{n\to\infty}r_{ij}(n)=\pi_j \qquad \forall i,j\in S$$</p>
+</div>
+<blockquote>
+<p><strong>Le contenu du théorème en une phrase.</strong> Si l'on peut aller de n'importe quel état à n'importe quel autre <strong>en un seul pas</strong>, alors la chaîne <strong>oublie complètement son point de départ</strong> : $r_{ij}(n)$ ne dépend plus de $i$ à la limite. C'est la réponse à la question <strong>(b)</strong> de l'introduction — les moyennes de long terme.</p>
+<p><strong>Et l'algèbre est simple</strong> : $A$ étant stochastique en colonnes, $1$ est toujours valeur propre. Perron-Frobenius ajoute que, sous positivité stricte, cette valeur propre est <strong>simple</strong> et <strong>dominante</strong> — toutes les autres sont de module $&lt;1$. D'où $A^n$ qui converge vers la projection sur le vecteur propre $\pi$.</p>
+</blockquote>
+<blockquote>
+<p class="cal piege"> <em>Un théorème correspondant <strong>n'est pas vrai</strong> si l'on considère des espaces d'états infinis.</em></p>
+</blockquote>
+<p class="cal piege"> <strong>Ce dernier avertissement est capital.</strong> La marche aléatoire simple sur $\mathbb Z$ n'a <strong>aucune</strong> distribution stationnaire : elle est récurrente nulle, elle revient en $0$ presque sûrement mais avec un temps de retour d'espérance <strong>infinie</strong>. Elle s'étale indéfiniment — d'où la variance $\mathrm{Var}(X_n)=n$ non bornée, exactement la non-stationnarité $I(1)$ de la fiche 52.</p>
+<h2 data-prio="must">Concept 6 — Les martingales</h2>
+<div class="cal formel"><span class="lab">Définition 4.1.</span>
+<p> <em>Un processus à temps discret $\{X_0,X_1,\dots\}$ est une <strong>martingale</strong> si</em>
+$$X_t=E\big[X_{t+1}\mid\mathcal F_t\big] \qquad \forall t\geq0$$
+<em>où $\mathcal F_t=\{X_0,\dots,X_t\}$ — on conditionne donc sur le <strong>segment initial</strong> du processus.</em></p>
+</div>
+<blockquote>
+<p><em>Cela dit que notre <strong>gain espéré</strong> dans le processus est <strong>nul à tout instant</strong>. On peut aussi voir cette définition comme la formalisation mathématique d'un <strong>jeu de hasard équitable</strong>.</em></p>
+</blockquote>
+<div class="cal formel"><span class="lab">Proposition 4.2.</span>
+<p> <em>Pour tous $t\geq s$, on a $X_s=E[X_t\mid\mathcal F_s]$.</em>
+<em>Démonstration : par récurrence immédiate.</em></p>
+</div>
+<p class="cal piege"> <strong>La proposition 4.2 dit que la propriété se propage à tout horizon.</strong> La définition ne porte que sur un pas, mais la loi des espérances itérées la propage : $E[X_{t+2}\mid\mathcal F_t]=E[E[X_{t+2}\mid\mathcal F_{t+1}]\mid\mathcal F_t]=E[X_{t+1}\mid\mathcal F_t]=X_t$. <strong>Quel que soit l'horizon, la meilleure prévision est la valeur actuelle.</strong></p>
+<p><strong>Exemple 4.3.</strong></p>
+<ul>
+<li><strong>(i)</strong> La <strong>marche aléatoire est une martingale</strong>.</li>
+<li><strong>(ii)</strong> Le solde d'un joueur de <strong>roulette n'est pas</strong> une martingale : on a toujours $X_k&gt;E[X_{k+1}\mid\mathcal F_k]$ — c'est une <strong>surmartingale</strong>, le jeu est défavorable.</li>
+<li><strong>(iii)</strong> Soient $Y_1,Y_2,\dots$ i.i.d. avec $Y_i=2$ de probabilité $\frac13$ et $Y_i=\frac12$ de probabilité $\frac23$. Alors
+$$E[Y_i]=2\cdot\tfrac13+\tfrac12\cdot\tfrac23=\tfrac23+\tfrac13=1$$
+et le <strong>produit</strong> $X_k=\prod_{i=1}^kY_i$, avec $X_0=1$, forme une martingale.</li>
+</ul>
+<p class="cal piege"> <strong>Sur l'exemple (iii) : c'est bien le produit, et $E[Y]=1$ est la condition.</strong> Pour une <strong>somme</strong>, la condition de martingale est $E[Y]=0$ ; pour un <strong>produit</strong>, c'est $E[Y]=1$. Ici $E[Y]=1$, donc $E[X_{k+1}\mid\mathcal F_k]=X_k\,E[Y_{k+1}]=X_k$. </p>
+<blockquote>
+<p><strong>Et c'est un modèle de prix</strong>, pas un jeu de casino : le prix est multiplié par $2$ ou divisé par $2$ à chaque pas. C'est exactement l'arbre binomial de la fiche 57 — et l'analogue discret de l'exponentielle stochastique de la fiche 56, dont l'espérance est constante alors que la médiane s'effondre.</p>
+</blockquote>
+<h2 data-prio="must">Concept 7 — Temps d'arrêt et théorème d'arrêt optionnel</h2>
+<div class="cal formel"><span class="lab">Définition 5.1 — temps d'arrêt.</span>
+<p> <em>Étant donné un processus $\{X_0,X_1,\dots\}$, une variable aléatoire $\tau$ à valeurs entières positives est un <strong>temps d'arrêt</strong> si, pour tout entier $k\geq0$, l'événement $\{\tau\leq k\}$ ne dépend que de $X_0,X_1,\dots,X_k$.</em></p>
+</div>
+<p><strong>Exemple 5.2.</strong></p>
+<ul>
+<li><strong>(i)</strong> Dans le jeu de pile ou face, un joueur mise $1$ à chaque tour. Soit $\tau$ le <strong>premier instant où son solde atteint $100$</strong>. Alors $\tau$ <strong>est</strong> un temps d'arrêt.</li>
+<li><strong>(ii)</strong> Pour le même joueur, soit $\tau$ l'instant du <strong>premier pic</strong> (maximum local) de son solde. Alors $\tau$ <strong>n'est pas</strong> un temps d'arrêt.</li>
+</ul>
+<blockquote>
+<p><strong>La différence, en une phrase.</strong> Pour savoir qu'on a atteint $100$, il suffit de regarder le solde <strong>maintenant</strong>. Pour savoir qu'on est à un pic, il faut savoir que le solde <strong>va redescendre</strong> — donc voir le futur. C'est exactement la notion d'<strong>adaptation</strong> de la fiche 56, appliquée à un instant plutôt qu'à un processus.</p>
+</blockquote>
+<div class="cal formel"><span class="lab">Théorème 5.3 — théorème d'arrêt optionnel de Doob, forme faible.</span>
+<p> <em>Supposons que $X_0,X_1,X_2,\dots$ soit une martingale et que $\tau$ soit un temps d'arrêt tel que $\tau\leq T$ pour une constante $T$. Alors</em>
+$$\boxed{\ E[X_\tau]=E[X_0]\ }$$</p>
+</div>
+<p><strong>Démonstration.</strong> On écrit
+$$X_\tau=X_0+\sum_{i=0}^{T-1}(X_{i+1}-X_i)\cdot\mathbf 1_{\{\tau\geq i+1\}}$$
+(on a utilisé $\tau\leq T$). Comme $T$ est une constante, la linéarité de l'espérance donne
+$$E[X_\tau]=E[X_0]+\sum_{i=0}^{T-1}E\Big[(X_{i+1}-X_i)\cdot\mathbf 1_{\{\tau\geq i+1\}}\Big]$$</p>
+<p><strong>L'observation principale</strong> est que l'événement $\{\tau\geq i+1\}$ est déterminé par $X_0,X_1,\dots,X_i$. Donc, en conditionnant :
+$$E\Big[(X_{i+1}-X_i)\mathbf 1_{\{\tau\geq i+1\}}\Big]=E\Big[E\big[(X_{i+1}-X_i)\mathbf 1_{\{\tau\geq i+1\}}\mid\mathcal F_i\big]\Big]$$
+$$=E\Big[\big(E[X_{i+1}\mid\mathcal F_i]-X_i\big)\mathbf 1_{\{\tau\geq i+1\}}\Big]=E\big[0\cdot\mathbf 1_{\{\tau\geq i+1\}}\big]=0$$
+D'où $E[X_\tau]=E[X_0]$. $\blacksquare$</p>
+<blockquote>
+<p><strong>Le pivot de la preuve.</strong> L'indicatrice $\mathbf 1_{\{\tau\geq i+1\}}$ est <strong>mesurable par rapport à $\mathcal F_i$</strong> — c'est la définition même d'un temps d'arrêt —, on peut donc la <strong>sortir</strong> de l'espérance conditionnelle. Ce qui reste est $E[X_{i+1}\mid\mathcal F_i]-X_i=0$, la propriété de martingale. Sans l'adaptation de $\tau$, l'indicatrice ne sortirait pas et tout s'effondre.</p>
+</blockquote>
+<blockquote>
+<p><strong>La leçon, telle que le cours l'énonce.</strong> <em>La condition peut être encore affaiblie. La leçon à retenir est qu'<strong>un être mortel n'a aucune stratégie gagnante</strong> — quand le jeu est équitable. En revanche, si l'on a un avantage sur son adversaire, aussi petit soit-il, on gagnera à long terme.</em></p>
+</blockquote>
+<p class="cal piege"> <strong>« Un être mortel » est le mot exact : la borne $\tau\leq T$ est l'hypothèse essentielle.</strong> Elle dit que le joueur ne peut pas jouer indéfiniment. Le concept 7 de la fiche 56 disait la même chose en continu : aucune stratégie <strong>adaptée</strong> ne peut créer de dérive à partir d'un mouvement brownien. C'est le fondement de l'absence d'opportunité d'arbitrage.</p>
+<p><strong>Exercice 5.4 (le paradoxe).</strong> <em>Dans le jeu de pile ou face, le joueur s'arrête la première fois où son solde atteint $100$. Par définition, $E[X_\tau]=100$. Cela contredit-il le théorème d'arrêt optionnel ?</em></p>
+<p><strong>Exercice 5.5.</strong> <em>Pour deux entiers positifs $a$ et $b$, un joueur s'arrête au premier instant où son solde vaut $a$ ou $-b$. Soit $\tau$ cet instant. Quelle est la loi de $X_\tau$ ?</em></p>
+<p><strong>Références du cours</strong> : Ross, <em>A first course in probability</em> · Bertsekas et Tsitsiklis, <em>Introduction to probability</em> · <strong>Bachelier</strong>, <em>Théorie de la spéculation</em>, Annales Scientifiques de l'ENS · Durrett, <em>Probability: Theory and Examples</em> · Varadhan, notes de cours.</p>
+<blockquote>
+<p><strong>Bachelier (1900) est cité pour une raison.</strong> C'est la première application d'une marche aléatoire — puis d'un mouvement brownien — à la modélisation des prix d'actifs, cinq ans avant Einstein. Toute la fiche 57 en descend.</p>
+</blockquote>
+<h2>Comment résoudre l'exercice type (protocole)</h2>
+<ol>
+<li><strong>Identifier la structure</strong> : marche aléatoire ? chaîne de Markov ? martingale ? Les trois se recoupent.</li>
+<li><strong>Si chaîne de Markov</strong> : écrire l'espace d'états $S$ et la matrice de transition, en <strong>vérifiant la convention</strong> (lignes ou colonnes).</li>
+<li><strong>Pour une question à $n$ pas</strong> : calculer $A^n$, éventuellement par diagonalisation.</li>
+<li><strong>Pour une question de long terme</strong> : chercher la <strong>distribution stationnaire</strong> — vecteur propre de valeur propre $1$, normalisé à somme $1$.</li>
+<li><strong>Si martingale</strong> : vérifier $E[X_{t+1}\mid\mathcal F_t]=X_t$ ; pour une somme, $E[Y]=0$ ; pour un produit, $E[Y]=1$.</li>
+<li><strong>Pour une question de sortie d'intervalle</strong> : poser $f(k)$, écrire la récurrence en conditionnant sur le premier pas, ajouter les conditions au bord.</li>
+<li><strong>Alternative élégante</strong> : appliquer le <strong>théorème d'arrêt optionnel</strong> — souvent une seule ligne remplace toute la récurrence.</li>
+<li><strong>Toujours vérifier les hypothèses du théorème</strong> : $\tau$ est-il un temps d'arrêt ? est-il <strong>borné</strong> ?</li>
+</ol>
+<h3>Comment reconnaître qu'il faut utiliser cette méthode ?</h3>
+<table>
+<thead>
+<tr>
+<th>Indice dans l'énoncé</th>
+<th>Ce qu'il faut faire</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>« le futur ne dépend que du présent »</td>
+<td><strong>chaîne de Markov</strong></td>
+</tr>
+<tr>
+<td>« probabilité après $n$ étapes »</td>
+<td>$A^n$</td>
+</tr>
+<tr>
+<td>« à long terme », « fraction du temps »</td>
+<td><strong>distribution stationnaire</strong></td>
+</tr>
+<tr>
+<td>« jeu équitable », « gain espéré nul »</td>
+<td><strong>martingale</strong></td>
+</tr>
+<tr>
+<td>« premier instant où… »</td>
+<td><strong>temps d'arrêt</strong></td>
+</tr>
+<tr>
+<td>« probabilité d'atteindre $A$ avant $-B$ »</td>
+<td>ruine du joueur, ou <strong>arrêt optionnel</strong></td>
+</tr>
+<tr>
+<td>« le premier pic », « le maximum sur $[0,T]$ »</td>
+<td><strong>pas</strong> un temps d'arrêt</td>
+</tr>
+<tr>
+<td>« existe-t-il une stratégie gagnante ? »</td>
+<td><strong>non</strong> — arrêt optionnel</td>
+</tr>
+</tbody></table>
+<h3>Exercices progressifs</h3>
+<p><strong> Niveau 1</strong> — Vérifiez que la marche aléatoire simple est une martingale.</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p><strong>Le calcul.</strong> $X_{k+1}=X_k+Y_{k+1}$, où $Y_{k+1}$ est <strong>indépendant</strong> de $\mathcal F_k=\{X_0,\dots,X_k\}$. Donc
+$$E[X_{k+1}\mid\mathcal F_k]=E[X_k\mid\mathcal F_k]+E[Y_{k+1}\mid\mathcal F_k]=X_k+E[Y_{k+1}]=X_k+0=X_k$$
+puisque $E[Y]=\frac12(+1)+\frac12(-1)=0$. C'est bien la définition. $\blacksquare$</p>
+<p><strong>Les deux étapes à justifier.</strong> (1) $X_k$ est $\mathcal F_k$-mesurable, donc sort de l'espérance conditionnelle. (2) $Y_{k+1}$ est indépendant de $\mathcal F_k$, donc son espérance conditionnelle est son espérance tout court.</p>
+<p><strong>La condition générale.</strong> Toute somme de variables i.i.d. <strong>centrées</strong> est une martingale — le cours le note à propos de la proposition 2.1. La symétrie $Y=\pm1$ n'est qu'un cas particulier commode.</p>
+<p class="cal piege"> <strong>Ne pas confondre avec le cas multiplicatif.</strong> Pour $X_k=\prod_iY_i$, la condition n'est plus $E[Y]=0$ mais $E[Y]=1$ — c'est l'exemple 4.3(iii).</p>
+</div></details>
+
+<p><strong> Niveau 2</strong> — Trouvez la distribution stationnaire de la machine de l'exemple 3.1.</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p><strong>La matrice</strong>, en convention <strong>colonnes</strong> (celle du cours) :
+$$A=\begin{pmatrix}0{,}99&amp;0{,}8\\0{,}01&amp;0{,}2\end{pmatrix}$$
+avec l'état $1$ = <em>en marche</em>, l'état $2$ = <em>en panne</em>.</p>
+<p><strong>L'équation.</strong> $\pi$ est vecteur propre de $A$ pour la valeur propre $1$, soit $A\pi=\pi$ :
+$$0{,}99\pi_1+0{,}8\pi_2=\pi_1 \qquad\Longrightarrow\qquad 0{,}8\pi_2=0{,}01\pi_1 \qquad\Longrightarrow\qquad \pi_1=80\,\pi_2$$</p>
+<p><strong>La normalisation.</strong> $\pi_1+\pi_2=1$ donne $81\pi_2=1$, donc
+$$\pi_2=\frac{1}{81}\approx0{,}0123, \qquad \pi_1=\frac{80}{81}\approx0{,}9877$$</p>
+<p><strong>L'interprétation.</strong> À long terme, la machine fonctionne environ <strong>$98{,}8\,\%$</strong> du temps et est en panne <strong>$1{,}2\,\%$</strong> du temps. C'est la réponse à la question <strong>(b)</strong> de l'introduction du cours : « quelle est la fraction du temps qu'une machine passe à l'arrêt ? »</p>
+<p><strong>Le théorème s'applique-t-il ?</strong> Il exige $p_{ij}&gt;0$ pour tous $i,j$. Ici toutes les entrées sont strictement positives, donc la distribution stationnaire est <strong>unique</strong> et $r_{ij}(n)\to\pi_j$ <strong>quel que soit l'état de départ</strong>. Après quelques semaines, savoir si la machine marchait le premier jour n'apporte plus aucune information.</p>
+<p><strong>Un contrôle de bon sens.</strong> Le rapport $\pi_1/\pi_2=80$ est exactement $0{,}8/0{,}01$ : le rapport entre le taux de réparation et le taux de panne. Une machine qui tombe rarement en panne et se répare vite passe l'essentiel de son temps en marche — et le rapport le quantifie.</p>
+</div></details>
+
+<p><strong> Niveau 3</strong> — Résolvez l'exercice 5.5 par le théorème d'arrêt optionnel, et comparez à la méthode de récurrence.</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p><strong>Le cadre.</strong> $X$ est la marche aléatoire simple, $X_0=0$, et $\tau$ est le premier instant où $X_\tau=a$ ou $X_\tau=-b$.</p>
+<p><strong>Par l'arrêt optionnel.</strong> $X$ est une martingale et $\tau$ un temps d'arrêt, donc $E[X_\tau]=E[X_0]=0$. Or $X_\tau$ ne prend que deux valeurs. En posant $p=\mathbb P(X_\tau=a)$ :
+$$a\,p+(-b)(1-p)=0 \qquad\Longrightarrow\qquad p(a+b)=b \qquad\Longrightarrow\qquad \boxed{p=\frac{b}{a+b}}$$
+et $\mathbb P(X_\tau=-b)=\frac{a}{a+b}$.</p>
+<p><strong>Comparaison avec la méthode du concept 2.</strong> La récurrence $f(k)=\frac12f(k+1)+\frac12f(k-1)$ avec $f(a)=1$, $f(-b)=0$ donne une solution linéaire $f(-b+r)=r/(a+b)$, d'où $f(0)=b/(a+b)$. <strong>Même résultat</strong>, obtenu en trois lignes au lieu d'une.</p>
+<p><strong>Ce que l'arrêt optionnel apporte.</strong> Il court-circuite entièrement la résolution de la récurrence : une seule équation, $E[X_\tau]=E[X_0]$, suffit. C'est la méthode de choix dès que le processus est une martingale.</p>
+<p class="cal piege"> <strong>Il y a une subtilité à mentionner.</strong> Le théorème 5.3, tel qu'énoncé, exige $\tau\leq T$ <strong>borné</strong> ; or ici $\tau$ n'est pas borné — il peut prendre des valeurs arbitrairement grandes. Ce qui sauve l'argument, c'est que la marche arrêtée reste <strong>bornée</strong> entre $-b$ et $a$, et que $\tau$ est fini presque sûrement d'espérance finie. C'est précisément l'affaiblissement de l'hypothèse auquel le cours fait allusion : <em>« la condition peut être encore affaiblie »</em>.</p>
+<p><strong>Application financière directe.</strong> C'est le calcul d'une stratégie « prendre ses profits à $+a$, couper ses pertes à $-b$ ». Le résultat dit que sur un jeu <strong>équitable</strong>, l'espérance de gain reste <strong>exactement nulle</strong> quel que soit le choix de $a$ et $b$ : on ne fait que redistribuer la probabilité entre un petit gain fréquent et une grosse perte rare. Aucun placement d'ordres ne crée de rendement.</p>
+</div></details>
+
+<p><strong> Niveau 4 — type examen</strong> — Résolvez l'exercice 5.4 : le joueur qui s'arrête à $100$ contredit-il le théorème ?</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p><strong>Le paradoxe apparent.</strong> Le joueur s'arrête au premier instant où son solde vaut $100$. Par construction $X_\tau=100$, donc $E[X_\tau]=100$. Or $E[X_0]=0$. Le théorème semble violé.</p>
+<p><strong>La réponse : non, il n'y a pas de contradiction — l'hypothèse $\tau\leq T$ est fausse.</strong></p>
+<p>Le théorème 5.3 exige que $\tau$ soit <strong>borné par une constante $T$</strong>. Ici, $\tau$ est fini presque sûrement — la marche aléatoire simple est récurrente, elle atteint $100$ avec probabilité $1$ — mais il n'est <strong>borné par aucune constante</strong> : pour tout $T$, la probabilité $\mathbb P(\tau&gt;T)$ est strictement positive.</p>
+<p><strong>Pourquoi la démonstration échoue précisément.</strong> La preuve écrit
+$$X_\tau=X_0+\sum_{i=0}^{T-1}(X_{i+1}-X_i)\mathbf 1_{\{\tau\geq i+1\}}$$
+et utilise « $T$ est une constante » pour intervertir somme finie et espérance. Avec $\tau$ non borné, la somme devient <strong>infinie</strong> et l'interversion demande un théorème de convergence (dominée, ou convergence des martingales) dont les hypothèses ne sont pas vérifiées ici.</p>
+<p><strong>Ce qui manque concrètement : $E[\tau]=\infty$.</strong> La marche atteint $100$ presque sûrement, mais le <strong>temps d'attente moyen est infini</strong>. Et pendant l'attente, le solde descend arbitrairement bas : $\min_{k\leq\tau}X_k$ n'est borné par rien.</p>
+<p><strong>La traduction financière — et c'est le vrai enseignement.</strong> Cette stratégie est la <strong>martingale du joueur</strong> (au sens familier) : doubler ou persévérer jusqu'à gagner. Elle « marche » mathématiquement, mais elle exige :</p>
+<ul>
+<li>un <strong>capital infini</strong> — il faut pouvoir encaisser des pertes non bornées ;</li>
+<li>un <strong>temps infini</strong> — l'espérance du temps d'attente diverge ;</li>
+<li><strong>aucune limite de mise</strong> de la part du casino.</li>
+</ul>
+<p>Aucune de ces trois conditions n'existe dans le monde réel. C'est exactement le sens de la formule du cours : <em>« un <strong>être mortel</strong> n'a aucune stratégie gagnante »</em>. Le mot « mortel » n'est pas décoratif — il encode les trois contraintes.</p>
+<p><strong>Le lien avec le concept 2.</strong> La probabilité d'atteindre $A$ avant $-B$ vaut $\frac{B}{A+B}$. Faire tendre $B\to\infty$ — capital infini — donne bien une probabilité qui tend vers $1$. Mais avec $B$ <strong>fini</strong>, la probabilité de ruine $\frac{A}{A+B}$ reste strictement positive, et l'espérance de gain est exactement nulle. La borne sur $\tau$ du théorème est la traduction technique de la finitude du capital.</p>
+<p><strong>Et le pendant en temps continu.</strong> C'est la condition $g\in L^2$ du théorème 2.3 de la fiche 56 : sans condition d'intégrabilité, l'intégrale d'Itô cesse d'être une martingale, et les « stratégies de doublement » réapparaissent. C'est pourquoi les modèles de finance mathématique imposent toujours une contrainte d'<strong>admissibilité</strong> aux stratégies.</p>
+</div></details>
+
+<h2 data-prio="must">Common mistakes</h2>
+<ol>
+<li><strong>Se tromper de convention pour la matrice de transition</strong> — le cours la prend <strong>stochastique en colonnes</strong> ; beaucoup de manuels utilisent la transposée.</li>
+<li><strong>Chercher une distribution stationnaire en espace d'états infini</strong> — le théorème 3.3 <strong>ne s'applique pas</strong> ; la marche aléatoire sur $\mathbb Z$ n'en a aucune.</li>
+<li><strong>Confondre les conditions de martingale</strong> — $E[Y]=0$ pour une <strong>somme</strong>, $E[Y]=1$ pour un <strong>produit</strong>.</li>
+<li><strong>Croire que tout instant aléatoire est un temps d'arrêt</strong> — le premier <strong>pic</strong> n'en est pas un : il faut voir le futur.</li>
+<li><strong>Appliquer l'arrêt optionnel sans vérifier la borne $\tau\leq T$</strong> — c'est exactement le paradoxe de l'exercice 5.4.</li>
+<li><strong>Confondre « $\tau$ fini presque sûrement » et « $\tau$ borné »</strong> — la marche atteint $100$ p.s., mais $E[\tau]=\infty$.</li>
+<li><strong>Croire qu'un jeu défavorable est une martingale</strong> — la roulette est une <strong>surmartingale</strong> : $X_k&gt;E[X_{k+1}\mid\mathcal F_k]$.</li>
+<li><strong>Oublier que la propriété de martingale vaut à tout horizon</strong> — la proposition 4.2 donne $X_s=E[X_t\mid\mathcal F_s]$ pour tout $t\geq s$.</li>
+<li><strong>Normaliser la marche par $n$ au lieu de $\sqrt n$</strong> — c'est $\frac{1}{\sqrt n}X_n$ qui converge vers $N(0,1)$.</li>
+</ol>
+<h2>Ultimate Review</h2>
+<ol>
+<li><strong>Processus stochastique</strong> = collection de variables aléatoires indexées par le temps = <strong>distribution sur des trajectoires</strong>.</li>
+<li><strong>Les trois questions</strong> : (a) dépendances dans la suite · (b) moyennes de long terme · (c) événements de bord.</li>
+<li><strong>Temps discret</strong> (entiers) ou <strong>continu</strong> (réels).</li>
+<li><strong>Marche aléatoire simple</strong> : $Y_i=\pm1$ i.i.d., $X_k=Y_1+\cdots+Y_k$ ; $\frac{1}{\sqrt n}X_n\to N(0,1)$.</li>
+<li><strong>Proposition 2.1</strong> : $E[X_k]=0$ · <strong>accroissements indépendants</strong> · <strong>stationnarité</strong> des accroissements. Valables dès que les $Y_i$ sont i.i.d. centrées.</li>
+<li><strong>Ruine du joueur</strong> : $f(k)=\frac12f(k+1)+\frac12f(k-1)$, $f(A)=1$, $f(-B)=0$ ⟹ $f$ <strong>linéaire</strong> et $f(0)=\frac{B}{A+B}$.</li>
+<li><strong>Propriété de Markov</strong> : $\mathbb P(X_{n+1}=i\mid X_n,\dots,X_0)=\mathbb P(X_{n+1}=i\mid X_n)$.</li>
+<li><strong>Transitions</strong> : $p_{ij}=\mathbb P(X_{n+1}=j\mid X_n=i)$, $\sum_jp_{ij}=1$ ; matrice $A$ <strong>stochastique en colonnes</strong>.</li>
+<li><strong>$n$ pas</strong> : $r_{ij}(n)=\sum_kr_{ik}(n-1)p_{kj}$, matrice $=A^n$ (Chapman-Kolmogorov).</li>
+<li><strong>Distribution stationnaire</strong> : $\pi_j=\sum_k\pi_kp_{kj}$ ; $\pi$ est <strong>vecteur propre de $A$ de valeur propre $1$</strong>.</li>
+<li><strong>Théorème 3.3 (Perron-Frobenius)</strong> : si $p_{ij}&gt;0$ pour tous $i,j$, la stationnaire est <strong>unique</strong> et $r_{ij}(n)\to\pi_j$. <strong>Faux</strong> en espace infini.</li>
+<li><strong>Martingale</strong> : $X_t=E[X_{t+1}\mid\mathcal F_t]$ ; gain espéré nul ; formalisation du <strong>jeu équitable</strong>.</li>
+<li><strong>Proposition 4.2</strong> : $X_s=E[X_t\mid\mathcal F_s]$ pour $t\geq s$.</li>
+<li><strong>Exemples</strong> : marche aléatoire <strong>oui</strong> · roulette <strong>non</strong> (surmartingale) · produit de variables d'espérance $1$ <strong>oui</strong>.</li>
+<li><strong>Temps d'arrêt</strong> : $\{\tau\leq k\}$ ne dépend que de $X_0,\dots,X_k$. « Atteindre $100$ » <strong>oui</strong> ; « le premier pic » <strong>non</strong>.</li>
+<li><strong>Théorème d'arrêt optionnel (Doob, forme faible)</strong> : $X$ martingale, $\tau\leq T$ borné ⟹ $E[X_\tau]=E[X_0]$.</li>
+<li><strong>Le pivot de la preuve</strong> : $\mathbf 1_{\{\tau\geq i+1\}}$ est $\mathcal F_i$-mesurable, donc sort de l'espérance conditionnelle.</li>
+<li><strong>La leçon</strong> : <em>un être mortel n'a aucune stratégie gagnante à un jeu équitable</em> ; mais le moindre avantage finit par payer.</li>
+</ol>
+<p><strong>Formulas to know</strong>
+$$X_k=Y_1+\cdots+Y_k, \qquad \tfrac{1}{\sqrt n}X_n\to N(0,1), \qquad f(0)=\frac{B}{A+B}$$
+$$r_{ij}(n)=\sum_kr_{ik}(n-1)p_{kj}, \qquad \pi_j=\sum_k\pi_kp_{kj}, \qquad A\pi=\pi$$
+$$X_t=E[X_{t+1}\mid\mathcal F_t], \qquad E[X_\tau]=E[X_0] \ \ (\tau\leq T)$$</p>
+<p><strong>Methods to know</strong> : la récurrence de la ruine du joueur et sa résolution linéaire ; le calcul d'une distribution stationnaire par vecteur propre ; la preuve du théorème d'arrêt optionnel ; l'usage de l'arrêt optionnel pour court-circuiter une récurrence.</p>
+<div class="rec"><h2>Active Recall</h2><p><strong>Basic</strong> — Donnez les trois propriétés de la marche aléatoire simple.</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p><strong>(i)</strong> $E[X_k]=0$ pour tout $k$.
+<strong>(ii) Accroissements indépendants</strong> : pour $0=k_0\leq k_1\leq\cdots\leq k_r$, les $X_{k_{i+1}}-X_{k_i}$ sont <strong>mutuellement indépendants</strong>.
+<strong>(iii) Stationnarité</strong> : pour $h\geq1$ et $k\geq0$, la loi de $X_{k+h}-X_k$ est la même que celle de $X_h$.</p>
+<p class="cal piege"> Ces propriétés valent <strong>dès que les $Y_i$ sont i.i.d. de moyenne nulle</strong> — la symétrie $\pm1$ n'est pas nécessaire. Et ce sont <strong>exactement</strong> les propriétés du processus de Wiener (fiche 53), à la loi des accroissements près.</p>
+</div></details><p><strong>Understanding</strong> — Qu'est-ce qu'une distribution stationnaire, et que garantit le théorème 3.3 ?</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p><strong>Définition</strong> : une distribution $\pi$ sur $S$ telle que $\pi_j=\sum_k\pi_kp_{kj}$ pour tout $j$. Autrement dit, si $X_0\sim\pi$, alors $X_1\sim\pi$ aussi : <strong>la loi ne bouge plus</strong>.</p>
+<p><strong>Lecture algébrique</strong> : $\pi$ est un <strong>vecteur propre de $A$ pour la valeur propre $1$</strong>, normalisé à somme $1$.</p>
+<p><strong>Théorème 3.3</strong> : si $p_{ij}&gt;0$ pour tous $i,j\in S$ (espace <strong>fini</strong>), alors la stationnaire est <strong>unique</strong> et
+$$\lim_{n\to\infty}r_{ij}(n)=\pi_j \qquad \forall i,j$$
+La limite <strong>ne dépend pas de $i$</strong> : la chaîne <strong>oublie son point de départ</strong>.</p>
+<p class="cal piege"> <em>Un théorème correspondant n'est pas vrai en espace d'états infini</em> — la marche aléatoire sur $\mathbb Z$ n'a aucune distribution stationnaire.</p>
+</div></details><p><strong>Application</strong> — Quelle est la probabilité de gagner $100$ avant de perdre $50$ à pile ou face ?</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p>C'est la ruine du joueur avec $A=100$ et $B=50$ :
+$$f(0)=\frac{B}{A+B}=\frac{50}{150}=\frac13\approx33{,}3\,\%$$</p>
+<p><strong>Le contrôle par l'espérance.</strong> Gain $+100$ avec probabilité $\frac13$, perte $-50$ avec probabilité $\frac23$ :
+$$E[\text{gain}]=\tfrac13(100)+\tfrac23(-50)=\tfrac{100}{3}-\tfrac{100}{3}=0 \qquad\checkmark$$
+C'est le théorème d'arrêt optionnel : le jeu est équitable, l'espérance reste nulle.</p>
+<p><strong>La leçon de gestion du risque.</strong> Viser un gain <strong>deux fois</strong> plus grand que la perte acceptée donne <strong>une chance sur trois</strong> de réussir. Le ratio gain/perte et la probabilité de succès sont indissolublement liés : on ne peut pas améliorer l'un sans dégrader l'autre. Aucun placement d'ordres ne crée de rendement sur un jeu équitable.</p>
+</div></details><p><strong>Comparison</strong> — Martingale, surmartingale, sous-martingale : quelle différence ?</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Condition</th>
+<th>Interprétation</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Martingale</strong></td>
+<td>$X_t=E[X_{t+1}\mid\mathcal F_t]$</td>
+<td>jeu <strong>équitable</strong>, gain espéré nul</td>
+</tr>
+<tr>
+<td><strong>Surmartingale</strong></td>
+<td>$X_t\geq E[X_{t+1}\mid\mathcal F_t]$</td>
+<td>jeu <strong>défavorable</strong> au joueur</td>
+</tr>
+<tr>
+<td><strong>Sous-martingale</strong></td>
+<td>$X_t\leq E[X_{t+1}\mid\mathcal F_t]$</td>
+<td>jeu <strong>favorable</strong> au joueur</td>
+</tr>
+</tbody></table>
+<p><strong>L'exemple du cours</strong> : <em>le solde d'un joueur de roulette n'est pas une martingale — on a toujours $X_k&gt;E[X_{k+1}\mid\mathcal F_k]$</em>. Le zéro de la roulette donne un avantage à la maison : c'est une <strong>surmartingale stricte</strong>.</p>
+<p><strong>Le lien avec la finance.</strong> Sous la mesure <strong>réelle</strong>, le prix actualisé d'une action est une <strong>sous-martingale</strong> : il rapporte une prime de risque, donc dérive vers le haut. Sous la mesure <strong>risque-neutre</strong> de la fiche 57, cette dérive est exactement annulée et le prix actualisé devient une <strong>martingale</strong> — c'est toute la valorisation par arbitrage.</p>
+</div></details><p><strong>Exam-style</strong> — Énoncez le théorème d'arrêt optionnel, démontrez-le, et expliquez sa portée.</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p><strong>Énoncé (Doob, forme faible).</strong> Si $X_0,X_1,\dots$ est une martingale et $\tau$ un temps d'arrêt tel que $\tau\leq T$ pour une <strong>constante</strong> $T$, alors $E[X_\tau]=E[X_0]$.</p>
+<p><strong>Démonstration.</strong> Comme $\tau\leq T$, on peut écrire
+$$X_\tau=X_0+\sum_{i=0}^{T-1}(X_{i+1}-X_i)\cdot\mathbf 1_{\{\tau\geq i+1\}}$$
+et, $T$ étant constant, la linéarité de l'espérance donne
+$$E[X_\tau]=E[X_0]+\sum_{i=0}^{T-1}E\big[(X_{i+1}-X_i)\mathbf 1_{\{\tau\geq i+1\}}\big]$$
+<strong>L'observation principale</strong> : $\{\tau\geq i+1\}$ est le complémentaire de $\{\tau\leq i\}$, qui ne dépend que de $X_0,\dots,X_i$ — c'est la <strong>définition</strong> d'un temps d'arrêt. L'indicatrice est donc $\mathcal F_i$-mesurable et sort de l'espérance conditionnelle :
+$$E\big[(X_{i+1}-X_i)\mathbf 1_{\{\tau\geq i+1\}}\big]=E\Big[\big(E[X_{i+1}\mid\mathcal F_i]-X_i\big)\mathbf 1_{\{\tau\geq i+1\}}\Big]=E[0]=0$$
+D'où $E[X_\tau]=E[X_0]$. $\blacksquare$</p>
+<p><strong>Où chaque hypothèse sert.</strong></p>
+<ul>
+<li><strong>$X$ martingale</strong> : c'est ce qui annule $E[X_{i+1}\mid\mathcal F_i]-X_i$.</li>
+<li><strong>$\tau$ temps d'arrêt</strong> : c'est ce qui rend l'indicatrice $\mathcal F_i$-mesurable.</li>
+<li><strong>$\tau\leq T$ borné</strong> : c'est ce qui rend la somme <strong>finie</strong>, donc l'interversion avec l'espérance légitime.</li>
+</ul>
+<p><strong>Sa portée — la formule du cours.</strong> <em>« Un être mortel n'a aucune stratégie gagnante » à un jeu équitable.</em> Aucun choix de moment d'arrêt — aussi astucieux soit-il — ne modifie l'espérance. <strong>En revanche</strong>, le moindre avantage sur l'adversaire finit par payer à long terme.</p>
+<p><strong>Sa limite, à connaître.</strong> L'exercice 5.4 en donne le contre-exemple : s'arrêter à $+100$ garantit $E[X_\tau]=100\neq0$. Il n'y a pas contradiction, parce que $\tau$ <strong>n'est pas borné</strong> — il est fini presque sûrement mais d'espérance infinie, et le solde descend arbitrairement bas dans l'intervalle. Il faudrait un capital infini et un temps infini : c'est là qu'intervient la mortalité.</p>
+<p><strong>Ses deux usages.</strong></p>
+<ol>
+<li><strong>Calculatoire</strong> : il court-circuite les récurrences. L'exercice 5.5 se résout en une ligne — $a\,p-b(1-p)=0$ donne $p=\frac{b}{a+b}$ — là où la méthode du concept 2 demande de résoudre une équation aux différences.</li>
+<li><strong>Conceptuel</strong> : c'est la version discrète du résultat de la fiche 56 selon lequel l'intégrale d'Itô d'un processus <strong>adapté</strong> est une martingale. Dans les deux cas, l'énoncé est le même : <strong>on ne peut pas gagner en moyenne à un jeu équitable quand on ne voit pas le futur</strong>. C'est le fondement de l'absence d'opportunité d'arbitrage.</li></ol></div></details></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h2>Flashcards</h2>
+<table>
+<thead>
+<tr>
+<th>Question</th>
+<th>Réponse</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Définition d'un processus stochastique ?</td>
+<td>Collection de variables aléatoires <strong>indexées par le temps</strong></td>
+</tr>
+<tr>
+<td>Vue alternative ?</td>
+<td>Une <strong>distribution sur un espace de trajectoires</strong></td>
+</tr>
+<tr>
+<td>Les trois questions du cours ?</td>
+<td>Dépendances · moyennes de long terme · événements de bord</td>
+</tr>
+<tr>
+<td>Construction de la marche aléatoire ?</td>
+<td>$Y_i=\pm1$ i.i.d., $X_k=Y_1+\cdots+Y_k$, $X_0=0$</td>
+</tr>
+<tr>
+<td>Vers quoi converge $\frac{1}{\sqrt n}X_n$ ?</td>
+<td>$N(0,1)$</td>
+</tr>
+<tr>
+<td>Les trois propriétés de la marche ?</td>
+<td>$E[X_k]=0$ · accroissements <strong>indépendants</strong> · <strong>stationnaires</strong></td>
+</tr>
+<tr>
+<td>Ces propriétés exigent quoi ?</td>
+<td>Des $Y_i$ <strong>i.i.d. centrées</strong></td>
+</tr>
+<tr>
+<td>Récurrence de la ruine du joueur ?</td>
+<td>$f(k)=\frac12f(k+1)+\frac12f(k-1)$</td>
+</tr>
+<tr>
+<td>Solution de la ruine du joueur ?</td>
+<td>$f(0)=\frac{B}{A+B}$</td>
+</tr>
+<tr>
+<td>Pourquoi $f$ est-elle linéaire ?</td>
+<td>Les différences successives sont constantes (harmonicité)</td>
+</tr>
+<tr>
+<td>Propriété de Markov ?</td>
+<td>$\mathbb P(X_{n+1}\mid X_n,\dots,X_0)=\mathbb P(X_{n+1}\mid X_n)$</td>
+</tr>
+<tr>
+<td>Convention de la matrice $A$ du cours ?</td>
+<td><strong>Stochastique en colonnes</strong></td>
+</tr>
+<tr>
+<td>Matrice de transition à $n$ pas ?</td>
+<td>$A^n$</td>
+</tr>
+<tr>
+<td>Récurrence de Chapman-Kolmogorov ?</td>
+<td>$r_{ij}(n)=\sum_kr_{ik}(n-1)p_{kj}$</td>
+</tr>
+<tr>
+<td>Définition d'une distribution stationnaire ?</td>
+<td>$\pi_j=\sum_k\pi_kp_{kj}$</td>
+</tr>
+<tr>
+<td>Lecture algébrique de $\pi$ ?</td>
+<td><strong>Vecteur propre de $A$</strong> de valeur propre $1$</td>
+</tr>
+<tr>
+<td>Hypothèse du théorème 3.3 ?</td>
+<td>$p_{ij}&gt;0$ pour <strong>tous</strong> $i,j$, espace <strong>fini</strong></td>
+</tr>
+<tr>
+<td>Que garantit-il ?</td>
+<td>Unicité de $\pi$ et $r_{ij}(n)\to\pi_j$</td>
+</tr>
+<tr>
+<td>Vaut-il en espace infini ?</td>
+<td><strong>Non</strong></td>
+</tr>
+<tr>
+<td>Définition d'une martingale ?</td>
+<td>$X_t=E[X_{t+1}\mid\mathcal F_t]$</td>
+</tr>
+<tr>
+<td>Que dit-elle en une phrase ?</td>
+<td>Le <strong>gain espéré est nul</strong> — jeu équitable</td>
+</tr>
+<tr>
+<td>Propriété à tout horizon ?</td>
+<td>$X_s=E[X_t\mid\mathcal F_s]$ pour $t\geq s$</td>
+</tr>
+<tr>
+<td>La roulette est-elle une martingale ?</td>
+<td><strong>Non</strong> — surmartingale, $X_k&gt;E[X_{k+1}\mid\mathcal F_k]$</td>
+</tr>
+<tr>
+<td>Condition pour un produit ?</td>
+<td>$E[Y]=1$ (et non $0$)</td>
+</tr>
+<tr>
+<td>Définition d'un temps d'arrêt ?</td>
+<td>$\{\tau\leq k\}$ ne dépend que de $X_0,\dots,X_k$</td>
+</tr>
+<tr>
+<td>« Atteindre $100$ » est-il un temps d'arrêt ?</td>
+<td><strong>Oui</strong></td>
+</tr>
+<tr>
+<td>« Le premier pic » ?</td>
+<td><strong>Non</strong> — il faut voir le futur</td>
+</tr>
+<tr>
+<td>Théorème d'arrêt optionnel ?</td>
+<td>$X$ martingale, $\tau\leq T$ ⟹ $E[X_\tau]=E[X_0]$</td>
+</tr>
+<tr>
+<td>Le pivot de sa démonstration ?</td>
+<td>$\mathbf 1_{\{\tau\geq i+1\}}$ est $\mathcal F_i$-mesurable</td>
+</tr>
+<tr>
+<td>Sa leçon ?</td>
+<td><em>Un être mortel n'a aucune stratégie gagnante</em></td>
+</tr>
+<tr>
+<td>Pourquoi « atteindre $100$ » ne le contredit pas ?</td>
+<td>$\tau$ n'est <strong>pas borné</strong> ; $E[\tau]=\infty$</td>
+</tr>
+</tbody></table>
+</main>
+
+
+
+
+</body></html>

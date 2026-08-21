@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fiche 69 — Statistique bayésienne : a priori, a posteriori, Jeffreys et estimateur de Bayes</title>
+<script>
+window.MathJax={tex:{inlineMath:[["$","$"]],displayMath:[["$$","$$"]],processEscapes:true},
+ options:{skipHtmlTags:["script","noscript","style","textarea","pre","code"]},
+ svg:{fontCache:"global"},
+ startup:{pageReady:()=>MathJax.startup.defaultPageReady().then(()=>{document.body.classList.add("ready")})}};
+setTimeout(function(){document.body.classList.add("ready")},2500);
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+/* ============================================================
+   MathiasLearn — feuille de style des fiches
+   Reprise intégrale des tokens de 00_PARCOURS/*.html
+   + blocs pédagogiques (callouts, méthode, essentiels, recall)
+   ============================================================ */
+:root{--bg:#faf9f7;--card:#fff;--ink:#1a1a1a;--muted:#6b6b6b;--line:#e5e2dd;--accent:#8b5e34;
+ --hl:#fdf8ef;--ok:#2d7d4f;--okbg:#f0f7f3;--warn:#b3402f;--warnbg:#fdf3f1;--blue:#2f5d8b;--bluebg:#f1f5fa}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+ font:17px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;padding:0 16px 100px}
+.nav{position:sticky;top:0;background:rgba(250,249,247,.96);backdrop-filter:blur(8px);
+ border-bottom:1px solid var(--line);margin:0 -16px 30px;padding:11px 16px;z-index:50;
+ display:flex;gap:6px;flex-wrap:wrap;font-size:13px}
+.nav a{color:var(--muted);text-decoration:none;padding:4px 9px;border-radius:5px;white-space:nowrap}
+.nav a:hover{background:var(--line);color:var(--ink)}
+.nav a.on{background:var(--accent);color:#fff}
+main{max-width:780px;margin:0 auto}
+h1{font-size:31px;letter-spacing:-.02em;margin:.4em 0 .5em;line-height:1.25}
+h2{font-size:23px;margin:2.2em 0 .7em;padding-bottom:.3em;border-bottom:1px solid var(--line)}
+h3{font-size:19px;margin:1.9em 0 .5em;color:var(--accent)}
+h4{font-size:17px;margin:1.5em 0 .4em}
+p{margin:.8em 0} a{color:var(--accent)} hr{border:0;border-top:1px solid var(--line);margin:2.6em 0}
+table{border-collapse:collapse;width:100%;margin:1.3em 0;font-size:15.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+th{background:#f3f0eb;font-weight:600}
+tr:nth-child(even) td{background:#fcfbfa}
+code{font-family:"SF Mono",Menlo,Consolas,monospace;font-size:.88em;background:#f2efea;padding:2px 6px;border-radius:4px;white-space:nowrap}
+pre{background:#f2efea;padding:14px 16px;border-radius:8px;overflow-x:auto}
+pre code{background:none;padding:0;white-space:pre}
+blockquote{border-left:3px solid var(--accent);background:var(--hl);margin:1.4em 0;padding:14px 20px;border-radius:0 8px 8px 0}
+blockquote p:first-child{margin-top:0} blockquote p:last-child{margin-bottom:0}
+ul,ol{padding-left:1.5em} li{margin:.35em 0} em{color:#4a4a4a}
+mjx-container[display="true"]{margin:1.1em 0!important;overflow-x:auto;overflow-y:hidden;padding:2px 0}
+mjx-container svg{max-width:100%}
+body:not(.ready) main{opacity:0} main{opacity:1;transition:opacity .25s}
+
+/* --- bandeau de tête de fiche --- */
+.cours{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--accent);
+ border-radius:0 10px 10px 0;padding:18px 22px;margin:0 0 34px}
+.cours h4{margin:0 0 4px;font-size:14px;text-transform:uppercase;letter-spacing:.07em;color:var(--accent)}
+.cours .cs{color:var(--muted);font-size:14.5px;margin:0 0 14px}
+
+/* --- exercices / corrigés --- */
+.ex{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:6px 24px 20px;margin:18px 0}
+.ex>h3:first-child{margin-top:14px}
+details.cor{margin-top:18px;border:1px solid var(--line);border-radius:8px;background:#fcfbfa;overflow:hidden}
+details.cor>summary{cursor:pointer;padding:12px 16px;font-weight:600;font-size:15px;color:var(--accent);
+ list-style:none;display:flex;align-items:center;gap:9px;user-select:none;transition:.15s;min-height:44px}
+details.cor>summary::-webkit-details-marker{display:none}
+details.cor>summary:hover{background:var(--hl)}
+details.cor>summary::before{content:"\25B6";font-size:10px;transition:transform .18s;display:inline-block}
+details.cor[open]>summary::before{transform:rotate(90deg)}
+details.cor[open]>summary{background:var(--okbg);color:var(--ok);border-bottom:1px solid var(--line)}
+.cor .in{padding:4px 20px 16px}
+.cor .in>*:first-child{margin-top:.9em}
+
+/* --- blocs pédagogiques (callouts) ---
+   Générés depuis une citation Markdown dont le premier **gras** commence
+   par un mot-clé : DÉFINITION, THÉORÈME, MÉTHODE, PIÈGE, INTUITION… */
+.cal{border:1px solid var(--line);border-left:4px solid var(--accent);background:var(--card);
+ border-radius:0 10px 10px 0;padding:15px 20px;margin:1.5em 0}
+.cal>p:first-child{margin-top:0}.cal>p:last-child,.cal>ul:last-child,.cal>ol:last-child{margin-bottom:0}
+.cal .lab{display:block;font-size:12.5px;text-transform:uppercase;letter-spacing:.08em;
+ font-weight:700;color:var(--accent);margin-bottom:6px}
+.cal.formel{background:var(--hl)}
+.cal.piege{border-left-color:var(--warn);background:var(--warnbg)}
+.cal.piege .lab{color:var(--warn)}
+.cal.methode{border-left-color:var(--ok);background:var(--okbg)}
+.cal.methode .lab{color:var(--ok)}
+.cal.intu{border-left-color:var(--blue);background:var(--bluebg)}
+.cal.intu .lab{color:var(--blue)}
+.cal.plus{border-left-style:dashed;background:#faf9f7}
+.cal.plus .lab{color:var(--muted)}
+
+/* --- révision express --- */
+.ess{background:var(--card);border:1px solid var(--accent);border-radius:10px;padding:4px 24px 20px;margin:1.6em 0}
+.ess h3{margin-top:1.3em}
+.rec{background:var(--card);border:1px dashed var(--accent);border-radius:10px;padding:4px 24px 18px;margin:1.6em 0}
+.rec ol{counter-reset:none}
+
+/* --- impression / PDF --- */
+@media print{
+ .nav{display:none}
+ body{padding:0;background:#fff;font-size:11.2pt;line-height:1.55}
+ main{max-width:none}
+ h1{font-size:23pt}h2{font-size:15pt;margin-top:1.5em}h3{font-size:12.6pt}
+ h2,h3,h4{break-after:avoid;page-break-after:avoid}
+ table,.cal,blockquote{break-inside:avoid;page-break-inside:avoid}
+ table{display:table;font-size:9.6pt}
+ details.cor{border:1px solid var(--line);background:#fcfbfa}
+ details.cor>summary{display:none}
+ details.cor .in{padding-top:10px}
+ .cal,.ex,.ess,.rec{box-shadow:none}
+ a{color:var(--ink);text-decoration:none}
+}
+@page{margin:16mm 15mm 18mm}
+
+/* --- exemples travaillés --- */
+.exm{background:#fcfbfa;border:1px solid var(--line);border-radius:10px;padding:2px 20px 14px;margin:1.5em 0}
+.exm>h4:first-child{margin:14px 0 .5em;color:var(--accent);font-size:13px;text-transform:uppercase;letter-spacing:.07em}
+
+
+/* --- pastilles de priorité (conventions des fiches de l'app) --- */
+h2[data-prio], h3[data-prio], h4[data-prio]{position:relative}
+h2[data-prio]::before,h3[data-prio]::before,h4[data-prio]::before{
+ content:"";display:inline-block;width:9px;height:9px;border-radius:50%;
+ margin-right:9px;vertical-align:middle;background:var(--muted)}
+[data-prio="must"]::before{background:var(--warn)}
+[data-prio="high"]::before{background:#d98324}
+[data-prio="mid"]::before{background:#c9a227}
+[data-prio="low"]::before{background:var(--ok)}
+/* corrigés des fiches de l'app : même traitement que les corrigés des séries */
+details.cor>summary::after{content:""}
+</style></head><body>
+<div class="nav"><a href="00_COMMENCER_ICI.html">Commencer ici</a><a href="01_NOTATIONS_le-decodeur.html">Notations</a><a href="02_EXERCICES_Serie-0.html">Série 0 — Remise en route</a><a href="03_EXERCICES_Serie-1.html">Série 1 — Convexité</a><a href="04_EXERCICES_Serie-2.html">Série 2 — KKT</a><a href="05_AUTO-EVALUATION.html">Auto-évaluation (quiz)</a><a href="06_FICHE_Optimisation-deux-variables.html">Fiche — Optimisation à 2 variables</a></div>
+<main><h1>Fiche 69 — Statistique bayésienne : a priori, a posteriori, Jeffreys et estimateur de Bayes</h1>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Matière</strong></td>
+<td>Maths · Économétrie</td>
+</tr>
+<tr>
+<td><strong>Cours source</strong></td>
+<td>Rigollet, <em>18.650 Statistics for Applications</em>, MIT OpenCourseWare, automne 2016 — chapitre 8 « Bayesian Statistics »</td>
+</tr>
+<tr>
+<td><strong>Difficulté</strong></td>
+<td> High — l'autre façon de faire de la statistique</td>
+</tr>
+<tr>
+<td><strong>Temps d'étude estimé</strong></td>
+<td>2 h</td>
+</tr>
+<tr>
+<td><strong>Prérequis</strong></td>
+<td>Fiche 64 (vraisemblance, information de Fisher), fiche 67 (estimateurs, intervalles de confiance)</td>
+</tr>
+<tr>
+<td><strong>Concepts clés</strong></td>
+<td>Approche fréquentiste et bayésienne, loi a priori, loi a posteriori, formule de Bayes, conjugaison bêta-binomiale, a priori non informatif, a priori impropre, a priori de Jeffreys, invariance par reparamétrisation, région de confiance bayésienne, estimateur de Bayes</td>
+</tr>
+<tr>
+<td><strong>Poids à l'examen</strong></td>
+<td>Trois choses : la <strong>formule de Bayes</strong> $\pi(\theta\mid X)\propto\pi(\theta)p_n(X\mid\theta)$ et la conjugaison bêta-Bernoulli ; l'<strong>a priori de Jeffreys</strong> et son invariance ; et la distinction <strong>région de confiance bayésienne</strong> / intervalle de confiance.</td>
+</tr>
+</tbody></table>
+<h2>Vue d'ensemble</h2>
+<blockquote>
+<p><strong>L'approche fréquentiste</strong>, celle des fiches 64 à 68 :</p>
+<ul>
+<li>on <strong>observe des données</strong> ;</li>
+<li>ces données ont été engendrées <strong>aléatoirement</strong> (par la Nature, par des mesures, par la conception d'un sondage…) ;</li>
+<li>on fait des <strong>hypothèses</strong> sur le processus générateur (i.i.d., données gaussiennes, densité régulière, fonction de régression linéaire…) ;</li>
+<li>ce processus est associé à un <strong>objet d'intérêt</strong> (un paramètre, une densité…) ;</li>
+<li><em>cet objet était <strong>inconnu mais fixe</strong>, et l'on voulait le trouver : on l'estimait, ou l'on testait une hypothèse à son sujet.</em></li>
+</ul>
+</blockquote>
+<blockquote>
+<p><strong>L'approche bayésienne.</strong> <em>On observe toujours des données, supposées engendrées aléatoirement par un processus associé à un objet fixe. Mais :</em></p>
+<ul>
+<li><em>on a une <strong>croyance a priori</strong> à son sujet ;</em></li>
+<li><em>en utilisant les données, on veut <strong>mettre à jour</strong> cette croyance et la transformer en une <strong>croyance a posteriori</strong>.</em></li>
+</ul>
+</blockquote>
+<pre><code>FRÉQUENTISTE   θ est FIXE et inconnu → on l'estime
+BAYÉSIEN       on modélise notre CROYANCE sur θ comme une loi
+     a priori π(θ)  ──── données ────→  a posteriori π(θ|X)
+FORMULE        π(θ|X) ∝ π(θ) · p_n(X|θ)
+                        ↑          ↑
+                    croyance   vraisemblance
+ESTIMATEUR     θ̂ = moyenne a posteriori
+</code></pre>
+<h2 data-prio="mid">Concept 1 — L'exemple fondateur</h2>
+<blockquote>
+<p>Soit $p$ la <strong>proportion de femmes</strong> dans la population. On échantillonne $n$ personnes au hasard avec remise et l'on note $X_1,\dots,X_n$ leur genre ($1$ pour une femme, $0$ sinon).</p>
+<p><em>Dans l'approche fréquentiste, on estimait $p$ (par l'EMV), on construisait un intervalle de confiance, on faisait des tests d'hypothèses ($H_0:p=0{,}5$ contre $H_1:p\neq0{,}5$).</em></p>
+<p>*Avant d'analyser les données, on peut croire que $p$ est vraisemblablement <strong>proche de $1/2$</strong>.*</p>
+</blockquote>
+<blockquote>
+<p><strong>L'approche bayésienne est un outil pour :</strong></p>
+<ol>
+<li><em>inclure <strong>mathématiquement</strong> notre croyance a priori dans les procédures statistiques ;</em></li>
+<li><em>mettre à jour cette croyance a priori en utilisant les données.</em></li>
+</ol>
+</blockquote>
+<p><strong>Comment quantifier la croyance.</strong> <em>On est sûr à $90\,\%$ que $p$ est entre $0{,}4$ et $0{,}6$, à $95\,\%$ qu'il est entre $0{,}3$ et $0{,}8$, etc. On peut donc <strong>modéliser notre croyance a priori par une loi</strong> pour $p$, <strong>comme si $p$ était aléatoire</strong>.</em></p>
+<blockquote>
+<p class="cal piege"> <em><strong>En réalité, le vrai paramètre n'est pas aléatoire !</strong> L'approche bayésienne est une façon de modéliser notre <strong>croyance</strong> sur le paramètre en <strong>faisant comme si</strong> il l'était.</em></p>
+</blockquote>
+<p>Par exemple $p\sim B(a,a)$ (loi bêta) pour un $a&gt;0$. <em>Cette loi s'appelle la <strong>loi a priori</strong>.</em></p>
+<p><strong>Et après observation.</strong> *$X_1,\dots,X_n$ sont supposées i.i.d. de Bernoulli de paramètre $p$ <strong>conditionnellement à $p$</strong>. Après avoir observé l'échantillon, on met à jour notre croyance en prenant la loi de $p$ <strong>conditionnellement aux données</strong> : c'est la <strong>loi a posteriori</strong>.* Ici,
+$$B\left(a+\sum_{i=1}^nX_i,\ a+n-\sum_{i=1}^nX_i\right)$$</p>
+<h2 data-prio="must">Concept 2 — La formule de Bayes</h2>
+<p><strong>Le cadre.</strong> On considère une loi de probabilité sur l'espace des paramètres $\Theta$, de densité $\pi(\cdot)$ : la <strong>loi a priori</strong>. Soit $X_1,\dots,X_n$ un échantillon, et $p_n(\cdot\mid\theta)$ la densité jointe de $X_1,\dots,X_n$ <strong>conditionnellement à $\theta$</strong>, où $\theta\sim\pi$. <em>On suppose généralement les $X_i$ i.i.d. conditionnellement à $\theta$.</em></p>
+<div class="cal formel"><span class="lab">Définition.</span>
+<p> La loi conditionnelle de $\theta$ sachant $X_1,\dots,X_n$ est la <strong>loi a posteriori</strong>, de densité $\pi(\cdot\mid X_1,\dots,X_n)$.</p>
+</div>
+<div class="cal formel"><span class="lab">Formule de Bayes.</span>
+<p>
+$$\boxed{\ \pi(\theta\mid X_1,\dots,X_n)\ \propto\ \pi(\theta)\,p_n(X_1,\dots,X_n\mid\theta), \qquad \forall\theta\in\Theta\ }$$
+<em>La constante ne dépend pas de $\theta$ :</em>
+$$\pi(\theta\mid X_1,\dots,X_n)=\frac{\pi(\theta)\,p_n(X_1,\dots,X_n\mid\theta)}{\int_\Theta p_n(X_1,\dots,X_n\mid t)\,d\pi(t)}$$</p>
+</div>
+<blockquote>
+<p><strong>Lisez la formule dans les deux sens.</strong></p>
+<ul>
+<li><strong>A posteriori $\propto$ a priori $\times$ vraisemblance.</strong> La croyance finale combine ce qu'on croyait avant et ce que les données disent. Si l'a priori est plat, seule la vraisemblance compte — on retombe sur le maximum de vraisemblance.</li>
+<li><strong>Le dénominateur est une simple constante de normalisation.</strong> C'est pourquoi on travaille presque toujours avec le symbole $\propto$ : on identifie la forme fonctionnelle en $\theta$, on reconnaît une loi connue, et la constante se déduit.</li>
+</ul>
+</blockquote>
+<p class="cal piege"> <strong>Le renversement conceptuel est complet par rapport à la fiche 65.</strong> Le fréquentiste calcule $\mathbb P[\text{données}\mid H_0]$ — la p-valeur. Le bayésien calcule $\mathbb P[\theta\mid\text{données}]$ — la loi a posteriori. Ce sont les deux conditionnements inverses, et passer de l'un à l'autre exige précisément une <strong>loi a priori</strong>, ce que le cadre fréquentiste refuse de fournir.</p>
+<h2 data-prio="must">Concept 3 — L'exemple bêta-Bernoulli en détail</h2>
+<p><strong>L'a priori.</strong> $\pi(p)\propto p^{a-1}(1-p)^{a-1}$ pour $p\in(0,1)$ — c'est la densité de $B(a,a)$.</p>
+<p><strong>La vraisemblance.</strong> Sachant $p$, les $X_i$ sont i.i.d. $\mathrm{Ber}(p)$, donc
+$$p_n(X_1,\dots,X_n\mid p)=p^{\sum_{i=1}^nX_i}(1-p)^{n-\sum_{i=1}^nX_i}$$</p>
+<p><strong>L'a posteriori.</strong> Par la formule de Bayes,
+$$\pi(p\mid X_1,\dots,X_n)\ \propto\ p^{a-1+\sum_iX_i}(1-p)^{a-1+n-\sum_iX_i}$$
+On <strong>reconnaît</strong> la forme d'une densité bêta, donc
+$$\boxed{\ \pi(\cdot\mid X_1,\dots,X_n)=B\left(a+\sum_{i=1}^nX_i,\ a+n-\sum_{i=1}^nX_i\right)\ }$$</p>
+<blockquote>
+<p><strong>C'est le phénomène de conjugaison</strong> : l'a priori est bêta, l'a posteriori aussi. La mise à jour se réduit à <strong>ajouter les succès au premier paramètre et les échecs au second</strong>. Aucune intégrale à calculer — on lit le résultat.</p>
+<p><strong>L'interprétation des paramètres de l'a priori</strong> devient alors très parlante : $B(a,a)$ équivaut à avoir déjà observé $a$ succès et $a$ échecs <strong>fictifs</strong>. Plus $a$ est grand, plus la croyance initiale est ferme et plus il faudra de données pour la déplacer. C'est ce qu'on appelle des « observations équivalentes a priori ».</p>
+</blockquote>
+<h2 data-prio="must">Concept 4 — Les a priori non informatifs</h2>
+<blockquote>
+<p><strong>L'idée.</strong> <em>En cas d'ignorance, ou d'absence d'information a priori, on peut vouloir utiliser un a priori <strong>aussi peu informatif que possible</strong>.</em></p>
+<p><strong>Bon candidat</strong> : $\pi(\theta)\propto1$, c'est-à-dire une densité <strong>constante</strong> sur $\Theta$.</p>
+<ul>
+<li>Si $\Theta$ est <strong>borné</strong>, c'est l'a priori <strong>uniforme</strong> sur $\Theta$.</li>
+<li>Si $\Theta$ est <strong>non borné</strong>, cela <strong>ne définit pas une densité valide</strong> sur $\Theta$ !</li>
+</ul>
+</blockquote>
+<div class="cal formel"><span class="lab">Définition.</span>
+<p> Un <strong>a priori impropre</strong> sur $\Theta$ est une fonction mesurable, positive, définie sur $\Theta$, <strong>non intégrable</strong>.</p>
+<p><em>En général, on peut malgré tout définir une loi a posteriori à partir d'un a priori impropre, en utilisant la formule de Bayes.</em></p>
+</div>
+<p><strong>Les deux exemples.</strong></p>
+<ul>
+<li>Si $p\sim U(0,1)$ et, sachant $p$, $X_1,\dots,X_n\overset{iid}\sim\mathrm{Ber}(p)$ :
+$$\pi(p\mid X_1,\dots,X_n)\propto p^{\sum_iX_i}(1-p)^{n-\sum_iX_i} \quad\Longrightarrow\quad B\left(1+\sum_iX_i,\ 1+n-\sum_iX_i\right)$$</li>
+<li>Si $\pi(\theta)=1$ pour tout $\theta\in\mathbb R$ et, sachant $\theta$, $X_1,\dots,X_n\overset{iid}\sim N(\theta,1)$ :
+$$\pi(\theta\mid X_1,\dots,X_n)\propto\exp\left(-\frac12\sum_{i=1}^n(X_i-\theta)^2\right) \quad\Longrightarrow\quad N\left(\bar X_n,\ \frac1n\right)$$</li>
+</ul>
+<p class="cal piege"> <strong>Le second cas illustre bien le mécanisme.</strong> $\pi(\theta)=1$ sur $\mathbb R$ n'est <strong>pas</strong> une densité — son intégrale est infinie. Pourtant, multipliée par la vraisemblance gaussienne, elle donne une a posteriori parfaitement <strong>propre</strong> : $N(\bar X_n,1/n)$. L'impropriété de l'a priori est « absorbée » par l'intégrabilité de la vraisemblance.</p>
+<blockquote>
+<p><strong>Et remarquez le résultat</strong> : la moyenne a posteriori est $\bar X_n$, l'EMV, et la variance $1/n$ reproduit exactement la variance de $\bar X_n$. <strong>Avec un a priori plat, bayésien et fréquentiste coïncident</strong> — ce qui est rassurant, puisque ne rien croire a priori revient à laisser parler les seules données.</p>
+</blockquote>
+<h2 data-prio="must">Concept 5 — L'a priori de Jeffreys</h2>
+<div class="cal formel"><span class="lab">Définition.</span>
+<p>
+$$\boxed{\ \pi_J(\theta)\ \propto\ \sqrt{\det I(\theta)}\ }$$
+<em>où $I(\theta)$ est la <strong>matrice d'information de Fisher</strong> du modèle statistique associé à $X_1,\dots,X_n$ dans l'approche fréquentiste (lorsqu'elle existe).</em></p>
+</div>
+<p><strong>Les deux exemples.</strong></p>
+<ul>
+<li><strong>Exemple 1</strong> (Bernoulli) : $I(p)=\dfrac{1}{p(1-p)}$ (fiche 64), donc
+$$\pi_J(p)\propto\frac{1}{\sqrt{p(1-p)}}, \qquad p\in(0,1)$$
+<em>L'a priori est $B(1/2,1/2)$.</em></li>
+<li><strong>Exemple 2</strong> (gaussien de variance connue) : $\pi_J(\theta)\propto1$ pour $\theta\in\mathbb R$ — c'est un <strong>a priori impropre</strong>.</li>
+</ul>
+<blockquote>
+<p><strong>Le principe d'invariance par reparamétrisation.</strong> <em>Si $\eta$ est une reparamétrisation de $\theta$, c'est-à-dire $\eta=\varphi(\theta)$ pour une application bijective $\varphi$, alors la densité $\tilde\pi(\cdot)$ de $\eta$ vérifie</em>
+$$\tilde\pi(\eta)\propto\sqrt{\det\tilde I(\eta)}$$
+<em>où $\tilde I(\eta)$ est l'information de Fisher du modèle paramétré par $\eta$ au lieu de $\theta$.</em></p>
+</blockquote>
+<div class="cal intu"><span class="lab">Pourquoi cette invariance est la justification décisive de Jeffreys.</span>
+<p> L'a priori uniforme a un défaut caché : <strong>il n'est pas invariant</strong>. Être « uniforme sur $p$ » n'est pas être « uniforme sur $\log\frac{p}{1-p}$ » — ignorer $p$ n'entraîne pas ignorer son logit. Le choix de la paramétrisation, qui devrait être arbitraire, influencerait alors les conclusions.</p>
+<p>L'a priori de Jeffreys, lui, <strong>se transforme correctement</strong> : appliquer $\pi_J$ dans une paramétrisation ou dans une autre donne <strong>la même loi a posteriori</strong>. C'est ce qui en fait le candidat canonique d'a priori non informatif.</p>
+<p class="cal piege"> <strong>Et remarquez la belle circularité</strong> : le fréquentiste utilise $I(\theta)$ pour mesurer la <strong>précision</strong> de son estimateur (fiche 64) ; le bayésien l'utilise pour définir son <strong>ignorance</strong>. Là où l'information est grande, l'a priori de Jeffreys met <strong>plus de masse</strong> — précisément là où les données discrimineront le mieux.</p>
+</div>
+<h2 data-prio="high">Concept 6 — Les régions de confiance bayésiennes</h2>
+<div class="cal formel"><span class="lab">Définition.</span>
+<p> Pour $\alpha\in(0,1)$, une <strong>région de confiance bayésienne de niveau $\alpha$</strong> est un sous-ensemble aléatoire $R$ de l'espace des paramètres $\Theta$, dépendant de l'échantillon, tel que
+$$\mathbb P\big[\theta\in R\mid X_1,\dots,X_n\big]=1-\alpha$$</p>
+<p><em>Noter que $R$ <strong>dépend de l'a priori</strong> $\pi(\cdot)$.</em></p>
+<blockquote>
+<p><em><strong>« Région de confiance bayésienne » et « intervalle de confiance » sont deux notions distinctes.</strong></em></p>
+</blockquote>
+</div>
+<p class="cal piege"> <strong>Cette dernière phrase mérite d'être développée, car c'est le point le plus souvent confondu.</strong></p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th><strong>Intervalle de confiance</strong> (fiche 67)</th>
+<th><strong>Région bayésienne</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Ce qui est aléatoire</td>
+<td>l'<strong>intervalle</strong> $I$</td>
+<td>le <strong>paramètre</strong> $\theta$</td>
+</tr>
+<tr>
+<td>Énoncé</td>
+<td>$\mathbb P_\theta[I\ni\theta]\geq1-\alpha$</td>
+<td>$\mathbb P[\theta\in R\mid X]=1-\alpha$</td>
+</tr>
+<tr>
+<td>Sur quoi porte la probabilité</td>
+<td>la <strong>procédure</strong>, répétée</td>
+<td>la <strong>croyance</strong>, ce coup-ci</td>
+</tr>
+<tr>
+<td>Dépend d'un a priori</td>
+<td>non</td>
+<td><strong>oui</strong></td>
+</tr>
+<tr>
+<td>Lecture</td>
+<td>« $95\,\%$ des intervalles ainsi construits contiendraient $\theta$ »</td>
+<td>« je crois à $95\,\%$ que $\theta\in R$ »</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>La lecture bayésienne est celle que tout le monde croit faire en lisant un intervalle de confiance</strong> — et c'est précisément pourquoi la confusion est si répandue. Mais elle a un prix : elle dépend de l'a priori choisi, donc elle n'est pas « objective ».</p>
+</blockquote>
+<h2 data-prio="must">Concept 7 — L'estimation bayésienne</h2>
+<blockquote>
+<p><strong>Le changement de point de vue.</strong> <em>Le cadre bayésien peut aussi servir à <strong>estimer le vrai paramètre sous-jacent</strong> — donc dans une approche fréquentiste. Dans ce cas, la loi a priori <strong>ne reflète pas une croyance</strong> : c'est un <strong>outil artificiel</strong> servant à définir une <strong>nouvelle classe d'estimateurs</strong>.</em></p>
+</blockquote>
+<p><strong>La construction.</strong> L'échantillon $X_1,\dots,X_n$ est associé à un modèle $\big(E,(\mathbb P_\theta)_{\theta\in\Theta}\big)$. On définit une loi — éventuellement <strong>impropre</strong> — de densité $\pi$ sur $\Theta$, on calcule la densité a posteriori $\pi(\cdot\mid X_1,\dots,X_n)$ associée à $\pi$ vue comme a priori, puis :</p>
+<div class="cal formel"><span class="lab">Définition — estimateur de Bayes.</span>
+<p>
+$$\boxed{\ \hat\theta^{(\pi)}=\int_\Theta\theta\ d\pi(\theta\mid X_1,\dots,X_n)\ }$$
+<em>C'est la <strong>moyenne a posteriori</strong>.</em></p>
+<p><em>L'estimateur bayésien <strong>dépend du choix de l'a priori</strong> $\pi$ — d'où l'exposant.</em></p>
+</div>
+<p><strong>Les exemples.</strong></p>
+<p><strong>Exemple 1</strong>, avec a priori $B(a,a)$, $a&gt;0$ :
+$$\hat p^{(\pi)}=\frac{a+\sum_{i=1}^nX_i}{2a+n}=\frac{a/n+\bar X_n}{2a/n+1}$$
+En particulier, pour $a=1/2$ (<strong>a priori de Jeffreys</strong>) :
+$$\hat p^{(\pi_J)}=\frac{1/(2n)+\bar X_n}{1/n+1}$$</p>
+<p><strong>Exemple 2</strong> : $\hat\theta^{(\pi_J)}=\bar X_n$.</p>
+<blockquote>
+<p><strong>Les propriétés asymptotiques.</strong>
+<em>Dans chacun de ces exemples, l'estimateur de Bayes est <strong>consistant et asymptotiquement normal</strong>.</em>
+<em>En général, les <strong>propriétés asymptotiques de l'estimateur de Bayes ne dépendent pas du choix de l'a priori</strong>.</em></p>
+</blockquote>
+<blockquote>
+<p><strong>C'est le résultat qui réconcilie les deux écoles.</strong> Regardez la formule de l'exemple 1 :
+$$\hat p^{(\pi)}=\frac{a/n+\bar X_n}{2a/n+1}\ \xrightarrow[n\to\infty]{}\ \bar X_n$$
+L'a priori contribue par des termes en $a/n$, qui <strong>s'évanouissent</strong> quand $n$ croît. Autrement dit : <strong>les données finissent toujours par l'emporter sur la croyance initiale</strong>.</p>
+<p><strong>La conséquence pratique.</strong> Le choix de l'a priori compte sur <strong>petit échantillon</strong> — c'est là qu'il régularise, et c'est là qu'il est contestable. Sur grand échantillon, bayésien et fréquentiste <strong>convergent vers la même réponse</strong>. C'est le contenu du théorème de Bernstein-von Mises.</p>
+</blockquote>
+<p class="cal piege"> <strong>Notez le rôle régularisateur de l'a priori sur petit échantillon.</strong> Si l'on observe $n=3$ succès sur $3$ essais, l'EMV donne $\hat p=1$ — une certitude absurde. L'estimateur de Bayes avec $a=1/2$ donne $\frac{0{,}5+3}{1+3}=0{,}875$, bien plus raisonnable. C'est exactement l'arbitrage biais-variance de la fiche 67 : un peu de biais contre beaucoup de variance en moins.</p>
+<h2>Comment résoudre l'exercice type (protocole)</h2>
+<ol>
+<li><strong>Identifier le modèle</strong> : $p_n(X\mid\theta)$, la vraisemblance.</li>
+<li><strong>Choisir l'a priori</strong> $\pi(\theta)$ : informatif (croyance), uniforme, ou <strong>Jeffreys</strong> $\propto\sqrt{\det I(\theta)}$.</li>
+<li><strong>Appliquer la formule de Bayes</strong> : $\pi(\theta\mid X)\propto\pi(\theta)p_n(X\mid\theta)$.</li>
+<li><strong>Reconnaître la loi</strong> dans l'expression obtenue — la constante de normalisation se déduit.</li>
+<li><strong>Calculer l'estimateur de Bayes</strong> : la <strong>moyenne a posteriori</strong>.</li>
+<li><strong>Vérifier le comportement asymptotique</strong> : les termes en $1/n$ venant de l'a priori doivent s'évanouir.</li>
+<li><strong>Pour une région de confiance</strong> : prendre un ensemble de masse a posteriori $1-\alpha$ — et <strong>ne pas confondre</strong> avec un intervalle de confiance.</li>
+</ol>
+<h3>Comment reconnaître qu'il faut utiliser cette méthode ?</h3>
+<table>
+<thead>
+<tr>
+<th>Indice dans l'énoncé</th>
+<th>Ce qu'il faut faire</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>« on croit a priori que… »</td>
+<td>approche <strong>bayésienne</strong>, a priori informatif</td>
+</tr>
+<tr>
+<td>« en l'absence d'information »</td>
+<td>a priori <strong>uniforme</strong> ou de <strong>Jeffreys</strong></td>
+</tr>
+<tr>
+<td>« $\Theta$ non borné et a priori constant »</td>
+<td>a priori <strong>impropre</strong></td>
+</tr>
+<tr>
+<td>a priori bêta $+$ données Bernoulli</td>
+<td><strong>conjugaison</strong> ⟹ a posteriori bêta</td>
+</tr>
+<tr>
+<td>a priori plat $+$ données gaussiennes</td>
+<td>a posteriori $N(\bar X_n,1/n)$</td>
+</tr>
+<tr>
+<td>« quelle est la probabilité que $\theta\in R$ ? »</td>
+<td><strong>région bayésienne</strong>, pas IC</td>
+</tr>
+<tr>
+<td>« invariance par changement de paramétrisation »</td>
+<td><strong>Jeffreys</strong></td>
+</tr>
+<tr>
+<td>« estimateur régularisé sur petit échantillon »</td>
+<td>estimateur de <strong>Bayes</strong></td>
+</tr>
+<tr>
+<td>« l'a priori influence-t-il le résultat ? »</td>
+<td>non <strong>asymptotiquement</strong></td>
+</tr>
+</tbody></table>
+<h3>Exercices progressifs</h3>
+<p><strong> Niveau 1</strong> — Calculez l'a posteriori pour un a priori $B(a,a)$ et des données de Bernoulli.</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p><strong>L'a priori.</strong> $\pi(p)\propto p^{a-1}(1-p)^{a-1}$ sur $(0,1)$.</p>
+<p><strong>La vraisemblance.</strong> Sachant $p$, avec $S=\sum_{i=1}^nX_i$ :
+$$p_n(X_1,\dots,X_n\mid p)=p^S(1-p)^{n-S}$$</p>
+<p><strong>La formule de Bayes.</strong>
+$$\pi(p\mid X)\ \propto\ p^{a-1}(1-p)^{a-1}\cdot p^S(1-p)^{n-S}=p^{a-1+S}(1-p)^{a-1+n-S}$$</p>
+<p><strong>La reconnaissance.</strong> C'est la forme d'une densité $B(\alpha,\beta)$ avec $\alpha-1=a-1+S$ et $\beta-1=a-1+n-S$, donc
+$$\pi(\cdot\mid X)=B\big(a+S,\ a+n-S\big)$$</p>
+<p><strong>L'estimateur de Bayes.</strong> La moyenne d'une $B(\alpha,\beta)$ vaut $\frac{\alpha}{\alpha+\beta}$, donc
+$$\hat p^{(\pi)}=\frac{a+S}{(a+S)+(a+n-S)}=\frac{a+S}{2a+n}=\frac{a/n+\bar X_n}{2a/n+1}$$</p>
+<p><strong>La lecture.</strong> C'est une <strong>moyenne pondérée</strong> entre $\bar X_n$ (les données) et $1/2$ (le centre de l'a priori $B(a,a)$), avec un poids $\frac{2a}{2a+n}$ pour l'a priori. Ce poids tend vers $0$ quand $n\to\infty$ : <strong>les données l'emportent</strong>.</p>
+<p><strong>Le phénomène de conjugaison.</strong> A priori bêta $\to$ a posteriori bêta. La mise à jour se réduit à ajouter $S$ succès et $n-S$ échecs aux paramètres. On peut donc lire $B(a,a)$ comme « $a$ succès et $a$ échecs fictifs déjà observés ».</p>
+</div></details>
+
+<p><strong> Niveau 2</strong> — Qu'est-ce qu'un a priori impropre, et pourquoi est-ce acceptable ?</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p><strong>La définition.</strong> <em>Un a priori impropre sur $\Theta$ est une fonction mesurable, positive, définie sur $\Theta$, mais <strong>non intégrable</strong>.</em></p>
+<p><strong>D'où cela vient.</strong> On cherche un a priori « non informatif », et le candidat naturel est $\pi(\theta)\propto1$ — constant. Si $\Theta$ est <strong>borné</strong>, c'est l'uniforme, parfaitement légitime. Si $\Theta$ est <strong>non borné</strong> — par exemple $\Theta=\mathbb R$ —, alors $\int_{\mathbb R}1\,d\theta=\infty$ : <strong>ce n'est pas une densité</strong>.</p>
+<p><strong>Pourquoi c'est malgré tout acceptable.</strong> <em>En général, on peut quand même définir une loi a posteriori en utilisant la formule de Bayes.</em> Ce qui compte est que le <strong>produit</strong> soit intégrable :
+$$\pi(\theta\mid X)\propto\pi(\theta)\,p_n(X\mid\theta)$$
+Si $\pi\equiv1$ et $p_n(X\mid\theta)$ est intégrable en $\theta$ — ce qui est le cas des vraisemblances usuelles —, l'a posteriori est une <strong>vraie densité</strong>.</p>
+<p><strong>L'exemple du cours.</strong> $\pi(\theta)=1$ sur $\mathbb R$ avec $X_i\overset{iid}\sim N(\theta,1)$ :
+$$\pi(\theta\mid X)\propto\exp\left(-\frac12\sum_i(X_i-\theta)^2\right)\propto\exp\left(-\frac n2(\theta-\bar X_n)^2\right)$$
+c'est-à-dire $N\big(\bar X_n,\frac1n\big)$ — parfaitement propre, malgré l'a priori impropre.</p>
+<p><strong>Le résultat remarquable.</strong> La moyenne a posteriori vaut $\bar X_n$, exactement l'EMV, et la variance a posteriori $1/n$ reproduit la variance de $\bar X_n$. <strong>Avec un a priori plat, l'inférence bayésienne et l'inférence fréquentiste coïncident.</strong></p>
+<p class="cal piege"> <strong>La précaution à prendre.</strong> Il faut <strong>toujours vérifier</strong> que l'a posteriori est propre. Il existe des combinaisons a priori impropre / vraisemblance où l'intégrale diverge : on obtient alors une « loi » qui n'en est pas une, et toute conclusion est vide de sens.</p>
+</div></details>
+
+<p><strong> Niveau 3</strong> — Pourquoi l'a priori de Jeffreys et pas simplement l'uniforme ?</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p><strong>La définition.</strong> $\pi_J(\theta)\propto\sqrt{\det I(\theta)}$, où $I(\theta)$ est l'information de Fisher.</p>
+<p><strong>Le défaut de l'uniforme : il n'est pas invariant.</strong> Supposons qu'on veuille « ne rien croire » sur $p\in(0,1)$ et qu'on prenne $\pi(p)\propto1$. Reparamétrons par le logit $\eta=\log\frac{p}{1-p}$. Par changement de variable, la densité induite sur $\eta$ est
+$$\tilde\pi(\eta)=\pi\big(p(\eta)\big)\left\lvert\frac{dp}{d\eta}\right\rvert\propto\frac{e^\eta}{(1+e^\eta)^2}$$
+qui n'est <strong>pas</strong> constante. Autrement dit : <strong>être uniforme sur $p$ n'est pas être uniforme sur $\eta$</strong>. Deux personnes prétendant toutes deux « ne rien savoir », l'une raisonnant en $p$ et l'autre en logit, arriveraient à des a posteriori <strong>différents</strong>. C'est incohérent — le choix de la paramétrisation devrait être sans effet.</p>
+<p><strong>Ce que Jeffreys corrige.</strong> <em>Si $\eta=\varphi(\theta)$ pour une application bijective $\varphi$, alors la densité $\tilde\pi$ de $\eta$ vérifie $\tilde\pi(\eta)\propto\sqrt{\det\tilde I(\eta)}$</em> — c'est-à-dire que <strong>l'a priori de Jeffreys calculé dans la nouvelle paramétrisation est exactement l'image de celui calculé dans l'ancienne</strong>.</p>
+<p><strong>Pourquoi cela marche.</strong> Sous reparamétrisation, l'information de Fisher se transforme comme $\tilde I(\eta)=I(\theta)\big(\frac{d\theta}{d\eta}\big)^2$, donc $\sqrt{\tilde I(\eta)}=\sqrt{I(\theta)}\big\lvert\frac{d\theta}{d\eta}\big\rvert$ — exactement la règle de changement de variable pour une densité. <strong>Le jacobien est absorbé.</strong></p>
+<p><strong>Les deux exemples du cours.</strong></p>
+<ul>
+<li>Bernoulli : $I(p)=\frac{1}{p(1-p)}$, donc $\pi_J(p)\propto\frac{1}{\sqrt{p(1-p)}}$, c'est-à-dire $B(1/2,1/2)$ — une loi en U, qui met <strong>plus de masse près de $0$ et de $1$</strong> que l'uniforme.</li>
+<li>Gaussien de variance connue : $I(\theta)$ constante, donc $\pi_J(\theta)\propto1$ — <strong>impropre</strong>, mais qui redonne l'inférence fréquentiste.</li>
+</ul>
+<p><strong>L'interprétation profonde.</strong> L'a priori de Jeffreys met plus de masse là où l'information de Fisher est <strong>grande</strong>, c'est-à-dire là où les données <strong>discriminent le mieux</strong> entre valeurs voisines du paramètre. Pour Bernoulli, c'est près de $0$ et de $1$ : $I(p)=\frac{1}{p(1-p)}$ y explose (fiche 64). Autrement dit, l'a priori s'adapte à la <strong>géométrie du modèle</strong> plutôt qu'à un système de coordonnées arbitraire.</p>
+</div></details>
+
+<p><strong> Niveau 4 — type examen</strong> — Comparez l'approche fréquentiste et l'approche bayésienne.</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<table>
+<thead>
+<tr>
+<th></th>
+<th><strong>Fréquentiste</strong></th>
+<th><strong>Bayésien</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Statut de $\theta$</td>
+<td><strong>fixe</strong> et inconnu</td>
+<td>modélisé <strong>comme s'il était aléatoire</strong></td>
+</tr>
+<tr>
+<td>Ce qui est aléatoire</td>
+<td>les <strong>données</strong></td>
+<td>les données <strong>et</strong> la croyance sur $\theta$</td>
+</tr>
+<tr>
+<td>Point de départ</td>
+<td>un modèle $\big(E,(\mathbb P_\theta)\big)$</td>
+<td>un modèle <strong>plus un a priori</strong> $\pi$</td>
+</tr>
+<tr>
+<td>Résultat</td>
+<td>un <strong>estimateur ponctuel</strong>, un IC, un test</td>
+<td>une <strong>loi a posteriori</strong> entière</td>
+</tr>
+<tr>
+<td>Estimateur</td>
+<td>EMV, moments</td>
+<td><strong>moyenne a posteriori</strong></td>
+</tr>
+<tr>
+<td>Incertitude</td>
+<td>$\mathbb P_\theta[I\ni\theta]\geq1-\alpha$</td>
+<td>$\mathbb P[\theta\in R\mid X]=1-\alpha$</td>
+</tr>
+<tr>
+<td>Sur quoi porte la probabilité</td>
+<td>la <strong>procédure</strong>, répétée</td>
+<td>la <strong>croyance</strong>, ce coup-ci</td>
+</tr>
+</tbody></table>
+<p><strong>Le point conceptuel décisif.</strong> <em>En réalité, le vrai paramètre n'est pas aléatoire ! L'approche bayésienne est une façon de modéliser notre <strong>croyance</strong> en faisant comme si il l'était.</em> La probabilité change donc de nature : elle mesure une <strong>incertitude épistémique</strong> et non plus une fréquence limite.</p>
+<p><strong>La formule qui articule tout.</strong>
+$$\pi(\theta\mid X_1,\dots,X_n)\ \propto\ \underbrace{\pi(\theta)}_{\text{croyance}}\cdot\underbrace{p_n(X_1,\dots,X_n\mid\theta)}_{\text{vraisemblance}}$$
+Le fréquentiste ne garde que le second facteur — maximiser la vraisemblance, c'est le cas particulier d'un a priori plat.</p>
+<p><strong>Ce que le bayésien apporte.</strong></p>
+<ol>
+<li><strong>Une distribution complète</strong> sur $\theta$, pas seulement un point et un écart-type.</li>
+<li>Une <strong>régularisation naturelle</strong> sur petit échantillon : $3$ succès sur $3$ donnent $\hat p=1$ en EMV — certitude absurde — contre $0{,}875$ avec l'a priori de Jeffreys.</li>
+<li>Des énoncés <strong>directement interprétables</strong> : « je crois à $95\,\%$ que $\theta\in R$ » est ce que tout le monde croit lire dans un intervalle de confiance.</li>
+</ol>
+<p><strong>Ce qu'il coûte.</strong></p>
+<ol>
+<li>Il faut <strong>choisir un a priori</strong>, et ce choix est contestable — d'où l'effort du cours sur les a priori non informatifs et sur <strong>Jeffreys</strong>, qui règle au moins le problème de l'arbitraire de la paramétrisation.</li>
+<li>Le calcul de l'a posteriori demande une intégrale, praticable seulement en cas de <strong>conjugaison</strong> ou par méthodes numériques.</li>
+</ol>
+<p><strong>La réconciliation asymptotique — et c'est la conclusion du cours.</strong> <em>Les propriétés asymptotiques de l'estimateur de Bayes <strong>ne dépendent pas du choix de l'a priori</strong>.</em> La formule
+$$\hat p^{(\pi)}=\frac{a/n+\bar X_n}{2a/n+1}\ \longrightarrow\ \bar X_n$$
+le montre : la contribution de l'a priori est d'ordre $1/n$ et s'évanouit. <strong>Les données finissent toujours par l'emporter.</strong></p>
+<p><strong>La conclusion pratique.</strong> Le débat n'a d'enjeu réel que sur <strong>petit échantillon</strong>, ou quand une information a priori véritable existe — antériorités cliniques, contraintes physiques, jugement d'expert. Sur grand échantillon, les deux écoles donnent la même réponse, et le choix relève de la commodité et de l'interprétation souhaitée.</p>
+</div></details>
+
+<h2 data-prio="must">Common mistakes</h2>
+<ol>
+<li><strong>Croire que le vrai paramètre est aléatoire</strong> — <em>en réalité il ne l'est pas</em> ; on modélise une <strong>croyance</strong>.</li>
+<li><strong>Oublier la constante de normalisation</strong> — elle ne dépend pas de $\theta$, on peut travailler en $\propto$, mais il faut savoir qu'elle existe.</li>
+<li><strong>Confondre région de confiance bayésienne et intervalle de confiance</strong> — <em>deux notions distinctes</em>.</li>
+<li><strong>Utiliser un a priori impropre sans vérifier que l'a posteriori est propre</strong> — l'intégrale peut diverger.</li>
+<li><strong>Croire que l'a priori uniforme est non informatif</strong> — il <strong>n'est pas invariant</strong> par reparamétrisation.</li>
+<li><strong>Oublier la racine carrée dans Jeffreys</strong> — c'est $\sqrt{\det I(\theta)}$, pas $\det I(\theta)$.</li>
+<li><strong>Prendre le mode a posteriori pour l'estimateur de Bayes</strong> — c'est la <strong>moyenne</strong> a posteriori.</li>
+<li><strong>Croire que le choix de l'a priori change les conclusions asymptotiques</strong> — il ne les change pas.</li>
+<li><strong>Négliger l'effet de l'a priori sur petit échantillon</strong> — c'est là, au contraire, qu'il compte le plus.</li>
+</ol>
+<h2>Ultimate Review</h2>
+<ol>
+<li><strong>Fréquentiste</strong> : $\theta$ <strong>fixe et inconnu</strong>, on l'estime ou on le teste. <strong>Bayésien</strong> : on a une <strong>croyance a priori</strong>, qu'on <strong>met à jour</strong> par les données.</li>
+<li><em>En réalité le vrai paramètre <strong>n'est pas aléatoire</strong></em> ; on modélise une croyance <strong>comme si</strong> il l'était.</li>
+<li><strong>Loi a priori</strong> $\pi(\theta)$ sur $\Theta$ ; <strong>loi a posteriori</strong> $\pi(\theta\mid X_1,\dots,X_n)$ = loi conditionnelle de $\theta$ sachant les données.</li>
+<li><strong>Formule de Bayes</strong> : $\pi(\theta\mid X)\propto\pi(\theta)p_n(X\mid\theta)$, la constante étant $\int_\Theta p_n(X\mid t)d\pi(t)$.</li>
+<li><strong>Conjugaison bêta-Bernoulli</strong> : a priori $B(a,a)$ ⟹ a posteriori $B\big(a+\sum X_i,\ a+n-\sum X_i\big)$.</li>
+<li><strong>A priori non informatif</strong> : $\pi(\theta)\propto1$ ; <strong>uniforme</strong> si $\Theta$ borné, <strong>impropre</strong> sinon.</li>
+<li><strong>A priori impropre</strong> : positif, mesurable, <strong>non intégrable</strong> ; l'a posteriori peut malgré tout être propre.</li>
+<li><strong>Exemples</strong> : $U(0,1)$ + Bernoulli ⟹ $B(1+\sum X_i,1+n-\sum X_i)$ ; $\pi\equiv1$ + $N(\theta,1)$ ⟹ $N\big(\bar X_n,\frac1n\big)$.</li>
+<li><strong>A priori de Jeffreys</strong> : $\pi_J(\theta)\propto\sqrt{\det I(\theta)}$ ; Bernoulli ⟹ $B(1/2,1/2)$ ; gaussien ⟹ $\pi_J\propto1$, impropre.</li>
+<li><strong>Invariance par reparamétrisation</strong> : si $\eta=\varphi(\theta)$, alors $\tilde\pi(\eta)\propto\sqrt{\det\tilde I(\eta)}$ — c'est la justification de Jeffreys.</li>
+<li><strong>Région de confiance bayésienne</strong> : $R$ aléatoire avec $\mathbb P[\theta\in R\mid X]=1-\alpha$ ; <strong>dépend de l'a priori</strong> ; <strong>distincte</strong> d'un intervalle de confiance.</li>
+<li><strong>Estimation bayésienne</strong> : l'a priori devient un <strong>outil artificiel</strong> définissant une classe d'estimateurs.</li>
+<li><strong>Estimateur de Bayes</strong> : $\hat\theta^{(\pi)}=\int_\Theta\theta\,d\pi(\theta\mid X)$, la <strong>moyenne a posteriori</strong>.</li>
+<li><strong>Exemples</strong> : $\hat p^{(\pi)}=\frac{a+\sum X_i}{2a+n}=\frac{a/n+\bar X_n}{2a/n+1}$ ; pour $a=1/2$, $\hat p^{(\pi_J)}=\frac{1/(2n)+\bar X_n}{1/n+1}$ ; $\hat\theta^{(\pi_J)}=\bar X_n$.</li>
+<li><strong>Propriétés</strong> : consistant et asymptotiquement normal ; <em>les propriétés asymptotiques <strong>ne dépendent pas de l'a priori</strong></em>.</li>
+</ol>
+<p><strong>Formulas to know</strong>
+$$\pi(\theta\mid X_1,\dots,X_n)=\frac{\pi(\theta)p_n(X_1,\dots,X_n\mid\theta)}{\int_\Theta p_n(X_1,\dots,X_n\mid t)d\pi(t)}$$
+$$B(a,a)\ +\ \mathrm{Ber}(p)\ \Longrightarrow\ B\Big(a+\sum_iX_i,\ a+n-\sum_iX_i\Big) \qquad \pi_J(\theta)\propto\sqrt{\det I(\theta)}$$
+$$\hat\theta^{(\pi)}=\int_\Theta\theta\,d\pi(\theta\mid X_1,\dots,X_n) \qquad \hat p^{(\pi)}=\frac{a/n+\bar X_n}{2a/n+1}$$</p>
+<p><strong>Methods to know</strong> : appliquer la formule de Bayes et reconnaître la loi a posteriori ; calculer un a priori de Jeffreys ; calculer une moyenne a posteriori ; vérifier l'évanouissement asymptotique de l'a priori.</p>
+<div class="rec"><h2>Active Recall</h2><p><strong>Basic</strong> — Énoncez la formule de Bayes pour la loi a posteriori.</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p>$$\pi(\theta\mid X_1,\dots,X_n)\ \propto\ \pi(\theta)\,p_n(X_1,\dots,X_n\mid\theta)$$
+soit, avec la constante de normalisation explicite,
+$$\pi(\theta\mid X_1,\dots,X_n)=\frac{\pi(\theta)\,p_n(X_1,\dots,X_n\mid\theta)}{\int_\Theta p_n(X_1,\dots,X_n\mid t)\,d\pi(t)}$$</p>
+<p><strong>En mots</strong> : a posteriori $\propto$ <strong>a priori</strong> $\times$ <strong>vraisemblance</strong>. Le dénominateur ne dépend pas de $\theta$ ; on travaille donc en $\propto$ et l'on reconnaît la loi obtenue.</p>
+</div></details><p><strong>Understanding</strong> — Pourquoi l'a priori de Jeffreys plutôt que l'uniforme ?</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p>Parce que l'a priori uniforme <strong>n'est pas invariant par reparamétrisation</strong>. Être uniforme sur $p$ n'est pas être uniforme sur $\log\frac{p}{1-p}$ : deux personnes prétendant « ne rien savoir », l'une raisonnant en $p$ et l'autre en logit, obtiendraient des a posteriori <strong>différents</strong>. Le choix de la paramétrisation, qui devrait être sans effet, en aurait un.</p>
+<p>L'<strong>a priori de Jeffreys</strong> $\pi_J(\theta)\propto\sqrt{\det I(\theta)}$ satisfait le <strong>principe d'invariance</strong> : si $\eta=\varphi(\theta)$ avec $\varphi$ bijective, alors $\tilde\pi(\eta)\propto\sqrt{\det\tilde I(\eta)}$. La raison est que $\sqrt{I}$ se transforme <strong>exactement comme le jacobien</strong> d'un changement de variable de densité.</p>
+<p><strong>Les deux exemples</strong> : Bernoulli ⟹ $\pi_J(p)\propto\frac{1}{\sqrt{p(1-p)}}$, c'est-à-dire $B(1/2,1/2)$ ; gaussien de variance connue ⟹ $\pi_J\propto1$, <strong>impropre</strong>.</p>
+<p><strong>L'interprétation</strong> : Jeffreys met plus de masse là où l'information de Fisher est grande — là où les données discriminent le mieux. Il s'adapte à la <strong>géométrie du modèle</strong> plutôt qu'à un système de coordonnées arbitraire.</p>
+</div></details><p><strong>Application</strong> — On observe $8$ succès sur $10$ essais. Comparez l'EMV et l'estimateur de Bayes avec a priori de Jeffreys.</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p><strong>L'EMV</strong> (fiche 64) : $\hat p^{MLE}=\bar X_n=\dfrac{8}{10}=\mathbf{0{,}80}$.</p>
+<p><strong>L'estimateur de Bayes</strong> avec l'a priori de Jeffreys, c'est-à-dire $a=1/2$ :
+$$\hat p^{(\pi_J)}=\frac{a+\sum_iX_i}{2a+n}=\frac{0{,}5+8}{1+10}=\frac{8{,}5}{11}\approx\mathbf{0{,}773}$$</p>
+<p><strong>La loi a posteriori complète</strong> : $B(0{,}5+8,\ 0{,}5+10-8)=B(8{,}5;\ 2{,}5)$ — dont on peut tirer une <strong>région de confiance bayésienne</strong> et non seulement un point.</p>
+<p><strong>La lecture.</strong> L'estimateur de Bayes <strong>tire légèrement vers le centre</strong> : $0{,}773$ au lieu de $0{,}80$. C'est le <strong>rétrécissement</strong> (<em>shrinkage</em>) induit par l'a priori.</p>
+<p><strong>Le cas extrême qui rend l'effet visible.</strong> Avec $3$ succès sur $3$ :</p>
+<ul>
+<li>EMV : $\hat p=1$ — on affirmerait qu'un échec est <strong>impossible</strong>, sur la foi de trois observations. Absurde.</li>
+<li>Bayes ($a=1/2$) : $\frac{0{,}5+3}{1+3}=0{,}875$ — bien plus prudent.</li>
+</ul>
+<p><strong>Et asymptotiquement.</strong> $\hat p^{(\pi_J)}=\frac{1/(2n)+\bar X_n}{1/n+1}\to\bar X_n$ : les deux estimateurs <strong>coïncident</strong> quand $n$ grandit. L'a priori ne compte que sur petit échantillon — ce qui est exactement là où l'on en a besoin.</p>
+</div></details><p><strong>Comparison</strong> — Région de confiance bayésienne et intervalle de confiance : quelle différence ?</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p>Le cours est explicite : <em>ce sont <strong>deux notions distinctes</strong>.</em></p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th><strong>Intervalle de confiance</strong></th>
+<th><strong>Région bayésienne</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Énoncé</td>
+<td>$\mathbb P_\theta[I\ni\theta]\geq1-\alpha$</td>
+<td>$\mathbb P[\theta\in R\mid X_1,\dots,X_n]=1-\alpha$</td>
+</tr>
+<tr>
+<td>Ce qui est aléatoire</td>
+<td>l'<strong>intervalle</strong></td>
+<td>le <strong>paramètre</strong> (au sens de la croyance)</td>
+</tr>
+<tr>
+<td>Conditionnement</td>
+<td>aucun — probabilité sur les échantillons</td>
+<td><strong>sachant les données observées</strong></td>
+</tr>
+<tr>
+<td>Dépend d'un a priori</td>
+<td>non</td>
+<td><strong>oui</strong></td>
+</tr>
+<tr>
+<td>Lecture correcte</td>
+<td>« $95\,\%$ des intervalles ainsi construits contiendraient $\theta$ »</td>
+<td>« je crois à $95\,\%$ que $\theta\in R$ »</td>
+</tr>
+</tbody></table>
+<p><strong>Le point crucial.</strong> L'intervalle de confiance porte sur la <strong>procédure répétée</strong> : sur de nombreux échantillons, $95\,\%$ des intervalles construits ainsi contiendraient le vrai $\theta$. Il ne dit <strong>rien</strong> sur l'échantillon particulier qu'on a sous les yeux.</p>
+<p>La région bayésienne porte sur la <strong>croyance après avoir vu ces données-ci</strong>. C'est l'énoncé que tout le monde croit lire dans un intervalle de confiance — et c'est précisément pour cela que la confusion est si répandue.</p>
+<p><strong>Le prix de l'interprétation naturelle</strong> : $R$ <strong>dépend de l'a priori</strong> choisi. Il n'y a pas de région bayésienne « objective ».</p>
+<p class="cal piege"> <strong>Numériquement, les deux coïncident souvent</strong> — avec un a priori plat et un grand $n$, la région bayésienne et l'intervalle de confiance sont presque identiques. Mais leur <strong>signification</strong> reste différente.</p>
+</div></details><p><strong>Exam-style</strong> — Construisez l'inférence bayésienne complète pour un modèle de Bernoulli.</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p><strong>1. Le modèle.</strong> $X_1,\dots,X_n\overset{iid}\sim\mathrm{Ber}(p)$ <strong>conditionnellement à $p$</strong>, avec $p\in(0,1)$. On note $S=\sum_iX_i$.</p>
+<p><strong>2. Le choix de l'a priori.</strong> Trois options :</p>
+<ul>
+<li><strong>informatif</strong> : $p\sim B(a,a)$ si l'on croit $p$ proche de $1/2$ — le cours donne l'exemple « $90\,\%$ sûr que $p\in[0{,}4;0{,}6]$ » ;</li>
+<li><strong>uniforme</strong> : $p\sim U(0,1)=B(1,1)$ ;</li>
+<li><strong>Jeffreys</strong> : $\pi_J(p)\propto\frac{1}{\sqrt{p(1-p)}}$, c'est-à-dire $B(1/2,1/2)$, puisque $I(p)=\frac{1}{p(1-p)}$.</li>
+</ul>
+<p><strong>3. La vraisemblance.</strong> $p_n(X\mid p)=p^S(1-p)^{n-S}$.</p>
+<p><strong>4. L'a posteriori, par la formule de Bayes.</strong>
+$$\pi(p\mid X)\propto p^{a-1}(1-p)^{a-1}\cdot p^S(1-p)^{n-S}=p^{a+S-1}(1-p)^{a+n-S-1}$$
+On <strong>reconnaît</strong> une densité bêta :
+$$\pi(\cdot\mid X)=B\big(a+S,\ a+n-S\big)$$
+C'est la <strong>conjugaison</strong> : a priori bêta $\to$ a posteriori bêta, la mise à jour consistant simplement à ajouter succès et échecs.</p>
+<p><strong>5. L'estimateur de Bayes</strong> — la moyenne a posteriori :
+$$\hat p^{(\pi)}=\frac{a+S}{2a+n}=\frac{a/n+\bar X_n}{2a/n+1}$$
+et pour Jeffreys ($a=1/2$) : $\hat p^{(\pi_J)}=\frac{1/(2n)+\bar X_n}{1/n+1}$.</p>
+<p><strong>6. La région de confiance bayésienne.</strong> Tout $R\subset(0,1)$ de masse $1-\alpha$ sous $B(a+S,a+n-S)$ — par exemple l'intervalle entre les quantiles $\alpha/2$ et $1-\alpha/2$.  <strong>Ce n'est pas un intervalle de confiance</strong> : c'est une région de <strong>croyance</strong>, et elle dépend de $a$.</p>
+<p><strong>7. Le comportement asymptotique.</strong> <em>L'estimateur de Bayes est consistant et asymptotiquement normal, et ses propriétés asymptotiques ne dépendent pas de l'a priori.</em> En effet,
+$$\hat p^{(\pi)}=\frac{a/n+\bar X_n}{2a/n+1}\ \xrightarrow[n\to\infty]{}\ \bar X_n=\hat p^{MLE}$$
+L'a priori contribue par des termes en $a/n$ qui s'évanouissent.</p>
+<p><strong>Ce qu'il faut savoir commenter.</strong></p>
+<ul>
+<li><strong>Sur petit échantillon</strong>, l'a priori <strong>régularise</strong> : $3$ succès sur $3$ donnent $\hat p^{MLE}=1$ (certitude absurde) contre $0{,}875$ pour Bayes. C'est l'arbitrage biais-variance de la fiche 67.</li>
+<li><strong>Sur grand échantillon</strong>, les deux écoles <strong>convergent</strong>. Le débat n'a d'enjeu que là où les données sont rares — ce qui est aussi là où le choix de l'a priori est le plus contestable.</li>
+<li><strong>Le bayésien fournit une loi entière</strong>, pas seulement un point : on peut en tirer n'importe quelle probabilité, région, ou décision, sans nouvelle théorie.</li></ul></div></details></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h2>Flashcards</h2>
+<table>
+<thead>
+<tr>
+<th>Question</th>
+<th>Réponse</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Statut de $\theta$ en fréquentiste ?</td>
+<td><strong>Fixe et inconnu</strong></td>
+</tr>
+<tr>
+<td>Statut de $\theta$ en bayésien ?</td>
+<td>Modélisé <strong>comme s'il était aléatoire</strong></td>
+</tr>
+<tr>
+<td>Le vrai paramètre est-il aléatoire ?</td>
+<td><strong>Non</strong> — on modélise une <strong>croyance</strong></td>
+</tr>
+<tr>
+<td>Qu'est-ce que la loi a priori ?</td>
+<td>La loi quantifiant la croyance <strong>avant</strong> les données</td>
+</tr>
+<tr>
+<td>Qu'est-ce que la loi a posteriori ?</td>
+<td>La loi de $\theta$ <strong>conditionnellement aux données</strong></td>
+</tr>
+<tr>
+<td>Formule de Bayes ?</td>
+<td>$\pi(\theta\mid X)\propto\pi(\theta)p_n(X\mid\theta)$</td>
+</tr>
+<tr>
+<td>Que vaut la constante ?</td>
+<td>$\int_\Theta p_n(X\mid t)d\pi(t)$</td>
+</tr>
+<tr>
+<td>A priori bêta $+$ Bernoulli ?</td>
+<td>A posteriori $B(a+\sum X_i,\ a+n-\sum X_i)$</td>
+</tr>
+<tr>
+<td>Nom de ce phénomène ?</td>
+<td>La <strong>conjugaison</strong></td>
+</tr>
+<tr>
+<td>Comment lire $B(a,a)$ ?</td>
+<td>Comme $a$ succès et $a$ échecs <strong>fictifs</strong></td>
+</tr>
+<tr>
+<td>A priori non informatif naturel ?</td>
+<td>$\pi(\theta)\propto1$</td>
+</tr>
+<tr>
+<td>Quand est-il uniforme ?</td>
+<td>Si $\Theta$ est <strong>borné</strong></td>
+</tr>
+<tr>
+<td>Qu'est-ce qu'un a priori impropre ?</td>
+<td>Positif, mesurable, <strong>non intégrable</strong></td>
+</tr>
+<tr>
+<td>Peut-on l'utiliser ?</td>
+<td><strong>Oui</strong>, si l'a posteriori est propre</td>
+</tr>
+<tr>
+<td>$\pi\equiv1$ + $N(\theta,1)$ ?</td>
+<td>A posteriori $N(\bar X_n,1/n)$</td>
+</tr>
+<tr>
+<td>A priori de Jeffreys ?</td>
+<td>$\pi_J(\theta)\propto\sqrt{\det I(\theta)}$</td>
+</tr>
+<tr>
+<td>Jeffreys pour Bernoulli ?</td>
+<td>$B(1/2,1/2)$</td>
+</tr>
+<tr>
+<td>Jeffreys pour le gaussien ?</td>
+<td>$\pi_J\propto1$ — <strong>impropre</strong></td>
+</tr>
+<tr>
+<td>Quelle propriété justifie Jeffreys ?</td>
+<td>L'<strong>invariance par reparamétrisation</strong></td>
+</tr>
+<tr>
+<td>Pourquoi l'uniforme échoue-t-il ?</td>
+<td>Uniforme sur $p$ $\neq$ uniforme sur $\log\frac{p}{1-p}$</td>
+</tr>
+<tr>
+<td>Région de confiance bayésienne ?</td>
+<td>$\mathbb P[\theta\in R\mid X]=1-\alpha$</td>
+</tr>
+<tr>
+<td>Est-ce un intervalle de confiance ?</td>
+<td><strong>Non</strong> — deux notions <strong>distinctes</strong></td>
+</tr>
+<tr>
+<td>De quoi $R$ dépend-il ?</td>
+<td>De l'<strong>a priori</strong></td>
+</tr>
+<tr>
+<td>Estimateur de Bayes ?</td>
+<td>La <strong>moyenne a posteriori</strong> $\int_\Theta\theta\,d\pi(\theta\mid X)$</td>
+</tr>
+<tr>
+<td>Sa valeur pour Bernoulli ?</td>
+<td>$\frac{a+\sum X_i}{2a+n}=\frac{a/n+\bar X_n}{2a/n+1}$</td>
+</tr>
+<tr>
+<td>Sa valeur pour Jeffreys ?</td>
+<td>$\frac{1/(2n)+\bar X_n}{1/n+1}$</td>
+</tr>
+<tr>
+<td>Ses propriétés asymptotiques ?</td>
+<td>Consistant et asymptotiquement normal</td>
+</tr>
+<tr>
+<td>Dépendent-elles de l'a priori ?</td>
+<td><strong>Non</strong></td>
+</tr>
+<tr>
+<td>Quand l'a priori compte-t-il ?</td>
+<td>Sur <strong>petit échantillon</strong></td>
+</tr>
+<tr>
+<td>Quel rôle y joue-t-il ?</td>
+<td>Il <strong>régularise</strong> — rétrécissement vers le centre</td>
+</tr>
+</tbody></table>
+</main>
+
+
+
+
+</body></html>

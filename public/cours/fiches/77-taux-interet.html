@@ -1,0 +1,1221 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fiche 77 — Taux d'intérêt : capitalisation, courbe zéro, forwards, duration</title>
+<script>
+window.MathJax={tex:{inlineMath:[["$","$"]],displayMath:[["$$","$$"]],processEscapes:true},
+ options:{skipHtmlTags:["script","noscript","style","textarea","pre","code"]},
+ svg:{fontCache:"global"},
+ startup:{pageReady:()=>MathJax.startup.defaultPageReady().then(()=>{document.body.classList.add("ready")})}};
+setTimeout(function(){document.body.classList.add("ready")},2500);
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+/* ============================================================
+   MathiasLearn — feuille de style des fiches
+   Reprise intégrale des tokens de 00_PARCOURS/*.html
+   + blocs pédagogiques (callouts, méthode, essentiels, recall)
+   ============================================================ */
+:root{--bg:#faf9f7;--card:#fff;--ink:#1a1a1a;--muted:#6b6b6b;--line:#e5e2dd;--accent:#8b5e34;
+ --hl:#fdf8ef;--ok:#2d7d4f;--okbg:#f0f7f3;--warn:#b3402f;--warnbg:#fdf3f1;--blue:#2f5d8b;--bluebg:#f1f5fa}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+ font:17px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;padding:0 16px 100px}
+.nav{position:sticky;top:0;background:rgba(250,249,247,.96);backdrop-filter:blur(8px);
+ border-bottom:1px solid var(--line);margin:0 -16px 30px;padding:11px 16px;z-index:50;
+ display:flex;gap:6px;flex-wrap:wrap;font-size:13px}
+.nav a{color:var(--muted);text-decoration:none;padding:4px 9px;border-radius:5px;white-space:nowrap}
+.nav a:hover{background:var(--line);color:var(--ink)}
+.nav a.on{background:var(--accent);color:#fff}
+main{max-width:780px;margin:0 auto}
+h1{font-size:31px;letter-spacing:-.02em;margin:.4em 0 .5em;line-height:1.25}
+h2{font-size:23px;margin:2.2em 0 .7em;padding-bottom:.3em;border-bottom:1px solid var(--line)}
+h3{font-size:19px;margin:1.9em 0 .5em;color:var(--accent)}
+h4{font-size:17px;margin:1.5em 0 .4em}
+p{margin:.8em 0} a{color:var(--accent)} hr{border:0;border-top:1px solid var(--line);margin:2.6em 0}
+table{border-collapse:collapse;width:100%;margin:1.3em 0;font-size:15.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+th{background:#f3f0eb;font-weight:600}
+tr:nth-child(even) td{background:#fcfbfa}
+code{font-family:"SF Mono",Menlo,Consolas,monospace;font-size:.88em;background:#f2efea;padding:2px 6px;border-radius:4px;white-space:nowrap}
+pre{background:#f2efea;padding:14px 16px;border-radius:8px;overflow-x:auto}
+pre code{background:none;padding:0;white-space:pre}
+blockquote{border-left:3px solid var(--accent);background:var(--hl);margin:1.4em 0;padding:14px 20px;border-radius:0 8px 8px 0}
+blockquote p:first-child{margin-top:0} blockquote p:last-child{margin-bottom:0}
+ul,ol{padding-left:1.5em} li{margin:.35em 0} em{color:#4a4a4a}
+mjx-container[display="true"]{margin:1.1em 0!important;overflow-x:auto;overflow-y:hidden;padding:2px 0}
+mjx-container svg{max-width:100%}
+body:not(.ready) main{opacity:0} main{opacity:1;transition:opacity .25s}
+
+/* --- bandeau de tête de fiche --- */
+.cours{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--accent);
+ border-radius:0 10px 10px 0;padding:18px 22px;margin:0 0 34px}
+.cours h4{margin:0 0 4px;font-size:14px;text-transform:uppercase;letter-spacing:.07em;color:var(--accent)}
+.cours .cs{color:var(--muted);font-size:14.5px;margin:0 0 14px}
+
+/* --- exercices / corrigés --- */
+.ex{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:6px 24px 20px;margin:18px 0}
+.ex>h3:first-child{margin-top:14px}
+details.cor{margin-top:18px;border:1px solid var(--line);border-radius:8px;background:#fcfbfa;overflow:hidden}
+details.cor>summary{cursor:pointer;padding:12px 16px;font-weight:600;font-size:15px;color:var(--accent);
+ list-style:none;display:flex;align-items:center;gap:9px;user-select:none;transition:.15s;min-height:44px}
+details.cor>summary::-webkit-details-marker{display:none}
+details.cor>summary:hover{background:var(--hl)}
+details.cor>summary::before{content:"\25B6";font-size:10px;transition:transform .18s;display:inline-block}
+details.cor[open]>summary::before{transform:rotate(90deg)}
+details.cor[open]>summary{background:var(--okbg);color:var(--ok);border-bottom:1px solid var(--line)}
+.cor .in{padding:4px 20px 16px}
+.cor .in>*:first-child{margin-top:.9em}
+
+/* --- blocs pédagogiques (callouts) ---
+   Générés depuis une citation Markdown dont le premier **gras** commence
+   par un mot-clé : DÉFINITION, THÉORÈME, MÉTHODE, PIÈGE, INTUITION… */
+.cal{border:1px solid var(--line);border-left:4px solid var(--accent);background:var(--card);
+ border-radius:0 10px 10px 0;padding:15px 20px;margin:1.5em 0}
+.cal>p:first-child{margin-top:0}.cal>p:last-child,.cal>ul:last-child,.cal>ol:last-child{margin-bottom:0}
+.cal .lab{display:block;font-size:12.5px;text-transform:uppercase;letter-spacing:.08em;
+ font-weight:700;color:var(--accent);margin-bottom:6px}
+.cal.formel{background:var(--hl)}
+.cal.piege{border-left-color:var(--warn);background:var(--warnbg)}
+.cal.piege .lab{color:var(--warn)}
+.cal.methode{border-left-color:var(--ok);background:var(--okbg)}
+.cal.methode .lab{color:var(--ok)}
+.cal.intu{border-left-color:var(--blue);background:var(--bluebg)}
+.cal.intu .lab{color:var(--blue)}
+.cal.plus{border-left-style:dashed;background:#faf9f7}
+.cal.plus .lab{color:var(--muted)}
+
+/* --- révision express --- */
+.ess{background:var(--card);border:1px solid var(--accent);border-radius:10px;padding:4px 24px 20px;margin:1.6em 0}
+.ess h3{margin-top:1.3em}
+.rec{background:var(--card);border:1px dashed var(--accent);border-radius:10px;padding:4px 24px 18px;margin:1.6em 0}
+.rec ol{counter-reset:none}
+
+/* --- impression / PDF --- */
+@media print{
+ .nav{display:none}
+ body{padding:0;background:#fff;font-size:11.2pt;line-height:1.55}
+ main{max-width:none}
+ h1{font-size:23pt}h2{font-size:15pt;margin-top:1.5em}h3{font-size:12.6pt}
+ h2,h3,h4{break-after:avoid;page-break-after:avoid}
+ table,.cal,blockquote{break-inside:avoid;page-break-inside:avoid}
+ table{display:table;font-size:9.6pt}
+ details.cor{border:1px solid var(--line);background:#fcfbfa}
+ details.cor>summary{display:none}
+ details.cor .in{padding-top:10px}
+ .cal,.ex,.ess,.rec{box-shadow:none}
+ a{color:var(--ink);text-decoration:none}
+}
+@page{margin:16mm 15mm 18mm}
+
+/* --- exemples travaillés --- */
+.exm{background:#fcfbfa;border:1px solid var(--line);border-radius:10px;padding:2px 20px 14px;margin:1.5em 0}
+.exm>h4:first-child{margin:14px 0 .5em;color:var(--accent);font-size:13px;text-transform:uppercase;letter-spacing:.07em}
+
+
+/* --- pastilles de priorité (conventions des fiches de l'app) --- */
+h2[data-prio], h3[data-prio], h4[data-prio]{position:relative}
+h2[data-prio]::before,h3[data-prio]::before,h4[data-prio]::before{
+ content:"";display:inline-block;width:9px;height:9px;border-radius:50%;
+ margin-right:9px;vertical-align:middle;background:var(--muted)}
+[data-prio="must"]::before{background:var(--warn)}
+[data-prio="high"]::before{background:#d98324}
+[data-prio="mid"]::before{background:#c9a227}
+[data-prio="low"]::before{background:var(--ok)}
+/* corrigés des fiches de l'app : même traitement que les corrigés des séries */
+details.cor>summary::after{content:""}
+</style></head><body>
+<div class="nav"><a href="00_COMMENCER_ICI.html">Commencer ici</a><a href="01_NOTATIONS_le-decodeur.html">Notations</a><a href="02_EXERCICES_Serie-0.html">Série 0 — Remise en route</a><a href="03_EXERCICES_Serie-1.html">Série 1 — Convexité</a><a href="04_EXERCICES_Serie-2.html">Série 2 — KKT</a><a href="05_AUTO-EVALUATION.html">Auto-évaluation (quiz)</a><a href="06_FICHE_Optimisation-deux-variables.html">Fiche — Optimisation à 2 variables</a></div>
+<main><h1>Fiche 77 — Taux d'intérêt : capitalisation, courbe zéro, forwards, duration</h1>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Matière</strong></td>
+<td>Maths · Finance de marché</td>
+</tr>
+<tr>
+<td><strong>Cours source</strong></td>
+<td>John C. Hull, <em>Options, Futures, and Other Derivatives</em>, 8ᵉ éd., Pearson — chapitre 4 « Interest Rates »</td>
+</tr>
+<tr>
+<td><strong>Difficulté</strong></td>
+<td> Must know — les taux interviennent dans la valorisation de <strong>presque tous</strong> les dérivés</td>
+</tr>
+<tr>
+<td><strong>Temps d'étude estimé</strong></td>
+<td>2 h</td>
+</tr>
+<tr>
+<td><strong>Prérequis</strong></td>
+<td>Fiche 74</td>
+</tr>
+<tr>
+<td><strong>Concepts clés</strong></td>
+<td>Taux du Trésor, LIBOR, repo, taux sans risque, fréquence de capitalisation, capitalisation continue, taux zéro-coupon, prix d'obligation, rendement, taux au pair, <em>bootstrap</em>, taux forward, FRA, duration, duration modifiée, convexité, théories de la structure par terme</td>
+</tr>
+<tr>
+<td><strong>Poids à l'examen</strong></td>
+<td>Les <strong>conversions</strong> $R_c\leftrightarrow R_m$ · le <strong>bootstrap</strong> complet · $R_F=\frac{R_2T_2-R_1T_1}{T_2-T_1}$ · la <strong>duration</strong> et $\Delta B=-BD\Delta y$.</td>
+</tr>
+</tbody></table>
+<h2>Vue d'ensemble</h2>
+<pre><code>MESURER    la fréquence de capitalisation = l'UNITÉ du taux (comme km vs miles)
+           R_c = m ln(1 + R_m/m)        R_m = m(e^{R_c/m} − 1)
+CONSTRUIRE prix des obligations → BOOTSTRAP → courbe zéro
+DÉRIVER    courbe zéro → taux FORWARD  →  FRA (et, ch. 7, les swaps)
+SENSIBILISER  ΔB/B = −D Δy + ½ C (Δy)²
+EXPLIQUER  anticipations · segmentation · PRÉFÉRENCE POUR LA LIQUIDITÉ
+</code></pre>
+<p><strong>La convention du livre.</strong> <em>Dans ce livre, les taux d'intérêt seront mesurés en capitalisation continue sauf mention contraire.</em> Les conventions de décompte des jours (<em>day count</em>) sont <strong>ignorées</strong> dans tout ce chapitre — elles arrivent aux chapitres 6 et 7.</p>
+<h2 data-prio="mid">Concept 1 — Les types de taux</h2>
+<table>
+<thead>
+<tr>
+<th>Taux</th>
+<th>Définition</th>
+<th>Risque de crédit</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Trésor</strong> (<em>Treasury</em>)</td>
+<td>ce qu'un investisseur gagne sur les bons et obligations d'État — l'État empruntant <strong>dans sa propre devise</strong></td>
+<td><em>On suppose habituellement qu'un gouvernement ne fera jamais défaut sur une obligation libellée dans sa propre devise</em> → <strong>totalement sans risque</strong></td>
+</tr>
+<tr>
+<td><strong>LIBOR</strong></td>
+<td><em>London Interbank Offered Rate</em> : taux auquel les banques sont prêtes à faire de <strong>gros dépôts de gros</strong> auprès d'autres banques ; publié une fois par jour par la British Bankers' Association, toutes devises majeures, maturités <strong>jusqu'à 12 mois</strong></td>
+<td>faible — il faut typiquement une notation <strong>AA</strong> pour recevoir des dépôts au LIBOR</td>
+</tr>
+<tr>
+<td><strong>LIBID</strong></td>
+<td><em>London Interbank <strong>Bid</strong> Rate</em> : taux auquel les banques <strong>acceptent</strong> des dépôts</td>
+<td>LIBID <strong>&lt; LIBOR</strong>, petit écart</td>
+</tr>
+<tr>
+<td><strong>Repo</strong></td>
+<td>l'opérateur détenant des titres les <strong>vend</strong> maintenant et les <strong>rachète</strong> plus tard un peu plus cher ; l'écart est l'intérêt</td>
+<td><em>très faible si l'opération est bien structurée</em> : en cas de défaut de l'emprunteur, le prêteur <strong>garde les titres</strong> ; en cas de défaut du prêteur, le propriétaire <strong>garde le cash</strong></td>
+</tr>
+</tbody></table>
+<p><strong>Repo overnight</strong> (renégocié chaque jour) est le plus courant ; les arrangements plus longs sont des <strong>term repos</strong>. Le marché interbancaire du LIBOR est le <strong>marché des eurodevises</strong> — <em>hors du contrôle d'un quelconque gouvernement</em>.</p>
+<h3>1.1 Quel est le vrai taux sans risque ?</h3>
+<p class="cal piege"> <strong>Les traders de dérivés n'utilisent PAS les taux du Trésor.</strong> Ils les jugent <strong>artificiellement bas</strong> pour trois raisons :</p>
+<ol>
+<li>les bons et obligations du Trésor <strong>doivent être achetés</strong> par les institutions financières pour satisfaire diverses <strong>exigences réglementaires</strong> → la demande monte, le prix monte, <strong>le rendement baisse</strong> ;</li>
+<li>le <strong>capital réglementaire</strong> exigé d'une banque pour porter du Trésor est <strong>nettement plus faible</strong> que pour d'autres instruments pourtant très peu risqués ;</li>
+<li>aux États-Unis, les titres du Trésor bénéficient d'un <strong>traitement fiscal favorable</strong> — ils ne sont <strong>pas imposés au niveau des États</strong>.</li>
+</ol>
+<p><strong>Ce que les institutions utilisent.</strong> Traditionnellement le <strong>LIBOR</strong> : pour une institution notée AA, c'est le <strong>coût d'opportunité du capital à court terme</strong> — elle emprunte aux cotations LIBOR des autres et prête aux siennes. <em>Les taux LIBOR ne sont pas totalement exempts de risque de crédit</em> (une AA peut faire défaut en trois mois), mais ils en sont <strong>proches en conditions normales de marché</strong>. Au-delà d'un an, la courbe LIBOR sans risque est prolongée par les <strong>futures eurodollars</strong> et les <strong>swaps de taux</strong>.</p>
+<p class="cal piege"> <strong>La crise a changé la pratique.</strong> <em>Les banques sont devenues très réticentes à se prêter entre elles pendant la crise et les taux LIBOR ont flambé. Beaucoup d'opérateurs utilisent maintenant le taux <strong>OIS</strong> (overnight indexed swap) comme approximation du taux sans risque</em> (section 7.8) — <strong>plus proche du sans-risque que le LIBOR</strong>. Le livre continue néanmoins, <strong>pour la commodité de l'exposé</strong>, à supposer le LIBOR sans risque.</p>
+<h2 data-prio="must">Concept 2 — Mesurer un taux : la fréquence de capitalisation</h2>
+<blockquote>
+<p><em>Une déclaration d'une banque selon laquelle le taux sur les dépôts à un an est de 10 % par an semble simple et sans ambiguïté. En réalité, sa signification précise dépend de la façon dont le taux est mesuré.</em></p>
+</blockquote>
+<p><strong>100 dollars placés un an à « 10 % »</strong> :</p>
+<table>
+<thead>
+<tr>
+<th>Fréquence</th>
+<th>Valeur au bout d'un an</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Annuelle ($m=1$)</td>
+<td><strong>110,00</strong></td>
+</tr>
+<tr>
+<td>Semestrielle ($m=2$)</td>
+<td><strong>110,25</strong></td>
+</tr>
+<tr>
+<td>Trimestrielle ($m=4$)</td>
+<td><strong>110,38</strong></td>
+</tr>
+<tr>
+<td>Mensuelle ($m=12$)</td>
+<td><strong>110,47</strong></td>
+</tr>
+<tr>
+<td>Hebdomadaire ($m=52$)</td>
+<td><strong>110,51</strong></td>
+</tr>
+<tr>
+<td>Quotidienne ($m=365$)</td>
+<td><strong>110,52</strong></td>
+</tr>
+<tr>
+<td><strong>Continue</strong></td>
+<td><strong>110,52</strong></td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>L'image à retenir.</strong> <em>La fréquence de capitalisation définit les unités dans lesquelles un taux est mesuré. La différence entre une fréquence et une autre est analogue à la différence entre des kilomètres et des miles : ce sont deux unités de mesure différentes.</em> Ainsi <strong>10,25 % annuel = 10 % semestriel</strong> : le même taux, deux unités.</p>
+</blockquote>
+<p><strong>Les formules.</strong> Montant $A$, $n$ années, taux $R$ :
+$$m\ \text{fois par an}:\ A\left(1+\frac Rm\right)^{mn};	ext{(4.1)}\qquad\qquad \text{continu}:\ Ae^{Rn};	ext{(4.2)}$$</p>
+<p>Quand $m=1$, on parle parfois de <strong>taux annuel équivalent</strong>. Les actuaires appellent le taux continu la <strong>force d'intérêt</strong>.</p>
+<blockquote>
+<p><strong>Capitaliser</strong> sur $n$ années à taux continu $R$ = multiplier par $e^{Rn}$ · <strong>actualiser</strong> = multiplier par $e^{-Rn}$.
+<em>Pour la plupart des usages pratiques, la capitalisation continue peut être considérée comme équivalente à la capitalisation quotidienne.</em></p>
+</blockquote>
+<p><strong>Les deux conversions à connaître par cœur.</strong>
+$$\boxed{R_c=m\ln\!\left(1+\frac{R_m}{m}\right)};	ext{(4.3)}\qquad\qquad\boxed{R_m=m\left(e^{R_c/m}-1\right)};	ext{(4.4)}$$</p>
+<details class="cor">
+<summary><strong>Exercices résolus — les deux sens de conversion (exemples 4.1 et 4.2)</strong></summary><div class="in">
+
+<p><strong>Exemple 4.1 — vers le continu.</strong> Taux coté <strong>10 % par an, capitalisation semestrielle</strong>.
+<em>Étape 1.</em> Identifier : $m=2$, $R_m=0{,}1$.
+<em>Étape 2.</em> Appliquer (4.3) : $R_c=2\ln\!\left(1+\dfrac{0{,}1}{2}\right)=2\ln(1{,}05)$.
+<em>Étape 3.</em> $\ln(1{,}05)=0{,}048790$ → $R_c=\mathbf{0{,}09758}$, soit <strong>9,758 % par an</strong>.
+<em>Contrôle de sens.</em> Le continu est <strong>inférieur</strong> au semestriel — normal : capitaliser plus souvent produit plus, donc il faut un <strong>taux nominal plus faible</strong> pour le même résultat.</p>
+<p><strong>Exemple 4.2 — vers le discret.</strong> Un prêteur cote <strong>8 % par an en capitalisation continue</strong>, mais les intérêts sont <strong>payés trimestriellement</strong>.
+<em>Étape 1.</em> $m=4$, $R_c=0{,}08$.
+<em>Étape 2.</em> Appliquer (4.4) : $R_m=4\left(e^{0{,}08/4}-1\right)=4\left(e^{0{,}02}-1\right)$.
+<em>Étape 3.</em> $e^{0{,}02}=1{,}020201$ → $R_m=4\times0{,}020201=\mathbf{0{,}0808}$, soit <strong>8,08 % par an</strong>.
+<em>Étape 4 — traduire en flux.</em> Sur un prêt de <strong>1 000 dollars</strong> : $1\,000\times\dfrac{0{,}0808}{4}=\mathbf{20{,}20}$ dollars <strong>par trimestre</strong>.</p>
+</div></details>
+
+<h2 data-prio="must">Concept 3 — Taux zéro-coupon et prix des obligations</h2>
+<div class="cal formel"><span class="lab">Définition.</span>
+<p> Le <strong>taux zéro-coupon à $n$ ans</strong> est le taux gagné sur un investissement qui <strong>commence aujourd'hui, dure $n$ ans</strong>, et dont <strong>tout</strong> l'intérêt et le principal sont réalisés <strong>à la fin</strong>. <strong>Aucun paiement intermédiaire.</strong> Synonymes : taux <em>spot</em> à $n$ ans, taux <em>zéro</em> à $n$ ans.</p>
+</div>
+<p><em>Exemple : un taux zéro 5 ans continu de 5 % signifie que 100 dollars deviennent $100e^{0{,}05\times5}=\mathbf{128{,}40}$.</em></p>
+<p class="cal piege"> <strong>La plupart des taux directement observables sur le marché ne sont PAS des taux zéro purs.</strong> Le prix d'une obligation d'État 5 ans à coupon 6 % ne détermine pas à lui seul le taux zéro 5 ans, <em>parce qu'une partie du rendement est réalisée sous forme de coupons <strong>avant</strong> la fin de l'année 5</em>.</p>
+<p><strong>Prix théorique d'une obligation = valeur actuelle de tous ses flux.</strong> <em>Les traders utilisent parfois le même taux d'actualisation pour tous les flux, mais une approche plus exacte consiste à utiliser un <strong>taux zéro différent pour chaque flux</strong>.</em></p>
+<p><strong>Courbe zéro du Trésor (continue).</strong></p>
+<table>
+<thead>
+<tr>
+<th>Maturité (ans)</th>
+<th>0,5</th>
+<th>1,0</th>
+<th>1,5</th>
+<th>2,0</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Taux zéro (%)</td>
+<td>5,0</td>
+<td>5,8</td>
+<td>6,4</td>
+<td>6,8</td>
+</tr>
+</tbody></table>
+<p><strong>Obligation 2 ans, principal 100, coupon 6 % semestriel</strong> (3 dollars tous les 6 mois) :
+$$B=3e^{-0{,}05\times0{,}5}+3e^{-0{,}058\times1}+3e^{-0{,}064\times1{,}5}+103e^{-0{,}068\times2}=\mathbf{98{,}39}$$</p>
+<h3>3.1 Rendement et taux au pair</h3>
+<blockquote>
+<p><strong>Rendement</strong> (<em>yield</em>) : le <strong>taux d'actualisation unique</strong> qui, appliqué à tous les flux, donne un prix égal au prix de marché.</p>
+</blockquote>
+<p>Si le prix de marché est justement 98,39, le rendement continu $y$ résout
+$$3e^{-0{,}5y}+3e^{-y}+3e^{-1{,}5y}+103e^{-2y}=98{,}39\ \Longrightarrow\ y=\mathbf{6{,}76\,\%}$$
+<em>Cette équation se résout par une procédure itérative (« essais-erreurs »)</em> — Hull suggère en note <strong>Newton-Raphson</strong> : $y_{i+1}=y_i-f(y_i)/f'(y_i)$.</p>
+<blockquote>
+<p><strong>Taux au pair</strong> (<em>par yield</em>) : le <strong>taux de coupon</strong> qui rend le prix de l'obligation égal à sa <strong>valeur nominale</strong>. (Coupons supposés semestriels.)</p>
+</blockquote>
+<p>Avec les mêmes taux zéro, on cherche $c$ tel que
+$$\frac c2e^{-0{,}05\times0{,}5}+\frac c2e^{-0{,}058}+\frac c2e^{-0{,}064\times1{,}5}+\left(100+\frac c2\right)e^{-0{,}068\times2}=100$$
+$$\Longrightarrow\ c=\mathbf{6{,}87\,\%}\ \text{par an, capitalisation semestrielle}\ (=6{,}75\,\%\ \text{en continu})$$</p>
+<p><strong>La formule générale.</strong> Soit $d$ la valeur actuelle de <strong>1 dollar reçu à maturité</strong>, $A$ la valeur d'une <strong>annuité versant 1 dollar à chaque date de coupon</strong>, $m$ le nombre de coupons par an :
+$$100=\frac{cA}{m}+100d\qquad\Longrightarrow\qquad\boxed{c=\frac{(100-100d)\,m}{A}}$$
+<em>Vérification : $m=2$, $d=e^{-0{,}068\times2}=0{,}87284$, $A=3{,}70027$ → $c=\dfrac{12{,}716\times2}{3{,}70027}=\mathbf{6{,}87}$ </em></p>
+<p class="cal piege"> <strong>Trois taux, trois objets différents.</strong> Le <strong>zéro</strong> décrit un placement sans flux intermédiaire ; le <strong>rendement</strong> est une moyenne implicite propre à <strong>une</strong> obligation donnée ; le <strong>taux au pair</strong> est le <strong>coupon</strong> qui met le prix à 100. Ne jamais les substituer l'un à l'autre.</p>
+<h2 data-prio="must">Concept 4 — Le <em>bootstrap</em> : construire la courbe zéro</h2>
+<p><strong>Deux sources.</strong> Les <strong>strips</strong> (obligations zéro-coupon créées synthétiquement quand les traders vendent séparément les coupons et le principal d'une obligation du Trésor) — ou, plus courant, la méthode <em><strong>bootstrap</strong></em> à partir des bons et des obligations à coupon.</p>
+<p><strong>Les données.</strong></p>
+<table>
+<thead>
+<tr>
+<th>Principal</th>
+<th>Maturité (ans)</th>
+<th>Coupon annuel</th>
+<th>Prix</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>100</td>
+<td>0,25</td>
+<td>0</td>
+<td>97,5</td>
+</tr>
+<tr>
+<td>100</td>
+<td>0,50</td>
+<td>0</td>
+<td>94,9</td>
+</tr>
+<tr>
+<td>100</td>
+<td>1,00</td>
+<td>0</td>
+<td>90,0</td>
+</tr>
+<tr>
+<td>100</td>
+<td>1,50</td>
+<td>8</td>
+<td>96,0</td>
+</tr>
+<tr>
+<td>100</td>
+<td>2,00</td>
+<td>12</td>
+<td>101,6</td>
+</tr>
+</tbody></table>
+<p><em>(La moitié du coupon annoncé est supposée versée tous les 6 mois.)</em></p>
+<details class="cor">
+<summary><strong>Le bootstrap complet, ligne par ligne</strong></summary><div class="in">
+
+<p><em>Étape 1 — les trois zéro-coupon, directement.</em> Chacun transforme un prix en 100 :
+$$100=97{,}5\,e^{0{,}25R}\Rightarrow R=\frac{-\ln(0{,}975)}{0{,}25}=\mathbf{10{,}127\,\%}$$
+$$100=94{,}9\,e^{0{,}5R}\Rightarrow R=\mathbf{10{,}469\,\%}\qquad 100=90{,}0\,e^{R}\Rightarrow R=\mathbf{10{,}536\,\%}$$</p>
+<p><em>Étape 2 — l'obligation à 1,5 an.</em> Ses flux : <strong>4</strong> à 6 mois, <strong>4</strong> à 1 an, <strong>104</strong> à 1,5 an. Les deux premiers s'actualisent avec des taux <strong>déjà connus</strong> ; seul le dernier contient l'inconnue :
+$$4e^{-0{,}10469\times0{,}5}+4e^{-0{,}10536\times1}+104e^{-1{,}5R}=96$$
+<em>Étape 3 — isoler.</em> $3{,}7959+3{,}6003+104e^{-1{,}5R}=96\Rightarrow e^{-1{,}5R}=\mathbf{0{,}85196}$
+<em>Étape 4 — extraire.</em> $R=-\dfrac{\ln(0{,}85196)}{1{,}5}=\mathbf{0{,}10681}$, soit <strong>10,681 %</strong>. <em>C'est le seul taux zéro compatible avec le taux 6 mois, le taux 1 an et les données.</em></p>
+<p><em>Étape 5 — l'obligation à 2 ans.</em> Flux : <strong>6</strong> à 0,5, 1 et 1,5 an, <strong>106</strong> à 2 ans.
+$$6e^{-0{,}10469\times0{,}5}+6e^{-0{,}10536}+6e^{-0{,}10681\times1{,}5}+106e^{-2R}=101{,}6\ \Rightarrow\ R=\mathbf{0{,}10808}$$</p>
+<p><strong>Le résultat.</strong></p>
+<table>
+<thead>
+<tr>
+<th>Maturité (ans)</th>
+<th>0,25</th>
+<th>0,50</th>
+<th>1,00</th>
+<th>1,50</th>
+<th>2,00</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Taux zéro continu (%)</td>
+<td>10,127</td>
+<td>10,469</td>
+<td>10,536</td>
+<td>10,681</td>
+<td>10,808</td>
+</tr>
+</tbody></table>
+<p><strong>Le principe en une phrase.</strong> À chaque étape, <strong>une seule inconnue</strong> — le taux zéro de la maturité la plus longue — parce que tous les flux antérieurs s'actualisent avec des taux déjà déterminés. On « se hisse » de proche en proche : <em>bootstrap</em>.</p>
+</div></details>
+
+<p><strong>Les conventions d'interpolation.</strong> <em>Une hypothèse courante est que la courbe zéro est <strong>linéaire</strong> entre les points obtenus.</em> Ainsi le taux 1,25 an vaut $0{,}5\times10{,}536+0{,}5\times10{,}681=\mathbf{10{,}6085\,\%}$. <em>On suppose aussi généralement que la courbe est <strong>horizontale avant le premier point et après le dernier</strong>.</em></p>
+<p class="cal piege"> <strong>En pratique, les maturités ne tombent pas rond.</strong> <em>L'approche souvent utilisée par les analystes consiste à interpoler entre les <strong>données de prix</strong> avant de calculer la courbe zéro.</em> Exemple du livre : si une obligation 2,3 ans à coupon 6 % vaut 98 et une 2,7 ans à 6,5 % vaut 99, on suppose qu'une <strong>2,5 ans à 6,25 % vaudrait 98,5</strong>.</p>
+<h2 data-prio="must">Concept 5 — Les taux forward</h2>
+<div class="cal formel"><span class="lab">Définition.</span>
+<p> Les <strong>taux forward</strong> sont les taux d'intérêt <strong>implicites dans les taux zéro actuels</strong> pour des périodes futures.</p>
+</div>
+<p><strong>Courbe LIBOR et forwards implicites.</strong></p>
+<table>
+<thead>
+<tr>
+<th>Année $n$</th>
+<th>Taux zéro $n$ ans (%)</th>
+<th>Taux forward de l'année $n$ (%)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>3,0</td>
+<td>—</td>
+</tr>
+<tr>
+<td>2</td>
+<td>4,0</td>
+<td><strong>5,0</strong></td>
+</tr>
+<tr>
+<td>3</td>
+<td>4,6</td>
+<td><strong>5,8</strong></td>
+</tr>
+<tr>
+<td>4</td>
+<td>5,0</td>
+<td><strong>6,2</strong></td>
+</tr>
+<tr>
+<td>5</td>
+<td>5,3</td>
+<td><strong>6,5</strong></td>
+</tr>
+</tbody></table>
+<p><strong>La vérification élémentaire.</strong> 3 % la première année <strong>puis</strong> 5 % la deuxième :
+$$100e^{0{,}03}e^{0{,}05}=\mathbf{108{,}33}\qquad\text{et}\qquad 100e^{0{,}04\times2}=\mathbf{108{,}33}\ \checkmark$$</p>
+<blockquote>
+<p><strong>Le résultat général.</strong> <em>Quand les taux sont capitalisés en continu et que des taux de périodes successives sont combinés, le taux équivalent global est simplement la <strong>moyenne</strong> du taux sur toute la période.</em> Ici : 3 % puis 5 % font <strong>4 %</strong> en moyenne sur deux ans.  <em>Ce résultat n'est qu'approximativement vrai quand les taux ne sont pas capitalisés en continu.</em></p>
+</blockquote>
+<p><strong>Les deux écritures de la formule.</strong>
+$$\boxed{R_F=\frac{R_2T_2-R_1T_1}{T_2-T_1}};	ext{(4.5)}\qquad\qquad\boxed{R_F=R_2+(R_2-R_1)\frac{T_1}{T_2-T_1}};	ext{(4.6)}$$</p>
+<p><em>Application : forward de l'année 4 — $T_1=3$, $T_2=4$, $R_1=0{,}046$, $R_2=0{,}05$ → $R_F=\dfrac{0{,}20-0{,}138}{1}=\mathbf{0{,}062}$.</em></p>
+<div class="cal intu"><span class="lab">Ce que (4.6) révèle.</span>
+<p> Courbe <strong>croissante</strong> ($R_2&gt;R_1$) → $\boxed{R_F&gt;R_2}$ : le forward finissant en $T_2$ <strong>dépasse</strong> le zéro $T_2$. Courbe <strong>décroissante</strong> → $R_F&lt;R_2$. <strong>Le forward est toujours « au-delà » du zéro, dans le sens de la pente.</strong></p>
+</div>
+<p><strong>Le taux forward instantané.</strong> En faisant tendre $T_2\to T_1=T$ dans (4.6) :
+$$\boxed{R_F=R+T\frac{\partial R}{\partial T}}\qquad\text{et, en posant }P(0,T)=e^{-RT},\qquad \boxed{R_F=-\frac{\partial}{\partial T}\ln P(0,T)}$$</p>
+<h3>5.1 Verrouiller un taux forward — la construction explicite</h3>
+<p class="cal piege"> <strong>C'est le point qui rend tout le reste valorisable :</strong> une grande institution peut <strong>verrouiller sans coût</strong> un taux forward, simplement en empruntant et prêtant au LIBOR.</p>
+<table>
+<thead>
+<tr>
+<th>Objectif</th>
+<th>Opérations</th>
+<th>Flux</th>
+<th>Vérification</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Gagner</strong> le forward de l'année 2 (5 %)</td>
+<td>emprunter 100 à 3 % <strong>1 an</strong>, placer à 4 % <strong>2 ans</strong></td>
+<td>$-100e^{0{,}03}=-103{,}05$ en $t=1$ ; $+100e^{0{,}08}=+108{,}33$ en $t=2$</td>
+<td>$108{,}33=103{,}05\,e^{0{,}05}$ </td>
+</tr>
+<tr>
+<td><strong>Payer</strong> le forward de l'année 4 (6,2 %)</td>
+<td>emprunter 100 à 5 % <strong>4 ans</strong>, placer à 4,6 % <strong>3 ans</strong></td>
+<td>$+100e^{0{,}138}=+114{,}80$ en $t=3$ ; $-100e^{0{,}20}=-122{,}14$ en $t=4$</td>
+<td>$122{,}14=114{,}80\,e^{0{,}062}$ </td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>Le pari sur la courbe.</strong> Un investisseur qui pense que les taux futurs <strong>différeront</strong> des forwards d'aujourd'hui a de nombreuses stratégies attractives — les <em>yield curve plays</em>. Avec la courbe ci-dessus : <strong>emprunter à 1 an et placer à 5 ans</strong>, en renouvelant l'emprunt chaque année. <em>Si les taux restent à peu près les mêmes, cette stratégie rapporte environ <strong>2,3 % par an</strong>, puisqu'on reçoit 5,3 % et qu'on paie 3 %.</em> L'investisseur <strong>spécule</strong> que les taux futurs seront différents des forwards (ici 5 %, 5,8 %, 6,2 %, 6,5 %).</p>
+</blockquote>
+<p class="cal piege"> <strong>Orange County — le prix de ce pari.</strong> Robert Citron, trésorier du comté, a mené ces stratégies <strong>avec grand succès en 1992 et 1993</strong> ; le profit devint une contribution importante au budget et <strong>il fut réélu</strong> — <em>personne n'écouta son adversaire qui disait sa stratégie trop risquée</em>. En 1994 il <strong>amplifia</strong> : investissement massif en <em><strong>inverse floaters</strong></em> (qui versent un taux <strong>fixe moins un taux variable</strong>) et <strong>levier</strong> par emprunts sur le marché repo. <em>Si les taux courts étaient restés stables ou avaient baissé, il aurait continué de bien faire. En fait, les taux ont fortement monté en 1994.</em> <strong>Le 1ᵉʳ décembre 1994, Orange County annonce une perte de 1,5 milliard de dollars</strong> et se place en faillite quelques jours plus tard.</p>
+<h2 data-prio="must">Concept 6 — Les accords de taux futur (FRA)</h2>
+<div class="cal formel"><span class="lab">Définition.</span>
+<p> Un <strong>FRA</strong> est un accord <strong>de gré à gré</strong> garantissant qu'un certain taux s'appliquera à un emprunt ou un prêt d'un certain principal <strong>sur une période future spécifiée</strong>. L'hypothèse sous-jacente est que l'emprunt ou le prêt se ferait <strong>normalement au LIBOR</strong>.</p>
+</div>
+<p><strong>Notation.</strong> X prête à Y entre $T_1$ et $T_2$.</p>
+<table>
+<thead>
+<tr>
+<th>Symbole</th>
+<th>Sens</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$R_K$</td>
+<td>taux <strong>convenu</strong> dans le FRA</td>
+</tr>
+<tr>
+<td>$R_F$</td>
+<td>taux <strong>forward LIBOR</strong> pour $[T_1,T_2]$, calculé <strong>aujourd'hui</strong></td>
+</tr>
+<tr>
+<td>$R_M$</td>
+<td>taux LIBOR <strong>réellement observé</strong> en $T_1$ pour $[T_1,T_2]$</td>
+</tr>
+<tr>
+<td>$L$</td>
+<td><strong>principal</strong> notionnel</td>
+</tr>
+</tbody></table>
+<p class="cal piege"> <strong>Rupture de convention.</strong> $R_K$, $R_F$ et $R_M$ sont mesurés avec une <strong>fréquence de capitalisation reflétant la longueur de la période</strong> : semestrielle si $T_2-T_1=0{,}5$, trimestrielle si $=0{,}25$. <strong>Pas en continu</strong> — <em>cela correspond à la pratique de marché usuelle pour les FRA</em>. Seul $R_2$ (l'actualisation) reste continu.</p>
+<p><strong>Les flux.</strong> X gagnerait normalement $R_M$ ; le FRA lui fait gagner $R_K$. Le supplément (possiblement négatif) est $R_K-R_M$ :
+$$\text{vers X en }T_2:\ \boxed{L(R_K-R_M)(T_2-T_1)};	ext{(4.7)}\qquad\text{vers Y en }T_2:\ \boxed{L(R_M-R_K)(T_2-T_1)};	ext{(4.8)}$$</p>
+<blockquote>
+<p><strong>La deuxième lecture, la plus utile.</strong> <em>Un FRA est un accord où X <strong>reçoit</strong> l'intérêt au taux <strong>fixe</strong> $R_K$ et <strong>paie</strong> l'intérêt au <strong>LIBOR réalisé</strong> $R_M$</em>, et réciproquement pour Y. C'est <strong>exactement</strong> la structure d'un swap à une seule période — d'où le chapitre 7.</p>
+</blockquote>
+<p><strong>Règlement anticipé.</strong> <em>Habituellement les FRA sont réglés en $T_1$ plutôt qu'en $T_2$</em> ; le payoff doit alors être <strong>actualisé</strong> :
+$$\text{payoff en }T_1\ \text{pour X}=\frac{L(R_K-R_M)(T_2-T_1)}{1+R_M(T_2-T_1)}$$</p>
+<details class="cor">
+<summary><strong>Exercice résolu — un FRA sur 3 mois dans 3 ans (exemple 4.3)</strong></summary><div class="in">
+
+<p><strong>Énoncé.</strong> Une entreprise entre dans un FRA lui assurant de <strong>recevoir 4 % fixe</strong> sur <strong>100 millions</strong>, pour une période de <strong>3 mois commençant dans 3 ans</strong>. C'est un échange : elle <strong>paie le LIBOR</strong>, <strong>reçoit 4 %</strong>. Le LIBOR 3 mois s'avère être <strong>4,5 %</strong>.</p>
+<p><em>Étape 1 — identifier les paramètres.</em> $L=100$ M, $R_K=0{,}04$, $R_M=0{,}045$, $T_2-T_1=0{,}25$, $T_1=3$ ans.
+<em>Étape 2 — appliquer (4.7).</em>
+$$100\,000\,000\times(0{,}04-0{,}045)\times0{,}25=\mathbf{-125\,000}\ \text{dollars}$$
+<em>Étape 3 — dater.</em> Ce flux tombe au point <strong>3,25 ans</strong>. Il est <strong>négatif</strong> : le prêteur reçoit 4 % alors que le marché offre 4,5 %.
+<em>Étape 4 — actualiser au règlement anticipé (3 ans).</em>
+$$-\frac{125\,000}{1+0{,}045\times0{,}25}=-\frac{125\,000}{1{,}01125}=\mathbf{-123\,609}\ \text{dollars}$$
+<em>Étape 5 — la contrepartie.</em> $+125\,000$ au point 3,25 ans, ou $+123\,609$ au point 3 ans.</p>
+<p class="cal piege"> <em>Tous les taux de cet exemple sont exprimés en capitalisation <strong>trimestrielle</strong>.</em> L'actualisation utilise $1+R_M(T_2-T_1)$, <strong>pas</strong> une exponentielle : c'est cohérent avec la convention de marché.</p>
+</div></details>
+
+<h3>6.1 Valorisation d'un FRA</h3>
+<blockquote>
+<p><strong>Le point de départ.</strong> <em>Un FRA vaut toujours zéro quand $R_K=R_F$.</em> Pourquoi ? <strong>Parce qu'une grande institution peut verrouiller le taux forward sans aucun coût</strong> (concept 5.1). Il est d'ailleurs <em>habituel que $R_K$ soit fixé égal à $R_F$ à l'initiation</em>.</p>
+</blockquote>
+<p><strong>La construction.</strong> Comparez deux FRA identiques sauf le taux reçu : l'un donne $R_F$ (valeur <strong>zéro</strong>), l'autre $R_K$. La différence de valeur est la valeur actuelle de la différence d'intérêts :</p>
+<p>$$\boxed{V_{\text{FRA}}=L(R_K-R_F)(T_2-T_1)e^{-R_2T_2}};	ext{(4.9)}\qquad\text{(on reçoit }R_K)$$
+$$\boxed{V_{\text{FRA}}=L(R_F-R_K)(T_2-T_1)e^{-R_2T_2}};	ext{(4.10)}\qquad\text{(on paie }R_K)$$</p>
+<blockquote>
+<p><strong>La règle de valorisation, en deux points — c'est elle qui servira pour les swaps.</strong>
+<strong>1.</strong> Calculer le payoff <strong>en supposant que les taux forward se réalisent</strong> (c'est-à-dire $R_M=R_F$).
+<strong>2.</strong> <strong>Actualiser</strong> ce payoff au taux sans risque.</p>
+</blockquote>
+<details class="cor">
+<summary><strong>Exercice résolu — valoriser un FRA hors du marché (exemple 4.4)</strong></summary><div class="in">
+
+<p><strong>Énoncé.</strong> Courbe LIBOR du concept 5. On <strong>reçoit 6 %</strong> (capitalisation <strong>annuelle</strong>) et on <strong>paie le LIBOR</strong> sur <strong>100 millions</strong>, entre la fin de l'année 1 et la fin de l'année 2.</p>
+<p><em>Étape 1 — le forward, dans la bonne unité.</em> Le forward de l'année 2 est <strong>5 % en continu</strong>. Comme $T_2-T_1=1$ an, la convention FRA impose la <strong>capitalisation annuelle</strong> :
+$$R_F=e^{0{,}05}-1=\mathbf{0{,}05127}$$
+<em>Étape 2 — vérifier le sens.</em> On reçoit $6\,\% &gt; 5{,}127\,\%$ : le FRA est <strong>favorable</strong>, sa valeur doit être <strong>positive</strong>.
+<em>Étape 3 — appliquer (4.9).</em> $L=10^8$, $R_K=0{,}06$, $T_2-T_1=1$, $R_2=0{,}04$ (zéro 2 ans), $T_2=2$ :
+$$V=100\,000\,000\times(0{,}06-0{,}05127)\times1\times e^{-0{,}04\times2}=873\,000\times0{,}92312=\mathbf{805\,800}\ \text{dollars}$$</p>
+<p class="cal piege"> <strong>Le piège d'unité, ici en pleine lumière.</strong> Utiliser 5 % au lieu de 5,127 % donnerait $100\,000\,000\times0{,}01\times0{,}92312=923\,120$ — une erreur de <strong>15 %</strong>. $R_K$ et $R_F$ doivent être dans <strong>la même unité de capitalisation</strong> ; $R_2$, lui, reste <strong>continu</strong> parce qu'il ne sert qu'à actualiser.</p>
+</div></details>
+
+<h2 data-prio="must">Concept 7 — Duration</h2>
+<div class="cal formel"><span class="lab">Définition intuitive.</span>
+<p> <em>La duration d'une obligation est une mesure du temps que le porteur doit attendre en moyenne avant de recevoir les paiements.</em> Une obligation zéro-coupon de $n$ ans a une duration de <strong>$n$ ans</strong> ; une obligation à coupon de $n$ ans a une duration <strong>inférieure à $n$</strong>, parce qu'une partie des flux arrive <strong>avant</strong>.</p>
+</div>
+<p>Avec des flux $c_i$ aux dates $t_i$ et un rendement continu $y$ :
+$$B=\sum_{i=1}^n c_ie^{-yt_i};	ext{(4.11)}\qquad\qquad \boxed{D=\frac{\sum_{i=1}^n t_ic_ie^{-yt_i}}{B}=\sum_{i=1}^n t_i\left[\frac{c_ie^{-yt_i}}{B}\right]};	ext{(4.12)}$$</p>
+<div class="cal intu"><span class="lab">Lecture.</span>
+<p> Le crochet est la <strong>part du prix</strong> apportée par le flux de la date $t_i$. <strong>La duration est donc une moyenne pondérée des dates de paiement</strong>, la somme des poids valant 1.</p>
+</div>
+<p class="cal piege"> <strong>Toute l'actualisation se fait au rendement $y$ de l'obligation</strong> — <em>on n'utilise pas un taux zéro différent pour chaque flux</em>, contrairement au concept 3. C'est une définition <strong>auto-référencée</strong> à l'obligation.</p>
+<p><strong>La relation clé.</strong> Pour une petite variation $\Delta y$ : $\Delta B\approx\dfrac{dB}{dy}\Delta y=-\Delta y\sum c_it_ie^{-yt_i}$, d'où</p>
+<p>$$\boxed{\Delta B=-BD\,\Delta y};	ext{(4.15)}\qquad\qquad\boxed{\frac{\Delta B}{B}=-D\,\Delta y};	ext{(4.16)}$$</p>
+<p><em>(Notez la relation <strong>négative</strong> : quand les rendements montent, les prix baissent.)</em> <em>(4.16) est une relation approchée entre variations en pourcentage du prix et variations du rendement. Elle est facile à utiliser, et c'est la raison pour laquelle la duration — proposée pour la première fois par <strong>Macaulay en 1938</strong> — est devenue une mesure si populaire.</em></p>
+<details class="cor">
+<summary><strong>Exercice résolu — duration d'une obligation 3 ans à coupon 10 % (tableau 4.6)</strong></summary><div class="in">
+
+<p><strong>Données.</strong> Nominal <strong>100</strong>, coupon <strong>10 %</strong> semestriel (donc <strong>5</strong> tous les 6 mois), rendement <strong>12 % continu</strong>.</p>
+<table>
+<thead>
+<tr>
+<th>Date (ans)</th>
+<th>Flux</th>
+<th>Valeur actuelle</th>
+<th>Poids</th>
+<th>Date × poids</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>0,5</td>
+<td>5</td>
+<td>4,709</td>
+<td>0,050</td>
+<td>0,025</td>
+</tr>
+<tr>
+<td>1,0</td>
+<td>5</td>
+<td>4,435</td>
+<td>0,047</td>
+<td>0,047</td>
+</tr>
+<tr>
+<td>1,5</td>
+<td>5</td>
+<td>4,176</td>
+<td>0,044</td>
+<td>0,066</td>
+</tr>
+<tr>
+<td>2,0</td>
+<td>5</td>
+<td>3,933</td>
+<td>0,042</td>
+<td>0,083</td>
+</tr>
+<tr>
+<td>2,5</td>
+<td>5</td>
+<td>3,704</td>
+<td>0,039</td>
+<td>0,098</td>
+</tr>
+<tr>
+<td>3,0</td>
+<td>105</td>
+<td>73,256</td>
+<td>0,778</td>
+<td>2,333</td>
+</tr>
+<tr>
+<td><strong>Total</strong></td>
+<td><strong>130</strong></td>
+<td><strong>94,213</strong></td>
+<td><strong>1,000</strong></td>
+<td><strong>2,653</strong></td>
+</tr>
+</tbody></table>
+<p><em>Étape 1.</em> Chaque valeur actuelle : $5e^{-0{,}12\times0{,}5}=4{,}709$, etc.
+<em>Étape 2.</em> La somme de la colonne 3 est le <strong>prix</strong> : $B=\mathbf{94{,}213}$.
+<em>Étape 3.</em> Les poids = colonne 3 divisée par 94,213 ; ils somment à 1.
+<em>Étape 4.</em> La duration est la somme de la dernière colonne : $D=\mathbf{2{,}653}$ ans.</p>
+<p class="cal piege"> <strong>Le poids du remboursement final domine tout</strong> : 0,778, soit <strong>78 %</strong> de la duration. C'est pourquoi la duration d'une obligation à coupon reste proche de sa maturité tant que le coupon est modeste.</p>
+<p><strong>Test de précision (exemple 4.5).</strong> $\Delta B=-94{,}213\times2{,}653\times\Delta y=-249{,}95\,\Delta y$.
+Pour <strong>+10 points de base</strong> ($\Delta y=+0{,}001$) : $\Delta B=-0{,}250$, donc $B\to93{,}963$.
+Calcul exact à $y=12{,}1\,\%$ :
+$$5e^{-0{,}121\times0{,}5}+\cdots+105e^{-0{,}121\times3}=\mathbf{93{,}963}$$
+<strong>Identique à trois décimales.</strong></p>
+</div></details>
+
+<h3>7.1 Duration modifiée et duration en dollars</h3>
+<p>Si $y$ est exprimé avec une fréquence $m$ (et non en continu), (4.15) devient $\Delta B=-\dfrac{BD}{1+y/m}\Delta y$, ce qui motive :</p>
+<p>$$\boxed{D^\ast=\frac{D}{1+y/m}}\qquad\Longrightarrow\qquad\boxed{\Delta B=-BD^\ast\Delta y};	ext{(4.17)}$$</p>
+<p><strong>Et la <em>duration en dollars</em></strong> $D^{\ast\ast}=D^\ast\times B$, de sorte que $\Delta B=-D^{\ast\ast}\Delta y$.</p>
+<details class="cor">
+<summary><strong>Exercice résolu — duration modifiée (exemple 4.6)</strong></summary><div class="in">
+
+<p><em>Étape 1 — convertir le rendement.</em> $y=12\,\%$ continu → semestriel : $R_2=2(e^{0{,}06}-1)=\mathbf{12{,}3673\,\%}$.
+<em>Étape 2 — duration modifiée.</em>
+$$D^\ast=\frac{2{,}653}{1+0{,}123673/2}=\frac{2{,}653}{1{,}0618365}=\mathbf{2{,}499}$$
+<em>Étape 3 — la sensibilité.</em> $\Delta B=-94{,}213\times2{,}4985\times\Delta y=-235{,}39\,\Delta y$.
+<em>Étape 4 — prédiction pour +10 pb.</em> $\Delta B=-0{,}235$ → $B\to\mathbf{93{,}978}$.
+<em>Étape 5 — vérification exacte.</em> À $12{,}4673\,\%$ semestriel, le prix vaut effectivement <strong>93,978</strong>. <em>La duration modifiée donne une bonne précision pour de petites variations de rendement.</em></p>
+<p class="cal piege"> <strong>Le bon réflexe.</strong> Duration <strong>de Macaulay</strong> avec $y$ <strong>continu</strong> → (4.15). Duration <strong>modifiée</strong> avec $y$ <strong>discret</strong> → (4.17). Mélanger les deux introduit une erreur de l'ordre de $y/m$, soit ici <strong>6 %</strong>.</p>
+</div></details>
+
+<h3>7.2 Portefeuilles d'obligations</h3>
+<p><em>La duration d'un portefeuille est la <strong>moyenne pondérée</strong> des durations des obligations qui le composent, les poids étant <strong>proportionnels aux prix</strong>.</em> Les équations (4.15) à (4.17) s'appliquent avec $B$ = valeur du portefeuille.</p>
+<p class="cal piege"> <strong>L'hypothèse implicite, et elle est forte.</strong> <em>Quand la duration est utilisée pour des portefeuilles, on suppose implicitement que les rendements de <strong>toutes</strong> les obligations varient d'à peu près le <strong>même montant</strong>. Quand les maturités diffèrent largement, cela n'arrive que s'il y a un <strong>déplacement parallèle</strong> de la courbe zéro.</em> Il faut donc lire (4.15)-(4.17) comme estimant l'effet d'un <strong>petit déplacement parallèle</strong> $\Delta y$.</p>
+<blockquote>
+<p><strong>L'immunisation.</strong> <em>En choisissant un portefeuille tel que la duration des actifs égale la duration des passifs (duration nette nulle), une institution financière élimine son exposition aux petits déplacements parallèles de la courbe. Mais elle reste exposée aux déplacements <strong>grands</strong> ou <strong>non parallèles</strong>.</em></p>
+</blockquote>
+<h2 data-prio="high">Concept 8 — Convexité</h2>
+<p><strong>Le problème.</strong> Deux portefeuilles de <strong>même duration</strong> ont la <strong>même pente à l'origine</strong> — donc la même sensibilité aux petites variations. Pour de <strong>grandes</strong> variations, ils divergent : l'un a plus de <strong>courbure</strong> que l'autre.</p>
+<p>$$\boxed{C=\frac1B\frac{d^2B}{dy^2}=\frac{\sum_{i=1}^n c_it_i^2e^{-yt_i}}{B}}$$</p>
+<p>Par développement de Taylor, $\Delta B=\dfrac{dB}{dy}\Delta y+\dfrac12\dfrac{d^2B}{dy^2}\Delta y^2$, d'où</p>
+<p>$$\boxed{\frac{\Delta B}{B}=-D\,\Delta y+\frac12\,C\,(\Delta y)^2}$$</p>
+<table>
+<thead>
+<tr>
+<th>Structure des flux, à duration donnée</th>
+<th>Convexité</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Paiements <strong>étalés régulièrement</strong> sur une longue période</td>
+<td><strong>maximale</strong></td>
+</tr>
+<tr>
+<td>Paiements <strong>concentrés</strong> autour d'une date</td>
+<td><strong>minimale</strong></td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>L'immunisation renforcée.</strong> <em>En choisissant un portefeuille d'actifs et de passifs de duration nette <strong>nulle</strong> et de convexité nette <strong>nulle</strong>, une institution financière peut s'immuniser contre des déplacements parallèles <strong>relativement grands</strong> de la courbe zéro. Elle reste cependant exposée aux déplacements <strong>non parallèles</strong>.</em></p>
+</blockquote>
+<h2 data-prio="high">Concept 9 — Les théories de la structure par terme</h2>
+<table>
+<thead>
+<tr>
+<th>Théorie</th>
+<th>Thèse</th>
+<th>Implication</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Anticipations</strong> (<em>expectations</em>)</td>
+<td><em>les taux longs devraient refléter les taux courts futurs anticipés</em> — précisément, <strong>le forward égale le taux zéro futur anticipé</strong></td>
+<td>courbe croissante ⟺ hausse anticipée</td>
+</tr>
+<tr>
+<td><strong>Segmentation</strong> (<em>market segmentation</em>)</td>
+<td><em>il n'y a <strong>pas nécessairement</strong> de relation entre taux courts, moyens et longs</em> ; un gros investisseur (fonds de pension) investit sur une maturité donnée et <strong>n'en change pas facilement</strong></td>
+<td>chaque segment a <strong>son</strong> offre et sa demande</td>
+</tr>
+<tr>
+<td><strong>Préférence pour la liquidité</strong> — <em>la plus séduisante</em></td>
+<td>les investisseurs <strong>préfèrent préserver leur liquidité</strong> et placer à court terme ; les emprunteurs <strong>préfèrent emprunter à taux fixe longtemps</strong></td>
+<td>$\boxed{\text{forwards}&gt;\text{taux zéro futurs anticipés}}$ et courbe <strong>croissante la plupart du temps</strong></td>
+</tr>
+</tbody></table>
+<p class="cal piege"> <strong>L'argument empirique décisif.</strong> La préférence pour la liquidité <em>est aussi cohérente avec le résultat empirique selon lequel les courbes de taux sont plus souvent croissantes que décroissantes</em>.</p>
+<details class="cor">
+<summary><strong>Le mécanisme bancaire qui engendre la préférence pour la liquidité</strong></summary><div class="in">
+
+<p><strong>Le point de départ.</strong> Une banque affiche :</p>
+<table>
+<thead>
+<tr>
+<th>Maturité</th>
+<th>Taux de dépôt</th>
+<th>Taux de crédit immobilier</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1 an</td>
+<td><strong>3 %</strong></td>
+<td><strong>6 %</strong></td>
+</tr>
+<tr>
+<td>5 ans</td>
+<td><strong>3 %</strong></td>
+<td><strong>6 %</strong></td>
+</tr>
+</tbody></table>
+<p>On suppose que le marché juge une hausse des taux <strong>aussi probable</strong> qu'une baisse : ces taux sont donc « <strong>justes</strong> » au sens de la théorie des anticipations — placer 1 an et réinvestir quatre fois donne le <strong>même rendement espéré</strong> qu'un placement 5 ans.</p>
+<p><em>Étape 1 — le choix du déposant.</em> Déposer à 3 % pour 1 an ou pour 5 ans ? <strong>Un an</strong> — <em>cela vous donne plus de flexibilité financière, cela immobilise vos fonds moins longtemps</em>.
+<em>Étape 2 — le choix de l'emprunteur.</em> Emprunter à 6 % pour 1 an ou pour 5 ans ? <strong>Cinq ans</strong> — <em>cela fixe votre taux d'emprunt pour cinq ans et vous expose à moins de risque de refinancement</em>.
+<em>Étape 3 — le déséquilibre.</em> La banque se retrouve avec des <strong>passifs courts</strong> et des <strong>actifs longs</strong> : une <strong>inadéquation actif/passif</strong>.
+<em>Étape 4 — quantifier le risque.</em> Si les taux <strong>baissent</strong>, elle finance des prêts à 6 % avec des dépôts coûtant <strong>moins de 3 %</strong> : la marge nette d'intérêt <strong>augmente</strong>. S'ils <strong>montent</strong>, elle <strong>diminue</strong>. <strong>Une hausse de 3 points ramènerait la marge nette d'intérêt à zéro.</strong>
+<em>Étape 5 — la riposte de la gestion actif-passif.</em> Relever le <strong>taux à 5 ans des deux côtés</strong> :</p>
+<table>
+<thead>
+<tr>
+<th>Maturité</th>
+<th>Taux de dépôt</th>
+<th>Taux de crédit</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1 an</td>
+<td>3 %</td>
+<td>6 %</td>
+</tr>
+<tr>
+<td>5 ans</td>
+<td><strong>4 %</strong></td>
+<td><strong>7 %</strong></td>
+</tr>
+</tbody></table>
+<p>Les dépôts 5 ans deviennent <strong>relativement plus attractifs</strong>, les crédits 1 an aussi. Certains clients basculent ; si le déséquilibre persiste, on relève encore. <em>Finalement le déséquilibre disparaît.</em>
+<em>Étape 6 — la conclusion théorique.</em> <strong>Le résultat net du comportement de toutes les banques est la théorie de la préférence pour la liquidité.</strong> <em>Les taux longs tendent à être plus élevés que ne le prédiraient les taux courts futurs anticipés. La courbe est croissante la plupart du temps. Elle n'est décroissante que lorsque le marché anticipe une chute marquée des taux courts.</em></p>
+<p><strong>Le prix de l'échec.</strong> <em>Aux États-Unis, la faillite des Savings and Loans dans les années 1980 et celle de Continental Illinois en 1984 résultaient en grande partie du fait qu'ils n'avaient pas adossé les maturités de leurs actifs et de leurs passifs. Les deux faillites ont coûté très cher aux contribuables américains.</em></p>
+</div></details>
+
+<p class="cal piege"> <strong>Le risque de liquidité est distinct du risque de taux — et il tue plus vite.</strong> Une institution finançant des prêts à taux fixe 5 ans par des dépôts de gros à <strong>3 mois</strong> peut parfaitement <strong>couvrir son risque de taux</strong> (par des swaps). <em>Elle a néanmoins un risque de liquidité : les déposants de gros peuvent, pour une raison quelconque, perdre confiance et refuser de continuer à lui fournir des fonds courts. L'institution, même dotée de fonds propres adéquats, connaîtra alors un grave problème de liquidité qui peut causer sa chute.</em></p>
+<blockquote>
+<p><strong>Northern Rock.</strong> Elle avait choisi de financer une grande partie de son portefeuille hypothécaire par des dépôts de gros, certains à <strong>3 mois seulement</strong>. <em>À partir de septembre 2007, les déposants sont devenus nerveux et ont refusé de renouveler leur financement</em> — au terme de chaque période de 3 mois, ils refusaient de replacer. Incapable de financer ses actifs, elle fut <strong>reprise par l'État britannique début 2008</strong>. <strong>Bear Stearns</strong> et <strong>Lehman Brothers</strong> ont connu des problèmes de liquidité similaires, pour la même raison.</p>
+</blockquote>
+<h2>Comment reconnaître le type d'exercice</h2>
+<table>
+<thead>
+<tr>
+<th>Signal</th>
+<th>Ce qu'on demande</th>
+<th>Outil</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Un taux + une fréquence, on en veut une autre</td>
+<td><strong>conversion</strong></td>
+<td>$R_c=m\ln(1+R_m/m)$ · $R_m=m(e^{R_c/m}-1)$</td>
+</tr>
+<tr>
+<td>Une courbe zéro + des flux</td>
+<td><strong>prix</strong></td>
+<td>actualiser <strong>chaque flux avec son propre taux zéro</strong></td>
+</tr>
+<tr>
+<td>Un prix de marché, on cherche « le » taux</td>
+<td><strong>rendement</strong></td>
+<td>équation non linéaire, Newton-Raphson</td>
+</tr>
+<tr>
+<td>« quel coupon met le prix à 100 ? »</td>
+<td><strong>taux au pair</strong></td>
+<td>$c=(100-100d)m/A$</td>
+</tr>
+<tr>
+<td>Une liste d'obligations de maturités croissantes</td>
+<td><em><strong>bootstrap</strong></em></td>
+<td>une inconnue par ligne, du plus court au plus long</td>
+</tr>
+<tr>
+<td>Deux taux zéro, on veut le taux d'une période intermédiaire</td>
+<td><strong>forward</strong></td>
+<td>$R_F=\frac{R_2T_2-R_1T_1}{T_2-T_1}$</td>
+</tr>
+<tr>
+<td>« recevoir fixe, payer LIBOR » sur une période future</td>
+<td><strong>FRA</strong></td>
+<td>payoff $L(R_K-R_M)(T_2-T_1)$ ; valeur (4.9)</td>
+</tr>
+<tr>
+<td>« de combien varie le prix si le rendement monte de X pb ? »</td>
+<td><strong>duration</strong></td>
+<td>$\Delta B=-BD\Delta y$ (ou $-BD^\ast\Delta y$)</td>
+</tr>
+<tr>
+<td>Grande variation de rendement</td>
+<td><strong>convexité</strong></td>
+<td>$\frac{\Delta B}B=-D\Delta y+\frac12C(\Delta y)^2$</td>
+</tr>
+</tbody></table>
+<h2>Comment résoudre ce type d'exercice</h2>
+<p><strong>Protocole <em>bootstrap</em> — 4 étapes.</strong></p>
+<ol>
+<li>Trier les instruments par <strong>maturité croissante</strong>.</li>
+<li>Traiter d'abord tous les <strong>zéro-coupon</strong> : $R=-\dfrac{\ln(P/F)}{T}$.</li>
+<li>Pour chaque obligation à coupon, écrire prix = somme des flux actualisés ; <strong>tous les taux sauf le dernier sont déjà connus</strong> → une seule inconnue.</li>
+<li>Isoler $e^{-RT}$, puis $R=-\ln(\cdot)/T$. Passer à la maturité suivante.</li>
+</ol>
+<p><strong>Protocole duration — 5 étapes.</strong></p>
+<ol>
+<li>Calculer chaque <strong>valeur actuelle</strong> $c_ie^{-yt_i}$ (attention : au <strong>rendement</strong>, pas aux taux zéro).</li>
+<li>Sommer → $B$.</li>
+<li>Poids $w_i=c_ie^{-yt_i}/B$ ; <strong>vérifier $\sum w_i=1$</strong>.</li>
+<li>$D=\sum t_iw_i$.</li>
+<li>Si $y$ est <strong>discret</strong>, diviser par $1+y/m$ pour obtenir $D^\ast$ avant d'appliquer $\Delta B=-BD^\ast\Delta y$.</li>
+</ol>
+<details class="cor">
+<summary><strong>Exercice résolu — enchaîner bootstrap, forward et FRA</strong></summary><div class="in">
+
+<p><strong>Question.</strong> Avec la courbe LIBOR (3,0 · 4,0 · 4,6 · 5,0 · 5,3 %), quelle est la valeur d'un FRA où l'on <strong>paie 5 % annuel</strong> et <strong>reçoit le LIBOR</strong> sur 50 millions entre la fin de l'année 3 et la fin de l'année 4 ?</p>
+<p><em>Étape 1 — le forward de l'année 4.</em> $T_1=3$, $T_2=4$, $R_1=0{,}046$, $R_2=0{,}05$ :
+$$R_F=\frac{0{,}05\times4-0{,}046\times3}{4-3}=\frac{0{,}200-0{,}138}{1}=\mathbf{0{,}062}\ \text{(continu)}$$
+<em>Étape 2 — convertir dans l'unité du FRA.</em> Période d'un an → capitalisation <strong>annuelle</strong> :
+$$R_F^{\text{ann}}=e^{0{,}062}-1=\mathbf{0{,}063962}$$
+<em>Étape 3 — identifier le sens.</em> On <strong>paie</strong> $R_K=0{,}05$ et on reçoit le LIBOR, dont le forward est <strong>6,3962 %</strong> : le contrat est <strong>favorable</strong>, on applique (4.10).
+<em>Étape 4 — appliquer (4.10).</em>
+$$V=50\,000\,000\times(0{,}063962-0{,}05)\times1\times e^{-0{,}05\times4}=697\,100\times0{,}818731=\mathbf{570\,740}\ \text{dollars}$$
+<em>Étape 5 — contrôle de cohérence.</em> Le signe est <strong>positif</strong> comme prévu à l'étape 3, et l'actualisation utilise le <strong>zéro 4 ans</strong> ($R_2=5\,\%$), pas le forward — ce sont deux rôles distincts.</p>
+</div></details>
+
+<h2 data-prio="must">Common mistakes</h2>
+<table>
+<thead>
+<tr>
+<th>Erreur</th>
+<th>Correction</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Comparer deux taux sans regarder leur <strong>fréquence</strong></td>
+<td>10,25 % annuel <strong>=</strong> 10 % semestriel : convertir d'abord</td>
+</tr>
+<tr>
+<td>Actualiser tous les flux d'une obligation au <strong>même</strong> taux zéro</td>
+<td>Un <strong>taux zéro par échéance</strong> — c'est l'approche exacte</td>
+</tr>
+<tr>
+<td>Confondre <strong>rendement</strong>, <strong>taux zéro</strong> et <strong>taux au pair</strong></td>
+<td>Trois objets distincts (concept 3)</td>
+</tr>
+<tr>
+<td>Dans le <em>bootstrap</em>, chercher <strong>deux</strong> inconnues à la fois</td>
+<td>Une seule par ligne, en allant du <strong>plus court au plus long</strong></td>
+</tr>
+<tr>
+<td>Écrire $R_F=\frac{R_2-R_1}{T_2-T_1}$</td>
+<td>C'est $\frac{R_2T_2-R_1T_1}{T_2-T_1}$ — les taux sont <strong>pondérés par les durées</strong></td>
+</tr>
+<tr>
+<td>Utiliser $R_F$ <strong>continu</strong> dans un payoff de FRA</td>
+<td>Le convertir dans la fréquence de la <strong>période</strong> ($e^{R_c}-1$ pour 1 an)</td>
+</tr>
+<tr>
+<td>Actualiser le payoff d'un FRA au <strong>taux forward</strong></td>
+<td>Actualiser au <strong>zéro sans risque</strong> $R_2$</td>
+</tr>
+<tr>
+<td>Appliquer $\Delta B=-BD\Delta y$ avec un $y$ <strong>discret</strong></td>
+<td>Utiliser $D^\ast=D/(1+y/m)$</td>
+</tr>
+<tr>
+<td>Croire que la duration protège contre <strong>tous</strong> les mouvements de taux</td>
+<td>Seulement les <strong>petits déplacements parallèles</strong></td>
+</tr>
+<tr>
+<td>Négliger la convexité pour une grosse variation</td>
+<td>Ajouter $\frac12C(\Delta y)^2$</td>
+</tr>
+<tr>
+<td>Croire que couvrir le risque de taux supprime le risque de <strong>liquidité</strong></td>
+<td>Northern Rock était couverte en taux — elle est morte de liquidité</td>
+</tr>
+<tr>
+<td>Prendre le taux du Trésor comme taux sans risque des dérivés</td>
+<td>Il est <strong>artificiellement bas</strong> (réglementation, capital, fiscalité)</td>
+</tr>
+</tbody></table>
+<h2>Ultimate Review</h2>
+<p><strong>Les conversions.</strong> $R_c=m\ln(1+R_m/m)$ · $R_m=m(e^{R_c/m}-1)$ · capitaliser $\times e^{Rn}$, actualiser $\times e^{-Rn}$.</p>
+<p><strong>Les prix.</strong> $B=\sum c_ie^{-R_it_i}$ (taux zéro par échéance) · rendement : <strong>un seul</strong> $y$ · taux au pair : $c=(100-100d)m/A$.</p>
+<p><strong>Les forwards.</strong> $R_F=\dfrac{R_2T_2-R_1T_1}{T_2-T_1}=R_2+(R_2-R_1)\dfrac{T_1}{T_2-T_1}$ · instantané : $R_F=R+T\partial R/\partial T=-\partial_T\ln P(0,T)$.</p>
+<p><strong>Les FRA.</strong> Payoff $L(R_K-R_M)(T_2-T_1)$ en $T_2$ · valeur $L(R_K-R_F)(T_2-T_1)e^{-R_2T_2}$ · <strong>règle</strong> : supposer les forwards réalisés, puis actualiser au sans-risque.</p>
+<p><strong>Les sensibilités.</strong> $D=\sum t_i\frac{c_ie^{-yt_i}}{B}$ · $\Delta B=-BD\Delta y$ · $D^\ast=\frac{D}{1+y/m}$ · $C=\frac{\sum c_it_i^2e^{-yt_i}}{B}$ · $\frac{\Delta B}{B}=-D\Delta y+\frac12C(\Delta y)^2$.</p>
+<p><strong>Les chiffres du chapitre.</strong> Courbe zéro 5,0/5,8/6,4/6,8 → prix <strong>98,39</strong>, rendement <strong>6,76 %</strong>, taux au pair <strong>6,87 %</strong> · bootstrap : <strong>10,127 · 10,469 · 10,536 · 10,681 · 10,808</strong> · forwards LIBOR : <strong>5,0 · 5,8 · 6,2 · 6,5</strong> · duration <strong>2,653</strong>, $B=94{,}213$, $BD=249{,}95$, $D^\ast=2{,}499$, $BD^\ast=235{,}39$ · FRA exemple 4.4 : <strong>805 800</strong> · Orange County <strong>1,5 Md</strong> · Macaulay <strong>1938</strong>.</p>
+<p><strong>Les trois théories.</strong> Anticipations · segmentation · <strong>préférence pour la liquidité</strong> (la plus séduisante, forwards <strong>au-dessus</strong> des taux futurs anticipés, courbe croissante le plus souvent).</p>
+<div class="rec"><h2>Active Recall</h2><details class="cor">
+<summary>Pourquoi les traders de dérivés n'utilisent-ils pas les taux du Trésor comme taux sans risque ?</summary><div class="in">
+
+<p>Parce qu'ils les jugent <strong>artificiellement bas</strong>, pour trois raisons : (1) les institutions <strong>doivent</strong> en acheter pour des raisons <strong>réglementaires</strong>, ce qui pousse le prix à la hausse et le rendement à la baisse ; (2) le <strong>capital réglementaire</strong> exigé pour les porter est bien <strong>inférieur</strong> à celui exigé pour d'autres instruments peu risqués ; (3) aux États-Unis ils bénéficient d'un <strong>traitement fiscal favorable</strong> (non imposés au niveau des États). Ils ont traditionnellement utilisé le <strong>LIBOR</strong> ; depuis la crise, beaucoup sont passés au taux <strong>OIS</strong>, plus proche du sans-risque.</p>
+</div></details><details class="cor">
+<summary>Convertir 10 % semestriel en continu, puis 8 % continu en trimestriel.</summary><div class="in">
+
+<p>$R_c=2\ln(1+0{,}1/2)=2\ln(1{,}05)=\mathbf{9{,}758\,\%}$ — <strong>inférieur</strong>, car capitaliser en continu produit plus.
+$R_4=4(e^{0{,}08/4}-1)=4(e^{0{,}02}-1)=\mathbf{8{,}08\,\%}$ — <strong>supérieur</strong>. Sur 1 000 dollars : <strong>20,20</strong> par trimestre.</p>
+</div></details><details class="cor">
+<summary>Expliquer le principe du bootstrap en une phrase, puis calculer le taux zéro 1,5 an de l'exemple.</summary><div class="in">
+
+<p><strong>Principe :</strong> à chaque étape, l'obligation la plus longue n'introduit <strong>qu'une seule inconnue</strong> — son propre taux zéro — parce que tous ses flux antérieurs s'actualisent avec des taux <strong>déjà déterminés</strong>.</p>
+<p><strong>Calcul :</strong> $4e^{-0{,}10469\times0{,}5}+4e^{-0{,}10536}+104e^{-1{,}5R}=96$ → $104e^{-1{,}5R}=88{,}604$ → $e^{-1{,}5R}=0{,}85196$ → $R=-\dfrac{\ln 0{,}85196}{1{,}5}=\mathbf{10{,}681\,\%}$.</p>
+</div></details><details class="cor">
+<summary>Zéro 3 ans = 4,6 %, zéro 4 ans = 5,0 %. Calculer le forward de l'année 4 et dire pourquoi il dépasse 5 %.</summary><div class="in">
+
+<p>$$R_F=\frac{0{,}05\times4-0{,}046\times3}{1}=\mathbf{6{,}2\,\%}$$
+Il dépasse le zéro 4 ans <strong>parce que la courbe est croissante</strong>. La formule (4.6), $R_F=R_2+(R_2-R_1)\frac{T_1}{T_2-T_1}$, le montre directement : $R_2&gt;R_1$ implique $R_F&gt;R_2$. <strong>La moyenne monte parce que le dernier terme tire vers le haut.</strong></p>
+</div></details><details class="cor">
+<summary>Pourquoi un FRA vaut-il zéro quand $R_K=R_F$ ?</summary><div class="in">
+
+<p>Parce qu'une grande institution peut <strong>verrouiller le taux forward sans aucun coût</strong>, par un simple couple emprunt/placement au LIBOR. Exemple : emprunter 100 à 3 % <strong>1 an</strong> et placer à 4 % <strong>2 ans</strong> produit $-103{,}05$ en $t=1$ et $+108{,}33$ en $t=2$, soit exactement <strong>5 %</strong> sur la deuxième année. Puisque ce résultat est <strong>gratuit</strong>, un contrat qui le promet ne peut valoir que <strong>zéro</strong> — et <em>il est d'ailleurs habituel de fixer $R_K=R_F$ à l'initiation</em>.</p>
+</div></details><details class="cor">
+<summary>Énoncer la règle de valorisation d'un FRA en deux points, et dire pourquoi elle est importante.</summary><div class="in">
+
+<p><strong>1.</strong> Calculer le payoff <strong>en supposant que les taux forward se réalisent</strong> ($R_M=R_F$). <strong>2.</strong> <strong>Actualiser</strong> ce payoff au <strong>taux sans risque</strong>.</p>
+<p>Elle est importante parce qu'un <strong>swap est un portefeuille de FRA</strong> : le chapitre 7 valorisera les swaps <strong>exactement</strong> par cette règle. Elle transforme un problème d'anticipation de taux en un simple calcul d'actualisation.</p>
+</div></details><details class="cor">
+<summary>Une obligation vaut 94,213 avec une duration de 2,653 et un rendement continu de 12 %. Prédire le prix si le rendement monte de 10 pb, puis dire quelle formule utiliser si le rendement était semestriel.</summary><div class="in">
+
+<p>$\Delta B=-94{,}213\times2{,}653\times0{,}001=\mathbf{-0{,}250}$ → $B\to\mathbf{93{,}963}$ (le calcul exact donne 93,963).</p>
+<p>Si le rendement est <strong>semestriel</strong> (12,3673 %), il faut la <strong>duration modifiée</strong> : $D^\ast=\dfrac{2{,}653}{1{,}0618}=2{,}499$, d'où $\Delta B=-94{,}213\times2{,}499\times0{,}001=-0{,}235$ → $B\to\mathbf{93{,}978}$.</p>
+</div></details><details class="cor">
+<summary>Contre quoi la duration protège-t-elle, et contre quoi ne protège-t-elle pas ?</summary><div class="in">
+
+<p>Elle protège contre les <strong>petits déplacements parallèles</strong> de la courbe zéro — car son usage sur un portefeuille suppose implicitement que <strong>tous les rendements bougent du même montant</strong>, ce qui, pour des maturités très différentes, ne se produit que lors d'un déplacement parallèle. Une duration nette <strong>nulle</strong> annule cette exposition. Elle ne protège <strong>ni</strong> contre les mouvements <strong>grands</strong> (il faut la convexité) <strong>ni</strong> contre les mouvements <strong>non parallèles</strong> (rien dans ce chapitre n'y répond).</p>
+</div></details><details class="cor">
+<summary>Exposer le mécanisme bancaire qui produit la préférence pour la liquidité.</summary><div class="in">
+
+<p>À taux « justes » (3 % dépôt et 6 % crédit, aux deux maturités), le <strong>déposant choisit 1 an</strong> (flexibilité) et l'<strong>emprunteur choisit 5 ans</strong> (pas de risque de refinancement). La banque se retrouve avec des <strong>passifs courts</strong> et des <strong>actifs longs</strong> : une hausse de <strong>3 points</strong> ramènerait sa marge nette d'intérêt <strong>à zéro</strong>. Pour rééquilibrer, elle <strong>relève le taux 5 ans des deux côtés</strong> (4 % et 7 %). <strong>Toutes les banques faisant de même, les taux longs finissent au-dessus de ce que prédiraient les taux courts anticipés</strong> — et la courbe est croissante la plupart du temps.</p>
+</div></details><details class="cor">
+<summary>Northern Rock avait couvert son risque de taux. Pourquoi a-t-elle fait faillite ?</summary><div class="in">
+
+<p>Par <strong>risque de liquidité</strong>, qui est distinct du risque de taux. Elle finançait son portefeuille hypothécaire par des <strong>dépôts de gros à 3 mois</strong>. À partir de septembre 2007, <em>les déposants sont devenus nerveux et ont refusé de renouveler</em> : au terme de chaque période de 3 mois ils ne replaçaient plus. <em>Même dotée de fonds propres adéquats</em>, elle ne pouvait plus financer ses actifs — reprise par l'État britannique début 2008. <strong>Bear Stearns</strong> et <strong>Lehman Brothers</strong> ont subi le même mécanisme.</p>
+</div></details></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h2>Flashcards</h2>
+<table>
+<thead>
+<tr>
+<th>Question</th>
+<th>Réponse</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>LIBOR ?</td>
+<td>Taux auquel les banques font de <strong>gros dépôts</strong> auprès d'autres banques</td>
+</tr>
+<tr>
+<td>Notation typiquement requise pour le LIBOR ?</td>
+<td><strong>AA</strong></td>
+</tr>
+<tr>
+<td>LIBID ?</td>
+<td>Taux auquel les banques <strong>acceptent</strong> des dépôts — <strong>&lt; LIBOR</strong></td>
+</tr>
+<tr>
+<td>Maturités du LIBOR ?</td>
+<td>Jusqu'à <strong>12 mois</strong></td>
+</tr>
+<tr>
+<td>Repo ?</td>
+<td>Vente de titres + rachat plus cher — l'écart est l'<strong>intérêt</strong></td>
+</tr>
+<tr>
+<td>Pourquoi le repo est-il peu risqué ?</td>
+<td>Défaut de l'emprunteur → on <strong>garde les titres</strong></td>
+</tr>
+<tr>
+<td>Trois raisons du biais des taux du Trésor ?</td>
+<td>Achats <strong>réglementaires</strong> · <strong>capital</strong> requis faible · <strong>fiscalité</strong> favorable</td>
+</tr>
+<tr>
+<td>Quel taux depuis la crise ?</td>
+<td>Le taux <strong>OIS</strong></td>
+</tr>
+<tr>
+<td>Que définit la fréquence de capitalisation ?</td>
+<td>Les <strong>unités</strong> dans lesquelles le taux est mesuré</td>
+</tr>
+<tr>
+<td>10 % semestriel = ? annuel</td>
+<td><strong>10,25 %</strong></td>
+</tr>
+<tr>
+<td>$R_c$ à partir de $R_m$ ?</td>
+<td>$m\ln(1+R_m/m)$</td>
+</tr>
+<tr>
+<td>$R_m$ à partir de $R_c$ ?</td>
+<td>$m(e^{R_c/m}-1)$</td>
+</tr>
+<tr>
+<td>Autre nom du taux continu ?</td>
+<td>La <strong>force d'intérêt</strong></td>
+</tr>
+<tr>
+<td>Taux zéro-coupon à $n$ ans ?</td>
+<td>Tout l'intérêt réalisé <strong>à la fin</strong>, <strong>aucun</strong> flux intermédiaire</td>
+</tr>
+<tr>
+<td>Prix théorique d'une obligation ?</td>
+<td>VA de tous les flux, <strong>un taux zéro par échéance</strong></td>
+</tr>
+<tr>
+<td>Rendement d'une obligation ?</td>
+<td>Le <strong>taux unique</strong> qui redonne le prix de marché</td>
+</tr>
+<tr>
+<td>Taux au pair ?</td>
+<td>Le <strong>coupon</strong> qui met le prix <strong>à 100</strong></td>
+</tr>
+<tr>
+<td>Formule du taux au pair ?</td>
+<td>$c=(100-100d)m/A$</td>
+</tr>
+<tr>
+<td>Que sont les <em>strips</em> ?</td>
+<td>Zéro-coupon <strong>synthétiques</strong> (coupons vendus séparément du principal)</td>
+</tr>
+<tr>
+<td>Principe du bootstrap ?</td>
+<td>Une <strong>seule inconnue</strong> par instrument, du plus court au plus long</td>
+</tr>
+<tr>
+<td>Taux zéro 1,5 an de l'exemple ?</td>
+<td><strong>10,681 %</strong></td>
+</tr>
+<tr>
+<td>Interpolation usuelle de la courbe zéro ?</td>
+<td><strong>Linéaire</strong> entre points, <strong>horizontale</strong> aux deux bouts</td>
+</tr>
+<tr>
+<td>Formule du taux forward ?</td>
+<td>$R_F=\dfrac{R_2T_2-R_1T_1}{T_2-T_1}$</td>
+</tr>
+<tr>
+<td>Courbe croissante : $R_F$ vs $R_2$ ?</td>
+<td>$R_F&gt;R_2$</td>
+</tr>
+<tr>
+<td>Taux forward instantané ?</td>
+<td>$R_F=R+T\,\partial R/\partial T=-\partial_T\ln P(0,T)$</td>
+</tr>
+<tr>
+<td>Comment verrouiller un forward ?</td>
+<td>Emprunter à une maturité, <strong>placer</strong> à l'autre</td>
+</tr>
+<tr>
+<td><em>Yield curve play</em> ?</td>
+<td>Parier que les taux futurs <strong>différeront</strong> des forwards</td>
+</tr>
+<tr>
+<td>Perte d'Orange County ?</td>
+<td><strong>1,5 milliard</strong> (1ᵉʳ décembre 1994)</td>
+</tr>
+<tr>
+<td><em>Inverse floater</em> ?</td>
+<td>Verse <strong>fixe moins variable</strong></td>
+</tr>
+<tr>
+<td>Qu'est-ce qu'un FRA ?</td>
+<td>Accord OTC fixant un taux pour une <strong>période future</strong></td>
+</tr>
+<tr>
+<td>Payoff d'un FRA (côté receveur du fixe) ?</td>
+<td>$L(R_K-R_M)(T_2-T_1)$ en $T_2$</td>
+</tr>
+<tr>
+<td>Quand un FRA est-il réglé ?</td>
+<td>Souvent en $T_1$ — payoff <strong>actualisé</strong> par $1+R_M(T_2-T_1)$</td>
+</tr>
+<tr>
+<td>Valeur d'un FRA ?</td>
+<td>$L(R_K-R_F)(T_2-T_1)e^{-R_2T_2}$</td>
+</tr>
+<tr>
+<td>Règle de valorisation en deux points ?</td>
+<td>Supposer les <strong>forwards réalisés</strong>, puis <strong>actualiser au sans-risque</strong></td>
+</tr>
+<tr>
+<td>Un FRA vaut zéro quand… ?</td>
+<td>$R_K=R_F$</td>
+</tr>
+<tr>
+<td>Duration d'un zéro-coupon $n$ ans ?</td>
+<td><strong>$n$ ans</strong></td>
+</tr>
+<tr>
+<td>Définition de la duration ?</td>
+<td><strong>Moyenne pondérée</strong> des dates, poids = part du prix</td>
+</tr>
+<tr>
+<td>À quel taux actualise-t-on pour la duration ?</td>
+<td>Au <strong>rendement</strong> $y$ de l'obligation</td>
+</tr>
+<tr>
+<td>Relation clé de la duration ?</td>
+<td>$\Delta B=-BD\,\Delta y$</td>
+</tr>
+<tr>
+<td>Duration modifiée ?</td>
+<td>$D^\ast=D/(1+y/m)$</td>
+</tr>
+<tr>
+<td>Duration en dollars ?</td>
+<td>$D^{\ast\ast}=D^\ast B$</td>
+</tr>
+<tr>
+<td>Duration d'un portefeuille ?</td>
+<td>Moyenne pondérée <strong>par les prix</strong></td>
+</tr>
+<tr>
+<td>Hypothèse implicite pour un portefeuille ?</td>
+<td>Déplacement <strong>parallèle</strong> de la courbe</td>
+</tr>
+<tr>
+<td>Formule de la convexité ?</td>
+<td>$C=\dfrac{\sum c_it_i^2e^{-yt_i}}{B}$</td>
+</tr>
+<tr>
+<td>Développement avec convexité ?</td>
+<td>$\dfrac{\Delta B}B=-D\Delta y+\dfrac12C(\Delta y)^2$</td>
+</tr>
+<tr>
+<td>Quand la convexité est-elle maximale ?</td>
+<td>Paiements <strong>étalés</strong> sur une longue période</td>
+</tr>
+<tr>
+<td>Duration et convexité nulles : protégé contre quoi ?</td>
+<td>Déplacements parallèles <strong>même grands</strong> — <strong>pas</strong> les non parallèles</td>
+</tr>
+<tr>
+<td>Théorie des anticipations ?</td>
+<td>Le <strong>forward</strong> égale le taux zéro futur <strong>anticipé</strong></td>
+</tr>
+<tr>
+<td>Théorie de la segmentation ?</td>
+<td><strong>Aucune</strong> relation nécessaire entre les maturités</td>
+</tr>
+<tr>
+<td>Préférence pour la liquidité ?</td>
+<td>Forwards <strong>au-dessus</strong> des taux anticipés → courbe <strong>croissante</strong></td>
+</tr>
+<tr>
+<td>Qui a proposé la duration, et quand ?</td>
+<td><strong>Macaulay</strong>, <strong>1938</strong></td>
+</tr>
+<tr>
+<td>Cause de la chute de Northern Rock ?</td>
+<td>Refus de <strong>renouveler</strong> des dépôts de gros à 3 mois</td>
+</tr>
+</tbody></table>
+</main>
+
+
+
+
+</body></html>

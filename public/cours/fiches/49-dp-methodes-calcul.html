@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fiche 49 — Méthodes de calcul : itération sur les valeurs, sur les politiques, programmation linéaire</title>
+<script>
+window.MathJax={tex:{inlineMath:[["$","$"]],displayMath:[["$$","$$"]],processEscapes:true},
+ options:{skipHtmlTags:["script","noscript","style","textarea","pre","code"]},
+ svg:{fontCache:"global"},
+ startup:{pageReady:()=>MathJax.startup.defaultPageReady().then(()=>{document.body.classList.add("ready")})}};
+setTimeout(function(){document.body.classList.add("ready")},2500);
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+/* ============================================================
+   MathiasLearn — feuille de style des fiches
+   Reprise intégrale des tokens de 00_PARCOURS/*.html
+   + blocs pédagogiques (callouts, méthode, essentiels, recall)
+   ============================================================ */
+:root{--bg:#faf9f7;--card:#fff;--ink:#1a1a1a;--muted:#6b6b6b;--line:#e5e2dd;--accent:#8b5e34;
+ --hl:#fdf8ef;--ok:#2d7d4f;--okbg:#f0f7f3;--warn:#b3402f;--warnbg:#fdf3f1;--blue:#2f5d8b;--bluebg:#f1f5fa}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+ font:17px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;padding:0 16px 100px}
+.nav{position:sticky;top:0;background:rgba(250,249,247,.96);backdrop-filter:blur(8px);
+ border-bottom:1px solid var(--line);margin:0 -16px 30px;padding:11px 16px;z-index:50;
+ display:flex;gap:6px;flex-wrap:wrap;font-size:13px}
+.nav a{color:var(--muted);text-decoration:none;padding:4px 9px;border-radius:5px;white-space:nowrap}
+.nav a:hover{background:var(--line);color:var(--ink)}
+.nav a.on{background:var(--accent);color:#fff}
+main{max-width:780px;margin:0 auto}
+h1{font-size:31px;letter-spacing:-.02em;margin:.4em 0 .5em;line-height:1.25}
+h2{font-size:23px;margin:2.2em 0 .7em;padding-bottom:.3em;border-bottom:1px solid var(--line)}
+h3{font-size:19px;margin:1.9em 0 .5em;color:var(--accent)}
+h4{font-size:17px;margin:1.5em 0 .4em}
+p{margin:.8em 0} a{color:var(--accent)} hr{border:0;border-top:1px solid var(--line);margin:2.6em 0}
+table{border-collapse:collapse;width:100%;margin:1.3em 0;font-size:15.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+th{background:#f3f0eb;font-weight:600}
+tr:nth-child(even) td{background:#fcfbfa}
+code{font-family:"SF Mono",Menlo,Consolas,monospace;font-size:.88em;background:#f2efea;padding:2px 6px;border-radius:4px;white-space:nowrap}
+pre{background:#f2efea;padding:14px 16px;border-radius:8px;overflow-x:auto}
+pre code{background:none;padding:0;white-space:pre}
+blockquote{border-left:3px solid var(--accent);background:var(--hl);margin:1.4em 0;padding:14px 20px;border-radius:0 8px 8px 0}
+blockquote p:first-child{margin-top:0} blockquote p:last-child{margin-bottom:0}
+ul,ol{padding-left:1.5em} li{margin:.35em 0} em{color:#4a4a4a}
+mjx-container[display="true"]{margin:1.1em 0!important;overflow-x:auto;overflow-y:hidden;padding:2px 0}
+mjx-container svg{max-width:100%}
+body:not(.ready) main{opacity:0} main{opacity:1;transition:opacity .25s}
+
+/* --- bandeau de tête de fiche --- */
+.cours{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--accent);
+ border-radius:0 10px 10px 0;padding:18px 22px;margin:0 0 34px}
+.cours h4{margin:0 0 4px;font-size:14px;text-transform:uppercase;letter-spacing:.07em;color:var(--accent)}
+.cours .cs{color:var(--muted);font-size:14.5px;margin:0 0 14px}
+
+/* --- exercices / corrigés --- */
+.ex{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:6px 24px 20px;margin:18px 0}
+.ex>h3:first-child{margin-top:14px}
+details.cor{margin-top:18px;border:1px solid var(--line);border-radius:8px;background:#fcfbfa;overflow:hidden}
+details.cor>summary{cursor:pointer;padding:12px 16px;font-weight:600;font-size:15px;color:var(--accent);
+ list-style:none;display:flex;align-items:center;gap:9px;user-select:none;transition:.15s;min-height:44px}
+details.cor>summary::-webkit-details-marker{display:none}
+details.cor>summary:hover{background:var(--hl)}
+details.cor>summary::before{content:"\25B6";font-size:10px;transition:transform .18s;display:inline-block}
+details.cor[open]>summary::before{transform:rotate(90deg)}
+details.cor[open]>summary{background:var(--okbg);color:var(--ok);border-bottom:1px solid var(--line)}
+.cor .in{padding:4px 20px 16px}
+.cor .in>*:first-child{margin-top:.9em}
+
+/* --- blocs pédagogiques (callouts) ---
+   Générés depuis une citation Markdown dont le premier **gras** commence
+   par un mot-clé : DÉFINITION, THÉORÈME, MÉTHODE, PIÈGE, INTUITION… */
+.cal{border:1px solid var(--line);border-left:4px solid var(--accent);background:var(--card);
+ border-radius:0 10px 10px 0;padding:15px 20px;margin:1.5em 0}
+.cal>p:first-child{margin-top:0}.cal>p:last-child,.cal>ul:last-child,.cal>ol:last-child{margin-bottom:0}
+.cal .lab{display:block;font-size:12.5px;text-transform:uppercase;letter-spacing:.08em;
+ font-weight:700;color:var(--accent);margin-bottom:6px}
+.cal.formel{background:var(--hl)}
+.cal.piege{border-left-color:var(--warn);background:var(--warnbg)}
+.cal.piege .lab{color:var(--warn)}
+.cal.methode{border-left-color:var(--ok);background:var(--okbg)}
+.cal.methode .lab{color:var(--ok)}
+.cal.intu{border-left-color:var(--blue);background:var(--bluebg)}
+.cal.intu .lab{color:var(--blue)}
+.cal.plus{border-left-style:dashed;background:#faf9f7}
+.cal.plus .lab{color:var(--muted)}
+
+/* --- révision express --- */
+.ess{background:var(--card);border:1px solid var(--accent);border-radius:10px;padding:4px 24px 20px;margin:1.6em 0}
+.ess h3{margin-top:1.3em}
+.rec{background:var(--card);border:1px dashed var(--accent);border-radius:10px;padding:4px 24px 18px;margin:1.6em 0}
+.rec ol{counter-reset:none}
+
+/* --- impression / PDF --- */
+@media print{
+ .nav{display:none}
+ body{padding:0;background:#fff;font-size:11.2pt;line-height:1.55}
+ main{max-width:none}
+ h1{font-size:23pt}h2{font-size:15pt;margin-top:1.5em}h3{font-size:12.6pt}
+ h2,h3,h4{break-after:avoid;page-break-after:avoid}
+ table,.cal,blockquote{break-inside:avoid;page-break-inside:avoid}
+ table{display:table;font-size:9.6pt}
+ details.cor{border:1px solid var(--line);background:#fcfbfa}
+ details.cor>summary{display:none}
+ details.cor .in{padding-top:10px}
+ .cal,.ex,.ess,.rec{box-shadow:none}
+ a{color:var(--ink);text-decoration:none}
+}
+@page{margin:16mm 15mm 18mm}
+
+/* --- exemples travaillés --- */
+.exm{background:#fcfbfa;border:1px solid var(--line);border-radius:10px;padding:2px 20px 14px;margin:1.5em 0}
+.exm>h4:first-child{margin:14px 0 .5em;color:var(--accent);font-size:13px;text-transform:uppercase;letter-spacing:.07em}
+
+
+/* --- pastilles de priorité (conventions des fiches de l'app) --- */
+h2[data-prio], h3[data-prio], h4[data-prio]{position:relative}
+h2[data-prio]::before,h3[data-prio]::before,h4[data-prio]::before{
+ content:"";display:inline-block;width:9px;height:9px;border-radius:50%;
+ margin-right:9px;vertical-align:middle;background:var(--muted)}
+[data-prio="must"]::before{background:var(--warn)}
+[data-prio="high"]::before{background:#d98324}
+[data-prio="mid"]::before{background:#c9a227}
+[data-prio="low"]::before{background:var(--ok)}
+/* corrigés des fiches de l'app : même traitement que les corrigés des séries */
+details.cor>summary::after{content:""}
+</style></head><body>
+<div class="nav"><a href="00_COMMENCER_ICI.html">Commencer ici</a><a href="01_NOTATIONS_le-decodeur.html">Notations</a><a href="02_EXERCICES_Serie-0.html">Série 0 — Remise en route</a><a href="03_EXERCICES_Serie-1.html">Série 1 — Convexité</a><a href="04_EXERCICES_Serie-2.html">Série 2 — KKT</a><a href="05_AUTO-EVALUATION.html">Auto-évaluation (quiz)</a><a href="06_FICHE_Optimisation-deux-variables.html">Fiche — Optimisation à 2 variables</a></div>
+<main><h1>Fiche 49 — Méthodes de calcul : itération sur les valeurs, sur les politiques, programmation linéaire</h1>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Matière</strong></td>
+<td>Maths · Optimisation</td>
+</tr>
+<tr>
+<td><strong>Cours source</strong></td>
+<td>Bertsekas, <em>6.231 Dynamic Programming</em>, MIT OpenCourseWare, automne 2015 — cours 11</td>
+</tr>
+<tr>
+<td><strong>Difficulté</strong></td>
+<td> Must know — les trois façons de résoudre une équation de Bellman</td>
+</tr>
+<tr>
+<td><strong>Temps d'étude estimé</strong></td>
+<td>1 h 45</td>
+</tr>
+<tr>
+<td><strong>Prérequis</strong></td>
+<td>Fiche 48 (équation de Bellman, SSP), fiche 24 (programmation linéaire)</td>
+</tr>
+<tr>
+<td><strong>Concepts clés</strong></td>
+<td>Équation de Bellman pour une politique, itération sur les valeurs, itération sur les politiques, évaluation et amélioration, monotonie de la DP, formulation par programmation linéaire</td>
+</tr>
+<tr>
+<td><strong>Poids à l'examen</strong></td>
+<td>La <strong>justification de l'itération sur les politiques</strong> — l'amélioration monotone puis la terminaison en un nombre fini d'étapes — est la démonstration type. Et savoir dire <strong>quand</strong> choisir chacune des trois méthodes.</td>
+</tr>
+</tbody></table>
+<h2>Vue d'ensemble</h2>
+<p>L'équation de Bellman
+$$J^\star(i)=\min_{u\in U(i)}\Big[g(i,u)+\sum_{j=1}^n p_{ij}(u)J^\star(j)\Big]$$
+détermine $J^\star$ de façon unique (fiche 48). Reste à la <strong>résoudre</strong>. Trois méthodes, trois philosophies.</p>
+<pre><code>ITÉRATION SUR LES VALEURS      on itère l'opérateur de Bellman sur J
+                               → converge, jamais exactement, coût faible par pas
+ITÉRATION SUR LES POLITIQUES   on alterne ÉVALUER une politique / l'AMÉLIORER
+                               → exacte en un nombre FINI d'étapes, chaque pas coûteux
+PROGRAMMATION LINÉAIRE         J* est le PLUS GRAND J satisfaisant les inégalités
+                               → un LP, mais de très grande taille
+</code></pre>
+<p>Le choix se joue sur la taille $n$ de l'espace d'états — et, au-delà d'un certain seuil, aucune des trois ne s'applique : il faut approcher.</p>
+<h2 data-prio="mid">Concept 1 — L'équation de Bellman pour une politique donnée</h2>
+<p><strong>Le résultat.</strong> Pour une politique <strong>stationnaire</strong> $\mu$, les valeurs $J_\mu(i)$, $i=1,\dots,n$, sont l'<strong>unique solution</strong> du système <strong>linéaire</strong> de $n$ équations
+$$J_\mu(i)=g\big(i,\mu(i)\big)+\sum_{j=1}^n p_{ij}\big(\mu(i)\big)J_\mu(j),\qquad i=1,\dots,n$$</p>
+<p><strong>Ce qui a disparu : le minimum.</strong> L'équation de Bellman générale est <strong>non linéaire</strong> à cause du $\min_u$. Une fois la politique <strong>fixée</strong>, il ne reste qu'un système <strong>linéaire</strong> — c'est toute la différence, et c'est ce qui rend l'évaluation d'une politique exactement soluble.</p>
+<p><strong>En écriture matricielle</strong>, avec $P_\mu = [p_{ij}(\mu(i))]$ et $g_\mu = [g(i,\mu(i))]$ :
+$$J_\mu = g_\mu + P_\mu J_\mu \qquad\Longleftrightarrow\qquad (I-P_\mu)J_\mu = g_\mu$$</p>
+<blockquote>
+<p><strong>Le coût, et la conséquence pratique.</strong> <em>L'équation fournit un moyen de calculer les $J_\mu(i)$, mais le calcul est substantiel pour $n$ grand — de l'ordre de $O(n^3)$.</em> Donc :</p>
+<ul>
+<li><strong>pour $n$ grand</strong>, l'itération sur les valeurs peut être préférable — <em>cas typique d'un grand système linéaire, où une méthode itérative peut battre une méthode directe</em> ;</li>
+<li><strong>pour $n$ TRÈS grand</strong>, aucune méthode exacte ne s'applique et il faut des <strong>approximations</strong>.</li>
+</ul>
+</blockquote>
+<h2 data-prio="high">Concept 2 — Itération sur les valeurs</h2>
+<p>$$J_{k+1}(i)=\min_{u\in U(i)}\Big[g(i,u)+\sum_{j=1}^n p_{ij}(u)J_k(j)\Big],\qquad \forall i$$</p>
+<p>Elle converge vers $J^\star$ <strong>depuis toute initialisation</strong> $J_0$ (fiche 48).</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Coût par itération</strong></td>
+<td>$O(n^2\times\lvert U\rvert)$ — un balayage de tous les états et de toutes les commandes</td>
+</tr>
+<tr>
+<td><strong>Nombre d'itérations</strong></td>
+<td><strong>infini</strong> en théorie ; on s'arrête sur un critère de précision</td>
+</tr>
+<tr>
+<td><strong>Nature</strong></td>
+<td>méthode <strong>itérative</strong>, jamais exacte en temps fini</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>La comparaison à retenir</strong> est celle que fait le cours : évaluer une politique, c'est résoudre un grand système linéaire. Comme pour tout grand système linéaire, on a le choix entre une méthode <strong>directe</strong> ($O(n^3)$, exacte) et une méthode <strong>itérative</strong> (pas moins cher, approchée). L'itération sur les valeurs est la méthode itérative ; l'itération sur les politiques utilise la méthode directe à chaque étape.</p>
+</blockquote>
+<h2 data-prio="must">Concept 3 — Itération sur les politiques</h2>
+<p><strong>Le principe.</strong> L'algorithme engendre une suite $\mu^0,\mu^1,\mu^2,\dots$ de politiques <strong>stationnaires</strong>, en partant d'une politique stationnaire quelconque $\mu^0$.</p>
+<p><strong>À l'itération typique, connaissant $\mu^k$ :</strong></p>
+<p><strong>Étape 1 — évaluation de la politique.</strong> Calculer les $J_{\mu^k}(i)$ comme solution du système <strong>linéaire</strong>
+$$J(i)=g\big(i,\mu^k(i)\big)+\sum_{j=1}^n p_{ij}\big(\mu^k(i)\big)J(j),\qquad i=1,\dots,n$$
+en les $n$ inconnues $J(1),\dots,J(n)$.</p>
+<p><strong>Étape 2 — amélioration de la politique.</strong>
+$$\mu^{k+1}(i)=\arg\min_{u\in U(i)}\Big[g(i,u)+\sum_{j=1}^n p_{ij}(u)J_{\mu^k}(j)\Big],\qquad \forall i$$</p>
+<p><strong>Terminaison.</strong> S'arrêter quand $J_{\mu^k}(i)=J_{\mu^{k+1}}(i)$ pour tout $i$. Alors $J_{\mu^{k+1}}=J^\star$ et $\mu^{k+1}$ est <strong>optimale</strong>, puisque
+$$J_{\mu^{k+1}}(i)=g\big(i,\mu^{k+1}(i)\big)+\sum_j p_{ij}\big(\mu^{k+1}(i)\big)J_{\mu^{k+1}}(j) = \min_{u\in U(i)}\Big[g(i,u)+\sum_j p_{ij}(u)J_{\mu^{k+1}}(j)\Big]$$
+c'est-à-dire que $J_{\mu^{k+1}}$ <strong>satisfait l'équation de Bellman</strong> — dont la solution est unique.</p>
+<blockquote>
+<p><strong>Les deux étapes s'opposent terme à terme.</strong> L'<strong>évaluation</strong> fixe la politique et résout exactement en $J$ ; l'<strong>amélioration</strong> fixe $J$ et optimise exactement en $\mu$. C'est une descente par coordonnées entre l'espace des valeurs et celui des politiques.</p>
+</blockquote>
+<h2 data-prio="must">Concept 4 — Pourquoi l'itération sur les politiques fonctionne</h2>
+<blockquote>
+<p><strong>Résultat d'amélioration monotone.</strong> $J_{\mu^k}(i)\geq J_{\mu^{k+1}}(i)$ pour tout $i$ et tout $k$.</p>
+</blockquote>
+<p><strong>Démonstration (celle du cours).</strong> Fixons $k$ et considérons la suite engendrée par
+$$J_{N+1}(i)=g\big(i,\mu^{k+1}(i)\big)+\sum_{j=1}^n p_{ij}\big(\mu^{k+1}(i)\big)J_N(j)$$
+initialisée par $J_0(i)=J_{\mu^k}(i)$. On a d'une part
+$$J_0(i)=g\big(i,\mu^k(i)\big)+\sum_j p_{ij}\big(\mu^k(i)\big)J_0(j)$$
+et d'autre part, <strong>par définition de $\mu^{k+1}$ comme argmin</strong> évalué avec $J_{\mu^k}=J_0$ :
+$$J_0(i)\ \geq\ g\big(i,\mu^{k+1}(i)\big)+\sum_j p_{ij}\big(\mu^{k+1}(i)\big)J_0(j) = J_1(i)$$</p>
+<p>En utilisant la <strong>propriété de monotonie de la DP</strong> — l'opérateur $J\mapsto g_{\mu^{k+1}}+P_{\mu^{k+1}}J$ préserve l'ordre ponctuel — on propage :
+$$J_0(i)\geq J_1(i)\geq\cdots\geq J_N(i)\geq J_{N+1}(i)\geq\cdots$$
+Or $J_N(i)\to J_{\mu^{k+1}}(i)$ quand $N\to\infty$ (c'est l'itération sur les valeurs pour la politique fixée $\mu^{k+1}$). D'où
+$$J_{\mu^k}(i)=J_0(i)\ \geq\ J_{\mu^{k+1}}(i) \qquad \forall i,\ \forall k \qquad\blacksquare$$</p>
+<p><strong>La terminaison.</strong> <em>Une politique ne peut pas se répéter — il n'y a qu'un nombre <strong>fini</strong> de politiques stationnaires — donc l'algorithme se termine avec une politique optimale.</em></p>
+<blockquote>
+<p><strong>C'est un argument de descente stricte sur un ensemble fini</strong>, exactement comme la convergence du simplexe (fiche 30) : le coût décroît à chaque itération, il y a un nombre fini de candidats, donc on ne peut pas boucler et l'on s'arrête. La structure de preuve est la même dans les deux cas.</p>
+</blockquote>
+<p><strong>Le compte des politiques.</strong> Il y a $\prod_{i=1}^n|U(i)|$ politiques stationnaires — un nombre astronomique, mais <strong>fini</strong>. En pratique, l'itération sur les politiques converge en très peu d'itérations (souvent moins d'une dizaine), ce qui en fait la méthode de choix quand $n$ reste modéré.</p>
+<h2 data-prio="high">Concept 5 — Formulation par programmation linéaire</h2>
+<p><strong>L'affirmation.</strong> <em>$J^\star$ est le « plus grand » $J$ satisfaisant la contrainte</em>
+$$J(i)\ \leq\ g(i,u)+\sum_{j=1}^n p_{ij}(u)J(j) \tag{1}$$
+<em>pour tout $i=1,\dots,n$ et tout $u\in U(i)$.</em></p>
+<p><strong>Démonstration.</strong> Si l'on lance l'itération sur les valeurs depuis un $J_0$ satisfaisant la contrainte, c'est-à-dire
+$$J_0(i)\leq\min_{u\in U(i)}\Big[g(i,u)+\sum_j p_{ij}(u)J_0(j)\Big] \qquad \forall i$$
+alors $J_0(i)\leq J_1(i)$, et par <strong>monotonie de la DP</strong>, $J_k(i)\leq J_{k+1}(i)$ pour tout $k$ et tout $i$. Comme $J_k\to J^\star$, on conclut $J_0(i)\leq J^\star(i)$ pour tout $i$. $\blacksquare$</p>
+<p><strong>Le programme linéaire.</strong> $J^\star=\big(J^\star(1),\dots,J^\star(n)\big)$ est donc la solution de
+$$\begin{array}{ll}\text{maximiser} &amp; \displaystyle\sum_{i=1}^n J(i)\\[6pt] \text{sous} &amp; \displaystyle J(i)\leq g(i,u)+\sum_{j=1}^n p_{ij}(u)J(j), \qquad i=1,\dots,n,\ u\in U(i)\end{array}$$</p>
+<blockquote>
+<p><strong>Ce qui est remarquable ici.</strong> Le $\min_u$ de l'équation de Bellman — qui la rend <strong>non linéaire</strong> — se dissout en autant de <strong>contraintes linéaires</strong> qu'il y a de commandes. C'est exactement le mécanisme de la fiche 25 : « minimiser un maximum » devient « une variable auxiliaire et une contrainte par morceau ». Ici, « la valeur est le minimum sur $u$ » devient « la valeur est sous chaque branche, et on la pousse le plus haut possible ».</p>
+</blockquote>
+<p><strong>L'inconvénient</strong>, que le cours souligne :</p>
+<blockquote>
+<p><em>Pour $n$ grand, la dimension de ce programme est très grande. De plus, le nombre de contraintes est égal au nombre de couples état-commande.</em></p>
+</blockquote>
+<p>Avec $n$ états et $|U|$ commandes par état, le LP a $n$ variables et $n|U|$ contraintes. C'est élégant en théorie — cela relie la DP à toute la fiche 28 sur la dualité — mais rarement compétitif en pratique.</p>
+<h2 data-prio="low">Concept 6 — Le cas actualisé</h2>
+<p>Tout se transporte, avec le facteur $\alpha&lt;1$ devant la somme.</p>
+<table>
+<thead>
+<tr>
+<th>Méthode</th>
+<th>Forme actualisée</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Itération sur les valeurs</td>
+<td>$J_{k+1}(i)=\min_u\big[g(i,u)+\alpha\sum_j p_{ij}(u)J_k(j)\big]$</td>
+</tr>
+<tr>
+<td>Évaluation d'une politique</td>
+<td>$J_\mu(i)=g(i,\mu(i))+\alpha\sum_j p_{ij}(\mu(i))J_\mu(j)$</td>
+</tr>
+<tr>
+<td>Équation de Bellman</td>
+<td>$J^\star(i)=\min_u\big[g(i,u)+\alpha\sum_j p_{ij}(u)J^\star(j)\big]$</td>
+</tr>
+<tr>
+<td>Programmation linéaire</td>
+<td>$\max\sum_iJ(i)$ s.c. $J(i)\leq g(i,u)+\alpha\sum_jp_{ij}(u)J(j)$</td>
+</tr>
+</tbody></table>
+<p><em>L'itération sur les politiques se termine avec une politique optimale, et la programmation linéaire fonctionne.</em></p>
+<p class="cal piege"> Dans le cas actualisé, l'évaluation d'une politique est <strong>toujours</strong> bien posée : $(I-\alpha P_\mu)$ est inversible pour tout $\alpha&lt;1$, puisque le rayon spectral de $\alpha P_\mu$ vaut au plus $\alpha&lt;1$. Pas besoin d'hypothèse de terminaison.</p>
+<h3>Comment résoudre l'exercice type (protocole)</h3>
+<ol>
+<li><strong>Écrire l'équation de Bellman</strong> en énumérant les commandes état par état.</li>
+<li><strong>Choisir la méthode</strong> selon la taille de $n$ :</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th>Situation</th>
+<th>Méthode</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$n$ petit (quelques états)</td>
+<td><strong>itération sur les politiques</strong> — exacte, quelques itérations</td>
+</tr>
+<tr>
+<td>$n$ moyen à grand</td>
+<td><strong>itération sur les valeurs</strong> — pas de résolution de système</td>
+</tr>
+<tr>
+<td>structure de LP exploitable, $n$ modéré</td>
+<td><strong>programmation linéaire</strong></td>
+</tr>
+<tr>
+<td>$n$ très grand ou modèle de simulation</td>
+<td><strong>DP approchée</strong> — aucune méthode exacte</td>
+</tr>
+</tbody></table>
+<ol start="3">
+<li><strong>Si itération sur les politiques</strong> : partir d'une politique stationnaire quelconque, alterner évaluation (système linéaire $n\times n$) et amélioration (argmin état par état).</li>
+<li><strong>Vérifier la décroissance</strong> $J_{\mu^k}\geq J_{\mu^{k+1}}$ à chaque tour — c'est le contrôle de cohérence du calcul.</li>
+<li><strong>S'arrêter</strong> quand la politique ne change plus, ou quand $J_{\mu^k}=J_{\mu^{k+1}}$.</li>
+<li><strong>Si itération sur les valeurs</strong> : initialiser librement (souvent $J_0=0$), itérer, s'arrêter sur $\max_i|J_{k+1}(i)-J_k(i)|&lt;\varepsilon$.</li>
+<li><strong>Valider</strong> : la solution obtenue satisfait-elle l'équation de Bellman en tout état ? La solution étant <strong>unique</strong>, c'est un contrôle complet.</li>
+</ol>
+<h3>Exercices progressifs</h3>
+<p><strong> Niveau 1</strong> — Pourquoi l'évaluation d'une politique est-elle un système <strong>linéaire</strong> alors que l'équation de Bellman ne l'est pas ?</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p>Parce que le $\min_{u}$ a disparu. L'équation de Bellman contient une <strong>minimisation sur les commandes</strong>, opération non linéaire (un minimum de fonctions affines est concave, pas affine). Une fois la politique $\mu$ <strong>fixée</strong>, la commande en chaque état est déterminée : il ne reste que
+$$J_\mu(i)=g(i,\mu(i))+\sum_j p_{ij}(\mu(i))J_\mu(j)$$
+soit $(I-P_\mu)J_\mu=g_\mu$ — un système linéaire de $n$ équations à $n$ inconnues.</p>
+<p><em>C'est précisément ce que l'itération sur les politiques exploite :</em> elle remplace un problème non linéaire par une suite de problèmes linéaires.</p>
+</div></details>
+
+<p><strong> Niveau 2</strong> — Combien d'itérations au maximum pour l'itération sur les politiques ?</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p>Au plus le <strong>nombre de politiques stationnaires</strong>, soit $\prod_{i=1}^n|U(i)|$. En effet, le coût décroît (au sens ponctuel) à chaque itération et une politique ne peut donc jamais réapparaître ; l'ensemble étant <strong>fini</strong>, l'algorithme se termine.</p>
+<p><em>C'est une borne astronomique mais finie</em> — et en pratique l'algorithme converge en une poignée d'itérations. C'est la même situation que pour le simplexe (fiche 30) : borne théorique exponentielle, comportement pratique excellent.</p>
+</div></details>
+
+<p><strong> Niveau 3</strong> — Démontrez que $J^\star$ est le plus grand $J$ satisfaisant $J(i)\leq g(i,u)+\sum_jp_{ij}(u)J(j)$ pour tous $i,u$.</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p>Soit $J_0$ satisfaisant la contrainte pour tous $i$ et $u$, c'est-à-dire
+$$J_0(i)\leq\min_{u\in U(i)}\Big[g(i,u)+\sum_j p_{ij}(u)J_0(j)\Big] = J_1(i)$$
+où $J_1$ est le résultat d'<strong>une</strong> itération sur les valeurs depuis $J_0$. On a donc $J_0\leq J_1$ ponctuellement.</p>
+<p>Par <strong>monotonie de l'opérateur de Bellman</strong> — si $J\leq J'$ ponctuellement, alors $\min_u[g+\sum p J]\leq\min_u[g+\sum pJ']$, les $p_{ij}$ étant positifs — on propage par récurrence :
+$$J_0\leq J_1\leq J_2\leq\cdots\leq J_k\leq\cdots$$
+Or $J_k\to J^\star$ (fiche 48, convergence depuis toute initialisation). Par passage à la limite, $J_0\leq J^\star$.</p>
+<p><strong>$J^\star$ majore donc tout $J$ admissible</strong>, et il est lui-même admissible puisqu'il satisfait l'équation de Bellman avec égalité. C'est bien le plus grand. $\blacksquare$</p>
+<p><strong>Ce qui rend la preuve possible :</strong> la <strong>monotonie</strong> de l'opérateur de Bellman, qui repose uniquement sur la positivité des probabilités de transition. C'est la même propriété qui sert à la fiche 47 (emboîtement des régions d'arrêt) et au concept 4 ci-dessus.</p>
+</div></details>
+
+<p><strong> Niveau 4 — type examen</strong> — Déroulez une itération sur les politiques sur un problème à deux états $\{1,t\}$ avec, en $1$, deux commandes : $u_a$ de coût $g(1,u_a)=1$ et $p_{1t}(u_a)=1$ ; $u_b$ de coût $g(1,u_b)=0$ et $p_{11}(u_b)=0{,}9$, $p_{1t}(u_b)=0{,}1$.</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p><em>Vérification préalable.</em> La terminaison est inévitable : sous $u_b$, $\mathbb{P}\{x_m\neq t\}=0{,}9^m\to0$, donc $\rho&lt;1$ pour $m$ assez grand .</p>
+<p><strong>Itération 0 — partons de $\mu^0(1)=u_b$.</strong></p>
+<p><em>Évaluation.</em> $J_{\mu^0}(1)=0+0{,}9\,J_{\mu^0}(1)+0{,}1\times0$, soit $0{,}1\,J_{\mu^0}(1)=0$, d'où
+$$J_{\mu^0}(1)=0$$
+<em>(Cohérent : la commande $u_b$ est gratuite, on peut tourner en rond sans rien payer.)</em></p>
+<p><em>Amélioration.</em>
+$$\mu^1(1)=\arg\min\big\{\underbrace{1+1\times0}_{u_a},\ \underbrace{0+0{,}9\times0+0{,}1\times0}_{u_b}\big\}=\arg\min\{1,\ 0\}=u_b$$</p>
+<p><strong>La politique ne change pas</strong> : $\mu^1=\mu^0$, donc $J_{\mu^1}=J_{\mu^0}$. L'algorithme <strong>termine</strong> et $\mu^\star(1)=u_b$, $J^\star(1)=0$.</p>
+<p><em>Vérification par l'équation de Bellman.</em> $J^\star(1)=\min\{1+0,\ 0+0{,}9\times0\}=0$ , et le minimum est bien atteint en $u_b$ .</p>
+<p><strong>Ce que l'exemple montre.</strong> L'itération sur les politiques peut <strong>terminer dès la première itération</strong> si la politique initiale est déjà optimale. Et le calcul d'évaluation, ici trivial, serait un système $n\times n$ en dimension réaliste — c'est là que réside le coût en $O(n^3)$.</p>
+<p><em>Variante instructive :</em> si l'on prenait $g(1,u_b)=0{,}05$ au lieu de $0$, l'évaluation donnerait $J_{\mu^0}(1)=0{,}05/0{,}1=0{,}5$, puis l'amélioration comparerait $1+0=1$ à $0{,}05+0{,}9\times0{,}5=0{,}5$ : la politique $u_b$ resterait optimale. Il faudrait $g(1,u_b)&gt;0{,}1$ pour que $u_a$ — payer $1$ et terminer tout de suite — devienne préférable.</p>
+</div></details>
+
+<h2 data-prio="must">Common mistakes</h2>
+<ol>
+<li><strong>Confondre les deux équations</strong> — celle de Bellman contient un $\min_u$ (non linéaire) ; celle d'évaluation d'une politique n'en a pas (linéaire).</li>
+<li><strong>Oublier la monotonie dans les preuves</strong> — c'est elle qui propage les inégalités à travers l'opérateur de Bellman, dans les trois démonstrations du chapitre.</li>
+<li><strong>Croire l'itération sur les valeurs exacte en temps fini</strong> — elle converge sans jamais atteindre $J^\star$ exactement.</li>
+<li><strong>Croire l'itération sur les politiques toujours meilleure</strong> — chaque itération coûte $O(n^3)$ ; pour $n$ grand, l'itération sur les valeurs gagne.</li>
+<li><strong>Se tromper de sens dans le LP</strong> — on <strong>maximise</strong> $\sum_iJ(i)$ sous des contraintes $\leq$, car $J^\star$ est le <strong>plus grand</strong> $J$ admissible.</li>
+<li><strong>Sous-estimer la taille du LP</strong> — le nombre de contraintes est le nombre de <strong>couples état-commande</strong>, pas le nombre d'états.</li>
+<li><strong>Partir d'une politique non stationnaire</strong> dans l'itération sur les politiques — la méthode ne manipule que des politiques stationnaires.</li>
+<li><strong>Oublier $\alpha$ dans le cas actualisé</strong> — il porte sur le terme futur $\sum_jp_{ij}(u)J(j)$, jamais sur $g(i,u)$.</li>
+</ol>
+<h2>Ultimate Review</h2>
+<ol>
+<li><strong>Évaluation d'une politique</strong> : $J_\mu = g_\mu+P_\mu J_\mu$, système <strong>linéaire</strong> $n\times n$ de solution unique, coût $O(n^3)$.</li>
+<li><strong>Itération sur les valeurs</strong> : $J_{k+1}(i)=\min_u[g(i,u)+\sum_jp_{ij}(u)J_k(j)]$ ; converge depuis tout $J_0$ ; itérative, jamais exacte.</li>
+<li><strong>Itération sur les politiques</strong> : alterner <strong>évaluation</strong> (système linéaire) et <strong>amélioration</strong> ($\arg\min$ état par état) ; s'arrêter quand $J_{\mu^k}=J_{\mu^{k+1}}$.</li>
+<li><strong>Amélioration monotone</strong> : $J_{\mu^k}\geq J_{\mu^{k+1}}$, démontrée en initialisant l'itération de $\mu^{k+1}$ à $J_{\mu^k}$ et en propageant par monotonie.</li>
+<li><strong>Terminaison</strong> : le coût décroît strictement et il n'y a qu'un nombre <strong>fini</strong> de politiques stationnaires — même argument que le simplexe.</li>
+<li><strong>Programmation linéaire</strong> : $J^\star$ est le <strong>plus grand</strong> $J$ vérifiant $J(i)\leq g(i,u)+\sum_jp_{ij}(u)J(j)$ ; d'où $\max\sum_iJ(i)$ sous ces contraintes.</li>
+<li><strong>Inconvénient du LP</strong> : $n$ variables mais <strong>autant de contraintes que de couples état-commande</strong>.</li>
+<li><strong>Cas actualisé</strong> : tout se transporte avec $\alpha$ ; $(I-\alpha P_\mu)$ est toujours inversible.</li>
+<li><strong>Le choix</strong> : politiques si $n$ petit ; valeurs si $n$ grand ; DP approchée si $n$ très grand.</li>
+</ol>
+<p><strong>Formulas to know</strong>
+$$J_\mu(i)=g\big(i,\mu(i)\big)+\sum_{j=1}^np_{ij}\big(\mu(i)\big)J_\mu(j) \qquad \mu^{k+1}(i)=\arg\min_{u\in U(i)}\Big[g(i,u)+\sum_jp_{ij}(u)J_{\mu^k}(j)\Big]$$
+$$\max\ \sum_{i=1}^nJ(i) \quad\text{s.c.}\quad J(i)\leq g(i,u)+\sum_{j=1}^np_{ij}(u)J(j),\ \ \forall i,\ \forall u\in U(i)$$</p>
+<p><strong>Methods to know</strong> : le protocole de choix de méthode ; la preuve d'amélioration monotone ; la preuve que $J^\star$ est le plus grand $J$ admissible.</p>
+<div class="rec"><h2>Active Recall</h2><p><strong>Basic</strong> — Décrivez les deux étapes d'une itération sur les politiques.</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p><strong>Évaluation</strong> : connaissant $\mu^k$, résoudre le système <strong>linéaire</strong> $J(i)=g(i,\mu^k(i))+\sum_jp_{ij}(\mu^k(i))J(j)$ pour obtenir $J_{\mu^k}$.
+<strong>Amélioration</strong> : poser $\mu^{k+1}(i)=\arg\min_{u\in U(i)}\big[g(i,u)+\sum_jp_{ij}(u)J_{\mu^k}(j)\big]$ pour chaque $i$.
+On s'arrête quand $J_{\mu^k}=J_{\mu^{k+1}}$ ; alors $\mu^{k+1}$ est optimale.</p>
+</div></details><p><strong>Understanding</strong> — Pourquoi l'itération sur les politiques se termine-t-elle en un nombre fini d'étapes ?</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p>Parce que le coût <strong>décroît</strong> à chaque itération ($J_{\mu^k}\geq J_{\mu^{k+1}}$ ponctuellement) et qu'il n'y a qu'un nombre <strong>fini</strong> de politiques stationnaires — au plus $\prod_i|U(i)|$. Une politique ne peut donc jamais réapparaître, et l'algorithme s'arrête nécessairement, sur une politique satisfaisant l'équation de Bellman, donc optimale.</p>
+<p><em>C'est exactement la structure de preuve de la convergence du simplexe : décroissance stricte sur un ensemble fini de candidats.</em></p>
+</div></details><p><strong>Application</strong> — Quelle méthode choisir pour $n=10$ états ? Pour $n=10^6$ ?</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p><strong>$n=10$</strong> : l'<strong>itération sur les politiques</strong>. Chaque évaluation est un système $10\times10$, résolu instantanément, et l'algorithme converge en quelques itérations vers la solution <strong>exacte</strong>.</p>
+<p><strong>$n=10^6$</strong> : ni l'une ni l'autre des méthodes exactes. Une évaluation coûterait $O(10^{18})$ opérations, et même un balayage d'itération sur les valeurs est coûteux. C'est le domaine de la <strong>DP approchée</strong> — approximation de $J^\star$ par une famille paramétrée, simulation, apprentissage.</p>
+</div></details><p><strong>Comparison</strong> — Itération sur les valeurs et sur les politiques : quel est le compromis ?</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Valeurs</th>
+<th>Politiques</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Coût par itération</td>
+<td>faible : un balayage</td>
+<td>élevé : $O(n^3)$</td>
+</tr>
+<tr>
+<td>Nombre d'itérations</td>
+<td>infini (approché)</td>
+<td>fini (exact)</td>
+</tr>
+<tr>
+<td>Nature</td>
+<td>itérative</td>
+<td>directe à chaque tour</td>
+</tr>
+</tbody></table>
+<p>C'est le compromis classique entre <strong>méthode itérative</strong> et <strong>méthode directe</strong> pour un grand système linéaire — comparaison que le cours fait explicitement. Beaucoup d'itérations bon marché, ou peu d'itérations chères.</p>
+</div></details><p><strong>Exam-style</strong> — Démontrez l'amélioration monotone de l'itération sur les politiques.</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p>Fixons $k$ et considérons la suite définie par
+$$J_{N+1}(i)=g\big(i,\mu^{k+1}(i)\big)+\sum_jp_{ij}\big(\mu^{k+1}(i)\big)J_N(j), \qquad J_0 = J_{\mu^k}$$</p>
+<p><em>Premier pas.</em> $J_0$ vérifie $J_0(i)=g(i,\mu^k(i))+\sum_jp_{ij}(\mu^k(i))J_0(j)$. Or $\mu^{k+1}(i)$ est, <strong>par définition</strong>, l'argmin de $g(i,u)+\sum_jp_{ij}(u)J_0(j)$ sur $u$. Donc
+$$J_0(i)\ \geq\ g\big(i,\mu^{k+1}(i)\big)+\sum_jp_{ij}\big(\mu^{k+1}(i)\big)J_0(j)=J_1(i)$$</p>
+<p><em>Propagation.</em> L'opérateur $J\mapsto g_{\mu^{k+1}}+P_{\mu^{k+1}}J$ est <strong>monotone</strong> (les $p_{ij}\geq0$). De $J_0\geq J_1$ on déduit donc $J_1\geq J_2$, puis par récurrence
+$$J_0\geq J_1\geq\cdots\geq J_N\geq J_{N+1}\geq\cdots$$</p>
+<p><em>Passage à la limite.</em> $J_N\to J_{\mu^{k+1}}$ (itération sur les valeurs à politique fixée). D'où
+$$J_{\mu^k}=J_0\ \geq\ J_{\mu^{k+1}} \qquad\blacksquare$$</p>
+</div></details></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h2>Flashcards</h2>
+<table>
+<thead>
+<tr>
+<th>Question</th>
+<th>Réponse</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Équation d'évaluation d'une politique ?</td>
+<td>$J_\mu(i)=g(i,\mu(i))+\sum_jp_{ij}(\mu(i))J_\mu(j)$</td>
+</tr>
+<tr>
+<td>Sa nature ?</td>
+<td>Système <strong>linéaire</strong> $n\times n$, solution unique</td>
+</tr>
+<tr>
+<td>Son coût ?</td>
+<td>$O(n^3)$</td>
+</tr>
+<tr>
+<td>Pourquoi est-elle linéaire ?</td>
+<td>Le $\min_u$ a disparu : la politique est fixée</td>
+</tr>
+<tr>
+<td>Itération sur les valeurs ?</td>
+<td>$J_{k+1}(i)=\min_u[g(i,u)+\sum_jp_{ij}(u)J_k(j)]$</td>
+</tr>
+<tr>
+<td>Les deux étapes de l'itération sur les politiques ?</td>
+<td><strong>Évaluation</strong> (système linéaire) puis <strong>amélioration</strong> (argmin)</td>
+</tr>
+<tr>
+<td>Critère d'arrêt ?</td>
+<td>$J_{\mu^k}=J_{\mu^{k+1}}$ pour tout état</td>
+</tr>
+<tr>
+<td>Résultat d'amélioration ?</td>
+<td>$J_{\mu^k}\geq J_{\mu^{k+1}}$ ponctuellement</td>
+</tr>
+<tr>
+<td>Sur quoi repose sa preuve ?</td>
+<td>La <strong>monotonie</strong> de l'opérateur de Bellman</td>
+</tr>
+<tr>
+<td>Pourquoi la terminaison est-elle finie ?</td>
+<td>Décroissance stricte sur un ensemble <strong>fini</strong> de politiques</td>
+</tr>
+<tr>
+<td>$J^\star$ et les inégalités de Bellman ?</td>
+<td>$J^\star$ est le <strong>plus grand</strong> $J$ tel que $J(i)\leq g(i,u)+\sum_jp_{ij}(u)J(j)$</td>
+</tr>
+<tr>
+<td>Le LP correspondant ?</td>
+<td>$\max\sum_iJ(i)$ sous ces contraintes</td>
+</tr>
+<tr>
+<td>Inconvénient du LP ?</td>
+<td>Autant de contraintes que de couples <strong>état-commande</strong></td>
+</tr>
+<tr>
+<td>Quelle méthode pour $n$ petit ?</td>
+<td>Itération sur les <strong>politiques</strong></td>
+</tr>
+<tr>
+<td>Quelle méthode pour $n$ grand ?</td>
+<td>Itération sur les <strong>valeurs</strong></td>
+</tr>
+<tr>
+<td>Et pour $n$ très grand ?</td>
+<td><strong>DP approchée</strong> — aucune méthode exacte</td>
+</tr>
+</tbody></table>
+</main>
+
+
+
+
+</body></html>

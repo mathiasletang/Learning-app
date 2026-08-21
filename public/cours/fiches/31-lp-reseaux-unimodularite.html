@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fiche 31 — Flots dans les réseaux et unimodularité totale</title>
+<script>
+window.MathJax={tex:{inlineMath:[["$","$"]],displayMath:[["$$","$$"]],processEscapes:true},
+ options:{skipHtmlTags:["script","noscript","style","textarea","pre","code"]},
+ svg:{fontCache:"global"},
+ startup:{pageReady:()=>MathJax.startup.defaultPageReady().then(()=>{document.body.classList.add("ready")})}};
+setTimeout(function(){document.body.classList.add("ready")},2500);
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+/* ============================================================
+   MathiasLearn — feuille de style des fiches
+   Reprise intégrale des tokens de 00_PARCOURS/*.html
+   + blocs pédagogiques (callouts, méthode, essentiels, recall)
+   ============================================================ */
+:root{--bg:#faf9f7;--card:#fff;--ink:#1a1a1a;--muted:#6b6b6b;--line:#e5e2dd;--accent:#8b5e34;
+ --hl:#fdf8ef;--ok:#2d7d4f;--okbg:#f0f7f3;--warn:#b3402f;--warnbg:#fdf3f1;--blue:#2f5d8b;--bluebg:#f1f5fa}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+ font:17px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;padding:0 16px 100px}
+.nav{position:sticky;top:0;background:rgba(250,249,247,.96);backdrop-filter:blur(8px);
+ border-bottom:1px solid var(--line);margin:0 -16px 30px;padding:11px 16px;z-index:50;
+ display:flex;gap:6px;flex-wrap:wrap;font-size:13px}
+.nav a{color:var(--muted);text-decoration:none;padding:4px 9px;border-radius:5px;white-space:nowrap}
+.nav a:hover{background:var(--line);color:var(--ink)}
+.nav a.on{background:var(--accent);color:#fff}
+main{max-width:780px;margin:0 auto}
+h1{font-size:31px;letter-spacing:-.02em;margin:.4em 0 .5em;line-height:1.25}
+h2{font-size:23px;margin:2.2em 0 .7em;padding-bottom:.3em;border-bottom:1px solid var(--line)}
+h3{font-size:19px;margin:1.9em 0 .5em;color:var(--accent)}
+h4{font-size:17px;margin:1.5em 0 .4em}
+p{margin:.8em 0} a{color:var(--accent)} hr{border:0;border-top:1px solid var(--line);margin:2.6em 0}
+table{border-collapse:collapse;width:100%;margin:1.3em 0;font-size:15.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+th{background:#f3f0eb;font-weight:600}
+tr:nth-child(even) td{background:#fcfbfa}
+code{font-family:"SF Mono",Menlo,Consolas,monospace;font-size:.88em;background:#f2efea;padding:2px 6px;border-radius:4px;white-space:nowrap}
+pre{background:#f2efea;padding:14px 16px;border-radius:8px;overflow-x:auto}
+pre code{background:none;padding:0;white-space:pre}
+blockquote{border-left:3px solid var(--accent);background:var(--hl);margin:1.4em 0;padding:14px 20px;border-radius:0 8px 8px 0}
+blockquote p:first-child{margin-top:0} blockquote p:last-child{margin-bottom:0}
+ul,ol{padding-left:1.5em} li{margin:.35em 0} em{color:#4a4a4a}
+mjx-container[display="true"]{margin:1.1em 0!important;overflow-x:auto;overflow-y:hidden;padding:2px 0}
+mjx-container svg{max-width:100%}
+body:not(.ready) main{opacity:0} main{opacity:1;transition:opacity .25s}
+
+/* --- bandeau de tête de fiche --- */
+.cours{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--accent);
+ border-radius:0 10px 10px 0;padding:18px 22px;margin:0 0 34px}
+.cours h4{margin:0 0 4px;font-size:14px;text-transform:uppercase;letter-spacing:.07em;color:var(--accent)}
+.cours .cs{color:var(--muted);font-size:14.5px;margin:0 0 14px}
+
+/* --- exercices / corrigés --- */
+.ex{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:6px 24px 20px;margin:18px 0}
+.ex>h3:first-child{margin-top:14px}
+details.cor{margin-top:18px;border:1px solid var(--line);border-radius:8px;background:#fcfbfa;overflow:hidden}
+details.cor>summary{cursor:pointer;padding:12px 16px;font-weight:600;font-size:15px;color:var(--accent);
+ list-style:none;display:flex;align-items:center;gap:9px;user-select:none;transition:.15s;min-height:44px}
+details.cor>summary::-webkit-details-marker{display:none}
+details.cor>summary:hover{background:var(--hl)}
+details.cor>summary::before{content:"\25B6";font-size:10px;transition:transform .18s;display:inline-block}
+details.cor[open]>summary::before{transform:rotate(90deg)}
+details.cor[open]>summary{background:var(--okbg);color:var(--ok);border-bottom:1px solid var(--line)}
+.cor .in{padding:4px 20px 16px}
+.cor .in>*:first-child{margin-top:.9em}
+
+/* --- blocs pédagogiques (callouts) ---
+   Générés depuis une citation Markdown dont le premier **gras** commence
+   par un mot-clé : DÉFINITION, THÉORÈME, MÉTHODE, PIÈGE, INTUITION… */
+.cal{border:1px solid var(--line);border-left:4px solid var(--accent);background:var(--card);
+ border-radius:0 10px 10px 0;padding:15px 20px;margin:1.5em 0}
+.cal>p:first-child{margin-top:0}.cal>p:last-child,.cal>ul:last-child,.cal>ol:last-child{margin-bottom:0}
+.cal .lab{display:block;font-size:12.5px;text-transform:uppercase;letter-spacing:.08em;
+ font-weight:700;color:var(--accent);margin-bottom:6px}
+.cal.formel{background:var(--hl)}
+.cal.piege{border-left-color:var(--warn);background:var(--warnbg)}
+.cal.piege .lab{color:var(--warn)}
+.cal.methode{border-left-color:var(--ok);background:var(--okbg)}
+.cal.methode .lab{color:var(--ok)}
+.cal.intu{border-left-color:var(--blue);background:var(--bluebg)}
+.cal.intu .lab{color:var(--blue)}
+.cal.plus{border-left-style:dashed;background:#faf9f7}
+.cal.plus .lab{color:var(--muted)}
+
+/* --- révision express --- */
+.ess{background:var(--card);border:1px solid var(--accent);border-radius:10px;padding:4px 24px 20px;margin:1.6em 0}
+.ess h3{margin-top:1.3em}
+.rec{background:var(--card);border:1px dashed var(--accent);border-radius:10px;padding:4px 24px 18px;margin:1.6em 0}
+.rec ol{counter-reset:none}
+
+/* --- impression / PDF --- */
+@media print{
+ .nav{display:none}
+ body{padding:0;background:#fff;font-size:11.2pt;line-height:1.55}
+ main{max-width:none}
+ h1{font-size:23pt}h2{font-size:15pt;margin-top:1.5em}h3{font-size:12.6pt}
+ h2,h3,h4{break-after:avoid;page-break-after:avoid}
+ table,.cal,blockquote{break-inside:avoid;page-break-inside:avoid}
+ table{display:table;font-size:9.6pt}
+ details.cor{border:1px solid var(--line);background:#fcfbfa}
+ details.cor>summary{display:none}
+ details.cor .in{padding-top:10px}
+ .cal,.ex,.ess,.rec{box-shadow:none}
+ a{color:var(--ink);text-decoration:none}
+}
+@page{margin:16mm 15mm 18mm}
+
+/* --- exemples travaillés --- */
+.exm{background:#fcfbfa;border:1px solid var(--line);border-radius:10px;padding:2px 20px 14px;margin:1.5em 0}
+.exm>h4:first-child{margin:14px 0 .5em;color:var(--accent);font-size:13px;text-transform:uppercase;letter-spacing:.07em}
+
+
+/* --- pastilles de priorité (conventions des fiches de l'app) --- */
+h2[data-prio], h3[data-prio], h4[data-prio]{position:relative}
+h2[data-prio]::before,h3[data-prio]::before,h4[data-prio]::before{
+ content:"";display:inline-block;width:9px;height:9px;border-radius:50%;
+ margin-right:9px;vertical-align:middle;background:var(--muted)}
+[data-prio="must"]::before{background:var(--warn)}
+[data-prio="high"]::before{background:#d98324}
+[data-prio="mid"]::before{background:#c9a227}
+[data-prio="low"]::before{background:var(--ok)}
+/* corrigés des fiches de l'app : même traitement que les corrigés des séries */
+details.cor>summary::after{content:""}
+</style></head><body>
+<div class="nav"><a href="24-lp-formulation.html">Programmation linéaire : formulation et géométrie</a><a href="25-lp-affine-par-morceaux.html">Optimisation affine par morceaux : tout ramener à un LP</a><a href="26-lp-polyedres.html">Polyèdres : faces, points extrêmes, test du rang</a><a href="27-lp-convexite-cones.html">Enveloppes convexes, cônes et décomposition d'un polyèdre</a><a href="28-lp-dualite.html">Dualité en programmation linéaire</a><a href="29-lp-sensibilite-jeux.html">Dualité II : sensibilité, prix implicites et jeux à somme nulle</a><a href="30-lp-simplexe.html">L'algorithme du simplexe</a><a href="31-lp-reseaux-unimodularite.html" class="on">Flots dans les réseaux et unimodularité totale</a><a href="32-lp-commande.html">Applications en automatique : suivi de consigne et robustesse</a><a href="33-lp-nombres-entiers.html">Programmation linéaire en nombres entiers et séparation-évaluation</a><a href="34-boyd-ensembles-convexes.html">Ensembles convexes</a><a href="35-boyd-fonctions-convexes.html">Fonctions convexes</a><a href="36-boyd-problemes-convexes.html">Problèmes d'optimisation convexe</a><a href="37-boyd-familles-standard.html">Les familles standard : LP, QP, SOCP, GP, SDP</a><a href="38-boyd-dualite.html">Dualité lagrangienne</a><a href="39-boyd-minimisation-sans-contrainte.html">Minimisation sans contrainte : gradient et Newton</a><a href="40-boyd-contraintes-egalite.html">Minimisation sous contraintes d'égalité</a><a href="41-boyd-points-interieurs.html">Méthodes de points intérieurs</a><a href="42-sous-gradients.html">Sous-gradients et sous-différentiel</a><a href="43-methode-sous-gradient.html">La méthode du sous-gradient</a></div>
+<main><h1>Fiche 31 — Flots dans les réseaux et unimodularité totale</h1>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Matière</strong></td>
+<td>Maths · Optimisation</td>
+</tr>
+<tr>
+<td><strong>Cours source</strong></td>
+<td>Vandenberghe, <em>EE236A — Linear Programming</em> (UCLA), Lecture 17 « Network flow optimization », 16 diapositives</td>
+</tr>
+<tr>
+<td><strong>Difficulté</strong></td>
+<td> Must know — c'est le pont entre programmation linéaire et optimisation combinatoire</td>
+</tr>
+<tr>
+<td><strong>Temps d'étude estimé</strong></td>
+<td>1 h 45</td>
+</tr>
+<tr>
+<td><strong>Prérequis</strong></td>
+<td>Fiche 26 (test du rang, points extrêmes), fiche 24 (problème d'affectation)</td>
+</tr>
+<tr>
+<td><strong>Concepts clés</strong></td>
+<td>Matrice d'incidence, flot, équations de conservation, flot de coût minimal, matrice totalement unimodulaire, intégralité des sommets, relaxation exacte</td>
+</tr>
+<tr>
+<td><strong>Poids à l'examen</strong></td>
+<td>Le résultat central — « unimodularité totale $+$ données entières $\Rightarrow$ sommets entiers » — explique <strong>pourquoi</strong> on peut résoudre certains problèmes combinatoires par un simple LP. C'est le théorème à savoir énoncer et appliquer.</td>
+</tr>
+</tbody></table>
+<h2>Vue d'ensemble</h2>
+<p>La fiche 24 a laissé une promesse en suspens : le problème d'affectation, combinatoire par nature ($N!$ candidats), se résout par un LP parce que « on peut montrer qu'à l'optimum $x_{ij}\in\{0,1\}$ ». Cette leçon <strong>démontre</strong> cette affirmation, et en donne la portée exacte.</p>
+<p>Le mécanisme tient en trois maillons :</p>
+<pre><code>MATRICE D'INCIDENCE d'un graphe  →  TOTALEMENT UNIMODULAIRE
+       + second membre et bornes ENTIERS
+       →  tous les SOMMETS du polyèdre sont ENTIERS
+       →  l'optimum du LP relâché est déjà entier : la RELAXATION EST EXACTE
+</code></pre>
+<p>Autrement dit : sur les problèmes de réseau, la frontière entre « continu, facile » et « entier, difficile » <strong>disparaît</strong>. C'est un des résultats les plus utiles de toute la programmation linéaire.</p>
+<h2 data-prio="mid">Concept 1 — Réseaux et matrice d'incidence</h2>
+<p><strong>Réseau</strong> (graphe orienté, <em>digraph</em>) : $m$ nœuds reliés par $n$ <strong>arcs</strong> orientés. Les arcs sont des couples ordonnés $(i,j)$ de nœuds. Le cours suppose <strong>au plus un arc</strong> d'un nœud $i$ vers un nœud $j$, et <strong>aucune boucle</strong> (arc $(i,i)$).</p>
+<p><strong>Matrice d'incidence arc-nœud</strong> : la matrice $A$ de taille $m\times n$ définie par
+$$A_{ij} = \begin{cases} 1 &amp; \text{si l'arc } j \text{ part du nœud } i\\ -1 &amp; \text{si l'arc } j \text{ arrive au nœud } i\\ 0 &amp; \text{sinon}\end{cases}$$</p>
+<p><strong>Sa structure, à retenir absolument.</strong> Chaque <strong>colonne</strong> (un arc) a exactement <strong>deux</strong> entrées non nulles : un $+1$ à son origine, un $-1$ à son extrémité. Tout le reste de la leçon découle de cette seule observation.</p>
+<h2 data-prio="high">Concept 2 — Flots et conservation</h2>
+<p><strong>Vecteur de flot</strong> $x\in\mathbb{R}^n$ : $x_j$ est le flot (de matière, de trafic, de charge, d'information…) circulant dans l'arc $j$ — <strong>positif</strong> dans le sens de l'arc, <strong>négatif</strong> dans l'autre sens.</p>
+<p><strong>Flot total sortant du nœud $i$</strong> :
+$$\sum_{j=1}^n A_{ij}x_j = (Ax)_i$$
+Le produit $Ax$ compte automatiquement chaque flot <strong>en positif</strong> pour le nœud d'où il part et <strong>en négatif</strong> pour celui où il arrive.</p>
+<p><strong>Vecteur d'approvisionnement</strong> $b\in\mathbb{R}^m$ : $b_i$ est l'apport externe au nœud $i$ (une valeur <strong>négative</strong> représentant une demande). Il doit vérifier
+$$\mathbf1^Tb = 0$$
+c'est-à-dire <strong>offre totale $=$ demande totale</strong>.</p>
+<p><strong>Équations de conservation :</strong>
+$$Ax = b$$</p>
+<p class="cal piege"> La condition $\mathbf1^Tb = 0$ n'est pas cosmétique : les lignes de $A$ somment à zéro (chaque colonne contient un $+1$ et un $-1$), donc $\mathbf1^TAx = 0$ pour tout $x$. Si $\mathbf1^Tb\neq0$, le système $Ax=b$ est <strong>sans solution</strong>. C'est le premier réflexe de vérification.</p>
+<h2 data-prio="must">Concept 3 — Le problème de flot de coût minimal</h2>
+<p>$$\begin{array}{ll}\text{minimiser} &amp; c^Tx\\ \text{sous} &amp; Ax = b\\ &amp; l\preceq x\preceq u\end{array}$$</p>
+<ul>
+<li>$c_j$ est le <strong>coût unitaire</strong> du flot sur l'arc $j$ ;</li>
+<li>$l_j$ et $u_j$ bornent le flot sur l'arc $j$ (typiquement $l_j\leq0\leq u_j$) ;</li>
+<li>on suppose $l_j&lt;u_j$, en autorisant $l_j=-\infty$ et $u_j=+\infty$ pour alléger les notations.</li>
+</ul>
+<p>Ce modèle <strong>contient comme cas particuliers</strong> un grand nombre de problèmes d'optimisation dans les réseaux.</p>
+<h3>Le problème de flot maximal</h3>
+<p>Maximiser le flot du nœud $1$ (la <strong>source</strong>) vers le nœud $m$ (le <strong>puits</strong>) :
+$$\begin{array}{ll}\text{maximiser} &amp; t\\ \text{sous} &amp; Ax = t\,e\\ &amp; l\preceq x\preceq u\end{array} \qquad\text{où } e = (1,0,\dots,0,-1)$$</p>
+<p><strong>Mise sous forme de flot de coût minimal.</strong> On ajoute un <strong>arc artificiel</strong> $n+1$ reliant le puits à la source, et l'on minimise $-t$ :
+$$\begin{array}{ll}\text{minimiser} &amp; -t\\ \text{sous} &amp; \begin{pmatrix}A &amp; -e\end{pmatrix}\begin{pmatrix}x\\t\end{pmatrix} = 0\\ &amp; l\preceq x\preceq u\end{array}$$</p>
+<p><strong>L'idée.</strong> Refermer le réseau par un arc de retour transforme un problème de flot <strong>avec</strong> source et puits en un problème de <strong>circulation</strong> sans apport externe : tout ce qui sort revient. Le flot maximal devient le flot qui circule dans l'arc de retour.</p>
+<h2 data-prio="must">Concept 4 — Matrices totalement unimodulaires</h2>
+<p><strong>Définition.</strong> Une matrice est <strong>totalement unimodulaire</strong> si <strong>tous ses mineurs</strong> valent $-1$, $0$ ou $1$ (un mineur étant le déterminant d'une sous-matrice carrée).</p>
+<p><strong>Exemple du cours.</strong>
+$$\begin{pmatrix} 1 &amp; 0 &amp; -1 &amp; 0 &amp; 1\\ 0 &amp; -1 &amp; 1 &amp; -1 &amp; -1\\ 0 &amp; 0 &amp; 0 &amp; 1 &amp; 1\end{pmatrix}$$</p>
+<p><strong>Le théorème principal.</strong> <em>La matrice d'incidence arc-nœud d'un graphe orienté est totalement unimodulaire.</em></p>
+<p><strong>Démonstration (celle du cours, par récurrence).</strong> Soit $A$ une matrice d'incidence $m\times n$. Ses entrées valent $-1$, $0$ ou $1$, et chaque colonne a <strong>exactement deux</strong> entrées non nulles, un $-1$ et un $+1$. Soit $B$ une sous-matrice carrée $k\times k$ de $A$. Trois cas :</p>
+<ul>
+<li>si $B$ a une <strong>colonne nulle</strong>, alors $\det B = 0$ ;</li>
+<li>si <strong>toutes</strong> les colonnes de $B$ ont leurs deux entrées non nulles, alors $\mathbf1^TB = 0$ (chaque colonne somme à $-1+1=0$), donc les lignes sont liées et $\det B = 0$ ;</li>
+<li>sinon, $B$ possède une colonne $j$ avec <strong>une seule</strong> entrée non nulle $B_{ij}$, et le développement selon cette colonne donne
+$$\det B = (-1)^{i+j}\,B_{ij}\,\det C$$
+où $C$, d'ordre $k-1$, s'obtient en supprimant la ligne $i$ et la colonne $j$ de $B$.</li>
+</ul>
+<p>Par récurrence sur $k$, tous les mineurs valent donc $\pm1$ ou $0$. $\blacksquare$</p>
+<p><strong>Deux propriétés utiles.</strong></p>
+<ul>
+<li>les entrées $A_{ij}$ (mineurs d'ordre 1) valent $-1$, $0$ ou $1$ ;</li>
+<li><strong>l'inverse de toute sous-matrice carrée inversible de $A$ est à coefficients entiers</strong> ($\pm1$ ou $0$) — conséquence de la formule $B^{-1} = \frac{1}{\det B}\,\mathrm{com}(B)^T$ avec $\det B = \pm1$ et une comatrice entière.</li>
+</ul>
+<p>C'est cette seconde propriété qui fait tout le travail au concept suivant.</p>
+<h2 data-prio="must">Concept 5 — Intégralité des points extrêmes</h2>
+<p><strong>Théorème.</strong> Soit $P$ le polyèdre de $\mathbb{R}^n$ défini par
+$$Ax = b, \qquad l\preceq x\preceq u$$
+où $A$ est <strong>totalement unimodulaire</strong>, $b$ un vecteur <strong>entier</strong>, et les bornes finies $l_k$, $u_k$ <strong>entières</strong>. Alors <strong>tous les points extrêmes de $P$ sont des vecteurs entiers</strong>.</p>
+<p><strong>Démonstration (celle du cours).</strong> On applique le test du rang (fiche 26) à un point $\hat x\in P$. Partitionnons $\{1,\dots,n\}$ en trois ensembles :
+$$l_k&lt;\hat x_k&lt;u_k \ (k\in J_0), \qquad \hat x_k = l_k \ (k\in J_-), \qquad \hat x_k = u_k \ (k\in J_+)$$
+et notons $A_0$, $A_-$, $A_+$ les sous-matrices correspondantes de $A$. Le test du rang donne
+$$\mathbf{rank}\begin{pmatrix} 0 &amp; I &amp; 0\\ 0 &amp; 0 &amp; -I\\ A_0 &amp; A_- &amp; A_+\end{pmatrix} = n \qquad\Longleftrightarrow\qquad A_0 \text{ est de rang colonne plein}$$</p>
+<p>L'intégralité s'ensuit : les composantes bloquées aux bornes sont entières par hypothèse, et les composantes libres se lisent sur
+$$A_0\,\hat x_{J_0} = b - A_-\hat x_{J_-} - A_+\hat x_{J_+}$$</p>
+<ul>
+<li>le second membre est <strong>entier</strong> ($\hat x_k$ entier pour $k\in J_-\cup J_+$, $b$ entier, $A$ entière) ;</li>
+<li>l'inverse de toute sous-matrice carrée inversible de $A_0$ est à coefficients <strong>entiers</strong> (unimodularité totale).</li>
+</ul>
+<p>Donc $\hat x_{J_0}$ est entier. $\blacksquare$</p>
+<p class="cal piege"> Les <strong>trois</strong> hypothèses sont indispensables : unimodularité totale de $A$, <strong>et</strong> $b$ entier, <strong>et</strong> bornes entières. Retirez-en une et le résultat tombe — un sommet peut avoir des coordonnées fractionnaires.</p>
+<h2 data-prio="must">Concept 6 — La conséquence : la relaxation est exacte</h2>
+<p>Considérons le <strong>programme linéaire en nombres entiers</strong>
+$$\begin{array}{ll}\text{minimiser} &amp; c^Tx\\ \text{sous} &amp; Ax = b,\quad l\preceq x\preceq u\\ &amp; x\in\mathbb{Z}^n\end{array}$$
+En général, un tel problème est <strong>très difficile</strong>. Mais :</p>
+<blockquote>
+<p><strong>Si $A$ est totalement unimodulaire et si $b$, $l$, $u$ sont entiers</strong>, ce problème est <strong>équivalent</strong> à sa <strong>relaxation linéaire</strong> — le même problème sans la contrainte $x\in\mathbb{Z}^n$.</p>
+</blockquote>
+<p><strong>Pourquoi.</strong> L'optimum du LP relâché est atteint en un <strong>point extrême</strong> (fiche 27) ; par le concept 5, ce point extrême est <strong>entier</strong> ; il est donc admissible pour le problème entier, et optimal puisqu'il minimise sur un ensemble plus grand.</p>
+<p><strong>La portée du résultat.</strong> On dispose donc d'une famille entière de problèmes combinatoires — tous ceux dont la matrice de contraintes est une matrice d'incidence — que l'on sait résoudre <strong>en temps polynomial</strong> par les méthodes de la programmation linéaire, alors que le problème entier général est NP-difficile.</p>
+<p class="cal piege"> <strong>Ne généralisez pas.</strong> L'exactitude de la relaxation est <strong>exceptionnelle</strong>. Pour une matrice de contraintes quelconque, la relaxation ne donne qu'une <strong>borne inférieure</strong>, et l'écart (le <em>saut d'intégrité</em>) peut être arbitrairement grand.</p>
+<h2 data-prio="high">Concept 7 — Trois applications</h2>
+<h3>Plus court chemin</h3>
+<p>Dans un graphe orienté de matrice d'incidence $A$, les chemins (orientés) du nœud $1$ au nœud $m$ se représentent par les vecteurs $x$ vérifiant
+$$Ax = (1,0,\dots,0,-1), \qquad x\in\{0,1\}^n$$
+Le plus court chemin est donc solution de
+$$\min\ \mathbf1^Tx \quad\text{s.c.}\quad Ax = (1,0,\dots,0,-1),\quad x\in\{0,1\}^n$$</p>
+<p><strong>Formulation LP :</strong> on remplace $x\in\{0,1\}^n$ par $0\preceq x\preceq\mathbf1$. Les solutions optimales <strong>extrêmes</strong> vérifient automatiquement $x_i\in\{0,1\}$ — l'unité d'approvisionnement injectée en $1$ ressort en $m$ en suivant un chemin.</p>
+<h3>Théorème de Birkhoff</h3>
+<p>Une matrice $X$ de taille $N\times N$ est <strong>bistochastique</strong> si $0\leq X_{ij}\leq1$ et
+$$\sum_{i=1}^N X_{ij} = 1 \ (\forall j), \qquad \sum_{j=1}^N X_{ij} = 1 \ (\forall i)$$
+L'ensemble de ces matrices est un polyèdre $P\subset\mathbb{R}^{N\times N}$.</p>
+<p><strong>Théorème.</strong> Les points extrêmes de $P$ sont exactement les <strong>matrices de permutation</strong>.</p>
+<p><strong>Preuve par les réseaux (celle du cours).</strong> On interprète $X$ comme un flot dans un graphe <strong>biparti</strong> à $N$ nœuds d'entrée et $N$ nœuds de sortie : $X_{ij}$ est le flot de l'entrée $i$ vers la sortie $j$, chaque entrée ayant un approvisionnement de $1$ et chaque sortie une demande de $1$. La matrice de contraintes est la matrice d'incidence de ce graphe biparti, donc <strong>totalement unimodulaire</strong> ; les données sont entières ; donc tout point extrême $X$ est <strong>à coefficients entiers</strong>, c'est-à-dire dans $\{0,1\}$ — une matrice de permutation. $\blacksquare$</p>
+<p><em>(La fiche 26 en donnait une preuve directe par échange le long d'un cycle ; celle-ci est immédiate une fois l'unimodularité acquise.)</em></p>
+<h3>Couplage biparti pondéré — la promesse tenue</h3>
+<p>$$\begin{array}{ll}\text{minimiser} &amp; \displaystyle\sum_{i,j=1}^N A_{ij}X_{ij}\\[4pt] \text{sous} &amp; \displaystyle\sum_{i=1}^N X_{ij} = 1, \quad j=1,\dots,N\\[4pt] &amp; \displaystyle\sum_{j=1}^N X_{ij} = 1, \quad i=1,\dots,N\\[4pt] &amp; 0\leq X_{ij}\leq1\end{array}$$</p>
+<p>C'est <strong>exactement</strong> le problème d'affectation du slide 1-8 (fiche 24), en version relâchée. <strong>Intégralité</strong> : toute solution optimale extrême a ses entrées dans $\{0,1\}$. La promesse laissée en suspens à la leçon 1 est donc tenue seize leçons plus tard, et la raison est l'unimodularité totale de la matrice d'incidence du graphe biparti.</p>
+<h3>Comment résoudre l'exercice type (protocole)</h3>
+<ol>
+<li><strong>Dessiner le graphe</strong> : nœuds, arcs orientés, numéroter les arcs.</li>
+<li><strong>Écrire la matrice d'incidence</strong> $A$ : une colonne par arc, $+1$ à l'origine, $-1$ à l'extrémité.</li>
+<li><strong>Vérifier $\mathbf1^Tb = 0$</strong> — sinon le problème est immédiatement non admissible.</li>
+<li><strong>Poser le LP</strong> : $\min c^Tx$ sous $Ax=b$, $l\preceq x\preceq u$.</li>
+<li><strong>Vérifier les hypothèses d'intégralité</strong> : $A$ d'incidence (donc totalement unimodulaire), $b$, $l$, $u$ entiers.</li>
+<li><strong>Conclure sur la relaxation</strong> : si les hypothèses tiennent, la solution du LP est entière — inutile d'ajouter $x\in\mathbb{Z}^n$.</li>
+<li><strong>Interpréter</strong> : quel chemin, quelle affectation, quel flot le vecteur $x^\star$ décrit-il ?</li>
+</ol>
+<h3>Comment reconnaître un problème de flot</h3>
+<table>
+<thead>
+<tr>
+<th>Signe dans l'énoncé</th>
+<th>Modélisation</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>« acheminer », « transporter », « router » entre des sites</td>
+<td>flot de coût minimal</td>
+</tr>
+<tr>
+<td>« le plus court chemin de A à B »</td>
+<td>flot unitaire, $b = e_1-e_m$</td>
+</tr>
+<tr>
+<td>« débit maximal entre une source et un puits »</td>
+<td>flot maximal, arc de retour artificiel</td>
+</tr>
+<tr>
+<td>« affecter $N$ personnes à $N$ tâches »</td>
+<td>couplage biparti, intégralité automatique</td>
+</tr>
+<tr>
+<td>Une contrainte « ce qui entre égale ce qui sort »</td>
+<td>équations de conservation $Ax=b$</td>
+</tr>
+<tr>
+<td>Des capacités sur les liaisons</td>
+<td>bornes $l\preceq x\preceq u$</td>
+</tr>
+</tbody></table>
+<h3>Exercices progressifs</h3>
+<p><strong> Niveau 1</strong> — Un réseau a $b = (3,\ -1,\ -1)$. Le problème est-il bien posé ?</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p>$\mathbf1^Tb = 3-1-1 = 1\neq0$ : offre et demande ne s'équilibrent pas. Comme $\mathbf1^TAx = 0$ pour tout $x$ (chaque colonne de $A$ somme à zéro), le système $Ax=b$ <strong>n'a aucune solution</strong>. Il faut corriger les données, par exemple $b=(2,-1,-1)$.</p>
+</div></details>
+
+<p><strong> Niveau 2</strong> — Écrivez la matrice d'incidence du graphe à 3 nœuds et 3 arcs $1\to2$, $2\to3$, $1\to3$.</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p>Une colonne par arc, dans l'ordre donné :
+$$A = \begin{pmatrix} 1 &amp; 0 &amp; 1\\ -1 &amp; 1 &amp; 0\\ 0 &amp; -1 &amp; -1\end{pmatrix}$$
+<em>Contrôles :</em> chaque colonne contient exactement un $+1$ et un $-1$  ; chaque ligne somme à… peu importe, mais <strong>chaque colonne</strong> somme à $0$, donc $\mathbf1^TA = 0$ .</p>
+</div></details>
+
+<p><strong> Niveau 3</strong> — Sur ce graphe, avec $b = (1,0,-1)$, $l=0$, $u=\mathbf1$ et des coûts $c = (1,1,3)$, trouvez le plus court chemin de $1$ à $3$.</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p>Les contraintes $Ax=b$ s'écrivent $x_1+x_3 = 1$, $-x_1+x_2 = 0$, $-x_2-x_3 = -1$. De la deuxième, $x_2=x_1$ ; en reportant dans la première, $x_3 = 1-x_1$ ; la troisième est alors automatiquement satisfaite. Le coût vaut
+$$c^Tx = x_1 + x_2 + 3x_3 = 2x_1 + 3(1-x_1) = 3 - x_1$$
+minimisé en $x_1 = 1$ (borne supérieure), soit $x = (1,1,0)$ de coût $2$ : le chemin $1\to2\to3$. La solution est <strong>entière sans qu'on l'ait imposé</strong>  — matrice d'incidence, données entières.
+<em>Lecture :</em> le chemin direct $1\to3$ coûte $3$, le détour par $2$ coûte $1+1=2$. Le détour est plus court.</p>
+</div></details>
+
+<p><strong> Niveau 4 — type feuille d'exercices</strong> — Donnez un exemple de LP en nombres entiers dont la relaxation <strong>n'est pas</strong> exacte, et expliquez quelle hypothèse est violée.</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p>$$\max\ x_1+x_2 \quad\text{s.c.}\quad 2x_1+2x_2\leq3,\quad x_1,x_2\geq0,\quad x\in\mathbb{Z}^2$$
+<em>Relaxation</em> : l'optimum continu est atteint sur tout le segment $x_1+x_2 = 3/2$, de valeur $3/2$ ; les sommets $(3/2,0)$ et $(0,3/2)$ sont <strong>fractionnaires</strong>.
+<em>Problème entier</em> : les points entiers admissibles sont $(0,0)$, $(1,0)$, $(0,1)$, de valeur maximale $1$.
+<strong>Saut d'intégrité</strong> : $3/2 - 1 = 1/2 &gt; 0$ — la relaxation n'est pas exacte.
+<em>Hypothèse violée :</em> la matrice de contraintes $\begin{pmatrix}2&amp;2\end{pmatrix}$ <strong>n'est pas totalement unimodulaire</strong> — son mineur d'ordre 1 vaut $2$. Ce n'est pas une matrice d'incidence : sa colonne ne contient pas un $+1$ et un $-1$.</p>
+</div></details>
+
+<h2 data-prio="must">Common mistakes</h2>
+<ol>
+<li><strong>Oublier $\mathbf1^Tb=0$</strong> — sans équilibre offre/demande, $Ax=b$ n'a <strong>aucune</strong> solution.</li>
+<li><strong>Se tromper de signe dans $A$</strong> — $+1$ à l'origine de l'arc, $-1$ à son extrémité ; l'inverser retourne tous les flots.</li>
+<li><strong>Croire toute matrice à coefficients $0,\pm1$ totalement unimodulaire</strong> — c'est faux : la définition porte sur <strong>tous les mineurs</strong>, pas seulement ceux d'ordre 1.</li>
+<li><strong>Oublier l'intégralité de $b$, $l$, $u$</strong> — l'unimodularité de $A$ seule ne suffit pas : avec $b$ fractionnaire, les sommets le sont aussi.</li>
+<li><strong>Généraliser l'exactitude de la relaxation</strong> — elle est propre aux matrices totalement unimodulaires ; ailleurs on n'a qu'une <strong>borne</strong>.</li>
+<li><strong>Confondre point extrême entier et solution entière quelconque</strong> — le théorème porte sur les <strong>sommets</strong> ; un point intérieur du polyèdre peut être fractionnaire, et un solveur doit renvoyer un sommet.</li>
+<li><strong>Modéliser un flot maximal sans arc de retour</strong> — sans lui, la conservation ne peut pas s'écrire comme une circulation.</li>
+</ol>
+<h2>Ultimate Review</h2>
+<ol>
+<li>Matrice d'incidence : $+1$ à l'origine, $-1$ à l'extrémité, <strong>deux non-nuls par colonne</strong>.</li>
+<li>Conservation : $Ax = b$ avec $\mathbf1^Tb=0$ ; $(Ax)_i$ est le flot net sortant du nœud $i$.</li>
+<li>Flot de coût minimal : $\min c^Tx$ s.c. $Ax=b$, $l\preceq x\preceq u$ — modèle générique.</li>
+<li>Flot maximal : $\max t$ s.c. $Ax=te$, $e = e_1-e_m$ ; se ramène au précédent par un <strong>arc de retour</strong>.</li>
+<li><strong>Totalement unimodulaire</strong> : tous les mineurs valent $-1$, $0$ ou $1$. Toute matrice d'incidence l'est (preuve par récurrence sur l'ordre des mineurs).</li>
+<li>Conséquence : l'inverse de toute sous-matrice carrée inversible est <strong>entière</strong>.</li>
+<li><strong>Théorème d'intégralité</strong> : $A$ totalement unimodulaire $+$ $b,l,u$ entiers $\Rightarrow$ tous les sommets sont entiers.</li>
+<li>Donc la <strong>relaxation linéaire d'un LP en nombres entiers est exacte</strong> dans ce cadre.</li>
+<li>Applications : plus court chemin, théorème de Birkhoff, couplage biparti — et la démonstration de l'intégralité du problème d'affectation annoncée à la leçon 1.</li>
+</ol>
+<p><strong>Formulas to know</strong>
+$$A_{ij}\in\{1,-1,0\} \qquad Ax = b,\ \mathbf1^Tb = 0 \qquad \min c^Tx \ \text{s.c.}\ Ax=b,\ l\preceq x\preceq u \qquad A_0\hat x_{J_0} = b - A_-\hat x_{J_-} - A_+\hat x_{J_+}$$</p>
+<p><strong>Methods to know</strong> : le protocole de modélisation en 7 étapes ; la preuve d'unimodularité par développement selon une colonne ; l'argument d'intégralité par le test du rang.</p>
+<div class="rec"><h2>Active Recall</h2><p><strong>Basic</strong> — Définissez une matrice totalement unimodulaire et donnez-en un exemple canonique.</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p>Une matrice dont <strong>tous les mineurs</strong> (déterminants de sous-matrices carrées) valent $-1$, $0$ ou $1$. Exemple canonique : la <strong>matrice d'incidence arc-nœud</strong> d'un graphe orienté.</p>
+</div></details><p><strong>Understanding</strong> — Pourquoi la structure « deux entrées non nulles par colonne » entraîne-t-elle l'unimodularité totale ?</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p>Elle permet une récurrence sur l'ordre du mineur. Pour une sous-matrice carrée $B$ : si une colonne est nulle, $\det B=0$ ; si toutes ont deux non-nuls, $\mathbf1^TB=0$ donc $\det B=0$ ; sinon une colonne a une seule entrée non nulle $B_{ij}=\pm1$, et $\det B = \pm\det C$ avec $C$ d'ordre inférieur. Les trois cas donnent $0$ ou $\pm1$.</p>
+</div></details><p><strong>Application</strong> — $A$ est d'incidence, $b=(1,-1)$, $l=0$, $u=(2{,}5,\ 3)$. Les sommets sont-ils entiers ?</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p><strong>Non garanti</strong> : la borne $u_1 = 2{,}5$ n'est pas entière, et le théorème exige que les bornes <strong>finies</strong> le soient. Un sommet peut se placer sur cette borne fractionnaire. Il faudrait arrondir $u_1$ à $2$ (si les flots doivent rester entiers) pour retrouver la garantie.</p>
+</div></details><p><strong>Comparison</strong> — Relaxation linéaire d'un LP entier : quand est-elle exacte, et sinon que donne-t-elle ?</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p><strong>Exacte</strong> si $A$ est totalement unimodulaire et $b$, $l$, $u$ entiers : l'optimum extrême du LP est déjà entier. <strong>Sinon</strong>, elle ne fournit qu'une <strong>borne</strong> (inférieure en minimisation), et l'écart avec l'optimum entier — le saut d'intégrité — peut être arbitrairement grand.</p>
+</div></details><p><strong>Exam-style</strong> — Démontrez que les points extrêmes de l'ensemble des matrices bistochastiques sont les matrices de permutation, par l'argument de flot.</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p>On voit $X$ comme un flot sur un graphe biparti : $N$ nœuds d'entrée d'approvisionnement $1$, $N$ nœuds de sortie de demande $1$, et un arc $(i,j)$ portant le flot $X_{ij}$. Les contraintes de somme de lignes et de colonnes sont exactement les équations de conservation $Ax=b$ de ce graphe, avec $b$ entier et $0\leq X_{ij}\leq1$. La matrice $A$ étant d'incidence, elle est <strong>totalement unimodulaire</strong> ; par le théorème d'intégralité, tout point extrême a ses entrées entières, donc dans $\{0,1\}$. Une matrice bistochastique à coefficients $0/1$ est une matrice de permutation. Réciproquement, une matrice de permutation est bien un sommet (elle ne s'écrit pas comme milieu de deux bistochastiques distinctes). $\blacksquare$</p>
+</div></details></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h2>Flashcards</h2>
+<table>
+<thead>
+<tr>
+<th>Question</th>
+<th>Réponse</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Matrice d'incidence arc-nœud ?</td>
+<td>$+1$ si l'arc part du nœud, $-1$ s'il y arrive, $0$ sinon</td>
+</tr>
+<tr>
+<td>Combien d'entrées non nulles par colonne ?</td>
+<td>Exactement deux : un $+1$ et un $-1$</td>
+</tr>
+<tr>
+<td>Équations de conservation ?</td>
+<td>$Ax = b$, avec $\mathbf1^Tb = 0$</td>
+</tr>
+<tr>
+<td>Flot de coût minimal ?</td>
+<td>$\min c^Tx$ s.c. $Ax=b$, $l\preceq x\preceq u$</td>
+</tr>
+<tr>
+<td>Flot maximal ?</td>
+<td>$\max t$ s.c. $Ax = t(e_1-e_m)$, $l\preceq x\preceq u$</td>
+</tr>
+<tr>
+<td>Totalement unimodulaire ?</td>
+<td>Tous les mineurs valent $-1$, $0$ ou $1$</td>
+</tr>
+<tr>
+<td>Les matrices d'incidence le sont-elles ?</td>
+<td>Oui — preuve par récurrence sur l'ordre du mineur</td>
+</tr>
+<tr>
+<td>Théorème d'intégralité ?</td>
+<td>$A$ TU $+$ $b,l,u$ entiers $\Rightarrow$ tous les sommets sont entiers</td>
+</tr>
+<tr>
+<td>Conséquence pour un LP entier ?</td>
+<td>La relaxation linéaire est <strong>exacte</strong></td>
+</tr>
+<tr>
+<td>Plus court chemin en LP ?</td>
+<td>$\min\mathbf1^Tx$ s.c. $Ax = e_1-e_m$, $0\preceq x\preceq\mathbf1$</td>
+</tr>
+<tr>
+<td>Points extrêmes des matrices bistochastiques ?</td>
+<td>Les matrices de permutation (Birkhoff)</td>
+</tr>
+<tr>
+<td>Pourquoi l'affectation se résout-elle par un LP ?</td>
+<td>Sa matrice est celle d'un graphe biparti, donc TU</td>
+</tr>
+<tr>
+<td>Que donne la relaxation hors du cadre TU ?</td>
+<td>Une simple borne — le saut d'intégrité peut être grand</td>
+</tr>
+</tbody></table>
+</main>
+
+
+
+
+</body></html>

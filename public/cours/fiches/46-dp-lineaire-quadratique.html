@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fiche 46 — Problèmes linéaire-quadratiques et gestion de stock</title>
+<script>
+window.MathJax={tex:{inlineMath:[["$","$"]],displayMath:[["$$","$$"]],processEscapes:true},
+ options:{skipHtmlTags:["script","noscript","style","textarea","pre","code"]},
+ svg:{fontCache:"global"},
+ startup:{pageReady:()=>MathJax.startup.defaultPageReady().then(()=>{document.body.classList.add("ready")})}};
+setTimeout(function(){document.body.classList.add("ready")},2500);
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+/* ============================================================
+   MathiasLearn — feuille de style des fiches
+   Reprise intégrale des tokens de 00_PARCOURS/*.html
+   + blocs pédagogiques (callouts, méthode, essentiels, recall)
+   ============================================================ */
+:root{--bg:#faf9f7;--card:#fff;--ink:#1a1a1a;--muted:#6b6b6b;--line:#e5e2dd;--accent:#8b5e34;
+ --hl:#fdf8ef;--ok:#2d7d4f;--okbg:#f0f7f3;--warn:#b3402f;--warnbg:#fdf3f1;--blue:#2f5d8b;--bluebg:#f1f5fa}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+ font:17px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;padding:0 16px 100px}
+.nav{position:sticky;top:0;background:rgba(250,249,247,.96);backdrop-filter:blur(8px);
+ border-bottom:1px solid var(--line);margin:0 -16px 30px;padding:11px 16px;z-index:50;
+ display:flex;gap:6px;flex-wrap:wrap;font-size:13px}
+.nav a{color:var(--muted);text-decoration:none;padding:4px 9px;border-radius:5px;white-space:nowrap}
+.nav a:hover{background:var(--line);color:var(--ink)}
+.nav a.on{background:var(--accent);color:#fff}
+main{max-width:780px;margin:0 auto}
+h1{font-size:31px;letter-spacing:-.02em;margin:.4em 0 .5em;line-height:1.25}
+h2{font-size:23px;margin:2.2em 0 .7em;padding-bottom:.3em;border-bottom:1px solid var(--line)}
+h3{font-size:19px;margin:1.9em 0 .5em;color:var(--accent)}
+h4{font-size:17px;margin:1.5em 0 .4em}
+p{margin:.8em 0} a{color:var(--accent)} hr{border:0;border-top:1px solid var(--line);margin:2.6em 0}
+table{border-collapse:collapse;width:100%;margin:1.3em 0;font-size:15.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+th{background:#f3f0eb;font-weight:600}
+tr:nth-child(even) td{background:#fcfbfa}
+code{font-family:"SF Mono",Menlo,Consolas,monospace;font-size:.88em;background:#f2efea;padding:2px 6px;border-radius:4px;white-space:nowrap}
+pre{background:#f2efea;padding:14px 16px;border-radius:8px;overflow-x:auto}
+pre code{background:none;padding:0;white-space:pre}
+blockquote{border-left:3px solid var(--accent);background:var(--hl);margin:1.4em 0;padding:14px 20px;border-radius:0 8px 8px 0}
+blockquote p:first-child{margin-top:0} blockquote p:last-child{margin-bottom:0}
+ul,ol{padding-left:1.5em} li{margin:.35em 0} em{color:#4a4a4a}
+mjx-container[display="true"]{margin:1.1em 0!important;overflow-x:auto;overflow-y:hidden;padding:2px 0}
+mjx-container svg{max-width:100%}
+body:not(.ready) main{opacity:0} main{opacity:1;transition:opacity .25s}
+
+/* --- bandeau de tête de fiche --- */
+.cours{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--accent);
+ border-radius:0 10px 10px 0;padding:18px 22px;margin:0 0 34px}
+.cours h4{margin:0 0 4px;font-size:14px;text-transform:uppercase;letter-spacing:.07em;color:var(--accent)}
+.cours .cs{color:var(--muted);font-size:14.5px;margin:0 0 14px}
+
+/* --- exercices / corrigés --- */
+.ex{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:6px 24px 20px;margin:18px 0}
+.ex>h3:first-child{margin-top:14px}
+details.cor{margin-top:18px;border:1px solid var(--line);border-radius:8px;background:#fcfbfa;overflow:hidden}
+details.cor>summary{cursor:pointer;padding:12px 16px;font-weight:600;font-size:15px;color:var(--accent);
+ list-style:none;display:flex;align-items:center;gap:9px;user-select:none;transition:.15s;min-height:44px}
+details.cor>summary::-webkit-details-marker{display:none}
+details.cor>summary:hover{background:var(--hl)}
+details.cor>summary::before{content:"\25B6";font-size:10px;transition:transform .18s;display:inline-block}
+details.cor[open]>summary::before{transform:rotate(90deg)}
+details.cor[open]>summary{background:var(--okbg);color:var(--ok);border-bottom:1px solid var(--line)}
+.cor .in{padding:4px 20px 16px}
+.cor .in>*:first-child{margin-top:.9em}
+
+/* --- blocs pédagogiques (callouts) ---
+   Générés depuis une citation Markdown dont le premier **gras** commence
+   par un mot-clé : DÉFINITION, THÉORÈME, MÉTHODE, PIÈGE, INTUITION… */
+.cal{border:1px solid var(--line);border-left:4px solid var(--accent);background:var(--card);
+ border-radius:0 10px 10px 0;padding:15px 20px;margin:1.5em 0}
+.cal>p:first-child{margin-top:0}.cal>p:last-child,.cal>ul:last-child,.cal>ol:last-child{margin-bottom:0}
+.cal .lab{display:block;font-size:12.5px;text-transform:uppercase;letter-spacing:.08em;
+ font-weight:700;color:var(--accent);margin-bottom:6px}
+.cal.formel{background:var(--hl)}
+.cal.piege{border-left-color:var(--warn);background:var(--warnbg)}
+.cal.piege .lab{color:var(--warn)}
+.cal.methode{border-left-color:var(--ok);background:var(--okbg)}
+.cal.methode .lab{color:var(--ok)}
+.cal.intu{border-left-color:var(--blue);background:var(--bluebg)}
+.cal.intu .lab{color:var(--blue)}
+.cal.plus{border-left-style:dashed;background:#faf9f7}
+.cal.plus .lab{color:var(--muted)}
+
+/* --- révision express --- */
+.ess{background:var(--card);border:1px solid var(--accent);border-radius:10px;padding:4px 24px 20px;margin:1.6em 0}
+.ess h3{margin-top:1.3em}
+.rec{background:var(--card);border:1px dashed var(--accent);border-radius:10px;padding:4px 24px 18px;margin:1.6em 0}
+.rec ol{counter-reset:none}
+
+/* --- impression / PDF --- */
+@media print{
+ .nav{display:none}
+ body{padding:0;background:#fff;font-size:11.2pt;line-height:1.55}
+ main{max-width:none}
+ h1{font-size:23pt}h2{font-size:15pt;margin-top:1.5em}h3{font-size:12.6pt}
+ h2,h3,h4{break-after:avoid;page-break-after:avoid}
+ table,.cal,blockquote{break-inside:avoid;page-break-inside:avoid}
+ table{display:table;font-size:9.6pt}
+ details.cor{border:1px solid var(--line);background:#fcfbfa}
+ details.cor>summary{display:none}
+ details.cor .in{padding-top:10px}
+ .cal,.ex,.ess,.rec{box-shadow:none}
+ a{color:var(--ink);text-decoration:none}
+}
+@page{margin:16mm 15mm 18mm}
+
+/* --- exemples travaillés --- */
+.exm{background:#fcfbfa;border:1px solid var(--line);border-radius:10px;padding:2px 20px 14px;margin:1.5em 0}
+.exm>h4:first-child{margin:14px 0 .5em;color:var(--accent);font-size:13px;text-transform:uppercase;letter-spacing:.07em}
+
+
+/* --- pastilles de priorité (conventions des fiches de l'app) --- */
+h2[data-prio], h3[data-prio], h4[data-prio]{position:relative}
+h2[data-prio]::before,h3[data-prio]::before,h4[data-prio]::before{
+ content:"";display:inline-block;width:9px;height:9px;border-radius:50%;
+ margin-right:9px;vertical-align:middle;background:var(--muted)}
+[data-prio="must"]::before{background:var(--warn)}
+[data-prio="high"]::before{background:#d98324}
+[data-prio="mid"]::before{background:#c9a227}
+[data-prio="low"]::before{background:var(--ok)}
+/* corrigés des fiches de l'app : même traitement que les corrigés des séries */
+details.cor>summary::after{content:""}
+</style></head><body>
+<div class="nav"><a href="00_COMMENCER_ICI.html">Commencer ici</a><a href="01_NOTATIONS_le-decodeur.html">Notations</a><a href="02_EXERCICES_Serie-0.html">Série 0 — Remise en route</a><a href="03_EXERCICES_Serie-1.html">Série 1 — Convexité</a><a href="04_EXERCICES_Serie-2.html">Série 2 — KKT</a><a href="05_AUTO-EVALUATION.html">Auto-évaluation (quiz)</a><a href="06_FICHE_Optimisation-deux-variables.html">Fiche — Optimisation à 2 variables</a></div>
+<main><h1>Fiche 46 — Problèmes linéaire-quadratiques et gestion de stock</h1>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Matière</strong></td>
+<td>Maths · Optimisation</td>
+</tr>
+<tr>
+<td><strong>Cours source</strong></td>
+<td>Bertsekas, <em>6.231 Dynamic Programming</em>, MIT OpenCourseWare, automne 2015 — cours 4</td>
+</tr>
+<tr>
+<td><strong>Difficulté</strong></td>
+<td> Must know — les deux problèmes stochastiques qu'on sait résoudre entièrement à la main</td>
+</tr>
+<tr>
+<td><strong>Temps d'étude estimé</strong></td>
+<td>2 h</td>
+</tr>
+<tr>
+<td><strong>Prérequis</strong></td>
+<td>Fiche 44 (algorithme DP), fiche 9 (matrices symétriques, définie positive)</td>
+</tr>
+<tr>
+<td><strong>Concepts clés</strong></td>
+<td>Régulateur linéaire-quadratique, équation de Riccati, politique linéaire, équivalent certain, régime stationnaire, gestion de stock, coût de rupture et de stockage, politique à niveau de recomplètement</td>
+</tr>
+<tr>
+<td><strong>Poids à l'examen</strong></td>
+<td>Deux résultats structurels à savoir démontrer par récurrence : <strong>LQ $\Rightarrow$ politique linéaire et coût quadratique</strong>, et <strong>convexité $\Rightarrow$ politique à seuil $S_k$</strong>. Ce sont les deux seuls cas où la DP continue se mène analytiquement.</td>
+</tr>
+</tbody></table>
+<h2>Vue d'ensemble</h2>
+<p>La DP est en général un algorithme numérique : on tabule $J_k$ sur tout l'espace d'états. Deux familles échappent à cette fatalité, parce que la <strong>forme fonctionnelle de $J_k$ se propage à rebours</strong>.</p>
+<pre><code>LINÉAIRE-QUADRATIQUE   J_k quadratique  →  reste quadratique  →  politique LINÉAIRE
+GESTION DE STOCK       J_k convexe      →  reste convexe      →  politique à SEUIL S_k
+</code></pre>
+<p>Dans les deux cas, on ne calcule plus une table mais <strong>quelques nombres</strong> : les matrices $K_k$ de l'équation de Riccati, ou les seuils $S_k$. C'est ce qui fait de ces deux modèles les chevaux de bataille de la macroéconomie dynamique, du contrôle et de la recherche opérationnelle.</p>
+<h2 data-prio="must">Concept 1 — Le problème linéaire-quadratique</h2>
+<p><strong>Système linéaire.</strong>
+$$x_{k+1} = A_kx_k + B_ku_k + w_k$$</p>
+<p><strong>Coût quadratique.</strong>
+$$\mathbb{E}_{w_k,\ k=0,\dots,N-1}\Big[x_N'Q_Nx_N + \sum_{k=0}^{N-1}\big(x_k'Q_kx_k + u_k'R_ku_k\big)\Big]$$
+avec $Q_k\succeq0$ et $R_k\succ0$ (au sens (semi-)défini positif). Les $w_k$ sont <strong>indépendants et centrés</strong>.</p>
+<p class="cal piege"> La distinction $Q_k\succeq0$ mais $R_k\succ0$ n'est pas cosmétique : $R_k$ <strong>strictement</strong> définie positive garantit que la minimisation en $u_k$ a une solution <strong>unique</strong> et que la matrice à inverser dans la formule du gain est régulière. On peut ne pas pénaliser certains états ($Q_k$ singulière), jamais la commande.</p>
+<p><strong>Algorithme DP.</strong>
+$$J_N(x_N) = x_N'Q_Nx_N$$
+$$J_k(x_k) = \min_{u_k}\ \mathbb{E}\Big[x_k'Q_kx_k+u_k'R_ku_k + J_{k+1}\big(A_kx_k+B_ku_k+w_k\big)\Big]$$</p>
+<blockquote>
+<p><strong>Les faits clés (le cours les appelle « key facts »).</strong></p>
+<ul>
+<li>$J_k(x_k)$ est <strong>quadratique</strong> ;</li>
+<li>la politique optimale $\{\mu_0^\star,\dots,\mu_{N-1}^\star\}$ est <strong>linéaire</strong> : $\mu_k^\star(x_k) = L_kx_k$ ;</li>
+<li>un grand nombre de variantes se traitent de la même façon.</li>
+</ul>
+</blockquote>
+<h2 data-prio="must">Concept 2 — L'équation de Riccati</h2>
+<p><strong>Le résultat, à vérifier par récurrence.</strong>
+$$\mu_k^\star(x_k) = L_kx_k, \qquad J_k(x_k) = x_k'K_kx_k + \text{constante}$$
+où les <strong>gains</strong> $L_k$ valent
+$$L_k = -\big(B_k'K_{k+1}B_k+R_k\big)^{-1}B_k'K_{k+1}A_k$$
+et où les matrices $K_k$, <strong>symétriques semi-définies positives</strong>, sont données par
+$$K_N = Q_N$$
+$$\boxed{\ K_k = A_k'\Big(K_{k+1}-K_{k+1}B_k\big(B_k'K_{k+1}B_k+R_k\big)^{-1}B_k'K_{k+1}\Big)A_k + Q_k\ }$$</p>
+<p><strong>C'est l'équation de Riccati en temps discret.</strong> <em>Tout comme la DP, elle part du temps terminal $N$ et progresse à rebours.</em></p>
+<blockquote>
+<p><strong>Ce qui a changé de nature.</strong> On est passé d'une récurrence sur des <strong>fonctions</strong> $J_k$ à une récurrence sur des <strong>matrices</strong> $K_k$ de taille $n\times n$. C'est une réduction de dimension spectaculaire : on ne tabule plus rien.</p>
+</blockquote>
+<p><strong>Équivalent certain.</strong> <em>La propriété d'équivalence certaine est vérifiée</em> : la politique optimale est <strong>la même</strong> que si l'on remplaçait $w_k$ par son espérance $\mathbb{E}\{w_k\}=0$.</p>
+<p class="cal piege"> <strong>L'équivalent certain est une propriété rare, pas une règle générale.</strong> Elle signifie qu'on peut concevoir la commande comme si le système était déterministe. Elle tient ici parce que le bruit est <strong>additif</strong>, <strong>centré</strong> et <strong>indépendant</strong> de l'état et de la commande. Le concept 4 montrera qu'elle tombe dès que le bruit entre dans les <strong>matrices</strong> du système.</p>
+<h2 data-prio="high">Concept 3 — Comportement asymptotique et régime stationnaire</h2>
+<p><strong>Hypothèses.</strong> Système et coût par étape <strong>stationnaires</strong> ($A_k=A$, $B_k=B$, $Q_k=Q$, $R_k=R$), plus deux hypothèses techniques : <strong>commandabilité</strong> de $(A,B)$ et <strong>observabilité</strong> de $(A,C)$ où $Q=C'C$.</p>
+<p><strong>Le résultat.</strong> L'équation de Riccati <strong>converge</strong> :
+$$\lim_{k\to-\infty}K_k = K$$
+où $K$ est <strong>définie positive</strong> et l'<strong>unique</strong> solution (dans la classe des matrices semi-définies positives) de l'<strong>équation algébrique de Riccati</strong>
+$$K = A'\Big(K - KB\big(B'KB+R\big)^{-1}B'K\Big)A + Q$$</p>
+<p><strong>Le contrôleur stationnaire optimal</strong> $\mu^\star(x)=Lx$ avec
+$$L = -\big(B'KB+R\big)^{-1}B'KA$$
+est <strong>stabilisant</strong> : la matrice $A+BL$ du système en boucle fermée
+$$x_{k+1}=(A+BL)x_k+w_k$$
+vérifie $\lim_{k\to\infty}(A+BL)^k=0$.</p>
+<blockquote>
+<p><strong>La lecture.</strong> Loin de l'horizon terminal, le gain optimal ne dépend plus du temps : on obtient un <strong>contrôleur stationnaire</strong>, calculé une fois pour toutes en résolvant une équation matricielle. Et ce contrôleur <strong>stabilise</strong> le système, même si $A$ seule ne l'était pas. C'est le résultat fondateur du contrôle optimal linéaire.</p>
+</blockquote>
+<h3>Preuve graphique dans le cas scalaire</h3>
+<p>En posant $P_k = K_{N-k}$ (on renverse le temps pour parler de convergence quand $k\to\infty$), l'équation de Riccati scalaire s'écrit
+$$P_{k+1} = A^2\Big(P_k - \frac{B^2P_k^2}{B^2P_k+R}\Big)+Q = F(P_k), \qquad F(P) = \frac{A^2RP}{B^2P+R}+Q$$</p>
+<p><strong>Ce que le graphe montre.</strong> $F$ est croissante, concave, de valeur $F(0)=Q$ et d'asymptote horizontale $A^2R/B^2+Q$. Son intersection avec la première bissectrice donne les points fixes $P=F(P)$ : <em>il y a <strong>deux</strong> solutions stationnaires, dont <strong>une seule est positive</strong></em>. C'est celle-là qui est la limite, et la monotonie de $F$ garantit la convergence de $P_k$ vers elle depuis toute condition initiale positive.</p>
+<blockquote>
+<p><strong>Le mécanisme à retenir</strong> : $F$ croissante et concave, un unique point fixe positif, donc convergence monotone. C'est le même argument que pour toute récurrence scalaire $P_{k+1}=F(P_k)$ — et il se généralise en dimension quelconque sous les hypothèses de commandabilité et d'observabilité.</p>
+</blockquote>
+<h2 data-prio="high">Concept 4 — Matrices de système aléatoires</h2>
+<p><strong>Le cadre.</strong> Supposons que $\{A_0,B_0\},\dots,\{A_{N-1},B_{N-1}\}$ ne soient <strong>pas connues</strong> mais soient des matrices <strong>aléatoires indépendantes</strong>, elles-mêmes indépendantes des $w_k$.</p>
+<p><strong>Algorithme DP.</strong>
+$$J_k(x_k) = \min_{u_k}\ \mathbb{E}_{w_k,A_k,B_k}\Big[x_k'Q_kx_k+u_k'R_ku_k+J_{k+1}\big(A_kx_k+B_ku_k+w_k\big)\Big]$$</p>
+<p><strong>La politique reste linéaire</strong>, $\mu_k^\star(x_k)=L_kx_k$, mais les formules gagnent des espérances :
+$$L_k = -\Big(R_k+\mathbb{E}\{B_k'K_{k+1}B_k\}\Big)^{-1}\mathbb{E}\{B_k'K_{k+1}A_k\}$$
+$$K_k = \mathbb{E}\{A_k'K_{k+1}A_k\} - \mathbb{E}\{A_k'K_{k+1}B_k\}\Big(R_k+\mathbb{E}\{B_k'K_{k+1}B_k\}\Big)^{-1}\mathbb{E}\{B_k'K_{k+1}A_k\}+Q_k$$</p>
+<p><strong>Deux propriétés se perdent.</strong></p>
+<blockquote>
+<ul>
+<li><em>L'équivalence certaine <strong>peut ne pas</strong> être vérifiée.</em></li>
+<li><em>L'équation de Riccati <strong>peut ne pas</strong> converger vers un régime stationnaire.</em></li>
+</ul>
+</blockquote>
+<p><strong>Pourquoi.</strong> Dans le cas scalaire, $P_{k+1}=\tilde F(P_k)$ avec
+$$\tilde F(P) = \frac{\mathbb{E}\{A^2\}RP}{\mathbb{E}\{B^2\}P+R}+Q+\frac{TP^2}{\mathbb{E}\{B^2\}P+R}, \qquad T = \mathbb{E}\{A^2\}\mathbb{E}\{B^2\}-\big(\mathbb{E}\{A\}\big)^2\big(\mathbb{E}\{B\}\big)^2$$</p>
+<p>Le terme supplémentaire en $TP^2$ change tout : si $T&gt;0$ — c'est-à-dire dès que $A$ ou $B$ est réellement aléatoire — $\tilde F$ cesse d'être bornée et peut <strong>n'avoir aucun point fixe</strong>, auquel cas $P_k\to\infty$.</p>
+<blockquote>
+<p><strong>L'interprétation.</strong> $T$ mesure la <strong>variabilité</strong> des matrices du système. Une incertitude <strong>additive</strong> (le bruit $w_k$) se moyenne et ne coûte rien à la conception ; une incertitude <strong>multiplicative</strong> (sur $A$ et $B$) déstabilise. C'est la différence entre « je ne sais pas où je serai poussé » et « je ne sais pas comment le système réagit à mes commandes » — la seconde est bien plus grave.</p>
+</blockquote>
+<h2 data-prio="must">Concept 5 — Gestion de stock</h2>
+<p><strong>Le modèle.</strong> $x_k$ le stock, $u_k$ la quantité achetée, $w_k$ la demande :
+$$x_{k+1}=x_k+u_k-w_k, \qquad k=0,\dots,N-1$$</p>
+<p><strong>Le coût à minimiser.</strong>
+$$\mathbb{E}\Big[\sum_{k=0}^{N-1}\big(c\,u_k + H(x_k+u_k)\big)\Big]$$
+où
+$$H(x+u) = \mathbb{E}\big\{r(x+u-w)\big\}$$
+est le <strong>coût espéré de rupture et de stockage</strong>, avec par exemple, pour $p&gt;0$ et $h&gt;0$,
+$$r(x) = p\max(0,-x)+h\max(0,x)$$</p>
+<div class="cal methode"><span class="lab">Comment lire $r$.</span>
+<p> Si le stock final $x$ est <strong>négatif</strong> (rupture), on paie $p$ par unité manquante ; s'il est <strong>positif</strong>, on paie $h$ par unité stockée. C'est une fonction <strong>convexe affine par morceaux</strong>, la même forme qu'à la fiche 25 — un maximum de deux fonctions affines : $r(x)=\max\{-px,\ hx\}$.</p>
+</div>
+<p><strong>Algorithme DP.</strong>
+$$J_N(x_N)=0, \qquad J_k(x_k)=\min_{u_k\geq0}\Big[c\,u_k+H(x_k+u_k)+\mathbb{E}\big\{J_{k+1}(x_k+u_k-w_k)\big\}\Big]$$</p>
+<h2 data-prio="must">Concept 6 — La politique optimale à niveau de recomplètement</h2>
+<p><strong>Le changement de variable décisif.</strong> Posons $y = x_k+u_k$, le <strong>stock après commande</strong>. Comme $u_k\geq0$, cela revient à $y\geq x_k$, et l'algorithme se réécrit
+$$J_k(x_k) = \min_{u_k\geq0}\Big[cu_k+H(x_k+u_k)+\mathbb{E}\{J_{k+1}(x_k+u_k-w_k)\}\Big] = \min_{y\geq x_k} G_k(y) - c\,x_k$$
+où
+$$\boxed{\ G_k(y) = c\,y + H(y) + \mathbb{E}\big\{J_{k+1}(y-w)\big\}\ }$$</p>
+<div class="cal intu"><span class="lab">Ce que le changement de variable accomplit.</span>
+<p> La minimisation portait sur $u_k$ avec un terme $cx_k$ mélangé dedans ; elle porte maintenant sur le <strong>niveau visé</strong> $y$, la seule contrainte étant $y\geq x_k$. La fonction $G_k$ <strong>ne dépend plus de $x_k$</strong> — celui-ci n'apparaît que dans la contrainte et dans le terme constant $-cx_k$.</p>
+</div>
+<p><strong>Le résultat.</strong> Si $G_k$ est <strong>convexe</strong> et $\lim_{|x|\to\infty}G_k(x)\to\infty$, alors
+$$\mu_k^\star(x_k) = \begin{cases} S_k-x_k &amp; \text{si } x_k&lt;S_k\\[2pt] 0 &amp; \text{si } x_k\geq S_k\end{cases}$$
+où <strong>$S_k$ minimise $G_k(y)$</strong>.</p>
+<p><strong>C'est une politique à niveau de recomplètement</strong> (<em>base-stock policy</em>) : <em>si le stock est sous le seuil $S_k$, on commande juste ce qu'il faut pour l'y ramener ; sinon on ne commande rien.</em></p>
+<p><strong>Pourquoi c'est immédiat une fois $G_k$ convexe.</strong> Minimiser une fonction convexe sur $[x_k,+\infty[$ : si le minimiseur libre $S_k$ est dans l'intervalle ($x_k\leq S_k$), on le prend ; sinon la fonction est croissante sur tout l'intervalle et l'optimum est au bord, $y=x_k$, c'est-à-dire $u_k=0$.</p>
+<p><strong>La justification complète.</strong> On montre, en supposant $H$ <strong>convexe</strong> et $c&lt;p$, que $J_k$ est <strong>convexe pour tout $k$</strong> et que $\lim_{|x|\to\infty}J_k(x)\to\infty$ — par une récurrence inductive graphique à rebours.</p>
+<p class="cal piege"> <strong>La condition $c&lt;p$ est indispensable et parle d'elle-même</strong> : le coût d'achat unitaire doit être <strong>inférieur</strong> au coût de rupture unitaire. Sinon il serait toujours moins cher de ne rien commander et de subir les ruptures — le problème n'aurait aucun intérêt, et la coercivité tomberait.</p>
+<h3>Comment résoudre l'exercice type (protocole)</h3>
+<ol>
+<li><strong>Reconnaître la structure</strong> : dynamique linéaire $+$ coût quadratique $\to$ LQ ; stock $+$ coût convexe de rupture et stockage $\to$ recomplètement.</li>
+<li><strong>Dans le cas LQ</strong> : poser $J_k(x)=x'K_kx+\text{cte}$, initialiser $K_N=Q_N$.</li>
+<li><strong>Dérouler Riccati à rebours</strong> pour obtenir les $K_k$, puis les gains $L_k=-(B_k'K_{k+1}B_k+R_k)^{-1}B_k'K_{k+1}A_k$.</li>
+<li><strong>Si le problème est stationnaire et l'horizon long</strong> : résoudre directement l'équation <strong>algébrique</strong> de Riccati et utiliser le gain constant $L$.</li>
+<li><strong>Dans le cas stock</strong> : poser $y=x_k+u_k$ et former $G_k(y)=cy+H(y)+\mathbb{E}\{J_{k+1}(y-w)\}$.</li>
+<li><strong>Vérifier la convexité et la coercivité</strong> de $G_k$ ($H$ convexe, $c&lt;p$).</li>
+<li><strong>Calculer $S_k=\arg\min G_k$</strong> et énoncer la politique à seuil.</li>
+<li><strong>Vérifier l'équivalent certain</strong> avant de l'invoquer : il tient pour un bruit additif centré, pas pour des matrices aléatoires.</li>
+</ol>
+<h3>Exercices progressifs</h3>
+<p><strong> Niveau 1</strong> — Pourquoi exige-t-on $R_k\succ0$ et non seulement $R_k\succeq0$ ?</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p>Parce que la minimisation en $u_k$ porte sur la quadratique
+$$u_k'\big(B_k'K_{k+1}B_k+R_k\big)u_k + 2u_k'B_k'K_{k+1}A_kx_k + \cdots$$
+et que la formule du gain exige d'<strong>inverser</strong> $B_k'K_{k+1}B_k+R_k$. Avec $K_{k+1}\succeq0$, le premier terme est seulement semi-défini positif : c'est $R_k\succ0$ qui garantit la <strong>stricte</strong> définie positivité de la somme, donc l'inversibilité, donc l'unicité du minimiseur.</p>
+<p><em>Autrement dit :</em> on peut ne pas pénaliser certaines directions de l'état ($Q_k$ singulière est admise), mais on doit <strong>toujours</strong> pénaliser strictement la commande — sinon une commande infinie serait gratuite.</p>
+</div></details>
+
+<p><strong> Niveau 2</strong> — Que signifie l'équivalence certaine, et pourquoi tient-elle dans le cas LQ standard ?</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p><strong>Elle signifie que la politique optimale est la même que si l'on remplaçait $w_k$ par son espérance $\mathbb{E}\{w_k\}=0$</strong> — donc qu'on peut concevoir la commande comme si le système était <strong>déterministe</strong>.</p>
+<p><strong>Pourquoi elle tient ici.</strong> Le bruit est <strong>additif</strong> : dans $J_{k+1}(A_kx_k+B_ku_k+w_k)$ avec $J_{k+1}$ quadratique, le développement fait apparaître un terme croisé en $w_k$ dont l'espérance est <strong>nulle</strong> ($w_k$ centré et indépendant), et un terme en $\mathbb{E}\{w_k'K_{k+1}w_k\}$ qui est une <strong>constante</strong> ne dépendant ni de $x_k$ ni de $u_k$. Le bruit n'influence donc <strong>pas l'argmin</strong> : il ne fait qu'ajouter une constante au coût.</p>
+</div></details>
+
+<p><strong> Niveau 3</strong> — Sur le système scalaire $x_{k+1}=ax_k+bu_k+w_k$ avec coût $\sum(qx_k^2+ru_k^2)+q_Nx_N^2$, écrivez la récurrence de Riccati et le gain.</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p>Tout est scalaire. $K_N=q_N$, puis
+$$K_k = a^2\Big(K_{k+1}-\frac{b^2K_{k+1}^2}{b^2K_{k+1}+r}\Big)+q = \frac{a^2rK_{k+1}}{b^2K_{k+1}+r}+q$$
+et le gain
+$$L_k = -\frac{b\,K_{k+1}a}{b^2K_{k+1}+r}, \qquad \mu_k^\star(x_k)=L_kx_k$$</p>
+<p><em>Lecture des cas limites.</em> Si $r\to\infty$ (commande très chère) : $L_k\to0$, on ne commande pas. Si $r\to0$ : $L_k\to-a/b$, donc $x_{k+1}=ax_k-\tfrac{a}{b}\,b\,x_k+w_k = w_k$ — on ramène l'état à zéro en un pas, ce que permet une commande gratuite.</p>
+<p><em>Régime stationnaire.</em> $K$ est le point fixe positif de $K = \dfrac{a^2rK}{b^2K+r}+q$, soit $b^2K^2+K(r-a^2r-b^2q)-qr=0$, dont une seule racine est positive.</p>
+</div></details>
+
+<p><strong> Niveau 4 — type examen</strong> — Démontrez que la politique optimale de gestion de stock est à seuil, en supposant $G_k$ convexe et coercive.</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p><strong>Étape 1 — réécriture.</strong> Avec $y=x_k+u_k$ et $u_k\geq0$, donc $y\geq x_k$ :
+$$c\,u_k+H(x_k+u_k)+\mathbb{E}\{J_{k+1}(x_k+u_k-w)\} = \underbrace{c\,y+H(y)+\mathbb{E}\{J_{k+1}(y-w)\}}_{G_k(y)} - c\,x_k$$
+(on a écrit $cu_k = cy-cx_k$). Donc
+$$J_k(x_k)=\min_{y\geq x_k}G_k(y)-c\,x_k$$</p>
+<p><strong>Étape 2 — minimiser une convexe sur une demi-droite.</strong> Soit $S_k$ un minimiseur global de $G_k$ (il existe par coercivité, et l'ensemble des minimiseurs est un intervalle par convexité). Deux cas :</p>
+<ul>
+<li><strong>si $x_k&lt;S_k$</strong> : le minimiseur libre $S_k$ appartient à $[x_k,+\infty[$, donc $y^\star=S_k$, c'est-à-dire $u_k^\star=S_k-x_k&gt;0$ ;</li>
+<li><strong>si $x_k\geq S_k$</strong> : par convexité, $G_k$ est <strong>croissante</strong> à droite de son minimiseur, donc sur tout $[x_k,+\infty[$ ; l'optimum est au bord, $y^\star=x_k$, c'est-à-dire $u_k^\star=0$.</li>
+</ul>
+<p>D'où
+$$\mu_k^\star(x_k)=\begin{cases}S_k-x_k &amp; x_k&lt;S_k\\ 0 &amp; x_k\geq S_k\end{cases} \qquad\blacksquare$$</p>
+<p><strong>Ce que la preuve enseigne.</strong> Toute la difficulté est reportée sur <strong>la convexité de $G_k$</strong>, elle-même conséquence de la convexité de $J_{k+1}$ — d'où la récurrence : $H$ convexe et $c&lt;p$ entraînent $J_k$ convexe pour tout $k$. <strong>La structure de la politique optimale est une conséquence directe d'une propriété de convexité qui se propage à rebours</strong> : exactement le même mécanisme que dans le cas LQ, où c'est la forme quadratique qui se propage.</p>
+<p><strong>La portée pratique.</strong> On n'a pas besoin de tabuler $J_k$ : il suffit de connaître les $N$ nombres $S_0,\dots,S_{N-1}$. Une politique à niveau de recomplètement est ce qu'utilisent réellement les systèmes de gestion de stock.</p>
+</div></details>
+
+<h2 data-prio="must">Common mistakes</h2>
+<ol>
+<li><strong>Prendre $R_k\succeq0$</strong> — il faut $R_k\succ0$ pour l'inversibilité et l'unicité.</li>
+<li><strong>Croire que l'équivalence certaine est générale</strong> — elle tombe dès que les matrices du système sont aléatoires (concept 4).</li>
+<li><strong>Dérouler Riccati dans le sens du temps</strong> — elle part de $K_N=Q_N$ et va <strong>à rebours</strong>, comme la DP.</li>
+<li><strong>Oublier la constante dans $J_k$</strong> — $J_k(x)=x'K_kx+\text{cte}$, la constante venant de $\mathbb{E}\{w'K w\}$ ; elle ne change pas l'argmin mais change la valeur.</li>
+<li><strong>Chercher un régime stationnaire sans hypothèses</strong> — il faut système et coût stationnaires, plus commandabilité et observabilité.</li>
+<li><strong>Oublier la contrainte $u_k\geq0$</strong> en gestion de stock — c'est elle qui donne $y\geq x_k$, donc la structure à seuil.</li>
+<li><strong>Confondre le seuil $S_k$ avec la quantité commandée</strong> — on commande $S_k-x_k$, pas $S_k$.</li>
+<li><strong>Oublier la condition $c&lt;p$</strong> — sans elle, $J_k$ n'est plus coercive et la politique à seuil n'a plus de sens.</li>
+</ol>
+<h2>Ultimate Review</h2>
+<ol>
+<li><strong>LQ</strong> : $x_{k+1}=A_kx_k+B_ku_k+w_k$, coût $x_N'Q_Nx_N+\sum(x_k'Q_kx_k+u_k'R_ku_k)$, $Q_k\succeq0$, $R_k\succ0$, $w_k$ indépendants centrés.</li>
+<li><strong>Faits clés</strong> : $J_k$ <strong>quadratique</strong>, politique <strong>linéaire</strong> $\mu_k^\star(x_k)=L_kx_k$.</li>
+<li><strong>Gain</strong> $L_k=-(B_k'K_{k+1}B_k+R_k)^{-1}B_k'K_{k+1}A_k$ ; <strong>Riccati</strong> $K_N=Q_N$ puis $K_k=A_k'(K_{k+1}-K_{k+1}B_k(\cdot)^{-1}B_k'K_{k+1})A_k+Q_k$, <strong>à rebours</strong>.</li>
+<li><strong>Équivalent certain</strong> : la politique est la même qu'avec $w_k$ remplacé par $\mathbb{E}\{w_k\}=0$.</li>
+<li><strong>Régime stationnaire</strong> : sous commandabilité et observabilité, $K_k\to K$, unique solution semi-définie positive de l'équation <strong>algébrique</strong> de Riccati ; le contrôleur $L$ <strong>stabilise</strong> ($(A+BL)^k\to0$).</li>
+<li>Cas scalaire : $P_{k+1}=F(P_k)$ avec $F(P)=\frac{A^2RP}{B^2P+R}+Q$ — deux points fixes, <strong>un seul positif</strong>.</li>
+<li><strong>Matrices aléatoires</strong> : la politique reste linéaire, mais l'équivalence certaine <strong>et</strong> la convergence de Riccati <strong>peuvent tomber</strong> ; le terme $TP^2$ mesure la variabilité multiplicative.</li>
+<li><strong>Stock</strong> : $x_{k+1}=x_k+u_k-w_k$, coût $\sum(cu_k+H(x_k+u_k))$ avec $H(y)=\mathbb{E}\{r(y-w)\}$ et $r(x)=p\max(0,-x)+h\max(0,x)$.</li>
+<li><strong>Changement de variable</strong> $y=x_k+u_k$ : $J_k(x_k)=\min_{y\geq x_k}G_k(y)-cx_k$ avec $G_k(y)=cy+H(y)+\mathbb{E}\{J_{k+1}(y-w)\}$.</li>
+<li><strong>Politique à niveau de recomplètement</strong> : commander $S_k-x_k$ si $x_k&lt;S_k$, rien sinon, où $S_k=\arg\min G_k$ — valable si $G_k$ est convexe et coercive ($H$ convexe, $c&lt;p$).</li>
+</ol>
+<p><strong>Formulas to know</strong>
+$$L_k=-\big(B_k'K_{k+1}B_k+R_k\big)^{-1}B_k'K_{k+1}A_k \qquad K_k=A_k'\Big(K_{k+1}-K_{k+1}B_k\big(B_k'K_{k+1}B_k+R_k\big)^{-1}B_k'K_{k+1}\Big)A_k+Q_k$$
+$$G_k(y)=cy+H(y)+\mathbb{E}\{J_{k+1}(y-w)\} \qquad \mu_k^\star(x_k)=\max\{S_k-x_k,\ 0\}$$</p>
+<p><strong>Methods to know</strong> : le protocole en 8 étapes ; la récurrence de Riccati à rebours ; le changement de variable $y=x_k+u_k$ ; la preuve de la politique à seuil.</p>
+<div class="rec"><h2>Active Recall</h2><p><strong>Basic</strong> — Quels sont les deux « faits clés » du problème linéaire-quadratique ?</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p><strong>(1)</strong> La fonction de coût-à-venir $J_k(x_k)$ est <strong>quadratique</strong> — de la forme $x_k'K_kx_k+\text{constante}$.
+<strong>(2)</strong> La politique optimale est <strong>linéaire</strong> en l'état : $\mu_k^\star(x_k)=L_kx_k$.
+Les matrices $K_k$ obéissent à l'équation de Riccati en temps discret, déroulée <strong>à rebours</strong> depuis $K_N=Q_N$.</p>
+</div></details><p><strong>Understanding</strong> — Pourquoi la forme quadratique se propage-t-elle à rebours ?</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p>Parce qu'à chaque étape on minimise, en $u_k$, une <strong>quadratique convexe</strong> : le coût par étape est quadratique, et $J_{k+1}$ l'est par hypothèse de récurrence. Une quadratique convexe se minimise analytiquement, le minimiseur est <strong>linéaire</strong> en $x_k$, et la <strong>valeur</strong> du minimum est encore <strong>quadratique</strong> en $x_k$. La forme fonctionnelle est donc <strong>stable</strong> par l'opérateur de Bellman — c'est exactement ce qui rend le problème résoluble à la main.</p>
+</div></details><p><strong>Application</strong> — En gestion de stock, quel changement de variable révèle la structure de la politique optimale ?</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p>Poser $y = x_k+u_k$, le <strong>stock après commande</strong>. La contrainte $u_k\geq0$ devient $y\geq x_k$, et le problème s'écrit $J_k(x_k)=\min_{y\geq x_k}G_k(y)-cx_k$ avec $G_k(y)=cy+H(y)+\mathbb{E}\{J_{k+1}(y-w)\}$. La fonction $G_k$ <strong>ne dépend plus de $x_k$</strong>, qui n'intervient que dans la contrainte : minimiser une convexe sur une demi-droite donne immédiatement la politique à seuil.</p>
+</div></details><p><strong>Comparison</strong> — Bruit additif et matrices de système aléatoires : qu'est-ce qui change ?</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p>Avec un bruit <strong>additif</strong> centré, la politique optimale est celle du problème déterministe (<strong>équivalence certaine</strong>) et l'équation de Riccati converge sous commandabilité et observabilité.</p>
+<p>Avec des matrices $A_k,B_k$ <strong>aléatoires</strong>, la politique reste linéaire mais les formules gagnent des espérances, l'<strong>équivalence certaine peut tomber</strong>, et l'équation de Riccati <strong>peut ne pas converger</strong> — le terme supplémentaire $TP^2$, avec $T=\mathbb{E}\{A^2\}\mathbb{E}\{B^2\}-(\mathbb{E}\{A\})^2(\mathbb{E}\{B\})^2$, mesure cette variabilité multiplicative. Ne pas savoir où l'on sera poussé est bénin ; ne pas savoir comment le système réagit ne l'est pas.</p>
+</div></details><p><strong>Exam-style</strong> — Énoncez la politique optimale de gestion de stock et ses conditions de validité.</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p>$$\mu_k^\star(x_k)=\begin{cases}S_k-x_k &amp; \text{si } x_k&lt;S_k\\ 0 &amp; \text{si } x_k\geq S_k\end{cases}, \qquad S_k=\arg\min_y G_k(y)$$
+avec $G_k(y)=cy+H(y)+\mathbb{E}\{J_{k+1}(y-w)\}$.</p>
+<p><strong>Conditions.</strong> $G_k$ doit être <strong>convexe</strong> et <strong>coercive</strong> ($G_k(x)\to\infty$ quand $|x|\to\infty$). On l'obtient en supposant $H$ <strong>convexe</strong> et $c&lt;p$ — le coût unitaire d'achat inférieur au coût unitaire de rupture — ce qui entraîne par récurrence que $J_k$ est convexe et coercive pour tout $k$.</p>
+</div></details></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h2>Flashcards</h2>
+<table>
+<thead>
+<tr>
+<th>Question</th>
+<th>Réponse</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Système LQ ?</td>
+<td>$x_{k+1}=A_kx_k+B_ku_k+w_k$</td>
+</tr>
+<tr>
+<td>Conditions sur $Q_k$ et $R_k$ ?</td>
+<td>$Q_k\succeq0$ et $R_k\succ0$</td>
+</tr>
+<tr>
+<td>Forme de $J_k$ en LQ ?</td>
+<td>Quadratique : $x_k'K_kx_k+\text{constante}$</td>
+</tr>
+<tr>
+<td>Forme de la politique optimale ?</td>
+<td><strong>Linéaire</strong> : $\mu_k^\star(x_k)=L_kx_k$</td>
+</tr>
+<tr>
+<td>Gain $L_k$ ?</td>
+<td>$-(B_k'K_{k+1}B_k+R_k)^{-1}B_k'K_{k+1}A_k$</td>
+</tr>
+<tr>
+<td>Initialisation de Riccati ?</td>
+<td>$K_N=Q_N$, puis à rebours</td>
+</tr>
+<tr>
+<td>Équivalence certaine ?</td>
+<td>La politique est la même qu'avec $w_k$ remplacé par $\mathbb{E}\{w_k\}=0$</td>
+</tr>
+<tr>
+<td>Hypothèses du régime stationnaire ?</td>
+<td>Système et coût stationnaires, commandabilité de $(A,B)$, observabilité de $(A,C)$</td>
+</tr>
+<tr>
+<td>Propriété du contrôleur stationnaire ?</td>
+<td>Il <strong>stabilise</strong> : $(A+BL)^k\to0$</td>
+</tr>
+<tr>
+<td>Riccati scalaire ?</td>
+<td>$F(P)=\frac{A^2RP}{B^2P+R}+Q$ — deux points fixes, un seul positif</td>
+</tr>
+<tr>
+<td>Matrices aléatoires : que perd-on ?</td>
+<td>L'équivalence certaine et la convergence de Riccati</td>
+</tr>
+<tr>
+<td>Dynamique du stock ?</td>
+<td>$x_{k+1}=x_k+u_k-w_k$</td>
+</tr>
+<tr>
+<td>Coût de rupture et de stockage ?</td>
+<td>$r(x)=p\max(0,-x)+h\max(0,x)$, convexe</td>
+</tr>
+<tr>
+<td>Changement de variable clé ?</td>
+<td>$y=x_k+u_k$, le stock <strong>après commande</strong></td>
+</tr>
+<tr>
+<td>Définition de $G_k$ ?</td>
+<td>$G_k(y)=cy+H(y)+\mathbb{E}\{J_{k+1}(y-w)\}$</td>
+</tr>
+<tr>
+<td>Politique optimale de stock ?</td>
+<td>Commander $S_k-x_k$ si $x_k&lt;S_k$, rien sinon</td>
+</tr>
+<tr>
+<td>Que vaut $S_k$ ?</td>
+<td>Le minimiseur de $G_k$</td>
+</tr>
+<tr>
+<td>Conditions de validité ?</td>
+<td>$G_k$ convexe et coercive : $H$ convexe et $c&lt;p$</td>
+</tr>
+</tbody></table>
+</main>
+
+
+
+
+</body></html>

@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fiche 67 — Inférence paramétrique : estimateurs, intervalles de confiance et méthode des moments</title>
+<script>
+window.MathJax={tex:{inlineMath:[["$","$"]],displayMath:[["$$","$$"]],processEscapes:true},
+ options:{skipHtmlTags:["script","noscript","style","textarea","pre","code"]},
+ svg:{fontCache:"global"},
+ startup:{pageReady:()=>MathJax.startup.defaultPageReady().then(()=>{document.body.classList.add("ready")})}};
+setTimeout(function(){document.body.classList.add("ready")},2500);
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+/* ============================================================
+   MathiasLearn — feuille de style des fiches
+   Reprise intégrale des tokens de 00_PARCOURS/*.html
+   + blocs pédagogiques (callouts, méthode, essentiels, recall)
+   ============================================================ */
+:root{--bg:#faf9f7;--card:#fff;--ink:#1a1a1a;--muted:#6b6b6b;--line:#e5e2dd;--accent:#8b5e34;
+ --hl:#fdf8ef;--ok:#2d7d4f;--okbg:#f0f7f3;--warn:#b3402f;--warnbg:#fdf3f1;--blue:#2f5d8b;--bluebg:#f1f5fa}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+ font:17px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;padding:0 16px 100px}
+.nav{position:sticky;top:0;background:rgba(250,249,247,.96);backdrop-filter:blur(8px);
+ border-bottom:1px solid var(--line);margin:0 -16px 30px;padding:11px 16px;z-index:50;
+ display:flex;gap:6px;flex-wrap:wrap;font-size:13px}
+.nav a{color:var(--muted);text-decoration:none;padding:4px 9px;border-radius:5px;white-space:nowrap}
+.nav a:hover{background:var(--line);color:var(--ink)}
+.nav a.on{background:var(--accent);color:#fff}
+main{max-width:780px;margin:0 auto}
+h1{font-size:31px;letter-spacing:-.02em;margin:.4em 0 .5em;line-height:1.25}
+h2{font-size:23px;margin:2.2em 0 .7em;padding-bottom:.3em;border-bottom:1px solid var(--line)}
+h3{font-size:19px;margin:1.9em 0 .5em;color:var(--accent)}
+h4{font-size:17px;margin:1.5em 0 .4em}
+p{margin:.8em 0} a{color:var(--accent)} hr{border:0;border-top:1px solid var(--line);margin:2.6em 0}
+table{border-collapse:collapse;width:100%;margin:1.3em 0;font-size:15.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+th{background:#f3f0eb;font-weight:600}
+tr:nth-child(even) td{background:#fcfbfa}
+code{font-family:"SF Mono",Menlo,Consolas,monospace;font-size:.88em;background:#f2efea;padding:2px 6px;border-radius:4px;white-space:nowrap}
+pre{background:#f2efea;padding:14px 16px;border-radius:8px;overflow-x:auto}
+pre code{background:none;padding:0;white-space:pre}
+blockquote{border-left:3px solid var(--accent);background:var(--hl);margin:1.4em 0;padding:14px 20px;border-radius:0 8px 8px 0}
+blockquote p:first-child{margin-top:0} blockquote p:last-child{margin-bottom:0}
+ul,ol{padding-left:1.5em} li{margin:.35em 0} em{color:#4a4a4a}
+mjx-container[display="true"]{margin:1.1em 0!important;overflow-x:auto;overflow-y:hidden;padding:2px 0}
+mjx-container svg{max-width:100%}
+body:not(.ready) main{opacity:0} main{opacity:1;transition:opacity .25s}
+
+/* --- bandeau de tête de fiche --- */
+.cours{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--accent);
+ border-radius:0 10px 10px 0;padding:18px 22px;margin:0 0 34px}
+.cours h4{margin:0 0 4px;font-size:14px;text-transform:uppercase;letter-spacing:.07em;color:var(--accent)}
+.cours .cs{color:var(--muted);font-size:14.5px;margin:0 0 14px}
+
+/* --- exercices / corrigés --- */
+.ex{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:6px 24px 20px;margin:18px 0}
+.ex>h3:first-child{margin-top:14px}
+details.cor{margin-top:18px;border:1px solid var(--line);border-radius:8px;background:#fcfbfa;overflow:hidden}
+details.cor>summary{cursor:pointer;padding:12px 16px;font-weight:600;font-size:15px;color:var(--accent);
+ list-style:none;display:flex;align-items:center;gap:9px;user-select:none;transition:.15s;min-height:44px}
+details.cor>summary::-webkit-details-marker{display:none}
+details.cor>summary:hover{background:var(--hl)}
+details.cor>summary::before{content:"\25B6";font-size:10px;transition:transform .18s;display:inline-block}
+details.cor[open]>summary::before{transform:rotate(90deg)}
+details.cor[open]>summary{background:var(--okbg);color:var(--ok);border-bottom:1px solid var(--line)}
+.cor .in{padding:4px 20px 16px}
+.cor .in>*:first-child{margin-top:.9em}
+
+/* --- blocs pédagogiques (callouts) ---
+   Générés depuis une citation Markdown dont le premier **gras** commence
+   par un mot-clé : DÉFINITION, THÉORÈME, MÉTHODE, PIÈGE, INTUITION… */
+.cal{border:1px solid var(--line);border-left:4px solid var(--accent);background:var(--card);
+ border-radius:0 10px 10px 0;padding:15px 20px;margin:1.5em 0}
+.cal>p:first-child{margin-top:0}.cal>p:last-child,.cal>ul:last-child,.cal>ol:last-child{margin-bottom:0}
+.cal .lab{display:block;font-size:12.5px;text-transform:uppercase;letter-spacing:.08em;
+ font-weight:700;color:var(--accent);margin-bottom:6px}
+.cal.formel{background:var(--hl)}
+.cal.piege{border-left-color:var(--warn);background:var(--warnbg)}
+.cal.piege .lab{color:var(--warn)}
+.cal.methode{border-left-color:var(--ok);background:var(--okbg)}
+.cal.methode .lab{color:var(--ok)}
+.cal.intu{border-left-color:var(--blue);background:var(--bluebg)}
+.cal.intu .lab{color:var(--blue)}
+.cal.plus{border-left-style:dashed;background:#faf9f7}
+.cal.plus .lab{color:var(--muted)}
+
+/* --- révision express --- */
+.ess{background:var(--card);border:1px solid var(--accent);border-radius:10px;padding:4px 24px 20px;margin:1.6em 0}
+.ess h3{margin-top:1.3em}
+.rec{background:var(--card);border:1px dashed var(--accent);border-radius:10px;padding:4px 24px 18px;margin:1.6em 0}
+.rec ol{counter-reset:none}
+
+/* --- impression / PDF --- */
+@media print{
+ .nav{display:none}
+ body{padding:0;background:#fff;font-size:11.2pt;line-height:1.55}
+ main{max-width:none}
+ h1{font-size:23pt}h2{font-size:15pt;margin-top:1.5em}h3{font-size:12.6pt}
+ h2,h3,h4{break-after:avoid;page-break-after:avoid}
+ table,.cal,blockquote{break-inside:avoid;page-break-inside:avoid}
+ table{display:table;font-size:9.6pt}
+ details.cor{border:1px solid var(--line);background:#fcfbfa}
+ details.cor>summary{display:none}
+ details.cor .in{padding-top:10px}
+ .cal,.ex,.ess,.rec{box-shadow:none}
+ a{color:var(--ink);text-decoration:none}
+}
+@page{margin:16mm 15mm 18mm}
+
+/* --- exemples travaillés --- */
+.exm{background:#fcfbfa;border:1px solid var(--line);border-radius:10px;padding:2px 20px 14px;margin:1.5em 0}
+.exm>h4:first-child{margin:14px 0 .5em;color:var(--accent);font-size:13px;text-transform:uppercase;letter-spacing:.07em}
+
+
+/* --- pastilles de priorité (conventions des fiches de l'app) --- */
+h2[data-prio], h3[data-prio], h4[data-prio]{position:relative}
+h2[data-prio]::before,h3[data-prio]::before,h4[data-prio]::before{
+ content:"";display:inline-block;width:9px;height:9px;border-radius:50%;
+ margin-right:9px;vertical-align:middle;background:var(--muted)}
+[data-prio="must"]::before{background:var(--warn)}
+[data-prio="high"]::before{background:#d98324}
+[data-prio="mid"]::before{background:#c9a227}
+[data-prio="low"]::before{background:var(--ok)}
+/* corrigés des fiches de l'app : même traitement que les corrigés des séries */
+details.cor>summary::after{content:""}
+</style></head><body>
+<div class="nav"><a href="00_COMMENCER_ICI.html">Commencer ici</a><a href="01_NOTATIONS_le-decodeur.html">Notations</a><a href="02_EXERCICES_Serie-0.html">Série 0 — Remise en route</a><a href="03_EXERCICES_Serie-1.html">Série 1 — Convexité</a><a href="04_EXERCICES_Serie-2.html">Série 2 — KKT</a><a href="05_AUTO-EVALUATION.html">Auto-évaluation (quiz)</a><a href="06_FICHE_Optimisation-deux-variables.html">Fiche — Optimisation à 2 variables</a></div>
+<main><h1>Fiche 67 — Inférence paramétrique : estimateurs, intervalles de confiance et méthode des moments</h1>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Matière</strong></td>
+<td>Maths · Économétrie</td>
+</tr>
+<tr>
+<td><strong>Cours source</strong></td>
+<td>Rigollet, <em>18.650 Statistics for Applications</em>, MIT OpenCourseWare, automne 2016 — chapitre 2 « Parametric Inference » et chapitre 4 « The Method of Moments »</td>
+</tr>
+<tr>
+<td><strong>Difficulté</strong></td>
+<td> High — le vocabulaire et les outils de base de toute l'inférence</td>
+</tr>
+<tr>
+<td><strong>Temps d'étude estimé</strong></td>
+<td>2 h 15</td>
+</tr>
+<tr>
+<td><strong>Prérequis</strong></td>
+<td>Loi des grands nombres, théorème central limite, fiche 64 (maximum de vraisemblance)</td>
+</tr>
+<tr>
+<td><strong>Concepts clés</strong></td>
+<td>Modèle statistique, identifiabilité, statistique et estimateur, consistance, biais, risque quadratique, intervalle de confiance, théorème de Weierstrass, quadrature gaussienne, déterminant de Vandermonde, méthode des moments, méthode delta multivariée</td>
+</tr>
+<tr>
+<td><strong>Poids à l'examen</strong></td>
+<td>Trois choses : la décomposition <strong>risque $=$ biais$^2$ $+$ variance</strong> ; la construction d'un <strong>intervalle de confiance</strong> et le problème du paramètre inconnu dans les bornes ; et la <strong>méthode des moments</strong> avec sa loi asymptotique.</td>
+</tr>
+</tbody></table>
+<h2>Vue d'ensemble</h2>
+<blockquote>
+<p><strong>Le raisonnement de la modélisation statistique.</strong> Soient $X_1,\dots,X_n$ des copies indépendantes de $X$. *Le but de la statistique est d'<strong>apprendre la loi de $X$</strong>.*</p>
+<ul>
+<li>Si $X\in\{0,1\}$, c'est facile : c'est une $\mathrm{Ber}(p)$ et il n'y a que le paramètre $p$ à apprendre.</li>
+<li>Cela peut être plus compliqué. Le cours donne un jeu de données réel : le <strong>nombre de frères et sœurs</strong> (soi-même inclus) relevé auprès d'étudiants — $2,3,2,4,1,3,1,1,1,1,1,2,2,3,2,2,2,3,2,1,3,1,2,3,\dots$</li>
+</ul>
+</blockquote>
+<p><strong>Deux stratégies.</strong></p>
+<ul>
+<li><em>Ne faire <strong>aucune hypothèse</strong> et tenter d'apprendre la fonction de masse :</em></li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>$x$</th>
+<th>$1$</th>
+<th>$2$</th>
+<th>$3$</th>
+<th>$4$</th>
+<th>$5$</th>
+<th>$6$</th>
+<th>$\geq7$</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$\mathbb P(X=x)$</td>
+<td>$p_1$</td>
+<td>$p_2$</td>
+<td>$p_3$</td>
+<td>$p_4$</td>
+<td>$p_5$</td>
+<td>$p_6$</td>
+<td>$\sum_{i\geq7}p_i$</td>
+</tr>
+</tbody></table>
+<p><em>Cela fait <strong>7 paramètres</strong> à apprendre.</em></p>
+<ul>
+<li><em>Ou supposer $X\sim\mathrm{Poiss}(\lambda)$. Cela fait <strong>1 paramètre</strong> à apprendre !</em></li>
+</ul>
+<pre><code>MODÈLE        (E, (P_θ)_{θ∈Θ})   — on suppose P = P_{θ*}
+IDENTIFIABLE  θ ↦ P_θ injective  — sinon rien n'est estimable
+ESTIMATEUR    toute statistique ne dépendant pas de θ
+QUALITÉ       risque quadratique = biais² + variance
+INCERTITUDE   intervalle de confiance de niveau 1 − α
+DEUX MÉTHODES maximum de vraisemblance (fiche 64) · MÉTHODE DES MOMENTS
+</code></pre>
+<blockquote>
+<p><strong>L'arbitrage fondateur, posé dès la première page.</strong> Modéliser, c'est <strong>échanger de la généralité contre de la précision</strong>. Sept paramètres n'imposent presque rien mais s'estiment mal ; un seul paramètre impose beaucoup mais s'estime bien. Tout le reste du cours vit dans cet arbitrage.</p>
+</blockquote>
+<h2 data-prio="must">Concept 1 — Le modèle statistique</h2>
+<div class="cal formel"><span class="lab">Définition formelle.</span>
+<p> Soit le résultat observé d'une expérience statistique un échantillon $X_1,\dots,X_n$ de $n$ variables i.i.d. dans un espace mesurable $E$ (généralement $E\subseteq\mathbb R$), de loi commune $\mathbb P$. Un <strong>modèle statistique</strong> associé est un couple
+$$\big(E,(\mathbb P_\theta)_{\theta\in\Theta}\big)$$
+où $E$ est l'<strong>espace d'échantillonnage</strong>, $(\mathbb P_\theta)_{\theta\in\Theta}$ une <strong>famille de mesures de probabilité</strong> sur $E$, et $\Theta$ un ensemble quelconque appelé <strong>ensemble de paramètres</strong>.</p>
+</div>
+<ul>
+<li><em>On suppose généralement le modèle <strong>bien spécifié</strong>, c'est-à-dire défini de sorte que $\mathbb P=\mathbb P_\theta$ pour un certain $\theta\in\Theta$.</em></li>
+<li><em>Ce $\theta$ particulier est le <strong>vrai paramètre</strong>, et il est <strong>inconnu</strong>. Le but de l'expérience est de l'<strong>estimer</strong>, ou de vérifier ses propriétés lorsqu'elles ont un sens particulier ($\theta&gt;2$ ? $\theta=1/2$ ?).</em></li>
+<li><em>On supposera toujours $\Theta\subseteq\mathbb R^d$ pour un $d\geq1$ : le modèle est alors dit <strong>paramétrique</strong>.</em></li>
+</ul>
+<p><strong>Les quatre exemples du cours.</strong></p>
+<table>
+<thead>
+<tr>
+<th>Situation</th>
+<th>Modèle</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$n$ épreuves de Bernoulli</td>
+<td>$\big(\{0,1\},(\mathrm{Ber}(p))_{p\in(0,1)}\big)$</td>
+</tr>
+<tr>
+<td>$X_i\overset{iid}\sim\mathrm{Exp}(\lambda)$, $\lambda&gt;0$ inconnu</td>
+<td>$\big(\mathbb R_+^\ast,(\mathrm{Exp}(\lambda))_{\lambda&gt;0}\big)$</td>
+</tr>
+<tr>
+<td>$X_i\overset{iid}\sim\mathrm{Poiss}(\lambda)$</td>
+<td>$\big(\mathbb N,(\mathrm{Poiss}(\lambda))_{\lambda&gt;0}\big)$</td>
+</tr>
+<tr>
+<td>$X_i\overset{iid}\sim N(\mu,\sigma^2)$</td>
+<td>$\big(\mathbb R,(N(\mu,\sigma^2))_{(\mu,\sigma^2)\in\mathbb R\times\mathbb R_+^\ast}\big)$</td>
+</tr>
+</tbody></table>
+<p class="cal piege"> <strong>« Bien spécifié » est une hypothèse, pas un fait.</strong> Elle affirme que la vraie loi appartient à la famille choisie. Si le nombre de frères et sœurs n'est <strong>pas</strong> de Poisson, aucune valeur de $\lambda$ ne décrit correctement les données, et tout ce qui suit est faux. C'est pourquoi le chapitre sur les tests d'adéquation existe.</p>
+<h2 data-prio="must">Concept 2 — L'identifiabilité</h2>
+<div class="cal formel"><span class="lab">Définition.</span>
+<p> Le paramètre $\theta$ est <strong>identifié</strong> si et seulement si l'application $\theta\in\Theta\mapsto\mathbb P_\theta$ est <strong>injective</strong> :
+$$\theta\neq\theta'\ \Longrightarrow\ \mathbb P_\theta\neq\mathbb P_{\theta'}$$</p>
+</div>
+<p><strong>Exemples.</strong></p>
+<ol>
+<li><em>Dans les quatre exemples précédents, le paramètre est identifié.</em></li>
+<li><em>Si $X_i=\mathbf 1_{Y_i\geq0}$, où $Y_1,\dots,Y_n\overset{iid}\sim N(\mu,\sigma^2)$ sont <strong>non observés</strong>, alors $\mu$ et $\sigma^2$ <strong>ne sont pas identifiés</strong> — mais $\theta=\mu/\sigma$ l'est.</em></li>
+</ol>
+<blockquote>
+<p><strong>Comprenez le contre-exemple, il est instructif.</strong> On n'observe que le <strong>signe</strong> de $Y_i$, donc la seule information disponible est
+$$\mathbb P(X_i=1)=\mathbb P(Y_i\geq0)=\Phi\Big(\frac{\mu}{\sigma}\Big)$$
+Toute la loi observable ne dépend que du <strong>rapport</strong> $\mu/\sigma$. Doubler $\mu$ et $\sigma$ simultanément ne change <strong>rien</strong> aux données. Aucune quantité de données ne permettra donc de séparer $\mu$ de $\sigma$ : ils ne sont pas identifiés, alors que leur rapport l'est.</p>
+</blockquote>
+<p class="cal piege"> <strong>C'est exactement le modèle probit</strong> de la fiche 66, et cela explique pourquoi on y normalise toujours $\sigma=1$ : sans cette normalisation, le modèle serait inestimable. L'identifiabilité est aussi l'hypothèse 1 du théorème asymptotique de la fiche 64 — sans elle, l'EMV ne peut converger vers rien de précis.</p>
+<h2 data-prio="must">Concept 3 — Statistiques, estimateurs et consistance</h2>
+<blockquote>
+<p><strong>Statistique</strong> : <em>toute fonction <strong>mesurable</strong> de l'échantillon</em> — par exemple $\bar X_n$, $\max_iX_i$, $X_1+\log(1+\lvert X_n\rvert)$, la variance empirique, etc.</p>
+<p><em>Règle empirique donnée par le cours : si vous pouvez la calculer exactement une fois les données connues, elle est mesurable.</em></p>
+</blockquote>
+<blockquote>
+<p><strong>Estimateur de $\theta$</strong> : *toute statistique dont l'expression <strong>ne dépend pas de $\theta$</strong>.*</p>
+</blockquote>
+<blockquote>
+<p><strong>Consistance.</strong> Un estimateur $\hat\theta_n$ de $\theta$ est <strong>faiblement</strong> (resp. <strong>fortement</strong>) <strong>consistant</strong> si et seulement si
+$$\hat\theta_n\ \xrightarrow[n\to\infty]{\mathbb P\ (\text{resp. p.s.})}\ \theta \qquad \text{par rapport à } \mathbb P_\theta$$</p>
+</blockquote>
+<p class="cal piege"> <strong>La condition « ne dépend pas de $\theta$ » est ce qui distingue un estimateur d'une simple statistique.</strong> $\bar X_n-\theta$ est une fonction parfaitement calculable <strong>si l'on connaît $\theta$</strong> — mais on ne le connaît pas. Un estimateur doit être calculable <strong>à partir des seules données</strong>. C'est précisément le problème que soulève l'exemple d'intervalle de confiance du concept 5.</p>
+<h2 data-prio="must">Concept 4 — Biais et risque quadratique</h2>
+<blockquote>
+<p><strong>Biais</strong> d'un estimateur $\hat\theta_n$ de $\theta$ :
+$$\mathbb E\big[\hat\theta_n\big]-\theta$$</p>
+</blockquote>
+<blockquote>
+<p><strong>Risque (ou risque quadratique)</strong> d'un estimateur $\hat\theta_n$ :
+$$\mathbb E\Big[\big\lvert\hat\theta_n-\theta\big\rvert^2\Big]$$</p>
+</blockquote>
+<div class="cal formel"><span class="lab">Remarque.</span>
+<p> Si $\Theta\subseteq\mathbb R$,
+$$\boxed{\ \text{risque quadratique}=\text{biais}^2+\text{variance}\ }$$</p>
+</div>
+<blockquote>
+<p><strong>Cette décomposition est l'un des énoncés les plus utiles de toute la statistique.</strong> Elle se démontre en une ligne, en ajoutant et retranchant $\mathbb E[\hat\theta_n]$ :
+$$\mathbb E\big[(\hat\theta_n-\theta)^2\big]=\underbrace{\big(\mathbb E[\hat\theta_n]-\theta\big)^2}_{\text{biais}^2}+\underbrace{\mathbb E\big[(\hat\theta_n-\mathbb E[\hat\theta_n])^2\big]}_{\text{variance}}$$
+le double produit s'annulant car $\mathbb E[\hat\theta_n-\mathbb E[\hat\theta_n]]=0$.</p>
+</blockquote>
+<p class="cal piege"> <strong>Sa portée pratique : un estimateur biaisé peut être meilleur qu'un estimateur sans biais.</strong> Ce qui compte est le <strong>risque total</strong>, pas le biais seul. C'est toute la justification de la <strong>régularisation</strong> — ridge, LASSO, rétrécissement — qui accepte du biais pour réduire la variance. C'est aussi la raison profonde du modèle à un paramètre de l'introduction : supposer Poisson introduit du biais si c'est faux, mais réduit énormément la variance.</p>
+<h2 data-prio="must">Concept 5 — Les intervalles de confiance</h2>
+<p>Soit $\big(E,(\mathbb P_\theta)_{\theta\in\Theta}\big)$ un modèle statistique fondé sur $X_1,\dots,X_n$, avec $\Theta\subseteq\mathbb R$, et $\alpha\in(0,1)$.</p>
+<blockquote>
+<p><strong>Intervalle de confiance de niveau $1-\alpha$ pour $\theta$</strong> : tout intervalle <strong>aléatoire</strong> $I$ — dépendant de $X_1,\dots,X_n$ — dont les <strong>bornes ne dépendent pas de $\theta$</strong> et tel que
+$$\mathbb P_\theta\big[I\ni\theta\big]\geq1-\alpha, \qquad \forall\theta\in\Theta$$</p>
+</blockquote>
+<blockquote>
+<p><strong>Intervalle de confiance de niveau asymptotique $1-\alpha$</strong> : tout intervalle aléatoire $I$ dont les bornes ne dépendent pas de $\theta$ et tel que
+$$\lim_{n\to\infty}\mathbb P_\theta\big[I\ni\theta\big]\geq1-\alpha, \qquad \forall\theta\in\Theta$$</p>
+</blockquote>
+<p class="cal piege"> <strong>Attention à la notation $I\ni\theta$ : elle n'est pas une coquetterie.</strong> C'est <strong>l'intervalle qui est aléatoire</strong>, pas $\theta$ — qui est un nombre fixe et inconnu. On ne dit donc <strong>pas</strong> « $\theta$ a $95\,\%$ de chances d'être dans $I$ » mais « $I$ a $95\,\%$ de chances de contenir $\theta$ ». La probabilité porte sur la procédure, répétée sur de nouveaux échantillons.</p>
+<h3>L'exemple de Bernoulli, et son problème</h3>
+<p>Soient $X_1,\dots,X_n\overset{iid}\sim\mathrm{Ber}(p)$ avec $p\in(0,1)$ inconnu.</p>
+<ul>
+<li><strong>LGN</strong> : la moyenne empirique $\bar X_n$ est un estimateur <strong>fortement consistant</strong> de $p$.</li>
+<li>Soit $q_{\alpha/2}$ le quantile d'ordre $(1-\frac\alpha2)$ de $N(0,1)$ et
+$$I=\left[\bar X_n-\frac{q_{\alpha/2}\sqrt{p(1-p)}}{\sqrt n},\ \bar X_n+\frac{q_{\alpha/2}\sqrt{p(1-p)}}{\sqrt n}\right]$$</li>
+<li><strong>TCL</strong> : $\displaystyle\lim_{n\to\infty}\mathbb P_p[I\ni p]=1-\alpha$ pour tout $p\in(0,1)$.</li>
+</ul>
+<div class="cal formel"><span class="lab">Problème : $I$ dépend de $p$ !</span>
+<p class="cal piege">  Les bornes contiennent le paramètre inconnu : ce n'est donc <strong>pas</strong> un intervalle de confiance au sens de la définition.</p>
+</div>
+<blockquote>
+<p><strong>Les deux solutions du cours.</strong></p>
+<ol>
+<li><strong>Remplacer $p(1-p)$ par $1/4$</strong> dans $I$, puisque $p(1-p)\leq1/4$.</li>
+<li><strong>Remplacer $p$ par $\bar X_n$</strong> dans $I$ et invoquer le <strong>théorème de Slutsky</strong>.</li>
+</ol>
+</blockquote>
+<blockquote>
+<p><strong>Comparez les deux — elles illustrent deux stratégies générales.</strong></p>
+<ul>
+<li>La première est <strong>conservatrice</strong> : elle majore la variance par son maximum, donc élargit l'intervalle. Le niveau réel est $\geq1-\alpha$ — l'inégalité de la définition est respectée, avec de la marge. Elle est <strong>valide à $n$ fini</strong>.</li>
+<li>La seconde est <strong>exacte asymptotiquement</strong> : Slutsky garantit que remplacer $p$ par un estimateur convergent ne change pas la loi limite. L'intervalle est plus court, mais le niveau n'est atteint <strong>qu'à la limite</strong>.</li>
+</ul>
+<p>Le choix dépend de ce qu'on privilégie : la <strong>garantie</strong> ou la <strong>précision</strong>.</p>
+</blockquote>
+<h2 data-prio="must">Concept 6 — Le théorème de Weierstrass et son usage statistique</h2>
+<div class="cal formel"><span class="lab">Théorème d'approximation de Weierstrass.</span>
+<p> <em>Soit $f$ une fonction continue sur l'intervalle $[a,b]$. Alors, pour tout $\varepsilon&gt;0$, il existe $a_0,a_1,\dots,a_d\in\mathbb R$ tels que</em>
+$$\max_{x\in[a,b]}\left\lvert f(x)-\sum_{k=0}^da_kx^k\right\rvert&lt;\varepsilon$$
+<em>En un mot : <strong>les fonctions continues peuvent être approchées arbitrairement bien par des polynômes</strong>.</em></p>
+</div>
+<p><strong>L'application statistique, en quatre pas.</strong></p>
+<p><strong>1.</strong> Soit $X_1,\dots,X_n$ un échantillon i.i.d. d'un modèle <strong>identifié</strong> $\big(E,\{\mathbb P_\theta\}_{\theta\in\Theta}\big)$, de vrai paramètre $\theta^\ast$, et supposons que chaque $\mathbb P_\theta$ ait une densité $f_\theta$.</p>
+<p><strong>2.</strong> <em>Si l'on trouve $\theta$ tel que</em>
+$$\int h(x)f_{\theta^\ast}(x)dx=\int h(x)f_\theta(x)dx$$
+<em>pour <strong>toute</strong> fonction $h$ continue bornée, alors $\theta=\theta^\ast$.</em></p>
+<p><strong>3.</strong> <em>Remplaçons les espérances par des moyennes : chercher $\hat\theta$ tel que</em>
+$$\frac1n\sum_{i=1}^nh(X_i)=\int h(x)f_{\hat\theta}(x)dx$$
+<em>pour toute fonction continue bornée $h$.</em>  <em>Il y en a une <strong>infinité</strong> : infaisable !</em></p>
+<p><strong>4.</strong> <em>Par le théorème de Weierstrass, il suffit de considérer les <strong>polynômes</strong>, puis — en identifiant les coefficients — les seules <strong>puissances</strong> :</em>
+$$\frac1n\sum_{i=1}^nX_i^k=\int x^kf_{\hat\theta}(x)dx, \qquad \forall k=1,\dots,d$$
+<em>ce qui ne fait que $d$ équations (plus la normalisation).</em></p>
+<blockquote>
+<p><strong>La quantité $m_k(\theta):=\int x^kf_\theta(x)dx=\mathbb E_\theta[X^k]$ est le $k$-ième moment de $\mathbb P_\theta$.</strong></p>
+</blockquote>
+<blockquote>
+<p><strong>Le raisonnement est très élégant.</strong> Identifier deux lois demande de comparer une infinité d'intégrales. Weierstrass dit que les <strong>polynômes suffisent</strong> à tester toutes les fonctions continues ; et par linéarité, les <strong>monômes</strong> suffisent à tester les polynômes. On passe donc d'une infinité de conditions à un nombre <strong>fini de moments</strong>.</p>
+</blockquote>
+<p><strong>Les trois limites du théorème</strong>, signalées par le cours :</p>
+<ol>
+<li>il ne vaut que pour les fonctions <strong>continues</strong> (<em>pas vraiment un problème</em>) ;</li>
+<li>il ne vaut que sur des <strong>intervalles $[a,b]$ bornés</strong> ;</li>
+<li>il <strong>ne dit pas</strong> combien de moments $d$ prendre.</li>
+</ol>
+<h2 data-prio="high">Concept 7 — La quadrature gaussienne : le cas discret</h2>
+<p><em>Que se passe-t-il si $E$ est <strong>discret</strong> — pas de densité mais une fonction de masse ?</em></p>
+<p>Supposons $E=\{x_1,\dots,x_r\}$ <strong>fini</strong> à $r$ valeurs possibles. La fonction de masse a $r-1$ paramètres, $p(x_1),\dots,p(x_{r-1})$, puisque $p(x_r)=1-\sum_{j=1}^{r-1}p(x_j)$. <em>On peut espérer n'avoir besoin de guère plus de $d=r-1$ moments pour retrouver $p(\cdot)$.</em></p>
+<p><strong>Le système linéaire.</strong> Pour $k=1,\dots,r-1$ :
+$$m_k=\mathbb E[X^k]=\sum_{j=1}^rp(x_j)x_j^k, \qquad\text{et}\qquad \sum_{j=1}^rp(x_j)=1$$
+C'est un <strong>système linéaire</strong> d'inconnues $p(x_1),\dots,p(x_r)$ :
+$$\begin{pmatrix}x_1&amp;x_2&amp;\cdots&amp;x_r\\ x_1^2&amp;x_2^2&amp;\cdots&amp;x_r^2\\ \vdots&amp;\vdots&amp;\ddots&amp;\vdots\\ x_1^{r-1}&amp;x_2^{r-1}&amp;\cdots&amp;x_r^{r-1}\\ 1&amp;1&amp;\cdots&amp;1\end{pmatrix}\begin{pmatrix}p(x_1)\\p(x_2)\\\vdots\\p(x_{r-1})\\p(x_r)\end{pmatrix}=\begin{pmatrix}m_1\\m_2\\\vdots\\m_{r-1}\\1\end{pmatrix}$$</p>
+<p><strong>La matrice est-elle inversible ? Le déterminant de Vandermonde.</strong>
+$$\det\begin{pmatrix}x_1&amp;x_2&amp;\cdots&amp;x_r\\ x_1^2&amp;x_2^2&amp;\cdots&amp;x_r^2\\ \vdots&amp;\vdots&amp;\ddots&amp;\vdots\\ x_1^{r-1}&amp;x_2^{r-1}&amp;\cdots&amp;x_r^{r-1}\\ 1&amp;1&amp;\cdots&amp;1\end{pmatrix}=\pm\prod_{1\leq j&lt;k\leq r}(x_j-x_k)\ \neq\ 0$$
+puisque les $x_j$ sont <strong>deux à deux distincts</strong>.</p>
+<blockquote>
+<p><strong>Conclusion.</strong> <em>Étant donnés $m_1,\dots,m_{r-1}$, il existe une <strong>unique</strong> fonction de masse ayant ces moments</em>, obtenue en inversant le système.</p>
+</blockquote>
+<div class="cal intu"><span class="lab">Ce que ce détour établit — et c'est la conclusion du cours.</span>
+
+<ul>
+<li><em>Les moments contiennent une information importante pour retrouver la densité ou la fonction de masse.</em></li>
+<li><em>Si l'on peut estimer ces moments avec précision, on peut espérer <strong>retrouver la loi</strong>.</em></li>
+<li><em>Dans un cadre paramétrique, où connaître $\mathbb P_\theta$ revient à connaître $\theta$, il faut souvent <strong>encore moins</strong> de moments. Cela se juge au cas par cas.</em></li>
+<li><em><strong>Règle empirique : si $\theta\in\Theta\subset\mathbb R^d$, il faut $d$ moments.</strong></em></li>
+</ul>
+</div>
+<h2 data-prio="must">Concept 8 — La méthode des moments</h2>
+<p>Soit $X_1,\dots,X_n$ un échantillon i.i.d. d'un modèle $\big(E,(\mathbb P_\theta)_{\theta\in\Theta}\big)$ avec $\Theta\subseteq\mathbb R^d$.</p>
+<blockquote>
+<p><strong>Moments de population</strong> : $m_k(\theta)=\mathbb E_\theta\big[X_1^k\big]$, $1\leq k\leq d$.
+<strong>Moments empiriques</strong> : $\displaystyle\hat m_k=\overline{X_n^k}=\frac1n\sum_{i=1}^nX_i^k$, $1\leq k\leq d$.
+Et l'application
+$$\psi:\Theta\subset\mathbb R^d\to\mathbb R^d, \qquad \theta\mapsto\big(m_1(\theta),\dots,m_d(\theta)\big)$$</p>
+</blockquote>
+<p><strong>En supposant $\psi$ bijective</strong>, de sorte que $\theta=\psi^{-1}\big(m_1(\theta),\dots,m_d(\theta)\big)$ :</p>
+<div class="cal formel"><span class="lab">Définition — estimateur des moments.</span>
+<p>
+$$\boxed{\ \hat\theta_n^{MM}=\psi^{-1}\big(\hat m_1,\dots,\hat m_d\big)\ }$$
+<em>sous réserve qu'il existe.</em></p>
+</div>
+<blockquote>
+<p><strong>L'idée, en une phrase.</strong> Les moments théoriques sont des <strong>fonctions connues</strong> de $\theta$ ; les moments empiriques sont <strong>calculables</strong> à partir des données. On <strong>égalise les deux</strong> et l'on résout en $\theta$. Aucune vraisemblance à écrire, aucune optimisation à conduire — juste un système d'équations à inverser.</p>
+</blockquote>
+<h2 data-prio="must">Concept 9 — La loi asymptotique de l'estimateur des moments</h2>
+<p><strong>Les notations.</strong> $M(\theta)=(m_1(\theta),\dots,m_d(\theta))$, $\hat M=(\hat m_1,\dots,\hat m_d)$, et
+$$\Sigma(\theta)=\mathbb V_\theta\big(X,X^2,\dots,X^d\big)$$
+la matrice de covariance du vecteur aléatoire $(X,X^2,\dots,X^d)$ pour $X\sim\mathbb P_\theta$. On suppose $\psi^{-1}$ <strong>continûment dérivable</strong> en $M(\theta)$, de matrice gradient $\nabla\psi^{-1}\big\vert_{M(\theta)}$ de taille $d\times d$.</p>
+<p><strong>Les deux étapes.</strong></p>
+<ul>
+<li><strong>LGN</strong> : $\hat\theta_n^{MM}$ est faiblement / fortement <strong>consistant</strong>.</li>
+<li><strong>TCL</strong> :
+$$\sqrt n\big(\hat M-M(\theta)\big)\ \xrightarrow[n\to\infty]{(d)}\ N\big(0,\Sigma(\theta)\big) \qquad \text{par rapport à } \mathbb P_\theta$$</li>
+</ul>
+<p><strong>D'où, par la méthode delta :</strong>
+$$\boxed{\ \sqrt n\big(\hat\theta_n^{MM}-\theta\big)\ \xrightarrow[n\to\infty]{(d)}\ N\big(0,\Gamma(\theta)\big), \qquad \Gamma(\theta)=\Big(\nabla\psi^{-1}\big\vert_{M(\theta)}\Big)^\top\Sigma(\theta)\,\nabla\psi^{-1}\big\vert_{M(\theta)}\ }$$</p>
+<div class="cal methode"><span class="lab">Méthode delta multivariée.</span>
+<p> <em>Soit $(T_n)_{n\geq1}$ une suite de vecteurs aléatoires de $\mathbb R^p$ vérifiant</em>
+$$\sqrt n\big(T_n-\theta\big)\ \xrightarrow[n\to\infty]{(d)}\ N(0,\Sigma)$$
+<em>pour un $\theta\in\mathbb R^p$ et une matrice symétrique semi-définie positive $\Sigma$. Soit $g:\mathbb R^p\to\mathbb R^k$ continûment dérivable en $\theta$. Alors</em>
+$$\sqrt n\big(g(T_n)-g(\theta)\big)\ \xrightarrow[n\to\infty]{(d)}\ N\big(0,\nabla g(\theta)^\top\Sigma\nabla g(\theta)\big)$$
+<em>où $\nabla g(\theta)=\Big(\frac{\partial g_j}{\partial\theta_i}\Big)_{1\leq i\leq d,\ 1\leq j\leq k}$.</em></p>
+</div>
+<blockquote>
+<p><strong>La méthode delta est l'outil le plus rentable de la statistique asymptotique.</strong> Son mécanisme est un développement de Taylor au premier ordre : $g(T_n)\approx g(\theta)+\nabla g(\theta)^\top(T_n-\theta)$. Une transformation <strong>régulière</strong> d'un estimateur asymptotiquement normal reste asymptotiquement normale, avec une variance <strong>transportée par le gradient</strong>.</p>
+<p><strong>Ici, $g=\psi^{-1}$</strong> : on passe des moments au paramètre. C'est <strong>exactement</strong> le mécanisme utilisé pour les hypothèses implicites de la fiche 65, avec la même formule $\Gamma=\nabla g^\top\Sigma\nabla g$.</p>
+</blockquote>
+<h2 data-prio="high">Concept 10 — Maximum de vraisemblance ou méthode des moments ?</h2>
+<blockquote>
+<ul>
+<li><strong>Comparaison des risques quadratiques</strong> : <em>en général, l'<strong>EMV est plus précis</strong>.</em></li>
+<li><strong>Questions de calcul</strong> : <em>parfois, l'EMV est <strong>intraitable</strong>.</em></li>
+<li><em>Si la vraisemblance est <strong>concave</strong>, on peut utiliser des algorithmes d'optimisation — <strong>méthode de points intérieurs</strong>, <strong>descente de gradient</strong>, etc.</em></li>
+<li><em>Si elle <strong>n'est pas concave</strong> : seulement des <strong>heuristiques</strong>, avec des maxima locaux — espérance-maximisation, etc.</em></li>
+</ul>
+</blockquote>
+<blockquote>
+<p><strong>La raison profonde de la supériorité de l'EMV.</strong> Le théorème de la fiche 64 dit que sa variance asymptotique est $I(\theta^\ast)^{-1}$, qui atteint la <strong>borne de Cramér-Rao</strong>. Aucun estimateur régulier ne peut faire mieux — en particulier pas la méthode des moments, dont la variance $\Gamma(\theta)$ est en général strictement supérieure.</p>
+<p><strong>Ce qui sauve la méthode des moments.</strong> Elle est <strong>explicite</strong> : on résout un système d'équations, sans optimisation, sans risque de maximum local. Quand la vraisemblance est intraitable ou non concave, un estimateur légèrement moins efficace mais <strong>sûrement calculable</strong> vaut mieux qu'un estimateur optimal introuvable.</p>
+<p><strong>Et elle sert souvent de point de départ</strong> : on initialise un algorithme de maximum de vraisemblance avec l'estimateur des moments.</p>
+</blockquote>
+<p class="cal piege"> <strong>La référence aux « points intérieurs » et à la « descente de gradient » renvoie explicitement aux fiches 39 et 41.</strong> Estimation statistique et optimisation convexe sont bien le même sujet, vu de deux côtés.</p>
+<h2>Comment résoudre l'exercice type (protocole)</h2>
+<ol>
+<li><strong>Écrire le modèle</strong> $\big(E,(\mathbb P_\theta)_{\theta\in\Theta}\big)$ et vérifier l'<strong>identifiabilité</strong>.</li>
+<li><strong>Choisir la méthode</strong> : maximum de vraisemblance si la vraisemblance est traitable ; <strong>moments</strong> sinon.</li>
+<li><strong>Méthode des moments</strong> : calculer $m_k(\theta)=\mathbb E_\theta[X^k]$ pour $k=1,\dots,d$, poser $\psi$, <strong>inverser</strong>, remplacer par les moments empiriques.</li>
+<li><strong>Évaluer la qualité</strong> : biais, variance, risque $=$ biais$^2+$ variance.</li>
+<li><strong>Établir la consistance</strong> par la LGN, la loi asymptotique par le TCL et la <strong>méthode delta</strong>.</li>
+<li><strong>Construire un intervalle de confiance</strong> — et <strong>vérifier que les bornes ne dépendent pas de $\theta$</strong> ; sinon, majorer la variance ou appliquer Slutsky.</li>
+</ol>
+<h3>Comment reconnaître qu'il faut utiliser cette méthode ?</h3>
+<table>
+<thead>
+<tr>
+<th>Indice dans l'énoncé</th>
+<th>Ce qu'il faut faire</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>« deux paramètres donnent la même loi »</td>
+<td>problème d'<strong>identifiabilité</strong></td>
+</tr>
+<tr>
+<td>« cet estimateur est-il bon ? »</td>
+<td><strong>risque quadratique</strong> $=$ biais$^2+$ variance</td>
+</tr>
+<tr>
+<td>« estimateur sans biais mais très variable »</td>
+<td>comparer les <strong>risques</strong>, pas les biais</td>
+</tr>
+<tr>
+<td>« intervalle de confiance »</td>
+<td>vérifier que les bornes ne contiennent pas $\theta$</td>
+</tr>
+<tr>
+<td>bornes dépendant du paramètre</td>
+<td>majorer la variance, ou <strong>Slutsky</strong></td>
+</tr>
+<tr>
+<td>« la vraisemblance est intraitable »</td>
+<td><strong>méthode des moments</strong></td>
+</tr>
+<tr>
+<td>$\theta\in\mathbb R^d$</td>
+<td>prendre <strong>$d$ moments</strong></td>
+</tr>
+<tr>
+<td>« loi asymptotique d'une fonction d'un estimateur »</td>
+<td><strong>méthode delta</strong></td>
+</tr>
+<tr>
+<td>« quel estimateur est le plus précis ? »</td>
+<td>en général l'<strong>EMV</strong> (borne de Cramér-Rao)</td>
+</tr>
+</tbody></table>
+<h3>Exercices progressifs</h3>
+<p><strong> Niveau 1</strong> — Estimez les paramètres d'une loi $N(\mu,\sigma^2)$ par la méthode des moments.</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p><strong>Le paramètre est de dimension $d=2$</strong>, il faut donc <strong>deux moments</strong>.</p>
+<p><strong>Les moments de population.</strong>
+$$m_1(\theta)=\mathbb E[X]=\mu, \qquad m_2(\theta)=\mathbb E[X^2]=\mathrm{var}(X)+\big(\mathbb E[X]\big)^2=\sigma^2+\mu^2$$</p>
+<p><strong>L'application $\psi$.</strong> $\psi(\mu,\sigma^2)=(\mu,\ \sigma^2+\mu^2)$, dont l'inverse est
+$$\psi^{-1}(m_1,m_2)=\big(m_1,\ m_2-m_1^2\big)$$</p>
+<p><strong>L'estimateur.</strong> Avec $\hat m_1=\bar X_n$ et $\hat m_2=\frac1n\sum X_i^2$ :
+$$\hat\mu_n^{MM}=\bar X_n, \qquad \hat\sigma^2_{n,MM}=\frac1n\sum_{i=1}^nX_i^2-\big(\bar X_n\big)^2=\frac1n\sum_{i=1}^n\big(X_i-\bar X_n\big)^2$$</p>
+<p><strong>La comparaison avec l'EMV.</strong> Ce sont <strong>exactement</strong> les mêmes estimateurs qu'en fiche 64 ! Pour le modèle gaussien, méthode des moments et maximum de vraisemblance <strong>coïncident</strong>.</p>
+<p><strong>Pourquoi.</strong> La loi gaussienne appartient à la famille exponentielle avec $T_1(x)=x$ et $T_2(x)=x^2$ (fiche 66) : les statistiques exhaustives <strong>sont</strong> les deux premiers moments empiriques. Les deux méthodes exploitent donc exactement la même information.</p>
+<p class="cal piege"> <strong>Et le même biais</strong> : $\hat\sigma^2$ divise par $n$, il est donc biaisé ; l'estimateur sans biais divise par $n-1$.</p>
+</div></details>
+
+<p><strong> Niveau 2</strong> — Pourquoi l'intervalle de confiance naïf de Bernoulli n'en est-il pas un ?</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p><strong>L'intervalle proposé.</strong>
+$$I=\left[\bar X_n-\frac{q_{\alpha/2}\sqrt{p(1-p)}}{\sqrt n},\ \bar X_n+\frac{q_{\alpha/2}\sqrt{p(1-p)}}{\sqrt n}\right]$$
+Le TCL garantit bien $\lim_n\mathbb P_p[I\ni p]=1-\alpha$ pour tout $p$.</p>
+<p><strong>Le problème.</strong> La définition exige que les <strong>bornes ne dépendent pas de $\theta$</strong>. Or elles contiennent $\sqrt{p(1-p)}$ — donc <strong>$p$, le paramètre inconnu</strong>. On ne peut pas calculer $I$ à partir des seules données : ce n'est pas une statistique, donc pas un intervalle de confiance.</p>
+<p><strong>Solution 1 — majorer.</strong> La fonction $p\mapsto p(1-p)$ est maximale en $p=1/2$, où elle vaut $1/4$. Donc
+$$I_1=\left[\bar X_n-\frac{q_{\alpha/2}}{2\sqrt n},\ \bar X_n+\frac{q_{\alpha/2}}{2\sqrt n}\right]$$
+contient $I$ et vérifie $\mathbb P_p[I_1\ni p]\geq1-\alpha$. <strong>Conservateur</strong> — l'intervalle est plus large que nécessaire dès que $p$ s'éloigne de $1/2$ — mais <strong>valide</strong>, et l'inégalité $\geq$ de la définition est bien respectée.</p>
+<p><strong>Solution 2 — remplacer et invoquer Slutsky.</strong>
+$$I_2=\left[\bar X_n-\frac{q_{\alpha/2}\sqrt{\bar X_n(1-\bar X_n)}}{\sqrt n},\ \bar X_n+\frac{q_{\alpha/2}\sqrt{\bar X_n(1-\bar X_n)}}{\sqrt n}\right]$$
+$\bar X_n\to p$ par la LGN, donc $\sqrt{\bar X_n(1-\bar X_n)}\to\sqrt{p(1-p)}$ par continuité, et le théorème de <strong>Slutsky</strong> garantit que la loi limite est inchangée. $I_2$ est un intervalle de niveau <strong>asymptotique</strong> $1-\alpha$.</p>
+<p><strong>Le choix.</strong> $I_1$ est valide à $n$ fini mais large ; $I_2$ est plus court mais son niveau n'est atteint qu'asymptotiquement. En pratique, avec $n$ grand et $p$ loin de $0$ et $1$, on préfère $I_2$.</p>
+<p class="cal piege"> <strong>Et la formulation correcte</strong> : « $I$ contient $p$ avec probabilité $1-\alpha$ », et non « $p$ est dans $I$ avec probabilité $1-\alpha$ ». C'est l'<strong>intervalle</strong> qui est aléatoire.</p>
+</div></details>
+
+<p><strong> Niveau 3</strong> — Expliquez comment le théorème de Weierstrass justifie la méthode des moments.</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p><strong>Le problème initial.</strong> Pour identifier $\theta^\ast$, il suffirait de trouver $\theta$ tel que
+$$\int h(x)f_{\theta^\ast}(x)dx=\int h(x)f_\theta(x)dx$$
+pour <strong>toute</strong> fonction $h$ continue bornée — car cela force $f_\theta=f_{\theta^\ast}$, donc $\theta=\theta^\ast$ par identifiabilité.</p>
+<p><strong>La version empirique.</strong> En remplaçant l'espérance par une moyenne, on chercherait $\hat\theta$ tel que
+$$\frac1n\sum_{i=1}^nh(X_i)=\int h(x)f_{\hat\theta}(x)dx$$
+pour toute $h$ continue bornée.  <strong>Il y en a une infinité : infaisable.</strong></p>
+<p><strong>Le premier apport de Weierstrass.</strong> <em>Les fonctions continues peuvent être approchées arbitrairement bien par des <strong>polynômes</strong>.</em> Il suffit donc de tester les polynômes :
+$$\frac1n\sum_i\sum_{k=0}^da_kX_i^k=\sum_{k=0}^da_k\int x^kf_{\hat\theta}(x)dx, \qquad \forall a_0,\dots,a_d$$</p>
+<p><strong>Le second apport — la linéarité.</strong> Cette égalité doit valoir pour <strong>tous</strong> les coefficients $a_k$, donc coefficient par coefficient :
+$$\frac1n\sum_{i=1}^nX_i^k=\int x^kf_{\hat\theta}(x)dx, \qquad k=1,\dots,d$$
+soit <strong>$d$ équations</strong> au lieu d'une infinité. C'est exactement $\hat m_k=m_k(\hat\theta)$.</p>
+<p><strong>Le passage d'une infinité à un nombre fini</strong> s'est fait en deux temps : <strong>densité des polynômes</strong> dans les fonctions continues, puis <strong>linéarité</strong> ramenant les polynômes aux monômes.</p>
+<p><strong>Les trois limites</strong>, que le cours énonce :</p>
+<ol>
+<li>cela ne vaut que pour les fonctions <strong>continues</strong> (<em>pas vraiment un problème</em>) ;</li>
+<li>cela ne vaut que sur un <strong>intervalle borné</strong> $[a,b]$ ;</li>
+<li>cela <strong>ne dit pas</strong> quel $d$ prendre.</li>
+</ol>
+<p><strong>La réponse au point 3.</strong> Le détour par la <strong>quadrature gaussienne</strong> en cas discret montre que $r-1$ moments déterminent <strong>exactement</strong> une loi à $r$ valeurs — le système de Vandermonde étant inversible. D'où la <strong>règle empirique</strong> : <em>si $\theta\in\Theta\subset\mathbb R^d$, il faut $d$ moments</em>. Le nombre de moments suit le nombre de paramètres, ce qui est intuitif : $d$ inconnues, $d$ équations.</p>
+</div></details>
+
+<p><strong> Niveau 4 — type examen</strong> — Établissez la loi asymptotique de l'estimateur des moments et comparez-la à celle de l'EMV.</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p><strong>Les notations.</strong> $M(\theta)=(m_1(\theta),\dots,m_d(\theta))$, $\hat M=(\hat m_1,\dots,\hat m_d)$, $\Sigma(\theta)=\mathbb V_\theta(X,X^2,\dots,X^d)$, et $\psi^{-1}$ continûment dérivable en $M(\theta)$.</p>
+<p><strong>Étape 1 — le TCL sur les moments empiriques.</strong> Les vecteurs $(X_i,X_i^2,\dots,X_i^d)$ sont i.i.d. de moyenne $M(\theta)$ et de covariance $\Sigma(\theta)$. Le TCL multivarié donne
+$$\sqrt n\big(\hat M-M(\theta)\big)\ \xrightarrow{(d)}\ N\big(0,\Sigma(\theta)\big)$$</p>
+<p><strong>Étape 2 — la méthode delta.</strong> Comme $\hat\theta_n^{MM}=\psi^{-1}(\hat M)$ et $\theta=\psi^{-1}(M(\theta))$, on applique la méthode delta avec $g=\psi^{-1}$ :
+$$\sqrt n\big(\hat\theta_n^{MM}-\theta\big)\ \xrightarrow{(d)}\ N\big(0,\Gamma(\theta)\big), \qquad \Gamma(\theta)=\big(\nabla\psi^{-1}\big)^\top\Sigma(\theta)\big(\nabla\psi^{-1}\big)$$
+le gradient étant évalué en $M(\theta)$.</p>
+<p><strong>Étape 3 — la consistance</strong>, par la LGN : $\hat M\to M(\theta)$, donc $\hat\theta_n^{MM}=\psi^{-1}(\hat M)\to\theta$ par continuité de $\psi^{-1}$.</p>
+<p><strong>La comparaison avec l'EMV.</strong></p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th><strong>Méthode des moments</strong></th>
+<th><strong>Maximum de vraisemblance</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Vitesse</td>
+<td>$1/\sqrt n$</td>
+<td>$1/\sqrt n$</td>
+</tr>
+<tr>
+<td>Variance asymptotique</td>
+<td>$\Gamma(\theta)=\nabla\psi^{-1\top}\Sigma\nabla\psi^{-1}$</td>
+<td>$I(\theta)^{-1}$</td>
+</tr>
+<tr>
+<td>Optimalité</td>
+<td>non en général</td>
+<td><strong>oui</strong> (Cramér-Rao)</td>
+</tr>
+<tr>
+<td>Calcul</td>
+<td><strong>explicite</strong>, système à inverser</td>
+<td>optimisation</td>
+</tr>
+<tr>
+<td>Risque d'échec</td>
+<td>$\psi$ non inversible</td>
+<td>maxima locaux</td>
+</tr>
+</tbody></table>
+<p><strong>Le point théorique décisif.</strong> Le théorème de la fiche 64 donne à l'EMV la variance $I(\theta^\ast)^{-1}$, qui <strong>atteint la borne de Cramér-Rao</strong> : c'est la plus petite variance asymptotique atteignable par un estimateur régulier. Donc
+$$\Gamma(\theta)\ \succeq\ I(\theta)^{-1}$$
+avec égalité seulement dans des cas particuliers. Le cours résume : <em>en général, l'EMV est plus précis</em>.</p>
+<p><strong>Le point pratique qui sauve la méthode des moments.</strong> <em>Parfois, l'EMV est <strong>intraitable</strong>.</em> Il faut alors optimiser : <em>si la vraisemblance est concave, on peut utiliser des algorithmes d'optimisation — points intérieurs, descente de gradient. Si elle n'est pas concave, seulement des heuristiques, avec des maxima locaux.</em></p>
+<p>La méthode des moments, elle, ne demande <strong>aucune optimisation</strong> : on résout $\hat m_k=m_k(\hat\theta)$, c'est-à-dire $d$ équations à $d$ inconnues. Elle est donc <strong>toujours calculable</strong> dès que $\psi$ est inversible, et sans risque de maximum local.</p>
+<p><strong>Le cas d'égalité intéressant.</strong> Pour le modèle gaussien, les deux méthodes donnent <strong>exactement le même estimateur</strong>. Ce n'est pas un hasard : la gaussienne est une famille exponentielle dont les statistiques exhaustives sont $T_1(x)=x$ et $T_2(x)=x^2$ (fiche 66) — précisément les deux premiers moments. Les deux méthodes utilisent la même information, donc coïncident.</p>
+<p><strong>En pratique</strong>, on utilise souvent l'estimateur des moments comme <strong>point de départ</strong> d'un algorithme de maximum de vraisemblance : facile à calculer, déjà consistant, et suffisamment proche de l'optimum pour que Newton converge rapidement.</p>
+</div></details>
+
+<h2 data-prio="must">Common mistakes</h2>
+<ol>
+<li><strong>Oublier de vérifier l'identifiabilité</strong> — sans elle, aucun estimateur ne peut converger vers un point unique.</li>
+<li><strong>Croire qu'un estimateur peut dépendre de $\theta$</strong> — un estimateur doit être calculable à partir des <strong>seules données</strong>.</li>
+<li><strong>Comparer des estimateurs sur leur biais seul</strong> — c'est le <strong>risque quadratique</strong> qui compte, biais$^2+$ variance.</li>
+<li><strong>Croire qu'un estimateur sans biais est toujours meilleur</strong> — un peu de biais peut réduire beaucoup la variance.</li>
+<li><strong>Dire « $\theta$ est dans $I$ avec probabilité $1-\alpha$ »</strong> — c'est <strong>$I$ qui est aléatoire</strong>, pas $\theta$.</li>
+<li><strong>Laisser $\theta$ dans les bornes d'un intervalle de confiance</strong> — il faut majorer la variance ou appliquer <strong>Slutsky</strong>.</li>
+<li><strong>Prendre le mauvais nombre de moments</strong> — il en faut $d$ pour $\theta\in\mathbb R^d$.</li>
+<li><strong>Oublier de vérifier que $\psi$ est inversible</strong> — sans cela, l'estimateur des moments n'existe pas.</li>
+<li><strong>Se tromper dans la méthode delta</strong> — c'est $\nabla g^\top\Sigma\nabla g$, avec le gradient évalué au <strong>point limite</strong>.</li>
+<li><strong>Croire que la méthode des moments vaut l'EMV</strong> — sa variance est en général strictement supérieure.</li>
+</ol>
+<h2>Ultimate Review</h2>
+<ol>
+<li><strong>L'arbitrage fondateur</strong> : plus de paramètres $=$ moins d'hypothèses mais plus de variance ; 7 paramètres libres contre 1 pour Poisson.</li>
+<li><strong>Modèle statistique</strong> : $\big(E,(\mathbb P_\theta)_{\theta\in\Theta}\big)$ ; $E$ espace d'échantillonnage, $\Theta$ ensemble de paramètres ; <strong>bien spécifié</strong> si $\mathbb P=\mathbb P_\theta$ ; <strong>paramétrique</strong> si $\Theta\subseteq\mathbb R^d$.</li>
+<li><strong>Identifiabilité</strong> : $\theta\mapsto\mathbb P_\theta$ <strong>injective</strong>. Contre-exemple : $X_i=\mathbf 1_{Y_i\geq0}$ avec $Y_i\sim N(\mu,\sigma^2)$ — seul $\mu/\sigma$ est identifié.</li>
+<li><strong>Statistique</strong> : toute fonction mesurable de l'échantillon. <strong>Estimateur</strong> : statistique <strong>ne dépendant pas de $\theta$</strong>.</li>
+<li><strong>Consistance</strong> : $\hat\theta_n\to\theta$ en probabilité (faible) ou presque sûrement (forte).</li>
+<li><strong>Biais</strong> $=\mathbb E[\hat\theta_n]-\theta$ ; <strong>risque quadratique</strong> $=\mathbb E[\lvert\hat\theta_n-\theta\rvert^2]$ ; et <strong>risque $=$ biais$^2+$ variance</strong>.</li>
+<li><strong>Intervalle de confiance de niveau $1-\alpha$</strong> : intervalle aléatoire à bornes indépendantes de $\theta$ avec $\mathbb P_\theta[I\ni\theta]\geq1-\alpha$ ; <strong>asymptotique</strong> si la limite le vérifie.</li>
+<li><strong>Le piège de Bernoulli</strong> : les bornes contiennent $\sqrt{p(1-p)}$. <strong>Deux remèdes</strong> : majorer par $1/4$ (conservateur, valide à $n$ fini) ou remplacer $p$ par $\bar X_n$ (<strong>Slutsky</strong>, asymptotique).</li>
+<li><strong>Weierstrass</strong> : toute fonction continue sur $[a,b]$ est approchable par des polynômes.</li>
+<li><strong>Son usage</strong> : identifier deux lois demande une infinité d'intégrales ⟹ polynômes suffisent ⟹ <strong>monômes</strong> suffisent ⟹ $d$ équations sur les moments.</li>
+<li><strong>Ses trois limites</strong> : fonctions continues · intervalles bornés · $d$ non déterminé.</li>
+<li><strong>Quadrature gaussienne</strong> (cas discret à $r$ valeurs) : système linéaire de matrice de <strong>Vandermonde</strong>, de déterminant $\prod_{j&lt;k}(x_j-x_k)\neq0$ ⟹ $r-1$ moments déterminent <strong>uniquement</strong> la loi.</li>
+<li><strong>Règle empirique</strong> : $\theta\in\mathbb R^d$ ⟹ <strong>$d$ moments</strong>.</li>
+<li><strong>Méthode des moments</strong> : $m_k(\theta)=\mathbb E_\theta[X^k]$, $\hat m_k=\frac1n\sum X_i^k$, $\psi(\theta)=(m_1(\theta),\dots,m_d(\theta))$, et
+$$\hat\theta_n^{MM}=\psi^{-1}\big(\hat m_1,\dots,\hat m_d\big)$$</li>
+<li><strong>Asymptotique</strong> : LGN ⟹ consistance ; TCL ⟹ $\sqrt n(\hat M-M(\theta))\to N(0,\Sigma(\theta))$ ; <strong>méthode delta</strong> ⟹
+$$\sqrt n\big(\hat\theta_n^{MM}-\theta\big)\to N\big(0,\Gamma(\theta)\big), \qquad \Gamma=\big(\nabla\psi^{-1}\big)^\top\Sigma\big(\nabla\psi^{-1}\big)$$</li>
+<li><strong>Méthode delta multivariée</strong> : $\sqrt n(T_n-\theta)\to N(0,\Sigma)$ et $g$ continûment dérivable ⟹ $\sqrt n(g(T_n)-g(\theta))\to N(0,\nabla g^\top\Sigma\nabla g)$.</li>
+<li><strong>EMV contre moments</strong> : l'EMV est <strong>plus précis</strong> en général (Cramér-Rao) ; la méthode des moments est <strong>explicite</strong> et sans maximum local. Elles <strong>coïncident</strong> pour le modèle gaussien.</li>
+</ol>
+<p><strong>Formulas to know</strong>
+$$\text{risque}=\text{biais}^2+\text{variance} \qquad \mathbb P_\theta[I\ni\theta]\geq1-\alpha \qquad p(1-p)\leq\tfrac14$$
+$$m_k(\theta)=\mathbb E_\theta[X^k] \qquad \hat m_k=\frac1n\sum_{i=1}^nX_i^k \qquad \hat\theta_n^{MM}=\psi^{-1}(\hat m_1,\dots,\hat m_d)$$
+$$\Gamma(\theta)=\big(\nabla\psi^{-1}\big)^\top\Sigma(\theta)\big(\nabla\psi^{-1}\big) \qquad \sqrt n\big(g(T_n)-g(\theta)\big)\to N\big(0,\nabla g^\top\Sigma\nabla g\big)$$</p>
+<p><strong>Methods to know</strong> : vérifier l'identifiabilité ; décomposer un risque ; construire un intervalle de confiance et traiter le paramètre inconnu ; appliquer la méthode des moments et sa méthode delta.</p>
+<div class="rec"><h2>Active Recall</h2><p><strong>Basic</strong> — Définissez un modèle statistique et l'identifiabilité.</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p><strong>Modèle statistique</strong> : un couple $\big(E,(\mathbb P_\theta)_{\theta\in\Theta}\big)$ où $E$ est l'<strong>espace d'échantillonnage</strong>, $(\mathbb P_\theta)_{\theta\in\Theta}$ une <strong>famille de lois</strong> sur $E$, et $\Theta$ l'<strong>ensemble de paramètres</strong>. Le modèle est <strong>bien spécifié</strong> si la vraie loi $\mathbb P$ vaut $\mathbb P_{\theta^\ast}$ pour un certain $\theta^\ast\in\Theta$, et <strong>paramétrique</strong> si $\Theta\subseteq\mathbb R^d$.</p>
+<p><strong>Identifiabilité</strong> : $\theta$ est <strong>identifié</strong> si l'application $\theta\mapsto\mathbb P_\theta$ est <strong>injective</strong>, c'est-à-dire
+$$\theta\neq\theta'\ \Longrightarrow\ \mathbb P_\theta\neq\mathbb P_{\theta'}$$</p>
+<p class="cal piege"> Sans identifiabilité, deux valeurs différentes du paramètre engendrent exactement les mêmes données : <strong>aucune</strong> quantité d'observations ne permet de les distinguer.</p>
+</div></details><p><strong>Understanding</strong> — Que dit la décomposition risque $=$ biais$^2+$ variance ?</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p>$$\mathbb E\big[(\hat\theta_n-\theta)^2\big]=\underbrace{\big(\mathbb E[\hat\theta_n]-\theta\big)^2}_{\text{biais}^2}+\underbrace{\mathrm{var}(\hat\theta_n)}_{\text{variance}}$$</p>
+<p><strong>Les deux sources d'erreur.</strong> Le <strong>biais</strong> est l'erreur <strong>systématique</strong> : l'estimateur vise-t-il la bonne cible ? La <strong>variance</strong> est l'erreur <strong>aléatoire</strong> : à quel point le tir est-il dispersé d'un échantillon à l'autre ?</p>
+<p><strong>La conséquence pratique, contre-intuitive.</strong> Un estimateur <strong>biaisé</strong> peut avoir un risque <strong>plus faible</strong> qu'un estimateur sans biais, si sa variance est nettement moindre. C'est toute la justification de la <strong>régularisation</strong> (ridge, LASSO, rétrécissement) et, plus généralement, de la modélisation paramétrique : supposer $X\sim\mathrm{Poiss}(\lambda)$ introduit du biais si c'est faux, mais fait passer de $7$ paramètres à $1$, donc réduit massivement la variance.</p>
+</div></details><p><strong>Application</strong> — Estimez $\lambda$ d'une loi exponentielle par la méthode des moments.</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p><strong>Le paramètre est de dimension $d=1$</strong> : un seul moment suffit.</p>
+<p><strong>Le moment de population.</strong> Pour $X\sim\mathrm{Exp}(\lambda)$, $\mathbb E[X]=\dfrac1\lambda$, donc $m_1(\lambda)=\dfrac1\lambda$.</p>
+<p><strong>L'application $\psi$ et son inverse.</strong> $\psi(\lambda)=1/\lambda$, donc $\psi^{-1}(m)=1/m$ — bijective sur $(0,\infty)$. </p>
+<p><strong>L'estimateur.</strong>
+$$\hat\lambda_n^{MM}=\psi^{-1}\big(\hat m_1\big)=\frac{1}{\bar X_n}$$</p>
+<p><strong>La consistance.</strong> $\bar X_n\to1/\lambda$ par la LGN, donc $\hat\lambda_n\to\lambda$ par continuité de $x\mapsto1/x$ sur $(0,\infty)$.</p>
+<p><strong>La loi asymptotique par la méthode delta.</strong> $\mathrm{var}(X)=1/\lambda^2$, donc $\sqrt n(\bar X_n-1/\lambda)\to N(0,1/\lambda^2)$. Avec $g(m)=1/m$ et $g'(m)=-1/m^2$, évalué en $m=1/\lambda$ : $g'(1/\lambda)=-\lambda^2$. D'où
+$$\sqrt n\big(\hat\lambda_n-\lambda\big)\ \xrightarrow{(d)}\ N\Big(0,\ \lambda^4\cdot\frac{1}{\lambda^2}\Big)=N\big(0,\lambda^2\big)$$</p>
+<p><strong>Comparaison avec l'EMV.</strong> Pour la loi exponentielle, l'EMV est <strong>aussi</strong> $1/\bar X_n$, et l'information de Fisher vaut $I(\lambda)=1/\lambda^2$, d'où une variance asymptotique $I(\lambda)^{-1}=\lambda^2$ — <strong>identique</strong>. </p>
+<p><strong>Pourquoi la coïncidence.</strong> La loi exponentielle est une famille exponentielle à un paramètre dont la statistique exhaustive est $T(x)=x$ : les deux méthodes utilisent la même information.</p>
+</div></details><p><strong>Comparison</strong> — EMV et méthode des moments : quand préférer laquelle ?</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<table>
+<thead>
+<tr>
+<th></th>
+<th><strong>Maximum de vraisemblance</strong></th>
+<th><strong>Méthode des moments</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Précision</td>
+<td><strong>optimale</strong> ($I(\theta)^{-1}$, Cramér-Rao)</td>
+<td>$\Gamma(\theta)\succeq I(\theta)^{-1}$</td>
+</tr>
+<tr>
+<td>Calcul</td>
+<td><strong>optimisation</strong></td>
+<td>système d'équations, <strong>explicite</strong></td>
+</tr>
+<tr>
+<td>Risque de blocage</td>
+<td>maxima locaux si non concave</td>
+<td>$\psi$ non inversible</td>
+</tr>
+<tr>
+<td>Ce qu'il faut connaître</td>
+<td>la <strong>vraisemblance</strong> entière</td>
+<td>seulement $d$ <strong>moments</strong></td>
+</tr>
+</tbody></table>
+<p><strong>Le cours tranche :</strong> <em>en général, l'EMV est plus précis</em>. La raison est le théorème de la fiche 64 : sa variance asymptotique atteint la <strong>borne de Cramér-Rao</strong>.</p>
+<p><strong>Mais</strong> : <em>parfois, l'EMV est <strong>intraitable</strong></em>. Il faut alors optimiser — <em>si la vraisemblance est concave, points intérieurs ou descente de gradient ; si elle ne l'est pas, seulement des heuristiques, avec des maxima locaux</em>.</p>
+<p><strong>Quand préférer les moments.</strong> Vraisemblance impossible à écrire ou à maximiser · besoin d'un estimateur <strong>rapide et sûr</strong> · besoin d'un <strong>point de départ</strong> pour un algorithme d'optimisation · modèle où seuls quelques moments sont spécifiés (méthode des moments <strong>généralisée</strong>, très utilisée en économétrie).</p>
+<p><strong>Quand elles coïncident.</strong> Pour les familles exponentielles dont les statistiques exhaustives sont des moments — gaussienne, exponentielle, Poisson. Les deux méthodes exploitent alors exactement la même information.</p>
+</div></details><p><strong>Exam-style</strong> — Expliquez comment construire un intervalle de confiance et le piège du paramètre inconnu.</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p><strong>La définition.</strong> Un intervalle de confiance de niveau $1-\alpha$ est un intervalle <strong>aléatoire</strong> $I$ — dépendant de $X_1,\dots,X_n$ — dont les <strong>bornes ne dépendent pas de $\theta$</strong> et tel que
+$$\mathbb P_\theta\big[I\ni\theta\big]\geq1-\alpha, \qquad \forall\theta\in\Theta$$
+La version <strong>asymptotique</strong> remplace l'inégalité par sa limite quand $n\to\infty$.</p>
+<p><strong>La construction, en trois pas.</strong></p>
+<ol>
+<li>Trouver un estimateur consistant $\hat\theta_n$.</li>
+<li>Établir sa loi asymptotique par le TCL : $\sqrt n(\hat\theta_n-\theta)\to N(0,\sigma^2(\theta))$.</li>
+<li>Inverser : $\mathbb P\big[\lvert\hat\theta_n-\theta\rvert\leq q_{\alpha/2}\sigma(\theta)/\sqrt n\big]\to1-\alpha$.</li>
+</ol>
+<p><strong>Le piège.</strong> Sur l'exemple de Bernoulli, cela donne
+$$I=\left[\bar X_n\pm\frac{q_{\alpha/2}\sqrt{p(1-p)}}{\sqrt n}\right]$$
+ <strong>$I$ dépend de $p$</strong>, le paramètre inconnu. Les bornes ne sont donc <strong>pas calculables</strong> : ce n'est pas un intervalle de confiance au sens de la définition. C'est exactement la contrainte du concept 3 — un estimateur ne doit pas dépendre de $\theta$.</p>
+<p><strong>Les deux remèdes.</strong></p>
+<p><strong>1. Majorer la variance.</strong> $p(1-p)\leq1/4$, donc
+$$I_1=\left[\bar X_n\pm\frac{q_{\alpha/2}}{2\sqrt n}\right] \supseteq I$$
+et $\mathbb P_p[I_1\ni p]\geq1-\alpha$. <strong>Conservateur mais valide à $n$ fini</strong> — et l'inégalité $\geq$ de la définition est exactement ce qui autorise cet élargissement.</p>
+<p><strong>2. Substituer et invoquer Slutsky.</strong>
+$$I_2=\left[\bar X_n\pm\frac{q_{\alpha/2}\sqrt{\bar X_n(1-\bar X_n)}}{\sqrt n}\right]$$
+La LGN donne $\bar X_n\to p$, la continuité donne $\sqrt{\bar X_n(1-\bar X_n)}\to\sqrt{p(1-p)}$, et <strong>Slutsky</strong> garantit que la loi limite est inchangée. Niveau <strong>asymptotique</strong> $1-\alpha$.</p>
+<p><strong>Le choix.</strong> $I_1$ garantit le niveau à toute taille d'échantillon, au prix d'un intervalle plus large — d'autant plus large que $p$ est loin de $1/2$. $I_2$ est plus court mais ne garantit rien à $n$ fini.</p>
+<p><strong>La généralité de ces deux stratégies.</strong> Elles se retrouvent partout : soit on <strong>majore</strong> la variance inconnue par un pire cas, soit on l'<strong>estime</strong> et l'on invoque Slutsky. La seconde est la plus courante — c'est exactement ce que fait la statistique de Wald de la fiche 65, en remplaçant $I(\theta^\ast)$ par $I(\hat\theta_n)$.</p>
+<p class="cal piege"> <strong>Et la formulation</strong> : « $I$ contient $\theta$ avec probabilité $1-\alpha$ ». C'est <strong>l'intervalle</strong> qui est aléatoire, pas $\theta$, qui est un nombre fixe et inconnu. La probabilité porte sur la <strong>procédure</strong>, pas sur le paramètre.</p>
+</div></details></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h2>Flashcards</h2>
+<table>
+<thead>
+<tr>
+<th>Question</th>
+<th>Réponse</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>L'arbitrage de la modélisation ?</td>
+<td>Moins de paramètres $=$ plus de biais mais moins de variance</td>
+</tr>
+<tr>
+<td>Définition d'un modèle statistique ?</td>
+<td>$\big(E,(\mathbb P_\theta)_{\theta\in\Theta}\big)$</td>
+</tr>
+<tr>
+<td>Que veut dire « bien spécifié » ?</td>
+<td>$\mathbb P=\mathbb P_\theta$ pour un $\theta\in\Theta$</td>
+</tr>
+<tr>
+<td>Que veut dire « paramétrique » ?</td>
+<td>$\Theta\subseteq\mathbb R^d$</td>
+</tr>
+<tr>
+<td>Définition de l'identifiabilité ?</td>
+<td>$\theta\mapsto\mathbb P_\theta$ <strong>injective</strong></td>
+</tr>
+<tr>
+<td>Le contre-exemple du cours ?</td>
+<td>$X_i=\mathbf 1_{Y_i\geq0}$ : seul $\mu/\sigma$ est identifié</td>
+</tr>
+<tr>
+<td>Différence entre statistique et estimateur ?</td>
+<td>L'estimateur <strong>ne dépend pas de $\theta$</strong></td>
+</tr>
+<tr>
+<td>Consistance faible / forte ?</td>
+<td>Convergence en probabilité / presque sûre</td>
+</tr>
+<tr>
+<td>Biais d'un estimateur ?</td>
+<td>$\mathbb E[\hat\theta_n]-\theta$</td>
+</tr>
+<tr>
+<td>Risque quadratique ?</td>
+<td>$\mathbb E[\lvert\hat\theta_n-\theta\rvert^2]$</td>
+</tr>
+<tr>
+<td>Sa décomposition ?</td>
+<td><strong>biais$^2$ $+$ variance</strong></td>
+</tr>
+<tr>
+<td>Définition d'un intervalle de confiance ?</td>
+<td>Bornes indépendantes de $\theta$, $\mathbb P_\theta[I\ni\theta]\geq1-\alpha$</td>
+</tr>
+<tr>
+<td>Qui est aléatoire dans $I\ni\theta$ ?</td>
+<td><strong>L'intervalle</strong>, pas $\theta$</td>
+</tr>
+<tr>
+<td>Le problème de l'IC de Bernoulli ?</td>
+<td>Les bornes contiennent $\sqrt{p(1-p)}$</td>
+</tr>
+<tr>
+<td>Première solution ?</td>
+<td>Majorer $p(1-p)$ par $1/4$</td>
+</tr>
+<tr>
+<td>Seconde solution ?</td>
+<td>Remplacer $p$ par $\bar X_n$ et invoquer <strong>Slutsky</strong></td>
+</tr>
+<tr>
+<td>Théorème de Weierstrass ?</td>
+<td>Toute fonction continue sur $[a,b]$ est approchable par des polynômes</td>
+</tr>
+<tr>
+<td>Son usage ici ?</td>
+<td>Ramener une infinité de conditions à $d$ moments</td>
+</tr>
+<tr>
+<td>Ses trois limites ?</td>
+<td>Continuité · intervalle borné · $d$ non déterminé</td>
+</tr>
+<tr>
+<td>Ce qu'établit la quadrature gaussienne ?</td>
+<td>$r-1$ moments déterminent <strong>uniquement</strong> une loi à $r$ valeurs</td>
+</tr>
+<tr>
+<td>Quel déterminant intervient ?</td>
+<td>Celui de <strong>Vandermonde</strong>, $\prod_{j&lt;k}(x_j-x_k)$</td>
+</tr>
+<tr>
+<td>La règle empirique du nombre de moments ?</td>
+<td>$d$ moments pour $\theta\in\mathbb R^d$</td>
+</tr>
+<tr>
+<td>Moment de population ?</td>
+<td>$m_k(\theta)=\mathbb E_\theta[X^k]$</td>
+</tr>
+<tr>
+<td>Moment empirique ?</td>
+<td>$\hat m_k=\frac1n\sum_iX_i^k$</td>
+</tr>
+<tr>
+<td>Estimateur des moments ?</td>
+<td>$\hat\theta_n^{MM}=\psi^{-1}(\hat m_1,\dots,\hat m_d)$</td>
+</tr>
+<tr>
+<td>Quelle hypothèse sur $\psi$ ?</td>
+<td>Elle doit être <strong>bijective</strong></td>
+</tr>
+<tr>
+<td>Loi asymptotique de $\hat\theta^{MM}$ ?</td>
+<td>$N(0,\Gamma(\theta))$ avec $\Gamma=\nabla\psi^{-1\top}\Sigma\nabla\psi^{-1}$</td>
+</tr>
+<tr>
+<td>Énoncé de la méthode delta ?</td>
+<td>$\sqrt n(g(T_n)-g(\theta))\to N(0,\nabla g^\top\Sigma\nabla g)$</td>
+</tr>
+<tr>
+<td>Quel estimateur est le plus précis ?</td>
+<td>En général l'<strong>EMV</strong></td>
+</tr>
+<tr>
+<td>Pourquoi ?</td>
+<td>Sa variance atteint la borne de <strong>Cramér-Rao</strong></td>
+</tr>
+<tr>
+<td>Quand préférer les moments ?</td>
+<td>Quand l'EMV est <strong>intraitable</strong></td>
+</tr>
+<tr>
+<td>Pour quel modèle coïncident-elles ?</td>
+<td>Le modèle <strong>gaussien</strong> (et exponentiel, Poisson)</td>
+</tr>
+</tbody></table>
+</main>
+
+
+
+
+</body></html>

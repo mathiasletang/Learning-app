@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fiche 42 — Sous-gradients et sous-différentiel</title>
+<script>
+window.MathJax={tex:{inlineMath:[["$","$"]],displayMath:[["$$","$$"]],processEscapes:true},
+ options:{skipHtmlTags:["script","noscript","style","textarea","pre","code"]},
+ svg:{fontCache:"global"},
+ startup:{pageReady:()=>MathJax.startup.defaultPageReady().then(()=>{document.body.classList.add("ready")})}};
+setTimeout(function(){document.body.classList.add("ready")},2500);
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+/* ============================================================
+   MathiasLearn — feuille de style des fiches
+   Reprise intégrale des tokens de 00_PARCOURS/*.html
+   + blocs pédagogiques (callouts, méthode, essentiels, recall)
+   ============================================================ */
+:root{--bg:#faf9f7;--card:#fff;--ink:#1a1a1a;--muted:#6b6b6b;--line:#e5e2dd;--accent:#8b5e34;
+ --hl:#fdf8ef;--ok:#2d7d4f;--okbg:#f0f7f3;--warn:#b3402f;--warnbg:#fdf3f1;--blue:#2f5d8b;--bluebg:#f1f5fa}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+ font:17px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;padding:0 16px 100px}
+.nav{position:sticky;top:0;background:rgba(250,249,247,.96);backdrop-filter:blur(8px);
+ border-bottom:1px solid var(--line);margin:0 -16px 30px;padding:11px 16px;z-index:50;
+ display:flex;gap:6px;flex-wrap:wrap;font-size:13px}
+.nav a{color:var(--muted);text-decoration:none;padding:4px 9px;border-radius:5px;white-space:nowrap}
+.nav a:hover{background:var(--line);color:var(--ink)}
+.nav a.on{background:var(--accent);color:#fff}
+main{max-width:780px;margin:0 auto}
+h1{font-size:31px;letter-spacing:-.02em;margin:.4em 0 .5em;line-height:1.25}
+h2{font-size:23px;margin:2.2em 0 .7em;padding-bottom:.3em;border-bottom:1px solid var(--line)}
+h3{font-size:19px;margin:1.9em 0 .5em;color:var(--accent)}
+h4{font-size:17px;margin:1.5em 0 .4em}
+p{margin:.8em 0} a{color:var(--accent)} hr{border:0;border-top:1px solid var(--line);margin:2.6em 0}
+table{border-collapse:collapse;width:100%;margin:1.3em 0;font-size:15.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+th{background:#f3f0eb;font-weight:600}
+tr:nth-child(even) td{background:#fcfbfa}
+code{font-family:"SF Mono",Menlo,Consolas,monospace;font-size:.88em;background:#f2efea;padding:2px 6px;border-radius:4px;white-space:nowrap}
+pre{background:#f2efea;padding:14px 16px;border-radius:8px;overflow-x:auto}
+pre code{background:none;padding:0;white-space:pre}
+blockquote{border-left:3px solid var(--accent);background:var(--hl);margin:1.4em 0;padding:14px 20px;border-radius:0 8px 8px 0}
+blockquote p:first-child{margin-top:0} blockquote p:last-child{margin-bottom:0}
+ul,ol{padding-left:1.5em} li{margin:.35em 0} em{color:#4a4a4a}
+mjx-container[display="true"]{margin:1.1em 0!important;overflow-x:auto;overflow-y:hidden;padding:2px 0}
+mjx-container svg{max-width:100%}
+body:not(.ready) main{opacity:0} main{opacity:1;transition:opacity .25s}
+
+/* --- bandeau de tête de fiche --- */
+.cours{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--accent);
+ border-radius:0 10px 10px 0;padding:18px 22px;margin:0 0 34px}
+.cours h4{margin:0 0 4px;font-size:14px;text-transform:uppercase;letter-spacing:.07em;color:var(--accent)}
+.cours .cs{color:var(--muted);font-size:14.5px;margin:0 0 14px}
+
+/* --- exercices / corrigés --- */
+.ex{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:6px 24px 20px;margin:18px 0}
+.ex>h3:first-child{margin-top:14px}
+details.cor{margin-top:18px;border:1px solid var(--line);border-radius:8px;background:#fcfbfa;overflow:hidden}
+details.cor>summary{cursor:pointer;padding:12px 16px;font-weight:600;font-size:15px;color:var(--accent);
+ list-style:none;display:flex;align-items:center;gap:9px;user-select:none;transition:.15s;min-height:44px}
+details.cor>summary::-webkit-details-marker{display:none}
+details.cor>summary:hover{background:var(--hl)}
+details.cor>summary::before{content:"\25B6";font-size:10px;transition:transform .18s;display:inline-block}
+details.cor[open]>summary::before{transform:rotate(90deg)}
+details.cor[open]>summary{background:var(--okbg);color:var(--ok);border-bottom:1px solid var(--line)}
+.cor .in{padding:4px 20px 16px}
+.cor .in>*:first-child{margin-top:.9em}
+
+/* --- blocs pédagogiques (callouts) ---
+   Générés depuis une citation Markdown dont le premier **gras** commence
+   par un mot-clé : DÉFINITION, THÉORÈME, MÉTHODE, PIÈGE, INTUITION… */
+.cal{border:1px solid var(--line);border-left:4px solid var(--accent);background:var(--card);
+ border-radius:0 10px 10px 0;padding:15px 20px;margin:1.5em 0}
+.cal>p:first-child{margin-top:0}.cal>p:last-child,.cal>ul:last-child,.cal>ol:last-child{margin-bottom:0}
+.cal .lab{display:block;font-size:12.5px;text-transform:uppercase;letter-spacing:.08em;
+ font-weight:700;color:var(--accent);margin-bottom:6px}
+.cal.formel{background:var(--hl)}
+.cal.piege{border-left-color:var(--warn);background:var(--warnbg)}
+.cal.piege .lab{color:var(--warn)}
+.cal.methode{border-left-color:var(--ok);background:var(--okbg)}
+.cal.methode .lab{color:var(--ok)}
+.cal.intu{border-left-color:var(--blue);background:var(--bluebg)}
+.cal.intu .lab{color:var(--blue)}
+.cal.plus{border-left-style:dashed;background:#faf9f7}
+.cal.plus .lab{color:var(--muted)}
+
+/* --- révision express --- */
+.ess{background:var(--card);border:1px solid var(--accent);border-radius:10px;padding:4px 24px 20px;margin:1.6em 0}
+.ess h3{margin-top:1.3em}
+.rec{background:var(--card);border:1px dashed var(--accent);border-radius:10px;padding:4px 24px 18px;margin:1.6em 0}
+.rec ol{counter-reset:none}
+
+/* --- impression / PDF --- */
+@media print{
+ .nav{display:none}
+ body{padding:0;background:#fff;font-size:11.2pt;line-height:1.55}
+ main{max-width:none}
+ h1{font-size:23pt}h2{font-size:15pt;margin-top:1.5em}h3{font-size:12.6pt}
+ h2,h3,h4{break-after:avoid;page-break-after:avoid}
+ table,.cal,blockquote{break-inside:avoid;page-break-inside:avoid}
+ table{display:table;font-size:9.6pt}
+ details.cor{border:1px solid var(--line);background:#fcfbfa}
+ details.cor>summary{display:none}
+ details.cor .in{padding-top:10px}
+ .cal,.ex,.ess,.rec{box-shadow:none}
+ a{color:var(--ink);text-decoration:none}
+}
+@page{margin:16mm 15mm 18mm}
+
+/* --- exemples travaillés --- */
+.exm{background:#fcfbfa;border:1px solid var(--line);border-radius:10px;padding:2px 20px 14px;margin:1.5em 0}
+.exm>h4:first-child{margin:14px 0 .5em;color:var(--accent);font-size:13px;text-transform:uppercase;letter-spacing:.07em}
+
+
+/* --- pastilles de priorité (conventions des fiches de l'app) --- */
+h2[data-prio], h3[data-prio], h4[data-prio]{position:relative}
+h2[data-prio]::before,h3[data-prio]::before,h4[data-prio]::before{
+ content:"";display:inline-block;width:9px;height:9px;border-radius:50%;
+ margin-right:9px;vertical-align:middle;background:var(--muted)}
+[data-prio="must"]::before{background:var(--warn)}
+[data-prio="high"]::before{background:#d98324}
+[data-prio="mid"]::before{background:#c9a227}
+[data-prio="low"]::before{background:var(--ok)}
+/* corrigés des fiches de l'app : même traitement que les corrigés des séries */
+details.cor>summary::after{content:""}
+</style></head><body>
+<div class="nav"><a href="24-lp-formulation.html">Programmation linéaire : formulation et géométrie</a><a href="25-lp-affine-par-morceaux.html">Optimisation affine par morceaux : tout ramener à un LP</a><a href="26-lp-polyedres.html">Polyèdres : faces, points extrêmes, test du rang</a><a href="27-lp-convexite-cones.html">Enveloppes convexes, cônes et décomposition d'un polyèdre</a><a href="28-lp-dualite.html">Dualité en programmation linéaire</a><a href="29-lp-sensibilite-jeux.html">Dualité II : sensibilité, prix implicites et jeux à somme nulle</a><a href="30-lp-simplexe.html">L'algorithme du simplexe</a><a href="31-lp-reseaux-unimodularite.html">Flots dans les réseaux et unimodularité totale</a><a href="32-lp-commande.html">Applications en automatique : suivi de consigne et robustesse</a><a href="33-lp-nombres-entiers.html">Programmation linéaire en nombres entiers et séparation-évaluation</a><a href="34-boyd-ensembles-convexes.html">Ensembles convexes</a><a href="35-boyd-fonctions-convexes.html">Fonctions convexes</a><a href="36-boyd-problemes-convexes.html">Problèmes d'optimisation convexe</a><a href="37-boyd-familles-standard.html">Les familles standard : LP, QP, SOCP, GP, SDP</a><a href="38-boyd-dualite.html">Dualité lagrangienne</a><a href="39-boyd-minimisation-sans-contrainte.html">Minimisation sans contrainte : gradient et Newton</a><a href="40-boyd-contraintes-egalite.html">Minimisation sous contraintes d'égalité</a><a href="41-boyd-points-interieurs.html">Méthodes de points intérieurs</a><a href="42-sous-gradients.html" class="on">Sous-gradients et sous-différentiel</a><a href="43-methode-sous-gradient.html">La méthode du sous-gradient</a></div>
+<main><h1>Fiche 42 — Sous-gradients et sous-différentiel</h1>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Matière</strong></td>
+<td>Maths · Optimisation</td>
+</tr>
+<tr>
+<td><strong>Cours source</strong></td>
+<td>Boyd, Duchi, Pilanci &amp; Vandenberghe, <em>Subgradients</em> — notes pour EE364b, Stanford, printemps 2021-22</td>
+</tr>
+<tr>
+<td><strong>Difficulté</strong></td>
+<td> Must know — la porte d'entrée de tout l'optimisation non lisse</td>
+</tr>
+<tr>
+<td><strong>Temps d'étude estimé</strong></td>
+<td>1 h 45</td>
+</tr>
+<tr>
+<td><strong>Prérequis</strong></td>
+<td>Fiche 35 (condition du premier ordre, épigraphe), fiche 34 (hyperplan d'appui)</td>
+</tr>
+<tr>
+<td><strong>Concepts clés</strong></td>
+<td>Sous-gradient, sous-différentiel, existence, condition d'optimalité $0\in\partial f(x^\star)$, dérivée directionnelle, calcul faible et fort, maximum ponctuel, minimisation partielle</td>
+</tr>
+<tr>
+<td><strong>Poids à l'examen</strong></td>
+<td>Deux compétences : <strong>calculer</strong> un sous-différentiel (valeur absolue, norme 1, maximum, $\lambda_{\max}$) et <strong>énoncer la condition d'optimalité</strong> $0\in\partial f(x^\star)$, avec sa version contrainte.</td>
+</tr>
+</tbody></table>
+<h2>Vue d'ensemble</h2>
+<p>Toutes les méthodes vues jusqu'ici supposent $f$ <strong>dérivable</strong>. Or les objectifs les plus utiles ne le sont pas : $\|x\|_1$ (parcimonie), $\max_i(a_i^Tx+b_i)$ (pire cas), $\lambda_{\max}(A(x))$ (spectral), la perte charnière (classification). Le <strong>sous-gradient</strong> étend le gradient à ces fonctions, sans rien perdre de l'essentiel.</p>
+<pre><code>GRADIENT      ∇f(x)  →  UNE tangente, sous la courbe
+SOUS-GRADIENT g      →  UNE des tangentes possibles, toutes sous la courbe
+SOUS-DIFFÉRENTIEL ∂f(x) = l'ENSEMBLE de ces g  →  convexe, fermé
+OPTIMALITÉ    ∇f(x*) = 0   devient   0 ∈ ∂f(x*)
+</code></pre>
+<p>Le prix à payer : $\partial f(x)$ est un <strong>ensemble</strong>, pas un vecteur, et $-g$ n'est plus nécessairement une direction de descente. C'est ce qui rendra les algorithmes du chapitre suivant (fiche 43) fondamentalement plus lents.</p>
+<h2 data-prio="must">Concept 1 — Définition et interprétations</h2>
+<p><strong>Définition.</strong> Un vecteur $g\in\mathbb{R}^n$ est un <strong>sous-gradient</strong> de $f:\mathbb{R}^n\to\mathbb{R}$ en $x\in\mathbf{dom}\,f$ si, pour tout $z\in\mathbf{dom}\,f$ :
+$$f(z) \geq f(x) + g^T(z-x) \tag{1}$$</p>
+<p><strong>Trois lectures.</strong></p>
+<ol>
+<li><strong>Minorant affine global</strong> : la fonction affine $z\mapsto f(x)+g^T(z-x)$ minore $f$ <strong>partout</strong>, avec égalité en $x$.</li>
+<li><strong>Hyperplan d'appui</strong> : $g$ est un sous-gradient en $x$ si et seulement si $(g,-1)$ définit un hyperplan d'appui à $\mathbf{epi}\,f$ au point $(x,f(x))$ — exactement la lecture géométrique de la fiche 35, mais sans exiger la différentiabilité.</li>
+<li><strong>Généralisation du gradient</strong> : si $f$ est convexe et dérivable, $\nabla f(x)$ <strong>est</strong> un sous-gradient (c'est la condition du premier ordre).</li>
+</ol>
+<p><strong>Sous-différentiel.</strong> L'ensemble des sous-gradients de $f$ en $x$ :
+$$\partial f(x) = \{g \mid f(z)\geq f(x)+g^T(z-x)\ \ \forall z\in\mathbf{dom}\,f\}$$
+$f$ est <strong>sous-différentiable</strong> en $x$ si $\partial f(x)\neq\emptyset$.</p>
+<p><strong>Exemple fondateur — la valeur absolue.</strong> Pour $f(z)=|z|$ :
+$$\partial f(x) = \begin{cases}\{-1\} &amp; x&lt;0\\ [-1,\ 1] &amp; x=0\\ \{1\} &amp; x&gt;0\end{cases}$$
+En $x=0$, la condition $|z|\geq gz$ pour tout $z$ équivaut à $g\in[-1,1]$. <strong>Le sous-différentiel est un intervalle : toutes les pentes des droites passant sous la courbe.</strong></p>
+<h2 data-prio="high">Concept 2 — Propriétés de base</h2>
+<p><strong>$\partial f(x)$ est toujours un ensemble convexe fermé</strong>, même si $f$ n'est pas convexe. En effet, c'est une <strong>intersection de demi-espaces</strong> :
+$$\partial f(x) = \bigcap_{z\in\mathbf{dom}\,f}\{g \mid f(z)\geq f(x)+g^T(z-x)\}$$
+— chacune de ces conditions étant linéaire en $g$ (fiche 34).</p>
+<p><strong>Bornitude.</strong> Si $f$ est <strong>continue</strong> en $x$, alors $\partial f(x)$ est <strong>borné</strong>. <em>Preuve par l'absurde :</em> si $\partial f(x)$ était non borné, il existerait $g_n\in\partial f(x)$ avec $\|g_n\|_2\to\infty$ ; en prenant $y_n = x+\epsilon g_n/\|g_n\|_2$,
+$$f(y_n)\geq f(x)+g_n^T(y_n-x) = f(x)+\epsilon\|g_n\|_2 \to\infty$$
+ce qui contredit la bornitude de $f$ au voisinage de $x$.</p>
+<p><strong>Existence (§2.1).</strong> Si $f$ est <strong>convexe</strong> et $x\in\mathbf{int}\,\mathbf{dom}\,f$, alors $\partial f(x)$ est <strong>non vide et borné</strong>.</p>
+<p><em>Démonstration.</em> On applique le <strong>théorème de l'hyperplan d'appui</strong> (fiche 34) à l'ensemble convexe $\mathbf{epi}\,f$ au point du bord $(x,f(x))$ : il existe $(a,b)\neq0$ tel que
+$$a^T(z-x) + b\,(t-f(x)) \leq 0 \qquad \forall (z,t)\in\mathbf{epi}\,f$$
+Cela impose $b\leq0$. Si $b\neq0$, on divise par $|b|$ et l'on obtient $f(z)\geq f(x)-(a/b)^T(z-x)$, c'est-à-dire $-a/b\in\partial f(x)$. Reste à exclure $b=0$ : on aurait alors $a^T(z-x)\leq0$ pour tout $z\in\mathbf{dom}\,f$, ce qui est <strong>impossible</strong> si $x$ est <strong>intérieur</strong> au domaine. $\blacksquare$</p>
+<blockquote>
+<p><strong>Le mot clé est « non vertical ».</strong> Une fonction convexe admet un sous-gradient en $x$ dès qu'il existe un hyperplan d'appui <strong>non vertical</strong> à son épigraphe en $(x,f(x))$. Aux points du bord du domaine, l'hyperplan d'appui peut être vertical, et le sous-différentiel vide.</p>
+</blockquote>
+<p><strong>Cas dérivable (§2.2).</strong> Si $f$ est convexe et <strong>dérivable</strong> en $x$, alors $\partial f(x)=\{\nabla f(x)\}$ : le gradient est <strong>l'unique</strong> sous-gradient. <strong>Réciproquement</strong>, si $f$ est convexe et $\partial f(x)=\{g\}$ est un singleton, alors $f$ est dérivable en $x$ et $g=\nabla f(x)$.</p>
+<blockquote>
+<p><strong>L'équivalence est totale : « dérivable » = « sous-différentiel réduit à un point ».</strong> C'est la meilleure façon de retenir le lien entre les deux notions.</p>
+</blockquote>
+<h2 data-prio="must">Concept 3 — La condition d'optimalité</h2>
+<p><strong>Sans contrainte (§2.3).</strong> Un point $x^\star$ minimise $f$ (convexe ou non !) <strong>si et seulement si</strong> $f$ est sous-différentiable en $x^\star$ et
+$$\boxed{\ 0 \in \partial f(x^\star)\ }$$</p>
+<p><em>Démonstration, immédiate dans les deux sens.</em> Si $x^\star$ est un minimiseur, $f(x)\geq f(x^\star) = f(x^\star)+0^T(x-x^\star)$ pour tout $x$ : le vecteur nul vérifie la définition (1). Réciproquement, si $0\in\partial f(x^\star)$, la même inégalité donne $f(x)\geq f(x^\star)$ pour tout $x$. $\blacksquare$</p>
+<p class="cal piege"> Cette caractérisation vaut pour des fonctions <strong>non convexes</strong>, mais elle n'y est pas utile : on ne sait généralement pas calculer le sous-différentiel d'une fonction non convexe. Et pour $f$ convexe <strong>dérivable</strong>, elle se réduit à $\nabla f(x^\star)=0$.</p>
+<p><strong>Avec contraintes (§2.5).</strong> Pour minimiser $f$ sur un <strong>convexe fermé</strong> $X$, $x^\star$ est optimal <strong>si et seulement s'il existe</strong> un sous-gradient $g\in\partial f(x^\star)$ tel que
+$$g^T(y-x^\star)\geq0 \qquad \forall y\in X$$</p>
+<p><strong>Comparez avec la fiche 36.</strong> Le critère différentiable était $\nabla f_0(x^\star)^T(y-x^\star)\geq0$ pour tout $y$ admissible. Ici, il ne suffit <strong>pas</strong> que l'inégalité vaille pour un $g$ quelconque : il faut qu'<strong>il existe</strong> un sous-gradient qui la satisfasse. La quantification change, et c'est essentiel.</p>
+<p><em>Le sens facile :</em> si un tel $g$ existe, alors pour $x\in X$, $f(x)\geq f(x^\star)+g^T(x-x^\star)\geq f(x^\star)$. <em>Le sens difficile</em> passe par la dérivée directionnelle et un échange min-max, licite parce que $\partial f(x^\star)$ est <strong>borné</strong>.</p>
+<h2 data-prio="high">Concept 4 — Dérivée directionnelle (§2.4)</h2>
+<p>Pour $f$ convexe, la <strong>dérivée directionnelle</strong> en $x$ dans la direction $v$ est
+$$f'(x;v) = \lim_{t\downarrow0}\frac{f(x+tv)-f(x)}{t}$$
+<strong>Cette limite existe toujours</strong> pour $f$ convexe (éventuellement $\pm\infty$), car le rapport est <strong>croissant en $t$</strong>. La preuve tient en une ligne de convexité : pour $0&lt;t_1\leq t_2$,
+$$f(x+t_1v) = f\Big(\tfrac{t_1}{t_2}(x+t_2v)+\big(1-\tfrac{t_1}{t_2}\big)x\Big) \leq \tfrac{t_1}{t_2}f(x+t_2v)+\big(1-\tfrac{t_1}{t_2}\big)f(x)$$
+d'où, après réarrangement, $\dfrac{f(x+t_1v)-f(x)}{t_1}\leq\dfrac{f(x+t_2v)-f(x)}{t_2}$.</p>
+<p><strong>Le lien avec le sous-différentiel :</strong>
+$$f'(x;v) = \sup_{g\in\partial f(x)} g^Tv$$
+La dérivée directionnelle est la <strong>fonction d'appui</strong> du sous-différentiel (fiche 35, exemple 3.7).</p>
+<blockquote>
+<p><strong>Conséquence.</strong> $v$ est une direction de descente si et seulement si $f'(x;v)&lt;0$, c'est-à-dire si <strong>tous</strong> les sous-gradients font un angle obtus avec $v$. Il ne suffit <strong>pas</strong> qu'un seul le fasse — d'où le fait, capital pour la fiche 43, que $-g$ n'est pas nécessairement une direction de descente.</p>
+</blockquote>
+<h2 data-prio="must">Concept 5 — Le calcul des sous-gradients (§3)</h2>
+<p>Les notes distinguent <strong>deux niveaux</strong>, et cette distinction est structurante :</p>
+<table>
+<thead>
+<tr>
+<th>Calcul</th>
+<th>But</th>
+<th>Usage</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>faible</strong></td>
+<td>produire <strong>un</strong> sous-gradient, même s'il en existe d'autres</td>
+<td>suffit en pratique : les méthodes de sous-gradient, de localisation et de plans sécants n'en demandent qu'<strong>un</strong></td>
+</tr>
+<tr>
+<td><strong>fort</strong></td>
+<td>décrire <strong>tout</strong> l'ensemble $\partial f(x)$</td>
+<td>théorie, conditions d'optimalité précises</td>
+</tr>
+</tbody></table>
+<p><strong>Les règles.</strong></p>
+<table>
+<thead>
+<tr>
+<th>Opération</th>
+<th>Règle (calcul fort)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Multiplication positive</td>
+<td>$\partial(\alpha f)(x) = \alpha\,\partial f(x)$, $\alpha\geq0$</td>
+</tr>
+<tr>
+<td><strong>Somme</strong></td>
+<td>$\partial(f_1+\dots+f_m)(x) = \partial f_1(x)+\dots+\partial f_m(x)$ (somme d'ensembles)</td>
+</tr>
+<tr>
+<td><strong>Composition affine</strong></td>
+<td>$h(x)=f(Ax+b)$ $\Rightarrow$ $\partial h(x) = A^T\partial f(Ax+b)$</td>
+</tr>
+<tr>
+<td><strong>Maximum ponctuel</strong></td>
+<td>$\partial f(x) = \mathbf{Co}\bigcup\{\partial f_i(x) \mid f_i(x)=f(x)\}$</td>
+</tr>
+<tr>
+<td><strong>Supremum</strong> (index compact, s.c.s.)</td>
+<td>$\partial f(x) = \mathbf{Co}\bigcup\{\partial f_\alpha(x)\mid f_\alpha(x)=f(x)\}$</td>
+</tr>
+<tr>
+<td><strong>Minimisation partielle</strong></td>
+<td>$\partial f(x) = \{g \mid (g,0)\in\partial F(x,y)$ pour un $y\in Y_x\}$</td>
+</tr>
+</tbody></table>
+<p><strong>La règle du maximum, en version faible — celle qu'on utilise.</strong> Soit $f = \max_i f_i$. Choisir <strong>un</strong> indice $k$ <strong>actif</strong> ($f_k(x)=f(x)$) et <strong>un</strong> sous-gradient $g\in\partial f_k(x)$ : alors $g\in\partial f(x)$. La preuve tient en une ligne :
+$$f(z)\geq f_k(z)\geq f_k(x)+g^T(z-x) = f(x)+g^T(z-x)$$</p>
+<blockquote>
+<p><strong>En pratique, on ne calcule jamais tout le sous-différentiel.</strong> On identifie une fonction active, on prend son gradient, et c'est terminé. Le calcul <strong>fort</strong> (enveloppe convexe des actifs) ne sert qu'à écrire des conditions d'optimalité exactes.</p>
+</blockquote>
+<h3>Exemple 1 — la norme 1</h3>
+<p>$$f(x)=\|x\|_1 = \max\{s^Tx \mid s\in\{-1,1\}^n\}$$
+C'est un maximum de $2^n$ fonctions <strong>linéaires</strong>. Pour obtenir un sous-gradient, on identifie un $s$ actif :
+$$g_i = \begin{cases}+1 &amp; x_i&gt;0\\ -1 &amp; x_i&lt;0\\ +1 \text{ ou } -1 &amp; x_i=0\end{cases}$$
+Et le sous-différentiel complet est
+$$\partial\|x\|_1 = \{g \mid \|g\|_\infty\leq1,\ g^Tx = \|x\|_1\}$$</p>
+<blockquote>
+<p><strong>C'est la formule qui fonde le LASSO.</strong> La condition d'optimalité $0\in\partial(\tfrac12\|Ax-b\|_2^2+\lambda\|x\|_1)$ s'écrit $A^T(b-Ax) \in \lambda\,\partial\|x\|_1$, c'est-à-dire $|(A^T(b-Ax))_i|\leq\lambda$ avec <strong>égalité et signe imposé</strong> dès que $x_i\neq0$. C'est cette « marge » sur les coordonnées nulles qui produit la <strong>parcimonie</strong>.</p>
+</blockquote>
+<h3>Exemple 2 — la plus grande valeur propre</h3>
+<p>Soit $f(x)=\lambda_{\max}(A(x))$ avec $A(x)=A_0+x_1A_1+\dots+x_nA_n$, $A_i\in\mathbf{S}^m$. On l'écrit en supremum (fiche 35) :
+$$f(x) = \sup_{\|y\|_2=1} y^TA(x)y$$
+Chaque $f_y(x)=y^TA(x)y$ est <strong>affine en $x$</strong> :
+$$y^TA(x)y = y^TA_0y + x_1y^TA_1y+\dots+x_ny^TA_ny$$
+donc dérivable, de gradient $\big(y^TA_1y,\dots,y^TA_ny\big)$. Les fonctions <strong>actives</strong> sont celles associées aux <strong>vecteurs propres de la plus grande valeur propre</strong>. D'où la recette :</p>
+<blockquote>
+<p><strong>Pour obtenir un sous-gradient de $\lambda_{\max}(A(x))$ :</strong> calculer un vecteur propre unitaire $y$ associé à $\lambda_{\max}(A(x))$, et prendre
+$$g = \big(y^TA_1y,\ y^TA_2y,\ \dots,\ y^TA_ny\big)$$
+L'ensemble d'indices $\{y \mid \|y\|_2=1\}$ étant <strong>compact</strong>, le sous-différentiel complet est l'enveloppe convexe des $g$ obtenus sur tous les vecteurs propres dominants.</p>
+</blockquote>
+<h3>Comment résoudre l'exercice type (protocole)</h3>
+<ol>
+<li><strong>Repérer la non-différentiabilité</strong> : valeur absolue, $\max$, norme 1 ou infinie, valeur propre.</li>
+<li><strong>Écrire $f$ comme un maximum ou un supremum</strong> de fonctions plus simples — c'est presque toujours possible.</li>
+<li><strong>Identifier les fonctions actives</strong> au point considéré.</li>
+<li><strong>Calcul faible</strong> (le cas usuel) : prendre <strong>une</strong> active, calculer son gradient, c'est un sous-gradient.</li>
+<li><strong>Calcul fort</strong> (si l'énoncé le demande) : enveloppe convexe des sous-différentiels actifs.</li>
+<li><strong>Composer</strong> si nécessaire : somme (somme d'ensembles), composition affine ($A^T\partial f$), multiplication positive.</li>
+<li><strong>Pour l'optimalité</strong> : écrire $0\in\partial f(x^\star)$, ou la version contrainte $\exists g\in\partial f(x^\star)$, $g^T(y-x^\star)\geq0$ sur $X$.</li>
+</ol>
+<h3>Exercices progressifs</h3>
+<p><strong> Niveau 1</strong> — Calculez $\partial f(0)$ pour $f(x)=\max\{x,\ -2x\}$ sur $\mathbb{R}$.</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p>Les deux fonctions $f_1(x)=x$ et $f_2(x)=-2x$ sont <strong>actives</strong> en $0$ (elles y valent toutes deux $0$), de gradients $1$ et $-2$. Par la règle du maximum,
+$$\partial f(0) = \mathbf{Co}\{1,\ -2\} = [-2,\ 1]$$
+<em>Contrôle :</em> $0\in[-2,1]$, donc $x=0$ est bien le minimiseur — ce qui est évident puisque $f\geq0$ avec égalité en $0$.</p>
+</div></details>
+
+<p><strong> Niveau 2</strong> — Donnez un sous-gradient de $f(x)=\|Ax-b\|_1$ en un point $x$.</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p>Composition affine : avec $h(u)=\|u\|_1$ et $u=Ax-b$, la règle donne
+$$\partial f(x) = A^T\,\partial h(Ax-b)$$
+Un sous-gradient explicite : poser $s_i = \mathbf{sign}\big((Ax-b)_i\big)$ (n'importe quelle valeur de $[-1,1]$ si la composante est nulle), puis
+$$g = A^Ts$$
+<em>Cas particulier utile :</em> si aucune composante du résidu n'est nulle, $f$ est <strong>dérivable</strong> en $x$ et $g$ est le gradient.</p>
+</div></details>
+
+<p><strong> Niveau 3</strong> — Montrez que si $f$ est convexe et $\partial f(x)$ est réduit à un point, alors $f$ est dérivable en $x$.</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p>C'est le sens réciproque du §2.2. L'argument passe par la dérivée directionnelle : pour $f$ convexe,
+$$f'(x;v) = \sup_{g\in\partial f(x)}g^Tv$$
+Si $\partial f(x)=\{g_0\}$, alors $f'(x;v)=g_0^Tv$ pour <strong>toute</strong> direction $v$ : la dérivée directionnelle est <strong>linéaire</strong> en $v$. En particulier $f'(x;v) = -f'(x;-v)$, ce qui signifie que les dérivées à droite et à gauche coïncident dans chaque direction. Une fonction convexe dont la dérivée directionnelle est linéaire est <strong>différentiable</strong>, de gradient $g_0$. $\blacksquare$</p>
+<p><strong>La lecture à retenir :</strong> un sous-différentiel « épais » mesure exactement l'écart à la différentiabilité, et sa <strong>taille</strong> est la largeur de l'angle formé par le graphe au point anguleux.</p>
+</div></details>
+
+<p><strong> Niveau 4 — type examen</strong> — Écrivez la condition d'optimalité du LASSO $\min_x\ \tfrac12\|Ax-b\|_2^2+\lambda\|x\|_1$ et expliquez d'où vient la parcimonie.</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p><strong>Étape 1 — somme.</strong> Par la règle de la somme, avec le premier terme <strong>dérivable</strong> :
+$$\partial f(x) = \{A^T(Ax-b)\} + \lambda\,\partial\|x\|_1$$</p>
+<p><strong>Étape 2 — condition d'optimalité.</strong> $0\in\partial f(x^\star)$ équivaut à
+$$A^T(b-Ax^\star) \in \lambda\,\partial\|x^\star\|_1$$</p>
+<p><strong>Étape 3 — expliciter, coordonnée par coordonnée.</strong> En notant $c = A^T(b-Ax^\star)$ le <strong>résidu corrélé</strong> et en utilisant $\partial\|x\|_1$ de l'exemple 1 :
+$$\begin{cases} c_i = \lambda\,\mathbf{sign}(x_i^\star) &amp; \text{si } x_i^\star\neq0\\ |c_i| \leq \lambda &amp; \text{si } x_i^\star = 0\end{cases}$$</p>
+<p><strong>Étape 4 — d'où vient la parcimonie.</strong> Sur les coordonnées <strong>non nulles</strong>, la condition est une <strong>égalité</strong> : elle détermine $x_i^\star$. Sur les coordonnées <strong>nulles</strong>, c'est une <strong>inégalité large</strong> : il y a une <strong>marge</strong> de manœuvre de largeur $2\lambda$. Une coordonnée peut donc rester exactement à zéro sur tout un intervalle de valeurs de $c_i$ — et c'est <strong>stable</strong> : une petite perturbation des données ne la fait pas bouger.</p>
+<p><strong>Comparaison avec la régularisation en norme 2.</strong> Avec $\lambda\|x\|_2^2$, le terme est dérivable et la condition devient $A^T(b-Ax^\star)=2\lambda x^\star$ : une <strong>égalité partout</strong>, qui ne s'annule que pour une valeur exacte de $c_i$ — événement de mesure nulle. Aucune coordonnée n'est jamais <strong>exactement</strong> nulle.</p>
+<p><strong>La morale :</strong> la parcimonie du LASSO ne vient pas d'une astuce numérique mais de la <strong>géométrie du sous-différentiel</strong> de $\|\cdot\|_1$, qui est un ensemble <strong>épais</strong> ($[-1,1]$) précisément là où la coordonnée s'annule.</p>
+</div></details>
+
+<h2 data-prio="must">Common mistakes</h2>
+<ol>
+<li><strong>Traiter $\partial f(x)$ comme un vecteur</strong> — c'est un <strong>ensemble</strong> ; on écrit $g\in\partial f(x)$, jamais $g=\partial f(x)$.</li>
+<li><strong>Croire que $-g$ est une direction de descente</strong> — c'est faux dès que $f$ n'est pas dérivable en $x$ ; il faut $f'(x;v)&lt;0$, c'est-à-dire que <strong>tous</strong> les sous-gradients s'opposent à $v$.</li>
+<li><strong>Se tromper de quantificateur dans la condition contrainte</strong> — il faut qu'<strong>il existe</strong> $g\in\partial f(x^\star)$ avec $g^T(y-x^\star)\geq0$, pas que <strong>tout</strong> $g$ le vérifie.</li>
+<li><strong>Oublier que le sous-différentiel peut être vide</strong> — au bord du domaine, l'hyperplan d'appui peut être <strong>vertical</strong>.</li>
+<li><strong>Calculer le sous-différentiel complet quand un seul sous-gradient suffit</strong> — le calcul <strong>faible</strong> est bien plus rapide et suffit à tous les algorithmes.</li>
+<li><strong>Prendre une fonction non active dans la règle du maximum</strong> — seules les $f_i$ <strong>atteignant</strong> le maximum au point considéré comptent.</li>
+<li><strong>Oublier l'enveloppe convexe</strong> dans la version forte de la règle du maximum — l'union des sous-différentiels actifs n'est pas convexe en général.</li>
+<li><strong>Confondre sous-gradient et gradient d'une approximation lisse</strong> — le sous-gradient est exact ; le lissage (fiche 35, log-sum-exp) est une autre stratégie.</li>
+</ol>
+<h2>Ultimate Review</h2>
+<ol>
+<li><strong>Sous-gradient</strong> : $f(z)\geq f(x)+g^T(z-x)$ pour tout $z$ — un <strong>minorant affine global</strong>, exact en $x$.</li>
+<li>Géométrie : $(g,-1)$ définit un hyperplan d'appui <strong>non vertical</strong> à $\mathbf{epi}\,f$ en $(x,f(x))$.</li>
+<li><strong>Sous-différentiel</strong> $\partial f(x)$ : toujours <strong>convexe fermé</strong> (intersection de demi-espaces) ; <strong>borné</strong> si $f$ est continue en $x$.</li>
+<li><strong>Existence</strong> : $f$ convexe et $x\in\mathbf{int}\,\mathbf{dom}\,f$ $\Rightarrow$ $\partial f(x)$ non vide et borné (par le théorème d'appui).</li>
+<li>$f$ dérivable en $x$ $\iff$ $\partial f(x)$ est un <strong>singleton</strong>, et alors $\partial f(x)=\{\nabla f(x)\}$.</li>
+<li><strong>Optimalité</strong> : $0\in\partial f(x^\star)$ ; version contrainte sur $X$ convexe : <strong>il existe</strong> $g\in\partial f(x^\star)$ avec $g^T(y-x^\star)\geq0$ sur $X$.</li>
+<li><strong>Dérivée directionnelle</strong> : existe toujours pour $f$ convexe (rapport croissant en $t$) et vaut $f'(x;v)=\sup_{g\in\partial f(x)}g^Tv$.</li>
+<li><strong>Calcul</strong> : somme (somme d'ensembles), composition affine ($A^T\partial f$), multiplication positive, <strong>maximum</strong> (enveloppe convexe des actifs), minimisation partielle.</li>
+<li><strong>Calcul faible contre fort</strong> : un seul sous-gradient suffit aux algorithmes ; l'ensemble complet sert à la théorie.</li>
+<li>$\partial\|x\|_1 = \{g\mid\|g\|_\infty\leq1,\ g^Tx=\|x\|_1\}$ ; sous-gradient de $\lambda_{\max}(A(x))$ : $g_i = y^TA_iy$ pour $y$ vecteur propre dominant unitaire.</li>
+</ol>
+<p><strong>Formulas to know</strong>
+$$f(z)\geq f(x)+g^T(z-x) \qquad 0\in\partial f(x^\star) \qquad f'(x;v)=\sup_{g\in\partial f(x)}g^Tv$$
+$$\partial(f_1+f_2) = \partial f_1+\partial f_2 \qquad \partial\big(f(Ax+b)\big)=A^T\partial f(Ax+b) \qquad \partial\max_i f_i(x)=\mathbf{Co}\bigcup_{i \text{ actif}}\partial f_i(x)$$</p>
+<p><strong>Methods to know</strong> : le protocole en 7 étapes ; la règle faible du maximum ; le calcul de $\partial\|x\|_1$ et du sous-gradient de $\lambda_{\max}$.</p>
+<div class="rec"><h2>Active Recall</h2><p><strong>Basic</strong> — Définissez un sous-gradient et donnez son interprétation géométrique.</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p>$g$ est un sous-gradient de $f$ en $x$ si $f(z)\geq f(x)+g^T(z-x)$ pour tout $z\in\mathbf{dom}\,f$ : la fonction affine associée est un <strong>minorant global</strong> de $f$, exact en $x$. Géométriquement, $(g,-1)$ définit un <strong>hyperplan d'appui</strong> à l'épigraphe de $f$ au point $(x,f(x))$.</p>
+</div></details><p><strong>Understanding</strong> — Pourquoi $\partial f(x)$ est-il toujours convexe et fermé ?</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p>Parce que c'est une <strong>intersection de demi-espaces</strong> :
+$$\partial f(x) = \bigcap_{z\in\mathbf{dom}\,f}\{g \mid g^T(z-x)\leq f(z)-f(x)\}$$
+Chaque condition est une inégalité <strong>linéaire en $g$</strong>, donc définit un demi-espace fermé ; une intersection quelconque de convexes fermés est convexe fermée (fiche 34). Ce raisonnement ne suppose <strong>pas</strong> $f$ convexe.</p>
+</div></details><p><strong>Application</strong> — Donnez $\partial f(x)$ pour $f(x)=\|x\|_1$ en $x=(2,\,0,\,-1)$.</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p>Coordonnée par coordonnée : $x_1=2&gt;0$ impose $g_1=1$ ; $x_3=-1&lt;0$ impose $g_3=-1$ ; $x_2=0$ laisse $g_2$ libre dans $[-1,1]$. Donc
+$$\partial f(x) = \{1\}\times[-1,1]\times\{-1\}$$
+On vérifie la formule générale : $\|g\|_\infty\leq1$  et $g^Tx = 2+0+1 = 3 = \|x\|_1$ .</p>
+</div></details><p><strong>Comparison</strong> — Condition d'optimalité sans contrainte et avec contrainte : quelle différence essentielle ?</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p><em>Sans contrainte</em> : $0\in\partial f(x^\star)$ — le vecteur nul doit <strong>appartenir</strong> au sous-différentiel.
+<em>Sur un convexe fermé $X$</em> : <strong>il existe</strong> $g\in\partial f(x^\star)$ tel que $g^T(y-x^\star)\geq0$ pour tout $y\in X$.</p>
+<p>La différence essentielle est le <strong>quantificateur existentiel</strong> : il suffit qu'un sous-gradient « pointe vers l'extérieur » de $X$. Sans contrainte, $X=\mathbb{R}^n$ et la condition force $g=0$, donc $0\in\partial f(x^\star)$ — on retrouve le premier cas.</p>
+</div></details><p><strong>Exam-style</strong> — Comment obtient-on un sous-gradient de $f(x)=\max_{i}(a_i^Tx+b_i)$, et quel est le sous-différentiel complet ?</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p><em>Calcul faible.</em> Identifier un indice <strong>actif</strong> $k$, c'est-à-dire tel que $a_k^Tx+b_k = f(x)$, et prendre $g = a_k$. En effet
+$$f(z)\geq a_k^Tz+b_k = a_k^Tx+b_k+a_k^T(z-x) = f(x)+g^T(z-x)$$</p>
+<p><em>Calcul fort.</em> $\partial f(x) = \mathbf{Co}\{a_i \mid a_i^Tx+b_i = f(x)\}$ — l'enveloppe convexe des $a_i$ <strong>actifs</strong>. Là où un seul indice est actif, $f$ est <strong>dérivable</strong> de gradient $a_k$ ; là où plusieurs le sont, $\partial f(x)$ est un <strong>polyèdre</strong>.</p>
+</div></details></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h2>Flashcards</h2>
+<table>
+<thead>
+<tr>
+<th>Question</th>
+<th>Réponse</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Sous-gradient ?</td>
+<td>$g$ tel que $f(z)\geq f(x)+g^T(z-x)$ pour tout $z$</td>
+</tr>
+<tr>
+<td>Interprétation géométrique ?</td>
+<td>$(g,-1)$ définit un hyperplan d'appui à $\mathbf{epi}\,f$ en $(x,f(x))$</td>
+</tr>
+<tr>
+<td>Sous-différentiel ?</td>
+<td>$\partial f(x)$, l'<strong>ensemble</strong> des sous-gradients</td>
+</tr>
+<tr>
+<td>Nature de $\partial f(x)$ ?</td>
+<td>Convexe <strong>fermé</strong> — intersection de demi-espaces</td>
+</tr>
+<tr>
+<td>Quand est-il non vide et borné ?</td>
+<td>$f$ convexe et $x\in\mathbf{int}\,\mathbf{dom}\,f$</td>
+</tr>
+<tr>
+<td>$\partial f(x)$ singleton signifie ?</td>
+<td>$f$ est <strong>dérivable</strong> en $x$, et $\partial f(x)=\{\nabla f(x)\}$</td>
+</tr>
+<tr>
+<td>$\partial|x|$ en $0$ ?</td>
+<td>$[-1,\ 1]$</td>
+</tr>
+<tr>
+<td>Condition d'optimalité ?</td>
+<td>$0\in\partial f(x^\star)$</td>
+</tr>
+<tr>
+<td>Version contrainte sur $X$ ?</td>
+<td><strong>Il existe</strong> $g\in\partial f(x^\star)$ avec $g^T(y-x^\star)\geq0$ sur $X$</td>
+</tr>
+<tr>
+<td>Dérivée directionnelle ?</td>
+<td>$f'(x;v)=\sup_{g\in\partial f(x)}g^Tv$</td>
+</tr>
+<tr>
+<td>Règle de la somme ?</td>
+<td>$\partial(f_1+f_2)=\partial f_1+\partial f_2$ (somme d'ensembles)</td>
+</tr>
+<tr>
+<td>Règle affine ?</td>
+<td>$\partial f(Ax+b) \to A^T\partial f(Ax+b)$</td>
+</tr>
+<tr>
+<td>Règle du maximum (faible) ?</td>
+<td>Prendre un sous-gradient d'une fonction <strong>active</strong></td>
+</tr>
+<tr>
+<td>Règle du maximum (forte) ?</td>
+<td>Enveloppe convexe des sous-différentiels actifs</td>
+</tr>
+<tr>
+<td>$\partial\|x\|_1$ ?</td>
+<td>$\{g\mid\|g\|_\infty\leq1,\ g^Tx=\|x\|_1\}$</td>
+</tr>
+<tr>
+<td>Sous-gradient de $\lambda_{\max}(A(x))$ ?</td>
+<td>$g_i=y^TA_iy$, $y$ vecteur propre dominant unitaire</td>
+</tr>
+<tr>
+<td>$-g$ est-il une direction de descente ?</td>
+<td><strong>Pas nécessairement</strong> — c'est la difficulté centrale du non lisse</td>
+</tr>
+</tbody></table>
+</main>
+
+
+
+
+</body></html>

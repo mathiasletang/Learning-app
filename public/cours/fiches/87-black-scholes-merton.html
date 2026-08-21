@@ -1,0 +1,1025 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fiche 87 — Le modèle de Black-Scholes-Merton</title>
+<script>
+window.MathJax={tex:{inlineMath:[["$","$"]],displayMath:[["$$","$$"]],processEscapes:true},
+ options:{skipHtmlTags:["script","noscript","style","textarea","pre","code"]},
+ svg:{fontCache:"global"},
+ startup:{pageReady:()=>MathJax.startup.defaultPageReady().then(()=>{document.body.classList.add("ready")})}};
+setTimeout(function(){document.body.classList.add("ready")},2500);
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+/* ============================================================
+   MathiasLearn — feuille de style des fiches
+   Reprise intégrale des tokens de 00_PARCOURS/*.html
+   + blocs pédagogiques (callouts, méthode, essentiels, recall)
+   ============================================================ */
+:root{--bg:#faf9f7;--card:#fff;--ink:#1a1a1a;--muted:#6b6b6b;--line:#e5e2dd;--accent:#8b5e34;
+ --hl:#fdf8ef;--ok:#2d7d4f;--okbg:#f0f7f3;--warn:#b3402f;--warnbg:#fdf3f1;--blue:#2f5d8b;--bluebg:#f1f5fa}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+ font:17px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;padding:0 16px 100px}
+.nav{position:sticky;top:0;background:rgba(250,249,247,.96);backdrop-filter:blur(8px);
+ border-bottom:1px solid var(--line);margin:0 -16px 30px;padding:11px 16px;z-index:50;
+ display:flex;gap:6px;flex-wrap:wrap;font-size:13px}
+.nav a{color:var(--muted);text-decoration:none;padding:4px 9px;border-radius:5px;white-space:nowrap}
+.nav a:hover{background:var(--line);color:var(--ink)}
+.nav a.on{background:var(--accent);color:#fff}
+main{max-width:780px;margin:0 auto}
+h1{font-size:31px;letter-spacing:-.02em;margin:.4em 0 .5em;line-height:1.25}
+h2{font-size:23px;margin:2.2em 0 .7em;padding-bottom:.3em;border-bottom:1px solid var(--line)}
+h3{font-size:19px;margin:1.9em 0 .5em;color:var(--accent)}
+h4{font-size:17px;margin:1.5em 0 .4em}
+p{margin:.8em 0} a{color:var(--accent)} hr{border:0;border-top:1px solid var(--line);margin:2.6em 0}
+table{border-collapse:collapse;width:100%;margin:1.3em 0;font-size:15.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+th{background:#f3f0eb;font-weight:600}
+tr:nth-child(even) td{background:#fcfbfa}
+code{font-family:"SF Mono",Menlo,Consolas,monospace;font-size:.88em;background:#f2efea;padding:2px 6px;border-radius:4px;white-space:nowrap}
+pre{background:#f2efea;padding:14px 16px;border-radius:8px;overflow-x:auto}
+pre code{background:none;padding:0;white-space:pre}
+blockquote{border-left:3px solid var(--accent);background:var(--hl);margin:1.4em 0;padding:14px 20px;border-radius:0 8px 8px 0}
+blockquote p:first-child{margin-top:0} blockquote p:last-child{margin-bottom:0}
+ul,ol{padding-left:1.5em} li{margin:.35em 0} em{color:#4a4a4a}
+mjx-container[display="true"]{margin:1.1em 0!important;overflow-x:auto;overflow-y:hidden;padding:2px 0}
+mjx-container svg{max-width:100%}
+body:not(.ready) main{opacity:0} main{opacity:1;transition:opacity .25s}
+
+/* --- bandeau de tête de fiche --- */
+.cours{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--accent);
+ border-radius:0 10px 10px 0;padding:18px 22px;margin:0 0 34px}
+.cours h4{margin:0 0 4px;font-size:14px;text-transform:uppercase;letter-spacing:.07em;color:var(--accent)}
+.cours .cs{color:var(--muted);font-size:14.5px;margin:0 0 14px}
+
+/* --- exercices / corrigés --- */
+.ex{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:6px 24px 20px;margin:18px 0}
+.ex>h3:first-child{margin-top:14px}
+details.cor{margin-top:18px;border:1px solid var(--line);border-radius:8px;background:#fcfbfa;overflow:hidden}
+details.cor>summary{cursor:pointer;padding:12px 16px;font-weight:600;font-size:15px;color:var(--accent);
+ list-style:none;display:flex;align-items:center;gap:9px;user-select:none;transition:.15s;min-height:44px}
+details.cor>summary::-webkit-details-marker{display:none}
+details.cor>summary:hover{background:var(--hl)}
+details.cor>summary::before{content:"\25B6";font-size:10px;transition:transform .18s;display:inline-block}
+details.cor[open]>summary::before{transform:rotate(90deg)}
+details.cor[open]>summary{background:var(--okbg);color:var(--ok);border-bottom:1px solid var(--line)}
+.cor .in{padding:4px 20px 16px}
+.cor .in>*:first-child{margin-top:.9em}
+
+/* --- blocs pédagogiques (callouts) ---
+   Générés depuis une citation Markdown dont le premier **gras** commence
+   par un mot-clé : DÉFINITION, THÉORÈME, MÉTHODE, PIÈGE, INTUITION… */
+.cal{border:1px solid var(--line);border-left:4px solid var(--accent);background:var(--card);
+ border-radius:0 10px 10px 0;padding:15px 20px;margin:1.5em 0}
+.cal>p:first-child{margin-top:0}.cal>p:last-child,.cal>ul:last-child,.cal>ol:last-child{margin-bottom:0}
+.cal .lab{display:block;font-size:12.5px;text-transform:uppercase;letter-spacing:.08em;
+ font-weight:700;color:var(--accent);margin-bottom:6px}
+.cal.formel{background:var(--hl)}
+.cal.piege{border-left-color:var(--warn);background:var(--warnbg)}
+.cal.piege .lab{color:var(--warn)}
+.cal.methode{border-left-color:var(--ok);background:var(--okbg)}
+.cal.methode .lab{color:var(--ok)}
+.cal.intu{border-left-color:var(--blue);background:var(--bluebg)}
+.cal.intu .lab{color:var(--blue)}
+.cal.plus{border-left-style:dashed;background:#faf9f7}
+.cal.plus .lab{color:var(--muted)}
+
+/* --- révision express --- */
+.ess{background:var(--card);border:1px solid var(--accent);border-radius:10px;padding:4px 24px 20px;margin:1.6em 0}
+.ess h3{margin-top:1.3em}
+.rec{background:var(--card);border:1px dashed var(--accent);border-radius:10px;padding:4px 24px 18px;margin:1.6em 0}
+.rec ol{counter-reset:none}
+
+/* --- impression / PDF --- */
+@media print{
+ .nav{display:none}
+ body{padding:0;background:#fff;font-size:11.2pt;line-height:1.55}
+ main{max-width:none}
+ h1{font-size:23pt}h2{font-size:15pt;margin-top:1.5em}h3{font-size:12.6pt}
+ h2,h3,h4{break-after:avoid;page-break-after:avoid}
+ table,.cal,blockquote{break-inside:avoid;page-break-inside:avoid}
+ table{display:table;font-size:9.6pt}
+ details.cor{border:1px solid var(--line);background:#fcfbfa}
+ details.cor>summary{display:none}
+ details.cor .in{padding-top:10px}
+ .cal,.ex,.ess,.rec{box-shadow:none}
+ a{color:var(--ink);text-decoration:none}
+}
+@page{margin:16mm 15mm 18mm}
+
+/* --- exemples travaillés --- */
+.exm{background:#fcfbfa;border:1px solid var(--line);border-radius:10px;padding:2px 20px 14px;margin:1.5em 0}
+.exm>h4:first-child{margin:14px 0 .5em;color:var(--accent);font-size:13px;text-transform:uppercase;letter-spacing:.07em}
+
+
+/* --- pastilles de priorité (conventions des fiches de l'app) --- */
+h2[data-prio], h3[data-prio], h4[data-prio]{position:relative}
+h2[data-prio]::before,h3[data-prio]::before,h4[data-prio]::before{
+ content:"";display:inline-block;width:9px;height:9px;border-radius:50%;
+ margin-right:9px;vertical-align:middle;background:var(--muted)}
+[data-prio="must"]::before{background:var(--warn)}
+[data-prio="high"]::before{background:#d98324}
+[data-prio="mid"]::before{background:#c9a227}
+[data-prio="low"]::before{background:var(--ok)}
+/* corrigés des fiches de l'app : même traitement que les corrigés des séries */
+details.cor>summary::after{content:""}
+</style></head><body>
+<div class="nav"><a href="00_COMMENCER_ICI.html">Commencer ici</a><a href="01_NOTATIONS_le-decodeur.html">Notations</a><a href="02_EXERCICES_Serie-0.html">Série 0 — Remise en route</a><a href="03_EXERCICES_Serie-1.html">Série 1 — Convexité</a><a href="04_EXERCICES_Serie-2.html">Série 2 — KKT</a><a href="05_AUTO-EVALUATION.html">Auto-évaluation (quiz)</a><a href="06_FICHE_Optimisation-deux-variables.html">Fiche — Optimisation à 2 variables</a></div>
+<main><h1>Fiche 87 — Le modèle de Black-Scholes-Merton</h1>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Matière</strong></td>
+<td>Maths · Finance de marché</td>
+</tr>
+<tr>
+<td><strong>Cours source</strong></td>
+<td>John C. Hull, <em>Options, Futures, and Other Derivatives</em>, 8ᵉ éd., Pearson — chapitre 14 « The Black-Scholes-Merton Model »</td>
+</tr>
+<tr>
+<td><strong>Difficulté</strong></td>
+<td> Must know — le chapitre central du livre</td>
+</tr>
+<tr>
+<td><strong>Temps d'étude estimé</strong></td>
+<td>2 h 15</td>
+</tr>
+<tr>
+<td><strong>Prérequis</strong></td>
+<td>Fiches 83, 85, 86 · <strong>complément</strong> : fiche 57 (approche risque-neutre, MIT)</td>
+</tr>
+<tr>
+<td><strong>Concepts clés</strong></td>
+<td>Loi log-normale, rendement espéré vs rendement réalisé, volatilité historique, EDP de Black-Scholes-Merton, portefeuille sans risque, valorisation risque-neutre, formules fermées, $d_1$ et $d_2$, dilution des warrants, volatilité implicite, indice VIX, dividendes, approximation de Black</td>
+</tr>
+<tr>
+<td><strong>Poids à l'examen</strong></td>
+<td>Les <strong>deux formules</strong> et leurs $d_1,d_2$ · la <strong>dérivation de l'EDP</strong> · $\mu$ <strong>contre</strong> $\mu-\sigma^2/2$ · l'ajustement pour dividendes ($S_0-D$).</td>
+</tr>
+</tbody></table>
+<h2>Vue d'ensemble</h2>
+<pre><code>LOI          ln S_T ~ N( ln S₀ + (μ − σ²/2)T , σ²T )    →  E(S_T) = S₀e^{μT}
+PIÈGE        rendement ARITHMÉTIQUE μ  ≠  rendement RÉALISÉ μ − σ²/2
+COUVERTURE   −1 dérivé  +  ∂f/∂S actions  →  le dz DISPARAÎT
+EDP          ∂f/∂t + rS ∂f/∂S + ½σ²S² ∂²f/∂S² = rf
+CLÉ          μ n'y figure PAS  →  on peut supposer le monde risque-neutre
+FORMULES     c = S₀N(d₁) − Ke^{−rT}N(d₂)     p = Ke^{−rT}N(−d₂) − S₀N(−d₁)
+             d₁ = [ln(S₀/K) + (r + σ²/2)T] / (σ√T)      d₂ = d₁ − σ√T
+DIVIDENDES   remplacer S₀ par S₀ − D   (D = valeur actuelle des dividendes)
+</code></pre>
+<p><strong>L'histoire, et pourquoi elle compte.</strong> <em>Au début des années 1970, <strong>Fischer Black, Myron Scholes et Robert Merton</strong> réalisent une percée majeure. En <strong>1997</strong>, Merton et Scholes reçoivent le prix Nobel d'économie ; <strong>Black est mort en 1995</strong>, sans quoi il l'aurait sans nul doute partagé.</em></p>
+<blockquote>
+<p><strong>La difficulté que les prédécesseurs n'avaient pas franchie.</strong> <em>Des chercheurs antérieurs avaient fait des hypothèses similaires et <strong>correctement calculé le payoff espéré</strong> d'une option européenne. Mais <strong>il est difficile de connaître le bon taux d'actualisation</strong> de ce payoff.</em></p>
+<p><strong>Deux réponses différentes.</strong> <em>Black et Scholes ont utilisé le <strong>MEDAF</strong> pour relier le rendement exigé sur l'option à celui de l'action — ce ne fut <strong>pas facile</strong>, car la relation dépend à la fois du prix de l'action et du temps. <strong>L'approche de Merton était différente</strong> : construire un <strong>portefeuille sans risque</strong> composé de l'option et de l'action, et arguer que son rendement sur une courte période doit être le taux sans risque. C'est ce que nous avons fait en 12.1 — <strong>mais en plus compliqué, parce que le portefeuille change continuellement</strong>. <strong>L'approche de Merton était plus générale : elle ne repose pas sur les hypothèses du MEDAF.</strong></em> C'est celle que suit ce chapitre.</p>
+</blockquote>
+<h2 data-prio="must">Concept 1 — La loi log-normale du prix</h2>
+<p>Du chapitre 13 :
+$$\boxed{\ln S_T\sim\phi\!\left(\ln S_0+\left(\mu-\frac{\sigma^2}{2}\right)T,\ \sigma^2T\right)}\;\text{(14.3)}$$</p>
+<p><strong>$S_T$ est donc log-normale</strong>, d'écart-type logarithmique $\sigma\sqrt T$.</p>
+<blockquote>
+<p><strong>La forme de la loi.</strong> <em>Une variable log-normale peut prendre <strong>toute valeur entre zéro et l'infini</strong>. Contrairement à la normale, elle est <strong>asymétrique</strong>, de sorte que <strong>moyenne, médiane et mode sont tous différents</strong>.</em></p>
+</blockquote>
+<p>$$\boxed{\mathbb E(S_T)=S_0e^{\mu T}}\;\text{(14.4)}\qquad\qquad\boxed{\mathrm{Var}(S_T)=S_0^2e^{2\mu T}\big(e^{\sigma^2T}-1\big)}\;\text{(14.5)}$$</p>
+<details class="cor">
+<summary><strong>Deux exercices résolus — intervalle de confiance et moments (exemples 14.1 et 14.2)</strong></summary><div class="in">
+
+<p><strong>Exemple 14.1 — l'intervalle à 95 %.</strong> $S_0=40$, $\mu=16\,\%$, $\sigma=20\,\%$, $T=0{,}5$.
+<em>Étape 1 — la loi de $\ln S_T$.</em>
+$$\ln S_T\sim\phi\big[\ln40+(0{,}16-0{,}02)\times0{,}5,\ 0{,}04\times0{,}5\big]=\phi(3{,}759;\ 0{,}02)$$
+<em>Étape 2 — l'écart-type.</em> $\sqrt{0{,}02}=\mathbf{0{,}141}$.
+<em>Étape 3 — l'intervalle <strong>sur le logarithme</strong>.</em> À 95 % :
+$$3{,}759-1{,}96\times0{,}141&lt;\ln S_T&lt;3{,}759+1{,}96\times0{,}141$$
+<em>Étape 4 — <strong>exponentier</strong>.</em>
+$$e^{3{,}4824}&lt;S_T&lt;e^{4{,}0356}\qquad\Longrightarrow\qquad\boxed{32{,}55&lt;S_T&lt;56{,}56}$$</p>
+<p class="cal piege"> <strong>L'intervalle n'est PAS symétrique autour de 40.</strong> Il descend de 7,45 et monte de 16,56 : c'est l'asymétrie log-normale. On construit <strong>toujours</strong> l'intervalle sur $\ln S_T$, <strong>jamais</strong> sur $S_T$.</p>
+<p><strong>Exemple 14.2 — moyenne et variance.</strong> $S_0=20$, $\mu=20\,\%$, $\sigma=40\,\%$, $T=1$.
+$$\mathbb E(S_T)=20e^{0{,}2}=\mathbf{24{,}43}$$
+$$\mathrm{Var}(S_T)=400e^{0{,}4}\big(e^{0{,}16}-1\big)=400\times1{,}4918\times0{,}1735=\mathbf{103{,}54}\quad\Rightarrow\quad\mathrm{sd}=\sqrt{103{,}54}=\mathbf{10{,}18}$$</p>
+</div></details>
+
+<h2 data-prio="must">Concept 2 — Le piège du rendement espéré</h2>
+<p><strong>Le rendement capitalisé en continu réalisé entre 0 et $T$</strong>, noté $x$, vérifie $S_T=S_0e^{xT}$, soit $x=\frac1T\ln\frac{S_T}{S_0}$. D'où, par (14.2) :</p>
+<p>$$\boxed{x\sim\phi\!\left(\mu-\frac{\sigma^2}{2},\ \frac{\sigma^2}{T}\right)}\;\text{(14.7)}$$</p>
+<p class="cal piege"> <strong>Deux observations dans cette seule formule.</strong></p>
+<ol>
+<li><strong>La moyenne est $\mu-\sigma^2/2$, pas $\mu$.</strong></li>
+<li><strong>L'écart-type $\sigma/\sqrt T$ <em>décroît</em> avec $T$</strong> : <em>nous sommes <strong>plus certains</strong> du rendement moyen par an sur 20 ans que du rendement d'une seule année.</em></li>
+</ol>
+<p><strong>Exemple 14.3.</strong> $\mu=17\,\%$, $\sigma=20\,\%$, $T=3$ ans. Moyenne $=0{,}17-0{,}02=\mathbf{15\,\%}$ ; écart-type $=\sqrt{0{,}04/3}=\mathbf{11{,}55\,\%}$. À 95 % : le rendement moyen réalisé sur 3 ans sera entre $15-1{,}96\times11{,}55=\mathbf{-7{,}6\,\%}$ et $15+1{,}96\times11{,}55=\mathbf{+37{,}6\,\%}$ par an.</p>
+<details class="cor">
+<summary><strong>Pourquoi $\mathbb E(x)\ne\mu$ — la démonstration, et l'exemple des fonds communs</strong></summary><div class="in">
+
+<p><strong>La démonstration mathématique.</strong> Partant de $\mathbb E(S_T)=S_0e^{\mu T}$ et en prenant le logarithme :
+$$\ln\big[\mathbb E(S_T)\big]=\ln S_0+\mu T$$
+<em>Il est alors <strong>tentant</strong> de poser $\ln[\mathbb E(S_T)]=\mathbb E[\ln(S_T)]$, ce qui donnerait $\mathbb E(x)=\mu$. <strong>Mais on ne peut pas faire cela, parce que $\ln$ est une fonction non linéaire.</strong> En fait, par l'inégalité de Jensen,</em>
+$$\ln\big[\mathbb E(S_T)\big]&gt;\mathbb E\big[\ln(S_T)\big]\quad\Longrightarrow\quad \mathbb E\left[\ln\frac{S_T}{S_0}\right]&lt;\mu T\quad\Longrightarrow\quad \boxed{\mathbb E(x)&lt;\mu}$$</p>
+<p><strong>L'explication en mots.</strong> <em>Sur un grand nombre de très courts intervalles, <strong>la moyenne des rendements de chaque intervalle est proche de $\mu$</strong> — c'est-à-dire que $\mu\Delta t$ est proche de la <strong>moyenne arithmétique</strong> des $\Delta S_i/S_i$. <strong>Mais le rendement sur toute la période couverte est proche de $\mu-\sigma^2/2$, pas de $\mu$.</strong></em></p>
+<p><strong>L'exemple des fonds communs.</strong> Un gérant affiche sur cinq ans : <strong>15 %, 20 %, 30 %, −20 %, 25 %</strong>.</p>
+<p><em>Étape 1 — la moyenne arithmétique.</em> $(15+20+30-20+25)/5=\mathbf{14\,\%}$.
+<em>Étape 2 — ce que 100 devient réellement.</em>
+$$100\times1{,}15\times1{,}20\times1{,}30\times0{,}80\times1{,}25=\mathbf{179{,}40}$$
+<em>Étape 3 — ce que 14 % auraient donné.</em> $100\times1{,}14^5=\mathbf{192{,}54}$ — <strong>bien davantage</strong>.
+<em>Étape 4 — le vrai rendement.</em> $100\times(1{,}124)^5=179{,}40$, donc <strong>12,4 %</strong>.
+<em>Étape 5 — ce qu'il faut dire.</em> <em>Il est tentant d'affirmer « la moyenne des rendements annuels réalisés est de 14 % ». <strong>Bien que vrai, c'est trompeur.</strong> Il est bien moins trompeur de dire : « le rendement réalisé par quelqu'un qui a investi chez nous ces cinq dernières années est de <strong>12,4 % par an</strong> ». <strong>Dans certaines juridictions, la réglementation oblige à présenter les rendements de la seconde manière.</strong></em></p>
+<p><em>Étape 6 — le résultat mathématique sous-jacent.</em> <em><strong>La moyenne géométrique d'un ensemble de nombres (non tous égaux) est toujours inférieure à la moyenne arithmétique.</strong></em> Ici les multiplicateurs sont 1,15 · 1,20 · 1,30 · 0,80 · 1,25 : moyenne arithmétique <strong>1,140</strong>, moyenne géométrique <strong>1,124</strong>.</p>
+<p class="cal piege"> <em><strong>Le terme « rendement espéré » est ambigu</strong></em> : il peut désigner $\mu$ <strong>ou</strong> $\mu-\sigma^2/2$. Hull précise : <em>sauf mention contraire, il désignera <strong>$\mu$</strong> dans tout le livre.</em></p>
+</div></details>
+
+<h2 data-prio="must">Concept 3 — La volatilité et son estimation</h2>
+<div class="cal formel"><span class="lab">Définition exacte.</span>
+<p> <em>La volatilité $\sigma$ d'une action est l'<strong>écart-type du rendement procuré par l'action sur un an, exprimé en capitalisation continue</strong></em>. Valeurs typiques : <strong>15 % à 60 %</strong>.</p>
+</div>
+<p><strong>L'approximation courte période.</strong> $\sigma\sqrt{\Delta t}$ est approximativement l'écart-type du <strong>changement en pourcentage</strong> sur $\Delta t$. <em>Avec $\sigma=30\,\%$ et $S=50$ : sur une semaine, $30\times\sqrt{1/52}=\mathbf{4{,}16\,\%}$, soit un mouvement d'un écart-type de $50\times0{,}0416=\mathbf{2{,}08}$. <strong>L'incertitude croît — au moins approximativement — comme la racine carrée de l'horizon</strong> : l'écart-type à 4 semaines vaut environ <strong>deux fois</strong> celui à 1 semaine.</em></p>
+<p><strong>La procédure d'estimation historique.</strong> Avec $n+1$ observations $S_i$ espacées de $\tau$ (en années) :
+$$u_i=\ln\frac{S_i}{S_{i-1}}\qquad s=\sqrt{\frac1{n-1}\sum_{i=1}^n(u_i-\bar u)^2}=\sqrt{\frac1{n-1}\sum_{i=1}^nu_i^2-\frac1{n(n-1)}\left(\sum_{i=1}^nu_i\right)^2}$$
+Comme l'écart-type des $u_i$ est $\sigma\sqrt\tau$ :
+$$\boxed{\hat\sigma=\frac{s}{\sqrt\tau}}\qquad\qquad\text{erreur type}\approx\boxed{\frac{\hat\sigma}{\sqrt{2n}}}$$</p>
+<p><em>(La moyenne $\bar u$ est souvent supposée <strong>nulle</strong> dans les estimations de volatilité historique.)</em></p>
+<details class="cor">
+<summary><strong>Exercice résolu — estimer une volatilité sur 21 jours (exemple 14.4)</strong></summary><div class="in">
+
+<p><strong>Données.</strong> 21 cours de clôture consécutifs → $n=20$ rendements, avec
+$$\sum u_i=0{,}09531\qquad \sum u_i^2=0{,}00326$$</p>
+<p><em>Étape 1 — l'écart-type des rendements quotidiens.</em>
+$$s=\sqrt{\frac{0{,}00326}{19}-\frac{0{,}09531^2}{20\times19}}=\sqrt{0{,}00017158-0{,}00002391}=\mathbf{0{,}01216}$$
+soit <strong>1,216 %</strong> par jour.
+<em>Étape 2 — annualiser.</em> En supposant <strong>252 jours de bourse</strong> par an, $\tau=1/252$ :
+$$\hat\sigma=0{,}01216\times\sqrt{252}=\mathbf{0{,}193}\quad\text{soit }\mathbf{19{,}3\,\%}$$
+<em>Étape 3 — l'erreur type.</em>
+$$\frac{0{,}193}{\sqrt{2\times20}}=\frac{0{,}193}{6{,}325}=\mathbf{0{,}031}\quad\text{soit }\mathbf{3{,}1\,\%}$$</p>
+<p class="cal piege"> <strong>L'erreur type est énorme relativement à l'estimation</strong> — près de <strong>16 %</strong> de sa valeur avec 20 observations. C'est ce qui justifie d'en prendre davantage.</p>
+<p><strong>Le choix de $n$ — un vrai compromis.</strong> <em>Plus de données donnent généralement plus de précision, <strong>mais $\sigma$ change au cours du temps</strong> et des données trop anciennes peuvent ne pas être pertinentes. Un compromis qui semble raisonnablement bien fonctionner : les <strong>cours de clôture quotidiens des 90 à 180 derniers jours</strong>. Autre règle empirique : prendre $n$ égal au <strong>nombre de jours auxquels la volatilité sera appliquée</strong></em> — pour une option à 2 ans, deux ans de données quotidiennes.</p>
+<p><strong>Avec dividendes.</strong> Sur un intervalle contenant une date de détachement :
+$$u_i=\ln\frac{S_i+D}{S_{i-1}}$$
+et la formule habituelle sur les autres intervalles.</p>
+</div></details>
+
+<h2 data-prio="must">Concept 4 — L'idée, puis la dérivation de l'EDP</h2>
+<div class="cal intu"><span class="lab">Pourquoi un portefeuille sans risque existe.</span>
+<p> <em>Le prix de l'action et le prix du dérivé sont affectés par <strong>la même source d'incertitude sous-jacente</strong> : les mouvements du prix de l'action. Sur une courte période, <strong>le prix du dérivé est parfaitement corrélé au prix de l'action</strong>. Avec un portefeuille approprié, <strong>le gain ou la perte sur l'action compense toujours le gain ou la perte sur le dérivé</strong>, si bien que la valeur du portefeuille en fin de période est <strong>connue avec certitude</strong>.</em></p>
+</div>
+<p><strong>L'illustration.</strong> Si $\Delta c=0{,}4\,\Delta S$, le portefeuille sans risque est <strong>long 0,4 action, short 1 call</strong>. <em>Si l'action monte de 10 cents, l'option monte de 4 cents : le gain de $0{,}4\times10=4$ cents sur les actions égale la perte de 4 cents sur l'option vendue.</em></p>
+<p class="cal piege"> <strong>La différence majeure avec le binomial.</strong> <em>En Black-Scholes-Merton, la position est sans risque <strong>pour une durée très courte seulement</strong> — théoriquement <strong>instantanée</strong>. Pour le rester, elle doit être <strong>ajustée, ou rééquilibrée, fréquemment</strong>.</em> Si la relation passe de $\Delta c=0{,}4\Delta S$ à $\Delta c=0{,}5\Delta S$ en deux semaines, il faut <strong>acheter 0,1 action de plus</strong> par call vendu. <em>Il n'en reste pas moins que le rendement du portefeuille sans risque sur <strong>toute période très courte</strong> doit être le taux sans risque : <strong>c'est l'élément clé de l'analyse</strong>.</em></p>
+<p><strong>Les sept hypothèses.</strong></p>
+<ol>
+<li>Le prix de l'action suit le processus du chapitre 13, avec <strong>$\mu$ et $\sigma$ constants</strong>.</li>
+<li>La <strong>vente à découvert</strong> est permise, avec <strong>plein usage du produit</strong>.</li>
+<li><strong>Ni coûts de transaction ni impôts</strong> ; tous les titres sont <strong>parfaitement divisibles</strong>.</li>
+<li><strong>Aucun dividende</strong> pendant la vie du dérivé.</li>
+<li><strong>Aucune opportunité d'arbitrage</strong> sans risque.</li>
+<li>La négociation est <strong>continue</strong>.</li>
+<li>Le taux sans risque $r$ est <strong>constant</strong> et <strong>le même pour toutes les maturités</strong>.</li>
+</ol>
+<p class="cal piege"> <em>Certaines peuvent être relâchées : $\sigma$ et $r$ peuvent être des <strong>fonctions connues de $t$</strong> ; on peut même <strong>autoriser des taux stochastiques</strong>, pourvu que la loi du prix à maturité reste <strong>log-normale</strong>.</em></p>
+<details class="cor">
+<summary><strong>La dérivation complète de l'EDP, en six étapes</strong></summary><div class="in">
+
+<p><em>Étape 1 — le processus de l'action.</em>
+$$dS=\mu S\,dt+\sigma S\,dz\;\text{(14.8)}$$
+<em>Étape 2 — le processus du dérivé, par Itô.</em> $f$ est fonction de $S$ et $t$, donc par (13.14) :
+$$df=\left(\frac{\partial f}{\partial S}\mu S+\frac{\partial f}{\partial t}+\frac12\frac{\partial^2f}{\partial S^2}\sigma^2S^2\right)dt+\frac{\partial f}{\partial S}\sigma S\,dz\;\text{(14.9)}$$
+<em>Étape 3 — l'observation décisive.</em> <em>Les processus de Wiener sous-jacents à $f$ et $S$ sont <strong>les mêmes</strong> : les $\Delta z=\varepsilon\sqrt{\Delta t}$ des versions discrètes (14.10) et (14.11) sont <strong>identiques</strong>. <strong>Il s'ensuit qu'on peut construire un portefeuille de l'action et du dérivé où le processus de Wiener est éliminé.</strong></em>
+<em>Étape 4 — le portefeuille.</em>
+$$\boxed{-1\ \text{dérivé}\qquad+\frac{\partial f}{\partial S}\ \text{actions}}\qquad\Longrightarrow\qquad \Pi=-f+\frac{\partial f}{\partial S}S\;\text{(14.12)}$$
+<em>Étape 5 — sa variation.</em> $\Delta\Pi=-\Delta f+\dfrac{\partial f}{\partial S}\Delta S$ ; en substituant (14.10) et (14.11), <strong>les termes en $\Delta z$ s'annulent</strong> :
+$$\boxed{\Delta\Pi=\left(-\frac{\partial f}{\partial t}-\frac12\frac{\partial^2f}{\partial S^2}\sigma^2S^2\right)\Delta t}\;\text{(14.14)}$$
+<em>Étape 6 — imposer le rendement sans risque.</em> *Comme cette équation <strong>ne contient pas $\Delta z$</strong>, le portefeuille est sans risque sur $\Delta t$ ; il doit donc rapporter instantanément le même taux que les autres titres sans risque à court terme. <strong>S'il rapportait plus, les arbitragistes emprunteraient pour l'acheter ; s'il rapportait moins, ils le shorteraient pour acheter des titres sans risque.</strong>* Donc $\Delta\Pi=r\Pi\Delta t$ :
+$$\left(\frac{\partial f}{\partial t}+\frac12\frac{\partial^2f}{\partial S^2}\sigma^2S^2\right)\Delta t=\left(rf-\frac{\partial f}{\partial S}rS\right)\Delta t$$</p>
+<p>$$\boxed{\frac{\partial f}{\partial t}+rS\frac{\partial f}{\partial S}+\frac12\sigma^2S^2\frac{\partial^2f}{\partial S^2}=rf}\;\text{(14.16)}$$</p>
+<p class="cal piege"> <strong>Le portefeuille n'est pas durablement sans risque.</strong> <em>Il ne l'est que pour une durée <strong>infinitésimale</strong>. Quand $S$ et $t$ changent, $\partial f/\partial S$ change aussi : il faut donc <strong>changer fréquemment les proportions</strong> de dérivé et d'action.</em></p>
+</div></details>
+
+<p><strong>Les conditions terminales.</strong> <em>L'EDP a <strong>de nombreuses solutions</strong>, correspondant à tous les dérivés définissables sur $S$. Celle qu'on obtient dépend des <strong>conditions aux limites</strong>.</em>
+$$\text{call}:\ f=\max(S-K,0)\ \text{en}\ t=T\qquad\qquad\text{put}:\ f=\max(K-S,0)\ \text{en}\ t=T$$</p>
+<details class="cor">
+<summary><strong>Deux vérifications instructives — le forward, et les fonctions qui ne sont pas des prix</strong></summary><div class="in">
+
+<p><strong>Exemple 14.5 — un forward satisfait l'EDP.</strong> D'après (5.5), $f=S-Ke^{-r(T-t)}$. Alors
+$$\frac{\partial f}{\partial t}=-rKe^{-r(T-t)}\qquad \frac{\partial f}{\partial S}=1\qquad \frac{\partial^2f}{\partial S^2}=0$$
+En injectant dans le membre de gauche de (14.16) :
+$$-rKe^{-r(T-t)}+rS=r\big(S-Ke^{-r(T-t)}\big)=rf\ \checkmark$$</p>
+<p><strong>Le critère général — et il est puissant.</strong> <em>Toute fonction $f(S,t)$ solution de (14.16) est le <strong>prix théorique d'un dérivé négociable</strong> ; s'il existait, il ne créerait aucune opportunité d'arbitrage. <strong>Réciproquement, une fonction qui ne satisfait PAS l'EDP ne peut pas être le prix d'un dérivé sans créer des arbitrages.</strong></em></p>
+<table>
+<thead>
+<tr>
+<th>Fonction</th>
+<th>Satisfait l'EDP ?</th>
+<th>Conclusion</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$e^S$</td>
+<td><strong>non</strong></td>
+<td><em>si un instrument valant toujours $e^S$ existait, il y aurait une <strong>opportunité d'arbitrage</strong></em></td>
+</tr>
+<tr>
+<td>$\dfrac{e^{(\sigma^2-2r)(T-t)}}{S}$</td>
+<td><strong>oui</strong></td>
+<td>c'est le prix d'un dérivé — <em>celui qui paie $1/S_T$ en $T$</em></td>
+</tr>
+</tbody></table>
+</div></details>
+
+<h2 data-prio="must">Concept 5 — La valorisation risque-neutre, justifiée par l'EDP</h2>
+<blockquote>
+<p><strong>La propriété clé.</strong> <em>L'EDP <strong>ne contient aucune variable affectée par les préférences des investisseurs pour le risque</strong>. Les variables qui y figurent — <strong>prix courant, temps, volatilité, taux sans risque</strong> — en sont toutes <strong>indépendantes</strong>.</em></p>
+<p><em><strong>L'EDP ne serait pas indépendante des préférences si elle contenait $\mu$</strong></em>, car $\mu$ dépend de l'aversion au risque : plus les investisseurs sont averses, plus $\mu$ est élevé pour une action donnée. <em><strong>Il est heureux que $\mu$ disparaisse dans la dérivation.</strong></em></p>
+<p><strong>L'argument ingénieux.</strong> <em>Si les préférences n'entrent pas dans l'équation, <strong>elles ne peuvent pas affecter sa solution</strong>. <strong>N'importe quel ensemble de préférences peut donc être utilisé</strong> — en particulier l'hypothèse très simple que <strong>tous les investisseurs sont neutres au risque</strong>.</em></p>
+</blockquote>
+<p><strong>La procédure en trois temps.</strong></p>
+<ol>
+<li><strong>Supposer $\mu=r$</strong> — le rendement espéré du sous-jacent est le taux sans risque.</li>
+<li>Calculer le <strong>payoff espéré</strong> du dérivé.</li>
+<li><strong>Actualiser</strong> ce payoff espéré au <strong>taux sans risque</strong>.</li>
+</ol>
+<p class="cal piege"> <strong>La mise en garde de Hull, à ne jamais oublier.</strong> <em>La valorisation risque-neutre est <strong>simplement un artifice</strong> pour obtenir des solutions de l'EDP. <strong>Les solutions obtenues sont valables dans tous les mondes</strong>, pas seulement ceux où les investisseurs sont neutres au risque. Quand on passe d'un monde risque-neutre à un monde averse au risque, <strong>deux choses changent</strong> : le <strong>taux de croissance espéré</strong> du prix de l'action, et le <strong>taux d'actualisation</strong> des payoffs. <strong>Il se trouve que ces deux changements se compensent toujours exactement.</strong></em></p>
+<details class="cor">
+<summary><strong>Exercice résolu — retrouver le prix d'un forward par la voie risque-neutre</strong></summary><div class="in">
+
+<p><em>Étape 1 — le payoff.</em> Un forward long de prix de livraison $K$ vaut $S_T-K$ en $T$.
+<em>Étape 2 — appliquer le principe.</em> La valeur en 0 est l'espérance <strong>risque-neutre</strong> actualisée :
+$$f=e^{-rT}\hat{\mathbb E}(S_T-K)$$
+<em>Étape 3 — $K$ étant constant.</em>
+$$f=e^{-rT}\hat{\mathbb E}(S_T)-Ke^{-rT}\;\text{(14.17)}$$
+<em>Étape 4 — utiliser (14.4) avec $\mu=r$.</em> $\hat{\mathbb E}(S_T)=S_0e^{rT}$ ;(14.18).
+<em>Étape 5 — conclure.</em>
+$$\boxed{f=S_0-Ke^{-rT}}\;\text{(14.19)}$$
+<strong>En accord avec (5.5)</strong> — obtenu ici <strong>sans aucun argument d'arbitrage explicite</strong>.</p>
+</div></details>
+
+<h2 data-prio="must">Concept 6 — Les formules de Black-Scholes-Merton</h2>
+<p>$$\boxed{c=S_0N(d_1)-Ke^{-rT}N(d_2)}\;\text{(14.20)}\qquad\qquad\boxed{p=Ke^{-rT}N(-d_2)-S_0N(-d_1)}\;\text{(14.21)}$$</p>
+<p>$$\boxed{d_1=\frac{\ln(S_0/K)+(r+\sigma^2/2)T}{\sigma\sqrt T}}\qquad\qquad\boxed{d_2=\frac{\ln(S_0/K)+(r-\sigma^2/2)T}{\sigma\sqrt T}=d_1-\sigma\sqrt T}$$</p>
+<p>où $N(x)$ est <em>la <strong>fonction de répartition</strong> de la loi normale centrée réduite : la probabilité qu'une variable $\phi(0,1)$ soit <strong>inférieure à $x$</strong></em>.</p>
+<p><strong>Deux voies de démonstration.</strong> <em>Résoudre l'EDP sous la condition terminale — <strong>ou</strong> utiliser la valorisation risque-neutre</em> :
+$$c=e^{-rT}\hat{\mathbb E}\big[\max(S_T-K,0)\big]\;\text{(14.22)}$$</p>
+<blockquote>
+<p><strong>L'interprétation des termes</strong> — en réécrivant (14.20) sous la forme
+$$c=e^{-rT}\big[S_0N(d_1)e^{rT}-KN(d_2)\big]\;\text{(14.23)}$$</p>
+<ul>
+<li><strong>$N(d_2)$ est la probabilité que l'option soit exercée en monde risque-neutre</strong>, donc $KN(d_2)$ est <strong>le strike multiplié par la probabilité de le payer</strong> ;</li>
+<li><strong>$S_0N(d_1)e^{rT}$ est l'espérance risque-neutre</strong> d'une variable valant $S_T$ si $S_T&gt;K$ et <strong>zéro sinon</strong>.</li>
+</ul>
+</blockquote>
+<p class="cal piege"> <strong>Trois précisions d'usage.</strong></p>
+<ul>
+<li><em>Comme il n'est jamais optimal d'exercer par anticipation un call américain sans dividende (fiche 83), <strong>(14.20) est aussi la valeur du call américain</strong>.</em></li>
+<li><em><strong>Aucune formule analytique exacte n'a été produite pour le put américain</strong></em> sans dividende — d'où les méthodes numériques du chapitre 20.</li>
+<li>*En pratique, <strong>$r$ est le taux zéro-coupon sans risque de maturité $T$</strong>, et le temps est mesuré en <strong>jours de bourse restants divisés par le nombre de jours de bourse dans l'année</strong>.*</li>
+</ul>
+<details class="cor">
+<summary><strong>Les tests aux valeurs extrêmes — vérifier qu'une formule est la bonne</strong></summary><div class="in">
+
+<p><strong>Test 1 — $S_0$ très grand.</strong> <em>Le call est presque certain d'être exercé ; il devient très semblable à un forward de prix de livraison $K$, donc on attend $S_0-Ke^{-rT}$.</em> Et c'est bien ce que donne (14.20) : quand $S_0\to\infty$, <strong>$d_1$ et $d_2$ deviennent très grands</strong>, donc $N(d_1),N(d_2)\to1$. Symétriquement, $p\to0$ car $N(-d_1),N(-d_2)\to0$.</p>
+<p><strong>Test 2 — $\sigma\to0$.</strong> <em>L'action est <strong>quasiment sans risque</strong> : son prix croîtra au taux $r$ jusqu'à $S_0e^{rT}$, et le payoff du call est $\max(S_0e^{rT}-K,0)$. Actualisé :</em>
+$$e^{-rT}\max(S_0e^{rT}-K,0)=\max(S_0-Ke^{-rT},0)$$
+<em>Vérification par la formule.</em> Si $S_0&gt;Ke^{-rT}$, alors $\ln(S_0/K)+rT&gt;0$ et, quand $\sigma\to0$, $d_1,d_2\to+\infty$, donc $N\to1$ et $c=S_0-Ke^{-rT}$. Si $S_0&lt;Ke^{-rT}$, alors $d_1,d_2\to-\infty$, $N\to0$ et $c=0$. <strong>La formule donne donc toujours $\max(S_0-Ke^{-rT},0)$</strong>  — et symétriquement $\max(Ke^{-rT}-S_0,0)$ pour le put.</p>
+<p class="cal piege"> <strong>C'est le réflexe de contrôle par excellence.</strong> Une formule d'option doit <strong>dégénérer correctement</strong> aux bornes. Si elle ne le fait pas, elle est fausse.</p>
+</div></details>
+
+<details class="cor">
+<summary><strong>Exercice résolu — le calcul complet d'un call et d'un put (exemple 14.6)</strong></summary><div class="in">
+
+<p><strong>Données.</strong> $S_0=42$, $K=40$, $r=0{,}1$, $\sigma=0{,}2$, $T=0{,}5$.</p>
+<p><em>Étape 1 — $d_1$.</em>
+$$d_1=\frac{\ln(42/40)+(0{,}1+0{,}02)\times0{,}5}{0{,}2\sqrt{0{,}5}}=\frac{0{,}04879+0{,}06}{0{,}14142}=\mathbf{0{,}7693}$$
+<em>Étape 2 — $d_2$.</em>
+$$d_2=d_1-\sigma\sqrt T=0{,}7693-0{,}1414=\mathbf{0{,}6278}$$
+<em>Étape 3 — le strike actualisé.</em> $40e^{-0{,}05}=\mathbf{38{,}049}$.
+<em>Étape 4 — les quatre valeurs de $N$.</em> (<code>=NORMSDIST(x)</code> en tableur)
+$$N(0{,}7693)=0{,}7791\quad N(0{,}6278)=0{,}7349\quad N(-0{,}7693)=0{,}2209\quad N(-0{,}6278)=0{,}2651$$
+<em>Étape 5 — le call.</em>
+$$c=42\times0{,}7791-38{,}049\times0{,}7349=32{,}722-27{,}962=\boxed{\mathbf{4{,}76}}$$
+<em>Étape 6 — le put.</em>
+$$p=38{,}049\times0{,}2651-42\times0{,}2209=10{,}087-9{,}278=\boxed{\mathbf{0{,}81}}$$
+<em>Étape 7 — contrôle par la parité.</em> $c+Ke^{-rT}=4{,}76+38{,}05=42{,}81$ et $p+S_0=0{,}81+42=42{,}81$ .
+<em>Étape 8 — les points morts.</em> <em>En ignorant la valeur temps de l'argent, l'action doit <strong>monter de 2,76</strong> pour que l'acheteur du call rentre dans ses frais, et <strong>baisser de 2,81</strong> pour l'acheteur du put.</em></p>
+<p class="cal piege"> <strong>$N(-x)=1-N(x)$</strong> — c'est ainsi qu'on obtient les deux dernières valeurs sans nouvelle table.</p>
+</div></details>
+
+<h2 data-prio="high">Concept 7 — Warrants, options de salariés et dilution</h2>
+<blockquote>
+<p><strong>La question, et la réponse contre-intuitive.</strong> <em>Comment la dilution potentielle devrait-elle affecter la valorisation de warrants et d'options de salariés <strong>en circulation</strong> ? <strong>La réponse est qu'elle ne devrait pas !</strong> Si les marchés sont efficients, <strong>le prix de l'action reflète déjà la dilution potentielle</strong> de tous les warrants et options en circulation.</em></p>
+</blockquote>
+<details class="cor">
+<summary><strong>L'argument de dilution, et pourquoi il ne faut pas la compter deux fois</strong></summary><div class="in">
+
+<p><strong>Le décor.</strong> Une entreprise de <strong>100 000 actions</strong> à <strong>50</strong> annonce l'attribution de <strong>100 000 options</strong> de strike <strong>50</strong> à ses salariés.</p>
+<p><em>Étape 1 — l'effet d'annonce.</em> <em>Si le marché ne voit guère de bénéfice pour les actionnaires — salaires réduits, dirigeants plus motivés —, <strong>le prix baisse immédiatement après l'annonce</strong>.</em> S'il tombe à <strong>45</strong>, le coût de dilution est <strong>5 par action</strong>, soit <strong>500 000</strong> au total.
+<em>Étape 2 — trois ans plus tard.</em> Le cours vaut <strong>100</strong> et toutes les options sont exercées ; le payoff est <strong>50 par option</strong>.
+<em>Étape 3 — l'argument fallacieux.</em> <em>Il est tentant d'argumenter qu'il y a <strong>une dilution supplémentaire</strong> : 100 000 actions à 100 fusionnent avec 100 000 actions payées 50 seulement, donc (a) le cours tombe à <strong>75</strong> et (b) le payoff n'est que de <strong>25</strong> par option.</em>
+<em>Étape 4 — pourquoi c'est faux.</em> <em><strong>Cet argument est vicié. L'exercice des options est anticipé par le marché et déjà reflété dans le cours. Le payoff de chaque option exercée est bien de 50.</strong></em></p>
+<blockquote>
+<p><strong>Le principe général.</strong> <em>Quand les marchés sont efficients, <strong>l'impact de la dilution est reflété dans le cours dès l'annonce</strong> et <strong>n'a pas à être pris en compte une seconde fois</strong> lors de la valorisation.</em></p>
+</blockquote>
+</div></details>
+
+<p><strong>Le coût d'une <em>nouvelle</em> émission.</strong> $N$ actions à $S_0$, $M$ nouvelles options de strike $K$.</p>
+<p><em>La valeur de l'entreprise aujourd'hui est $NS_0$, et <strong>elle ne change pas</strong> du fait de l'émission.</em> Si, <strong>sans</strong> l'émission, le cours en $T$ vaut $S_T$, la valeur totale (actions + warrants) est $NS_T$ ; l'exercice apporte $MK$, portant le total à $NS_T+MK$, réparti sur $N+M$ actions :
+$$\text{cours après exercice}=\frac{NS_T+MK}{N+M}\qquad\Longrightarrow\qquad \text{payoff}=\frac{NS_T+MK}{N+M}-K=\boxed{\frac{N}{N+M}(S_T-K)}$$</p>
+<blockquote>
+<p><strong>Conclusion.</strong> <em>La valeur de chaque warrant est $\dfrac{N}{N+M}$ fois la valeur d'un <strong>call ordinaire</strong>. Le coût total est $M$ fois cela, et <strong>la baisse du cours est $\dfrac{M}{N+M}$ fois la valeur d'un call ordinaire</strong> de strike $K$ et maturité $T$.</em></p>
+</blockquote>
+<details class="cor">
+<summary><strong>Exercice résolu — le coût d'une émission de warrants (exemple 14.7)</strong></summary><div class="in">
+
+<p><strong>Données.</strong> $N=1\,000\,000$ actions à <strong>40</strong> ; $M=200\,000$ warrants, $K=60$, <strong>5 ans</strong>, $r=3\,\%$, $\sigma=30\,\%$, pas de dividende.</p>
+<p><em>Étape 1 — la valeur d'un call ordinaire.</em> Par (14.20) : <strong>7,04</strong>.
+<em>Étape 2 — le facteur de dilution.</em>
+$$\frac{N}{N+M}=\frac{1\,000\,000}{1\,200\,000}=\mathbf{0{,}8333}$$
+<em>Étape 3 — la valeur d'un warrant.</em> $0{,}8333\times7{,}04=\mathbf{5{,}87}$.
+<em>Étape 4 — le coût total.</em> $200\,000\times5{,}87=\mathbf{1{,}17}$ million.
+<em>Étape 5 — l'effet sur le cours.</em> <em>En supposant que le marché ne perçoit <strong>aucun bénéfice</strong>, on attend une baisse de <strong>1,17 dollar</strong> par action, à <strong>38,83</strong>.</em></p>
+</div></details>
+
+<h2 data-prio="must">Concept 8 — La volatilité implicite et le VIX</h2>
+<div class="cal formel"><span class="lab">Définition.</span>
+<p> <em>Le seul paramètre des formules qui <strong>ne peut pas être observé directement</strong> est la volatilité. En pratique, les traders travaillent avec des <strong>volatilités implicites</strong> : celles <strong>impliquées par les prix d'options observés sur le marché</strong>.</em></p>
+</div>
+<p class="cal piege"> <em><strong>Il n'est pas possible d'inverser (14.20) pour exprimer $\sigma$ en fonction de $S_0,K,r,T,c$.</strong></em> On procède par <strong>recherche itérative</strong>.</p>
+<details class="cor">
+<summary><strong>Exercice résolu — trouver une volatilité implicite par dichotomie</strong></summary><div class="in">
+
+<p><strong>Données.</strong> $c=1{,}875$, $S_0=21$, $K=20$, $r=0{,}1$, $T=0{,}25$.</p>
+<p><em>Étape 1 — premier essai, $\sigma=0{,}20$.</em> Donne $c=\mathbf{1{,}76}$ — <strong>trop bas</strong>.
+<em>Étape 2 — raisonner sur la monotonie.</em> <em>Comme $c$ est une fonction <strong>croissante</strong> de $\sigma$, il faut une valeur <strong>plus élevée</strong>.</em>
+<em>Étape 3 — essai $\sigma=0{,}30$.</em> Donne $c=\mathbf{2{,}10}$ — <strong>trop haut</strong>. Donc $\sigma\in[0{,}20;0{,}30]$.
+<em>Étape 4 — essai $\sigma=0{,}25$.</em> Encore <strong>trop haut</strong> → $\sigma\in[0{,}20;0{,}25]$.
+<em>Étape 5 — itérer.</em> <em>En <strong>divisant l'intervalle par deux</strong> à chaque itération, on obtient $\sigma$ à la précision voulue.</em> Ici : $\boxed{\sigma=0{,}235}$, soit <strong>23,5 %</strong>.</p>
+<p><em>(En pratique on utilise des méthodes plus puissantes, comme <strong>Newton-Raphson</strong>. La même procédure, avec des arbres binomiaux, donne les volatilités implicites d'options <strong>américaines</strong>.)</em></p>
+</div></details>
+
+<div class="cal intu"><span class="lab">Pourquoi les traders les préfèrent.</span>
+<p> <em>Les volatilités <strong>historiques</strong> regardent <strong>en arrière</strong>, les <strong>implicites</strong> regardent <strong>en avant</strong>. Les traders <strong>cotent souvent la volatilité implicite plutôt que le prix</strong>, ce qui est commode parce qu'<strong>elle est moins variable que le prix de l'option</strong>.</em></p>
+</div>
+<p><strong>Le VIX.</strong> <em>Le CBOE publie des indices de volatilité implicite. Le plus populaire, le <strong>SPX VIX</strong>, est un indice de la volatilité implicite des options <strong>30 jours</strong> sur le S&amp;P 500, calculé à partir d'un <strong>large éventail de calls et de puts</strong>.</em> Futures sur le VIX depuis <strong>2004</strong>, options depuis <strong>2006</strong>. <strong>Un contrat porte sur 1 000 fois l'indice.</strong></p>
+<blockquote>
+<p class="cal piege"> <strong>La distinction qui fait tout l'intérêt du produit.</strong> <em>Une opération sur futures ou options <strong>sur le S&amp;P 500</strong> est un pari <strong>à la fois</strong> sur le niveau futur du S&amp;P 500 <strong>et</strong> sur sa volatilité. Par contraste, un contrat sur le <strong>VIX</strong> est un pari <strong>uniquement sur la volatilité</strong>.</em></p>
+</blockquote>
+<p><strong>Exemple 14.8.</strong> Achat d'un futures VIX avril à <strong>18,5</strong>, dénoué à <strong>19,3</strong> → gain $=(19{,}3-18{,}5)\times1\,000=\mathbf{800}$ dollars.</p>
+<p><strong>L'histoire du VIX, janvier 2004 – juillet 2010.</strong> <em>Entre 2004 et mi-2007 il <strong>restait entre 10 et 20</strong>. Il atteint <strong>30</strong> au second semestre 2007, puis un <strong>record de 80</strong> en octobre-novembre 2008, après la faillite de Lehman. Début 2010 il était revenu à des niveaux plus normaux, mais en <strong>mai 2010 il a bondi au-delà de 45</strong> à cause de la <strong>crise des dettes souveraines européennes</strong>.</em></p>
+<h2 data-prio="must">Concept 9 — Les dividendes</h2>
+<p><strong>L'hypothèse.</strong> <em>Le <strong>montant et le calendrier</strong> des dividendes pendant la vie de l'option sont <strong>prévisibles avec certitude</strong> — hypothèse raisonnable pour des options courtes.</em> La date à retenir est la <strong>date de détachement</strong>, <em>à laquelle le cours baisse du montant du dividende</em>.</p>
+<p class="cal piege"> <strong>La nuance fiscale, importante en pratique.</strong> <em>Pour des raisons fiscales, le cours peut baisser <strong>de moins</strong> que le montant en espèces. Il faut donc interpréter le mot « dividende » comme <strong>la réduction du cours à la date de détachement causée par le dividende</strong>. Si un dividende de 1 est anticipé et que le cours baisse habituellement de <strong>80 %</strong> du dividende, <strong>il faut prendre 0,80</strong> dans l'analyse.</em></p>
+<h3>9.1 Options européennes</h3>
+<blockquote>
+<p><strong>La décomposition.</strong> <em>Le prix de l'action est la somme de <strong>deux composantes</strong> : une composante <strong>sans risque</strong> correspondant aux dividendes connus, et une composante <strong>risquée</strong>. La composante sans risque est, à tout instant, la <strong>valeur actuelle de tous les dividendes</strong> de la vie de l'option, actualisés des dates de détachement au taux sans risque. <strong>À maturité, les dividendes auront été payés et la composante sans risque n'existera plus.</strong></em></p>
+</blockquote>
+<p>$$\boxed{\text{utiliser Black-Scholes avec }S_0\ \longrightarrow\ S_0-D}\qquad D=\text{valeur actuelle des dividendes}$$</p>
+<p class="cal piege"> *En théorie, $\sigma$ n'est alors pas tout à fait la volatilité du prix entier : celle de la composante risquée vaut environ <strong>$\sigma\times S_0/(S_0-D)$</strong>. Mais <strong>l'ajustement n'est nécessaire que si $\sigma$ est estimée sur données historiques</strong> — une volatilité <strong>implicite</strong> est calculée <strong>après</strong> soustraction de $D$ et <strong>est</strong> celle de la composante risquée.*</p>
+<details class="cor">
+<summary><strong>Exercice résolu — un call européen avec deux dividendes (exemple 14.9)</strong></summary><div class="in">
+
+<p><strong>Données.</strong> Détachements dans <strong>2 mois</strong> et <strong>5 mois</strong>, <strong>0,50</strong> chacun. $S_0=40$, $K=40$, $\sigma=30\,\%$, $r=9\,\%$, $T=6$ mois.</p>
+<p><em>Étape 1 — la valeur actuelle des dividendes.</em>
+$$D=0{,}5e^{-0{,}09\times2/12}+0{,}5e^{-0{,}09\times5/12}=0{,}49256+0{,}48160=\mathbf{0{,}9742}$$
+<em>Étape 2 — le prix ajusté.</em> $S_0=40-0{,}9742=\mathbf{39{,}0258}$.
+<em>Étape 3 — $d_1$.</em>
+$$d_1=\frac{\ln(39{,}0258/40)+(0{,}09+0{,}045)\times0{,}5}{0{,}3\sqrt{0{,}5}}=\frac{-0{,}02466+0{,}0675}{0{,}21213}=\mathbf{0{,}2020}$$
+<em>Étape 4 — $d_2$.</em> $0{,}2020-0{,}2121=\mathbf{-0{,}0102}$.
+<em>Étape 5 — les $N$.</em> $N(0{,}2020)=0{,}5800$ · $N(-0{,}0102)=0{,}4959$.
+<em>Étape 6 — le prix.</em>
+$$c=39{,}0258\times0{,}5800-40e^{-0{,}045}\times0{,}4959=22{,}635-18{,}964=\boxed{\mathbf{3{,}67}}$$</p>
+<p class="cal piege"> <strong>Seul $S_0$ est ajusté.</strong> Le strike $K$ reste <strong>40</strong> dans $d_1$, $d_2$ <strong>et</strong> dans le terme $Ke^{-rT}$.</p>
+</div></details>
+
+<h3>9.2 Options américaines et approximation de Black</h3>
+<p><strong>Le résultat de structure.</strong> <em>Quand il y a des dividendes, il <strong>ne peut être optimal d'exercer qu'à un instant immédiatement avant une date de détachement</strong>.</em> Soit $t_1&lt;\cdots&lt;t_n$ les dates de détachement et $D_1,\ldots,D_n$ les dividendes.</p>
+<details class="cor">
+<summary><strong>La démonstration des deux critères, et leur lecture</strong></summary><div class="in">
+
+<p><strong>À la dernière date $t_n$.</strong> Exercer donne $S(t_n)-K$. Ne pas exercer : le cours tombe à $S(t_n)-D_n$ et l'option vaut alors <strong>au moins</strong> $S(t_n)-D_n-Ke^{-r(T-t_n)}$ (borne 10.4). Donc si
+$$S(t_n)-D_n-Ke^{-r(T-t_n)}&gt;S(t_n)-K\qquad\text{c'est-à-dire}\qquad\boxed{D_n\le K\big[1-e^{-r(T-t_n)}\big]}\;\text{(14.24)}$$
+<strong>il ne peut pas être optimal d'exercer en $t_n$.</strong> À l'inverse, si
+$$\boxed{D_n&gt;K\big[1-e^{-r(T-t_n)}\big]}\;\text{(14.25)}$$
+<em>alors, pour toute hypothèse raisonnable sur le processus, <strong>il est toujours optimal d'exercer en $t_n$ pour un $S(t_n)$ suffisamment élevé</strong>.</em> <em>Cette inégalité tend à être satisfaite quand la <strong>dernière date de détachement est proche de la maturité</strong> ($T-t_n$ petit) et que <strong>le dividende est important</strong>.</em></p>
+<p><strong>Aux dates antérieures.</strong> Le même raisonnement, avec $t_{i+1}$ à la place de $T$ :
+$$\boxed{D_i\le K\big[1-e^{-r(t_{i+1}-t_i)}\big]}\;\text{(14.26)}\ \Longrightarrow\ \text{pas d'exercice en }t_i$$</p>
+<p><strong>L'approximation qui la rend lisible.</strong> $(14.26)$ équivaut approximativement à
+$$D_i\le Kr(t_{i+1}-t_i)$$
+<em>Si $K$ est assez proche du cours, <strong>cette inégalité est satisfaite quand le rendement du dividende est inférieur au taux sans risque — ce qui est souvent le cas</strong>.</em></p>
+<blockquote>
+<p><strong>La conclusion pratique.</strong> <em>Dans beaucoup de circonstances, <strong>le moment le plus probable d'exercice anticipé d'un call américain est immédiatement avant la DERNIÈRE date de détachement</strong>. De plus, si (14.26) vaut pour $i=1,\ldots,n-1$ <strong>et</strong> que (14.24) vaut, <strong>on est certain que l'exercice anticipé n'est jamais optimal</strong>.</em></p>
+</blockquote>
+</div></details>
+
+<blockquote>
+<p><strong>L'approximation de Black (1975).</strong> <em>Calculer les prix des options <strong>européennes</strong> échéant en $T$ <strong>et</strong> en $t_n$, puis prendre <strong>le plus grand des deux</strong> comme prix américain. <strong>Cette approximation semble bien fonctionner dans la plupart des cas.</strong></em></p>
+</blockquote>
+<details class="cor">
+<summary><strong>Exercice résolu — l'approximation de Black et ses deux biais (exemple 14.10)</strong></summary><div class="in">
+
+<p><strong>Données.</strong> Mêmes que l'exemple 14.9, mais option <strong>américaine</strong>. $D_1=D_2=0{,}5$, $S_0=K=40$, $r=0{,}09$, $t_1=2/12$, $t_2=5/12$, $T=0{,}5$.</p>
+<p><em>Étape 1 — tester la première date.</em>
+$$K\big[1-e^{-r(t_2-t_1)}\big]=40\big(1-e^{-0{,}09\times0{,}25}\big)=\mathbf{0{,}89}\ &gt;\ 0{,}5=D_1$$
+Par (14.26), <strong>l'option ne devrait jamais être exercée avant la première date</strong> .
+<em>Étape 2 — tester la seconde.</em>
+$$K\big[1-e^{-r(T-t_2)}\big]=40\big(1-e^{-0{,}09\times0{,}0833}\big)=\mathbf{0{,}30}\ &lt;\ 0{,}5=D_2$$
+Par (14.25), <strong>quand elle est suffisamment dans la monnaie, l'option devrait être exercée juste avant la seconde date</strong> .
+<em>Étape 3 — première branche de l'approximation.</em> Option supposée expirer <strong>juste avant $t_2$</strong> : on ne retranche que le <strong>premier</strong> dividende, $0{,}5e^{-0{,}09\times0{,}1667}=\mathbf{0{,}4926}$, d'où $S_0=\mathbf{39{,}5074}$, $K=40$, $T=\mathbf{0{,}4167}$ → prix <strong>3,52</strong>.
+<em>Étape 4 — seconde branche.</em> Option européenne à 6 mois : <strong>3,67</strong> (exemple 14.9).
+<em>Étape 5 — l'approximation.</em> $\max(3{,}52;\,3{,}67)=\boxed{\mathbf{3{,}67}}$.
+<em>Étape 6 — la référence.</em> L'arbre binomial à <strong>500 pas</strong> donne <strong>3,72</strong>.</p>
+<p class="cal piege"> <strong>Les deux sources d'écart, et elles jouent en sens opposés.</strong></p>
+<ol>
+<li><em><strong>Le calendrier de la décision d'exercice</strong></em> — il rend le <strong>binomial plus grand</strong>. <em>Dans l'approximation, on suppose que le détenteur doit décider <strong>aujourd'hui</strong> si l'option sera exercée à 5 ou à 6 mois ; le binomial permet à la décision au point 5 mois de <strong>dépendre du cours à cet instant</strong>.</em></li>
+<li><em><strong>La façon dont la volatilité est appliquée</strong></em> — elle rend l'<strong>approximation plus grande</strong>. <em>Quand on suppose l'exercice à 5 mois, la volatilité s'applique au cours moins la VA du <strong>premier</strong> dividende ; quand on suppose l'exercice à 6 mois, elle s'applique au cours moins la VA des <strong>deux</strong>.</em></li></ol></div></details>
+
+<h2>Comment reconnaître le type d'exercice</h2>
+<table>
+<thead>
+<tr>
+<th>Signal</th>
+<th>Ce qu'on demande</th>
+<th>Outil</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>« probabilité que $S_T$ soit entre… »</td>
+<td><strong>intervalle log-normal</strong></td>
+<td>travailler sur $\ln S_T$, puis exponentier</td>
+</tr>
+<tr>
+<td>Une suite de rendements annuels</td>
+<td><strong>arithmétique vs géométrique</strong></td>
+<td>$\mu$ contre $\mu-\sigma^2/2$</td>
+</tr>
+<tr>
+<td>Une série de cours</td>
+<td><strong>volatilité historique</strong></td>
+<td>$u_i=\ln(S_i/S_{i-1})$, $\hat\sigma=s/\sqrt\tau$</td>
+</tr>
+<tr>
+<td>$S_0,K,r,\sigma,T$</td>
+<td><strong>prix Black-Scholes</strong></td>
+<td>$d_1$, $d_2$, $N$, formules</td>
+</tr>
+<tr>
+<td>Un <strong>prix d'option</strong> donné, $\sigma$ inconnue</td>
+<td><strong>volatilité implicite</strong></td>
+<td>recherche itérative</td>
+</tr>
+<tr>
+<td>Des <strong>dividendes</strong> en montant</td>
+<td><strong>ajustement</strong></td>
+<td>remplacer $S_0$ par $S_0-D$</td>
+</tr>
+<tr>
+<td>Une option <strong>américaine</strong> avec dividendes</td>
+<td><strong>exercice anticipé</strong></td>
+<td>tester (14.24)-(14.26), puis Black</td>
+</tr>
+<tr>
+<td>$N$ actions, $M$ warrants</td>
+<td><strong>dilution</strong></td>
+<td>multiplier le call par $N/(N+M)$</td>
+</tr>
+<tr>
+<td>Une fonction $f(S,t)$ proposée</td>
+<td><strong>est-ce un prix ?</strong></td>
+<td>l'injecter dans l'EDP</td>
+</tr>
+</tbody></table>
+<h2>Comment résoudre ce type d'exercice</h2>
+<p><strong>Protocole Black-Scholes — 6 étapes.</strong></p>
+<ol>
+<li>Si dividendes : calculer $D$ = <strong>valeur actuelle</strong>, et remplacer $S_0$ par $S_0-D$.</li>
+<li>Calculer $\sigma\sqrt T$ <strong>une fois pour toutes</strong> — il sert deux fois.</li>
+<li>$d_1=\dfrac{\ln(S_0/K)+(r+\sigma^2/2)T}{\sigma\sqrt T}$, puis $d_2=d_1-\sigma\sqrt T$ (<strong>jamais</strong> recalculé de zéro).</li>
+<li>Lire $N(d_1)$ et $N(d_2)$ ; utiliser $N(-x)=1-N(x)$ pour le put.</li>
+<li>$c=S_0N(d_1)-Ke^{-rT}N(d_2)$ · $p=Ke^{-rT}N(-d_2)-S_0N(-d_1)$.</li>
+<li><strong>Contrôler par la parité</strong> $c+Ke^{-rT}=p+S_0$ — c'est gratuit et cela détecte presque toutes les erreurs.</li>
+</ol>
+<p><strong>Protocole volatilité historique — 5 étapes.</strong></p>
+<ol>
+<li>$u_i=\ln(S_i/S_{i-1})$ pour $i=1,\ldots,n$.</li>
+<li>$\sum u_i$ et $\sum u_i^2$.</li>
+<li>$s=\sqrt{\dfrac{\sum u_i^2}{n-1}-\dfrac{(\sum u_i)^2}{n(n-1)}}$.</li>
+<li>$\hat\sigma=s/\sqrt\tau$, avec $\tau=1/252$ pour des données quotidiennes.</li>
+<li>Reporter l'<strong>erreur type</strong> $\hat\sigma/\sqrt{2n}$ — sans elle, l'estimation n'a pas de sens.</li>
+</ol>
+<h2 data-prio="must">Common mistakes</h2>
+<table>
+<thead>
+<tr>
+<th>Erreur</th>
+<th>Correction</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Construire un intervalle de confiance sur $S_T$</td>
+<td>Le construire sur <strong>$\ln S_T$</strong>, puis exponentier</td>
+</tr>
+<tr>
+<td>Croire que le rendement réalisé espéré est $\mu$</td>
+<td>C'est <strong>$\mu-\sigma^2/2$</strong> — $\ln$ est <strong>non linéaire</strong></td>
+</tr>
+<tr>
+<td>Annoncer la moyenne <strong>arithmétique</strong> des rendements d'un fonds</td>
+<td>La géométrique est <strong>toujours inférieure</strong> : 12,4 % contre 14 %</td>
+</tr>
+<tr>
+<td>Oublier d'annualiser par $\sqrt{252}$</td>
+<td>$\hat\sigma=s/\sqrt\tau$</td>
+</tr>
+<tr>
+<td>Donner une volatilité historique sans erreur type</td>
+<td>Elle vaut $\hat\sigma/\sqrt{2n}$ — <strong>3,1 %</strong> pour $\hat\sigma=19{,}3\,\%$ et $n=20$</td>
+</tr>
+<tr>
+<td>Croire le portefeuille de couverture durablement sans risque</td>
+<td>Il ne l'est que <strong>instantanément</strong> — il faut <strong>rééquilibrer</strong></td>
+</tr>
+<tr>
+<td>Chercher $\mu$ dans l'EDP</td>
+<td><strong>Il n'y figure pas</strong> — c'est précisément le miracle</td>
+</tr>
+<tr>
+<td>Ajuster <strong>aussi</strong> $K$ pour les dividendes</td>
+<td>Seul <strong>$S_0$</strong> devient $S_0-D$</td>
+</tr>
+<tr>
+<td>Utiliser le <strong>montant</strong> des dividendes</td>
+<td>C'est leur <strong>valeur actuelle</strong> $D$</td>
+</tr>
+<tr>
+<td>Recalculer $d_2$ depuis la formule complète</td>
+<td>$d_2=d_1-\sigma\sqrt T$ — plus rapide et sans erreur</td>
+</tr>
+<tr>
+<td>Compter la dilution <strong>deux fois</strong></td>
+<td>Elle est <strong>déjà dans le cours</strong> dès l'annonce</td>
+</tr>
+<tr>
+<td>Croire qu'il existe une formule fermée pour le put américain</td>
+<td><em><strong>Aucune</strong></em> — méthodes numériques (ch. 20)</td>
+</tr>
+<tr>
+<td>Croire qu'on peut inverser (14.20) en $\sigma$</td>
+<td><strong>Impossible</strong> — recherche itérative</td>
+</tr>
+</tbody></table>
+<h2>Ultimate Review</h2>
+<p><strong>Les formules.</strong>
+$$c=S_0N(d_1)-Ke^{-rT}N(d_2)\qquad p=Ke^{-rT}N(-d_2)-S_0N(-d_1)$$
+$$d_1=\frac{\ln(S_0/K)+(r+\sigma^2/2)T}{\sigma\sqrt T}\qquad d_2=d_1-\sigma\sqrt T$$</p>
+<p><strong>L'EDP.</strong> $\dfrac{\partial f}{\partial t}+rS\dfrac{\partial f}{\partial S}+\dfrac12\sigma^2S^2\dfrac{\partial^2f}{\partial S^2}=rf$ — <strong>$\mu$ n'y figure pas</strong>, d'où la valorisation risque-neutre.</p>
+<p><strong>Le portefeuille de couverture.</strong> $-1$ dérivé $+\ \partial f/\partial S$ actions ; il élimine $dz$ et doit rapporter $r$.</p>
+<p><strong>La loi et ses deux moments.</strong> $\ln S_T\sim\phi(\ln S_0+(\mu-\sigma^2/2)T,\sigma^2T)$ · $\mathbb E(S_T)=S_0e^{\mu T}$ · $\mathrm{Var}(S_T)=S_0^2e^{2\mu T}(e^{\sigma^2T}-1)$ · rendement réalisé $x\sim\phi(\mu-\sigma^2/2,\sigma^2/T)$.</p>
+<p><strong>La volatilité.</strong> $\hat\sigma=s/\sqrt\tau$, erreur type $\hat\sigma/\sqrt{2n}$ · <strong>90 à 180 jours</strong> de données quotidiennes · implicite = <strong>prospective</strong>, historique = <strong>rétrospective</strong>.</p>
+<p><strong>Les dividendes.</strong> $S_0\to S_0-D$ · américaine : exercice possible <strong>uniquement juste avant un détachement</strong> ; jamais si $D_i\le K[1-e^{-r(t_{i+1}-t_i)}]$ · <strong>approximation de Black</strong> : max des deux européennes.</p>
+<p><strong>Les chiffres du chapitre.</strong> Nobel <strong>1997</strong>, Black mort en <strong>1995</strong> · exemple 14.1 : $[32{,}55;56{,}56]$ · fonds : arithmétique <strong>14 %</strong>, géométrique <strong>12,4 %</strong> · exemple 14.4 : $\hat\sigma=\mathbf{19{,}3\,\%}$, erreur type <strong>3,1 %</strong> · exemple 14.6 : $d_1=0{,}7693$, $d_2=0{,}6278$, $c=\mathbf{4{,}76}$, $p=\mathbf{0{,}81}$ · warrants : facteur <strong>0,8333</strong>, warrant <strong>5,87</strong>, coût <strong>1,17 M</strong> · volatilité implicite <strong>23,5 %</strong> · VIX : <strong>10-20</strong> avant 2007, record <strong>80</strong> fin 2008, <strong>45+</strong> en mai 2010, contrat sur <strong>1 000</strong> fois l'indice · dividendes : $D=0{,}9742$, $c=\mathbf{3{,}67}$ ; Black <strong>3,67</strong> contre binomial <strong>3,72</strong>.</p>
+<div class="rec"><h2>Active Recall</h2><details class="cor">
+<summary>Quelle difficulté Black, Scholes et Merton ont-ils franchie, et par quelles voies différentes ?</summary><div class="in">
+
+<p><em>Des chercheurs antérieurs avaient <strong>correctement calculé le payoff espéré</strong> d'une option européenne, mais <strong>il est difficile de connaître le bon taux d'actualisation</strong>.</em></p>
+<p><strong>Black et Scholes</strong> ont utilisé le <strong>MEDAF</strong> pour relier le rendement exigé sur l'option à celui de l'action — <em>ce ne fut pas facile, car la relation dépend à la fois du prix de l'action et du temps</em>. <strong>Merton</strong> a construit un <strong>portefeuille sans risque</strong> option + action et argué que son rendement doit être le taux sans risque — <em>approche plus générale, car elle <strong>ne repose pas sur les hypothèses du MEDAF</strong></em>.</p>
+</div></details><details class="cor">
+<summary>$S_0=40$, $\mu=16\,\%$, $\sigma=20\,\%$. Donner l'intervalle à 95 % de $S_T$ à 6 mois.</summary><div class="in">
+
+<p>$\ln S_T\sim\phi(\ln40+(0{,}16-0{,}02)\times0{,}5;\ 0{,}04\times0{,}5)=\phi(3{,}759;0{,}02)$, écart-type $0{,}141$.
+$$3{,}759\pm1{,}96\times0{,}141\ \Longrightarrow\ e^{3{,}4824}&lt;S_T&lt;e^{4{,}0356}\ \Longrightarrow\ \boxed{32{,}55&lt;S_T&lt;56{,}56}$$
+<strong>L'intervalle est asymétrique</strong> autour de 40 — c'est la signature de la log-normalité. On le construit <strong>toujours</strong> sur le logarithme.</p>
+</div></details><details class="cor">
+<summary>Pourquoi le rendement réalisé espéré vaut-il $\mu-\sigma^2/2$ et non $\mu$ ?</summary><div class="in">
+
+<p>Parce que $\ln$ est <strong>non linéaire</strong>. On a $\ln[\mathbb E(S_T)]=\ln S_0+\mu T$, mais <em>on <strong>ne peut pas</strong> poser $\ln[\mathbb E(S_T)]=\mathbb E[\ln(S_T)]$</em>. Par Jensen, $\ln[\mathbb E(S_T)]&gt;\mathbb E[\ln S_T]$, donc $\mathbb E(x)&lt;\mu$ — et précisément $\mathbb E(x)=\mu-\sigma^2/2$.</p>
+<p>En mots : $\mu\Delta t$ est proche de la <strong>moyenne arithmétique</strong> des rendements courts, mais <em>le rendement sur toute la période est proche de <strong>$\mu-\sigma^2/2$</strong></em>.</p>
+</div></details><details class="cor">
+<summary>Un fonds affiche 15 %, 20 %, 30 %, −20 %, 25 %. Quel rendement doit-il annoncer ?</summary><div class="in">
+
+<p><strong>12,4 %</strong>, pas 14 %. La moyenne arithmétique est 14 %, mais $100\times1{,}15\times1{,}20\times1{,}30\times0{,}80\times1{,}25=\mathbf{179{,}40}$, alors que $100\times1{,}14^5=192{,}54$. Or $100\times1{,}124^5=179{,}40$.</p>
+<p><em>Il est bien moins trompeur de dire : « le rendement réalisé par quelqu'un qui a investi chez nous ces cinq dernières années est de <strong>12,4 % par an</strong> ». <strong>Dans certaines juridictions, la réglementation l'impose.</strong></em> Résultat général : <em>la moyenne <strong>géométrique</strong> est toujours inférieure à la moyenne <strong>arithmétique</strong></em>.</p>
+</div></details><details class="cor">
+<summary>Sur 20 rendements quotidiens, $\sum u_i=0{,}09531$ et $\sum u_i^2=0{,}00326$. Estimer $\sigma$ et sa précision.</summary><div class="in">
+
+<p>$$s=\sqrt{\frac{0{,}00326}{19}-\frac{0{,}09531^2}{380}}=\mathbf{0{,}01216}\ \text{par jour}$$
+$$\hat\sigma=0{,}01216\sqrt{252}=\mathbf{19{,}3\,\%}\qquad \text{erreur type}=\frac{0{,}193}{\sqrt{40}}=\mathbf{3{,}1\,\%}$$
+L'erreur type vaut <strong>16 %</strong> de l'estimation : 20 observations, c'est <strong>très peu</strong>. Compromis usuel : <strong>90 à 180 jours</strong>.</p>
+</div></details><details class="cor">
+<summary>Dériver l'EDP de Black-Scholes-Merton.</summary><div class="in">
+
+<p><em>Étape 1.</em> $dS=\mu S\,dt+\sigma S\,dz$ ; par Itô, $df=\left(\frac{\partial f}{\partial S}\mu S+\frac{\partial f}{\partial t}+\frac12\frac{\partial^2f}{\partial S^2}\sigma^2S^2\right)dt+\frac{\partial f}{\partial S}\sigma S\,dz$.
+<em>Étape 2.</em> <strong>Le $dz$ est le même</strong> dans les deux → on peut l'éliminer.
+<em>Étape 3.</em> Portefeuille $\Pi=-f+\frac{\partial f}{\partial S}S$.
+<em>Étape 4.</em> $\Delta\Pi=\left(-\frac{\partial f}{\partial t}-\frac12\frac{\partial^2f}{\partial S^2}\sigma^2S^2\right)\Delta t$ — <strong>sans $\Delta z$</strong>.
+<em>Étape 5.</em> Sans risque ⇒ $\Delta\Pi=r\Pi\Delta t$.
+<em>Étape 6.</em>
+$$\frac{\partial f}{\partial t}+rS\frac{\partial f}{\partial S}+\frac12\sigma^2S^2\frac{\partial^2f}{\partial S^2}=rf$$
+Le portefeuille n'est sans risque <strong>qu'instantanément</strong> : il faut <strong>rééquilibrer</strong>.</p>
+</div></details><details class="cor">
+<summary>Pourquoi l'absence de $\mu$ dans l'EDP autorise-t-elle la valorisation risque-neutre ?</summary><div class="in">
+
+<p>*L'EDP <strong>ne contient aucune variable affectée par les préférences pour le risque</strong> : prix, temps, volatilité et taux sans risque en sont tous indépendants. Elle <strong>ne le serait pas si elle contenait $\mu$</strong>, qui dépend de l'aversion au risque.*</p>
+<p>D'où l'argument : <em>si les préférences n'entrent pas dans l'équation, <strong>elles ne peuvent pas affecter sa solution</strong>. <strong>N'importe quel ensemble de préférences peut donc être utilisé</strong> — en particulier la neutralité au risque.</em></p>
+<p class="cal piege"> Ce n'est <strong>qu'un artifice</strong> : <em>les solutions obtenues sont valables <strong>dans tous les mondes</strong>. En passant à un monde averse, <strong>le taux de croissance et le taux d'actualisation changent tous les deux — et se compensent exactement</strong>.</em></p>
+</div></details><details class="cor">
+<summary>Que représentent $N(d_1)$ et $N(d_2)$ ?</summary><div class="in">
+
+<p>En réécrivant $c=e^{-rT}[S_0N(d_1)e^{rT}-KN(d_2)]$ :</p>
+<ul>
+<li><strong>$N(d_2)$ est la probabilité que l'option soit exercée en monde risque-neutre</strong> ; $KN(d_2)$ est donc <strong>le strike multiplié par la probabilité de le payer</strong>.</li>
+<li><strong>$S_0N(d_1)e^{rT}$ est l'espérance risque-neutre</strong> d'une variable valant $S_T$ si $S_T&gt;K$ et <strong>zéro sinon</strong>.</li></ul></div></details><details class="cor">
+<summary>$S_0=42$, $K=40$, $r=10\,\%$, $\sigma=20\,\%$, $T=0{,}5$. Calculer $c$ et $p$.</summary><div class="in">
+
+<p>$d_1=\dfrac{\ln(1{,}05)+0{,}06}{0{,}14142}=\mathbf{0{,}7693}$ ; $d_2=0{,}7693-0{,}1414=\mathbf{0{,}6278}$ ; $Ke^{-rT}=\mathbf{38{,}049}$.
+$N(0{,}7693)=0{,}7791$, $N(0{,}6278)=0{,}7349$.
+$$c=42(0{,}7791)-38{,}049(0{,}7349)=\mathbf{4{,}76}\qquad p=38{,}049(0{,}2651)-42(0{,}2209)=\mathbf{0{,}81}$$
+<strong>Contrôle par la parité</strong> : $4{,}76+38{,}05=42{,}81=0{,}81+42$ .</p>
+</div></details><details class="cor">
+<summary>Vérifier que la formule dégénère correctement quand $\sigma\to0$.</summary><div class="in">
+
+<p>Sans risque, l'action croît à $S_0e^{rT}$ et le call paie $\max(S_0e^{rT}-K,0)$, de valeur actuelle $\max(S_0-Ke^{-rT},0)$.</p>
+<p>Par la formule : si $S_0&gt;Ke^{-rT}$, alors $\ln(S_0/K)+rT&gt;0$ et <strong>$d_1,d_2\to+\infty$</strong>, donc $N\to1$ et $c=S_0-Ke^{-rT}$. Si $S_0&lt;Ke^{-rT}$, alors <strong>$d_1,d_2\to-\infty$</strong>, $N\to0$ et $c=0$. <strong>La formule donne bien $\max(S_0-Ke^{-rT},0)$</strong> dans les deux cas.</p>
+</div></details><details class="cor">
+<summary>Faut-il tenir compte de la dilution en valorisant des warrants déjà émis ?</summary><div class="in">
+
+<p><strong>Non.</strong> <em>Si les marchés sont efficients, <strong>le prix de l'action reflète déjà la dilution potentielle</strong>.</em> L'argument selon lequel il faudrait diviser le payoff par le nouveau nombre d'actions est <strong>vicié</strong> : <em>l'exercice est <strong>anticipé par le marché et déjà reflété dans le cours</strong></em>.</p>
+<p>Pour une <strong>nouvelle</strong> émission, en revanche, chaque warrant vaut $\dfrac{N}{N+M}$ fois un call ordinaire, et le cours baisse de $\dfrac{M}{N+M}$ fois cette valeur.</p>
+</div></details><details class="cor">
+<summary>Comment calcule-t-on une volatilité implicite, et pourquoi les traders la préfèrent-ils ?</summary><div class="in">
+
+<p><strong>Par recherche itérative</strong> : <em>il n'est <strong>pas possible d'inverser</strong> la formule pour exprimer $\sigma$ en fonction du prix</em>. On exploite que <strong>$c$ est croissante en $\sigma$</strong> : essai à 0,20 → 1,76 (trop bas) ; 0,30 → 2,10 (trop haut) ; 0,25 → trop haut ; on <strong>divise l'intervalle par deux</strong> jusqu'à la précision voulue → <strong>23,5 %</strong>.</p>
+<p>Les traders la préfèrent parce que <em>les historiques regardent <strong>en arrière</strong>, les implicites <strong>en avant</strong></em>, et parce qu'<em>elle est <strong>moins variable que le prix</strong> de l'option</em>.</p>
+</div></details><details class="cor">
+<summary>Comment ajuste-t-on Black-Scholes pour des dividendes connus ?</summary><div class="in">
+
+<p>On décompose le prix en une <strong>composante sans risque</strong> (la <strong>valeur actuelle des dividendes</strong>, actualisés des dates de détachement) et une <strong>composante risquée</strong>. <em>À maturité les dividendes auront été payés et la composante sans risque n'existera plus.</em> Il suffit donc de <strong>remplacer $S_0$ par $S_0-D$</strong> — <strong>et rien d'autre</strong> : $K$ reste inchangé partout.</p>
+<p class="cal piege"> En pratique, « dividende » signifie <strong>la baisse du cours à la date de détachement</strong> : si le cours ne baisse que de 80 % du dividende pour raisons fiscales, il faut prendre <strong>0,80</strong>.</p>
+</div></details><details class="cor">
+<summary>Quand un call américain avec dividendes doit-il être exercé, et qu'est-ce que l'approximation de Black ?</summary><div class="in">
+
+<p><em>Il ne peut être optimal d'exercer qu'<strong>immédiatement avant une date de détachement</strong>.</em> Il ne l'est <strong>jamais</strong> en $t_i$ si
+$$D_i\le K\big[1-e^{-r(t_{i+1}-t_i)}\big]\approx Kr(t_{i+1}-t_i)$$
+— <em>satisfait quand le <strong>rendement du dividende est inférieur au taux sans risque</strong>, ce qui est souvent le cas</em>. Le moment le plus probable est donc <strong>juste avant la dernière date</strong>.</p>
+<p><strong>L'approximation de Black (1975)</strong> : calculer les deux européennes échéant en $T$ et en $t_n$, et <strong>prendre le plus grand</strong>. Dans l'exemple : $\max(3{,}52;3{,}67)=\mathbf{3{,}67}$, contre <strong>3,72</strong> au binomial 500 pas. Deux biais opposés : le <strong>calendrier de décision</strong> favorise le binomial, l'<strong>application de la volatilité</strong> favorise l'approximation.</p>
+</div></details></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h2>Flashcards</h2>
+<table>
+<thead>
+<tr>
+<th>Question</th>
+<th>Réponse</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Qui a reçu le Nobel, et quand ?</td>
+<td><strong>Merton et Scholes</strong>, <strong>1997</strong> ; Black mort en <strong>1995</strong></td>
+</tr>
+<tr>
+<td>Quelle difficulté avaient les prédécesseurs ?</td>
+<td>Le <strong>taux d'actualisation</strong> du payoff espéré</td>
+</tr>
+<tr>
+<td>Approche de Black et Scholes ?</td>
+<td>Le <strong>MEDAF</strong></td>
+</tr>
+<tr>
+<td>Approche de Merton ?</td>
+<td>Un <strong>portefeuille sans risque</strong> — plus générale</td>
+</tr>
+<tr>
+<td>Loi de $\ln S_T$ ?</td>
+<td>$\phi(\ln S_0+(\mu-\sigma^2/2)T,\ \sigma^2T)$</td>
+</tr>
+<tr>
+<td>$\mathbb E(S_T)$ ?</td>
+<td>$S_0e^{\mu T}$</td>
+</tr>
+<tr>
+<td>$\mathrm{Var}(S_T)$ ?</td>
+<td>$S_0^2e^{2\mu T}(e^{\sigma^2T}-1)$</td>
+</tr>
+<tr>
+<td>Sur quoi construit-on un intervalle de confiance ?</td>
+<td>Sur <strong>$\ln S_T$</strong></td>
+</tr>
+<tr>
+<td>Loi du rendement réalisé $x$ ?</td>
+<td>$\phi(\mu-\sigma^2/2,\ \sigma^2/T)$</td>
+</tr>
+<tr>
+<td>Que fait l'écart-type de $x$ quand $T$ croît ?</td>
+<td>Il <strong>décroît</strong></td>
+</tr>
+<tr>
+<td>Pourquoi $\mathbb E(x)\ne\mu$ ?</td>
+<td>$\ln$ est <strong>non linéaire</strong> (Jensen)</td>
+</tr>
+<tr>
+<td>Moyenne géométrique vs arithmétique ?</td>
+<td>La géométrique est <strong>toujours inférieure</strong></td>
+</tr>
+<tr>
+<td>Rendement à annoncer dans l'exemple du fonds ?</td>
+<td><strong>12,4 %</strong>, pas 14 %</td>
+</tr>
+<tr>
+<td>Définition exacte de la volatilité ?</td>
+<td>Écart-type du rendement <strong>continu</strong> sur un an</td>
+</tr>
+<tr>
+<td>Fourchette typique ?</td>
+<td><strong>15 % à 60 %</strong></td>
+</tr>
+<tr>
+<td>Formule d'estimation historique ?</td>
+<td>$\hat\sigma=s/\sqrt\tau$ avec $u_i=\ln(S_i/S_{i-1})$</td>
+</tr>
+<tr>
+<td>Erreur type de $\hat\sigma$ ?</td>
+<td>$\hat\sigma/\sqrt{2n}$</td>
+</tr>
+<tr>
+<td>Combien de jours de données ?</td>
+<td><strong>90 à 180</strong> jours quotidiens</td>
+</tr>
+<tr>
+<td>Jours de bourse par an ?</td>
+<td><strong>252</strong></td>
+</tr>
+<tr>
+<td>$u_i$ un jour de détachement ?</td>
+<td>$\ln\frac{S_i+D}{S_{i-1}}$</td>
+</tr>
+<tr>
+<td>Composition du portefeuille de couverture ?</td>
+<td>$-1$ dérivé, $+\partial f/\partial S$ actions</td>
+</tr>
+<tr>
+<td>Pourquoi le risque disparaît-il ?</td>
+<td><strong>Même $dz$</strong> pour $S$ et $f$</td>
+</tr>
+<tr>
+<td>Combien de temps est-il sans risque ?</td>
+<td><strong>Instantanément</strong> seulement</td>
+</tr>
+<tr>
+<td>L'EDP de Black-Scholes-Merton ?</td>
+<td>$f_t+rSf_S+\frac12\sigma^2S^2f_{SS}=rf$</td>
+</tr>
+<tr>
+<td>Quelle variable n'y figure pas ?</td>
+<td><strong>$\mu$</strong></td>
+</tr>
+<tr>
+<td>Combien de solutions a-t-elle ?</td>
+<td><strong>Beaucoup</strong> — les conditions aux limites tranchent</td>
+</tr>
+<tr>
+<td>Condition terminale d'un call ?</td>
+<td>$f=\max(S-K,0)$ en $t=T$</td>
+</tr>
+<tr>
+<td>$e^S$ satisfait-il l'EDP ?</td>
+<td><strong>Non</strong> — ce n'est donc pas un prix</td>
+</tr>
+<tr>
+<td>Que paie le dérivé de prix $e^{(\sigma^2-2r)(T-t)}/S$ ?</td>
+<td>$\mathbf{1/S_T}$ en $T$</td>
+</tr>
+<tr>
+<td>Les trois étapes de la valorisation risque-neutre ?</td>
+<td>$\mu=r$ · payoff espéré · <strong>actualiser à $r$</strong></td>
+</tr>
+<tr>
+<td>Est-ce une hypothèse sur le monde réel ?</td>
+<td><strong>Non</strong> — un <strong>artifice</strong> ; les solutions valent partout</td>
+</tr>
+<tr>
+<td>Formule du call ?</td>
+<td>$c=S_0N(d_1)-Ke^{-rT}N(d_2)$</td>
+</tr>
+<tr>
+<td>Formule du put ?</td>
+<td>$p=Ke^{-rT}N(-d_2)-S_0N(-d_1)$</td>
+</tr>
+<tr>
+<td>Formule de $d_1$ ?</td>
+<td>$\frac{\ln(S_0/K)+(r+\sigma^2/2)T}{\sigma\sqrt T}$</td>
+</tr>
+<tr>
+<td>Relation entre $d_1$ et $d_2$ ?</td>
+<td>$d_2=d_1-\sigma\sqrt T$</td>
+</tr>
+<tr>
+<td>Que représente $N(d_2)$ ?</td>
+<td>La <strong>probabilité d'exercice</strong> en monde risque-neutre</td>
+</tr>
+<tr>
+<td>La formule vaut-elle pour un call américain ?</td>
+<td><strong>Oui</strong>, sans dividende</td>
+</tr>
+<tr>
+<td>Et pour un put américain ?</td>
+<td><strong>Aucune formule fermée</strong> n'existe</td>
+</tr>
+<tr>
+<td>Comportement quand $S_0\to\infty$ ?</td>
+<td>$c\to S_0-Ke^{-rT}$, $p\to0$</td>
+</tr>
+<tr>
+<td>Comportement quand $\sigma\to0$ ?</td>
+<td>$c\to\max(S_0-Ke^{-rT},0)$</td>
+</tr>
+<tr>
+<td>Valeur d'un warrant vs call ordinaire ?</td>
+<td>$\frac{N}{N+M}$ fois</td>
+</tr>
+<tr>
+<td>Baisse du cours à l'émission ?</td>
+<td>$\frac{M}{N+M}$ fois la valeur d'un call</td>
+</tr>
+<tr>
+<td>Faut-il compter la dilution pour des warrants existants ?</td>
+<td><strong>Non</strong> — déjà dans le cours</td>
+</tr>
+<tr>
+<td>Peut-on inverser Black-Scholes en $\sigma$ ?</td>
+<td><strong>Non</strong> — recherche itérative</td>
+</tr>
+<tr>
+<td>Pourquoi coter la volatilité implicite ?</td>
+<td>Elle est <strong>moins variable</strong> que le prix, et <strong>prospective</strong></td>
+</tr>
+<tr>
+<td>Que mesure le VIX ?</td>
+<td>Volatilité implicite des options <strong>30 jours</strong> sur le S&amp;P 500</td>
+</tr>
+<tr>
+<td>Taille d'un contrat VIX ?</td>
+<td><strong>1 000 fois</strong> l'indice</td>
+</tr>
+<tr>
+<td>Record du VIX ?</td>
+<td><strong>80</strong>, octobre-novembre <strong>2008</strong></td>
+</tr>
+<tr>
+<td>Ajustement pour dividendes ?</td>
+<td>$S_0\to S_0-D$, $D$ = <strong>valeur actuelle</strong></td>
+</tr>
+<tr>
+<td>Le strike change-t-il ?</td>
+<td><strong>Non</strong></td>
+</tr>
+<tr>
+<td>Quand exercer un call américain avec dividendes ?</td>
+<td><strong>Juste avant</strong> une date de détachement</td>
+</tr>
+<tr>
+<td>Critère de non-exercice en $t_i$ ?</td>
+<td>$D_i\le K[1-e^{-r(t_{i+1}-t_i)}]$</td>
+</tr>
+<tr>
+<td>Sa lecture approchée ?</td>
+<td>Rendement du dividende <strong>&lt; taux sans risque</strong></td>
+</tr>
+<tr>
+<td>Qu'est-ce que l'approximation de Black ?</td>
+<td><strong>Max</strong> des deux européennes ($T$ et $t_n$)</td>
+</tr>
+<tr>
+<td>Ses deux sources d'erreur ?</td>
+<td><strong>Calendrier</strong> de décision · <strong>application</strong> de la volatilité</td>
+</tr>
+</tbody></table>
+</main>
+
+
+
+
+</body></html>

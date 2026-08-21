@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fiche 65 — Tests d'hypothèses paramétriques : niveau, puissance, Wald et rapport de vraisemblance</title>
+<script>
+window.MathJax={tex:{inlineMath:[["$","$"]],displayMath:[["$$","$$"]],processEscapes:true},
+ options:{skipHtmlTags:["script","noscript","style","textarea","pre","code"]},
+ svg:{fontCache:"global"},
+ startup:{pageReady:()=>MathJax.startup.defaultPageReady().then(()=>{document.body.classList.add("ready")})}};
+setTimeout(function(){document.body.classList.add("ready")},2500);
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+/* ============================================================
+   MathiasLearn — feuille de style des fiches
+   Reprise intégrale des tokens de 00_PARCOURS/*.html
+   + blocs pédagogiques (callouts, méthode, essentiels, recall)
+   ============================================================ */
+:root{--bg:#faf9f7;--card:#fff;--ink:#1a1a1a;--muted:#6b6b6b;--line:#e5e2dd;--accent:#8b5e34;
+ --hl:#fdf8ef;--ok:#2d7d4f;--okbg:#f0f7f3;--warn:#b3402f;--warnbg:#fdf3f1;--blue:#2f5d8b;--bluebg:#f1f5fa}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+ font:17px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;padding:0 16px 100px}
+.nav{position:sticky;top:0;background:rgba(250,249,247,.96);backdrop-filter:blur(8px);
+ border-bottom:1px solid var(--line);margin:0 -16px 30px;padding:11px 16px;z-index:50;
+ display:flex;gap:6px;flex-wrap:wrap;font-size:13px}
+.nav a{color:var(--muted);text-decoration:none;padding:4px 9px;border-radius:5px;white-space:nowrap}
+.nav a:hover{background:var(--line);color:var(--ink)}
+.nav a.on{background:var(--accent);color:#fff}
+main{max-width:780px;margin:0 auto}
+h1{font-size:31px;letter-spacing:-.02em;margin:.4em 0 .5em;line-height:1.25}
+h2{font-size:23px;margin:2.2em 0 .7em;padding-bottom:.3em;border-bottom:1px solid var(--line)}
+h3{font-size:19px;margin:1.9em 0 .5em;color:var(--accent)}
+h4{font-size:17px;margin:1.5em 0 .4em}
+p{margin:.8em 0} a{color:var(--accent)} hr{border:0;border-top:1px solid var(--line);margin:2.6em 0}
+table{border-collapse:collapse;width:100%;margin:1.3em 0;font-size:15.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+th{background:#f3f0eb;font-weight:600}
+tr:nth-child(even) td{background:#fcfbfa}
+code{font-family:"SF Mono",Menlo,Consolas,monospace;font-size:.88em;background:#f2efea;padding:2px 6px;border-radius:4px;white-space:nowrap}
+pre{background:#f2efea;padding:14px 16px;border-radius:8px;overflow-x:auto}
+pre code{background:none;padding:0;white-space:pre}
+blockquote{border-left:3px solid var(--accent);background:var(--hl);margin:1.4em 0;padding:14px 20px;border-radius:0 8px 8px 0}
+blockquote p:first-child{margin-top:0} blockquote p:last-child{margin-bottom:0}
+ul,ol{padding-left:1.5em} li{margin:.35em 0} em{color:#4a4a4a}
+mjx-container[display="true"]{margin:1.1em 0!important;overflow-x:auto;overflow-y:hidden;padding:2px 0}
+mjx-container svg{max-width:100%}
+body:not(.ready) main{opacity:0} main{opacity:1;transition:opacity .25s}
+
+/* --- bandeau de tête de fiche --- */
+.cours{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--accent);
+ border-radius:0 10px 10px 0;padding:18px 22px;margin:0 0 34px}
+.cours h4{margin:0 0 4px;font-size:14px;text-transform:uppercase;letter-spacing:.07em;color:var(--accent)}
+.cours .cs{color:var(--muted);font-size:14.5px;margin:0 0 14px}
+
+/* --- exercices / corrigés --- */
+.ex{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:6px 24px 20px;margin:18px 0}
+.ex>h3:first-child{margin-top:14px}
+details.cor{margin-top:18px;border:1px solid var(--line);border-radius:8px;background:#fcfbfa;overflow:hidden}
+details.cor>summary{cursor:pointer;padding:12px 16px;font-weight:600;font-size:15px;color:var(--accent);
+ list-style:none;display:flex;align-items:center;gap:9px;user-select:none;transition:.15s;min-height:44px}
+details.cor>summary::-webkit-details-marker{display:none}
+details.cor>summary:hover{background:var(--hl)}
+details.cor>summary::before{content:"\25B6";font-size:10px;transition:transform .18s;display:inline-block}
+details.cor[open]>summary::before{transform:rotate(90deg)}
+details.cor[open]>summary{background:var(--okbg);color:var(--ok);border-bottom:1px solid var(--line)}
+.cor .in{padding:4px 20px 16px}
+.cor .in>*:first-child{margin-top:.9em}
+
+/* --- blocs pédagogiques (callouts) ---
+   Générés depuis une citation Markdown dont le premier **gras** commence
+   par un mot-clé : DÉFINITION, THÉORÈME, MÉTHODE, PIÈGE, INTUITION… */
+.cal{border:1px solid var(--line);border-left:4px solid var(--accent);background:var(--card);
+ border-radius:0 10px 10px 0;padding:15px 20px;margin:1.5em 0}
+.cal>p:first-child{margin-top:0}.cal>p:last-child,.cal>ul:last-child,.cal>ol:last-child{margin-bottom:0}
+.cal .lab{display:block;font-size:12.5px;text-transform:uppercase;letter-spacing:.08em;
+ font-weight:700;color:var(--accent);margin-bottom:6px}
+.cal.formel{background:var(--hl)}
+.cal.piege{border-left-color:var(--warn);background:var(--warnbg)}
+.cal.piege .lab{color:var(--warn)}
+.cal.methode{border-left-color:var(--ok);background:var(--okbg)}
+.cal.methode .lab{color:var(--ok)}
+.cal.intu{border-left-color:var(--blue);background:var(--bluebg)}
+.cal.intu .lab{color:var(--blue)}
+.cal.plus{border-left-style:dashed;background:#faf9f7}
+.cal.plus .lab{color:var(--muted)}
+
+/* --- révision express --- */
+.ess{background:var(--card);border:1px solid var(--accent);border-radius:10px;padding:4px 24px 20px;margin:1.6em 0}
+.ess h3{margin-top:1.3em}
+.rec{background:var(--card);border:1px dashed var(--accent);border-radius:10px;padding:4px 24px 18px;margin:1.6em 0}
+.rec ol{counter-reset:none}
+
+/* --- impression / PDF --- */
+@media print{
+ .nav{display:none}
+ body{padding:0;background:#fff;font-size:11.2pt;line-height:1.55}
+ main{max-width:none}
+ h1{font-size:23pt}h2{font-size:15pt;margin-top:1.5em}h3{font-size:12.6pt}
+ h2,h3,h4{break-after:avoid;page-break-after:avoid}
+ table,.cal,blockquote{break-inside:avoid;page-break-inside:avoid}
+ table{display:table;font-size:9.6pt}
+ details.cor{border:1px solid var(--line);background:#fcfbfa}
+ details.cor>summary{display:none}
+ details.cor .in{padding-top:10px}
+ .cal,.ex,.ess,.rec{box-shadow:none}
+ a{color:var(--ink);text-decoration:none}
+}
+@page{margin:16mm 15mm 18mm}
+
+/* --- exemples travaillés --- */
+.exm{background:#fcfbfa;border:1px solid var(--line);border-radius:10px;padding:2px 20px 14px;margin:1.5em 0}
+.exm>h4:first-child{margin:14px 0 .5em;color:var(--accent);font-size:13px;text-transform:uppercase;letter-spacing:.07em}
+
+
+/* --- pastilles de priorité (conventions des fiches de l'app) --- */
+h2[data-prio], h3[data-prio], h4[data-prio]{position:relative}
+h2[data-prio]::before,h3[data-prio]::before,h4[data-prio]::before{
+ content:"";display:inline-block;width:9px;height:9px;border-radius:50%;
+ margin-right:9px;vertical-align:middle;background:var(--muted)}
+[data-prio="must"]::before{background:var(--warn)}
+[data-prio="high"]::before{background:#d98324}
+[data-prio="mid"]::before{background:#c9a227}
+[data-prio="low"]::before{background:var(--ok)}
+/* corrigés des fiches de l'app : même traitement que les corrigés des séries */
+details.cor>summary::after{content:""}
+</style></head><body>
+<div class="nav"><a href="00_COMMENCER_ICI.html">Commencer ici</a><a href="01_NOTATIONS_le-decodeur.html">Notations</a><a href="02_EXERCICES_Serie-0.html">Série 0 — Remise en route</a><a href="03_EXERCICES_Serie-1.html">Série 1 — Convexité</a><a href="04_EXERCICES_Serie-2.html">Série 2 — KKT</a><a href="05_AUTO-EVALUATION.html">Auto-évaluation (quiz)</a><a href="06_FICHE_Optimisation-deux-variables.html">Fiche — Optimisation à 2 variables</a></div>
+<main><h1>Fiche 65 — Tests d'hypothèses paramétriques : niveau, puissance, Wald et rapport de vraisemblance</h1>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Matière</strong></td>
+<td>Maths · Économétrie</td>
+</tr>
+<tr>
+<td><strong>Cours source</strong></td>
+<td>Rigollet, <em>18.650 Statistics for Applications</em>, MIT OpenCourseWare, automne 2016 — chapitre 5 « Parametric hypothesis testing »</td>
+</tr>
+<tr>
+<td><strong>Difficulté</strong></td>
+<td> Must know — tout test d'économétrie sort de ce chapitre</td>
+</tr>
+<tr>
+<td><strong>Temps d'étude estimé</strong></td>
+<td>2 h 30</td>
+</tr>
+<tr>
+<td><strong>Prérequis</strong></td>
+<td>Fiche 64 (maximum de vraisemblance, information de Fisher), fiche 50 (test de Student en régression), théorème central limite</td>
+</tr>
+<tr>
+<td><strong>Concepts clés</strong></td>
+<td>Hypothèse nulle et alternative, région de rejet, erreurs de première et seconde espèce, puissance, niveau asymptotique, statistique de test, p-valeur, paradigme de Neyman-Pearson, lois du khi-deux et de Student, théorème de Cochran, test de Wald, test du rapport de vraisemblance, méthode delta</td>
+</tr>
+<tr>
+<td><strong>Poids à l'examen</strong></td>
+<td>Trois choses : la <strong>définition exacte</strong> du niveau, de la puissance et de la p-valeur ; la <strong>statistique de Wald</strong> $n(\hat\theta-\theta_0)^\top I(\hat\theta)(\hat\theta-\theta_0)\to\chi_d^2$ ; et le <strong>rapport de vraisemblance</strong> $2[\ell_n(\hat\theta)-\ell_n(\hat\theta^c)]\to\chi^2_{d-r}$.</td>
+</tr>
+</tbody></table>
+<h2>Vue d'ensemble</h2>
+<pre><code>QUESTION   les données contredisent-elles H₀ ?
+TEST       ψ ∈ {0,1} :  ψ = 1 ⟹ on REJETTE H₀
+NIVEAU     α = risque de rejeter H₀ à tort        ← on le CONTRÔLE
+PUISSANCE  1 − β = chance de rejeter H₀ à raison  ← on la MAXIMISE
+p-VALEUR   le plus petit α auquel on rejette
+DEUX TESTS UNIVERSELS
+  Wald                n(θ̂−θ₀)ᵀI(θ̂)(θ̂−θ₀) → χ²_d
+  rapport de vrais.   2[ℓₙ(θ̂) − ℓₙ(θ̂ᶜ)]   → χ²_{d−r}
+</code></pre>
+<h3>Les deux situations types</h3>
+<p><strong>La course Cherry Blossom.</strong> <em>Le Cherry Blossom Run est une course de 10 miles à Washington. En 2009, il y avait $14\,974$ participants et le temps moyen était de $103{,}5$ minutes.</em> <strong>Les coureurs étaient-ils plus rapides en 2012 ?</strong> On sélectionne $n$ coureurs de 2012 au hasard et l'on note $X_1,\dots,X_n$ leurs temps. <em>Les données passées montrent que le temps suit une loi gaussienne, de variance $373$.</em></p>
+<p>Il y a <strong>beaucoup de façons</strong> dont l'hypothèse $X_1\sim N(103{,}5;373)$ peut être fausse : $\mathbb E[X_1]\neq103{,}5$, ou $\mathrm{var}[X_1]\neq373$, ou $X_1$ pas même gaussienne. <em>On s'intéresse à une question très spécifique : a-t-on $\mathbb E[X_1]&lt;103{,}5$ ?</em></p>
+<blockquote>
+<p><em>En faisant des hypothèses de modélisation — variance inchangée, loi gaussienne —, on <strong>réduit le nombre de façons</strong> dont l'hypothèse peut être rejetée. La seule qui reste est $X_1\sim N(\mu;373)$ avec $\mu&lt;103{,}5$.</em> On <strong>compare une espérance à un nombre de référence</strong>.</p>
+</blockquote>
+<p><strong>Les essais cliniques.</strong> On administre un sirop antitussif au groupe test et un placebo au groupe témoin ; $\mu_{\text{drug}}$ et $\mu_{\text{control}}$ sont les nombres espérés d'expectorations par heure. On veut savoir si $\mu_{\text{drug}}&lt;\mu_{\text{control}}$. Avec $X_1,\dots,X_{n_{\text{drug}}}\sim\mathrm{Poiss}(\mu_{\text{drug}})$ et $Y_1,\dots,Y_{n_{\text{control}}}\sim\mathrm{Poiss}(\mu_{\text{control}})$, on <strong>compare deux espérances</strong>, sans nombre de référence.</p>
+<h3>L'heuristique et sa correction</h3>
+<blockquote>
+<p><strong>Heuristique naïve</strong> : <em>« si $\bar X_n&lt;103{,}5$, alors $\mu&lt;103{,}5$ ».</em>
+<em>Cela pourrait mal tourner si je tombe par hasard sur des coureurs rapides dans mon échantillon.</em></p>
+<p><strong>Meilleure heuristique</strong> :
+$$\text{« si } \bar X_n&lt;103{,}5-\big(\text{quelque chose qui}\xrightarrow[n\to\infty]{}0\big)\text{, alors } \mu&lt;103{,}5 \text{ »}$$
+<em>Pour rendre cette intuition précise, il faut tenir compte de la <strong>taille des fluctuations aléatoires</strong> de $\bar X_n$ !</em></p>
+</blockquote>
+<p class="cal piege"> <strong>« Quelque chose qui tend vers zéro » est la clé de tout le chapitre.</strong> Ce quelque chose est de l'ordre de $\sigma/\sqrt n$, et c'est le théorème central limite qui en donne la taille exacte. Toute la théorie des tests consiste à <strong>calibrer</strong> ce terme correcteur.</p>
+<h3>Les deux exemples numériques</h3>
+<p><strong>Exemple 1.</strong> <em>Une pièce est lancée $80$ fois et Face sort $54$ fois. Peut-on conclure que la pièce est significativement biaisée ?</em> Avec $n=80$, $X_i\overset{iid}\sim\mathrm{Ber}(p)$, $\bar X_n=54/80=0{,}68$. Si $p=0{,}5$ était vrai, alors par le <strong>TCL et le théorème de Slutsky</strong> :
+$$\sqrt n\,\frac{\bar X_n-0{,}5}{\sqrt{0{,}5(1-0{,}5)}}\approx N(0,1) \qquad\text{et ici}\qquad \sqrt{80}\,\frac{0{,}68-0{,}5}{0{,}5}\approx3{,}22$$</p>
+<blockquote>
+<p><em>Conclusion : il paraît tout à fait raisonnable de <strong>rejeter</strong> l'hypothèse $p=0{,}5$.</em></p>
+</blockquote>
+<p><strong>Exemple 2.</strong> <em>Une pièce est lancée $30$ fois et Face sort $13$ fois.</em> Avec $\bar X_n=13/30\approx0{,}43$ :
+$$\sqrt{30}\,\frac{0{,}43-0{,}5}{0{,}5}\approx-0{,}77$$</p>
+<blockquote>
+<p><em>Le nombre $0{,}77$ est une réalisation plausible d'une variable $Z\sim N(0,1)$. Conclusion : nos données <strong>ne suggèrent pas</strong> que la pièce soit biaisée.</em></p>
+</blockquote>
+<h2 data-prio="must">Concept 1 — La formulation statistique</h2>
+<p>Soit un échantillon i.i.d. $X_1,\dots,X_n$ et un modèle statistique $\big(E,(\mathbb P_\theta)_{\theta\in\Theta}\big)$. Soient $\Theta_0$ et $\Theta_1$ des sous-ensembles <strong>disjoints</strong> de $\Theta$. On considère les deux hypothèses
+$$\begin{cases}H_0:\ \theta\in\Theta_0\\ H_1:\ \theta\in\Theta_1\end{cases}$$
+$H_0$ est l'<strong>hypothèse nulle</strong>, $H_1$ l'<strong>hypothèse alternative</strong>. <em>On veut décider s'il faut <strong>rejeter $H_0$</strong> — chercher dans les données des éléments <strong>contre</strong> $H_0$.</em></p>
+<blockquote>
+<p><strong>L'asymétrie fondamentale.</strong></p>
+<ul>
+<li><em>$H_0$ et $H_1$ <strong>ne jouent pas un rôle symétrique</strong> : les données ne servent qu'à tenter de <strong>réfuter</strong> $H_0$.</em></li>
+<li><em>En particulier, une <strong>absence de preuve</strong> ne signifie pas que $H_0$ est <strong>vraie</strong> — « innocent jusqu'à preuve du contraire ».</em></li>
+</ul>
+</blockquote>
+<div class="cal formel"><span class="lab">Définition — un test.</span>
+<p> Un test est une statistique $\psi\in\{0,1\}$ telle que :</p>
+<ul>
+<li>si $\psi=0$, $H_0$ <strong>n'est pas rejetée</strong> ;</li>
+<li>si $\psi=1$, $H_0$ <strong>est rejetée</strong>.</li>
+</ul>
+</div>
+<p class="cal piege"> <strong>L'asymétrie est l'erreur d'interprétation la plus répandue en économétrie appliquée.</strong> « Le coefficient n'est pas significatif » ne veut <strong>pas</strong> dire « le coefficient est nul » : cela veut dire qu'on n'a pas assez d'éléments pour l'exclure. Sur un échantillon petit ou bruité, on ne rejette presque jamais — ce n'est pas une preuve de nullité, c'est un manque de <strong>puissance</strong>.</p>
+<h2 data-prio="must">Concept 2 — Erreurs, puissance et niveau</h2>
+<blockquote>
+<p><strong>Région de rejet</strong> d'un test $\psi$ :
+$$R_\psi=\big\{x\in E^n:\psi(x)=1\big\}$$</p>
+</blockquote>
+<div class="cal piege"><span class="lab">Erreur de première espèce</span>
+<p> (rejeter $H_0$ alors qu'elle est <strong>vraie</strong>) :
+$$\alpha_\psi:\Theta_0\to\mathbb R, \qquad \theta\mapsto\mathbb P_\theta[\psi=1]$$</p>
+</div>
+<div class="cal piege"><span class="lab">Erreur de seconde espèce</span>
+<p> (ne pas rejeter $H_0$ alors que $H_1$ est <strong>vraie</strong>) :
+$$\beta_\psi:\Theta_1\to\mathbb R, \qquad \theta\mapsto\mathbb P_\theta[\psi=0]$$</p>
+</div>
+<blockquote>
+<p><strong>Puissance</strong> d'un test $\psi$ :
+$$\pi_\psi=\inf_{\theta\in\Theta_1}\big(1-\beta_\psi(\theta)\big)$$</p>
+</blockquote>
+<blockquote>
+<p><strong>Niveau.</strong> Un test $\psi$ est de <strong>niveau $\alpha$</strong> si
+$$\alpha_\psi(\theta)\leq\alpha, \qquad \forall\theta\in\Theta_0$$
+Il est de <strong>niveau asymptotique $\alpha$</strong> si
+$$\lim_{n\to\infty}\alpha_\psi(\theta)\leq\alpha, \qquad \forall\theta\in\Theta_0$$</p>
+</blockquote>
+<p><strong>La forme générale.</strong> <em>En général, un test a la forme</em>
+$$\psi=\mathbf 1\{T_n&gt;c\}$$
+<em>pour une statistique $T_n$ et un seuil $c\in\mathbb R$. $T_n$ est la <strong>statistique de test</strong>, et la région de rejet est $R_\psi=\{T_n&gt;c\}$.</em></p>
+<div class="cal formel"><span class="lab">Remarquez les deux définitions asymétriques.</span>
+
+<ul>
+<li>Le <strong>niveau</strong> est un $\sup$ implicite : la contrainte porte sur <strong>tout</strong> $\theta\in\Theta_0$. On veut que le risque de fausse alerte soit contrôlé quelle que soit la façon dont $H_0$ est vraie.</li>
+<li>La <strong>puissance</strong> est un $\inf$ explicite sur $\Theta_1$ : on mesure le test par son <strong>pire cas</strong> sous l'alternative — la performance dans la configuration la plus difficile à détecter.</li>
+</ul>
+<p><strong>Le compromis.</strong> Abaisser $\alpha$ — être plus prudent — réduit mécaniquement la puissance. Le test trivial $\psi\equiv0$, qui ne rejette jamais, a un niveau <strong>parfait</strong> ($\alpha=0$) et une puissance <strong>nulle</strong>. C'est ce que le concept 5 formalise.</p>
+</div>
+<h2 data-prio="must">Concept 3 — L'exemple de la pièce, formalisé</h2>
+<p>Soient $X_1,\dots,X_n\overset{iid}\sim\mathrm{Ber}(p)$ avec $p\in(0,1)$ inconnu. On veut tester
+$$H_0:\ p=1/2 \qquad\text{contre}\qquad H_1:\ p\neq1/2$$
+au niveau asymptotique $\alpha\in(0,1)$.</p>
+<p><strong>La statistique de test.</strong> Avec $\hat p_n$ l'EMV (fiche 64) :
+$$T_n=\sqrt n\,\frac{\hat p_n-0{,}5}{\sqrt{0{,}5(1-0{,}5)}}$$</p>
+<p><strong>Sous $H_0$</strong>, par le <strong>TCL et le théorème de Slutsky</strong> :
+$$\mathbb P\big[\lvert T_n\rvert&gt;q_{\alpha/2}\big]\ \xrightarrow[n\to\infty]{}\ \alpha$$
+d'où le test
+$$\psi_\alpha=\mathbf 1\big\{\lvert T_n\rvert&gt;q_{\alpha/2}\big\}$$</p>
+<p><strong>L'application aux deux exemples.</strong> Pour $\alpha=5\,\%$, $q_{\alpha/2}=1{,}96$, donc :</p>
+<ul>
+<li><strong>Exemple 1</strong> ($T_n\approx3{,}22$) : $H_0$ <strong>est rejetée</strong> au niveau asymptotique $5\,\%$.</li>
+<li><strong>Exemple 2</strong> ($T_n\approx-0{,}77$) : $H_0$ <strong>n'est pas rejetée</strong> au niveau asymptotique $5\,\%$.</li>
+</ul>
+<blockquote>
+<p><strong>Question du cours.</strong> <em>Dans l'exemple 1, pour quel niveau $\alpha$ le test $\psi_\alpha$ ne rejetterait-il <strong>pas</strong> $H_0$ ? Et dans l'exemple 2, à quel niveau $\alpha$ rejetterait-il $H_0$ ?</em> — c'est exactement ce que la p-valeur répond.</p>
+</blockquote>
+<p class="cal piege"> <strong>Le rôle de Slutsky mérite d'être noté.</strong> Le TCL seul donne la loi de $\sqrt n(\hat p_n-p)/\sigma$ avec le <strong>vrai</strong> $\sigma$. Le théorème de Slutsky autorise à le remplacer par un estimateur convergent sans changer la loi limite. Ici, sous $H_0$, $\sigma=\sqrt{0{,}5\times0{,}5}$ est <strong>connu</strong> — mais dans le cas général, c'est Slutsky qui légitime la substitution.</p>
+<h2 data-prio="must">Concept 4 — La p-valeur</h2>
+<div class="cal formel"><span class="lab">Définition.</span>
+<p> La <strong>p-valeur</strong> (asymptotique) d'un test $\psi_\alpha$ est le <strong>plus petit niveau</strong> (asymptotique) $\alpha$ auquel $\psi_\alpha$ rejette $H_0$. <em>Elle est aléatoire : elle dépend de l'échantillon.</em></p>
+</div>
+<blockquote>
+<p><strong>La règle d'or.</strong>
+$$\boxed{\ \text{p-valeur}\leq\alpha\iff H_0 \text{ est rejetée par } \psi_\alpha \text{ au niveau } \alpha\ }$$
+<em><strong>Plus la p-valeur est petite, plus on peut rejeter $H_0$ avec confiance.</strong></em></p>
+</blockquote>
+<p><strong>Les deux exemples.</strong></p>
+<ul>
+<li><strong>Exemple 1</strong> : p-valeur $=\mathbb P[\lvert Z\rvert&gt;3{,}22]\ll0{,}01$.</li>
+<li><strong>Exemple 2</strong> : p-valeur $=\mathbb P[\lvert Z\rvert&gt;0{,}77]\approx0{,}44$.</li>
+</ul>
+<div class="cal intu"><span class="lab">Pourquoi la p-valeur est plus informative que la décision binaire.</span>
+<p> Le test $\psi_\alpha$ ne rend qu'un verdict à un seuil fixé arbitrairement. La p-valeur rend <strong>le seuil critique lui-même</strong> : elle permet à chaque lecteur d'appliquer son propre $\alpha$. Dans l'exemple 2, une p-valeur de $0{,}44$ dit qu'il faudrait accepter un risque de fausse alerte de $44\,\%$ pour rejeter — autant dire jamais.</p>
+</div>
+<p class="cal piege"> <strong>Ce que la p-valeur n'est PAS.</strong> Elle n'est <strong>pas</strong> la probabilité que $H_0$ soit vraie. C'est la probabilité, <strong>sous $H_0$</strong>, d'observer une statistique au moins aussi extrême que celle observée. Confondre $\mathbb P[\text{données}\mid H_0]$ et $\mathbb P[H_0\mid\text{données}]$ est l'erreur classique — et il faut un cadre bayésien pour accéder à la seconde.</p>
+<h2 data-prio="high">Concept 5 — Le paradigme de Neyman-Pearson</h2>
+<blockquote>
+<p><strong>L'idée.</strong> <em>Pour des hypothèses données, parmi tous les tests de niveau (asymptotique) $\alpha$, est-il possible d'en trouver un de <strong>puissance maximale</strong> ?</em></p>
+</blockquote>
+<blockquote>
+<p><strong>L'exemple qui pose le problème.</strong> <em>Le test trivial $\psi=0$, qui ne rejette jamais $H_0$, a un niveau <strong>parfait</strong> ($\alpha=0$) mais une <strong>puissance médiocre</strong> ($\pi_\psi=0$).</em></p>
+</blockquote>
+<blockquote>
+<p><em>La théorie de Neyman-Pearson fournit les tests <strong>les plus puissants</strong> à niveau donné.</em></p>
+</blockquote>
+<blockquote>
+<p><strong>La logique du paradigme, en une phrase.</strong> On ne peut pas minimiser les deux erreurs à la fois : elles varient en sens inverse. On <strong>fixe donc</strong> la première espèce à un seuil tolérable $\alpha$ — c'est la contrainte —, puis on <strong>maximise la puissance</strong> sous cette contrainte. C'est un problème d'optimisation sous contrainte, au sens exact des fiches 7 et 38.</p>
+<p><strong>Et le choix de $\alpha$ n'est pas statistique, il est décisionnel</strong> : quelle est la conséquence d'un faux positif ? En essai clinique, mettre sur le marché un médicament inefficace est grave — on prend $\alpha$ petit. En exploration de données, manquer une piste coûte plus cher qu'une fausse alerte — on l'assouplit.</p>
+</blockquote>
+<h2 data-prio="must">Concept 6 — Les lois du khi-deux et de Student</h2>
+<div class="cal formel"><span class="lab">Définition — loi $\chi^2$.</span>
+<p> Pour un entier positif $d$, la loi du <strong>khi-deux à $d$ degrés de liberté</strong> est la loi de la variable
+$$Z_1^2+Z_2^2+\cdots+Z_d^2, \qquad Z_1,\dots,Z_d\overset{iid}\sim N(0,1)$$</p>
+</div>
+<p><strong>Exemples et propriétés.</strong></p>
+<ul>
+<li>Si $Z\sim N_d(0,I_d)$, alors $\lVert Z\rVert_2^2\sim\chi_d^2$.</li>
+<li>La <strong>variance empirique</strong> est
+$$S_n=\frac1n\sum_{i=1}^n(X_i-\bar X_n)^2=\frac1n\sum_{i=1}^nX_i^2-(\bar X_n)^2$$</li>
+<li>Le <strong>théorème de Cochran</strong> implique que, pour $X_1,\dots,X_n\overset{iid}\sim N(\mu,\sigma^2)$ :
+$$\boxed{\ \frac{nS_n}{\sigma^2}\sim\chi^2_{n-1}\ }$$</li>
+<li>$\chi_2^2=\mathrm{Exp}(1/2)$.</li>
+</ul>
+<div class="cal formel"><span class="lab">Définition — loi de Student.</span>
+<p> Pour un entier positif $d$, la loi de <strong>Student à $d$ degrés de liberté</strong>, notée $t_d$, est la loi de
+$$\frac{Z}{\sqrt{V/d}}, \qquad Z\sim N(0,1),\quad V\sim\chi_d^2,\quad Z\perp\!\!\!\perp V$$</p>
+</div>
+<p><strong>Exemple.</strong> Si $S_n$ est la variance empirique :
+$$\boxed{\ \sqrt{n-1}\,\frac{\bar X_n-\mu}{\sqrt{S_n}}\sim t_{n-1}\ }$$</p>
+<div class="cal intu"><span class="lab">Pourquoi $n-1$ et pas $n$ ?</span>
+<p> Parce que $\bar X_n$ a été <strong>estimée à partir des mêmes données</strong>. Les $n$ écarts $X_i-\bar X_n$ sont liés par une contrainte — leur somme est nulle —, donc ils ne fournissent que $n-1$ directions libres. C'est le contenu précis du théorème de Cochran, et c'est la même comptabilité de degrés de liberté qu'en fiche 50 ($n-p$ pour $p$ paramètres estimés).</p>
+<p><strong>L'indépendance $Z\perp V$ dans la définition de Student est essentielle</strong> : c'est elle qui permet de former le quotient. Cochran la fournit — $\bar X_n$ et $S_n$ sont <strong>indépendants</strong> dans le modèle gaussien, ce qui est un fait remarquable et propre à la gaussienne.</p>
+</div>
+<h2 data-prio="must">Concept 7 — Le test de Wald</h2>
+<p><strong>Le cadre.</strong> Échantillon i.i.d. de modèle $\big(E,(\mathbb P_\theta)_{\theta\in\Theta}\big)$ avec $\Theta\subseteq\mathbb R^d$, et $\theta_0\in\Theta$ fixé. On teste
+$$\begin{cases}H_0:\ \theta=\theta_0\\ H_1:\ \theta\neq\theta_0\end{cases}$$</p>
+<p><strong>Le point de départ.</strong> Soit $\hat\theta^{MLE}$ l'EMV, les conditions techniques de la fiche 64 étant satisfaites. Si $H_0$ est vraie, alors
+$$\sqrt n\,I\big(\hat\theta^{MLE}_n\big)^{1/2}\big(\hat\theta_n^{MLE}-\theta_0\big)\ \xrightarrow[n\to\infty]{(d)}\ N_d(0,I_d) \qquad \text{par rapport à } \mathbb P_{\theta_0}$$</p>
+<p><strong>D'où la statistique.</strong> En prenant la norme au carré :
+$$\boxed{\ T_n=n\big(\hat\theta_n^{MLE}-\theta_0\big)^\top I\big(\hat\theta_n^{MLE}\big)\big(\hat\theta_n^{MLE}-\theta_0\big)\ \xrightarrow[n\to\infty]{(d)}\ \chi_d^2\ }$$</p>
+<blockquote>
+<p><strong>Test de Wald de niveau asymptotique $\alpha\in(0,1)$ :</strong>
+$$\psi=\mathbf 1\{T_n&gt;q_\alpha\}$$
+où $q_\alpha$ est le quantile d'ordre $(1-\alpha)$ de $\chi_d^2$.</p>
+</blockquote>
+<div class="cal formel"><span class="lab">Remarque.</span>
+<p> <em>Le test de Wald est <strong>aussi valide</strong> si $H_1$ est de la forme « $\theta&gt;\theta_0$ », « $\theta&lt;\theta_0$ » ou « $\theta=\theta_1$ »…</em></p>
+</div>
+<blockquote>
+<p><strong>La construction est limpide.</strong> Le théorème asymptotique de la fiche 64 dit que $\sqrt n(\hat\theta_n-\theta^\ast)\to N_d(0,I(\theta^\ast)^{-1})$. En <strong>normalisant</strong> par $I^{1/2}$, on obtient une gaussienne standard $N_d(0,I_d)$ ; en prenant la <strong>norme au carré</strong>, on obtient un $\chi^2_d$ par définition même de cette loi. La statistique de Wald est simplement une <strong>distance normalisée</strong> entre l'estimation et la valeur testée.</p>
+<p><strong>Le lien avec la fiche 50</strong> : le test de Student $\hat t_j=(\hat\beta_j-\beta_j)/(\hat\sigma\sqrt{C_{jj}})$ est le cas $d=1$ de Wald, à cela près que la régression normale donne une loi <strong>exacte</strong> de Student, là où Wald ne donne qu'une limite en $\chi^2$.</p>
+</blockquote>
+<h2 data-prio="must">Concept 8 — Le test du rapport de vraisemblance</h2>
+<p><strong>Le cadre.</strong> Modèle $\big(E,(\mathbb P_\theta)_{\theta\in\Theta}\big)$ avec $\Theta\subseteq\mathbb R^d$. L'hypothèse nulle est de la forme
+$$H_0:\ (\theta_{r+1},\dots,\theta_d)=\big(\theta^{(0)}_{r+1},\dots,\theta^{(0)}_d\big)$$
+pour des nombres fixés — autrement dit, on <strong>contraint $d-r$ des $d$ composantes</strong>.</p>
+<p><strong>Les deux estimateurs.</strong>
+$$\hat\theta_n=\underset{\theta\in\Theta}{\mathrm{argmax}}\ \ell_n(\theta) \quad \text{(EMV)}, \qquad \hat\theta_n^c=\underset{\theta\in\Theta_0}{\mathrm{argmax}}\ \ell_n(\theta) \quad \text{(EMV **contraint**)}$$</p>
+<p><strong>La statistique de test.</strong>
+$$\boxed{\ T_n=2\Big[\ell_n\big(\hat\theta_n\big)-\ell_n\big(\hat\theta_n^c\big)\Big]\ }$$</p>
+<div class="cal formel"><span class="lab">Théorème.</span>
+<p> <em>Si $H_0$ est vraie et si les conditions techniques de l'EMV sont satisfaites, alors</em>
+$$T_n\ \xrightarrow[n\to\infty]{(d)}\ \chi^2_{d-r}$$</p>
+</div>
+<blockquote>
+<p><strong>Test du rapport de vraisemblance de niveau asymptotique $\alpha$ :</strong> $\psi=\mathbf 1\{T_n&gt;q_\alpha\}$, où $q_\alpha$ est le quantile d'ordre $(1-\alpha)$ de $\chi^2_{d-r}$.</p>
+</blockquote>
+<blockquote>
+<p><strong>L'idée est très intuitive.</strong> $\ell_n(\hat\theta_n)\geq\ell_n(\hat\theta_n^c)$ toujours, puisque le maximum sur $\Theta$ ne peut qu'excéder le maximum sur le sous-ensemble $\Theta_0$. La question est : <strong>de combien</strong> ? Si la contrainte coûte peu en vraisemblance, elle est plausible ; si elle coûte beaucoup, on la rejette.</p>
+<p><strong>Et le nombre de degrés de liberté est le nombre de contraintes</strong> : $d-r$, exactement le nombre de composantes fixées par $H_0$. C'est une règle très générale et facile à retenir.</p>
+</blockquote>
+<p class="cal piege"> <strong>Le facteur $2$ n'est pas cosmétique.</strong> Il vient d'un développement de Taylor au second ordre de $\ell_n$ autour de $\hat\theta_n$ : le terme dominant est $\frac12(\hat\theta-\hat\theta^c)^\top\nabla^2\ell_n(\hat\theta-\hat\theta^c)$, et le facteur $2$ l'annule pour donner exactement une forme quadratique gaussienne — donc un $\chi^2$. C'est aussi ce qui montre que <strong>Wald et le rapport de vraisemblance sont asymptotiquement équivalents</strong>.</p>
+<h2 data-prio="must">Concept 9 — Tester des hypothèses implicites</h2>
+<p><strong>Le cadre.</strong> Soient $X_1,\dots,X_n$ i.i.d. et $\theta\in\mathbb R^d$ un paramètre associé à la loi de $X_1$ — un moment, un paramètre de modèle, etc. Soit $g:\mathbb R^d\to\mathbb R^k$ <strong>continûment dérivable</strong>, avec $k&lt;d$. On teste
+$$\begin{cases}H_0:\ g(\theta)=0\\ H_1:\ g(\theta)\neq0\end{cases}$$
+<em>Par exemple $g(\theta)=(\theta_1,\theta_2)$ avec $k=2$, ou $g(\theta)=\theta_1-\theta_2$ avec $k=1$.</em></p>
+<p><strong>Étape 1 — un estimateur asymptotiquement normal.</strong> On suppose disposer de $\hat\theta_n$ tel que
+$$\sqrt n\big(\hat\theta_n-\theta\big)\ \xrightarrow[n\to\infty]{(d)}\ N_d\big(0,\Sigma(\theta)\big)$$</p>
+<p><strong>Étape 2 — la méthode delta.</strong>
+$$\sqrt n\Big(g\big(\hat\theta_n\big)-g(\theta)\Big)\ \xrightarrow[n\to\infty]{(d)}\ N_k\big(0,\Gamma(\theta)\big), \qquad \boxed{\ \Gamma(\theta)=\nabla g(\theta)^\top\Sigma(\theta)\nabla g(\theta)\in\mathbb R^{k\times k}\ }$$</p>
+<p><strong>Étape 3 — normaliser.</strong> Supposons $\Sigma(\theta)$ inversible et $\nabla g(\theta)$ de rang $k$ ; alors $\Gamma(\theta)$ est inversible et
+$$\sqrt n\,\Gamma(\theta)^{-1/2}\Big(g\big(\hat\theta_n\big)-g(\theta)\Big)\ \xrightarrow{(d)}\ N_k(0,I_k)$$</p>
+<p><strong>Étape 4 — remplacer $\theta$ par $\hat\theta_n$.</strong> Par le <strong>théorème de Slutsky</strong>, si $\Gamma$ est continue en $\theta$ :
+$$\sqrt n\,\Gamma\big(\hat\theta_n\big)^{-1/2}\Big(g\big(\hat\theta_n\big)-g(\theta)\Big)\ \xrightarrow{(d)}\ N_k(0,I_k)$$</p>
+<p><strong>Étape 5 — sous $H_0$</strong>, c'est-à-dire $g(\theta)=0$ :
+$$T_n=n\,g\big(\hat\theta_n\big)^\top\Gamma^{-1}\big(\hat\theta_n\big)\,g\big(\hat\theta_n\big)\ \xrightarrow[n\to\infty]{(d)}\ \chi_k^2$$
+d'où le test de niveau asymptotique $\alpha$ : $\psi=\mathbf 1\{T_n&gt;q_\alpha\}$ avec $q_\alpha$ le quantile de $\chi^2_k$.</p>
+<blockquote>
+<p><strong>La méthode delta est l'outil le plus utile de la statistique asymptotique</strong>, et le mécanisme est un simple développement de Taylor : $g(\hat\theta_n)\approx g(\theta)+\nabla g(\theta)^\top(\hat\theta_n-\theta)$. Une transformation régulière d'un estimateur asymptotiquement normal reste asymptotiquement normale, avec une variance <strong>transportée par le gradient</strong>.</p>
+<p><strong>Ce que le concept ajoute aux tests précédents.</strong> Wald teste $\theta=\theta_0$ ; le rapport de vraisemblance teste que certaines <strong>composantes</strong> valent des valeurs fixées. Ici, on teste <strong>n'importe quelle relation régulière</strong> entre les composantes : $\theta_1=\theta_2$, $\theta_1\theta_2=1$, une élasticité égale à un… C'est le cadre général des <strong>restrictions non linéaires</strong> en économétrie.</p>
+</blockquote>
+<h2>Comment résoudre l'exercice type (protocole)</h2>
+<ol>
+<li><strong>Formuler</strong> $H_0$ et $H_1$ en termes de $\Theta_0$ et $\Theta_1$ disjoints — et se rappeler qu'ils <strong>ne sont pas symétriques</strong>.</li>
+<li><strong>Choisir la statistique de test</strong> $T_n$ et déterminer sa <strong>loi sous $H_0$</strong> (exacte ou asymptotique).</li>
+<li><strong>Fixer le niveau $\alpha$</strong> et lire le quantile correspondant.</li>
+<li><strong>Calculer</strong> $T_n$ sur les données et comparer au seuil.</li>
+<li><strong>Calculer la p-valeur</strong> — plus informative que la décision binaire.</li>
+<li><strong>Conclure prudemment</strong> : « on rejette $H_0$ » ou « on ne rejette pas $H_0$ », <strong>jamais</strong> « $H_0$ est vraie ».</li>
+</ol>
+<h3>Comment reconnaître qu'il faut utiliser cette méthode ?</h3>
+<table>
+<thead>
+<tr>
+<th>Indice dans l'énoncé</th>
+<th>Ce qu'il faut faire</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>« comparer une moyenne à une référence »</td>
+<td>test sur une espérance, TCL + Slutsky</td>
+</tr>
+<tr>
+<td>« comparer deux groupes »</td>
+<td>test sur une différence d'espérances</td>
+</tr>
+<tr>
+<td>variance <strong>connue</strong>, loi gaussienne</td>
+<td>statistique en $\sqrt n(\bar X_n-\mu_0)/\sigma$, loi $N(0,1)$</td>
+</tr>
+<tr>
+<td>variance <strong>inconnue</strong>, petit échantillon gaussien</td>
+<td><strong>Student</strong> $t_{n-1}$</td>
+</tr>
+<tr>
+<td>« la variance vaut-elle $\sigma_0^2$ ? »</td>
+<td><strong>Cochran</strong> : $nS_n/\sigma^2\sim\chi^2_{n-1}$</td>
+</tr>
+<tr>
+<td>tester $\theta=\theta_0$ en dimension $d$</td>
+<td><strong>Wald</strong>, $\chi_d^2$</td>
+</tr>
+<tr>
+<td>tester que $d-r$ composantes sont fixées</td>
+<td><strong>rapport de vraisemblance</strong>, $\chi^2_{d-r}$</td>
+</tr>
+<tr>
+<td>tester une relation $g(\theta)=0$</td>
+<td><strong>méthode delta</strong>, $\chi_k^2$</td>
+</tr>
+<tr>
+<td>« à quel seuil rejette-t-on ? »</td>
+<td>la <strong>p-valeur</strong></td>
+</tr>
+<tr>
+<td>« le test est-il optimal ? »</td>
+<td><strong>Neyman-Pearson</strong></td>
+</tr>
+</tbody></table>
+<h3>Exercices progressifs</h3>
+<p><strong> Niveau 1</strong> — Une pièce donne $54$ faces sur $80$ lancers. Testez $p=1/2$ au niveau $5\,\%$.</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p><strong>Les hypothèses.</strong> $H_0:p=1/2$ contre $H_1:p\neq1/2$, au niveau asymptotique $\alpha=5\,\%$.</p>
+<p><strong>La statistique.</strong> Avec $\hat p_n=54/80=0{,}68$ et $\sqrt{0{,}5(1-0{,}5)}=0{,}5$ :
+$$T_n=\sqrt{80}\,\frac{0{,}68-0{,}5}{0{,}5}=8{,}944\times0{,}36\approx3{,}22$$</p>
+<p><strong>La décision.</strong> Sous $H_0$, $T_n\approx N(0,1)$ par le TCL et Slutsky. Le quantile est $q_{\alpha/2}=q_{0{,}025}=1{,}96$. Comme
+$$\lvert3{,}22\rvert&gt;1{,}96$$
+on <strong>rejette $H_0$</strong> au niveau asymptotique $5\,\%$.</p>
+<p><strong>La p-valeur.</strong>
+$$\text{p-valeur}=\mathbb P\big[\lvert Z\rvert&gt;3{,}22\big]=2\big(1-\Phi(3{,}22)\big)\approx0{,}0013\ \ll\ 0{,}01$$
+On rejetterait donc même au niveau $1\,\%$, et même à $0{,}2\,\%$. <em>Il paraît tout à fait raisonnable de rejeter l'hypothèse $p=0{,}5$.</em></p>
+<p class="cal piege"> <strong>Formulez la conclusion correctement</strong> : « les données sont incompatibles avec une pièce équilibrée », et <strong>non</strong> « la pièce a une probabilité $0{,}68$ de tomber sur face ». Le test rejette une hypothèse ; il n'établit pas une valeur.</p>
+</div></details>
+
+<p><strong> Niveau 2</strong> — Qu'est-ce que la p-valeur, et pourquoi n'est-elle pas $\mathbb P[H_0\text{ vraie}]$ ?</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p><strong>La définition.</strong> La p-valeur est le <strong>plus petit niveau $\alpha$</strong> auquel le test rejette $H_0$. C'est une variable <strong>aléatoire</strong> : elle dépend de l'échantillon.</p>
+<p><strong>La règle d'or.</strong>
+$$\text{p-valeur}\leq\alpha\iff H_0 \text{ est rejetée au niveau } \alpha$$
+Plus la p-valeur est petite, plus on rejette avec confiance.</p>
+<p><strong>Ce qu'elle est vraiment.</strong> C'est
+$$\mathbb P\big[\text{observer une statistique au moins aussi extrême}\ \big\vert\ H_0\big]$$
+— une probabilité <strong>conditionnelle à $H_0$</strong>, calculée <strong>sous</strong> l'hypothèse nulle.</p>
+<p><strong>Pourquoi ce n'est pas $\mathbb P[H_0\mid\text{données}]$.</strong> Ce sont deux conditionnements <strong>inverses</strong>. Passer de l'un à l'autre exige la formule de Bayes :
+$$\mathbb P[H_0\mid\text{données}]=\frac{\mathbb P[\text{données}\mid H_0]\,\mathbb P[H_0]}{\mathbb P[\text{données}]}$$
+ce qui demande une <strong>probabilité a priori</strong> $\mathbb P[H_0]$ — objet qui n'existe pas dans le cadre fréquentiste, où $\theta$ est un paramètre <strong>fixe</strong>, pas une variable aléatoire. Dire « $H_0$ a $4\,\%$ de chances d'être vraie » n'a <strong>aucun sens</strong> ici.</p>
+<p><strong>L'analogie du procès</strong>, que le cours suggère avec « innocent jusqu'à preuve du contraire » : la p-valeur mesure à quel point les preuves seraient <strong>surprenantes si l'accusé était innocent</strong>. Elle ne mesure pas la probabilité qu'il soit innocent — cela dépendrait aussi du taux de criminalité <em>a priori</em>.</p>
+<p><strong>La conséquence pratique.</strong> Une p-valeur de $0{,}44$ (exemple 2) signifie : « si la pièce était équilibrée, on observerait un écart au moins aussi grand $44\,\%$ du temps ». Rien d'étonnant, donc — mais cela ne prouve <strong>pas</strong> que la pièce est équilibrée.</p>
+</div></details>
+
+<p><strong> Niveau 3</strong> — Construisez le test de Wald et expliquez d'où vient le $\chi^2_d$.</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p><strong>Le point de départ — le théorème de la fiche 64.</strong> Sous les conditions techniques,
+$$\sqrt n\big(\hat\theta_n^{MLE}-\theta^\ast\big)\ \xrightarrow{(d)}\ N_d\big(0,I(\theta^\ast)^{-1}\big)$$</p>
+<p><strong>Étape 1 — normaliser.</strong> En multipliant par $I(\theta^\ast)^{1/2}$, la covariance devient $I^{1/2}I^{-1}I^{1/2}=I_d$ :
+$$\sqrt n\,I\big(\hat\theta_n\big)^{1/2}\big(\hat\theta_n-\theta_0\big)\ \xrightarrow{(d)}\ N_d(0,I_d) \qquad \text{sous } H_0:\theta=\theta_0$$
+(on a remplacé $I(\theta^\ast)$ par $I(\hat\theta_n)$, ce que <strong>Slutsky</strong> autorise par continuité).</p>
+<p><strong>Étape 2 — prendre la norme au carré.</strong> Par définition même de la loi $\chi^2$ — <em>la loi de $Z_1^2+\cdots+Z_d^2$ pour $Z_i$ i.i.d. $N(0,1)$</em> —, si $Z\sim N_d(0,I_d)$ alors $\lVert Z\rVert_2^2\sim\chi_d^2$. Donc
+$$T_n=\Big\lVert\sqrt n\,I(\hat\theta_n)^{1/2}(\hat\theta_n-\theta_0)\Big\rVert_2^2=n\big(\hat\theta_n-\theta_0\big)^\top I\big(\hat\theta_n\big)\big(\hat\theta_n-\theta_0\big)\ \xrightarrow{(d)}\ \chi_d^2$$</p>
+<p><strong>Étape 3 — le test.</strong> $\psi=\mathbf 1\{T_n&gt;q_\alpha\}$, $q_\alpha$ étant le quantile d'ordre $(1-\alpha)$ de $\chi_d^2$.</p>
+<p><strong>L'interprétation géométrique.</strong> $T_n$ est le <strong>carré d'une distance normalisée</strong> entre $\hat\theta_n$ et $\theta_0$, la normalisation étant faite par l'information de Fisher. Les directions où l'information est <strong>grande</strong> — donc l'estimation précise — pèsent <strong>davantage</strong> dans la distance : un petit écart y est déjà suspect. Les directions mal informées pèsent peu.</p>
+<p><strong>Pourquoi $d$ degrés de liberté</strong> : on teste $d$ composantes simultanément, donc on somme $d$ carrés de gaussiennes standard indépendantes.</p>
+<p><strong>Une remarque du cours à ne pas manquer</strong> : <em>le test de Wald est aussi valide si $H_1$ est de la forme $\theta&gt;\theta_0$, $\theta&lt;\theta_0$ ou $\theta=\theta_1$</em>. La statistique ne change pas ; c'est seulement la puissance qui varie selon l'alternative.</p>
+<p><strong>Le lien avec la fiche 50</strong> : en dimension $d=1$, $T_n=n(\hat\theta_n-\theta_0)^2I(\hat\theta_n)$ est le <strong>carré</strong> de la statistique de Student. La différence est que la régression normale donne une loi <strong>exacte</strong> ($t_{n-p}$), tandis que Wald ne fournit qu'une limite asymptotique ($\chi^2_1$).</p>
+</div></details>
+
+<p><strong> Niveau 4 — type examen</strong> — Comparez le test de Wald et le test du rapport de vraisemblance.</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<table>
+<thead>
+<tr>
+<th></th>
+<th><strong>Wald</strong></th>
+<th><strong>Rapport de vraisemblance</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Hypothèse testée</td>
+<td>$\theta=\theta_0$ (valeur complète)</td>
+<td>$(\theta_{r+1},\dots,\theta_d)=(\theta^{(0)}_{r+1},\dots,\theta^{(0)}_d)$</td>
+</tr>
+<tr>
+<td>Statistique</td>
+<td>$n(\hat\theta_n-\theta_0)^\top I(\hat\theta_n)(\hat\theta_n-\theta_0)$</td>
+<td>$2\big[\ell_n(\hat\theta_n)-\ell_n(\hat\theta_n^c)\big]$</td>
+</tr>
+<tr>
+<td>Loi limite</td>
+<td>$\chi_d^2$</td>
+<td>$\chi^2_{d-r}$</td>
+</tr>
+<tr>
+<td>Degrés de liberté</td>
+<td>dimension de $\theta$</td>
+<td><strong>nombre de contraintes</strong></td>
+</tr>
+<tr>
+<td>Ce qu'il faut calculer</td>
+<td>l'EMV <strong>libre</strong> et $I(\hat\theta_n)$</td>
+<td>l'EMV <strong>libre</strong> et l'EMV <strong>contraint</strong></td>
+</tr>
+<tr>
+<td>Ce qu'il mesure</td>
+<td>une <strong>distance</strong> dans l'espace des paramètres</td>
+<td>un <strong>coût en vraisemblance</strong></td>
+</tr>
+</tbody></table>
+<p><strong>L'idée de Wald.</strong> <em>À quelle distance $\hat\theta_n$ est-il de $\theta_0$</em>, mesurée dans la métrique de l'information de Fisher ? Le théorème asymptotique donne $\sqrt nI^{1/2}(\hat\theta_n-\theta_0)\to N_d(0,I_d)$, et la norme au carré donne le $\chi_d^2$.</p>
+<p><strong>L'idée du rapport de vraisemblance.</strong> <em>Combien coûte la contrainte</em> ? Comme $\Theta_0\subset\Theta$, on a toujours $\ell_n(\hat\theta_n)\geq\ell_n(\hat\theta_n^c)$. Si l'écart est faible, la contrainte est plausible ; s'il est grand, on rejette. Le nombre de degrés de liberté, $d-r$, est exactement le <strong>nombre de composantes contraintes</strong>.</p>
+<p><strong>Le lien entre les deux — et c'est le point à savoir.</strong> Ils sont <strong>asymptotiquement équivalents</strong>. La raison est un développement de Taylor de $\ell_n$ au second ordre autour de $\hat\theta_n$ : comme $\nabla\ell_n(\hat\theta_n)=0$,
+$$\ell_n(\hat\theta_n^c)\approx\ell_n(\hat\theta_n)+\tfrac12(\hat\theta_n^c-\hat\theta_n)^\top\nabla^2\ell_n(\hat\theta_n)(\hat\theta_n^c-\hat\theta_n)$$
+d'où
+$$2\big[\ell_n(\hat\theta_n)-\ell_n(\hat\theta_n^c)\big]\approx n(\hat\theta_n-\hat\theta_n^c)^\top I(\hat\theta_n)(\hat\theta_n-\hat\theta_n^c)$$
+qui est exactement la forme de Wald. <strong>Le facteur $2$ de la statistique du rapport de vraisemblance est là pour annuler le $\frac12$ de Taylor.</strong></p>
+<p><strong>Comment choisir en pratique.</strong></p>
+<ul>
+<li><strong>Wald</strong> est plus simple quand on a déjà l'EMV libre : pas besoin de réoptimiser sous contrainte. Mais il exige de calculer $I(\hat\theta_n)$, et il n'est <strong>pas invariant par reparamétrisation</strong> — tester $\theta=1$ ou $\log\theta=0$ peut donner des réponses différentes à $n$ fini.</li>
+<li><strong>Le rapport de vraisemblance</strong> est <strong>invariant par reparamétrisation</strong> et généralement mieux calibré en échantillon fini, mais il exige <strong>deux</strong> optimisations.</li>
+<li><strong>Un troisième test</strong> existe, celui du <strong>score</strong> (multiplicateur de Lagrange), qui ne demande que l'EMV <strong>contraint</strong> — utile quand le modèle libre est difficile à estimer. Les trois sont asymptotiquement équivalents et forment la « trinité » des tests classiques.</li>
+</ul>
+<p><strong>La limite commune, à mentionner.</strong> Les trois reposent sur les <strong>conditions techniques de l'EMV</strong> de la fiche 64 — en particulier que le <strong>support ne dépende pas de $\theta$</strong> et que $\theta^\ast$ ne soit pas sur la <strong>frontière</strong> de $\Theta$. Tester $\sigma^2=0$ ou une probabilité $p=0$ tombe précisément dans le cas exclu, et la loi limite n'est alors plus un $\chi^2$ ordinaire.</p>
+</div></details>
+
+<h2 data-prio="must">Common mistakes</h2>
+<ol>
+<li><strong>Conclure « $H_0$ est vraie »</strong> — on ne peut que <strong>ne pas la rejeter</strong> : <em>innocent jusqu'à preuve du contraire</em>.</li>
+<li><strong>Confondre p-valeur et $\mathbb P[H_0\mid\text{données}]$</strong> — la p-valeur est calculée <strong>sous</strong> $H_0$.</li>
+<li><strong>Confondre erreur de première et de seconde espèce</strong> — la première rejette à tort, la seconde manque un effet réel.</li>
+<li><strong>Oublier que la puissance est un $\inf$ sur $\Theta_1$</strong> — c'est une performance de <strong>pire cas</strong>.</li>
+<li><strong>Croire qu'on peut minimiser les deux erreurs</strong> — elles varient en sens inverse : on <strong>fixe</strong> $\alpha$ et l'on maximise la puissance.</li>
+<li><strong>Utiliser $q_\alpha$ au lieu de $q_{\alpha/2}$</strong> pour un test <strong>bilatéral</strong>.</li>
+<li><strong>Se tromper de degrés de liberté</strong> — $\chi^2_d$ pour Wald, $\chi^2_{d-r}$ pour le rapport de vraisemblance (<strong>nombre de contraintes</strong>), $\chi^2_k$ pour la méthode delta.</li>
+<li><strong>Oublier le facteur $2$</strong> dans la statistique du rapport de vraisemblance.</li>
+<li><strong>Utiliser $n$ au lieu de $n-1$</strong> dans les degrés de liberté de Cochran et de Student.</li>
+<li><strong>Appliquer ces tests quand $\theta^\ast$ est sur la frontière</strong> — les conditions techniques de l'EMV sont violées.</li>
+<li><strong>Interpréter un non-rejet sur un petit échantillon comme une absence d'effet</strong> — c'est un manque de <strong>puissance</strong>.</li>
+</ol>
+<h2>Ultimate Review</h2>
+<ol>
+<li><strong>Formulation</strong> : $\Theta_0,\Theta_1$ disjoints ; $H_0:\theta\in\Theta_0$ contre $H_1:\theta\in\Theta_1$ ; les données servent <strong>seulement à réfuter $H_0$</strong>.</li>
+<li><strong>Test</strong> : $\psi\in\{0,1\}$ ; $\psi=1$ ⟹ rejet. Région de rejet $R_\psi=\{x:\psi(x)=1\}$.</li>
+<li><strong>Erreur de 1re espèce</strong> : $\alpha_\psi(\theta)=\mathbb P_\theta[\psi=1]$ sur $\Theta_0$. <strong>De 2e espèce</strong> : $\beta_\psi(\theta)=\mathbb P_\theta[\psi=0]$ sur $\Theta_1$.</li>
+<li><strong>Puissance</strong> : $\pi_\psi=\inf_{\theta\in\Theta_1}(1-\beta_\psi(\theta))$.</li>
+<li><strong>Niveau $\alpha$</strong> : $\alpha_\psi(\theta)\leq\alpha\ \forall\theta\in\Theta_0$ ; <strong>asymptotique</strong> si $\lim_n\alpha_\psi(\theta)\leq\alpha$.</li>
+<li><strong>Forme générale</strong> : $\psi=\mathbf 1\{T_n&gt;c\}$, $T_n$ statistique de test.</li>
+<li><strong>Exemple de la pièce</strong> : $T_n=\sqrt n(\hat p_n-0{,}5)/\sqrt{0{,}25}$ ; $\psi_\alpha=\mathbf 1\{\lvert T_n\rvert&gt;q_{\alpha/2}\}$ ; $q_{0{,}025}=1{,}96$.</li>
+<li><strong>p-valeur</strong> : plus petit niveau auquel on rejette ; <strong>règle d'or</strong> p-valeur $\leq\alpha\iff$ rejet au niveau $\alpha$ ; <strong>aléatoire</strong>.</li>
+<li><strong>Neyman-Pearson</strong> : à niveau $\alpha$ fixé, chercher la <strong>puissance maximale</strong> ; le test trivial $\psi=0$ a un niveau parfait et une puissance nulle.</li>
+<li><strong>Loi $\chi^2_d$</strong> : loi de $Z_1^2+\cdots+Z_d^2$ ; si $Z\sim N_d(0,I_d)$, $\lVert Z\rVert^2\sim\chi_d^2$ ; $\chi^2_2=\mathrm{Exp}(1/2)$.</li>
+<li><strong>Variance empirique</strong> : $S_n=\frac1n\sum(X_i-\bar X_n)^2$ ; <strong>Cochran</strong> : $nS_n/\sigma^2\sim\chi^2_{n-1}$ dans le modèle gaussien.</li>
+<li><strong>Loi de Student</strong> $t_d$ : loi de $Z/\sqrt{V/d}$ avec $Z\sim N(0,1)$, $V\sim\chi_d^2$, $Z\perp V$ ; et $\sqrt{n-1}(\bar X_n-\mu)/\sqrt{S_n}\sim t_{n-1}$.</li>
+<li><strong>Wald</strong> : $\sqrt nI(\hat\theta_n)^{1/2}(\hat\theta_n-\theta_0)\to N_d(0,I_d)$, d'où
+$$T_n=n\big(\hat\theta_n-\theta_0\big)^\top I\big(\hat\theta_n\big)\big(\hat\theta_n-\theta_0\big)\to\chi_d^2$$</li>
+<li><strong>Rapport de vraisemblance</strong> : $H_0$ fixe $d-r$ composantes ; $T_n=2[\ell_n(\hat\theta_n)-\ell_n(\hat\theta_n^c)]\to\chi^2_{d-r}$.</li>
+<li><strong>Hypothèses implicites</strong> : $H_0:g(\theta)=0$ avec $g:\mathbb R^d\to\mathbb R^k$ ; <strong>méthode delta</strong>
+$$\sqrt n\big(g(\hat\theta_n)-g(\theta)\big)\to N_k\big(0,\Gamma(\theta)\big), \qquad \Gamma(\theta)=\nabla g(\theta)^\top\Sigma(\theta)\nabla g(\theta)$$
+puis $T_n=n\,g(\hat\theta_n)^\top\Gamma^{-1}(\hat\theta_n)g(\hat\theta_n)\to\chi_k^2$.</li>
+<li><strong>Wald et rapport de vraisemblance sont asymptotiquement équivalents</strong> — développement de Taylor au second ordre, d'où le facteur $2$.</li>
+</ol>
+<p><strong>Formulas to know</strong>
+$$\alpha_\psi(\theta)=\mathbb P_\theta[\psi=1] \qquad \pi_\psi=\inf_{\theta\in\Theta_1}\big(1-\beta_\psi(\theta)\big) \qquad \psi=\mathbf 1\{T_n&gt;c\}$$
+$$\frac{nS_n}{\sigma^2}\sim\chi^2_{n-1} \qquad \sqrt{n-1}\,\frac{\bar X_n-\mu}{\sqrt{S_n}}\sim t_{n-1}$$
+$$T_n^{\text{Wald}}=n(\hat\theta_n-\theta_0)^\top I(\hat\theta_n)(\hat\theta_n-\theta_0)\to\chi_d^2 \qquad T_n^{\text{RV}}=2\big[\ell_n(\hat\theta_n)-\ell_n(\hat\theta_n^c)\big]\to\chi^2_{d-r}$$
+$$\Gamma(\theta)=\nabla g(\theta)^\top\Sigma(\theta)\nabla g(\theta)$$</p>
+<p><strong>Methods to know</strong> : la construction d'un test en six étapes ; la dérivation de la statistique de Wald à partir du théorème asymptotique ; le comptage des degrés de liberté ; la méthode delta.</p>
+<div class="rec"><h2>Active Recall</h2><p><strong>Basic</strong> — Définissez les deux types d'erreur, la puissance et le niveau.</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p><strong>Erreur de première espèce</strong> — rejeter $H_0$ alors qu'elle est <strong>vraie</strong> :
+$$\alpha_\psi:\Theta_0\to\mathbb R, \qquad \theta\mapsto\mathbb P_\theta[\psi=1]$$</p>
+<p><strong>Erreur de seconde espèce</strong> — ne pas rejeter $H_0$ alors que $H_1$ est <strong>vraie</strong> :
+$$\beta_\psi:\Theta_1\to\mathbb R, \qquad \theta\mapsto\mathbb P_\theta[\psi=0]$$</p>
+<p><strong>Puissance</strong> — la performance de <strong>pire cas</strong> sous l'alternative :
+$$\pi_\psi=\inf_{\theta\in\Theta_1}\big(1-\beta_\psi(\theta)\big)$$</p>
+<p><strong>Niveau $\alpha$</strong> : $\alpha_\psi(\theta)\leq\alpha$ pour <strong>tout</strong> $\theta\in\Theta_0$ ; <strong>niveau asymptotique $\alpha$</strong> si $\lim_{n\to\infty}\alpha_\psi(\theta)\leq\alpha$.</p>
+</div></details><p><strong>Understanding</strong> — Pourquoi $H_0$ et $H_1$ ne jouent-ils pas un rôle symétrique ?</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p>Parce que <em>les données ne servent qu'à tenter de <strong>réfuter</strong> $H_0$</em>. Le test cherche des éléments <strong>contre</strong> $H_0$ ; il ne cherche jamais à la confirmer.</p>
+<p><strong>La conséquence</strong> : <em>une absence de preuve ne signifie pas que $H_0$ est vraie</em> — « innocent jusqu'à preuve du contraire ». On ne peut conclure que « on rejette $H_0$ » ou « on ne rejette pas $H_0$ ».</p>
+<p><strong>La traduction technique</strong> : le <strong>niveau</strong> — le risque de rejeter à tort — est <strong>contrôlé par construction</strong> à $\alpha$. La <strong>puissance</strong> — la chance de rejeter à raison — n'est contrôlée par rien : elle dépend de la taille de l'échantillon et de l'écart réel à $H_0$.</p>
+<p><strong>En pratique</strong>, c'est l'erreur d'interprétation la plus fréquente en économétrie. « Le coefficient n'est pas significatif » ne veut pas dire « le coefficient est nul » : sur un échantillon petit ou bruité, on ne rejette presque jamais — faute de <strong>puissance</strong>, pas faute d'effet.</p>
+</div></details><p><strong>Application</strong> — Un test donne une p-valeur de $0{,}03$. Que conclure aux niveaux $5\,\%$ et $1\,\%$ ?</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p>Par la <strong>règle d'or</strong> : p-valeur $\leq\alpha\iff$ rejet au niveau $\alpha$.</p>
+<ul>
+<li><strong>Au niveau $5\,\%$</strong> : $0{,}03\leq0{,}05$ ⟹ on <strong>rejette $H_0$</strong>.</li>
+<li><strong>Au niveau $1\,\%$</strong> : $0{,}03&gt;0{,}01$ ⟹ on <strong>ne rejette pas $H_0$</strong>.</li>
+</ul>
+<p><strong>Ce que cela illustre.</strong> La conclusion <strong>dépend du seuil choisi</strong>, et le seuil est une décision, pas un fait statistique. Un résultat « significatif à $5\,\%$ » et « non significatif à $1\,\%$ » est un résultat <strong>fragile</strong> : il n'y a rien de magique dans $0{,}05$.</p>
+<p><strong>Ce que la p-valeur apporte de plus qu'un verdict.</strong> Elle donne le <strong>seuil critique lui-même</strong>, ce qui permet à chaque lecteur d'appliquer son propre arbitrage. Elle mesure la force de l'évidence, pas seulement sa présence.</p>
+<p class="cal piege"> <strong>Et elle ne dit pas</strong> : « il y a $3\,\%$ de chances que $H_0$ soit vraie ». Elle dit : « <strong>si</strong> $H_0$ était vraie, on observerait un résultat au moins aussi extrême $3\,\%$ du temps ».</p>
+</div></details><p><strong>Comparison</strong> — $\chi^2$ et Student : d'où viennent ces deux lois ?</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<table>
+<thead>
+<tr>
+<th></th>
+<th><strong>$\chi_d^2$</strong></th>
+<th><strong>$t_d$</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Définition</td>
+<td>$Z_1^2+\cdots+Z_d^2$, $Z_i$ i.i.d. $N(0,1)$</td>
+<td>$Z/\sqrt{V/d}$, $Z\sim N(0,1)$, $V\sim\chi_d^2$, $Z\perp V$</td>
+</tr>
+<tr>
+<td>À quoi elle sert</td>
+<td>tester une <strong>variance</strong>, ou plusieurs paramètres à la fois</td>
+<td>tester une <strong>moyenne</strong> à variance <strong>inconnue</strong></td>
+</tr>
+<tr>
+<td>Où elle apparaît</td>
+<td>$nS_n/\sigma^2\sim\chi^2_{n-1}$ (Cochran)</td>
+<td>$\sqrt{n-1}(\bar X_n-\mu)/\sqrt{S_n}\sim t_{n-1}$</td>
+</tr>
+<tr>
+<td>Tests concernés</td>
+<td><strong>Wald</strong>, <strong>rapport de vraisemblance</strong>, méthode delta</td>
+<td>test de Student (fiche 50)</td>
+</tr>
+</tbody></table>
+<p><strong>Le lien entre les deux.</strong> Student est un <strong>quotient</strong> : une gaussienne divisée par la racine d'un $\chi^2$ normalisé et <strong>indépendant</strong>. C'est exactement ce que produit le modèle gaussien : $\bar X_n$ est gaussienne, $nS_n/\sigma^2$ est un $\chi^2_{n-1}$, et le théorème de <strong>Cochran</strong> garantit leur <strong>indépendance</strong>. Le $\sigma$ inconnu se simplifie dans le quotient — c'est tout l'intérêt.</p>
+<p><strong>Pourquoi $n-1$.</strong> Les écarts $X_i-\bar X_n$ sont liés par une contrainte (leur somme est nulle), donc ils n'occupent que $n-1$ dimensions. C'est la même comptabilité qu'en fiche 50, où l'estimation de $p$ paramètres laisse $n-p$ degrés de liberté.</p>
+<p><strong>Et quand $n$ grandit</strong>, $t_{n-1}\to N(0,1)$ : l'incertitude sur $\sigma$ devient négligeable et Student redevient gaussienne. C'est pourquoi les tests asymptotiques du chapitre utilisent directement $N(0,1)$ et $\chi^2$.</p>
+</div></details><p><strong>Exam-style</strong> — Construisez le test du rapport de vraisemblance et justifiez ses degrés de liberté.</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p><strong>Le cadre.</strong> Modèle $\big(E,(\mathbb P_\theta)_{\theta\in\Theta}\big)$ avec $\Theta\subseteq\mathbb R^d$. L'hypothèse nulle <strong>fixe $d-r$ composantes</strong> :
+$$H_0:\ (\theta_{r+1},\dots,\theta_d)=\big(\theta^{(0)}_{r+1},\dots,\theta^{(0)}_d\big)$$</p>
+<p><strong>Les deux estimateurs.</strong>
+$$\hat\theta_n=\underset{\theta\in\Theta}{\mathrm{argmax}}\ \ell_n(\theta) \qquad\text{et}\qquad \hat\theta_n^c=\underset{\theta\in\Theta_0}{\mathrm{argmax}}\ \ell_n(\theta)$$</p>
+<p><strong>La statistique.</strong>
+$$T_n=2\Big[\ell_n\big(\hat\theta_n\big)-\ell_n\big(\hat\theta_n^c\big)\Big]$$</p>
+<p><strong>Le théorème.</strong> Sous $H_0$ et les conditions techniques de l'EMV, $T_n\xrightarrow{(d)}\chi^2_{d-r}$. Le test de niveau asymptotique $\alpha$ est $\psi=\mathbf 1\{T_n&gt;q_\alpha\}$, avec $q_\alpha$ le quantile d'ordre $1-\alpha$ de $\chi^2_{d-r}$.</p>
+<p><strong>L'idée.</strong> Comme $\Theta_0\subset\Theta$, on a toujours $\ell_n(\hat\theta_n)\geq\ell_n(\hat\theta_n^c)$, donc $T_n\geq0$. La question est : <strong>combien coûte la contrainte</strong> en vraisemblance ? Peu ⟹ elle est plausible. Beaucoup ⟹ on rejette.</p>
+<p><strong>Pourquoi $d-r$ degrés de liberté.</strong> C'est <strong>le nombre de contraintes imposées par $H_0$</strong> — le nombre de composantes fixées. L'argument formel est un développement de Taylor : comme $\nabla\ell_n(\hat\theta_n)=0$,
+$$T_n\approx n\big(\hat\theta_n-\hat\theta_n^c\big)^\top I\big(\hat\theta_n\big)\big(\hat\theta_n-\hat\theta_n^c\big)$$
+Or $\hat\theta_n-\hat\theta_n^c$ est asymptotiquement gaussien <strong>confiné dans le sous-espace de dimension $d-r$</strong> orthogonal à $\Theta_0$ — les $r$ composantes libres sont estimées de la même façon des deux côtés et ne contribuent pas. La forme quadratique est donc une somme de $d-r$ carrés de gaussiennes standard, c'est-à-dire un $\chi^2_{d-r}$.</p>
+<p><strong>D'où vient le facteur $2$.</strong> Le développement de Taylor produit un $\frac12$ devant la forme quadratique ; le facteur $2$ l'annule exactement, ce qui donne la loi $\chi^2$ pure. Ce n'est donc pas un ajustement empirique.</p>
+<p><strong>Ce que ce calcul montre aussi.</strong> La forme obtenue est <strong>celle de Wald</strong>, avec $\hat\theta_n^c$ à la place de $\theta_0$ : les deux tests sont <strong>asymptotiquement équivalents</strong>.</p>
+<p><strong>Quand préférer le rapport de vraisemblance.</strong> Il est <strong>invariant par reparamétrisation</strong> — contrairement à Wald, qui peut donner des réponses différentes selon qu'on teste $\theta=1$ ou $\log\theta=0$ à $n$ fini — et il est généralement mieux calibré en petit échantillon. Son coût : il faut <strong>deux</strong> optimisations au lieu d'une.</p>
+</div></details></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h2>Flashcards</h2>
+<table>
+<thead>
+<tr>
+<th>Question</th>
+<th>Réponse</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Rôle des données dans un test ?</td>
+<td>Tenter de <strong>réfuter $H_0$</strong> — jamais la confirmer</td>
+</tr>
+<tr>
+<td>Que signifie « ne pas rejeter $H_0$ » ?</td>
+<td><strong>Pas</strong> que $H_0$ est vraie — « innocent jusqu'à preuve du contraire »</td>
+</tr>
+<tr>
+<td>Définition d'un test ?</td>
+<td>Une statistique $\psi\in\{0,1\}$ ; $\psi=1$ ⟹ rejet</td>
+</tr>
+<tr>
+<td>Région de rejet ?</td>
+<td>$R_\psi=\{x\in E^n:\psi(x)=1\}$</td>
+</tr>
+<tr>
+<td>Erreur de première espèce ?</td>
+<td>$\alpha_\psi(\theta)=\mathbb P_\theta[\psi=1]$ sur $\Theta_0$</td>
+</tr>
+<tr>
+<td>Erreur de seconde espèce ?</td>
+<td>$\beta_\psi(\theta)=\mathbb P_\theta[\psi=0]$ sur $\Theta_1$</td>
+</tr>
+<tr>
+<td>Puissance ?</td>
+<td>$\pi_\psi=\inf_{\theta\in\Theta_1}(1-\beta_\psi(\theta))$</td>
+</tr>
+<tr>
+<td>Pourquoi un $\inf$ ?</td>
+<td>C'est la performance de <strong>pire cas</strong> sous l'alternative</td>
+</tr>
+<tr>
+<td>Niveau $\alpha$ ?</td>
+<td>$\alpha_\psi(\theta)\leq\alpha$ pour <strong>tout</strong> $\theta\in\Theta_0$</td>
+</tr>
+<tr>
+<td>Forme générale d'un test ?</td>
+<td>$\psi=\mathbf 1\{T_n&gt;c\}$</td>
+</tr>
+<tr>
+<td>Statistique du test de la pièce ?</td>
+<td>$\sqrt n(\hat p_n-0{,}5)/\sqrt{0{,}25}$</td>
+</tr>
+<tr>
+<td>Quantile bilatéral à $5\,\%$ ?</td>
+<td>$q_{0{,}025}=1{,}96$</td>
+</tr>
+<tr>
+<td>Définition de la p-valeur ?</td>
+<td>Le <strong>plus petit niveau</strong> auquel on rejette $H_0$</td>
+</tr>
+<tr>
+<td>La règle d'or ?</td>
+<td>p-valeur $\leq\alpha\iff$ rejet au niveau $\alpha$</td>
+</tr>
+<tr>
+<td>La p-valeur est-elle $\mathbb P[H_0]$ ?</td>
+<td><strong>Non</strong> — elle est calculée <strong>sous</strong> $H_0$</td>
+</tr>
+<tr>
+<td>Idée de Neyman-Pearson ?</td>
+<td>À niveau $\alpha$ fixé, maximiser la <strong>puissance</strong></td>
+</tr>
+<tr>
+<td>Défaut du test trivial $\psi=0$ ?</td>
+<td>Niveau parfait, <strong>puissance nulle</strong></td>
+</tr>
+<tr>
+<td>Définition de $\chi^2_d$ ?</td>
+<td>Loi de $Z_1^2+\cdots+Z_d^2$, $Z_i$ i.i.d. $N(0,1)$</td>
+</tr>
+<tr>
+<td>Variance empirique ?</td>
+<td>$S_n=\frac1n\sum(X_i-\bar X_n)^2$</td>
+</tr>
+<tr>
+<td>Théorème de Cochran ?</td>
+<td>$nS_n/\sigma^2\sim\chi^2_{n-1}$</td>
+</tr>
+<tr>
+<td>Que vaut $\chi_2^2$ ?</td>
+<td>$\mathrm{Exp}(1/2)$</td>
+</tr>
+<tr>
+<td>Définition de $t_d$ ?</td>
+<td>$Z/\sqrt{V/d}$, $Z\sim N(0,1)$, $V\sim\chi_d^2$, <strong>indépendants</strong></td>
+</tr>
+<tr>
+<td>Statistique de Student pour la moyenne ?</td>
+<td>$\sqrt{n-1}(\bar X_n-\mu)/\sqrt{S_n}\sim t_{n-1}$</td>
+</tr>
+<tr>
+<td>Statistique de Wald ?</td>
+<td>$n(\hat\theta_n-\theta_0)^\top I(\hat\theta_n)(\hat\theta_n-\theta_0)$</td>
+</tr>
+<tr>
+<td>Sa loi limite ?</td>
+<td>$\chi_d^2$</td>
+</tr>
+<tr>
+<td>D'où vient ce $\chi^2$ ?</td>
+<td>Norme au carré d'un $N_d(0,I_d)$</td>
+</tr>
+<tr>
+<td>Statistique du rapport de vraisemblance ?</td>
+<td>$2[\ell_n(\hat\theta_n)-\ell_n(\hat\theta_n^c)]$</td>
+</tr>
+<tr>
+<td>Sa loi limite ?</td>
+<td>$\chi^2_{d-r}$</td>
+</tr>
+<tr>
+<td>Que compte $d-r$ ?</td>
+<td>Le <strong>nombre de contraintes</strong> de $H_0$</td>
+</tr>
+<tr>
+<td>Pourquoi le facteur $2$ ?</td>
+<td>Il annule le $\frac12$ du développement de Taylor</td>
+</tr>
+<tr>
+<td>Formule de la méthode delta ?</td>
+<td>$\Gamma(\theta)=\nabla g(\theta)^\top\Sigma(\theta)\nabla g(\theta)$</td>
+</tr>
+<tr>
+<td>Loi limite du test implicite ?</td>
+<td>$\chi_k^2$, $k$ = dimension de $g$</td>
+</tr>
+<tr>
+<td>Wald et rapport de vraisemblance ?</td>
+<td><strong>Asymptotiquement équivalents</strong></td>
+</tr>
+</tbody></table>
+</main>
+
+
+
+
+</body></html>

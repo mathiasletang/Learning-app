@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fiche 36 — Problèmes d'optimisation convexe (Boyd, §4.1–4.2)</title>
+<script>
+window.MathJax={tex:{inlineMath:[["$","$"]],displayMath:[["$$","$$"]],processEscapes:true},
+ options:{skipHtmlTags:["script","noscript","style","textarea","pre","code"]},
+ svg:{fontCache:"global"},
+ startup:{pageReady:()=>MathJax.startup.defaultPageReady().then(()=>{document.body.classList.add("ready")})}};
+setTimeout(function(){document.body.classList.add("ready")},2500);
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+/* ============================================================
+   MathiasLearn — feuille de style des fiches
+   Reprise intégrale des tokens de 00_PARCOURS/*.html
+   + blocs pédagogiques (callouts, méthode, essentiels, recall)
+   ============================================================ */
+:root{--bg:#faf9f7;--card:#fff;--ink:#1a1a1a;--muted:#6b6b6b;--line:#e5e2dd;--accent:#8b5e34;
+ --hl:#fdf8ef;--ok:#2d7d4f;--okbg:#f0f7f3;--warn:#b3402f;--warnbg:#fdf3f1;--blue:#2f5d8b;--bluebg:#f1f5fa}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+ font:17px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;padding:0 16px 100px}
+.nav{position:sticky;top:0;background:rgba(250,249,247,.96);backdrop-filter:blur(8px);
+ border-bottom:1px solid var(--line);margin:0 -16px 30px;padding:11px 16px;z-index:50;
+ display:flex;gap:6px;flex-wrap:wrap;font-size:13px}
+.nav a{color:var(--muted);text-decoration:none;padding:4px 9px;border-radius:5px;white-space:nowrap}
+.nav a:hover{background:var(--line);color:var(--ink)}
+.nav a.on{background:var(--accent);color:#fff}
+main{max-width:780px;margin:0 auto}
+h1{font-size:31px;letter-spacing:-.02em;margin:.4em 0 .5em;line-height:1.25}
+h2{font-size:23px;margin:2.2em 0 .7em;padding-bottom:.3em;border-bottom:1px solid var(--line)}
+h3{font-size:19px;margin:1.9em 0 .5em;color:var(--accent)}
+h4{font-size:17px;margin:1.5em 0 .4em}
+p{margin:.8em 0} a{color:var(--accent)} hr{border:0;border-top:1px solid var(--line);margin:2.6em 0}
+table{border-collapse:collapse;width:100%;margin:1.3em 0;font-size:15.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+th{background:#f3f0eb;font-weight:600}
+tr:nth-child(even) td{background:#fcfbfa}
+code{font-family:"SF Mono",Menlo,Consolas,monospace;font-size:.88em;background:#f2efea;padding:2px 6px;border-radius:4px;white-space:nowrap}
+pre{background:#f2efea;padding:14px 16px;border-radius:8px;overflow-x:auto}
+pre code{background:none;padding:0;white-space:pre}
+blockquote{border-left:3px solid var(--accent);background:var(--hl);margin:1.4em 0;padding:14px 20px;border-radius:0 8px 8px 0}
+blockquote p:first-child{margin-top:0} blockquote p:last-child{margin-bottom:0}
+ul,ol{padding-left:1.5em} li{margin:.35em 0} em{color:#4a4a4a}
+mjx-container[display="true"]{margin:1.1em 0!important;overflow-x:auto;overflow-y:hidden;padding:2px 0}
+mjx-container svg{max-width:100%}
+body:not(.ready) main{opacity:0} main{opacity:1;transition:opacity .25s}
+
+/* --- bandeau de tête de fiche --- */
+.cours{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--accent);
+ border-radius:0 10px 10px 0;padding:18px 22px;margin:0 0 34px}
+.cours h4{margin:0 0 4px;font-size:14px;text-transform:uppercase;letter-spacing:.07em;color:var(--accent)}
+.cours .cs{color:var(--muted);font-size:14.5px;margin:0 0 14px}
+
+/* --- exercices / corrigés --- */
+.ex{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:6px 24px 20px;margin:18px 0}
+.ex>h3:first-child{margin-top:14px}
+details.cor{margin-top:18px;border:1px solid var(--line);border-radius:8px;background:#fcfbfa;overflow:hidden}
+details.cor>summary{cursor:pointer;padding:12px 16px;font-weight:600;font-size:15px;color:var(--accent);
+ list-style:none;display:flex;align-items:center;gap:9px;user-select:none;transition:.15s;min-height:44px}
+details.cor>summary::-webkit-details-marker{display:none}
+details.cor>summary:hover{background:var(--hl)}
+details.cor>summary::before{content:"\25B6";font-size:10px;transition:transform .18s;display:inline-block}
+details.cor[open]>summary::before{transform:rotate(90deg)}
+details.cor[open]>summary{background:var(--okbg);color:var(--ok);border-bottom:1px solid var(--line)}
+.cor .in{padding:4px 20px 16px}
+.cor .in>*:first-child{margin-top:.9em}
+
+/* --- blocs pédagogiques (callouts) ---
+   Générés depuis une citation Markdown dont le premier **gras** commence
+   par un mot-clé : DÉFINITION, THÉORÈME, MÉTHODE, PIÈGE, INTUITION… */
+.cal{border:1px solid var(--line);border-left:4px solid var(--accent);background:var(--card);
+ border-radius:0 10px 10px 0;padding:15px 20px;margin:1.5em 0}
+.cal>p:first-child{margin-top:0}.cal>p:last-child,.cal>ul:last-child,.cal>ol:last-child{margin-bottom:0}
+.cal .lab{display:block;font-size:12.5px;text-transform:uppercase;letter-spacing:.08em;
+ font-weight:700;color:var(--accent);margin-bottom:6px}
+.cal.formel{background:var(--hl)}
+.cal.piege{border-left-color:var(--warn);background:var(--warnbg)}
+.cal.piege .lab{color:var(--warn)}
+.cal.methode{border-left-color:var(--ok);background:var(--okbg)}
+.cal.methode .lab{color:var(--ok)}
+.cal.intu{border-left-color:var(--blue);background:var(--bluebg)}
+.cal.intu .lab{color:var(--blue)}
+.cal.plus{border-left-style:dashed;background:#faf9f7}
+.cal.plus .lab{color:var(--muted)}
+
+/* --- révision express --- */
+.ess{background:var(--card);border:1px solid var(--accent);border-radius:10px;padding:4px 24px 20px;margin:1.6em 0}
+.ess h3{margin-top:1.3em}
+.rec{background:var(--card);border:1px dashed var(--accent);border-radius:10px;padding:4px 24px 18px;margin:1.6em 0}
+.rec ol{counter-reset:none}
+
+/* --- impression / PDF --- */
+@media print{
+ .nav{display:none}
+ body{padding:0;background:#fff;font-size:11.2pt;line-height:1.55}
+ main{max-width:none}
+ h1{font-size:23pt}h2{font-size:15pt;margin-top:1.5em}h3{font-size:12.6pt}
+ h2,h3,h4{break-after:avoid;page-break-after:avoid}
+ table,.cal,blockquote{break-inside:avoid;page-break-inside:avoid}
+ table{display:table;font-size:9.6pt}
+ details.cor{border:1px solid var(--line);background:#fcfbfa}
+ details.cor>summary{display:none}
+ details.cor .in{padding-top:10px}
+ .cal,.ex,.ess,.rec{box-shadow:none}
+ a{color:var(--ink);text-decoration:none}
+}
+@page{margin:16mm 15mm 18mm}
+
+/* --- exemples travaillés --- */
+.exm{background:#fcfbfa;border:1px solid var(--line);border-radius:10px;padding:2px 20px 14px;margin:1.5em 0}
+.exm>h4:first-child{margin:14px 0 .5em;color:var(--accent);font-size:13px;text-transform:uppercase;letter-spacing:.07em}
+
+
+/* --- pastilles de priorité (conventions des fiches de l'app) --- */
+h2[data-prio], h3[data-prio], h4[data-prio]{position:relative}
+h2[data-prio]::before,h3[data-prio]::before,h4[data-prio]::before{
+ content:"";display:inline-block;width:9px;height:9px;border-radius:50%;
+ margin-right:9px;vertical-align:middle;background:var(--muted)}
+[data-prio="must"]::before{background:var(--warn)}
+[data-prio="high"]::before{background:#d98324}
+[data-prio="mid"]::before{background:#c9a227}
+[data-prio="low"]::before{background:var(--ok)}
+/* corrigés des fiches de l'app : même traitement que les corrigés des séries */
+details.cor>summary::after{content:""}
+</style></head><body>
+<div class="nav"><a href="24-lp-formulation.html">Programmation linéaire : formulation et géométrie</a><a href="25-lp-affine-par-morceaux.html">Optimisation affine par morceaux : tout ramener à un LP</a><a href="26-lp-polyedres.html">Polyèdres : faces, points extrêmes, test du rang</a><a href="27-lp-convexite-cones.html">Enveloppes convexes, cônes et décomposition d'un polyèdre</a><a href="28-lp-dualite.html">Dualité en programmation linéaire</a><a href="29-lp-sensibilite-jeux.html">Dualité II : sensibilité, prix implicites et jeux à somme nulle</a><a href="30-lp-simplexe.html">L'algorithme du simplexe</a><a href="31-lp-reseaux-unimodularite.html">Flots dans les réseaux et unimodularité totale</a><a href="32-lp-commande.html">Applications en automatique : suivi de consigne et robustesse</a><a href="33-lp-nombres-entiers.html">Programmation linéaire en nombres entiers et séparation-évaluation</a><a href="34-boyd-ensembles-convexes.html">Ensembles convexes</a><a href="35-boyd-fonctions-convexes.html">Fonctions convexes</a><a href="36-boyd-problemes-convexes.html" class="on">Problèmes d'optimisation convexe</a><a href="37-boyd-familles-standard.html">Les familles standard : LP, QP, SOCP, GP, SDP</a><a href="38-boyd-dualite.html">Dualité lagrangienne</a><a href="39-boyd-minimisation-sans-contrainte.html">Minimisation sans contrainte : gradient et Newton</a><a href="40-boyd-contraintes-egalite.html">Minimisation sous contraintes d'égalité</a><a href="41-boyd-points-interieurs.html">Méthodes de points intérieurs</a><a href="42-sous-gradients.html">Sous-gradients et sous-différentiel</a><a href="43-methode-sous-gradient.html">La méthode du sous-gradient</a></div>
+<main><h1>Fiche 36 — Problèmes d'optimisation convexe (Boyd, §4.1–4.2)</h1>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Matière</strong></td>
+<td>Maths · Optimisation</td>
+</tr>
+<tr>
+<td><strong>Cours source</strong></td>
+<td>Boyd &amp; Vandenberghe, <em>Convex Optimization</em>, §4.1 « Optimization problems » et §4.2 « Convex optimization », p. 127–146</td>
+</tr>
+<tr>
+<td><strong>Difficulté</strong></td>
+<td> Must know — c'est ici que le vocabulaire du domaine se fixe</td>
+</tr>
+<tr>
+<td><strong>Temps d'étude estimé</strong></td>
+<td>2 h</td>
+</tr>
+<tr>
+<td><strong>Prérequis</strong></td>
+<td>Fiches 34 et 35 (ensembles et fonctions convexes)</td>
+</tr>
+<tr>
+<td><strong>Concepts clés</strong></td>
+<td>Forme standard, admissibilité, valeur optimale, optimum local et global, contraintes actives, problèmes équivalents, critère d'optimalité du premier ordre, optimisation quasiconvexe</td>
+</tr>
+<tr>
+<td><strong>Poids à l'examen</strong></td>
+<td>Deux choses s'évaluent : <strong>mettre un problème en forme standard convexe</strong> (et détecter ce qui l'empêche), et <strong>appliquer le critère d'optimalité</strong> $\nabla f_0(x^\star)^T(y-x^\star)\geq0$. C'est aussi la fiche qui prépare toute la dualité.</td>
+</tr>
+</tbody></table>
+<h2>Vue d'ensemble</h2>
+<p>Un problème d'optimisation convexe n'est pas seulement « un problème dont les données sont convexes » : c'est un problème <strong>écrit</strong> d'une certaine façon. Boyd insiste sur ce point, et c'est la source de la moitié des erreurs du chapitre.</p>
+<pre><code>FORME STANDARD    min f₀(x)  s.c.  fᵢ(x) ≤ 0,  hᵢ(x) = 0
+CONVEXE si :      f₀ convexe,  fᵢ convexes,  hᵢ AFFINES
+                                              ↑ trois exigences, pas deux
+</code></pre>
+<p>Deux résultats en découlent, et ils justifient tout le reste du livre :</p>
+<ol>
+<li><strong>tout optimum local est global</strong> — il n'y a rien à comparer, rien dont on puisse rester prisonnier ;</li>
+<li><strong>un critère d'optimalité du premier ordre</strong> entièrement calculable, qui se spécialise en $\nabla f_0(x^\star)=0$ dans le cas sans contrainte.</li>
+</ol>
+<h2 data-prio="mid">Concept 1 — La forme standard et son vocabulaire</h2>
+<p>$$\begin{array}{ll}\text{minimiser} &amp; f_0(x)\\ \text{sous} &amp; f_i(x)\leq0, \quad i=1,\dots,m\\ &amp; h_i(x) = 0, \quad i=1,\dots,p\end{array} \tag{4.1}$$</p>
+<table>
+<thead>
+<tr>
+<th>Terme</th>
+<th>Définition</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>variable d'optimisation</strong></td>
+<td>$x\in\mathbb{R}^n$</td>
+</tr>
+<tr>
+<td><strong>fonction objectif</strong> (ou de coût)</td>
+<td>$f_0:\mathbb{R}^n\to\mathbb{R}$</td>
+</tr>
+<tr>
+<td><strong>contraintes d'inégalité</strong></td>
+<td>$f_i(x)\leq0$</td>
+</tr>
+<tr>
+<td><strong>contraintes d'égalité</strong></td>
+<td>$h_i(x)=0$</td>
+</tr>
+<tr>
+<td><strong>problème sans contrainte</strong></td>
+<td>$m=p=0$</td>
+</tr>
+<tr>
+<td><strong>domaine</strong> $\mathcal{D}$</td>
+<td>$\bigcap_{i=0}^m\mathbf{dom}\,f_i \cap \bigcap_{i=1}^p\mathbf{dom}\,h_i$</td>
+</tr>
+<tr>
+<td>$x$ <strong>admissible</strong></td>
+<td>$x\in\mathcal{D}$ et satisfait toutes les contraintes</td>
+</tr>
+<tr>
+<td>problème <strong>admissible</strong></td>
+<td>il existe au moins un point admissible</td>
+</tr>
+<tr>
+<td><strong>valeur optimale</strong> $p^\star$</td>
+<td>$\inf\{f_0(x)\mid x \text{ admissible}\}$</td>
+</tr>
+</tbody></table>
+<p><strong>Conventions sur $p^\star$.</strong> Si le problème est <strong>non admissible</strong>, $p^\star=+\infty$ (l'infimum de l'ensemble vide). S'il existe des $x_k$ admissibles avec $f_0(x_k)\to-\infty$, alors $p^\star=-\infty$ et le problème est dit <strong>non minoré</strong>.</p>
+<p><strong>Points optimaux.</strong> $x^\star$ est <strong>optimal</strong> s'il est admissible et $f_0(x^\star)=p^\star$ ; l'ensemble des points optimaux est $X_{\text{opt}}$. Si $X_{\text{opt}}\neq\emptyset$, la valeur optimale est <strong>atteinte</strong> et le problème est <strong>soluble</strong>. Un point admissible $x$ avec $f_0(x)\leq p^\star+\varepsilon$ est dit <strong>$\varepsilon$-sous-optimal</strong>.</p>
+<p><strong>Optimalité locale.</strong> $x$ admissible est <strong>localement optimal</strong> s'il existe $R&gt;0$ tel que
+$$f_0(x) = \inf\{f_0(z) \mid z \text{ admissible},\ \|z-x\|_2\leq R\}$$
+<em>Dans tout le livre, « optimal » signifie <strong>globalement</strong> optimal.</em></p>
+<p><strong>Contraintes.</strong> $f_i(x)\leq0$ est <strong>active</strong> en $x$ si $f_i(x)=0$, <strong>inactive</strong> si $f_i(x)&lt;0$. Les contraintes d'égalité sont actives en <strong>tout</strong> point admissible. Une contrainte est <strong>redondante</strong> si la supprimer ne change pas l'ensemble admissible.</p>
+<p><em>Exemple 4.1 — trois problèmes sans contrainte sur $\mathbf{dom}\,f_0=\mathbb{R}_{++}$.</em></p>
+<table>
+<thead>
+<tr>
+<th>$f_0(x)$</th>
+<th>$p^\star$</th>
+<th>Commentaire</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$1/x$</td>
+<td>$0$</td>
+<td><strong>non atteinte</strong> — l'infimum existe, le minimum non</td>
+</tr>
+<tr>
+<td>$-\log x$</td>
+<td>$-\infty$</td>
+<td>problème <strong>non minoré</strong></td>
+</tr>
+<tr>
+<td>$x\log x$</td>
+<td>$-1/e$</td>
+<td>atteinte en l'unique point $x^\star = 1/e$</td>
+</tr>
+</tbody></table>
+<p class="cal piege"> Les trois cas sont différents et il faut les nommer correctement : valeur optimale <strong>non atteinte</strong>, problème <strong>non minoré</strong>, problème <strong>soluble</strong>.</p>
+<p><strong>Problème de faisabilité.</strong> Si $f_0\equiv0$, la valeur optimale vaut $0$ (ensemble admissible non vide) ou $+\infty$ (vide). On écrit alors
+$$\text{trouver } x \quad\text{s.c.}\quad f_i(x)\leq0,\ h_i(x)=0$$
+Il s'agit de déterminer si les contraintes sont <strong>compatibles</strong>, et le cas échéant d'en exhiber une solution.</p>
+<p><strong>Mise en forme standard.</strong> Les seconds membres sont <strong>toujours</strong> nuls : $g_i(x)=\tilde g_i(x)$ devient $h_i(x)=g_i(x)-\tilde g_i(x)=0$, et $f_i(x)\geq0$ devient $-f_i(x)\leq0$.</p>
+<p><em>Exemple 4.2 — contraintes de boîte.</em> $l_i\leq x_i\leq u_i$ s'écrit en $2n$ contraintes d'inégalité : $l_i-x_i\leq0$ et $x_i-u_i\leq0$.</p>
+<p><strong>Maximisation.</strong> On maximise $f_0$ en minimisant $-f_0$ ; l'objectif s'appelle alors <strong>utilité</strong> ou niveau de <strong>satisfaction</strong> plutôt que coût, et $x$ est $\varepsilon$-sous-optimal si $f_0(x)\geq p^\star-\varepsilon$.</p>
+<h2 data-prio="high">Concept 2 — Problèmes équivalents (§4.1.3)</h2>
+<p>Deux problèmes sont <strong>équivalents</strong> si, de la solution de l'un, on tire immédiatement celle de l'autre — et réciproquement. Ce n'est <strong>pas</strong> l'égalité des problèmes : les fonctions peuvent différer.</p>
+<p><strong>Mise à l'échelle.</strong> Multiplier $f_0$ et les $f_i$ par des constantes $\alpha_i&gt;0$ et les $h_i$ par des $\beta_i\neq0$ donne un problème équivalent : l'ensemble admissible est <strong>identique</strong>, et les points optimaux aussi.</p>
+<p><strong>Changement de variable.</strong> Si $\phi$ est injective d'image couvrant $\mathcal{D}$, poser $x=\phi(z)$ et $\tilde f_i = f_i\circ\phi$, $\tilde h_i=h_i\circ\phi$ donne un problème équivalent : $x^\star$ optimal $\iff z^\star=\phi^{-1}(x^\star)$ optimal.</p>
+<p><strong>Transformation des fonctions.</strong> Si $\psi_0$ est <strong>croissante</strong>, si $\psi_i(u)\leq0\iff u\leq0$ pour $i=1,\dots,m$, et si $\psi_{m+i}(u)=0\iff u=0$, alors remplacer $f_i$ par $\psi_i\circ f_i$ et $h_i$ par $\psi_{m+i}\circ h_i$ donne un problème équivalent.</p>
+<blockquote>
+<p><strong>L'exemple qui sert tout le temps.</strong> Minimiser $\|Ax-b\|_2$ et minimiser $\|Ax-b\|_2^2$ sont <strong>équivalents</strong> ($\psi_0(u)=u^2$ est croissante sur $\mathbb{R}_+$) — mais la seconde est dérivable partout et convexe quadratique. Choisir la bonne écriture est la moitié du travail de modélisation.</p>
+</blockquote>
+<p><strong>Autres transformations classiques du §4.1.3</strong> : introduction de <strong>variables d'écart</strong> ($f_i(x)\leq0$ devient $f_i(x)+s_i=0$, $s_i\geq0$) ; <strong>élimination</strong> de contraintes d'égalité linéaires ; <strong>introduction</strong> de contraintes d'égalité pour découpler ; forme <strong>épigraphe</strong> (minimiser $t$ sous $f_0(x)\leq t$) ; <strong>minimisation partielle</strong> sur une partie des variables.</p>
+<p class="cal piege"> Une transformation équivalente peut <strong>détruire la convexité</strong> si l'on n'y prend pas garde. Le changement de variable $\phi$ doit être compatible, et $\psi_0$ <strong>croissante</strong> : sinon le problème obtenu n'est plus convexe, même si l'ancien l'était.</p>
+<h2 data-prio="must">Concept 3 — Le problème d'optimisation convexe</h2>
+<p><strong>Définition (4.15).</strong> Un problème d'optimisation <strong>convexe</strong> est de la forme
+$$\begin{array}{ll}\text{minimiser} &amp; f_0(x)\\ \text{sous} &amp; f_i(x)\leq0, \quad i=1,\dots,m\\ &amp; a_i^Tx = b_i, \quad i=1,\dots,p\end{array}$$
+avec $f_0,\dots,f_m$ <strong>convexes</strong>. Par rapport à la forme standard générale, il y a <strong>trois</strong> exigences supplémentaires :</p>
+<ol>
+<li>la fonction objectif doit être <strong>convexe</strong> ;</li>
+<li>les fonctions de contrainte d'inégalité doivent être <strong>convexes</strong> ;</li>
+<li>les fonctions de contrainte d'égalité doivent être <strong>affines</strong>.</li>
+</ol>
+<p><strong>Conséquence immédiate.</strong> L'ensemble admissible d'un problème convexe est <strong>convexe</strong> : c'est l'intersection du domaine $\mathcal{D}$ (convexe), de $m$ sous-niveaux de fonctions convexes (convexes) et de $p$ hyperplans (convexes). <em>On minimise donc une fonction convexe sur un ensemble convexe.</em></p>
+<p class="cal piege"> <strong>L'exigence d'affinité des égalités n'est pas négociable.</strong> Une contrainte $h(x)=0$ avec $h$ <strong>convexe non affine</strong> définit un ensemble en général <strong>non convexe</strong> : $\{x\mid h(x)=0\}$ est l'intersection de $\{h\leq0\}$ (convexe) et de $\{h\geq0\}$ (généralement pas). Exemple : $x_1^2+x_2^2=1$ est un cercle, pas un disque.</p>
+<blockquote>
+<p><strong>Le point de vocabulaire à retenir.</strong> Un problème peut avoir un ensemble admissible convexe <strong>sans être un problème convexe au sens de Boyd</strong> — parce qu'il n'est pas <strong>écrit</strong> en forme standard convexe. Exemple donné par le livre : $\min\ x_1^2+x_2^2$ sous $x_1/(1+x_2^2)\leq0$, $(x_1+x_2)^2=0$. L'ensemble admissible est $\{x\mid x_1\leq0,\ x_1=-x_2\}$, parfaitement convexe ; mais $f_1$ n'est pas convexe et $h_1$ n'est pas affine. Le problème <strong>n'est pas convexe</strong>, bien qu'il soit <strong>équivalent</strong> à un problème convexe. La convexité est une propriété de l'<strong>écriture</strong>.</p>
+</blockquote>
+<h2 data-prio="must">Concept 4 — Tout optimum local est global (§4.2.2)</h2>
+<p><strong>Propriété fondamentale.</strong> Dans un problème d'optimisation convexe, <strong>tout point localement optimal est globalement optimal</strong>.</p>
+<p><strong>Démonstration (celle de Boyd, à savoir refaire).</strong> Soit $x$ localement optimal : $x$ est admissible et
+$$f_0(x) = \inf\{f_0(z) \mid z \text{ admissible},\ \|z-x\|_2\leq R\}$$
+pour un $R&gt;0$. Supposons $x$ non globalement optimal : il existe $y$ admissible avec $f_0(y)&lt;f_0(x)$. Nécessairement $\|y-x\|_2&gt;R$ (sinon la définition locale donnerait $f_0(x)\leq f_0(y)$). Posons
+$$z = (1-\theta)x + \theta y, \qquad \theta = \frac{R}{2\|y-x\|_2} \in\ ]0,\tfrac12[$$
+Alors $\|z-x\|_2 = R/2 &lt; R$, et $z$ est <strong>admissible</strong> par convexité de l'ensemble admissible. Par convexité de $f_0$,
+$$f_0(z) \leq (1-\theta)f_0(x)+\theta f_0(y) &lt; f_0(x)$$
+ce qui contredit l'optimalité locale de $x$. $\blacksquare$</p>
+<div class="cal intu"><span class="lab">Ce que la preuve exploite.</span>
+<p> Deux ingrédients, et deux seulement : la <strong>convexité de l'ensemble admissible</strong> (pour que $z$ soit admissible) et la <strong>convexité de $f_0$</strong> (pour que $f_0(z)&lt;f_0(x)$). C'est exactement pourquoi les trois exigences du concept 3 sont indispensables.</p>
+</div>
+<h2 data-prio="must">Concept 5 — Le critère d'optimalité du premier ordre (§4.2.3)</h2>
+<p>Supposons $f_0$ <strong>dérivable</strong>. Notons $X$ l'ensemble admissible. Alors
+$$\boxed{\ x^\star \text{ est optimal} \iff x^\star\in X \ \text{ et } \ \nabla f_0(x^\star)^T(y-x^\star)\geq0 \quad \forall y\in X\ } \tag{4.21}$$</p>
+<p><strong>Interprétation géométrique.</strong> Si $\nabla f_0(x^\star)\neq0$, la condition dit que $-\nabla f_0(x^\star)$ définit un <strong>hyperplan d'appui</strong> à l'ensemble admissible en $x^\star$ : toutes les directions admissibles font un angle <strong>aigu ou droit</strong> avec le gradient, donc aucune ne fait descendre l'objectif.</p>
+<p><strong>Démonstration (celle de Boyd).</strong></p>
+<p><em>($\Leftarrow$)</em> Si $x^\star\in X$ vérifie (4.21), alors pour tout $y\in X$, la condition du premier ordre de la convexité (§3.1.3) donne
+$$f_0(y)\geq f_0(x^\star)+\nabla f_0(x^\star)^T(y-x^\star)\geq f_0(x^\star)$$
+donc $x^\star$ est optimal.</p>
+<p><em>($\Rightarrow$)</em> Si (4.21) échoue, il existe $y\in X$ avec $\nabla f_0(x^\star)^T(y-x^\star)&lt;0$. Le point $z(t)=ty+(1-t)x^\star$ est admissible pour $t\in[0,1]$ (convexité de $X$), et
+$$\frac{d}{dt}f_0(z(t))\Big|_{t=0} = \nabla f_0(x^\star)^T(y-x^\star) &lt; 0$$
+donc $f_0(z(t))&lt;f_0(x^\star)$ pour $t&gt;0$ petit : $x^\star$ n'est pas optimal. $\blacksquare$</p>
+<h3>Les trois spécialisations à connaître</h3>
+<table>
+<thead>
+<tr>
+<th>Problème</th>
+<th>Critère (4.21) devient</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Sans contrainte</strong></td>
+<td>$\nabla f_0(x^\star) = 0$</td>
+</tr>
+<tr>
+<td><strong>Contraintes d'égalité seules</strong> ($Ax=b$)</td>
+<td>$\nabla f_0(x^\star)\perp\mathbf{nullspace}(A)$, c'est-à-dire $\nabla f_0(x^\star) = A^T\nu$ pour un $\nu$</td>
+</tr>
+<tr>
+<td><strong>Orthant positif</strong> ($x\succeq0$)</td>
+<td>$x^\star\succeq0$, $\nabla f_0(x^\star)\succeq0$, et $\nabla f_0(x^\star)_i\,x_i^\star = 0$ pour tout $i$</td>
+</tr>
+</tbody></table>
+<p><strong>Le troisième cas mérite le détour.</strong> La condition $\nabla f_0(x^\star)^T(y-x^\star)\geq0$ pour tout $y\succeq0$ contient le terme $\nabla f_0(x^\star)^Ty$, linéaire en $y$ et <strong>non minoré</strong> sur $\{y\succeq0\}$ à moins que $\nabla f_0(x^\star)\succeq0$. La condition se réduit alors à $-\nabla f_0(x^\star)^Tx^\star\geq0$ ; comme les deux vecteurs sont positifs, leur produit scalaire l'est aussi, d'où l'<strong>égalité</strong> et la <strong>complémentarité</strong> composante par composante.</p>
+<blockquote>
+<p><strong>On vient de retrouver KKT.</strong> Ces conditions — positivité, positivité du gradient, complémentarité — sont exactement celles des fiches 13 et 28. Le chapitre 5 (fiche 38) les obtiendra en toute généralité par la dualité.</p>
+</blockquote>
+<h2 data-prio="high">Concept 6 — Optimisation quasiconvexe (§4.2.5)</h2>
+<p>Un problème <strong>quasiconvexe</strong> a la même forme que (4.15) mais avec $f_0$ seulement <strong>quasiconvexe</strong> (les $f_i$ restant convexes, les égalités affines).</p>
+<p class="cal piege"> <strong>La propriété du concept 4 tombe</strong> : un problème quasiconvexe peut avoir des optima <strong>locaux non globaux</strong>. C'est la différence essentielle, et elle justifie une méthode de résolution entièrement différente.</p>
+<p><strong>La méthode : bissection sur la valeur.</strong> On utilise une représentation des sous-niveaux de $f_0$ par une famille de fonctions <strong>convexes</strong> $\phi_t$ (§3.4.5) telles que
+$$f_0(x)\leq t \iff \phi_t(x)\leq0$$
+avec $\phi_t(x)$ <strong>décroissante en $t$</strong> (si $s\geq t$, alors $\phi_s(x)\leq\phi_t(x)$).</p>
+<p>Le problème de <strong>faisabilité convexe</strong>
+$$\text{trouver } x \quad\text{s.c.}\quad \phi_t(x)\leq0,\quad f_i(x)\leq0,\quad Ax=b \tag{4.26}$$
+tranche alors :</p>
+<ul>
+<li>s'il est <strong>admissible</strong>, alors $p^\star\leq t$ ;</li>
+<li>s'il est <strong>non admissible</strong>, alors $p^\star\geq t$.</li>
+</ul>
+<p><strong>L'algorithme.</strong> Partant d'un encadrement $[l,u]$ de $p^\star$, on teste $t=(l+u)/2$ et l'on remplace $u$ ou $l$ selon le verdict. Chaque itération <strong>divise l'intervalle par deux</strong> ; après $k$ itérations, l'incertitude est $(u-l)/2^k$. Il faut donc
+$$\Big\lceil \log_2\frac{u-l}{\varepsilon}\Big\rceil \ \text{ résolutions d'un problème convexe}$$
+pour atteindre une précision $\varepsilon$.</p>
+<blockquote>
+<p><strong>La leçon.</strong> On ne sait pas minimiser directement une fonction quasiconvexe, mais on sait <strong>tester</strong> si sa valeur optimale dépasse un seuil — et cela suffit. Transformer une optimisation en une suite de problèmes de faisabilité est un schéma qui resservira (méthodes de points intérieurs).</p>
+</blockquote>
+<h3>Comment résoudre l'exercice type (protocole)</h3>
+<ol>
+<li><strong>Identifier les variables</strong> et écrire l'objectif et toutes les contraintes.</li>
+<li><strong>Mettre en forme standard</strong> : seconds membres nuls, $\leq$ pour les inégalités, maximisation transformée en minimisation.</li>
+<li><strong>Tester les trois exigences</strong> : $f_0$ convexe ? tous les $f_i$ convexes ? tous les $h_i$ <strong>affines</strong> ?</li>
+<li><strong>Si l'une échoue, chercher une écriture équivalente</strong> : changement de variable, transformation croissante de l'objectif, variables d'écart, forme épigraphe.</li>
+<li><strong>Vérifier l'admissibilité</strong> et le caractère minoré avant de chercher un optimum.</li>
+<li><strong>Appliquer le critère (4.21)</strong> — ou sa spécialisation si le problème est sans contrainte, à égalités seules, ou sur l'orthant.</li>
+<li><strong>Conclure</strong> : la solution locale trouvée <strong>est</strong> globale (concept 4). Si $f_0$ n'est que quasiconvexe, cette conclusion <strong>tombe</strong> — passer à la bissection.</li>
+</ol>
+<h3>Exercices progressifs</h3>
+<p><strong> Niveau 1</strong> — Le problème $\min\ x_1^2+x_2^2$ s.c. $x_1^2+x_2^2 = 1$ est-il convexe ?</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p><strong>Non.</strong> La contrainte d'égalité $h(x)=x_1^2+x_2^2-1$ n'est <strong>pas affine</strong> : c'est la troisième exigence qui échoue. L'ensemble admissible est le <strong>cercle</strong> unité, qui n'est pas convexe.
+<em>Remarque :</em> le problème reste facile (l'objectif vaut $1$ partout sur le cercle !), mais il ne relève pas de la théorie convexe. Si la contrainte était $x_1^2+x_2^2\leq1$, le problème <strong>serait</strong> convexe.</p>
+</div></details>
+
+<p><strong> Niveau 2</strong> — Montrez que $\min\ \|Ax-b\|_2$ et $\min\ \|Ax-b\|_2^2$ sont équivalents, et dites lequel préférer.</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p>$\psi_0(u)=u^2$ est <strong>croissante sur $\mathbb{R}_+$</strong>, et $\|Ax-b\|_2\geq0$ toujours. Par la transformation de l'objectif (§4.1.3), les deux problèmes ont <strong>le même ensemble admissible et les mêmes points optimaux</strong> ; seules les valeurs optimales diffèrent ($p^\star$ et $(p^\star)^2$).</p>
+<p><strong>Préférer la version au carré</strong> : elle est <strong>dérivable partout</strong> (la norme ne l'est pas en $0$), et c'est une quadratique convexe $x^TA^TAx-2b^TAx+b^Tb$ dont le gradient s'annule en $A^TAx = A^Tb$ — les équations normales.</p>
+</div></details>
+
+<p><strong> Niveau 3</strong> — Sur $\min f_0(x)$ s.c. $Ax=b$, montrez que le critère (4.21) équivaut à l'existence de $\nu$ avec $\nabla f_0(x^\star) = A^T\nu$.</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p>L'ensemble admissible est $X = \{x\mid Ax=b\}$. Pour $x^\star\in X$, les points de $X$ s'écrivent $y = x^\star+v$ avec $v\in\mathbf{nullspace}(A)$. Le critère devient
+$$\nabla f_0(x^\star)^Tv\geq0 \qquad \forall v\in\mathbf{nullspace}(A)$$
+Mais le noyau est un <strong>sous-espace</strong> : si $v$ y est, $-v$ aussi. L'inégalité pour $v$ et pour $-v$ force donc l'<strong>égalité</strong> :
+$$\nabla f_0(x^\star)^Tv = 0 \qquad \forall v\in\mathbf{nullspace}(A)$$
+c'est-à-dire $\nabla f_0(x^\star)\in\mathbf{nullspace}(A)^\perp = \mathbf{range}(A^T)$, soit $\nabla f_0(x^\star)=A^T\nu$ pour un certain $\nu$.</p>
+<p><strong>C'est la condition de Lagrange</strong> : $\nabla f_0 + A^T(-\nu) = 0$, avec $-\nu$ dans le rôle des multiplicateurs. Retenez le mécanisme : sur un <strong>sous-espace</strong>, une inégalité variationnelle devient une <strong>égalité</strong>, et c'est pour cela que les multiplicateurs d'égalité sont de <strong>signe libre</strong>.</p>
+</div></details>
+
+<p><strong> Niveau 4 — type examen</strong> — Un problème a $f_0$ convexe, $f_1$ convexe et $h_1$ affine, et l'on y trouve deux points optimaux distincts $x^{(1)}$ et $x^{(2)}$. Que peut-on dire de l'ensemble optimal ? Et si $f_0$ est <strong>strictement</strong> convexe ?</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p><strong>L'ensemble optimal est convexe.</strong> Il s'écrit $X_{\text{opt}} = \{x\in X \mid f_0(x)\leq p^\star\}$ : c'est l'intersection de l'ensemble admissible $X$ (convexe) et d'un <strong>sous-niveau</strong> de $f_0$ (convexe, §3.1.6). Donc tout le <strong>segment</strong> $[x^{(1)},x^{(2)}]$ est optimal, et il y a en fait une infinité de solutions.</p>
+<p><strong>Si $f_0$ est strictement convexe</strong>, c'est impossible : pour $\theta\in\ ]0,1[$,
+$$f_0\big(\theta x^{(1)}+(1-\theta)x^{(2)}\big) &lt; \theta f_0(x^{(1)})+(1-\theta)f_0(x^{(2)}) = p^\star$$
+et ce point est admissible — ce qui contredirait la définition de $p^\star$. <strong>L'optimum est donc unique</strong> s'il existe.</p>
+<p><strong>Ce que l'exercice enseigne.</strong> La stricte convexité n'améliore pas l'existence (elle ne garantit rien : $e^x$ est strictement convexe sans minimum), mais elle garantit l'<strong>unicité</strong>. Existence et unicité sont deux questions séparées : l'existence vient de la compacité ou de la coercivité (fiche 10), l'unicité de la stricte convexité (fiche 11).</p>
+</div></details>
+
+<h2 data-prio="must">Common mistakes</h2>
+<ol>
+<li><strong>Croire qu'un ensemble admissible convexe suffit</strong> — la convexité du <strong>problème</strong> porte sur l'écriture : $f_i$ convexes et $h_i$ <strong>affines</strong>.</li>
+<li><strong>Accepter une contrainte d'égalité non affine</strong> — $h(x)=0$ avec $h$ convexe non affine donne presque toujours un ensemble non convexe.</li>
+<li><strong>Confondre « non atteinte » et « non minoré »</strong> — $\inf 1/x = 0$ n'est pas atteint ; $\inf(-\log x) = -\infty$ n'existe pas. Deux situations distinctes.</li>
+<li><strong>Transformer l'objectif par une fonction non croissante</strong> — cela change l'ensemble des optima et peut détruire la convexité.</li>
+<li><strong>Appliquer $\nabla f_0(x^\star)=0$ à un problème contraint</strong> — c'est la spécialisation au cas <strong>sans contrainte</strong> ; avec contraintes, l'optimum est souvent au bord et le gradient n'y est pas nul.</li>
+<li><strong>Chercher des optima locaux « à comparer »</strong> — dans un problème convexe il n'y en a pas : local $=$ global.</li>
+<li><strong>Étendre local $=$ global au quasiconvexe</strong> — c'est faux, et c'est toute la raison d'être de la méthode par bissection.</li>
+<li><strong>Oublier que la convexité de l'ensemble optimal ne donne pas l'unicité</strong> — il faut la <strong>stricte</strong> convexité de $f_0$.</li>
+</ol>
+<h2>Ultimate Review</h2>
+<ol>
+<li>Forme standard : $\min f_0(x)$ s.c. $f_i(x)\leq0$, $h_i(x)=0$ ; domaine $\mathcal{D}$, ensemble admissible, $p^\star$.</li>
+<li>Conventions : $p^\star=+\infty$ si non admissible, $p^\star=-\infty$ si non minoré ; valeur <strong>atteinte</strong> ou non.</li>
+<li>Contrainte <strong>active</strong> si $f_i(x)=0$ ; les égalités sont actives partout ; <strong>redondante</strong> si sa suppression ne change rien.</li>
+<li><strong>Problèmes équivalents</strong> : mise à l'échelle, changement de variable, transformation <strong>croissante</strong> de l'objectif, variables d'écart, forme épigraphe, minimisation partielle.</li>
+<li><strong>Problème convexe</strong> : $f_0$ convexe, $f_i$ convexes, $h_i$ <strong>affines</strong> — trois exigences. L'ensemble admissible est alors convexe.</li>
+<li>La convexité est une propriété de l'<strong>écriture</strong>, pas seulement de l'ensemble admissible.</li>
+<li><strong>Tout optimum local est global</strong> — preuve par un point du segment à distance $R/2$.</li>
+<li><strong>Critère d'optimalité</strong> : $\nabla f_0(x^\star)^T(y-x^\star)\geq0$ pour tout $y$ admissible ; $-\nabla f_0(x^\star)$ appuie l'ensemble admissible.</li>
+<li>Spécialisations : $\nabla f_0=0$ (sans contrainte) ; $\nabla f_0 = A^T\nu$ (égalités seules) ; positivité $+$ complémentarité (orthant).</li>
+<li><strong>Quasiconvexe</strong> : local $\neq$ global ; résolution par <strong>bissection</strong> sur $t$, avec $\lceil\log_2((u-l)/\varepsilon)\rceil$ problèmes de faisabilité convexes.</li>
+</ol>
+<p><strong>Formulas to know</strong>
+$$p^\star=\inf\{f_0(x)\mid f_i(x)\leq0,\ h_i(x)=0\} \qquad \nabla f_0(x^\star)^T(y-x^\star)\geq0 \ \ \forall y\in X$$
+$$f_0(x)\leq t \iff \phi_t(x)\leq0 \qquad \big\lceil\log_2\tfrac{u-l}{\varepsilon}\big\rceil \text{ itérations de bissection}$$</p>
+<p><strong>Methods to know</strong> : le protocole en 7 étapes ; la preuve local $=$ global ; les trois spécialisations du critère d'optimalité.</p>
+<div class="rec"><h2>Active Recall</h2><p><strong>Basic</strong> — Quelles sont les trois exigences qui font d'un problème en forme standard un problème <strong>convexe</strong> ?</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p>$f_0$ <strong>convexe</strong>, les $f_i$ des contraintes d'inégalité <strong>convexes</strong>, et les contraintes d'égalité <strong>affines</strong> ($h_i(x)=a_i^Tx-b_i$). La troisième est la plus souvent oubliée.</p>
+</div></details><p><strong>Understanding</strong> — Démontrez que tout optimum local d'un problème convexe est global.</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p>Soit $x$ localement optimal sur une boule de rayon $R$, et supposons $y$ admissible avec $f_0(y)&lt;f_0(x)$ ; alors $\|y-x\|_2&gt;R$. Le point $z=(1-\theta)x+\theta y$ avec $\theta = R/(2\|y-x\|_2)$ est admissible (convexité de $X$) et vérifie $\|z-x\|_2 = R/2&lt;R$. Par convexité de $f_0$, $f_0(z)\leq(1-\theta)f_0(x)+\theta f_0(y)&lt;f_0(x)$ — contradiction avec l'optimalité locale.</p>
+</div></details><p><strong>Application</strong> — Sur $\min f_0(x)$ s.c. $x\succeq0$, quelle forme prend le critère d'optimalité ?</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p>$$x^\star\succeq0, \qquad \nabla f_0(x^\star)\succeq0, \qquad \nabla f_0(x^\star)_i\,x_i^\star = 0 \ \ \forall i$$
+Les deux premières viennent de ce que $\nabla f_0(x^\star)^Ty$ doit être minoré sur l'orthant ; la troisième est la <strong>complémentarité</strong>, obtenue parce que le produit de deux vecteurs positifs est nul si et seulement si chaque terme l'est.</p>
+</div></details><p><strong>Comparison</strong> — Problème convexe et problème quasiconvexe : qu'est-ce qui change, et comment résout-on le second ?</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p>Le convexe garantit <strong>local $=$ global</strong> ; le quasiconvexe <strong>non</strong> — il peut avoir des minima locaux parasites. On le résout donc indirectement : on représente les sous-niveaux par des inégalités convexes $\phi_t(x)\leq0$, et l'on <strong>bissecte</strong> sur $t$, chaque test étant un problème de <strong>faisabilité convexe</strong>. Le coût est logarithmique en la précision.</p>
+</div></details><p><strong>Exam-style</strong> — Un problème a un ensemble admissible convexe mais des fonctions de contrainte non convexes. Est-il « un problème convexe » ? Justifiez.</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p><strong>Non</strong>, au sens de Boyd : la définition (4.15) porte sur les <strong>fonctions</strong> de l'écriture, pas sur l'ensemble qu'elles décrivent. L'exemple du livre est $\min x_1^2+x_2^2$ s.c. $x_1/(1+x_2^2)\leq0$ et $(x_1+x_2)^2=0$ : l'ensemble admissible $\{x_1\leq0,\ x_1=-x_2\}$ est convexe, mais $f_1$ n'est pas convexe et $h_1$ n'est pas affine.</p>
+<p>Le problème est cependant <strong>équivalent</strong> au problème convexe $\min x_1^2+x_2^2$ s.c. $x_1\leq0$, $x_1+x_2=0$. La distinction est pratique : les algorithmes et les théorèmes (dualité, KKT) s'appliquent à l'<strong>écriture</strong>, pas à l'ensemble — d'où l'importance de savoir réécrire.</p>
+</div></details></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h2>Flashcards</h2>
+<table>
+<thead>
+<tr>
+<th>Question</th>
+<th>Réponse</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Forme standard ?</td>
+<td>$\min f_0(x)$ s.c. $f_i(x)\leq0$, $h_i(x)=0$</td>
+</tr>
+<tr>
+<td>Domaine du problème ?</td>
+<td>$\bigcap_i\mathbf{dom}\,f_i\cap\bigcap_i\mathbf{dom}\,h_i$</td>
+</tr>
+<tr>
+<td>$p^\star$ si non admissible ?</td>
+<td>$+\infty$</td>
+</tr>
+<tr>
+<td>$p^\star$ si non minoré ?</td>
+<td>$-\infty$</td>
+</tr>
+<tr>
+<td>Contrainte active ?</td>
+<td>$f_i(x)=0$ ; les égalités le sont partout</td>
+</tr>
+<tr>
+<td>Les trois exigences de convexité ?</td>
+<td>$f_0$ convexe, $f_i$ convexes, $h_i$ <strong>affines</strong></td>
+</tr>
+<tr>
+<td>L'ensemble admissible d'un problème convexe ?</td>
+<td>Convexe — intersection de sous-niveaux et d'hyperplans</td>
+</tr>
+<tr>
+<td>Propriété fondamentale ?</td>
+<td>Tout optimum <strong>local</strong> est <strong>global</strong></td>
+</tr>
+<tr>
+<td>Critère d'optimalité du premier ordre ?</td>
+<td>$\nabla f_0(x^\star)^T(y-x^\star)\geq0$ pour tout $y$ admissible</td>
+</tr>
+<tr>
+<td>Cas sans contrainte ?</td>
+<td>$\nabla f_0(x^\star)=0$</td>
+</tr>
+<tr>
+<td>Cas $Ax=b$ ?</td>
+<td>$\nabla f_0(x^\star)=A^T\nu$ pour un $\nu$</td>
+</tr>
+<tr>
+<td>Cas $x\succeq0$ ?</td>
+<td>$\nabla f_0\succeq0$ et $\nabla f_0(x^\star)_ix_i^\star=0$</td>
+</tr>
+<tr>
+<td>L'ensemble optimal est-il convexe ?</td>
+<td>Oui — intersection de $X$ et d'un sous-niveau</td>
+</tr>
+<tr>
+<td>Quand l'optimum est-il unique ?</td>
+<td>Si $f_0$ est <strong>strictement</strong> convexe</td>
+</tr>
+<tr>
+<td>Problème quasiconvexe ?</td>
+<td>$f_0$ quasiconvexe ; local $\neq$ global</td>
+</tr>
+<tr>
+<td>Résolution du quasiconvexe ?</td>
+<td>Bissection sur $t$, tests de faisabilité convexe $\phi_t(x)\leq0$</td>
+</tr>
+<tr>
+<td>Coût de la bissection ?</td>
+<td>$\lceil\log_2((u-l)/\varepsilon)\rceil$ problèmes convexes</td>
+</tr>
+</tbody></table>
+</main>
+
+
+
+
+</body></html>

@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fiche 52 — Séries temporelles I : stationnarité, Wold, ARMA et racines unitaires</title>
+<script>
+window.MathJax={tex:{inlineMath:[["$","$"]],displayMath:[["$$","$$"]],processEscapes:true},
+ options:{skipHtmlTags:["script","noscript","style","textarea","pre","code"]},
+ svg:{fontCache:"global"},
+ startup:{pageReady:()=>MathJax.startup.defaultPageReady().then(()=>{document.body.classList.add("ready")})}};
+setTimeout(function(){document.body.classList.add("ready")},2500);
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+/* ============================================================
+   MathiasLearn — feuille de style des fiches
+   Reprise intégrale des tokens de 00_PARCOURS/*.html
+   + blocs pédagogiques (callouts, méthode, essentiels, recall)
+   ============================================================ */
+:root{--bg:#faf9f7;--card:#fff;--ink:#1a1a1a;--muted:#6b6b6b;--line:#e5e2dd;--accent:#8b5e34;
+ --hl:#fdf8ef;--ok:#2d7d4f;--okbg:#f0f7f3;--warn:#b3402f;--warnbg:#fdf3f1;--blue:#2f5d8b;--bluebg:#f1f5fa}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+ font:17px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;padding:0 16px 100px}
+.nav{position:sticky;top:0;background:rgba(250,249,247,.96);backdrop-filter:blur(8px);
+ border-bottom:1px solid var(--line);margin:0 -16px 30px;padding:11px 16px;z-index:50;
+ display:flex;gap:6px;flex-wrap:wrap;font-size:13px}
+.nav a{color:var(--muted);text-decoration:none;padding:4px 9px;border-radius:5px;white-space:nowrap}
+.nav a:hover{background:var(--line);color:var(--ink)}
+.nav a.on{background:var(--accent);color:#fff}
+main{max-width:780px;margin:0 auto}
+h1{font-size:31px;letter-spacing:-.02em;margin:.4em 0 .5em;line-height:1.25}
+h2{font-size:23px;margin:2.2em 0 .7em;padding-bottom:.3em;border-bottom:1px solid var(--line)}
+h3{font-size:19px;margin:1.9em 0 .5em;color:var(--accent)}
+h4{font-size:17px;margin:1.5em 0 .4em}
+p{margin:.8em 0} a{color:var(--accent)} hr{border:0;border-top:1px solid var(--line);margin:2.6em 0}
+table{border-collapse:collapse;width:100%;margin:1.3em 0;font-size:15.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+th{background:#f3f0eb;font-weight:600}
+tr:nth-child(even) td{background:#fcfbfa}
+code{font-family:"SF Mono",Menlo,Consolas,monospace;font-size:.88em;background:#f2efea;padding:2px 6px;border-radius:4px;white-space:nowrap}
+pre{background:#f2efea;padding:14px 16px;border-radius:8px;overflow-x:auto}
+pre code{background:none;padding:0;white-space:pre}
+blockquote{border-left:3px solid var(--accent);background:var(--hl);margin:1.4em 0;padding:14px 20px;border-radius:0 8px 8px 0}
+blockquote p:first-child{margin-top:0} blockquote p:last-child{margin-bottom:0}
+ul,ol{padding-left:1.5em} li{margin:.35em 0} em{color:#4a4a4a}
+mjx-container[display="true"]{margin:1.1em 0!important;overflow-x:auto;overflow-y:hidden;padding:2px 0}
+mjx-container svg{max-width:100%}
+body:not(.ready) main{opacity:0} main{opacity:1;transition:opacity .25s}
+
+/* --- bandeau de tête de fiche --- */
+.cours{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--accent);
+ border-radius:0 10px 10px 0;padding:18px 22px;margin:0 0 34px}
+.cours h4{margin:0 0 4px;font-size:14px;text-transform:uppercase;letter-spacing:.07em;color:var(--accent)}
+.cours .cs{color:var(--muted);font-size:14.5px;margin:0 0 14px}
+
+/* --- exercices / corrigés --- */
+.ex{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:6px 24px 20px;margin:18px 0}
+.ex>h3:first-child{margin-top:14px}
+details.cor{margin-top:18px;border:1px solid var(--line);border-radius:8px;background:#fcfbfa;overflow:hidden}
+details.cor>summary{cursor:pointer;padding:12px 16px;font-weight:600;font-size:15px;color:var(--accent);
+ list-style:none;display:flex;align-items:center;gap:9px;user-select:none;transition:.15s;min-height:44px}
+details.cor>summary::-webkit-details-marker{display:none}
+details.cor>summary:hover{background:var(--hl)}
+details.cor>summary::before{content:"\25B6";font-size:10px;transition:transform .18s;display:inline-block}
+details.cor[open]>summary::before{transform:rotate(90deg)}
+details.cor[open]>summary{background:var(--okbg);color:var(--ok);border-bottom:1px solid var(--line)}
+.cor .in{padding:4px 20px 16px}
+.cor .in>*:first-child{margin-top:.9em}
+
+/* --- blocs pédagogiques (callouts) ---
+   Générés depuis une citation Markdown dont le premier **gras** commence
+   par un mot-clé : DÉFINITION, THÉORÈME, MÉTHODE, PIÈGE, INTUITION… */
+.cal{border:1px solid var(--line);border-left:4px solid var(--accent);background:var(--card);
+ border-radius:0 10px 10px 0;padding:15px 20px;margin:1.5em 0}
+.cal>p:first-child{margin-top:0}.cal>p:last-child,.cal>ul:last-child,.cal>ol:last-child{margin-bottom:0}
+.cal .lab{display:block;font-size:12.5px;text-transform:uppercase;letter-spacing:.08em;
+ font-weight:700;color:var(--accent);margin-bottom:6px}
+.cal.formel{background:var(--hl)}
+.cal.piege{border-left-color:var(--warn);background:var(--warnbg)}
+.cal.piege .lab{color:var(--warn)}
+.cal.methode{border-left-color:var(--ok);background:var(--okbg)}
+.cal.methode .lab{color:var(--ok)}
+.cal.intu{border-left-color:var(--blue);background:var(--bluebg)}
+.cal.intu .lab{color:var(--blue)}
+.cal.plus{border-left-style:dashed;background:#faf9f7}
+.cal.plus .lab{color:var(--muted)}
+
+/* --- révision express --- */
+.ess{background:var(--card);border:1px solid var(--accent);border-radius:10px;padding:4px 24px 20px;margin:1.6em 0}
+.ess h3{margin-top:1.3em}
+.rec{background:var(--card);border:1px dashed var(--accent);border-radius:10px;padding:4px 24px 18px;margin:1.6em 0}
+.rec ol{counter-reset:none}
+
+/* --- impression / PDF --- */
+@media print{
+ .nav{display:none}
+ body{padding:0;background:#fff;font-size:11.2pt;line-height:1.55}
+ main{max-width:none}
+ h1{font-size:23pt}h2{font-size:15pt;margin-top:1.5em}h3{font-size:12.6pt}
+ h2,h3,h4{break-after:avoid;page-break-after:avoid}
+ table,.cal,blockquote{break-inside:avoid;page-break-inside:avoid}
+ table{display:table;font-size:9.6pt}
+ details.cor{border:1px solid var(--line);background:#fcfbfa}
+ details.cor>summary{display:none}
+ details.cor .in{padding-top:10px}
+ .cal,.ex,.ess,.rec{box-shadow:none}
+ a{color:var(--ink);text-decoration:none}
+}
+@page{margin:16mm 15mm 18mm}
+
+/* --- exemples travaillés --- */
+.exm{background:#fcfbfa;border:1px solid var(--line);border-radius:10px;padding:2px 20px 14px;margin:1.5em 0}
+.exm>h4:first-child{margin:14px 0 .5em;color:var(--accent);font-size:13px;text-transform:uppercase;letter-spacing:.07em}
+
+
+/* --- pastilles de priorité (conventions des fiches de l'app) --- */
+h2[data-prio], h3[data-prio], h4[data-prio]{position:relative}
+h2[data-prio]::before,h3[data-prio]::before,h4[data-prio]::before{
+ content:"";display:inline-block;width:9px;height:9px;border-radius:50%;
+ margin-right:9px;vertical-align:middle;background:var(--muted)}
+[data-prio="must"]::before{background:var(--warn)}
+[data-prio="high"]::before{background:#d98324}
+[data-prio="mid"]::before{background:#c9a227}
+[data-prio="low"]::before{background:var(--ok)}
+/* corrigés des fiches de l'app : même traitement que les corrigés des séries */
+details.cor>summary::after{content:""}
+</style></head><body>
+<div class="nav"><a href="00_COMMENCER_ICI.html">Commencer ici</a><a href="01_NOTATIONS_le-decodeur.html">Notations</a><a href="02_EXERCICES_Serie-0.html">Série 0 — Remise en route</a><a href="03_EXERCICES_Serie-1.html">Série 1 — Convexité</a><a href="04_EXERCICES_Serie-2.html">Série 2 — KKT</a><a href="05_AUTO-EVALUATION.html">Auto-évaluation (quiz)</a><a href="06_FICHE_Optimisation-deux-variables.html">Fiche — Optimisation à 2 variables</a></div>
+<main><h1>Fiche 52 — Séries temporelles I : stationnarité, Wold, ARMA et racines unitaires</h1>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Matière</strong></td>
+<td>Maths · Économétrie</td>
+</tr>
+<tr>
+<td><strong>Cours source</strong></td>
+<td>Kempthorne, <em>18.S096 Topics in Mathematics with Applications in Finance</em>, MIT OpenCourseWare, automne 2013 — cours 8 « Time Series Analysis I »</td>
+</tr>
+<tr>
+<td><strong>Difficulté</strong></td>
+<td> Must know — l'outil de base de l'économétrie des marchés</td>
+</tr>
+<tr>
+<td><strong>Temps d'étude estimé</strong></td>
+<td>2 h 45</td>
+</tr>
+<tr>
+<td><strong>Prérequis</strong></td>
+<td>Fiche 50 (moindres carrés, projection linéaire), notions de variance et covariance</td>
+</tr>
+<tr>
+<td><strong>Concepts clés</strong></td>
+<td>Stationnarité stricte et en covariance, autocorrélation, théorème de représentation de Wold, opérateur retard, réponse impulsionnelle, inversibilité, ARMA, AR(p), équations de Yule-Walker, MA(q), différenciation, ARIMA, AIC/BIC/HQ, test de Dickey-Fuller</td>
+</tr>
+<tr>
+<td><strong>Poids à l'examen</strong></td>
+<td>Quatre choses : la <strong>définition</strong> de la stationnarité en covariance, la <strong>condition sur les racines</strong> du polynôme caractéristique, les <strong>moments de l'AR(1)</strong>, et la <strong>logique du test de racine unitaire</strong>.</td>
+</tr>
+</tbody></table>
+<h2>Vue d'ensemble</h2>
+<p>Un <strong>processus stochastique</strong> $\{\dots,X_{t-1},X_t,X_{t+1},\dots\}$ constitué de variables aléatoires indexées par un indice de temps $t$ est une <strong>série temporelle</strong>. Le comportement stochastique de $\{X_t\}$ est déterminé en spécifiant les densités
+$$p(x_{t_1},x_{t_2},\dots,x_{t_m})$$
+pour toutes les collections finies d'indices $\{(t_1,\dots,t_m),\ m&lt;\infty\}$ — c'est-à-dire <strong>toutes les distributions de dimension finie</strong> de $\{X_t\}$.</p>
+<pre><code>STATIONNARITÉ    l'hypothèse qui rend l'estimation possible
+     ↓
+WOLD             toute série stationnaire = déterministe + MA(∞)
+     ↓
+ARMA(p,q)        l'approximation parcimonieuse et utilisable
+     ↓
+ARIMA(p,d,q)     ce qu'on fait quand la série n'est PAS stationnaire
+     ↓
+DICKEY-FULLER    comment savoir dans quel cas on est
+</code></pre>
+<blockquote>
+<p><strong>La question qui structure tout le chapitre.</strong> On n'observe qu'<strong>une seule</strong> trajectoire de la série. Comment estimer quoi que ce soit à partir d'une réalisation unique ? Réponse : en supposant que la loi <strong>ne change pas au cours du temps</strong> — c'est la stationnarité, et elle est ce qui permet de remplacer une moyenne d'ensemble inobservable par une moyenne temporelle calculable.</p>
+</blockquote>
+<h2 data-prio="must">Concept 1 — Les deux stationnarités</h2>
+<div class="cal formel"><span class="lab">Définition — stationnarité stricte.</span>
+<p> Une série temporelle $\{X_t\}$ est <strong>strictement stationnaire</strong> si
+$$p(t_1+\tau,\ t_2+\tau,\ \dots,\ t_m+\tau)=p(t_1,t_2,\dots,t_m) \qquad \forall\tau,\ \forall m,\ \forall(t_1,\dots,t_m)$$
+<em>(invariance par translation du temps)</em></p>
+</div>
+<div class="cal formel"><span class="lab">Définition — stationnarité en covariance.</span>
+<p> Une série temporelle $\{X_t\}$ est <strong>stationnaire en covariance</strong> si
+$$E(X_t)=\mu, \qquad \mathrm{Var}(X_t)=\sigma_X^2, \qquad \mathrm{Cov}(X_t,X_{t+\tau})=\gamma(\tau)$$
+<em>toutes constantes au cours du temps $t$.</em></p>
+</div>
+<p><strong>La fonction d'autocorrélation</strong> de $\{X_t\}$ est
+$$\rho(\tau)=\frac{\mathrm{Cov}(X_t,X_{t+\tau})}{\sqrt{\mathrm{Var}(X_t)\cdot\mathrm{Var}(X_{t+\tau})}}=\frac{\gamma(\tau)}{\gamma(0)}$$</p>
+<blockquote>
+<p><strong>La différence entre les deux, en une phrase.</strong> La stationnarité <strong>stricte</strong> contraint <strong>toute la loi jointe</strong> ; la stationnarité <strong>en covariance</strong> ne contraint que les <strong>deux premiers moments</strong>. La stricte implique la seconde (si les moments existent) ; la réciproque est fausse en général — mais <strong>vraie pour un processus gaussien</strong>, puisqu'une loi gaussienne est entièrement déterminée par ses deux premiers moments.</p>
+</blockquote>
+<p class="cal piege"> <strong>La stationnarité en covariance est celle qu'on utilise partout</strong>, parce que c'est celle qu'on peut vérifier et exploiter. Elle est parfois appelée « stationnarité au sens faible » ou « du second ordre ».</p>
+<p class="cal piege"> <strong>Ce que $\gamma(\tau)$ ne dépend pas de $t$ signifie</strong> : la covariance entre deux instants ne dépend que de <strong>l'écart</strong> qui les sépare, jamais de leur position absolue. C'est exactement ce qui permet d'estimer $\gamma(\tau)$ en moyennant sur $t$.</p>
+<h2 data-prio="must">Concept 2 — Le théorème de représentation de Wold</h2>
+<div class="cal formel"><span class="lab">Théorème de Wold.</span>
+<p> Toute série temporelle stationnaire $\{X_t\}$ peut être décomposée en
+$$X_t=V_t+S_t$$
+où :</p>
+<ul>
+<li>$\{V_t\}$ est un processus <strong>linéairement déterministe</strong>, c'est-à-dire une combinaison linéaire des valeurs passées de $V_t$ à coefficients constants ;</li>
+<li>$\displaystyle S_t=\sum_{i=0}^\infty\psi_i\,\epsilon_{t-i}$ est un processus <strong>moyenne mobile infinie</strong> de termes d'erreur, avec
+$$\psi_0=1, \qquad \sum_{i=0}^\infty\psi_i^2&lt;\infty$$</li>
+<li>$\{\epsilon_t\}$ est un <strong>bruit blanc linéairement imprévisible</strong> :
+$$E(\epsilon_t)=0, \qquad E(\epsilon_t^2)=\sigma^2, \qquad E(\epsilon_t\epsilon_s)=0\ \ \forall t,s\neq t$$</li>
+<li>et $\{\epsilon_t\}$ est <strong>non corrélé</strong> avec $\{V_t\}$ : $E(\epsilon_tV_s)=0,\ \forall t,s$.</li>
+</ul>
+</div>
+<div class="cal intu"><span class="lab">Pourquoi c'est le théorème fondateur.</span>
+<p> Il dit qu'il n'existe <strong>aucune</strong> autre forme de série stationnaire : <strong>toute</strong> série stationnaire est une partie prévisible plus une moyenne mobile infinie d'innovations. Modéliser une série stationnaire, c'est donc nécessairement estimer $\{\psi_i\}$ — le seul problème est qu'il y en a une infinité.</p>
+</div>
+<p class="cal piege"> <strong>Attention au sens de « déterministe » ici.</strong> $V_t$ est <strong>linéairement</strong> déterministe : il est parfaitement prédictible par une combinaison linéaire de son propre passé. Ce n'est pas une fonction connue du temps, c'est la partie de la série qui ne contient <strong>aucune information nouvelle</strong>.</p>
+<p class="cal piege"> <strong>Le bruit blanc de Wold n'est pas forcément i.i.d.</strong> — il est seulement <strong>non corrélé</strong>. C'est une différence capitale en finance : les rendements sont à peu près non corrélés, mais leurs <strong>carrés</strong> ne le sont pas du tout (volatilité groupée). Un bruit blanc peut donc être très loin d'être imprévisible au sens fort.</p>
+<h3>Application intuitive du théorème de Wold</h3>
+<p>Supposons qu'on veuille spécifier une série stationnaire en covariance $\{X_t\}$ pour modéliser les données réelles $\{x_t,\ t=0,1,\dots,T\}$. La stratégie du cours :</p>
+<p><strong>Étape 1 — initialiser $p$</strong>, le nombre d'observations passées dans le terme linéairement déterministe de la décomposition de Wold.</p>
+<p><strong>Étape 2 — estimer la projection linéaire</strong> de $X_t$ sur $(X_{t-1},X_{t-2},\dots,X_{t-p})$. On prend un échantillon d'estimation de taille $n$ de point final $t_0\leq T$, on indexe par $\{j=-(p-1),\dots,0,1,\dots,n\}$ la sous-série correspondante et l'on pose $y_j=x_{t_0-n+j}$ (avec $t_0\geq n+p$). On définit
+$$y=\begin{pmatrix}y_1\\y_2\\\vdots\\y_n\end{pmatrix}, \qquad Z=\begin{pmatrix}1&amp;y_0&amp;y_{-1}&amp;\cdots&amp;y_{-(p-1)}\\ 1&amp;y_1&amp;y_0&amp;\cdots&amp;y_{-(p-2)}\\ \vdots&amp;\vdots&amp;\vdots&amp;\ddots&amp;\vdots\\ 1&amp;y_{n-1}&amp;y_{n-2}&amp;\cdots&amp;y_{n-p}\end{pmatrix}$$
+et l'on <strong>applique les MCO</strong> :
+$$\hat y=Z(Z^TZ)^{-1}Z^Ty=\hat P(Y_t\mid Y_{t-1},Y_{t-2},\dots,Y_{t-p})=\hat y^{(p)}$$</p>
+<blockquote>
+<p><strong>Reconnaissez la fiche 50.</strong> $Z(Z^TZ)^{-1}Z^T$ est la <strong>matrice chapeau</strong> : ajuster une AR($p$), c'est <strong>exactement</strong> faire une régression linéaire dont les explicatives sont les retards de la variable expliquée.</p>
+</blockquote>
+<p><strong>Étape 3 — calculer le résidu de projection</strong> $\hat\epsilon^{(p)}=y-\hat y^{(p)}$.</p>
+<p><strong>Étape 4 — appliquer les méthodes de séries temporelles à la série des résidus</strong> $\{\hat\epsilon_j^{(p)}\}$ pour spécifier un modèle moyenne mobile
+$$\epsilon_t^{(p)}=\sum_{i\geq0}\theta_i\,\eta_{t-i}$$
+ce qui fournit $\{\hat\theta_j\}$ et $\{\hat\eta_t\}$, estimations des paramètres et des innovations.</p>
+<p><strong>Étape 5 — conduire une analyse de cas diagnostiquant la cohérence avec les hypothèses du modèle :</strong></p>
+<ul>
+<li>Évaluer l'<strong>orthogonalité</strong> de $\hat\epsilon^{(p)}$ à $Y_{t-s}$, $s&gt;p$. <strong>S'il y a des signes de corrélation, augmenter $p$ et recommencer.</strong></li>
+<li>Évaluer la cohérence de $\{\hat\eta_t\}$ avec les hypothèses de <strong>bruit blanc</strong> du théorème. Sinon, envisager des révisions du modèle global : changer la spécification du modèle moyenne mobile, ou ajouter d'autres variables « déterministes » au modèle de projection.</li>
+</ul>
+<blockquote>
+<p><strong>Note théorique du cours.</strong> <em>Théoriquement, $\lim_{p\to\infty}\hat y^{(p)}=\hat y=P(Y_t\mid Y_{t-1},Y_{t-2},\dots)$, mais si $p\to\infty$ est requis, alors il faut $n\to\infty$ avec $p/n\to0$.</em> Les <strong>modèles utiles</strong> de séries stationnaires ont des valeurs <strong>finies et modestes</strong> de $p$, et/ou incluent des modèles moyenne mobile dépendant d'un <strong>nombre parcimonieux</strong> de paramètres.</p>
+</blockquote>
+<p class="cal piege"> <strong>Voilà le vrai sujet du chapitre.</strong> Wold garantit une représentation MA($\infty$) ; la pratique exige un nombre <strong>fini</strong> de paramètres. Toute la construction ARMA n'est qu'une manière d'approcher les $\{\psi_i\}$ infinis par un <strong>quotient de deux polynômes courts</strong>.</p>
+<h2 data-prio="high">Concept 3 — L'opérateur retard et ses conséquences</h2>
+<div class="cal formel"><span class="lab">Définition.</span>
+<p> L'<strong>opérateur retard</strong> $L(\cdot)$ décale une série temporelle d'un incrément de temps vers le passé : $L(X_t)=X_{t-1}$.</p>
+</div>
+<p>En l'appliquant récursivement :
+$$L^0(X_t)=X_t, \quad L^1(X_t)=X_{t-1}, \quad L^2(X_t)=L(L(X_t))=X_{t-2}, \quad \dots, \quad L^n(X_t)=X_{t-n}$$
+Les inverses sont bien définis : $L^{-n}(X_t)=X_{t+n}$ pour $n=1,2,\dots$</p>
+<p><strong>La représentation de Wold en notation d'opérateur.</strong>
+$$X_t=\sum_{i=0}^\infty\psi_i\epsilon_{t-i}+V_t=\sum_{i=0}^\infty\psi_iL^i(\epsilon_t)+V_t=\psi(L)\epsilon_t+V_t, \qquad \psi(L)=\sum_{i=0}^\infty\psi_iL^i$$</p>
+<blockquote>
+<p><strong>L'intérêt de la notation.</strong> Elle transforme des <strong>convolutions infinies</strong> en <strong>produits de polynômes</strong>. Toutes les manipulations qui suivent — inversion, factorisation, différenciation — sont de l'algèbre élémentaire sur des séries formelles.</p>
+</blockquote>
+<div class="cal formel"><span class="lab">Définition — fonction de réponse impulsionnelle.</span>
+<p> La <em>Impulse Response Function</em> du processus stationnaire $\{X_t\}$ est
+$$IR(j)=\frac{\partial X_t}{\partial\epsilon_{t-j}}=\psi_j$$
+et la <strong>réponse cumulée de long terme</strong> est
+$$\sum_{j=0}^\infty IR(j)=\sum_{i=0}^\infty\psi_i=\psi(L)\ \text{ avec }\ L=1$$</p>
+</div>
+<div class="cal intu"><span class="lab">Lecture économique.</span>
+<p> $IR(j)$ répond à : « si une innovation de taille $1$ frappe le système aujourd'hui, de combien la série sera-t-elle décalée dans $j$ périodes ? » La somme $\psi(1)$ mesure l'<strong>effet total permanent</strong> d'un choc. Pour un processus stationnaire elle est <strong>finie</strong> ; pour une marche aléatoire elle est infinie — le choc ne s'estompe jamais.</p>
+</div>
+<h3>Représentation autorégressive équivalente</h3>
+<p>Supposons que l'opérateur $\psi(L)$ soit <strong>inversible</strong>, c'est-à-dire qu'il existe
+$$\psi^{-1}(L)=\sum_{i=0}^\infty\pi_iL^i \quad\text{tel que}\quad \psi^{-1}(L)\psi(L)=I=L^0$$
+Alors, en supposant $V_t=0$ (la série a été ajustée en $X_t\leftarrow X_t-V_t$), les deux écritures suivantes sont équivalentes :
+$$X_t=\psi(L)\epsilon_t \qquad\Longleftrightarrow\qquad \psi^{-1}(L)X_t=\epsilon_t$$</p>
+<div class="cal formel"><span class="lab">Définition.</span>
+<p> Quand $\psi^{-1}(L)$ existe, la série $\{X_t\}$ est <strong>inversible</strong> et admet une <strong>représentation autorégressive</strong> :
+$$X_t=\Big(\sum_{i\geq0}\pi_iX_{t-i}\Big)+\epsilon_t$$</p>
+</div>
+<blockquote>
+<p><strong>La dualité AR / MA est le cœur de tout le chapitre.</strong> Une MA finie est une AR infinie, et une AR finie est une MA infinie. C'est ce qui rend ARMA($p,q$) si efficace : quelques paramètres de chaque côté engendrent une structure de dépendance très riche.</p>
+</blockquote>
+<h2 data-prio="must">Concept 4 — Les modèles ARMA($p,q$)</h2>
+<div class="cal formel"><span class="lab">Définition.</span>
+<p> La série $\{X_t\}$ suit le modèle <strong>ARMA($p,q$)</strong>, d'ordre autorégressif $p$ et d'ordre moyenne mobile $q$, si
+$$X_t=\mu+\phi_1(X_{t-1}-\mu)+\phi_2(X_{t-2}-\mu)+\cdots+\phi_p(X_{t-p}-\mu)+\epsilon_t+\theta_1\epsilon_{t-1}+\theta_2\epsilon_{t-2}+\cdots+\theta_q\epsilon_{t-q}$$
+où $\{\epsilon_t\}$ est un $WN(0,\sigma^2)$ — un « bruit blanc » avec
+$$E(\epsilon_t)=0\ \forall t, \qquad E(\epsilon_t^2)=\sigma^2&lt;\infty\ \forall t, \qquad E(\epsilon_t\epsilon_s)=0,\ t\neq s$$</p>
+</div>
+<p><strong>Avec les opérateurs retard</strong>, en posant
+$$\phi(L)=1-\phi_1L-\phi_2L^2-\cdots-\phi_pL^p, \qquad \theta(L)=1+\theta_1L+\theta_2L^2+\cdots+\theta_qL^q$$
+on écrit
+$$\boxed{\ \phi(L)\cdot(X_t-\mu)=\theta(L)\,\epsilon_t\ }$$
+et la décomposition de Wold est
+$$X_t=\mu+\psi(L)\epsilon_t, \qquad \psi(L)=[\phi(L)]^{-1}\theta(L)$$</p>
+<blockquote>
+<p><strong>Voilà la réponse au problème posé par Wold.</strong> Les coefficients $\{\psi_i\}$, en nombre infini, sont obtenus comme le développement d'une <strong>fraction rationnelle</strong> de deux polynômes de degrés $p$ et $q$. On a résumé une infinité de paramètres par $p+q+2$.</p>
+</blockquote>
+<h2 data-prio="must">Concept 5 — Les modèles AR($p$)</h2>
+<p><strong>Définition.</strong> Modèle autorégressif d'ordre $p$ :
+$$\phi(L)\cdot(X_t-\mu)=\epsilon_t, \qquad \{\epsilon_t\}\sim WN(0,\sigma^2), \qquad \phi(L)=1-\phi_1L-\phi_2L^2-\cdots-\phi_pL^p$$</p>
+<p><strong>Propriétés.</strong></p>
+<ul>
+<li>Une <strong>combinaison linéaire</strong> de $\{X_t,X_{t-1},\dots,X_{t-p}\}$ est un $WN(0,\sigma^2)$.</li>
+<li>$X_t$ suit un <strong>modèle de régression linéaire</strong> sur les variables explicatives $(X_{t-1},\dots,X_{t-p})$ :
+$$X_t=c+\sum_{j=1}^p\phi_jX_{t-j}+\epsilon_t, \qquad c=\mu\cdot\phi(1)$$
+(en remplaçant $L$ par $1$ dans $\phi(L)$, soit $c=\mu(1-\phi_1-\cdots-\phi_p)$).</li>
+</ul>
+<blockquote>
+<p><strong>Le pont avec la fiche 50 est explicite.</strong> Un AR($p$) <strong>est</strong> une régression linéaire. Tout l'appareil des MCO s'y applique — mais attention, les hypothèses de Gauss-Markov demandent réflexion : les régresseurs sont <strong>aléatoires</strong> et corrélés aux erreurs passées, si bien que les propriétés ne sont plus qu'<strong>asymptotiques</strong>.</p>
+</blockquote>
+<h3>Conditions de stationnarité</h3>
+<p>On considère $\phi(z)$ en remplaçant $L$ par une variable <strong>complexe</strong> $z$ :
+$$\phi(z)=1-\phi_1z-\phi_2z^2-\cdots-\phi_pz^p$$
+Soient $\lambda_1,\lambda_2,\dots,\lambda_p$ les $p$ racines de $\phi(z)=0$. Alors
+$$\phi(L)=\Big(1-\frac{1}{\lambda_1}L\Big)\Big(1-\frac{1}{\lambda_2}L\Big)\cdots\Big(1-\frac{1}{\lambda_p}L\Big)$$</p>
+<blockquote>
+<p><strong>Résultat central.</strong> <em>$\{X_t\}$ est stationnaire en covariance <strong>si et seulement si</strong> toutes les racines de $\phi(z)=0$ (l'« <strong>équation caractéristique</strong> ») sont <strong>en dehors du cercle unité</strong> $\{z:\lvert z\rvert\leq1\}$, c'est-à-dire $\lvert\lambda_j\rvert&gt;1$, $j=1,\dots,p$.</em></p>
+</blockquote>
+<p><strong>Pourquoi.</strong> Pour un nombre complexe $\lambda$ avec $\lvert\lambda\rvert&gt;1$ :
+$$\Big(1-\frac1\lambda L\Big)^{-1}=\sum_{i=0}^\infty\Big(\frac1\lambda\Big)^iL^i=1+\frac1\lambda L+\Big(\frac1\lambda\Big)^2L^2+\Big(\frac1\lambda\Big)^3L^3+\cdots$$
+qui <strong>converge</strong> précisément parce que $\lvert1/\lambda\rvert&lt;1$. D'où
+$$\phi^{-1}(L)=\prod_{j=1}^p\Big(1-\frac{1}{\lambda_j}L\Big)^{-1}$$
+et la représentation MA($\infty$) — la décomposition de Wold — existe.</p>
+<p class="cal piege"> <strong>L'erreur classique.</strong> « Les racines sont <strong>en dehors</strong> du cercle unité » porte sur les racines de $\phi(z)$, où $z$ est la variable <strong>du polynôme en $L$</strong>. Certains manuels énoncent la condition sur les <strong>valeurs propres</strong> de la matrice compagnon, qui sont les <strong>inverses</strong> $1/\lambda_j$ : la condition devient alors « <strong>à l'intérieur</strong> ». Les deux énoncés disent la même chose ; c'est la variable qui change. Vérifiez toujours laquelle est utilisée.</p>
+<h2 data-prio="must">Concept 6 — Le modèle AR(1) en détail</h2>
+<p>Supposons que $\{X_t\}$ suive le processus AR(1) :
+$$X_t-\mu=\phi(X_{t-1}-\mu)+\epsilon_t, \qquad t=1,2,\dots, \qquad \epsilon_t\sim WN(0,\sigma^2)$$</p>
+<p><strong>L'équation caractéristique</strong> est $(1-\phi z)=0$, de racine $\lambda=1/\phi$. Le modèle est stationnaire en covariance <strong>si et seulement si</strong>
+$$\lvert\phi\rvert&lt;1 \qquad(\text{de façon équivalente } \lvert\lambda\rvert&gt;1)$$</p>
+<p><strong>Les moments.</strong>
+$$E(X_t)=\mu$$
+$$\mathrm{Var}(X_t)=\sigma_X^2=\frac{\sigma^2}{1-\phi^2}\qquad(=\gamma(0))$$
+$$\mathrm{Cov}(X_t,X_{t-1})=\phi\cdot\sigma_X^2, \qquad \mathrm{Cov}(X_t,X_{t-j})=\phi^j\cdot\sigma_X^2\qquad(=\gamma(j))$$
+$$\mathrm{Corr}(X_t,X_{t-j})=\phi^j=\rho(j)$$</p>
+<blockquote>
+<p><strong>L'autocorrélation décroît <strong>géométriquement</strong>.</strong> C'est la signature de l'AR(1) : $\rho(j)=\phi^j$ décroît exponentiellement et ne s'annule jamais exactement — à comparer avec le MA($q$), dont l'autocorrélation <strong>tombe brutalement à zéro</strong> au-delà du retard $q$.</p>
+</blockquote>
+<p><strong>La décomposition de Wold.</strong> Pour $\lvert\phi\rvert&lt;1$ :
+$$X_t=\mu+\sum_{j=0}^\infty\phi^j\epsilon_{t-j}$$</p>
+<p><strong>Les trois régimes.</strong></p>
+<table>
+<thead>
+<tr>
+<th>Valeur de $\phi$</th>
+<th>Comportement</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$0&lt;\phi&lt;1$</td>
+<td><strong>retour exponentiel à la moyenne</strong> $\mu$</td>
+</tr>
+<tr>
+<td>$-1&lt;\phi&lt;0$</td>
+<td>retour exponentiel <strong>oscillant</strong> à la moyenne $\mu$</td>
+</tr>
+<tr>
+<td>$\phi=1$</td>
+<td>la décomposition de Wold <strong>n'existe pas</strong> : c'est la <strong>marche aléatoire simple</strong> (non stationnaire !)</td>
+</tr>
+<tr>
+<td>$\phi&gt;1$</td>
+<td>le processus AR(1) est <strong>explosif</strong></td>
+</tr>
+</tbody></table>
+<p><strong>Exemples d'AR(1) à retour à la moyenne ($0&lt;\phi&lt;1$) cités par le cours :</strong></p>
+<ul>
+<li><strong>Taux d'intérêt</strong> (processus d'Ornstein-Uhlenbeck ; modèle de Vasicek)</li>
+<li><strong>Écarts de taux d'intérêt</strong> (<em>spreads</em>)</li>
+<li><strong>Taux de change réels</strong></li>
+<li><strong>Ratios de valorisation</strong> (dividende sur prix, bénéfice sur prix)</li>
+</ul>
+<div class="cal intu"><span class="lab">Pourquoi ces variables-là et pas les prix.</span>
+<p> Ce sont toutes des grandeurs <strong>bornées économiquement</strong> : un taux ne peut pas dériver indéfiniment, un ratio de valorisation non plus. Le prix d'une action, lui, n'a pas de niveau d'équilibre — d'où $\phi\approx1$ et la marche aléatoire.</p>
+</div>
+<h2 data-prio="high">Concept 7 — Les équations de Yule-Walker</h2>
+<p><strong>Moments d'ordre 2 des processus AR($p$).</strong> À partir de la spécification
+$$(X_t-\mu)=\phi_1(X_{t-1}-\mu)+\phi_2(X_{t-2}-\mu)+\cdots+\phi_p(X_{t-p}-\mu)+\epsilon_t$$
+on multiplie par $(X_{t-j}-\mu)$ et l'on prend l'espérance :
+$$E[(X_t-\mu)(X_{t-j}-\mu)]=\phi_1E[(X_{t-1}-\mu)(X_{t-j}-\mu)]+\cdots+\phi_pE[(X_{t-p}-\mu)(X_{t-j}-\mu)]+E[\epsilon_t(X_{t-j}-\mu)]$$
+soit les <strong>équations de Yule-Walker</strong> ($j=0,1,\dots$) :
+$$\gamma(j)=\phi_1\gamma(j-1)+\phi_2\gamma(j-2)+\cdots+\phi_p\gamma(j-p)+\delta_{0,j}\sigma^2$$</p>
+<p><strong>Les équations $j=1,\dots,p$ forment un système linéaire de $p$ équations en les $\phi_j$ :</strong>
+$$\begin{pmatrix}\gamma(1)\\\gamma(2)\\\vdots\\\gamma(p)\end{pmatrix}=\begin{pmatrix}\gamma(0)&amp;\gamma(-1)&amp;\gamma(-2)&amp;\cdots&amp;\gamma(-(p-1))\\ \gamma(1)&amp;\gamma(0)&amp;\gamma(-1)&amp;\cdots&amp;\gamma(-(p-2))\\ \vdots&amp;\vdots&amp;\vdots&amp;\ddots&amp;\vdots\\ \gamma(p-1)&amp;\gamma(p-2)&amp;\gamma(p-3)&amp;\cdots&amp;\gamma(0)\end{pmatrix}\begin{pmatrix}\phi_1\\\phi_2\\\vdots\\\phi_p\end{pmatrix}$$</p>
+<blockquote>
+<p><strong>Les estimateurs de Yule-Walker.</strong> Étant donné des estimations $\hat\gamma(j)$, $j=0,\dots,p$ (et $\hat\mu$), la solution de ces équations donne les <strong>estimations de Yule-Walker</strong> des $\phi_j$ ; on utilise la propriété $\gamma(-j)=\gamma(+j)$, $\forall j$.</p>
+</blockquote>
+<p><strong>Et l'équation $j=0$ fournit $\sigma^2$.</strong> De
+$$\gamma(0)=\phi_1\gamma(-1)+\phi_2\gamma(-2)+\cdots+\phi_p\gamma(-p)+\sigma^2$$
+on tire
+$$\hat\sigma^2=\hat\gamma(0)-\sum_{j=1}^p\hat\phi_j\,\hat\gamma(j)$$</p>
+<blockquote>
+<p><strong>Quand toutes les estimations $\hat\gamma(j)$ et $\hat\mu$ sont sans biais, les estimateurs de Yule-Walker appliquent le principe d'estimation par la méthode des moments.</strong></p>
+</blockquote>
+<p class="cal piege"> <strong>La matrice ci-dessus est une matrice de Toeplitz symétrique</strong> : elle est constante le long de chaque diagonale, puisque $\gamma$ ne dépend que de l'écart. Cette structure permet une résolution en $O(p^2)$ (algorithme de Levinson-Durbin) au lieu de $O(p^3)$.</p>
+<h2 data-prio="high">Concept 8 — Les modèles MA($q$)</h2>
+<p><strong>Définition.</strong> Modèle moyenne mobile d'ordre $q$ :
+$$(X_t-\mu)=\theta(L)\epsilon_t, \qquad \{\epsilon_t\}\sim WN(0,\sigma^2), \qquad \theta(L)=1+\theta_1L+\theta_2L^2+\cdots+\theta_qL^q$$</p>
+<p><strong>Propriétés.</strong></p>
+<ul>
+<li>Le processus $\{X_t\}$ est <strong>inversible</strong> si toutes les racines de $\theta(z)=0$ sont <strong>en dehors</strong> du cercle unité complexe.</li>
+<li>Les moments de $X_t$ sont :
+$$E(X_t)=\mu, \qquad \mathrm{Var}(X_t)=\gamma(0)=\sigma^2\cdot(1+\theta_1^2+\theta_2^2+\cdots+\theta_q^2)$$
+$$\mathrm{Cov}(X_t,X_{t+j})=\begin{cases}0 &amp; j&gt;q\\[2pt] \sigma^2\cdot(\theta_j+\theta_{j+1}\theta_1+\theta_{j+2}\theta_2+\cdots+\theta_q\theta_{q-j}) &amp; 1\leq j\leq q\end{cases}$$</li>
+</ul>
+<blockquote>
+<p><strong>La signature du MA($q$) est la coupure nette.</strong> $\gamma(j)=0$ dès que $j&gt;q$ — parce que $X_t$ et $X_{t+j}$ ne partagent <strong>aucune</strong> innovation commune quand l'écart dépasse la mémoire $q$ du filtre. C'est <strong>le</strong> critère d'identification pratique : si l'autocorrélogramme empirique tombe à zéro après le retard $q$, pensez MA($q$) ; s'il décroît géométriquement sans jamais s'annuler, pensez AR.</p>
+</blockquote>
+<p class="cal piege"> <strong>Noter la dissymétrie des deux conditions.</strong> Pour l'AR, les racines hors du cercle unité donnent la <strong>stationnarité</strong>. Pour le MA, elles donnent l'<strong>inversibilité</strong>. Un MA($q$) est <strong>toujours stationnaire</strong> (c'est une somme finie de bruits blancs, ses moments ne dépendent jamais de $t$) — l'inversibilité est une question distincte : peut-on retrouver les innovations à partir des observations ?</p>
+<h2 data-prio="must">Concept 9 — Non-stationnarité et différenciation</h2>
+<blockquote>
+<p><em>De nombreuses séries économiques présentent un comportement non stationnaire compatible avec des marches aléatoires. Box et Jenkins préconisent de retirer le comportement de tendance non stationnaire à l'aide d'opérateurs de différenciation.</em></p>
+</blockquote>
+<p>$$\Delta=1-L, \qquad \Delta^2=(1-L)^2=1-2L+L^2, \qquad \Delta^k=(1-L)^k=\sum_{j=0}^k\binom kj(-L)^j \quad (k&gt;0 \text{ entier})$$</p>
+<ul>
+<li>Si le processus $\{X_t\}$ a une <strong>tendance linéaire</strong> en temps, alors $\{\Delta X_t\}$ <strong>n'a pas</strong> de tendance.</li>
+<li>Si $\{X_t\}$ a une <strong>tendance quadratique</strong>, alors le processus <strong>doublement différencié</strong> $\{\Delta^2X_t\}$ n'a pas de tendance.</li>
+</ul>
+<h3>Deux processus non stationnaires à ne surtout pas confondre</h3>
+<p><strong>(a) Modèle à retour vers une tendance linéaire (<em>trend stationary</em>).</strong>
+$$X_t=TD_t+\varepsilon_t, \qquad TD_t=a+bt \text{ (tendance déterministe linéaire)}, \qquad \varepsilon_t\sim AR(1)$$
+avec $\varepsilon_t=\rho\varepsilon_{t-1}+\eta_t$, $\lvert\rho\rvert&lt;1$ et $\{\eta_t\}\sim WN(0,\sigma^2)$.</p>
+<p>Les moments de $\{X_t\}$ :
+$$E(X_t)=E(TD_t)+E(\varepsilon_t)=a+bt, \qquad \mathrm{Var}(X_t)=\mathrm{Var}(\varepsilon_t)=\frac{\sigma^2}{1-\rho^2}$$
+Le processus différencié s'écrit
+$$\Delta X_t=b+\Delta\varepsilon_t=b+(\varepsilon_t-\varepsilon_{t-1})=b+(1-L)\varepsilon_t=b+(1-L)(1-\rho L)^{-1}\eta_t$$</p>
+<p><strong>(b) Processus purement intégré I(1).</strong>
+$$X_t=X_{t-1}+\eta_t, \qquad \{\eta_t\}\sim WN(0,\sigma^2)$$
+soit, de façon équivalente, $\Delta X_t=(1-L)X_t=\eta_t$. Étant donné $X_0$ :
+$$X_t=X_0+TS_t, \qquad TS_t=\sum_{j=0}^t\eta_j$$
+Le processus $\{TS_t\}$ est un processus à <strong>tendance stochastique</strong> : $TS_t=TS_{t-1}+\eta_t$.</p>
+<blockquote>
+<p><strong>Notes du cours.</strong> <em>Le processus à tendance stochastique <strong>n'est pas parfaitement prévisible</strong>. Le processus $\{X_t\}$ est une <strong>marche aléatoire simple</strong> à pas bruit blanc. Il est non stationnaire car, étant donné $X_0$ :</em>
+$$\mathrm{Var}(X_t)=t\sigma^2, \qquad \mathrm{Cov}(X_t,X_{t-j})=(t-j)\sigma^2 \ \text{ pour } 0&lt;j&lt;t$$
+$$\mathrm{Corr}(X_t,X_{t-j})=\frac{t-j}{\sqrt{t(t-j)}}=\sqrt{1-j/t}$$</p>
+</blockquote>
+<blockquote>
+<p><strong>Comparez les deux.</strong> Dans (a) la variance est <strong>constante</strong> et les chocs s'estompent : la série revient à sa tendance. Dans (b) la variance <strong>croît linéairement avec $t$</strong> et les chocs sont <strong>permanents</strong> : la série n'a aucun niveau vers lequel revenir. Et remarquez la corrélation $\sqrt{1-j/t}$ : pour $t$ grand elle reste <strong>proche de 1</strong> même à grand écart $j$ — c'est l'illusion d'une forte dépendance qui produit les fameuses <strong>régressions fallacieuses</strong>.</p>
+</blockquote>
+<p class="cal piege"> <strong>La conséquence pratique est brutale.</strong> Différencier un processus (a) qui n'en avait pas besoin introduit un MA non inversible ; ne pas différencier un processus (b) qui en avait besoin produit des régressions et des tests entièrement faux. C'est <strong>exactement</strong> pourquoi les tests de racine unitaire existent.</p>
+<div class="cal formel"><span class="lab">Définition — ARIMA($p,d,q$).</span>
+<p> La série $\{X_t\}$ suit un modèle <strong>ARIMA($p,d,q$)</strong> (« ARMA intégré ») si $\{\Delta^dX_t\}$ est <strong>stationnaire</strong> (et non stationnaire pour une différenciation d'ordre inférieur) et suit un modèle ARMA($p,q$).</p>
+</div>
+<p><strong>Les trois questions que pose ce modèle :</strong></p>
+<ol>
+<li><strong>Déterminer l'ordre de différenciation</strong> requis pour retirer les tendances temporelles (déterministes ou stochastiques).</li>
+<li><strong>Estimer</strong> les paramètres inconnus d'un modèle ARIMA($p,d,q$).</li>
+<li><strong>Sélectionner le modèle</strong> : choisir parmi des modèles alternatifs de spécifications $(p,d,q)$ différentes.</li>
+</ol>
+<h2 data-prio="mid">Concept 10 — Estimation et sélection de modèle</h2>
+<p><strong>Estimation par maximum de vraisemblance.</strong></p>
+<ol>
+<li>Supposer que les $\{\epsilon_t\}$ sont des variables i.i.d. $N(0,\sigma^2)$.</li>
+<li>Exprimer le modèle ARMA($p,q$) sous <strong>forme espace-état</strong>.</li>
+<li>Appliquer la <strong>décomposition en erreurs de prédiction</strong> de la log-vraisemblance.</li>
+<li>Appliquer l'une ou l'autre méthode — ou les deux :<ul>
+<li><strong>LIML</strong> (<em>Limited Information Maximum-Likelihood</em>) : conditionner sur les $p$ premières valeurs de $\{X_t\}$ et supposer que les $q$ premières valeurs de $\{\epsilon_t\}$ sont <strong>nulles</strong>.</li>
+<li><strong>FIML</strong> (<em>Full Information Maximum-Likelihood</em>) : utiliser la <strong>distribution stationnaire</strong> des $p$ premières valeurs pour spécifier la vraisemblance <strong>exacte</strong>.</li>
+</ul>
+</li>
+</ol>
+<blockquote>
+<p><strong>La différence entre les deux, en pratique.</strong> LIML est bien plus simple : conditionner sur le début de la série évite d'avoir à écrire sa loi marginale. FIML est plus efficace, surtout sur les <strong>échantillons courts</strong>, où les $p$ premières observations pèsent lourd. Sur des séries financières longues, l'écart est négligeable.</p>
+</blockquote>
+<p><strong>Critères de sélection de modèle.</strong> Des critères statistiques servent à choisir les ordres $(p,q)$ :</p>
+<ol>
+<li>Ajuster tous les modèles ARMA($p,q$) avec $0\leq p\leq p_{\max}$ et $0\leq q\leq q_{\max}$.</li>
+<li>Soit $\tilde\sigma^2(p,q)$ l'<strong>EMV</strong> de $\sigma^2=\mathrm{Var}(\epsilon_t)$, la variance des innovations ARMA sous hypothèse gaussienne.</li>
+<li>Choisir $(p,q)$ minimisant l'un de :</li>
+</ol>
+<p>$$\textbf{AIC}(p,q)=\log\big(\tilde\sigma^2(p,q)\big)+2\cdot\frac{p+q}{n}$$
+$$\textbf{BIC}(p,q)=\log\big(\tilde\sigma^2(p,q)\big)+\log(n)\cdot\frac{p+q}{n}$$
+$$\textbf{HQ}(p,q)=\log\big(\tilde\sigma^2(p,q)\big)+2\log(\log(n))\cdot\frac{p+q}{n}$$</p>
+<blockquote>
+<p><strong>Ces trois critères ont la même structure : ajustement + pénalité.</strong> Le premier terme récompense la réduction de la variance résiduelle, le second pénalise le nombre de paramètres $p+q$. <strong>Ce qui les distingue est le poids de la pénalité</strong> : $2$ pour l'AIC, $\log(n)$ pour le BIC, $2\log\log(n)$ pour Hannan-Quinn.</p>
+<p>Pour $n&gt;7$, $\log(n)&gt;2$ : <strong>le BIC pénalise plus fort que l'AIC</strong> et sélectionne donc des modèles <strong>plus parcimonieux</strong>. Le BIC est <em>consistant</em> (il retrouve le vrai modèle quand $n\to\infty$, si le vrai modèle est dans la liste) ; l'AIC ne l'est pas mais est <em>efficace</em> en prédiction. HQ est intermédiaire.</p>
+</blockquote>
+<h2 data-prio="must">Concept 11 — Tester la stationnarité</h2>
+<blockquote>
+<p><strong>Test de Dickey-Fuller (DF).</strong> Supposons que $\{X_t\}$ suive le modèle AR(1)
+$$X_t=\phi X_{t-1}+\epsilon_t, \qquad \{\epsilon_t\}\sim WN(0,\sigma^2)$$
+On teste les hypothèses
+$$H_0:\ \phi=1 \quad (\textbf{racine unitaire, non-stationnarité})$$
+$$H_1:\ \lvert\phi\rvert&lt;1 \quad (\textbf{stationnarité})$$
+(« test de racine unitaire autorégressive »).</p>
+</blockquote>
+<p><strong>La statistique.</strong> On ajuste le modèle AR(1) par moindres carrés et l'on définit
+$$\hat t_{\phi=1}=\frac{\hat\phi-1}{se(\hat\phi)}$$
+où $\hat\phi$ est l'estimateur des moindres carrés de $\phi$ et $se(\hat\phi)$ l'estimation MCO de son écart-type.</p>
+<p><strong>Le comportement asymptotique — et c'est là tout l'intérêt du test :</strong></p>
+<ul>
+<li>Si $\lvert\phi\rvert&lt;1$, alors $\ \sqrt T(\hat\phi-\phi)\ \xrightarrow{\ d\ }\ N\big(0,\ (1-\phi^2)\big)$.</li>
+<li>Si $\phi=1$, alors $\hat\phi$ est <strong>super-consistant</strong>, de vitesse $(1/T)$, et $\hat t_{\phi=1}$ suit la <strong>distribution de Dickey-Fuller</strong>.</li>
+</ul>
+<blockquote>
+<p><strong>Le point crucial à comprendre.</strong> Sous $H_0$, la statistique <strong>ne suit pas une loi de Student</strong>. La loi limite est non standard — c'est une fonctionnelle de mouvement brownien — et ses quantiles sont <strong>tabulés séparément</strong> (ils sont plus négatifs que ceux de la normale). Utiliser les tables de Student ici conduit à <strong>rejeter beaucoup trop souvent</strong> la racine unitaire.</p>
+<p><strong>Et « super-consistant » ?</strong> Sous $H_0$, $\hat\phi$ converge à la vitesse $1/T$ au lieu de $1/\sqrt T$ — bien plus vite que d'ordinaire. Intuition : sous racine unitaire, la variance du régresseur $X_{t-1}$ <strong>croît avec $t$</strong>, ce qui donne à la régression une information bien plus riche.</p>
+</blockquote>
+<p><strong>Les tests disponibles.</strong></p>
+<table>
+<thead>
+<tr>
+<th>Tests de racine unitaire ($H_0$ : <strong>non-stationnarité</strong>)</th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Dickey et Fuller (1979)</td>
+<td>test <strong>DF</strong></td>
+</tr>
+<tr>
+<td>Said et Dickey (1984)</td>
+<td>test <strong>ADF</strong> (Dickey-Fuller augmenté)</td>
+</tr>
+<tr>
+<td>Phillips et Perron (1988)</td>
+<td>tests de racine unitaire <strong>PP</strong></td>
+</tr>
+<tr>
+<td>Elliot, Rothenberg et Stock (2001)</td>
+<td>statistiques de racine unitaire efficaces <strong>ERS</strong></td>
+</tr>
+</tbody></table>
+<table>
+<thead>
+<tr>
+<th>Tests de stationnarité ($H_0$ : <strong>stationnarité</strong>)</th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Kwiatkowski, Phillips, Schmidt et Shin (1992)</td>
+<td>test <strong>KPSS</strong></td>
+</tr>
+</tbody></table>
+<p class="cal piege"> <strong>Regardez bien les deux tableaux : les hypothèses nulles sont inversées.</strong> Pour DF/ADF/PP/ERS, $H_0$ est la non-stationnarité — ne pas rejeter ne prouve <strong>pas</strong> la racine unitaire, cela veut souvent dire qu'on manque de puissance. Pour KPSS, $H_0$ est la stationnarité. <strong>La bonne pratique est de faire les deux</strong> : si ADF ne rejette pas et KPSS rejette, on conclut à la racine unitaire avec confiance ; si les deux rejettent, il y a un problème de spécification.</p>
+<h2>Comment résoudre l'exercice type (protocole)</h2>
+<ol>
+<li><strong>Tracer la série</strong> et chercher tendance, saisonnalité, changement de variance.</li>
+<li><strong>Tester la racine unitaire</strong> (ADF <em>et</em> KPSS). Si racine unitaire, <strong>différencier</strong> et recommencer ⟹ cela fixe $d$.</li>
+<li><strong>Regarder l'autocorrélogramme</strong> de la série stationnarisée : coupure nette après $q$ ⟹ MA($q$) ; décroissance géométrique ⟹ AR.</li>
+<li><strong>Ajuster</strong> tous les ARMA($p,q$) jusqu'à $(p_{\max},q_{\max})$ par maximum de vraisemblance.</li>
+<li><strong>Sélectionner</strong> $(p,q)$ par AIC, BIC ou HQ.</li>
+<li><strong>Vérifier les racines</strong> : $\phi(z)=0$ hors du cercle unité (stationnarité), $\theta(z)=0$ hors du cercle unité (inversibilité).</li>
+<li><strong>Diagnostiquer les résidus</strong> : sont-ils un bruit blanc ? Sinon, revenir à l'étape 4.</li>
+</ol>
+<h3>Comment reconnaître qu'il faut utiliser cette méthode ?</h3>
+<table>
+<thead>
+<tr>
+<th>Indice dans l'énoncé</th>
+<th>Ce qu'il faut faire</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>« autocorrélation nulle au-delà du retard $k$ »</td>
+<td><strong>MA($k$)</strong></td>
+</tr>
+<tr>
+<td>« autocorrélation décroissant géométriquement »</td>
+<td><strong>AR</strong> ; si $\rho(j)=\phi^j$, <strong>AR(1)</strong></td>
+</tr>
+<tr>
+<td>« retour à la moyenne » (taux, spread, ratio de valorisation)</td>
+<td><strong>AR(1)</strong> avec $0&lt;\phi&lt;1$</td>
+</tr>
+<tr>
+<td>« la variance croît avec le temps »</td>
+<td><strong>marche aléatoire / I(1)</strong> ⟹ différencier</td>
+</tr>
+<tr>
+<td>« tendance linéaire »</td>
+<td>distinguer <strong>trend stationary</strong> de <strong>I(1) avec dérive</strong> ⟹ tester</td>
+</tr>
+<tr>
+<td>« choisir entre plusieurs modèles »</td>
+<td><strong>AIC / BIC / HQ</strong></td>
+</tr>
+<tr>
+<td>« la série est-elle stationnaire ? »</td>
+<td><strong>Dickey-Fuller</strong>, tables DF et non Student</td>
+</tr>
+</tbody></table>
+<h3>Exercices progressifs</h3>
+<p><strong> Niveau 1</strong> — Le processus $X_t=0{,}6X_{t-1}+\epsilon_t$ est-il stationnaire ? Donnez $\gamma(0)$, $\rho(2)$ et $IR(3)$ si $\sigma^2=4$.</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p><strong>Stationnarité.</strong> L'équation caractéristique est $1-0{,}6z=0$, de racine $\lambda=1/0{,}6\approx1{,}67$. Comme $\lvert\lambda\rvert&gt;1$ (ou, ce qui revient au même, $\lvert\phi\rvert=0{,}6&lt;1$), le processus <strong>est stationnaire en covariance</strong>.</p>
+<p><strong>Variance.</strong>
+$$\gamma(0)=\frac{\sigma^2}{1-\phi^2}=\frac{4}{1-0{,}36}=\frac{4}{0{,}64}=6{,}25$$</p>
+<p><strong>Autocorrélation au retard 2.</strong> $\rho(2)=\phi^2=0{,}36$.</p>
+<p><strong>Réponse impulsionnelle.</strong> La décomposition de Wold est $X_t=\sum_j\phi^j\epsilon_{t-j}$, donc $\psi_j=\phi^j$ et
+$$IR(3)=\psi_3=0{,}6^3=0{,}216$$
+Un choc unitaire aujourd'hui déplace encore la série de $0{,}216$ dans trois périodes. La <strong>réponse cumulée de long terme</strong> vaut $\psi(1)=1/(1-0{,}6)=2{,}5$.</p>
+</div></details>
+
+<p><strong> Niveau 2</strong> — Pourquoi un MA($q$) est-il toujours stationnaire, alors qu'un AR($p$) ne l'est pas toujours ?</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p><strong>MA($q$).</strong> $X_t-\mu=\epsilon_t+\theta_1\epsilon_{t-1}+\cdots+\theta_q\epsilon_{t-q}$ est une <strong>somme finie</strong> de bruits blancs à coefficients constants. Donc
+$$E(X_t)=\mu \quad\text{et}\quad \mathrm{Var}(X_t)=\sigma^2(1+\theta_1^2+\cdots+\theta_q^2)$$
+sont <strong>finies et indépendantes de $t$</strong>, et $\gamma(j)$ ne dépend que de $j$. La stationnarité est <strong>automatique</strong>, quels que soient les $\theta_i$.</p>
+<p><strong>AR($p$).</strong> $X_t$ dépend de son <strong>propre passé</strong>. Le processus se rétroalimente : si le coefficient est trop grand, les chocs s'accumulent au lieu de s'estomper. En développant l'AR(1) :
+$$X_t=\sum_{j=0}^\infty\phi^j\epsilon_{t-j}$$
+Cette somme <strong>infinie</strong> ne converge en moyenne quadratique que si $\sum_j\phi^{2j}&lt;\infty$, soit $\lvert\phi\rvert&lt;1$. Pour $\phi=1$ la variance est $t\sigma^2\to\infty$ ; pour $\phi&gt;1$ elle explose géométriquement.</p>
+<p><strong>La formulation générale.</strong> Un AR est stationnaire quand son inverse $\phi^{-1}(L)$ existe, c'est-à-dire quand il <strong>admet</strong> une représentation MA($\infty$) convergente. La condition sur les racines est exactement la condition de convergence de cette série.</p>
+</div></details>
+
+<p><strong> Niveau 3</strong> — Distinguez « trend stationary » et « difference stationary », et dites pourquoi la confusion coûte cher.</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p><strong>Trend stationary</strong> : $X_t=a+bt+\varepsilon_t$ avec $\varepsilon_t$ AR(1) stationnaire.
+$$E(X_t)=a+bt, \qquad \mathrm{Var}(X_t)=\frac{\sigma^2}{1-\rho^2} \quad\textbf{constante}$$
+Les chocs sont <strong>transitoires</strong> : la série revient à sa tendance déterministe. La bonne stationnarisation est de <strong>retirer la tendance</strong> par régression sur $t$.</p>
+<p><strong>Difference stationary (I(1))</strong> : $X_t=X_{t-1}+\eta_t$, donc $X_t=X_0+\sum_{j\leq t}\eta_j$.
+$$\mathrm{Var}(X_t)=t\sigma^2 \quad\textbf{croissante}, \qquad \mathrm{Corr}(X_t,X_{t-j})=\sqrt{1-j/t}$$
+Les chocs sont <strong>permanents</strong> : il n'existe aucun niveau de référence. La bonne stationnarisation est de <strong>différencier</strong>.</p>
+<p><strong>Le coût des deux erreurs.</strong></p>
+<ul>
+<li><strong>Différencier un trend stationary</strong> : $\Delta X_t=b+(1-L)\varepsilon_t$ contient le facteur $(1-L)$, dont la racine $\theta(z)=1-z$ est <strong>sur</strong> le cercle unité. Le MA obtenu est <strong>non inversible</strong> — on parle de « sur-différenciation ». L'estimation devient instable et la prévision se dégrade.</li>
+<li><strong>Ne pas différencier un I(1)</strong> : c'est le problème des <strong>régressions fallacieuses</strong>. Deux marches aléatoires <strong>indépendantes</strong> régressées l'une sur l'autre donnent un $R^2$ élevé et un $t$ de Student très significatif — purement par artefact, parce que la corrélation $\sqrt{1-j/t}$ reste proche de 1 sur de longs horizons. Toute l'inférence est fausse.</li>
+</ul>
+<p><strong>D'où le protocole.</strong> Tester avant de transformer. Et comme les deux familles de tests ont des $H_0$ opposées, faire <strong>ADF et KPSS</strong> et croiser leurs conclusions.</p>
+</div></details>
+
+<p><strong> Niveau 4 — type examen</strong> — Expliquez le théorème de Wold, dites pourquoi il ne suffit pas en pratique, et comment ARMA résout le problème.</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p><strong>L'énoncé.</strong> Toute série stationnaire $\{X_t\}$ se décompose en $X_t=V_t+S_t$, où $V_t$ est <strong>linéairement déterministe</strong> (combinaison linéaire de son propre passé à coefficients constants) et
+$$S_t=\sum_{i=0}^\infty\psi_i\epsilon_{t-i}, \qquad \psi_0=1, \qquad \sum_{i=0}^\infty\psi_i^2&lt;\infty$$
+avec $\{\epsilon_t\}$ un bruit blanc linéairement imprévisible ($E\epsilon_t=0$, $E\epsilon_t^2=\sigma^2$, $E\epsilon_t\epsilon_s=0$ pour $s\neq t$) non corrélé avec $\{V_t\}$.</p>
+<p><strong>Sa portée.</strong> C'est un théorème de <strong>structure</strong> : il ne dit pas comment modéliser, il dit qu'il n'y a <strong>rien d'autre</strong> à modéliser. Toute série stationnaire <em>est</em> une MA($\infty$) plus une partie prévisible. Modéliser = estimer les $\{\psi_i\}$.</p>
+<p><strong>Pourquoi il ne suffit pas.</strong> Les $\{\psi_i\}$ sont en <strong>nombre infini</strong> et l'on ne dispose que de $T$ observations. Le cours le dit explicitement : théoriquement $\lim_{p\to\infty}\hat y^{(p)}=P(Y_t\mid Y_{t-1},\dots)$, mais si $p\to\infty$ est requis, il faut $n\to\infty$ avec $p/n\to0$. On ne peut donc pas estimer directement la représentation de Wold : il faut une <strong>paramétrisation finie</strong>.</p>
+<p><strong>Comment ARMA résout le problème.</strong> ARMA($p,q$) s'écrit $\phi(L)(X_t-\mu)=\theta(L)\epsilon_t$, dont la décomposition de Wold est
+$$X_t=\mu+\psi(L)\epsilon_t, \qquad \psi(L)=[\phi(L)]^{-1}\theta(L)$$
+Les $\{\psi_i\}$ infinis sont donc engendrés comme le développement en série d'une <strong>fraction rationnelle</strong> de deux polynômes de degrés $p$ et $q$ : $p+q+2$ paramètres seulement (avec $\mu$ et $\sigma^2$).</p>
+<p><strong>Pourquoi une fraction rationnelle est le bon choix.</strong> Le numérateur $\theta(L)$ crée une mémoire <strong>courte et exacte</strong> (autocovariances nulles au-delà de $q$) ; le dénominateur $\phi(L)$ crée une mémoire <strong>longue et géométriquement décroissante</strong> (les racines produisent des termes en $\lambda_j^{-i}$). Combiner les deux permet d'approcher n'importe quelle suite $\{\psi_i\}$ de carré sommable avec très peu de paramètres — c'est le principe des approximations de Padé, transposé aux séries temporelles.</p>
+<p><strong>Ce qu'il reste à faire.</strong> Choisir $(p,q)$ — d'où AIC/BIC/HQ ; vérifier que $\phi(z)=0$ a ses racines hors du cercle unité (stationnarité) et $\theta(z)=0$ aussi (inversibilité) ; et si la série n'est pas stationnaire au départ, différencier $d$ fois — d'où ARIMA($p,d,q$).</p>
+</div></details>
+
+<h2 data-prio="must">Common mistakes</h2>
+<ol>
+<li><strong>Confondre stationnarité stricte et stationnarité en covariance</strong> — la première porte sur toute la loi jointe, la seconde sur les deux premiers moments seulement. Elles coïncident pour un processus gaussien.</li>
+<li><strong>Croire que le bruit blanc de Wold est i.i.d.</strong> — il est seulement <strong>non corrélé</strong>. Les rendements financiers en sont l'illustration : non corrélés mais avec des carrés fortement dépendants.</li>
+<li><strong>Se tromper de côté sur les racines</strong> — « hors du cercle unité » porte sur les racines de $\phi(z)$, pas sur les valeurs propres de la matrice compagnon, qui sont leurs inverses.</li>
+<li><strong>Croire qu'un MA($q$) peut être non stationnaire</strong> — il l'est toujours ; les racines de $\theta(z)$ gouvernent l'<strong>inversibilité</strong>, pas la stationnarité.</li>
+<li><strong>Utiliser les tables de Student pour Dickey-Fuller</strong> — la loi sous $H_0$ est <strong>non standard</strong>, ses quantiles sont plus négatifs. On rejette bien trop souvent la racine unitaire sinon.</li>
+<li><strong>Interpréter un non-rejet de ADF comme une preuve de racine unitaire</strong> — c'est $H_0$ ; le non-rejet reflète souvent un simple manque de puissance. Croiser avec KPSS.</li>
+<li><strong>Sur-différencier</strong> — différencier une série <em>trend stationary</em> introduit un facteur $(1-L)$ <strong>non inversible</strong>.</li>
+<li><strong>Régresser deux séries I(1) sans précaution</strong> — régression fallacieuse : $R^2$ élevé et $t$ significatif sans aucune relation réelle.</li>
+<li><strong>Comparer AIC entre modèles ajustés sur des échantillons différents</strong> — différencier fait perdre des observations ; $n$ doit être identique pour que les critères soient comparables.</li>
+<li><strong>Oublier que $c=\mu\phi(1)$ et non $c=\mu$</strong> dans l'écriture $X_t=c+\sum_j\phi_jX_{t-j}+\epsilon_t$.</li>
+</ol>
+<h2>Ultimate Review</h2>
+<ol>
+<li><strong>Série temporelle</strong> = processus stochastique indexé par $t$, spécifié par toutes ses lois de dimension finie.</li>
+<li><strong>Stationnarité stricte</strong> : invariance de $p(\cdot)$ par translation du temps. <strong>Stationnarité en covariance</strong> : $E(X_t)=\mu$, $\mathrm{Var}(X_t)=\sigma_X^2$, $\mathrm{Cov}(X_t,X_{t+\tau})=\gamma(\tau)$ constants.</li>
+<li><strong>Autocorrélation</strong> : $\rho(\tau)=\gamma(\tau)/\gamma(0)$.</li>
+<li><strong>Wold</strong> : $X_t=V_t+\sum_{i\geq0}\psi_i\epsilon_{t-i}$, $\psi_0=1$, $\sum\psi_i^2&lt;\infty$, $\epsilon_t$ bruit blanc non corrélé avec $V_t$.</li>
+<li><strong>Opérateur retard</strong> : $L(X_t)=X_{t-1}$ ; $\psi(L)=\sum\psi_iL^i$ ; <strong>réponse impulsionnelle</strong> $IR(j)=\partial X_t/\partial\epsilon_{t-j}=\psi_j$ ; réponse cumulée $=\psi(1)$.</li>
+<li><strong>Inversibilité</strong> : si $\psi^{-1}(L)$ existe, $X_t=\sum_i\pi_iX_{t-i}+\epsilon_t$ (représentation AR).</li>
+<li><strong>ARMA($p,q$)</strong> : $\phi(L)(X_t-\mu)=\theta(L)\epsilon_t$ ; Wold $\psi(L)=[\phi(L)]^{-1}\theta(L)$.</li>
+<li><strong>AR($p$)</strong> : régression linéaire sur $(X_{t-1},\dots,X_{t-p})$ avec $c=\mu\phi(1)$ ; <strong>stationnaire ssi</strong> toutes les racines de $\phi(z)=0$ sont hors du cercle unité.</li>
+<li><strong>AR(1)</strong> : $\mathrm{Var}=\sigma^2/(1-\phi^2)$, $\rho(j)=\phi^j$ ; $0&lt;\phi&lt;1$ retour à la moyenne, $-1&lt;\phi&lt;0$ oscillant, $\phi=1$ marche aléatoire, $\phi&gt;1$ explosif. Exemples : taux, spreads, changes réels, ratios de valorisation.</li>
+<li><strong>Yule-Walker</strong> : $\gamma(j)=\sum_k\phi_k\gamma(j-k)+\delta_{0,j}\sigma^2$ ; système de Toeplitz en $\phi$ ; $\hat\sigma^2=\hat\gamma(0)-\sum_j\hat\phi_j\hat\gamma(j)$ ; <strong>méthode des moments</strong>.</li>
+<li><strong>MA($q$)</strong> : toujours stationnaire ; <strong>inversible</strong> ssi racines de $\theta(z)=0$ hors du cercle unité ; $\gamma(0)=\sigma^2(1+\sum\theta_i^2)$ et <strong>$\gamma(j)=0$ pour $j&gt;q$</strong>.</li>
+<li><strong>Différenciation</strong> : $\Delta=1-L$ ; tendance linéaire ⟹ $\Delta$, quadratique ⟹ $\Delta^2$.</li>
+<li><strong>Trend stationary</strong> ($\mathrm{Var}$ constante, chocs transitoires) contre <strong>I(1)</strong> ($\mathrm{Var}=t\sigma^2$, chocs permanents, $\mathrm{Corr}=\sqrt{1-j/t}$).</li>
+<li><strong>ARIMA($p,d,q$)</strong> : $\{\Delta^dX_t\}$ stationnaire et ARMA($p,q$).</li>
+<li><strong>Estimation</strong> : MV sous forme espace-état, décomposition en erreurs de prédiction, <strong>LIML</strong> (conditionne) ou <strong>FIML</strong> (loi stationnaire exacte).</li>
+<li><strong>Sélection</strong> : $\log\tilde\sigma^2(p,q)$ + pénalité $\times\frac{p+q}{n}$, avec pénalité $2$ (<strong>AIC</strong>), $\log n$ (<strong>BIC</strong>), $2\log\log n$ (<strong>HQ</strong>).</li>
+<li><strong>Dickey-Fuller</strong> : $H_0:\phi=1$ contre $H_1:\lvert\phi\rvert&lt;1$ ; $\hat t=(\hat\phi-1)/se(\hat\phi)$ ; sous $H_0$ <strong>loi DF non standard</strong> et $\hat\phi$ <strong>super-consistant</strong> en $1/T$.</li>
+<li><strong>Familles de tests</strong> : DF, ADF, PP, ERS ($H_0$ = non-stationnarité) · <strong>KPSS</strong> ($H_0$ = stationnarité).</li>
+</ol>
+<p><strong>Formulas to know</strong>
+$$\rho(\tau)=\frac{\gamma(\tau)}{\gamma(0)} \qquad \phi(L)(X_t-\mu)=\theta(L)\epsilon_t \qquad \psi(L)=[\phi(L)]^{-1}\theta(L)$$
+$$\mathrm{Var}(X_t)=\frac{\sigma^2}{1-\phi^2} \quad\text{et}\quad \rho(j)=\phi^j \quad\text{[AR(1)]} \qquad \gamma(j)=0 \ \ (j&gt;q) \quad\text{[MA(q)]}$$
+$$AIC=\log\tilde\sigma^2+2\tfrac{p+q}{n} \qquad BIC=\log\tilde\sigma^2+\log(n)\tfrac{p+q}{n} \qquad \hat t_{\phi=1}=\frac{\hat\phi-1}{se(\hat\phi)}$$</p>
+<p><strong>Methods to know</strong> : la stratégie de Wold en 5 étapes ; la factorisation de $\phi(L)$ et l'inversion terme à terme ; la dérivation des équations de Yule-Walker ; le protocole Box-Jenkins complet.</p>
+<div class="rec"><h2>Active Recall</h2><p><strong>Basic</strong> — Donnez la définition de la stationnarité en covariance.</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p>$\{X_t\}$ est stationnaire en covariance si les trois quantités suivantes sont <strong>constantes au cours du temps $t$</strong> :
+$$E(X_t)=\mu, \qquad \mathrm{Var}(X_t)=\sigma_X^2, \qquad \mathrm{Cov}(X_t,X_{t+\tau})=\gamma(\tau)$$
+La covariance ne dépend donc que de l'<strong>écart</strong> $\tau$ entre les deux dates, jamais de leur position absolue. La fonction d'autocorrélation est $\rho(\tau)=\gamma(\tau)/\gamma(0)$.</p>
+</div></details><p><strong>Understanding</strong> — Énoncez le théorème de Wold et dites ce qu'il garantit exactement.</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p>Toute série stationnaire se décompose en $X_t=V_t+S_t$ avec $V_t$ <strong>linéairement déterministe</strong> et $S_t=\sum_{i\geq0}\psi_i\epsilon_{t-i}$ une <strong>MA($\infty$)</strong>, où $\psi_0=1$, $\sum\psi_i^2&lt;\infty$, $\{\epsilon_t\}$ est un bruit blanc linéairement imprévisible et $E(\epsilon_tV_s)=0$.</p>
+<p><strong>Ce qu'il garantit</strong> : qu'il n'existe <strong>aucune autre structure</strong>. Une série stationnaire est nécessairement une partie prévisible plus une moyenne mobile infinie d'innovations. C'est un théorème d'<strong>existence et d'exhaustivité</strong>, pas une méthode.</p>
+<p><strong>Ce qu'il ne donne pas</strong> : un modèle estimable. Les $\{\psi_i\}$ sont en nombre infini ; d'où ARMA, qui les engendre par une fraction rationnelle à peu de paramètres.</p>
+</div></details><p><strong>Application</strong> — Comment reconnaître un AR d'un MA à partir de l'autocorrélogramme empirique ?</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p><strong>MA($q$)</strong> : $\gamma(j)=0$ pour $j&gt;q$. L'autocorrélogramme <strong>coupe net</strong> après le retard $q$ puis reste dans les bandes de confiance. Raison : $X_t$ et $X_{t+j}$ ne partagent <strong>aucune innovation commune</strong> au-delà de la mémoire $q$ du filtre.</p>
+<p><strong>AR($p$)</strong> : l'autocorrélation <strong>décroît géométriquement</strong> sans jamais s'annuler exactement — pour un AR(1), $\rho(j)=\phi^j$ exactement. Raison : la représentation de Wold est une MA($\infty$), donc toutes les autocovariances sont non nulles.</p>
+<p><strong>Le complément indispensable</strong> : l'autocorrélogramme <strong>partiel</strong> (PACF), qui présente la coupure symétrique — nette après $p$ pour un AR($p$), décroissance pour un MA. En pratique on lit ACF <strong>et</strong> PACF ensemble, puis on confirme par AIC/BIC.</p>
+</div></details><p><strong>Comparison</strong> — AIC, BIC et HQ : même structure, quelle différence ?</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p>Les trois ont la forme $\log\big(\tilde\sigma^2(p,q)\big)+c_n\cdot\frac{p+q}{n}$, où $\tilde\sigma^2$ est l'EMV de la variance des innovations. <strong>Seule la pénalité $c_n$ change :</strong></p>
+<table>
+<thead>
+<tr>
+<th>Critère</th>
+<th>$c_n$</th>
+<th>Effet</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>AIC</strong></td>
+<td>$2$</td>
+<td>pénalité la plus faible ⟹ modèles <strong>plus riches</strong></td>
+</tr>
+<tr>
+<td><strong>HQ</strong></td>
+<td>$2\log\log(n)$</td>
+<td>intermédiaire</td>
+</tr>
+<tr>
+<td><strong>BIC</strong></td>
+<td>$\log(n)$</td>
+<td>pénalité la plus forte (dès $n&gt;7$) ⟹ modèles <strong>plus parcimonieux</strong></td>
+</tr>
+</tbody></table>
+<p><strong>Le principe commun</strong> : premier terme = qualité d'ajustement, second terme = prix de la complexité. Sans pénalité, on choisirait toujours le modèle le plus gros.</p>
+<p><strong>Lequel choisir ?</strong> Le <strong>BIC</strong> est <em>consistant</em> : si le vrai modèle est dans la liste, il le retrouve quand $n\to\infty$. L'<strong>AIC</strong> ne l'est pas mais est <em>efficace</em> pour la prévision. En finance, où le vrai modèle n'est jamais dans la liste, l'AIC se défend bien.</p>
+</div></details><p><strong>Exam-style</strong> — Décrivez le test de Dickey-Fuller, son asymptotique, et pourquoi on ne peut pas y utiliser les tables usuelles.</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p><strong>Le cadre.</strong> $X_t=\phi X_{t-1}+\epsilon_t$ avec $\{\epsilon_t\}\sim WN(0,\sigma^2)$, et l'on teste
+$$H_0:\ \phi=1 \ \text{ (racine unitaire, non-stationnarité)} \qquad\text{contre}\qquad H_1:\ \lvert\phi\rvert&lt;1 \ \text{ (stationnarité)}$$
+On ajuste par moindres carrés et l'on forme $\hat t_{\phi=1}=(\hat\phi-1)/se(\hat\phi)$.</p>
+<p><strong>L'asymptotique — deux régimes complètement différents.</strong></p>
+<ul>
+<li>Si $\lvert\phi\rvert&lt;1$ : $\sqrt T(\hat\phi-\phi)\xrightarrow{d}N(0,(1-\phi^2))$ — vitesse standard $1/\sqrt T$, loi limite normale.</li>
+<li>Si $\phi=1$ : $\hat\phi$ est <strong>super-consistant</strong>, de vitesse $1/T$, et $\hat t_{\phi=1}$ suit la <strong>distribution de Dickey-Fuller</strong>.</li>
+</ul>
+<p><strong>Pourquoi les tables usuelles sont invalides.</strong> Sous $H_0$, le régresseur $X_{t-1}$ n'est pas stationnaire : sa variance croît en $t$. Les conditions du théorème central limite standard tombent, et la loi limite s'exprime comme une fonctionnelle de mouvement brownien — non standard, <strong>asymétrique vers la gauche</strong>, avec des quantiles nettement plus négatifs que ceux de Student. Utiliser Student conduirait à <strong>rejeter la racine unitaire beaucoup trop souvent</strong>.</p>
+<p><strong>Et l'idée derrière la super-consistance.</strong> Sous racine unitaire, la variance du régresseur explose avec $t$ ; la régression dispose donc d'une information bien plus riche que dans le cas stationnaire, d'où une convergence en $1/T$ au lieu de $1/\sqrt T$.</p>
+<p><strong>Les extensions et le complément.</strong> ADF (Said et Dickey, 1984) ajoute des retards pour absorber l'autocorrélation résiduelle ; PP (Phillips et Perron, 1988) corrige non paramétriquement ; ERS (Elliot, Rothenberg et Stock, 2001) améliore la puissance. Et <strong>KPSS</strong> (Kwiatkowski <em>et al.</em>, 1992) renverse l'hypothèse nulle : $H_0$ y est la <strong>stationnarité</strong>. On croise les deux, car un non-rejet de ADF reflète souvent un simple manque de puissance.</p>
+</div></details></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h2>Flashcards</h2>
+<table>
+<thead>
+<tr>
+<th>Question</th>
+<th>Réponse</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Stationnarité stricte ?</td>
+<td>Invariance de toutes les lois jointes par translation du temps</td>
+</tr>
+<tr>
+<td>Stationnarité en covariance ?</td>
+<td>$E(X_t)$, $\mathrm{Var}(X_t)$, $\mathrm{Cov}(X_t,X_{t+\tau})$ constants en $t$</td>
+</tr>
+<tr>
+<td>Fonction d'autocorrélation ?</td>
+<td>$\rho(\tau)=\gamma(\tau)/\gamma(0)$</td>
+</tr>
+<tr>
+<td>Théorème de Wold ?</td>
+<td>$X_t=V_t+\sum_{i\geq0}\psi_i\epsilon_{t-i}$, $\psi_0=1$, $\sum\psi_i^2&lt;\infty$</td>
+</tr>
+<tr>
+<td>Le bruit blanc de Wold est-il i.i.d. ?</td>
+<td><strong>Non</strong> — seulement non corrélé</td>
+</tr>
+<tr>
+<td>Opérateur retard ?</td>
+<td>$L(X_t)=X_{t-1}$, $L^n(X_t)=X_{t-n}$</td>
+</tr>
+<tr>
+<td>Réponse impulsionnelle ?</td>
+<td>$IR(j)=\partial X_t/\partial\epsilon_{t-j}=\psi_j$</td>
+</tr>
+<tr>
+<td>Réponse cumulée de long terme ?</td>
+<td>$\psi(1)=\sum_i\psi_i$</td>
+</tr>
+<tr>
+<td>Représentation AR d'un processus inversible ?</td>
+<td>$X_t=\sum_i\pi_iX_{t-i}+\epsilon_t$</td>
+</tr>
+<tr>
+<td>Écriture ARMA($p,q$) ?</td>
+<td>$\phi(L)(X_t-\mu)=\theta(L)\epsilon_t$</td>
+</tr>
+<tr>
+<td>Wold d'un ARMA ?</td>
+<td>$\psi(L)=[\phi(L)]^{-1}\theta(L)$</td>
+</tr>
+<tr>
+<td>Condition de stationnarité d'un AR($p$) ?</td>
+<td>Racines de $\phi(z)=0$ <strong>hors</strong> du cercle unité</td>
+</tr>
+<tr>
+<td>Constante d'un AR($p$) en régression ?</td>
+<td>$c=\mu\cdot\phi(1)$</td>
+</tr>
+<tr>
+<td>Variance d'un AR(1) ?</td>
+<td>$\sigma^2/(1-\phi^2)$</td>
+</tr>
+<tr>
+<td>Autocorrélation d'un AR(1) ?</td>
+<td>$\rho(j)=\phi^j$</td>
+</tr>
+<tr>
+<td>AR(1) avec $\phi=1$ ?</td>
+<td><strong>Marche aléatoire</strong>, non stationnaire, pas de Wold</td>
+</tr>
+<tr>
+<td>Exemples financiers d'AR(1) ?</td>
+<td>Taux d'intérêt (Vasicek), spreads, changes réels, ratios de valorisation</td>
+</tr>
+<tr>
+<td>Équations de Yule-Walker ?</td>
+<td>$\gamma(j)=\sum_k\phi_k\gamma(j-k)+\delta_{0,j}\sigma^2$</td>
+</tr>
+<tr>
+<td>Estimateur de $\sigma^2$ par Yule-Walker ?</td>
+<td>$\hat\gamma(0)-\sum_j\hat\phi_j\hat\gamma(j)$</td>
+</tr>
+<tr>
+<td>Principe d'estimation de Yule-Walker ?</td>
+<td><strong>Méthode des moments</strong></td>
+</tr>
+<tr>
+<td>Un MA($q$) est-il stationnaire ?</td>
+<td><strong>Toujours</strong> — les racines gouvernent l'inversibilité</td>
+</tr>
+<tr>
+<td>Autocovariance d'un MA($q$) au-delà de $q$ ?</td>
+<td><strong>Nulle</strong></td>
+</tr>
+<tr>
+<td>Variance d'un MA($q$) ?</td>
+<td>$\sigma^2(1+\theta_1^2+\cdots+\theta_q^2)$</td>
+</tr>
+<tr>
+<td>Opérateur de différenciation ?</td>
+<td>$\Delta=1-L$ ; $\Delta^k=(1-L)^k$</td>
+</tr>
+<tr>
+<td>Variance d'une marche aléatoire ?</td>
+<td>$t\sigma^2$ — croissante, donc non stationnaire</td>
+</tr>
+<tr>
+<td>$\mathrm{Corr}(X_t,X_{t-j})$ pour une marche aléatoire ?</td>
+<td>$\sqrt{1-j/t}$</td>
+</tr>
+<tr>
+<td>ARIMA($p,d,q$) ?</td>
+<td>$\Delta^dX_t$ stationnaire et ARMA($p,q$)</td>
+</tr>
+<tr>
+<td>LIML contre FIML ?</td>
+<td>LIML conditionne sur les $p$ premières valeurs ; FIML utilise leur loi stationnaire exacte</td>
+</tr>
+<tr>
+<td>Pénalités AIC / BIC / HQ ?</td>
+<td>$2$ · $\log(n)$ · $2\log\log(n)$, le tout $\times\frac{p+q}{n}$</td>
+</tr>
+<tr>
+<td>Hypothèses du test de Dickey-Fuller ?</td>
+<td>$H_0:\phi=1$ (racine unitaire) contre $H_1:\lvert\phi\rvert&lt;1$</td>
+</tr>
+<tr>
+<td>Loi de $\hat t$ sous $H_0$ ?</td>
+<td><strong>Distribution de Dickey-Fuller</strong>, non standard</td>
+</tr>
+<tr>
+<td>Vitesse de convergence sous $H_0$ ?</td>
+<td>$1/T$ — $\hat\phi$ est <strong>super-consistant</strong></td>
+</tr>
+<tr>
+<td>Le test dont $H_0$ est la stationnarité ?</td>
+<td><strong>KPSS</strong> (Kwiatkowski, Phillips, Schmidt et Shin, 1992)</td>
+</tr>
+</tbody></table>
+</main>
+
+
+
+
+</body></html>

@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fiche 56 — Calcul d'Itô : lemme, isométrie, martingales et théorème de Girsanov</title>
+<script>
+window.MathJax={tex:{inlineMath:[["$","$"]],displayMath:[["$$","$$"]],processEscapes:true},
+ options:{skipHtmlTags:["script","noscript","style","textarea","pre","code"]},
+ svg:{fontCache:"global"},
+ startup:{pageReady:()=>MathJax.startup.defaultPageReady().then(()=>{document.body.classList.add("ready")})}};
+setTimeout(function(){document.body.classList.add("ready")},2500);
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+/* ============================================================
+   MathiasLearn — feuille de style des fiches
+   Reprise intégrale des tokens de 00_PARCOURS/*.html
+   + blocs pédagogiques (callouts, méthode, essentiels, recall)
+   ============================================================ */
+:root{--bg:#faf9f7;--card:#fff;--ink:#1a1a1a;--muted:#6b6b6b;--line:#e5e2dd;--accent:#8b5e34;
+ --hl:#fdf8ef;--ok:#2d7d4f;--okbg:#f0f7f3;--warn:#b3402f;--warnbg:#fdf3f1;--blue:#2f5d8b;--bluebg:#f1f5fa}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+ font:17px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;padding:0 16px 100px}
+.nav{position:sticky;top:0;background:rgba(250,249,247,.96);backdrop-filter:blur(8px);
+ border-bottom:1px solid var(--line);margin:0 -16px 30px;padding:11px 16px;z-index:50;
+ display:flex;gap:6px;flex-wrap:wrap;font-size:13px}
+.nav a{color:var(--muted);text-decoration:none;padding:4px 9px;border-radius:5px;white-space:nowrap}
+.nav a:hover{background:var(--line);color:var(--ink)}
+.nav a.on{background:var(--accent);color:#fff}
+main{max-width:780px;margin:0 auto}
+h1{font-size:31px;letter-spacing:-.02em;margin:.4em 0 .5em;line-height:1.25}
+h2{font-size:23px;margin:2.2em 0 .7em;padding-bottom:.3em;border-bottom:1px solid var(--line)}
+h3{font-size:19px;margin:1.9em 0 .5em;color:var(--accent)}
+h4{font-size:17px;margin:1.5em 0 .4em}
+p{margin:.8em 0} a{color:var(--accent)} hr{border:0;border-top:1px solid var(--line);margin:2.6em 0}
+table{border-collapse:collapse;width:100%;margin:1.3em 0;font-size:15.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+th{background:#f3f0eb;font-weight:600}
+tr:nth-child(even) td{background:#fcfbfa}
+code{font-family:"SF Mono",Menlo,Consolas,monospace;font-size:.88em;background:#f2efea;padding:2px 6px;border-radius:4px;white-space:nowrap}
+pre{background:#f2efea;padding:14px 16px;border-radius:8px;overflow-x:auto}
+pre code{background:none;padding:0;white-space:pre}
+blockquote{border-left:3px solid var(--accent);background:var(--hl);margin:1.4em 0;padding:14px 20px;border-radius:0 8px 8px 0}
+blockquote p:first-child{margin-top:0} blockquote p:last-child{margin-bottom:0}
+ul,ol{padding-left:1.5em} li{margin:.35em 0} em{color:#4a4a4a}
+mjx-container[display="true"]{margin:1.1em 0!important;overflow-x:auto;overflow-y:hidden;padding:2px 0}
+mjx-container svg{max-width:100%}
+body:not(.ready) main{opacity:0} main{opacity:1;transition:opacity .25s}
+
+/* --- bandeau de tête de fiche --- */
+.cours{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--accent);
+ border-radius:0 10px 10px 0;padding:18px 22px;margin:0 0 34px}
+.cours h4{margin:0 0 4px;font-size:14px;text-transform:uppercase;letter-spacing:.07em;color:var(--accent)}
+.cours .cs{color:var(--muted);font-size:14.5px;margin:0 0 14px}
+
+/* --- exercices / corrigés --- */
+.ex{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:6px 24px 20px;margin:18px 0}
+.ex>h3:first-child{margin-top:14px}
+details.cor{margin-top:18px;border:1px solid var(--line);border-radius:8px;background:#fcfbfa;overflow:hidden}
+details.cor>summary{cursor:pointer;padding:12px 16px;font-weight:600;font-size:15px;color:var(--accent);
+ list-style:none;display:flex;align-items:center;gap:9px;user-select:none;transition:.15s;min-height:44px}
+details.cor>summary::-webkit-details-marker{display:none}
+details.cor>summary:hover{background:var(--hl)}
+details.cor>summary::before{content:"\25B6";font-size:10px;transition:transform .18s;display:inline-block}
+details.cor[open]>summary::before{transform:rotate(90deg)}
+details.cor[open]>summary{background:var(--okbg);color:var(--ok);border-bottom:1px solid var(--line)}
+.cor .in{padding:4px 20px 16px}
+.cor .in>*:first-child{margin-top:.9em}
+
+/* --- blocs pédagogiques (callouts) ---
+   Générés depuis une citation Markdown dont le premier **gras** commence
+   par un mot-clé : DÉFINITION, THÉORÈME, MÉTHODE, PIÈGE, INTUITION… */
+.cal{border:1px solid var(--line);border-left:4px solid var(--accent);background:var(--card);
+ border-radius:0 10px 10px 0;padding:15px 20px;margin:1.5em 0}
+.cal>p:first-child{margin-top:0}.cal>p:last-child,.cal>ul:last-child,.cal>ol:last-child{margin-bottom:0}
+.cal .lab{display:block;font-size:12.5px;text-transform:uppercase;letter-spacing:.08em;
+ font-weight:700;color:var(--accent);margin-bottom:6px}
+.cal.formel{background:var(--hl)}
+.cal.piege{border-left-color:var(--warn);background:var(--warnbg)}
+.cal.piege .lab{color:var(--warn)}
+.cal.methode{border-left-color:var(--ok);background:var(--okbg)}
+.cal.methode .lab{color:var(--ok)}
+.cal.intu{border-left-color:var(--blue);background:var(--bluebg)}
+.cal.intu .lab{color:var(--blue)}
+.cal.plus{border-left-style:dashed;background:#faf9f7}
+.cal.plus .lab{color:var(--muted)}
+
+/* --- révision express --- */
+.ess{background:var(--card);border:1px solid var(--accent);border-radius:10px;padding:4px 24px 20px;margin:1.6em 0}
+.ess h3{margin-top:1.3em}
+.rec{background:var(--card);border:1px dashed var(--accent);border-radius:10px;padding:4px 24px 18px;margin:1.6em 0}
+.rec ol{counter-reset:none}
+
+/* --- impression / PDF --- */
+@media print{
+ .nav{display:none}
+ body{padding:0;background:#fff;font-size:11.2pt;line-height:1.55}
+ main{max-width:none}
+ h1{font-size:23pt}h2{font-size:15pt;margin-top:1.5em}h3{font-size:12.6pt}
+ h2,h3,h4{break-after:avoid;page-break-after:avoid}
+ table,.cal,blockquote{break-inside:avoid;page-break-inside:avoid}
+ table{display:table;font-size:9.6pt}
+ details.cor{border:1px solid var(--line);background:#fcfbfa}
+ details.cor>summary{display:none}
+ details.cor .in{padding-top:10px}
+ .cal,.ex,.ess,.rec{box-shadow:none}
+ a{color:var(--ink);text-decoration:none}
+}
+@page{margin:16mm 15mm 18mm}
+
+/* --- exemples travaillés --- */
+.exm{background:#fcfbfa;border:1px solid var(--line);border-radius:10px;padding:2px 20px 14px;margin:1.5em 0}
+.exm>h4:first-child{margin:14px 0 .5em;color:var(--accent);font-size:13px;text-transform:uppercase;letter-spacing:.07em}
+
+
+/* --- pastilles de priorité (conventions des fiches de l'app) --- */
+h2[data-prio], h3[data-prio], h4[data-prio]{position:relative}
+h2[data-prio]::before,h3[data-prio]::before,h4[data-prio]::before{
+ content:"";display:inline-block;width:9px;height:9px;border-radius:50%;
+ margin-right:9px;vertical-align:middle;background:var(--muted)}
+[data-prio="must"]::before{background:var(--warn)}
+[data-prio="high"]::before{background:#d98324}
+[data-prio="mid"]::before{background:#c9a227}
+[data-prio="low"]::before{background:var(--ok)}
+/* corrigés des fiches de l'app : même traitement que les corrigés des séries */
+details.cor>summary::after{content:""}
+</style></head><body>
+<div class="nav"><a href="00_COMMENCER_ICI.html">Commencer ici</a><a href="01_NOTATIONS_le-decodeur.html">Notations</a><a href="02_EXERCICES_Serie-0.html">Série 0 — Remise en route</a><a href="03_EXERCICES_Serie-1.html">Série 1 — Convexité</a><a href="04_EXERCICES_Serie-2.html">Série 2 — KKT</a><a href="05_AUTO-EVALUATION.html">Auto-évaluation (quiz)</a><a href="06_FICHE_Optimisation-deux-variables.html">Fiche — Optimisation à 2 variables</a></div>
+<main><h1>Fiche 56 — Calcul d'Itô : lemme, isométrie, martingales et théorème de Girsanov</h1>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Matière</strong></td>
+<td>Maths · Finance de marché</td>
+</tr>
+<tr>
+<td><strong>Cours source</strong></td>
+<td><em>18.S096 Topics in Mathematics with Applications in Finance</em>, MIT OpenCourseWare, automne 2013 — cours 18 « Itô Calculus »</td>
+</tr>
+<tr>
+<td><strong>Difficulté</strong></td>
+<td> Must know — l'outil sans lequel Black-Scholes n'existe pas</td>
+</tr>
+<tr>
+<td><strong>Temps d'étude estimé</strong></td>
+<td>2 h 30</td>
+</tr>
+<tr>
+<td><strong>Prérequis</strong></td>
+<td>Fiche 53 (mouvement brownien, brownien géométrique), développement de Taylor, espérance conditionnelle</td>
+</tr>
+<tr>
+<td><strong>Concepts clés</strong></td>
+<td>Non-dérivabilité du brownien, règle $(dB_t)^2=dt$, lemme d'Itô, intégrale d'Itô, processus adapté, martingale, isométrie d'Itô, exponentielle stochastique, mesures équivalentes, dérivée de Radon-Nikodym, théorème de Girsanov</td>
+</tr>
+<tr>
+<td><strong>Poids à l'examen</strong></td>
+<td>Trois choses à savoir faire de mémoire : <strong>écrire et appliquer</strong> le lemme d'Itô ; calculer $\int_0^TB_t\,dB_t$ et expliquer pourquoi il « viole » le théorème fondamental ; trouver le processus vérifiant $dX_t=\sigma X_t\,dB_t$.</td>
+</tr>
+</tbody></table>
+<h2>Vue d'ensemble</h2>
+<p>Le cours précédent a établi qu'<em>une trajectoire brownienne n'est <strong>nulle part dérivable</strong> avec probabilité $1$</em>. Autrement dit, la dérivée
+$$\frac{dB_t}{dt}$$
+<strong>n'existe pas</strong>. Or, quand on étudie le mouvement brownien — ou qu'on l'utilise comme modèle —, on a très fréquemment besoin d'estimer la variation d'une fonction du type $f(B_t)$ sur une durée infinitésimale.</p>
+<pre><code>PROBLÈME    dB_t/dt n'existe pas → la règle de la chaîne est inutilisable
+IDÉE        décrire df en fonction de dB_t, pas de dB_t/dt
+OBSTACLE    dans Taylor, le terme (ΔB_t)² N'EST PAS négligeable : E[(ΔB_t)²] = Δt
+RÈGLE       (dB_t)² = dt        ← toute la théorie tient dans cette substitution
+RÉSULTAT    df(B_t) = f'(B_t) dB_t + ½ f''(B_t) dt      ← lemme d'Itô
+</code></pre>
+<blockquote>
+<p><strong>Ce qu'il faut comprendre d'emblée.</strong> Le calcul d'Itô n'est pas une généralisation cosmétique du calcul ordinaire : il en <strong>change une règle</strong>. Le terme de second ordre, négligeable partout ailleurs, survit ici — et c'est exactement ce terme $\frac12f''\,dt$ qui produira le $-\sigma^2/2$ de la fiche 53 et toute la formule de Black-Scholes.</p>
+</blockquote>
+<h2 data-prio="must">Concept 1 — Pourquoi la règle de la chaîne échoue</h2>
+<p><strong>Ce qu'on voudrait écrire.</strong> Si $\frac{dB_t}{dt}$ existait, la règle de la chaîne donnerait
+$$df=\frac{dB_t}{dt}\cdot f'(B_t)\,dt$$
+<em>Nous savons déjà que cette formule n'a aucun sens.</em></p>
+<p><strong>Le contournement naturel.</strong> Une façon de tourner le problème est de décrire la différence $df$ <strong>en termes de la différence $dB_t$</strong>. L'équation devient
+$$df=f'(B_t)\,dB_t \tag{1.1}$$
+<em>Cette nouvelle formule a au moins un sens, puisqu'elle n'a plus besoin de $\frac{dB_t}{dt}$. Le seul problème, c'est qu'elle <strong>ne marche pas tout à fait</strong>.</em></p>
+<p><strong>Pourquoi.</strong> Considérons le développement de Taylor de $f$ :
+$$f(x+\Delta x)-f(x)=(\Delta x)\cdot f'(x)+\frac{(\Delta x)^2}{2}f''(x)+\frac{(\Delta x)^3}{6}f'''(x)+\cdots$$
+Pour en déduire l'équation (1.1), il faudrait pouvoir affirmer que <strong>le terme significatif est le premier</strong>, $(\Delta x)\cdot f'(x)$, et que tous les autres sont d'ordre de grandeur plus petit. Est-ce vrai pour $\Delta x=\Delta B_t$ ?
+$$\Delta f=(\Delta B_t)\cdot f'(B_t)+\frac{(\Delta B_t)^2}{2}f''(B_t)+\frac{(\Delta B_t)^3}{6}f'''(B_t)+\cdots$$</p>
+<blockquote>
+<p><strong>Le point décisif.</strong> Considérons le terme $(\Delta B_t)^2$. Comme $B_t$ est un mouvement brownien, on sait que
+$$E\big[(\Delta B_t)^2\big]=\Delta t$$
+Puisqu'une variation de $B_t$ s'accompagne nécessairement d'une variation de $t$, <strong>le deuxième terme n'est plus négligeable</strong>.</p>
+</blockquote>
+<p class="cal piege"> <strong>Comparez les ordres de grandeur.</strong> Pour une fonction ordinaire, $\Delta x\sim\Delta t$ et donc $(\Delta x)^2\sim(\Delta t)^2$, négligeable. Pour le brownien, $\Delta B_t\sim\sqrt{\Delta t}$ — c'est précisément ce qui le rend non dérivable — et donc $(\Delta B_t)^2\sim\Delta t$ : <strong>du même ordre que le terme dominant</strong>. En revanche $(\Delta B_t)^3\sim(\Delta t)^{3/2}$, qui est bien négligeable. Le développement s'arrête donc <strong>exactement à l'ordre 2</strong>, ni plus ni moins.</p>
+<h2 data-prio="must">Concept 2 — Le lemme d'Itô</h2>
+<blockquote>
+<p><em>La théorie du calcul d'Itô nous dit essentiellement qu'on peut faire la <strong>substitution</strong></em>
+$$\boxed{\ (\Delta B_t)^2=\Delta t\ }$$
+<em>et que les termes restants sont négligeables.</em></p>
+</blockquote>
+<p>L'équation devient alors
+$$\Delta f=(\Delta B_t)\cdot f'(B_t)+\frac{\Delta t}{2}f''(B_t)+\cdots$$
+soit, en termes d'infinitésimaux :
+$$\boxed{\ df(B_t)=f'(B_t)\,dB_t+\frac12f''(B_t)\,dt\ } \tag{1.2}$$</p>
+<div class="cal formel"><span class="lab">lemme d'Itô</span>
+<p><em>Cette équation, connue sous le nom de , est l'équation principale du calcul d'Itô.</em></p>
+</div>
+<p><strong>Le cas de deux variables.</strong> Pour une fonction régulière $f(t,x)$ dont on veut la différentielle de $f(t,B_t)$, le calcul classique donnerait
+$$df=\frac{\partial f}{\partial t}dt+\frac{\partial f}{\partial x}dx$$
+mais en calcul d'Itô on obtient
+$$df(t,B_t)=\frac{\partial f}{\partial t}dt+\frac{\partial f}{\partial x}dB_t+\frac12\frac{\partial^2f}{\partial x^2}(dB_t)^2=\left(\frac{\partial f}{\partial t}+\frac12\frac{\partial^2f}{\partial x^2}\right)dt+\frac{\partial f}{\partial x}dB_t$$</p>
+<div class="cal formel"><span class="lab">Théorème 1.1 — lemme d'Itô.</span>
+<p> <em>Soit $f(t,x)$ une fonction régulière de deux variables, et soit $X_t$ un processus stochastique vérifiant $dX_t=\mu_t\,dt+\sigma_t\,dB_t$ pour un mouvement brownien $B_t$. Alors</em>
+$$\boxed{\ df(t,X_t)=\left(\frac{\partial f}{\partial t}+\mu_t\frac{\partial f}{\partial x}+\frac12\sigma_t^2\frac{\partial^2f}{\partial x^2}\right)dt+\sigma_t\frac{\partial f}{\partial x}\,dB_t\ }$$</p>
+</div>
+<p><strong>Démonstration.</strong>
+$$df(t,X_t)=\frac{\partial f}{\partial t}dt+\frac{\partial f}{\partial x}dX_t+\frac12\frac{\partial^2f}{\partial x^2}(dX_t)^2$$
+$$=\left(\frac{\partial f}{\partial t}+\mu_t\frac{\partial f}{\partial x}+\frac12\sigma_t^2\frac{\partial^2f}{\partial x^2}\right)dt+\sigma_t\frac{\partial f}{\partial x}dB_t+\ldots\,dt\,dB_t+\ldots(dt)^2$$
+<em>On peut ignorer les termes $dt\,dB_t$ et $(dt)^2$.</em> $\blacksquare$</p>
+<h3>La table de multiplication d'Itô</h3>
+<table>
+<thead>
+<tr>
+<th>$\times$</th>
+<th>$dt$</th>
+<th>$dB_t$</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>$dt$</strong></td>
+<td>$0$</td>
+<td>$0$</td>
+</tr>
+<tr>
+<td><strong>$dB_t$</strong></td>
+<td>$0$</td>
+<td>$dt$</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>Toute la mécanique du calcul tient dans cette table.</strong> On développe $(dX_t)^2=(\mu_t\,dt+\sigma_t\,dB_t)^2=\mu_t^2(dt)^2+2\mu_t\sigma_t\,dt\,dB_t+\sigma_t^2(dB_t)^2$, et seuls survivent les $\sigma_t^2\,dt$. C'est la seule chose à retenir mécaniquement pour appliquer le lemme.</p>
+</blockquote>
+<p class="cal piege"> <strong>Le terme $\frac12\sigma_t^2\frac{\partial^2f}{\partial x^2}$ est le « terme d'Itô ».</strong> Il n'a <strong>aucun</strong> équivalent en calcul classique. Son signe dépend de la <strong>convexité</strong> de $f$ : pour $f$ convexe ($f''&gt;0$), il <strong>ajoute</strong> de la dérive ; pour $f$ concave — comme $\log$ —, il en <strong>retire</strong>. C'est exactement le $-\sigma^2/2$ de la fiche 53.</p>
+<h2 data-prio="must">Concept 3 — L'intégrale d'Itô et les exemples fondamentaux</h2>
+<div class="cal formel"><span class="lab">Définition 1.2.</span>
+<p> <em>On définit l'intégration comme l'<strong>inverse de la différentiation</strong> :</em>
+$$F(t,B_t)=\int f(t,B_t)\,dB_t+\int g(t,B_t)\,dt \qquad\Longleftrightarrow\qquad dF=f(t,B_t)\,dB_t+g(t,B_t)\,dt$$</p>
+</div>
+<h3>Exemple (i) — le brownien avec dérive</h3>
+<p>Le processus $X_t=\mu t+\sigma B_t$ est le <strong>mouvement brownien de dérive $\mu$ et de variance $\sigma$</strong>. Pour ce processus,
+$$dX_t=\mu\,dt+\sigma\,dB_t$$</p>
+<h3>Exemple (ii) — le calcul de $\int_0^TB_t\,dB_t$</h3>
+<p>Considérons $f(x)=\frac12x^2$. Comme $f'(x)=x$ et $f''(x)=1$, le lemme d'Itô donne
+$$df(B_t)=B_t\,dB_t+\frac12\,dt$$
+Autrement dit, en intégrant de $0$ à $T$ :
+$$\frac12B_T^2=\int_0^TB_t\,dB_t+\int_0^T\frac12\,dt=\int_0^TB_t\,dB_t+\frac T2$$
+ce qui implique
+$$\boxed{\ \int_0^TB_t\,dB_t=\frac12B_T^2-\frac T2\ }$$</p>
+<div class="cal formel"><span class="lab">Remarquez comment ceci « viole » le théorème fondamental du calcul.</span>
+<p> En calcul ordinaire, $\int_0^Tx\,dx=\frac12T^2$ tout court. Ici apparaît un terme correctif $-\frac T2$, sorti tout droit du terme d'Itô.</p>
+</div>
+<p class="cal piege"> <strong>Ce terme n'est pas un artefact : il est indispensable.</strong> Sans lui, $\int_0^TB_t\,dB_t=\frac12B_T^2\geq0$ serait <strong>toujours positive</strong>, et son espérance strictement positive — ce qui contredirait la propriété de martingale du concept 6. Avec le $-\frac T2$ : $E\big[\frac12B_T^2-\frac T2\big]=\frac T2-\frac T2=0$. </p>
+<h3>Exemple (iii) — l'exponentielle</h3>
+<p>Soit $f(t,x)=\exp(\mu t+\sigma x)$. On a $\frac{\partial f}{\partial t}=\mu f$, $\frac{\partial f}{\partial x}=\sigma f$ et $\frac{\partial^2f}{\partial x^2}=\sigma^2f$, donc
+$$df(t,B_t)=\Big(\mu+\frac12\sigma^2\Big)f(t,B_t)\,dt+\sigma f(t,B_t)\,dB_t$$</p>
+<h3>Exemple (iv) — une fonction des deux variables</h3>
+<p>Soit $f(t,x)=t^2+x^2$ et $X_t=\mu t+\sigma B_t$. Alors $\frac{\partial f}{\partial t}=2t$, $\frac{\partial f}{\partial x}=2x$, $\frac{\partial^2f}{\partial x^2}=2$, d'où
+$$df(t,X_t)=2t\,dt+2X_t\,dX_t+(dX_t)^2=2t\,dt+2X_t(\mu\,dt+\sigma\,dB_t)+\sigma^2\,dt$$
+$$=\big(2t+2\mu X_t+\sigma^2\big)dt+2\sigma X_t\,dB_t$$</p>
+<h2 data-prio="must">Concept 4 — L'exponentielle stochastique</h2>
+<blockquote>
+<p><strong>La question.</strong> Trouver le processus $X_t(t,B_t)$ tel que
+$$dX_t=\sigma X_t\cdot dB_t$$
+c'est-à-dire un processus <strong>sans aucune dérive</strong>, dont l'accroissement est proportionnel à sa valeur.</p>
+</blockquote>
+<p><strong>La réponse.</strong> Il suffit de reprendre l'exemple (iii) et de poser $\mu=-\frac12\sigma^2$, de sorte que le coefficient $\big(\mu+\frac12\sigma^2\big)$ s'annule :
+$$\boxed{\ X_t(t,B_t)=\exp\Big(-\frac12\sigma^2t+\sigma B_t\Big)\ }$$</p>
+<blockquote>
+<p><strong>Ce processus s'appelle l'exponentielle stochastique</strong> (ou exponentielle de Doléans-Dade), et il est <strong>partout</strong> en finance.</p>
+<p><strong>Le lien direct avec la fiche 53.</strong> C'est exactement la solution du brownien géométrique $dS/S=\mu\,dt+\sigma\,dB$ : $S_t=S_0\exp\big((\mu-\frac{\sigma^2}{2})t+\sigma B_t\big)$. Le terme $-\sigma^2/2$ dans la dérive du logarithme, qu'on avait justifié par l'inégalité de Jensen, est ici <strong>produit mécaniquement</strong> par le lemme d'Itô.</p>
+<p><strong>Et son autre rôle :</strong> c'est la densité de Radon-Nikodym du théorème de Girsanov, au concept 8.</p>
+</blockquote>
+<p class="cal piege"> <strong>La conséquence contre-intuitive à retenir.</strong> $X_t$ a une <strong>espérance constante</strong> $E[X_t]=1$ (c'est une martingale), mais sa <strong>médiane décroît</strong> : $\exp(-\frac12\sigma^2t)$ tend vers $0$. Presque toute trajectoire finit par s'écraser, mais quelques-unes deviennent gigantesques et maintiennent la moyenne. C'est le mécanisme exact de la « <em>volatility drag</em> ».</p>
+<h2 data-prio="high">Concept 5 — Les trois questions et le choix d'Itô</h2>
+<p>Une fois le lemme acquis, le cours annonce le programme :</p>
+<blockquote>
+<ol>
+<li><em>Étant donné $g(t,B_t)=\int a\,dB_t+\int b\,dt$ pour certaines fonctions $a$ et $b$, existe-t-il une façon simple de décrire la <strong>variance</strong> de $g$ ?</em></li>
+<li><em>Étant donné $g(t,B_t)$ comme ci-dessus, quand $g$ est-elle une <strong>martingale</strong> ?</em></li>
+<li><em>Supposons $b=0$. Quand $g(t,B_t)$ est-elle <strong>normalement distribuée</strong> au temps $t$ ?</em></li>
+</ol>
+</blockquote>
+<p><strong>La remarque sur les autres calculs.</strong> <em>La théorie du calcul peut être étendue aux mouvements browniens de plusieurs façons différentes, toutes « correctes » — autrement dit, il peut exister plusieurs versions du calcul d'Itô. Par exemple, il existe une théorie du calcul où</em>
+$$df=f'(B_t)\,dB_t-\frac12f''(B_t)\,dt$$</p>
+<blockquote>
+<p><em><strong>Cependant, l'intégrale d'Itô est la plus naturelle</strong> dans le contexte de la façon dont la variable temporelle s'insère dans la théorie, parce que <strong>le fait que nous ne puissions pas voir le futur</strong> est la base de toute la théorie.</em></p>
+</blockquote>
+<p class="cal piege"> <strong>Ce n'est pas un argument esthétique, c'est un argument financier.</strong> L'intégrale d'Itô évalue l'intégrande à l'instant <strong>initial</strong> de chaque petit intervalle : $\sum_i g(t_i)(B_{t_{i+1}}-B_{t_i})$. C'est précisément le modèle d'une stratégie de trading — on choisit sa position <strong>avant</strong> d'observer le mouvement du prix. Une autre convention (évaluer au milieu, comme Stratonovich) reviendrait à supposer qu'on connaît déjà une partie du mouvement à venir : mathématiquement licite, <strong>financièrement absurde</strong>. C'est aussi ce qui fait que l'intégrale d'Itô est une martingale, et pas les autres.</p>
+<h2 data-prio="must">Concept 6 — Propriétés : normalité, adaptation, martingale</h2>
+<h3>La normalité pour un intégrande déterministe</h3>
+<div class="cal formel"><span class="lab">Théorème.</span>
+<p> <em>Soit $B(t)$ un mouvement brownien et $\Delta(t)$ une fonction du temps <strong>non aléatoire</strong>. Supposons qu'un processus $I(t)$ vérifie</em>
+$$dI=\Delta(s)\,dB_s, \quad\text{c'est-à-dire}\quad I(t)=\int_0^t\Delta(s)\,dB_s$$
+<em>avec $I(0)=0$. Alors pour chaque $t\geq0$, la variable aléatoire $I(t)$ est <strong>normalement distribuée</strong>.</em></p>
+</div>
+<blockquote>
+<p><em>Ce premier théorème peut être vu comme une extension du fait que la <strong>somme de variables normales indépendantes</strong> est une variable normale.</em> En effet, $\int_0^t\Delta(s)\,dB_s$ est une limite de sommes $\sum_i\Delta(t_i)(B_{t_{i+1}}-B_{t_i})$ : des combinaisons linéaires à coefficients <strong>constants</strong> d'accroissements gaussiens indépendants.</p>
+</blockquote>
+<h3>Les processus adaptés</h3>
+<p><em>Que se passe-t-il si l'on autorise $\Delta(t)$ à être une fonction <strong>aléatoire</strong> du temps ?</em></p>
+<div class="cal formel"><span class="lab">Définition 2.1.</span>
+<p> <em>Soit $X_t$ un processus stochastique. Un processus $\Delta_t$ est dit <strong>adapté</strong> (relativement à $X_t$) si, pour tout $t\geq0$, la variable aléatoire $\Delta_t$ ne dépend que des $X_s$ pour $s\leq t$.</em></p>
+</div>
+<p><strong>Exemple 2.2.</strong> Soit $X_t$ un processus stochastique.</p>
+<table>
+<thead>
+<tr>
+<th>Processus</th>
+<th>Adapté ?</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$\Delta(t)=X_t$</td>
+<td><strong>oui</strong></td>
+</tr>
+<tr>
+<td>$\Delta(t)=\min\{X_t,c\}$ ($c$ constante)</td>
+<td><strong>oui</strong></td>
+</tr>
+<tr>
+<td>$\Delta(t)=\max_{0\leq t\leq T}X_t$</td>
+<td><strong>non</strong></td>
+</tr>
+<tr>
+<td>$X_\tau$ pour $\tau$ un <strong>temps d'arrêt</strong></td>
+<td><strong>oui</strong></td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>L'interprétation financière, donnée par le cours.</strong> <em>Supposons qu'on modélise le prix d'une action par un processus stochastique et qu'on cherche une stratégie d'espérance de rendement positive. Considérons une stratégie simple où, à chaque instant $t$, on achète ou vend une action, donc $\Delta_t=1$ ou $-1$. Notre stratégie <strong>n'a de sens que si $\Delta_t$ est un processus adapté</strong> — sinon elle contredit le fait que nous ne pouvons pas voir le futur.</em></p>
+</blockquote>
+<p class="cal piege"> <strong>Le troisième exemple est le plus instructif.</strong> $\max_{0\leq t\leq T}X_t$ n'est pas adapté parce que, pour le connaître à l'instant $t&lt;T$, il faudrait déjà savoir ce qui va se passer jusqu'à $T$. En revanche, le <strong>maximum courant</strong> $\max_{0\leq s\leq t}X_s$, lui, est parfaitement adapté. La différence porte sur la borne supérieure : $T$ ou $t$.</p>
+<h3>Le théorème de martingale</h3>
+<div class="cal formel"><span class="lab">Théorème 2.3.</span>
+<p> <em>Soit $B_t$ un mouvement brownien. Alors, pour tous les processus <strong>adaptés</strong> $g(t,B_t)$, l'intégrale</em>
+$$\int g(t,B_t)\,dB_s$$
+<em>est une <strong>martingale</strong>, tant que $g$ est une « fonction raisonnable » — formellement, si $g\in L^2$ (de carré intégrable).</em></p>
+</div>
+<p><strong>Exemple 2.4.</strong> Le processus $B_t$ est lui-même adapté. Rappelons que
+$$\int_0^tB_s\,dB_s=\frac12B_t^2-\frac t2, \qquad E[B_t^2]=t$$
+d'où
+$$E\left[\int_0^tB_s\,dB_s\right]=\frac t2-\frac t2=0$$
+Plus généralement, pour $t_1&lt;t_2$ :
+$$E\left[\int_{t_1}^{t_2}B_s\,dB_s\ \Big\vert\ \mathcal F_{t_1}\right]=E\left[\frac12B_{t_2}^2-\frac{t_2}{2}\ \Big\vert\ \mathcal F_{t_1}\right]-\left(\frac12B_{t_1}^2-\frac{t_1}{2}\right)$$
+$$=\frac12(t_2-t_1)+\frac12B_{t_1}^2-\frac{t_2}{2}-\frac12B_{t_1}^2+\frac{t_1}{2}=0$$
+<em>Ceci confirme le théorème ci-dessus pour $\Delta(t)=B_t$.</em></p>
+<blockquote>
+<p><strong>Le calcul repose sur une seule identité</strong> : $E[B_{t_2}^2\mid\mathcal F_{t_1}]=B_{t_1}^2+(t_2-t_1)$, elle-même conséquence de l'indépendance des accroissements. Le brownien « accumule » de la variance à raison de $1$ par unité de temps, et le terme $-t/2$ de l'intégrale d'Itô <strong>compense exactement</strong> cette accumulation.</p>
+</blockquote>
+<p class="cal piege"> <strong>La propriété de martingale est la raison financière d'être du calcul d'Itô.</strong> Une martingale est un processus « sans dérive » : $E[M_T\mid\mathcal F_t]=M_t$. Le théorème dit qu'<strong>aucune stratégie adaptée</strong> ne peut créer de dérive à partir d'un brownien — impossible de gagner en moyenne en pariant sur un jeu équitable, quelle que soit l'ingéniosité de la stratégie, tant qu'elle ne voit pas le futur. C'est le fondement de l'absence d'opportunité d'arbitrage.</p>
+<h2 data-prio="must">Concept 7 — L'isométrie d'Itô</h2>
+<div class="cal formel"><span class="lab">Théorème 2.5 — isométrie d'Itô.</span>
+<p> <em>Soit $B_t$ un mouvement brownien. Alors, pour tous les processus adaptés $\Delta(t)$ :</em>
+$$\boxed{\ E\left[\left(\int_0^t\Delta(s)\,dB_s\right)^2\right]=E\left[\int_0^t\Delta(s)^2\,ds\right]\ }$$</p>
+</div>
+<p><strong>Exemple 2.6.</strong> Soit $\Delta(t)=1$. Le membre de gauche vaut
+$$E\left[\left(\int_0^t\Delta(s)\,dB_s\right)^2\right]=E[B_t^2]=t$$
+et le membre de droite
+$$E\left[\int_0^t\Delta(s)^2\,ds\right]=E[t]=t \qquad\checkmark$$</p>
+<blockquote>
+<p><em>Notons que $E\big[\int_0^t\Delta(s)\,dB_s\big]=0$ par le théorème de martingale. <strong>L'isométrie d'Itô nous dit donc comment calculer la variance de cette intégrale.</strong></em></p>
+</blockquote>
+<blockquote>
+<p><strong>C'est la réponse à la question (1) du programme.</strong> Comme l'espérance est nulle, la variance <strong>est</strong> le moment d'ordre 2. L'isométrie transforme donc un calcul de variance sur une intégrale <strong>stochastique</strong> — objet difficile — en une intégrale <strong>ordinaire</strong> de $\Delta^2$. C'est l'outil de calcul le plus utilisé de tout le calcul d'Itô.</p>
+</blockquote>
+<p class="cal piege"> <strong>Le nom « isométrie » est littéral.</strong> L'application $\Delta\mapsto\int_0^t\Delta\,dB$ <strong>préserve la norme</strong> : la norme $L^2(\Omega)$ de l'intégrale égale la norme $L^2(dt\times\mathbb P)$ de l'intégrande. C'est cette propriété qui permet de <strong>construire</strong> l'intégrale d'Itô par prolongement continu depuis les processus simples — l'isométrie n'est pas seulement un outil de calcul, c'est la fondation de la définition.</p>
+<h2 data-prio="must">Concept 8 — Le changement de mesure et le théorème de Girsanov</h2>
+<blockquote>
+<p><em>Un processus stochastique avec dérive peut-il aussi être vu comme un processus <strong>sans</strong> dérive ? Cette question modestement paradoxale n'est pas une simple curiosité. Elle a de nombreuses conséquences importantes, dont la plus immédiate est la découverte que presque toute question sur le mouvement brownien avec dérive peut être <strong>reformulée</strong> comme une question parallèle sur le mouvement brownien standard.</em> (Steele, <em>Stochastic calculus and financial applications</em>)</p>
+</blockquote>
+<p><strong>Le cadre.</strong> Un processus stochastique <strong>est</strong> une distribution de probabilité sur un ensemble de trajectoires. Un <strong>changement de mesure</strong> est une méthode de transformation de cette distribution en une autre. On fixe un temps final $T$, toutes les trajectoires sont définies sur $0\leq t\leq T$, et l'on adopte une vue plus abstraite : un processus $X$ est une fonction $X:\Omega\to[0,T]$, où $\mathbb P$ est une distribution sur $\Omega$ qui décrit la loi des trajectoires par $X^{-1}$, c'est-à-dire $\mathbb P(A)=\mathbb P(X^{-1}(A))$ pour tout ensemble de trajectoires $A$.</p>
+<p><strong>La construction.</strong> Soit $Z$ une variable aléatoire <strong>positive</strong> vérifiant $\int Z(\omega)\,d\mathbb P(\omega)=1$. On définit un nouveau processus $\tilde X$ de distribution
+$$\tilde{\mathbb P}(A)=\int_AZ(\omega)\,d\mathbb P(\omega)$$
+Comme $Z$ est positive,
+$$\mathbb P(A)&gt;0\ \Longleftrightarrow\ \tilde{\mathbb P}(A)&gt;0 \qquad \forall A \tag{3.1}$$
+<em>Donc l'ensemble des trajectoires « observées » sous $\mathbb P$ et sous $\tilde{\mathbb P}$ est <strong>le même</strong>.</em></p>
+<div class="cal formel"><span class="lab">Définition 3.1.</span>
+<p> <em>Deux distributions $\mathbb P$ et $\tilde{\mathbb P}$ sont <strong>équivalentes</strong> si (3.1) est vérifiée.</em></p>
+</div>
+<p><em>En changeant de mesure, on fixe l'ensemble $\Omega$ des trajectoires possibles et l'on transforme $\mathbb P$ en une autre distribution équivalente. <strong>L'espace sous-jacent est le même, seul le point de vue change.</strong></em> Ce n'est pas vrai des transformations générales : par exemple, la loi du <strong>carré</strong> d'un brownien $B(t)^2$ n'est <strong>pas</strong> équivalente à celle de $B(t)$.</p>
+<blockquote>
+<p><strong>La fonction $Z$ est la dérivée de Radon-Nikodym</strong> de $\tilde{\mathbb P}$ par rapport à $\mathbb P$ :
+$$Z=\frac{d\tilde{\mathbb P}}{d\mathbb P}$$</p>
+</blockquote>
+<p><strong>Pourquoi c'est important.</strong> <em>Théoriquement, cela fournit un outil pour comprendre la relation entre deux processus différents mais équivalents. Pratiquement aussi, car convertir une distribution en une autre peut révéler des intuitions cachées. Par exemple, <strong>en finance, on peut convertir un processus non martingale en une martingale par changement de mesure</strong>, ce qui donne une méthode de <strong>valorisation des produits dérivés</strong>.</em></p>
+<p class="cal piege"> <strong>Retenez la phrase précédente : c'est le principe de toute la valorisation risque-neutre.</strong> On ne change pas le monde, on change la <strong>mesure de probabilité</strong> sous laquelle on le regarde — de sorte que les prix actualisés deviennent des martingales. Le prix d'un dérivé devient alors une simple espérance sous cette nouvelle mesure. L'<strong>équivalence</strong> est essentielle : elle garantit que les scénarios impossibles restent impossibles, donc qu'aucun arbitrage n'est créé.</p>
+<div class="cal formel"><span class="lab">Théorème 3.2 — Girsanov, version simple.</span>
+<p> <em>Soit $(\Omega,\mathbb P)$ un espace de probabilité et $X:\Omega\to[0,T]$ un processus stochastique qui est un <strong>mouvement brownien de dérive $\mu$</strong> sous la distribution induite par $(\Omega,\mathbb P)$. Écrivons $X(t)=\mu t+W(t)$ avec $W$ brownien standard sous $\mathbb P$, et considérons la distribution $\tilde{\mathbb P}$ définie par</em>
+$$\frac{d\tilde{\mathbb P}}{d\mathbb P}(\omega)=e^{-\mu W(T)-\mu^2T/2}$$
+<em>Alors $X$ est un mouvement brownien <strong>sans dérive</strong> sous la distribution induite par $(\Omega,\tilde{\mathbb P})$.</em></p>
+</div>
+<blockquote>
+<p><strong>Reconnaissez la densité !</strong> $e^{-\mu W(T)-\mu^2T/2}$ est exactement l'<strong>exponentielle stochastique</strong> du concept 4, avec $\sigma=-\mu$. Sa valeur en $T$ est la densité qui « redresse » la dérive. Et c'est bien une densité valide : $E_{\mathbb P}\big[e^{-\mu W(T)}\big]=e^{\mu^2T/2}$ pour $W(T)\sim N(0,T)$, donc $E_{\mathbb P}[Z]=e^{\mu^2T/2}e^{-\mu^2T/2}=1$. </p>
+</blockquote>
+<div class="cal formel"><span class="lab">Théorème 3.3 — Girsanov, version générale.</span>
+<p> <em>Soit $(\Omega,\mathbb P)$ un espace de probabilité et $X:\Omega\to[0,T]$ un processus stochastique qui est un mouvement brownien <strong>sans dérive</strong> sous $(\Omega,\mathbb P)$. Soit $\theta(t)$ un processus <strong>adapté borné</strong>, et considérons la distribution $\tilde{\mathbb P}$ définie par</em>
+$$\frac{d\tilde{\mathbb P}}{d\mathbb P}(\omega)=\exp\left(-\int_0^T\theta(u)\,dX(u)-\frac12\int_0^T\theta(u)^2\,du\right)$$
+<em>Alors le processus défini par</em>
+$$Y(t)=X(t)+\int_0^t\theta(u)\,du$$
+<em>est un mouvement brownien sous la distribution induite par $(\Omega,\tilde{\mathbb P})$.</em></p>
+</div>
+<blockquote>
+<p><strong>Lisez le théorème dans le bon sens.</strong> On part d'un brownien <strong>sans</strong> dérive sous $\mathbb P$. Sous $\tilde{\mathbb P}$, c'est le processus <strong>avec</strong> la dérive ajoutée $\int_0^t\theta(u)\,du$ qui devient un brownien standard. Autrement dit : <strong>changer de mesure revient à ajouter ou retirer une dérive</strong>, et rien d'autre. La volatilité, elle, est <strong>invariante</strong> par changement de mesure — un fait fondamental en finance, puisque c'est ce qui rend le prix d'une option indépendant de la dérive du sous-jacent, mais totalement dépendant de sa volatilité.</p>
+</blockquote>
+<p class="cal piege"> <strong>La condition « $\theta$ adapté borné » n'est pas décorative.</strong> Il faut que $\theta$ soit adapté (on ne voit pas le futur) et suffisamment intégrable pour que la densité soit d'espérance $1$ — sinon $\tilde{\mathbb P}$ n'est pas une probabilité et le théorème tombe. La condition affaiblie usuelle est celle de <strong>Novikov</strong>.</p>
+<p><strong>Une remarque finale du cours :</strong> <em>nous avons évité toute technicité dans ces notes. <strong>Formaliser la théorie du calcul d'Itô demande un solide bagage en théorie de la mesure.</strong></em></p>
+<p><strong>Références citées</strong> : Wilmott, Howison et Dewynne, <em>The mathematics of financial derivatives</em> · Shreve, <em>Stochastic calculus for finance II</em> · Steele, <em>Stochastic calculus and financial applications</em>.</p>
+<h2>Comment résoudre l'exercice type (protocole)</h2>
+<ol>
+<li><strong>Identifier le processus sous-jacent</strong> : $dX_t=\mu_t\,dt+\sigma_t\,dB_t$ — repérer $\mu_t$ et $\sigma_t$.</li>
+<li><strong>Identifier la fonction</strong> $f(t,x)$ à laquelle on applique le lemme.</li>
+<li><strong>Calculer les trois dérivées partielles</strong> : $\frac{\partial f}{\partial t}$, $\frac{\partial f}{\partial x}$, $\frac{\partial^2f}{\partial x^2}$.</li>
+<li><strong>Appliquer le lemme</strong> :
+$$df=\Big(\frac{\partial f}{\partial t}+\mu_t\frac{\partial f}{\partial x}+\frac12\sigma_t^2\frac{\partial^2f}{\partial x^2}\Big)dt+\sigma_t\frac{\partial f}{\partial x}dB_t$$</li>
+<li><strong>Lire la dérive et la diffusion</strong> séparément — le coefficient de $dt$ et celui de $dB_t$.</li>
+<li><strong>Si l'on cherche une martingale</strong> : annuler le coefficient de $dt$.</li>
+<li><strong>Si l'on cherche une variance</strong> : appliquer l'<strong>isométrie d'Itô</strong>.</li>
+<li><strong>Si l'on veut supprimer une dérive</strong> : appliquer <strong>Girsanov</strong>.</li>
+</ol>
+<h3>Comment reconnaître qu'il faut utiliser cette méthode ?</h3>
+<table>
+<thead>
+<tr>
+<th>Indice dans l'énoncé</th>
+<th>Ce qu'il faut faire</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>« différentielle de $f(t,X_t)$ »</td>
+<td><strong>lemme d'Itô</strong>, ne pas oublier le terme en $\frac12\sigma^2f''$</td>
+</tr>
+<tr>
+<td>« montrer que … est une martingale »</td>
+<td>vérifier que le coefficient de $dt$ est <strong>nul</strong></td>
+</tr>
+<tr>
+<td>« variance de $\int\Delta\,dB$ »</td>
+<td><strong>isométrie d'Itô</strong> : $E\big[\int\Delta^2ds\big]$</td>
+</tr>
+<tr>
+<td>« loi de $\int\Delta\,dB$ » avec $\Delta$ déterministe</td>
+<td><strong>normale</strong>, de variance $\int\Delta^2ds$</td>
+</tr>
+<tr>
+<td>« ce processus dépend-il du futur ? »</td>
+<td>vérifier l'<strong>adaptation</strong></td>
+</tr>
+<tr>
+<td>« trouver $X$ tel que $dX=\sigma X\,dB$ »</td>
+<td><strong>exponentielle stochastique</strong> $\exp(-\frac12\sigma^2t+\sigma B_t)$</td>
+</tr>
+<tr>
+<td>« éliminer la dérive », « mesure risque-neutre »</td>
+<td><strong>Girsanov</strong></td>
+</tr>
+<tr>
+<td>« équivalent » pour deux mesures</td>
+<td>$\mathbb P(A)&gt;0\Leftrightarrow\tilde{\mathbb P}(A)&gt;0$</td>
+</tr>
+</tbody></table>
+<h3>Exercices progressifs</h3>
+<p><strong> Niveau 1</strong> — Appliquez le lemme d'Itô à $f(x)=x^3$ pour $X_t=B_t$.</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p><strong>Étape 1 — les dérivées.</strong> $f'(x)=3x^2$, $f''(x)=6x$.</p>
+<p><strong>Étape 2 — le lemme (forme 1.2).</strong>
+$$df(B_t)=f'(B_t)\,dB_t+\frac12f''(B_t)\,dt=3B_t^2\,dB_t+3B_t\,dt$$</p>
+<p><strong>Étape 3 — la forme intégrale.</strong>
+$$B_T^3=3\int_0^TB_t^2\,dB_t+3\int_0^TB_t\,dt$$</p>
+<p><strong>Le contraste avec le calcul ordinaire.</strong> On aurait écrit $dx^3=3x^2dx$ tout court. Le terme $3B_t\,dt$ est <strong>entièrement dû à Itô</strong> : il vient de $\frac12\cdot6B_t\cdot(dB_t)^2=3B_t\,dt$.</p>
+<p><strong>Vérification par les espérances.</strong> $\int_0^TB_t^2\,dB_t$ est une martingale nulle en $0$, donc d'espérance nulle. Il reste $E[B_T^3]=3\int_0^TE[B_t]\,dt=0$ — ce qui est correct, la loi de $B_T$ étant symétrique. </p>
+</div></details>
+
+<p><strong> Niveau 2</strong> — Pourquoi $\int_0^TB_t\,dB_t\neq\frac12B_T^2$ ?</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p><strong>Le calcul.</strong> Avec $f(x)=\frac12x^2$, le lemme d'Itô donne $df(B_t)=B_t\,dB_t+\frac12\,dt$, donc en intégrant
+$$\frac12B_T^2=\int_0^TB_t\,dB_t+\frac T2 \qquad\Longrightarrow\qquad \int_0^TB_t\,dB_t=\frac12B_T^2-\frac T2$$</p>
+<p><strong>La raison structurelle.</strong> Le terme $-\frac T2$ vient du terme d'Itô $\frac12f''(B_t)(dB_t)^2=\frac12\,dt$, lui-même conséquence de $(\Delta B_t)^2=\Delta t$. Le brownien accumule de la variation quadratique à raison de $1$ par unité de temps ; l'intégrale doit en tenir compte.</p>
+<p><strong>Le contrôle par l'espérance — c'est l'argument décisif.</strong> Par le théorème 2.3, $\int_0^TB_t\,dB_t$ est une <strong>martingale nulle en $0$</strong>, donc d'espérance nulle. Or
+$$E\Big[\frac12B_T^2\Big]=\frac T2\ \neq\ 0$$
+La formule naïve ne peut donc <strong>pas</strong> être correcte : elle donnerait une intégrale stochastique d'espérance strictement positive, ce qui reviendrait à gagner en moyenne à un jeu équitable. Le terme $-\frac T2$ rétablit exactement $E\big[\frac12B_T^2-\frac T2\big]=0$. </p>
+<p><strong>La formulation à retenir.</strong> Le théorème fondamental du calcul est « violé » précisément parce que le brownien a une <strong>variation quadratique non nulle</strong> — c'est la même propriété qui le rend non dérivable.</p>
+</div></details>
+
+<p><strong> Niveau 3</strong> — Trouvez le processus vérifiant $dX_t=\sigma X_t\,dB_t$, et calculez $E[X_t]$ et $\mathrm{Var}(X_t)$.</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p><strong>Étape 1 — la forme candidate.</strong> L'exemple (iii) du cours donne, pour $f(t,x)=\exp(\mu t+\sigma x)$ :
+$$df(t,B_t)=\Big(\mu+\frac12\sigma^2\Big)f\,dt+\sigma f\,dB_t$$</p>
+<p><strong>Étape 2 — annuler la dérive.</strong> On veut le coefficient de $dt$ nul, donc $\mu+\frac12\sigma^2=0$, soit $\mu=-\frac12\sigma^2$ :
+$$X_t=\exp\Big(-\frac12\sigma^2t+\sigma B_t\Big)$$</p>
+<p><strong>Étape 3 — l'espérance.</strong> Comme $\sigma B_t\sim N(0,\sigma^2t)$, on utilise $E[e^Y]=e^{m+v/2}$ pour $Y\sim N(m,v)$ :
+$$E[X_t]=e^{-\sigma^2t/2}\cdot E[e^{\sigma B_t}]=e^{-\sigma^2t/2}\cdot e^{\sigma^2t/2}=1$$
+$X_t$ est bien une <strong>martingale</strong> d'espérance constante $1$ — conforme au théorème 2.3, puisque $dX_t=\sigma X_t\,dB_t$ n'a pas de terme en $dt$.</p>
+<p><strong>Étape 4 — la variance.</strong>
+$$E[X_t^2]=E\big[e^{-\sigma^2t+2\sigma B_t}\big]=e^{-\sigma^2t}\cdot e^{2\sigma^2t}=e^{\sigma^2t}$$
+$$\mathrm{Var}(X_t)=e^{\sigma^2t}-1$$</p>
+<p><strong>L'interprétation, qui est le vrai enseignement.</strong> $E[X_t]=1$ pour tout $t$, mais $\mathrm{Var}(X_t)$ <strong>explose exponentiellement</strong>. Et la médiane, elle, vaut $e^{-\sigma^2t/2}\to0$ : <strong>presque toute trajectoire tend vers zéro</strong>, tandis que quelques trajectoires très rares deviennent immenses et maintiennent la moyenne à $1$.</p>
+<p>C'est le mécanisme exact de la « <em>volatility drag</em> » de la fiche 53, et l'illustration la plus nette de la différence entre <strong>espérance</strong> et <strong>trajectoire typique</strong> — une distinction cruciale pour tout ce qui touche à l'investissement à long terme.</p>
+</div></details>
+
+<p><strong> Niveau 4 — type examen</strong> — Énoncez l'isométrie d'Itô, expliquez son nom, et servez-vous-en pour calculer $\mathrm{Var}\big(\int_0^ts\,dB_s\big)$.</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p><strong>L'énoncé.</strong> Pour tout processus adapté $\Delta(t)$,
+$$E\left[\left(\int_0^t\Delta(s)\,dB_s\right)^2\right]=E\left[\int_0^t\Delta(s)^2\,ds\right]$$</p>
+<p><strong>Pourquoi cela donne la variance.</strong> Par le théorème 2.3, $\int_0^t\Delta(s)\,dB_s$ est une martingale nulle en $0$, donc d'<strong>espérance nulle</strong>. La variance est donc égale au moment d'ordre 2, c'est-à-dire au membre de gauche.</p>
+<p><strong>Pourquoi le nom « isométrie ».</strong> L'application
+$$\Delta\ \longmapsto\ \int_0^t\Delta(s)\,dB_s$$
+envoie l'espace $L^2(dt\times\mathbb P)$ des intégrandes dans $L^2(\Omega)$ des variables aléatoires, en <strong>préservant exactement la norme</strong> :
+$$\Big\lVert\int_0^t\Delta\,dB\Big\rVert_{L^2(\Omega)}^2=\lVert\Delta\rVert_{L^2(dt\times\mathbb P)}^2$$
+Ce n'est pas seulement joli : c'est ce qui permet de <strong>construire</strong> l'intégrale d'Itô. On la définit d'abord sur les processus simples (constants par morceaux), où elle est évidente ; l'isométrie garantit alors qu'elle se prolonge <strong>de façon unique et continue</strong> à tout $L^2$ par densité.</p>
+<p><strong>Le calcul demandé.</strong> Ici $\Delta(s)=s$, une fonction <strong>déterministe</strong> :
+$$\mathrm{Var}\left(\int_0^ts\,dB_s\right)=E\left[\int_0^ts^2\,ds\right]=\int_0^ts^2\,ds=\frac{t^3}{3}$$</p>
+<p><strong>Bonus — la loi complète.</strong> L'intégrande étant <strong>non aléatoire</strong>, le premier théorème du concept 6 s'applique : l'intégrale est <strong>normalement distribuée</strong>. Avec l'espérance nulle et la variance calculée :
+$$\int_0^ts\,dB_s\ \sim\ N\Big(0,\ \frac{t^3}{3}\Big)$$</p>
+<p><strong>La méthode générale à retenir.</strong> Pour toute intégrale d'Itô, la chaîne de raisonnement est toujours la même :</p>
+<ol>
+<li><strong>espérance</strong> $=0$ — par le théorème de martingale (si l'intégrande est adapté) ;</li>
+<li><strong>variance</strong> — par l'isométrie d'Itô, qui la ramène à une intégrale ordinaire ;</li>
+<li><strong>loi</strong> — normale si et seulement si l'intégrande est <strong>déterministe</strong> ; sinon on ne connaît en général que les deux premiers moments.</li></ol></div></details>
+
+<h2 data-prio="must">Common mistakes</h2>
+<ol>
+<li><strong>Oublier le terme $\frac12\sigma^2\frac{\partial^2f}{\partial x^2}$</strong> — c'est <em>le</em> terme d'Itô, celui qui distingue tout ce calcul du calcul ordinaire.</li>
+<li><strong>Écrire $df=f'(B_t)\,dB_t$</strong> — c'est l'équation (1.1), et le cours dit explicitement qu'elle <em>ne marche pas tout à fait</em>.</li>
+<li><strong>Croire que $(\Delta B_t)^3$ compte aussi</strong> — non : $\Delta B_t\sim\sqrt{\Delta t}$, donc $(\Delta B_t)^3\sim(\Delta t)^{3/2}$, négligeable. Le développement s'arrête <strong>exactement</strong> à l'ordre 2.</li>
+<li><strong>Oublier le $\sigma_t$ devant $\frac{\partial f}{\partial x}dB_t$</strong> dans le lemme général.</li>
+<li><strong>Écrire $\int_0^TB_t\,dB_t=\frac12B_T^2$</strong> — il manque le $-\frac T2$.</li>
+<li><strong>Croire que toute intégrale d'Itô est gaussienne</strong> — seulement si l'intégrande est <strong>déterministe</strong>.</li>
+<li><strong>Utiliser un intégrande non adapté</strong> — $\max_{0\leq t\leq T}X_t$ n'est pas adapté ; $\max_{0\leq s\leq t}X_s$ l'est.</li>
+<li><strong>Croire que Girsanov change la volatilité</strong> — il ne change que la <strong>dérive</strong> ; la volatilité est invariante.</li>
+<li><strong>Oublier de vérifier $E[Z]=1$</strong> — sans cela $\tilde{\mathbb P}$ n'est pas une probabilité.</li>
+<li><strong>Confondre « équivalent » et « égal »</strong> — deux mesures équivalentes ont les mêmes ensembles négligeables, pas les mêmes probabilités.</li>
+<li><strong>Confondre espérance et trajectoire typique</strong> — pour l'exponentielle stochastique, $E[X_t]=1$ alors que presque toute trajectoire tend vers $0$.</li>
+</ol>
+<h2>Ultimate Review</h2>
+<ol>
+<li><strong>Le problème</strong> : une trajectoire brownienne est <strong>nulle part dérivable</strong>, $dB_t/dt$ n'existe pas.</li>
+<li><strong>Le blocage de Taylor</strong> : $E[(\Delta B_t)^2]=\Delta t$, donc le terme de second ordre <strong>n'est pas négligeable</strong> ; $\Delta B_t\sim\sqrt{\Delta t}$.</li>
+<li><strong>La règle fondatrice</strong> : $(\Delta B_t)^2=\Delta t$, tout le reste est négligeable.</li>
+<li><strong>Lemme d'Itô, cas simple</strong> : $df(B_t)=f'(B_t)\,dB_t+\frac12f''(B_t)\,dt$.</li>
+<li><strong>Cas $f(t,B_t)$</strong> : $df=\big(\frac{\partial f}{\partial t}+\frac12\frac{\partial^2f}{\partial x^2}\big)dt+\frac{\partial f}{\partial x}dB_t$.</li>
+<li><strong>Théorème 1.1 — cas général</strong> : pour $dX_t=\mu_t\,dt+\sigma_t\,dB_t$,
+$$df(t,X_t)=\Big(\frac{\partial f}{\partial t}+\mu_t\frac{\partial f}{\partial x}+\frac12\sigma_t^2\frac{\partial^2f}{\partial x^2}\Big)dt+\sigma_t\frac{\partial f}{\partial x}dB_t$$</li>
+<li><strong>Table de multiplication</strong> : $(dB_t)^2=dt$, $dt\,dB_t=0$, $(dt)^2=0$.</li>
+<li><strong>Intégration</strong> = inverse de la différentiation.</li>
+<li><strong>Exemples</strong> : brownien avec dérive $dX_t=\mu\,dt+\sigma\,dB_t$ · $\int_0^TB_t\,dB_t=\frac12B_T^2-\frac T2$ · $f=e^{\mu t+\sigma x}$ ⟹ $df=(\mu+\frac{\sigma^2}{2})f\,dt+\sigma f\,dB_t$ · $f=t^2+x^2$ ⟹ $df=(2t+2\mu X_t+\sigma^2)dt+2\sigma X_t\,dB_t$.</li>
+<li><strong>Exponentielle stochastique</strong> : $dX_t=\sigma X_t\,dB_t\iff X_t=\exp\big(-\frac12\sigma^2t+\sigma B_t\big)$ ; $E[X_t]=1$, médiane $\to0$.</li>
+<li><strong>Pourquoi Itô et pas une autre convention</strong> : <em>le fait que nous ne puissions pas voir le futur est la base de toute la théorie</em>.</li>
+<li><strong>Intégrande déterministe</strong> ⟹ l'intégrale est <strong>normalement distribuée</strong>.</li>
+<li><strong>Processus adapté</strong> : $\Delta_t$ ne dépend que des $X_s$, $s\leq t$. Adaptés : $X_t$, $\min\{X_t,c\}$, $X_\tau$ pour $\tau$ temps d'arrêt. <strong>Non adapté</strong> : $\max_{0\leq t\leq T}X_t$.</li>
+<li><strong>Théorème 2.3</strong> : pour tout $g$ adapté et $L^2$, $\int g\,dB$ est une <strong>martingale</strong>.</li>
+<li><strong>Isométrie d'Itô</strong> : $E\big[(\int_0^t\Delta\,dB_s)^2\big]=E\big[\int_0^t\Delta^2\,ds\big]$ — donne la <strong>variance</strong>.</li>
+<li><strong>Changement de mesure</strong> : $Z&gt;0$ avec $\int Z\,d\mathbb P=1$, $\tilde{\mathbb P}(A)=\int_AZ\,d\mathbb P$ ; <strong>équivalence</strong> $\mathbb P(A)&gt;0\Leftrightarrow\tilde{\mathbb P}(A)&gt;0$ ; $Z=d\tilde{\mathbb P}/d\mathbb P$ est la <strong>dérivée de Radon-Nikodym</strong>.</li>
+<li><strong>Girsanov simple</strong> : $X$ brownien de dérive $\mu$ sous $\mathbb P$ ; avec $d\tilde{\mathbb P}/d\mathbb P=e^{-\mu W(T)-\mu^2T/2}$, $X$ est sans dérive sous $\tilde{\mathbb P}$.</li>
+<li><strong>Girsanov général</strong> : $X$ brownien sans dérive sous $\mathbb P$, $\theta$ adapté borné, $d\tilde{\mathbb P}/d\mathbb P=\exp\big(-\int_0^T\theta\,dX-\frac12\int_0^T\theta^2du\big)$ ⟹ $Y(t)=X(t)+\int_0^t\theta(u)du$ est un brownien sous $\tilde{\mathbb P}$.</li>
+<li><strong>L'usage en finance</strong> : <em>convertir un processus non martingale en martingale par changement de mesure donne une méthode de valorisation des dérivés</em>.</li>
+</ol>
+<p><strong>Formulas to know</strong>
+$$(dB_t)^2=dt \qquad df(B_t)=f'(B_t)\,dB_t+\frac12f''(B_t)\,dt \qquad \int_0^TB_t\,dB_t=\frac12B_T^2-\frac T2$$
+$$df(t,X_t)=\Big(\frac{\partial f}{\partial t}+\mu_t\frac{\partial f}{\partial x}+\frac{\sigma_t^2}{2}\frac{\partial^2f}{\partial x^2}\Big)dt+\sigma_t\frac{\partial f}{\partial x}dB_t \qquad X_t=e^{-\frac12\sigma^2t+\sigma B_t}$$
+$$E\left[\left(\int_0^t\Delta\,dB_s\right)^2\right]=E\left[\int_0^t\Delta^2\,ds\right] \qquad Z=\frac{d\tilde{\mathbb P}}{d\mathbb P}$$</p>
+<p><strong>Methods to know</strong> : le protocole en 8 étapes ; la dérivation du lemme par Taylor ; le calcul de $\int_0^TB_t\,dB_t$ et sa vérification par l'espérance ; la recherche d'une martingale en annulant la dérive ; le calcul de variance par isométrie.</p>
+<div class="rec"><h2>Active Recall</h2><p><strong>Basic</strong> — Énoncez le lemme d'Itô dans sa forme générale.</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p>Pour $f(t,x)$ régulière et $X_t$ vérifiant $dX_t=\mu_t\,dt+\sigma_t\,dB_t$ :
+$$df(t,X_t)=\left(\frac{\partial f}{\partial t}+\mu_t\frac{\partial f}{\partial x}+\frac12\sigma_t^2\frac{\partial^2f}{\partial x^2}\right)dt+\sigma_t\frac{\partial f}{\partial x}\,dB_t$$</p>
+<p>Le <strong>terme d'Itô</strong> est $\frac12\sigma_t^2\frac{\partial^2f}{\partial x^2}$ : il n'a aucun équivalent en calcul classique et vient de la règle $(dB_t)^2=dt$.</p>
+</div></details><p><strong>Understanding</strong> — Pourquoi le terme de second ordre du développement de Taylor survit-il ici ?</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p>Parce que le brownien vérifie
+$$E\big[(\Delta B_t)^2\big]=\Delta t$$
+c'est-à-dire $\Delta B_t\sim\sqrt{\Delta t}$ en ordre de grandeur — et c'est précisément cette « racine carrée » qui rend le brownien <strong>non dérivable</strong>.</p>
+<p>Dans le développement
+$$\Delta f=(\Delta B_t)f'+\frac{(\Delta B_t)^2}{2}f''+\frac{(\Delta B_t)^3}{6}f'''+\cdots$$</p>
+<ul>
+<li>le premier terme est d'ordre $\sqrt{\Delta t}$ ;</li>
+<li>le deuxième est d'ordre $\Delta t$ — <strong>pas négligeable</strong>, puisqu'une variation de $B_t$ s'accompagne nécessairement d'une variation de $t$ ;</li>
+<li>le troisième est d'ordre $(\Delta t)^{3/2}$ — <strong>négligeable</strong>.</li>
+</ul>
+<p>Pour une fonction ordinaire, $\Delta x\sim\Delta t$ et le second terme serait en $(\Delta t)^2$, négligeable comme d'habitude. Le développement s'arrête donc ici <strong>exactement à l'ordre 2</strong>, ni plus ni moins.</p>
+</div></details><p><strong>Application</strong> — Retrouvez l'équation du brownien géométrique à partir du lemme d'Itô.</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p><strong>Le point de départ.</strong> $S_t$ vérifie $dS_t=\mu S_t\,dt+\sigma S_t\,dB_t$, c'est-à-dire $\mu_t=\mu S_t$ et $\sigma_t=\sigma S_t$.</p>
+<p><strong>La fonction.</strong> $f(t,x)=\log x$, d'où $\frac{\partial f}{\partial t}=0$, $\frac{\partial f}{\partial x}=\frac1x$, $\frac{\partial^2f}{\partial x^2}=-\frac{1}{x^2}$.</p>
+<p><strong>Le lemme.</strong>
+$$d(\log S_t)=\left(0+\mu S_t\cdot\frac{1}{S_t}+\frac12\sigma^2S_t^2\cdot\Big(-\frac{1}{S_t^2}\Big)\right)dt+\sigma S_t\cdot\frac{1}{S_t}\,dB_t$$
+$$=\Big(\mu-\frac{\sigma^2}{2}\Big)dt+\sigma\,dB_t$$</p>
+<p><strong>L'intégration.</strong>
+$$\log S_t=\log S_0+\Big(\mu-\frac{\sigma^2}{2}\Big)t+\sigma B_t \qquad\Longrightarrow\qquad S_t=S_0\exp\Big(\Big(\mu-\frac{\sigma^2}{2}\Big)t+\sigma B_t\Big)$$</p>
+<blockquote>
+<p><strong>Voilà d'où vient le $-\sigma^2/2$ de la fiche 53.</strong> Il n'était pas un ajustement <em>ad hoc</em> justifié par l'inégalité de Jensen : c'est <strong>exactement</strong> le terme d'Itô, avec le signe négatif dû à la <strong>concavité</strong> du logarithme ($f''&lt;0$).</p>
+</blockquote>
+</div></details><p><strong>Comparison</strong> — Isométrie d'Itô et théorème de martingale : que donne chacun ?</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p>Les deux portent sur $\int_0^t\Delta(s)\,dB_s$ avec $\Delta$ <strong>adapté</strong>, et ils sont <strong>complémentaires</strong>.</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th><strong>Théorème 2.3 (martingale)</strong></th>
+<th><strong>Théorème 2.5 (isométrie)</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Ce qu'il donne</td>
+<td>l'<strong>espérance</strong> : $E\big[\int_0^t\Delta\,dB\big]=0$</td>
+<td>la <strong>variance</strong> : $E\big[\int_0^t\Delta^2ds\big]$</td>
+</tr>
+<tr>
+<td>Contenu</td>
+<td>l'intégrale d'un processus adapté est une <strong>martingale</strong></td>
+<td>l'application $\Delta\mapsto\int\Delta\,dB$ <strong>préserve la norme $L^2$</strong></td>
+</tr>
+<tr>
+<td>Condition</td>
+<td>$\Delta$ adapté, $\Delta\in L^2$</td>
+<td>$\Delta$ adapté</td>
+</tr>
+</tbody></table>
+<p><strong>Comment ils s'articulent.</strong> C'est parce que l'espérance est nulle (théorème 2.3) que le moment d'ordre 2 <strong>est</strong> la variance — et c'est l'isométrie qui le calcule. Le cours le dit explicitement : <em>l'isométrie d'Itô nous dit comment calculer la variance de cette intégrale</em>.</p>
+<p><strong>Et le troisième maillon.</strong> Si en plus $\Delta$ est <strong>déterministe</strong>, on connaît la <strong>loi entière</strong> : c'est une gaussienne $N\big(0,\int_0^t\Delta(s)^2ds\big)$.</p>
+<p><strong>Le rôle plus profond de l'isométrie.</strong> Au-delà du calcul, c'est elle qui <strong>construit</strong> l'intégrale d'Itô : on la définit sur les processus simples, et l'isométrie garantit son prolongement unique et continu à tout $L^2$.</p>
+</div></details><p><strong>Exam-style</strong> — Expliquez le changement de mesure et le théorème de Girsanov, et dites pourquoi c'est le fondement de la valorisation des dérivés.</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p><strong>La question de départ</strong>, telle que Steele la pose : <em>un processus stochastique avec dérive peut-il aussi être vu comme un processus sans dérive ?</em></p>
+<p><strong>Le mécanisme.</strong> Un processus stochastique <strong>est</strong> une distribution de probabilité sur des trajectoires. Étant donné $Z&gt;0$ avec $\int Z\,d\mathbb P=1$, on définit
+$$\tilde{\mathbb P}(A)=\int_AZ(\omega)\,d\mathbb P(\omega)$$
+$Z$ est la <strong>dérivée de Radon-Nikodym</strong> $d\tilde{\mathbb P}/d\mathbb P$. Comme $Z&gt;0$,
+$$\mathbb P(A)&gt;0\ \Longleftrightarrow\ \tilde{\mathbb P}(A)&gt;0$$
+— les deux mesures sont <strong>équivalentes</strong>. <em>L'ensemble des trajectoires observées est le même ; l'espace sous-jacent est le même, seul le point de vue change.</em></p>
+<p><strong>Girsanov, version générale.</strong> $X$ brownien sans dérive sous $\mathbb P$, $\theta$ adapté borné,
+$$\frac{d\tilde{\mathbb P}}{d\mathbb P}=\exp\left(-\int_0^T\theta(u)\,dX(u)-\frac12\int_0^T\theta(u)^2\,du\right)$$
+Alors $Y(t)=X(t)+\int_0^t\theta(u)\,du$ est un <strong>brownien sous $\tilde{\mathbb P}$</strong>.</p>
+<p><strong>Le contenu du théorème en une phrase.</strong> Changer de mesure équivalente revient exactement à <strong>ajouter ou retirer une dérive</strong>. La <strong>volatilité est invariante</strong>.</p>
+<p><strong>Pourquoi c'est le fondement de la valorisation.</strong> Le cours le dit directement : <em>en finance, on peut convertir un processus non martingale en une martingale par changement de mesure, et cela donne une méthode de valorisation des produits dérivés.</em></p>
+<p>Le raisonnement complet :</p>
+<ol>
+<li>Sous la mesure réelle $\mathbb P$, le prix actualisé d'un actif risqué <strong>n'est pas</strong> une martingale : il a une dérive, la prime de risque.</li>
+<li>Par Girsanov, on choisit $\theta$ pour <strong>annuler exactement cette prime</strong>. Sous la nouvelle mesure $\tilde{\mathbb P}$ — dite <strong>risque-neutre</strong> —, tout actif actualisé devient une martingale.</li>
+<li>Le prix d'un dérivé de flux terminal $H$ est alors une simple <strong>espérance</strong> : $V_0=E_{\tilde{\mathbb P}}\big[e^{-rT}H\big]$.</li>
+</ol>
+<p><strong>Les deux points qui font la solidité du raisonnement.</strong></p>
+<ul>
+<li><strong>L'équivalence est essentielle.</strong> Elle garantit que les événements de probabilité nulle restent de probabilité nulle : aucun scénario n'est créé ni détruit, donc <strong>aucun arbitrage</strong> n'est introduit. C'est la condition technique qui donne son sens économique au théorème.</li>
+<li><strong>La volatilité est invariante, la dérive ne l'est pas.</strong> C'est la raison profonde pour laquelle le prix d'une option <strong>ne dépend pas</strong> du rendement espéré du sous-jacent — un fait déroutant au premier abord — mais dépend crucialement de sa <strong>volatilité</strong>. Deux investisseurs en total désaccord sur la performance future d'une action doivent néanmoins s'accorder sur le prix de l'option, dès lors qu'ils s'accordent sur sa volatilité.</li>
+</ul>
+<p class="cal piege"> <strong>La condition « $\theta$ adapté borné » n'est pas décorative</strong> : adapté parce qu'on ne voit pas le futur, borné (ou sous condition de Novikov) pour que la densité soit bien d'espérance $1$ et $\tilde{\mathbb P}$ une vraie probabilité.</p>
+</div></details></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h2>Flashcards</h2>
+<table>
+<thead>
+<tr>
+<th>Question</th>
+<th>Réponse</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Le brownien est-il dérivable ?</td>
+<td><strong>Nulle part</strong>, avec probabilité $1$</td>
+</tr>
+<tr>
+<td>Ordre de grandeur de $\Delta B_t$ ?</td>
+<td>$\sqrt{\Delta t}$</td>
+</tr>
+<tr>
+<td>La règle fondatrice d'Itô ?</td>
+<td>$(\Delta B_t)^2=\Delta t$</td>
+</tr>
+<tr>
+<td>Pourquoi le terme d'ordre 2 survit ?</td>
+<td>$E[(\Delta B_t)^2]=\Delta t$, du même ordre que le terme dominant</td>
+</tr>
+<tr>
+<td>Pourquoi l'ordre 3 est négligeable ?</td>
+<td>$(\Delta B_t)^3\sim(\Delta t)^{3/2}$</td>
+</tr>
+<tr>
+<td>Lemme d'Itô, cas simple ?</td>
+<td>$df(B_t)=f'(B_t)dB_t+\frac12f''(B_t)dt$</td>
+</tr>
+<tr>
+<td>Lemme d'Itô, cas général ?</td>
+<td>$\big(\frac{\partial f}{\partial t}+\mu_t\frac{\partial f}{\partial x}+\frac{\sigma_t^2}{2}\frac{\partial^2f}{\partial x^2}\big)dt+\sigma_t\frac{\partial f}{\partial x}dB_t$</td>
+</tr>
+<tr>
+<td>Table de multiplication ?</td>
+<td>$(dB_t)^2=dt$, $dt\,dB_t=0$, $(dt)^2=0$</td>
+</tr>
+<tr>
+<td>Signe du terme d'Itô ?</td>
+<td>Celui de $f''$ — positif si $f$ convexe, négatif si concave</td>
+</tr>
+<tr>
+<td>$\int_0^TB_t\,dB_t=?$</td>
+<td>$\frac12B_T^2-\frac T2$</td>
+</tr>
+<tr>
+<td>Pourquoi le $-T/2$ ?</td>
+<td>Sinon l'intégrale ne serait pas d'espérance nulle</td>
+</tr>
+<tr>
+<td>$df$ pour $f=e^{\mu t+\sigma x}$ ?</td>
+<td>$(\mu+\frac{\sigma^2}{2})f\,dt+\sigma f\,dB_t$</td>
+</tr>
+<tr>
+<td>Processus tel que $dX=\sigma X\,dB$ ?</td>
+<td>$\exp(-\frac12\sigma^2t+\sigma B_t)$</td>
+</tr>
+<tr>
+<td>Son espérance ?</td>
+<td>$E[X_t]=1$ — c'est une martingale</td>
+</tr>
+<tr>
+<td>Son comportement typique ?</td>
+<td>La <strong>médiane</strong> $e^{-\sigma^2t/2}$ tend vers $0$</td>
+</tr>
+<tr>
+<td>Pourquoi la convention d'Itô ?</td>
+<td><em>Nous ne pouvons pas voir le futur</em></td>
+</tr>
+<tr>
+<td>Quand $\int\Delta\,dB$ est-elle gaussienne ?</td>
+<td>Si $\Delta$ est <strong>déterministe</strong></td>
+</tr>
+<tr>
+<td>Définition d'un processus adapté ?</td>
+<td>$\Delta_t$ ne dépend que des $X_s$ pour $s\leq t$</td>
+</tr>
+<tr>
+<td>$\max_{0\leq t\leq T}X_t$ est-il adapté ?</td>
+<td><strong>Non</strong></td>
+</tr>
+<tr>
+<td>$X_\tau$ pour $\tau$ temps d'arrêt ?</td>
+<td><strong>Oui</strong>, adapté</td>
+</tr>
+<tr>
+<td>Théorème de martingale ?</td>
+<td>$\int g\,dB$ est une martingale pour tout $g$ adapté et $L^2$</td>
+</tr>
+<tr>
+<td>Isométrie d'Itô ?</td>
+<td>$E\big[(\int_0^t\Delta\,dB)^2\big]=E\big[\int_0^t\Delta^2ds\big]$</td>
+</tr>
+<tr>
+<td>À quoi sert-elle ?</td>
+<td>À calculer la <strong>variance</strong> d'une intégrale d'Itô</td>
+</tr>
+<tr>
+<td>Pourquoi le mot « isométrie » ?</td>
+<td>L'application $\Delta\mapsto\int\Delta\,dB$ préserve la norme $L^2$</td>
+</tr>
+<tr>
+<td>Deux mesures équivalentes ?</td>
+<td>$\mathbb P(A)&gt;0\Leftrightarrow\tilde{\mathbb P}(A)&gt;0$</td>
+</tr>
+<tr>
+<td>Dérivée de Radon-Nikodym ?</td>
+<td>$Z=d\tilde{\mathbb P}/d\mathbb P$, positive et d'espérance $1$</td>
+</tr>
+<tr>
+<td>Que change Girsanov ?</td>
+<td>La <strong>dérive</strong> seulement — la volatilité est invariante</td>
+</tr>
+<tr>
+<td>Girsanov, version générale ?</td>
+<td>$Y(t)=X(t)+\int_0^t\theta(u)du$ est un brownien sous $\tilde{\mathbb P}$</td>
+</tr>
+<tr>
+<td>Densité de Girsanov ?</td>
+<td>$\exp\big(-\int_0^T\theta\,dX-\frac12\int_0^T\theta^2du\big)$</td>
+</tr>
+<tr>
+<td>Son usage en finance ?</td>
+<td>Rendre martingale un processus qui ne l'est pas ⟹ <strong>valorisation des dérivés</strong></td>
+</tr>
+</tbody></table>
+</main>
+
+
+
+
+</body></html>

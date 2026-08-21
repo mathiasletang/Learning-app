@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fiche 68 — Tests d'adéquation : Glivenko-Cantelli, Kolmogorov-Smirnov et khi-deux</title>
+<script>
+window.MathJax={tex:{inlineMath:[["$","$"]],displayMath:[["$$","$$"]],processEscapes:true},
+ options:{skipHtmlTags:["script","noscript","style","textarea","pre","code"]},
+ svg:{fontCache:"global"},
+ startup:{pageReady:()=>MathJax.startup.defaultPageReady().then(()=>{document.body.classList.add("ready")})}};
+setTimeout(function(){document.body.classList.add("ready")},2500);
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+/* ============================================================
+   MathiasLearn — feuille de style des fiches
+   Reprise intégrale des tokens de 00_PARCOURS/*.html
+   + blocs pédagogiques (callouts, méthode, essentiels, recall)
+   ============================================================ */
+:root{--bg:#faf9f7;--card:#fff;--ink:#1a1a1a;--muted:#6b6b6b;--line:#e5e2dd;--accent:#8b5e34;
+ --hl:#fdf8ef;--ok:#2d7d4f;--okbg:#f0f7f3;--warn:#b3402f;--warnbg:#fdf3f1;--blue:#2f5d8b;--bluebg:#f1f5fa}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+ font:17px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;padding:0 16px 100px}
+.nav{position:sticky;top:0;background:rgba(250,249,247,.96);backdrop-filter:blur(8px);
+ border-bottom:1px solid var(--line);margin:0 -16px 30px;padding:11px 16px;z-index:50;
+ display:flex;gap:6px;flex-wrap:wrap;font-size:13px}
+.nav a{color:var(--muted);text-decoration:none;padding:4px 9px;border-radius:5px;white-space:nowrap}
+.nav a:hover{background:var(--line);color:var(--ink)}
+.nav a.on{background:var(--accent);color:#fff}
+main{max-width:780px;margin:0 auto}
+h1{font-size:31px;letter-spacing:-.02em;margin:.4em 0 .5em;line-height:1.25}
+h2{font-size:23px;margin:2.2em 0 .7em;padding-bottom:.3em;border-bottom:1px solid var(--line)}
+h3{font-size:19px;margin:1.9em 0 .5em;color:var(--accent)}
+h4{font-size:17px;margin:1.5em 0 .4em}
+p{margin:.8em 0} a{color:var(--accent)} hr{border:0;border-top:1px solid var(--line);margin:2.6em 0}
+table{border-collapse:collapse;width:100%;margin:1.3em 0;font-size:15.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+th{background:#f3f0eb;font-weight:600}
+tr:nth-child(even) td{background:#fcfbfa}
+code{font-family:"SF Mono",Menlo,Consolas,monospace;font-size:.88em;background:#f2efea;padding:2px 6px;border-radius:4px;white-space:nowrap}
+pre{background:#f2efea;padding:14px 16px;border-radius:8px;overflow-x:auto}
+pre code{background:none;padding:0;white-space:pre}
+blockquote{border-left:3px solid var(--accent);background:var(--hl);margin:1.4em 0;padding:14px 20px;border-radius:0 8px 8px 0}
+blockquote p:first-child{margin-top:0} blockquote p:last-child{margin-bottom:0}
+ul,ol{padding-left:1.5em} li{margin:.35em 0} em{color:#4a4a4a}
+mjx-container[display="true"]{margin:1.1em 0!important;overflow-x:auto;overflow-y:hidden;padding:2px 0}
+mjx-container svg{max-width:100%}
+body:not(.ready) main{opacity:0} main{opacity:1;transition:opacity .25s}
+
+/* --- bandeau de tête de fiche --- */
+.cours{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--accent);
+ border-radius:0 10px 10px 0;padding:18px 22px;margin:0 0 34px}
+.cours h4{margin:0 0 4px;font-size:14px;text-transform:uppercase;letter-spacing:.07em;color:var(--accent)}
+.cours .cs{color:var(--muted);font-size:14.5px;margin:0 0 14px}
+
+/* --- exercices / corrigés --- */
+.ex{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:6px 24px 20px;margin:18px 0}
+.ex>h3:first-child{margin-top:14px}
+details.cor{margin-top:18px;border:1px solid var(--line);border-radius:8px;background:#fcfbfa;overflow:hidden}
+details.cor>summary{cursor:pointer;padding:12px 16px;font-weight:600;font-size:15px;color:var(--accent);
+ list-style:none;display:flex;align-items:center;gap:9px;user-select:none;transition:.15s;min-height:44px}
+details.cor>summary::-webkit-details-marker{display:none}
+details.cor>summary:hover{background:var(--hl)}
+details.cor>summary::before{content:"\25B6";font-size:10px;transition:transform .18s;display:inline-block}
+details.cor[open]>summary::before{transform:rotate(90deg)}
+details.cor[open]>summary{background:var(--okbg);color:var(--ok);border-bottom:1px solid var(--line)}
+.cor .in{padding:4px 20px 16px}
+.cor .in>*:first-child{margin-top:.9em}
+
+/* --- blocs pédagogiques (callouts) ---
+   Générés depuis une citation Markdown dont le premier **gras** commence
+   par un mot-clé : DÉFINITION, THÉORÈME, MÉTHODE, PIÈGE, INTUITION… */
+.cal{border:1px solid var(--line);border-left:4px solid var(--accent);background:var(--card);
+ border-radius:0 10px 10px 0;padding:15px 20px;margin:1.5em 0}
+.cal>p:first-child{margin-top:0}.cal>p:last-child,.cal>ul:last-child,.cal>ol:last-child{margin-bottom:0}
+.cal .lab{display:block;font-size:12.5px;text-transform:uppercase;letter-spacing:.08em;
+ font-weight:700;color:var(--accent);margin-bottom:6px}
+.cal.formel{background:var(--hl)}
+.cal.piege{border-left-color:var(--warn);background:var(--warnbg)}
+.cal.piege .lab{color:var(--warn)}
+.cal.methode{border-left-color:var(--ok);background:var(--okbg)}
+.cal.methode .lab{color:var(--ok)}
+.cal.intu{border-left-color:var(--blue);background:var(--bluebg)}
+.cal.intu .lab{color:var(--blue)}
+.cal.plus{border-left-style:dashed;background:#faf9f7}
+.cal.plus .lab{color:var(--muted)}
+
+/* --- révision express --- */
+.ess{background:var(--card);border:1px solid var(--accent);border-radius:10px;padding:4px 24px 20px;margin:1.6em 0}
+.ess h3{margin-top:1.3em}
+.rec{background:var(--card);border:1px dashed var(--accent);border-radius:10px;padding:4px 24px 18px;margin:1.6em 0}
+.rec ol{counter-reset:none}
+
+/* --- impression / PDF --- */
+@media print{
+ .nav{display:none}
+ body{padding:0;background:#fff;font-size:11.2pt;line-height:1.55}
+ main{max-width:none}
+ h1{font-size:23pt}h2{font-size:15pt;margin-top:1.5em}h3{font-size:12.6pt}
+ h2,h3,h4{break-after:avoid;page-break-after:avoid}
+ table,.cal,blockquote{break-inside:avoid;page-break-inside:avoid}
+ table{display:table;font-size:9.6pt}
+ details.cor{border:1px solid var(--line);background:#fcfbfa}
+ details.cor>summary{display:none}
+ details.cor .in{padding-top:10px}
+ .cal,.ex,.ess,.rec{box-shadow:none}
+ a{color:var(--ink);text-decoration:none}
+}
+@page{margin:16mm 15mm 18mm}
+
+/* --- exemples travaillés --- */
+.exm{background:#fcfbfa;border:1px solid var(--line);border-radius:10px;padding:2px 20px 14px;margin:1.5em 0}
+.exm>h4:first-child{margin:14px 0 .5em;color:var(--accent);font-size:13px;text-transform:uppercase;letter-spacing:.07em}
+
+
+/* --- pastilles de priorité (conventions des fiches de l'app) --- */
+h2[data-prio], h3[data-prio], h4[data-prio]{position:relative}
+h2[data-prio]::before,h3[data-prio]::before,h4[data-prio]::before{
+ content:"";display:inline-block;width:9px;height:9px;border-radius:50%;
+ margin-right:9px;vertical-align:middle;background:var(--muted)}
+[data-prio="must"]::before{background:var(--warn)}
+[data-prio="high"]::before{background:#d98324}
+[data-prio="mid"]::before{background:#c9a227}
+[data-prio="low"]::before{background:var(--ok)}
+/* corrigés des fiches de l'app : même traitement que les corrigés des séries */
+details.cor>summary::after{content:""}
+</style></head><body>
+<div class="nav"><a href="00_COMMENCER_ICI.html">Commencer ici</a><a href="01_NOTATIONS_le-decodeur.html">Notations</a><a href="02_EXERCICES_Serie-0.html">Série 0 — Remise en route</a><a href="03_EXERCICES_Serie-1.html">Série 1 — Convexité</a><a href="04_EXERCICES_Serie-2.html">Série 2 — KKT</a><a href="05_AUTO-EVALUATION.html">Auto-évaluation (quiz)</a><a href="06_FICHE_Optimisation-deux-variables.html">Fiche — Optimisation à 2 variables</a></div>
+<main><h1>Fiche 68 — Tests d'adéquation : Glivenko-Cantelli, Kolmogorov-Smirnov et khi-deux</h1>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Matière</strong></td>
+<td>Maths · Économétrie</td>
+</tr>
+<tr>
+<td><strong>Cours source</strong></td>
+<td>Rigollet, <em>18.650 Statistics for Applications</em>, MIT OpenCourseWare, automne 2016 — chapitre 6 « Testing goodness of fit »</td>
+</tr>
+<tr>
+<td><strong>Difficulté</strong></td>
+<td> Must know — c'est ici qu'on vérifie que le modèle tient</td>
+</tr>
+<tr>
+<td><strong>Temps d'étude estimé</strong></td>
+<td>2 h 15</td>
+</tr>
+<tr>
+<td><strong>Prérequis</strong></td>
+<td>Fiche 65 (tests, niveau, p-valeur), fiche 64 (maximum de vraisemblance), fiche 62 (mouvement brownien)</td>
+</tr>
+<tr>
+<td><strong>Concepts clés</strong></td>
+<td>Fonction de répartition empirique, théorème de Glivenko-Cantelli, théorème de Donsker, pont brownien, test de Kolmogorov-Smirnov, statistique pivotale, Cramér-Von Mises, Anderson-Darling, test de Kolmogorov-Lilliefors, graphique quantile-quantile, test du khi-deux d'adéquation</td>
+</tr>
+<tr>
+<td><strong>Poids à l'examen</strong></td>
+<td>Trois choses : <strong>Glivenko-Cantelli et Donsker</strong>, et le rôle du pont brownien ; le caractère <strong>pivotal</strong> de la statistique de Kolmogorov-Smirnov ; et les <strong>degrés de liberté $K-d-1$</strong> du test du khi-deux.</td>
+</tr>
+</tbody></table>
+<h2>Vue d'ensemble</h2>
+<p>Soit $X$ une variable aléatoire. Étant données des copies i.i.d. de $X$, on veut répondre à des questions du type :</p>
+<ul>
+<li><em>$X$ a-t-elle la loi $N(0,1)$ ?</em> (cf. la loi de Student)</li>
+<li><em>$X$ a-t-elle la loi $U([0,1])$ ?</em> (cf. la p-valeur sous $H_0$)</li>
+<li><em>$X$ a-t-elle la fonction de masse $p_1=0{,}3$, $p_2=0{,}5$, $p_3=0{,}2$ ?</em></li>
+</ul>
+<blockquote>
+<p><em>Ce sont tous des <strong>tests d'adéquation</strong> : on veut savoir si la loi supposée est un bon ajustement pour les données.</em></p>
+<p><em><strong>Caractéristique essentielle des tests d'adéquation : aucune modélisation paramétrique.</strong></em></p>
+</blockquote>
+<pre><code>LA QUESTION   la loi supposée décrit-elle bien les données ?
+OUTIL         la fonction de répartition EMPIRIQUE F_n
+GARANTIE 1    Glivenko-Cantelli : sup|F_n − F| → 0   (consistance)
+GARANTIE 2    Donsker : √n sup|F_n − F| → sup|pont brownien|  (loi)
+TEST 1        Kolmogorov-Smirnov — loi continue, statistique PIVOTALE
+TEST 2        khi-deux — loi discrète ou données regroupées, χ²_{K−d−1}
+PIÈGE         estimer les paramètres invalide Donsker !
+</code></pre>
+<p class="cal piege"> <strong>Ces tests répondent à la question laissée ouverte par la fiche 67.</strong> Le modèle statistique y était supposé <strong>bien spécifié</strong> : la vraie loi appartient à la famille choisie. C'est une <strong>hypothèse</strong>, et c'est ici qu'on la teste.</p>
+<h2 data-prio="must">Concept 1 — La fonction de répartition empirique</h2>
+<p><strong>Rappel.</strong> Pour $X_1,\dots,X_n$ i.i.d. réelles, la fonction de répartition de $X_1$ est
+$$F(t)=\mathbb P[X_1\leq t], \qquad \forall t\in\mathbb R$$
+<em>Elle <strong>caractérise entièrement</strong> la loi de $X_1$.</em></p>
+<div class="cal formel"><span class="lab">Définition.</span>
+<p> La <strong>fonction de répartition empirique</strong> de l'échantillon est
+$$F_n(t)=\frac1n\sum_{i=1}^n\mathbf 1\{X_i\leq t\}=\frac{\#\{i=1,\dots,n:X_i\leq t\}}{n}, \qquad \forall t\in\mathbb R$$</p>
+</div>
+<p><strong>Par la loi des grands nombres</strong>, pour tout $t\in\mathbb R$ :
+$$F_n(t)\ \xrightarrow[n\to\infty]{\text{p.s.}}\ F(t)$$</p>
+<div class="cal formel"><span class="lab">Théorème de Glivenko-Cantelli</span>
+<p><em>le théorème fondamental de la statistique</em>.
+$$\boxed{\ \sup_{t\in\mathbb R}\big\lvert F_n(t)-F(t)\big\rvert\ \xrightarrow[n\to\infty]{\text{p.s.}}\ 0\ }$$</p>
+</div>
+<div class="cal intu"><span class="lab">Pourquoi ce nom, et pourquoi ce théorème est plus fort que la LGN.</span>
+<p> La LGN donne la convergence <strong>pour chaque $t$ fixé</strong> ; Glivenko-Cantelli donne la convergence <strong>uniforme en $t$</strong> — le pire écart, sur toute la droite réelle, tend vers zéro.</p>
+<p><strong>C'est ce qui justifie toute la statistique non paramétrique</strong> : la fonction de répartition caractérisant la loi, et $F_n$ convergeant <strong>uniformément</strong> vers $F$, l'échantillon détermine asymptotiquement la loi <strong>sans aucune hypothèse de modèle</strong>. On n'a plus besoin de supposer Poisson, gaussienne ou quoi que ce soit.</p>
+</div>
+<h2 data-prio="must">Concept 2 — Donsker et le pont brownien</h2>
+<p><strong>Par le théorème central limite</strong>, pour tout $t\in\mathbb R$ :
+$$\sqrt n\big(F_n(t)-F(t)\big)\ \xrightarrow[n\to\infty]{(d)}\ N\Big(0,\ F(t)\big(1-F(t)\big)\Big)$$</p>
+<div class="cal formel"><span class="lab">Théorème de Donsker.</span>
+<p> <em>Si $F$ est <strong>continue</strong>, alors</em>
+$$\boxed{\ \sqrt n\,\sup_{t\in\mathbb R}\big\lvert F_n(t)-F(t)\big\rvert\ \xrightarrow[n\to\infty]{(d)}\ \sup_{0\leq t\leq1}\lvert B(t)\rvert\ }$$
+<em>où $B$ est un <strong>pont brownien</strong> sur $[0,1]$.</em></p>
+</div>
+<blockquote>
+<p><strong>Le rapport entre les deux théorèmes est celui entre LGN et TCL.</strong> Glivenko-Cantelli dit que l'écart uniforme <strong>tend vers zéro</strong> ; Donsker dit <strong>à quelle vitesse</strong> — en $1/\sqrt n$ — et donne la <strong>loi limite</strong> de l'écart renormalisé.</p>
+<p><strong>Pourquoi un pont brownien.</strong> $\mathbf 1\{X_i\leq t\}$ est une variable de Bernoulli de paramètre $F(t)$, donc la variance ponctuelle est $F(t)(1-F(t))$ — nulle en $t=-\infty$ et $t=+\infty$, maximale au milieu. Le processus limite est donc un mouvement brownien <strong>contraint à s'annuler aux deux extrémités</strong> : c'est exactement la définition du <strong>pont brownien</strong>. La contrainte vient de $F_n(-\infty)=F(-\infty)=0$ et $F_n(+\infty)=F(+\infty)=1$ — les deux fonctions coïncident <strong>exactement</strong> aux bords.</p>
+</blockquote>
+<p class="cal piege"> <strong>L'hypothèse de continuité de $F$ est essentielle</strong>, et elle sera au cœur des concepts 5 et 7.</p>
+<h2 data-prio="must">Concept 3 — Le test de Kolmogorov-Smirnov</h2>
+<p><strong>Le cadre.</strong> $X_1,\dots,X_n$ i.i.d. réelles de fonction de répartition <strong>inconnue</strong> $F$, et $F^0$ une fonction de répartition <strong>continue</strong> donnée. On teste
+$$H_0:\ F=F^0 \qquad\text{contre}\qquad H_1:\ F\neq F^0$$
+<em>Si $F=F^0$, alors $F_n(t)\approx F^0(t)$ pour tout $t$.</em></p>
+<blockquote>
+<p><strong>La statistique de test.</strong>
+$$T_n=\sup_{t\in\mathbb R}\sqrt n\,\big\lvert F_n(t)-F^0(t)\big\rvert$$
+<em>Par le théorème de Donsker, si $H_0$ est vraie, alors $T_n\xrightarrow{(d)}Z$, où $Z$ a une <strong>loi connue</strong> — le supremum d'un pont brownien.</em></p>
+</blockquote>
+<blockquote>
+<p><strong>Test KS de niveau asymptotique $\alpha$ :</strong>
+$$\delta_\alpha^{KS}=\mathbf 1\{T_n&gt;q_\alpha\}$$
+<em>où $q_\alpha$ est le quantile d'ordre $(1-\alpha)$ de $Z$, obtenu dans des tables.</em></p>
+<p><strong>p-valeur du test KS</strong> : $\mathbb P[Z&gt;T_n\mid T_n]$.</p>
+</blockquote>
+<h2 data-prio="high">Concept 4 — La formule pratique</h2>
+<blockquote>
+<p><em>En pratique, comment calculer $T_n$ ?</em></p>
+</blockquote>
+<p><strong>L'observation géométrique.</strong> $F^0$ est <strong>croissante et continue</strong> ; $F_n$ est <strong>constante par morceaux</strong>, avec des sauts en $t_i=X_i$. Le supremum de l'écart est donc atteint <strong>aux points de saut</strong>.</p>
+<p>Soit $X_{(1)}\leq X_{(2)}\leq\cdots\leq X_{(n)}$ l'échantillon <strong>réordonné</strong>. Juste à gauche de $X_{(i)}$, $F_n$ vaut $\frac{i-1}{n}$ ; en $X_{(i)}$ et juste à droite, elle vaut $\frac in$. Il y a donc <strong>deux candidats par saut</strong>, et
+$$\boxed{\ T_n=\sqrt n\max_{i=1,\dots,n}\max\left\{\frac in-F^0\big(X_{(i)}\big),\ F^0\big(X_{(i)}\big)-\frac{i-1}{n}\right\}\ }$$</p>
+<blockquote>
+<p><strong>Le calcul est donc élémentaire</strong> : trier l'échantillon, évaluer $F^0$ en chaque point, et prendre le maximum de $2n$ nombres. C'est une raison majeure du succès du test.</p>
+</blockquote>
+<h2 data-prio="must">Concept 5 — Le caractère pivotal</h2>
+<div class="cal formel"><span class="lab">Définition.</span>
+<p> *$T_n$ est une <strong>statistique pivotale</strong> : si $H_0$ est vraie, la loi de $T_n$ <strong>ne dépend pas de la loi des $X_i$</strong>, et elle est facile à reproduire par simulation.*</p>
+</div>
+<p><strong>La démonstration, en deux lignes.</strong> Posons $U_i=F^0(X_i)$ et soit $G_n$ la fonction de répartition empirique de $U_1,\dots,U_n$. <em>Si $H_0$ est vraie, alors $U_1,\dots,U_n\overset{iid}\sim U([0,1])$</em> — c'est la transformation intégrale de probabilité — et
+$$T_n=\sup_{0\leq x\leq1}\sqrt n\,\big\lvert G_n(x)-x\big\rvert$$</p>
+<blockquote>
+<p><strong>Voilà tout l'intérêt.</strong> La loi de $T_n$ sous $H_0$ est <strong>la même quelle que soit $F^0$</strong> : gaussienne, exponentielle, Cauchy — peu importe. Une <strong>seule table</strong> de quantiles sert pour tous les tests d'adéquation. C'est ce qui rend le test universel.</p>
+</blockquote>
+<p><strong>La procédure par simulation</strong>, si l'on ne dispose pas de table. Pour un grand entier $M$ :</p>
+<ul>
+<li><em>Simuler $M$ copies i.i.d. $T_n^1,\dots,T_n^M$ de $T_n$</em> — c'est possible <strong>précisément parce que la loi ne dépend d'aucun paramètre inconnu</strong> ;</li>
+<li><em>Estimer le quantile $q_\alpha(n)$ d'ordre $(1-\alpha)$ par le quantile empirique $\hat q_\alpha^{(n,M)}$ de $T_n^1,\dots,T_n^M$.</em></li>
+</ul>
+<p><strong>Test de niveau approché $\alpha$</strong> : $\delta_\alpha=\mathbf 1\{T_n&gt;\hat q_\alpha^{(n,M)}\}$, et
+$$\text{p-valeur}\approx\frac{\#\{j=1,\dots,M:T_n^j&gt;T_n\}}{M}$$
+<em>Ces quantiles sont souvent précalculés dans une table.</em></p>
+<h2 data-prio="mid">Concept 6 — D'autres distances, d'autres tests</h2>
+<p><em>On veut mesurer la <strong>distance entre deux fonctions</strong>, $F_n(t)$ et $F(t)$. Il y a d'autres façons de le faire, qui conduisent à d'autres tests.</em></p>
+<table>
+<thead>
+<tr>
+<th>Test</th>
+<th>Distance</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Kolmogorov-Smirnov</strong></td>
+<td>$d(F_n,F)=\displaystyle\sup_{t\in\mathbb R}\lvert F_n(t)-F(t)\rvert$</td>
+</tr>
+<tr>
+<td><strong>Cramér-Von Mises</strong></td>
+<td>$d^2(F_n,F)=\displaystyle\int_{\mathbb R}\big[F_n(t)-F(t)\big]^2dt$</td>
+</tr>
+<tr>
+<td><strong>Anderson-Darling</strong></td>
+<td>$d^2(F_n,F)=\displaystyle\int_{\mathbb R}\frac{\big[F_n(t)-F(t)\big]^2}{F(t)\big(1-F(t)\big)}dt$</td>
+</tr>
+</tbody></table>
+<div class="cal methode"><span class="lab">Comment choisir — chaque distance a une sensibilité différente.</span>
+
+<ul>
+<li><strong>KS</strong> ne regarde que le <strong>pire écart</strong> : sensible à un décalage local, mais aveugle à de nombreux petits écarts.</li>
+<li><strong>Cramér-Von Mises</strong> <strong>intègre</strong> l'écart au carré : elle prend en compte tout le domaine, donc détecte mieux des désaccords diffus.</li>
+<li><strong>Anderson-Darling</strong> pondère par $\frac{1}{F(1-F)}$, qui <strong>explose aux extrémités</strong> : elle est donc bien plus sensible aux <strong>queues</strong> de distribution. C'est le test de choix quand ce sont les événements extrêmes qui comptent — donc en finance (fiche 55).</li>
+</ul>
+</div>
+<h2 data-prio="must">Concept 7 — Les tests composites et l'erreur classique</h2>
+<blockquote>
+<p><em>Que faire si l'on veut tester « $X$ a-t-elle une loi gaussienne ? » sans connaître les paramètres ?</em></p>
+</blockquote>
+<p><strong>L'idée simple — le remplacement.</strong> Calculer
+$$\sup_{t\in\mathbb R}\Big\lvert F_n(t)-\Phi_{\hat\mu,\hat\sigma^2}(t)\Big\rvert \qquad\text{où}\qquad \hat\mu=\bar X_n,\quad \hat\sigma^2=S_n^2$$
+et $\Phi_{\hat\mu,\hat\sigma^2}$ est la fonction de répartition de $N(\hat\mu,\hat\sigma^2)$.</p>
+<blockquote>
+<p class="cal piege"> <em>Dans ce cas, <strong>le théorème de Donsker n'est plus valide</strong>. C'est une erreur <strong>courante et grave</strong> !</em></p>
+</blockquote>
+<p class="cal piege"> <strong>Pourquoi l'erreur est grave, et pourquoi elle est si tentante.</strong> En estimant $\mu$ et $\sigma^2$ <strong>sur les mêmes données</strong>, on <strong>rapproche artificiellement</strong> $\Phi_{\hat\mu,\hat\sigma^2}$ de $F_n$ : la gaussienne ajustée est, par construction, celle qui colle le mieux à l'échantillon. La statistique est donc <strong>systématiquement trop petite</strong>, la loi limite n'est plus celle du supremum d'un pont brownien, et l'on <strong>rejette beaucoup trop rarement</strong> — on croit valider la normalité alors qu'on a seulement mesuré à quel point on a bien ajusté.</p>
+<blockquote>
+<p>C'est le même mécanisme que la perte de degrés de liberté en fiche 50 : estimer des paramètres sur les données <strong>consomme de l'information</strong>, et il faut en tenir compte.</p>
+</blockquote>
+<blockquote>
+<p><strong>La solution — le test de Kolmogorov-Lilliefors.</strong> <em>On calcule à la place les quantiles de la statistique</em>
+$$\sup_{t\in\mathbb R}\Big\lvert F_n(t)-\Phi_{\hat\mu,\hat\sigma^2}(t)\Big\rvert$$
+<em><strong>Ils ne dépendent pas de paramètres inconnus !</strong></em></p>
+</blockquote>
+<div class="cal intu"><span class="lab">Pourquoi cela fonctionne.</span>
+<p> La statistique de Lilliefors reste <strong>pivotale</strong> : sa loi sous $H_0$ ne dépend ni de $\mu$ ni de $\sigma^2$, parce que la standardisation par $\hat\mu$ et $\hat\sigma$ élimine ces deux paramètres. On peut donc tabuler ses quantiles une fois pour toutes — mais ce sont des quantiles <strong>différents</strong> de ceux de Kolmogorov-Smirnov, et <strong>plus petits</strong>, précisément pour compenser l'ajustement.</p>
+</div>
+<h2 data-prio="mid">Concept 8 — Les graphiques quantile-quantile</h2>
+<blockquote>
+<ul>
+<li><em>Ils fournissent une façon <strong>visuelle</strong> de faire un test d'adéquation.</em></li>
+<li><em>Ce n'est <strong>pas un test formel</strong>, mais une vérification rapide et facile pour voir si une loi est plausible.</em></li>
+<li><em>L'idée : vérifier visuellement si le graphe de $F_n$ est proche de celui de $F$, ou de façon équivalente si le graphe de $F_n^{-1}$ est proche de celui de $F^{-1}$.</em></li>
+<li><em>Il est plus commode de vérifier si les points</em>
+$$\left(F^{-1}\Big(\frac1n\Big),F_n^{-1}\Big(\frac1n\Big)\right),\ \left(F^{-1}\Big(\frac2n\Big),F_n^{-1}\Big(\frac2n\Big)\right),\ \dots,\ \left(F^{-1}\Big(\frac{n-1}{n}\Big),F_n^{-1}\Big(\frac{n-1}{n}\Big)\right)$$
+<em>sont proches de la droite $y=x$.</em></li>
+</ul>
+<p><em>$F_n$ n'est techniquement pas inversible, mais on définit $F_n^{-1}(i/n)=X_{(i)}$, la $i$-ième plus grande observation.</em></p>
+</blockquote>
+<blockquote>
+<p><strong>Ce qu'un QQ-plot montre que le test ne dit pas : <em>où</em> ça cloche.</strong> Un test rend un verdict ; le graphique montre la <strong>forme</strong> du désaccord. Points au-dessus de la droite dans la queue droite et en dessous dans la queue gauche ⟹ <strong>queues plus épaisses</strong> que la loi supposée. Courbure systématique ⟹ <strong>asymétrie</strong>. C'est précisément le diagnostic recommandé en fiche 53 pour les résidus standardisés d'un GARCH.</p>
+</blockquote>
+<h2 data-prio="must">Concept 9 — Le test du khi-deux, cas fini</h2>
+<p><strong>Le cadre.</strong> Soient $X_1,\dots,X_n$ i.i.d. sur un espace <strong>fini</strong> $E=\{a_1,\dots,a_K\}$, de loi $\mathbb P$, et $(\mathbb P_\theta)_{\theta\in\Theta}$ une famille paramétrique de lois sur $E$. <em>Exemple : sur $E=\{1,\dots,K\}$, la famille des lois binomiales $(\mathrm{Bin}(K,p))_{p\in(0,1)}$.</em></p>
+<p>Pour $j=1,\dots,K$ et $\theta\in\Theta$, on pose
+$$p_j(\theta)=\mathbb P_\theta[Y=a_j] \ \text{ où } Y\sim\mathbb P_\theta, \qquad\text{et}\qquad p_j=\mathbb P[X_1=a_j]$$</p>
+<p><strong>Les hypothèses.</strong>
+$$H_0:\ \mathbb P\in(\mathbb P_\theta)_{\theta\in\Theta} \qquad\text{contre}\qquad H_1:\ \mathbb P\notin(\mathbb P_\theta)_{\theta\in\Theta}$$</p>
+<blockquote>
+<p><em>Tester $H_0$, c'est tester si le <strong>modèle statistique</strong> $\big(E,(\mathbb P_\theta)_{\theta\in\Theta}\big)$ <strong>s'ajuste aux données</strong> — par exemple si les données proviennent bien d'une loi binomiale.</em></p>
+<p>$H_0$ équivaut à : $p_j=p_j(\theta)$ pour tout $j$, pour un certain $\theta\in\Theta$.</p>
+</blockquote>
+<p><strong>La construction.</strong> Soit $\hat\theta$ l'<strong>EMV de $\theta$ sous $H_0$</strong>, et
+$$\hat p_j=\frac1n\sum_{i=1}^n\mathbf 1\{X_i=a_j\}=\frac{\#\{i:X_i=a_j\}}{n}$$</p>
+<blockquote>
+<p><strong>L'idée.</strong> *Si $H_0$ est vraie, alors $p_j=p_j(\theta)$, donc $\hat p_j$ et $p_j(\hat\theta)$ sont <strong>tous deux de bons estimateurs de $p_j$</strong>. Par conséquent $\hat p_j\approx p_j(\hat\theta)$ pour tout $j$.*</p>
+</blockquote>
+<blockquote>
+<p><strong>La statistique de test.</strong>
+$$\boxed{\ T_n=n\sum_{j=1}^K\frac{\big(\hat p_j-p_j(\hat\theta)\big)^2}{p_j(\hat\theta)}\ }$$</p>
+</blockquote>
+<blockquote>
+<p><strong>Le théorème.</strong> <em>Sous certaines hypothèses techniques, si $H_0$ est vraie,</em>
+$$T_n\ \xrightarrow[n\to\infty]{(d)}\ \chi^2_{K-d-1}$$
+<em>où $d$ est la dimension du paramètre $\theta$ ($\Theta\subseteq\mathbb R^d$ et $d&lt;K-1$).</em></p>
+</blockquote>
+<p><strong>Test de niveau asymptotique $\alpha$</strong> : $\delta_\alpha=\mathbf 1\{T_n&gt;q_\alpha\}$, avec $q_\alpha$ le quantile d'ordre $(1-\alpha)$ de $\chi^2_{K-d-1}$. <strong>p-valeur</strong> : $\mathbb P[Z&gt;T_n\mid T_n]$ où $Z\sim\chi^2_{K-d-1}$ indépendant de $T_n$.</p>
+<p class="cal piege"> <strong>Le compte des degrés de liberté, $K-d-1$, est LA question d'examen.</strong> Il se lit en trois temps :</p>
+<blockquote>
+<ul>
+<li>$K$ classes ⟹ $K$ fréquences observées ;</li>
+<li>moins $1$ pour la contrainte $\sum_j\hat p_j=1$ — les fréquences ne sont pas libres ;</li>
+<li>moins $d$ pour les $d$ paramètres <strong>estimés sur les données</strong>.</li>
+</ul>
+<p>C'est <strong>exactement</strong> la même comptabilité que le $n-p$ de la fiche 50 et le $n-1$ de Cochran en fiche 65 : <strong>chaque paramètre estimé consomme un degré de liberté</strong>. Et la condition $d&lt;K-1$ garantit qu'il en reste au moins un.</p>
+<p><strong>Notez aussi la normalisation par $p_j(\hat\theta)$</strong> : l'écart $\hat p_j-p_j(\hat\theta)$ est divisé par sa variance approchée, ce qui rend chaque terme comparable à un carré de gaussienne standard — d'où le $\chi^2$.</p>
+</blockquote>
+<h2 data-prio="high">Concept 10 — Le test du khi-deux, cas infini</h2>
+<p><em>Si $E$ est infini — $E=\mathbb N$, $E=\mathbb R$… —, on <strong>partitionne</strong> $E$ en $K$ classes disjointes :</em>
+$$E=A_1\cup\cdots\cup A_K$$
+et l'on définit, pour $\theta\in\Theta$ et $j=1,\dots,K$ :
+$$p_j(\theta)=\mathbb P_\theta[Y\in A_j] \ \text{ pour } Y\sim\mathbb P_\theta, \qquad p_j=\mathbb P[X_1\in A_j], \qquad \hat p_j=\frac{\#\{i:X_i\in A_j\}}{n}$$
+$\hat\theta$ étant obtenu comme précédemment. La statistique et la loi limite sont <strong>inchangées</strong> :
+$$T_n=n\sum_{j=1}^K\frac{\big(\hat p_j-p_j(\hat\theta)\big)^2}{p_j(\hat\theta)}\ \xrightarrow[n\to\infty]{(d)}\ \chi^2_{K-d-1}$$</p>
+<blockquote>
+<p><strong>Les questions pratiques</strong>, telles que le cours les pose : <em>choix de $K$ ? choix des classes $A_1,\dots,A_K$ ? calcul de $p_j(\theta)$ ?</em></p>
+</blockquote>
+<p><strong>L'exemple du cours.</strong> Soit $E=\mathbb N$ et $H_0:\mathbb P\in(\mathrm{Poiss}(\lambda))_{\lambda&gt;0}$. <em>Si l'on s'attend à ce que $\lambda$ ne dépasse pas un certain $\lambda_{\max}$, on peut choisir</em>
+$$A_1=\{0\},\quad A_2=\{1\},\quad\dots,\quad A_{K-1}=\{K-2\},\quad A_K=\{K-1,K,K+1,\dots\}$$
+<em>avec $K$ assez grand pour que $p_K(\lambda_{\max})\approx0$.</em></p>
+<blockquote>
+<p><strong>La construction est astucieuse.</strong> Les petites valeurs, fréquentes, ont chacune leur classe ; toute la <strong>queue</strong> est regroupée dans une classe finale $A_K$ de probabilité négligeable. On respecte ainsi la contrainte pratique — chaque classe doit contenir assez d'observations pour que l'approximation $\chi^2$ soit valable — sans perdre la résolution là où les données sont nombreuses.</p>
+</blockquote>
+<p class="cal piege"> <strong>Le regroupement en classes est une perte d'information, et c'est le prix du test du khi-deux.</strong> Deux lois différentes ayant les mêmes probabilités de classe seront indiscernables. Sur des données <strong>continues</strong>, Kolmogorov-Smirnov est donc préférable — il utilise toute l'information de l'échantillon, sans découpage arbitraire.</p>
+<h2>Comment résoudre l'exercice type (protocole)</h2>
+<ol>
+<li><strong>Identifier la nature de $H_0$</strong> : loi <strong>entièrement spécifiée</strong> (test simple) ou <strong>famille paramétrique</strong> (test composite) ?</li>
+<li><strong>Identifier la nature des données</strong> : continues ⟹ Kolmogorov-Smirnov · discrètes ou regroupées ⟹ khi-deux.</li>
+<li><strong>Test simple, données continues</strong> : calculer $T_n$ par la formule des statistiques d'ordre, comparer à la table KS.</li>
+<li><strong>Test composite</strong> :  <strong>ne pas</strong> utiliser la table KS ; utiliser <strong>Kolmogorov-Lilliefors</strong> ou le khi-deux.</li>
+<li><strong>Khi-deux</strong> : estimer $\hat\theta$ par maximum de vraisemblance <strong>sous $H_0$</strong>, calculer $\hat p_j$ et $p_j(\hat\theta)$, former $T_n$, comparer à $\chi^2_{K-d-1}$.</li>
+<li><strong>Compter les degrés de liberté</strong> : $K$ classes $-\,1$ (contrainte de somme) $-\,d$ (paramètres estimés).</li>
+<li><strong>Compléter par un QQ-plot</strong> — il montre <strong>où</strong> le modèle échoue.</li>
+</ol>
+<h3>Comment reconnaître qu'il faut utiliser cette méthode ?</h3>
+<table>
+<thead>
+<tr>
+<th>Indice dans l'énoncé</th>
+<th>Ce qu'il faut faire</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>« ces données suivent-elles la loi $F^0$ ? »</td>
+<td><strong>Kolmogorov-Smirnov</strong></td>
+</tr>
+<tr>
+<td>« … une loi gaussienne ? » (paramètres inconnus)</td>
+<td><strong>Kolmogorov-Lilliefors</strong>, pas KS</td>
+</tr>
+<tr>
+<td>données <strong>discrètes</strong> ou en <strong>classes</strong></td>
+<td>test du <strong>khi-deux</strong></td>
+</tr>
+<tr>
+<td>« le modèle s'ajuste-t-il ? »</td>
+<td>khi-deux d'adéquation</td>
+</tr>
+<tr>
+<td>« combien de degrés de liberté ? »</td>
+<td>$K-d-1$</td>
+</tr>
+<tr>
+<td>« les queues sont-elles bien modélisées ? »</td>
+<td><strong>Anderson-Darling</strong></td>
+</tr>
+<tr>
+<td>« vérification visuelle rapide »</td>
+<td><strong>QQ-plot</strong></td>
+</tr>
+<tr>
+<td>« simuler la loi de la statistique »</td>
+<td>elle est <strong>pivotale</strong> — c'est possible</td>
+</tr>
+<tr>
+<td>« peut-on estimer les paramètres puis appliquer KS ? »</td>
+<td><strong>non</strong> — Donsker tombe</td>
+</tr>
+</tbody></table>
+<h3>Exercices progressifs</h3>
+<p><strong> Niveau 1</strong> — Que disent Glivenko-Cantelli et Donsker, et quel est leur rapport ?</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p><strong>Glivenko-Cantelli</strong> — <em>le théorème fondamental de la statistique</em> :
+$$\sup_{t\in\mathbb R}\big\lvert F_n(t)-F(t)\big\rvert\ \xrightarrow{\text{p.s.}}\ 0$$
+La fonction de répartition empirique converge <strong>uniformément</strong> vers la vraie.</p>
+<p><strong>Donsker</strong> — si $F$ est <strong>continue</strong> :
+$$\sqrt n\,\sup_{t\in\mathbb R}\big\lvert F_n(t)-F(t)\big\rvert\ \xrightarrow{(d)}\ \sup_{0\leq t\leq1}\lvert B(t)\rvert$$
+où $B$ est un <strong>pont brownien</strong>.</p>
+<p><strong>Leur rapport est celui de la LGN au TCL.</strong></p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>LGN / Glivenko-Cantelli</th>
+<th>TCL / Donsker</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Ponctuel</td>
+<td>$F_n(t)\to F(t)$</td>
+<td>$\sqrt n(F_n(t)-F(t))\to N(0,F(1-F))$</td>
+</tr>
+<tr>
+<td>Uniforme</td>
+<td>$\sup_t\lvert F_n-F\rvert\to0$</td>
+<td>$\sqrt n\sup_t\lvert F_n-F\rvert\to\sup\lvert B\rvert$</td>
+</tr>
+<tr>
+<td>Ce qu'il donne</td>
+<td>la <strong>convergence</strong></td>
+<td>la <strong>vitesse</strong> et la <strong>loi</strong></td>
+</tr>
+</tbody></table>
+<p><strong>Pourquoi ils comptent.</strong> Glivenko-Cantelli justifie qu'on <strong>peut</strong> apprendre la loi sans modèle paramétrique — c'est le fondement de la statistique non paramétrique. Donsker fournit la <strong>loi limite</strong> qui permet de construire un <strong>test</strong>, en calibrant le seuil de rejet.</p>
+</div></details>
+
+<p><strong> Niveau 2</strong> — Pourquoi la statistique de Kolmogorov-Smirnov est-elle pivotale, et pourquoi est-ce précieux ?</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p><strong>La démonstration.</strong> Posons $U_i=F^0(X_i)$. Sous $H_0$, $X_i$ a pour fonction de répartition $F^0$, donc par la <strong>transformation intégrale de probabilité</strong>,
+$$U_i\overset{iid}\sim U([0,1])$$
+Soit $G_n$ la fonction de répartition empirique des $U_i$. Comme $F^0$ est continue et croissante, $\{X_i\leq t\}\iff\{U_i\leq F^0(t)\}$, et en posant $x=F^0(t)$ :
+$$T_n=\sup_{t\in\mathbb R}\sqrt n\big\lvert F_n(t)-F^0(t)\big\rvert=\sup_{0\leq x\leq1}\sqrt n\big\lvert G_n(x)-x\big\rvert$$</p>
+<p><strong>Le membre de droite ne dépend plus de $F^0$.</strong> La loi de $T_n$ sous $H_0$ est donc <strong>la même quelle que soit la loi testée</strong>.</p>
+<p><strong>Pourquoi c'est précieux — trois raisons.</strong></p>
+<ol>
+<li><strong>Une seule table</strong> de quantiles sert pour tous les tests d'adéquation : gaussienne, exponentielle, Cauchy, n'importe quoi.</li>
+<li><strong>On peut simuler</strong> la loi de $T_n$ — tirer $M$ échantillons uniformes et former les $T_n^j$ — précisément parce qu'aucun paramètre inconnu n'intervient. D'où la procédure du concept 5.</li>
+<li>Le test est <strong>exactement calibré</strong>, sans approximation liée à la loi particulière testée.</li>
+</ol>
+<p class="cal piege"> <strong>Et c'est exactement ce qu'on perd dans le cas composite.</strong> Si l'on estime $\hat\mu$ et $\hat\sigma^2$ sur les données, $\Phi_{\hat\mu,\hat\sigma^2}(X_i)$ n'est plus uniforme — les $U_i$ deviennent dépendants —, et <strong>Donsker tombe</strong>. Il faut alors la table de <strong>Lilliefors</strong>, différente et plus petite.</p>
+</div></details>
+
+<p><strong> Niveau 3</strong> — Pourquoi le test du khi-deux a-t-il $K-d-1$ degrés de liberté ?</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p><strong>Le décompte, en trois temps.</strong></p>
+<p><strong>1. On part de $K$ fréquences.</strong> $\hat p_1,\dots,\hat p_K$ : $K$ quantités observées.</p>
+<p><strong>2. On retire $1$ pour la contrainte de somme.</strong> $\sum_{j=1}^K\hat p_j=1$ <strong>par construction</strong>. Les fréquences ne sont pas libres : connaître $K-1$ d'entre elles détermine la dernière. Il ne reste que $K-1$ directions libres.</p>
+<p><strong>3. On retire $d$ pour les paramètres estimés.</strong> Le vecteur $\big(p_1(\hat\theta),\dots,p_K(\hat\theta)\big)$ est ajusté aux données via $\hat\theta\in\mathbb R^d$. Les écarts $\hat p_j-p_j(\hat\theta)$ sont donc <strong>contraints dans $d$ directions supplémentaires</strong> : l'EMV a rendu ces directions « nulles au premier ordre ».</p>
+<p><strong>Total</strong> : $K-1-d$ directions libres, donc $T_n\to\chi^2_{K-d-1}$.</p>
+<p><strong>La condition $d&lt;K-1$</strong> garantit qu'il reste au moins un degré de liberté. Si $d=K-1$, le modèle a autant de paramètres que la loi générale : il s'ajuste parfaitement et il n'y a <strong>rien à tester</strong>.</p>
+<p><strong>Le principe général, à retenir.</strong> C'est la même comptabilité que partout :</p>
+<table>
+<thead>
+<tr>
+<th>Contexte</th>
+<th>Degrés de liberté</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Variance empirique (Cochran, fiche 65)</td>
+<td>$n-1$ (moyenne estimée)</td>
+</tr>
+<tr>
+<td>Régression (fiche 50)</td>
+<td>$n-p$ ($p$ coefficients estimés)</td>
+</tr>
+<tr>
+<td>Khi-deux d'adéquation</td>
+<td>$K-d-1$ (somme $+$ $d$ paramètres)</td>
+</tr>
+<tr>
+<td>Rapport de vraisemblance (fiche 65)</td>
+<td>$d-r$ (nombre de contraintes)</td>
+</tr>
+</tbody></table>
+<p><strong>Chaque paramètre estimé sur les données consomme un degré de liberté.</strong></p>
+<p class="cal piege"> <strong>L'erreur classique</strong> est d'utiliser $K-1$ en oubliant les paramètres estimés. Le seuil est alors <strong>trop élevé</strong> et l'on rejette trop rarement — on croit valider un modèle qu'on a simplement bien ajusté.</p>
+</div></details>
+
+<p><strong> Niveau 4 — type examen</strong> — Pourquoi ne peut-on pas estimer les paramètres puis appliquer Kolmogorov-Smirnov ?</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p><strong>La tentation.</strong> On veut tester « $X$ est-elle gaussienne ? » sans connaître $\mu$ ni $\sigma^2$. L'idée naturelle est de les estimer par $\hat\mu=\bar X_n$ et $\hat\sigma^2=S_n^2$, puis de calculer
+$$\sup_{t\in\mathbb R}\Big\lvert F_n(t)-\Phi_{\hat\mu,\hat\sigma^2}(t)\Big\rvert$$
+et de comparer à la table de Kolmogorov-Smirnov.</p>
+<blockquote>
+<p class="cal piege"> <em>Dans ce cas, le théorème de Donsker n'est plus valide. <strong>C'est une erreur courante et grave !</strong></em></p>
+</blockquote>
+<p><strong>Pourquoi Donsker tombe — deux raisons liées.</strong></p>
+<p><strong>1. La perte du caractère pivotal.</strong> L'argument du concept 5 reposait sur $U_i=F^0(X_i)\overset{iid}\sim U([0,1])$. Ici $F^0$ est remplacée par $\Phi_{\hat\mu,\hat\sigma^2}$, qui <strong>dépend de tout l'échantillon</strong>. Les variables $\Phi_{\hat\mu,\hat\sigma^2}(X_i)$ ne sont <strong>ni uniformes ni indépendantes</strong> — chacune a été « recalibrée » à l'aide des autres.</p>
+<p><strong>2. Le rapprochement artificiel.</strong> $\Phi_{\hat\mu,\hat\sigma^2}$ est, par construction, la gaussienne qui <strong>colle le mieux</strong> à l'échantillon : on a choisi $\hat\mu$ et $\hat\sigma^2$ pour cela. L'écart $\sup_t\lvert F_n-\Phi_{\hat\mu,\hat\sigma^2}\rvert$ est donc <strong>systématiquement plus petit</strong> que si l'on avait utilisé les vrais $\mu,\sigma^2$.</p>
+<p><strong>La conséquence pratique, et elle est grave.</strong> La statistique étant trop petite, on <strong>rejette beaucoup trop rarement</strong> : on conclut à la normalité alors qu'on a seulement constaté qu'on avait bien ajusté une gaussienne. Le vrai niveau du test est très inférieur au niveau nominal, donc la <strong>puissance s'effondre</strong>. Le modèle est validé à tort — et tout ce qui repose dessus (intervalles de confiance, tests de Student, VaR paramétrique) est faux.</p>
+<p><strong>La solution : le test de Kolmogorov-Lilliefors.</strong> <em>On calcule à la place les quantiles de la statistique $\sup_t\lvert F_n(t)-\Phi_{\hat\mu,\hat\sigma^2}(t)\rvert$ ; <strong>ils ne dépendent pas de paramètres inconnus</strong>.</em></p>
+<p><strong>Pourquoi cela marche.</strong> Cette statistique reste <strong>pivotale</strong> — mais avec une <strong>autre loi</strong> que celle de KS. La raison est la propriété d'<strong>invariance par location-échelle</strong> de la famille gaussienne : si $X_i\sim N(\mu,\sigma^2)$, alors $(X_i-\hat\mu)/\hat\sigma$ a une loi qui ne dépend <strong>ni de $\mu$ ni de $\sigma$</strong>. Les quantiles sont donc tabulables une fois pour toutes, et ils sont <strong>plus petits</strong> que ceux de KS — exactement pour compenser l'ajustement.</p>
+<p><strong>Les autres voies.</strong></p>
+<ul>
+<li>Le test du <strong>khi-deux</strong>, qui gère nativement l'estimation de $\theta$ en retirant $d$ degrés de liberté. C'est la même correction, exprimée autrement.</li>
+<li>Une <strong>estimation sur des données indépendantes</strong> de celles du test — le découpage apprentissage / validation.</li>
+</ul>
+<p><strong>Le principe général qu'il faut savoir énoncer.</strong> <em>Estimer des paramètres sur les données consomme de l'information, et tout test qui l'ignore est biaisé en faveur du modèle.</em> On le retrouve sous trois formes : $-1$ dans Cochran, $-p$ en régression, $-d$ dans le khi-deux — et sous la forme d'une <strong>table différente</strong> pour Lilliefors.</p>
+</div></details>
+
+<h2 data-prio="must">Common mistakes</h2>
+<ol>
+<li><strong>Utiliser la table de Kolmogorov-Smirnov après avoir estimé les paramètres</strong> — <em>erreur courante et grave</em> : il faut <strong>Lilliefors</strong>.</li>
+<li><strong>Oublier l'hypothèse de continuité de $F$</strong> dans le théorème de Donsker.</li>
+<li><strong>Confondre Glivenko-Cantelli et Donsker</strong> — le premier donne la convergence, le second la vitesse et la loi.</li>
+<li><strong>Se tromper de degrés de liberté au khi-deux</strong> — c'est $K-d-1$, pas $K-1$.</li>
+<li><strong>Oublier la condition $d&lt;K-1$</strong> — sinon il ne reste aucun degré de liberté.</li>
+<li><strong>Oublier de normaliser par $p_j(\hat\theta)$</strong> dans la statistique du khi-deux.</li>
+<li><strong>Appliquer le khi-deux avec des classes trop peu peuplées</strong> — l'approximation $\chi^2$ exige assez d'observations par classe.</li>
+<li><strong>Croire qu'un QQ-plot est un test</strong> — c'est un diagnostic <strong>visuel</strong>, sans niveau ni p-valeur.</li>
+<li><strong>Utiliser KS quand les queues comptent</strong> — il ne voit que le pire écart, souvent au centre ; préférer <strong>Anderson-Darling</strong>.</li>
+<li><strong>Chercher le supremum de $\lvert F_n-F^0\rvert$ ailleurs qu'aux points de saut</strong> — il y est toujours atteint.</li>
+</ol>
+<h2>Ultimate Review</h2>
+<ol>
+<li><strong>Test d'adéquation</strong> : la loi supposée s'ajuste-t-elle aux données ? Caractéristique : <strong>aucune modélisation paramétrique</strong>.</li>
+<li><strong>Fonction de répartition empirique</strong> : $F_n(t)=\frac1n\sum_i\mathbf 1\{X_i\leq t\}$ ; $F$ <strong>caractérise entièrement</strong> la loi.</li>
+<li><strong>LGN</strong> : $F_n(t)\to F(t)$ p.s. pour chaque $t$. <strong>Glivenko-Cantelli</strong> : $\sup_t\lvert F_n(t)-F(t)\rvert\to0$ p.s. — <em>théorème fondamental de la statistique</em>.</li>
+<li><strong>TCL</strong> : $\sqrt n(F_n(t)-F(t))\to N(0,F(t)(1-F(t)))$.</li>
+<li><strong>Donsker</strong> ($F$ <strong>continue</strong>) : $\sqrt n\sup_t\lvert F_n-F\rvert\to\sup_{0\leq t\leq1}\lvert B(t)\rvert$, $B$ <strong>pont brownien</strong>.</li>
+<li><strong>Kolmogorov-Smirnov</strong> : $H_0:F=F^0$ ; $T_n=\sup_t\sqrt n\lvert F_n(t)-F^0(t)\rvert\to Z$ ; $\delta_\alpha^{KS}=\mathbf 1\{T_n&gt;q_\alpha\}$ ; p-valeur $\mathbb P[Z&gt;T_n\mid T_n]$.</li>
+<li><strong>Formule pratique</strong> : $T_n=\sqrt n\max_i\max\{\frac in-F^0(X_{(i)}),\ F^0(X_{(i)})-\frac{i-1}{n}\}$ — le sup est atteint <strong>aux sauts</strong>.</li>
+<li><strong>Caractère pivotal</strong> : $U_i=F^0(X_i)\sim U([0,1])$ sous $H_0$, donc $T_n=\sup_{0\leq x\leq1}\sqrt n\lvert G_n(x)-x\rvert$ — <strong>loi indépendante de $F^0$</strong>.</li>
+<li><strong>Simulation</strong> : $M$ copies de $T_n$, quantile empirique, p-valeur $\approx\#\{j:T_n^j&gt;T_n\}/M$.</li>
+<li><strong>Autres distances</strong> : <strong>Cramér-Von Mises</strong> $\int(F_n-F)^2$ · <strong>Anderson-Darling</strong> $\int\frac{(F_n-F)^2}{F(1-F)}$, sensible aux <strong>queues</strong>.</li>
+<li><strong>Cas composite</strong> : remplacer les paramètres par leurs estimations <strong>invalide Donsker</strong> — <em>erreur courante et grave</em>.</li>
+<li><strong>Kolmogorov-Lilliefors</strong> : recalculer les quantiles de $\sup_t\lvert F_n(t)-\Phi_{\hat\mu,\hat\sigma^2}(t)\rvert$ ; ils <strong>ne dépendent d'aucun paramètre inconnu</strong>.</li>
+<li><strong>QQ-plot</strong> : tracer $\big(F^{-1}(i/n),F_n^{-1}(i/n)\big)$ avec $F_n^{-1}(i/n)=X_{(i)}$, et comparer à $y=x$. <strong>Pas un test formel</strong>.</li>
+<li><strong>Khi-deux, cas fini</strong> : $p_j(\theta)=\mathbb P_\theta[Y=a_j]$, $\hat p_j=\#\{i:X_i=a_j\}/n$, $\hat\theta$ EMV sous $H_0$, et
+$$T_n=n\sum_{j=1}^K\frac{\big(\hat p_j-p_j(\hat\theta)\big)^2}{p_j(\hat\theta)}\ \xrightarrow{(d)}\ \chi^2_{K-d-1}$$</li>
+<li><strong>Degrés de liberté</strong> : $K$ classes $-\,1$ (somme) $-\,d$ (paramètres estimés) ; condition $d&lt;K-1$.</li>
+<li><strong>Cas infini</strong> : partitionner $E=A_1\cup\cdots\cup A_K$, même statistique, même loi limite.</li>
+<li><strong>Questions pratiques</strong> : choix de $K$, choix des classes, calcul de $p_j(\theta)$. Exemple Poisson : $A_j=\{j-1\}$ et $A_K=\{K-1,K,\dots\}$ avec $p_K(\lambda_{\max})\approx0$.</li>
+</ol>
+<p><strong>Formulas to know</strong>
+$$F_n(t)=\frac1n\sum_{i=1}^n\mathbf 1\{X_i\leq t\} \qquad \sup_t\lvert F_n(t)-F(t)\rvert\xrightarrow{\text{p.s.}}0$$
+$$\sqrt n\sup_t\lvert F_n-F\rvert\xrightarrow{(d)}\sup_{0\leq t\leq1}\lvert B(t)\rvert \qquad T_n^{KS}=\sup_t\sqrt n\big\lvert F_n(t)-F^0(t)\big\rvert$$
+$$T_n^{\chi^2}=n\sum_{j=1}^K\frac{\big(\hat p_j-p_j(\hat\theta)\big)^2}{p_j(\hat\theta)}\ \xrightarrow{(d)}\ \chi^2_{K-d-1}$$</p>
+<p><strong>Methods to know</strong> : le calcul pratique de $T_n$ par les statistiques d'ordre ; la démonstration du caractère pivotal ; le décompte des degrés de liberté ; le diagnostic par QQ-plot.</p>
+<div class="rec"><h2>Active Recall</h2><p><strong>Basic</strong> — Énoncez le théorème de Glivenko-Cantelli et celui de Donsker.</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p><strong>Glivenko-Cantelli</strong> — <em>le théorème fondamental de la statistique</em> :
+$$\sup_{t\in\mathbb R}\big\lvert F_n(t)-F(t)\big\rvert\ \xrightarrow[n\to\infty]{\text{p.s.}}\ 0$$
+La convergence est <strong>uniforme en $t$</strong>, plus forte que la convergence ponctuelle donnée par la LGN.</p>
+<p><strong>Donsker</strong> — si $F$ est <strong>continue</strong> :
+$$\sqrt n\,\sup_{t\in\mathbb R}\big\lvert F_n(t)-F(t)\big\rvert\ \xrightarrow[n\to\infty]{(d)}\ \sup_{0\leq t\leq1}\lvert B(t)\rvert$$
+où $B$ est un <strong>pont brownien</strong> sur $[0,1]$ — un mouvement brownien contraint à s'annuler en $0$ et en $1$, ce qui traduit $F_n=F$ exactement aux deux extrémités.</p>
+</div></details><p><strong>Understanding</strong> — Que signifie « statistique pivotale » et pourquoi est-ce utile ?</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p>Une statistique est <strong>pivotale</strong> si <strong>sa loi sous $H_0$ ne dépend pas de la loi des données</strong>.</p>
+<p><strong>Pour Kolmogorov-Smirnov.</strong> En posant $U_i=F^0(X_i)$, on a sous $H_0$ que $U_i\overset{iid}\sim U([0,1])$ (transformation intégrale de probabilité), donc
+$$T_n=\sup_{0\leq x\leq1}\sqrt n\big\lvert G_n(x)-x\big\rvert$$
+où $G_n$ est la fonction de répartition empirique des $U_i$. <strong>$F^0$ a disparu.</strong></p>
+<p><strong>Les trois bénéfices.</strong></p>
+<ol>
+<li><strong>Une seule table</strong> de quantiles pour tous les tests d'adéquation.</li>
+<li><strong>On peut simuler</strong> la loi de $T_n$ — tirer $M$ échantillons uniformes — puisque aucun paramètre inconnu n'intervient.</li>
+<li>Le test est <strong>exactement calibré</strong>, quelle que soit la loi testée.</li>
+</ol>
+<p class="cal piege"> <strong>Et c'est ce qu'on perd dans le cas composite</strong> : si les paramètres sont estimés sur les données, les $U_i$ ne sont plus ni uniformes ni indépendants, et Donsker tombe.</p>
+</div></details><p><strong>Application</strong> — On teste si des données suivent une loi de Poisson en les regroupant en $6$ classes. Combien de degrés de liberté ?</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p><strong>Le décompte.</strong></p>
+<ul>
+<li>$K=6$ classes ;</li>
+<li>$-1$ pour la contrainte $\sum_j\hat p_j=1$ ;</li>
+<li>$-d=-1$ pour le paramètre $\lambda$ estimé (la loi de Poisson a <strong>un</strong> paramètre).</li>
+</ul>
+<p>$$K-d-1=6-1-1=\mathbf 4 \qquad\Longrightarrow\qquad T_n\ \xrightarrow{(d)}\ \chi^2_4$$</p>
+<p><strong>Le test.</strong> $\delta_\alpha=\mathbf 1\{T_n&gt;q_\alpha\}$, avec $q_\alpha$ le quantile d'ordre $1-\alpha$ de $\chi^2_4$ ; à $5\,\%$, $q_{0{,}05}\approx9{,}49$.</p>
+<p><strong>La vérification de la condition.</strong> $d&lt;K-1$, soit $1&lt;5$ .</p>
+<p><strong>Le choix des classes</strong>, selon la recommandation du cours : $A_1=\{0\}$, $A_2=\{1\}$, …, $A_5=\{4\}$, $A_6=\{5,6,7,\dots\}$ — les petites valeurs isolées, toute la queue regroupée. On choisit $K$ assez grand pour que $p_K(\lambda_{\max})\approx0$.</p>
+<p class="cal piege"> <strong>L'erreur à éviter</strong> : utiliser $\chi^2_5$ en oubliant le paramètre estimé. Le seuil serait alors $11{,}07$ au lieu de $9{,}49$, et l'on rejetterait trop rarement.</p>
+</div></details><p><strong>Comparison</strong> — Kolmogorov-Smirnov ou khi-deux : lequel choisir ?</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<table>
+<thead>
+<tr>
+<th></th>
+<th><strong>Kolmogorov-Smirnov</strong></th>
+<th><strong>Khi-deux</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Données</td>
+<td><strong>continues</strong> ($F$ continue)</td>
+<td>discrètes ou <strong>regroupées</strong></td>
+</tr>
+<tr>
+<td>Découpage</td>
+<td>aucun</td>
+<td><strong>classes à choisir</strong></td>
+</tr>
+<tr>
+<td>Information utilisée</td>
+<td><strong>toute</strong> l'information de l'échantillon</td>
+<td>seulement les fréquences de classes</td>
+</tr>
+<tr>
+<td>Paramètres estimés</td>
+<td> <strong>interdit</strong> (⟹ Lilliefors)</td>
+<td><strong>géré</strong> par $-d$ degrés de liberté</td>
+</tr>
+<tr>
+<td>Loi limite</td>
+<td>$\sup\lvert$pont brownien$\rvert$</td>
+<td>$\chi^2_{K-d-1}$</td>
+</tr>
+<tr>
+<td>Statistique pivotale</td>
+<td><strong>oui</strong></td>
+<td>asymptotiquement</td>
+</tr>
+</tbody></table>
+<p><strong>KS</strong> est préférable sur données <strong>continues avec loi entièrement spécifiée</strong> : il n'y a pas de perte d'information par regroupement, et la statistique est exactement pivotale.</p>
+<p><strong>Le khi-deux</strong> est préférable sur données <strong>discrètes</strong>, ou dès qu'il faut <strong>estimer des paramètres</strong> — il traite ce cas nativement, en retirant $d$ degrés de liberté, là où KS exige de changer de table.</p>
+<p><strong>Les inconvénients respectifs.</strong> KS ne regarde que le <strong>pire écart</strong> — souvent situé au centre —, donc il est peu sensible aux queues ; Anderson-Darling corrige ce défaut. Le khi-deux impose des <strong>choix arbitraires</strong> (nombre et bornes des classes) qui influencent le résultat, et il perd de l'information par regroupement.</p>
+<p><strong>En pratique</strong>, on combine : un test formel, un <strong>QQ-plot</strong> pour voir <em>où</em> le modèle échoue.</p>
+</div></details><p><strong>Exam-style</strong> — Construisez le test du khi-deux d'adéquation et justifiez sa loi limite.</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p><strong>Le cadre.</strong> $X_1,\dots,X_n$ i.i.d. sur $E=\{a_1,\dots,a_K\}$ de loi $\mathbb P$, et $(\mathbb P_\theta)_{\theta\in\Theta}$ une famille paramétrique avec $\Theta\subseteq\mathbb R^d$. On teste
+$$H_0:\ \mathbb P\in(\mathbb P_\theta)_{\theta\in\Theta} \qquad\text{contre}\qquad H_1:\ \mathbb P\notin(\mathbb P_\theta)_{\theta\in\Theta}$$
+c'est-à-dire : <em>le modèle statistique s'ajuste-t-il aux données ?</em> De façon équivalente, $p_j=p_j(\theta)$ pour tout $j$ et un certain $\theta$.</p>
+<p><strong>La construction, en trois étapes.</strong></p>
+<ol>
+<li>Estimer $\hat\theta$ par <strong>maximum de vraisemblance sous $H_0$</strong>.</li>
+<li>Calculer les fréquences observées $\hat p_j=\#\{i:X_i=a_j\}/n$ et les probabilités ajustées $p_j(\hat\theta)$.</li>
+<li>*Si $H_0$ est vraie, $\hat p_j$ et $p_j(\hat\theta)$ sont <strong>tous deux de bons estimateurs de $p_j$</strong>, donc ils doivent être proches.* D'où
+$$T_n=n\sum_{j=1}^K\frac{\big(\hat p_j-p_j(\hat\theta)\big)^2}{p_j(\hat\theta)}$$</li>
+</ol>
+<p><strong>Pourquoi cette forme — la normalisation.</strong> $n\hat p_j$ suit approximativement une binomiale de variance $np_j(1-p_j)\approx np_j$ pour $p_j$ petit. Diviser l'écart au carré par $p_j(\hat\theta)$ rend donc chaque terme comparable au <strong>carré d'une gaussienne standard</strong>. La somme de tels carrés est, par définition, un $\chi^2$ (fiche 65).</p>
+<p><strong>Pourquoi $K-d-1$ degrés de liberté.</strong></p>
+<ul>
+<li><strong>$K$</strong> fréquences observées ;</li>
+<li><strong>$-1$</strong> : elles somment à $1$ par construction, donc une seule est déterminée par les autres ;</li>
+<li><strong>$-d$</strong> : l'EMV $\hat\theta$ ajuste le modèle dans $d$ directions supplémentaires, annulant les écarts au premier ordre dans ces directions.</li>
+</ul>
+<p>D'où $T_n\xrightarrow{(d)}\chi^2_{K-d-1}$, sous la condition $d&lt;K-1$ — sinon il ne reste aucun degré de liberté et il n'y a rien à tester.</p>
+<p><strong>Le test.</strong> $\delta_\alpha=\mathbf 1\{T_n&gt;q_\alpha\}$ avec $q_\alpha$ le quantile d'ordre $1-\alpha$ de $\chi^2_{K-d-1}$ ; p-valeur $\mathbb P[Z&gt;T_n\mid T_n]$, $Z\sim\chi^2_{K-d-1}$.</p>
+<p><strong>Le cas infini.</strong> Si $E$ est infini, on <strong>partitionne</strong> $E=A_1\cup\cdots\cup A_K$ et l'on remplace $\{X_i=a_j\}$ par $\{X_i\in A_j\}$. La statistique et la loi limite sont <strong>inchangées</strong>.</p>
+<p><strong>Les trois questions pratiques</strong>, que le cours pose explicitement : <em>choix de $K$ ? choix des classes ? calcul de $p_j(\theta)$ ?</em> Pour Poisson, le cours recommande $A_1=\{0\},\dots,A_{K-1}=\{K-2\}$, $A_K=\{K-1,K,\dots\}$ avec $K$ assez grand pour que $p_K(\lambda_{\max})\approx0$.</p>
+<p><strong>Ce qu'il faut ajouter en critique.</strong> Le regroupement en classes est une <strong>perte d'information</strong> : deux lois ayant les mêmes probabilités de classe sont indiscernables. Et les choix de $K$ et des bornes influencent le résultat — trop de classes et l'approximation $\chi^2$ échoue faute d'observations ; trop peu et la puissance s'effondre. Sur données continues, Kolmogorov-Smirnov est préférable.</p>
+</div></details></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h2>Flashcards</h2>
+<table>
+<thead>
+<tr>
+<th>Question</th>
+<th>Réponse</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Caractéristique des tests d'adéquation ?</td>
+<td><strong>Aucune modélisation paramétrique</strong></td>
+</tr>
+<tr>
+<td>Fonction de répartition empirique ?</td>
+<td>$F_n(t)=\frac1n\sum_i\mathbf 1\{X_i\leq t\}$</td>
+</tr>
+<tr>
+<td>Que dit la LGN pour $F_n$ ?</td>
+<td>$F_n(t)\to F(t)$ p.s. pour chaque $t$</td>
+</tr>
+<tr>
+<td>Théorème de Glivenko-Cantelli ?</td>
+<td>$\sup_t\lvert F_n(t)-F(t)\rvert\to0$ p.s.</td>
+</tr>
+<tr>
+<td>Son surnom ?</td>
+<td>Le <strong>théorème fondamental de la statistique</strong></td>
+</tr>
+<tr>
+<td>Théorème de Donsker ?</td>
+<td>$\sqrt n\sup_t\lvert F_n-F\rvert\to\sup_{[0,1]}\lvert B\rvert$</td>
+</tr>
+<tr>
+<td>Quelle hypothèse exige-t-il ?</td>
+<td>$F$ <strong>continue</strong></td>
+</tr>
+<tr>
+<td>Quel processus limite ?</td>
+<td>Le <strong>pont brownien</strong></td>
+</tr>
+<tr>
+<td>Pourquoi un pont et pas un brownien ?</td>
+<td>$F_n=F$ exactement aux deux extrémités</td>
+</tr>
+<tr>
+<td>Statistique de Kolmogorov-Smirnov ?</td>
+<td>$T_n=\sup_t\sqrt n\lvert F_n(t)-F^0(t)\rvert$</td>
+</tr>
+<tr>
+<td>Où le sup est-il atteint ?</td>
+<td>Aux <strong>points de saut</strong> de $F_n$</td>
+</tr>
+<tr>
+<td>Formule pratique ?</td>
+<td>$\sqrt n\max_i\max\{\frac in-F^0(X_{(i)}),\ F^0(X_{(i)})-\frac{i-1}{n}\}$</td>
+</tr>
+<tr>
+<td>Que signifie « pivotale » ?</td>
+<td>La loi sous $H_0$ ne dépend pas de celle des données</td>
+</tr>
+<tr>
+<td>Pourquoi $T_n$ est-elle pivotale ?</td>
+<td>$U_i=F^0(X_i)\sim U([0,1])$ sous $H_0$</td>
+</tr>
+<tr>
+<td>p-valeur du test KS ?</td>
+<td>$\mathbb P[Z&gt;T_n\mid T_n]$</td>
+</tr>
+<tr>
+<td>Distance de Cramér-Von Mises ?</td>
+<td>$\int(F_n-F)^2dt$</td>
+</tr>
+<tr>
+<td>Distance d'Anderson-Darling ?</td>
+<td>$\int\frac{(F_n-F)^2}{F(1-F)}dt$</td>
+</tr>
+<tr>
+<td>Que privilégie Anderson-Darling ?</td>
+<td>Les <strong>queues</strong> de distribution</td>
+</tr>
+<tr>
+<td>Que se passe-t-il si l'on estime les paramètres ?</td>
+<td><strong>Donsker n'est plus valide</strong> — erreur grave</td>
+</tr>
+<tr>
+<td>Pourquoi la statistique devient-elle trop petite ?</td>
+<td>La loi ajustée colle par construction aux données</td>
+</tr>
+<tr>
+<td>Quel test utiliser alors ?</td>
+<td><strong>Kolmogorov-Lilliefors</strong></td>
+</tr>
+<tr>
+<td>Pourquoi ses quantiles existent-ils ?</td>
+<td>Ils ne dépendent d'aucun paramètre inconnu</td>
+</tr>
+<tr>
+<td>Qu'est-ce qu'un QQ-plot ?</td>
+<td>Un diagnostic <strong>visuel</strong>, pas un test formel</td>
+</tr>
+<tr>
+<td>Que trace-t-on ?</td>
+<td>$\big(F^{-1}(i/n),X_{(i)}\big)$, comparé à $y=x$</td>
+</tr>
+<tr>
+<td>Comment définit-on $F_n^{-1}(i/n)$ ?</td>
+<td>$X_{(i)}$, la $i$-ième plus grande observation</td>
+</tr>
+<tr>
+<td>Hypothèses du test du khi-deux ?</td>
+<td>$H_0:\mathbb P\in(\mathbb P_\theta)$ contre $H_1:\mathbb P\notin(\mathbb P_\theta)$</td>
+</tr>
+<tr>
+<td>Statistique du khi-deux ?</td>
+<td>$n\sum_j\frac{(\hat p_j-p_j(\hat\theta))^2}{p_j(\hat\theta)}$</td>
+</tr>
+<tr>
+<td>Sa loi limite ?</td>
+<td>$\chi^2_{K-d-1}$</td>
+</tr>
+<tr>
+<td>Que compte $K-d-1$ ?</td>
+<td>$K$ classes $-1$ (somme) $-d$ (paramètres estimés)</td>
+</tr>
+<tr>
+<td>Quelle condition sur $d$ ?</td>
+<td>$d&lt;K-1$</td>
+</tr>
+<tr>
+<td>Comment traiter un espace infini ?</td>
+<td><strong>Partitionner</strong> en $K$ classes disjointes</td>
+</tr>
+<tr>
+<td>Découpage recommandé pour Poisson ?</td>
+<td>$\{0\},\{1\},\dots,\{K-2\},\{K-1,K,\dots\}$</td>
+</tr>
+</tbody></table>
+</main>
+
+
+
+
+</body></html>

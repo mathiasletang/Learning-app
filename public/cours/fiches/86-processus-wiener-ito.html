@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fiche 86 — Processus de Wiener et lemme d'Itô</title>
+<script>
+window.MathJax={tex:{inlineMath:[["$","$"]],displayMath:[["$$","$$"]],processEscapes:true},
+ options:{skipHtmlTags:["script","noscript","style","textarea","pre","code"]},
+ svg:{fontCache:"global"},
+ startup:{pageReady:()=>MathJax.startup.defaultPageReady().then(()=>{document.body.classList.add("ready")})}};
+setTimeout(function(){document.body.classList.add("ready")},2500);
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+/* ============================================================
+   MathiasLearn — feuille de style des fiches
+   Reprise intégrale des tokens de 00_PARCOURS/*.html
+   + blocs pédagogiques (callouts, méthode, essentiels, recall)
+   ============================================================ */
+:root{--bg:#faf9f7;--card:#fff;--ink:#1a1a1a;--muted:#6b6b6b;--line:#e5e2dd;--accent:#8b5e34;
+ --hl:#fdf8ef;--ok:#2d7d4f;--okbg:#f0f7f3;--warn:#b3402f;--warnbg:#fdf3f1;--blue:#2f5d8b;--bluebg:#f1f5fa}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+ font:17px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;padding:0 16px 100px}
+.nav{position:sticky;top:0;background:rgba(250,249,247,.96);backdrop-filter:blur(8px);
+ border-bottom:1px solid var(--line);margin:0 -16px 30px;padding:11px 16px;z-index:50;
+ display:flex;gap:6px;flex-wrap:wrap;font-size:13px}
+.nav a{color:var(--muted);text-decoration:none;padding:4px 9px;border-radius:5px;white-space:nowrap}
+.nav a:hover{background:var(--line);color:var(--ink)}
+.nav a.on{background:var(--accent);color:#fff}
+main{max-width:780px;margin:0 auto}
+h1{font-size:31px;letter-spacing:-.02em;margin:.4em 0 .5em;line-height:1.25}
+h2{font-size:23px;margin:2.2em 0 .7em;padding-bottom:.3em;border-bottom:1px solid var(--line)}
+h3{font-size:19px;margin:1.9em 0 .5em;color:var(--accent)}
+h4{font-size:17px;margin:1.5em 0 .4em}
+p{margin:.8em 0} a{color:var(--accent)} hr{border:0;border-top:1px solid var(--line);margin:2.6em 0}
+table{border-collapse:collapse;width:100%;margin:1.3em 0;font-size:15.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+th{background:#f3f0eb;font-weight:600}
+tr:nth-child(even) td{background:#fcfbfa}
+code{font-family:"SF Mono",Menlo,Consolas,monospace;font-size:.88em;background:#f2efea;padding:2px 6px;border-radius:4px;white-space:nowrap}
+pre{background:#f2efea;padding:14px 16px;border-radius:8px;overflow-x:auto}
+pre code{background:none;padding:0;white-space:pre}
+blockquote{border-left:3px solid var(--accent);background:var(--hl);margin:1.4em 0;padding:14px 20px;border-radius:0 8px 8px 0}
+blockquote p:first-child{margin-top:0} blockquote p:last-child{margin-bottom:0}
+ul,ol{padding-left:1.5em} li{margin:.35em 0} em{color:#4a4a4a}
+mjx-container[display="true"]{margin:1.1em 0!important;overflow-x:auto;overflow-y:hidden;padding:2px 0}
+mjx-container svg{max-width:100%}
+body:not(.ready) main{opacity:0} main{opacity:1;transition:opacity .25s}
+
+/* --- bandeau de tête de fiche --- */
+.cours{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--accent);
+ border-radius:0 10px 10px 0;padding:18px 22px;margin:0 0 34px}
+.cours h4{margin:0 0 4px;font-size:14px;text-transform:uppercase;letter-spacing:.07em;color:var(--accent)}
+.cours .cs{color:var(--muted);font-size:14.5px;margin:0 0 14px}
+
+/* --- exercices / corrigés --- */
+.ex{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:6px 24px 20px;margin:18px 0}
+.ex>h3:first-child{margin-top:14px}
+details.cor{margin-top:18px;border:1px solid var(--line);border-radius:8px;background:#fcfbfa;overflow:hidden}
+details.cor>summary{cursor:pointer;padding:12px 16px;font-weight:600;font-size:15px;color:var(--accent);
+ list-style:none;display:flex;align-items:center;gap:9px;user-select:none;transition:.15s;min-height:44px}
+details.cor>summary::-webkit-details-marker{display:none}
+details.cor>summary:hover{background:var(--hl)}
+details.cor>summary::before{content:"\25B6";font-size:10px;transition:transform .18s;display:inline-block}
+details.cor[open]>summary::before{transform:rotate(90deg)}
+details.cor[open]>summary{background:var(--okbg);color:var(--ok);border-bottom:1px solid var(--line)}
+.cor .in{padding:4px 20px 16px}
+.cor .in>*:first-child{margin-top:.9em}
+
+/* --- blocs pédagogiques (callouts) ---
+   Générés depuis une citation Markdown dont le premier **gras** commence
+   par un mot-clé : DÉFINITION, THÉORÈME, MÉTHODE, PIÈGE, INTUITION… */
+.cal{border:1px solid var(--line);border-left:4px solid var(--accent);background:var(--card);
+ border-radius:0 10px 10px 0;padding:15px 20px;margin:1.5em 0}
+.cal>p:first-child{margin-top:0}.cal>p:last-child,.cal>ul:last-child,.cal>ol:last-child{margin-bottom:0}
+.cal .lab{display:block;font-size:12.5px;text-transform:uppercase;letter-spacing:.08em;
+ font-weight:700;color:var(--accent);margin-bottom:6px}
+.cal.formel{background:var(--hl)}
+.cal.piege{border-left-color:var(--warn);background:var(--warnbg)}
+.cal.piege .lab{color:var(--warn)}
+.cal.methode{border-left-color:var(--ok);background:var(--okbg)}
+.cal.methode .lab{color:var(--ok)}
+.cal.intu{border-left-color:var(--blue);background:var(--bluebg)}
+.cal.intu .lab{color:var(--blue)}
+.cal.plus{border-left-style:dashed;background:#faf9f7}
+.cal.plus .lab{color:var(--muted)}
+
+/* --- révision express --- */
+.ess{background:var(--card);border:1px solid var(--accent);border-radius:10px;padding:4px 24px 20px;margin:1.6em 0}
+.ess h3{margin-top:1.3em}
+.rec{background:var(--card);border:1px dashed var(--accent);border-radius:10px;padding:4px 24px 18px;margin:1.6em 0}
+.rec ol{counter-reset:none}
+
+/* --- impression / PDF --- */
+@media print{
+ .nav{display:none}
+ body{padding:0;background:#fff;font-size:11.2pt;line-height:1.55}
+ main{max-width:none}
+ h1{font-size:23pt}h2{font-size:15pt;margin-top:1.5em}h3{font-size:12.6pt}
+ h2,h3,h4{break-after:avoid;page-break-after:avoid}
+ table,.cal,blockquote{break-inside:avoid;page-break-inside:avoid}
+ table{display:table;font-size:9.6pt}
+ details.cor{border:1px solid var(--line);background:#fcfbfa}
+ details.cor>summary{display:none}
+ details.cor .in{padding-top:10px}
+ .cal,.ex,.ess,.rec{box-shadow:none}
+ a{color:var(--ink);text-decoration:none}
+}
+@page{margin:16mm 15mm 18mm}
+
+/* --- exemples travaillés --- */
+.exm{background:#fcfbfa;border:1px solid var(--line);border-radius:10px;padding:2px 20px 14px;margin:1.5em 0}
+.exm>h4:first-child{margin:14px 0 .5em;color:var(--accent);font-size:13px;text-transform:uppercase;letter-spacing:.07em}
+
+
+/* --- pastilles de priorité (conventions des fiches de l'app) --- */
+h2[data-prio], h3[data-prio], h4[data-prio]{position:relative}
+h2[data-prio]::before,h3[data-prio]::before,h4[data-prio]::before{
+ content:"";display:inline-block;width:9px;height:9px;border-radius:50%;
+ margin-right:9px;vertical-align:middle;background:var(--muted)}
+[data-prio="must"]::before{background:var(--warn)}
+[data-prio="high"]::before{background:#d98324}
+[data-prio="mid"]::before{background:#c9a227}
+[data-prio="low"]::before{background:var(--ok)}
+/* corrigés des fiches de l'app : même traitement que les corrigés des séries */
+details.cor>summary::after{content:""}
+</style></head><body>
+<div class="nav"><a href="00_COMMENCER_ICI.html">Commencer ici</a><a href="01_NOTATIONS_le-decodeur.html">Notations</a><a href="02_EXERCICES_Serie-0.html">Série 0 — Remise en route</a><a href="03_EXERCICES_Serie-1.html">Série 1 — Convexité</a><a href="04_EXERCICES_Serie-2.html">Série 2 — KKT</a><a href="05_AUTO-EVALUATION.html">Auto-évaluation (quiz)</a><a href="06_FICHE_Optimisation-deux-variables.html">Fiche — Optimisation à 2 variables</a></div>
+<main><h1>Fiche 86 — Processus de Wiener et lemme d'Itô</h1>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Matière</strong></td>
+<td>Maths · Finance de marché</td>
+</tr>
+<tr>
+<td><strong>Cours source</strong></td>
+<td>John C. Hull, <em>Options, Futures, and Other Derivatives</em>, 8ᵉ éd., Pearson — chapitre 13 « Wiener Processes and Itô's Lemma »</td>
+</tr>
+<tr>
+<td><strong>Difficulté</strong></td>
+<td> Must know — l'outillage mathématique de Black-Scholes</td>
+</tr>
+<tr>
+<td><strong>Temps d'étude estimé</strong></td>
+<td>1 h 30</td>
+</tr>
+<tr>
+<td><strong>Prérequis</strong></td>
+<td>Fiche 85 · <strong>compléments</strong> : fiches 56 (calcul d'Itô, MIT) et 62 (mouvement brownien)</td>
+</tr>
+<tr>
+<td><strong>Concepts clés</strong></td>
+<td>Processus stochastique, propriété de Markov, efficience de forme faible, processus de Wiener, processus de Wiener généralisé, processus d'Itô, mouvement brownien géométrique, simulation de Monte-Carlo, processus corrélés, lemme d'Itô, propriété log-normale</td>
+</tr>
+<tr>
+<td><strong>Poids à l'examen</strong></td>
+<td><strong>Appliquer le lemme d'Itô</strong> à $G=\ln S$ et à $F=Se^{r(T-t)}$ · savoir que $\ln S_T$ est <strong>normale</strong> de moyenne $\ln S_0+(\mu-\sigma^2/2)T$.</td>
+</tr>
+</tbody></table>
+<h2>Vue d'ensemble</h2>
+<pre><code>MARKOV      seule la valeur PRÉSENTE compte  ⟺  efficience de forme faible
+WIENER      dz = ε√dt ,  ε ~ N(0,1) ,  incréments INDÉPENDANTS
+            dérive 0 · taux de variance 1 par an ·  écart-type ∝ √T
+GÉNÉRALISÉ  dx = a dt + b dz          dérive a · taux de variance b²
+ITÔ         dx = a(x,t) dt + b(x,t) dz
+ACTION      dS = μS dt + σS dz        ← mouvement brownien GÉOMÉTRIQUE
+LEMME       dG = (∂G/∂x·a + ∂G/∂t + ½ ∂²G/∂x²·b²) dt + ∂G/∂x·b dz
+CONSÉQUENCE ln S_T ~ N( ln S₀ + (μ − σ²/2)T , σ²T )   →  S_T LOG-NORMALE
+</code></pre>
+<blockquote>
+<p><strong>Le message d'ouverture de Hull, qu'il faut prendre au sérieux.</strong> <em>Beaucoup pensent que les processus stochastiques en temps continu sont si compliqués qu'ils devraient être laissés entièrement aux « scientifiques de fusée ». <strong>Ce n'est pas le cas. Le plus grand obstacle à leur compréhension est la notation.</strong></em></p>
+</blockquote>
+<p><strong>La classification des processus.</strong> Un processus stochastique est <strong>à temps discret</strong> (la variable ne change qu'à certaines dates fixes) ou <strong>à temps continu</strong> ; et <strong>à variable continue</strong> ou <strong>à variable discrète</strong>.</p>
+<p class="cal piege"> <strong>Honnêteté du modèle.</strong> <em>En pratique, on <strong>n'observe pas</strong> les prix d'actions suivant des processus à variable continue et temps continu : les prix sont restreints à des valeurs discrètes (multiples du cent) et les changements ne s'observent que quand la bourse est ouverte. <strong>Le processus continu n'en est pas moins un modèle utile pour de nombreux usages.</strong></em></p>
+<h2 data-prio="mid">Concept 1 — La propriété de Markov</h2>
+<div class="cal formel"><span class="lab">Définition.</span>
+<p> <em>Un processus de Markov est un processus stochastique où <strong>seule la valeur courante</strong> de la variable est pertinente pour prédire l'avenir. <strong>L'historique passé de la variable, et la façon dont le présent a émergé du passé, sont sans importance.</strong></em></p>
+</div>
+<p><em>Si IBM vaut 100 aujourd'hui et suit un processus de Markov, nos prévisions <strong>ne devraient pas être affectées</strong> par le prix d'il y a une semaine, un mois ou un an. <strong>La seule information pertinente est que le prix est maintenant de 100.</strong></em> L'avenir est incertain et s'exprime par une <strong>loi de probabilité</strong> ; la propriété de Markov implique que <em>la loi du prix à une date future ne dépend <strong>pas du chemin particulier</strong> suivi dans le passé</em>.</p>
+<p class="cal piege"> <strong>Ce que la propriété de Markov n'interdit pas.</strong> Hull le précise en note : <em>les propriétés statistiques de l'historique d'IBM peuvent être utiles pour déterminer les <strong>caractéristiques du processus</strong> (par exemple sa volatilité). Le point est que <strong>le chemin particulier suivi dans le passé est sans importance</strong>.</em></p>
+<p><strong>Le lien économique — l'efficience de forme faible.</strong> <em>Elle affirme que le prix présent <strong>incorpore toute l'information contenue dans l'historique des prix passés</strong>. Si elle était fausse, les analystes techniques pourraient obtenir des rendements supérieurs à la moyenne en interprétant les graphiques — <strong>il y a très peu de preuves qu'ils y parviennent effectivement</strong>.</em></p>
+<blockquote>
+<p><strong>Le mécanisme d'auto-destruction, énoncé par Hull.</strong> <em>Supposons qu'on découvre qu'un certain motif graphique donne toujours <strong>65 %</strong> de chances de fortes hausses ultérieures. Les investisseurs tenteraient d'acheter dès que le motif est observé, la demande <strong>augmenterait immédiatement</strong>, ce qui provoquerait une <strong>hausse immédiate du prix</strong> — et <strong>l'effet observé serait éliminé</strong>, ainsi que toute occasion de profit.</em> C'est la <strong>concurrence</strong> qui produit l'efficience.</p>
+</blockquote>
+<h2 data-prio="must">Concept 2 — Le processus de Wiener</h2>
+<p><strong>Le raisonnement d'additivité, à faire une fois pour toutes.</strong> Une variable markovienne dont le changement sur un an est $\phi(0,1)$ :</p>
+<table>
+<thead>
+<tr>
+<th>Horizon</th>
+<th>Loi du changement</th>
+<th>Écart-type</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1 an</td>
+<td>$\phi(0,1)$</td>
+<td>$1$</td>
+</tr>
+<tr>
+<td><strong>2 ans</strong></td>
+<td>somme de <strong>deux</strong> normales <strong>indépendantes</strong> → $\phi(0,2)$</td>
+<td>$\sqrt2$</td>
+</tr>
+<tr>
+<td>3 ans</td>
+<td>$\phi(0,3)$</td>
+<td>$\sqrt3$</td>
+</tr>
+<tr>
+<td><strong>6 mois</strong></td>
+<td>la variance annuelle est la somme des deux semestres → $\phi(0;0{,}5)$</td>
+<td>$\sqrt{0{,}5}$</td>
+</tr>
+<tr>
+<td>3 mois</td>
+<td>$\phi(0;0{,}25)$</td>
+<td>$0{,}5$</td>
+</tr>
+<tr>
+<td>$T$</td>
+<td>$\phi(0,T)$</td>
+<td>$\sqrt T$</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p class="cal piege"> <em><strong>Pour les processus de Markov, les VARIANCES des changements sur des périodes successives sont additives. Les ÉCARTS-TYPES ne le sont pas.</strong></em> <em>À proprement parler, on ne devrait pas dire que l'écart-type de la variable est de 1,0 par an.</em> <strong>C'est cela qui explique que l'incertitude soit dite proportionnelle à la racine carrée du temps.</strong></p>
+</blockquote>
+<div class="cal formel"><span class="lab">Définition formelle.</span>
+<p> Une variable $z$ suit un <strong>processus de Wiener</strong> si :
+<strong>1.</strong> le changement $\Delta z$ sur un petit intervalle $\Delta t$ vaut
+$$\boxed{\Delta z=\varepsilon\sqrt{\Delta t}}\;\text{(13.1)}\qquad\varepsilon\sim\phi(0,1)$$
+<strong>2.</strong> les valeurs de $\Delta z$ sur <strong>deux intervalles différents</strong> sont <strong>indépendantes</strong>.</p>
+</div>
+<p>De 1 : $\mathbb E[\Delta z]=0$, $\mathrm{sd}(\Delta z)=\sqrt{\Delta t}$, $\mathrm{Var}(\Delta z)=\Delta t$. De 2 : $z$ est <strong>markovien</strong>. <em>Le processus a été utilisé en physique pour décrire le mouvement d'une particule soumise à un grand nombre de petits chocs moléculaires : on l'appelle parfois <strong>mouvement brownien</strong>.</em></p>
+<p><strong>Sur un horizon long $T$</strong>, en découpant en $N=T/\Delta t$ intervalles :
+$$z(T)-z(0)=\sum_{i=1}^N\varepsilon_i\sqrt{\Delta t}\;\text{(13.2)}\qquad\Longrightarrow\qquad \mathbb E=0,\quad \mathrm{Var}=N\Delta t=T,\quad \mathrm{sd}=\sqrt T$$</p>
+<p><strong>Exemple 13.1.</strong> $z$ vaut initialement <strong>25</strong>. Au bout d'<strong>un an</strong> : normale de moyenne <strong>25</strong> et écart-type <strong>1,0</strong>. Au bout de <strong>5 ans</strong> : moyenne <strong>25</strong>, écart-type $\sqrt5=\mathbf{2{,}236}$. <em>Notre incertitude, mesurée par l'écart-type, croît comme <strong>la racine carrée</strong> de l'horizon.</em></p>
+<details class="cor">
+<summary><strong>Pourquoi la trajectoire d'un processus de Wiener est « déchiquetée » — et deux propriétés stupéfiantes</strong></summary><div class="in">
+
+<p><em>Étape 1 — comparer les deux échelles.</em> L'écart-type du mouvement sur $\Delta t$ vaut $\sqrt{\Delta t}$.
+<em>Étape 2 — le rapport décisif.</em> Quand $\Delta t$ est petit, $\sqrt{\Delta t}$ est <strong>beaucoup plus grand</strong> que $\Delta t$. Exemple : $\Delta t=10^{-4}$ donne $\sqrt{\Delta t}=10^{-2}$, soit <strong>cent fois</strong> plus.
+<em>Étape 3 — la conséquence.</em> Le déplacement <strong>vertical</strong> domine le déplacement <strong>horizontal</strong> à toute échelle : la trajectoire ne « s'aplatit » jamais en zoomant. Elle n'est <strong>nulle part dérivable</strong>.</p>
+<p><strong>Les deux propriétés que Hull qualifie d'intrigantes.</strong></p>
+<ol>
+<li><em>La <strong>longueur espérée</strong> du chemin suivi par $z$ sur n'importe quel intervalle de temps est <strong>infinie</strong>.</em></li>
+<li><em>Le <strong>nombre espéré de fois</strong> où $z$ égale une valeur particulière donnée sur n'importe quel intervalle est <strong>infini</strong>.</em></li>
+</ol>
+<p class="cal piege"> <strong>C'est la même propriété $\sqrt{\Delta t}\gg\Delta t$ qui donnera, au concept 6, le terme en $\frac12\frac{\partial^2G}{\partial x^2}b^2$ du lemme d'Itô.</strong> Retenez-la : elle est la source de <strong>tout</strong> ce qui distingue le calcul stochastique du calcul ordinaire. (Voir fiche 62 pour la variation quadratique.)</p>
+</div></details>
+
+<h2 data-prio="must">Concept 3 — Wiener généralisé et processus d'Itô</h2>
+<blockquote>
+<p><strong>Vocabulaire.</strong> <em>La <strong>moyenne</strong> du changement par unité de temps est le <strong>taux de dérive</strong> ; la <strong>variance</strong> par unité de temps est le <strong>taux de variance</strong>.</em> Le Wiener de base a une dérive <strong>nulle</strong> et un taux de variance <strong>1</strong>.</p>
+</blockquote>
+<p>$$\boxed{dx=a\,dt+b\,dz}\;\text{(13.3)}\qquad a,b\ \text{constants}$$</p>
+<table>
+<thead>
+<tr>
+<th>Terme</th>
+<th>Rôle</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$a\,dt$</td>
+<td><strong>dérive espérée</strong> de $a$ par unité de temps ; sans le second terme, $x=x_0+at$</td>
+</tr>
+<tr>
+<td>$b\,dz$</td>
+<td><em>ajoute du <strong>bruit</strong> ou de la <strong>variabilité</strong> au chemin</em>, d'un montant $b$ fois un Wiener → taux de variance $\mathbf{b^2}$</td>
+</tr>
+</tbody></table>
+<p>En temps discret : $\Delta x=a\Delta t+b\varepsilon\sqrt{\Delta t}$, d'où sur un horizon $T$ :
+$$\mathbb E[\Delta x]=aT\qquad \mathrm{sd}=b\sqrt T\qquad \mathrm{Var}=b^2T$$</p>
+<p><strong>Exemple 13.2 — la trésorerie d'une entreprise.</strong> Position de trésorerie (en milliers) suivant un Wiener généralisé de <strong>dérive 20 par an</strong> et <strong>taux de variance 900 par an</strong>, valeur initiale <strong>50</strong>.</p>
+<table>
+<thead>
+<tr>
+<th>Horizon</th>
+<th>Moyenne</th>
+<th>Écart-type</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>1 an</strong></td>
+<td>$50+20=\mathbf{70}$</td>
+<td>$\sqrt{900}=\mathbf{30}$</td>
+</tr>
+<tr>
+<td><strong>6 mois</strong></td>
+<td>$50+10=\mathbf{60}$</td>
+<td>$30\sqrt{0{,}5}=\mathbf{21{,}21}$</td>
+</tr>
+</tbody></table>
+<p class="cal piege"> <em>Notez que <strong>la position de trésorerie peut devenir négative</strong> — on peut l'interpréter comme une situation où l'entreprise <strong>emprunte</strong> des fonds.</em> C'est une limite structurelle du Wiener généralisé, et c'est exactement pourquoi on ne l'utilisera <strong>pas</strong> pour un prix d'action.</p>
+<blockquote>
+<p><strong>Processus d'Itô.</strong> <em>Un Wiener généralisé dans lequel les paramètres $a$ et $b$ sont des <strong>fonctions de la valeur de $x$ et du temps</strong> :</em>
+$$\boxed{dx=a(x,t)\,dt+b(x,t)\,dz}\;\text{(13.4)}$$
+<em>Le taux de dérive <strong>et</strong> le taux de variance sont alors susceptibles de <strong>changer au cours du temps</strong>.</em></p>
+</blockquote>
+<h2 data-prio="must">Concept 4 — Le processus du prix d'une action</h2>
+<p><strong>Pourquoi le Wiener généralisé ne convient pas.</strong> <em>Il serait tentant de dire qu'un prix d'action suit un Wiener généralisé — dérive constante et variance constante. <strong>Mais ce modèle rate un aspect essentiel</strong> : le <strong>rendement en pourcentage</strong> exigé par les investisseurs est <strong>indépendant du niveau du prix</strong>. S'ils exigent 14 % par an quand l'action vaut 10, alors, toutes choses égales, ils exigeront <strong>aussi 14 %</strong> quand elle vaut 50.</em></p>
+<p><strong>La correction, en deux temps.</strong></p>
+<p><em>Étape 1 — la dérive.</em> Ce n'est pas la dérive qui est constante, c'est le <strong>rendement</strong> (dérive divisée par le prix). La dérive de $S$ doit donc être $\boldsymbol{\mu S}$.
+<strong>Sans incertitude</strong>, $dS=\mu S\,dt$, soit $\dfrac{dS}{S}=\mu\,dt$, qui s'intègre en
+$$S_T=S_0e^{\mu T}\;\text{(13.5)}$$
+<em>— le prix croît au taux $\mu$ <strong>capitalisé en continu</strong>.</em></p>
+<p><em>Étape 2 — la diffusion.</em> <em>Une hypothèse raisonnable est que la <strong>variabilité du rendement en pourcentage</strong> sur $\Delta t$ est la même quel que soit le prix : <strong>un investisseur est tout aussi incertain du rendement en pourcentage quand l'action vaut 50 que quand elle vaut 10</strong>.</em> L'écart-type de $\Delta S$ doit donc être <strong>proportionnel à $S$</strong>.</p>
+<p>$$\boxed{dS=\mu S\,dt+\sigma S\,dz}\qquad\text{ou}\qquad\boxed{\frac{dS}{S}=\mu\,dt+\sigma\,dz}\;\text{(13.6)}$$</p>
+<blockquote>
+<p><em><strong>C'est le modèle de comportement des prix d'actions le plus largement utilisé.</strong></em> $\mu$ est le <strong>rendement espéré</strong>, $\sigma$ la <strong>volatilité</strong>, $\sigma^2$ le <strong>taux de variance</strong>. Le modèle (13.6) représente le processus <strong>dans le monde réel</strong> ; <strong>dans un monde risque-neutre, $\mu$ vaut $r$.</strong></p>
+</blockquote>
+<p><strong>La version discrète</strong> — le <strong>mouvement brownien géométrique</strong> :
+$$\frac{\Delta S}{S}=\mu\Delta t+\sigma\varepsilon\sqrt{\Delta t}\;\text{(13.7)}\qquad\Longrightarrow\qquad \boxed{\frac{\Delta S}{S}\sim\phi\big(\mu\Delta t,\ \sigma^2\Delta t\big)}\;\text{(13.9)}$$</p>
+<p><em>Le terme $\mu\Delta t$ est la <strong>valeur espérée</strong> du rendement ; $\sigma\varepsilon\sqrt{\Delta t}$ en est la <strong>composante stochastique</strong>, de variance $\sigma^2\Delta t$ — <strong>cohérent avec la définition de $\sigma$</strong> de la section 12.7.</em></p>
+<details class="cor">
+<summary><strong>Exercice résolu — simulation de Monte-Carlo d'une trajectoire (exemple 13.3 et tableau 13.1)</strong></summary><div class="in">
+
+<p><strong>Données.</strong> Action sans dividende, $\sigma=30\,\%$, $\mu=15\,\%$ (continu). Pas de <strong>1 semaine</strong> $=0{,}0192$ an.</p>
+<p><em>Étape 1 — écrire le processus.</em> $\dfrac{dS}{S}=0{,}15\,dt+0{,}30\,dz$.
+<em>Étape 2 — calculer les deux coefficients hebdomadaires.</em>
+$$\mu\Delta t=0{,}15\times0{,}0192=\mathbf{0{,}00288}\qquad \sigma\sqrt{\Delta t}=0{,}30\sqrt{0{,}0192}=\mathbf{0{,}0416}$$
+<em>Étape 3 — la récurrence à simuler.</em>
+$$\boxed{\Delta S=0{,}00288\,S+0{,}0416\,S\,\varepsilon}\;\text{(13.10)}$$
+<em>Étape 4 — tirer $\varepsilon$.</em> En tableur : <code>=NORMSINV(RAND())</code>.
+<em>Étape 5 — dérouler.</em> $S_0=100$, $\varepsilon=0{,}52$ :
+$$\Delta S=0{,}00288\times100+0{,}0416\times100\times0{,}52=0{,}288+2{,}163=\mathbf{2{,}45}\ \Rightarrow\ S=\mathbf{102{,}45}$$
+Puis $\varepsilon=1{,}44$ : $\Delta S=0{,}00288\times102{,}45+0{,}0416\times102{,}45\times1{,}44=\mathbf{6{,}43}\ \Rightarrow\ S=\mathbf{108{,}88}$, etc.</p>
+<table>
+<thead>
+<tr>
+<th>$S$ au début</th>
+<th>$\varepsilon$</th>
+<th>$\Delta S$</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>100,00</td>
+<td>0,52</td>
+<td>2,45</td>
+</tr>
+<tr>
+<td>102,45</td>
+<td>1,44</td>
+<td>6,43</td>
+</tr>
+<tr>
+<td>108,88</td>
+<td>−0,86</td>
+<td>−3,58</td>
+</tr>
+<tr>
+<td>105,30</td>
+<td>1,46</td>
+<td>6,70</td>
+</tr>
+<tr>
+<td>112,00</td>
+<td>−0,69</td>
+<td>−2,89</td>
+</tr>
+<tr>
+<td>109,11</td>
+<td>−0,74</td>
+<td>−3,04</td>
+</tr>
+<tr>
+<td>106,06</td>
+<td>0,21</td>
+<td>1,23</td>
+</tr>
+<tr>
+<td>107,30</td>
+<td>−1,10</td>
+<td>−4,60</td>
+</tr>
+<tr>
+<td>102,69</td>
+<td>0,73</td>
+<td>3,41</td>
+</tr>
+<tr>
+<td>106,11</td>
+<td>1,16</td>
+<td>5,43</td>
+</tr>
+<tr>
+<td><strong>111,54</strong></td>
+<td>2,56</td>
+<td>12,20</td>
+</tr>
+</tbody></table>
+<p class="cal piege"> <strong>Trois points de méthode.</strong>
+(i) <em>Comme le processus simulé est <strong>markovien</strong>, les tirages de $\varepsilon$ doivent être <strong>indépendants</strong> les uns des autres.</em>
+(ii) <em>Le tableau montre <strong>une seule</strong> trajectoire possible ; des tirages différents donneraient des mouvements différents. <strong>En répétant, on obtient la loi complète</strong> de $S$ à 10 semaines.</em> Le 111,54 final est <strong>un tirage</strong> de cette loi.
+(iii) *N'importe quel $\Delta t$ convient ; <strong>à la limite $\Delta t\to0$</strong>, on obtient une description parfaite du processus.* En pratique il est plus efficace de simuler $\ln S$ que $S$ (chapitre 20).</p>
+</div></details>
+
+<h2 data-prio="mid">Concept 5 — Les paramètres et les processus corrélés</h2>
+<table>
+<thead>
+<tr>
+<th>Paramètre</th>
+<th>Statut</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$\mu$</td>
+<td><em>rendement espéré annualisé ; il dépend du <strong>risque</strong> — plus précisément <strong>de la part du risque qui ne peut pas être diversifiée</strong> — et du <strong>niveau des taux</strong> dans l'économie</em></td>
+</tr>
+<tr>
+<td>$\sigma$</td>
+<td><strong>volatilité</strong> ; <em>valeurs typiques pour une action : <strong>0,15 à 0,60</strong></em>, soit 15 % à 60 %</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p class="cal piege"> <strong>La bonne nouvelle décisive.</strong> <em><strong>Nous n'avons pas à nous préoccuper des déterminants de $\mu$ en détail, parce que la valeur d'un dérivé dépendant d'une action est, en général, INDÉPENDANTE de $\mu$.</strong></em> <em>Le paramètre $\sigma$, en revanche, est <strong>d'une importance critique</strong> pour la valeur de nombreux dérivés.</em></p>
+</blockquote>
+<p><strong>Interprétation approchée de $\sigma$.</strong> <em>L'écart-type du changement proportionnel sur $\Delta t$ est $\sigma\sqrt{\Delta t}$. En <strong>approximation grossière</strong>, celui sur une longue période $T$ est $\sigma\sqrt T$ : <strong>la volatilité peut donc s'interpréter comme l'écart-type du changement du prix sur un an</strong>.</em> Le chapitre 14 montrera qu'elle est <strong>exactement</strong> l'écart-type du rendement <strong>capitalisé en continu</strong> sur un an.</p>
+<p><strong>Processus corrélés.</strong> Pour $dx_1=a_1dt+b_1dz_1$ et $dx_2=a_2dt+b_2dz_2$ : si $x_1$ et $x_2$ sont <strong>non corrélés</strong>, les $\varepsilon_1,\varepsilon_2$ doivent être <strong>indépendants</strong> ; s'ils ont une corrélation $\rho$, il faut les tirer d'une <strong>normale bivariée</strong> de corrélation $\rho$ — on dit alors que $dz_1$ et $dz_2$ ont une corrélation $\rho$.</p>
+<blockquote>
+<p><strong>La recette de simulation, à connaître.</strong> À partir de deux tirages <strong>indépendants</strong> $u$ et $v$ standard normaux :
+$$\boxed{\varepsilon_1=u\qquad\qquad \varepsilon_2=\rho u+\sqrt{1-\rho^2}\,v}$$
+<em>Généralisation : trois variables → normale <strong>trivariée</strong> ; $n$ variables → <strong>normale multivariée</strong> (chapitre 20).</em></p>
+</blockquote>
+<p class="cal piege"> <em>Dans ces processus, $a_1,a_2,b_1,b_2$ peuvent être des fonctions de $x_1$, $x_2$ <strong>et</strong> $t$ — en particulier $a_1$ et $b_1$ peuvent dépendre de $x_2$.</em></p>
+<h2 data-prio="must">Concept 6 — Le lemme d'Itô</h2>
+<p><strong>Le contexte.</strong> <em>Le prix d'une option est une <strong>fonction du prix de l'action et du temps</strong>. Plus généralement, le prix de tout dérivé est une fonction des variables stochastiques sous-jacentes et du temps.</em> Résultat découvert par <strong>K. Itô en 1951</strong>.</p>
+<blockquote>
+<p><strong>Le lemme.</strong> Si $x$ suit $dx=a(x,t)dt+b(x,t)dz$, alors une fonction $G$ de $x$ et $t$ suit
+$$\boxed{dG=\left(\frac{\partial G}{\partial x}a+\frac{\partial G}{\partial t}+\frac12\frac{\partial^2G}{\partial x^2}b^2\right)dt+\frac{\partial G}{\partial x}b\,dz}\;\text{(13.12)}$$
+<em><strong>où $dz$ est LE MÊME processus de Wiener</strong></em> que celui de $x$. $G$ suit donc aussi un processus d'Itô, de dérive $\frac{\partial G}{\partial x}a+\frac{\partial G}{\partial t}+\frac12\frac{\partial^2G}{\partial x^2}b^2$ et de taux de variance $\left(\frac{\partial G}{\partial x}\right)^2b^2$.</p>
+</blockquote>
+<p><strong>Appliqué au prix d'une action</strong> ($a=\mu S$, $b=\sigma S$) :
+$$\boxed{dG=\left(\frac{\partial G}{\partial S}\mu S+\frac{\partial G}{\partial t}+\frac12\frac{\partial^2G}{\partial S^2}\sigma^2S^2\right)dt+\frac{\partial G}{\partial S}\sigma S\,dz}\;\text{(13.14)}$$</p>
+<blockquote>
+<p class="cal piege"> <strong>Le point que Hull souligne comme décisif.</strong> <em><strong>$S$ et $G$ sont affectés par la MÊME source d'incertitude, $dz$. Cela se révèle très important dans la dérivation des résultats de Black-Scholes-Merton.</strong></em> C'est <strong>exactement</strong> ce qui permettra, au chapitre 14, de construire un portefeuille où le $dz$ <strong>s'annule</strong>.</p>
+</blockquote>
+<p class="cal piege"> <strong>Le terme qui n'existe pas en calcul ordinaire</strong> est $\frac12\frac{\partial^2G}{\partial x^2}b^2\,dt$. Il vient de ce que $(dz)^2$ est d'ordre $dt$, et non $dt^2$ — la propriété $\sqrt{\Delta t}\gg\Delta t$ du concept 2. (Démonstration détaillée en fiche 56.)</p>
+<details class="cor">
+<summary><strong>Exercice résolu A — le processus suivi par un prix forward</strong></summary><div class="in">
+
+<p><strong>Question.</strong> Que devient le <strong>prix forward</strong> d'une action sans dividende quand le temps passe ? Taux sans risque $r$ <strong>constant</strong>.</p>
+<p><em>Étape 1 — la relation.</em> D'après (5.1), $F_0=S_0e^{rT}$ ; à une date générale $t&lt;T$ :
+$$F=Se^{r(T-t)}\;\text{(13.15)}$$
+<em>Étape 2 — les trois dérivées partielles.</em>
+$$\frac{\partial F}{\partial S}=e^{r(T-t)}\qquad \frac{\partial^2F}{\partial S^2}=\mathbf{0}\qquad \frac{\partial F}{\partial t}=-rSe^{r(T-t)}$$
+<em>Étape 3 — injecter dans (13.14).</em> Le terme du second ordre <strong>disparaît</strong> ($\partial^2F/\partial S^2=0$) :
+$$dF=\big[e^{r(T-t)}\mu S-rSe^{r(T-t)}\big]dt+e^{r(T-t)}\sigma S\,dz$$
+<em>Étape 4 — substituer $F=Se^{r(T-t)}$.</em>
+$$\boxed{dF=(\mu-r)F\,dt+\sigma F\,dz}\;\text{(13.16)}$$
+<em>Étape 5 — lire.</em> <em>Comme $S$, le prix forward suit un <strong>mouvement brownien géométrique</strong>. Il a un taux de croissance espéré de $\mu-r$ au lieu de $\mu$ : <strong>la croissance de $F$ est l'excès de rendement de $S$ sur le taux sans risque</strong>.</em> Et <strong>la volatilité est inchangée</strong>, à $\sigma$.</p>
+<p class="cal piege"> <strong>Le lemme d'Itô se réduit ici au calcul ordinaire</strong>, parce que $F$ est <strong>linéaire</strong> en $S$. C'est le bon test : le terme d'Itô n'apparaît que pour les fonctions <strong>non linéaires</strong>.</p>
+</div></details>
+
+<h2 data-prio="must">Concept 7 — La propriété log-normale</h2>
+<details class="cor">
+<summary><strong>Exercice résolu B — le calcul le plus important du chapitre : $G=\ln S$</strong></summary><div class="in">
+
+<p><em>Étape 1 — poser $G=\ln S$ et calculer les dérivées.</em>
+$$\frac{\partial G}{\partial S}=\frac1S\qquad \frac{\partial^2G}{\partial S^2}=-\frac1{S^2}\qquad \frac{\partial G}{\partial t}=0$$
+<em>Étape 2 — injecter dans (13.14).</em>
+$$dG=\left(\frac1S\mu S+0+\frac12\left(-\frac1{S^2}\right)\sigma^2S^2\right)dt+\frac1S\sigma S\,dz$$
+<em>Étape 3 — simplifier.</em>
+$$\boxed{d(\ln S)=\left(\mu-\frac{\sigma^2}{2}\right)dt+\sigma\,dz}\;\text{(13.17)}$$
+<em>Étape 4 — reconnaître la nature du processus.</em> $\mu$ et $\sigma$ étant constants, <strong>$\ln S$ suit un Wiener GÉNÉRALISÉ</strong>, de dérive constante $\mu-\sigma^2/2$ et de taux de variance constant $\sigma^2$.
+<em>Étape 5 — en déduire la loi.</em> Le changement de $\ln S$ entre $0$ et $T$ est donc <strong>normal</strong> :
+$$\boxed{\ln S_T-\ln S_0\sim\phi\!\left(\left(\mu-\frac{\sigma^2}{2}\right)T,\ \sigma^2T\right)}\;\text{(13.18)}$$
+$$\boxed{\ln S_T\sim\phi\!\left(\ln S_0+\left(\mu-\frac{\sigma^2}{2}\right)T,\ \sigma^2T\right)}\;\text{(13.19)}$$</p>
+<blockquote>
+<p><strong>Conclusion.</strong> <em>Une variable a une loi <strong>log-normale</strong> si son <strong>logarithme naturel</strong> est normalement distribué. Le modèle développé implique donc que <strong>le prix de l'action en $T$, connaissant son prix aujourd'hui, est log-normal</strong>. L'écart-type du logarithme du prix est $\sigma\sqrt T$ : il est <strong>proportionnel à la racine carrée de l'horizon</strong>.</em></p>
+</blockquote>
+<p class="cal piege"> <strong>D'où vient le $-\sigma^2/2$ ?</strong> <strong>Uniquement du terme d'Itô</strong>, $\frac12\left(-\frac1{S^2}\right)\sigma^2S^2$. Sans lui on écrirait naïvement $d(\ln S)=\mu\,dt+\sigma\,dz$ — <strong>faux</strong>. Ce demi-terme est la différence entre le <strong>rendement arithmétique espéré</strong> $\mu$ et le <strong>rendement géométrique</strong> $\mu-\sigma^2/2$ ; c'est lui qui produira le $d_2$ de Black-Scholes.</p>
+</div></details>
+
+<h2>Comment reconnaître le type d'exercice</h2>
+<table>
+<thead>
+<tr>
+<th>Signal</th>
+<th>Ce qu'on demande</th>
+<th>Outil</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>« quelle est la loi de $x$ dans $T$ ans ? »</td>
+<td><strong>Wiener généralisé</strong></td>
+<td>$\phi(x_0+aT,\ b^2T)$</td>
+</tr>
+<tr>
+<td>Une variance annuelle, un autre horizon</td>
+<td><strong>additivité</strong></td>
+<td>les <strong>variances</strong> s'ajoutent, pas les écarts-types</td>
+</tr>
+<tr>
+<td>« quel processus suit $G(S,t)$ ? »</td>
+<td><strong>lemme d'Itô</strong></td>
+<td>(13.14), trois dérivées partielles</td>
+</tr>
+<tr>
+<td>$G$ <strong>linéaire</strong> en $S$</td>
+<td>vérification</td>
+<td>le terme d'Itô <strong>disparaît</strong></td>
+</tr>
+<tr>
+<td>« quelle est la loi de $S_T$ ? »</td>
+<td><strong>log-normale</strong></td>
+<td>$\ln S_T\sim\phi(\ln S_0+(\mu-\sigma^2/2)T,\sigma^2T)$</td>
+</tr>
+<tr>
+<td>Un pas de temps et deux paramètres</td>
+<td><strong>simulation</strong></td>
+<td>$\Delta S=\mu S\Delta t+\sigma S\varepsilon\sqrt{\Delta t}$</td>
+</tr>
+<tr>
+<td>Deux variables et une corrélation</td>
+<td><strong>tirages corrélés</strong></td>
+<td>$\varepsilon_2=\rho u+\sqrt{1-\rho^2}v$</td>
+</tr>
+</tbody></table>
+<h2>Comment résoudre ce type d'exercice</h2>
+<p><strong>Protocole lemme d'Itô — 5 étapes.</strong></p>
+<ol>
+<li>Identifier $a(x,t)$ et $b(x,t)$ dans le processus de $x$ (pour une action : $a=\mu S$, $b=\sigma S$).</li>
+<li>Calculer <strong>les trois</strong> dérivées : $\dfrac{\partial G}{\partial x}$, $\dfrac{\partial G}{\partial t}$, $\dfrac{\partial^2G}{\partial x^2}$.</li>
+<li>Assembler la dérive : $\dfrac{\partial G}{\partial x}a+\dfrac{\partial G}{\partial t}+\dfrac12\dfrac{\partial^2G}{\partial x^2}b^2$.</li>
+<li>Assembler la diffusion : $\dfrac{\partial G}{\partial x}b$ — <strong>même $dz$</strong> que pour $x$.</li>
+<li><strong>Simplifier</strong>, puis vérifier si le résultat est un Wiener généralisé (coefficients constants) ou un Itô.</li>
+</ol>
+<p><strong>Protocole loi de $S_T$ — 3 étapes.</strong></p>
+<ol>
+<li>Appliquer le lemme à $\ln S$ → dérive $\mu-\sigma^2/2$, variance $\sigma^2$.</li>
+<li>Sur $[0,T]$ : $\ln S_T$ est <strong>normale</strong> de moyenne $\ln S_0+(\mu-\sigma^2/2)T$ et variance $\sigma^2T$.</li>
+<li>Toute probabilité sur $S_T$ se calcule en <strong>passant au logarithme</strong> puis en utilisant $N(\cdot)$.</li>
+</ol>
+<h2 data-prio="must">Common mistakes</h2>
+<table>
+<thead>
+<tr>
+<th>Erreur</th>
+<th>Correction</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Additionner les <strong>écarts-types</strong> sur des périodes successives</td>
+<td>Ce sont les <strong>variances</strong> qui s'additionnent</td>
+</tr>
+<tr>
+<td>Modéliser un prix d'action par un Wiener <strong>généralisé</strong></td>
+<td>Il autoriserait des prix <strong>négatifs</strong> et une dérive indépendante du niveau</td>
+</tr>
+<tr>
+<td>Écrire $d(\ln S)=\mu\,dt+\sigma\,dz$</td>
+<td>Il manque le <strong>$-\sigma^2/2$</strong> du terme d'Itô</td>
+</tr>
+<tr>
+<td>Oublier $\partial G/\partial t$ dans le lemme</td>
+<td>Trois termes de dérive, <strong>jamais deux</strong></td>
+</tr>
+<tr>
+<td>Croire que $G$ a un <strong>autre</strong> $dz$ que $x$</td>
+<td><em><strong>Le même</strong></em> — c'est ce qui rend la couverture possible</td>
+</tr>
+<tr>
+<td>Croire que $\mu$ compte pour valoriser un dérivé</td>
+<td><em>La valeur d'un dérivé est <strong>en général indépendante de $\mu$</strong></em></td>
+</tr>
+<tr>
+<td>Confondre $\sigma$ et $\sigma^2$</td>
+<td>$\sigma$ = <strong>volatilité</strong>, $\sigma^2$ = <strong>taux de variance</strong></td>
+</tr>
+<tr>
+<td>Tirer des $\varepsilon$ corrélés dans le temps</td>
+<td>Le processus est <strong>markovien</strong> : tirages <strong>indépendants</strong></td>
+</tr>
+<tr>
+<td>Croire que $S_T$ est normale</td>
+<td><strong>$\ln S_T$</strong> est normale ; $S_T$ est <strong>log-normale</strong></td>
+</tr>
+<tr>
+<td>Appliquer le terme d'Itô à une fonction linéaire</td>
+<td>$\partial^2G/\partial x^2=0$ : il <strong>disparaît</strong></td>
+</tr>
+</tbody></table>
+<h2>Ultimate Review</h2>
+<p><strong>La hiérarchie des processus.</strong>
+$$\underbrace{dz=\varepsilon\sqrt{dt}}_{\text{Wiener}}\ \subset\ \underbrace{dx=a\,dt+b\,dz}_{\text{Wiener généralisé}}\ \subset\ \underbrace{dx=a(x,t)dt+b(x,t)dz}_{\text{Itô}}$$</p>
+<p><strong>Le modèle du prix d'une action.</strong> $dS=\mu S\,dt+\sigma S\,dz$ — <strong>mouvement brownien géométrique</strong> ; version discrète $\Delta S/S\sim\phi(\mu\Delta t,\sigma^2\Delta t)$ ; <strong>en monde risque-neutre, $\mu=r$</strong>.</p>
+<p><strong>Le lemme d'Itô.</strong>
+$$dG=\left(\frac{\partial G}{\partial x}a+\frac{\partial G}{\partial t}+\frac12\frac{\partial^2G}{\partial x^2}b^2\right)dt+\frac{\partial G}{\partial x}b\,dz$$</p>
+<p><strong>Les deux applications à retenir par cœur.</strong>
+$$F=Se^{r(T-t)}\ \Longrightarrow\ dF=(\mu-r)F\,dt+\sigma F\,dz\qquad\qquad \ln S\ \Longrightarrow\ d(\ln S)=\left(\mu-\frac{\sigma^2}{2}\right)dt+\sigma\,dz$$</p>
+<p><strong>La conclusion.</strong> $\ln S_T\sim\phi\left(\ln S_0+(\mu-\sigma^2/2)T,\ \sigma^2T\right)$ : <strong>$S_T$ est log-normale</strong>, d'écart-type logarithmique $\sigma\sqrt T$.</p>
+<p><strong>Les chiffres du chapitre.</strong> Wiener partant de 25 : écart-type <strong>1</strong> à un an, <strong>2,236</strong> à cinq ans · trésorerie : moyenne <strong>70</strong>, écart-type <strong>30</strong> à un an ; <strong>60</strong> et <strong>21,21</strong> à six mois · simulation : $\mu\Delta t=\mathbf{0{,}00288}$, $\sigma\sqrt{\Delta t}=\mathbf{0{,}0416}$ pour une semaine, trajectoire $100\to\mathbf{111{,}54}$ · volatilités typiques <strong>0,15 à 0,60</strong> · Itô, <strong>1951</strong>.</p>
+<div class="rec"><h2>Active Recall</h2><details class="cor">
+<summary>Qu'est-ce que la propriété de Markov, et à quelle notion économique correspond-elle ?</summary><div class="in">
+
+<p><em>Seule la <strong>valeur courante</strong> de la variable est pertinente pour prédire l'avenir ; <strong>l'historique passé et la façon dont le présent a émergé du passé sont sans importance</strong>.</em> Elle correspond à l'<strong>efficience de forme faible</strong> : <em>le prix présent incorpore toute l'information contenue dans l'historique des prix passés</em>. Si elle était fausse, les analystes techniques battraient le marché — <em>il y a très peu de preuves qu'ils y parviennent</em>. C'est la <strong>concurrence</strong> qui la produit : un motif prédictif découvert serait exploité immédiatement, et donc <strong>éliminé</strong>.</p>
+</div></details><details class="cor">
+<summary>Pourquoi l'incertitude est-elle proportionnelle à la racine carrée du temps ?</summary><div class="in">
+
+<p>Parce que pour un processus markovien, <strong>les variances des changements sur des périodes successives sont additives, pas les écarts-types</strong>. Une variance de 1 par an donne une variance de $T$ sur $T$ années, donc un écart-type de $\sqrt T$. <em>À proprement parler, on ne devrait pas dire que l'écart-type est de 1,0 <strong>par an</strong>.</em></p>
+</div></details><details class="cor">
+<summary>Donner la définition formelle d'un processus de Wiener.</summary><div class="in">
+
+<p><strong>(1)</strong> $\Delta z=\varepsilon\sqrt{\Delta t}$ avec $\varepsilon\sim\phi(0,1)$. <strong>(2)</strong> Les $\Delta z$ de <strong>deux intervalles différents</strong> sont <strong>indépendants</strong>.</p>
+<p>De (1) : $\mathbb E[\Delta z]=0$, $\mathrm{sd}=\sqrt{\Delta t}$, $\mathrm{Var}=\Delta t$. De (2) : $z$ est markovien. Sur $[0,T]$ : $z(T)-z(0)\sim\phi(0,T)$.</p>
+</div></details><details class="cor">
+<summary>Pourquoi la trajectoire d'un Wiener est-elle « déchiquetée », et quelles deux propriétés extrêmes en découlent ?</summary><div class="in">
+
+<p>Parce que l'écart-type du mouvement sur $\Delta t$ vaut $\sqrt{\Delta t}$, et que <em>quand $\Delta t$ est petit, $\sqrt{\Delta t}$ est <strong>beaucoup plus grand</strong> que $\Delta t$</em> : le déplacement vertical domine l'horizontal <strong>à toute échelle</strong>.</p>
+<p>Conséquences : <strong>(1)</strong> <em>la <strong>longueur espérée</strong> du chemin sur n'importe quel intervalle est <strong>infinie</strong></em> ; <strong>(2)</strong> <em>le <strong>nombre espéré de passages</strong> par une valeur donnée sur n'importe quel intervalle est <strong>infini</strong></em>.</p>
+</div></details><details class="cor">
+<summary>Pourquoi le Wiener généralisé ne convient-il pas pour un prix d'action ?</summary><div class="in">
+
+<p>Deux raisons. <strong>(1) La dérive.</strong> <em>Le rendement en pourcentage exigé est <strong>indépendant du niveau du prix</strong></em> : 14 % par an que l'action vaille 10 ou 50. Il faut donc une dérive <strong>proportionnelle à $S$</strong>, soit $\mu S$. <strong>(2) La diffusion.</strong> <em>Un investisseur est <strong>tout aussi incertain</strong> du rendement en pourcentage à 50 qu'à 10</em> : l'écart-type doit être proportionnel à $S$. Et le Wiener généralisé autoriserait des <strong>prix négatifs</strong> — acceptable pour une trésorerie (qui emprunte), pas pour une action.</p>
+</div></details><details class="cor">
+<summary>Écrire le processus du prix d'une action et sa version discrète, puis dire ce qui change en monde risque-neutre.</summary><div class="in">
+
+<p>$$dS=\mu S\,dt+\sigma S\,dz\qquad\text{ou}\qquad \frac{dS}{S}=\mu\,dt+\sigma\,dz$$
+Version discrète (<strong>mouvement brownien géométrique</strong>) : $\dfrac{\Delta S}{S}=\mu\Delta t+\sigma\varepsilon\sqrt{\Delta t}\sim\phi(\mu\Delta t,\sigma^2\Delta t)$.</p>
+<p><strong>En monde risque-neutre, $\mu$ est remplacé par $r$</strong> — et <strong>seulement $\mu$</strong> : $\sigma$ est inchangée (Girsanov, fiche 85).</p>
+</div></details><details class="cor">
+<summary>Énoncer le lemme d'Itô et dire ce qui le distingue du calcul ordinaire.</summary><div class="in">
+
+<p>$$dG=\left(\frac{\partial G}{\partial x}a+\frac{\partial G}{\partial t}+\frac12\frac{\partial^2G}{\partial x^2}b^2\right)dt+\frac{\partial G}{\partial x}b\,dz$$</p>
+<p>Le calcul ordinaire donnerait seulement les deux premiers termes de dérive. <strong>Le troisième, $\frac12\frac{\partial^2G}{\partial x^2}b^2$, est propre au calcul stochastique</strong> : il vient de ce que $(dz)^2$ est d'ordre $dt$. Et <strong>le $dz$ est le même</strong> que celui de $x$ : <em>les deux sont soumis à la même source d'incertitude sous-jacente</em> — c'est ce qui permettra la couverture parfaite du chapitre 14.</p>
+</div></details><details class="cor">
+<summary>Appliquer le lemme d'Itô à $F=Se^{r(T-t)}$ et interpréter.</summary><div class="in">
+
+<p>$\dfrac{\partial F}{\partial S}=e^{r(T-t)}$, $\dfrac{\partial^2F}{\partial S^2}=0$, $\dfrac{\partial F}{\partial t}=-rSe^{r(T-t)}$. D'où
+$$dF=\big[e^{r(T-t)}\mu S-rSe^{r(T-t)}\big]dt+e^{r(T-t)}\sigma S\,dz=\boxed{(\mu-r)F\,dt+\sigma F\,dz}$$
+<em>Le prix forward suit lui aussi un <strong>mouvement brownien géométrique</strong>, avec un taux de croissance espéré $\mu-r$ au lieu de $\mu$ : <strong>la croissance de $F$ est l'excès de rendement de $S$ sur le taux sans risque</strong>.</em> Et la volatilité est <strong>inchangée</strong>. Le terme d'Itô a disparu parce que $F$ est <strong>linéaire</strong> en $S$.</p>
+</div></details><details class="cor">
+<summary>Appliquer le lemme à $\ln S$ et en déduire la loi de $S_T$.</summary><div class="in">
+
+<p>$\dfrac{\partial G}{\partial S}=\dfrac1S$, $\dfrac{\partial^2G}{\partial S^2}=-\dfrac1{S^2}$, $\dfrac{\partial G}{\partial t}=0$, donc
+$$d(\ln S)=\left(\mu-\frac{\sigma^2}{2}\right)dt+\sigma\,dz$$
+<strong>$\ln S$ suit un Wiener généralisé</strong> à coefficients constants, donc
+$$\ln S_T\sim\phi\!\left(\ln S_0+\left(\mu-\frac{\sigma^2}{2}\right)T,\ \sigma^2T\right)$$
+<strong>$S_T$ est donc log-normale</strong>, d'écart-type logarithmique $\sigma\sqrt T$.</p>
+</div></details><details class="cor">
+<summary>D'où vient le terme $-\sigma^2/2$, et que signifie-t-il ?</summary><div class="in">
+
+<p><strong>Uniquement du terme d'Itô</strong> : $\frac12\left(-\frac1{S^2}\right)\sigma^2S^2=-\frac{\sigma^2}{2}$. Sans lui, on écrirait naïvement $d(\ln S)=\mu\,dt+\sigma\,dz$, ce qui est <strong>faux</strong>.</p>
+<p>Sa signification : c'est l'écart entre le <strong>rendement arithmétique espéré</strong> $\mu$ et le <strong>rendement géométrique</strong> (celui effectivement réalisé à long terme) $\mu-\sigma^2/2$. Plus la volatilité est forte, plus le second est <strong>inférieur</strong> au premier. C'est ce terme qui produira le $d_2$ de Black-Scholes.</p>
+</div></details><details class="cor">
+<summary>Comment simuler deux variables de corrélation $\rho$ ?</summary><div class="in">
+
+<p>Tirer <strong>deux</strong> normales standard <strong>indépendantes</strong> $u$ et $v$, puis poser
+$$\varepsilon_1=u\qquad\qquad \varepsilon_2=\rho u+\sqrt{1-\rho^2}\,v$$
+On vérifie que $\varepsilon_2$ est standard normale ($\rho^2+1-\rho^2=1$) et que $\mathrm{corr}(\varepsilon_1,\varepsilon_2)=\rho$. Pour $n$ variables, il faut tirer d'une <strong>normale multivariée</strong> — c'est la décomposition de Cholesky (chapitre 20).</p>
+</div></details><details class="cor">
+<summary>Pourquoi n'a-t-on pas besoin de connaître $\mu$ pour valoriser un dérivé ?</summary><div class="in">
+
+<p>Parce que <em>la valeur d'un dérivé dépendant d'une action est, <strong>en général, indépendante de $\mu$</strong></em>. La raison profonde a été vue en fiche 85 : on valorise <strong>relativement au prix de l'action</strong>, et les anticipations sont <strong>déjà dans $S_0$</strong>. En revanche <em>$\sigma$ est <strong>d'une importance critique</strong></em> — et c'est le seul paramètre qu'il faut réellement estimer.</p>
+</div></details></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h2>Flashcards</h2>
+<table>
+<thead>
+<tr>
+<th>Question</th>
+<th>Réponse</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Qu'est-ce qu'un processus de Markov ?</td>
+<td>Seule la <strong>valeur présente</strong> compte pour prédire l'avenir</td>
+</tr>
+<tr>
+<td>Notion économique correspondante ?</td>
+<td>L'<strong>efficience de forme faible</strong></td>
+</tr>
+<tr>
+<td>Qu'est-ce qui s'additionne sur des périodes successives ?</td>
+<td>Les <strong>variances</strong>, pas les écarts-types</td>
+</tr>
+<tr>
+<td>Définition d'un Wiener (propriété 1) ?</td>
+<td>$\Delta z=\varepsilon\sqrt{\Delta t}$, $\varepsilon\sim\phi(0,1)$</td>
+</tr>
+<tr>
+<td>Définition (propriété 2) ?</td>
+<td>Les $\Delta z$ d'intervalles différents sont <strong>indépendants</strong></td>
+</tr>
+<tr>
+<td>Loi de $z(T)-z(0)$ ?</td>
+<td>$\phi(0,T)$</td>
+</tr>
+<tr>
+<td>Autre nom du processus de Wiener ?</td>
+<td><strong>Mouvement brownien</strong></td>
+</tr>
+<tr>
+<td>Longueur espérée du chemin sur un intervalle ?</td>
+<td><strong>Infinie</strong></td>
+</tr>
+<tr>
+<td>Nombre espéré de passages par une valeur ?</td>
+<td><strong>Infini</strong></td>
+</tr>
+<tr>
+<td>Équation d'un Wiener généralisé ?</td>
+<td>$dx=a\,dt+b\,dz$</td>
+</tr>
+<tr>
+<td>Sa dérive ? son taux de variance ?</td>
+<td>$a$ · $\mathbf{b^2}$</td>
+</tr>
+<tr>
+<td>Loi de $\Delta x$ sur $T$ ?</td>
+<td>$\phi(aT,\ b^2T)$</td>
+</tr>
+<tr>
+<td>Équation d'un processus d'Itô ?</td>
+<td>$dx=a(x,t)dt+b(x,t)dz$</td>
+</tr>
+<tr>
+<td>Pourquoi pas un Wiener généralisé pour une action ?</td>
+<td>Rendement <strong>indépendant du niveau</strong>, et prix <strong>négatifs</strong> possibles</td>
+</tr>
+<tr>
+<td>Processus du prix d'une action ?</td>
+<td>$dS=\mu S\,dt+\sigma S\,dz$</td>
+</tr>
+<tr>
+<td>Son nom ?</td>
+<td><strong>Mouvement brownien géométrique</strong></td>
+</tr>
+<tr>
+<td>Version discrète ?</td>
+<td>$\Delta S/S\sim\phi(\mu\Delta t,\sigma^2\Delta t)$</td>
+</tr>
+<tr>
+<td>Que devient $\mu$ en monde risque-neutre ?</td>
+<td>Il vaut <strong>$r$</strong></td>
+</tr>
+<tr>
+<td>Que vaut $S_T$ sans incertitude ?</td>
+<td>$S_0e^{\mu T}$</td>
+</tr>
+<tr>
+<td>Fourchette typique de $\sigma$ ?</td>
+<td><strong>0,15 à 0,60</strong></td>
+</tr>
+<tr>
+<td>De quoi dépend $\mu$ ?</td>
+<td>Du risque <strong>non diversifiable</strong> et du niveau des taux</td>
+</tr>
+<tr>
+<td>A-t-on besoin de $\mu$ pour valoriser un dérivé ?</td>
+<td><strong>Non</strong></td>
+</tr>
+<tr>
+<td>Interprétation approchée de $\sigma$ ?</td>
+<td>Écart-type du changement <strong>sur un an</strong></td>
+</tr>
+<tr>
+<td>Comment simuler $\varepsilon_2$ corrélé à $\varepsilon_1$ ?</td>
+<td>$\varepsilon_2=\rho u+\sqrt{1-\rho^2}\,v$</td>
+</tr>
+<tr>
+<td>Qui a découvert le lemme, et quand ?</td>
+<td><strong>K. Itô</strong>, <strong>1951</strong></td>
+</tr>
+<tr>
+<td>Le lemme d'Itô ?</td>
+<td>$dG=(G_xa+G_t+\frac12G_{xx}b^2)dt+G_xb\,dz$</td>
+</tr>
+<tr>
+<td>Quel terme est absent du calcul ordinaire ?</td>
+<td>$\frac12G_{xx}b^2$</td>
+</tr>
+<tr>
+<td>Le $dz$ de $G$ est-il celui de $x$ ?</td>
+<td><strong>Le même</strong> — même source d'incertitude</td>
+</tr>
+<tr>
+<td>Pourquoi est-ce essentiel ?</td>
+<td>Cela permet <strong>d'annuler</strong> le risque par couverture</td>
+</tr>
+<tr>
+<td>Taux de variance de $G$ ?</td>
+<td>$(\partial G/\partial x)^2b^2$</td>
+</tr>
+<tr>
+<td>Processus suivi par $F=Se^{r(T-t)}$ ?</td>
+<td>$dF=(\mu-r)F\,dt+\sigma F\,dz$</td>
+</tr>
+<tr>
+<td>Pourquoi le terme d'Itô y disparaît-il ?</td>
+<td>$F$ est <strong>linéaire</strong> en $S$</td>
+</tr>
+<tr>
+<td>Processus suivi par $\ln S$ ?</td>
+<td>$d(\ln S)=(\mu-\sigma^2/2)dt+\sigma\,dz$</td>
+</tr>
+<tr>
+<td>De quel type est ce processus ?</td>
+<td>Un Wiener <strong>généralisé</strong></td>
+</tr>
+<tr>
+<td>Loi de $\ln S_T$ ?</td>
+<td>$\phi(\ln S_0+(\mu-\sigma^2/2)T,\ \sigma^2T)$</td>
+</tr>
+<tr>
+<td>Loi de $S_T$ ?</td>
+<td><strong>Log-normale</strong></td>
+</tr>
+<tr>
+<td>Écart-type du log du prix ?</td>
+<td>$\sigma\sqrt T$</td>
+</tr>
+<tr>
+<td>D'où vient le $-\sigma^2/2$ ?</td>
+<td><strong>Du terme d'Itô</strong></td>
+</tr>
+<tr>
+<td>Que mesure-t-il ?</td>
+<td>L'écart entre rendement <strong>arithmétique</strong> et <strong>géométrique</strong></td>
+</tr>
+<tr>
+<td>Coefficients hebdomadaires de l'exemple ?</td>
+<td>$\mu\Delta t=0{,}00288$ · $\sigma\sqrt{\Delta t}=0{,}0416$</td>
+</tr>
+<tr>
+<td>Instruction tableur pour tirer $\varepsilon$ ?</td>
+<td><code>=NORMSINV(RAND())</code></td>
+</tr>
+<tr>
+<td>Que vaut-il mieux simuler que $S$ ?</td>
+<td>$\ln S$</td>
+</tr>
+</tbody></table>
+</main>
+
+
+
+
+</body></html>

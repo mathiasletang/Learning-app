@@ -1,0 +1,1030 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fiche 73 — Inférence en petit échantillon et bootstrap</title>
+<script>
+window.MathJax={tex:{inlineMath:[["$","$"]],displayMath:[["$$","$$"]],processEscapes:true},
+ options:{skipHtmlTags:["script","noscript","style","textarea","pre","code"]},
+ svg:{fontCache:"global"},
+ startup:{pageReady:()=>MathJax.startup.defaultPageReady().then(()=>{document.body.classList.add("ready")})}};
+setTimeout(function(){document.body.classList.add("ready")},2500);
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+/* ============================================================
+   MathiasLearn — feuille de style des fiches
+   Reprise intégrale des tokens de 00_PARCOURS/*.html
+   + blocs pédagogiques (callouts, méthode, essentiels, recall)
+   ============================================================ */
+:root{--bg:#faf9f7;--card:#fff;--ink:#1a1a1a;--muted:#6b6b6b;--line:#e5e2dd;--accent:#8b5e34;
+ --hl:#fdf8ef;--ok:#2d7d4f;--okbg:#f0f7f3;--warn:#b3402f;--warnbg:#fdf3f1;--blue:#2f5d8b;--bluebg:#f1f5fa}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+ font:17px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;padding:0 16px 100px}
+.nav{position:sticky;top:0;background:rgba(250,249,247,.96);backdrop-filter:blur(8px);
+ border-bottom:1px solid var(--line);margin:0 -16px 30px;padding:11px 16px;z-index:50;
+ display:flex;gap:6px;flex-wrap:wrap;font-size:13px}
+.nav a{color:var(--muted);text-decoration:none;padding:4px 9px;border-radius:5px;white-space:nowrap}
+.nav a:hover{background:var(--line);color:var(--ink)}
+.nav a.on{background:var(--accent);color:#fff}
+main{max-width:780px;margin:0 auto}
+h1{font-size:31px;letter-spacing:-.02em;margin:.4em 0 .5em;line-height:1.25}
+h2{font-size:23px;margin:2.2em 0 .7em;padding-bottom:.3em;border-bottom:1px solid var(--line)}
+h3{font-size:19px;margin:1.9em 0 .5em;color:var(--accent)}
+h4{font-size:17px;margin:1.5em 0 .4em}
+p{margin:.8em 0} a{color:var(--accent)} hr{border:0;border-top:1px solid var(--line);margin:2.6em 0}
+table{border-collapse:collapse;width:100%;margin:1.3em 0;font-size:15.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+th{background:#f3f0eb;font-weight:600}
+tr:nth-child(even) td{background:#fcfbfa}
+code{font-family:"SF Mono",Menlo,Consolas,monospace;font-size:.88em;background:#f2efea;padding:2px 6px;border-radius:4px;white-space:nowrap}
+pre{background:#f2efea;padding:14px 16px;border-radius:8px;overflow-x:auto}
+pre code{background:none;padding:0;white-space:pre}
+blockquote{border-left:3px solid var(--accent);background:var(--hl);margin:1.4em 0;padding:14px 20px;border-radius:0 8px 8px 0}
+blockquote p:first-child{margin-top:0} blockquote p:last-child{margin-bottom:0}
+ul,ol{padding-left:1.5em} li{margin:.35em 0} em{color:#4a4a4a}
+mjx-container[display="true"]{margin:1.1em 0!important;overflow-x:auto;overflow-y:hidden;padding:2px 0}
+mjx-container svg{max-width:100%}
+body:not(.ready) main{opacity:0} main{opacity:1;transition:opacity .25s}
+
+/* --- bandeau de tête de fiche --- */
+.cours{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--accent);
+ border-radius:0 10px 10px 0;padding:18px 22px;margin:0 0 34px}
+.cours h4{margin:0 0 4px;font-size:14px;text-transform:uppercase;letter-spacing:.07em;color:var(--accent)}
+.cours .cs{color:var(--muted);font-size:14.5px;margin:0 0 14px}
+
+/* --- exercices / corrigés --- */
+.ex{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:6px 24px 20px;margin:18px 0}
+.ex>h3:first-child{margin-top:14px}
+details.cor{margin-top:18px;border:1px solid var(--line);border-radius:8px;background:#fcfbfa;overflow:hidden}
+details.cor>summary{cursor:pointer;padding:12px 16px;font-weight:600;font-size:15px;color:var(--accent);
+ list-style:none;display:flex;align-items:center;gap:9px;user-select:none;transition:.15s;min-height:44px}
+details.cor>summary::-webkit-details-marker{display:none}
+details.cor>summary:hover{background:var(--hl)}
+details.cor>summary::before{content:"\25B6";font-size:10px;transition:transform .18s;display:inline-block}
+details.cor[open]>summary::before{transform:rotate(90deg)}
+details.cor[open]>summary{background:var(--okbg);color:var(--ok);border-bottom:1px solid var(--line)}
+.cor .in{padding:4px 20px 16px}
+.cor .in>*:first-child{margin-top:.9em}
+
+/* --- blocs pédagogiques (callouts) ---
+   Générés depuis une citation Markdown dont le premier **gras** commence
+   par un mot-clé : DÉFINITION, THÉORÈME, MÉTHODE, PIÈGE, INTUITION… */
+.cal{border:1px solid var(--line);border-left:4px solid var(--accent);background:var(--card);
+ border-radius:0 10px 10px 0;padding:15px 20px;margin:1.5em 0}
+.cal>p:first-child{margin-top:0}.cal>p:last-child,.cal>ul:last-child,.cal>ol:last-child{margin-bottom:0}
+.cal .lab{display:block;font-size:12.5px;text-transform:uppercase;letter-spacing:.08em;
+ font-weight:700;color:var(--accent);margin-bottom:6px}
+.cal.formel{background:var(--hl)}
+.cal.piege{border-left-color:var(--warn);background:var(--warnbg)}
+.cal.piege .lab{color:var(--warn)}
+.cal.methode{border-left-color:var(--ok);background:var(--okbg)}
+.cal.methode .lab{color:var(--ok)}
+.cal.intu{border-left-color:var(--blue);background:var(--bluebg)}
+.cal.intu .lab{color:var(--blue)}
+.cal.plus{border-left-style:dashed;background:#faf9f7}
+.cal.plus .lab{color:var(--muted)}
+
+/* --- révision express --- */
+.ess{background:var(--card);border:1px solid var(--accent);border-radius:10px;padding:4px 24px 20px;margin:1.6em 0}
+.ess h3{margin-top:1.3em}
+.rec{background:var(--card);border:1px dashed var(--accent);border-radius:10px;padding:4px 24px 18px;margin:1.6em 0}
+.rec ol{counter-reset:none}
+
+/* --- impression / PDF --- */
+@media print{
+ .nav{display:none}
+ body{padding:0;background:#fff;font-size:11.2pt;line-height:1.55}
+ main{max-width:none}
+ h1{font-size:23pt}h2{font-size:15pt;margin-top:1.5em}h3{font-size:12.6pt}
+ h2,h3,h4{break-after:avoid;page-break-after:avoid}
+ table,.cal,blockquote{break-inside:avoid;page-break-inside:avoid}
+ table{display:table;font-size:9.6pt}
+ details.cor{border:1px solid var(--line);background:#fcfbfa}
+ details.cor>summary{display:none}
+ details.cor .in{padding-top:10px}
+ .cal,.ex,.ess,.rec{box-shadow:none}
+ a{color:var(--ink);text-decoration:none}
+}
+@page{margin:16mm 15mm 18mm}
+
+/* --- exemples travaillés --- */
+.exm{background:#fcfbfa;border:1px solid var(--line);border-radius:10px;padding:2px 20px 14px;margin:1.5em 0}
+.exm>h4:first-child{margin:14px 0 .5em;color:var(--accent);font-size:13px;text-transform:uppercase;letter-spacing:.07em}
+
+
+/* --- pastilles de priorité (conventions des fiches de l'app) --- */
+h2[data-prio], h3[data-prio], h4[data-prio]{position:relative}
+h2[data-prio]::before,h3[data-prio]::before,h4[data-prio]::before{
+ content:"";display:inline-block;width:9px;height:9px;border-radius:50%;
+ margin-right:9px;vertical-align:middle;background:var(--muted)}
+[data-prio="must"]::before{background:var(--warn)}
+[data-prio="high"]::before{background:#d98324}
+[data-prio="mid"]::before{background:#c9a227}
+[data-prio="low"]::before{background:var(--ok)}
+/* corrigés des fiches de l'app : même traitement que les corrigés des séries */
+details.cor>summary::after{content:""}
+</style></head><body>
+<div class="nav"><a href="00_COMMENCER_ICI.html">Commencer ici</a><a href="01_NOTATIONS_le-decodeur.html">Notations</a><a href="02_EXERCICES_Serie-0.html">Série 0 — Remise en route</a><a href="03_EXERCICES_Serie-1.html">Série 1 — Convexité</a><a href="04_EXERCICES_Serie-2.html">Série 2 — KKT</a><a href="05_AUTO-EVALUATION.html">Auto-évaluation (quiz)</a><a href="06_FICHE_Optimisation-deux-variables.html">Fiche — Optimisation à 2 variables</a></div>
+<main><h1>Fiche 73 — Inférence en petit échantillon et bootstrap</h1>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Matière</strong></td>
+<td>Maths · Économétrie</td>
+</tr>
+<tr>
+<td><strong>Cours source</strong></td>
+<td>Kogan, <em>15.450 Analytics of Finance</em>, MIT Sloan / OpenCourseWare, automne 2010 — cours 9 « Small-Sample Inference and Bootstrap »</td>
+</tr>
+<tr>
+<td><strong>Difficulté</strong></td>
+<td> High — ce qui reste quand l'asymptotique ne tient plus</td>
+</tr>
+<tr>
+<td><strong>Temps d'étude estimé</strong></td>
+<td>2 h 15</td>
+</tr>
+<tr>
+<td><strong>Prérequis</strong></td>
+<td>Fiche 72 (écarts-types GMM, Newey-West), fiche 52 (AR(1)), fiche 67 (biais, intervalles de confiance)</td>
+</tr>
+<tr>
+<td><strong>Concepts clés</strong></td>
+<td>Biais en petit échantillon, biais de Kendall, biais de Stambaugh, simulation de Monte-Carlo, bootstrap, distribution empirique, rééchantillonnage, intervalle de confiance bootstrap, bootstrap paramétrique, correction de biais</td>
+</tr>
+<tr>
+<td><strong>Poids à l'examen</strong></td>
+<td>Trois choses : la <strong>formule de Kendall</strong> et le <strong>biais de Stambaugh</strong> ; le <strong>principe</strong> du bootstrap — la distribution empirique traitée comme la vraie ; et la <strong>formule de l'intervalle de confiance bootstrap</strong>, dont l'asymétrie surprend.</td>
+</tr>
+</tbody></table>
+<h2>Vue d'ensemble</h2>
+<blockquote>
+<p><strong>Les limites de l'inférence asymptotique.</strong></p>
+<ul>
+<li><em>Jusqu'ici, notre inférence reposait sur des résultats <strong>asymptotiques</strong> : LGN et TCL.</em></li>
+<li><em>L'inférence asymptotique est parfois <strong>difficile à appliquer</strong>, trop compliquée analytiquement.</em></li>
+<li><em>En <strong>petit échantillon</strong>, l'inférence asymptotique peut être <strong>peu fiable</strong> :</em><ul>
+<li><em>les estimateurs peuvent être <strong>consistants mais biaisés</strong> ;</em></li>
+<li><em>les écarts-types peuvent être <strong>imprécis</strong>, ce qui conduit à des intervalles de confiance et des tailles de test <strong>incorrects</strong>.</em></li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<blockquote>
+<p><strong>Les remèdes par simulation.</strong></p>
+<ul>
+<li><em>Le <strong>bootstrap</strong> peut remplacer l'inférence asymptotique dans les problèmes analytiquement difficiles.</em></li>
+<li><em>Le <strong>bootstrap</strong> peut servir à <strong>corriger le biais</strong>.</em></li>
+<li><em>La <strong>simulation de Monte-Carlo</strong> permet de comprendre les propriétés des procédures statistiques.</em></li>
+</ul>
+</blockquote>
+<pre><code>ASYMPTOTIQUE   T → ∞ :  consistance, normalité, écarts-types
+EN PRATIQUE    T fini :  biais réel + écarts-types faux
+DIAGNOSTIC     MONTE-CARLO — simuler le vrai modèle, mesurer
+REMÈDE         BOOTSTRAP — rééchantillonner les DONNÉES observées
+     monde réel :  P inconnue → θ̂ = s(x)
+     monde boot. :  P̂ connue  → θ̂* = s(x*)
+LIMITES        événements rares · biais de sélection · mauvaise spécification
+</code></pre>
+<h2 data-prio="must">Concept 1 — Le biais de l'autocorrélation estimée</h2>
+<p><strong>Le problème.</strong> On veut estimer l'autocorrélation d'ordre $1$ d'une série $x_t$ — l'inflation, par exemple — c'est-à-dire $\mathrm{corr}(x_t,x_{t+1})$, par MCO (donc GMM) :
+$$x_t=a_0+\rho_1x_{t-1}+\varepsilon_t$$
+<em>On sait que cet estimateur est <strong>consistant</strong> : $\mathrm{plim}_{T\to\infty}\hat\rho_1=\rho_1$. Mais on veut savoir s'il est <strong>biaisé</strong>, c'est-à-dire estimer $\mathbb E(\hat\rho_1)-\rho_1$.</em></p>
+<p><strong>L'expérience de Monte-Carlo.</strong> <em>Simuler indépendamment $N$ séries aléatoires de longueur $T$, chacune suivant un AR(1) de persistance $\rho_1$ et d'erreurs gaussiennes</em> :
+$$x_t=\rho_1x_{t-1}+\varepsilon_t, \qquad \varepsilon_t\sim N(0,1)$$
+<em>Calculer $\hat\rho_1^{(n)}$ pour chaque échantillon simulé, puis estimer le biais</em>
+$$\hat{\mathbb E}(\hat\rho_1)-\rho_1=\frac1N\sum_{n=1}^N\hat\rho_1^{(n)}-\rho_1, \qquad \hat\sigma=\sqrt{\frac1N\sum_{n=1}^N\Big(\hat\rho_1^{(n)}-\hat{\mathbb E}(\hat\rho_1)\Big)^2}$$</p>
+<p><strong>Les résultats sur $100\,000$ simulations.</strong></p>
+<table>
+<thead>
+<tr>
+<th>$\rho_1$</th>
+<th>$T$</th>
+<th>Biais moyen</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$0{,}9$</td>
+<td>$50$</td>
+<td>$-0{,}0826\pm0{,}0006$</td>
+</tr>
+<tr>
+<td>$0{,}0$</td>
+<td>$50$</td>
+<td>$-0{,}0203\pm0{,}0009$</td>
+</tr>
+<tr>
+<td>$0{,}9$</td>
+<td>$100$</td>
+<td>$-0{,}0402\pm0{,}0004$</td>
+</tr>
+<tr>
+<td>$0{,}0$</td>
+<td>$100$</td>
+<td>$-0{,}0100\pm0{,}0006$</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><em>Le biais semble <strong>croissant en $\rho_1$</strong> et <strong>décroissant avec la taille d'échantillon</strong>.</em></p>
+</blockquote>
+<div class="cal formel"><span class="lab">Formule analytique de Kendall.</span>
+<p>
+$$\boxed{\ \mathbb E(\hat\rho_1)-\rho_1\approx-\frac{1+3\rho_1}{T}\ }$$
+<em>Quand les formules explicites ne sont pas connues, on peut utiliser le <strong>bootstrap</strong> pour estimer le biais.</em></p>
+</div>
+<p class="cal piege"> <strong>Le biais est toujours NÉGATIF : l'autocorrélation est systématiquement sous-estimée.</strong> Pour $\rho_1=0{,}9$ et $T=50$, on estime en moyenne $0{,}817$ au lieu de $0{,}9$ — un écart de près de $10\,\%$. Et la formule de Kendall reproduit bien les simulations : $-(1+2{,}7)/50=-0{,}074$ contre $-0{,}0826$ observé, $-1/50=-0{,}020$ contre $-0{,}0203$.</p>
+<blockquote>
+<p><strong>La raison intuitive.</strong> La régression estime $\rho_1$ en projetant sur les écarts à la moyenne <strong>empirique</strong> — laquelle est calculée sur les mêmes données. Comme dans le cas de la variance empirique (fiche 65), estimer la moyenne « consomme » de l'information et tire mécaniquement l'estimation vers zéro.</p>
+</blockquote>
+<h2 data-prio="must">Concept 2 — Le biais de Stambaugh</h2>
+<p><strong>Le cadre.</strong> Une régression prédictive — par exemple prévoir les rendements d'actions par le rendement du dividende :
+$$r_{t+1}=\alpha+\beta x_t+u_{t+1}$$
+$$x_{t+1}=\theta+\rho x_t+\varepsilon_{t+1}$$
+$$(u_t,\varepsilon_t)^\top\sim N(0,\Sigma)$$</p>
+<blockquote>
+<p><strong>Biais de Stambaugh.</strong>
+$$\boxed{\ \mathbb E(\hat\beta-\beta)=\frac{\mathrm{Cov}(u_t,\varepsilon_t)}{\mathrm{Var}(\varepsilon_t)}\ \mathbb E(\hat\rho-\rho)\approx-\frac{1+3\rho}{T}\cdot\frac{\mathrm{Cov}(u_t,\varepsilon_t)}{\mathrm{Var}(\varepsilon_t)}\ }$$
+*Dans le cas du rendement du dividende prédisant les rendements d'actions, le biais est <strong>positif</strong> et peut être <strong>substantiel comparé à l'écart-type de $\hat\beta$</strong>.*</p>
+</blockquote>
+<blockquote>
+<p><strong>Le mécanisme, en trois pas.</strong></p>
+<ol>
+<li>Le prédicteur $x_t$ est <strong>très persistant</strong> ($\rho$ proche de $1$), donc $\hat\rho$ souffre du biais de Kendall — <strong>négatif</strong>.</li>
+<li>Les innovations $u_t$ (rendements) et $\varepsilon_t$ (prédicteur) sont <strong>corrélées</strong>. Pour le rendement du dividende $D/P$, une hausse du prix <strong>baisse</strong> $x$ et <strong>augmente</strong> $r$ : la covariance est <strong>négative</strong>.</li>
+<li>Le produit de deux quantités négatives est <strong>positif</strong> : $\hat\beta$ est <strong>surestimé</strong>.</li>
+</ol>
+<p><strong>La conséquence.</strong> On croit détecter de la prévisibilité là où il n'y en a pas nécessairement — et le biais est du même ordre de grandeur que l'écart-type, donc il <strong>suffit à créer une significativité apparente</strong>.</p>
+</blockquote>
+<p class="cal piege"> <strong>C'est le piège annoncé à la fin de la fiche 72.</strong> Newey-West corrige les <strong>écarts-types</strong> mais <strong>pas le biais du coefficient lui-même</strong>. Ce sont deux problèmes distincts, qui exigent deux remèdes différents.</p>
+<h2 data-prio="high">Concept 3 — L'application empirique au S&amp;P 500</h2>
+<p><strong>Les données.</strong> Régression prédictive des rendements excédentaires mensuels du S&amp;P 500 sur le logarithme du rendement du dividende, CRSP, du $31/01/1934$ au $31/12/2008$ :
+$$r_{t+1}=\alpha+\beta x_t+u_{t+1}, \qquad x_{t+1}=\theta+\rho x_t+\varepsilon_{t+1}$$</p>
+<p><strong>Les estimations.</strong>
+$$\hat\beta=0{,}0089, \qquad \hat\rho=0{,}9936, \qquad SE(\hat\beta)=0{,}005$$</p>
+<p><strong>L'expérience de Monte-Carlo.</strong> <em>Générer $1\,000$ échantillons avec les paramètres égaux aux estimations empiriques. Utiliser $200$ périodes de <strong>rodage</strong> (<em>burn-in</em>) et retenir des échantillons de même longueur que la série historique. Tabuler $\hat\beta$ et les écarts-types de chaque échantillon, en utilisant <strong>Newey-West à $6$ retards</strong>.</em></p>
+<table>
+<thead>
+<tr>
+<th>Grandeur</th>
+<th>Valeur</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Moyenne de $\hat\beta$</td>
+<td>$0{,}013$</td>
+</tr>
+<tr>
+<td><strong>Biais moyen</strong> de $\hat\beta$</td>
+<td>$0{,}004$</td>
+</tr>
+<tr>
+<td>Écart-type moyen</td>
+<td>$0{,}005$</td>
+</tr>
+<tr>
+<td><strong>Statistique de Student moyenne</strong></td>
+<td>$0{,}75$</td>
+</tr>
+</tbody></table>
+<p class="cal piege"> <strong>Lisez les deux dernières lignes ensemble : c'est le résultat le plus important de la fiche.</strong> Le biais ($0{,}004$) est <strong>presque égal</strong> à l'écart-type ($0{,}005$). Autrement dit, <strong>même quand $\beta=0$ exactement</strong>, la régression produit en moyenne un coefficient de $0{,}004$ et un $t$ de Student de $0{,}75$.</p>
+<blockquote>
+<p><strong>Et $\hat\rho=0{,}9936$ explique pourquoi.</strong> Le prédicteur est presque une marche aléatoire, donc le biais de Kendall est maximal et le biais de Stambaugh avec lui.</p>
+<p><strong>La conclusion.</strong> Une partie substantielle du $\hat\beta=0{,}0089$ observé pourrait n'être <strong>que du biais</strong>. C'est l'un des arguments centraux du débat sur la prévisibilité des rendements.</p>
+</blockquote>
+<h2 data-prio="must">Concept 4 — Quand la normalité asymptotique échoue</h2>
+<p><strong>Le problème.</strong> On estime la moyenne $\mu$ par la moyenne empirique, et les tests reposent sur
+$$\frac{\hat\mu-\mu}{\hat\sigma/\sqrt T}\sim N(0,1)$$
+<em>Cette approximation normale est-elle bonne en échantillon fini si la loi n'est pas gaussienne ?</em></p>
+<p><strong>L'exemple log-normal.</strong> $x_t=e^{-\frac12+\varepsilon_t}$ avec $\varepsilon_t\sim N(0,1)$, de sorte que
+$$\mu=\mathbb E(x_t)=\mathbb E\big(e^{-\frac12+\varepsilon_t}\big)=1$$</p>
+<p><strong>L'expérience.</strong> $N=100\,000$ simulations, $T=50$, en documentant la loi de $\hat t=\dfrac{\hat\mu-1}{\hat\sigma/\sqrt T}$.</p>
+<table>
+<thead>
+<tr>
+<th>Quantité</th>
+<th>Théorie asymptotique</th>
+<th>Estimation Monte-Carlo</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$\mathrm{Var}(\hat t)$</td>
+<td>$1$</td>
+<td>$1{,}2542^2$</td>
+</tr>
+<tr>
+<td>$\mathrm{Prob}(\hat t&gt;1{,}96)$</td>
+<td>$0{,}025$</td>
+<td>$\mathbf{0{,}0042}$</td>
+</tr>
+<tr>
+<td>$\mathrm{Prob}(\hat t&lt;-1{,}96)$</td>
+<td>$0{,}025$</td>
+<td>$\mathbf{0{,}1053}$</td>
+</tr>
+</tbody></table>
+<p class="cal piege"> <strong>Ces deux nombres sont catastrophiques, et il faut comprendre pourquoi.</strong> Un test bilatéral de niveau nominal $5\,\%$ rejette en réalité $0{,}42\,\%+10{,}53\,\%\approx11\,\%$ du temps — <strong>plus du double</strong> — et de façon <strong>massivement asymétrique</strong>.</p>
+<blockquote>
+<p><strong>La cause est l'asymétrie de la loi log-normale.</strong> Elle a une longue queue à droite ; la plupart des échantillons de taille $50$ ne contiennent <strong>aucune</strong> grande valeur, donc $\hat\mu$ est <strong>sous-estimée</strong> et $\hat\sigma$ aussi. La statistique $\hat t$ est donc <strong>biaisée vers la gauche</strong> — d'où les $10{,}5\,\%$ dans la queue gauche et à peine $0{,}4\,\%$ à droite.</p>
+<p><strong>La pertinence financière est directe</strong> : les rendements ont des queues épaisses et asymétriques (fiche 53). Toute inférence asymptotique sur des séries courtes est suspecte.</p>
+</blockquote>
+<h2 data-prio="must">Concept 5 — Le principe du bootstrap</h2>
+<blockquote>
+<p><em><strong>Le bootstrap est une méthode de rééchantillonnage qui permet d'évaluer les propriétés des estimateurs statistiques.</strong></em></p>
+<p><em><strong>Le bootstrap est en substance une étude de Monte-Carlo qui utilise la distribution EMPIRIQUE comme si elle était la vraie distribution.</strong></em></p>
+</blockquote>
+<blockquote>
+<p><strong>Les applications principales.</strong></p>
+<ul>
+<li><em>Évaluer les propriétés distributionnelles d'estimateurs <strong>compliqués</strong>, et faire la <strong>correction de biais</strong> ;</em></li>
+<li><em>Améliorer la précision des approximations asymptotiques en petit échantillon — intervalles de confiance, régions de rejet, etc.</em></li>
+</ul>
+</blockquote>
+<p><strong>Le parallèle des deux mondes</strong>, tel que le cours le présente (d'après Efron et Tibshirani) :</p>
+<table>
+<thead>
+<tr>
+<th><strong>MONDE RÉEL</strong></th>
+<th><strong>MONDE BOOTSTRAP</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>modèle de probabilité <strong>inconnu</strong> $P$</td>
+<td>modèle <strong>estimé</strong> $\hat P$</td>
+</tr>
+<tr>
+<td>données observées $x=(x_1,\dots,x_n)$</td>
+<td>échantillon bootstrap $x^\ast=(x_1^\ast,\dots,x_n^\ast)$</td>
+</tr>
+<tr>
+<td>paramètre d'intérêt $\theta=\theta(P)$</td>
+<td>paramètre estimé $\hat\theta=\theta(\hat P)$</td>
+</tr>
+<tr>
+<td>estimation $\hat\theta=s(x)$</td>
+<td><strong>réplique bootstrap</strong> $\hat\theta^\ast=s(x^\ast)$</td>
+</tr>
+<tr>
+<td>$\mathrm{Biais}_P(\hat\theta,\theta)$</td>
+<td>$\mathrm{Biais}_{\hat P}(\hat\theta^\ast,\hat\theta)$</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>L'idée en une phrase.</strong> On ne peut pas répéter l'expérience réelle — on n'a qu'un échantillon. Mais on peut <strong>répéter l'expérience dans un monde dont on connaît tout</strong> : celui où la vraie loi est la loi <strong>empirique</strong>. La relation entre $\hat\theta^\ast$ et $\hat\theta$ dans ce monde artificiel imite la relation entre $\hat\theta$ et $\theta$ dans le monde réel.</p>
+</blockquote>
+<p><strong>Le cas i.i.d.</strong> Pour un échantillon i.i.d. $x_t$, $t=1,\dots,T$, dont on estime la moyenne $\hat\mu=\hat{\mathbb E}(x_t)$ : <em>sous la distribution empirique, $x$ prend chacune des valeurs $x_1,\dots,x_T$ avec <strong>probabilité égale</strong>.</em> Rééchantillonner, c'est donc <strong>tirer avec remise</strong> parmi les observations.</p>
+<h2 data-prio="must">Concept 6 — Les intervalles de confiance bootstrap</h2>
+<blockquote>
+<p><strong>La procédure</strong>, à partir de $R$ échantillons tirés de la distribution empirique :</p>
+<ol>
+<li><em>Pour chaque échantillon bootstrapé, calculer $\hat\mu^\ast$ — « $\ast$ » désignant les statistiques calculées sur les échantillons bootstrapés.</em></li>
+<li><em>Calculer les percentiles à $2{,}5\,\%$ et $97{,}5\,\%$ de la distribution obtenue : $\hat\mu^\ast_{2{,}5\%}$, $\hat\mu^\ast_{97{,}5\%}$.</em></li>
+<li><em>Approcher la loi de $\hat\mu-\mu$ par la loi simulée de $\hat\mu^\ast-\hat\mu$, et estimer l'intervalle de confiance</em>
+$$\boxed{\ \Big(\hat\mu-\big(\hat\mu^\ast_{97{,}5\%}-\hat\mu\big),\ \ \hat\mu-\big(\hat\mu^\ast_{2{,}5\%}-\hat\mu\big)\Big)\ }$$</li>
+</ol>
+</blockquote>
+<p class="cal piege"> <strong>Regardez attentivement l'étape 3 : les percentiles sont INVERSÉS, et ce n'est pas une coquille.</strong> Le percentile <strong>haut</strong> de $\hat\mu^\ast$ donne la borne <strong>basse</strong> de l'intervalle.</p>
+<blockquote>
+<p><strong>Le raisonnement.</strong> On approche la loi de l'erreur $\hat\mu-\mu$ par celle de $\hat\mu^\ast-\hat\mu$. Si l'on constate que $\hat\mu^\ast$ dépasse $\hat\mu$ de $\delta$ dans $2{,}5\,\%$ des cas, alors on estime que $\hat\mu$ dépasse $\mu$ de $\delta$ dans $2{,}5\,\%$ des cas — donc $\mu$ pourrait être <strong>inférieur</strong> à $\hat\mu$ de $\delta$. La borne basse est bien $\hat\mu-\delta$.</p>
+<p><strong>Et cela produit un intervalle asymétrique</strong> quand la loi de l'estimateur l'est — ce que l'approximation normale, symétrique par construction, ne peut jamais faire. C'est précisément l'avantage du bootstrap sur la log-normale du concept 4.</p>
+</blockquote>
+<h3>L'exemple log-normal</h3>
+<p><em>On fixe un échantillon de $50$ observations d'une loi log-normale $\ln x_t\sim N(-1/2,1)$ et l'on calcule</em>
+$$\hat\mu=1{,}1784, \qquad \hat\sigma=1{,}5340$$
+<em>La moyenne de population est $\mu=\mathbb E(x_t)=1$.</em></p>
+<p><strong>L'approximation asymptotique</strong> donne
+$$\left(\hat\mu-1{,}96\frac{\hat\sigma}{\sqrt T},\ \hat\mu+1{,}96\frac{\hat\sigma}{\sqrt T}\right)=(0{,}7532\ ;\ 1{,}6036)$$</p>
+<p><strong>Le bootstrap sur la statistique de Student</strong> donne une variance de $1{,}1852^2$, à comparer à $1$ (approximation normale) et $1{,}2542^2$ (Monte-Carlo).</p>
+<blockquote>
+<p><em>De façon cohérente avec les résultats de Monte-Carlo, la distribution en petit échantillon des statistiques de Student présente une <strong>asymétrie à gauche</strong>.</em></p>
+</blockquote>
+<blockquote>
+<p><strong>Le bootstrap capture donc une bonne partie de l'écart à la normalité</strong>, sans connaître la vraie loi. $1{,}185$ n'est pas $1{,}254$, mais c'est bien plus proche que $1$.</p>
+</blockquote>
+<h2 data-prio="high">Concept 7 — Le bootstrap paramétrique</h2>
+<blockquote>
+<p><em>Le <strong>bootstrap paramétrique</strong> peut traiter les échantillons <strong>non i.i.d.</strong></em></p>
+</blockquote>
+<p><strong>Exemple — un processus AR(1)</strong> $x_t=a_0+a_1x_{t-1}+\varepsilon_t$, dont on veut un intervalle de confiance pour $\hat a_1$ :</p>
+<blockquote>
+<ol>
+<li><em>Estimer les paramètres $\hat a_0$, $\hat a_1$ et les <strong>résidus</strong> $\hat\varepsilon_t$.</em></li>
+<li><em>Générer $R$ échantillons bootstrap pour $x_t$. Pour chaque échantillon : engendrer une <strong>longue série</strong> selon la dynamique AR(1) avec $\hat a_0,\hat a_1$, en tirant les chocs <strong>avec remise</strong> dans l'échantillon $\hat\varepsilon_1,\dots,\hat\varepsilon_T$ ; ne retenir que les <strong>$T$ dernières</strong> observations (abandonner la période de rodage).</em></li>
+<li><em>Calculer l'intervalle de confiance comme avec le bootstrap non paramétrique de base, à partir des $R$ échantillons.</em></li>
+</ol>
+</blockquote>
+<div class="cal intu"><span class="lab">Pourquoi « paramétrique ».</span>
+<p> On ne rééchantillonne <strong>pas les observations</strong> — elles sont dépendantes, les tirer avec remise détruirait la structure temporelle. On rééchantillonne les <strong>résidus</strong>, qui, eux, sont approximativement i.i.d., et l'on <strong>régénère</strong> la série par le modèle estimé. La structure de dépendance est donc <strong>imposée par le modèle</strong>, la distribution des chocs venant des données.</p>
+<p><strong>Le rodage (<em>burn-in</em>) est essentiel</strong> : les premières observations dépendent de la condition initiale arbitraire. En n'en gardant que les $T$ dernières, on part de la loi stationnaire.</p>
+</div>
+<h2 data-prio="must">Concept 8 — La correction de biais par bootstrap</h2>
+<blockquote>
+<p><strong>Le problème.</strong> Estimer le biais en petit échantillon d'une statistique $\theta$ : $\mathbb E[\hat\theta]-\theta_0$.</p>
+<p><strong>L'approche bootstrap.</strong>
+$$\boxed{\ \mathbb E\big[\hat\theta\big]-\theta_0\ \approx\ \mathbb E_R\big[\hat\theta^\ast\big]-\hat\theta\ }$$
+<em>où $\mathbb E_R$ désigne la moyenne sur les $R$ échantillons bootstrapés.</em></p>
+<p><strong>L'intuition</strong> : <em>traiter la distribution empirique comme exacte, et calculer le biais moyen sur les échantillons bootstrapés.</em></p>
+</blockquote>
+<blockquote>
+<p class="cal piege"> <strong>La mise en garde du cours.</strong> <em>En estimant le biais, on peut <strong>ajouter de l'erreur d'échantillonnage</strong>. Corriger le biais <strong>si et seulement s'il est grand comparé à l'écart-type</strong> de $\hat\theta$.</em></p>
+</blockquote>
+<p class="cal piege"> <strong>Cette mise en garde est la décomposition biais-variance de la fiche 67</strong>, appliquée à la correction elle-même. Retirer un biais estimé avec bruit peut <strong>augmenter</strong> le risque quadratique total. La correction ne se justifie que quand le biais domine.</p>
+<h3>L'application à la régression prédictive</h3>
+<p><em>Bootstrap paramétrique : $1\,000$ échantillons, $200$ périodes de rodage, échantillons de même longueur que la série historique.</em></p>
+<table>
+<thead>
+<tr>
+<th>Grandeur</th>
+<th>Monte-Carlo (vrai modèle)</th>
+<th><strong>Bootstrap</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Moyenne de $\hat\beta$</td>
+<td>$0{,}013$</td>
+<td>$0{,}0125$</td>
+</tr>
+<tr>
+<td>Biais moyen de $\hat\beta$</td>
+<td>$0{,}004$</td>
+<td>$0{,}0036$</td>
+</tr>
+<tr>
+<td>Statistique de Student moyenne</td>
+<td>$0{,}75$</td>
+<td>$0{,}67$</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>Les deux colonnes concordent très bien.</strong> Le bootstrap — qui n'utilise <strong>que les données observées</strong> — retrouve un biais de $0{,}0036$ là où le Monte-Carlo — qui connaît le vrai modèle — trouve $0{,}004$. C'est la validation empirique du principe : <em>la distribution empirique se comporte comme la vraie</em>.</p>
+<p><strong>Et la conclusion pour l'économétrie financière est sévère</strong> : sur $\hat\beta=0{,}0089$ estimé, environ $0{,}0036$ — soit <strong>40 %</strong> — serait attribuable au seul biais de petit échantillon.</p>
+</blockquote>
+<h2 data-prio="mid">Concept 9 — Les limites du bootstrap</h2>
+<blockquote>
+<p><strong>La discussion finale du cours.</strong></p>
+<ul>
+<li><em>La théorie asymptotique est très commode quand elle est disponible, mais <strong>en petit échantillon les résultats peuvent être inexacts</strong>.</em></li>
+<li><em>Utiliser les simulations de <strong>Monte-Carlo</strong> pour acquérir de l'intuition.</em></li>
+<li><em>Le <strong>bootstrap</strong> est un outil puissant. L'utiliser quand la théorie asymptotique est <strong>indisponible ou suspecte</strong>.</em></li>
+</ul>
+<p><strong>Le bootstrap n'est pas une baguette magique :</strong></p>
+<ul>
+<li><em>il <strong>ne fonctionne pas bien</strong> si des <strong>événements rares</strong> sont absents de l'échantillon empirique ;</em></li>
+<li><em>il <strong>ne tient pas compte</strong> de biais plus subtils, comme le <strong>biais du survivant</strong> ou la <strong>sélection d'échantillon</strong> ;</em></li>
+<li><em>il <strong>ne guérit pas</strong> la <strong>mauvaise spécification du modèle</strong>.</em></li>
+</ul>
+<p><em><strong>Il ne remplace pas le bon sens !</strong></em></p>
+</blockquote>
+<p class="cal piege"> <strong>La première limite est la plus grave en finance.</strong> Le bootstrap ne peut <strong>rééchantillonner que ce qui a été observé</strong>. Si les vingt années de données ne contiennent aucun krach, aucun échantillon bootstrap n'en contiendra — et l'on conclura à une queue mince. <strong>Le bootstrap ne crée jamais d'événement plus extrême que le pire observé</strong> : c'est exactement la faiblesse de la simulation historique de la fiche 55.</p>
+<p><strong>Les références du cours</strong> : Campbell, Lo et MacKinlay (1997) · <strong>Efron et Tibshirani</strong>, <em>An Introduction to the Bootstrap</em> · Davison et Hinkley, <em>Bootstrap Methods and Their Application</em> · <strong>Stambaugh (1999)</strong>, « Predictive Regressions », <em>Journal of Financial Economics</em>.</p>
+<h2>Comment résoudre l'exercice type (protocole)</h2>
+<ol>
+<li><strong>Identifier le risque</strong> : échantillon court ? prédicteur persistant ? loi asymétrique ou à queues épaisses ?</li>
+<li><strong>Si le vrai modèle est connu</strong> : faire un <strong>Monte-Carlo</strong> — simuler, estimer, mesurer biais et couverture.</li>
+<li><strong>Si le vrai modèle est inconnu</strong> : faire un <strong>bootstrap</strong> — rééchantillonner les données observées.</li>
+<li><strong>Données i.i.d.</strong> : tirer <strong>avec remise</strong> dans les observations.</li>
+<li><strong>Données dépendantes</strong> : <strong>bootstrap paramétrique</strong> — estimer le modèle, rééchantillonner les <strong>résidus</strong>, régénérer, jeter le rodage.</li>
+<li><strong>Intervalle de confiance</strong> : $\big(\hat\mu-(\hat\mu^\ast_{97{,}5\%}-\hat\mu),\ \hat\mu-(\hat\mu^\ast_{2{,}5\%}-\hat\mu)\big)$ — attention à l'<strong>inversion</strong>.</li>
+<li><strong>Correction de biais</strong> : $\mathbb E_R[\hat\theta^\ast]-\hat\theta$, <strong>et seulement si</strong> le biais est grand devant l'écart-type.</li>
+<li><strong>Vérifier les limites</strong> : événements rares présents ? biais de sélection ? modèle bien spécifié ?</li>
+</ol>
+<h3>Comment reconnaître qu'il faut utiliser cette méthode ?</h3>
+<table>
+<thead>
+<tr>
+<th>Indice dans l'énoncé</th>
+<th>Ce qu'il faut faire</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>« échantillon court »</td>
+<td>se méfier de l'asymptotique</td>
+</tr>
+<tr>
+<td>autocorrélation estimée</td>
+<td><strong>biais de Kendall</strong> $-(1+3\rho_1)/T$</td>
+</tr>
+<tr>
+<td>régression prédictive, prédicteur persistant</td>
+<td><strong>biais de Stambaugh</strong></td>
+</tr>
+<tr>
+<td>loi asymétrique ou à queues épaisses</td>
+<td>l'approximation normale échoue</td>
+</tr>
+<tr>
+<td>« estimateur analytiquement compliqué »</td>
+<td><strong>bootstrap</strong></td>
+</tr>
+<tr>
+<td>« corriger le biais »</td>
+<td>$\mathbb E_R[\hat\theta^\ast]-\hat\theta$</td>
+</tr>
+<tr>
+<td>données <strong>dépendantes</strong></td>
+<td>bootstrap <strong>paramétrique</strong> sur les résidus</td>
+</tr>
+<tr>
+<td>« la théorie asymptotique est-elle fiable ? »</td>
+<td><strong>Monte-Carlo</strong>, mesurer la couverture</td>
+</tr>
+<tr>
+<td>événements extrêmes importants</td>
+<td> le bootstrap <strong>ne les crée pas</strong></td>
+</tr>
+</tbody></table>
+<h3>Exercices progressifs</h3>
+<p><strong> Niveau 1</strong> — Estimez le biais de $\hat\rho_1$ pour $\rho_1=0{,}8$ et $T=60$, et comparez à l'écart-type.</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p><strong>La formule de Kendall.</strong>
+$$\mathbb E(\hat\rho_1)-\rho_1\approx-\frac{1+3\rho_1}{T}=-\frac{1+2{,}4}{60}=-\frac{3{,}4}{60}\approx-0{,}057$$</p>
+<p><strong>L'estimation moyenne</strong> serait donc $0{,}8-0{,}057=0{,}743$ au lieu de $0{,}8$ — une sous-estimation de plus de $7\,\%$.</p>
+<p><strong>La comparaison à l'écart-type.</strong> Pour un AR(1), $SE(\hat\rho_1)\approx\sqrt{(1-\rho_1^2)/T}=\sqrt{0{,}36/60}=\sqrt{0{,}006}\approx0{,}077$.</p>
+<p>$$\frac{\text{biais}}{SE}=\frac{0{,}057}{0{,}077}\approx0{,}74$$</p>
+<p><strong>Le biais vaut donc les trois quarts de l'écart-type</strong> — c'est considérable. Un intervalle de confiance centré sur $\hat\rho_1$ est <strong>systématiquement décalé</strong> vers le bas, et sa couverture réelle est bien inférieure au niveau nominal.</p>
+<p><strong>La vérification sur le tableau du cours.</strong> Pour $\rho_1=0{,}9$, $T=50$ : Kendall donne $-(1+2{,}7)/50=-0{,}074$, et la simulation sur $100\,000$ tirages donne $-0{,}0826$. Pour $\rho_1=0$, $T=50$ : $-1/50=-0{,}020$ contre $-0{,}0203$ observé — accord quasi parfait.</p>
+<p class="cal piege"> <strong>La leçon</strong> : sur des séries persistantes et courtes — inflation, taux, ratios de valorisation —, il faut <strong>corriger le biais</strong> avant toute conclusion. Et quand la formule de Kendall ne s'applique pas, <em>on peut utiliser le bootstrap pour estimer le biais</em>.</p>
+</div></details>
+
+<p><strong> Niveau 2</strong> — Expliquez le biais de Stambaugh et pourquoi il est positif pour la prévisibilité par le rendement du dividende.</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p><strong>La formule.</strong>
+$$\mathbb E(\hat\beta-\beta)=\frac{\mathrm{Cov}(u_t,\varepsilon_t)}{\mathrm{Var}(\varepsilon_t)}\ \mathbb E(\hat\rho-\rho)\approx-\frac{1+3\rho}{T}\cdot\frac{\mathrm{Cov}(u_t,\varepsilon_t)}{\mathrm{Var}(\varepsilon_t)}$$</p>
+<p><strong>Le mécanisme, en trois pas.</strong></p>
+<p><strong>1. Le prédicteur est persistant.</strong> Pour le rendement du dividende, $\hat\rho=0{,}9936$ — presque une marche aléatoire. Le biais de Kendall $\mathbb E(\hat\rho-\rho)\approx-(1+3\rho)/T$ est donc <strong>négatif</strong> et <strong>maximal</strong>.</p>
+<p><strong>2. Les innovations sont corrélées négativement.</strong> Le rendement du dividende est $x_t=\ln(D_t/P_t)$. Une hausse <strong>inattendue</strong> du prix $P$ produit simultanément :</p>
+<ul>
+<li>un <strong>rendement élevé</strong> ⟹ $u_{t+1}&gt;0$ ;</li>
+<li>une <strong>baisse</strong> de $D/P$ ⟹ $\varepsilon_{t+1}&lt;0$.</li>
+</ul>
+<p>Donc $\mathrm{Cov}(u_t,\varepsilon_t)&lt;0$.</p>
+<p><strong>3. Le produit.</strong> $(-)\times(-)=(+)$ : le biais sur $\hat\beta$ est <strong>positif</strong>. *Le biais est positif, et peut être <strong>substantiel comparé à l'écart-type de $\hat\beta$</strong>.*</p>
+<p><strong>L'ampleur empirique</strong>, sur les données du cours (S&amp;P 500, 1934-2008) :</p>
+<ul>
+<li>$\hat\beta=0{,}0089$ estimé, $SE(\hat\beta)=0{,}005$ ;</li>
+<li>Monte-Carlo : biais moyen $0{,}004$, statistique de Student moyenne $\mathbf{0{,}75}$ <strong>même sous $H_0:\beta=0$</strong>.</li>
+</ul>
+<p><strong>Le biais vaut $80\,\%$ de l'écart-type.</strong> Sur $\hat\beta=0{,}0089$, environ $0{,}004$ pourrait n'être <strong>que du biais</strong> — soit près de la moitié.</p>
+<p class="cal piege"> <strong>Le point de méthode à retenir.</strong> Newey-West (fiche 72) corrige les <strong>écarts-types</strong> ; le biais de Stambaugh affecte le <strong>coefficient</strong>. Ce sont <strong>deux problèmes distincts</strong>, et corriger l'un ne corrige pas l'autre. Le remède au second est le <strong>bootstrap paramétrique</strong> du concept 8, qui retrouve ici un biais de $0{,}0036$ — très proche du $0{,}004$ du Monte-Carlo.</p>
+</div></details>
+
+<p><strong> Niveau 3</strong> — Expliquez le principe du bootstrap et la formule de l'intervalle de confiance.</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p><strong>Le principe.</strong> <em>Le bootstrap est une méthode de rééchantillonnage. C'est en substance une étude de Monte-Carlo qui utilise la <strong>distribution empirique comme si elle était la vraie distribution</strong>.</em></p>
+<p><strong>Le parallèle des deux mondes.</strong></p>
+<table>
+<thead>
+<tr>
+<th><strong>Monde réel</strong></th>
+<th><strong>Monde bootstrap</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$P$ inconnue</td>
+<td>$\hat P$ = loi empirique, <strong>connue</strong></td>
+</tr>
+<tr>
+<td>données $x$</td>
+<td>échantillon $x^\ast$ tiré de $\hat P$</td>
+</tr>
+<tr>
+<td>$\hat\theta=s(x)$</td>
+<td>$\hat\theta^\ast=s(x^\ast)$</td>
+</tr>
+<tr>
+<td>$\mathrm{Biais}_P(\hat\theta,\theta)$</td>
+<td>$\mathrm{Biais}_{\hat P}(\hat\theta^\ast,\hat\theta)$</td>
+</tr>
+</tbody></table>
+<p><strong>L'idée.</strong> On ne peut pas répéter l'expérience réelle — on n'a qu'un échantillon. Mais on peut la répéter dans un monde où l'on <strong>connaît tout</strong>, celui de la loi empirique. La relation $\hat\theta^\ast\leftrightarrow\hat\theta$ y imite la relation $\hat\theta\leftrightarrow\theta$ dans le monde réel.</p>
+<p><strong>Concrètement, pour des données i.i.d.</strong> : <em>sous la distribution empirique, $x$ prend chacune des valeurs $x_1,\dots,x_T$ avec probabilité égale</em>. Rééchantillonner, c'est <strong>tirer avec remise</strong>.</p>
+<p><strong>La construction de l'intervalle, en trois pas.</strong></p>
+<ol>
+<li>Tirer $R$ échantillons et calculer $\hat\mu^\ast$ pour chacun.</li>
+<li>Prendre les percentiles $\hat\mu^\ast_{2{,}5\%}$ et $\hat\mu^\ast_{97{,}5\%}$.</li>
+<li><strong>Approcher la loi de $\hat\mu-\mu$ par celle de $\hat\mu^\ast-\hat\mu$</strong>, d'où
+$$\Big(\hat\mu-\big(\hat\mu^\ast_{97{,}5\%}-\hat\mu\big),\ \hat\mu-\big(\hat\mu^\ast_{2{,}5\%}-\hat\mu\big)\Big)$$</li>
+</ol>
+<p><strong>Pourquoi les percentiles sont-ils inversés ?</strong> C'est le point qui déroute. Si dans le monde bootstrap $\hat\mu^\ast$ <strong>dépasse</strong> $\hat\mu$ de $\delta$ dans $2{,}5\,\%$ des cas, on en déduit que dans le monde réel $\hat\mu$ <strong>dépasse</strong> $\mu$ de $\delta$ dans $2{,}5\,\%$ des cas — donc que $\mu$ pourrait être <strong>inférieur</strong> de $\delta$. Le percentile <strong>haut</strong> de $\hat\mu^\ast$ donne donc la borne <strong>basse</strong>.</p>
+<p><strong>L'avantage sur la normale.</strong> L'intervalle obtenu est <strong>asymétrique</strong> si la loi de l'estimateur l'est. Sur l'exemple log-normal du cours, l'approximation normale donne $(0{,}7532;1{,}6036)$, symétrique autour de $\hat\mu=1{,}1784$ — alors que la vraie loi de $\hat t$ est fortement <strong>asymétrique à gauche</strong>, comme le Monte-Carlo le montre ($\mathrm{Prob}(\hat t&lt;-1{,}96)=0{,}1053$ contre $0{,}0042$ à droite). Le bootstrap capture cette asymétrie ; la normale ne le peut pas.</p>
+</div></details>
+
+<p><strong> Niveau 4 — type examen</strong> — Décrivez le bootstrap paramétrique et la correction de biais, avec leurs limites.</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p><strong>Pourquoi une version paramétrique.</strong> <em>Le bootstrap paramétrique peut traiter les échantillons <strong>non i.i.d.</strong></em>. Pour des données dépendantes — une série temporelle —, tirer les <strong>observations</strong> avec remise <strong>détruirait la structure temporelle</strong> : l'échantillon bootstrap n'aurait plus aucune autocorrélation.</p>
+<p><strong>La procédure, sur un AR(1)</strong> $x_t=a_0+a_1x_{t-1}+\varepsilon_t$ :</p>
+<ol>
+<li><em>Estimer $\hat a_0$, $\hat a_1$ et les <strong>résidus</strong> $\hat\varepsilon_t$.</em></li>
+<li><em>Générer $R$ échantillons : pour chacun, engendrer une <strong>longue</strong> série selon la dynamique AR(1) avec $\hat a_0,\hat a_1$, en tirant les chocs <strong>avec remise</strong> dans $\hat\varepsilon_1,\dots,\hat\varepsilon_T$ ; ne retenir que les <strong>$T$ dernières</strong> observations (abandonner le rodage).</em></li>
+<li><em>Calculer l'intervalle comme dans le bootstrap de base.</em></li>
+</ol>
+<p><strong>Les deux idées.</strong></p>
+<ul>
+<li>On rééchantillonne les <strong>résidus</strong> — approximativement i.i.d. — et non les observations. La <strong>dépendance</strong> est réimposée par le modèle, la <strong>distribution des chocs</strong> vient des données.</li>
+<li>Le <strong>rodage</strong> élimine l'effet de la condition initiale arbitraire, de sorte que les $T$ observations retenues proviennent de la loi stationnaire.</li>
+</ul>
+<p><strong>La correction de biais.</strong>
+$$\mathbb E\big[\hat\theta\big]-\theta_0\ \approx\ \mathbb E_R\big[\hat\theta^\ast\big]-\hat\theta$$
+<em>Intuition : traiter la distribution empirique comme exacte et calculer le biais moyen sur les échantillons bootstrapés.</em> On corrige ensuite en retranchant le biais estimé.</p>
+<p><strong>La validation empirique du cours</strong>, sur la régression prédictive du S&amp;P 500 :</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Monte-Carlo (vrai modèle)</th>
+<th><strong>Bootstrap</strong> (données seules)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Moyenne de $\hat\beta$</td>
+<td>$0{,}013$</td>
+<td>$0{,}0125$</td>
+</tr>
+<tr>
+<td>Biais</td>
+<td>$0{,}004$</td>
+<td>$0{,}0036$</td>
+</tr>
+<tr>
+<td>$t$ moyen</td>
+<td>$0{,}75$</td>
+<td>$0{,}67$</td>
+</tr>
+</tbody></table>
+<p><strong>La concordance est frappante</strong> : le bootstrap, qui n'utilise que l'échantillon observé, retrouve presque exactement ce que le Monte-Carlo obtient en connaissant le vrai modèle.</p>
+<p><strong>Les limites — quatre points, tous dans le cours.</strong></p>
+<p><strong>1. La mise en garde sur la correction elle-même.</strong> <em>En estimant le biais, on peut <strong>ajouter de l'erreur d'échantillonnage</strong>. Corriger <strong>seulement si le biais est grand comparé à l'écart-type</strong>.</em> C'est l'arbitrage biais-variance de la fiche 67 appliqué à la correction : retirer un biais mal estimé peut <strong>augmenter</strong> le risque quadratique.</p>
+<p><strong>2. Les événements rares.</strong> <em>Le bootstrap ne fonctionne pas bien si des <strong>événements rares sont absents</strong> de l'échantillon empirique.</em> Il ne peut rééchantillonner que ce qui a été observé : <strong>il ne crée jamais un événement plus extrême que le pire vu</strong>. C'est exactement la limite de la simulation historique de la fiche 55.</p>
+<p><strong>3. Les biais de sélection.</strong> <em>Il ne tient pas compte de biais plus subtils, comme le <strong>biais du survivant</strong> ou la <strong>sélection d'échantillon</strong>.</em> Si les fonds disparus sont absents de la base, le bootstrap reproduira fidèlement… un échantillon biaisé.</p>
+<p><strong>4. La mauvaise spécification.</strong> <em>Il ne guérit pas la mauvaise spécification du modèle.</em> Le bootstrap paramétrique <strong>régénère par le modèle estimé</strong> : si l'AR(1) est faux, tous les échantillons bootstrap le seront aussi.</p>
+<blockquote>
+<p><em><strong>Il ne remplace pas le bon sens !</strong></em></p>
+</blockquote>
+<p><strong>La conclusion de méthode.</strong> <em>La théorie asymptotique est très commode quand elle est disponible, mais en petit échantillon les résultats peuvent être inexacts. Utiliser Monte-Carlo pour acquérir de l'intuition. Utiliser le bootstrap quand la théorie asymptotique est indisponible ou suspecte.</em></p>
+</div></details>
+
+<h2 data-prio="must">Common mistakes</h2>
+<ol>
+<li><strong>Confondre consistance et absence de biais</strong> — $\hat\rho_1$ est consistant <strong>et</strong> biaisé.</li>
+<li><strong>Se tromper de signe pour Kendall</strong> — le biais est <strong>négatif</strong> : l'autocorrélation est sous-estimée.</li>
+<li><strong>Croire que Newey-West corrige le biais de Stambaugh</strong> — il corrige les <strong>écarts-types</strong>, pas le coefficient.</li>
+<li><strong>Oublier que le biais de Stambaugh est positif</strong> pour le rendement du dividende — deux effets négatifs qui se multiplient.</li>
+<li><strong>Inverser la formule de l'intervalle bootstrap</strong> — le percentile <strong>haut</strong> de $\hat\mu^\ast$ donne la borne <strong>basse</strong>.</li>
+<li><strong>Rééchantillonner les observations d'une série temporelle</strong> — cela détruit la dépendance ; rééchantillonner les <strong>résidus</strong>.</li>
+<li><strong>Oublier le rodage</strong> dans un bootstrap paramétrique.</li>
+<li><strong>Corriger un biais petit devant l'écart-type</strong> — on ajoute alors plus de bruit qu'on n'enlève de biais.</li>
+<li><strong>Croire que le bootstrap crée des événements extrêmes</strong> — il ne peut que rééchantillonner l'observé.</li>
+<li><strong>Croire que le bootstrap corrige la mauvaise spécification</strong> — il ne le fait pas.</li>
+</ol>
+<h2>Ultimate Review</h2>
+<ol>
+<li><strong>Les limites de l'asymptotique</strong> : estimateurs <strong>consistants mais biaisés</strong> · écarts-types imprécis · intervalles et tailles de test <strong>incorrects</strong>.</li>
+<li><strong>Les remèdes</strong> : <strong>Monte-Carlo</strong> pour comprendre · <strong>bootstrap</strong> pour l'inférence et la correction de biais.</li>
+<li><strong>Biais de l'autocorrélation</strong> : $\hat\rho_1$ des MCO est consistant mais biaisé <strong>négativement</strong>.</li>
+<li><strong>Simulation</strong> ($100\,000$ tirages) : $-0{,}0826$ pour $(\rho_1,T)=(0{,}9;50)$ · $-0{,}0203$ pour $(0;50)$ · $-0{,}0402$ pour $(0{,}9;100)$ · $-0{,}0100$ pour $(0;100)$.</li>
+<li><strong>Formule de Kendall</strong> : $\mathbb E(\hat\rho_1)-\rho_1\approx-\frac{1+3\rho_1}{T}$ — croissant en $\rho_1$, décroissant en $T$.</li>
+<li><strong>Biais de Stambaugh</strong> : $\mathbb E(\hat\beta-\beta)=\frac{\mathrm{Cov}(u_t,\varepsilon_t)}{\mathrm{Var}(\varepsilon_t)}\mathbb E(\hat\rho-\rho)$ — <strong>positif</strong> pour le rendement du dividende, et substantiel devant $SE(\hat\beta)$.</li>
+<li><strong>S&amp;P 500 (1934-2008)</strong> : $\hat\beta=0{,}0089$, $\hat\rho=0{,}9936$, $SE=0{,}005$ ; Monte-Carlo ($1\,000$ tirages, $200$ de rodage, Newey-West à $6$ retards) : moyenne $0{,}013$, <strong>biais $0{,}004$</strong>, $t$ moyen $\mathbf{0{,}75}$.</li>
+<li><strong>Échec de la normalité</strong> — log-normale $x_t=e^{-1/2+\varepsilon_t}$, $T=50$ : $\mathrm{Var}(\hat t)=1{,}2542^2$ au lieu de $1$ ; $\mathrm{Prob}(\hat t&gt;1{,}96)=0{,}0042$ et $\mathrm{Prob}(\hat t&lt;-1{,}96)=0{,}1053$ au lieu de $0{,}025$ chacune.</li>
+<li><strong>Principe du bootstrap</strong> : <em>une étude de Monte-Carlo utilisant la <strong>distribution empirique</strong> comme si elle était la vraie</em>.</li>
+<li><strong>Les deux mondes</strong> : $(P,x,\hat\theta=s(x))$ ↔ $(\hat P,x^\ast,\hat\theta^\ast=s(x^\ast))$.</li>
+<li><strong>Cas i.i.d.</strong> : tirer <strong>avec remise</strong> — chaque $x_i$ a probabilité $1/T$.</li>
+<li><strong>Intervalle bootstrap</strong> : $\big(\hat\mu-(\hat\mu^\ast_{97{,}5\%}-\hat\mu),\ \hat\mu-(\hat\mu^\ast_{2{,}5\%}-\hat\mu)\big)$ — percentiles <strong>inversés</strong>.</li>
+<li><strong>Exemple log-normal</strong> : $\hat\mu=1{,}1784$, $\hat\sigma=1{,}5340$, $T=50$ ; IC asymptotique $(0{,}7532;1{,}6036)$ ; variance de $\hat t$ bootstrapée $1{,}1852^2$ contre $1{,}2542^2$ (MC) et $1$ (normale).</li>
+<li><strong>Bootstrap paramétrique</strong> : estimer le modèle et les résidus · régénérer en tirant les <strong>résidus</strong> avec remise · <strong>abandonner le rodage</strong> · calculer comme d'habitude.</li>
+<li><strong>Correction de biais</strong> : $\mathbb E[\hat\theta]-\theta_0\approx\mathbb E_R[\hat\theta^\ast]-\hat\theta$ ; <strong>corriger seulement si le biais est grand devant l'écart-type</strong>.</li>
+<li><strong>Validation</strong> : bootstrap sur la régression prédictive ⟹ biais $0{,}0036$, $t$ moyen $0{,}67$ — très proche du Monte-Carlo.</li>
+<li><strong>Limites</strong> : <strong>événements rares absents</strong> · biais du <strong>survivant</strong> et de <strong>sélection</strong> · <strong>mauvaise spécification</strong>. <em>Il ne remplace pas le bon sens !</em></li>
+</ol>
+<p><strong>Formulas to know</strong>
+$$\mathbb E(\hat\rho_1)-\rho_1\approx-\frac{1+3\rho_1}{T} \qquad \mathbb E(\hat\beta-\beta)=\frac{\mathrm{Cov}(u_t,\varepsilon_t)}{\mathrm{Var}(\varepsilon_t)}\,\mathbb E(\hat\rho-\rho)$$
+$$\Big(\hat\mu-\big(\hat\mu^\ast_{97{,}5\%}-\hat\mu\big),\ \hat\mu-\big(\hat\mu^\ast_{2{,}5\%}-\hat\mu\big)\Big) \qquad \mathbb E\big[\hat\theta\big]-\theta_0\approx\mathbb E_R\big[\hat\theta^\ast\big]-\hat\theta$$</p>
+<p><strong>Methods to know</strong> : conduire un Monte-Carlo de biais ; construire un intervalle bootstrap et justifier l'inversion des percentiles ; mener un bootstrap paramétrique sur une série temporelle ; décider s'il faut corriger un biais.</p>
+<div class="rec"><h2>Active Recall</h2><p><strong>Basic</strong> — Quel est le biais de l'autocorrélation estimée ?</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p><strong>La formule de Kendall.</strong>
+$$\mathbb E(\hat\rho_1)-\rho_1\approx-\frac{1+3\rho_1}{T}$$</p>
+<p>Le biais est <strong>négatif</strong> — l'autocorrélation est <strong>sous-estimée</strong> —, <strong>croissant en valeur absolue avec $\rho_1$</strong> et <strong>décroissant avec $T$</strong>.</p>
+<p><strong>Les simulations du cours</strong> ($100\,000$ tirages) le confirment :</p>
+<table>
+<thead>
+<tr>
+<th>$\rho_1$</th>
+<th>$T$</th>
+<th>Biais observé</th>
+<th>Kendall</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$0{,}9$</td>
+<td>$50$</td>
+<td>$-0{,}0826$</td>
+<td>$-0{,}074$</td>
+</tr>
+<tr>
+<td>$0{,}0$</td>
+<td>$50$</td>
+<td>$-0{,}0203$</td>
+<td>$-0{,}020$</td>
+</tr>
+<tr>
+<td>$0{,}9$</td>
+<td>$100$</td>
+<td>$-0{,}0402$</td>
+<td>$-0{,}037$</td>
+</tr>
+<tr>
+<td>$0{,}0$</td>
+<td>$100$</td>
+<td>$-0{,}0100$</td>
+<td>$-0{,}010$</td>
+</tr>
+</tbody></table>
+<p class="cal piege"> $\hat\rho_1$ est <strong>consistant mais biaisé</strong> : les deux notions sont distinctes (fiche 67).</p>
+</div></details><p><strong>Understanding</strong> — Quel est le principe du bootstrap ?</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p><em>Le bootstrap est une <strong>méthode de rééchantillonnage</strong>. C'est en substance une <strong>étude de Monte-Carlo qui utilise la distribution empirique comme si elle était la vraie distribution</strong>.</em></p>
+<p><strong>Le parallèle des deux mondes.</strong></p>
+<table>
+<thead>
+<tr>
+<th><strong>Monde réel</strong></th>
+<th><strong>Monde bootstrap</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$P$ <strong>inconnue</strong></td>
+<td>$\hat P$ empirique, <strong>connue</strong></td>
+</tr>
+<tr>
+<td>$\hat\theta=s(x)$</td>
+<td>$\hat\theta^\ast=s(x^\ast)$</td>
+</tr>
+<tr>
+<td>$\mathrm{Biais}_P(\hat\theta,\theta)$</td>
+<td>$\mathrm{Biais}_{\hat P}(\hat\theta^\ast,\hat\theta)$</td>
+</tr>
+</tbody></table>
+<p><strong>Le raisonnement.</strong> On ne peut pas répéter l'expérience réelle — on n'a qu'un échantillon. Mais on peut la répéter dans un monde artificiel où l'on <strong>connaît tout</strong>. La relation entre $\hat\theta^\ast$ et $\hat\theta$ y <strong>imite</strong> la relation entre $\hat\theta$ et $\theta$ dans le monde réel.</p>
+<p><strong>Les deux usages principaux</strong> : <em>évaluer les propriétés distributionnelles d'estimateurs compliqués et corriger le biais</em> ; <em>améliorer la précision des approximations asymptotiques en petit échantillon</em>.</p>
+</div></details><p><strong>Application</strong> — Pourquoi le bootstrap donne-t-il un intervalle asymétrique là où la normale n'en donne jamais ?</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p><strong>L'intervalle bootstrap.</strong>
+$$\Big(\hat\mu-\big(\hat\mu^\ast_{97{,}5\%}-\hat\mu\big),\ \hat\mu-\big(\hat\mu^\ast_{2{,}5\%}-\hat\mu\big)\Big)$$
+Les deux demi-largeurs sont $\hat\mu^\ast_{97{,}5\%}-\hat\mu$ et $\hat\mu-\hat\mu^\ast_{2{,}5\%}$ : elles sont <strong>différentes</strong> dès que la loi bootstrapée de $\hat\mu^\ast$ est asymétrique.</p>
+<p><strong>L'intervalle normal</strong>, $\hat\mu\pm1{,}96\,\hat\sigma/\sqrt T$, est <strong>symétrique par construction</strong> — il ne peut jamais capturer l'asymétrie.</p>
+<p><strong>L'illustration du cours.</strong> Pour la log-normale $x_t=e^{-1/2+\varepsilon_t}$ avec $T=50$, la loi de $\hat t$ est fortement <strong>asymétrique à gauche</strong> :
+$$\mathrm{Prob}(\hat t&gt;1{,}96)\approx0{,}0042, \qquad \mathrm{Prob}(\hat t&lt;-1{,}96)\approx0{,}1053$$
+au lieu de $0{,}025$ de chaque côté. <strong>Un test bilatéral nominal à $5\,\%$ rejette en réalité $11\,\%$ du temps</strong>, presque entièrement du même côté.</p>
+<p><strong>Ce que le bootstrap capture.</strong> La variance de $\hat t$ bootstrapée est $1{,}1852^2$, contre $1{,}2542^2$ pour le Monte-Carlo et $1$ pour l'approximation normale. Le bootstrap récupère donc l'essentiel de l'écart à la normalité, <strong>sans connaître la vraie loi</strong>.</p>
+<blockquote>
+<p><em>Pour la statistique de Student, la distribution bootstrapée est <strong>plus précise</strong> que l'approximation normale asymptotique.</em></p>
+</blockquote>
+</div></details><p><strong>Comparison</strong> — Monte-Carlo et bootstrap : quelle différence ?</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<table>
+<thead>
+<tr>
+<th></th>
+<th><strong>Monte-Carlo</strong></th>
+<th><strong>Bootstrap</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Loi utilisée</td>
+<td>le <strong>vrai modèle</strong> supposé connu</td>
+<td>la loi <strong>empirique</strong></td>
+</tr>
+<tr>
+<td>Ce qu'il faut</td>
+<td>des paramètres et une forme de loi</td>
+<td><strong>seulement les données</strong></td>
+</tr>
+<tr>
+<td>Usage</td>
+<td>comprendre les propriétés d'une procédure</td>
+<td><strong>inférence</strong> sur les données réelles</td>
+</tr>
+<tr>
+<td>Question</td>
+<td>« que se passerait-il <strong>si</strong> le modèle était vrai ? »</td>
+<td>« que dit <strong>cet échantillon</strong> ? »</td>
+</tr>
+</tbody></table>
+<p><strong>Monte-Carlo</strong> est un <strong>outil de diagnostic</strong> : on simule le vrai modèle, on mesure biais et couverture, on juge la fiabilité de l'asymptotique. <em>Utiliser les simulations de Monte-Carlo pour acquérir de l'intuition.</em></p>
+<p><strong>Bootstrap</strong> est un <strong>outil d'inférence</strong> : on ne connaît pas le vrai modèle, alors on prend la loi empirique à sa place. <em>L'utiliser quand la théorie asymptotique est indisponible ou suspecte.</em></p>
+<p><strong>La validation croisée du cours.</strong> Sur la régression prédictive du S&amp;P 500 :</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Monte-Carlo</th>
+<th>Bootstrap</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Biais de $\hat\beta$</td>
+<td>$0{,}004$</td>
+<td>$0{,}0036$</td>
+</tr>
+<tr>
+<td>$t$ moyen</td>
+<td>$0{,}75$</td>
+<td>$0{,}67$</td>
+</tr>
+</tbody></table>
+<p>Les deux concordent — ce qui <strong>valide empiriquement</strong> le principe du bootstrap : la loi empirique se comporte bien comme la vraie.</p>
+<p class="cal piege"> <strong>Mais seulement dans la mesure où l'échantillon est représentatif.</strong> Si les événements rares en sont absents, le bootstrap les ignorera ; le Monte-Carlo, lui, les engendrera si le modèle en prévoit.</p>
+</div></details><p><strong>Exam-style</strong> — Quand utiliser le bootstrap, et quelles sont ses limites ?</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p><strong>Quand l'utiliser.</strong></p>
+<ol>
+<li><em>Quand la théorie asymptotique est <strong>indisponible</strong></em> — estimateur analytiquement trop compliqué pour en dériver la loi.</li>
+<li><em>Quand elle est <strong>suspecte</strong></em> — petit échantillon, loi asymétrique ou à queues épaisses, prédicteur très persistant.</li>
+<li>Pour <strong>corriger un biais</strong> de petit échantillon quand aucune formule analytique n'existe : <em>quand les formules explicites ne sont pas connues, on peut utiliser le bootstrap pour estimer le biais</em>.</li>
+<li>Pour obtenir des intervalles <strong>asymétriques</strong>, que l'approximation normale ne peut pas produire.</li>
+</ol>
+<p><strong>Comment.</strong></p>
+<ul>
+<li>Données <strong>i.i.d.</strong> : tirer avec remise dans les observations.</li>
+<li>Données <strong>dépendantes</strong> : <strong>bootstrap paramétrique</strong> — estimer le modèle, rééchantillonner les <strong>résidus</strong>, régénérer la série, abandonner le rodage.</li>
+<li>Intervalle : $\big(\hat\mu-(\hat\mu^\ast_{97{,}5\%}-\hat\mu),\ \hat\mu-(\hat\mu^\ast_{2{,}5\%}-\hat\mu)\big)$.</li>
+<li>Biais : $\mathbb E_R[\hat\theta^\ast]-\hat\theta$.</li>
+</ul>
+<p><strong>Les limites — quatre, toutes énoncées par le cours.</strong></p>
+<p><strong>1. Les événements rares.</strong> <em>Il ne fonctionne pas bien si des événements rares sont <strong>absents de l'échantillon empirique</strong>.</em> C'est la limite la plus grave en finance : le bootstrap ne peut rééchantillonner que l'observé, donc <strong>ne crée jamais</strong> d'événement plus extrême que le pire vu. Une base sans krach produira des queues minces — exactement le défaut de la simulation historique (fiche 55).</p>
+<p><strong>2. Les biais de sélection.</strong> <em>Il ne tient pas compte de biais plus subtils, comme le <strong>biais du survivant</strong> ou la sélection d'échantillon.</em> Si les fonds disparus manquent, le bootstrap reproduira fidèlement un échantillon biaisé.</p>
+<p><strong>3. La mauvaise spécification.</strong> <em>Il ne guérit pas la mauvaise spécification du modèle.</em> Le bootstrap paramétrique <strong>régénère par le modèle estimé</strong> : si le modèle est faux, tous les échantillons le seront.</p>
+<p><strong>4. L'erreur ajoutée par la correction elle-même.</strong> <em>En estimant le biais, on peut ajouter de l'erreur d'échantillonnage. Corriger <strong>seulement si le biais est grand comparé à l'écart-type</strong>.</em> C'est l'arbitrage biais-variance : retirer un biais mal estimé peut augmenter le risque total.</p>
+<blockquote>
+<p><em><strong>Il ne remplace pas le bon sens !</strong></em></p>
+</blockquote>
+<p><strong>La conclusion de méthode.</strong> Le bootstrap est un <strong>outil d'inférence</strong>, pas un correcteur universel. Il traite l'<strong>erreur d'échantillonnage</strong> — l'incertitude due au fait qu'on n'a qu'un échantillon fini. Il ne traite <strong>ni</strong> les erreurs de <strong>modèle</strong>, <strong>ni</strong> les erreurs de <strong>collecte</strong>. Diagnostiquer d'abord la nature du problème, choisir l'outil ensuite.</p>
+</div></details></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h2>Flashcards</h2>
+<table>
+<thead>
+<tr>
+<th>Question</th>
+<th>Réponse</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Les deux défauts de l'asymptotique en petit échantillon ?</td>
+<td>Estimateurs <strong>biaisés</strong> · écarts-types <strong>imprécis</strong></td>
+</tr>
+<tr>
+<td>Formule de Kendall ?</td>
+<td>$\mathbb E(\hat\rho_1)-\rho_1\approx-\frac{1+3\rho_1}{T}$</td>
+</tr>
+<tr>
+<td>Signe du biais de l'autocorrélation ?</td>
+<td><strong>Négatif</strong> — elle est sous-estimée</td>
+</tr>
+<tr>
+<td>Comment varie-t-il ?</td>
+<td>Croissant en $\rho_1$, décroissant en $T$</td>
+</tr>
+<tr>
+<td>Biais observé pour $(\rho_1,T)=(0{,}9;50)$ ?</td>
+<td>$-0{,}0826$</td>
+</tr>
+<tr>
+<td>Formule du biais de Stambaugh ?</td>
+<td>$\frac{\mathrm{Cov}(u_t,\varepsilon_t)}{\mathrm{Var}(\varepsilon_t)}\mathbb E(\hat\rho-\rho)$</td>
+</tr>
+<tr>
+<td>Son signe pour le rendement du dividende ?</td>
+<td><strong>Positif</strong> — deux effets négatifs se multiplient</td>
+</tr>
+<tr>
+<td>Persistance du rendement du dividende ?</td>
+<td>$\hat\rho=0{,}9936$</td>
+</tr>
+<tr>
+<td>Biais moyen sur $\hat\beta$ dans l'exemple ?</td>
+<td>$0{,}004$, pour un $SE$ de $0{,}005$</td>
+</tr>
+<tr>
+<td>Statistique de Student moyenne sous $H_0$ ?</td>
+<td>$\mathbf{0{,}75}$</td>
+</tr>
+<tr>
+<td>Newey-West corrige-t-il ce biais ?</td>
+<td><strong>Non</strong> — il corrige les écarts-types</td>
+</tr>
+<tr>
+<td>Loi de l'exemple non gaussien ?</td>
+<td>Log-normale $x_t=e^{-1/2+\varepsilon_t}$, de moyenne $1$</td>
+</tr>
+<tr>
+<td>$\mathrm{Var}(\hat t)$ observée ?</td>
+<td>$1{,}2542^2$ au lieu de $1$</td>
+</tr>
+<tr>
+<td>$\mathrm{Prob}(\hat t&lt;-1{,}96)$ ?</td>
+<td>$0{,}1053$ au lieu de $0{,}025$</td>
+</tr>
+<tr>
+<td>Que montre cette asymétrie ?</td>
+<td>La loi de $\hat t$ est <strong>asymétrique à gauche</strong></td>
+</tr>
+<tr>
+<td>Définition du bootstrap ?</td>
+<td>Monte-Carlo utilisant la <strong>loi empirique</strong> comme vraie</td>
+</tr>
+<tr>
+<td>Comment rééchantillonner en i.i.d. ?</td>
+<td>Tirer <strong>avec remise</strong>, chaque $x_i$ de probabilité $1/T$</td>
+</tr>
+<tr>
+<td>Intervalle de confiance bootstrap ?</td>
+<td>$\big(\hat\mu-(\hat\mu^\ast_{97{,}5\%}-\hat\mu),\ \hat\mu-(\hat\mu^\ast_{2{,}5\%}-\hat\mu)\big)$</td>
+</tr>
+<tr>
+<td>Pourquoi les percentiles sont-ils inversés ?</td>
+<td>On approche $\hat\mu-\mu$ par $\hat\mu^\ast-\hat\mu$</td>
+</tr>
+<tr>
+<td>Avantage sur l'intervalle normal ?</td>
+<td>Il peut être <strong>asymétrique</strong></td>
+</tr>
+<tr>
+<td>Variance de $\hat t$ bootstrapée ?</td>
+<td>$1{,}1852^2$ — plus proche de $1{,}2542^2$ que de $1$</td>
+</tr>
+<tr>
+<td>Que rééchantillonne le bootstrap paramétrique ?</td>
+<td>Les <strong>résidus</strong>, pas les observations</td>
+</tr>
+<tr>
+<td>Pourquoi ?</td>
+<td>Tirer les observations <strong>détruirait la dépendance</strong></td>
+</tr>
+<tr>
+<td>Pourquoi le rodage ?</td>
+<td>Éliminer l'effet de la <strong>condition initiale</strong></td>
+</tr>
+<tr>
+<td>Formule de correction de biais ?</td>
+<td>$\mathbb E_R[\hat\theta^\ast]-\hat\theta$</td>
+</tr>
+<tr>
+<td>Quand corriger ?</td>
+<td>Si le biais est <strong>grand devant l'écart-type</strong></td>
+</tr>
+<tr>
+<td>Pourquoi cette réserve ?</td>
+<td>La correction <strong>ajoute de l'erreur d'échantillonnage</strong></td>
+</tr>
+<tr>
+<td>Biais bootstrapé de $\hat\beta$ ?</td>
+<td>$0{,}0036$ — proche du $0{,}004$ du Monte-Carlo</td>
+</tr>
+<tr>
+<td>Première limite du bootstrap ?</td>
+<td>Les <strong>événements rares absents</strong> de l'échantillon</td>
+</tr>
+<tr>
+<td>Deuxième limite ?</td>
+<td>Biais du <strong>survivant</strong> et de <strong>sélection</strong></td>
+</tr>
+<tr>
+<td>Troisième limite ?</td>
+<td>Il ne guérit pas la <strong>mauvaise spécification</strong></td>
+</tr>
+<tr>
+<td>La conclusion du cours ?</td>
+<td><em>Il ne remplace pas le bon sens !</em></td>
+</tr>
+</tbody></table>
+</main>
+
+
+
+
+</body></html>

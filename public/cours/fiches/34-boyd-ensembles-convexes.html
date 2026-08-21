@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fiche 34 — Ensembles convexes (Boyd, chapitre 2)</title>
+<script>
+window.MathJax={tex:{inlineMath:[["$","$"]],displayMath:[["$$","$$"]],processEscapes:true},
+ options:{skipHtmlTags:["script","noscript","style","textarea","pre","code"]},
+ svg:{fontCache:"global"},
+ startup:{pageReady:()=>MathJax.startup.defaultPageReady().then(()=>{document.body.classList.add("ready")})}};
+setTimeout(function(){document.body.classList.add("ready")},2500);
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+/* ============================================================
+   MathiasLearn — feuille de style des fiches
+   Reprise intégrale des tokens de 00_PARCOURS/*.html
+   + blocs pédagogiques (callouts, méthode, essentiels, recall)
+   ============================================================ */
+:root{--bg:#faf9f7;--card:#fff;--ink:#1a1a1a;--muted:#6b6b6b;--line:#e5e2dd;--accent:#8b5e34;
+ --hl:#fdf8ef;--ok:#2d7d4f;--okbg:#f0f7f3;--warn:#b3402f;--warnbg:#fdf3f1;--blue:#2f5d8b;--bluebg:#f1f5fa}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+ font:17px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;padding:0 16px 100px}
+.nav{position:sticky;top:0;background:rgba(250,249,247,.96);backdrop-filter:blur(8px);
+ border-bottom:1px solid var(--line);margin:0 -16px 30px;padding:11px 16px;z-index:50;
+ display:flex;gap:6px;flex-wrap:wrap;font-size:13px}
+.nav a{color:var(--muted);text-decoration:none;padding:4px 9px;border-radius:5px;white-space:nowrap}
+.nav a:hover{background:var(--line);color:var(--ink)}
+.nav a.on{background:var(--accent);color:#fff}
+main{max-width:780px;margin:0 auto}
+h1{font-size:31px;letter-spacing:-.02em;margin:.4em 0 .5em;line-height:1.25}
+h2{font-size:23px;margin:2.2em 0 .7em;padding-bottom:.3em;border-bottom:1px solid var(--line)}
+h3{font-size:19px;margin:1.9em 0 .5em;color:var(--accent)}
+h4{font-size:17px;margin:1.5em 0 .4em}
+p{margin:.8em 0} a{color:var(--accent)} hr{border:0;border-top:1px solid var(--line);margin:2.6em 0}
+table{border-collapse:collapse;width:100%;margin:1.3em 0;font-size:15.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+th{background:#f3f0eb;font-weight:600}
+tr:nth-child(even) td{background:#fcfbfa}
+code{font-family:"SF Mono",Menlo,Consolas,monospace;font-size:.88em;background:#f2efea;padding:2px 6px;border-radius:4px;white-space:nowrap}
+pre{background:#f2efea;padding:14px 16px;border-radius:8px;overflow-x:auto}
+pre code{background:none;padding:0;white-space:pre}
+blockquote{border-left:3px solid var(--accent);background:var(--hl);margin:1.4em 0;padding:14px 20px;border-radius:0 8px 8px 0}
+blockquote p:first-child{margin-top:0} blockquote p:last-child{margin-bottom:0}
+ul,ol{padding-left:1.5em} li{margin:.35em 0} em{color:#4a4a4a}
+mjx-container[display="true"]{margin:1.1em 0!important;overflow-x:auto;overflow-y:hidden;padding:2px 0}
+mjx-container svg{max-width:100%}
+body:not(.ready) main{opacity:0} main{opacity:1;transition:opacity .25s}
+
+/* --- bandeau de tête de fiche --- */
+.cours{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--accent);
+ border-radius:0 10px 10px 0;padding:18px 22px;margin:0 0 34px}
+.cours h4{margin:0 0 4px;font-size:14px;text-transform:uppercase;letter-spacing:.07em;color:var(--accent)}
+.cours .cs{color:var(--muted);font-size:14.5px;margin:0 0 14px}
+
+/* --- exercices / corrigés --- */
+.ex{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:6px 24px 20px;margin:18px 0}
+.ex>h3:first-child{margin-top:14px}
+details.cor{margin-top:18px;border:1px solid var(--line);border-radius:8px;background:#fcfbfa;overflow:hidden}
+details.cor>summary{cursor:pointer;padding:12px 16px;font-weight:600;font-size:15px;color:var(--accent);
+ list-style:none;display:flex;align-items:center;gap:9px;user-select:none;transition:.15s;min-height:44px}
+details.cor>summary::-webkit-details-marker{display:none}
+details.cor>summary:hover{background:var(--hl)}
+details.cor>summary::before{content:"\25B6";font-size:10px;transition:transform .18s;display:inline-block}
+details.cor[open]>summary::before{transform:rotate(90deg)}
+details.cor[open]>summary{background:var(--okbg);color:var(--ok);border-bottom:1px solid var(--line)}
+.cor .in{padding:4px 20px 16px}
+.cor .in>*:first-child{margin-top:.9em}
+
+/* --- blocs pédagogiques (callouts) ---
+   Générés depuis une citation Markdown dont le premier **gras** commence
+   par un mot-clé : DÉFINITION, THÉORÈME, MÉTHODE, PIÈGE, INTUITION… */
+.cal{border:1px solid var(--line);border-left:4px solid var(--accent);background:var(--card);
+ border-radius:0 10px 10px 0;padding:15px 20px;margin:1.5em 0}
+.cal>p:first-child{margin-top:0}.cal>p:last-child,.cal>ul:last-child,.cal>ol:last-child{margin-bottom:0}
+.cal .lab{display:block;font-size:12.5px;text-transform:uppercase;letter-spacing:.08em;
+ font-weight:700;color:var(--accent);margin-bottom:6px}
+.cal.formel{background:var(--hl)}
+.cal.piege{border-left-color:var(--warn);background:var(--warnbg)}
+.cal.piege .lab{color:var(--warn)}
+.cal.methode{border-left-color:var(--ok);background:var(--okbg)}
+.cal.methode .lab{color:var(--ok)}
+.cal.intu{border-left-color:var(--blue);background:var(--bluebg)}
+.cal.intu .lab{color:var(--blue)}
+.cal.plus{border-left-style:dashed;background:#faf9f7}
+.cal.plus .lab{color:var(--muted)}
+
+/* --- révision express --- */
+.ess{background:var(--card);border:1px solid var(--accent);border-radius:10px;padding:4px 24px 20px;margin:1.6em 0}
+.ess h3{margin-top:1.3em}
+.rec{background:var(--card);border:1px dashed var(--accent);border-radius:10px;padding:4px 24px 18px;margin:1.6em 0}
+.rec ol{counter-reset:none}
+
+/* --- impression / PDF --- */
+@media print{
+ .nav{display:none}
+ body{padding:0;background:#fff;font-size:11.2pt;line-height:1.55}
+ main{max-width:none}
+ h1{font-size:23pt}h2{font-size:15pt;margin-top:1.5em}h3{font-size:12.6pt}
+ h2,h3,h4{break-after:avoid;page-break-after:avoid}
+ table,.cal,blockquote{break-inside:avoid;page-break-inside:avoid}
+ table{display:table;font-size:9.6pt}
+ details.cor{border:1px solid var(--line);background:#fcfbfa}
+ details.cor>summary{display:none}
+ details.cor .in{padding-top:10px}
+ .cal,.ex,.ess,.rec{box-shadow:none}
+ a{color:var(--ink);text-decoration:none}
+}
+@page{margin:16mm 15mm 18mm}
+
+/* --- exemples travaillés --- */
+.exm{background:#fcfbfa;border:1px solid var(--line);border-radius:10px;padding:2px 20px 14px;margin:1.5em 0}
+.exm>h4:first-child{margin:14px 0 .5em;color:var(--accent);font-size:13px;text-transform:uppercase;letter-spacing:.07em}
+
+
+/* --- pastilles de priorité (conventions des fiches de l'app) --- */
+h2[data-prio], h3[data-prio], h4[data-prio]{position:relative}
+h2[data-prio]::before,h3[data-prio]::before,h4[data-prio]::before{
+ content:"";display:inline-block;width:9px;height:9px;border-radius:50%;
+ margin-right:9px;vertical-align:middle;background:var(--muted)}
+[data-prio="must"]::before{background:var(--warn)}
+[data-prio="high"]::before{background:#d98324}
+[data-prio="mid"]::before{background:#c9a227}
+[data-prio="low"]::before{background:var(--ok)}
+/* corrigés des fiches de l'app : même traitement que les corrigés des séries */
+details.cor>summary::after{content:""}
+</style></head><body>
+<div class="nav"><a href="24-lp-formulation.html">Programmation linéaire : formulation et géométrie</a><a href="25-lp-affine-par-morceaux.html">Optimisation affine par morceaux : tout ramener à un LP</a><a href="26-lp-polyedres.html">Polyèdres : faces, points extrêmes, test du rang</a><a href="27-lp-convexite-cones.html">Enveloppes convexes, cônes et décomposition d'un polyèdre</a><a href="28-lp-dualite.html">Dualité en programmation linéaire</a><a href="29-lp-sensibilite-jeux.html">Dualité II : sensibilité, prix implicites et jeux à somme nulle</a><a href="30-lp-simplexe.html">L'algorithme du simplexe</a><a href="31-lp-reseaux-unimodularite.html">Flots dans les réseaux et unimodularité totale</a><a href="32-lp-commande.html">Applications en automatique : suivi de consigne et robustesse</a><a href="33-lp-nombres-entiers.html">Programmation linéaire en nombres entiers et séparation-évaluation</a><a href="34-boyd-ensembles-convexes.html" class="on">Ensembles convexes</a><a href="35-boyd-fonctions-convexes.html">Fonctions convexes</a><a href="36-boyd-problemes-convexes.html">Problèmes d'optimisation convexe</a><a href="37-boyd-familles-standard.html">Les familles standard : LP, QP, SOCP, GP, SDP</a><a href="38-boyd-dualite.html">Dualité lagrangienne</a><a href="39-boyd-minimisation-sans-contrainte.html">Minimisation sans contrainte : gradient et Newton</a><a href="40-boyd-contraintes-egalite.html">Minimisation sous contraintes d'égalité</a><a href="41-boyd-points-interieurs.html">Méthodes de points intérieurs</a><a href="42-sous-gradients.html">Sous-gradients et sous-différentiel</a><a href="43-methode-sous-gradient.html">La méthode du sous-gradient</a></div>
+<main><h1>Fiche 34 — Ensembles convexes (Boyd, chapitre 2)</h1>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Matière</strong></td>
+<td>Maths · Optimisation</td>
+</tr>
+<tr>
+<td><strong>Cours source</strong></td>
+<td>Boyd &amp; Vandenberghe, <em>Convex Optimization</em>, chapitre 2 « Convex sets », p. 21–66</td>
+</tr>
+<tr>
+<td><strong>Difficulté</strong></td>
+<td> Must know — le socle de tout le M1</td>
+</tr>
+<tr>
+<td><strong>Temps d'étude estimé</strong></td>
+<td>2 h 30</td>
+</tr>
+<tr>
+<td><strong>Prérequis</strong></td>
+<td>Fiche 11 (convexité, Garrigos), fiche 26 (polyèdres, faces)</td>
+</tr>
+<tr>
+<td><strong>Concepts clés</strong></td>
+<td>Ensemble affine, ensemble convexe, cône convexe, enveloppes, hyperplan, ellipsoïde, cône de norme, polyèdre, cône PSD, opérations préservant la convexité, perspective, inégalités généralisées, hyperplan séparateur, cône dual</td>
+</tr>
+<tr>
+<td><strong>Poids à l'examen</strong></td>
+<td>Deux réflexes s'évaluent : <strong>reconnaître</strong> un ensemble convexe dans une liste, et surtout <strong>le démontrer par le calcul de convexité</strong> (§2.3) plutôt que par la définition. Le théorème de séparation est l'outil de toutes les preuves de dualité (fiche 37).</td>
+</tr>
+</tbody></table>
+<h2>Vue d'ensemble</h2>
+<p>Boyd construit la convexité en trois temps, et c'est cette architecture qu'il faut retenir — pas la liste des exemples.</p>
+<pre><code>1. DÉFINIR    affine ⊂ convexe,  et le cas particulier des CÔNES
+2. CATALOGUER une dizaine d'ensembles convexes de référence (§2.2)
+3. CALCULER   des opérations qui préservent la convexité (§2.3)
+              →  un ensemble est convexe s'il se construit par ces opérations
+                 À PARTIR du catalogue — plus jamais par la définition
+</code></pre>
+<p>Puis viennent deux prolongements qui serviront à la dualité : les <strong>inégalités généralisées</strong> (comparer des vecteurs ou des matrices, pas seulement des nombres) et les <strong>hyperplans séparateurs</strong> (la version géométrique du théorème de dualité).</p>
+<h2 data-prio="mid">Concept 1 — Affine, convexe, cône : trois familles emboîtées</h2>
+<p>Tout part d'une combinaison $\theta_1x_1+\dots+\theta_kx_k$ ; <strong>seule la contrainte sur les coefficients change.</strong></p>
+<table>
+<thead>
+<tr>
+<th>Combinaison</th>
+<th>Contrainte sur les $\theta_i$</th>
+<th>Ensemble stable</th>
+<th>Enveloppe</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>linéaire</strong></td>
+<td>aucune</td>
+<td>sous-espace</td>
+<td>—</td>
+</tr>
+<tr>
+<td><strong>affine</strong></td>
+<td>$\sum_i\theta_i = 1$</td>
+<td>ensemble <strong>affine</strong></td>
+<td>$\mathbf{aff}\,C$</td>
+</tr>
+<tr>
+<td><strong>convexe</strong></td>
+<td>$\theta_i\geq0$ et $\sum_i\theta_i=1$</td>
+<td>ensemble <strong>convexe</strong></td>
+<td>$\mathbf{conv}\,C$</td>
+</tr>
+<tr>
+<td><strong>conique</strong></td>
+<td>$\theta_i\geq0$</td>
+<td><strong>cône convexe</strong></td>
+<td>enveloppe conique</td>
+</tr>
+</tbody></table>
+<p><strong>Droite et segment.</strong> Pour $x_1\neq x_2$ dans $\mathbb{R}^n$, les points $y = \theta x_1+(1-\theta)x_2$ décrivent la <strong>droite</strong> passant par $x_1$ et $x_2$ quand $\theta$ parcourt $\mathbb{R}$, et le <strong>segment</strong> quand $\theta\in[0,1]$. L'écriture $y = x_2+\theta(x_1-x_2)$ donne l'autre lecture : point de base $x_2$ plus direction $x_1-x_2$ mise à l'échelle par $\theta$.</p>
+<p><strong>Ensemble affine.</strong> $C$ est affine si la <strong>droite</strong> passant par deux points distincts de $C$ est dans $C$. <em>Exemple 2.1 :</em> l'ensemble solution $\{x\mid Ax=b\}$ d'un système linéaire est affine, et <strong>réciproquement tout affine s'écrit ainsi</strong>. Si $x_0\in C$, alors $V = C-x_0$ est un <strong>sous-espace</strong> indépendant du choix de $x_0$, et l'on pose $\dim C := \dim V$.</p>
+<p><strong>Ensemble convexe.</strong> $C$ est convexe si le <strong>segment</strong> entre deux points de $C$ est dans $C$. Image de Boyd : <em>un ensemble est convexe si tout point y voit tout autre point, le long d'un chemin droit non obstrué</em>. Tout affine est convexe.</p>
+<p><strong>Cône.</strong> $C$ est un <strong>cône</strong> si $x\in C$ et $\theta\geq0$ impliquent $\theta x\in C$ ; c'est un <strong>cône convexe</strong> s'il est de plus convexe, c'est-à-dire si
+$$x_1,x_2\in C,\ \theta_1,\theta_2\geq0 \ \Longrightarrow\ \theta_1x_1+\theta_2x_2\in C$$
+Géométriquement, ces points forment la <strong>part de tarte</strong> de sommet $0$ et de bords passant par $x_1$ et $x_2$ (figure 2.4).</p>
+<p><strong>Généralisation aux sommes infinies.</strong> Si $\theta_i\geq0$ avec $\sum_{i=1}^\infty\theta_i=1$ et $x_i\in C$ convexe, alors $\sum_i\theta_ix_i\in C$ (si la série converge). Plus généralement, si $p\geq0$ sur $C$ avec $\int_Cp(x)\,dx=1$, alors $\int_Cp(x)x\,dx\in C$. <strong>Forme la plus générale :</strong> si $x$ est un vecteur aléatoire à valeurs dans $C$ convexe avec probabilité $1$, alors $\mathbb{E}x\in C$.</p>
+<blockquote>
+<p><strong>La conséquence à retenir.</strong> L'espérance d'une variable aléatoire à valeurs dans un convexe reste dans le convexe. C'est ce fait qui fait le lien avec l'inégalité de Jensen (fiche 35) et avec toute la théorie des moyennes.</p>
+</blockquote>
+<p><strong>Dimension affine et intérieur relatif.</strong> La dimension affine de $C$ est celle de $\mathbf{aff}\,C$. Attention : le cercle unité de $\mathbb{R}^2$ a pour enveloppe affine tout $\mathbb{R}^2$, donc une dimension affine de <strong>deux</strong>, alors que la plupart des définitions lui donnent la dimension un. L'<strong>intérieur relatif</strong> est l'intérieur pris dans $\mathbf{aff}\,C$ :
+$$\mathbf{relint}\,C = \{x\in C \mid B(x,r)\cap\mathbf{aff}\,C\subseteq C \ \text{pour un } r&gt;0\}$$</p>
+<p><em>Exemple 2.2.</em> Le carré $C = \{x\in\mathbb{R}^3 \mid |x_1|\leq1,\ |x_2|\leq1,\ x_3=0\}$ a un intérieur <strong>vide</strong> dans $\mathbb{R}^3$, mais son intérieur relatif est le carré ouvert dans le plan $x_3=0$.</p>
+<p class="cal piege"> Confondre intérieur et intérieur relatif est l'erreur classique dès qu'un ensemble est plat (contenu dans un hyperplan). En optimisation, la condition de Slater (fiche 37) s'énonce sur l'intérieur <strong>relatif</strong> précisément pour cette raison.</p>
+<h2 data-prio="high">Concept 2 — Le catalogue (§2.2)</h2>
+<p><strong>Les cas triviaux.</strong> $\emptyset$, un singleton $\{x_0\}$ et $\mathbb{R}^n$ tout entier sont affines donc convexes. Toute <strong>droite</strong> est affine (et un sous-espace si elle passe par $0$). Un <strong>segment</strong> est convexe mais pas affine. Un <strong>rayon</strong> $\{x_0+\theta v\mid\theta\geq0\}$, $v\neq0$, est convexe, et c'est un cône si $x_0=0$. Tout <strong>sous-espace</strong> est affine et un cône convexe.</p>
+<h3>Hyperplans et demi-espaces</h3>
+<p>$$\text{hyperplan}: \{x\mid a^Tx = b\}, \qquad \text{demi-espace}: \{x\mid a^Tx\leq b\}, \qquad a\neq0$$
+En posant $x_0$ un point de l'hyperplan ($a^Tx_0=b$) :
+$$\{x\mid a^T(x-x_0)=0\} = x_0 + a^\perp, \qquad a^\perp = \{v\mid a^Tv=0\}$$
+Un hyperplan est donc « un décalage $x_0$ plus tous les vecteurs orthogonaux à la normale $a$ ». Le demi-espace s'écrit $\{x\mid a^T(x-x_0)\leq0\}$ : c'est $x_0$ plus tout vecteur faisant un angle <strong>obtus</strong> avec $a$. Les hyperplans sont affines et convexes ; les demi-espaces sont convexes mais <strong>pas affines</strong>.</p>
+<h3>Boules et ellipsoïdes</h3>
+<p>$$B(x_c,r) = \{x \mid \|x-x_c\|_2\leq r\} = \{x_c+ru \mid \|u\|_2\leq1\}$$
+$$\mathcal{E} = \{x\mid (x-x_c)^TP^{-1}(x-x_c)\leq1\}, \qquad P = P^T\succ0$$
+Les longueurs des demi-axes de $\mathcal{E}$ sont les $\sqrt{\lambda_i}$, où les $\lambda_i$ sont les <strong>valeurs propres</strong> de $P$ ; une boule est l'ellipsoïde avec $P = r^2I$. Autre représentation :
+$$\mathcal{E} = \{x_c+Au \mid \|u\|_2\leq1\}, \qquad A \text{ carrée inversible}$$
+(on peut supposer $A$ symétrique définie positive en prenant $A = P^{1/2}$). Si $A$ est semi-définie positive <strong>singulière</strong>, on parle d'ellipsoïde <strong>dégénéré</strong> : sa dimension affine vaut $\mathbf{rank}(A)$, et il reste convexe.</p>
+<p><em>La preuve de convexité de la boule</em>, que Boyd déroule, n'utilise que l'homogénéité et l'inégalité triangulaire :
+$$\|\theta x_1+(1-\theta)x_2-x_c\|_2 \leq \theta\|x_1-x_c\|_2 + (1-\theta)\|x_2-x_c\|_2 \leq r$$</p>
+<h3>Boules de norme et cônes de norme</h3>
+<p>Pour <strong>toute</strong> norme $\|\cdot\|$, la boule $\{x\mid\|x-x_c\|\leq r\}$ est convexe, et le <strong>cône de norme</strong>
+$$C = \{(x,t)\in\mathbb{R}^{n+1} \mid \|x\|\leq t\}$$
+est un cône convexe. <em>Exemple 2.3 :</em> le <strong>cône du second ordre</strong> est le cône de norme de la norme euclidienne,
+$$C = \{(x,t)\in\mathbb{R}^{n+1}\mid \|x\|_2\leq t\}$$
+également appelé cône <strong>quadratique</strong>, cône de <strong>Lorentz</strong> ou cône <strong>glace</strong> (<em>ice-cream cone</em>).</p>
+<h3>Polyèdres et simplexes</h3>
+<p>$$P = \{x \mid a_j^Tx\leq b_j,\ j=1,\dots,m,\quad c_j^Tx = d_j,\ j=1,\dots,p\} = \{x\mid Ax\preceq b,\ Cx=d\}$$
+Un polyèdre est l'intersection d'un nombre <strong>fini</strong> de demi-espaces et d'hyperplans ; les affines, rayons, segments et demi-espaces en sont. Un polyèdre borné s'appelle parfois <strong>polytope</strong> — mais Boyd prévient que certains auteurs utilisent la convention inverse.</p>
+<p><em>Exemple 2.4 :</em> l'<strong>orthant positif</strong> $\mathbb{R}^n_+ = \{x\mid x\succeq0\}$ est un polyèdre <strong>et</strong> un cône : un <strong>cône polyédral</strong>.</p>
+<p><strong>Simplexes.</strong> Si $v_0,\dots,v_k$ sont <strong>affinement indépendants</strong> ($v_1-v_0,\dots,v_k-v_0$ libres), le simplexe qu'ils déterminent est
+$$C = \mathbf{conv}\{v_0,\dots,v_k\} = \{\theta_0v_0+\dots+\theta_kv_k \mid \theta\succeq0,\ \mathbf1^T\theta=1\}$$
+de dimension affine $k$. <em>Exemple 2.5 :</em> un simplexe de dimension 1 est un segment, de dimension 2 un triangle plein, de dimension 3 un tétraèdre. Le <strong>simplexe unité</strong> est $\{x\mid x\succeq0,\ \mathbf1^Tx\leq1\}$ ; le <strong>simplexe de probabilité</strong> est $\{x\mid x\succeq0,\ \mathbf1^Tx=1\}$ — ses éléments sont les distributions de probabilité sur $n$ éléments.</p>
+<blockquote>
+<p><strong>La représentation compte (fait souligné par Boyd).</strong> La boule unité de la norme infinie, $C = \{x\mid |x_i|\leq1\}$, se décrit avec <strong>$2n$</strong> inégalités $\pm e_i^Tx\leq1$ ; sa description par enveloppe convexe demande <strong>$2^n$</strong> points (tous les vecteurs de $\pm1$). Pour $n=30$, c'est 60 contre plus d'un milliard. Le choix de la représentation a des conséquences pratiques majeures.</p>
+</blockquote>
+<h3>Le cône semi-défini positif</h3>
+<p>$$\mathbf{S}^n = \{X\in\mathbb{R}^{n\times n}\mid X = X^T\}, \qquad \mathbf{S}^n_+ = \{X\in\mathbf{S}^n\mid X\succeq0\}, \qquad \mathbf{S}^n_{++} = \{X\in\mathbf{S}^n\mid X\succ0\}$$
+$\mathbf{S}^n$ est un espace vectoriel de dimension $n(n+1)/2$. <strong>$\mathbf{S}^n_+$ est un cône convexe</strong> : si $\theta_1,\theta_2\geq0$ et $A,B\succeq0$, alors pour tout $x$,
+$$x^T(\theta_1A+\theta_2B)x = \theta_1x^TAx + \theta_2x^TBx \geq 0$$
+<em>Exemple 2.6 :</em> dans $\mathbf{S}^2$, $\begin{pmatrix}x &amp; y\\ y&amp; z\end{pmatrix}\succeq0 \iff x\geq0,\ z\geq0,\ xz\geq y^2$.</p>
+<h2 data-prio="must">Concept 3 — Le calcul de convexité (§2.3)</h2>
+<p>C'est <strong>la</strong> section utile : elle permet d'établir la convexité <strong>sans jamais revenir à la définition</strong>.</p>
+<h3>Intersection</h3>
+<p>Si $S_1$ et $S_2$ sont convexes, $S_1\cap S_2$ l'est ; et cela vaut pour une intersection <strong>quelconque</strong>, même infinie. Un polyèdre est convexe pour cette seule raison.</p>
+<p><em>Exemple 2.7 :</em> $\mathbf{S}^n_+ = \bigcap_{z\neq0}\{X\in\mathbf{S}^n\mid z^TXz\geq0\}$ — une intersection d'une <strong>infinité de demi-espaces</strong> de $\mathbf{S}^n$, donc convexe.</p>
+<p><em>Exemple 2.8 :</em> $S = \{x\in\mathbb{R}^m \mid |p(t)|\leq1 \text{ pour } |t|\leq\pi/3\}$ avec $p(t)=\sum_kx_k\cos kt$ est l'intersection d'une infinité de <strong>tranches</strong> $S_t = \{x\mid -1\leq(\cos t,\dots,\cos mt)^Tx\leq1\}$.</p>
+<blockquote>
+<p><strong>La réciproque (§2.5.1).</strong> Tout convexe <strong>fermé</strong> est l'intersection de <strong>tous</strong> les demi-espaces qui le contiennent. Description externe et interne se rejoignent.</p>
+</blockquote>
+<h3>Fonctions affines</h3>
+<p>Si $f(x)=Ax+b$ et $S$ est convexe, alors l'<strong>image</strong> $f(S)$ et l'<strong>image réciproque</strong> $f^{-1}(S)$ sont convexes. Cas particuliers : mise à l'échelle $\alpha S$, translation $S+a$, <strong>projection</strong> sur une partie des coordonnées, <strong>somme</strong> $S_1+S_2$, <strong>produit cartésien</strong> $S_1\times S_2$, sommes partielles.</p>
+<table>
+<thead>
+<tr>
+<th>Exemple</th>
+<th>Ce qu'on montre</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>2.9</strong> Polyèdre</td>
+<td>$\{x\mid Ax\preceq b,\ Cx=d\}$ est l'image réciproque de $\mathbb{R}^m_+\times\{0\}$ par $f(x) = (b-Ax,\ d-Cx)$</td>
+</tr>
+<tr>
+<td><strong>2.10</strong> Inégalité matricielle linéaire (LMI)</td>
+<td>$\{x\mid A(x)\preceq B\}$ avec $A(x)=x_1A_1+\dots+x_nA_n$ est l'image réciproque de $\mathbf{S}^m_+$ par $f(x) = B-A(x)$</td>
+</tr>
+<tr>
+<td><strong>2.11</strong> Cône hyperbolique</td>
+<td>$\{x\mid x^TPx\leq(c^Tx)^2,\ c^Tx\geq0\}$ est l'image réciproque du cône du second ordre par $f(x) = (P^{1/2}x,\ c^Tx)$</td>
+</tr>
+<tr>
+<td><strong>2.12</strong> Ellipsoïde</td>
+<td>image de la boule unité par $f(u) = P^{1/2}u+x_c$</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>La LMI est le motif à retenir.</strong> Une contrainte $A(x)\preceq B$, affine en $x$ à valeurs matricielles, définit toujours un <strong>convexe</strong> — c'est la brique de toute la programmation semi-définie.</p>
+</blockquote>
+<h3>Perspective et fonctions linéaires-fractionnaires</h3>
+<p><strong>Fonction perspective</strong> $P:\mathbb{R}^{n+1}\to\mathbb{R}^n$, de domaine $\mathbb{R}^n\times\mathbb{R}_{++}$ :
+$$P(z,t) = z/t$$
+Elle normalise le vecteur pour que la dernière composante vaille $1$, puis la supprime. <strong>Interprétation (remarque 2.1) : c'est une caméra à sténopé.</strong> Un objet en $x$ au-dessus du plan opaque $x_3=0$ percé à l'origine forme son image en $-P(x)$ sur le plan $x_3=-1$.</p>
+<p>Si $C\subseteq\mathbf{dom}\,P$ est convexe, $P(C)$ l'est ; et si $C$ est convexe, $P^{-1}(C) = \{(x,t)\mid x/t\in C,\ t&gt;0\}$ l'est aussi. <em>Un objet convexe, vu par une caméra à sténopé, donne une image convexe.</em></p>
+<p><strong>La clé de la preuve.</strong> Les segments sont envoyés sur des segments :
+$$P\big(\theta x+(1-\theta)y\big) = \mu P(x)+(1-\mu)P(y), \qquad \mu = \frac{\theta x_{n+1}}{\theta x_{n+1}+(1-\theta)y_{n+1}}\in[0,1]$$
+et la correspondance $\theta\mapsto\mu$ est <strong>monotone</strong> : quand $\theta$ balaye $[0,1]$, $\mu$ aussi.</p>
+<p><strong>Fonction linéaire-fractionnaire</strong> : composée de la perspective avec une affine,
+$$f(x) = \frac{Ax+b}{c^Tx+d}, \qquad \mathbf{dom}\,f = \{x\mid c^Tx+d&gt;0\}$$
+Si $c=0$ et $d&gt;0$, $f$ est affine : les fonctions affines et linéaires sont des cas particuliers. Images et images réciproques de convexes par $f$ sont convexes.</p>
+<h2 data-prio="high">Concept 4 — Inégalités généralisées (§2.4)</h2>
+<p><strong>Cône propre.</strong> $K\subseteq\mathbb{R}^n$ est un <strong>cône propre</strong> s'il est <strong>convexe</strong>, <strong>fermé</strong>, <strong>plein</strong> (<em>solid</em> : d'intérieur non vide) et <strong>pointu</strong> (<em>pointed</em> : il ne contient aucune droite, c'est-à-dire $x\in K$ et $-x\in K$ entraînent $x=0$).</p>
+<p>Un cône propre définit une <strong>inégalité généralisée</strong>, c'est-à-dire un ordre <strong>partiel</strong> :
+$$x\preceq_K y \iff y-x\in K, \qquad x\prec_K y \iff y-x\in\mathbf{int}\,K$$</p>
+<table>
+<thead>
+<tr>
+<th>Cône</th>
+<th>Inégalité obtenue</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$K=\mathbb{R}^n_+$</td>
+<td>inégalité <strong>composante par composante</strong> : $x\preceq y \iff x_i\leq y_i\ \forall i$</td>
+</tr>
+<tr>
+<td>$K=\mathbf{S}^n_+$</td>
+<td>inégalité <strong>matricielle</strong> : $X\preceq Y \iff Y-X$ semi-définie positive</td>
+</tr>
+<tr>
+<td>$K$ = polynômes $\geq0$ sur $[0,1]$ (exemple 2.16)</td>
+<td>$c\preceq_K d \iff \sum_ic_it^{i-1}\leq\sum_id_it^{i-1}$ pour tout $t\in[0,1]$</td>
+</tr>
+</tbody></table>
+<p><strong>Propriétés conservées</strong> : $\preceq_K$ est préservée par addition, par multiplication par un scalaire $\geq0$, par passage à la limite ; elle est transitive, réflexive et <strong>antisymétrique</strong>.</p>
+<p class="cal piege"> <strong>Ce qui est perdu.</strong> L'ordre $\leq$ sur $\mathbb{R}$ est <strong>total</strong> : deux points sont toujours comparables. Une inégalité généralisée ne l'est <strong>pas</strong> — d'où la distinction suivante, qui n'existe pas sur $\mathbb{R}$.</p>
+<p><strong>Élément minimum et élément minimal.</strong></p>
+<ul>
+<li>$x\in S$ est <strong>l'élément minimum</strong> si $x\preceq_K y$ pour <strong>tout</strong> $y\in S$. De façon équivalente : $S\subseteq x+K$. S'il existe, il est <strong>unique</strong>.</li>
+<li>$x\in S$ est <strong>un élément minimal</strong> si ($y\in S$ et $y\preceq_K x$) implique $y=x$. De façon équivalente : $(x-K)\cap S = \{x\}$. Un ensemble peut en avoir <strong>beaucoup</strong>.</li>
+</ul>
+<p><em>Exemple 2.17, dans $\mathbb{R}^2_+$.</em> « $x$ est le minimum » signifie que tous les autres points de $S$ sont <strong>en haut à droite</strong> de $x$. « $x$ est minimal » signifie qu'aucun point de $S$ n'est <strong>en bas à gauche</strong> de $x$.</p>
+<p><em>Exemple 2.18.</em> $S = \{P\in\mathbf{S}^n_{++} \mid v_i^TP^{-1}v_i\leq1\}$ est l'ensemble des ellipsoïdes centrés contenant les points $v_1,\dots,v_k$. Il <strong>n'a pas</strong> d'élément minimum : pour tout ellipsoïde contenant les points on en trouve un autre qui les contient et qui ne lui est pas comparable. Un ellipsoïde est <strong>minimal</strong> s'il contient les points et qu'aucun ellipsoïde plus petit ne le fait.</p>
+<div class="cal intu"><span class="lab">Pourquoi c'est important.</span>
+<p> L'optimisation <strong>vectorielle</strong> (plusieurs objectifs) repose entièrement sur cette distinction : on cherche rarement un minimum (il n'existe presque jamais), on cherche les points <strong>minimaux</strong> — le front de Pareto.</p>
+</div>
+<h2 data-prio="must">Concept 5 — Hyperplans séparateurs et d'appui (§2.5)</h2>
+<p><strong>Théorème de l'hyperplan séparateur.</strong> Si $C$ et $D$ sont convexes, non vides et <strong>disjoints</strong>, il existe $a\neq0$ et $b$ tels que
+$$a^Tx\leq b \ \ \forall x\in C, \qquad a^Tx\geq b \ \ \forall x\in D$$
+La fonction affine $a^Tx-b$ est donc négative ou nulle sur $C$ et positive ou nulle sur $D$.</p>
+<p><strong>Preuve (cas où la distance est atteinte, celle de Boyd).</strong> Supposons $\mathrm{dist}(C,D)&gt;0$ atteinte en $c\in C$ et $d\in D$. Posons
+$$a = d-c, \qquad b = \frac{\|d\|_2^2-\|c\|_2^2}{2}$$
+de sorte que $f(x) = a^Tx-b = (d-c)^T\big(x-\tfrac12(d+c)\big)$. L'hyperplan est <strong>perpendiculaire</strong> au segment $[c,d]$ et passe par son <strong>milieu</strong>. Si $f$ était strictement négative en un $u\in D$, on aurait $(d-c)^T(u-d)&lt;0$, donc
+$$\frac{d}{dt}\Big\|d+t(u-d)-c\Big\|_2^2\Big|_{t=0} = 2(d-c)^T(u-d)&lt;0$$
+et pour $t&gt;0$ petit le point $d+t(u-d)$ — qui est dans $D$ par convexité — serait <strong>plus proche de $c$</strong> que $d$, contredisant la minimalité. $\blacksquare$</p>
+<p><strong>Séparation stricte.</strong> L'hyperplan construit ci-dessus vérifie en fait $a^Tx&lt;b$ sur $C$ et $a^Tx&gt;b$ sur $D$. En général, deux convexes disjoints ne sont <strong>pas</strong> strictement séparables, même fermés. <em>Exemple 2.20 :</em> mais un <strong>point $x_0\notin C$</strong> et un convexe <strong>fermé</strong> $C$ le sont toujours.</p>
+<p><strong>Conséquence majeure.</strong> Un convexe fermé est <strong>l'intersection de tous les demi-espaces qui le contiennent</strong>. (Sinon un point extérieur serait strictement séparable, donc exclu par l'un de ces demi-espaces.)</p>
+<p><strong>Réciproque partielle.</strong> La réciproque est fausse en général (prendre $C=D=\{0\}$). Mais : <em>deux convexes dont l'un au moins est ouvert sont disjoints si et seulement s'il existe un hyperplan séparateur.</em></p>
+<p><strong>Hyperplan d'appui.</strong> Si $x_0\in\mathbf{bd}\,C$ et si $a\neq0$ vérifie $a^Tx\leq a^Tx_0$ pour tout $x\in C$, l'hyperplan $\{x\mid a^Tx = a^Tx_0\}$ est un <strong>hyperplan d'appui</strong> de $C$ en $x_0$ : il est tangent à $C$ en $x_0$, et le demi-espace $\{x\mid a^Tx\leq a^Tx_0\}$ contient $C$.</p>
+<p><strong>Théorème de l'hyperplan d'appui.</strong> Pour tout convexe <strong>non vide</strong> $C$ et tout $x_0\in\mathbf{bd}\,C$, il existe un hyperplan d'appui à $C$ en $x_0$.</p>
+<h2 data-prio="high">Concept 6 — Cônes duaux (§2.6)</h2>
+<p><strong>Définition.</strong> Pour un cône $K$,
+$$K^\star = \{y \mid x^Ty\geq0 \ \text{ pour tout } x\in K\}$$
+$K^\star$ est un cône, et il est <strong>toujours convexe</strong>, même si $K$ ne l'est pas. Géométriquement, $y\in K^\star$ si et seulement si $-y$ est la normale d'un hyperplan qui <strong>appuie $K$ à l'origine</strong>.</p>
+<p><strong>Exemples fondamentaux.</strong></p>
+<table>
+<thead>
+<tr>
+<th>$K$</th>
+<th>$K^\star$</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$\mathbb{R}^n_+$</td>
+<td>$\mathbb{R}^n_+$ — <strong>auto-dual</strong></td>
+</tr>
+<tr>
+<td>$\mathbf{S}^n_+$</td>
+<td>$\mathbf{S}^n_+$ — <strong>auto-dual</strong> (avec le produit $\mathbf{tr}(YX)$)</td>
+</tr>
+<tr>
+<td>cône de norme $\{(x,t)\mid\|x\|\leq t\}$</td>
+<td>cône de la <strong>norme duale</strong> $\{(u,v)\mid\|u\|_\star\leq v\}$</td>
+</tr>
+<tr>
+<td>un sous-espace $V$</td>
+<td>$V^\perp$</td>
+</tr>
+</tbody></table>
+<p><em>Preuve de l'auto-dualité de $\mathbf{S}^n_+$ (celle de Boyd).</em> Pour $X,Y\succeq0$, en décomposant $X = \sum_i\lambda_iq_iq_i^T$ avec $\lambda_i\geq0$ :
+$$\mathbf{tr}(YX) = \mathbf{tr}\Big(Y\sum_i\lambda_iq_iq_i^T\Big) = \sum_i\lambda_i\,q_i^TYq_i \geq 0$$</p>
+<p><strong>Propriétés des cônes duaux.</strong> $K^\star$ est <strong>fermé et convexe</strong> ; $K_1\subseteq K_2$ implique $K_2^\star\subseteq K_1^\star$ ; si $K$ est d'intérieur non vide, $K^\star$ est pointu ; si l'adhérence de $K$ est pointue, $K^\star$ est d'intérieur non vide ; et $K^{\star\star}$ est l'adhérence de l'enveloppe convexe de $K$. <strong>Donc si $K$ est un cône propre, $K^\star$ aussi, et $K^{\star\star}=K$.</strong></p>
+<p><strong>Inégalités généralisées duales.</strong> $\preceq_{K^\star}$ est le dual de $\preceq_K$, et
+$$x\preceq_K y \iff \lambda^Tx\leq\lambda^Ty \ \text{ pour tout } \lambda\succeq_{K^\star}0$$
+$$x\prec_K y \iff \lambda^Tx&lt;\lambda^Ty \ \text{ pour tout } \lambda\succeq_{K^\star}0,\ \lambda\neq0$$</p>
+<p><strong>Caractérisation duale des éléments minimum et minimaux.</strong></p>
+<ul>
+<li><em>Minimum</em> : $x$ est <strong>l'élément minimum</strong> de $S$ si et seulement si, <strong>pour tout</strong> $\lambda\succ_{K^\star}0$, $x$ est l'<strong>unique</strong> minimiseur de $\lambda^Tz$ sur $S$. (La convexité de $S$ n'est <strong>pas</strong> requise.)</li>
+<li><em>Minimal, sens facile</em> : si $\lambda\succ_{K^\star}0$ et si $x$ minimise $\lambda^Tz$ sur $S$, alors $x$ est <strong>minimal</strong>.</li>
+<li><em>Minimal, réciproque</em> : elle est <strong>fausse</strong> en général ; mais si $S$ est <strong>convexe</strong>, tout élément minimal $x$ minimise $\lambda^Tz$ sur $S$ pour un certain $\lambda\succeq_{K^\star}0$ <strong>non nul</strong> (démonstration par le théorème de séparation appliqué à $(x-K)\setminus\{x\}$ et $S$). On <strong>ne peut pas</strong> renforcer en $\lambda\succ_{K^\star}0$.</li>
+</ul>
+<blockquote>
+<p><strong>La lecture pratique.</strong> Scalariser un problème multi-objectif par une pondération $\lambda\succ0$ donne toujours un point <strong>Pareto-minimal</strong> ; mais on n'atteint <strong>tous</strong> les points minimaux par scalarisation que si le problème est <strong>convexe</strong> — et encore, certains ne s'obtiennent qu'avec un $\lambda$ ayant des composantes nulles.</p>
+</blockquote>
+<h3>Comment résoudre l'exercice type (protocole)</h3>
+<ol>
+<li><strong>Chercher d'abord dans le catalogue</strong> (§2.2) : est-ce un demi-espace, une boule, un ellipsoïde, un polyèdre, un cône de norme, le cône PSD ?</li>
+<li><strong>Sinon, décomposer</strong> : l'ensemble est-il une <strong>intersection</strong> de convexes ? une <strong>image</strong> ou une <strong>image réciproque</strong> par une fonction affine, une perspective, une linéaire-fractionnaire ?</li>
+<li><strong>N'utiliser la définition qu'en dernier recours</strong> — prendre $x_1,x_2$ dans l'ensemble, $\theta\in[0,1]$, et vérifier.</li>
+<li><strong>Pour prouver la non-convexité</strong>, exhiber <strong>deux points et un $\theta$</strong> : c'est toujours plus rapide qu'un argument général.</li>
+<li><strong>Pour un cône</strong>, vérifier séparément la stabilité par $\theta\geq0$ et la convexité.</li>
+<li><strong>Pour une contrainte matricielle</strong>, chercher la forme LMI $A(x)\preceq B$ avec $A$ affine.</li>
+</ol>
+<h3>Exercices progressifs</h3>
+<p><strong> Niveau 1</strong> — L'ensemble $\{x\in\mathbb{R}^2 \mid x_1x_2\geq1,\ x\succ0\}$ est-il convexe ?</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p><strong>Oui.</strong> Sur $x_1&gt;0$, la condition s'écrit $x_2\geq1/x_1$ : c'est l'<strong>épigraphe</strong> de $x_1\mapsto1/x_1$, convexe sur $\mathbb{R}_{++}$ (dérivée seconde $2/x_1^3&gt;0$). Un épigraphe de fonction convexe est convexe (fiche 35).
+<em>Attention :</em> sans la condition $x\succ0$, l'ensemble $\{x_1x_2\geq1\}$ a <strong>deux</strong> branches et n'est pas convexe.</p>
+</div></details>
+
+<p><strong> Niveau 2</strong> — Montrez que $\{x \mid \|x-a\|_2\leq\|x-b\|_2\}$ est un <strong>demi-espace</strong>.</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p>Élevons au carré (les deux membres sont positifs) :
+$$\|x\|_2^2-2a^Tx+\|a\|_2^2 \leq \|x\|_2^2-2b^Tx+\|b\|_2^2$$
+Les termes $\|x\|_2^2$ <strong>s'annulent</strong> — c'est tout l'intérêt du calcul — et il reste
+$$2(b-a)^Tx \leq \|b\|_2^2-\|a\|_2^2$$
+soit un demi-espace de normale $a' = 2(b-a)$, donc convexe. <em>Interprétation :</em> les points plus proches de $a$ que de $b$ forment le demi-espace délimité par la <strong>médiatrice</strong> du segment $[a,b]$.</p>
+</div></details>
+
+<p><strong> Niveau 3</strong> — Montrez que $\{X\in\mathbf{S}^n \mid \lambda_{\max}(X)\leq1\}$ est convexe, sans passer par la définition.</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p>$\lambda_{\max}(X)\leq1$ équivaut à $x^TXx\leq\|x\|_2^2$ pour tout $x$, c'est-à-dire à
+$$I - X \succeq 0$$
+C'est une <strong>LMI</strong> en $X$ (exemple 2.10) : l'ensemble est l'image réciproque du cône $\mathbf{S}^n_+$ par la fonction affine $X\mapsto I-X$, donc <strong>convexe</strong>.
+<em>Le réflexe :</em> traduire une condition spectrale en inégalité matricielle. On aurait aussi pu écrire l'ensemble comme l'intersection des demi-espaces $\{X\mid x^TXx\leq\|x\|_2^2\}$ pour $x$ parcourant $\mathbb{R}^n$ (exemple 2.7).</p>
+</div></details>
+
+<p><strong> Niveau 4 — type examen</strong> — Soit $K$ un cône propre. Démontrez que $x\preceq_K y$ si et seulement si $\lambda^Tx\leq\lambda^Ty$ pour tout $\lambda\succeq_{K^\star}0$.</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p><strong>($\Rightarrow$)</strong> Si $x\preceq_Ky$, alors $y-x\in K$. Par définition du cône dual, $\lambda^T(y-x)\geq0$ pour tout $\lambda\in K^\star$, c'est-à-dire $\lambda^Tx\leq\lambda^Ty$.</p>
+<p><strong>($\Leftarrow$)</strong> Supposons $\lambda^T(y-x)\geq0$ pour tout $\lambda\in K^\star$. Cela signifie exactement que $y-x$ appartient au <strong>bidual</strong> $K^{\star\star}$. Or $K$ est un cône propre, donc convexe et fermé, et $K^{\star\star}=K$. Donc $y-x\in K$, c'est-à-dire $x\preceq_Ky$. $\blacksquare$</p>
+<p><strong>Ce que l'exercice enseigne.</strong> Une inégalité vectorielle (difficile, partielle) se <strong>teste par une famille d'inégalités scalaires</strong> (faciles, totales), indexée par le cône dual. C'est le principe même de la dualité : remplacer un objet par la famille des formes linéaires qui le testent — on le retrouvera à la fiche 37 sous le nom de fonction duale de Lagrange.</p>
+</div></details>
+
+<h2 data-prio="must">Common mistakes</h2>
+<ol>
+<li><strong>Prouver la convexité par la définition</strong> alors que le calcul du §2.3 la donne en une ligne — c'est plus long et plus fragile.</li>
+<li><strong>Confondre affine et convexe</strong> — l'affine contient la <strong>droite</strong>, le convexe seulement le <strong>segment</strong>. Affine $\Rightarrow$ convexe, jamais l'inverse.</li>
+<li><strong>Oublier $\sum\theta_i=1$ ou $\theta_i\geq0$</strong> — l'une donne un cône, l'autre l'enveloppe affine ; les quatre types de combinaisons ne se mélangent pas.</li>
+<li><strong>Confondre intérieur et intérieur relatif</strong> — pour un ensemble plat, l'intérieur est vide et seul l'intérieur relatif a un sens.</li>
+<li><strong>Croire les éléments minimaux uniques</strong> — seul l'élément <strong>minimum</strong> l'est, et il n'existe presque jamais dès qu'on quitte $\mathbb{R}$.</li>
+<li><strong>Utiliser la perspective hors de son domaine</strong> — elle exige $t&gt;0$ strictement.</li>
+<li><strong>Croire que deux convexes disjoints sont toujours strictement séparables</strong> — c'est faux même pour des fermés ; il faut par exemple qu'un des deux soit compact.</li>
+<li><strong>Prendre $\lambda\succ0$ dans la réciproque des éléments minimaux</strong> — on n'obtient que $\lambda\succeq0$ non nul, et c'est indépassable.</li>
+</ol>
+<h2>Ultimate Review</h2>
+<ol>
+<li>Quatre combinaisons, une seule différence : les contraintes sur les $\theta_i$ — linéaire, affine ($\sum=1$), convexe ($\succeq0$, $\sum=1$), conique ($\succeq0$).</li>
+<li>Affine $=$ contient la droite ; convexe $=$ contient le segment ; cône convexe $=$ stable par combinaisons positives.</li>
+<li>$\mathbb{E}x\in C$ si $x\in C$ presque sûrement et $C$ convexe — la forme la plus générale de la combinaison convexe.</li>
+<li>Catalogue : hyperplans et demi-espaces, boules et ellipsoïdes ($P\succ0$, demi-axes $\sqrt{\lambda_i}$), boules et cônes de norme (second ordre), polyèdres et simplexes, $\mathbf{S}^n_+$.</li>
+<li><strong>Calcul de convexité</strong> : intersection (même infinie), fonctions affines (image et image réciproque), perspective $P(z,t)=z/t$, linéaire-fractionnaire.</li>
+<li>LMI $A(x)\preceq B$ : image réciproque de $\mathbf{S}^m_+$ par une affine — toujours convexe.</li>
+<li><strong>Cône propre</strong> : convexe, fermé, plein, pointu. Il induit $\preceq_K$, ordre <strong>partiel</strong>.</li>
+<li><strong>Minimum</strong> (unique, $S\subseteq x+K$) contre <strong>minimal</strong> ($({x-K})\cap S=\{x\}$, possiblement multiple).</li>
+<li><strong>Séparation</strong> : deux convexes disjoints admettent un hyperplan séparateur ; un convexe fermé est l'intersection des demi-espaces qui le contiennent ; <strong>hyperplan d'appui</strong> en tout point du bord.</li>
+<li><strong>Cône dual</strong> $K^\star=\{y\mid x^Ty\geq0\ \forall x\in K\}$ ; $\mathbb{R}^n_+$ et $\mathbf{S}^n_+$ sont <strong>auto-duaux</strong> ; $K^{\star\star}=K$ pour un cône propre.</li>
+</ol>
+<p><strong>Formulas to know</strong>
+$$\mathcal{E} = \{x\mid(x-x_c)^TP^{-1}(x-x_c)\leq1\} \qquad P(z,t)=z/t \qquad f(x)=\frac{Ax+b}{c^Tx+d}$$
+$$x\preceq_Ky\iff y-x\in K \qquad K^\star=\{y\mid x^Ty\geq0\ \forall x\in K\}$$</p>
+<p><strong>Methods to know</strong> : le protocole en 6 étapes ; la preuve de séparation par le segment de distance minimale ; la traduction d'une condition spectrale en LMI.</p>
+<div class="rec"><h2>Active Recall</h2><p><strong>Basic</strong> — Donnez les définitions d'ensemble affine, d'ensemble convexe et de cône convexe, en une phrase chacune.</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p><em>Affine</em> : contient la <strong>droite</strong> passant par deux quelconques de ses points. <em>Convexe</em> : contient le <strong>segment</strong> entre deux quelconques de ses points. <em>Cône convexe</em> : contient toutes les <strong>combinaisons positives</strong> $\theta_1x_1+\theta_2x_2$, $\theta_i\geq0$, de ses points.</p>
+</div></details><p><strong>Understanding</strong> — Pourquoi le calcul de convexité (§2.3) est-il plus utile que la définition ?</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p>Parce qu'il <strong>compose</strong> : une fois établi que le catalogue du §2.2 est convexe, tout ensemble obtenu par intersection, image ou image réciproque affine, perspective ou linéaire-fractionnaire l'est automatiquement. On prouve la convexité par <strong>construction</strong>, sans jamais manipuler $\theta x_1+(1-\theta)x_2$ — ce qui serait souvent très pénible (essayez sur le cône PSD).</p>
+</div></details><p><strong>Application</strong> — L'ensemble $\{(x,t)\mid \|x\|_1\leq t\}$ est-il convexe ? De quel type ?</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p>Oui : c'est le <strong>cône de norme</strong> associé à $\|\cdot\|_1$, donc un cône convexe. Son dual est le cône de la norme duale, ici $\|\cdot\|_\infty$ : $K^\star = \{(u,v)\mid\|u\|_\infty\leq v\}$.</p>
+</div></details><p><strong>Comparison</strong> — Élément minimum et élément minimal : définitions, unicité, et pourquoi la distinction n'existe pas sur $\mathbb{R}$.</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p><em>Minimum</em> : $x\preceq_Ky$ pour <strong>tout</strong> $y\in S$, soit $S\subseteq x+K$ ; <strong>unique</strong> s'il existe. <em>Minimal</em> : aucun $y\in S$ n'est strictement plus petit, soit $(x-K)\cap S=\{x\}$ ; il peut y en avoir <strong>beaucoup</strong>. Sur $\mathbb{R}$ avec $K=\mathbb{R}_+$, l'ordre est <strong>total</strong> : tout est comparable, et les deux notions coïncident. Dès que l'ordre est partiel, elles se séparent.</p>
+</div></details><p><strong>Exam-style</strong> — Énoncez le théorème de l'hyperplan séparateur et donnez sa construction dans le cas où la distance entre les deux convexes est atteinte.</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p><em>Énoncé.</em> Si $C$ et $D$ sont convexes non vides et disjoints, il existe $a\neq0$ et $b$ avec $a^Tx\leq b$ sur $C$ et $a^Tx\geq b$ sur $D$.</p>
+<p><em>Construction.</em> Soient $c\in C$ et $d\in D$ réalisant $\mathrm{dist}(C,D) = \|c-d\|_2&gt;0$. On pose $a=d-c$ et $b = (\|d\|_2^2-\|c\|_2^2)/2$, de sorte que
+$$f(x) = a^Tx-b = (d-c)^T\big(x-\tfrac12(d+c)\big)$$
+L'hyperplan $\{f=0\}$ est perpendiculaire au segment $[c,d]$ et passe par son milieu. Si $f$ était négative en un point $u\in D$, on montrerait que $d+t(u-d)\in D$ est plus proche de $c$ que $d$ pour $t&gt;0$ petit — contradiction.</p>
+</div></details></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h2>Flashcards</h2>
+<table>
+<thead>
+<tr>
+<th>Question</th>
+<th>Réponse</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Ensemble affine ?</td>
+<td>Contient la <strong>droite</strong> passant par deux de ses points</td>
+</tr>
+<tr>
+<td>Ensemble convexe ?</td>
+<td>Contient le <strong>segment</strong> entre deux de ses points</td>
+</tr>
+<tr>
+<td>Cône convexe ?</td>
+<td>Stable par combinaisons <strong>positives</strong> $\theta_1x_1+\theta_2x_2$, $\theta_i\geq0$</td>
+</tr>
+<tr>
+<td>Enveloppe convexe ?</td>
+<td>Ensemble des combinaisons convexes — le plus petit convexe contenant $C$</td>
+</tr>
+<tr>
+<td>Intérieur relatif ?</td>
+<td>Intérieur pris dans $\mathbf{aff}\,C$</td>
+</tr>
+<tr>
+<td>Ellipsoïde ?</td>
+<td>$\{x\mid(x-x_c)^TP^{-1}(x-x_c)\leq1\}$, $P\succ0$ ; demi-axes $\sqrt{\lambda_i}$</td>
+</tr>
+<tr>
+<td>Cône du second ordre ?</td>
+<td>$\{(x,t)\mid\|x\|_2\leq t\}$ — aussi dit de Lorentz ou « glace »</td>
+</tr>
+<tr>
+<td>Simplexe de probabilité ?</td>
+<td>$\{x\mid x\succeq0,\ \mathbf1^Tx=1\}$</td>
+</tr>
+<tr>
+<td>Le cône PSD est-il convexe ?</td>
+<td>Oui — intersection des demi-espaces $\{X\mid z^TXz\geq0\}$</td>
+</tr>
+<tr>
+<td>Opérations préservant la convexité ?</td>
+<td>Intersection, affine (image et image réciproque), perspective, linéaire-fractionnaire</td>
+</tr>
+<tr>
+<td>Fonction perspective ?</td>
+<td>$P(z,t)=z/t$, $t&gt;0$ — une caméra à sténopé</td>
+</tr>
+<tr>
+<td>LMI ?</td>
+<td>$A(x)=x_1A_1+\dots+x_nA_n\preceq B$ — ensemble solution convexe</td>
+</tr>
+<tr>
+<td>Cône propre ?</td>
+<td>Convexe, fermé, plein, pointu</td>
+</tr>
+<tr>
+<td>$x\preceq_K y$ ?</td>
+<td>$y-x\in K$</td>
+</tr>
+<tr>
+<td>Élément minimum vs minimal ?</td>
+<td>$S\subseteq x+K$ (unique) contre $(x-K)\cap S=\{x\}$ (multiple)</td>
+</tr>
+<tr>
+<td>Théorème de séparation ?</td>
+<td>Deux convexes disjoints admettent un hyperplan séparateur</td>
+</tr>
+<tr>
+<td>Un convexe fermé est ?</td>
+<td>L'intersection de <strong>tous</strong> les demi-espaces qui le contiennent</td>
+</tr>
+<tr>
+<td>Hyperplan d'appui ?</td>
+<td>En tout point du bord d'un convexe, il en existe un</td>
+</tr>
+<tr>
+<td>Cône dual ?</td>
+<td>$K^\star=\{y\mid x^Ty\geq0\ \forall x\in K\}$ — toujours convexe et fermé</td>
+</tr>
+<tr>
+<td>Cônes auto-duaux ?</td>
+<td>$\mathbb{R}^n_+$ et $\mathbf{S}^n_+$</td>
+</tr>
+</tbody></table>
+</main>
+
+
+
+
+</body></html>

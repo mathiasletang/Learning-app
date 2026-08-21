@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fiche 72 — Écarts-types et tests par GMM : méthode delta, Newey-West et test du khi-deux</title>
+<script>
+window.MathJax={tex:{inlineMath:[["$","$"]],displayMath:[["$$","$$"]],processEscapes:true},
+ options:{skipHtmlTags:["script","noscript","style","textarea","pre","code"]},
+ svg:{fontCache:"global"},
+ startup:{pageReady:()=>MathJax.startup.defaultPageReady().then(()=>{document.body.classList.add("ready")})}};
+setTimeout(function(){document.body.classList.add("ready")},2500);
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+/* ============================================================
+   MathiasLearn — feuille de style des fiches
+   Reprise intégrale des tokens de 00_PARCOURS/*.html
+   + blocs pédagogiques (callouts, méthode, essentiels, recall)
+   ============================================================ */
+:root{--bg:#faf9f7;--card:#fff;--ink:#1a1a1a;--muted:#6b6b6b;--line:#e5e2dd;--accent:#8b5e34;
+ --hl:#fdf8ef;--ok:#2d7d4f;--okbg:#f0f7f3;--warn:#b3402f;--warnbg:#fdf3f1;--blue:#2f5d8b;--bluebg:#f1f5fa}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+ font:17px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;padding:0 16px 100px}
+.nav{position:sticky;top:0;background:rgba(250,249,247,.96);backdrop-filter:blur(8px);
+ border-bottom:1px solid var(--line);margin:0 -16px 30px;padding:11px 16px;z-index:50;
+ display:flex;gap:6px;flex-wrap:wrap;font-size:13px}
+.nav a{color:var(--muted);text-decoration:none;padding:4px 9px;border-radius:5px;white-space:nowrap}
+.nav a:hover{background:var(--line);color:var(--ink)}
+.nav a.on{background:var(--accent);color:#fff}
+main{max-width:780px;margin:0 auto}
+h1{font-size:31px;letter-spacing:-.02em;margin:.4em 0 .5em;line-height:1.25}
+h2{font-size:23px;margin:2.2em 0 .7em;padding-bottom:.3em;border-bottom:1px solid var(--line)}
+h3{font-size:19px;margin:1.9em 0 .5em;color:var(--accent)}
+h4{font-size:17px;margin:1.5em 0 .4em}
+p{margin:.8em 0} a{color:var(--accent)} hr{border:0;border-top:1px solid var(--line);margin:2.6em 0}
+table{border-collapse:collapse;width:100%;margin:1.3em 0;font-size:15.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+th{background:#f3f0eb;font-weight:600}
+tr:nth-child(even) td{background:#fcfbfa}
+code{font-family:"SF Mono",Menlo,Consolas,monospace;font-size:.88em;background:#f2efea;padding:2px 6px;border-radius:4px;white-space:nowrap}
+pre{background:#f2efea;padding:14px 16px;border-radius:8px;overflow-x:auto}
+pre code{background:none;padding:0;white-space:pre}
+blockquote{border-left:3px solid var(--accent);background:var(--hl);margin:1.4em 0;padding:14px 20px;border-radius:0 8px 8px 0}
+blockquote p:first-child{margin-top:0} blockquote p:last-child{margin-bottom:0}
+ul,ol{padding-left:1.5em} li{margin:.35em 0} em{color:#4a4a4a}
+mjx-container[display="true"]{margin:1.1em 0!important;overflow-x:auto;overflow-y:hidden;padding:2px 0}
+mjx-container svg{max-width:100%}
+body:not(.ready) main{opacity:0} main{opacity:1;transition:opacity .25s}
+
+/* --- bandeau de tête de fiche --- */
+.cours{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--accent);
+ border-radius:0 10px 10px 0;padding:18px 22px;margin:0 0 34px}
+.cours h4{margin:0 0 4px;font-size:14px;text-transform:uppercase;letter-spacing:.07em;color:var(--accent)}
+.cours .cs{color:var(--muted);font-size:14.5px;margin:0 0 14px}
+
+/* --- exercices / corrigés --- */
+.ex{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:6px 24px 20px;margin:18px 0}
+.ex>h3:first-child{margin-top:14px}
+details.cor{margin-top:18px;border:1px solid var(--line);border-radius:8px;background:#fcfbfa;overflow:hidden}
+details.cor>summary{cursor:pointer;padding:12px 16px;font-weight:600;font-size:15px;color:var(--accent);
+ list-style:none;display:flex;align-items:center;gap:9px;user-select:none;transition:.15s;min-height:44px}
+details.cor>summary::-webkit-details-marker{display:none}
+details.cor>summary:hover{background:var(--hl)}
+details.cor>summary::before{content:"\25B6";font-size:10px;transition:transform .18s;display:inline-block}
+details.cor[open]>summary::before{transform:rotate(90deg)}
+details.cor[open]>summary{background:var(--okbg);color:var(--ok);border-bottom:1px solid var(--line)}
+.cor .in{padding:4px 20px 16px}
+.cor .in>*:first-child{margin-top:.9em}
+
+/* --- blocs pédagogiques (callouts) ---
+   Générés depuis une citation Markdown dont le premier **gras** commence
+   par un mot-clé : DÉFINITION, THÉORÈME, MÉTHODE, PIÈGE, INTUITION… */
+.cal{border:1px solid var(--line);border-left:4px solid var(--accent);background:var(--card);
+ border-radius:0 10px 10px 0;padding:15px 20px;margin:1.5em 0}
+.cal>p:first-child{margin-top:0}.cal>p:last-child,.cal>ul:last-child,.cal>ol:last-child{margin-bottom:0}
+.cal .lab{display:block;font-size:12.5px;text-transform:uppercase;letter-spacing:.08em;
+ font-weight:700;color:var(--accent);margin-bottom:6px}
+.cal.formel{background:var(--hl)}
+.cal.piege{border-left-color:var(--warn);background:var(--warnbg)}
+.cal.piege .lab{color:var(--warn)}
+.cal.methode{border-left-color:var(--ok);background:var(--okbg)}
+.cal.methode .lab{color:var(--ok)}
+.cal.intu{border-left-color:var(--blue);background:var(--bluebg)}
+.cal.intu .lab{color:var(--blue)}
+.cal.plus{border-left-style:dashed;background:#faf9f7}
+.cal.plus .lab{color:var(--muted)}
+
+/* --- révision express --- */
+.ess{background:var(--card);border:1px solid var(--accent);border-radius:10px;padding:4px 24px 20px;margin:1.6em 0}
+.ess h3{margin-top:1.3em}
+.rec{background:var(--card);border:1px dashed var(--accent);border-radius:10px;padding:4px 24px 18px;margin:1.6em 0}
+.rec ol{counter-reset:none}
+
+/* --- impression / PDF --- */
+@media print{
+ .nav{display:none}
+ body{padding:0;background:#fff;font-size:11.2pt;line-height:1.55}
+ main{max-width:none}
+ h1{font-size:23pt}h2{font-size:15pt;margin-top:1.5em}h3{font-size:12.6pt}
+ h2,h3,h4{break-after:avoid;page-break-after:avoid}
+ table,.cal,blockquote{break-inside:avoid;page-break-inside:avoid}
+ table{display:table;font-size:9.6pt}
+ details.cor{border:1px solid var(--line);background:#fcfbfa}
+ details.cor>summary{display:none}
+ details.cor .in{padding-top:10px}
+ .cal,.ex,.ess,.rec{box-shadow:none}
+ a{color:var(--ink);text-decoration:none}
+}
+@page{margin:16mm 15mm 18mm}
+
+/* --- exemples travaillés --- */
+.exm{background:#fcfbfa;border:1px solid var(--line);border-radius:10px;padding:2px 20px 14px;margin:1.5em 0}
+.exm>h4:first-child{margin:14px 0 .5em;color:var(--accent);font-size:13px;text-transform:uppercase;letter-spacing:.07em}
+
+
+/* --- pastilles de priorité (conventions des fiches de l'app) --- */
+h2[data-prio], h3[data-prio], h4[data-prio]{position:relative}
+h2[data-prio]::before,h3[data-prio]::before,h4[data-prio]::before{
+ content:"";display:inline-block;width:9px;height:9px;border-radius:50%;
+ margin-right:9px;vertical-align:middle;background:var(--muted)}
+[data-prio="must"]::before{background:var(--warn)}
+[data-prio="high"]::before{background:#d98324}
+[data-prio="mid"]::before{background:#c9a227}
+[data-prio="low"]::before{background:var(--ok)}
+/* corrigés des fiches de l'app : même traitement que les corrigés des séries */
+details.cor>summary::after{content:""}
+</style></head><body>
+<div class="nav"><a href="00_COMMENCER_ICI.html">Commencer ici</a><a href="01_NOTATIONS_le-decodeur.html">Notations</a><a href="02_EXERCICES_Serie-0.html">Série 0 — Remise en route</a><a href="03_EXERCICES_Serie-1.html">Série 1 — Convexité</a><a href="04_EXERCICES_Serie-2.html">Série 2 — KKT</a><a href="05_AUTO-EVALUATION.html">Auto-évaluation (quiz)</a><a href="06_FICHE_Optimisation-deux-variables.html">Fiche — Optimisation à 2 variables</a></div>
+<main><h1>Fiche 72 — Écarts-types et tests par GMM : méthode delta, Newey-West et test du khi-deux</h1>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Matière</strong></td>
+<td>Maths · Économétrie</td>
+</tr>
+<tr>
+<td><strong>Cours source</strong></td>
+<td>Kogan, <em>15.450 Analytics of Finance</em>, MIT Sloan / OpenCourseWare, automne 2010 — cours 8 « Standard Errors and Tests »</td>
+</tr>
+<tr>
+<td><strong>Difficulté</strong></td>
+<td> Must know — sans écarts-types corrects, aucune conclusion n'est valide</td>
+</tr>
+<tr>
+<td><strong>Temps d'étude estimé</strong></td>
+<td>2 h 30</td>
+</tr>
+<tr>
+<td><strong>Prérequis</strong></td>
+<td>Fiche 71 (GMM, QMLE), fiche 65 (tests, $\chi^2$), fiche 50 (MCO, hétéroscédasticité)</td>
+</tr>
+<tr>
+<td><strong>Concepts clés</strong></td>
+<td>Méthode delta, ratio de Sharpe, matrice $d$ et matrice $S$, variance asymptotique du GMM, MCO comme GMM, écarts-types robustes, autocorrélation des moments, estimateur de Newey-West, fenêtre $k$, prévisibilité à long horizon, moindres carrés non linéaires, taille d'un test, test du khi-deux</td>
+</tr>
+<tr>
+<td><strong>Poids à l'examen</strong></td>
+<td>Trois choses : la <strong>méthode delta</strong> et son application au ratio de Sharpe ; la formule $T\,\mathrm{Var}[\hat\theta]=(\hat d^\top\hat S^{-1}\hat d)^{-1}$ ; et l'<strong>estimateur de Newey-West</strong> avec le rôle de $k$.</td>
+</tr>
+</tbody></table>
+<h2>Vue d'ensemble</h2>
+<pre><code>ESTIMER θ̂          ← fiche 71 (MLE, QMLE, GMM)
+CALCULER SES ÉCARTS-TYPES   ← cette fiche
+   GMM :   T·Var[θ̂] = (d̂ᵀ Ŝ⁻¹ d̂)⁻¹
+   f corrélés dans le temps ?  → NEWEY-WEST
+FONCTION DE θ̂ ?    → MÉTHODE DELTA :  Var[h(θ̂)] = A Ω Aᵀ
+TESTER              → ξ = h(θ̂)ᵀ V̂⁻¹ h(θ̂) ~ χ²(dim h)
+</code></pre>
+<blockquote>
+<p><strong>Le message central du cours, énoncé dans sa discussion sur la régression.</strong> <em>Les MCO classiques reposent sur des hypothèses <strong>très restrictives</strong>. En pratique, les variables explicatives sont stochastiques et <strong>non décorrélées des résidus retardés</strong>. Le GMM fournit un cadre puissant : <strong>les MCO restent valides tant que les conditions de moment le sont</strong>. Il est <strong>essentiel de traiter les écarts-types correctement</strong> — le GMM offre une recette générale.</em></p>
+</blockquote>
+<h2 data-prio="mid">Concept 1 — Notations et rappels</h2>
+<p><strong>Notations vectorielles.</strong> $\theta$ est toujours un vecteur <strong>colonne</strong>, $\theta^\top=(\theta_1\ \dots\ \theta_N)$. Pour une fonction scalaire régulière $h(\theta)$ :
+$$\frac{\partial h(\theta)}{\partial\theta}=\begin{pmatrix}\frac{\partial h}{\partial\theta_1}\\\vdots\\\frac{\partial h}{\partial\theta_N}\end{pmatrix}, \qquad \frac{\partial h(\theta)}{\partial\theta^\top}\equiv\left(\frac{\partial h}{\partial\theta_1}\ \cdots\ \frac{\partial h}{\partial\theta_N}\right)$$
+Et pour un vecteur de fonctions $h(\theta)=(h_1(\theta),\dots,h_M(\theta))^\top$, la <strong>jacobienne</strong>
+$$\frac{\partial h(\theta)}{\partial\theta^\top}=\begin{pmatrix}\frac{\partial h_1}{\partial\theta_1}&amp;\cdots&amp;\frac{\partial h_1}{\partial\theta_N}\\ \vdots&amp;\ddots&amp;\vdots\\ \frac{\partial h_M}{\partial\theta_1}&amp;\cdots&amp;\frac{\partial h_M}{\partial\theta_N}\end{pmatrix}$$</p>
+<p><strong>Rappels sur la loi normale multivariée.</strong></p>
+<ul>
+<li><em>Les combinaisons linéaires de variables normales sont normales</em> : $x\sim N(0,\Omega)\Rightarrow Ax\sim N(0,A\Omega A^\top)$.</li>
+<li><em>La somme des carrés de $n$ variables $N(0,1)$ indépendantes suit une loi $\chi^2$ à $n$ degrés de liberté</em> : $\varepsilon\sim N(0,I)\Rightarrow\varepsilon^\top\varepsilon\sim\chi^2(\dim\varepsilon)$.</li>
+<li><em>Forme quadratique d'un vecteur normal</em> : $x\sim N(0,\Omega)\Rightarrow x^\top\Omega^{-1}x\sim\chi^2(\dim x)$.</li>
+<li>Densité : $\phi(x)=\big((2\pi)^N\lvert\Omega\rvert\big)^{-1/2}e^{-\frac12(x-\mu)^\top\Omega^{-1}(x-\mu)}$.</li>
+</ul>
+<blockquote>
+<p><strong>Ces trois faits sont exactement les briques dont on aura besoin.</strong> Le premier justifie la méthode delta ; le troisième produit toutes les statistiques de test du concept 9.</p>
+</blockquote>
+<h2 data-prio="must">Concept 2 — La méthode delta</h2>
+<blockquote>
+<p><strong>Le problème.</strong> <em>Étant donné l'estimateur $\hat\theta$, on veut la loi asymptotique du vecteur de fonctions régulières $h(\hat\theta)$.</em></p>
+</blockquote>
+<p><strong>L'idée.</strong> <em>Localement, une fonction régulière est approximativement <strong>linéaire</strong></em> :
+$$h(\hat\theta)\approx h(\theta_0)+\left.\frac{\partial h(\theta)}{\partial\theta^\top}\right\vert_{\theta_0}\big(\hat\theta-\theta_0\big)$$</p>
+<p><strong>La conclusion.</strong> Si $\hat\theta-\theta_0\sim N(0,\Omega)$ avec $\Omega=\mathrm{Var}(\hat\theta)$ petite (proportionnelle à $1/T$), alors
+$$\boxed{\ h(\hat\theta)-h(\theta_0)\sim N\big(0,\ A\Omega A^\top\big), \qquad A=\left.\frac{\partial h(\theta)}{\partial\theta^\top}\right\vert_{\theta_0}\ }$$</p>
+<p><em>En pratique, on remplace $A$ et $\Omega$ par des estimations consistantes $\hat A=\left.\frac{\partial h(\theta)}{\partial\theta^\top}\right\vert_{\hat\theta}$ et $\hat\Omega$ :</em>
+$$h(\hat\theta)-h(\theta_0)\sim N\big(0,\ \hat A\hat\Omega\hat A^\top\big)$$</p>
+<blockquote>
+<p><strong>C'est le même énoncé qu'en fiches 65 et 67</strong> — $\Gamma=\nabla g^\top\Sigma\nabla g$ — avec la convention jacobienne. Le mécanisme est toujours le développement de Taylor au premier ordre : la variance se <strong>transporte par le gradient</strong>.</p>
+</blockquote>
+<h3>L'exemple du ratio de Sharpe</h3>
+<p>On estime la moyenne et l'écart-type des rendements excédentaires, $(\hat\mu,\hat\sigma)$, de matrice de variance-covariance asymptotique estimée $\hat\Omega$. Le ratio de Sharpe est
+$$\widehat{SR}=h(\hat\theta)\equiv\frac{\hat\mu}{\hat\sigma}$$</p>
+<p><strong>Le gradient.</strong>
+$$\hat A=\left.\frac{\partial h(\theta)}{\partial\theta^\top}\right\vert_{\hat\theta}=\left(\frac{1}{\hat\sigma}\quad -\frac{\hat\mu}{\hat\sigma^2}\right)$$</p>
+<p><strong>La variance.</strong>
+$$\mathrm{Var}\big(\widehat{SR}\big)=\left(\frac{1}{\hat\sigma}\quad-\frac{\hat\mu}{\hat\sigma^2}\right)\hat\Omega\begin{pmatrix}\frac{1}{\hat\sigma}\\[4pt]-\frac{\hat\mu}{\hat\sigma^2}\end{pmatrix}$$</p>
+<h2 data-prio="must">Concept 3 — Les écarts-types du GMM</h2>
+<blockquote>
+<p><em>Sous des conditions de régularité faibles, les estimations GMM sont <strong>consistantes</strong> : $\hat\theta\to\theta_0$ en probabilité quand $T\to\infty$.</em></p>
+</blockquote>
+<p><strong>Les deux matrices centrales.</strong>
+$$\hat d=\left.\frac{\partial\hat{\mathbb E}\big(f(x_t,\theta)\big)}{\partial\theta^\top}\right\vert_{\hat\theta}, \qquad \hat S=\hat{\mathbb E}\Big[f(x_t,\hat\theta)f(x_t,\hat\theta)^\top\Big]$$</p>
+<blockquote>
+<p><strong>Normalité asymptotique du GMM.</strong>
+$$\boxed{\ \sqrt T\big(\hat\theta-\theta_0\big)\ \Rightarrow\ N\Big(0,\ \big(\hat d^\top\hat S^{-1}\hat d\big)^{-1}\Big)\ }$$
+<em>Les écarts-types se lisent sur la matrice de variance-covariance asymptotique :</em>
+$$T\,\mathrm{Var}\big[\hat\theta\big]\approx\big(\hat d^\top\hat S^{-1}\hat d\big)^{-1}$$</p>
+</blockquote>
+<div class="cal methode"><span class="lab">Comment lire les deux matrices.</span>
+
+<ul>
+<li>$\hat d$ mesure la <strong>sensibilité des moments au paramètre</strong> : $\partial\mathbb E[f]/\partial\theta^\top$. Si les moments réagissent fortement à $\theta$, une petite erreur sur les moments cause une petite erreur sur $\theta$ — bonne identification.</li>
+<li>$\hat S$ mesure la <strong>variabilité des moments eux-mêmes</strong>. Plus les $f(x_t,\hat\theta)$ sont bruités, plus l'estimation est imprécise.</li>
+</ul>
+<p>La formule $(\hat d^\top\hat S^{-1}\hat d)^{-1}$ combine les deux exactement comme il faut : elle <strong>croît</strong> avec $S$ et <strong>décroît</strong> avec $d$.</p>
+<p><strong>Et la structure est celle de l'information de Fisher</strong> (fiche 64) : $\hat d^\top\hat S^{-1}\hat d$ joue le rôle de $I(\theta)$, et la variance est son inverse.</p>
+</div>
+<h3>L'exemple moyenne et écart-type</h3>
+<p>Avec $f_1(x_t,\theta)=x_t-\mu$ et $f_2(x_t,\theta)=(x_t-\mu)^2-\sigma^2$ :
+$$\hat d=\begin{pmatrix}-1&amp;0\\ -2\big(\hat{\mathbb E}(x_t)-\hat\mu\big)&amp;-2\hat\sigma\end{pmatrix}=\begin{pmatrix}-1&amp;0\\ 0&amp;-2\hat\sigma\end{pmatrix}$$
+(le terme hors diagonale s'annule <strong>par définition de $\hat\mu$</strong>), et
+$$\hat S=\hat{\mathbb E}\big[f(x_t,\hat\theta)f(x_t,\hat\theta)^\top\big]=\hat{\mathbb E}\begin{pmatrix}f_1^2&amp;f_1f_2\\ f_1f_2&amp;f_2^2\end{pmatrix}$$
+d'où $\hat\theta-\theta_0\sim N\big(0,\frac1T\hat V\big)$ avec $\hat V=\big(\hat d^\top\hat S^{-1}\hat d\big)^{-1}$.</p>
+<p><strong>Le cas gaussien.</strong> <em>Pour une loi gaussienne, $\mathbb E[(x-\mu_0)^3]=0$ et $\mathbb E[(x-\mu_0)^4]=3\sigma_0^4$.</em> Par la LGN,
+$$\mathrm{plim}\ \hat d=d\equiv\begin{pmatrix}-1&amp;0\\0&amp;-2\sigma_0\end{pmatrix}, \qquad \mathrm{plim}\ \hat S=S\equiv\begin{pmatrix}\sigma_0^2&amp;0\\0&amp;2\sigma_0^4\end{pmatrix}$$
+$$\mathrm{plim}\ \hat V=\big(d^\top S^{-1}d\big)^{-1}=\begin{pmatrix}\sigma_0^2&amp;0\\0&amp;\frac12\sigma_0^2\end{pmatrix}$$</p>
+<blockquote>
+<p><strong>Deux résultats classiques tombent d'un coup.</strong> $\mathrm{Var}(\hat\mu)\approx\sigma_0^2/T$ — la variance de la moyenne empirique — et $\mathrm{Var}(\hat\sigma)\approx\sigma_0^2/(2T)$. Le second est <strong>moins connu</strong> et très utile : l'écart-type s'estime <strong>deux fois plus précisément</strong> que la moyenne, en variance relative.</p>
+<p><strong>Et le terme $\mathbb E[(x-\mu_0)^4]=3\sigma_0^4$ est celui qui produit le $2\sigma_0^4$</strong> dans $S$ : $\mathrm{Var}\big[(x-\mu)^2\big]=3\sigma^4-\sigma^4=2\sigma^4$. Sur des données à <strong>queues épaisses</strong>, ce moment d'ordre 4 est plus grand, donc l'écart-type est estimé <strong>moins précisément</strong> — un point crucial en finance.</p>
+</blockquote>
+<h2 data-prio="high">Concept 4 — Intervalles de confiance et vérification par simulation</h2>
+<p><em>Des intervalles de confiance à $95\,\%$ se construisent comme</em>
+$$\widehat{CI}(\theta_i)=\Big[\hat\theta_i-1{,}96\times SE(\hat\theta_i),\ \hat\theta_i+1{,}96\times SE(\hat\theta_i)\Big], \qquad i=1,2$$
+<em>Asymptotiquement, ils devraient contenir les vraies valeurs avec probabilité $95\,\%$.</em></p>
+<blockquote>
+<p><strong>La question que le cours pose — et résout empiriquement.</strong> <em>Ces intervalles sont-ils bons en <strong>échantillon fini</strong> ? Faisons une expérience de Monte-Carlo : simulons $N$ échantillons artificiels indépendants et calculons la <strong>fréquence de couverture</strong>.</em></p>
+<p><strong>Résultat sur $100\,000$ simulations : les fréquences de couverture sont $(0{,}945\ ;\ 0{,}929)$.</strong></p>
+</blockquote>
+<p class="cal piege"> <strong>Lisez ces deux nombres attentivement.</strong> L'intervalle pour $\hat\mu$ couvre $94{,}5\,\%$ du temps — très proche du $95\,\%$ nominal. Celui pour $\hat\sigma$ ne couvre que $92{,}9\,\%$ : il est <strong>trop étroit</strong>. La théorie asymptotique est donc <strong>moins fiable pour l'écart-type que pour la moyenne</strong> à taille d'échantillon finie.</p>
+<blockquote>
+<p><strong>La leçon de méthode est générale</strong> : la normalité asymptotique est une <strong>approximation</strong>, et la seule façon de savoir si elle tient est de <strong>simuler</strong>. C'est aussi ce que fait le bootstrap (cours 9 du même corpus).</p>
+</blockquote>
+<h3>La variance asymptotique du ratio de Sharpe</h3>
+<p>Dans le cas gaussien, $\hat\Omega=\frac1T\begin{pmatrix}\sigma^2&amp;0\\0&amp;\frac12\sigma^2\end{pmatrix}$, et la méthode delta donne
+$$\mathrm{Var}\big(\widehat{SR}\big)=\left(\frac1{\hat\sigma}\quad-\frac{\hat\mu}{\hat\sigma^2}\right)\hat\Omega\begin{pmatrix}\frac1{\hat\sigma}\\[3pt]-\frac{\hat\mu}{\hat\sigma^2}\end{pmatrix}=\boxed{\ \frac1T\left(1+\frac{\widehat{SR}^2}{2}\right)\ }$$</p>
+<blockquote>
+<p><strong>Cette formule est d'un usage constant en gestion.</strong> L'écart-type du ratio de Sharpe estimé vaut environ $\sqrt{(1+SR^2/2)/T}$. Pour $SR=0{,}5$ et $T=60$ mois, cela fait $\approx0{,}134$ — soit un intervalle de confiance à $95\,\%$ de $[0{,}24\ ;\ 0{,}76]$. <strong>Cinq ans de données ne permettent pas de distinguer un gérant médiocre d'un excellent.</strong> C'est la traduction quantitative de la remarque de la fiche 62 sur le temps qu'il faut à la dérive pour émerger du bruit.</p>
+</blockquote>
+<h2 data-prio="must">Concept 5 — Les MCO comme cas particulier du GMM</h2>
+<p><strong>Le modèle linéaire</strong> $y_t=x_t^\top\beta+u_t$. <em>Les MCO reposent sur l'hypothèse que les résidus sont de moyenne nulle conditionnellement aux variables explicatives <strong>et les uns aux autres</strong> :</em>
+$$\mathbb E\big[u_t\mid x_t,x_{t-1},\dots,u_{t-1},u_{t-2},\dots\big]=0$$</p>
+<p><strong>En posant</strong> $f(x_t,y_t,\beta)=x_t\big(y_t-x_t^\top\beta\big)$, on obtient une condition de moment valide, par espérances itérées :
+$$\mathbb E\big[x_t(y_t-x_t^\top\beta)\big]=\mathbb E[x_tu_t]=\mathbb E\big[x_t\,\mathbb E[u_t\mid x_t]\big]=0$$</p>
+<p><strong>L'estimateur GMM.</strong>
+$$\hat{\mathbb E}\big[x_t(y_t-x_t^\top\beta)\big]=0 \qquad\Longrightarrow\qquad \hat\beta=\hat{\mathbb E}\big(x_tx_t^\top\big)^{-1}\hat{\mathbb E}\big(x_ty_t\big)$$
+<em>qui est l'estimateur MCO standard.</em></p>
+<p><strong>Les écarts-types.</strong>
+$$\hat S=\hat{\mathbb E}\big(f_tf_t^\top\big)=\hat{\mathbb E}\big(\hat u_t^2\,x_tx_t^\top\big), \qquad \hat u_t\equiv y_t-x_t^\top\hat\beta, \qquad \hat d=\frac{\partial\hat{\mathbb E}[f]}{\partial\beta^\top}=-\hat{\mathbb E}\big(x_tx_t^\top\big)$$
+d'où
+$$\boxed{\ \mathrm{Var}\big[\hat\beta\big]=\frac1T\big(\hat d^\top\hat S^{-1}\hat d\big)^{-1}=\frac1T\hat{\mathbb E}\big(x_tx_t^\top\big)^{-1}\hat{\mathbb E}\big(\hat u_t^2x_tx_t^\top\big)\hat{\mathbb E}\big(x_tx_t^\top\big)^{-1}\ }$$</p>
+<blockquote>
+<p><strong>C'est l'estimateur robuste à l'hétéroscédasticité — la formule « sandwich » de White.</strong> Comparez avec la formule classique $\hat\sigma^2\hat{\mathbb E}(x_tx_t^\top)^{-1}$ de la fiche 50 : elle suppose $\mathbb E[u_t^2\mid x_t]=\sigma^2$ <strong>constante</strong>. Ici, $\hat{\mathbb E}(\hat u_t^2x_tx_t^\top)$ <strong>n'impose rien</strong> sur la variance conditionnelle.</p>
+<p><strong>Le nom « sandwich » vient de la forme</strong> : $\hat{\mathbb E}(xx^\top)^{-1}$ · <strong>garniture</strong> · $\hat{\mathbb E}(xx^\top)^{-1}$. Si la variance est effectivement constante, la garniture se réduit à $\sigma^2\hat{\mathbb E}(xx^\top)$ et l'on retrouve la formule classique.</p>
+</blockquote>
+<h2 data-prio="must">Concept 6 — Observations corrélées et Newey-West</h2>
+<blockquote>
+<p><em>Quand les $f(x_t,\theta)$ sont <strong>corrélés dans le temps</strong>, les formules d'écarts-types doivent être <strong>ajustées</strong> pour tenir compte de l'autocorrélation. <strong>Les observations corrélées affectent la taille effective de l'échantillon</strong>.</em></p>
+</blockquote>
+<p>La relation
+$$\mathrm{Var}\big[\hat\theta\big]=\frac1T\big(\hat d^{-1}\hat S\,\hat d^{\top-1}\big)=\frac1T\big(\hat d^\top\hat S^{-1}\hat d\big)^{-1}$$
+*reste valide. Mais il faut <strong>modifier l'estimation de $\hat S$</strong>.* En échantillon infini,
+$$S=\sum_{j=-\infty}^{\infty}\mathbb E\Big[f(x_t,\theta_0)f(x_{t-j},\theta_0)^\top\Big]$$</p>
+<blockquote>
+<p><strong>Procédure de Newey-West.</strong>
+$$\boxed{\ \hat S=\sum_{j=-k}^{k}\frac{k-\lvert j\rvert}{k}\cdot\frac1T\sum_{t=1}^Tf(x_t,\hat\theta)f(x_{t-j},\hat\theta)^\top\ }$$
+<em>(en abandonnant les termes hors domaine.)</em></p>
+<ul>
+<li><em>$k$ est le paramètre de <strong>largeur de fenêtre</strong>. Plus l'échantillon est grand, plus $k$ doit être grand ; le taux de croissance suggéré est $k\propto T^{1/3}$.</em></li>
+<li><em>En échantillon fini, il faut $k$ <strong>petit devant $T$</strong> mais <strong>assez grand</strong> pour couvrir la portée de la dépendance temporelle.</em></li>
+<li><em><strong>Considérer plusieurs valeurs de $k$ et comparer les résultats.</strong></em></li>
+</ul>
+</blockquote>
+<blockquote>
+<p><strong>Deux points à comprendre sur cette formule.</strong></p>
+<ul>
+<li><strong>Pourquoi sommer sur $j$ ?</strong> Parce que la variance d'une somme de termes corrélés n'est pas la somme des variances : il faut ajouter toutes les <strong>autocovariances</strong>. C'est exactement $\mathrm{var}(a+b)=\mathrm{var}(a)+\mathrm{var}(b)+2\mathrm{cov}(a,b)$ de la fiche 55, généralisé.</li>
+<li><strong>Pourquoi la pondération triangulaire $\frac{k-\lvert j\rvert}{k}$ ?</strong> Elle décroît linéairement avec le retard et s'annule en $j=k$. Ce n'est pas cosmétique : cette pondération <strong>garantit que $\hat S$ soit semi-définie positive</strong>, ce qu'une troncature brutale ne ferait pas — et une matrice de covariance négative n'aurait aucun sens.</li>
+</ul>
+</blockquote>
+<h3>Les MCO à résidus autocorrélés</h3>
+<p>Modèle $y_t=x_t^\top\beta+u_t$ avec $\mathbb E[u_t\mid x_t,x_{t-1},\dots]=0$, <em>mais en autorisant $u_t$ à être <strong>autocorrélé</strong></em>. Comme $f(x_t,\theta)=x_tu_t$ :
+$$\hat S=\sum_{j=-k}^{k}\frac{k-\lvert j\rvert}{k}\cdot\frac1T\sum_t\hat u_t\,x_tx_{t-j}^\top\,\hat u_{t-j}$$
+et la matrice de variance-covariance asymptotique des coefficients est
+$$\mathrm{Var}\big[\hat\beta\big]=\frac1T\hat{\mathbb E}\big(x_tx_t^\top\big)^{-1}\hat S\,\hat{\mathbb E}\big(x_tx_t^\top\big)^{-1}$$</p>
+<h2 data-prio="must">Concept 7 — L'exemple de la prévisibilité à long horizon</h2>
+<blockquote>
+<p><em>On prédit les rendements du S&amp;P 500 par le logarithme du ratio dividende / prix, sur $1934/01$–$2008/12$ :</em>
+$$r_{t\to t+h}=\alpha+\beta\ln\left(\frac DP\right)_{t-1}+u_{t+h}$$
+<em>Les rendements sont <strong>cumulés</strong> sur $6$ ou $12$ mois — somme de rendements mensuels.</em></p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>$h$</th>
+<th>$\hat\beta$</th>
+<th>$k=0$</th>
+<th>$k=5$</th>
+<th>$k=12$</th>
+<th>$k=24$</th>
+<th>$k=36$</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>6</strong></td>
+<td>$0{,}0530$</td>
+<td>$0{,}0089$</td>
+<td>$0{,}0185$</td>
+<td>$0{,}0215$</td>
+<td>$0{,}0233$</td>
+<td>$0{,}0232$</td>
+</tr>
+<tr>
+<td><strong>12</strong></td>
+<td>$0{,}1067$</td>
+<td>$0{,}0129$</td>
+<td>$0{,}0297$</td>
+<td>$0{,}0378$</td>
+<td>$0{,}0428$</td>
+<td>$0{,}0431$</td>
+</tr>
+</tbody></table>
+<p class="cal piege"> <strong>Ce tableau est le plus instructif de tout le cours. Lisez la première ligne de gauche à droite.</strong> L'écart-type passe de $0{,}0089$ à $0{,}0233$ — il est <strong>multiplié par plus de $2{,}5$</strong> — simplement en tenant compte de l'autocorrélation. Le rapport $\hat\beta/SE$ passe de $6{,}0$ (très significatif) à $2{,}3$ (tout juste significatif).</p>
+<blockquote>
+<p><strong>Pour $h=12$, c'est pire encore</strong> : de $8{,}3$ à $2{,}5$.</p>
+<p><strong>D'où vient cette autocorrélation ?</strong> Les rendements sont <strong>cumulés sur $h$ mois</strong> avec des fenêtres <strong>chevauchantes</strong> : $r_{t\to t+6}$ et $r_{t+1\to t+7}$ partagent cinq mois de rendements. Les résidus sont donc mécaniquement autocorrélés jusqu'au retard $h-1$, et ignorer ce fait <strong>sous-estime massivement</strong> les écarts-types.</p>
+<p><strong>Notez aussi la stabilisation</strong> : entre $k=24$ et $k=36$, les valeurs ne bougent presque plus. C'est le diagnostic que le cours recommande — <em>considérer plusieurs valeurs de $k$ et comparer</em> : quand $\hat S$ se stabilise, la fenêtre est assez large.</p>
+</blockquote>
+<blockquote>
+<p><strong>La discussion du cours.</strong> <em>Les MCO classiques reposent sur des hypothèses très restrictives. En pratique, les variables explicatives sont stochastiques et non décorrélées des résidus retardés. Le GMM fournit un cadre puissant pour traiter les régressions : <strong>les MCO sont valides tant que les conditions de moment le sont</strong>. Il est important de <strong>traiter les écarts-types correctement</strong> — le GMM offre une recette générale.</em></p>
+</blockquote>
+<h2 data-prio="high">Concept 8 — MLE, QMLE et moindres carrés non linéaires comme GMM</h2>
+<p><strong>MLE et GMM.</strong> Les conditions d'optimalité pour maximiser $\mathcal L(\theta)=\sum_{t=1}^T\ln p(x_t\mid\text{passé};\theta)$ sont $\sum_t\frac{\partial\ln p}{\partial\theta}=0$. En posant $f(x_t,\theta)=\frac{\partial\ln p(x_t\mid\text{passé};\theta)}{\partial\theta}$ — le <strong>score</strong> —, le MLE est un GMM.</p>
+<blockquote>
+<p><em>Les scores sont <strong>non corrélés dans le temps</strong>, parce que $\mathbb E_t[f(x_{t+1},\theta_0)]=0$.</em> Les écarts-types s'obtiennent donc par les formules GMM <strong>sans correction de Newey-West</strong> :
+$$\hat d=\hat{\mathbb E}\left[\frac{\partial^2\ln p(x_t\mid\text{passé};\theta)}{\partial\theta\,\partial\theta^\top}\right], \qquad \hat S=\hat{\mathbb E}\left[\frac{\partial\ln p}{\partial\theta}\cdot\frac{\partial\ln p}{\partial\theta^\top}\right]$$
+$$T\,\mathrm{Var}\big[\hat\theta\big]=\big(\hat d^\top\hat S^{-1}\hat d\big)^{-1}$$</p>
+</blockquote>
+<blockquote>
+<p><strong>Reconnaissez les deux expressions de l'information de Fisher</strong> de la fiche 64 : $\hat d$ est la hessienne moyenne, $\hat S$ la variance du score. Si le modèle est <strong>correct</strong>, l'identité de l'information donne $-\hat d=\hat S=I(\theta)$ et la formule se réduit à $I(\theta)^{-1}$. Si le modèle est <strong>faux</strong> — cas du QMLE —, les deux diffèrent, et c'est la formule sandwich qui donne les <strong>bons</strong> écarts-types.</p>
+</blockquote>
+<p><strong>Les moindres carrés non linéaires.</strong> Pour $y_t=h(x_t,\beta)+u_t$ avec $\mathbb E[u_t\mid x_t]=0$, on utilise le QMLE en faisant comme si $u_t\sim N(0,\sigma^2)$ i.i.d. :
+$$\mathcal L(\beta)=\sum_{t=1}^T\left[-\ln\sqrt{2\pi\sigma^2}-\frac{\big(y_t-h(x_t,\beta)\big)^2}{2\sigma^2}\right]$$
+Les conditions du premier ordre se lisent comme des conditions de moment GMM :
+$$\hat\beta=\underset{\beta}{\arg\min}\ \hat{\mathbb E}\Big[\big(y_t-h(x_t,\beta)\big)^2\Big] \qquad\Longrightarrow\qquad \mathbb E\left[\frac{\partial h(x_t,\beta)}{\partial\beta}\big(y_t-h(x_t,\beta)\big)\right]=0$$</p>
+<blockquote>
+<p><strong>La question du cours, et sa réponse.</strong> <em>Pourquoi ne pas choisir d'autres moments, par exemple $f=g(x_t)(y_t-h(x_t,\beta))$ avec $g$ à peu près arbitraire ?</em>
+<em>On pourrait. <strong>Mais cela peut donner des estimations moins précises</strong>, ou des conditions de moment <strong>invalides</strong>. De fait, <strong>si les $u_t$ sont gaussiens, les MCNL sont optimaux</strong>.</em></p>
+<p>C'est la réponse à la question laissée ouverte en fiche 71 : parmi l'infinité d'instruments possibles, le <strong>score</strong> de la vraisemblance est celui qui donne l'estimateur le plus efficace.</p>
+</blockquote>
+<h2 data-prio="must">Concept 9 — Les tests d'hypothèses</h2>
+<p><strong>Le cadre.</strong> Échantillon d'observations indépendantes $x_1,\dots,x_T$ de loi $p(x,\theta_0)$. On veut tester une hypothèse nulle $H_0$ constituée de <strong>restrictions</strong> sur $\theta_0$ — par exemple $b^\top\theta_0=0$.</p>
+<blockquote>
+<p><em>Un <strong>test statistique</strong> est une <strong>règle de décision</strong> rejetant l'hypothèse nulle si l'échantillon satisfait certaines conditions :</em>
+$$\text{Rejeter si } (x_1,\dots,x_T)\in A$$
+<em>La <strong>taille du test</strong> est la borne supérieure de la probabilité de rejeter l'hypothèse nulle, sur tous les cas où elle est correcte.</em>
+<em>L'<strong>erreur de type I</strong> est le rejet à tort de $H_0$ ; la taille du test est la probabilité maximale de rejet à tort.</em></p>
+</blockquote>
+<p class="cal piege"> <strong>C'est exactement le <strong>niveau</strong> de la fiche 65</strong> — la borne supérieure sur $\Theta_0$ de la probabilité de rejeter à tort.</p>
+<blockquote>
+<p><strong>Le test du khi-deux.</strong> Pour tester $H_0:h(\theta)=0$ :</p>
+<ol>
+<li>Estimer la variance-covariance de $h(\hat\theta)$, notée $\hat V$ — <strong>par la méthode delta</strong>.</li>
+<li>Construire la statistique de test
+$$\boxed{\ \xi=h(\hat\theta)^\top\hat V^{-1}h(\hat\theta)\ \sim\ \chi^2\big(\dim h(\hat\theta)\big)\ }$$
+<em>Rejeter $H_0$ si $\xi$ est suffisamment grand ; le seuil de rejet est déterminé par la taille souhaitée et la loi de $\xi$ sous $H_0$.</em></li>
+</ol>
+</blockquote>
+<blockquote>
+<p><strong>La construction est immédiate à partir du concept 1</strong> : si $h(\hat\theta)\sim N(0,\hat V)$ sous $H_0$, alors la forme quadratique $h^\top\hat V^{-1}h$ suit un $\chi^2$ de dimension $\dim h$. C'est exactement la statistique de <strong>Wald</strong> de la fiche 65, avec $\hat V^{-1}$ à la place de l'information de Fisher.</p>
+</blockquote>
+<h3>Trois applications</h3>
+<p><strong>1. Test de non-prévisibilité.</strong> Pour une régression prédictive $y_t=\beta_0+x_t^\top\beta+u_t$, on estime $\hat\beta$ par MCO et $\widehat{\mathrm{Var}}(\hat\beta)$ par <strong>Newey-West</strong>. Pour tester $H_0:\beta=0$ :
+$$\xi=\hat\beta^\top\big(\widehat{\mathrm{Var}}(\hat\beta)\big)^{-1}\hat\beta\ \sim\ \chi^2\big(\dim\beta\big)$$
+<em>Test de taille $\alpha$ : rejeter si $\xi\geq\bar\xi$, où $\mathrm{CDF}_{\chi^2(\dim\beta)}(\bar\xi)=1-\alpha$.</em></p>
+<p><strong>2. Test sur le ratio de Sharpe.</strong> Pour tester $SR=SR_0$, en deux étapes :</p>
+<ol>
+<li><em>Par la méthode delta, dériver la variance asymptotique de $\widehat{SR}=\hat\mu/\hat\sigma$.</em></li>
+<li>Former
+$$\frac{\big(\widehat{SR}-SR_0\big)^2}{\mathrm{Var}\big(\widehat{SR}\big)}\ \sim\ \chi^2(1)$$</li>
+</ol>
+<p><strong>3. Comparaison de deux ratios de Sharpe.</strong> <em>Deux séries de rendements excédentaires produites sur la même période par deux stratégies. On ne connaît pas la loi exacte de chacune, mais on sait que les rendements sont <strong>i.i.d. dans le temps</strong> ; <strong>contemporainement</strong>, $x_t^1$ et $x_t^2$ peuvent être <strong>corrélés</strong>.</em></p>
+<p>On empile : $x_t=(x_t^1,x_t^2)^\top$, $\theta_0=(\mu^1_0,\sigma^1_0,\mu^2_0,\sigma^2_0)$, et
+$$H_0:\ \frac{\mu^1_0}{\sigma^1_0}-\frac{\mu^2_0}{\sigma^2_0}=0$$
+Avec $h(\theta)=\frac{\mu_1}{\sigma_1}-\frac{\mu_2}{\sigma_2}$, la méthode delta donne
+$$\hat A=\left.\frac{\partial h(\theta)}{\partial\theta^\top}\right\vert_{\hat\theta}=\left(\frac{1}{\hat\sigma_1}\quad-\frac{\hat\mu_1}{\hat\sigma_1^2}\quad-\frac{1}{\hat\sigma_2}\quad\frac{\hat\mu_2}{\hat\sigma_2^2}\right)$$
+$$\widehat{\mathrm{Var}}\big(h(\hat\theta)\big)=\hat A\,\hat\Omega\,\hat A^\top$$
+puis $\xi=h(\hat\theta)^2/\widehat{\mathrm{Var}}(h(\hat\theta))\sim\chi^2(1)$.</p>
+<blockquote>
+<p><strong>L'élégance du procédé.</strong> Il faut <strong>empiler les deux séries</strong> dans un même vecteur d'observations, ce qui permet à $\hat\Omega$ de capturer la <strong>corrélation contemporaine</strong> entre les deux stratégies. Comparer deux ratios de Sharpe estimés séparément, sans tenir compte de leur corrélation, donnerait un écart-type <strong>faux</strong> — trop grand si les stratégies sont positivement corrélées.</p>
+</blockquote>
+<h2>Comment résoudre l'exercice type (protocole)</h2>
+<ol>
+<li><strong>Écrire les conditions de moment</strong> $f(x_t,\theta)$ et vérifier leur validité.</li>
+<li><strong>Estimer $\hat\theta$</strong> en résolvant $\frac1T\sum_tf(x_t,\hat\theta)=0$.</li>
+<li><strong>Calculer $\hat d=\partial\hat{\mathbb E}[f]/\partial\theta^\top$</strong> et $\hat S$.</li>
+<li><strong>Vérifier l'autocorrélation des $f_t$</strong> : si elle est présente, utiliser <strong>Newey-West</strong> avec $k\propto T^{1/3}$ et <strong>comparer plusieurs $k$</strong>.</li>
+<li><strong>En déduire</strong> $T\,\mathrm{Var}[\hat\theta]=(\hat d^\top\hat S^{-1}\hat d)^{-1}$, puis les écarts-types.</li>
+<li><strong>Pour une fonction de $\hat\theta$</strong> : appliquer la <strong>méthode delta</strong>, $\mathrm{Var}[h(\hat\theta)]=\hat A\hat\Omega\hat A^\top$.</li>
+<li><strong>Pour tester $h(\theta)=0$</strong> : $\xi=h(\hat\theta)^\top\hat V^{-1}h(\hat\theta)\sim\chi^2(\dim h)$.</li>
+<li><strong>En cas de doute sur la validité asymptotique</strong> : vérifier par <strong>simulation de Monte-Carlo</strong> la fréquence de couverture.</li>
+</ol>
+<h3>Comment reconnaître qu'il faut utiliser cette méthode ?</h3>
+<table>
+<thead>
+<tr>
+<th>Indice dans l'énoncé</th>
+<th>Ce qu'il faut faire</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>« loi asymptotique d'une fonction de l'estimateur »</td>
+<td><strong>méthode delta</strong></td>
+</tr>
+<tr>
+<td>ratio de Sharpe, ratio d'information</td>
+<td>delta, $\mathrm{Var}=\frac1T(1+SR^2/2)$</td>
+</tr>
+<tr>
+<td>« écarts-types d'un estimateur GMM »</td>
+<td>$(\hat d^\top\hat S^{-1}\hat d)^{-1}/T$</td>
+</tr>
+<tr>
+<td>régression, variance conditionnelle inconnue</td>
+<td><strong>sandwich de White</strong></td>
+</tr>
+<tr>
+<td>rendements <strong>cumulés</strong> / fenêtres <strong>chevauchantes</strong></td>
+<td><strong>Newey-West</strong> — sinon écarts-types faux</td>
+</tr>
+<tr>
+<td>« quelle largeur de fenêtre ? »</td>
+<td>$k\propto T^{1/3}$, et <strong>comparer plusieurs $k$</strong></td>
+</tr>
+<tr>
+<td>« tester $h(\theta)=0$ »</td>
+<td>$\xi=h^\top\hat V^{-1}h\sim\chi^2(\dim h)$</td>
+</tr>
+<tr>
+<td>« les prédicteurs sont-ils significatifs ? »</td>
+<td>$\chi^2$ sur $\beta=0$, écarts-types Newey-West</td>
+</tr>
+<tr>
+<td>comparer deux stratégies</td>
+<td><strong>empiler</strong> les séries pour capturer la corrélation</td>
+</tr>
+<tr>
+<td>« l'asymptotique est-elle fiable ici ? »</td>
+<td><strong>Monte-Carlo</strong>, fréquence de couverture</td>
+</tr>
+</tbody></table>
+<h3>Exercices progressifs</h3>
+<p><strong> Niveau 1</strong> — Dérivez la variance asymptotique du ratio de Sharpe par la méthode delta.</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p><strong>Le cadre.</strong> $\theta=(\mu,\sigma)^\top$, $h(\theta)=\mu/\sigma$, et dans le cas gaussien
+$$\hat\Omega=\frac1T\begin{pmatrix}\sigma^2&amp;0\\0&amp;\frac12\sigma^2\end{pmatrix}$$</p>
+<p><strong>Étape 1 — le gradient.</strong>
+$$\hat A=\left(\frac{\partial h}{\partial\mu}\quad\frac{\partial h}{\partial\sigma}\right)=\left(\frac{1}{\hat\sigma}\quad-\frac{\hat\mu}{\hat\sigma^2}\right)$$</p>
+<p><strong>Étape 2 — la formule delta.</strong>
+$$\mathrm{Var}\big(\widehat{SR}\big)=\hat A\hat\Omega\hat A^\top=\frac1T\left[\frac{1}{\hat\sigma^2}\cdot\hat\sigma^2+\frac{\hat\mu^2}{\hat\sigma^4}\cdot\frac{\hat\sigma^2}{2}\right]=\frac1T\left[1+\frac{\hat\mu^2}{2\hat\sigma^2}\right]$$</p>
+<p><strong>Étape 3 — conclure.</strong>
+$$\mathrm{Var}\big(\widehat{SR}\big)=\frac1T\left(1+\frac{\widehat{SR}^2}{2}\right)$$</p>
+<p><strong>L'application numérique qui fait réfléchir.</strong> Pour $SR=0{,}5$ et $T=60$ mois :
+$$SE\big(\widehat{SR}\big)=\sqrt{\frac{1+0{,}125}{60}}=\sqrt{0{,}01875}\approx0{,}137$$
+d'où un intervalle de confiance à $95\,\%$ de $[0{,}23\ ;\ 0{,}77]$.</p>
+<p><strong>La conclusion pratique.</strong> Cinq ans de données mensuelles <strong>ne suffisent pas</strong> à distinguer un gérant de ratio $0{,}25$ d'un gérant de ratio $0{,}75$. Il faudrait $T\approx1\,000$ mois — plus de $80$ ans — pour ramener l'écart-type à $0{,}03$. C'est la version chiffrée de la remarque de la fiche 62 : la dérive met très longtemps à émerger du bruit.</p>
+</div></details>
+
+<p><strong> Niveau 2</strong> — Pourquoi l'estimateur sandwich des MCO ?</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p><strong>La construction par GMM.</strong> Avec $f(x_t,y_t,\beta)=x_t(y_t-x_t^\top\beta)$ :
+$$\hat d=\frac{\partial\hat{\mathbb E}[f]}{\partial\beta^\top}=-\hat{\mathbb E}\big(x_tx_t^\top\big), \qquad \hat S=\hat{\mathbb E}\big(f_tf_t^\top\big)=\hat{\mathbb E}\big(\hat u_t^2x_tx_t^\top\big)$$
+La formule générale $\mathrm{Var}[\hat\beta]=\frac1T(\hat d^\top\hat S^{-1}\hat d)^{-1}$ donne, comme $\hat d$ est symétrique,
+$$\mathrm{Var}\big[\hat\beta\big]=\frac1T\hat{\mathbb E}\big(x_tx_t^\top\big)^{-1}\hat{\mathbb E}\big(\hat u_t^2x_tx_t^\top\big)\hat{\mathbb E}\big(x_tx_t^\top\big)^{-1}$$</p>
+<p><strong>Le nom.</strong> La forme est <strong>pain – garniture – pain</strong> : $\hat{\mathbb E}(xx^\top)^{-1}$ de part et d'autre de $\hat{\mathbb E}(\hat u^2xx^\top)$.</p>
+<p><strong>Ce qu'il apporte par rapport à la formule classique.</strong> La fiche 50 donne $\mathrm{Var}[\hat\beta]=\sigma^2(X^\top X)^{-1}$, qui suppose $\mathbb E[u_t^2\mid x_t]=\sigma^2$ <strong>constante</strong> — homoscédasticité. Le sandwich <strong>n'impose rien</strong> : $\hat{\mathbb E}(\hat u_t^2x_tx_t^\top)$ pondère chaque observation par son <strong>résidu carré observé</strong>, quelle que soit la structure de variance.</p>
+<p><strong>La vérification du cas particulier.</strong> Si la variance est bien constante, $\hat{\mathbb E}(\hat u_t^2x_tx_t^\top)\to\sigma^2\mathbb E(x_tx_t^\top)$, et la formule se réduit à
+$$\frac1T\sigma^2\hat{\mathbb E}(x_tx_t^\top)^{-1}$$
+— la formule classique. <strong>Le sandwich la contient comme cas particulier.</strong></p>
+<p><strong>Pourquoi c'est important en finance.</strong> Les rendements présentent presque toujours de l'hétéroscédasticité (fiche 53). Utiliser la formule classique <strong>sous-estime généralement</strong> les écarts-types et fait conclure à tort à la significativité.</p>
+<p class="cal piege"> <strong>Et ce n'est pas suffisant.</strong> Le sandwich corrige l'<strong>hétéroscédasticité</strong> mais pas l'<strong>autocorrélation</strong> des moments. Pour cela, il faut remplacer $\hat S$ par l'estimateur de <strong>Newey-West</strong> — c'est le concept 6.</p>
+</div></details>
+
+<p><strong> Niveau 3</strong> — Interprétez le tableau de prévisibilité à long horizon.</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p><strong>Le modèle.</strong> $r_{t\to t+h}=\alpha+\beta\ln(D/P)_{t-1}+u_{t+h}$, S&amp;P 500, $1934/01$–$2008/12$, rendements <strong>cumulés</strong> sur $h$ mois.</p>
+<table>
+<thead>
+<tr>
+<th>$h$</th>
+<th>$\hat\beta$</th>
+<th>$k=0$</th>
+<th>$k=5$</th>
+<th>$k=12$</th>
+<th>$k=24$</th>
+<th>$k=36$</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>6</strong></td>
+<td>$0{,}0530$</td>
+<td>$0{,}0089$</td>
+<td>$0{,}0185$</td>
+<td>$0{,}0215$</td>
+<td>$0{,}0233$</td>
+<td>$0{,}0232$</td>
+</tr>
+<tr>
+<td><strong>12</strong></td>
+<td>$0{,}1067$</td>
+<td>$0{,}0129$</td>
+<td>$0{,}0297$</td>
+<td>$0{,}0378$</td>
+<td>$0{,}0428$</td>
+<td>$0{,}0431$</td>
+</tr>
+</tbody></table>
+<p><strong>Les statistiques de Student correspondantes</strong>, $\hat\beta/SE$ :</p>
+<table>
+<thead>
+<tr>
+<th>$h$</th>
+<th>$k=0$</th>
+<th>$k=5$</th>
+<th>$k=12$</th>
+<th>$k=24$</th>
+<th>$k=36$</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>6</strong></td>
+<td>$6{,}0$</td>
+<td>$2{,}9$</td>
+<td>$2{,}5$</td>
+<td>$2{,}3$</td>
+<td>$2{,}3$</td>
+</tr>
+<tr>
+<td><strong>12</strong></td>
+<td>$8{,}3$</td>
+<td>$3{,}6$</td>
+<td>$2{,}8$</td>
+<td>$2{,}5$</td>
+<td>$2{,}5$</td>
+</tr>
+</tbody></table>
+<p><strong>Ce que cela montre — trois observations.</strong></p>
+<p><strong>1. Ignorer l'autocorrélation ($k=0$) surestime massivement la significativité.</strong> De $t=6{,}0$ à $t=2{,}3$ pour $h=6$ ; de $8{,}3$ à $2{,}5$ pour $h=12$. La conclusion passe de « écrasante » à « limite ».</p>
+<p><strong>2. La cause est le chevauchement des fenêtres.</strong> $r_{t\to t+6}$ et $r_{t+1\to t+7}$ partagent <strong>cinq mois</strong> de rendements : les résidus successifs sont mécaniquement corrélés jusqu'au retard $h-1$. C'est une autocorrélation <strong>induite par la construction</strong>, pas par le modèle.</p>
+<p><strong>3. Les écarts-types se stabilisent.</strong> Entre $k=24$ et $k=36$, ils ne bougent presque plus ($0{,}0233$ contre $0{,}0232$). C'est le signe que la fenêtre couvre bien la portée de la dépendance — exactement le diagnostic que le cours recommande : <em>considérer plusieurs valeurs de $k$ et comparer les résultats</em>.</p>
+<p><strong>4. L'effet est plus fort pour $h=12$.</strong> Logique : le chevauchement est deux fois plus long, donc la dépendance porte plus loin, et il faut un $k$ plus grand pour la capturer.</p>
+<p><strong>La conclusion économique.</strong> La prévisibilité par le ratio dividende/prix reste <strong>statistiquement significative</strong> au seuil de $5\,\%$ ($t\approx2{,}3$–$2{,}5$), mais <strong>beaucoup moins spectaculaire</strong> qu'une lecture naïve ne le suggérerait. C'est l'un des débats les plus discutés de l'économétrie financière, et ce tableau montre pourquoi le traitement des écarts-types en est le cœur.</p>
+<blockquote>
+<p><em>Il est important de traiter les écarts-types correctement. Le GMM offre une recette générale.</em></p>
+</blockquote>
+</div></details>
+
+<p><strong> Niveau 4 — type examen</strong> — Construisez un test comparant les ratios de Sharpe de deux stratégies.</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p><strong>Le cadre.</strong> <em>Deux séries de rendements excédentaires $(x_1^1,\dots,x_T^1)$ et $(x_1^2,\dots,x_T^2)$, produites sur la même période. On ne connaît pas la loi exacte de chacune, mais on sait qu'elles sont <strong>i.i.d. dans le temps</strong>. <strong>Contemporainement</strong>, $x_t^1$ et $x_t^2$ peuvent être corrélés.</em></p>
+<p><strong>Étape 1 — empiler.</strong> C'est le point crucial. On forme le vecteur d'observations
+$$x_t=(x_t^1,x_t^2)^\top$$
+et le vecteur de paramètres $\theta_0=(\mu^1_0,\sigma^1_0,\mu^2_0,\sigma^2_0)$.</p>
+<p><strong>Pourquoi empiler ?</strong> Parce que $\hat\Omega$, la variance-covariance des quatre estimations, capture alors la <strong>corrélation contemporaine</strong> entre les deux stratégies. Estimer séparément et soustraire donnerait un écart-type <strong>faux</strong> — surestimé si les stratégies sont positivement corrélées.</p>
+<p><strong>Étape 2 — les moments GMM.</strong> Quatre fonctions, deux par série :
+$$f_1=x_t^1-\mu_1, \quad f_2=(x_t^1-\mu_1)^2-\sigma_1^2, \quad f_3=x_t^2-\mu_2, \quad f_4=(x_t^2-\mu_2)^2-\sigma_2^2$$
+et l'on estime $\hat\Omega$ par les formules GMM standard, $\frac1T(\hat d^\top\hat S^{-1}\hat d)^{-1}$. Les termes croisés de $\hat S$ — les $\hat{\mathbb E}[f_1f_3]$, etc. — portent la corrélation entre stratégies.</p>
+<p><strong>Étape 3 — l'hypothèse nulle.</strong>
+$$H_0:\ \frac{\mu^1_0}{\sigma^1_0}-\frac{\mu^2_0}{\sigma^2_0}=0 \qquad\text{soit}\qquad h(\theta)=\frac{\mu_1}{\sigma_1}-\frac{\mu_2}{\sigma_2}=0$$</p>
+<p><strong>Étape 4 — la méthode delta.</strong>
+$$\hat A=\left.\frac{\partial h}{\partial\theta^\top}\right\vert_{\hat\theta}=\left(\frac{1}{\hat\sigma_1}\quad-\frac{\hat\mu_1}{\hat\sigma_1^2}\quad-\frac{1}{\hat\sigma_2}\quad\frac{\hat\mu_2}{\hat\sigma_2^2}\right)$$
+$$\widehat{\mathrm{Var}}\big(h(\hat\theta)\big)=\hat A\,\hat\Omega\,\hat A^\top$$</p>
+<p><strong>Étape 5 — la statistique de test.</strong>
+$$\xi=\frac{\big(\widehat{SR}_1-\widehat{SR}_2\big)^2}{\widehat{\mathrm{Var}}\big(h(\hat\theta)\big)}\ \sim\ \chi^2(1)$$
+On rejette $H_0$ si $\xi&gt;q_{1-\alpha}$ ; à $5\,\%$, $q_{0{,}95}=3{,}84$.</p>
+<p><strong>Ce qu'il faut savoir commenter.</strong></p>
+<p><strong>1. L'importance de la corrélation contemporanée.</strong> Si les deux stratégies sont fortement corrélées — deux fonds actions, par exemple —, la variance de la <strong>différence</strong> est bien plus faible que la somme des variances. Le test est alors <strong>beaucoup plus puissant</strong> : on peut détecter un petit écart de performance là où des tests séparés ne concluraient rien. Ignorer cette corrélation, c'est perdre l'essentiel de l'information.</p>
+<p><strong>2. La puissance reste faible en pratique.</strong> Avec $\mathrm{Var}(\widehat{SR})\approx(1+SR^2/2)/T$ par stratégie, il faut de très longues séries pour départager deux gérants. C'est le message central de l'exercice de niveau 1.</p>
+<p><strong>3. L'hypothèse i.i.d. dans le temps est essentielle</strong> — c'est elle qui autorise à ne pas faire de correction de Newey-West sur $\hat S$. Si les rendements étaient autocorrélés — hedge funds à actifs illiquides, par exemple —, il faudrait la correction du concept 6, et les écarts-types augmenteraient encore.</p>
+<p><strong>4. La méthode est complètement générale.</strong> Le même schéma — empiler, estimer $\hat\Omega$ par GMM, appliquer la méthode delta, former un $\chi^2$ — sert à tester n'importe quelle relation régulière entre paramètres estimés : égalité de deux alphas, d'un bêta à $1$, d'une élasticité à une valeur donnée.</p>
+</div></details>
+
+<h2 data-prio="must">Common mistakes</h2>
+<ol>
+<li><strong>Évaluer le gradient de la méthode delta au mauvais point</strong> — c'est en $\hat\theta$ (ou $\theta_0$), pas ailleurs.</li>
+<li><strong>Oublier le facteur $1/T$</strong> — la formule GMM donne $T\,\mathrm{Var}[\hat\theta]$, pas $\mathrm{Var}[\hat\theta]$.</li>
+<li><strong>Utiliser la formule d'écart-type classique des MCO en présence d'hétéroscédasticité</strong> — il faut le <strong>sandwich</strong>.</li>
+<li><strong>Ignorer l'autocorrélation des moments</strong> — c'est l'erreur du tableau de prévisibilité : écarts-types divisés par $2{,}5$.</li>
+<li><strong>Oublier Newey-West avec des fenêtres chevauchantes</strong> — le chevauchement <strong>crée</strong> de l'autocorrélation.</li>
+<li><strong>Prendre $k$ trop petit ou trop grand</strong> — $k\propto T^{1/3}$, et <strong>comparer plusieurs valeurs</strong>.</li>
+<li><strong>Omettre la pondération triangulaire</strong> — sans elle, $\hat S$ peut ne pas être semi-définie positive.</li>
+<li><strong>Comparer deux estimateurs sans les empiler</strong> — on perd la <strong>corrélation contemporaine</strong>.</li>
+<li><strong>Se tromper de degrés de liberté</strong> — c'est $\dim h(\hat\theta)$, le nombre de <strong>restrictions</strong>.</li>
+<li><strong>Faire confiance à l'asymptotique sans vérifier</strong> — la couverture observée est $92{,}9\,\%$ pour $\hat\sigma$, pas $95\,\%$.</li>
+</ol>
+<h2>Ultimate Review</h2>
+<ol>
+<li><strong>Rappels</strong> : $x\sim N(0,\Omega)\Rightarrow Ax\sim N(0,A\Omega A^\top)$ · $\varepsilon\sim N(0,I)\Rightarrow\varepsilon^\top\varepsilon\sim\chi^2$ · $x\sim N(0,\Omega)\Rightarrow x^\top\Omega^{-1}x\sim\chi^2(\dim x)$.</li>
+<li><strong>Méthode delta</strong> : $h(\hat\theta)-h(\theta_0)\sim N(0,A\Omega A^\top)$ avec $A=\partial h/\partial\theta^\top$ évalué en $\theta_0$ (ou $\hat\theta$).</li>
+<li><strong>Ratio de Sharpe</strong> : $A=\big(\frac1{\hat\sigma},-\frac{\hat\mu}{\hat\sigma^2}\big)$ et, dans le cas gaussien, $\mathrm{Var}(\widehat{SR})=\frac1T\big(1+\frac{\widehat{SR}^2}{2}\big)$.</li>
+<li><strong>GMM</strong> : $\hat d=\partial\hat{\mathbb E}[f]/\partial\theta^\top$, $\hat S=\hat{\mathbb E}[ff^\top]$, et
+$$\sqrt T(\hat\theta-\theta_0)\Rightarrow N\Big(0,\big(\hat d^\top\hat S^{-1}\hat d\big)^{-1}\Big)$$</li>
+<li><strong>Cas gaussien moyenne / écart-type</strong> : $d=\mathrm{diag}(-1,-2\sigma_0)$, $S=\mathrm{diag}(\sigma_0^2,2\sigma_0^4)$, $V=\mathrm{diag}(\sigma_0^2,\tfrac12\sigma_0^2)$.</li>
+<li><strong>Intervalles</strong> : $\hat\theta_i\pm1{,}96\,SE(\hat\theta_i)$ ; <strong>couverture observée</strong> sur $100\,000$ simulations : $(0{,}945;0{,}929)$ — l'asymptotique est <strong>moins bonne pour $\hat\sigma$</strong>.</li>
+<li><strong>MCO comme GMM</strong> : $f=x_t(y_t-x_t^\top\beta)$, $\hat\beta=\hat{\mathbb E}(x_tx_t^\top)^{-1}\hat{\mathbb E}(x_ty_t)$.</li>
+<li><strong>Sandwich de White</strong> : $\mathrm{Var}[\hat\beta]=\frac1T\hat{\mathbb E}(x_tx_t^\top)^{-1}\hat{\mathbb E}(\hat u_t^2x_tx_t^\top)\hat{\mathbb E}(x_tx_t^\top)^{-1}$.</li>
+<li><strong>Moments corrélés</strong> : $S=\sum_{j=-\infty}^{\infty}\mathbb E[f_tf_{t-j}^\top]$ — <em>les observations corrélées affectent la taille effective de l'échantillon</em>.</li>
+<li><strong>Newey-West</strong> : $\hat S=\sum_{j=-k}^k\frac{k-\lvert j\rvert}{k}\cdot\frac1T\sum_tf(x_t,\hat\theta)f(x_{t-j},\hat\theta)^\top$ ; $k\propto T^{1/3}$ ; <strong>comparer plusieurs $k$</strong>.</li>
+<li><strong>Prévisibilité S&amp;P 500</strong> : $\hat\beta=0{,}0530$ ($h=6$) avec $SE$ passant de $0{,}0089$ ($k=0$) à $0{,}0233$ ($k=24$) — Student de $6{,}0$ à $2{,}3$.</li>
+<li><strong>MLE comme GMM</strong> : $\hat d=\hat{\mathbb E}[\partial^2\ln p/\partial\theta\partial\theta^\top]$, $\hat S=\hat{\mathbb E}[\text{score}\cdot\text{score}^\top]$ ; <strong>les scores sont non corrélés dans le temps</strong>.</li>
+<li><strong>MCNL</strong> : moments $\mathbb E\big[\frac{\partial h}{\partial\beta}(y_t-h(x_t,\beta))\big]=0$ ; <em>si les $u_t$ sont gaussiens, les MCNL sont <strong>optimaux</strong></em>.</li>
+<li><strong>Taille du test</strong> : borne supérieure de la probabilité de rejeter $H_0$ à tort — l'<strong>erreur de type I</strong>.</li>
+<li><strong>Test du khi-deux</strong> : $\xi=h(\hat\theta)^\top\hat V^{-1}h(\hat\theta)\sim\chi^2(\dim h)$.</li>
+<li><strong>Applications</strong> : $\beta=0$ en régression prédictive · $SR=SR_0$ · comparaison de deux ratios de Sharpe, en <strong>empilant</strong> les séries.</li>
+</ol>
+<p><strong>Formulas to know</strong>
+$$h(\hat\theta)-h(\theta_0)\sim N\big(0,A\Omega A^\top\big), \qquad A=\frac{\partial h(\theta)}{\partial\theta^\top}$$
+$$T\,\mathrm{Var}\big[\hat\theta\big]=\big(\hat d^\top\hat S^{-1}\hat d\big)^{-1} \qquad \mathrm{Var}(\widehat{SR})=\frac1T\Big(1+\frac{\widehat{SR}^2}{2}\Big)$$
+$$\mathrm{Var}[\hat\beta]=\frac1T\hat{\mathbb E}(x_tx_t^\top)^{-1}\hat{\mathbb E}(\hat u_t^2x_tx_t^\top)\hat{\mathbb E}(x_tx_t^\top)^{-1} \qquad \hat S_{NW}=\sum_{j=-k}^k\frac{k-\lvert j\rvert}{k}\hat{\mathbb E}\big[f_tf_{t-j}^\top\big]$$
+$$\xi=h(\hat\theta)^\top\hat V^{-1}h(\hat\theta)\sim\chi^2\big(\dim h\big)$$</p>
+<p><strong>Methods to know</strong> : appliquer la méthode delta ; calculer $\hat d$ et $\hat S$ ; corriger par Newey-West et choisir $k$ ; construire un test du $\chi^2$ ; empiler deux séries pour capturer leur corrélation.</p>
+<div class="rec"><h2>Active Recall</h2><p><strong>Basic</strong> — Énoncez la méthode delta.</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p>Pour un estimateur $\hat\theta$ tel que $\hat\theta-\theta_0\sim N(0,\Omega)$ avec $\Omega$ petite (d'ordre $1/T$), et $h$ régulière :
+$$h(\hat\theta)-h(\theta_0)\sim N\big(0,\ A\Omega A^\top\big), \qquad A=\left.\frac{\partial h(\theta)}{\partial\theta^\top}\right\vert_{\theta_0}$$</p>
+<p><strong>L'idée</strong> : <em>localement, une fonction régulière est approximativement linéaire</em>
+$$h(\hat\theta)\approx h(\theta_0)+A(\hat\theta-\theta_0)$$
+et une transformation linéaire d'un vecteur gaussien est gaussienne, de covariance $A\Omega A^\top$.</p>
+<p><strong>En pratique</strong>, on remplace $A$ et $\Omega$ par $\hat A=\partial h/\partial\theta^\top\vert_{\hat\theta}$ et $\hat\Omega$.</p>
+</div></details><p><strong>Understanding</strong> — Que représentent $\hat d$ et $\hat S$ dans la formule des écarts-types GMM ?</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p>$$T\,\mathrm{Var}\big[\hat\theta\big]=\big(\hat d^\top\hat S^{-1}\hat d\big)^{-1}, \qquad \hat d=\frac{\partial\hat{\mathbb E}[f]}{\partial\theta^\top}\bigg\vert_{\hat\theta}, \qquad \hat S=\hat{\mathbb E}\big[f f^\top\big]$$</p>
+<ul>
+<li><strong>$\hat d$ est la sensibilité des moments au paramètre.</strong> Si $\mathbb E[f]$ varie fortement avec $\theta$, une erreur sur les moments se traduit par une <strong>petite</strong> erreur sur $\theta$ : bonne identification, faible variance.</li>
+<li><strong>$\hat S$ est la variabilité des moments eux-mêmes.</strong> Plus les $f(x_t,\hat\theta)$ sont bruités, plus l'estimation est imprécise.</li>
+</ul>
+<p>La formule combine les deux comme il faut : la variance <strong>croît</strong> avec $\hat S$ et <strong>décroît</strong> avec $\hat d$.</p>
+<p class="cal piege"> <strong>Et la structure est celle de la fiche 64</strong> : $\hat d^\top\hat S^{-1}\hat d$ joue le rôle de l'<strong>information de Fisher</strong>, et la variance est son inverse. Quand $f$ est le score et le modèle correct, l'identité de l'information donne $-\hat d=\hat S=I(\theta)$ et l'on retrouve exactement $I(\theta)^{-1}$.</p>
+</div></details><p><strong>Application</strong> — Pourquoi faut-il Newey-West pour une régression à horizon long ?</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p><strong>Le modèle</strong> : $r_{t\to t+h}=\alpha+\beta\ln(D/P)_{t-1}+u_{t+h}$ avec des rendements <strong>cumulés sur $h$ mois</strong>.</p>
+<p><strong>Le problème.</strong> Les fenêtres sont <strong>chevauchantes</strong> : $r_{t\to t+6}$ et $r_{t+1\to t+7}$ partagent <strong>cinq mois</strong> de rendements. Les résidus $u_{t+h}$ et $u_{t+1+h}$ sont donc <strong>mécaniquement corrélés</strong>, jusqu'au retard $h-1$ — et cela, indépendamment de tout modèle : c'est un artefact de la construction.</p>
+<p><strong>La conséquence si on l'ignore.</strong> L'estimateur $\hat S=\hat{\mathbb E}[f_tf_t^\top]$ ne compte que la variance et <strong>omet toutes les autocovariances</strong>. Or <em>les observations corrélées affectent la taille effective de l'échantillon</em> : on croit disposer de $T$ observations indépendantes alors qu'on en a bien moins. Les écarts-types sont donc <strong>massivement sous-estimés</strong>.</p>
+<p><strong>L'ampleur, sur les données du cours</strong> ($h=6$) : $SE$ passe de $0{,}0089$ ($k=0$) à $0{,}0233$ ($k=24$) — <strong>multiplié par $2{,}6$</strong> —, et la statistique de Student de $6{,}0$ à $2{,}3$. La conclusion passe d'« écrasante » à « tout juste significative ».</p>
+<p><strong>Le remède.</strong>
+$$\hat S=\sum_{j=-k}^{k}\frac{k-\lvert j\rvert}{k}\cdot\frac1T\sum_t\hat u_tx_tx_{t-j}^\top\hat u_{t-j}$$
+avec $k\propto T^{1/3}$, assez grand pour couvrir la dépendance (au moins $h-1$) mais petit devant $T$. <strong>Le cours recommande d'essayer plusieurs $k$</strong> : quand les résultats se stabilisent — ici entre $k=24$ et $k=36$ —, la fenêtre est suffisante.</p>
+</div></details><p><strong>Comparison</strong> — Écarts-types classiques, sandwich et Newey-West : que corrige chacun ?</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<table>
+<thead>
+<tr>
+<th></th>
+<th><strong>Classique</strong></th>
+<th><strong>Sandwich (White)</strong></th>
+<th><strong>Newey-West</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Formule de $\hat S$</td>
+<td>$\hat\sigma^2\hat{\mathbb E}(xx^\top)$</td>
+<td>$\hat{\mathbb E}(\hat u_t^2xx^\top)$</td>
+<td>$\sum_{j=-k}^k\frac{k-\lvert j\rvert}{k}\hat{\mathbb E}[f_tf_{t-j}^\top]$</td>
+</tr>
+<tr>
+<td>Hypothèse</td>
+<td>homoscédasticité <strong>et</strong> absence d'autocorrélation</td>
+<td>absence d'<strong>autocorrélation</strong> seule</td>
+<td>aucune des deux</td>
+</tr>
+<tr>
+<td>Corrige</td>
+<td>rien</td>
+<td>l'<strong>hétéroscédasticité</strong></td>
+<td>hétéroscédasticité <strong>et</strong> autocorrélation</td>
+</tr>
+</tbody></table>
+<p><strong>La hiérarchie est emboîtée</strong> : chaque formule contient la précédente comme cas particulier. Si la variance est constante, le sandwich se réduit au classique ; si $k=0$, Newey-West se réduit au sandwich.</p>
+<p><strong>Quand utiliser quoi.</strong></p>
+<ul>
+<li><strong>Classique</strong> : seulement si l'on a de bonnes raisons de croire à l'homoscédasticité et à l'indépendance — rare en finance.</li>
+<li><strong>Sandwich</strong> : dès qu'il y a hétéroscédasticité, ce qui est la règle sur les rendements (fiche 53).</li>
+<li><strong>Newey-West</strong> : dès qu'il y a autocorrélation des moments — <strong>obligatoire</strong> avec des fenêtres chevauchantes, des rendements cumulés, ou des données à haute fréquence.</li>
+</ul>
+<p><strong>La règle pratique</strong> : en économétrie financière, on utilise <strong>Newey-West par défaut</strong>. Le coût est une légère perte de précision si la correction était inutile ; le bénéfice est d'éviter des conclusions fausses. L'asymétrie des risques tranche.</p>
+</div></details><p><strong>Exam-style</strong> — Construisez un test de non-prévisibilité des rendements et discutez ses pièges.</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p><strong>Le modèle.</strong> $y_t=\beta_0+x_t^\top\beta+u_t$, où $x_t$ est un vecteur de prédicteurs connus en $t$ — ratio dividende/prix, pente de la courbe des taux, etc.</p>
+<p><strong>L'hypothèse nulle.</strong> $H_0:\beta=0$ — aucune prévisibilité.</p>
+<p><strong>Étape 1 — estimer par MCO</strong>, ce qui est légitime <strong>comme GMM</strong> avec $f(x_t,y_t,\beta)=x_t(y_t-x_t^\top\beta)$ :
+$$\hat\beta=\hat{\mathbb E}\big(x_tx_t^\top\big)^{-1}\hat{\mathbb E}\big(x_ty_t\big)$$
+La validité repose sur $\mathbb E[u_t\mid x_t]=0$, non sur la normalité ni l'homoscédasticité.</p>
+<p><strong>Étape 2 — estimer $\widehat{\mathrm{Var}}(\hat\beta)$ par Newey-West</strong> :
+$$\widehat{\mathrm{Var}}\big[\hat\beta\big]=\frac1T\hat{\mathbb E}(x_tx_t^\top)^{-1}\hat S\,\hat{\mathbb E}(x_tx_t^\top)^{-1}, \qquad \hat S=\sum_{j=-k}^k\frac{k-\lvert j\rvert}{k}\cdot\frac1T\sum_t\hat u_tx_tx_{t-j}^\top\hat u_{t-j}$$</p>
+<p><strong>Étape 3 — la statistique de test.</strong> Avec $h(\theta)=\beta$ :
+$$\xi=\hat\beta^\top\Big(\widehat{\mathrm{Var}}(\hat\beta)\Big)^{-1}\hat\beta\ \sim\ \chi^2\big(\dim\beta\big)$$
+<em>Test de taille $\alpha$ : rejeter si $\xi\geq\bar\xi$ où $\mathrm{CDF}_{\chi^2(\dim\beta)}(\bar\xi)=1-\alpha$.</em></p>
+<p><strong>Les pièges — cinq points.</strong></p>
+<p><strong>1. L'autocorrélation des résidus.</strong> Avec des rendements cumulés à fenêtres chevauchantes, elle est <strong>certaine</strong>. Le tableau du cours montre l'ampleur : Student de $6{,}0$ à $2{,}3$. <strong>Ne jamais utiliser $k=0$ dans ce cas.</strong></p>
+<p><strong>2. Le choix de $k$.</strong> $k\propto T^{1/3}$, mais <strong>il faut essayer plusieurs valeurs</strong>. Trop petit, on sous-estime les écarts-types ; trop grand, on ajoute du bruit d'estimation. Le critère est la <strong>stabilisation</strong> des résultats.</p>
+<p><strong>3. L'hétéroscédasticité.</strong> Les rendements en présentent presque toujours (fiche 53). La formule sandwich la traite ; la formule classique ne le fait pas.</p>
+<p><strong>4. La significativité asymptotique n'est pas la fiabilité en échantillon fini.</strong> L'expérience Monte-Carlo du cours montre une couverture de $92{,}9\,\%$ pour un intervalle nominal de $95\,\%$. Sur des régressions prédictives, avec des régresseurs très persistants, la distorsion peut être bien pire.</p>
+<p><strong>5. Le problème le plus profond, que le cours annonce dans sa discussion.</strong> <em>En pratique, les variables explicatives sont <strong>stochastiques</strong>, et <strong>non décorrélées des résidus retardés</strong>.</em> Le ratio dividende/prix est très persistant et corrélé aux rendements passés — ce qui induit un <strong>biais de petit échantillon</strong> dans $\hat\beta$, distinct du problème d'écarts-types. C'est le biais de Stambaugh, et il ne se corrige pas par Newey-West.</p>
+<p><strong>La conclusion de méthode.</strong> <em>Les MCO sont valides tant que les conditions de moment le sont. Il est important de traiter les écarts-types correctement — le GMM offre une recette générale.</em> La recette est : vérifier les moments, calculer $\hat d$ et $\hat S$, corriger $\hat S$ pour l'autocorrélation, et <strong>ne jamais faire confiance à un $t$ de Student sans savoir comment il a été calculé</strong>.</p>
+</div></details></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h2>Flashcards</h2>
+<table>
+<thead>
+<tr>
+<th>Question</th>
+<th>Réponse</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Loi d'une combinaison linéaire gaussienne ?</td>
+<td>$x\sim N(0,\Omega)\Rightarrow Ax\sim N(0,A\Omega A^\top)$</td>
+</tr>
+<tr>
+<td>Loi de $x^\top\Omega^{-1}x$ ?</td>
+<td>$\chi^2(\dim x)$</td>
+</tr>
+<tr>
+<td>Principe de la méthode delta ?</td>
+<td>Une fonction régulière est <strong>localement linéaire</strong></td>
+</tr>
+<tr>
+<td>Formule de la méthode delta ?</td>
+<td>$h(\hat\theta)-h(\theta_0)\sim N(0,A\Omega A^\top)$</td>
+</tr>
+<tr>
+<td>Que vaut $A$ ?</td>
+<td>$\partial h(\theta)/\partial\theta^\top$ évalué au point limite</td>
+</tr>
+<tr>
+<td>Gradient du ratio de Sharpe ?</td>
+<td>$\big(1/\hat\sigma,\ -\hat\mu/\hat\sigma^2\big)$</td>
+</tr>
+<tr>
+<td>Variance du ratio de Sharpe ?</td>
+<td>$\frac1T\big(1+\widehat{SR}^2/2\big)$</td>
+</tr>
+<tr>
+<td>Que vaut $\hat d$ en GMM ?</td>
+<td>$\partial\hat{\mathbb E}[f]/\partial\theta^\top$</td>
+</tr>
+<tr>
+<td>Que vaut $\hat S$ ?</td>
+<td>$\hat{\mathbb E}[f f^\top]$</td>
+</tr>
+<tr>
+<td>Variance asymptotique du GMM ?</td>
+<td>$T\,\mathrm{Var}[\hat\theta]=(\hat d^\top\hat S^{-1}\hat d)^{-1}$</td>
+</tr>
+<tr>
+<td>$S$ pour la moyenne-variance gaussienne ?</td>
+<td>$\mathrm{diag}(\sigma_0^2,\ 2\sigma_0^4)$</td>
+</tr>
+<tr>
+<td>$V$ correspondant ?</td>
+<td>$\mathrm{diag}(\sigma_0^2,\ \sigma_0^2/2)$</td>
+</tr>
+<tr>
+<td>Couverture observée par Monte-Carlo ?</td>
+<td>$(0{,}945\ ;\ 0{,}929)$</td>
+</tr>
+<tr>
+<td>Que montre le second nombre ?</td>
+<td>L'asymptotique est <strong>moins fiable</strong> pour $\hat\sigma$</td>
+</tr>
+<tr>
+<td>Moment GMM des MCO ?</td>
+<td>$f=x_t(y_t-x_t^\top\beta)$</td>
+</tr>
+<tr>
+<td>Estimateur MCO par GMM ?</td>
+<td>$\hat{\mathbb E}(x_tx_t^\top)^{-1}\hat{\mathbb E}(x_ty_t)$</td>
+</tr>
+<tr>
+<td>Formule sandwich ?</td>
+<td>$\frac1T\hat{\mathbb E}(xx^\top)^{-1}\hat{\mathbb E}(\hat u^2xx^\top)\hat{\mathbb E}(xx^\top)^{-1}$</td>
+</tr>
+<tr>
+<td>Que corrige-t-elle ?</td>
+<td>L'<strong>hétéroscédasticité</strong></td>
+</tr>
+<tr>
+<td>Que vaut $S$ avec des moments corrélés ?</td>
+<td>$\sum_{j=-\infty}^{\infty}\mathbb E[f_tf_{t-j}^\top]$</td>
+</tr>
+<tr>
+<td>Formule de Newey-West ?</td>
+<td>$\sum_{j=-k}^k\frac{k-\lvert j\rvert}{k}\hat{\mathbb E}[f_tf_{t-j}^\top]$</td>
+</tr>
+<tr>
+<td>Pourquoi la pondération triangulaire ?</td>
+<td>Pour garantir que $\hat S$ soit <strong>semi-définie positive</strong></td>
+</tr>
+<tr>
+<td>Taux de croissance de $k$ ?</td>
+<td>$k\propto T^{1/3}$</td>
+</tr>
+<tr>
+<td>Que recommande le cours pour $k$ ?</td>
+<td><strong>Essayer plusieurs valeurs</strong> et comparer</td>
+</tr>
+<tr>
+<td>Effet sur la prévisibilité du S&amp;P 500 ?</td>
+<td>$SE$ de $0{,}0089$ à $0{,}0233$ pour $h=6$</td>
+</tr>
+<tr>
+<td>Pourquoi cette autocorrélation ?</td>
+<td>Les fenêtres de rendements sont <strong>chevauchantes</strong></td>
+</tr>
+<tr>
+<td>Les scores du MLE sont-ils autocorrélés ?</td>
+<td><strong>Non</strong> — $\mathbb E_t[f(x_{t+1},\theta_0)]=0$</td>
+</tr>
+<tr>
+<td>$\hat d$ et $\hat S$ pour le MLE ?</td>
+<td>Hessienne moyenne et variance du <strong>score</strong></td>
+</tr>
+<tr>
+<td>Moments des MCNL ?</td>
+<td>$\mathbb E[\frac{\partial h}{\partial\beta}(y_t-h(x_t,\beta))]=0$</td>
+</tr>
+<tr>
+<td>Quand les MCNL sont-ils optimaux ?</td>
+<td>Si les erreurs sont <strong>gaussiennes</strong></td>
+</tr>
+<tr>
+<td>Définition de la taille d'un test ?</td>
+<td>Probabilité <strong>maximale</strong> de rejet à tort</td>
+</tr>
+<tr>
+<td>Autre nom de cette erreur ?</td>
+<td>Erreur de <strong>type I</strong></td>
+</tr>
+<tr>
+<td>Statistique du test du khi-deux ?</td>
+<td>$\xi=h(\hat\theta)^\top\hat V^{-1}h(\hat\theta)$</td>
+</tr>
+<tr>
+<td>Ses degrés de liberté ?</td>
+<td>$\dim h(\hat\theta)$</td>
+</tr>
+<tr>
+<td>Comment comparer deux ratios de Sharpe ?</td>
+<td><strong>Empiler</strong> les séries pour capturer la corrélation</td>
+</tr>
+</tbody></table>
+</main>
+
+
+
+
+</body></html>

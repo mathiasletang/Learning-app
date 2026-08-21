@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fiche 47 — Arrêt optimal, ordonnancement et contrôle minimax</title>
+<script>
+window.MathJax={tex:{inlineMath:[["$","$"]],displayMath:[["$$","$$"]],processEscapes:true},
+ options:{skipHtmlTags:["script","noscript","style","textarea","pre","code"]},
+ svg:{fontCache:"global"},
+ startup:{pageReady:()=>MathJax.startup.defaultPageReady().then(()=>{document.body.classList.add("ready")})}};
+setTimeout(function(){document.body.classList.add("ready")},2500);
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+/* ============================================================
+   MathiasLearn — feuille de style des fiches
+   Reprise intégrale des tokens de 00_PARCOURS/*.html
+   + blocs pédagogiques (callouts, méthode, essentiels, recall)
+   ============================================================ */
+:root{--bg:#faf9f7;--card:#fff;--ink:#1a1a1a;--muted:#6b6b6b;--line:#e5e2dd;--accent:#8b5e34;
+ --hl:#fdf8ef;--ok:#2d7d4f;--okbg:#f0f7f3;--warn:#b3402f;--warnbg:#fdf3f1;--blue:#2f5d8b;--bluebg:#f1f5fa}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+ font:17px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;padding:0 16px 100px}
+.nav{position:sticky;top:0;background:rgba(250,249,247,.96);backdrop-filter:blur(8px);
+ border-bottom:1px solid var(--line);margin:0 -16px 30px;padding:11px 16px;z-index:50;
+ display:flex;gap:6px;flex-wrap:wrap;font-size:13px}
+.nav a{color:var(--muted);text-decoration:none;padding:4px 9px;border-radius:5px;white-space:nowrap}
+.nav a:hover{background:var(--line);color:var(--ink)}
+.nav a.on{background:var(--accent);color:#fff}
+main{max-width:780px;margin:0 auto}
+h1{font-size:31px;letter-spacing:-.02em;margin:.4em 0 .5em;line-height:1.25}
+h2{font-size:23px;margin:2.2em 0 .7em;padding-bottom:.3em;border-bottom:1px solid var(--line)}
+h3{font-size:19px;margin:1.9em 0 .5em;color:var(--accent)}
+h4{font-size:17px;margin:1.5em 0 .4em}
+p{margin:.8em 0} a{color:var(--accent)} hr{border:0;border-top:1px solid var(--line);margin:2.6em 0}
+table{border-collapse:collapse;width:100%;margin:1.3em 0;font-size:15.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+th{background:#f3f0eb;font-weight:600}
+tr:nth-child(even) td{background:#fcfbfa}
+code{font-family:"SF Mono",Menlo,Consolas,monospace;font-size:.88em;background:#f2efea;padding:2px 6px;border-radius:4px;white-space:nowrap}
+pre{background:#f2efea;padding:14px 16px;border-radius:8px;overflow-x:auto}
+pre code{background:none;padding:0;white-space:pre}
+blockquote{border-left:3px solid var(--accent);background:var(--hl);margin:1.4em 0;padding:14px 20px;border-radius:0 8px 8px 0}
+blockquote p:first-child{margin-top:0} blockquote p:last-child{margin-bottom:0}
+ul,ol{padding-left:1.5em} li{margin:.35em 0} em{color:#4a4a4a}
+mjx-container[display="true"]{margin:1.1em 0!important;overflow-x:auto;overflow-y:hidden;padding:2px 0}
+mjx-container svg{max-width:100%}
+body:not(.ready) main{opacity:0} main{opacity:1;transition:opacity .25s}
+
+/* --- bandeau de tête de fiche --- */
+.cours{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--accent);
+ border-radius:0 10px 10px 0;padding:18px 22px;margin:0 0 34px}
+.cours h4{margin:0 0 4px;font-size:14px;text-transform:uppercase;letter-spacing:.07em;color:var(--accent)}
+.cours .cs{color:var(--muted);font-size:14.5px;margin:0 0 14px}
+
+/* --- exercices / corrigés --- */
+.ex{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:6px 24px 20px;margin:18px 0}
+.ex>h3:first-child{margin-top:14px}
+details.cor{margin-top:18px;border:1px solid var(--line);border-radius:8px;background:#fcfbfa;overflow:hidden}
+details.cor>summary{cursor:pointer;padding:12px 16px;font-weight:600;font-size:15px;color:var(--accent);
+ list-style:none;display:flex;align-items:center;gap:9px;user-select:none;transition:.15s;min-height:44px}
+details.cor>summary::-webkit-details-marker{display:none}
+details.cor>summary:hover{background:var(--hl)}
+details.cor>summary::before{content:"\25B6";font-size:10px;transition:transform .18s;display:inline-block}
+details.cor[open]>summary::before{transform:rotate(90deg)}
+details.cor[open]>summary{background:var(--okbg);color:var(--ok);border-bottom:1px solid var(--line)}
+.cor .in{padding:4px 20px 16px}
+.cor .in>*:first-child{margin-top:.9em}
+
+/* --- blocs pédagogiques (callouts) ---
+   Générés depuis une citation Markdown dont le premier **gras** commence
+   par un mot-clé : DÉFINITION, THÉORÈME, MÉTHODE, PIÈGE, INTUITION… */
+.cal{border:1px solid var(--line);border-left:4px solid var(--accent);background:var(--card);
+ border-radius:0 10px 10px 0;padding:15px 20px;margin:1.5em 0}
+.cal>p:first-child{margin-top:0}.cal>p:last-child,.cal>ul:last-child,.cal>ol:last-child{margin-bottom:0}
+.cal .lab{display:block;font-size:12.5px;text-transform:uppercase;letter-spacing:.08em;
+ font-weight:700;color:var(--accent);margin-bottom:6px}
+.cal.formel{background:var(--hl)}
+.cal.piege{border-left-color:var(--warn);background:var(--warnbg)}
+.cal.piege .lab{color:var(--warn)}
+.cal.methode{border-left-color:var(--ok);background:var(--okbg)}
+.cal.methode .lab{color:var(--ok)}
+.cal.intu{border-left-color:var(--blue);background:var(--bluebg)}
+.cal.intu .lab{color:var(--blue)}
+.cal.plus{border-left-style:dashed;background:#faf9f7}
+.cal.plus .lab{color:var(--muted)}
+
+/* --- révision express --- */
+.ess{background:var(--card);border:1px solid var(--accent);border-radius:10px;padding:4px 24px 20px;margin:1.6em 0}
+.ess h3{margin-top:1.3em}
+.rec{background:var(--card);border:1px dashed var(--accent);border-radius:10px;padding:4px 24px 18px;margin:1.6em 0}
+.rec ol{counter-reset:none}
+
+/* --- impression / PDF --- */
+@media print{
+ .nav{display:none}
+ body{padding:0;background:#fff;font-size:11.2pt;line-height:1.55}
+ main{max-width:none}
+ h1{font-size:23pt}h2{font-size:15pt;margin-top:1.5em}h3{font-size:12.6pt}
+ h2,h3,h4{break-after:avoid;page-break-after:avoid}
+ table,.cal,blockquote{break-inside:avoid;page-break-inside:avoid}
+ table{display:table;font-size:9.6pt}
+ details.cor{border:1px solid var(--line);background:#fcfbfa}
+ details.cor>summary{display:none}
+ details.cor .in{padding-top:10px}
+ .cal,.ex,.ess,.rec{box-shadow:none}
+ a{color:var(--ink);text-decoration:none}
+}
+@page{margin:16mm 15mm 18mm}
+
+/* --- exemples travaillés --- */
+.exm{background:#fcfbfa;border:1px solid var(--line);border-radius:10px;padding:2px 20px 14px;margin:1.5em 0}
+.exm>h4:first-child{margin:14px 0 .5em;color:var(--accent);font-size:13px;text-transform:uppercase;letter-spacing:.07em}
+
+
+/* --- pastilles de priorité (conventions des fiches de l'app) --- */
+h2[data-prio], h3[data-prio], h4[data-prio]{position:relative}
+h2[data-prio]::before,h3[data-prio]::before,h4[data-prio]::before{
+ content:"";display:inline-block;width:9px;height:9px;border-radius:50%;
+ margin-right:9px;vertical-align:middle;background:var(--muted)}
+[data-prio="must"]::before{background:var(--warn)}
+[data-prio="high"]::before{background:#d98324}
+[data-prio="mid"]::before{background:#c9a227}
+[data-prio="low"]::before{background:var(--ok)}
+/* corrigés des fiches de l'app : même traitement que les corrigés des séries */
+details.cor>summary::after{content:""}
+</style></head><body>
+<div class="nav"><a href="00_COMMENCER_ICI.html">Commencer ici</a><a href="01_NOTATIONS_le-decodeur.html">Notations</a><a href="02_EXERCICES_Serie-0.html">Série 0 — Remise en route</a><a href="03_EXERCICES_Serie-1.html">Série 1 — Convexité</a><a href="04_EXERCICES_Serie-2.html">Série 2 — KKT</a><a href="05_AUTO-EVALUATION.html">Auto-évaluation (quiz)</a><a href="06_FICHE_Optimisation-deux-variables.html">Fiche — Optimisation à 2 variables</a></div>
+<main><h1>Fiche 47 — Arrêt optimal, ordonnancement et contrôle minimax</h1>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Matière</strong></td>
+<td>Maths · Optimisation</td>
+</tr>
+<tr>
+<td><strong>Cours source</strong></td>
+<td>Bertsekas, <em>6.231 Dynamic Programming</em>, MIT OpenCourseWare, automne 2015 — cours 5</td>
+</tr>
+<tr>
+<td><strong>Difficulté</strong></td>
+<td> Fondamental — trois familles de problèmes à structure remarquable</td>
+</tr>
+<tr>
+<td><strong>Temps d'étude estimé</strong></td>
+<td>1 h 45</td>
+</tr>
+<tr>
+<td><strong>Prérequis</strong></td>
+<td>Fiche 44 (algorithme DP), fiche 46 (structure de la politique optimale)</td>
+</tr>
+<tr>
+<td><strong>Concepts clés</strong></td>
+<td>Problème d'arrêt, région d'arrêt et de continuation, vente d'actif, seuil décroissant, régions d'arrêt emboîtées, ordonnancement, argument d'échange, politique d'indice, contrôle minimax</td>
+</tr>
+<tr>
+<td><strong>Poids à l'examen</strong></td>
+<td>L'<strong>argument d'échange</strong> du problème du quiz est l'exercice type par excellence : court, astucieux, et généralisable. La <strong>structure à seuil</strong> des problèmes d'arrêt en est le pendant en continu.</td>
+</tr>
+</tbody></table>
+<h2>Vue d'ensemble</h2>
+<p>Trois familles où la DP ne se contente pas de calculer : elle <strong>révèle une structure</strong>.</p>
+<pre><code>ARRÊT OPTIMAL     la politique est une PARTITION de l'espace d'états
+                  en région d'ARRÊT et région de CONTINUATION
+ORDONNANCEMENT    parfois une POLITIQUE D'INDICE : un nombre par tâche, on trie
+MINIMAX           l'aléa n'est plus moyenné mais ADVERSE : min–max au lieu de min–E
+</code></pre>
+<p>Dans chaque cas, on gagne beaucoup plus qu'un algorithme : on obtient une <strong>forme</strong> de solution — un seuil, un tri, une règle — qui se calcule en quelques opérations et s'interprète immédiatement.</p>
+<h2 data-prio="must">Concept 1 — Problèmes d'arrêt purs</h2>
+<p><strong>Deux commandes seulement.</strong></p>
+<ul>
+<li><strong>Arrêter</strong> : encourir un coût d'arrêt <strong>unique</strong>, et passer dans un état d'arrêt <strong>absorbant et sans coût</strong> ;</li>
+<li><strong>Continuer</strong> : évoluer selon $x_{k+1}=f_k(x_k,w_k)$ en encourant le <strong>coût par étape</strong>.</li>
+</ul>
+<blockquote>
+<p><strong>La conséquence structurelle.</strong> <em>Chaque politique consiste en une partition de l'ensemble des états $x_k$ en deux régions</em> : la <strong>région d'arrêt</strong>, où l'on s'arrête, et la <strong>région de continuation</strong>, où l'on continue. On ne cherche donc pas une fonction quelconque : on cherche une <strong>frontière</strong>.</p>
+</blockquote>
+<p>C'est ce qui rend ces problèmes si maniables — et si présents en finance (exercice d'une option américaine), en recherche d'emploi, en essais cliniques séquentiels.</p>
+<h2 data-prio="must">Concept 2 — L'exemple de la vente d'un actif</h2>
+<p><strong>Le problème.</strong> Une personne possède un actif. Aux instants $k=0,1,\dots,N-1$ elle reçoit une <strong>offre aléatoire</strong> $w_k$. Elle peut :</p>
+<ul>
+<li><strong>accepter</strong> $w_k$ et placer l'argent à un taux d'intérêt fixe $r$ ;</li>
+<li><strong>refuser</strong> $w_k$ et attendre $w_{k+1}$.</li>
+</ul>
+<p>Elle <strong>doit accepter la dernière offre</strong> $w_{N-1}$.</p>
+<p><strong>Algorithme DP</strong> ($x_k$ : l'offre courante, $T$ : l'état d'arrêt) :
+$$J_N(x_N) = \begin{cases} x_N &amp; \text{si } x_N\neq T\\ 0 &amp; \text{si } x_N = T\end{cases}$$
+$$J_k(x_k) = \begin{cases} \max\big\{(1+r)^{N-k}x_k,\ \mathbb{E}\{J_{k+1}(w_k)\}\big\} &amp; \text{si } x_k\neq T\\ 0 &amp; \text{si } x_k = T\end{cases}$$</p>
+<p><strong>Comment lire le maximum.</strong> Le premier terme $(1+r)^{N-k}x_k$ est ce que rapporte <strong>accepter maintenant</strong> et placer jusqu'à $N$ ; le second $\mathbb{E}\{J_{k+1}(w_k)\}$ est la valeur espérée de <strong>refuser</strong> et de jouer de façon optimale ensuite.</p>
+<p><strong>La politique optimale est à seuil.</strong>
+$$\text{accepter } x_k \text{ si } x_k&gt;\alpha_k, \qquad \text{refuser si } x_k&lt;\alpha_k, \qquad\text{où}\qquad \alpha_k = \frac{\mathbb{E}\{J_{k+1}(w_k)\}}{(1+r)^{N-k}}$$</p>
+<h3>Le seuil décroît avec le temps</h3>
+<blockquote>
+<p><strong>Résultat.</strong> $\alpha_k\geq\alpha_{k+1}$ pour tout $k$ : <strong>on devient de moins en moins exigeant à mesure qu'on s'approche de la fin.</strong></p>
+</blockquote>
+<p><strong>Preuve (celle du cours).</strong> Posons, pour $x_k\neq T$,
+$$V_k(x_k) = \frac{J_k(x_k)}{(1+r)^{N-k}}$$
+la valeur <strong>actualisée à l'instant $k$</strong>. L'algorithme DP devient alors
+$$V_N(x_N)=x_N, \qquad V_k(x_k)=\max\Big\{x_k,\ \frac{1}{1+r}\,\mathbb{E}_w\{V_{k+1}(w)\}\Big\}$$
+et l'on a $\alpha_k = \mathbb{E}_w\{V_{k+1}(w)\}/(1+r)$. <strong>Il suffit donc de montrer que $V_k(x)\geq V_{k+1}(x)$ pour tous $x$ et $k$.</strong> On part de $V_{N-1}(x)\geq V_N(x)$ — immédiat, puisque $V_{N-1}$ est un maximum dont $x$ est l'un des termes — puis on utilise la <strong>propriété de monotonie de la DP</strong> : si deux fonctions de coût-à-venir sont ordonnées à l'étape $k+1$, leurs images par l'opérateur de Bellman le restent à l'étape $k$. Q.E.D.</p>
+<blockquote>
+<p><strong>Le renversement de perspective.</strong> Le changement de variable $V_k = J_k/(1+r)^{N-k}$ élimine le facteur d'actualisation qui dépendait du temps, et transforme une récurrence à coefficients variables en une récurrence <strong>stationnaire</strong>. C'est exactement le geste qui prépare le passage à l'horizon infini.</p>
+</blockquote>
+<p><strong>Le comportement asymptotique.</strong> <em>Si $w$ est <strong>bornée</strong>, alors $\alpha_k\to\bar\alpha$ quand $k\to-\infty$.</em> Cela <strong>suggère qu'en horizon infini la politique optimale est stationnaire</strong> — un seuil unique, indépendant du temps. C'est la porte d'entrée du chapitre sur l'horizon infini.</p>
+<h2 data-prio="high">Concept 3 — Problèmes d'arrêt généraux</h2>
+<p><strong>Le cadre.</strong> À l'instant $k$, on peut <strong>arrêter</strong> au coût $t(x_k)$, ou <strong>choisir une commande</strong> $u_k\in U(x_k)$ et continuer :
+$$J_N(x_N)=t(x_N)$$
+$$J_k(x_k)=\min\Big\{\underbrace{t(x_k)}_{\text{arrêter}},\ \underbrace{\min_{u_k\in U(x_k)}\mathbb{E}\big\{g(x_k,u_k,w_k)+J_{k+1}\big(f(x_k,u_k,w_k)\big)\big\}}_{\text{continuer}}\Big\}$$</p>
+<p><strong>La région d'arrêt à l'instant $k$.</strong> Il est optimal de s'arrêter en $x$ si
+$$T_k = \Big\{x \ \Big|\ t(x)\leq \min_{u\in U(x)}\mathbb{E}\big\{g(x,u,w)+J_{k+1}\big(f(x,u,w)\big)\big\}\Big\}$$</p>
+<p><strong>Les régions d'arrêt sont emboîtées.</strong> Puisque $J_{N-1}(x)\leq J_N(x)$, la monotonie de la DP donne $J_k(x)\leq J_{k+1}(x)$ pour tout $k$, d'où
+$$T_0\subseteq T_1\subseteq\cdots\subseteq T_k\subseteq T_{k+1}\subseteq\cdots\subseteq T_{N-1}$$</p>
+<blockquote>
+<p><strong>La lecture.</strong> Plus on s'approche de l'horizon, <strong>plus la région d'arrêt s'agrandit</strong> : il reste moins d'occasions futures, donc on s'arrête plus volontiers. C'est le même phénomène que le seuil décroissant $\alpha_k$ de la vente d'actif.</p>
+</blockquote>
+<p><strong>Le cas intéressant.</strong> <em>Celui où toutes les régions $T_k$ sont <strong>égales</strong> — à $T_{N-1}$, l'ensemble où il vaut mieux s'arrêter que de faire un pas puis s'arrêter.</em> On peut montrer que c'est le cas si
+$$f(x,u,w)\in T_{N-1} \qquad \text{pour tout } x\in T_{N-1},\ u\in U(x),\ w$$</p>
+<p class="cal piege"> La condition dit que <strong>$T_{N-1}$ est absorbante</strong> : une fois dans la région d'arrêt, la dynamique ne peut plus en sortir. Alors la règle « s'arrêter dans $T_{N-1}$ » est optimale <strong>à tout instant</strong>, et la politique devient <strong>stationnaire</strong> — un seul ensemble à calculer au lieu de $N$.</p>
+<h2 data-prio="must">Concept 4 — Problèmes d'ordonnancement</h2>
+<p><strong>Le cadre.</strong> On dispose d'un ensemble de tâches à exécuter, l'ordre étant à choisir. <strong>Les coûts dépendent de l'ordre.</strong> Il peut y avoir de l'incertitude stochastique, ainsi que des contraintes de précédence et de disponibilité de ressources.</p>
+<blockquote>
+<p><em>Certains des problèmes combinatoires les plus difficiles sont de ce type</em> — voyageur de commerce, tournées de véhicules.</p>
+</blockquote>
+<p><strong>Mais certains problèmes particuliers admettent une méthode de résolution quasi analytique.</strong> Le cours en distingue deux.</p>
+<table>
+<thead>
+<tr>
+<th>Méthode</th>
+<th>Principe</th>
+<th>Exige</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Politique d'indice</strong></td>
+<td>chaque tâche possède un « <strong>indice de coût</strong> » facile à calculer ; il est optimal de choisir celle d'indice minimal</td>
+<td>— (problèmes de bandits manchots)</td>
+</tr>
+<tr>
+<td><strong>Argument d'échange</strong></td>
+<td>partir d'un ordonnancement, <strong>échanger deux tâches adjacentes</strong> et regarder ce qui se passe</td>
+<td>l'existence d'une politique optimale <strong>en boucle ouverte</strong></td>
+</tr>
+</tbody></table>
+<p class="cal piege"> <strong>L'argument d'échange n'est pas universel</strong> : il exige qu'une politique optimale <strong>en boucle ouverte</strong> existe, c'est-à-dire que l'ordre puisse être fixé à l'avance sans rien observer (fiche 44). Si l'ordre optimal dépendait de ce qui se produit en cours de route, l'échange n'aurait pas de sens.</p>
+<h3>L'exemple du quiz</h3>
+<p><strong>Le problème.</strong> Une liste de $N$ questions. Si la question $i$ reçoit une réponse correcte — ce qui arrive avec probabilité $p_i$ — on reçoit la récompense $R_i$ ; sinon <strong>le quiz s'arrête</strong>. Choisir l'ordre des questions pour maximiser la récompense espérée.</p>
+<p><strong>L'argument d'échange, en trois lignes.</strong> Soient $i$ et $j$ les $k$-ième et $(k+1)$-ième questions d'une liste <strong>ordonnée de façon optimale</strong> :
+$$L = (i_0,\dots,i_{k-1},\ i,\ j,\ i_{k+2},\dots,i_{N-1})$$
+La récompense espérée se décompose en
+$$\mathbb{E}\{\text{récompense de } L\} = \mathbb{E}\{\text{récompense de } (i_0,\dots,i_{k-1})\} + p_{i_0}\cdots p_{i_{k-1}}\big(p_iR_i+p_ip_jR_j\big) + p_{i_0}\cdots p_{i_{k-1}}p_ip_j\,\mathbb{E}\{\text{récompense de } (i_{k+2},\dots)\}$$</p>
+<p>Considérons maintenant la liste $L'$ où $i$ et $j$ sont <strong>échangées</strong>. Les premier et troisième termes sont <strong>identiques</strong> — le préfixe est le même, et le suffixe est atteint avec la même probabilité $p_ip_j$ dans les deux cas. Comme $L$ est optimale, $\mathbb{E}\{L\}\geq\mathbb{E}\{L'\}$, ce qui se réduit à
+$$p_iR_i+p_ip_jR_j \geq p_jR_j+p_jp_iR_i$$
+soit, après réarrangement,
+$$\boxed{\ \frac{p_iR_i}{1-p_i} \geq \frac{p_jR_j}{1-p_j}\ }$$</p>
+<blockquote>
+<p><strong>La règle d'ordonnancement.</strong> Il faut poser les questions <strong>par indice $\dfrac{p_iR_i}{1-p_i}$ décroissant</strong>. C'est une <strong>politique d'indice</strong> : on attribue un nombre à chaque tâche, on trie, et c'est fini — $N\log N$ opérations au lieu des $N!$ ordres possibles.</p>
+</blockquote>
+<p><strong>Comment lire l'indice.</strong> Le numérateur $p_iR_i$ est le <strong>gain espéré</strong> de la question. Le dénominateur $1-p_i$ est la <strong>probabilité d'interruption</strong> : plus une question risque de tout arrêter, plus elle est pénalisée. On veut donc les questions <strong>rentables</strong> et <strong>sûres</strong> d'abord — et l'indice dose exactement l'arbitrage.</p>
+<h2 data-prio="high">Concept 5 — Contrôle minimax</h2>
+<p><strong>Le cadre.</strong> On reprend le problème de base, à ceci près que la perturbation $w_k$, <strong>au lieu d'être aléatoire, est seulement connue pour appartenir à un ensemble donné</strong> $W_k(x_k,u_k)$.</p>
+<p><strong>Le coût à minimiser</strong> devient un <strong>pire cas</strong> :
+$$J_\pi(x_0) = \max_{\substack{w_k\in W_k(x_k,\mu_k(x_k))\\ k=0,\dots,N-1}}\Big[g_N(x_N)+\sum_{k=0}^{N-1}g_k\big(x_k,\mu_k(x_k),w_k\big)\Big]$$</p>
+<p><strong>L'algorithme DP</strong> prend la forme
+$$J_N(x_N)=g_N(x_N)$$
+$$\boxed{\ J_k(x_k)=\min_{u_k\in U(x_k)}\ \max_{w_k\in W_k(x_k,u_k)}\Big[g_k(x_k,u_k,w_k)+J_{k+1}\big(f_k(x_k,u_k,w_k)\big)\Big]\ }$$</p>
+<blockquote>
+<p><strong>La seule différence avec le cas stochastique : $\mathbb{E}_{w_k}$ devient $\max_{w_k}$.</strong> Toute la structure — récurrence à rebours, principe d'optimalité, politique en boucle fermée — est <strong>inchangée</strong>. La dérivation de l'algorithme est <em>similaire à celle du cas stochastique</em>.</p>
+</blockquote>
+<p><strong>L'ordre $\min$ puis $\max$ compte autant qu'en stochastique.</strong> On choisit $u_k$ <strong>avant</strong> de connaître $w_k$, et la nature (ou l'adversaire) choisit ensuite le pire $w_k$ <strong>sachant</strong> $u_k$. C'est la même asymétrie qu'à la fiche 44 — et c'est le lien direct avec l'optimisation robuste de la fiche 32, où l'on minimisait déjà un pire cas sur une famille de modèles.</p>
+<p class="cal piege"> <strong>Le minimax est pessimiste par construction.</strong> Il protège contre la pire réalisation, aussi improbable soit-elle. C'est adapté quand l'aléa est réellement adverse (jeux, sûreté) ou quand on ne connaît pas la loi de $w_k$ ; c'est excessivement conservateur quand on la connaît et qu'on peut moyenner.</p>
+<h3>Comment résoudre l'exercice type (protocole)</h3>
+<ol>
+<li><strong>Reconnaître la famille</strong> : deux commandes dont une absorbante $\to$ arrêt ; ordre de tâches $\to$ ordonnancement ; aléa dans un ensemble $\to$ minimax.</li>
+<li><strong>Pour un problème d'arrêt</strong> : écrire $J_k = \min\{\text{arrêter},\ \text{continuer}\}$ et identifier la <strong>région d'arrêt</strong> $T_k$.</li>
+<li><strong>Chercher la structure à seuil</strong> : si l'état est scalaire et le terme « continuer » indépendant de $x_k$, la règle est « arrêter au-dessus (ou en dessous) d'un seuil ».</li>
+<li><strong>Vérifier la monotonie</strong> : $J_k\leq J_{k+1}$ donne $T_k\subseteq T_{k+1}$, donc des seuils monotones en temps.</li>
+<li><strong>Tester l'absorption</strong> : si $f(x,u,w)\in T_{N-1}$ pour tout $x\in T_{N-1}$, la politique est <strong>stationnaire</strong>.</li>
+<li><strong>Pour un ordonnancement</strong> : vérifier qu'une politique optimale <strong>en boucle ouverte</strong> existe, puis appliquer l'<strong>argument d'échange</strong> sur deux tâches adjacentes.</li>
+<li><strong>Lire l'indice</strong> obtenu et trier les tâches selon lui.</li>
+<li><strong>Pour un minimax</strong> : remplacer $\mathbb{E}_{w_k}$ par $\max_{w_k\in W_k}$ et dérouler la même récurrence.</li>
+</ol>
+<h3>Exercices progressifs</h3>
+<p><strong> Niveau 1</strong> — Dans la vente d'actif, pourquoi le seuil $\alpha_k$ décroît-il avec $k$ ?</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p>Parce que $\alpha_k = \mathbb{E}_w\{V_{k+1}(w)\}/(1+r)$ et que $V_k(x)\geq V_{k+1}(x)$ pour tout $x$ : la valeur actualisée d'une offre donnée <strong>décroît</strong> quand on s'approche de l'horizon, puisqu'il reste moins d'occasions futures de faire mieux.</p>
+<p><strong>Interprétation.</strong> En début de période on peut se permettre d'être exigeant : il reste beaucoup d'offres à venir. Près de la fin, l'option d'attendre ne vaut presque plus rien, et l'on accepte des offres qu'on aurait refusées plus tôt. À la dernière étape, on accepte <strong>tout</strong>.</p>
+</div></details>
+
+<p><strong> Niveau 2</strong> — Dans le problème du quiz, deux questions ont $(p_1,R_1)=(0{,}9;\ 10)$ et $(p_2,R_2)=(0{,}5;\ 100)$. Dans quel ordre les poser ?</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p>Les indices valent
+$$\frac{p_1R_1}{1-p_1} = \frac{0{,}9\times10}{0{,}1}=90, \qquad \frac{p_2R_2}{1-p_2}=\frac{0{,}5\times100}{0{,}5}=100$$
+Il faut poser la question <strong>2 d'abord</strong> (indice $100&gt;90$), bien qu'elle soit deux fois moins sûre.</p>
+<p><em>Vérification directe.</em> Ordre $(2,1)$ : $0{,}5\times100+0{,}5\times0{,}9\times10 = 50+4{,}5=54{,}5$. Ordre $(1,2)$ : $0{,}9\times10+0{,}9\times0{,}5\times100 = 9+45 = 54$. L'ordre $(2,1)$ est bien meilleur .</p>
+<p><em>La leçon :</em> le classement ne se fait ni sur $R_i$ seul, ni sur $p_i$ seul, ni même sur $p_iR_i$ (qui donnerait $9$ contre $50$, même conclusion ici mais pas toujours) — c'est bien $p_iR_i/(1-p_i)$ qui tranche.</p>
+</div></details>
+
+<p><strong> Niveau 3</strong> — Écrivez la récurrence de contrôle minimax et dites ce qui la distingue du cas stochastique.</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p>$$J_N(x_N)=g_N(x_N), \qquad J_k(x_k)=\min_{u_k\in U(x_k)}\max_{w_k\in W_k(x_k,u_k)}\Big[g_k(x_k,u_k,w_k)+J_{k+1}\big(f_k(x_k,u_k,w_k)\big)\Big]$$</p>
+<p><strong>La seule différence</strong> est que $\mathbb{E}_{w_k}$ est remplacé par $\max_{w_k\in W_k(x_k,u_k)}$ : au lieu de moyenner sur la loi de l'aléa, on prend le <strong>pire cas</strong> sur l'ensemble où il vit.</p>
+<p>Tout le reste est identique : récurrence à rebours, principe d'optimalité, politique en boucle fermée $\mu_k(x_k)$, et l'ordre $\min$ <strong>puis</strong> $\max$ qui traduit qu'on décide <strong>avant</strong> de subir. On peut d'ailleurs voir le cas stochastique et le cas minimax comme deux instances d'un même schéma, avec deux « opérateurs d'agrégation » différents sur $w_k$.</p>
+</div></details>
+
+<p><strong> Niveau 4 — type examen</strong> — Démontrez l'emboîtement $T_k\subseteq T_{k+1}$ des régions d'arrêt, et expliquez quand la politique devient stationnaire.</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p><strong>Étape 1 — la monotonie de $J_k$.</strong> À l'avant-dernière étape,
+$$J_{N-1}(x)=\min\Big\{t(x),\ \min_u\mathbb{E}\{g+J_N(f)\}\Big\}\leq t(x) = J_N(x)$$
+puisque le minimum d'un ensemble contenant $t(x)$ lui est inférieur. Puis, par <strong>monotonie de l'opérateur de Bellman</strong> — si $J_{k+1}\leq J_{k+2}$ ponctuellement, alors leurs images le restent, car $\min$, $\max$ et $\mathbb{E}$ préservent l'ordre — on obtient par récurrence descendante
+$$J_k(x)\leq J_{k+1}(x) \qquad \text{pour tout } k \text{ et tout } x$$</p>
+<p><strong>Étape 2 — l'emboîtement.</strong> Par définition,
+$$x\in T_k \iff t(x)\leq\min_u\mathbb{E}\big\{g(x,u,w)+J_{k+1}\big(f(x,u,w)\big)\big\}$$
+Comme $J_{k+1}\leq J_{k+2}$, le membre de droite pour $k$ est <strong>inférieur ou égal</strong> à celui pour $k+1$. Donc si l'inégalité est vérifiée pour $k$, elle l'est a fortiori pour $k+1$ :
+$$T_0\subseteq T_1\subseteq\cdots\subseteq T_{N-1} \qquad\blacksquare$$</p>
+<p><strong>Étape 3 — quand la politique est-elle stationnaire ?</strong> Lorsque toutes les $T_k$ sont <strong>égales</strong> à $T_{N-1}$. Le cours donne une condition suffisante :
+$$f(x,u,w)\in T_{N-1} \quad \text{pour tout } x\in T_{N-1},\ u\in U(x),\ w$$
+c'est-à-dire que <strong>$T_{N-1}$ est absorbante</strong> pour la dynamique.</p>
+<p><strong>Pourquoi cette condition suffit, intuitivement.</strong> Si l'on est dans $T_{N-1}$, continuer ne peut mener qu'à un état où l'on voudra encore s'arrêter — donc continuer ne fait que retarder l'inévitable en accumulant des coûts. Il est donc optimal de s'arrêter <strong>immédiatement</strong>, à n'importe quel instant : la région d'arrêt ne dépend plus de $k$.</p>
+<p><strong>La portée.</strong> Une politique stationnaire est <strong>une seule règle</strong> au lieu de $N$, calculée une fois. C'est exactement ce qu'on cherchera systématiquement en horizon infini — et l'observation « $\alpha_k\to\bar\alpha$ si $w$ est bornée » du concept 2 en est l'annonce.</p>
+</div></details>
+
+<h2 data-prio="must">Common mistakes</h2>
+<ol>
+<li><strong>Chercher une politique compliquée dans un problème d'arrêt</strong> — la solution est une <strong>partition</strong> de l'espace d'états, souvent un simple seuil.</li>
+<li><strong>Croire le seuil constant en horizon fini</strong> — $\alpha_k$ <strong>décroît</strong> ; il ne devient constant qu'à l'horizon infini.</li>
+<li><strong>Se tromper de sens dans l'emboîtement</strong> — c'est $T_k\subseteq T_{k+1}$ : la région d'arrêt <strong>grandit</strong> quand on approche de la fin.</li>
+<li><strong>Appliquer l'argument d'échange sans vérifier l'hypothèse</strong> — il exige l'existence d'une politique optimale <strong>en boucle ouverte</strong>.</li>
+<li><strong>Échanger deux tâches non adjacentes</strong> — l'argument ne fonctionne que sur des tâches <strong>voisines</strong>, sinon les termes de préfixe et de suffixe ne se simplifient pas.</li>
+<li><strong>Trier sur $p_iR_i$ au lieu de $p_iR_i/(1-p_i)$</strong> — le dénominateur encode le risque d'interruption ; l'oublier donne un ordre faux.</li>
+<li><strong>Inverser $\min$ et $\max$ en minimax</strong> — $\min_u\max_w$ signifie « je décide, puis le pire arrive » ; $\max_w\min_u$ donnerait à l'adversaire le désavantage de jouer en premier.</li>
+<li><strong>Utiliser le minimax quand on connaît la loi</strong> — il est inutilement pessimiste ; l'espérance est alors le bon critère.</li>
+</ol>
+<h2>Ultimate Review</h2>
+<ol>
+<li><strong>Arrêt pur</strong> : deux commandes, l'arrêt menant à un état <strong>absorbant sans coût</strong> ; toute politique est une <strong>partition</strong> en région d'arrêt et région de continuation.</li>
+<li><strong>Vente d'actif</strong> : $J_k(x_k)=\max\{(1+r)^{N-k}x_k,\ \mathbb{E}\{J_{k+1}(w_k)\}\}$ ; accepter si $x_k&gt;\alpha_k$ avec $\alpha_k=\mathbb{E}\{J_{k+1}(w_k)\}/(1+r)^{N-k}$.</li>
+<li>Le seuil <strong>décroît</strong> : $\alpha_k\geq\alpha_{k+1}$ — preuve par $V_k=J_k/(1+r)^{N-k}$ et monotonie de la DP.</li>
+<li>Si $w$ est bornée, $\alpha_k\to\bar\alpha$ : <strong>politique stationnaire</strong> en horizon infini.</li>
+<li><strong>Arrêt général</strong> : $J_k=\min\{t(x_k),\ \min_u\mathbb{E}[g+J_{k+1}(f)]\}$ ; région d'arrêt $T_k$.</li>
+<li><strong>Emboîtement</strong> $T_0\subseteq\cdots\subseteq T_{N-1}$ ; politique <strong>stationnaire</strong> si $T_{N-1}$ est <strong>absorbante</strong>.</li>
+<li><strong>Ordonnancement</strong> : parmi les problèmes combinatoires les plus durs ; deux voies quasi analytiques — <strong>indice</strong> et <strong>argument d'échange</strong> (qui exige une politique optimale en boucle ouverte).</li>
+<li><strong>Problème du quiz</strong> : trier par $\dfrac{p_iR_i}{1-p_i}$ <strong>décroissant</strong> — gain espéré divisé par le risque d'interruption.</li>
+<li><strong>Minimax</strong> : $\mathbb{E}_{w_k}$ devient $\max_{w_k\in W_k(x_k,u_k)}$ ; tout le reste de la structure DP est inchangé.</li>
+</ol>
+<p><strong>Formulas to know</strong>
+$$J_k(x_k)=\max\big\{(1+r)^{N-k}x_k,\ \mathbb{E}\{J_{k+1}(w_k)\}\big\} \qquad \alpha_k=\frac{\mathbb{E}\{J_{k+1}(w_k)\}}{(1+r)^{N-k}}$$
+$$T_k=\Big\{x\ \Big|\ t(x)\leq\min_{u}\mathbb{E}\{g+J_{k+1}(f)\}\Big\} \qquad \frac{p_iR_i}{1-p_i}\geq\frac{p_jR_j}{1-p_j}$$
+$$J_k(x_k)=\min_{u_k}\max_{w_k\in W_k(x_k,u_k)}\big[g_k+J_{k+1}(f_k)\big]$$</p>
+<p><strong>Methods to know</strong> : le protocole en 8 étapes ; l'argument d'échange sur deux tâches adjacentes ; la preuve de monotonie des seuils et de l'emboîtement des régions d'arrêt.</p>
+<div class="rec"><h2>Active Recall</h2><p><strong>Basic</strong> — Quelle forme prend nécessairement une politique dans un problème d'arrêt pur ?</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p>Une <strong>partition</strong> de l'ensemble des états en deux régions : la <strong>région d'arrêt</strong>, où l'on s'arrête, et la <strong>région de continuation</strong>, où l'on continue. On ne cherche donc pas une fonction quelconque mais une <strong>frontière</strong> — souvent, en dimension un, un simple <strong>seuil</strong>.</p>
+</div></details><p><strong>Understanding</strong> — Pourquoi les régions d'arrêt sont-elles emboîtées, et dans quel sens ?</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p>Dans le sens $T_0\subseteq T_1\subseteq\cdots\subseteq T_{N-1}$ : elles <strong>grandissent</strong> avec $k$. La raison est la monotonie $J_k\leq J_{k+1}$, elle-même issue de $J_{N-1}\leq J_N$ et de la monotonie de l'opérateur de Bellman. Comme le coût-à-venir de continuer augmente quand on approche de l'horizon, la condition « il vaut mieux s'arrêter » est satisfaite par de plus en plus d'états.</p>
+<p><em>Intuitivement :</em> près de la fin, l'option de continuer vaut de moins en moins cher, donc on s'arrête plus volontiers.</p>
+</div></details><p><strong>Application</strong> — Trois questions de quiz : $(0{,}8;\,5)$, $(0{,}4;\,20)$, $(0{,}6;\,9)$. Quel ordre ?</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p>Indices $p_iR_i/(1-p_i)$ :
+$$\frac{0{,}8\times5}{0{,}2}=20, \qquad \frac{0{,}4\times20}{0{,}6}\approx13{,}3, \qquad \frac{0{,}6\times9}{0{,}4}=13{,}5$$
+Ordre optimal : <strong>question 1</strong> ($20$), puis <strong>question 3</strong> ($13{,}5$), puis <strong>question 2</strong> ($13{,}3$). Les deux dernières sont très proches, ce qui montre que le critère arbitre finement entre récompense élevée et probabilité de survie.</p>
+</div></details><p><strong>Comparison</strong> — Contrôle stochastique et contrôle minimax : qu'est-ce qui change, qu'est-ce qui reste ?</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p><strong>Ce qui change</strong> : l'agrégation sur $w_k$. Le stochastique <strong>moyenne</strong> ($\mathbb{E}_{w_k}$, avec une loi connue) ; le minimax prend le <strong>pire cas</strong> ($\max_{w_k\in W_k}$, avec un simple ensemble d'appartenance).</p>
+<p><strong>Ce qui reste</strong> : absolument tout le reste — la récurrence à rebours, le principe d'optimalité, la politique en boucle fermée, et l'ordre $\min_u$ <strong>puis</strong> agrégation sur $w$, qui traduit qu'on décide avant de subir.</p>
+</div></details><p><strong>Exam-style</strong> — Menez l'argument d'échange sur le problème du quiz.</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p>Soit $L=(i_0,\dots,i_{k-1},i,j,i_{k+2},\dots)$ une liste <strong>optimale</strong>, où $i$ et $j$ occupent les positions $k$ et $k+1$. Sa récompense espérée est
+$$\mathbb{E}\{L\}=\mathbb{E}\{\text{préfixe}\}+p_{i_0}\cdots p_{i_{k-1}}\big(p_iR_i+p_ip_jR_j\big)+p_{i_0}\cdots p_{i_{k-1}}p_ip_j\,\mathbb{E}\{\text{suffixe}\}$$
+Soit $L'$ la même liste avec $i$ et $j$ <strong>échangées</strong>. Les termes de préfixe sont identiques, et les termes de suffixe aussi — le suffixe est atteint avec la probabilité $p_ip_j$ dans les deux ordres. L'optimalité de $L$ donne donc $\mathbb{E}\{L\}\geq\mathbb{E}\{L'\}$, soit
+$$p_iR_i+p_ip_jR_j\ \geq\ p_jR_j+p_jp_iR_i$$
+En regroupant : $p_iR_i(1-p_j)\geq p_jR_j(1-p_i)$, puis en divisant par $(1-p_i)(1-p_j)&gt;0$ :
+$$\frac{p_iR_i}{1-p_i}\geq\frac{p_jR_j}{1-p_j}$$
+Toute paire adjacente d'une liste optimale est donc ordonnée par indice décroissant : la liste entière l'est. $\blacksquare$</p>
+</div></details></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h2>Flashcards</h2>
+<table>
+<thead>
+<tr>
+<th>Question</th>
+<th>Réponse</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Les deux commandes d'un problème d'arrêt ?</td>
+<td>Arrêter (coût unique, état absorbant sans coût) ou continuer</td>
+</tr>
+<tr>
+<td>Forme d'une politique d'arrêt ?</td>
+<td>Une <strong>partition</strong> : région d'arrêt / région de continuation</td>
+</tr>
+<tr>
+<td>DP de la vente d'actif ?</td>
+<td>$J_k(x_k)=\max\{(1+r)^{N-k}x_k,\ \mathbb{E}\{J_{k+1}(w_k)\}\}$</td>
+</tr>
+<tr>
+<td>Seuil d'acceptation ?</td>
+<td>$\alpha_k=\mathbb{E}\{J_{k+1}(w_k)\}/(1+r)^{N-k}$</td>
+</tr>
+<tr>
+<td>Le seuil est-il constant ?</td>
+<td>Non : $\alpha_k\geq\alpha_{k+1}$, il <strong>décroît</strong></td>
+</tr>
+<tr>
+<td>Que se passe-t-il si $w$ est bornée ?</td>
+<td>$\alpha_k\to\bar\alpha$ : politique stationnaire en horizon infini</td>
+</tr>
+<tr>
+<td>Sens de l'emboîtement des régions d'arrêt ?</td>
+<td>$T_0\subseteq T_1\subseteq\cdots\subseteq T_{N-1}$</td>
+</tr>
+<tr>
+<td>Quand la politique d'arrêt est-elle stationnaire ?</td>
+<td>Si $T_{N-1}$ est <strong>absorbante</strong> pour la dynamique</td>
+</tr>
+<tr>
+<td>Les deux voies quasi analytiques en ordonnancement ?</td>
+<td>Politique d'<strong>indice</strong> ; <strong>argument d'échange</strong></td>
+</tr>
+<tr>
+<td>Que suppose l'argument d'échange ?</td>
+<td>L'existence d'une politique optimale en <strong>boucle ouverte</strong></td>
+</tr>
+<tr>
+<td>Indice du problème du quiz ?</td>
+<td>$p_iR_i/(1-p_i)$, à trier par ordre <strong>décroissant</strong></td>
+</tr>
+<tr>
+<td>Comment lire cet indice ?</td>
+<td>Gain espéré divisé par le risque d'interruption</td>
+</tr>
+<tr>
+<td>Que change le contrôle minimax ?</td>
+<td>$\mathbb{E}_{w_k}$ devient $\max_{w_k\in W_k(x_k,u_k)}$</td>
+</tr>
+<tr>
+<td>Ordre des opérateurs en minimax ?</td>
+<td>$\min_u$ <strong>puis</strong> $\max_w$ — on décide avant de subir</td>
+</tr>
+<tr>
+<td>Quand le minimax est-il justifié ?</td>
+<td>Aléa adverse ou loi inconnue ; sinon il est trop pessimiste</td>
+</tr>
+</tbody></table>
+</main>
+
+
+
+
+</body></html>

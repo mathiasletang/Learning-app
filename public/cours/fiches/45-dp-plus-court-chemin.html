@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fiche 45 — Programmation dynamique déterministe et plus court chemin</title>
+<script>
+window.MathJax={tex:{inlineMath:[["$","$"]],displayMath:[["$$","$$"]],processEscapes:true},
+ options:{skipHtmlTags:["script","noscript","style","textarea","pre","code"]},
+ svg:{fontCache:"global"},
+ startup:{pageReady:()=>MathJax.startup.defaultPageReady().then(()=>{document.body.classList.add("ready")})}};
+setTimeout(function(){document.body.classList.add("ready")},2500);
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+/* ============================================================
+   MathiasLearn — feuille de style des fiches
+   Reprise intégrale des tokens de 00_PARCOURS/*.html
+   + blocs pédagogiques (callouts, méthode, essentiels, recall)
+   ============================================================ */
+:root{--bg:#faf9f7;--card:#fff;--ink:#1a1a1a;--muted:#6b6b6b;--line:#e5e2dd;--accent:#8b5e34;
+ --hl:#fdf8ef;--ok:#2d7d4f;--okbg:#f0f7f3;--warn:#b3402f;--warnbg:#fdf3f1;--blue:#2f5d8b;--bluebg:#f1f5fa}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+ font:17px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;padding:0 16px 100px}
+.nav{position:sticky;top:0;background:rgba(250,249,247,.96);backdrop-filter:blur(8px);
+ border-bottom:1px solid var(--line);margin:0 -16px 30px;padding:11px 16px;z-index:50;
+ display:flex;gap:6px;flex-wrap:wrap;font-size:13px}
+.nav a{color:var(--muted);text-decoration:none;padding:4px 9px;border-radius:5px;white-space:nowrap}
+.nav a:hover{background:var(--line);color:var(--ink)}
+.nav a.on{background:var(--accent);color:#fff}
+main{max-width:780px;margin:0 auto}
+h1{font-size:31px;letter-spacing:-.02em;margin:.4em 0 .5em;line-height:1.25}
+h2{font-size:23px;margin:2.2em 0 .7em;padding-bottom:.3em;border-bottom:1px solid var(--line)}
+h3{font-size:19px;margin:1.9em 0 .5em;color:var(--accent)}
+h4{font-size:17px;margin:1.5em 0 .4em}
+p{margin:.8em 0} a{color:var(--accent)} hr{border:0;border-top:1px solid var(--line);margin:2.6em 0}
+table{border-collapse:collapse;width:100%;margin:1.3em 0;font-size:15.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+th{background:#f3f0eb;font-weight:600}
+tr:nth-child(even) td{background:#fcfbfa}
+code{font-family:"SF Mono",Menlo,Consolas,monospace;font-size:.88em;background:#f2efea;padding:2px 6px;border-radius:4px;white-space:nowrap}
+pre{background:#f2efea;padding:14px 16px;border-radius:8px;overflow-x:auto}
+pre code{background:none;padding:0;white-space:pre}
+blockquote{border-left:3px solid var(--accent);background:var(--hl);margin:1.4em 0;padding:14px 20px;border-radius:0 8px 8px 0}
+blockquote p:first-child{margin-top:0} blockquote p:last-child{margin-bottom:0}
+ul,ol{padding-left:1.5em} li{margin:.35em 0} em{color:#4a4a4a}
+mjx-container[display="true"]{margin:1.1em 0!important;overflow-x:auto;overflow-y:hidden;padding:2px 0}
+mjx-container svg{max-width:100%}
+body:not(.ready) main{opacity:0} main{opacity:1;transition:opacity .25s}
+
+/* --- bandeau de tête de fiche --- */
+.cours{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--accent);
+ border-radius:0 10px 10px 0;padding:18px 22px;margin:0 0 34px}
+.cours h4{margin:0 0 4px;font-size:14px;text-transform:uppercase;letter-spacing:.07em;color:var(--accent)}
+.cours .cs{color:var(--muted);font-size:14.5px;margin:0 0 14px}
+
+/* --- exercices / corrigés --- */
+.ex{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:6px 24px 20px;margin:18px 0}
+.ex>h3:first-child{margin-top:14px}
+details.cor{margin-top:18px;border:1px solid var(--line);border-radius:8px;background:#fcfbfa;overflow:hidden}
+details.cor>summary{cursor:pointer;padding:12px 16px;font-weight:600;font-size:15px;color:var(--accent);
+ list-style:none;display:flex;align-items:center;gap:9px;user-select:none;transition:.15s;min-height:44px}
+details.cor>summary::-webkit-details-marker{display:none}
+details.cor>summary:hover{background:var(--hl)}
+details.cor>summary::before{content:"\25B6";font-size:10px;transition:transform .18s;display:inline-block}
+details.cor[open]>summary::before{transform:rotate(90deg)}
+details.cor[open]>summary{background:var(--okbg);color:var(--ok);border-bottom:1px solid var(--line)}
+.cor .in{padding:4px 20px 16px}
+.cor .in>*:first-child{margin-top:.9em}
+
+/* --- blocs pédagogiques (callouts) ---
+   Générés depuis une citation Markdown dont le premier **gras** commence
+   par un mot-clé : DÉFINITION, THÉORÈME, MÉTHODE, PIÈGE, INTUITION… */
+.cal{border:1px solid var(--line);border-left:4px solid var(--accent);background:var(--card);
+ border-radius:0 10px 10px 0;padding:15px 20px;margin:1.5em 0}
+.cal>p:first-child{margin-top:0}.cal>p:last-child,.cal>ul:last-child,.cal>ol:last-child{margin-bottom:0}
+.cal .lab{display:block;font-size:12.5px;text-transform:uppercase;letter-spacing:.08em;
+ font-weight:700;color:var(--accent);margin-bottom:6px}
+.cal.formel{background:var(--hl)}
+.cal.piege{border-left-color:var(--warn);background:var(--warnbg)}
+.cal.piege .lab{color:var(--warn)}
+.cal.methode{border-left-color:var(--ok);background:var(--okbg)}
+.cal.methode .lab{color:var(--ok)}
+.cal.intu{border-left-color:var(--blue);background:var(--bluebg)}
+.cal.intu .lab{color:var(--blue)}
+.cal.plus{border-left-style:dashed;background:#faf9f7}
+.cal.plus .lab{color:var(--muted)}
+
+/* --- révision express --- */
+.ess{background:var(--card);border:1px solid var(--accent);border-radius:10px;padding:4px 24px 20px;margin:1.6em 0}
+.ess h3{margin-top:1.3em}
+.rec{background:var(--card);border:1px dashed var(--accent);border-radius:10px;padding:4px 24px 18px;margin:1.6em 0}
+.rec ol{counter-reset:none}
+
+/* --- impression / PDF --- */
+@media print{
+ .nav{display:none}
+ body{padding:0;background:#fff;font-size:11.2pt;line-height:1.55}
+ main{max-width:none}
+ h1{font-size:23pt}h2{font-size:15pt;margin-top:1.5em}h3{font-size:12.6pt}
+ h2,h3,h4{break-after:avoid;page-break-after:avoid}
+ table,.cal,blockquote{break-inside:avoid;page-break-inside:avoid}
+ table{display:table;font-size:9.6pt}
+ details.cor{border:1px solid var(--line);background:#fcfbfa}
+ details.cor>summary{display:none}
+ details.cor .in{padding-top:10px}
+ .cal,.ex,.ess,.rec{box-shadow:none}
+ a{color:var(--ink);text-decoration:none}
+}
+@page{margin:16mm 15mm 18mm}
+
+/* --- exemples travaillés --- */
+.exm{background:#fcfbfa;border:1px solid var(--line);border-radius:10px;padding:2px 20px 14px;margin:1.5em 0}
+.exm>h4:first-child{margin:14px 0 .5em;color:var(--accent);font-size:13px;text-transform:uppercase;letter-spacing:.07em}
+
+
+/* --- pastilles de priorité (conventions des fiches de l'app) --- */
+h2[data-prio], h3[data-prio], h4[data-prio]{position:relative}
+h2[data-prio]::before,h3[data-prio]::before,h4[data-prio]::before{
+ content:"";display:inline-block;width:9px;height:9px;border-radius:50%;
+ margin-right:9px;vertical-align:middle;background:var(--muted)}
+[data-prio="must"]::before{background:var(--warn)}
+[data-prio="high"]::before{background:#d98324}
+[data-prio="mid"]::before{background:#c9a227}
+[data-prio="low"]::before{background:var(--ok)}
+/* corrigés des fiches de l'app : même traitement que les corrigés des séries */
+details.cor>summary::after{content:""}
+</style></head><body>
+<div class="nav"><a href="00_COMMENCER_ICI.html">Commencer ici</a><a href="01_NOTATIONS_le-decodeur.html">Notations</a><a href="02_EXERCICES_Serie-0.html">Série 0 — Remise en route</a><a href="03_EXERCICES_Serie-1.html">Série 1 — Convexité</a><a href="04_EXERCICES_Serie-2.html">Série 2 — KKT</a><a href="05_AUTO-EVALUATION.html">Auto-évaluation (quiz)</a><a href="06_FICHE_Optimisation-deux-variables.html">Fiche — Optimisation à 2 variables</a></div>
+<main><h1>Fiche 45 — Programmation dynamique déterministe et plus court chemin</h1>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Matière</strong></td>
+<td>Maths · Optimisation</td>
+</tr>
+<tr>
+<td><strong>Cours source</strong></td>
+<td>Bertsekas, <em>6.231 Dynamic Programming</em>, MIT OpenCourseWare, automne 2015 — cours 3</td>
+</tr>
+<tr>
+<td><strong>Difficulté</strong></td>
+<td> Fondamental — c'est le pont entre DP, graphes et optimisation combinatoire</td>
+</tr>
+<tr>
+<td><strong>Temps d'étude estimé</strong></td>
+<td>1 h 45</td>
+</tr>
+<tr>
+<td><strong>Prérequis</strong></td>
+<td>Fiche 44 (algorithme DP, principe d'optimalité), fiche 31 (flots dans les réseaux)</td>
+</tr>
+<tr>
+<td><strong>Concepts clés</strong></td>
+<td>Graphe en couches, coût-à-venir et coût-pour-arriver, DP arrière et avant, plus court chemin générique, chaînes de Markov cachées, algorithme de Viterbi, méthodes de correction d'étiquettes</td>
+</tr>
+<tr>
+<td><strong>Poids à l'examen</strong></td>
+<td>Savoir <strong>traduire</strong> un problème déterministe à états finis en plus court chemin, et savoir <strong>dire pourquoi la DP avant n'existe pas</strong> en stochastique. Le Viterbi est l'application vedette.</td>
+</tr>
+</tbody></table>
+<h2>Vue d'ensemble</h2>
+<p>Un problème de DP <strong>déterministe à états finis</strong> est <strong>exactement</strong> un problème de plus court chemin dans un graphe en couches.</p>
+<pre><code>ÉTATS              ⟷  NŒUDS
+COMMANDES          ⟷  ARCS
+SUITES DE COMMANDES (boucle ouverte) ⟷  CHEMINS de l'état initial aux états terminaux
+COÛT d'une suite   ⟷  LONGUEUR du chemin
+</code></pre>
+<p>Cette traduction n'est pas une curiosité : elle <strong>ouvre deux portes</strong>. Elle donne un second algorithme, la <strong>DP avant</strong>, qui n'existe que dans le cas déterministe ; et elle rend disponibles <strong>tous les algorithmes de plus court chemin</strong> non fondés sur la DP — indispensables dès que l'espace d'états devient énorme.</p>
+<h2 data-prio="mid">Concept 1 — Le dictionnaire graphe / DP</h2>
+<p>On considère un problème déterministe à états finis : à l'instant $k$, l'état vit dans un ensemble fini $S_k$.</p>
+<table>
+<thead>
+<tr>
+<th>Notation</th>
+<th>Sens</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$a_{ij}^k$</td>
+<td>coût de transition de l'état $i\in S_k$ vers l'état $j\in S_{k+1}$ à l'instant $k$ — vu comme la <strong>longueur</strong> de l'arc</td>
+</tr>
+<tr>
+<td>$a_{it}^N$</td>
+<td>coût <strong>terminal</strong> de l'état $i\in S_N$ — l'arc vers le <strong>nœud terminal artificiel</strong> $t$</td>
+</tr>
+<tr>
+<td>$s$</td>
+<td>l'état initial</td>
+</tr>
+</tbody></table>
+<p>Le graphe est <strong>en couches</strong> : étape $0$, étape $1$, …, étape $N$, plus un nœud terminal artificiel $t$ relié à tous les états finaux par des <strong>arcs terminaux de longueur égale au coût terminal</strong>.</p>
+<div class="cal intu"><span class="lab">Pourquoi le nœud artificiel $t$.</span>
+<p> Il transforme « minimiser le coût sur toutes les trajectoires, avec un coût terminal qui dépend de l'état d'arrivée » en « trouver le plus court chemin <strong>entre deux nœuds fixés</strong> $s$ et $t$ ». On revient au problème de graphe le plus standard qui soit.</p>
+</div>
+<h2 data-prio="must">Concept 2 — DP arrière et DP avant</h2>
+<p><strong>Algorithme DP (arrière).</strong>
+$$J_N(i) = a_{it}^N, \quad i\in S_N$$
+$$J_k(i) = \min_{j\in S_{k+1}}\Big[a_{ij}^k + J_{k+1}(j)\Big], \quad i\in S_k,\ k=0,\dots,N-1$$
+<strong>Le coût optimal est $J_0(s)$</strong>, et il est égal à la <strong>longueur du plus court chemin de $s$ à $t$</strong>.</p>
+<p><strong>L'observation qui donne l'algorithme avant.</strong></p>
+<blockquote>
+<p><em>Un chemin optimal $s\to t$ est aussi un chemin optimal $t\to s$ dans le problème de plus court chemin <strong>inversé</strong>, où la direction de chaque arc est renversée et sa longueur laissée inchangée.</em></p>
+</blockquote>
+<p><strong>Algorithme DP avant</strong> — c'est la DP arrière appliquée au problème inversé :
+$$\tilde J_N(j) = a_{sj}^0, \quad j\in S_1$$
+$$\tilde J_k(j) = \min_{i\in S_{N-k}}\Big[a_{ij}^{N-k}+\tilde J_{k+1}(i)\Big], \quad j\in S_{N-k+1}$$
+et le coût optimal est
+$$\tilde J_0(t) = \min_{i\in S_N}\Big[a_{it}^N+\tilde J_1(i)\Big]$$</p>
+<p><strong>L'interprétation, essentielle.</strong> On voit $\tilde J_k(j)$ comme le <strong>coût-pour-arriver optimal</strong> à l'état $j$ depuis l'état initial $s$ — par symétrie avec le <strong>coût-à-venir</strong> $J_k(i)$ de la DP arrière.</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>DP arrière</th>
+<th>DP avant</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Quantité calculée</td>
+<td><strong>coût-à-venir</strong> : de $i$ jusqu'à $t$</td>
+<td><strong>coût-pour-arriver</strong> : de $s$ jusqu'à $j$</td>
+</tr>
+<tr>
+<td>Sens de parcours</td>
+<td>de $N$ vers $0$</td>
+<td>de $0$ vers $N$</td>
+</tr>
+<tr>
+<td>Existe en stochastique ?</td>
+<td><strong>oui</strong></td>
+<td><strong>non</strong></td>
+</tr>
+</tbody></table>
+<h2 data-prio="must">Concept 3 — Pourquoi il n'y a pas de DP avant en stochastique</h2>
+<p>C'est l'un des points les plus profonds du cours, et il tient en trois arguments.</p>
+<blockquote>
+<p><strong>Il n'existe pas d'algorithme DP avant pour les problèmes stochastiques.</strong></p>
+<p><strong>Mathématiquement</strong> : en stochastique, on ne peut pas se restreindre aux <strong>suites en boucle ouverte</strong> (fiche 44) ; or c'est précisément l'identification « suite de commandes $\leftrightarrow$ chemin » qui fonde le point de vue plus court chemin. Celui-ci <strong>s'effondre</strong>.</p>
+<p><strong>Conceptuellement</strong> : en présence d'incertitude, la notion de <strong>coût-pour-arriver optimal</strong> à un état $x_k$ <strong>n'a pas de sens</strong>. Il peut par exemple être <strong>impossible de garantir</strong>, avec probabilité $1$, qu'un état donné sera atteint.</p>
+<p><strong>Par contraste</strong> : même en stochastique, la notion de <strong>coût-à-venir optimal</strong> depuis un état $x_k$ garde un sens parfaitement clair.</p>
+</blockquote>
+<p class="cal piege"> <strong>La conséquence pratique.</strong> Toute méthode fondée sur un « coût-pour-arriver » — beaucoup d'algorithmes de graphe, dont A* — est cantonnée au <strong>déterministe</strong>. Dès qu'il y a de l'aléa, il ne reste que la récurrence à rebours. C'est une <strong>asymétrie fondamentale</strong> du temps en décision stochastique : on peut raisonner sur l'avenir en espérance, pas sur le passé qui aurait pu être.</p>
+<h2 data-prio="high">Concept 4 — Le problème de plus court chemin générique</h2>
+<p><strong>Données.</strong> Des nœuds $\{1,2,\dots,N,t\}$ ($t$ étant la <strong>destination</strong>), et $a_{ij}$ le coût du déplacement du nœud $i$ au nœud $j$. On cherche un plus court chemin de <strong>chaque</strong> nœud $i$ vers $t$.</p>
+<p><strong>Hypothèse.</strong> <em>Tous les cycles sont de longueur positive ou nulle.</em> Alors <strong>un chemin optimal n'a pas besoin de plus de $N$ déplacements</strong> — repasser par un nœud ne peut qu'ajouter la longueur d'un cycle, donc ne fait jamais gagner.</p>
+<p><strong>La mise en forme DP.</strong> On impose <strong>exactement $N$ déplacements</strong>, en autorisant des déplacements <strong>dégénérés</strong> d'un nœud $i$ vers lui-même, de coût $a_{ii}=0$. On pose
+$$J_k(i) = \text{coût optimal pour aller de } i \text{ à } t \text{ en } N-k \text{ déplacements}$$
+si bien que $J_0(i)$ est le coût du chemin optimal de $i$ à $t$.</p>
+<p><strong>Algorithme.</strong>
+$$J_{N-1}(i) = a_{it}, \quad i=1,\dots,N$$
+$$J_k(i) = \min_{j=1,\dots,N}\Big[a_{ij}+J_{k+1}(j)\Big], \quad k=0,1,\dots,N-2$$</p>
+<blockquote>
+<p><strong>L'astuce des déplacements dégénérés</strong> mérite d'être retenue : elle transforme « au plus $N$ étapes » en « exactement $N$ étapes », donc un problème à horizon <strong>variable</strong> en un problème à horizon <strong>fixe</strong> — le seul que sache traiter l'algorithme DP standard.</p>
+</blockquote>
+<h2 data-prio="must">Concept 5 — Chaînes de Markov cachées et algorithme de Viterbi</h2>
+<p>C'est l'application la plus célèbre du plus court chemin, et elle est spectaculaire.</p>
+<p><strong>Le cadre.</strong> Une chaîne de Markov de probabilités de transition $p_{ij}$, dont les <strong>transitions d'état sont cachées</strong>. À chaque transition, on obtient une <strong>observation indépendante</strong> : $r(z;i,j)$ est la probabilité que l'observation vaille $z$ lorsque la transition va de $i$ à $j$.</p>
+<p><strong>Le problème d'estimation de trajectoire.</strong> Étant donné la suite d'observations $Z_N=\{z_1,\dots,z_N\}$, quelle est la suite de transitions d'états <strong>la plus vraisemblable</strong> $\hat X_N = \{\hat x_0,\dots,\hat x_N\}$, c'est-à-dire celle qui maximise $p(X_N\mid Z_N)$ sur toutes les suites $X_N$ ?</p>
+<p><strong>La réduction (l'algorithme de Viterbi).</strong></p>
+<p><em>Étape 1 — se débarrasser du conditionnement.</em>
+$$p(X_N\mid Z_N) = \frac{p(X_N,Z_N)}{p(Z_N)}$$
+Le dénominateur <strong>ne dépend pas de $X_N$</strong> : maximiser $p(X_N\mid Z_N)$ équivaut à maximiser $p(X_N,Z_N)$, donc $\ln p(X_N,Z_N)$.</p>
+<p><em>Étape 2 — factoriser</em> par la règle de multiplication des probabilités conditionnelles :
+$$p(X_N,Z_N) = \pi_{x_0}\prod_{k=1}^N p_{x_{k-1}x_k}\,r(z_k;x_{k-1},x_k)$$
+où $\pi_{x_0}$ est la loi initiale.</p>
+<p><em>Étape 3 — passer au logarithme</em>, ce qui transforme le produit en somme et le maximum en minimum :
+$$\min_{\{x_0,\dots,x_N\}}\ \Big(-\ln\pi_{x_0}-\sum_{k=1}^N\ln\big(p_{x_{k-1}x_k}\,r(z_k;x_{k-1},x_k)\big)\Big)$$</p>
+<blockquote>
+<p><strong>C'est un problème de plus court chemin.</strong> Les nœuds sont les états à chaque instant, la longueur de l'arc de $x_{k-1}$ vers $x_k$ à l'étape $k$ est $-\ln\big(p_{x_{k-1}x_k}\,r(z_k;x_{k-1},x_k)\big)$, et le coût de départ est $-\ln\pi_{x_0}$. On le résout par la DP.</p>
+</blockquote>
+<p><strong>Pourquoi le logarithme est le geste décisif.</strong> Il convertit un <strong>produit</strong> de probabilités — qui est multiplicatif, donc étranger à la structure additive de la DP — en une <strong>somme</strong>. C'est ce qui rend le problème <em>additif dans le temps</em>, condition d'application de la DP (fiche 44). Et comme $-\ln$ est décroissante, maximiser la vraisemblance devient minimiser une longueur : les probabilités deviennent des <strong>distances</strong>.</p>
+<p class="cal piege"> Les longueurs $-\ln(p\,r)$ sont <strong>positives</strong> (des probabilités sont $\leq1$), ce qui garantit l'hypothèse « cycles de longueur positive » du concept 4.</p>
+<h2 data-prio="high">Concept 6 — Algorithmes de plus court chemin non fondés sur la DP</h2>
+<blockquote>
+<p><em>Il existe beaucoup d'algorithmes de plus court chemin qui ne relèvent pas de la DP. Tous peuvent servir à résoudre des problèmes déterministes à états finis. Ils peuvent être <strong>préférables</strong> à la DP s'ils évitent de calculer le coût-à-venir optimal de <strong>CHAQUE</strong> état.</em></p>
+</blockquote>
+<p><strong>C'est l'argument décisif pour les très grands espaces d'états.</strong> La DP calcule $J_k(i)$ pour <strong>tous</strong> les $i$ et <strong>tous</strong> les $k$ : c'est exhaustif, donc rédhibitoire quand l'espace d'états est immense. Un algorithme qui explore seulement les nœuds prometteurs peut aboutir sans jamais visiter le reste.</p>
+<p><strong>L'exemple emblématique : l'optimisation combinatoire</strong> — ordonnancement, voyageur de commerce. Le cours illustre par un arbre d'états où chaque nœud est une <strong>séquence partielle</strong> de villes visitées (<code>A</code>, <code>AB</code>, <code>ABC</code>, <code>ABCD</code>…), les arcs portant les distances, et un nœud terminal artificiel $t$ refermant les séquences complètes.</p>
+<h3>Les méthodes de correction d'étiquettes</h3>
+<p><strong>Données.</strong> Une origine $s$, une destination $t$, des longueurs $a_{ij}\geq0$.
+<strong>L'idée.</strong> Découvrir <strong>progressivement</strong> des chemins de plus en plus courts de $s$ vers chaque nœud $i$.</p>
+<p><strong>Notations.</strong></p>
+<table>
+<thead>
+<tr>
+<th>Symbole</th>
+<th>Sens</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$d_i$ (<strong>étiquette</strong> de $i$)</td>
+<td>longueur du plus court chemin trouvé <strong>jusqu'ici</strong> ; initialement $d_s=0$ et $d_i=\infty$ pour $i\neq s$</td>
+</tr>
+<tr>
+<td><code>UPPER</code></td>
+<td>l'étiquette $d_t$ de la destination</td>
+</tr>
+<tr>
+<td>liste <code>OPEN</code></td>
+<td>les nœuds <strong>actifs</strong>, candidats à un examen ultérieur ; initialement <code>OPEN</code> $=\{s\}$</td>
+</tr>
+</tbody></table>
+<p><strong>L'algorithme.</strong></p>
+<pre><code>Étape 1 (retrait d'un nœud). Retirer un nœud i de OPEN et, pour chaque
+       enfant j de i, effectuer l'étape 2.
+
+Étape 2 (test d'insertion). Si  d_i + a_ij &lt; min{ d_j , UPPER }  alors
+       poser d_j := d_i + a_ij  et  déclarer i parent de j ;
+       de plus, si j ≠ t, placer j dans OPEN s'il n'y est pas déjà ;
+                 si j = t, poser UPPER := d_i + a_it.
+
+Étape 3 (test d'arrêt). Si OPEN est vide, terminer ; sinon retourner à l'étape 1.
+</code></pre>
+<p><strong>Les deux questions que pose le test d'insertion</strong> — c'est la façon de le mémoriser :</p>
+<p>$$d_i+a_{ij} &lt; \texttt{UPPER}\ ? \qquad \text{« le chemin } s\to i\to j \text{ a-t-il une CHANCE de faire partie d'un } s\to t \text{ plus court ? »}$$
+$$d_i+a_{ij} &lt; d_j\ ? \qquad \text{« le chemin } s\to i\to j \text{ est-il MEILLEUR que le } s\to j \text{ courant ? »}$$</p>
+<blockquote>
+<p><strong>Le premier test est un élagage</strong> exactement de la même nature que celui du branch-and-bound (fiche 33) : <code>UPPER</code> joue le rôle de l'incumbent, et tout chemin partiel qui dépasse déjà cette borne est abandonné <strong>sans être exploré</strong>. Le second test évite de refaire un travail déjà fait.</p>
+</blockquote>
+<p class="cal piege"> L'ordre dans lequel on retire les nœuds de <code>OPEN</code> n'est <strong>pas</strong> spécifié — et c'est là que se logent toutes les variantes : le retirer selon $d_i$ minimal donne <strong>Dijkstra</strong>, en file donne <strong>Bellman-Ford</strong>, en pile donne une exploration en profondeur.</p>
+<h3>Comment résoudre l'exercice type (protocole)</h3>
+<ol>
+<li><strong>Vérifier que le problème est déterministe et à états finis</strong> — sinon, pas de traduction en graphe.</li>
+<li><strong>Construire le graphe en couches</strong> : un nœud par couple (état, instant), un arc par transition possible, la longueur étant le coût de transition.</li>
+<li><strong>Ajouter le nœud terminal artificiel</strong> $t$, relié aux états finaux par des arcs de longueur égale au coût terminal.</li>
+<li><strong>Choisir le sens</strong> : DP arrière si l'on veut le coût-à-venir depuis tout état ; DP avant si l'on veut le coût-pour-arriver.</li>
+<li><strong>Dérouler la récurrence</strong> en enregistrant à chaque nœud le coût optimal <strong>et</strong> l'arc choisi.</li>
+<li><strong>Reconstituer le chemin optimal</strong> en remontant les parents depuis $t$.</li>
+<li><strong>Si l'espace d'états est énorme</strong> : renoncer à la DP exhaustive et passer à une méthode de correction d'étiquettes, en soignant l'ordre de retrait de <code>OPEN</code>.</li>
+</ol>
+<h3>Exercices progressifs</h3>
+<p><strong> Niveau 1</strong> — Pourquoi ajoute-t-on un nœud terminal artificiel $t$ ?</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p>Parce que le coût terminal $g_N(x_N)$ dépend de l'état d'arrivée : sans nœud unique, on aurait « le plus court chemin de $s$ vers <strong>l'un quelconque</strong> des états finaux, avec une pénalité par état ». En reliant chaque état final $i\in S_N$ à un nœud unique $t$ par un arc de longueur $a_{it}^N = g_N(i)$, on obtient un problème de plus court chemin <strong>entre deux nœuds fixés</strong> — la forme canonique.</p>
+</div></details>
+
+<p><strong> Niveau 2</strong> — Justifiez l'hypothèse « tous les cycles sont de longueur positive ou nulle » dans le problème générique.</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p><strong>Elle garantit qu'un chemin optimal ne repasse jamais par un nœud</strong>, donc utilise au plus $N$ déplacements. En effet, un chemin qui repasserait par un nœud contient un cycle ; le supprimer retranche la longueur de ce cycle, qui est $\geq0$ : le chemin raccourci est donc au moins aussi court.</p>
+<p><strong>Si l'hypothèse tombe</strong> — s'il existe un cycle de longueur <strong>strictement négative</strong> — le problème n'a pas de solution : on peut parcourir ce cycle indéfiniment et faire tendre la longueur vers $-\infty$. C'est l'analogue exact d'un LP non borné (fiche 24).</p>
+</div></details>
+
+<p><strong> Niveau 3</strong> — Expliquez pourquoi l'algorithme de Viterbi passe par le logarithme.</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p>Le critère naturel est $p(X_N,Z_N)=\pi_{x_0}\prod_k p_{x_{k-1}x_k}r(z_k;\cdot)$ : c'est un <strong>produit</strong> le long de la trajectoire. Or la DP exige un coût <strong>additif</strong> dans le temps (fiche 44) — c'est l'hypothèse structurelle de tout le formalisme.</p>
+<p>Le logarithme convertit le produit en <strong>somme</strong> :
+$$\ln p(X_N,Z_N)=\ln\pi_{x_0}+\sum_k\ln\big(p_{x_{k-1}x_k}r(z_k;\cdot)\big)$$
+et comme $\ln$ est <strong>strictement croissante</strong>, maximiser $p$ équivaut à maximiser $\ln p$, donc à <strong>minimiser</strong> $-\ln p$ — une somme de termes positifs, c'est-à-dire une <strong>longueur de chemin</strong>.</p>
+<p><strong>Le geste général à retenir :</strong> face à un critère multiplicatif, passer au logarithme pour retrouver l'additivité. C'est le même mouvement qui rend convexe un programme géométrique (fiche 37).</p>
+</div></details>
+
+<p><strong> Niveau 4 — type examen</strong> — Sur le graphe à quatre nœuds $\{1,2,3,t\}$ avec $a_{12}=2$, $a_{13}=5$, $a_{23}=1$, $a_{2t}=7$, $a_{3t}=3$, et $a_{ij}=\infty$ sinon, calculez $J_0(1)$ par la récurrence du concept 4 avec $N=3$.</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p>On autorise les déplacements dégénérés $a_{ii}=0$.</p>
+<p><em>Initialisation ($k=N-1=2$)</em> : $J_2(i)=a_{it}$, soit
+$$J_2(1)=\infty, \qquad J_2(2)=7, \qquad J_2(3)=3$$</p>
+<p><em>Étape $k=1$</em> : $J_1(i)=\min_j\big[a_{ij}+J_2(j)\big]$, le déplacement dégénéré $j=i$ donnant $0+J_2(i)$.
+$$J_1(1)=\min\{\underbrace{0+\infty}_{j=1},\ \underbrace{2+7}_{j=2},\ \underbrace{5+3}_{j=3}\} = 8$$
+$$J_1(2)=\min\{0+7,\ 1+3\} = 4, \qquad J_1(3)=\min\{0+3\} = 3$$</p>
+<p><em>Étape $k=0$</em> :
+$$J_0(1)=\min\{0+8,\ 2+4,\ 5+3\} = 6$$
+$$J_0(2)=\min\{0+4,\ 1+3\}=4, \qquad J_0(3)=3$$</p>
+<p><strong>Conclusion.</strong> $J_0(1)=6$, réalisé par $1\to2$ (coût $2$) puis le chemin optimal depuis $2$, qui est $2\to3\to t$ (coût $1+3=4$). Le plus court chemin est donc $1\to2\to3\to t$, de longueur $6$.</p>
+<p><strong>Ce que l'exercice illustre.</strong> Le chemin direct $1\to3\to t$ coûte $5+3=8$, et $1\to2\to t$ coûte $2+7=9$ : c'est la combinaison $1\to2\to3\to t$ qui gagne. Aucune décision <strong>myope</strong> (regarder seulement le prochain arc) ne l'aurait trouvée — depuis $1$, l'arc le moins cher mène à $2$, mais depuis $2$ la suite naturelle serait $t$. Seule la récurrence, qui <strong>propage l'information depuis la destination</strong>, découvre le bon chemin. C'est précisément ce que la DP apporte.</p>
+</div></details>
+
+<h2 data-prio="must">Common mistakes</h2>
+<ol>
+<li><strong>Chercher un algorithme DP avant en stochastique</strong> — il n'en existe pas ; le coût-pour-arriver n'a pas de sens sous incertitude.</li>
+<li><strong>Oublier le nœud terminal artificiel</strong> — sans lui, le coût terminal n'est pas intégré au graphe.</li>
+<li><strong>Oublier les déplacements dégénérés $a_{ii}=0$</strong> dans le problème générique — sans eux, on impose de faire <strong>exactement</strong> $N$ vrais déplacements.</li>
+<li><strong>Négliger l'hypothèse sur les cycles</strong> — avec un cycle de longueur négative, le problème est non borné.</li>
+<li><strong>Appliquer la DP sur un critère multiplicatif</strong> — il faut d'abord passer au logarithme (Viterbi).</li>
+<li><strong>Utiliser la DP exhaustive sur un espace d'états énorme</strong> — elle calcule le coût-à-venir de <strong>chaque</strong> état ; une méthode d'étiquettes peut aboutir sans les visiter tous.</li>
+<li><strong>Confondre les deux tests d'insertion</strong> — l'un compare à <code>UPPER</code> (élagage global), l'autre à $d_j$ (amélioration locale). Les deux sont nécessaires.</li>
+<li><strong>Oublier d'enregistrer le parent</strong> — sans lui, on obtient la <strong>longueur</strong> du plus court chemin, pas le chemin.</li>
+</ol>
+<h2>Ultimate Review</h2>
+<ol>
+<li><strong>Dictionnaire</strong> : états $\leftrightarrow$ nœuds, commandes $\leftrightarrow$ arcs, suites en boucle ouverte $\leftrightarrow$ chemins, coût $\leftrightarrow$ longueur.</li>
+<li><strong>DP arrière</strong> : $J_N(i)=a_{it}^N$, $J_k(i)=\min_j[a_{ij}^k+J_{k+1}(j)]$ ; coût optimal $J_0(s)$.</li>
+<li>Un chemin optimal $s\to t$ est optimal $t\to s$ dans le graphe <strong>inversé</strong> — d'où la <strong>DP avant</strong>.</li>
+<li><strong>Coût-à-venir</strong> (arrière) contre <strong>coût-pour-arriver</strong> (avant).</li>
+<li><strong>Pas de DP avant en stochastique</strong> : on ne peut pas se restreindre aux suites en boucle ouverte, et le coût-pour-arriver n'a pas de sens ; le coût-à-venir, lui, en a toujours un.</li>
+<li><strong>Plus court chemin générique</strong> : cycles de longueur $\geq0$, au plus $N$ déplacements, déplacements dégénérés $a_{ii}=0$, $J_{N-1}(i)=a_{it}$ puis $J_k(i)=\min_j[a_{ij}+J_{k+1}(j)]$.</li>
+<li><strong>Viterbi</strong> : maximiser $p(X_N\mid Z_N)$ $\iff$ maximiser $p(X_N,Z_N)$ $\iff$ minimiser $-\ln\pi_{x_0}-\sum_k\ln(p\,r)$ — un plus court chemin.</li>
+<li>Les algorithmes non-DP sont <strong>préférables</strong> quand ils évitent de calculer le coût-à-venir de <strong>chaque</strong> état — indispensable en optimisation combinatoire.</li>
+<li><strong>Correction d'étiquettes</strong> : étiquettes $d_i$, borne <code>UPPER</code>, liste <code>OPEN</code>, deux tests — « a-t-il une chance ? » et « est-il meilleur ? ».</li>
+</ol>
+<p><strong>Formulas to know</strong>
+$$J_N(i)=a_{it}^N,\qquad J_k(i)=\min_{j\in S_{k+1}}\big[a_{ij}^k+J_{k+1}(j)\big]$$
+$$\tilde J_0(t)=\min_{i\in S_N}\big[a_{it}^N+\tilde J_1(i)\big] \qquad \min\Big(-\ln\pi_{x_0}-\sum_{k=1}^N\ln\big(p_{x_{k-1}x_k}r(z_k;x_{k-1},x_k)\big)\Big)$$
+$$d_i+a_{ij}&lt;\min\{d_j,\ \texttt{UPPER}\}$$</p>
+<p><strong>Methods to know</strong> : le protocole en 7 étapes ; la construction du graphe en couches ; la réduction de Viterbi ; l'algorithme de correction d'étiquettes.</p>
+<div class="rec"><h2>Active Recall</h2><p><strong>Basic</strong> — Donnez le dictionnaire entre DP déterministe à états finis et plus court chemin.</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p>États $\leftrightarrow$ nœuds ; commandes $\leftrightarrow$ arcs ; suites de commandes en boucle ouverte $\leftrightarrow$ chemins de l'état initial aux états terminaux ; coût d'une suite $\leftrightarrow$ longueur du chemin. Le coût de transition $a_{ij}^k$ est la longueur de l'arc, et le coût terminal $a_{it}^N$ celle de l'arc vers le nœud terminal artificiel $t$.</p>
+</div></details><p><strong>Understanding</strong> — Pourquoi n'y a-t-il pas de DP avant en stochastique ?</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p><strong>Mathématiquement</strong> : en stochastique on ne peut pas se restreindre aux suites en boucle ouverte, or c'est l'identification « suite $\leftrightarrow$ chemin » qui fonde le point de vue plus court chemin ; il s'effondre.
+<strong>Conceptuellement</strong> : le « coût-pour-arriver optimal » à un état $x_k$ n'a pas de sens sous incertitude — il peut être impossible de garantir avec probabilité $1$ qu'un état sera atteint. Le « coût-à-venir » depuis $x_k$, en revanche, garde toujours un sens clair.</p>
+</div></details><p><strong>Application</strong> — Comment traduit-on « au plus $N$ déplacements » en un problème DP à horizon fixe ?</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p>En imposant <strong>exactement $N$</strong> déplacements et en autorisant des déplacements <strong>dégénérés</strong> d'un nœud vers lui-même, de coût $a_{ii}=0$. Un chemin utilisant $m&lt;N$ vrais déplacements se complète par $N-m$ déplacements dégénérés sans changer sa longueur. L'hypothèse « cycles de longueur $\geq0$ » garantit qu'aucun chemin optimal n'a besoin de plus de $N$ déplacements.</p>
+</div></details><p><strong>Comparison</strong> — DP exhaustive et méthodes de correction d'étiquettes : quand préférer l'une ou l'autre ?</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p>La <strong>DP</strong> calcule le coût-à-venir optimal de <strong>chaque</strong> état à chaque instant : elle donne donc la politique complète, mais son coût croît avec la taille de l'espace d'états. Les méthodes d'<strong>étiquettes</strong> ne visitent que les nœuds prometteurs, grâce à l'élagage par <code>UPPER</code> : elles sont préférables quand l'espace d'états est <strong>énorme</strong> et qu'on ne veut qu'<strong>un</strong> chemin optimal depuis une origine donnée — cas typique de l'optimisation combinatoire (ordonnancement, voyageur de commerce).</p>
+</div></details><p><strong>Exam-style</strong> — Décrivez l'algorithme de Viterbi et dites quel est son geste décisif.</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p><em>Cadre.</em> Chaîne de Markov de transitions $p_{ij}$ cachées, observations indépendantes de loi $r(z;i,j)$. On cherche la trajectoire $\hat X_N$ maximisant $p(X_N\mid Z_N)$.</p>
+<p><em>Réduction.</em> Comme $p(Z_N)$ ne dépend pas de $X_N$, maximiser $p(X_N\mid Z_N)$ revient à maximiser $p(X_N,Z_N)=\pi_{x_0}\prod_kp_{x_{k-1}x_k}r(z_k;x_{k-1},x_k)$, donc à minimiser
+$$-\ln\pi_{x_0}-\sum_{k=1}^N\ln\big(p_{x_{k-1}x_k}r(z_k;x_{k-1},x_k)\big)$$
+C'est un <strong>plus court chemin</strong> dans un graphe en couches dont les longueurs d'arcs sont ces $-\ln$, positives.</p>
+<p><em>Le geste décisif : le logarithme.</em> Il transforme un critère <strong>multiplicatif</strong> — étranger à la DP — en un critère <strong>additif</strong>, seule structure que sache exploiter la récurrence de Bellman.</p>
+</div></details></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h2>Flashcards</h2>
+<table>
+<thead>
+<tr>
+<th>Question</th>
+<th>Réponse</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>DP déterministe à états finis $=$ ?</td>
+<td>Un problème de plus court chemin dans un graphe en couches</td>
+</tr>
+<tr>
+<td>À quoi correspondent les commandes ?</td>
+<td>Aux <strong>arcs</strong> du graphe</td>
+</tr>
+<tr>
+<td>Rôle du nœud terminal artificiel $t$ ?</td>
+<td>Intégrer le coût terminal comme longueur d'arc</td>
+</tr>
+<tr>
+<td>Récurrence DP arrière ?</td>
+<td>$J_k(i)=\min_j[a_{ij}^k+J_{k+1}(j)]$, $J_N(i)=a_{it}^N$</td>
+</tr>
+<tr>
+<td>Que calcule la DP arrière ?</td>
+<td>Le <strong>coût-à-venir</strong> de $i$ jusqu'à $t$</td>
+</tr>
+<tr>
+<td>Que calcule la DP avant ?</td>
+<td>Le <strong>coût-pour-arriver</strong> de $s$ jusqu'à $j$</td>
+</tr>
+<tr>
+<td>D'où vient la DP avant ?</td>
+<td>C'est la DP arrière sur le graphe <strong>inversé</strong></td>
+</tr>
+<tr>
+<td>Existe-t-il une DP avant en stochastique ?</td>
+<td><strong>Non</strong> — le coût-pour-arriver n'y a pas de sens</td>
+</tr>
+<tr>
+<td>Hypothèse du plus court chemin générique ?</td>
+<td>Tous les cycles de longueur $\geq0$</td>
+</tr>
+<tr>
+<td>Astuce des déplacements dégénérés ?</td>
+<td>$a_{ii}=0$, pour passer d'« au plus $N$ » à « exactement $N$ »</td>
+</tr>
+<tr>
+<td>Problème résolu par Viterbi ?</td>
+<td>Trajectoire la plus vraisemblable d'une chaîne de Markov cachée</td>
+</tr>
+<tr>
+<td>Le geste clé de Viterbi ?</td>
+<td>Le <strong>logarithme</strong> : produit $\to$ somme, donc coût additif</td>
+</tr>
+<tr>
+<td>Longueur d'arc dans Viterbi ?</td>
+<td>$-\ln\big(p_{x_{k-1}x_k}\,r(z_k;x_{k-1},x_k)\big)$</td>
+</tr>
+<tr>
+<td>Quand préférer un algorithme non-DP ?</td>
+<td>Quand il évite de calculer le coût-à-venir de <strong>chaque</strong> état</td>
+</tr>
+<tr>
+<td>Les trois objets des méthodes d'étiquettes ?</td>
+<td>Étiquettes $d_i$, borne <code>UPPER</code>, liste <code>OPEN</code></td>
+</tr>
+<tr>
+<td>Le test d'insertion ?</td>
+<td>$d_i+a_{ij}&lt;\min\{d_j,\ \texttt{UPPER}\}$</td>
+</tr>
+<tr>
+<td>Que change l'ordre de retrait de <code>OPEN</code> ?</td>
+<td>Dijkstra, Bellman-Ford, exploration en profondeur</td>
+</tr>
+</tbody></table>
+</main>
+
+
+
+
+</body></html>

@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fiche 44 — Programmation dynamique : le problème de base et le principe d'optimalité</title>
+<script>
+window.MathJax={tex:{inlineMath:[["$","$"]],displayMath:[["$$","$$"]],processEscapes:true},
+ options:{skipHtmlTags:["script","noscript","style","textarea","pre","code"]},
+ svg:{fontCache:"global"},
+ startup:{pageReady:()=>MathJax.startup.defaultPageReady().then(()=>{document.body.classList.add("ready")})}};
+setTimeout(function(){document.body.classList.add("ready")},2500);
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+/* ============================================================
+   MathiasLearn — feuille de style des fiches
+   Reprise intégrale des tokens de 00_PARCOURS/*.html
+   + blocs pédagogiques (callouts, méthode, essentiels, recall)
+   ============================================================ */
+:root{--bg:#faf9f7;--card:#fff;--ink:#1a1a1a;--muted:#6b6b6b;--line:#e5e2dd;--accent:#8b5e34;
+ --hl:#fdf8ef;--ok:#2d7d4f;--okbg:#f0f7f3;--warn:#b3402f;--warnbg:#fdf3f1;--blue:#2f5d8b;--bluebg:#f1f5fa}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+ font:17px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;padding:0 16px 100px}
+.nav{position:sticky;top:0;background:rgba(250,249,247,.96);backdrop-filter:blur(8px);
+ border-bottom:1px solid var(--line);margin:0 -16px 30px;padding:11px 16px;z-index:50;
+ display:flex;gap:6px;flex-wrap:wrap;font-size:13px}
+.nav a{color:var(--muted);text-decoration:none;padding:4px 9px;border-radius:5px;white-space:nowrap}
+.nav a:hover{background:var(--line);color:var(--ink)}
+.nav a.on{background:var(--accent);color:#fff}
+main{max-width:780px;margin:0 auto}
+h1{font-size:31px;letter-spacing:-.02em;margin:.4em 0 .5em;line-height:1.25}
+h2{font-size:23px;margin:2.2em 0 .7em;padding-bottom:.3em;border-bottom:1px solid var(--line)}
+h3{font-size:19px;margin:1.9em 0 .5em;color:var(--accent)}
+h4{font-size:17px;margin:1.5em 0 .4em}
+p{margin:.8em 0} a{color:var(--accent)} hr{border:0;border-top:1px solid var(--line);margin:2.6em 0}
+table{border-collapse:collapse;width:100%;margin:1.3em 0;font-size:15.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+th{background:#f3f0eb;font-weight:600}
+tr:nth-child(even) td{background:#fcfbfa}
+code{font-family:"SF Mono",Menlo,Consolas,monospace;font-size:.88em;background:#f2efea;padding:2px 6px;border-radius:4px;white-space:nowrap}
+pre{background:#f2efea;padding:14px 16px;border-radius:8px;overflow-x:auto}
+pre code{background:none;padding:0;white-space:pre}
+blockquote{border-left:3px solid var(--accent);background:var(--hl);margin:1.4em 0;padding:14px 20px;border-radius:0 8px 8px 0}
+blockquote p:first-child{margin-top:0} blockquote p:last-child{margin-bottom:0}
+ul,ol{padding-left:1.5em} li{margin:.35em 0} em{color:#4a4a4a}
+mjx-container[display="true"]{margin:1.1em 0!important;overflow-x:auto;overflow-y:hidden;padding:2px 0}
+mjx-container svg{max-width:100%}
+body:not(.ready) main{opacity:0} main{opacity:1;transition:opacity .25s}
+
+/* --- bandeau de tête de fiche --- */
+.cours{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--accent);
+ border-radius:0 10px 10px 0;padding:18px 22px;margin:0 0 34px}
+.cours h4{margin:0 0 4px;font-size:14px;text-transform:uppercase;letter-spacing:.07em;color:var(--accent)}
+.cours .cs{color:var(--muted);font-size:14.5px;margin:0 0 14px}
+
+/* --- exercices / corrigés --- */
+.ex{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:6px 24px 20px;margin:18px 0}
+.ex>h3:first-child{margin-top:14px}
+details.cor{margin-top:18px;border:1px solid var(--line);border-radius:8px;background:#fcfbfa;overflow:hidden}
+details.cor>summary{cursor:pointer;padding:12px 16px;font-weight:600;font-size:15px;color:var(--accent);
+ list-style:none;display:flex;align-items:center;gap:9px;user-select:none;transition:.15s;min-height:44px}
+details.cor>summary::-webkit-details-marker{display:none}
+details.cor>summary:hover{background:var(--hl)}
+details.cor>summary::before{content:"\25B6";font-size:10px;transition:transform .18s;display:inline-block}
+details.cor[open]>summary::before{transform:rotate(90deg)}
+details.cor[open]>summary{background:var(--okbg);color:var(--ok);border-bottom:1px solid var(--line)}
+.cor .in{padding:4px 20px 16px}
+.cor .in>*:first-child{margin-top:.9em}
+
+/* --- blocs pédagogiques (callouts) ---
+   Générés depuis une citation Markdown dont le premier **gras** commence
+   par un mot-clé : DÉFINITION, THÉORÈME, MÉTHODE, PIÈGE, INTUITION… */
+.cal{border:1px solid var(--line);border-left:4px solid var(--accent);background:var(--card);
+ border-radius:0 10px 10px 0;padding:15px 20px;margin:1.5em 0}
+.cal>p:first-child{margin-top:0}.cal>p:last-child,.cal>ul:last-child,.cal>ol:last-child{margin-bottom:0}
+.cal .lab{display:block;font-size:12.5px;text-transform:uppercase;letter-spacing:.08em;
+ font-weight:700;color:var(--accent);margin-bottom:6px}
+.cal.formel{background:var(--hl)}
+.cal.piege{border-left-color:var(--warn);background:var(--warnbg)}
+.cal.piege .lab{color:var(--warn)}
+.cal.methode{border-left-color:var(--ok);background:var(--okbg)}
+.cal.methode .lab{color:var(--ok)}
+.cal.intu{border-left-color:var(--blue);background:var(--bluebg)}
+.cal.intu .lab{color:var(--blue)}
+.cal.plus{border-left-style:dashed;background:#faf9f7}
+.cal.plus .lab{color:var(--muted)}
+
+/* --- révision express --- */
+.ess{background:var(--card);border:1px solid var(--accent);border-radius:10px;padding:4px 24px 20px;margin:1.6em 0}
+.ess h3{margin-top:1.3em}
+.rec{background:var(--card);border:1px dashed var(--accent);border-radius:10px;padding:4px 24px 18px;margin:1.6em 0}
+.rec ol{counter-reset:none}
+
+/* --- impression / PDF --- */
+@media print{
+ .nav{display:none}
+ body{padding:0;background:#fff;font-size:11.2pt;line-height:1.55}
+ main{max-width:none}
+ h1{font-size:23pt}h2{font-size:15pt;margin-top:1.5em}h3{font-size:12.6pt}
+ h2,h3,h4{break-after:avoid;page-break-after:avoid}
+ table,.cal,blockquote{break-inside:avoid;page-break-inside:avoid}
+ table{display:table;font-size:9.6pt}
+ details.cor{border:1px solid var(--line);background:#fcfbfa}
+ details.cor>summary{display:none}
+ details.cor .in{padding-top:10px}
+ .cal,.ex,.ess,.rec{box-shadow:none}
+ a{color:var(--ink);text-decoration:none}
+}
+@page{margin:16mm 15mm 18mm}
+
+/* --- exemples travaillés --- */
+.exm{background:#fcfbfa;border:1px solid var(--line);border-radius:10px;padding:2px 20px 14px;margin:1.5em 0}
+.exm>h4:first-child{margin:14px 0 .5em;color:var(--accent);font-size:13px;text-transform:uppercase;letter-spacing:.07em}
+
+
+/* --- pastilles de priorité (conventions des fiches de l'app) --- */
+h2[data-prio], h3[data-prio], h4[data-prio]{position:relative}
+h2[data-prio]::before,h3[data-prio]::before,h4[data-prio]::before{
+ content:"";display:inline-block;width:9px;height:9px;border-radius:50%;
+ margin-right:9px;vertical-align:middle;background:var(--muted)}
+[data-prio="must"]::before{background:var(--warn)}
+[data-prio="high"]::before{background:#d98324}
+[data-prio="mid"]::before{background:#c9a227}
+[data-prio="low"]::before{background:var(--ok)}
+/* corrigés des fiches de l'app : même traitement que les corrigés des séries */
+details.cor>summary::after{content:""}
+</style></head><body>
+<div class="nav"><a href="00_COMMENCER_ICI.html">Commencer ici</a><a href="01_NOTATIONS_le-decodeur.html">Notations</a><a href="02_EXERCICES_Serie-0.html">Série 0 — Remise en route</a><a href="03_EXERCICES_Serie-1.html">Série 1 — Convexité</a><a href="04_EXERCICES_Serie-2.html">Série 2 — KKT</a><a href="05_AUTO-EVALUATION.html">Auto-évaluation (quiz)</a><a href="06_FICHE_Optimisation-deux-variables.html">Fiche — Optimisation à 2 variables</a></div>
+<main><h1>Fiche 44 — Programmation dynamique : le problème de base et le principe d'optimalité</h1>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Matière</strong></td>
+<td>Maths · Optimisation</td>
+</tr>
+<tr>
+<td><strong>Cours source</strong></td>
+<td>Bertsekas, <em>6.231 Dynamic Programming</em>, MIT OpenCourseWare, automne 2015 — cours 1 et 2</td>
+</tr>
+<tr>
+<td><strong>Difficulté</strong></td>
+<td> Must know — la porte d'entrée de toute la décision séquentielle</td>
+</tr>
+<tr>
+<td><strong>Temps d'étude estimé</strong></td>
+<td>2 h</td>
+</tr>
+<tr>
+<td><strong>Prérequis</strong></td>
+<td>Probabilités introductives, espérance conditionnelle ; fiche 36 (forme standard d'un problème d'optimisation)</td>
+</tr>
+<tr>
+<td><strong>Concepts clés</strong></td>
+<td>Système dynamique discret, état, commande, aléa, politique, coût additif, principe d'optimalité, algorithme DP, rétropropagation, boucle ouverte contre boucle fermée, augmentation d'état</td>
+</tr>
+<tr>
+<td><strong>Poids à l'examen</strong></td>
+<td>Deux gestes : <strong>écrire la récurrence de Bellman</strong> pour un problème donné, et <strong>la dérouler à rebours</strong> sur un petit exemple. C'est aussi le socle mathématique de la macroéconomie dynamique et des modèles de décision intertemporelle.</td>
+</tr>
+</tbody></table>
+<h2>Vue d'ensemble</h2>
+<p>Jusqu'ici, on optimisait <strong>un vecteur</strong> $x$, une fois pour toutes. La programmation dynamique optimise <strong>une suite de décisions</strong>, prises l'une après l'autre, en tenant compte de l'information qui arrive <strong>entre</strong> les décisions.</p>
+<pre><code>SYSTÈME     x_{k+1} = f_k(x_k, u_k, w_k)        état, commande, aléa
+COÛT        E[ g_N(x_N) + Σ_k g_k(x_k, u_k, w_k) ]     additif dans le temps
+DÉCIDER     non pas une suite de nombres u_0,…,u_{N−1}
+            mais une suite de RÈGLES  u_k = μ_k(x_k)   ← une POLITIQUE
+</code></pre>
+<p><strong>L'idée qui rend tout calculable</strong> tient en une phrase : <em>l'optimisation du futur ne dépend pas de ce qu'on a fait dans le passé.</em> C'est le <strong>principe d'optimalité</strong>, et il transforme un problème d'optimisation sur des fonctions en une <strong>récurrence à rebours</strong>.</p>
+<h2 data-prio="mid">Concept 1 — La programmation dynamique comme méthodologie</h2>
+<p><strong>Le problème d'optimisation générique</strong> du cours :
+$$\min_{u\in U} g(u)$$
+où $u$ est la variable de décision, $g$ le coût, $U$ l'ensemble de contraintes. Les catégories habituelles :</p>
+<ul>
+<li><strong>discret</strong> ($U$ fini) ou <strong>continu</strong> ;</li>
+<li><strong>linéaire</strong> ($g$ linéaire, $U$ polyédral) ou non linéaire ;</li>
+<li><strong>stochastique</strong> ou déterministe — dans le cas stochastique, le coût fait intervenir un paramètre aléatoire $w$ que l'on moyenne : $g(u) = \mathbb{E}_w\big[G(u,w)\big]$.</li>
+</ul>
+<div class="cal intu"><span class="lab">Ce que la DP apporte de spécifique.</span>
+<p> <em>Elle sait traiter des problèmes stochastiques complexes où l'information sur $w$ devient disponible <strong>par étapes</strong>, et où les décisions sont elles aussi prises <strong>par étapes</strong> en utilisant cette information.</em> C'est exactement ce qu'aucun des chapitres précédents ne savait faire : là, on décidait tout d'un coup, avant de rien observer.</p>
+</div>
+<h2 data-prio="must">Concept 2 — La structure de base</h2>
+<p><strong>Système en temps discret.</strong>
+$$x_{k+1} = f_k(x_k,u_k,w_k), \qquad k=0,1,\dots,N-1$$</p>
+<table>
+<thead>
+<tr>
+<th>Symbole</th>
+<th>Nom</th>
+<th>Rôle</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$k$</td>
+<td>temps discret</td>
+<td>l'étape</td>
+</tr>
+<tr>
+<td>$x_k$</td>
+<td><strong>état</strong></td>
+<td><em>résume l'information passée pertinente pour l'optimisation future</em></td>
+</tr>
+<tr>
+<td>$u_k$</td>
+<td><strong>commande</strong></td>
+<td>la décision, choisie dans un ensemble donné</td>
+</tr>
+<tr>
+<td>$w_k$</td>
+<td><strong>aléa</strong></td>
+<td>perturbation ou bruit selon le contexte</td>
+</tr>
+<tr>
+<td>$N$</td>
+<td><strong>horizon</strong></td>
+<td>nombre de fois où l'on applique une commande</td>
+</tr>
+</tbody></table>
+<p><strong>Coût additif dans le temps.</strong>
+$$\mathbb{E}\Big[g_N(x_N) + \sum_{k=0}^{N-1}g_k(x_k,u_k,w_k)\Big]$$</p>
+<blockquote>
+<p><strong>La définition de l'état est la seule chose vraiment difficile.</strong> <em>L'état résume l'information passée pertinente pour l'optimisation future</em> : ni plus (on gonflerait inutilement le problème), ni moins (la récurrence serait fausse). Tout le travail de modélisation en DP consiste à trouver le bon état.</p>
+</blockquote>
+<p><strong>Description alternative.</strong> Au lieu de $f_k$ et de la loi de $w_k$, on peut se donner directement la <strong>loi de transition</strong> $P(x_{k+1}\mid x_k,u_k)$ : il suffit de poser $x_{k+1}=w_k$ avec $P(w_k\mid x_k,u_k) = P(x_{k+1}\mid x_k,u_k)$. C'est la formulation « chaîne de Markov contrôlée », celle qu'on rencontre en économie.</p>
+<h3>Les deux hypothèses qui font marcher la DP</h3>
+<ol>
+<li>L'ensemble des valeurs que peut prendre $u_k$ dépend <strong>au plus de $x_k$</strong>, et non des $x$ ou $u$ antérieurs.</li>
+<li>La loi de $w_k$ <strong>ne dépend pas</strong> des valeurs passées $w_{k-1},\dots,w_0$ ; elle peut dépendre de $x_k$ et $u_k$.</li>
+</ol>
+<blockquote>
+<p><em>Sinon, les valeurs passées de $w$ ou de $x$ seraient utiles pour l'optimisation future</em> — c'est-à-dire que $x_k$ ne serait pas un état. Les deux hypothèses ne sont donc pas des restrictions techniques : elles <strong>définissent</strong> ce qu'est un état.</p>
+</blockquote>
+<p><strong>La chronologie d'une période $k$</strong>, à avoir en tête :</p>
+<p>$$x_k \ \text{ apparaît, } \ x_k = f_{k-1}(x_{k-1},u_{k-1},w_{k-1}) \ \longrightarrow\ u_k \ \text{ choisi en CONNAISSANT } x_k \ \longrightarrow\ w_k \ \text{ tiré selon } P_{w_k}(\cdot\mid x_k,u_k)$$</p>
+<p class="cal piege"> L'ordre compte : on choisit $u_k$ <strong>après</strong> avoir observé $x_k$ mais <strong>avant</strong> de connaître $w_k$. C'est ce décalage qui crée toute la difficulté — et toute la valeur de l'information.</p>
+<h3>Exemple fil rouge : la gestion de stock</h3>
+<p>$$x_{k+1} = f_k(x_k,u_k,w_k) = x_k+u_k-w_k$$
+avec $x_k$ le stock en début de période, $u_k$ la quantité commandée, $w_k$ la <strong>demande</strong> de la période. Le coût :
+$$\mathbb{E}\Big[g_N(x_N)+\sum_{k=0}^{N-1}\big(c\,u_k + r(x_k+u_k-w_k)\big)\Big]$$
+où $c$ est le coût unitaire d'achat et $r(\cdot)$ le coût de stockage ou de rupture sur le stock final de période.</p>
+<h2 data-prio="must">Concept 3 — Politiques et problème de base</h2>
+<p><strong>Politique.</strong> $\pi = \{\mu_0,\dots,\mu_{N-1}\}$, où chaque $\mu_k$ associe à un état $x_k$ une commande $u_k=\mu_k(x_k)$, avec $\mu_k(x_k)\in U_k(x_k)$ pour tout $x_k$.</p>
+<blockquote>
+<p><strong>On n'optimise pas sur des nombres, on optimise sur des FONCTIONS.</strong> C'est la différence fondamentale avec tout ce qui précède. Une politique est une <em>règle</em> qui dit quoi faire dans chaque situation possible — pas un plan d'action figé.</p>
+</blockquote>
+<p><strong>Coût espéré d'une politique</strong> partant de $x_0$ :
+$$J_\pi(x_0) = \mathbb{E}\Big[g_N(x_N)+\sum_{k=0}^{N-1}g_k\big(x_k,\mu_k(x_k),w_k\big)\Big]$$</p>
+<p><strong>Fonction de coût optimal</strong> et <strong>politique optimale</strong> :
+$$J^\star(x_0) = \min_\pi J_\pi(x_0), \qquad \pi^\star \text{ optimale si } J_{\pi^\star}(x_0)=J^\star(x_0)$$</p>
+<blockquote>
+<p><strong>Un fait remarquable, souligné par Bertsekas.</strong> Lorsqu'elle est produite par la DP, la politique optimale $\pi^\star$ est <strong>indépendante de $x_0$</strong> : la même règle est optimale quel que soit le point de départ. On ne calcule pas une trajectoire, on calcule une <strong>stratégie universelle</strong>.</p>
+</blockquote>
+<h2 data-prio="high">Concept 4 — Boucle ouverte contre boucle fermée</h2>
+<p><strong>Boucle ouverte</strong> : on fixe la suite $u_0,\dots,u_{N-1}$ à l'avance, sans jamais regarder l'état. <strong>Boucle fermée</strong> (<em>feedback</em>) : $u_k = \mu_k(x_k)$, la décision s'adapte à ce qu'on observe.</p>
+<blockquote>
+<p><strong>Dans les problèmes déterministes, la boucle ouverte vaut la boucle fermée.</strong> Comme il n'y a pas d'aléa, l'état futur est parfaitement prévisible : observer ne apprend rien. <strong>Dès qu'il y a de l'aléa, la boucle fermée est strictement meilleure</strong> — c'est la <em>valeur de l'information</em>.</p>
+</blockquote>
+<h3>L'exemple du match d'échecs</h3>
+<p>Deux parties. Le joueur a deux styles :</p>
+<table>
+<thead>
+<tr>
+<th>Style</th>
+<th>Résultat</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>prudent</strong></td>
+<td>nulle avec probabilité $p_d&gt;0$, défaite avec probabilité $1-p_d$</td>
+</tr>
+<tr>
+<td><strong>audacieux</strong></td>
+<td>victoire avec probabilité $p_w&lt;1/2$, défaite avec probabilité $1-p_w$</td>
+</tr>
+</tbody></table>
+<ul>
+<li><strong>Politique en boucle ouverte</strong> : jouer toujours audacieux.</li>
+<li><strong>Politique en boucle fermée</strong> : <em>jouer prudent si et seulement si l'on mène</em>.</li>
+</ul>
+<p><strong>L'arbre de la politique en boucle fermée</strong> (slide 10 du cours). On n'est pas devant, donc <strong>audacieux</strong> en première partie :</p>
+<ul>
+<li><strong>victoire</strong> (prob. $p_w$) → score $1$–$0$, on mène → <strong>prudent</strong> :<ul>
+<li>nulle (prob. $p_d$) → $1{,}5$–$0{,}5$ : <strong>match gagné</strong> ;</li>
+<li>défaite (prob. $1-p_d$) → $1$–$1$ : égalité ;</li>
+</ul>
+</li>
+<li><strong>défaite</strong> (prob. $1-p_w$) → $0$–$1$, on est mené → <strong>audacieux</strong> :<ul>
+<li>victoire (prob. $p_w$) → $1$–$1$ : égalité ;</li>
+<li>défaite (prob. $1-p_w$) → $0$–$2$ : <strong>match perdu</strong>.</li>
+</ul>
+</li>
+</ul>
+<div class="cal plus"><span class="lab">AJOUT — le calcul, sous une hypothèse explicite.</span>
+<p> Le cours ne chiffre pas l'exemple. Si l'on suppose qu'une égalité $1$–$1$ se départage par une partie de mort subite jouée en audacieux (gagnée avec probabilité $p_w$), on obtient
+$$\mathbb{P}(\text{match gagné}) = \underbrace{p_w p_d}_{\text{gagné en deux parties}} + \underbrace{\big(p_w(1-p_d)+(1-p_w)p_w\big)}_{\mathbb{P}(1\text{–}1)}\cdot p_w = p_wp_d + p_w^2(2-p_d-p_w)$$
+Avec $p_w = 0{,}45$ et $p_d = 0{,}9$ : $\approx0{,}405+0{,}2025\times0{,}65\approx0{,}54$ — <strong>le joueur est favori</strong>, alors qu'il perd chaque partie plus souvent qu'il ne la gagne. Cette hypothèse de départage n'est <strong>pas</strong> dans les transparents : c'est une convention que j'ajoute pour rendre le calcul possible.</p>
+</div>
+<p><strong>Ce que l'exemple enseigne.</strong> Adapter son style à la position <strong>crée</strong> un avantage à partir de deux styles individuellement défavorables. C'est la valeur de l'information, et c'est exactement pourquoi on optimise sur des <strong>politiques</strong> et non sur des suites.</p>
+<h2 data-prio="must">Concept 5 — Le principe d'optimalité</h2>
+<p>Soit $\pi^\star=\{\mu_0^\star,\dots,\mu_{N-1}^\star\}$ une politique optimale. Considérons le <strong>sous-problème de queue</strong> : on est en $x_i$ à l'instant $i$ et l'on veut minimiser le <strong>coût-à-venir</strong> de $i$ à $N$ :
+$$\mathbb{E}\Big[g_N(x_N)+\sum_{k=i}^{N-1}g_k\big(x_k,\mu_k(x_k),w_k\big)\Big]$$
+et la <strong>politique de queue</strong> $\{\mu_i^\star,\mu_{i+1}^\star,\dots,\mu_{N-1}^\star\}$.</p>
+<blockquote>
+<p><strong>Principe d'optimalité.</strong> <em>La politique de queue est optimale pour le sous-problème de queue.</em>
+Autrement dit : <strong>l'optimisation du futur ne dépend pas de ce qu'on a fait dans le passé.</strong></p>
+</blockquote>
+<p><strong>Ce que la DP en fait.</strong> Elle résout <strong>d'abord tous</strong> les sous-problèmes de queue de la <strong>dernière</strong> étape ; puis, à l'étape générique, elle résout <strong>tous</strong> les sous-problèmes de queue d'une longueur donnée, <strong>en utilisant</strong> la solution des sous-problèmes de queue plus courts.</p>
+<p class="cal piege"> Le principe d'optimalité ne dit pas que le passé est sans importance : il dit que <strong>tout ce qui compte du passé est résumé dans l'état courant $x_i$</strong>. Si ce n'est pas le cas, c'est que l'état est mal choisi — voir l'augmentation d'état (concept 8).</p>
+<h2 data-prio="must">Concept 6 — L'algorithme de programmation dynamique</h2>
+<p><strong>Initialisation</strong> — le coût terminal :
+$$J_N(x_N) = g_N(x_N)$$</p>
+<p><strong>Récurrence à rebours</strong>, pour $k=N-1,N-2,\dots,0$ :
+$$\boxed{\ J_k(x_k) = \min_{u_k\in U_k(x_k)} \ \mathbb{E}_{w_k}\Big[g_k(x_k,u_k,w_k) + J_{k+1}\big(f_k(x_k,u_k,w_k)\big)\Big]\ }$$</p>
+<p>Alors $J_0(x_0)$, produit au dernier pas, <strong>est égal</strong> au coût optimal $J^\star(x_0)$. Et la politique $\pi^\star=\{\mu_0^\star,\dots,\mu_{N-1}^\star\}$ où $\mu_k^\star(x_k)$ <strong>atteint le minimum</strong> du membre de droite, pour chaque $x_k$ et chaque $k$, est <strong>optimale</strong>.</p>
+<p><strong>Justification.</strong> Récurrence sur $k$ : on montre que $J_k(x_k)$ est égal au coût optimal $J_k^\star(x_k)$ du sous-problème de queue démarrant à l'instant $k$ dans l'état $x_k$.</p>
+<p><strong>La preuve du pas de récurrence (celle du cours).</strong> En supposant $J_{k+1}=J_{k+1}^\star$ :
+$$\begin{aligned} J_k^\star(x_k) &amp;= \min_{(\mu_k,\pi^{k+1})}\ \mathbb{E}_{w_k,\dots,w_{N-1}}\Big[g_k\big(x_k,\mu_k(x_k),w_k\big)+g_N(x_N)+\sum_{i=k+1}^{N-1}g_i\big(x_i,\mu_i(x_i),w_i\big)\Big]\\[4pt] &amp;= \min_{\mu_k}\ \mathbb{E}_{w_k}\Big[g_k\big(x_k,\mu_k(x_k),w_k\big) + \min_{\pi^{k+1}}\mathbb{E}\Big[g_N(x_N)+\sum_{i=k+1}^{N-1}g_i\big(x_i,\mu_i(x_i),w_i\big)\Big]\Big]\\[4pt] &amp;= \min_{\mu_k}\ \mathbb{E}_{w_k}\Big[g_k\big(x_k,\mu_k(x_k),w_k\big)+J_{k+1}\big(f_k(x_k,\mu_k(x_k),w_k)\big)\Big]\\[4pt] &amp;= \min_{u_k\in U_k(x_k)}\ \mathbb{E}_{w_k}\Big[g_k(x_k,u_k,w_k)+J_{k+1}\big(f_k(x_k,u_k,w_k)\big)\Big] \ = \ J_k(x_k)\end{aligned}$$</p>
+<blockquote>
+<p><strong>La deuxième ligne est le cœur de la preuve</strong> : on <strong>sépare</strong> le minimum sur $\mu_k$ de celui sur la politique de queue $\pi^{k+1}$. C'est licite précisément parce que le sous-problème de queue ne dépend du passé qu'à travers $x_{k+1}$ — c'est le principe d'optimalité en action.
+<strong>La dernière ligne</strong> remplace la minimisation sur une <strong>fonction</strong> $\mu_k$ par une minimisation sur un <strong>vecteur</strong> $u_k$, état par état : c'est ce qui rend le calcul possible.</p>
+</blockquote>
+<p><strong>Les deux remarques du cours, à retenir.</strong></p>
+<ul>
+<li><strong>Tous</strong> les sous-problèmes de queue sont résolus, en plus du problème d'origine — on obtient bien plus qu'une trajectoire.</li>
+<li><strong>Les besoins de calcul sont intensifs</strong> : il faut balayer tout l'espace d'états à chaque étape. C'est la fameuse « malédiction de la dimension », et c'est ce qui motivera les méthodes approchées.</li>
+</ul>
+<h3>Exemple : ordonnancement déterministe</h3>
+<p>Trouver l'ordre optimal des opérations A, B, C, D, sachant que <strong>A précède B</strong> et <strong>C précède D</strong>, avec des coûts de démarrage $S_A$, $S_C$ et des coûts de transition $C_{mn}$ de l'opération $m$ à l'opération $n$.</p>
+<p><strong>La méthode.</strong> On part du <strong>dernier</strong> sous-problème de queue et l'on remonte. <strong>À chaque couple état-instant, on enregistre le coût-à-venir optimal et la décision optimale.</strong> L'état est ici la suite des opérations déjà effectuées — et le graphe des états se referme : <code>AC</code> et <code>CA</code> mènent au même état, ce qui est précisément l'économie que réalise la DP par rapport à l'énumération des $4!$ ordres.</p>
+<h3>Exemple : gestion de stock stochastique</h3>
+<p><strong>Sous-problèmes de queue de longueur 1 :</strong>
+$$J_{N-1}(x_{N-1}) = \min_{u_{N-1}\geq0}\ \mathbb{E}_{w_{N-1}}\Big[c\,u_{N-1}+r(x_{N-1}+u_{N-1}-w_{N-1})\Big]$$</p>
+<p><strong>Sous-problèmes de queue de longueur $N-k$ :</strong>
+$$J_k(x_k) = \min_{u_k\geq0}\ \mathbb{E}_{w_k}\Big[c\,u_k+r(x_k+u_k-w_k)+J_{k+1}(x_k+u_k-w_k)\Big]$$</p>
+<p>et $J_0(x_0)$ est le coût optimal depuis l'état initial $x_0$.</p>
+<h2 data-prio="high">Concept 7 — L'exemple linéaire-quadratique</h2>
+<p>Deux fours en série. Une pièce de température initiale $x_0$ traverse le four 1 puis le four 2 ; on veut atteindre une température cible $T$ en dépensant peu d'énergie.</p>
+<p><strong>Système</strong> : $x_{k+1} = (1-a)x_k + a\,u_k$ pour $k=0,1$, avec $a\in\,]0,1[$ donné.
+<strong>Coût</strong> : $r(x_2-T)^2+u_0^2+u_1^2$, avec $r&gt;0$ donné.</p>
+<p><strong>Algorithme DP.</strong>
+$$J_2(x_2) = r(x_2-T)^2$$
+$$J_1(x_1) = \min_{u_1}\Big[u_1^2 + r\big((1-a)x_1+a u_1 - T\big)^2\Big]$$
+$$J_0(x_0) = \min_{u_0}\Big[u_0^2 + J_1\big((1-a)x_0+a u_0\big)\Big]$$</p>
+<div class="cal intu"><span class="lab">Pourquoi ce cas est central.</span>
+<p> Chaque minimisation est celle d'une <strong>quadratique convexe en $u_k$</strong> : elle se résout <strong>analytiquement</strong>, et le résultat $J_1$ est encore une quadratique en $x_1$. La forme quadratique se <strong>propage</strong> à rebours. C'est le seul cadre continu où la DP se mène entièrement à la main — d'où son omniprésence en contrôle et en macroéconomie.</p>
+</div>
+<h2 data-prio="high">Concept 8 — Augmentation d'état</h2>
+<p>Quand les hypothèses du problème de base sont violées — perturbations <strong>corrélées</strong>, coût <strong>non additif</strong>, retards — on <strong>reformule en augmentant l'état</strong>. L'algorithme DP s'applique toujours, mais <strong>le problème grossit</strong>.</p>
+<p><strong>Exemple : les retards.</strong> Si le système s'écrit
+$$x_{k+1} = f_k(x_k,\,x_{k-1},\,u_k,w_k)$$
+alors $x_k$ <strong>n'est pas</strong> un état : le passé lointain influence encore le futur. On introduit la variable supplémentaire $y_k = x_{k-1}$, et le nouveau système devient
+$$\begin{pmatrix}x_{k+1}\\ y_{k+1}\end{pmatrix} = \begin{pmatrix}f_k(x_k,y_k,u_k,w_k)\\ x_k\end{pmatrix}$$
+On considère $\tilde x_k = (x_k,y_k)$ comme le <strong>nouvel état</strong>, et la récurrence devient
+$$J_k(x_k,x_{k-1}) = \min_{u_k\in U_k(x_k)}\ \mathbb{E}_{w_k}\Big[g_k(x_k,u_k,w_k)+J_{k+1}\big(f_k(x_k,x_{k-1},u_k,w_k),\ x_k\big)\Big]$$</p>
+<p class="cal piege"> <strong>L'augmentation d'état n'est pas gratuite.</strong> Chaque variable ajoutée multiplie la taille de l'espace d'états, donc le coût de la récurrence. C'est le compromis permanent de la DP : un état plus riche rend le problème correct, mais plus cher.</p>
+<h3>Comment résoudre l'exercice type (protocole)</h3>
+<ol>
+<li><strong>Identifier l'horizon $N$</strong> et le découpage temporel.</li>
+<li><strong>Choisir l'état $x_k$</strong> — la question décisive : quelle information passée est <strong>pertinente pour le futur</strong> ? Si un élément du passé influence encore le futur, il doit entrer dans l'état.</li>
+<li><strong>Identifier la commande $u_k$</strong> et son ensemble de contraintes $U_k(x_k)$.</li>
+<li><strong>Identifier l'aléa $w_k$</strong> et sa loi conditionnelle $P(w_k\mid x_k,u_k)$ — vérifier qu'elle ne dépend pas du passé.</li>
+<li><strong>Écrire la dynamique</strong> $x_{k+1}=f_k(x_k,u_k,w_k)$ et le <strong>coût par étape</strong> $g_k$, plus le coût terminal $g_N$.</li>
+<li><strong>Vérifier l'additivité</strong> du coût ; sinon, augmenter l'état.</li>
+<li><strong>Poser $J_N=g_N$</strong> et dérouler la récurrence <strong>à rebours</strong>, en enregistrant à chaque couple état-instant le <strong>coût-à-venir</strong> et la <strong>décision optimale</strong>.</li>
+<li><strong>Lire la politique</strong> : $\mu_k^\star(x_k)$ est l'argmin à l'étape $k$. Conclure sur $J_0(x_0)$.</li>
+</ol>
+<h3>Exercices progressifs</h3>
+<p><strong> Niveau 1</strong> — Dans le problème de gestion de stock, quel est l'état ? Pourquoi la demande passée n'en fait-elle pas partie ?</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p>L'état est le <strong>stock disponible</strong> $x_k$. La demande passée $w_{k-1},w_{k-2},\dots$ n'en fait pas partie parce que, sous l'hypothèse que les $w_k$ sont indépendants, elle n'apporte <strong>aucune information sur la demande future</strong> — et son effet sur le futur est déjà <strong>entièrement résumé</strong> par le stock courant.</p>
+<p><strong>Attention à la réciproque :</strong> si les demandes étaient <strong>corrélées</strong> (par exemple $w_k$ dépendant de $w_{k-1}$), l'hypothèse 2 tomberait, et il faudrait <strong>augmenter l'état</strong> en $(x_k,w_{k-1})$.</p>
+</div></details>
+
+<p><strong> Niveau 2</strong> — Pourquoi la boucle fermée n'apporte-t-elle rien dans un problème déterministe ?</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p>Sans aléa, la trajectoire $x_1,x_2,\dots$ est <strong>entièrement déterminée</strong> par $x_0$ et la suite $u_0,u_1,\dots$ : on peut la calculer d'avance. Observer $x_k$ en cours de route <strong>n'apprend donc rien</strong> qu'on ne sût déjà. Toute politique en boucle fermée $\{\mu_k\}$ engendre depuis $x_0$ une suite de commandes que l'on peut reproduire à l'identique en boucle ouverte, et réciproquement : les deux classes atteignent <strong>le même coût optimal</strong>.</p>
+<p><em>La conséquence pratique :</em> en déterministe, la DP reste utile comme <strong>méthode de calcul</strong> (elle décompose le problème), pas comme façon d'exploiter l'information.</p>
+</div></details>
+
+<p><strong> Niveau 3</strong> — Résolvez le problème des deux fours pour $a=1/2$, $r=1$, $T=0$.</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p>Avec $a=1/2$ : $x_{k+1}=\tfrac12x_k+\tfrac12u_k$, et le coût est $x_2^2+u_0^2+u_1^2$.</p>
+<p><em>Étape 1 — $J_2$.</em> $J_2(x_2)=x_2^2$.</p>
+<p><em>Étape 2 — $J_1$.</em>
+$$J_1(x_1) = \min_{u_1}\Big[u_1^2+\big(\tfrac12x_1+\tfrac12u_1\big)^2\Big]$$
+On dérive : $2u_1 + 2\cdot\tfrac12\big(\tfrac12x_1+\tfrac12u_1\big) = 0$, soit $2u_1+\tfrac12 u_1 = -\tfrac12x_1$, d'où
+$$\mu_1^\star(x_1) = -\frac{x_1}{5}$$
+En reportant : $x_2 = \tfrac12x_1-\tfrac1{10}x_1 = \tfrac25x_1$, et
+$$J_1(x_1) = \frac{x_1^2}{25}+\frac{4x_1^2}{25} = \frac{x_1^2}{5}$$</p>
+<p><em>Étape 3 — $J_0$.</em>
+$$J_0(x_0)=\min_{u_0}\Big[u_0^2+\tfrac15\big(\tfrac12x_0+\tfrac12u_0\big)^2\Big]$$
+Dérivée : $2u_0+\tfrac15\cdot\tfrac12\big(\tfrac12x_0+\tfrac12u_0\big)\cdot 2 = 0$, soit $2u_0+\tfrac1{10}u_0 = -\tfrac1{10}x_0$, d'où
+$$\mu_0^\star(x_0) = -\frac{x_0}{21}, \qquad J_0(x_0) = \frac{x_0^2}{21}$$</p>
+<p><strong>Ce qu'on observe.</strong> La politique optimale est <strong>linéaire en l'état</strong> ($\mu_k^\star(x_k)=L_kx_k$) et le coût optimal <strong>quadratique</strong> ($J_k(x_k)=K_kx_k^2$) : la structure se propage à rebours. C'est le résultat général du cas linéaire-quadratique.</p>
+</div></details>
+
+<p><strong> Niveau 4 — type examen</strong> — Un consommateur dispose d'une richesse $x_0$ et vit $N$ périodes. À chaque période il consomme $u_k\in[0,x_k]$, en tire l'utilité $\log u_k$, et le reste croît au taux $R&gt;0$ : $x_{k+1}=R(x_k-u_k)$. Il maximise $\sum_{k=0}^{N-1}\beta^k\log u_k$ avec $\beta\in\,]0,1[$. Écrivez la récurrence de Bellman et résolvez pour $N=2$.</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p><strong>Mise en forme.</strong> On maximise, donc on écrit la récurrence en $\max$ (ou l'on minimise $-\sum\beta^k\log u_k$). Avec un coût terminal nul, $J_2(x_2)=0$ et
+$$J_k(x_k) = \max_{0\leq u_k\leq x_k}\Big[\beta^k\log u_k + J_{k+1}\big(R(x_k-u_k)\big)\Big]$$</p>
+<p><strong>Étape 1 — dernière période ($k=1$).</strong> Comme $J_2\equiv0$, on maximise $\beta\log u_1$ sur $[0,x_1]$ : la fonction est croissante, donc
+$$\mu_1^\star(x_1)=x_1, \qquad J_1(x_1)=\beta\log x_1$$
+<em>On consomme tout à la dernière période — il n'y a plus de futur à financer.</em></p>
+<p><strong>Étape 2 — première période ($k=0$).</strong>
+$$J_0(x_0)=\max_{0\leq u_0\leq x_0}\Big[\log u_0 + \beta\log\big(R(x_0-u_0)\big)\Big]$$
+La dérivée en $u_0$ vaut $\dfrac{1}{u_0}-\dfrac{\beta}{x_0-u_0}$, nulle pour $x_0-u_0 = \beta u_0$, soit
+$$\mu_0^\star(x_0) = \frac{x_0}{1+\beta}$$
+et
+$$J_0(x_0) = \log\frac{x_0}{1+\beta}+\beta\log\frac{\beta R\,x_0}{1+\beta} = (1+\beta)\log x_0 + \text{const}$$</p>
+<p><strong>Lecture économique.</strong> La politique optimale est de consommer une <strong>fraction fixe de la richesse</strong> : $\frac{1}{1+\beta}$ à la première période, puis tout. La fraction ne dépend <strong>pas</strong> du niveau de richesse — propriété caractéristique de l'utilité logarithmique. Et l'on retrouve la structure du cas linéaire-quadratique : la forme fonctionnelle de $J$ (ici $a\log x + b$) se <strong>propage</strong> à rebours.</p>
+<p><strong>Ce que l'exercice enseigne.</strong> C'est le modèle de consommation intertemporelle de la macroéconomie, écrit exactement dans le formalisme de Bertsekas : état $=$ richesse, commande $=$ consommation, dynamique $=$ accumulation du capital, coût $=$ utilité actualisée. Le passage à $N=\infty$ donnera l'équation de Bellman stationnaire.</p>
+</div></details>
+
+<h2 data-prio="must">Common mistakes</h2>
+<ol>
+<li><strong>Choisir un état trop pauvre</strong> — si un élément du passé influence encore le futur, la récurrence est <strong>fausse</strong>. Il faut augmenter l'état.</li>
+<li><strong>Choisir un état trop riche</strong> — chaque variable ajoutée multiplie le coût de calcul ; l'état doit contenir <strong>exactement</strong> l'information pertinente.</li>
+<li><strong>Optimiser sur des suites au lieu de politiques</strong> — en stochastique, une suite $u_0,\dots,u_{N-1}$ fixée d'avance est strictement moins bonne qu'une règle $\mu_k(x_k)$.</li>
+<li><strong>Dérouler la récurrence dans le sens du temps</strong> — la DP va <strong>à rebours</strong> : on part du coût terminal.</li>
+<li><strong>Oublier l'espérance</strong> — le minimum porte sur $u_k$, l'espérance sur $w_k$, et <strong>dans cet ordre</strong> : $\min_u\mathbb{E}_w$, jamais $\mathbb{E}_w\min_u$ (qui supposerait de connaître $w_k$ avant de décider).</li>
+<li><strong>Croire que l'ordre $\min$ / $\mathbb{E}$ est indifférent</strong> — $\mathbb{E}_w\min_u \leq \min_u\mathbb{E}_w$ : l'inversion donne la valeur d'un devin, pas celle d'un décideur.</li>
+<li><strong>Oublier de mémoriser la décision optimale</strong> — la récurrence sur $J_k$ donne le <strong>coût</strong> ; c'est l'argmin qui donne la <strong>politique</strong>, et c'est elle qu'on veut.</li>
+<li><strong>Croire que la DP ne donne qu'une trajectoire</strong> — elle résout <strong>tous</strong> les sous-problèmes de queue, donc donne la politique pour <strong>tout</strong> état et <strong>tout</strong> instant.</li>
+</ol>
+<h2>Ultimate Review</h2>
+<ol>
+<li>Système $x_{k+1}=f_k(x_k,u_k,w_k)$ ; coût <strong>additif</strong> $\mathbb{E}\big[g_N(x_N)+\sum_kg_k(x_k,u_k,w_k)\big]$.</li>
+<li><strong>L'état résume l'information passée pertinente pour l'optimisation future</strong> — c'est la définition, et le seul vrai travail de modélisation.</li>
+<li>Deux hypothèses : $U_k$ dépend au plus de $x_k$ ; la loi de $w_k$ ne dépend pas du passé de $w$.</li>
+<li>Chronologie : $x_k$ observé $\to$ $u_k$ choisi $\to$ $w_k$ tiré.</li>
+<li><strong>Politique</strong> $\pi=\{\mu_0,\dots,\mu_{N-1}\}$ : on optimise sur des <strong>fonctions</strong>, pas sur des nombres. La politique optimale produite par la DP est <strong>indépendante de $x_0$</strong>.</li>
+<li><strong>Boucle ouverte $=$ boucle fermée en déterministe</strong> ; en stochastique la boucle fermée est strictement meilleure — c'est la <strong>valeur de l'information</strong>.</li>
+<li><strong>Principe d'optimalité</strong> : la politique de queue est optimale pour le sous-problème de queue ; l'optimisation du futur ne dépend pas du passé.</li>
+<li><strong>Algorithme DP</strong> : $J_N=g_N$, puis à rebours $J_k(x_k)=\min_{u_k}\mathbb{E}_{w_k}\big[g_k+J_{k+1}(f_k)\big]$ ; $J_0(x_0)=J^\star(x_0)$, et l'argmin donne $\mu_k^\star$.</li>
+<li>Preuve par récurrence : on <strong>sépare</strong> le min sur $\mu_k$ du min sur la politique de queue.</li>
+<li><strong>Linéaire-quadratique</strong> : chaque minimisation est analytique et la forme quadratique se <strong>propage</strong> à rebours.</li>
+<li><strong>Augmentation d'état</strong> pour les retards, les aléas corrélés, les coûts non additifs — au prix d'un espace d'états plus grand.</li>
+</ol>
+<p><strong>Formulas to know</strong>
+$$x_{k+1}=f_k(x_k,u_k,w_k) \qquad J_\pi(x_0)=\mathbb{E}\Big[g_N(x_N)+\sum_{k=0}^{N-1}g_k\big(x_k,\mu_k(x_k),w_k\big)\Big]$$
+$$J_N(x_N)=g_N(x_N) \qquad J_k(x_k)=\min_{u_k\in U_k(x_k)}\mathbb{E}_{w_k}\Big[g_k(x_k,u_k,w_k)+J_{k+1}\big(f_k(x_k,u_k,w_k)\big)\Big]$$</p>
+<p><strong>Methods to know</strong> : le protocole de modélisation en 8 étapes ; la récurrence à rebours ; la preuve du pas de récurrence ; l'augmentation d'état.</p>
+<div class="rec"><h2>Active Recall</h2><p><strong>Basic</strong> — Écrivez l'algorithme de programmation dynamique et dites ce que produit chacune de ses sorties.</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p>$J_N(x_N)=g_N(x_N)$, puis pour $k=N-1,\dots,0$ :
+$$J_k(x_k)=\min_{u_k\in U_k(x_k)}\mathbb{E}_{w_k}\Big[g_k(x_k,u_k,w_k)+J_{k+1}\big(f_k(x_k,u_k,w_k)\big)\Big]$$
+$J_0(x_0)$ est le <strong>coût optimal</strong> $J^\star(x_0)$ ; l'<strong>argmin</strong> à chaque étape donne $\mu_k^\star(x_k)$, c'est-à-dire la <strong>politique optimale</strong>.</p>
+</div></details><p><strong>Understanding</strong> — Énoncez le principe d'optimalité et expliquez où il intervient dans la preuve de l'algorithme.</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p><em>Énoncé.</em> Si $\pi^\star$ est optimale, alors sa <strong>politique de queue</strong> $\{\mu_i^\star,\dots,\mu_{N-1}^\star\}$ est optimale pour le <strong>sous-problème de queue</strong> démarrant en $x_i$ à l'instant $i$ — l'optimisation du futur ne dépend pas du passé.</p>
+<p><em>Où il intervient.</em> Dans la deuxième ligne de la preuve du pas de récurrence, quand on <strong>sépare</strong> $\min_{(\mu_k,\pi^{k+1})}$ en $\min_{\mu_k}$ puis $\min_{\pi^{k+1}}$. Cette séparation n'est licite que parce que le sous-problème de queue ne dépend du passé qu'à travers $x_{k+1}$.</p>
+</div></details><p><strong>Application</strong> — Dans quel ordre écrit-on le minimum et l'espérance, et pourquoi ?</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p>$\min_{u_k}\mathbb{E}_{w_k}[\cdots]$ — <strong>le minimum d'abord, l'espérance ensuite</strong>. C'est la chronologie : on choisit $u_k$ en connaissant $x_k$ mais <strong>avant</strong> de connaître $w_k$, donc on ne peut optimiser que la <strong>moyenne</strong> sur $w_k$.</p>
+<p>L'ordre inverse $\mathbb{E}_{w_k}\min_{u_k}$ correspondrait à choisir $u_k$ <strong>après</strong> avoir vu $w_k$ : c'est la valeur d'un devin. On a toujours $\mathbb{E}\min\leq\min\mathbb{E}$, et l'écart est précisément la valeur de l'information future.</p>
+</div></details><p><strong>Comparison</strong> — Boucle ouverte et boucle fermée : quand diffèrent-elles, et de combien ?</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p>Elles <strong>coïncident</strong> en déterministe : sans aléa, la trajectoire est prévisible et observer n'apprend rien. Elles <strong>diffèrent</strong> dès qu'il y a de l'aléa, et l'écart est la <strong>valeur de l'information</strong>.</p>
+<p>L'exemple du match d'échecs le montre de façon spectaculaire : avec deux styles individuellement défavorables ($p_w&lt;1/2$), la politique « prudent si et seulement si l'on mène » rend le joueur favori, ce qu'aucune politique en boucle ouverte n'obtient.</p>
+</div></details><p><strong>Exam-style</strong> — Une entreprise doit décider chaque mois de sa production, avec une demande aléatoire corrélée d'un mois sur l'autre. Le stock suffit-il comme état ?</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p><strong>Non.</strong> L'hypothèse 2 du problème de base exige que la loi de $w_k$ ne dépende pas de $w_{k-1},\dots,w_0$. Si les demandes sont <strong>corrélées</strong>, la demande passée porte de l'information sur la demande future : elle est donc « pertinente pour l'optimisation future » et doit entrer dans l'état.</p>
+<p><strong>La parade : augmenter l'état.</strong> On prend $\tilde x_k = (x_k,\ w_{k-1})$, ou plus généralement l'état de la chaîne qui engendre la demande. La récurrence DP s'applique alors sans changement — mais l'espace d'états est <strong>multiplié</strong> par le nombre de valeurs possibles de $w_{k-1}$, ce qui alourdit d'autant le calcul.</p>
+</div></details></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h2>Flashcards</h2>
+<table>
+<thead>
+<tr>
+<th>Question</th>
+<th>Réponse</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Système de la DP ?</td>
+<td>$x_{k+1}=f_k(x_k,u_k,w_k)$</td>
+</tr>
+<tr>
+<td>Qu'est-ce que l'état ?</td>
+<td>Ce qui résume l'information passée <strong>pertinente pour le futur</strong></td>
+</tr>
+<tr>
+<td>Structure du coût ?</td>
+<td><strong>Additif</strong> : $\mathbb{E}[g_N(x_N)+\sum_kg_k(x_k,u_k,w_k)]$</td>
+</tr>
+<tr>
+<td>Les deux hypothèses du problème de base ?</td>
+<td>$U_k$ dépend au plus de $x_k$ ; la loi de $w_k$ ne dépend pas du passé de $w$</td>
+</tr>
+<tr>
+<td>Chronologie d'une période ?</td>
+<td>$x_k$ observé, puis $u_k$ choisi, puis $w_k$ tiré</td>
+</tr>
+<tr>
+<td>Qu'est-ce qu'une politique ?</td>
+<td>$\pi=\{\mu_0,\dots,\mu_{N-1}\}$, des <strong>règles</strong> $u_k=\mu_k(x_k)$</td>
+</tr>
+<tr>
+<td>Boucle ouverte contre fermée ?</td>
+<td>Équivalentes en déterministe ; la fermée est meilleure en stochastique</td>
+</tr>
+<tr>
+<td>Principe d'optimalité ?</td>
+<td>La politique de queue est optimale pour le sous-problème de queue</td>
+</tr>
+<tr>
+<td>Initialisation de la DP ?</td>
+<td>$J_N(x_N)=g_N(x_N)$</td>
+</tr>
+<tr>
+<td>Récurrence de la DP ?</td>
+<td>$J_k(x_k)=\min_{u_k}\mathbb{E}_{w_k}[g_k+J_{k+1}(f_k)]$</td>
+</tr>
+<tr>
+<td>Dans quel sens déroule-t-on ?</td>
+<td><strong>À rebours</strong>, de $N$ vers $0$</td>
+</tr>
+<tr>
+<td>Ordre du min et de l'espérance ?</td>
+<td>$\min_u\mathbb{E}_w$ — on décide avant de connaître l'aléa</td>
+</tr>
+<tr>
+<td>Que donne l'argmin ?</td>
+<td>La politique optimale $\mu_k^\star(x_k)$</td>
+</tr>
+<tr>
+<td>La politique optimale dépend-elle de $x_0$ ?</td>
+<td><strong>Non</strong>, quand elle est produite par la DP</td>
+</tr>
+<tr>
+<td>Cas linéaire-quadratique ?</td>
+<td>Minimisations analytiques ; la forme quadratique se propage à rebours</td>
+</tr>
+<tr>
+<td>Quand augmente-t-on l'état ?</td>
+<td>Retards, aléas corrélés, coût non additif</td>
+</tr>
+<tr>
+<td>Prix de l'augmentation d'état ?</td>
+<td>L'espace d'états grossit, donc le calcul aussi</td>
+</tr>
+</tbody></table>
+</main>
+
+
+
+
+</body></html>

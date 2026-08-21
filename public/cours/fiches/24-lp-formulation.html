@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fiche 24 — Programmation linéaire : formulation et géométrie</title>
+<script>
+window.MathJax={tex:{inlineMath:[["$","$"]],displayMath:[["$$","$$"]],processEscapes:true},
+ options:{skipHtmlTags:["script","noscript","style","textarea","pre","code"]},
+ svg:{fontCache:"global"},
+ startup:{pageReady:()=>MathJax.startup.defaultPageReady().then(()=>{document.body.classList.add("ready")})}};
+setTimeout(function(){document.body.classList.add("ready")},2500);
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+/* ============================================================
+   MathiasLearn — feuille de style des fiches
+   Reprise intégrale des tokens de 00_PARCOURS/*.html
+   + blocs pédagogiques (callouts, méthode, essentiels, recall)
+   ============================================================ */
+:root{--bg:#faf9f7;--card:#fff;--ink:#1a1a1a;--muted:#6b6b6b;--line:#e5e2dd;--accent:#8b5e34;
+ --hl:#fdf8ef;--ok:#2d7d4f;--okbg:#f0f7f3;--warn:#b3402f;--warnbg:#fdf3f1;--blue:#2f5d8b;--bluebg:#f1f5fa}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+ font:17px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;padding:0 16px 100px}
+.nav{position:sticky;top:0;background:rgba(250,249,247,.96);backdrop-filter:blur(8px);
+ border-bottom:1px solid var(--line);margin:0 -16px 30px;padding:11px 16px;z-index:50;
+ display:flex;gap:6px;flex-wrap:wrap;font-size:13px}
+.nav a{color:var(--muted);text-decoration:none;padding:4px 9px;border-radius:5px;white-space:nowrap}
+.nav a:hover{background:var(--line);color:var(--ink)}
+.nav a.on{background:var(--accent);color:#fff}
+main{max-width:780px;margin:0 auto}
+h1{font-size:31px;letter-spacing:-.02em;margin:.4em 0 .5em;line-height:1.25}
+h2{font-size:23px;margin:2.2em 0 .7em;padding-bottom:.3em;border-bottom:1px solid var(--line)}
+h3{font-size:19px;margin:1.9em 0 .5em;color:var(--accent)}
+h4{font-size:17px;margin:1.5em 0 .4em}
+p{margin:.8em 0} a{color:var(--accent)} hr{border:0;border-top:1px solid var(--line);margin:2.6em 0}
+table{border-collapse:collapse;width:100%;margin:1.3em 0;font-size:15.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+th{background:#f3f0eb;font-weight:600}
+tr:nth-child(even) td{background:#fcfbfa}
+code{font-family:"SF Mono",Menlo,Consolas,monospace;font-size:.88em;background:#f2efea;padding:2px 6px;border-radius:4px;white-space:nowrap}
+pre{background:#f2efea;padding:14px 16px;border-radius:8px;overflow-x:auto}
+pre code{background:none;padding:0;white-space:pre}
+blockquote{border-left:3px solid var(--accent);background:var(--hl);margin:1.4em 0;padding:14px 20px;border-radius:0 8px 8px 0}
+blockquote p:first-child{margin-top:0} blockquote p:last-child{margin-bottom:0}
+ul,ol{padding-left:1.5em} li{margin:.35em 0} em{color:#4a4a4a}
+mjx-container[display="true"]{margin:1.1em 0!important;overflow-x:auto;overflow-y:hidden;padding:2px 0}
+mjx-container svg{max-width:100%}
+body:not(.ready) main{opacity:0} main{opacity:1;transition:opacity .25s}
+
+/* --- bandeau de tête de fiche --- */
+.cours{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--accent);
+ border-radius:0 10px 10px 0;padding:18px 22px;margin:0 0 34px}
+.cours h4{margin:0 0 4px;font-size:14px;text-transform:uppercase;letter-spacing:.07em;color:var(--accent)}
+.cours .cs{color:var(--muted);font-size:14.5px;margin:0 0 14px}
+
+/* --- exercices / corrigés --- */
+.ex{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:6px 24px 20px;margin:18px 0}
+.ex>h3:first-child{margin-top:14px}
+details.cor{margin-top:18px;border:1px solid var(--line);border-radius:8px;background:#fcfbfa;overflow:hidden}
+details.cor>summary{cursor:pointer;padding:12px 16px;font-weight:600;font-size:15px;color:var(--accent);
+ list-style:none;display:flex;align-items:center;gap:9px;user-select:none;transition:.15s;min-height:44px}
+details.cor>summary::-webkit-details-marker{display:none}
+details.cor>summary:hover{background:var(--hl)}
+details.cor>summary::before{content:"\25B6";font-size:10px;transition:transform .18s;display:inline-block}
+details.cor[open]>summary::before{transform:rotate(90deg)}
+details.cor[open]>summary{background:var(--okbg);color:var(--ok);border-bottom:1px solid var(--line)}
+.cor .in{padding:4px 20px 16px}
+.cor .in>*:first-child{margin-top:.9em}
+
+/* --- blocs pédagogiques (callouts) ---
+   Générés depuis une citation Markdown dont le premier **gras** commence
+   par un mot-clé : DÉFINITION, THÉORÈME, MÉTHODE, PIÈGE, INTUITION… */
+.cal{border:1px solid var(--line);border-left:4px solid var(--accent);background:var(--card);
+ border-radius:0 10px 10px 0;padding:15px 20px;margin:1.5em 0}
+.cal>p:first-child{margin-top:0}.cal>p:last-child,.cal>ul:last-child,.cal>ol:last-child{margin-bottom:0}
+.cal .lab{display:block;font-size:12.5px;text-transform:uppercase;letter-spacing:.08em;
+ font-weight:700;color:var(--accent);margin-bottom:6px}
+.cal.formel{background:var(--hl)}
+.cal.piege{border-left-color:var(--warn);background:var(--warnbg)}
+.cal.piege .lab{color:var(--warn)}
+.cal.methode{border-left-color:var(--ok);background:var(--okbg)}
+.cal.methode .lab{color:var(--ok)}
+.cal.intu{border-left-color:var(--blue);background:var(--bluebg)}
+.cal.intu .lab{color:var(--blue)}
+.cal.plus{border-left-style:dashed;background:#faf9f7}
+.cal.plus .lab{color:var(--muted)}
+
+/* --- révision express --- */
+.ess{background:var(--card);border:1px solid var(--accent);border-radius:10px;padding:4px 24px 20px;margin:1.6em 0}
+.ess h3{margin-top:1.3em}
+.rec{background:var(--card);border:1px dashed var(--accent);border-radius:10px;padding:4px 24px 18px;margin:1.6em 0}
+.rec ol{counter-reset:none}
+
+/* --- impression / PDF --- */
+@media print{
+ .nav{display:none}
+ body{padding:0;background:#fff;font-size:11.2pt;line-height:1.55}
+ main{max-width:none}
+ h1{font-size:23pt}h2{font-size:15pt;margin-top:1.5em}h3{font-size:12.6pt}
+ h2,h3,h4{break-after:avoid;page-break-after:avoid}
+ table,.cal,blockquote{break-inside:avoid;page-break-inside:avoid}
+ table{display:table;font-size:9.6pt}
+ details.cor{border:1px solid var(--line);background:#fcfbfa}
+ details.cor>summary{display:none}
+ details.cor .in{padding-top:10px}
+ .cal,.ex,.ess,.rec{box-shadow:none}
+ a{color:var(--ink);text-decoration:none}
+}
+@page{margin:16mm 15mm 18mm}
+
+/* --- exemples travaillés --- */
+.exm{background:#fcfbfa;border:1px solid var(--line);border-radius:10px;padding:2px 20px 14px;margin:1.5em 0}
+.exm>h4:first-child{margin:14px 0 .5em;color:var(--accent);font-size:13px;text-transform:uppercase;letter-spacing:.07em}
+
+
+/* --- pastilles de priorité (conventions des fiches de l'app) --- */
+h2[data-prio], h3[data-prio], h4[data-prio]{position:relative}
+h2[data-prio]::before,h3[data-prio]::before,h4[data-prio]::before{
+ content:"";display:inline-block;width:9px;height:9px;border-radius:50%;
+ margin-right:9px;vertical-align:middle;background:var(--muted)}
+[data-prio="must"]::before{background:var(--warn)}
+[data-prio="high"]::before{background:#d98324}
+[data-prio="mid"]::before{background:#c9a227}
+[data-prio="low"]::before{background:var(--ok)}
+/* corrigés des fiches de l'app : même traitement que les corrigés des séries */
+details.cor>summary::after{content:""}
+</style></head><body>
+<div class="nav"><a href="24-lp-formulation.html" class="on">Programmation linéaire : formulation et géométrie</a><a href="25-lp-affine-par-morceaux.html">Optimisation affine par morceaux : tout ramener à un LP</a><a href="26-lp-polyedres.html">Polyèdres : faces, points extrêmes, test du rang</a><a href="27-lp-convexite-cones.html">Enveloppes convexes, cônes et décomposition d'un polyèdre</a><a href="28-lp-dualite.html">Dualité en programmation linéaire</a><a href="29-lp-sensibilite-jeux.html">Dualité II : sensibilité, prix implicites et jeux à somme nulle</a><a href="30-lp-simplexe.html">L'algorithme du simplexe</a><a href="31-lp-reseaux-unimodularite.html">Flots dans les réseaux et unimodularité totale</a><a href="32-lp-commande.html">Applications en automatique : suivi de consigne et robustesse</a><a href="33-lp-nombres-entiers.html">Programmation linéaire en nombres entiers et séparation-évaluation</a><a href="34-boyd-ensembles-convexes.html">Ensembles convexes</a><a href="35-boyd-fonctions-convexes.html">Fonctions convexes</a><a href="36-boyd-problemes-convexes.html">Problèmes d'optimisation convexe</a><a href="37-boyd-familles-standard.html">Les familles standard : LP, QP, SOCP, GP, SDP</a><a href="38-boyd-dualite.html">Dualité lagrangienne</a><a href="39-boyd-minimisation-sans-contrainte.html">Minimisation sans contrainte : gradient et Newton</a><a href="40-boyd-contraintes-egalite.html">Minimisation sous contraintes d'égalité</a><a href="41-boyd-points-interieurs.html">Méthodes de points intérieurs</a><a href="42-sous-gradients.html">Sous-gradients et sous-différentiel</a><a href="43-methode-sous-gradient.html">La méthode du sous-gradient</a></div>
+<main><h1>Fiche 24 — Programmation linéaire : formulation et géométrie</h1>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Matière</strong></td>
+<td>Maths · Optimisation</td>
+</tr>
+<tr>
+<td><strong>Cours source</strong></td>
+<td>Vandenberghe, <em>EE236A — Linear Programming</em> (UCLA), Lecture 1 « Introduction », 28 diapositives</td>
+</tr>
+<tr>
+<td><strong>Difficulté</strong></td>
+<td> Fondamental — la porte d'entrée du versant « recherche opérationnelle »</td>
+</tr>
+<tr>
+<td><strong>Temps d'étude estimé</strong></td>
+<td>1 h 30</td>
+</tr>
+<tr>
+<td><strong>Prérequis</strong></td>
+<td>Fiche 9 (matrices, produit scalaire), fiche 11 (convexité)</td>
+</tr>
+<tr>
+<td><strong>Concepts clés</strong></td>
+<td>Programme linéaire, formes scalaire/vectorielle/matricielle, admissibilité, valeur optimale, hyperplan, demi-espace, polyèdre</td>
+</tr>
+<tr>
+<td><strong>Poids à l'examen</strong></td>
+<td>Tout le reste du cours (dualité, simplexe, applications) suppose qu'on lit un LP dans les trois écritures <strong>sans hésiter</strong>. C'est la fiche à maîtriser avant d'ouvrir la feuille d'exercices <code>ZZ_EXERCICES_problems.pdf</code>.</td>
+</tr>
+</tbody></table>
+<h2>Vue d'ensemble</h2>
+<p>Un <strong>programme linéaire</strong> est le problème d'optimisation le plus simple qui reste utile : minimiser une fonction linéaire sous des contraintes linéaires. Deux idées portent toute la fiche.</p>
+<p>D'abord, <strong>la même chose s'écrit de trois façons</strong>, et il faut passer de l'une à l'autre de tête : indices, produits scalaires, matrices. Ensuite, <strong>la géométrie décide</strong> : les contraintes découpent un polyèdre, l'objectif se lit comme une famille d'hyperplans parallèles, et on pousse cet hyperplan dans la direction $-c$ jusqu'à sortir du polyèdre. Le dernier point touché est la solution.</p>
+<pre><code>CONTRAINTES  →  intersection de demi-espaces  →  POLYÈDRE
+OBJECTIF     →  hyperplans parallèles cᵀx = γ  →  on pousse dans la direction −c
+SOLUTION     →  le dernier point du polyèdre touché  →  presque toujours un SOMMET
+</code></pre>
+<h2 data-prio="must">Concept 1 — Les trois écritures d'un LP</h2>
+<p><strong>Écriture scalaire</strong> — celle des slides d'ouverture du cours :
+$$\begin{array}{ll}\text{minimiser} &amp; \displaystyle\sum_{j=1}^n c_j x_j \\[4pt] \text{sous} &amp; \displaystyle\sum_{j=1}^n a_{ij}x_j \leq b_i, \quad i = 1,\dots,m \\[4pt] &amp; \displaystyle\sum_{j=1}^n d_{ij}x_j = f_i, \quad i = 1,\dots,p\end{array}$$</p>
+<ul>
+<li>$n$ <strong>variables</strong> d'optimisation $x_1,\dots,x_n$ (des réels) ;</li>
+<li>les <strong>données</strong> du problème sont les coefficients $c_j$, $a_{ij}$, $b_i$, $d_{ij}$, $f_i$ ;</li>
+<li>$\sum_j c_jx_j$ est la <strong>fonction de coût</strong> (ou fonction objectif) ;</li>
+<li>$\sum_j a_{ij}x_j \leq b_i$ sont les contraintes d'<strong>inégalité</strong>, $\sum_j d_{ij}x_j = f_i$ celles d'<strong>égalité</strong>.</li>
+</ul>
+<p><strong>Écriture par produits scalaires</strong> — on regroupe chaque ligne dans un vecteur :
+$$\begin{array}{ll}\text{minimiser} &amp; c^Tx \\ \text{sous} &amp; a_i^Tx \leq b_i, \quad i=1,\dots,m \\ &amp; d_i^Tx = f_i, \quad i=1,\dots,p\end{array}$$
+avec $c = (c_1,\dots,c_n)$, $a_i = (a_{i1},\dots,a_{in})$, $d_i = (d_{i1},\dots,d_{in})$.</p>
+<p><strong>Écriture matricielle</strong> — on empile les lignes :
+$$\begin{array}{ll}\text{minimiser} &amp; c^Tx \\ \text{sous} &amp; Ax \preceq b \\ &amp; Dx = f\end{array}$$
+où $A \in \mathbb{R}^{m\times n}$ a pour lignes les $a_i^T$, $D \in \mathbb{R}^{p\times n}$ a pour lignes les $d_i^T$, et <strong>l'inégalité est composante par composante</strong>.</p>
+<p class="cal piege"> $Ax \preceq b$ n'est pas une inégalité entre nombres : c'est $m$ inégalités simultanées. Le symbole $\preceq$ (ou $\leq$ entre vecteurs chez Vandenberghe) se lit « composante par composante » — jamais « la norme de $Ax$ est plus petite ».</p>
+<h2 data-prio="must">Concept 2 — Le vocabulaire, et les deux valeurs pathologiques</h2>
+<p>Pour le problème $\min\ c^Tx$ sous $Ax \preceq b$, $Dx = f$ :</p>
+<table>
+<thead>
+<tr>
+<th>Terme</th>
+<th>Définition</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$x$ <strong>admissible</strong> (<em>feasible</em>)</td>
+<td>$x$ satisfait les contraintes $Ax \preceq b$ et $Dx = f$</td>
+</tr>
+<tr>
+<td><strong>Ensemble admissible</strong></td>
+<td>l'ensemble de tous les points admissibles</td>
+</tr>
+<tr>
+<td>$x^\star$ <strong>optimal</strong></td>
+<td>$x^\star$ admissible et $c^Tx^\star \leq c^Tx$ pour tout $x$ admissible</td>
+</tr>
+<tr>
+<td><strong>Valeur optimale</strong> $p^\star$</td>
+<td>$p^\star = c^Tx^\star$</td>
+</tr>
+<tr>
+<td>Problème <strong>non borné</strong></td>
+<td>$c^Tx$ n'est pas minorée sur l'ensemble admissible : $p^\star = -\infty$</td>
+</tr>
+<tr>
+<td>Problème <strong>non admissible</strong></td>
+<td>l'ensemble admissible est vide : $p^\star = +\infty$</td>
+</tr>
+</tbody></table>
+<p><strong>Pourquoi ces deux conventions.</strong> Poser $p^\star = +\infty$ quand rien n'est admissible et $p^\star = -\infty$ quand on descend indéfiniment permet d'énoncer les théorèmes de dualité <strong>sans cas particuliers</strong> : $p^\star$ est toujours défini dans $[-\infty,+\infty]$. C'est une convention, pas un résultat — mais elle vous suivra jusqu'à la fiche sur la dualité.</p>
+<p class="cal piege"> « Non borné » et « non admissible » sont deux échecs <strong>opposés</strong>, et un solveur les distingue. Un LP non borné a des solutions admissibles en quantité ; un LP non admissible n'en a aucune. Confondre les deux dans une conclusion d'exercice coûte tout le point.</p>
+<h2 data-prio="high">Concept 3 — Pourquoi le LP est partout</h2>
+<p>Le cours ouvre sur trois arguments, à savoir citer.</p>
+<p><strong>Faible complexité.</strong> Des problèmes à plusieurs milliers de variables et de contraintes se résolvent en routine ; jusqu'à des millions de variables si les données sont <strong>creuses</strong>. Les logiciels sont largement disponibles, et la complexité théorique dans le pire des cas est <strong>polynomiale</strong>.</p>
+<p><strong>Applicabilité très large.</strong> Développé à l'origine pour l'économie et la gestion, le LP sert aujourd'hui dans toutes les branches de l'ingénierie, l'analyse de données et la finance. C'est aussi un outil clé de l'<strong>optimisation combinatoire</strong>.</p>
+<p><strong>Théorie riche.</strong> Il n'existe pas de formule simple donnant la solution — mais il existe une théorie complète et utile : la <strong>dualité</strong>.</p>
+<p><strong>Repères historiques (slide « Brief history »).</strong></p>
+<table>
+<thead>
+<tr>
+<th>Date</th>
+<th>Apport</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Années 1940</td>
+<td>Dantzig, Kantorovitch, Koopmans, von Neumann : fondations, motivées par l'économie et la logistique</td>
+</tr>
+<tr>
+<td>1947</td>
+<td>Dantzig : <strong>algorithme du simplexe</strong></td>
+</tr>
+<tr>
+<td>1950–60</td>
+<td>diffusion dans les autres disciplines</td>
+</tr>
+<tr>
+<td>1979</td>
+<td>Khachiyan : algorithme de l'<strong>ellipsoïde</strong>, polynomial dans le pire cas, mais bien plus lent en pratique que le simplexe</td>
+</tr>
+<tr>
+<td>1984</td>
+<td>Karmarkar : algorithme <strong>projectif</strong> (points intérieurs), polynomial <em>et</em> efficace en pratique</td>
+</tr>
+<tr>
+<td>depuis 1984</td>
+<td>variantes des méthodes de points intérieurs, logiciels grande échelle</td>
+</tr>
+</tbody></table>
+<p><strong>Intuition à retenir de 1979 et 1984.</strong> Le simplexe est exponentiel dans le pire cas et excellent en pratique ; l'ellipsoïde est l'inverse. Karmarkar est le premier à réunir les deux qualités — c'est pour cela que la date est retenue.</p>
+<h2 data-prio="high">Concept 4 — Deux exemples fondateurs du cours</h2>
+<h3>Exemple 1 — commande en boucle ouverte (<em>open-loop control</em>)</h3>
+<p>Un système à une entrée $u(t)$ et une sortie $y(t)$, de réponse impulsionnelle $h_0,h_1,\dots$ :
+$$y(t) = h_0u(t) + h_1u(t-1) + h_2u(t-2) + h_3u(t-3) + \cdots$$</p>
+<p>On veut suivre une sortie désirée $y_{\text{des}}$ au mieux :
+$$\min\ \max_{t=0,\dots,N} |y(t) - y_{\text{des}}(t)|$$
+sous des contraintes d'<strong>amplitude</strong> et de <strong>vitesse de variation</strong> (<em>slew rate</em>) de la commande :
+$$|u(t)| \leq U, \qquad |u(t+1)-u(t)| \leq S$$
+Les variables sont $u(0),\dots,u(M)$, avec $u(t)=0$ pour $t&lt;0$ et $t&gt;M$. Le cours donne l'illustration numérique $U = 1{,}1$ et $S = 0{,}25$.</p>
+<p><strong>Ce qu'il faut voir.</strong> L'objectif est un <strong>maximum de valeurs absolues</strong> : ce n'est pas linéaire. Pourtant le problème « se formule comme un LP, donc se résout facilement ». <em>Comment</em> — c'est exactement l'objet de la fiche 25.</p>
+<h3>Exemple 2 — problème d'affectation (<em>assignment problem</em>)</h3>
+<p>Affecter $N$ personnes à $N$ tâches, chaque personne à une tâche et chaque tâche à une personne ; affecter la personne $i$ à la tâche $j$ coûte $a_{ij}$.</p>
+<p><strong>Formulation combinatoire</strong> — $x_{ij} = 1$ si $i$ est affectée à $j$, $0$ sinon :
+$$\begin{array}{ll}\text{minimiser} &amp; \displaystyle\sum_{i,j=1}^N a_{ij}x_{ij} \\[4pt] \text{sous} &amp; \displaystyle\sum_{i=1}^N x_{ij} = 1, \quad j = 1,\dots,N \\[4pt] &amp; \displaystyle\sum_{j=1}^N x_{ij} = 1, \quad i = 1,\dots,N \\[4pt] &amp; x_{ij} \in \{0,1\}\end{array}$$
+Il y a $N!$ affectations possibles : <strong>beaucoup trop pour énumérer</strong>.</p>
+<p><strong>Formulation linéaire (relaxation)</strong> — on remplace $x_{ij}\in\{0,1\}$ par
+$$0 \leq x_{ij} \leq 1$$
+Le cours annonce le résultat : <em>on peut montrer qu'à l'optimum $x_{ij} \in \{0,1\}$</em> (démontré plus loin dans le cours). Donc <strong>relâcher ne coûte rien</strong>, et un problème combinatoire se résout efficacement par la programmation linéaire.</p>
+<p><strong>Pourquoi c'est spectaculaire.</strong> Relâcher une contrainte d'intégrité donne en général une borne, pas une solution entière. Ici, la structure particulière des contraintes d'affectation garantit que l'optimum du LP relâché est déjà entier. C'est le pont entre programmation linéaire et optimisation combinatoire, et la raison pour laquelle le LP est « un outil clé » de ce domaine.</p>
+<h2 data-prio="must">Concept 5 — Hyperplans, demi-espaces, polyèdres</h2>
+<p>C'est la géométrie qui porte tout le cours.</p>
+<p><strong>Hyperplan</strong> — ensemble des solutions d'<strong>une</strong> équation linéaire, à vecteur de coefficients $a \neq 0$ :
+$$G = \{x \mid a^Tx = b\}$$</p>
+<p><strong>Demi-espace</strong> — ensemble des solutions d'<strong>une</strong> inégalité linéaire, $a \neq 0$ :
+$$H = \{x \mid a^Tx \leq b\}$$
+$a$ s'appelle le <strong>vecteur normal</strong>.</p>
+<p><strong>Interprétation géométrique (slide 1-22).</strong> Posons $u = \dfrac{b}{\|a\|^2}\,a$ ; ce point vérifie $a^Tu = b$, il est donc sur l'hyperplan. Alors :</p>
+<p>$$x \in G \iff a^T(x-u) = 0 \qquad\text{($x-u$ est orthogonal à $a$)}$$
+$$x \in H \iff a^T(x-u) \leq 0 \qquad\text{(l'angle entre $x-u$ et $a$ est $\geq \pi/2$)}$$</p>
+<p><strong>Le mémo.</strong> Un hyperplan, c'est « tous les points qu'on atteint depuis $u$ en se déplaçant <strong>perpendiculairement</strong> à $a$ » ; un demi-espace, c'est « ceux du côté opposé à $a$ ». Le vecteur $a$ pointe vers l'extérieur du demi-espace.</p>
+<p><strong>Polyèdre</strong> — ensemble des solutions d'un <strong>nombre fini</strong> d'inégalités linéaires :
+$$a_1^Tx \leq b_1,\quad a_2^Tx\leq b_2,\quad\dots,\quad a_m^Tx\leq b_m$$</p>
+<ul>
+<li>c'est l'<strong>intersection d'un nombre fini de demi-espaces</strong> ;</li>
+<li>en notation matricielle : $Ax \preceq b$ où les lignes de $A$ sont les $a_i^T$ ;</li>
+<li><strong>les égalités sont incluses</strong> : $Fx = g$ équivaut à $Fx \preceq g$ <strong>et</strong> $-Fx \preceq -g$.</li>
+</ul>
+<p><strong>Exemples du cours.</strong> En dimension 2 : $x_1 + x_2 \leq 1$, $-2x_1+x_2\leq 2$, $x_1 \geq 0$, $x_2\geq0$. En dimension 3 : $0\leq x_i \leq 2$ pour $i=1,2,3$ et $x_1+x_2+x_3\leq 5$, dont le cours dessine les sommets $(2,2,1)$, $(1,2,2)$, $(2,1,2)$…</p>
+<p class="cal piege"> Un polyèdre peut être <strong>non borné</strong> (un demi-plan est un polyèdre) et peut être <strong>vide</strong>. « Polyèdre » ne veut pas dire « solide fermé et borné » — le mot pour cela est <em>polytope</em>, et c'est un polyèdre borné.</p>
+<h2 data-prio="must">Concept 6 — Lecture géométrique d'un LP</h2>
+<p>$$\min\ c^Tx \quad \text{sous} \quad Ax\preceq b$$</p>
+<p>Les ensembles de niveau de l'objectif, $\{x \mid c^Tx = \gamma\}$, sont des <strong>hyperplans parallèles</strong> — les pointillés du slide 1-27. Minimiser $c^Tx$, c'est déplacer cet hyperplan dans la direction $-c$ aussi loin que possible <strong>tout en touchant encore le polyèdre</strong>. Le dernier point touché est la solution optimale.</p>
+<p><strong>Trois conséquences immédiates.</strong></p>
+<ol>
+<li>L'optimum est atteint <strong>au bord</strong> du polyèdre, jamais à l'intérieur (sauf si $c=0$) : dans un point intérieur, on peut toujours avancer un peu dans la direction $-c$.</li>
+<li>Il est généralement atteint en un <strong>sommet</strong>. S'il l'est sur toute une arête ou une face, il y a une infinité de solutions optimales, toutes de même valeur.</li>
+<li>Si le polyèdre est non borné dans la direction $-c$, on peut pousser indéfiniment : $p^\star = -\infty$.</li>
+</ol>
+<p><strong>Exemple du cours (slide 1-28).</strong>
+$$\begin{array}{ll}\text{minimiser} &amp; -x_1-x_2\\ \text{sous} &amp; 2x_1+x_2\leq 3\\ &amp; x_1+4x_2\leq 5\\ &amp; x_1\geq0,\ x_2\geq0\end{array}$$
+La solution optimale est $(1,1)$.</p>
+<p><strong>Vérification par les sommets</strong> — l'ensemble admissible est un quadrilatère :</p>
+<table>
+<thead>
+<tr>
+<th>Sommet</th>
+<th>Origine</th>
+<th>$-x_1-x_2$</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$(0,0)$</td>
+<td>$x_1=0,\ x_2=0$</td>
+<td>$0$</td>
+</tr>
+<tr>
+<td>$(3/2,\,0)$</td>
+<td>$x_2=0$ et $2x_1+x_2=3$</td>
+<td>$-1{,}5$</td>
+</tr>
+<tr>
+<td>$(1,1)$</td>
+<td>$2x_1+x_2=3$ <strong>et</strong> $x_1+4x_2=5$</td>
+<td>$\mathbf{-2}$</td>
+</tr>
+<tr>
+<td>$(0,\,5/4)$</td>
+<td>$x_1=0$ et $x_1+4x_2=5$</td>
+<td>$-1{,}25$</td>
+</tr>
+</tbody></table>
+<p>Le minimum est bien $-2$, atteint en $(1,1)$ — le sommet où les <strong>deux</strong> contraintes d'inégalité sont <strong>saturées</strong> (actives). Retenez le réflexe : à l'optimum, on cherche quelles contraintes sont serrées.</p>
+<h3>Comment résoudre l'exercice type (protocole)</h3>
+<ol>
+<li><strong>Nommer les variables</strong> et leur unité ; préciser les signes ($x \succeq 0$ pour des quantités).</li>
+<li><strong>Écrire l'objectif</strong> : coût à minimiser ou profit à maximiser ($\max c^Tx = -\min(-c)^Tx$).</li>
+<li><strong>Traduire chaque phrase de l'énoncé</strong> en une inégalité ou une égalité linéaire. Une ressource limitée donne un $\leq$ ; une demande à satisfaire, un $\geq$ ; une composition imposée, un $=$.</li>
+<li><strong>Vérifier la linéarité</strong> : aucun produit de variables, aucun quotient, aucune valeur absolue non traitée (sinon, fiche 25).</li>
+<li><strong>Passer en matriciel</strong> : identifier $c$, $A$, $b$, $D$, $f$ — c'est ce que consomme un solveur.</li>
+<li><strong>En dimension 2, dessiner</strong> : le polyèdre, la direction $-c$, les sommets ; lire la solution.</li>
+<li><strong>Conclure</strong> : valeur optimale, contraintes actives, et interprétation en langage de l'énoncé.</li>
+</ol>
+<h3>Comment reconnaître qu'un problème est un LP</h3>
+<table>
+<thead>
+<tr>
+<th>Signe dans l'énoncé</th>
+<th>Verdict</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Objectif et contraintes sont des sommes $\sum_j c_jx_j$</td>
+<td>LP directement</td>
+</tr>
+<tr>
+<td>« maximiser le profit sous des capacités »</td>
+<td>LP de production, la forme la plus classique</td>
+</tr>
+<tr>
+<td>Un $\max$ ou une valeur absolue dans l'objectif</td>
+<td>LP <strong>après reformulation</strong> (fiche 25)</td>
+</tr>
+<tr>
+<td>Un produit $x_iy_j$ ou un quotient $x_i/x_j$</td>
+<td>pas un LP — il faut linéariser ou changer de cadre</td>
+</tr>
+<tr>
+<td>Des variables entières ou binaires</td>
+<td>programmation linéaire <strong>en nombres entiers</strong> — relaxation à étudier</td>
+</tr>
+<tr>
+<td>Une norme euclidienne $\|Ax-b\|_2$</td>
+<td>pas un LP (c'est un problème quadratique) — mais $\|\cdot\|_1$ et $\|\cdot\|_\infty$, si</td>
+</tr>
+</tbody></table>
+<h3>Exercices progressifs</h3>
+<p><strong> Niveau 1</strong> — Mettez sous la forme $\min c^Tx$ s.c. $Ax \preceq b$ le problème : maximiser $3x_1+2x_2$ sous $x_1+x_2\leq 4$, $x_1\leq 3$, $x_1,x_2\geq0$.</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p>Maximiser $3x_1+2x_2$, c'est minimiser $-3x_1-2x_2$, donc $c = (-3,-2)$. Les contraintes de positivité se réécrivent $-x_1\leq0$ et $-x_2\leq0$ :
+$$A = \begin{pmatrix} 1 &amp; 1\\ 1 &amp; 0\\ -1 &amp; 0\\ 0 &amp; -1\end{pmatrix},\qquad b = \begin{pmatrix}4\\3\\0\\0\end{pmatrix}$$
+Valeur optimale : le sommet $(3,1)$ donne $11$, le sommet $(0,4)$ donne $8$, $(3,0)$ donne $9$ ; l'optimum est $(3,1)$, de valeur $11$, soit $p^\star = -11$ pour le problème de minimisation.</p>
+</div></details>
+
+<p><strong> Niveau 2</strong> — Le polyèdre $P = \{x\in\mathbb{R}^2 \mid x_1+x_2\leq 1,\ -2x_1+x_2\leq2,\ x_1\geq0,\ x_2\geq0\}$ (exemple du cours). Est-il borné ? Donnez ses sommets.</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p>Sur $P$, $x_1\geq0$ et $x_2\geq0$ avec $x_1+x_2\leq1$ : donc $0\leq x_1\leq 1$ et $0\leq x_2\leq1$. <strong>$P$ est borné</strong> (c'est un polytope). La contrainte $-2x_1+x_2\leq2$ est alors <strong>redondante</strong> : sur $P$, $-2x_1+x_2 \leq x_2 \leq 1 &lt; 2$. Sommets : $(0,0)$, $(1,0)$, $(0,1)$ — le triangle. <em>Leçon : une contrainte peut ne rien découper ; le repérer simplifie le dessin.</em></p>
+</div></details>
+
+<p><strong> Niveau 3</strong> — Soit $H = \{x\in\mathbb{R}^3 \mid a^Tx\leq b\}$ avec $a = (1,2,2)$ et $b = 9$. Le point $x = (1,1,1)$ est-il dans $H$ ? Quelle est sa distance à l'hyperplan frontière ?</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p>$a^Tx = 1+2+2 = 5 \leq 9$ : <strong>oui</strong>, $x\in H$. Pour la distance, on utilise le point $u = \frac{b}{\|a\|^2}a$ du slide 1-22 : $\|a\|^2 = 1+4+4 = 9$, donc $u = \frac{9}{9}a = (1,2,2)$, et $a^Tu = 9$ . La distance d'un point à l'hyperplan $\{a^Tz=b\}$ vaut
+$$\frac{|a^Tx - b|}{\|a\|} = \frac{|5-9|}{3} = \frac43$$
+<em>Contrôle de cohérence : $x$ est strictement à l'intérieur de $H$, la distance est donc strictement positive.</em></p>
+</div></details>
+
+<p><strong> Niveau 4 — type feuille d'exercices</strong> — Une raffinerie produit de l'essence ($x_1$ barils) et du fioul ($x_2$ barils). Chaque baril d'essence demande 2 h de craquage et 1 h de raffinage, chaque baril de fioul 1 h et 4 h. On dispose de 3 h de craquage et 5 h de raffinage. Les marges sont de 1 par baril pour chacun. Formulez, résolvez graphiquement, identifiez les contraintes actives.</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p>$$\max\ x_1+x_2 \quad\text{s.c.}\quad 2x_1+x_2\leq3,\quad x_1+4x_2\leq5,\quad x_1,x_2\geq0$$
+C'est <strong>exactement l'exemple du slide 1-28</strong>, écrit en minimisation de $-x_1-x_2$. Optimum en $(1,1)$, marge $2$. <strong>Les deux contraintes sont actives</strong> : $2(1)+1 = 3$ et $1+4(1)=5$ — les deux ateliers sont saturés, aucune heure ne reste inutilisée. C'est le cas typique : à l'optimum d'un LP à deux variables, <strong>deux</strong> contraintes se coupent au sommet retenu. <em>(Suite naturelle : combien vaut une heure de craquage supplémentaire ? C'est la question de la dualité, fiche 26.)</em></p>
+</div></details>
+
+<h2 data-prio="must">Common mistakes</h2>
+<ol>
+<li><strong>Lire $Ax\preceq b$ comme une inégalité scalaire</strong> — c'est $m$ inégalités composante par composante.</li>
+<li><strong>Oublier les contraintes de signe</strong> — $x\succeq0$ fait partie du polyèdre et doit apparaître dans $A$ et $b$ ; c'est la source d'erreur n°1 en modélisation.</li>
+<li><strong>Confondre non borné et non admissible</strong> — $p^\star=-\infty$ contre $p^\star=+\infty$, deux diagnostics opposés.</li>
+<li><strong>Chercher l'optimum à l'intérieur</strong> du polyèdre — il est toujours au bord, et en général sur un sommet.</li>
+<li><strong>Croire qu'un polyèdre est borné</strong> — un demi-espace est un polyèdre. La bornitude se démontre.</li>
+<li><strong>Oublier le vecteur normal non nul</strong> — la définition d'un hyperplan et d'un demi-espace exige $a\neq0$ ; sinon $\{x \mid 0 = b\}$ est vide ou tout l'espace.</li>
+<li><strong>Maximiser en gardant $c$</strong> — $\max c^Tx$ devient $\min\,(-c)^Tx$, et la valeur optimale change de signe. Beaucoup de solveurs n'acceptent que la minimisation.</li>
+</ol>
+<h2>Ultimate Review</h2>
+<ol>
+<li>LP $=$ objectif linéaire $+$ contraintes linéaires, en trois écritures équivalentes : indices, produits scalaires, matrices.</li>
+<li>$Ax\preceq b$ : inégalité <strong>composante par composante</strong>.</li>
+<li>Vocabulaire : admissible, ensemble admissible, optimal, $p^\star$ ; non borné $p^\star=-\infty$ ; non admissible $p^\star=+\infty$.</li>
+<li>Hyperplan $\{a^Tx=b\}$, demi-espace $\{a^Tx\leq b\}$, $a\neq0$ vecteur normal ; $u = (b/\|a\|^2)a$ est le point de référence.</li>
+<li>Polyèdre $=$ intersection finie de demi-espaces $=$ $\{x \mid Ax\preceq b\}$ ; une égalité vaut deux inégalités.</li>
+<li>Géométrie du LP : pousser l'hyperplan $c^Tx=\gamma$ dans la direction $-c$ ; l'optimum est au bord, en général sur un sommet.</li>
+<li>Relaxation de l'affectation : les contraintes d'affectation rendent l'optimum du LP automatiquement entier.</li>
+<li>Histoire : simplexe (Dantzig 1947), ellipsoïde (Khachiyan 1979), points intérieurs (Karmarkar 1984).</li>
+</ol>
+<p><strong>Formulas to know</strong>
+$$\min\ c^Tx \ \text{ s.c. } Ax\preceq b,\ Dx=f \qquad G=\{x\mid a^Tx=b\} \qquad H=\{x\mid a^Tx\leq b\} \qquad u=\frac{b}{\|a\|^2}a$$</p>
+<p><strong>Methods to know</strong> : le protocole de modélisation en 7 étapes ; la résolution graphique en dimension 2 par comparaison des sommets ; le passage $\max \to \min$.</p>
+<div class="rec"><h2>Active Recall</h2><p><strong>Basic</strong> — Écrivez un LP général sous forme matricielle et nommez chaque objet.</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p>$\min\ c^Tx$ sous $Ax \preceq b$ et $Dx = f$. $x\in\mathbb{R}^n$ : variables ; $c\in\mathbb{R}^n$ : coefficients de coût ; $A\in\mathbb{R}^{m\times n}$, $b\in\mathbb{R}^m$ : contraintes d'inégalité ; $D\in\mathbb{R}^{p\times n}$, $f\in\mathbb{R}^p$ : contraintes d'égalité. L'inégalité est composante par composante.</p>
+</div></details><p><strong>Understanding</strong> — Pourquoi l'optimum d'un LP se trouve-t-il toujours au bord de l'ensemble admissible ?</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p>Si $x$ est intérieur et $c\neq0$, une petite boule autour de $x$ reste admissible ; en se déplaçant de $x$ vers $x - \varepsilon c$ on reste admissible et l'objectif baisse de $\varepsilon\|c\|^2$. Donc $x$ ne peut pas être optimal. Seul un point du bord bloque ce déplacement.</p>
+</div></details><p><strong>Application</strong> — Le problème $\min\ -x_1$ sous $x_1 - x_2 \leq 0$, $x_2\geq0$ : admissible ? borné ?</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p>Admissible : $(0,0)$ convient. Mais pour tout $t&gt;0$, $(t,t)$ est admissible et l'objectif vaut $-t \to -\infty$. Le problème est <strong>non borné</strong>, $p^\star = -\infty$ : le polyèdre s'étend indéfiniment dans la direction $-c = (1,0)$.</p>
+</div></details><p><strong>Comparison</strong> — Formulation combinatoire et formulation linéaire du problème d'affectation : qu'est-ce qui change, et pourquoi est-ce sans conséquence ?</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p>Seule change la contrainte $x_{ij}\in\{0,1\}$, remplacée par $0\leq x_{ij}\leq 1$. La première rend le problème combinatoire ($N!$ candidats) ; la seconde en fait un LP. Le cours annonce qu'à l'optimum du LP relâché, les $x_{ij}$ <strong>sont</strong> automatiquement dans $\{0,1\}$ : la relaxation ne perd donc rien, et un problème combinatoire devient résoluble efficacement.</p>
+</div></details><p><strong>Exam-style</strong> — Décrivez géométriquement $\{x\in\mathbb{R}^2 \mid x_1+x_2 = 2\}$, $\{x \mid x_1+x_2\leq2\}$, puis leur intersection avec $x\succeq0$. Où se trouve le maximum de $x_1$ sur ce dernier ensemble ?</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p>Une droite de vecteur normal $a=(1,1)$ ; le demi-plan situé du côté opposé à $a$, sous cette droite ; l'intersection avec $x\succeq0$ est le <strong>triangle</strong> de sommets $(0,0)$, $(2,0)$, $(0,2)$. Maximiser $x_1$, c'est pousser l'hyperplan $x_1 = \gamma$ vers les $\gamma$ croissants : le dernier point touché est le sommet $(2,0)$, valeur $2$. Les contraintes actives y sont $x_1+x_2\leq2$ et $x_2\geq0$.</p>
+</div></details></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h2>Flashcards</h2>
+<table>
+<thead>
+<tr>
+<th>Question</th>
+<th>Réponse</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Forme matricielle d'un LP ?</td>
+<td>$\min c^Tx$ s.c. $Ax\preceq b$, $Dx=f$</td>
+</tr>
+<tr>
+<td>Sens de $Ax\preceq b$ ?</td>
+<td>Composante par composante : $a_i^Tx\leq b_i$ pour tout $i$</td>
+</tr>
+<tr>
+<td>$p^\star$ d'un problème non borné ?</td>
+<td>$-\infty$</td>
+</tr>
+<tr>
+<td>$p^\star$ d'un problème non admissible ?</td>
+<td>$+\infty$</td>
+</tr>
+<tr>
+<td>Hyperplan ?</td>
+<td>$\{x\mid a^Tx=b\}$, $a\neq0$ ; $a$ est le vecteur normal</td>
+</tr>
+<tr>
+<td>Demi-espace ?</td>
+<td>$\{x\mid a^Tx\leq b\}$, $a\neq0$</td>
+</tr>
+<tr>
+<td>Polyèdre ?</td>
+<td>Intersection d'un nombre fini de demi-espaces, $\{x\mid Ax\preceq b\}$</td>
+</tr>
+<tr>
+<td>Comment écrire une égalité dans un polyèdre ?</td>
+<td>$Fx=g \iff Fx\preceq g$ et $-Fx\preceq -g$</td>
+</tr>
+<tr>
+<td>Où se trouve l'optimum d'un LP ?</td>
+<td>Au bord, en général sur un sommet</td>
+</tr>
+<tr>
+<td>Dans quelle direction pousse-t-on l'hyperplan objectif ?</td>
+<td>$-c$</td>
+</tr>
+<tr>
+<td>Relaxation du problème d'affectation ?</td>
+<td>$x_{ij}\in\{0,1\}$ devient $0\leq x_{ij}\leq1$ ; l'optimum reste entier</td>
+</tr>
+<tr>
+<td>Trois dates de l'histoire du LP ?</td>
+<td>Simplexe 1947 (Dantzig), ellipsoïde 1979 (Khachiyan), points intérieurs 1984 (Karmarkar)</td>
+</tr>
+</tbody></table>
+</main>
+
+
+
+
+</body></html>

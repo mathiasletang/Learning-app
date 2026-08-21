@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fiche 27 — Enveloppes convexes, cônes et décomposition d'un polyèdre</title>
+<script>
+window.MathJax={tex:{inlineMath:[["$","$"]],displayMath:[["$$","$$"]],processEscapes:true},
+ options:{skipHtmlTags:["script","noscript","style","textarea","pre","code"]},
+ svg:{fontCache:"global"},
+ startup:{pageReady:()=>MathJax.startup.defaultPageReady().then(()=>{document.body.classList.add("ready")})}};
+setTimeout(function(){document.body.classList.add("ready")},2500);
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+/* ============================================================
+   MathiasLearn — feuille de style des fiches
+   Reprise intégrale des tokens de 00_PARCOURS/*.html
+   + blocs pédagogiques (callouts, méthode, essentiels, recall)
+   ============================================================ */
+:root{--bg:#faf9f7;--card:#fff;--ink:#1a1a1a;--muted:#6b6b6b;--line:#e5e2dd;--accent:#8b5e34;
+ --hl:#fdf8ef;--ok:#2d7d4f;--okbg:#f0f7f3;--warn:#b3402f;--warnbg:#fdf3f1;--blue:#2f5d8b;--bluebg:#f1f5fa}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+ font:17px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;padding:0 16px 100px}
+.nav{position:sticky;top:0;background:rgba(250,249,247,.96);backdrop-filter:blur(8px);
+ border-bottom:1px solid var(--line);margin:0 -16px 30px;padding:11px 16px;z-index:50;
+ display:flex;gap:6px;flex-wrap:wrap;font-size:13px}
+.nav a{color:var(--muted);text-decoration:none;padding:4px 9px;border-radius:5px;white-space:nowrap}
+.nav a:hover{background:var(--line);color:var(--ink)}
+.nav a.on{background:var(--accent);color:#fff}
+main{max-width:780px;margin:0 auto}
+h1{font-size:31px;letter-spacing:-.02em;margin:.4em 0 .5em;line-height:1.25}
+h2{font-size:23px;margin:2.2em 0 .7em;padding-bottom:.3em;border-bottom:1px solid var(--line)}
+h3{font-size:19px;margin:1.9em 0 .5em;color:var(--accent)}
+h4{font-size:17px;margin:1.5em 0 .4em}
+p{margin:.8em 0} a{color:var(--accent)} hr{border:0;border-top:1px solid var(--line);margin:2.6em 0}
+table{border-collapse:collapse;width:100%;margin:1.3em 0;font-size:15.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+th{background:#f3f0eb;font-weight:600}
+tr:nth-child(even) td{background:#fcfbfa}
+code{font-family:"SF Mono",Menlo,Consolas,monospace;font-size:.88em;background:#f2efea;padding:2px 6px;border-radius:4px;white-space:nowrap}
+pre{background:#f2efea;padding:14px 16px;border-radius:8px;overflow-x:auto}
+pre code{background:none;padding:0;white-space:pre}
+blockquote{border-left:3px solid var(--accent);background:var(--hl);margin:1.4em 0;padding:14px 20px;border-radius:0 8px 8px 0}
+blockquote p:first-child{margin-top:0} blockquote p:last-child{margin-bottom:0}
+ul,ol{padding-left:1.5em} li{margin:.35em 0} em{color:#4a4a4a}
+mjx-container[display="true"]{margin:1.1em 0!important;overflow-x:auto;overflow-y:hidden;padding:2px 0}
+mjx-container svg{max-width:100%}
+body:not(.ready) main{opacity:0} main{opacity:1;transition:opacity .25s}
+
+/* --- bandeau de tête de fiche --- */
+.cours{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--accent);
+ border-radius:0 10px 10px 0;padding:18px 22px;margin:0 0 34px}
+.cours h4{margin:0 0 4px;font-size:14px;text-transform:uppercase;letter-spacing:.07em;color:var(--accent)}
+.cours .cs{color:var(--muted);font-size:14.5px;margin:0 0 14px}
+
+/* --- exercices / corrigés --- */
+.ex{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:6px 24px 20px;margin:18px 0}
+.ex>h3:first-child{margin-top:14px}
+details.cor{margin-top:18px;border:1px solid var(--line);border-radius:8px;background:#fcfbfa;overflow:hidden}
+details.cor>summary{cursor:pointer;padding:12px 16px;font-weight:600;font-size:15px;color:var(--accent);
+ list-style:none;display:flex;align-items:center;gap:9px;user-select:none;transition:.15s;min-height:44px}
+details.cor>summary::-webkit-details-marker{display:none}
+details.cor>summary:hover{background:var(--hl)}
+details.cor>summary::before{content:"\25B6";font-size:10px;transition:transform .18s;display:inline-block}
+details.cor[open]>summary::before{transform:rotate(90deg)}
+details.cor[open]>summary{background:var(--okbg);color:var(--ok);border-bottom:1px solid var(--line)}
+.cor .in{padding:4px 20px 16px}
+.cor .in>*:first-child{margin-top:.9em}
+
+/* --- blocs pédagogiques (callouts) ---
+   Générés depuis une citation Markdown dont le premier **gras** commence
+   par un mot-clé : DÉFINITION, THÉORÈME, MÉTHODE, PIÈGE, INTUITION… */
+.cal{border:1px solid var(--line);border-left:4px solid var(--accent);background:var(--card);
+ border-radius:0 10px 10px 0;padding:15px 20px;margin:1.5em 0}
+.cal>p:first-child{margin-top:0}.cal>p:last-child,.cal>ul:last-child,.cal>ol:last-child{margin-bottom:0}
+.cal .lab{display:block;font-size:12.5px;text-transform:uppercase;letter-spacing:.08em;
+ font-weight:700;color:var(--accent);margin-bottom:6px}
+.cal.formel{background:var(--hl)}
+.cal.piege{border-left-color:var(--warn);background:var(--warnbg)}
+.cal.piege .lab{color:var(--warn)}
+.cal.methode{border-left-color:var(--ok);background:var(--okbg)}
+.cal.methode .lab{color:var(--ok)}
+.cal.intu{border-left-color:var(--blue);background:var(--bluebg)}
+.cal.intu .lab{color:var(--blue)}
+.cal.plus{border-left-style:dashed;background:#faf9f7}
+.cal.plus .lab{color:var(--muted)}
+
+/* --- révision express --- */
+.ess{background:var(--card);border:1px solid var(--accent);border-radius:10px;padding:4px 24px 20px;margin:1.6em 0}
+.ess h3{margin-top:1.3em}
+.rec{background:var(--card);border:1px dashed var(--accent);border-radius:10px;padding:4px 24px 18px;margin:1.6em 0}
+.rec ol{counter-reset:none}
+
+/* --- impression / PDF --- */
+@media print{
+ .nav{display:none}
+ body{padding:0;background:#fff;font-size:11.2pt;line-height:1.55}
+ main{max-width:none}
+ h1{font-size:23pt}h2{font-size:15pt;margin-top:1.5em}h3{font-size:12.6pt}
+ h2,h3,h4{break-after:avoid;page-break-after:avoid}
+ table,.cal,blockquote{break-inside:avoid;page-break-inside:avoid}
+ table{display:table;font-size:9.6pt}
+ details.cor{border:1px solid var(--line);background:#fcfbfa}
+ details.cor>summary{display:none}
+ details.cor .in{padding-top:10px}
+ .cal,.ex,.ess,.rec{box-shadow:none}
+ a{color:var(--ink);text-decoration:none}
+}
+@page{margin:16mm 15mm 18mm}
+
+/* --- exemples travaillés --- */
+.exm{background:#fcfbfa;border:1px solid var(--line);border-radius:10px;padding:2px 20px 14px;margin:1.5em 0}
+.exm>h4:first-child{margin:14px 0 .5em;color:var(--accent);font-size:13px;text-transform:uppercase;letter-spacing:.07em}
+
+
+/* --- pastilles de priorité (conventions des fiches de l'app) --- */
+h2[data-prio], h3[data-prio], h4[data-prio]{position:relative}
+h2[data-prio]::before,h3[data-prio]::before,h4[data-prio]::before{
+ content:"";display:inline-block;width:9px;height:9px;border-radius:50%;
+ margin-right:9px;vertical-align:middle;background:var(--muted)}
+[data-prio="must"]::before{background:var(--warn)}
+[data-prio="high"]::before{background:#d98324}
+[data-prio="mid"]::before{background:#c9a227}
+[data-prio="low"]::before{background:var(--ok)}
+/* corrigés des fiches de l'app : même traitement que les corrigés des séries */
+details.cor>summary::after{content:""}
+</style></head><body>
+<div class="nav"><a href="24-lp-formulation.html">Programmation linéaire : formulation et géométrie</a><a href="25-lp-affine-par-morceaux.html">Optimisation affine par morceaux : tout ramener à un LP</a><a href="26-lp-polyedres.html">Polyèdres : faces, points extrêmes, test du rang</a><a href="27-lp-convexite-cones.html" class="on">Enveloppes convexes, cônes et décomposition d'un polyèdre</a><a href="28-lp-dualite.html">Dualité en programmation linéaire</a><a href="29-lp-sensibilite-jeux.html">Dualité II : sensibilité, prix implicites et jeux à somme nulle</a><a href="30-lp-simplexe.html">L'algorithme du simplexe</a><a href="31-lp-reseaux-unimodularite.html">Flots dans les réseaux et unimodularité totale</a><a href="32-lp-commande.html">Applications en automatique : suivi de consigne et robustesse</a><a href="33-lp-nombres-entiers.html">Programmation linéaire en nombres entiers et séparation-évaluation</a><a href="34-boyd-ensembles-convexes.html">Ensembles convexes</a><a href="35-boyd-fonctions-convexes.html">Fonctions convexes</a><a href="36-boyd-problemes-convexes.html">Problèmes d'optimisation convexe</a><a href="37-boyd-familles-standard.html">Les familles standard : LP, QP, SOCP, GP, SDP</a><a href="38-boyd-dualite.html">Dualité lagrangienne</a><a href="39-boyd-minimisation-sans-contrainte.html">Minimisation sans contrainte : gradient et Newton</a><a href="40-boyd-contraintes-egalite.html">Minimisation sous contraintes d'égalité</a><a href="41-boyd-points-interieurs.html">Méthodes de points intérieurs</a><a href="42-sous-gradients.html">Sous-gradients et sous-différentiel</a><a href="43-methode-sous-gradient.html">La méthode du sous-gradient</a></div>
+<main><h1>Fiche 27 — Enveloppes convexes, cônes et décomposition d'un polyèdre</h1>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Matière</strong></td>
+<td>Maths · Optimisation</td>
+</tr>
+<tr>
+<td><strong>Cours source</strong></td>
+<td>Vandenberghe, <em>EE236A — Linear Programming</em> (UCLA), Lecture 4 « Convexity », 11 diapositives</td>
+</tr>
+<tr>
+<td><strong>Difficulté</strong></td>
+<td> Structurant — court, mais c'est le théorème de structure du cours</td>
+</tr>
+<tr>
+<td><strong>Temps d'étude estimé</strong></td>
+<td>1 h 15</td>
+</tr>
+<tr>
+<td><strong>Prérequis</strong></td>
+<td>Fiche 26 (faces, points extrêmes, espace de linéalité)</td>
+</tr>
+<tr>
+<td><strong>Concepts clés</strong></td>
+<td>Combinaison convexe, enveloppe convexe, polytope, Carathéodory, cône convexe, cône polyédral, rayons extrêmes, cône de récession, théorème de décomposition</td>
+</tr>
+<tr>
+<td><strong>Poids à l'examen</strong></td>
+<td>Le <strong>théorème de décomposition</strong> explique en une ligne pourquoi un LP est soit résolu en un sommet, soit non borné le long d'un rayon. C'est la réponse théorique à « pourquoi le simplexe fonctionne ».</td>
+</tr>
+</tbody></table>
+<h2>Vue d'ensemble</h2>
+<p>La fiche 26 a décrit un polyèdre <strong>par l'extérieur</strong> : une intersection d'inégalités. Cette leçon le décrit <strong>par l'intérieur</strong> : comme engendré par ses sommets et ses directions infinies. Les deux descriptions sont équivalentes, et c'est le contenu du théorème de décomposition :</p>
+<pre><code>DESCRIPTION EXTERNE   P = { x | Ax ≼ b, Cx = d }        (des inégalités)
+DESCRIPTION INTERNE   P = L + conv{v₁..v_r} + cone{w₁..w_s}   (des générateurs)
+                          droites  +  sommets  +  directions infinies
+</code></pre>
+<p>Trois ingrédients, trois types de combinaisons : <strong>linéaire</strong> (coefficients quelconques) pour l'espace de linéalité, <strong>convexe</strong> (positifs, de somme $1$) pour les sommets, <strong>conique</strong> (positifs, sans contrainte de somme) pour les directions.</p>
+<h2 data-prio="mid">Concept 1 — Combinaison convexe et ensemble convexe</h2>
+<p><strong>Combinaison convexe</strong> de points $v_1,\dots,v_k$ : une combinaison linéaire
+$$x = \theta_1v_1 + \theta_2v_2+\dots+\theta_kv_k \qquad\text{avec}\qquad \theta_i\geq0,\quad \sum_{i=1}^k\theta_i = 1$$
+Pour $k=2$, $x$ parcourt le <strong>segment</strong> d'extrémités $v_1$ et $v_2$ : $\theta_1=1$ donne $v_1$, $\theta_1 = 0$ donne $v_2$, $\theta_1 = 0{,}6$ un point aux deux tiers du chemin.</p>
+<p><strong>Ensemble convexe.</strong> $S$ est convexe s'il contient toutes les combinaisons convexes de ses points.</p>
+<p><strong>Deux familles d'exemples, démontrées dans le cours.</strong></p>
+<p><em>Les ensembles affines.</em> Si $Cx=d$ et $Cy=d$, alors pour tout $\theta\in\mathbb{R}$ :
+$$C\big(\theta x + (1-\theta)y\big) = \theta Cx + (1-\theta)Cy = \theta d + (1-\theta)d = d$$</p>
+<p><em>Les polyèdres.</em> Si $Ax\preceq b$ et $Ay\preceq b$, alors pour $\theta\in[0,1]$ :
+$$A\big(\theta x+(1-\theta)y\big) = \theta Ax + (1-\theta)Ay \preceq \theta b + (1-\theta)b = b$$</p>
+<p class="cal piege"> Notez la différence des quantificateurs : pour un affine, $\theta$ parcourt <strong>tout $\mathbb{R}$</strong> ; pour un polyèdre, seulement $[0,1]$. C'est la positivité de $\theta$ et de $1-\theta$ qui préserve le sens des inégalités — avec $\theta = 2$ le calcul s'effondrerait. Affine $\Rightarrow$ convexe, jamais l'inverse.</p>
+<h2 data-prio="high">Concept 2 — Enveloppe convexe et polytope</h2>
+<p><strong>Enveloppe convexe</strong> de $S$ : l'ensemble de toutes les combinaisons convexes de points de $S$. Notation $\mathbf{conv}\,S$. C'est aussi le plus petit convexe contenant $S$.</p>
+<p><strong>Polytope</strong> : l'enveloppe convexe $\mathbf{conv}\{v_1,\dots,v_k\}$ d'un <strong>ensemble fini</strong> de points.</p>
+<p><strong>Le vocabulaire à ne pas mélanger.</strong></p>
+<table>
+<thead>
+<tr>
+<th>Objet</th>
+<th>Définition</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Polyèdre</strong></td>
+<td>$\{x\mid Ax\preceq b\}$</td>
+<td>par l'<strong>extérieur</strong> (inégalités) ; peut être non borné</td>
+</tr>
+<tr>
+<td><strong>Polytope</strong></td>
+<td>$\mathbf{conv}\{v_1,\dots,v_k\}$</td>
+<td>par l'<strong>intérieur</strong> (générateurs) ; toujours borné</td>
+</tr>
+</tbody></table>
+<p>Un polytope est un polyèdre borné, et réciproquement — c'est un cas particulier du théorème de décomposition.</p>
+<h3>Théorème de Carathéodory (exercice du cours)</h3>
+<p><strong>Énoncé.</strong> Si $S\subseteq\mathbb{R}^n$, tout $x\in\mathbf{conv}(S)$ s'écrit comme combinaison convexe d'<strong>au plus $n+1$</strong> points de $S$. Dans $\mathbb{R}^2$ : trois points suffisent toujours.</p>
+<p><strong>Démonstration (celle du cours — elle réutilise la fiche 26).</strong> Partons d'une décomposition convexe quelconque de $x$ :
+$$\begin{pmatrix}v_1 &amp; v_2 &amp; \cdots &amp; v_m\\ 1 &amp; 1 &amp; \cdots &amp; 1\end{pmatrix}\begin{pmatrix}\theta_1\\ \vdots\\ \theta_m\end{pmatrix} = \begin{pmatrix}x\\1\end{pmatrix}, \qquad \theta_i\geq0$$
+Soit $P$ l'ensemble des $\theta = (\theta_1,\dots,\theta_m)$ vérifiant ces conditions : c'est un polyèdre non vide <strong>en forme standard</strong> ($\theta\succeq0$ et égalités linéaires), donc <strong>pointu</strong>, donc il a des points extrêmes. Soit $\hat\theta$ l'un d'eux. Par le critère des colonnes (fiche 26), les colonnes associées aux composantes strictement positives sont libres :
+$$\mathbf{rank}\begin{pmatrix}v_{i_1} &amp; \cdots &amp; v_{i_k}\\ 1 &amp; \cdots &amp; 1\end{pmatrix} = k \qquad\text{où}\qquad \{i_1,\dots,i_k\} = \{i\mid\hat\theta_i&gt;0\}$$
+Cette matrice ayant $n+1$ lignes, son rang est $\leq n+1$, donc $k\leq n+1$. $\blacksquare$</p>
+<p><strong>Ce que la preuve enseigne.</strong> La ligne de $1$ transforme la contrainte « les poids somment à $1$ » en une ligne de matrice ordinaire : c'est le même truc qu'à l'indépendance affine. Et un résultat de géométrie convexe se démontre par un argument de <strong>rang</strong> sur un polyèdre auxiliaire — c'est le style du cours entier.</p>
+<h2 data-prio="must">Concept 3 — Cônes convexes</h2>
+<p><strong>Cône convexe</strong> : un ensemble non vide $S$ tel que
+$$x_1,\dots,x_k\in S,\quad \theta_1\geq0,\dots,\theta_k\geq0 \ \Longrightarrow\ \theta_1x_1+\dots+\theta_kx_k\in S$$
+Toutes les combinaisons <strong>positives</strong> (dites coniques) de points de $S$ restent dans $S$. En particulier $S$ est convexe <strong>et</strong> c'est un cône ($x\in S \Rightarrow \alpha x\in S$ pour $\alpha\geq0$).</p>
+<p><strong>Exemples.</strong> Les sous-espaces ; et le <strong>cône polyédral</strong>
+$$S = \{x\mid Ax\preceq0,\ Cx=0\}$$
+c'est-à-dire l'ensemble des solutions d'un système fini d'inégalités linéaires <strong>homogènes</strong> (second membre nul).</p>
+<p><strong>Enveloppe conique</strong> de $S$ : l'ensemble des combinaisons positives de points de $S$, aussi appelée le <strong>cône engendré</strong> par $S$. Notation $\mathbf{cone}\,S$. Un <strong>cône de type fini</strong> est $\mathbf{cone}\{v_1,\dots,v_k\}$.</p>
+<p><strong>Cône polyédral pointu.</strong> Pour $K = \{x\in\mathbb{R}^n \mid Ax\preceq0,\ Cx=0\}$ :</p>
+<ul>
+<li>l'espace de linéalité est $\mathbf{nullspace}\binom{A}{C}$ ;</li>
+<li>$K$ est <strong>pointu</strong> si et seulement si $\mathbf{rank}\binom{A}{C} = n$ ;</li>
+<li>s'il est pointu, il a <strong>exactement un</strong> point extrême : l'origine ;</li>
+<li>ses faces de dimension $1$ s'appellent les <strong>rayons extrêmes</strong>.</li>
+</ul>
+<p><strong>Le mémo.</strong> Un cône pointu ressemble à un cornet : une pointe unique (l'origine) et des arêtes qui partent à l'infini (les rayons extrêmes). Un cône non pointu contient une droite entière et n'a ni pointe ni sommet.</p>
+<h2 data-prio="must">Concept 4 — Cône de récession</h2>
+<p><strong>Définition.</strong> Le cône de récession (ou cône asymptotique) du polyèdre $P = \{x\mid Ax\preceq b,\ Cx = d\}$ est
+$$K = \{y \mid Ay\preceq0,\ Cy = 0\}$$
+C'est le polyèdre <strong>homogénéisé</strong> : on remplace $b$ et $d$ par $0$.</p>
+<p><strong>Propriétés.</strong></p>
+<ul>
+<li>$K$ a le <strong>même espace de linéalité</strong> que $P$ ;</li>
+<li>$K$ est pointu <strong>si et seulement si</strong> $P$ l'est ;</li>
+<li>si $x\in P$, alors $x+y\in P$ pour <strong>tout</strong> $y\in K$ — d'où l'image du cours : $x+K \subseteq P$.</li>
+</ul>
+<p><strong>Interprétation.</strong> $K$ rassemble les <strong>directions dans lesquelles le polyèdre s'étend à l'infini</strong>. Depuis n'importe quel point admissible, on peut avancer indéfiniment dans une direction de récession sans jamais sortir. Un polyèdre est <strong>borné</strong> si et seulement si $K = \{0\}$.</p>
+<p><strong>Le lien direct avec les LP.</strong> Un LP $\min c^Tx$ sur $P$ est <strong>non borné</strong> ($p^\star=-\infty$) si et seulement s'il existe une direction de récession $y\in K$ avec $c^Ty&lt;0$ : on descend le long de $y$ sans jamais quitter $P$. C'est le critère que l'algorithme du simplexe détecte quand aucune variable ne peut sortir de la base.</p>
+<h2 data-prio="must">Concept 5 — Le théorème de décomposition</h2>
+<p><strong>Énoncé (du cours).</strong> Tout polyèdre $P$ se décompose en
+$$P = L + Q = L + \mathbf{conv}\{v_1,\dots,v_r\} + \mathbf{cone}\{w_1,\dots,w_s\}$$
+où :</p>
+<ul>
+<li>$L$ est l'<strong>espace de linéalité</strong> de $P$ ;</li>
+<li>$Q$ est un polyèdre <strong>pointu</strong> ;</li>
+<li>$v_1,\dots,v_r$ sont les <strong>points extrêmes</strong> de $Q$ ;</li>
+<li>$w_1,\dots,w_s$ engendrent les <strong>rayons extrêmes</strong> du cône de récession de $Q$.</li>
+</ul>
+<p><em>(Le cours passe la preuve.)</em></p>
+<p><strong>Applications, telles que listées par le cours.</strong></p>
+<ul>
+<li>utile à des fins <strong>théoriques</strong> ;</li>
+<li>en général <strong>extrêmement coûteux</strong> à calculer à partir de la description par inégalités ;</li>
+<li><strong>implicitement utilisé</strong> par certains algorithmes.</li>
+</ul>
+<p><strong>Pourquoi c'est le théorème central.</strong> Il dit qu'un polyèdre est exactement « une enveloppe convexe de sommets, épaissie par des directions infinies, elle-même translatée le long de droites ». Trois conséquences pour l'optimisation linéaire :</p>
+<ol>
+<li><strong>Polyèdre borné</strong> ($L = \{0\}$, aucun rayon) : $P = \mathbf{conv}\{v_1,\dots,v_r\}$ est un polytope. Comme $c^Tx$ est linéaire, son minimum sur une enveloppe convexe est atteint <strong>en un générateur</strong> : il suffit d'examiner les <strong>sommets</strong>. C'est la justification du simplexe.</li>
+<li><strong>Polyèdre non borné</strong> : soit $c^Tw_j\geq0$ pour tous les rayons, et l'optimum est encore en un sommet ; soit $c^Tw_j&lt;0$ pour un rayon, et le problème est <strong>non borné</strong>. Il n'y a pas d'autre cas.</li>
+<li><strong>Polyèdre non pointu</strong> : $L\neq\{0\}$ ; si $c^Tv \neq 0$ pour un $v\in L$, le problème est non borné dans les deux sens. Sinon on peut <strong>éliminer</strong> $L$ et se ramener à un polyèdre pointu, en travaillant dans un espace de dimension plus petite.</li>
+</ol>
+<h3>Comment résoudre l'exercice type (protocole)</h3>
+<ol>
+<li><strong>Identifier la nature de la combinaison</strong> demandée : linéaire, affine, convexe ou conique — c'est la contrainte sur les poids qui change tout.</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th>Combinaison</th>
+<th>Contrainte sur les $\theta_i$</th>
+<th>Objet engendré</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>linéaire</td>
+<td>aucune</td>
+<td>sous-espace</td>
+</tr>
+<tr>
+<td>affine</td>
+<td>$\sum\theta_i = 1$</td>
+<td>ensemble affine</td>
+</tr>
+<tr>
+<td><strong>convexe</strong></td>
+<td>$\theta_i\geq0$ et $\sum\theta_i=1$</td>
+<td>enveloppe convexe</td>
+</tr>
+<tr>
+<td><strong>conique</strong></td>
+<td>$\theta_i\geq0$</td>
+<td>cône</td>
+</tr>
+</tbody></table>
+<ol start="2">
+<li><strong>Pour montrer qu'un ensemble est convexe</strong> : prendre $x,y$ dedans, $\theta\in[0,1]$, et vérifier la définition — le calcul tient en deux lignes pour un polyèdre ou un affine.</li>
+<li><strong>Pour un cône de récession</strong> : réécrire le système avec $b=0$ et $d=0$, puis résoudre.</li>
+<li><strong>Pour la bornitude</strong> : $P$ est borné $\iff$ $K = \{0\}$ $\iff$ le système homogène $Ay\preceq0$, $Cy=0$ n'a que la solution nulle.</li>
+<li><strong>Pour la non-bornitude d'un LP</strong> : chercher $y\in K$ avec $c^Ty&lt;0$.</li>
+</ol>
+<h3>Exercices progressifs</h3>
+<p><strong> Niveau 1</strong> — L'ensemble $\{(x_1,x_2)\mid x_1\geq0,\ x_2\geq0\}$ est-il un cône convexe ? Un polytope ?</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p><strong>Cône convexe : oui.</strong> C'est $\{x\mid -x\preceq0\}$, un cône polyédral (système homogène). Toute combinaison positive de vecteurs à composantes positives a des composantes positives.
+<strong>Polytope : non</strong> — un polytope est borné, or l'orthant positif ne l'est pas. On peut cependant l'écrire $\mathbf{cone}\{e_1,e_2\}$ : c'est un cône de type fini, engendré par ses deux <strong>rayons extrêmes</strong>.</p>
+</div></details>
+
+<p><strong> Niveau 2</strong> — Calculez le cône de récession de $P = \{x\in\mathbb{R}^2 \mid x_1+x_2\geq1,\ x\succeq0\}$. $P$ est-il borné ? pointu ?</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p>Écrivons $P$ sous la forme $Ax\preceq b$ : $-x_1-x_2\leq-1$, $-x_1\leq0$, $-x_2\leq0$. Le cône de récession est le même système avec $b=0$ :
+$$K = \{y\mid -y_1-y_2\leq0,\ y\succeq0\} = \{y\mid y\succeq0\}$$
+(la première inégalité est impliquée par $y\succeq0$). $K\neq\{0\}$ : <strong>$P$ n'est pas borné</strong> — on peut partir à l'infini dans tout l'orthant positif.
+<strong>Pointu :</strong> $\mathbf{nullspace}(A) = \{y \mid y_1+y_2 = 0,\ y_1=0,\ y_2=0\} = \{0\}$ : oui. $P$ a donc des sommets, ici $(1,0)$ et $(0,1)$, et la décomposition s'écrit $P = \mathbf{conv}\{(1,0),(0,1)\} + \mathbf{cone}\{e_1,e_2\}$.</p>
+</div></details>
+
+<p><strong> Niveau 3</strong> — Sur le $P$ de l'exercice précédent, le LP $\min\ -x_1$ est-il borné ? Et $\min\ x_1+x_2$ ?</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p><em>$\min -x_1$</em> : $c = (-1,0)$ et le rayon $y = e_1 = (1,0)$ appartient à $K$, avec $c^Ty = -1 &lt; 0$. <strong>Non borné</strong>, $p^\star = -\infty$.</p>
+<p><em>$\min x_1+x_2$</em> : $c = (1,1)$ et pour tout $y\in K = \{y\succeq0\}$, $c^Ty = y_1+y_2 \geq 0$. Aucune direction de récession ne fait descendre : l'optimum est atteint <strong>en un sommet</strong>. On compare : $f(1,0) = 1$ et $f(0,1) = 1$ — les deux sommets donnent $1$, et tout le segment entre eux est optimal. $p^\star = 1$.</p>
+</div></details>
+
+<p><strong> Niveau 4 — type feuille d'exercices</strong> — Montrez que $\mathbf{conv}\{v_1,\dots,v_k\}$ est borné, puis déduisez du théorème de décomposition qu'un polyèdre est borné si et seulement si c'est un polytope.</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p><strong>Bornitude.</strong> Soit $x = \sum_i\theta_iv_i$ une combinaison convexe. Par l'inégalité triangulaire et $\theta_i\geq0$, $\sum\theta_i=1$ :
+$$\|x\| \leq \sum_i\theta_i\|v_i\| \leq \Big(\max_i\|v_i\|\Big)\sum_i\theta_i = \max_i\|v_i\|$$
+L'enveloppe convexe est donc contenue dans la boule de rayon $\max_i\|v_i\|$ : elle est bornée.</p>
+<p><strong>Équivalence.</strong> ($\Leftarrow$) Un polytope est borné par ce qui précède, et c'est un polyèdre (admis, c'est l'autre sens du théorème de décomposition).
+($\Rightarrow$) Soit $P$ un polyèdre borné. Son espace de linéalité est $\{0\}$ (sinon il contiendrait une droite, donc serait non borné) et son cône de récession est $\{0\}$ (sinon $x+ty\in P$ pour tout $t&gt;0$ partirait à l'infini). La décomposition se réduit alors à
+$$P = \{0\} + \mathbf{conv}\{v_1,\dots,v_r\} + \{0\} = \mathbf{conv}\{v_1,\dots,v_r\}$$
+c'est-à-dire un polytope, engendré par ses <strong>points extrêmes</strong>. $\blacksquare$</p>
+<p><strong>La conséquence pratique.</strong> Minimiser une fonction linéaire sur un polyèdre borné revient à comparer sa valeur aux sommets — un ensemble <strong>fini</strong>. Un problème continu devient combinatoire : c'est exactement l'idée du simplexe.</p>
+</div></details>
+
+<h2 data-prio="must">Common mistakes</h2>
+<ol>
+<li><strong>Oublier $\sum\theta_i = 1$</strong> dans une combinaison convexe — sans cette condition on obtient un cône, pas une enveloppe convexe.</li>
+<li><strong>Oublier $\theta_i\geq0$</strong> — sans positivité on obtient l'enveloppe <strong>affine</strong>, bien plus grande (le cercle du slide 3-12 a pour enveloppe affine tout un plan).</li>
+<li><strong>Confondre polyèdre et polytope</strong> — le second est borné par définition ; le premier peut partir à l'infini.</li>
+<li><strong>Calculer un cône de récession en gardant $b$</strong> — il faut homogénéiser : $Ay\preceq0$ et $Cy=0$, seconds membres nuls.</li>
+<li><strong>Croire qu'un cône contient toujours des droites</strong> — un cône <strong>pointu</strong> n'en contient aucune ; il a l'origine pour unique point extrême.</li>
+<li><strong>Conclure « non borné » sans direction de descente</strong> — un polyèdre non borné peut parfaitement porter un LP borné : il faut $c^Ty&lt;0$ pour un $y$ du cône de récession.</li>
+<li><strong>Croire Carathéodory optimal partout</strong> — la borne $n+1$ est générale ; sur un convexe particulier, moins de points peuvent suffire.</li>
+</ol>
+<h2>Ultimate Review</h2>
+<ol>
+<li>Combinaison convexe : $\theta_i\geq0$ <strong>et</strong> $\sum\theta_i=1$ ; conique : $\theta_i\geq0$ seulement.</li>
+<li>Affines et polyèdres sont convexes ; la preuve tient en une ligne, et la positivité de $\theta$ y est essentielle.</li>
+<li>$\mathbf{conv}\,S$ = plus petit convexe contenant $S$ ; <strong>polytope</strong> = enveloppe convexe d'un ensemble fini.</li>
+<li><strong>Carathéodory</strong> : dans $\mathbb{R}^n$, au plus $n+1$ points suffisent ; se démontre par le critère des sommets en forme standard.</li>
+<li>Cône convexe : stable par combinaisons positives. <strong>Cône polyédral</strong> : $\{x\mid Ax\preceq0,\ Cx=0\}$, système homogène.</li>
+<li>Cône polyédral pointu $\iff \mathbf{rank}\binom{A}{C}=n$ ; un seul point extrême, l'origine ; faces de dimension 1 = <strong>rayons extrêmes</strong>.</li>
+<li><strong>Cône de récession</strong> $K = \{y\mid Ay\preceq0,\ Cy=0\}$ : $x\in P \Rightarrow x+K\subseteq P$ ; $P$ borné $\iff K=\{0\}$.</li>
+<li><strong>Décomposition</strong> : $P = L + \mathbf{conv}\{v_i\} + \mathbf{cone}\{w_j\}$ — droites, sommets, directions infinies.</li>
+</ol>
+<p><strong>Formulas to know</strong>
+$$x=\sum_i\theta_iv_i,\ \theta\succeq0,\ \textstyle\sum_i\theta_i=1 \qquad K=\{y\mid Ay\preceq0,\ Cy=0\} \qquad P = L+\mathbf{conv}\{v_i\}+\mathbf{cone}\{w_j\}$$</p>
+<p><strong>Methods to know</strong> : distinguer les quatre types de combinaisons ; calculer un cône de récession par homogénéisation ; conclure à la bornitude d'un LP par le signe de $c^Tw_j$.</p>
+<div class="rec"><h2>Active Recall</h2><p><strong>Basic</strong> — Différence entre combinaison convexe et combinaison conique ?</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p>Les deux exigent $\theta_i\geq0$. La combinaison <strong>convexe</strong> impose en plus $\sum_i\theta_i = 1$ ; la combinaison <strong>conique</strong> ne l'impose pas. D'où : enveloppe convexe bornée si les générateurs le sont, cône toujours non borné (sauf $\{0\}$).</p>
+</div></details><p><strong>Understanding</strong> — Pourquoi la preuve de convexité d'un polyèdre exige-t-elle $\theta\in[0,1]$ alors que celle d'un affine autorise tout $\theta\in\mathbb{R}$ ?</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p>Parce qu'on manipule des <strong>inégalités</strong>. De $Ax\preceq b$ on ne peut déduire $\theta Ax \preceq \theta b$ que si $\theta\geq0$ ; multiplier par un négatif renverse le sens. Pour un affine, les contraintes sont des <strong>égalités</strong> : elles survivent à n'importe quel coefficient.</p>
+</div></details><p><strong>Application</strong> — Cône de récession de $P = \{x\in\mathbb{R}^2\mid x_1\geq0,\ x_2 = 3\}$ ? $P$ est-il pointu ?</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p>En homogénéisant : $K = \{y\mid y_1\geq0,\ y_2 = 0\}$, la demi-droite positive de l'axe des abscisses. $P$ n'est donc pas borné. <strong>Pointu :</strong> l'espace de linéalité est $\{y \mid y_1 = 0,\ y_2=0\} = \{0\}$, donc oui — $P$ est une demi-droite, dont l'unique point extrême est $(0,3)$. Décomposition : $P = \{(0,3)\} + \mathbf{cone}\{e_1\}$.</p>
+</div></details><p><strong>Comparison</strong> — Description externe et description interne d'un polyèdre : avantages respectifs ?</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p><em>Externe</em> ($Ax\preceq b$) : compacte, directement exploitable par un algorithme, c'est la forme dans laquelle les problèmes arrivent. <em>Interne</em> ($L+\mathbf{conv}+\mathbf{cone}$) : elle rend évidentes la bornitude et la position des optima, mais le cours prévient qu'elle est <strong>extrêmement coûteuse</strong> à calculer à partir des inégalités (le nombre de sommets croît exponentiellement).</p>
+</div></details><p><strong>Exam-style</strong> — Énoncez le théorème de décomposition et déduisez-en la trichotomie d'un LP : optimum en un sommet, non borné, ou non admissible.</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p>$P = L + \mathbf{conv}\{v_1,\dots,v_r\} + \mathbf{cone}\{w_1,\dots,w_s\}$. Si $P=\emptyset$, le problème est <strong>non admissible</strong>. Sinon, tout $x\in P$ s'écrit $x = \ell + \sum_i\theta_iv_i + \sum_j\mu_jw_j$ et
+$$c^Tx = c^T\ell + \sum_i\theta_i\,c^Tv_i + \sum_j\mu_j\,c^Tw_j$$
+S'il existe $\ell\in L$ ou $w_j$ avec un produit scalaire strictement négatif, on fait tendre le coefficient vers $+\infty$ : <strong>non borné</strong>. Sinon, les deux derniers termes sont minimisés en prenant tous les $\mu_j = 0$, et $\sum_i\theta_ic^Tv_i \geq \min_i c^Tv_i$ : l'optimum est atteint <strong>en un point extrême</strong>.</p>
+</div></details></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h2>Flashcards</h2>
+<table>
+<thead>
+<tr>
+<th>Question</th>
+<th>Réponse</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Combinaison convexe ?</td>
+<td>$\sum_i\theta_iv_i$ avec $\theta_i\geq0$ et $\sum_i\theta_i=1$</td>
+</tr>
+<tr>
+<td>Combinaison conique ?</td>
+<td>$\sum_i\theta_iv_i$ avec $\theta_i\geq0$ (pas de contrainte de somme)</td>
+</tr>
+<tr>
+<td>Polytope ?</td>
+<td>$\mathbf{conv}$ d'un ensemble <strong>fini</strong> de points — toujours borné</td>
+</tr>
+<tr>
+<td>Théorème de Carathéodory ?</td>
+<td>Dans $\mathbb{R}^n$, $n+1$ points suffisent pour toute combinaison convexe</td>
+</tr>
+<tr>
+<td>Cône polyédral ?</td>
+<td>$\{x\mid Ax\preceq0,\ Cx=0\}$ — système <strong>homogène</strong></td>
+</tr>
+<tr>
+<td>Cône polyédral pointu ?</td>
+<td>$\mathbf{rank}\binom{A}{C}=n$ ; un seul point extrême : l'origine</td>
+</tr>
+<tr>
+<td>Rayon extrême ?</td>
+<td>Face de dimension 1 d'un cône pointu</td>
+</tr>
+<tr>
+<td>Cône de récession ?</td>
+<td>$K=\{y\mid Ay\preceq0,\ Cy=0\}$ — les directions infinies de $P$</td>
+</tr>
+<tr>
+<td>$P$ borné $\iff$ ?</td>
+<td>$K=\{0\}$</td>
+</tr>
+<tr>
+<td>LP non borné $\iff$ ?</td>
+<td>Il existe $y\in K$ avec $c^Ty&lt;0$</td>
+</tr>
+<tr>
+<td>Théorème de décomposition ?</td>
+<td>$P = L+\mathbf{conv}\{v_i\}+\mathbf{cone}\{w_j\}$</td>
+</tr>
+<tr>
+<td>Pourquoi l'optimum est-il en un sommet ?</td>
+<td>Sur $\mathbf{conv}\{v_i\}$, une fonction linéaire atteint son min en un générateur</td>
+</tr>
+</tbody></table>
+</main>
+
+
+
+
+</body></html>

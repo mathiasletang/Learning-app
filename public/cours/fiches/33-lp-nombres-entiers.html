@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fiche 33 — Programmation linéaire en nombres entiers et séparation-évaluation</title>
+<script>
+window.MathJax={tex:{inlineMath:[["$","$"]],displayMath:[["$$","$$"]],processEscapes:true},
+ options:{skipHtmlTags:["script","noscript","style","textarea","pre","code"]},
+ svg:{fontCache:"global"},
+ startup:{pageReady:()=>MathJax.startup.defaultPageReady().then(()=>{document.body.classList.add("ready")})}};
+setTimeout(function(){document.body.classList.add("ready")},2500);
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+/* ============================================================
+   MathiasLearn — feuille de style des fiches
+   Reprise intégrale des tokens de 00_PARCOURS/*.html
+   + blocs pédagogiques (callouts, méthode, essentiels, recall)
+   ============================================================ */
+:root{--bg:#faf9f7;--card:#fff;--ink:#1a1a1a;--muted:#6b6b6b;--line:#e5e2dd;--accent:#8b5e34;
+ --hl:#fdf8ef;--ok:#2d7d4f;--okbg:#f0f7f3;--warn:#b3402f;--warnbg:#fdf3f1;--blue:#2f5d8b;--bluebg:#f1f5fa}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+ font:17px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;padding:0 16px 100px}
+.nav{position:sticky;top:0;background:rgba(250,249,247,.96);backdrop-filter:blur(8px);
+ border-bottom:1px solid var(--line);margin:0 -16px 30px;padding:11px 16px;z-index:50;
+ display:flex;gap:6px;flex-wrap:wrap;font-size:13px}
+.nav a{color:var(--muted);text-decoration:none;padding:4px 9px;border-radius:5px;white-space:nowrap}
+.nav a:hover{background:var(--line);color:var(--ink)}
+.nav a.on{background:var(--accent);color:#fff}
+main{max-width:780px;margin:0 auto}
+h1{font-size:31px;letter-spacing:-.02em;margin:.4em 0 .5em;line-height:1.25}
+h2{font-size:23px;margin:2.2em 0 .7em;padding-bottom:.3em;border-bottom:1px solid var(--line)}
+h3{font-size:19px;margin:1.9em 0 .5em;color:var(--accent)}
+h4{font-size:17px;margin:1.5em 0 .4em}
+p{margin:.8em 0} a{color:var(--accent)} hr{border:0;border-top:1px solid var(--line);margin:2.6em 0}
+table{border-collapse:collapse;width:100%;margin:1.3em 0;font-size:15.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+th{background:#f3f0eb;font-weight:600}
+tr:nth-child(even) td{background:#fcfbfa}
+code{font-family:"SF Mono",Menlo,Consolas,monospace;font-size:.88em;background:#f2efea;padding:2px 6px;border-radius:4px;white-space:nowrap}
+pre{background:#f2efea;padding:14px 16px;border-radius:8px;overflow-x:auto}
+pre code{background:none;padding:0;white-space:pre}
+blockquote{border-left:3px solid var(--accent);background:var(--hl);margin:1.4em 0;padding:14px 20px;border-radius:0 8px 8px 0}
+blockquote p:first-child{margin-top:0} blockquote p:last-child{margin-bottom:0}
+ul,ol{padding-left:1.5em} li{margin:.35em 0} em{color:#4a4a4a}
+mjx-container[display="true"]{margin:1.1em 0!important;overflow-x:auto;overflow-y:hidden;padding:2px 0}
+mjx-container svg{max-width:100%}
+body:not(.ready) main{opacity:0} main{opacity:1;transition:opacity .25s}
+
+/* --- bandeau de tête de fiche --- */
+.cours{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--accent);
+ border-radius:0 10px 10px 0;padding:18px 22px;margin:0 0 34px}
+.cours h4{margin:0 0 4px;font-size:14px;text-transform:uppercase;letter-spacing:.07em;color:var(--accent)}
+.cours .cs{color:var(--muted);font-size:14.5px;margin:0 0 14px}
+
+/* --- exercices / corrigés --- */
+.ex{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:6px 24px 20px;margin:18px 0}
+.ex>h3:first-child{margin-top:14px}
+details.cor{margin-top:18px;border:1px solid var(--line);border-radius:8px;background:#fcfbfa;overflow:hidden}
+details.cor>summary{cursor:pointer;padding:12px 16px;font-weight:600;font-size:15px;color:var(--accent);
+ list-style:none;display:flex;align-items:center;gap:9px;user-select:none;transition:.15s;min-height:44px}
+details.cor>summary::-webkit-details-marker{display:none}
+details.cor>summary:hover{background:var(--hl)}
+details.cor>summary::before{content:"\25B6";font-size:10px;transition:transform .18s;display:inline-block}
+details.cor[open]>summary::before{transform:rotate(90deg)}
+details.cor[open]>summary{background:var(--okbg);color:var(--ok);border-bottom:1px solid var(--line)}
+.cor .in{padding:4px 20px 16px}
+.cor .in>*:first-child{margin-top:.9em}
+
+/* --- blocs pédagogiques (callouts) ---
+   Générés depuis une citation Markdown dont le premier **gras** commence
+   par un mot-clé : DÉFINITION, THÉORÈME, MÉTHODE, PIÈGE, INTUITION… */
+.cal{border:1px solid var(--line);border-left:4px solid var(--accent);background:var(--card);
+ border-radius:0 10px 10px 0;padding:15px 20px;margin:1.5em 0}
+.cal>p:first-child{margin-top:0}.cal>p:last-child,.cal>ul:last-child,.cal>ol:last-child{margin-bottom:0}
+.cal .lab{display:block;font-size:12.5px;text-transform:uppercase;letter-spacing:.08em;
+ font-weight:700;color:var(--accent);margin-bottom:6px}
+.cal.formel{background:var(--hl)}
+.cal.piege{border-left-color:var(--warn);background:var(--warnbg)}
+.cal.piege .lab{color:var(--warn)}
+.cal.methode{border-left-color:var(--ok);background:var(--okbg)}
+.cal.methode .lab{color:var(--ok)}
+.cal.intu{border-left-color:var(--blue);background:var(--bluebg)}
+.cal.intu .lab{color:var(--blue)}
+.cal.plus{border-left-style:dashed;background:#faf9f7}
+.cal.plus .lab{color:var(--muted)}
+
+/* --- révision express --- */
+.ess{background:var(--card);border:1px solid var(--accent);border-radius:10px;padding:4px 24px 20px;margin:1.6em 0}
+.ess h3{margin-top:1.3em}
+.rec{background:var(--card);border:1px dashed var(--accent);border-radius:10px;padding:4px 24px 18px;margin:1.6em 0}
+.rec ol{counter-reset:none}
+
+/* --- impression / PDF --- */
+@media print{
+ .nav{display:none}
+ body{padding:0;background:#fff;font-size:11.2pt;line-height:1.55}
+ main{max-width:none}
+ h1{font-size:23pt}h2{font-size:15pt;margin-top:1.5em}h3{font-size:12.6pt}
+ h2,h3,h4{break-after:avoid;page-break-after:avoid}
+ table,.cal,blockquote{break-inside:avoid;page-break-inside:avoid}
+ table{display:table;font-size:9.6pt}
+ details.cor{border:1px solid var(--line);background:#fcfbfa}
+ details.cor>summary{display:none}
+ details.cor .in{padding-top:10px}
+ .cal,.ex,.ess,.rec{box-shadow:none}
+ a{color:var(--ink);text-decoration:none}
+}
+@page{margin:16mm 15mm 18mm}
+
+/* --- exemples travaillés --- */
+.exm{background:#fcfbfa;border:1px solid var(--line);border-radius:10px;padding:2px 20px 14px;margin:1.5em 0}
+.exm>h4:first-child{margin:14px 0 .5em;color:var(--accent);font-size:13px;text-transform:uppercase;letter-spacing:.07em}
+
+
+/* --- pastilles de priorité (conventions des fiches de l'app) --- */
+h2[data-prio], h3[data-prio], h4[data-prio]{position:relative}
+h2[data-prio]::before,h3[data-prio]::before,h4[data-prio]::before{
+ content:"";display:inline-block;width:9px;height:9px;border-radius:50%;
+ margin-right:9px;vertical-align:middle;background:var(--muted)}
+[data-prio="must"]::before{background:var(--warn)}
+[data-prio="high"]::before{background:#d98324}
+[data-prio="mid"]::before{background:#c9a227}
+[data-prio="low"]::before{background:var(--ok)}
+/* corrigés des fiches de l'app : même traitement que les corrigés des séries */
+details.cor>summary::after{content:""}
+</style></head><body>
+<div class="nav"><a href="24-lp-formulation.html">Programmation linéaire : formulation et géométrie</a><a href="25-lp-affine-par-morceaux.html">Optimisation affine par morceaux : tout ramener à un LP</a><a href="26-lp-polyedres.html">Polyèdres : faces, points extrêmes, test du rang</a><a href="27-lp-convexite-cones.html">Enveloppes convexes, cônes et décomposition d'un polyèdre</a><a href="28-lp-dualite.html">Dualité en programmation linéaire</a><a href="29-lp-sensibilite-jeux.html">Dualité II : sensibilité, prix implicites et jeux à somme nulle</a><a href="30-lp-simplexe.html">L'algorithme du simplexe</a><a href="31-lp-reseaux-unimodularite.html">Flots dans les réseaux et unimodularité totale</a><a href="32-lp-commande.html">Applications en automatique : suivi de consigne et robustesse</a><a href="33-lp-nombres-entiers.html" class="on">Programmation linéaire en nombres entiers et séparation-évaluation</a><a href="34-boyd-ensembles-convexes.html">Ensembles convexes</a><a href="35-boyd-fonctions-convexes.html">Fonctions convexes</a><a href="36-boyd-problemes-convexes.html">Problèmes d'optimisation convexe</a><a href="37-boyd-familles-standard.html">Les familles standard : LP, QP, SOCP, GP, SDP</a><a href="38-boyd-dualite.html">Dualité lagrangienne</a><a href="39-boyd-minimisation-sans-contrainte.html">Minimisation sans contrainte : gradient et Newton</a><a href="40-boyd-contraintes-egalite.html">Minimisation sous contraintes d'égalité</a><a href="41-boyd-points-interieurs.html">Méthodes de points intérieurs</a><a href="42-sous-gradients.html">Sous-gradients et sous-différentiel</a><a href="43-methode-sous-gradient.html">La méthode du sous-gradient</a></div>
+<main><h1>Fiche 33 — Programmation linéaire en nombres entiers et séparation-évaluation</h1>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Matière</strong></td>
+<td>Maths · Optimisation</td>
+</tr>
+<tr>
+<td><strong>Cours source</strong></td>
+<td>Vandenberghe, <em>EE236A — Linear Programming</em> (UCLA), Lecture 18 « Integer linear programming », 8 diapositives</td>
+</tr>
+<tr>
+<td><strong>Difficulté</strong></td>
+<td> Fondamental — court, mais c'est la porte de l'optimisation combinatoire</td>
+</tr>
+<tr>
+<td><strong>Temps d'étude estimé</strong></td>
+<td>1 h 15</td>
+</tr>
+<tr>
+<td><strong>Prérequis</strong></td>
+<td>Fiche 31 (unimodularité totale, relaxation exacte), fiche 24 (modélisation)</td>
+</tr>
+<tr>
+<td><strong>Concepts clés</strong></td>
+<td>Programme linéaire en nombres entiers, variables booléennes, relaxation linéaire, borne inférieure, séparation-évaluation, élagage</td>
+</tr>
+<tr>
+<td><strong>Poids à l'examen</strong></td>
+<td>Deux compétences : <strong>modéliser</strong> avec des variables booléennes (localisation, affectation, choix), et <strong>dérouler un arbre de séparation-évaluation</strong> en expliquant chaque élagage.</td>
+</tr>
+</tbody></table>
+<h2>Vue d'ensemble</h2>
+<p>La fiche 31 a montré un cas heureux : quand la matrice de contraintes est totalement unimodulaire, la contrainte d'intégrité est <strong>gratuite</strong>. Cette leçon traite le cas général, où elle ne l'est pas — et où le problème devient difficile.</p>
+<p>La stratégie est universelle : <strong>relaxer pour borner, séparer pour décider</strong>.</p>
+<pre><code>RELAXER  : on retire x ∈ Zⁿ  →  un LP  →  BORNE INFÉRIEURE
+SÉPARER  : on coupe P en morceaux (x₁ ≤ 2 / x₁ ≥ 3)  →  sous-problèmes
+ÉLAGUER  : un sous-problème dont la borne est trop mauvaise est ABANDONNÉ
+           sans être exploré
+</code></pre>
+<p>Ce que la relaxation apporte n'est donc pas une solution mais un <strong>certificat d'inutilité</strong> : elle permet de jeter des branches entières de l'arbre sans les visiter.</p>
+<h2 data-prio="mid">Concept 1 — Les trois formes</h2>
+<p><strong>Programme linéaire en nombres entiers (ILP)</strong> :
+$$\begin{array}{ll}\text{minimiser} &amp; c^Tx\\ \text{sous} &amp; Ax\preceq b\\ &amp; x\in\mathbb{Z}^n\end{array}$$</p>
+<p><strong>Programme linéaire mixte</strong> : seules <strong>certaines</strong> variables sont entières.</p>
+<p><strong>Programme linéaire 0-1 (booléen)</strong> : les variables prennent les valeurs $0$ ou $1$.</p>
+<p><strong>Le pouvoir de modélisation des variables booléennes.</strong> Une variable $0/1$ encode une <strong>décision</strong> : ouvrir ou non un site, sélectionner ou non un objet, affecter ou non une tâche. Ce que le LP continu ne sait pas exprimer — « c'est tout ou rien » —, l'ILP l'exprime en une ligne. C'est ce qui le rend à la fois si expressif et si difficile.</p>
+<h2 data-prio="high">Concept 2 — Exemple : le problème de localisation d'installations</h2>
+<p><strong>Les données.</strong> $n$ emplacements possibles, $m$ clients ; $c_j$ est le coût d'ouverture d'une installation à l'emplacement $j$, et $d_{ij}$ le coût de service du client $i$ depuis l'emplacement $j$.</p>
+<p><strong>Formulation en LP booléen :</strong>
+$$\begin{array}{ll}\text{minimiser} &amp; \displaystyle\sum_{j=1}^n c_jy_j + \sum_{i=1}^m\sum_{j=1}^n d_{ij}x_{ij}\\[6pt] \text{sous} &amp; \displaystyle\sum_{j=1}^n x_{ij} = 1, \qquad i=1,\dots,m\\[6pt] &amp; x_{ij}\leq y_j, \qquad i=1,\dots,m,\ j=1,\dots,n\\[4pt] &amp; x_{ij},\ y_j\in\{0,1\}\end{array}$$</p>
+<p><strong>Les variables.</strong> $x_{ij}=1$ si l'emplacement $j$ sert le client $i$ ; $y_j=1$ si l'emplacement $j$ est <strong>sélectionné</strong>.</p>
+<p><strong>Les contraintes, une par une.</strong></p>
+<ul>
+<li>$\sum_j x_{ij}=1$ : chaque client est servi par <strong>exactement un</strong> emplacement ;</li>
+<li>$x_{ij}\leq y_j$ : on ne peut servir depuis un emplacement <strong>que s'il est ouvert</strong>. C'est la contrainte de <strong>couplage</strong>, et c'est elle qui donne toute sa structure au problème.</li>
+</ul>
+<p><strong>Ce qu'il faut voir.</strong> Le couplage $x_{ij}\leq y_j$ est le motif de modélisation le plus utile de tout l'ILP : « l'action $x$ n'est possible que si la décision $y$ est prise ». On le retrouve partout — coût fixe d'installation, capacité activée, option souscrite.</p>
+<p class="cal piege"> Ce problème <strong>n'est pas</strong> un problème de réseau : sa matrice de contraintes n'est pas d'incidence, et la relaxation linéaire n'a <strong>aucune raison</strong> d'être entière. C'est exactement le cas difficile.</p>
+<h2 data-prio="must">Concept 3 — La relaxation linéaire</h2>
+<p><strong>Définition.</strong> Relâcher, c'est retirer la contrainte $x\in\mathbb{Z}^n$ (et remplacer $x\in\{0,1\}$ par $0\preceq x\preceq\mathbf1$).</p>
+<p><strong>Deux propriétés.</strong></p>
+<ol>
+<li>La relaxation fournit une <strong>borne inférieure</strong> sur la valeur optimale de l'ILP — on minimise sur un ensemble <strong>plus grand</strong>.</li>
+<li>Si la solution de la relaxation est <strong>entière</strong>, alors elle résout l'ILP : elle est admissible pour le problème entier et optimale sur un ensemble plus grand.</li>
+</ol>
+<p><strong>L'avertissement du cours, essentiel.</strong> <em>Des formulations ILP équivalentes peuvent avoir des relaxations différentes.</em></p>
+<p><strong>Ce que cela signifie.</strong> Deux modèles décrivant <strong>exactement les mêmes points entiers</strong> peuvent avoir des polyèdres relâchés très différents. Celui dont le polyèdre est le plus <strong>serré</strong> autour des points entiers donne une meilleure borne, donc un arbre de séparation plus petit. <strong>La qualité d'une modélisation ILP se mesure à la qualité de sa relaxation</strong>, pas seulement à sa correction.</p>
+<p><strong>Le lien avec la fiche 31.</strong> La relaxation est <strong>exacte</strong> (borne atteinte, solution entière) lorsque la matrice est totalement unimodulaire et les données entières. C'est le cas idéal ; hors de là, il reste un <strong>saut d'intégrité</strong> et il faut chercher la solution entière.</p>
+<h2 data-prio="must">Concept 4 — L'algorithme de séparation-évaluation</h2>
+<p><strong>Cadre général.</strong>
+$$\min\ c^Tx \quad\text{sous}\quad x\in P$$
+où $P$ est un ensemble <strong>fini</strong>.</p>
+<p><strong>L'idée.</strong></p>
+<ul>
+<li><strong>partitionner récursivement</strong> $P$ en sous-ensembles $P_i$, et résoudre les sous-problèmes $\min c^Tx$ s.c. $x\in P_i$ ;</li>
+<li><strong>utiliser les relaxations linéaires pour écarter</strong> les sous-problèmes qui ne peuvent pas mener à une solution.</li>
+</ul>
+<p><strong>Les trois raisons d'élaguer une branche.</strong> À chaque nœud, on résout la relaxation et l'on compare sa valeur à la <strong>meilleure solution entière connue</strong> (l'incumbent) :</p>
+<table>
+<thead>
+<tr>
+<th>Situation au nœud</th>
+<th>Conclusion</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>relaxation <strong>non admissible</strong></td>
+<td>le sous-problème n'a aucune solution : <strong>abandon</strong></td>
+</tr>
+<tr>
+<td>valeur de la relaxation $\geq$ meilleure valeur entière connue</td>
+<td>aucun descendant ne fera mieux : <strong>abandon</strong></td>
+</tr>
+<tr>
+<td>solution de la relaxation <strong>entière</strong></td>
+<td>on a une solution admissible : on met à jour l'incumbent, <strong>pas besoin de descendre</strong></td>
+</tr>
+<tr>
+<td>sinon</td>
+<td><strong>séparer</strong> sur une variable fractionnaire</td>
+</tr>
+</tbody></table>
+<p><strong>Comment séparer.</strong> Si $x_k^\star = 2{,}17$ dans la relaxation, aucune solution entière n'a $2 &lt; x_k &lt; 3$. On coupe donc en deux :
+$$x_k\leq2 \qquad\text{ou}\qquad x_k\geq3$$
+Les deux morceaux couvrent tous les points entiers, et <strong>excluent</strong> la solution fractionnaire courante — ce qui garantit la progression.</p>
+<h2 data-prio="must">Concept 5 — L'exemple déroulé du cours</h2>
+<p>$$\min\ -2x_1-3x_2 \quad\text{sous}\quad x\in P, \qquad P = \Big\{x\in\mathbb{Z}^2_+ \ \Big|\ \frac{2x_1}{9}+\frac{x_2}{4}\leq1,\quad \frac{x_1}{7}+\frac{x_2}{3}\leq1\Big\}$$</p>
+<p><strong>Le point optimal est $(2,2)$</strong>, de valeur $-10$. Voici comment l'arbre le découvre.</p>
+<table>
+<thead>
+<tr>
+<th>Nœud</th>
+<th>Contraintes ajoutées</th>
+<th>Solution de la relaxation</th>
+<th>Valeur</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$P_0$</td>
+<td>—</td>
+<td>$(2{,}17,\ 2{,}07)$</td>
+<td>$-10{,}56$</td>
+</tr>
+<tr>
+<td>$P_1$</td>
+<td>$x_1\leq2$</td>
+<td>$(2{,}00,\ 2{,}14)$</td>
+<td>$-10{,}43$</td>
+</tr>
+<tr>
+<td>$P_2$</td>
+<td>$x_1\geq3$</td>
+<td>$(3{,}00,\ 1{,}33)$</td>
+<td>$-10{,}00$</td>
+</tr>
+<tr>
+<td>$P_3$</td>
+<td>$x_1\leq2$, $x_2\leq2$</td>
+<td>$(2{,}00,\ 2{,}00)$</td>
+<td>$-10{,}00$</td>
+</tr>
+<tr>
+<td>$P_4$</td>
+<td>$x_1\leq2$, $x_2\geq3$</td>
+<td>$(0{,}00,\ 3{,}00)$</td>
+<td>$-9{,}00$</td>
+</tr>
+<tr>
+<td>$P_5$</td>
+<td>$x_1\geq3$, $x_2\leq1$</td>
+<td>$(3{,}38,\ 1{,}00)$</td>
+<td>$-9{,}75$</td>
+</tr>
+<tr>
+<td>$P_6$</td>
+<td>$x_1\geq3$, $x_2\geq2$</td>
+<td>non admissible</td>
+<td>$+\infty$</td>
+</tr>
+<tr>
+<td>$P_7$</td>
+<td>$\dots$, $x_1=3$</td>
+<td>$(3{,}00,\ 1{,}00)$</td>
+<td>$-9{,}00$</td>
+</tr>
+<tr>
+<td>$P_8$</td>
+<td>$\dots$, $x_1\geq4$</td>
+<td>$(4{,}00,\ 0{,}44)$</td>
+<td>$-9{,}33$</td>
+</tr>
+<tr>
+<td>$P_9$</td>
+<td>$\dots$, $x_2=0$</td>
+<td>$(4{,}50,\ 0{,}00)$</td>
+<td>$-9{,}00$</td>
+</tr>
+<tr>
+<td>$P_{10}$</td>
+<td>$\dots$, $x_2=1$</td>
+<td>non admissible</td>
+<td>$+\infty$</td>
+</tr>
+<tr>
+<td>$P_{11}$</td>
+<td>$\dots$, $x_1=4$</td>
+<td>$(4{,}00,\ 0{,}00)$</td>
+<td>$-8{,}00$</td>
+</tr>
+<tr>
+<td>$P_{12}$</td>
+<td>$\dots$, $x_1\geq5$</td>
+<td>non admissible</td>
+<td>$+\infty$</td>
+</tr>
+</tbody></table>
+<p><strong>Les conclusions tirées par le cours.</strong></p>
+<ul>
+<li><strong>$P_2$</strong> ($x_1\geq3$) : la valeur optimale du sous-problème est $\geq-10{,}00$ — sa relaxation vaut déjà $-10{,}00$, donc <strong>aucun</strong> point entier de cette branche ne fera mieux que $-10$.</li>
+<li><strong>$P_3$</strong> ($x_1\leq2$, $x_2\leq2$) : la solution de la relaxation est $(2,2)$, <strong>entière</strong> — c'est une solution admissible de l'ILP, de valeur $-10$.</li>
+<li><strong>$P_6$</strong> ($x_1\geq3$, $x_2\geq2$) : le sous-problème est <strong>non admissible</strong>.</li>
+</ul>
+<p><strong>Le résultat marquant.</strong> Après avoir résolu les relaxations de $P_0$, $P_1$, $P_2$, $P_3$ et $P_4$ <strong>seulement</strong>, on peut conclure que $(2,2)$ est la solution optimale de l'ILP. Les nœuds $P_5$ à $P_{12}$ <strong>n'auraient jamais eu besoin d'être explorés</strong> : ils descendent de $P_2$, dont la borne $-10{,}00$ interdit déjà de battre l'incumbent.</p>
+<p><strong>Le raisonnement complet, à savoir rédiger.</strong></p>
+<ol>
+<li>$P_3$ fournit la solution entière $(2,2)$, de valeur $-10$ : <strong>incumbent</strong> $=-10$.</li>
+<li>$P_4$ a une borne de $-9{,}00 &gt; -10$ : cette branche est <strong>élaguée</strong>.</li>
+<li>$P_2$ a une borne de $-10{,}00 \geq -10$ : cette branche entière est <strong>élaguée</strong> — et avec elle les huit nœuds qu'elle contient.</li>
+<li>Tout l'arbre est donc traité, et $(2,2)$ est optimal. $\blacksquare$</li>
+</ol>
+<p class="cal piege"> Notez que $P_2$ a une borne <strong>égale</strong> à l'incumbent. On élague quand même : une branche qui ne peut qu'<strong>égaler</strong> la meilleure solution connue n'apporte rien (à moins qu'on ne veuille énumérer <strong>toutes</strong> les solutions optimales).</p>
+<h3>Comment résoudre l'exercice type (protocole)</h3>
+<ol>
+<li><strong>Résoudre la relaxation</strong> à la racine : borne inférieure globale.</li>
+<li><strong>Si la solution est entière</strong> : c'est fini.</li>
+<li><strong>Choisir une variable fractionnaire</strong> $x_k^\star$ et <strong>séparer</strong> en $x_k\leq\lfloor x_k^\star\rfloor$ et $x_k\geq\lceil x_k^\star\rceil$.</li>
+<li><strong>Résoudre la relaxation de chaque fils</strong> et appliquer les trois tests d'élagage : non admissible, borne $\geq$ incumbent, solution entière.</li>
+<li><strong>Mettre à jour l'incumbent</strong> dès qu'une solution entière apparaît — plus il arrive tôt, plus on élaguera.</li>
+<li><strong>Recommencer</strong> sur les nœuds actifs jusqu'à ce qu'il n'en reste aucun.</li>
+<li><strong>Conclure</strong> : l'incumbent final est optimal, et l'on <strong>justifie</strong> chaque branche non explorée par sa borne.</li>
+</ol>
+<h3>Comment reconnaître qu'il faut un ILP</h3>
+<table>
+<thead>
+<tr>
+<th>Signe dans l'énoncé</th>
+<th>Modélisation</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>« ouvrir ou non », « choisir ou non »</td>
+<td>variable booléenne $y_j\in\{0,1\}$</td>
+</tr>
+<tr>
+<td>Un <strong>coût fixe</strong> en plus d'un coût variable</td>
+<td>couplage $x_{ij}\leq y_j$ (ou $x\leq My$)</td>
+</tr>
+<tr>
+<td>« au plus $k$ parmi $n$ »</td>
+<td>$\sum_j y_j\leq k$</td>
+</tr>
+<tr>
+<td>« si A alors B »</td>
+<td>$y_A\leq y_B$</td>
+</tr>
+<tr>
+<td>Des quantités <strong>indivisibles</strong> (machines, personnes)</td>
+<td>$x\in\mathbb{Z}^n$</td>
+</tr>
+<tr>
+<td>Un réseau, un couplage, un plus court chemin</td>
+<td><strong>pas besoin</strong> d'ILP — la relaxation suffit (fiche 31)</td>
+</tr>
+</tbody></table>
+<h3>Exercices progressifs</h3>
+<p><strong> Niveau 1</strong> — La relaxation d'un ILP de minimisation vaut $-7{,}3$. Que peut-on affirmer sur la valeur optimale entière ?</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p>Elle est $\geq -7{,}3$ : la relaxation est une <strong>borne inférieure</strong>. Et comme la valeur optimale entière est ici forcément entière si $c$ l'est et $x$ aussi, on peut même écrire $\geq-7$. <em>Attention :</em> cet arrondi n'est licite que si l'objectif ne prend que des valeurs entières sur les points entiers.</p>
+</div></details>
+
+<p><strong> Niveau 2</strong> — Traduisez : « le site 3 ne peut être ouvert que si le site 1 l'est aussi », et « au plus deux sites parmi cinq ».</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p>$$y_3\leq y_1 \qquad\text{et}\qquad \sum_{j=1}^5 y_j\leq2$$
+La première interdit $(y_1,y_3) = (0,1)$ et autorise les trois autres combinaisons — c'est exactement l'implication « $y_3=1\Rightarrow y_1=1$ ». C'est le même motif que le couplage $x_{ij}\leq y_j$ de la localisation.</p>
+</div></details>
+
+<p><strong> Niveau 3</strong> — Au nœud courant, la relaxation donne $x^\star = (1{,}5,\ 3)$ de valeur $-8$, et l'incumbent vaut $-8$. Que fait-on ?</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p>On <strong>élague</strong>. La borne du nœud ($-8$) n'est pas strictement meilleure que l'incumbent ($-8$) : aucun descendant ne pourra faire mieux que $-8$, puisque la valeur d'un sous-problème est toujours $\geq$ la borne de son parent. Inutile de séparer sur $x_1$.
+<em>(Si l'on cherchait <strong>toutes</strong> les solutions optimales, il faudrait au contraire explorer.)</em></p>
+</div></details>
+
+<p><strong> Niveau 4 — type feuille d'exercices</strong> — Sur l'exemple du concept 5, montrez que la branche $P_2$ pouvait être élaguée dès que $(2,2)$ a été trouvé, et évaluez l'économie.</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p><strong>L'argument.</strong> La relaxation de $P_2$ vaut $-10{,}00$. Or, pour tout sous-ensemble $Q\subseteq P_2$, la valeur optimale de l'ILP sur $Q$ est $\geq$ la valeur de la relaxation sur $P_2$ — les bornes ne peuvent que <strong>croître</strong> en descendant dans l'arbre (on ajoute des contraintes). Une fois l'incumbent fixé à $-10$ par $P_3$, aucun descendant de $P_2$ ne peut donner strictement mieux : la branche entière est inutile.</p>
+<p><strong>L'économie.</strong> La branche $P_2$ contient $P_5,P_6,P_7,P_8,P_9,P_{10},P_{11},P_{12}$, soit <strong>huit</strong> relaxations épargnées sur les treize nœuds de l'arbre — plus de <strong>60 %</strong> du travail. Et c'est le cas d'un tout petit exemple à deux variables ; sur un problème réel, la qualité des bornes fait la différence entre quelques secondes et plusieurs jours.</p>
+<p><strong>La morale.</strong> Deux leviers pour accélérer un branch-and-bound : trouver <strong>tôt</strong> une bonne solution entière (pour élaguer vite), et disposer de <strong>bonnes bornes</strong> — c'est-à-dire d'une formulation dont la relaxation est serrée. On retrouve l'avertissement du concept 3.</p>
+</div></details>
+
+<h2 data-prio="must">Common mistakes</h2>
+<ol>
+<li><strong>Arrondir la solution de la relaxation</strong> — l'arrondi n'est en général <strong>ni admissible ni optimal</strong>. Il faut séparer.</li>
+<li><strong>Prendre la relaxation pour une solution</strong> — c'est une <strong>borne</strong>, sauf si elle tombe entière (ou si la matrice est totalement unimodulaire).</li>
+<li><strong>Séparer sur une variable déjà entière</strong> — on sépare sur une variable <strong>fractionnaire</strong>, sinon la coupe n'exclut rien et l'arbre ne progresse pas.</li>
+<li><strong>Oublier de mettre à jour l'incumbent</strong> — sans meilleure solution connue, aucun élagage par la borne n'est possible et l'arbre explose.</li>
+<li><strong>Élaguer sur la mauvaise comparaison</strong> — en minimisation, on élague si borne $\geq$ incumbent ; en maximisation, si borne $\leq$ incumbent.</li>
+<li><strong>Croire que deux formulations équivalentes se valent</strong> — elles donnent les mêmes points entiers mais des relaxations différentes, donc des arbres de tailles très différentes.</li>
+<li><strong>Utiliser un ILP là où un LP suffit</strong> — pour un problème de réseau (fiche 31), la relaxation est exacte : imposer l'intégrité serait une perte de temps pure.</li>
+</ol>
+<h2>Ultimate Review</h2>
+<ol>
+<li>ILP : $\min c^Tx$ s.c. $Ax\preceq b$, $x\in\mathbb{Z}^n$ ; <strong>mixte</strong> si certaines variables seulement ; <strong>booléen</strong> si $x\in\{0,1\}^n$.</li>
+<li>Motif de modélisation clé : $x_{ij}\leq y_j$ — « l'action n'est possible que si la décision est prise ».</li>
+<li><strong>Relaxation</strong> : retirer $x\in\mathbb{Z}^n$. Elle donne une <strong>borne inférieure</strong> ; si sa solution est entière, elle résout l'ILP.</li>
+<li>Des formulations équivalentes ont des relaxations différentes : <strong>la qualité de la borne est un choix de modélisation</strong>.</li>
+<li><strong>Séparation-évaluation</strong> : partitionner récursivement, résoudre les relaxations, élaguer.</li>
+<li>Trois motifs d'élagage : non-admissibilité, borne $\geq$ incumbent, solution entière trouvée.</li>
+<li>Séparer sur une variable fractionnaire $x_k^\star$ : $x_k\leq\lfloor x_k^\star\rfloor$ ou $x_k\geq\lceil x_k^\star\rceil$.</li>
+<li>Sur l'exemple du cours, cinq relaxations sur treize suffisent à prouver l'optimalité de $(2,2)$.</li>
+</ol>
+<p><strong>Formulas to know</strong>
+$$\min c^Tx \ \text{s.c.}\ Ax\preceq b,\ x\in\mathbb{Z}^n \qquad x_{ij}\leq y_j \qquad x_k\leq\lfloor x_k^\star\rfloor \ \text{ ou }\ x_k\geq\lceil x_k^\star\rceil$$</p>
+<p><strong>Methods to know</strong> : le protocole de séparation-évaluation en 7 étapes ; les trois tests d'élagage ; les motifs de modélisation booléenne.</p>
+<div class="rec"><h2>Active Recall</h2><p><strong>Basic</strong> — Qu'apporte la relaxation linéaire d'un ILP, et dans quel cas résout-elle le problème ?</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p>Elle fournit une <strong>borne inférieure</strong> sur la valeur optimale (on minimise sur un ensemble plus grand). Elle <strong>résout</strong> l'ILP si sa solution optimale se trouve être entière — en particulier lorsque la matrice de contraintes est totalement unimodulaire et les données entières (fiche 31).</p>
+</div></details><p><strong>Understanding</strong> — Pourquoi peut-on élaguer une branche dont la borne dépasse l'incumbent ?</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p>Parce que les bornes <strong>croissent</strong> en descendant dans l'arbre : chaque fils ajoute des contraintes, donc sa relaxation vaut au moins celle du parent. Si la borne du parent est déjà $\geq$ la meilleure valeur entière connue, aucun de ses descendants ne peut faire strictement mieux. On les jette tous d'un coup.</p>
+</div></details><p><strong>Application</strong> — La relaxation donne $x^\star = (3{,}0,\ 4{,}6)$. Sur quoi séparer, et comment ?</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p>Sur $x_2$, la seule variable fractionnaire : deux fils, $x_2\leq4$ et $x_2\geq5$. Ces deux morceaux couvrent tous les points entiers et excluent la solution courante $4{,}6$, ce qui garantit que l'arbre progresse. Séparer sur $x_1$, déjà entière, ne servirait à rien.</p>
+</div></details><p><strong>Comparison</strong> — Problème de réseau et problème de localisation : pourquoi l'un est-il facile et l'autre difficile ?</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p>Le problème de réseau a une matrice <strong>d'incidence</strong>, donc totalement unimodulaire : les sommets du polyèdre relâché sont entiers, la relaxation est <strong>exacte</strong> et un simple LP suffit. La localisation d'installations n'a pas cette structure ; sa relaxation donne des solutions fractionnaires et il faut un branch-and-bound. La différence n'est pas la taille, mais la <strong>structure de la matrice</strong>.</p>
+</div></details><p><strong>Exam-style</strong> — Modélisez : $n$ projets, chacun de coût $c_j$ et de gain $g_j$ ; budget $B$ ; le projet 2 exige le projet 1 ; on veut au plus trois projets.</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p>Variables booléennes $y_j\in\{0,1\}$ ($y_j=1$ si le projet $j$ est retenu) :
+$$\begin{array}{ll}\text{maximiser} &amp; \displaystyle\sum_{j=1}^n g_jy_j\\[4pt] \text{sous} &amp; \displaystyle\sum_{j=1}^n c_jy_j\leq B \quad\text{(budget)}\\[4pt] &amp; y_2\leq y_1 \quad\text{(précédence)}\\[4pt] &amp; \displaystyle\sum_{j=1}^n y_j\leq3 \quad\text{(cardinalité)}\\[4pt] &amp; y_j\in\{0,1\}\end{array}$$
+C'est un <strong>sac à dos</strong> avec contraintes additionnelles — la matrice n'est pas totalement unimodulaire (les $c_j$ sont quelconques), donc la relaxation ne donnera qu'une borne et il faudra séparer.</p>
+</div></details></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h2>Flashcards</h2>
+<table>
+<thead>
+<tr>
+<th>Question</th>
+<th>Réponse</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>ILP ?</td>
+<td>$\min c^Tx$ s.c. $Ax\preceq b$, $x\in\mathbb{Z}^n$</td>
+</tr>
+<tr>
+<td>LP mixte ?</td>
+<td>Seules certaines variables sont entières</td>
+</tr>
+<tr>
+<td>LP booléen ?</td>
+<td>Variables dans $\{0,1\}$</td>
+</tr>
+<tr>
+<td>Que donne la relaxation linéaire ?</td>
+<td>Une <strong>borne inférieure</strong> sur l'optimum entier</td>
+</tr>
+<tr>
+<td>Quand résout-elle l'ILP ?</td>
+<td>Quand sa solution est entière (ex. matrice totalement unimodulaire)</td>
+</tr>
+<tr>
+<td>Deux formulations équivalentes ont-elles la même relaxation ?</td>
+<td><strong>Non</strong> — d'où l'importance de la qualité du modèle</td>
+</tr>
+<tr>
+<td>Contrainte de couplage ?</td>
+<td>$x_{ij}\leq y_j$ : servir depuis $j$ exige d'ouvrir $j$</td>
+</tr>
+<tr>
+<td>« au plus $k$ parmi $n$ » ?</td>
+<td>$\sum_j y_j\leq k$</td>
+</tr>
+<tr>
+<td>« si A alors B » ?</td>
+<td>$y_A\leq y_B$</td>
+</tr>
+<tr>
+<td>Idée du branch-and-bound ?</td>
+<td>Partitionner récursivement, borner par les relaxations, élaguer</td>
+</tr>
+<tr>
+<td>Les trois motifs d'élagage ?</td>
+<td>Non admissible ; borne $\geq$ incumbent ; solution entière trouvée</td>
+</tr>
+<tr>
+<td>Comment sépare-t-on ?</td>
+<td>Sur une variable fractionnaire : $x_k\leq\lfloor x_k^\star\rfloor$ ou $x_k\geq\lceil x_k^\star\rceil$</td>
+</tr>
+<tr>
+<td>Les bornes évoluent comment dans l'arbre ?</td>
+<td>Elles <strong>croissent</strong> en descendant (on ajoute des contraintes)</td>
+</tr>
+<tr>
+<td>Peut-on arrondir la solution relâchée ?</td>
+<td>Non — ni admissible ni optimale en général</td>
+</tr>
+</tbody></table>
+</main>
+
+
+
+
+</body></html>

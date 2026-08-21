@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fiche 30 — L'algorithme du simplexe</title>
+<script>
+window.MathJax={tex:{inlineMath:[["$","$"]],displayMath:[["$$","$$"]],processEscapes:true},
+ options:{skipHtmlTags:["script","noscript","style","textarea","pre","code"]},
+ svg:{fontCache:"global"},
+ startup:{pageReady:()=>MathJax.startup.defaultPageReady().then(()=>{document.body.classList.add("ready")})}};
+setTimeout(function(){document.body.classList.add("ready")},2500);
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+/* ============================================================
+   MathiasLearn — feuille de style des fiches
+   Reprise intégrale des tokens de 00_PARCOURS/*.html
+   + blocs pédagogiques (callouts, méthode, essentiels, recall)
+   ============================================================ */
+:root{--bg:#faf9f7;--card:#fff;--ink:#1a1a1a;--muted:#6b6b6b;--line:#e5e2dd;--accent:#8b5e34;
+ --hl:#fdf8ef;--ok:#2d7d4f;--okbg:#f0f7f3;--warn:#b3402f;--warnbg:#fdf3f1;--blue:#2f5d8b;--bluebg:#f1f5fa}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+ font:17px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;padding:0 16px 100px}
+.nav{position:sticky;top:0;background:rgba(250,249,247,.96);backdrop-filter:blur(8px);
+ border-bottom:1px solid var(--line);margin:0 -16px 30px;padding:11px 16px;z-index:50;
+ display:flex;gap:6px;flex-wrap:wrap;font-size:13px}
+.nav a{color:var(--muted);text-decoration:none;padding:4px 9px;border-radius:5px;white-space:nowrap}
+.nav a:hover{background:var(--line);color:var(--ink)}
+.nav a.on{background:var(--accent);color:#fff}
+main{max-width:780px;margin:0 auto}
+h1{font-size:31px;letter-spacing:-.02em;margin:.4em 0 .5em;line-height:1.25}
+h2{font-size:23px;margin:2.2em 0 .7em;padding-bottom:.3em;border-bottom:1px solid var(--line)}
+h3{font-size:19px;margin:1.9em 0 .5em;color:var(--accent)}
+h4{font-size:17px;margin:1.5em 0 .4em}
+p{margin:.8em 0} a{color:var(--accent)} hr{border:0;border-top:1px solid var(--line);margin:2.6em 0}
+table{border-collapse:collapse;width:100%;margin:1.3em 0;font-size:15.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+th{background:#f3f0eb;font-weight:600}
+tr:nth-child(even) td{background:#fcfbfa}
+code{font-family:"SF Mono",Menlo,Consolas,monospace;font-size:.88em;background:#f2efea;padding:2px 6px;border-radius:4px;white-space:nowrap}
+pre{background:#f2efea;padding:14px 16px;border-radius:8px;overflow-x:auto}
+pre code{background:none;padding:0;white-space:pre}
+blockquote{border-left:3px solid var(--accent);background:var(--hl);margin:1.4em 0;padding:14px 20px;border-radius:0 8px 8px 0}
+blockquote p:first-child{margin-top:0} blockquote p:last-child{margin-bottom:0}
+ul,ol{padding-left:1.5em} li{margin:.35em 0} em{color:#4a4a4a}
+mjx-container[display="true"]{margin:1.1em 0!important;overflow-x:auto;overflow-y:hidden;padding:2px 0}
+mjx-container svg{max-width:100%}
+body:not(.ready) main{opacity:0} main{opacity:1;transition:opacity .25s}
+
+/* --- bandeau de tête de fiche --- */
+.cours{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--accent);
+ border-radius:0 10px 10px 0;padding:18px 22px;margin:0 0 34px}
+.cours h4{margin:0 0 4px;font-size:14px;text-transform:uppercase;letter-spacing:.07em;color:var(--accent)}
+.cours .cs{color:var(--muted);font-size:14.5px;margin:0 0 14px}
+
+/* --- exercices / corrigés --- */
+.ex{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:6px 24px 20px;margin:18px 0}
+.ex>h3:first-child{margin-top:14px}
+details.cor{margin-top:18px;border:1px solid var(--line);border-radius:8px;background:#fcfbfa;overflow:hidden}
+details.cor>summary{cursor:pointer;padding:12px 16px;font-weight:600;font-size:15px;color:var(--accent);
+ list-style:none;display:flex;align-items:center;gap:9px;user-select:none;transition:.15s;min-height:44px}
+details.cor>summary::-webkit-details-marker{display:none}
+details.cor>summary:hover{background:var(--hl)}
+details.cor>summary::before{content:"\25B6";font-size:10px;transition:transform .18s;display:inline-block}
+details.cor[open]>summary::before{transform:rotate(90deg)}
+details.cor[open]>summary{background:var(--okbg);color:var(--ok);border-bottom:1px solid var(--line)}
+.cor .in{padding:4px 20px 16px}
+.cor .in>*:first-child{margin-top:.9em}
+
+/* --- blocs pédagogiques (callouts) ---
+   Générés depuis une citation Markdown dont le premier **gras** commence
+   par un mot-clé : DÉFINITION, THÉORÈME, MÉTHODE, PIÈGE, INTUITION… */
+.cal{border:1px solid var(--line);border-left:4px solid var(--accent);background:var(--card);
+ border-radius:0 10px 10px 0;padding:15px 20px;margin:1.5em 0}
+.cal>p:first-child{margin-top:0}.cal>p:last-child,.cal>ul:last-child,.cal>ol:last-child{margin-bottom:0}
+.cal .lab{display:block;font-size:12.5px;text-transform:uppercase;letter-spacing:.08em;
+ font-weight:700;color:var(--accent);margin-bottom:6px}
+.cal.formel{background:var(--hl)}
+.cal.piege{border-left-color:var(--warn);background:var(--warnbg)}
+.cal.piege .lab{color:var(--warn)}
+.cal.methode{border-left-color:var(--ok);background:var(--okbg)}
+.cal.methode .lab{color:var(--ok)}
+.cal.intu{border-left-color:var(--blue);background:var(--bluebg)}
+.cal.intu .lab{color:var(--blue)}
+.cal.plus{border-left-style:dashed;background:#faf9f7}
+.cal.plus .lab{color:var(--muted)}
+
+/* --- révision express --- */
+.ess{background:var(--card);border:1px solid var(--accent);border-radius:10px;padding:4px 24px 20px;margin:1.6em 0}
+.ess h3{margin-top:1.3em}
+.rec{background:var(--card);border:1px dashed var(--accent);border-radius:10px;padding:4px 24px 18px;margin:1.6em 0}
+.rec ol{counter-reset:none}
+
+/* --- impression / PDF --- */
+@media print{
+ .nav{display:none}
+ body{padding:0;background:#fff;font-size:11.2pt;line-height:1.55}
+ main{max-width:none}
+ h1{font-size:23pt}h2{font-size:15pt;margin-top:1.5em}h3{font-size:12.6pt}
+ h2,h3,h4{break-after:avoid;page-break-after:avoid}
+ table,.cal,blockquote{break-inside:avoid;page-break-inside:avoid}
+ table{display:table;font-size:9.6pt}
+ details.cor{border:1px solid var(--line);background:#fcfbfa}
+ details.cor>summary{display:none}
+ details.cor .in{padding-top:10px}
+ .cal,.ex,.ess,.rec{box-shadow:none}
+ a{color:var(--ink);text-decoration:none}
+}
+@page{margin:16mm 15mm 18mm}
+
+/* --- exemples travaillés --- */
+.exm{background:#fcfbfa;border:1px solid var(--line);border-radius:10px;padding:2px 20px 14px;margin:1.5em 0}
+.exm>h4:first-child{margin:14px 0 .5em;color:var(--accent);font-size:13px;text-transform:uppercase;letter-spacing:.07em}
+
+
+/* --- pastilles de priorité (conventions des fiches de l'app) --- */
+h2[data-prio], h3[data-prio], h4[data-prio]{position:relative}
+h2[data-prio]::before,h3[data-prio]::before,h4[data-prio]::before{
+ content:"";display:inline-block;width:9px;height:9px;border-radius:50%;
+ margin-right:9px;vertical-align:middle;background:var(--muted)}
+[data-prio="must"]::before{background:var(--warn)}
+[data-prio="high"]::before{background:#d98324}
+[data-prio="mid"]::before{background:#c9a227}
+[data-prio="low"]::before{background:var(--ok)}
+/* corrigés des fiches de l'app : même traitement que les corrigés des séries */
+details.cor>summary::after{content:""}
+</style></head><body>
+<div class="nav"><a href="24-lp-formulation.html">Programmation linéaire : formulation et géométrie</a><a href="25-lp-affine-par-morceaux.html">Optimisation affine par morceaux : tout ramener à un LP</a><a href="26-lp-polyedres.html">Polyèdres : faces, points extrêmes, test du rang</a><a href="27-lp-convexite-cones.html">Enveloppes convexes, cônes et décomposition d'un polyèdre</a><a href="28-lp-dualite.html">Dualité en programmation linéaire</a><a href="29-lp-sensibilite-jeux.html">Dualité II : sensibilité, prix implicites et jeux à somme nulle</a><a href="30-lp-simplexe.html" class="on">L'algorithme du simplexe</a><a href="31-lp-reseaux-unimodularite.html">Flots dans les réseaux et unimodularité totale</a><a href="32-lp-commande.html">Applications en automatique : suivi de consigne et robustesse</a><a href="33-lp-nombres-entiers.html">Programmation linéaire en nombres entiers et séparation-évaluation</a><a href="34-boyd-ensembles-convexes.html">Ensembles convexes</a><a href="35-boyd-fonctions-convexes.html">Fonctions convexes</a><a href="36-boyd-problemes-convexes.html">Problèmes d'optimisation convexe</a><a href="37-boyd-familles-standard.html">Les familles standard : LP, QP, SOCP, GP, SDP</a><a href="38-boyd-dualite.html">Dualité lagrangienne</a><a href="39-boyd-minimisation-sans-contrainte.html">Minimisation sans contrainte : gradient et Newton</a><a href="40-boyd-contraintes-egalite.html">Minimisation sous contraintes d'égalité</a><a href="41-boyd-points-interieurs.html">Méthodes de points intérieurs</a><a href="42-sous-gradients.html">Sous-gradients et sous-différentiel</a><a href="43-methode-sous-gradient.html">La méthode du sous-gradient</a></div>
+<main><h1>Fiche 30 — L'algorithme du simplexe</h1>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Matière</strong></td>
+<td>Maths · Optimisation</td>
+</tr>
+<tr>
+<td><strong>Cours source</strong></td>
+<td>Vandenberghe, <em>EE236A — Linear Programming</em> (UCLA), Lecture 12 « Simplex method », 31 diapositives</td>
+</tr>
+<tr>
+<td><strong>Difficulté</strong></td>
+<td> Must know — l'algorithme historique, et le seul qu'on sache dérouler à la main</td>
+</tr>
+<tr>
+<td><strong>Temps d'étude estimé</strong></td>
+<td>2 h 30</td>
+</tr>
+<tr>
+<td><strong>Prérequis</strong></td>
+<td>Fiche 26 (test du rang, points extrêmes), fiche 28 (dualité, écarts complémentaires)</td>
+</tr>
+<tr>
+<td><strong>Concepts clés</strong></td>
+<td>Sommets adjacents, direction d'arête, test du rapport minimal, itération du simplexe, dégénérescence, cyclage, règle de Bland, phase I</td>
+</tr>
+<tr>
+<td><strong>Poids à l'examen</strong></td>
+<td>Savoir <strong>dérouler une itération à la main</strong> — calculer $z$, choisir $k$, calculer $\Delta x$, faire le test du rapport minimal — est la compétence évaluée. Le reste (cyclage, phase I) s'énonce.</td>
+</tr>
+</tbody></table>
+<h2>Vue d'ensemble</h2>
+<p>Le théorème de décomposition (fiche 27) a réduit un LP à un problème <strong>fini</strong> : l'optimum est en un sommet, il y en a un nombre fini, il « suffit » de les comparer. Mais leur nombre croît exponentiellement — les énumérer est hors de question.</p>
+<p><strong>L'idée de Dantzig (1947)</strong> : ne pas énumérer, mais <strong>descendre</strong>. On part d'un sommet, on se déplace vers un sommet <strong>voisin</strong> de coût strictement plus bas, et on recommence. Comme les sommets sont en nombre fini et que le coût décroît strictement, on s'arrête.</p>
+<pre><code>SOMMET COURANT x, contraintes actives J
+  1. calculer z          → si z ≽ 0 : STOP, optimal (certificat dual)
+  2. choisir k avec z_k &lt; 0, calculer la direction Δx
+                         → si AΔx ≼ 0 : STOP, non borné
+  3. test du rapport minimal → pas α̂, contrainte entrante j
+  J := (J \ {k}) ∪ {j},  x := x + α̂ Δx
+</code></pre>
+<p>Le critère d'arrêt <strong>est</strong> le certificat dual de la fiche 28 : le simplexe fabrique simultanément une solution primale et une solution duale, et s'arrête quand elles se rejoignent.</p>
+<h2 data-prio="mid">Concept 1 — Format et hypothèses</h2>
+<p>Le cours travaille sur la <strong>forme d'inégalités</strong>
+$$\min\ c^Tx \quad\text{sous}\quad Ax\preceq b, \qquad A\in\mathbb{R}^{m\times n}$$</p>
+<p><strong>Hypothèse.</strong> L'ensemble admissible est <strong>non vide</strong> et <strong>pointu</strong> — c'est-à-dire $\mathbf{rank}(A) = n$ (fiche 26). Sans pointure il n'y a aucun sommet, et l'algorithme n'a rien à visiter.</p>
+<p><strong>Condition suffisante commode.</strong> Il suffit que les contraintes contiennent, pour chaque variable $x_k$, une <strong>borne simple</strong> $x_k\geq l_k$ et/ou $x_k\leq u_k$ : ces lignes fournissent à elles seules $n$ directions indépendantes.</p>
+<p><strong>Variables libres.</strong> Une variable sans borne se scinde en deux variables positives :
+$$x_k = x_k^+ - x_k^-, \qquad x_k^+\geq0,\ x_k^-\geq0$$</p>
+<blockquote>
+<p>Historique : le simplexe est inventé en <strong>1947 par George Dantzig</strong>. Il se présente habituellement sur la forme standard (« simplexe primal ») ; le cours expose la variante pour la forme d'inégalités, dite <strong>simplexe dual</strong>.</p>
+</blockquote>
+<p><strong>Les quatre questions que pose une itération</strong>, et où elles se règlent :</p>
+<table>
+<thead>
+<tr>
+<th>Question</th>
+<th>Réponse</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Comment caractériser un sommet ?</td>
+<td>Test du rang (fiche 26)</td>
+</tr>
+<tr>
+<td>Comment trouver un sommet voisin de coût plus bas ?</td>
+<td>Concepts 3 et 4</td>
+</tr>
+<tr>
+<td>Quand s'arrête-t-on ?</td>
+<td>Quand $z\succeq0$ (optimal) ou $A\Delta x\preceq0$ (non borné)</td>
+</tr>
+<tr>
+<td>Comment trouver un sommet initial ?</td>
+<td>La <strong>phase I</strong> (concept 7)</td>
+</tr>
+</tbody></table>
+<h2 data-prio="high">Concept 2 — Dégénérescence et adjacence</h2>
+<p><strong>Sommet non dégénéré.</strong> Un point extrême $x$ est <strong>non dégénéré</strong> si <strong>exactement $n$</strong> inégalités y sont actives. Alors $A_J$ est <strong>carrée et inversible</strong>, et
+$$x = A_J^{-1}b_J$$</p>
+<p><strong>Sommet dégénéré</strong> : plus de $n$ inégalités actives. $A_J$ est de rang $n$ mais <strong>rectangulaire</strong>.</p>
+<p class="cal piege"> Distinction importante du cours : l'<strong>extrémalité</strong> est une propriété <strong>géométrique</strong> de l'ensemble $P=\{x\mid Ax\preceq b\}$ ; la <strong>(non-)dégénérescence</strong> dépend en plus de la <strong>description</strong> choisie, c'est-à-dire de $A$ et $b$. Ajouter une inégalité redondante peut rendre un sommet dégénéré sans changer le polyèdre.</p>
+<p><em>Jusqu'au concept 6, on suppose tous les sommets non dégénérés.</em></p>
+<p><strong>Sommets adjacents.</strong> Deux points extrêmes sont <strong>adjacents</strong> s'ils ont $n-1$ contraintes actives <strong>communes</strong> — géométriquement, ils sont reliés par une <strong>arête</strong> du polyèdre.</p>
+<p><strong>Exemple du cours.</strong> Pour le polyèdre de $\mathbb{R}^2$ défini par $-x_2\leq0$, $-x_1-x_2\leq-1$, $-x_1\leq0$, $-x_1+x_2\leq2$ :</p>
+<table>
+<thead>
+<tr>
+<th>$x$</th>
+<th>$b - Ax$</th>
+<th>$J$</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$(1,0)$</td>
+<td>$(0,0,1,3)$</td>
+<td>$\{1,2\}$</td>
+</tr>
+<tr>
+<td>$(0,1)$</td>
+<td>$(1,0,0,1)$</td>
+<td>$\{2,3\}$</td>
+</tr>
+<tr>
+<td>$(0,2)$</td>
+<td>$(2,1,0,0)$</td>
+<td>$\{3,4\}$</td>
+</tr>
+</tbody></table>
+<p>$(1,0)$ et $(0,1)$ partagent la contrainte $2$ : ils sont <strong>adjacents</strong>. $(1,0)$ et $(0,2)$ n'ont aucune contrainte commune : ils ne le sont pas.</p>
+<p><strong>Le mémo.</strong> $b - Ax$ est le vecteur des <strong>marges</strong> ; ses zéros repèrent les contraintes actives. Le calculer à chaque étape est le réflexe de base.</p>
+<h2 data-prio="must">Concept 3 — Se déplacer vers un sommet adjacent</h2>
+<p><strong>Données</strong> : un sommet $x$ d'ensemble actif $J$, et un indice $k\in J$ qu'on décide de <strong>relâcher</strong>.
+<strong>But</strong> : trouver le sommet adjacent $\hat x$ dont l'ensemble actif contient $J\setminus\{k\}$.</p>
+<p><strong>Étape 1 — la direction d'arête.</strong> Résoudre le système de $n$ équations à $n$ inconnues
+$$a_i^T\Delta x = 0 \ \text{ pour } i\in J\setminus\{k\}, \qquad a_k^T\Delta x = -1$$
+On reste sur les $n-1$ contraintes conservées, et on <strong>quitte</strong> la contrainte $k$ vers l'intérieur (le $-1$ garantit que la marge $b_k - a_k^Tx$ augmente). Le système est <strong>résoluble</strong> car $A_J$ est inversible.</p>
+<p><strong>Étape 2 — cas non borné.</strong> Si $A\Delta x\preceq0$, alors pour tout $\alpha\geq0$ :
+$$A(x+\alpha\Delta x) = Ax + \alpha A\Delta x \preceq b$$
+La demi-droite $\{x+\alpha\Delta x \mid \alpha\geq0\}$ est <strong>entièrement admissible</strong> : c'est une arête infinie du polyèdre.</p>
+<p><strong>Étape 3 — le test du rapport minimal.</strong> Sinon, on avance jusqu'à ce qu'une nouvelle contrainte devienne active :
+$$\hat x = x + \hat\alpha\,\Delta x, \qquad \hat\alpha = \min_{i\,:\,a_i^T\Delta x&gt;0}\ \frac{b_i - a_i^Tx}{a_i^T\Delta x}$$
+C'est le $\alpha$ maximal tel que $A(x+\alpha\Delta x)\preceq b$ : chaque contrainte $i$ dont la marge diminue impose une limite, et <strong>la plus contraignante gagne</strong>.</p>
+<p><strong>Discussion (points du cours à retenir).</strong></p>
+<ul>
+<li>$\hat\alpha&gt;0$ : par construction $A_J\Delta x\preceq0$, donc $a_i^T\Delta x&gt;0$ entraîne $i\notin J$, donc $b_i - a_i^Tx&gt;0$ : tous les rapports sont <strong>strictement positifs</strong>.</li>
+<li>Le nouvel ensemble actif est $\hat J = (J\setminus\{k\})\cup I$ avec $I = \{i \mid a_i^T\Delta x&gt;0,\ (b_i-a_i^Tx)/(a_i^T\Delta x) = \hat\alpha\}$.</li>
+<li>$\hat x$ est bien un <strong>point extrême</strong> : pour $j\in I$, on a $a_j^T\Delta x&gt;0$ alors que $a_i^T\Delta x = 0$ pour $i\in J\setminus\{k\}$ ; donc $a_j$ est linéairement indépendant des $a_i$, $i\in J\setminus\{k\}$, et $\mathbf{rank}(A_{\hat J}) = n$.</li>
+<li>Sous l'hypothèse de non-dégénérescence, $|I| = 1$ : <strong>le minimum du test est unique</strong>.</li>
+</ul>
+<h3>Exemple du cours</h3>
+<p>Sur le polyèdre ci-dessus, cherchons les sommets adjacents à $x=(1,0)$, $J=\{1,2\}$.</p>
+<p><strong>Retirer $k=1$.</strong> Le système $a_2^T\Delta x = 0$, $a_1^T\Delta x = -1$ s'écrit
+$$\begin{pmatrix}0&amp;-1\\-1&amp;-1\end{pmatrix}\begin{pmatrix}\Delta x_1\\ \Delta x_2\end{pmatrix} = \begin{pmatrix}-1\\0\end{pmatrix} \ \Longrightarrow\ \Delta x = (-1,1)$$
+Test du rapport minimal : $A\Delta x = (-1,0,1,2)$, donc seuls $i=3$ et $i=4$ comptent :
+$$\hat\alpha = \min\Big\{\frac{1}{1},\ \frac{3}{2}\Big\} = 1$$
+Nouveau sommet : $\hat x = (1,0)+1\cdot(-1,1) = (0,1)$, d'ensemble actif $\{2,3\}$. </p>
+<p><strong>Retirer $k=2$.</strong> On obtient $\Delta x = (1,0)$ et $A\Delta x = (0,-1,-1,-1)\preceq0$ : la demi-droite $\{(1,0)+\alpha(1,0) \mid \alpha\geq0\}$ est une <strong>arête non bornée</strong> du polyèdre.</p>
+<h2 data-prio="must">Concept 4 — Choisir une direction qui fait baisser le coût</h2>
+<p><strong>Le calcul du vecteur dual.</strong> Étant donné le sommet $x$ d'ensemble actif $J$, on définit $z\in\mathbb{R}^m$ par
+$$A_J^Tz_J + c = 0, \qquad z_j = 0 \ \text{ pour } j\notin J$$
+C'est exactement le <strong>candidat dual</strong> de la fiche 28 : admissibilité duale sur le support $J$, écarts complémentaires ailleurs.</p>
+<p><strong>Test d'optimalité.</strong> Si $z\succeq0$, alors $x$ et $z$ sont primal et dual <strong>optimaux</strong> — le certificat est complet, on s'arrête.</p>
+<p><strong>Sinon.</strong> On choisit $k$ avec $z_k&lt;0$ et on construit $\Delta x$ comme au concept 3. Le coût varie alors selon
+$$c^T(x+\alpha\Delta x) = c^Tx - \alpha\,z_J^TA_J\Delta x = c^Tx + \alpha\,z_k$$
+(en utilisant $c = -A_J^Tz_J$ et $A_J\Delta x = -(e_k)_J$). Comme $z_k&lt;0$, <strong>le coût décroît strictement</strong> dans la direction $\Delta x$.</p>
+<p><strong>Le point à comprendre.</strong> $z_k$ est exactement le <strong>taux de décroissance</strong> du coût le long de l'arête qui quitte la contrainte $k$. Le vecteur $z$ n'est donc pas seulement un certificat : c'est le tableau des pentes disponibles, et le signe de ses composantes dit s'il reste une descente possible.</p>
+<h2 data-prio="must">Concept 5 — Une itération complète, et la convergence</h2>
+<p><strong>L'itération (encadré du cours).</strong> Donné un sommet $x$ d'ensemble actif $J$ :</p>
+<ol>
+<li>Calculer $z$ par $A_J^Tz_J+c=0$ et $z_j=0$ pour $j\notin J$. <strong>Si $z\succeq0$ : terminer</strong>, $x$ et $z$ sont primal et dual optimaux.</li>
+<li>Choisir $k$ avec $z_k&lt;0$ et calculer $\Delta x$ par $a_i^T\Delta x=0$ ($i\in J\setminus\{k\}$), $a_k^T\Delta x = -1$. <strong>Si $A\Delta x\preceq0$ : terminer</strong>, le LP est non borné ($p^\star=-\infty$).</li>
+<li>Poser $J := (J\setminus\{k\})\cup\{j\}$ et $x := x+\hat\alpha\Delta x$ où
+$$j = \arg\min_{i\,:\,a_i^T\Delta x&gt;0}\frac{b_i-a_i^Tx}{a_i^T\Delta x}, \qquad \hat\alpha = \frac{b_j-a_j^Tx}{a_j^T\Delta x}$$</li>
+</ol>
+<p><strong>Choix du pivot (étape 2).</strong> Si plusieurs $z_k$ sont négatifs, plusieurs variantes existent :</p>
+<ul>
+<li>prendre le $z_k$ <strong>le plus négatif</strong> ;</li>
+<li>prendre celui qui donne la <strong>plus forte baisse</strong> du coût, $\hat\alpha z_k$ ;</li>
+<li>prendre le <strong>plus petit indice</strong> $k$.</li>
+</ul>
+<p>Les trois fonctionnent <strong>si tous les sommets sont non dégénérés</strong>.</p>
+<p><strong>Convergence.</strong> Elle découle de deux faits :</p>
+<ul>
+<li>le nombre de points extrêmes est <strong>fini</strong> ;</li>
+<li>le coût <strong>décroît strictement</strong> à chaque étape (car $\hat\alpha&gt;0$ et $z_k&lt;0$), donc aucun sommet n'est visité deux fois.</li>
+</ul>
+<h3>Exemple déroulé (celui du cours, 5 itérations)</h3>
+<p>$$\min\ x_1+x_2-x_3 \quad\text{sous}\quad 0\leq x_i\leq2\ (i=1,2,3),\quad x_1+x_2+x_3\leq5$$
+Les sept contraintes, dans l'ordre : $-x_1\leq0$, $-x_2\leq0$, $-x_3\leq0$, $x_1\leq2$, $x_2\leq2$, $x_3\leq2$, $x_1+x_2+x_3\leq5$. L'optimum est $x^\star=(0,0,2)$ ; on démarre au sommet $x=(2,2,0)$.</p>
+<table>
+<thead>
+<tr>
+<th>It.</th>
+<th>$x$</th>
+<th>$J$</th>
+<th>$z$</th>
+<th>$k$ retiré</th>
+<th>$\Delta x$</th>
+<th>$\hat\alpha$</th>
+<th>$j$ entrant</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>$(2,2,0)$</td>
+<td>$\{3,4,5\}$</td>
+<td>$(0,0,-1,-1,-1,0,0)$</td>
+<td>$3$</td>
+<td>$(0,0,1)$</td>
+<td>$1$</td>
+<td>$7$</td>
+</tr>
+<tr>
+<td>2</td>
+<td>$(2,2,1)$</td>
+<td>$\{4,5,7\}$</td>
+<td>$(0,0,0,-2,-2,0,1)$</td>
+<td>$5$</td>
+<td>$(0,-1,1)$</td>
+<td>$1$</td>
+<td>$6$</td>
+</tr>
+<tr>
+<td>3</td>
+<td>$(2,1,2)$</td>
+<td>$\{4,6,7\}$</td>
+<td>$(0,0,0,0,0,2,-1)$</td>
+<td>$7$</td>
+<td>$(0,-1,0)$</td>
+<td>$1$</td>
+<td>$2$</td>
+</tr>
+<tr>
+<td>4</td>
+<td>$(2,0,2)$</td>
+<td>$\{2,4,6\}$</td>
+<td>$(0,1,0,-1,0,1,0)$</td>
+<td>$4$</td>
+<td>$(-1,0,0)$</td>
+<td>$2$</td>
+<td>$1$</td>
+</tr>
+<tr>
+<td>5</td>
+<td>$(0,0,2)$</td>
+<td>$\{1,2,6\}$</td>
+<td>$(1,1,0,0,0,1,0)$</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td><strong>optimal</strong></td>
+</tr>
+</tbody></table>
+<p><strong>Détail de l'itération 1, à savoir refaire.</strong> Marges : $b-Ax = (2,2,0,0,0,2,1)$, donc $J=\{3,4,5\}$.
+<em>Calcul de $z$</em> : $A_J^Tz_J = -c = (-1,-1,1)$ avec $a_3=(0,0,-1)$, $a_4=(1,0,0)$, $a_5=(0,1,0)$, d'où $z_4=-1$, $z_5=-1$, $z_3=-1$. Il y a des composantes négatives : <strong>pas optimal</strong>, on retire $k=3$.
+<em>Calcul de $\Delta x$</em> : $a_4^T\Delta x=0 \Rightarrow \Delta x_1=0$ ; $a_5^T\Delta x=0\Rightarrow \Delta x_2=0$ ; $a_3^T\Delta x=-1\Rightarrow -\Delta x_3=-1$, donc $\Delta x=(0,0,1)$ — on fait croître $x_3$, ce qui est cohérent avec le coût $-x_3$.
+<em>Test du rapport</em> : $A\Delta x = (0,0,-1,0,0,1,1)$ ; les indices actifs du test sont $6$ (rapport $2/1=2$) et $7$ (rapport $1/1=1$). Donc $\hat\alpha=1$ et $j=7$.
+<em>Nouveau sommet</em> : $x=(2,2,1)$, $J=\{4,5,7\}$.</p>
+<p><strong>À l'itération 5</strong>, $z = (1,1,0,0,0,1,0)\succeq0$ : le certificat dual est valide, $x^\star=(0,0,2)$ est optimal, de coût $-2$.</p>
+<h2 data-prio="high">Concept 6 — Dégénérescence, cyclage et règle de Bland</h2>
+<p><strong>Ce qui casse.</strong> Si $x$ est dégénéré, $A_J$ a le rang $n$ mais <strong>n'est pas carrée</strong> ; et si le point suivant est dégénéré, il y a <strong>égalité</strong> dans le test du rapport minimal.</p>
+<p><strong>La parade du cours.</strong></p>
+<ul>
+<li>définir $J$ comme un <strong>sous-ensemble de $n$ contraintes actives linéairement indépendantes</strong> — $A_J$ redevient carrée, les étapes 1 et 2 fonctionnent comme avant ;</li>
+<li>à l'étape 3, <strong>casser les égalités arbitrairement</strong>.</li>
+</ul>
+<p><strong>Le problème qui subsiste.</strong> On peut obtenir $\hat\alpha = 0$ : le point <strong>ne bouge pas</strong>, seul $J$ change. Cela pourrait être acceptable tant que $J$ continue de changer — mais rien ne le garantit.</p>
+<p><strong>Le cyclage.</strong> Le cours donne l'exemple
+$$\min\ -3x_1+5x_2-x_3+2x_4$$
+sous sept contraintes, démarré au sommet dégénéré $x = (0,0,0,0)$ avec $J=\{4,5,6,7\}$. Sept itérations plus tard, avec $\hat\alpha = 0$ à chaque fois, on retrouve <strong>exactement</strong> $J = \{4,5,6,7\}$ : l'algorithme <strong>boucle indéfiniment</strong> sans jamais bouger.</p>
+<p><strong>La règle de Bland (« plus petit indice »).</strong> Aucun cyclage ne se produit si l'on applique :</p>
+<ul>
+<li>à l'étape 2, choisir le <strong>plus petit</strong> $k$ pour lequel $z_k&lt;0$ ;</li>
+<li>à l'étape 3, en cas d'égalité, choisir le <strong>plus petit</strong> $j$.</li>
+</ul>
+<p><strong>Structure de la preuve (par l'absurde).</strong> Supposons un cycle : pour $q&gt;p$,
+$$x^{(p)}=\dots=x^{(q)}, \qquad J^{(p)}=\dots=J^{(q)}=J^{(p)}$$
+Notons $k_s$ l'indice retiré et $j_s$ l'indice ajouté à l'itération $s$, puis $\bar k = \max_{p\leq s\leq q-1}k_s$, $r$ l'itération où $\bar k$ est retiré et $t$ celle où il est réintroduit. En $r$ : $z^{(r)}_{\bar k}&lt;0$, $z^{(r)}_i\geq0$ pour $i\notin J^{(r)}$ avec $i&lt;\bar k$ (sinon on aurait retiré $i$), et $z_i^{(r)}=0$ pour $i\notin J^{(r)}$. En $t$ : $a_{\bar k}^T\Delta x^{(t)}&gt;0$, $a_i^T\Delta x^{(t)}\leq0$ pour $i\notin J^{(r)}$ avec $i&lt;\bar k$, et $a_i^T\Delta x^{(t)}=0$ pour $i\notin J^{(r)}$ avec $i&gt;\bar k$. On en déduit $z^{(r)T}A\Delta x^{(t)}&lt;0$ — contradiction, car $-z^{(r)T}A\Delta x^{(t)} = c^T\Delta x^{(t)}\leq0$. $\blacksquare$</p>
+<p><strong>Sur le même exemple</strong>, la règle de Bland sort du piège : après cinq itérations à $\hat\alpha=0$, l'itération 5 donne enfin $\hat\alpha = 1$ et le point bouge ; l'algorithme se termine à l'itération 8 avec $z\succeq0$.</p>
+<p class="cal piege"> <strong>En pratique.</strong> La règle de Bland garantit la terminaison mais elle est <strong>lente</strong> : les implémentations utilisent une règle rapide (plus négatif, plus forte baisse) et ne basculent sur Bland qu'en cas de blocage détecté.</p>
+<h2 data-prio="high">Concept 7 — Initialisation : la phase I</h2>
+<p>Le simplexe a besoin d'un <strong>sommet de départ admissible</strong>. Pour un LP à variables bornées
+$$\min\ c^Tx \quad\text{sous}\quad Ax\preceq b,\ x\succeq0$$
+(une variable libre se scindant en $x_k = x_k^+-x_k^-$), on résout d'abord le <strong>problème de phase I</strong> :
+$$\begin{array}{ll}\text{minimiser} &amp; t\\ \text{sous} &amp; Ax\preceq(1-t)\,b\\ &amp; x\succeq0,\quad 0\leq t\leq1\end{array}$$</p>
+<p><strong>Pourquoi ça marche.</strong></p>
+<ul>
+<li>$x = 0$, $t=1$ est un <strong>point extrême</strong> du problème de phase I : les contraintes $Ax\preceq0$ y sont satisfaites, et il est admissible d'office. On a donc un point de départ <strong>gratuit</strong>.</li>
+<li>On résout la phase I par le simplexe, ce qui donne un sommet optimal $(x^\star,t^\star)$.</li>
+<li>Si $t^\star&gt;0$ : le problème d'origine est <strong>non admissible</strong>.</li>
+<li>Si $t^\star=0$ : $x^\star$ est un <strong>point extrême du problème d'origine</strong> — on démarre la phase II avec lui.</li>
+</ul>
+<p><strong>Le mémo.</strong> La phase I mesure « de combien il faut relâcher $b$ pour que le problème devienne admissible ». Si zéro suffit, le problème l'était déjà.</p>
+<h2 data-prio="low">Concept 8 — Implémentation et complexité</h2>
+<p><strong>Le coût dominant</strong> d'une itération est la résolution de <strong>deux</strong> systèmes linéaires :
+$$A_J^Tz_J = -c, \qquad A_J\Delta x = -(e_k)_J$$
+où $e_k$ est le $k$-ième vecteur de base.</p>
+<p><strong>L'observation clé.</strong> D'une itération à l'autre, <strong>une seule ligne de $A_J$ change</strong>. On ne refactorise donc pas : on <strong>propage une factorisation LU</strong> de $A_J$.</p>
+<ul>
+<li>avec la factorisation, chaque système se résout en $O(n^2)$ opérations ;</li>
+<li>la mise à jour de la factorisation après changement d'une ligne coûte $O(n^2)$ ;</li>
+<li>coût total : $O(n^2)$ par itération — <strong>beaucoup moins si $A$ est creuse</strong>.</li>
+</ul>
+<p><strong>Complexité.</strong></p>
+<p><em>Dans le pire des cas</em> : pour la plupart des règles de pivotage, il existe des exemples où le nombre d'itérations croît <strong>exponentiellement</strong> avec $n$ et $m$. Savoir s'il existe une règle de pivotage garantissant un nombre <strong>polynomial</strong> d'itérations est une <strong>question ouverte</strong>.</p>
+<p><em>En pratique</em> : très efficace — le nombre d'itérations croît typiquement de façon <strong>linéaire</strong> en $m$ et $n$.</p>
+<p><strong>Le paradoxe à retenir.</strong> Le simplexe est exponentiel en théorie et excellent en pratique ; l'ellipsoïde (1979) est l'inverse. C'est ce paradoxe qui a motivé les méthodes de points intérieurs (1984), polynomiales <strong>et</strong> rapides.</p>
+<h3>Comment résoudre l'exercice type (protocole d'une itération)</h3>
+<ol>
+<li><strong>Calculer les marges</strong> $b - Ax$ ; les zéros donnent $J$.</li>
+<li><strong>Vérifier</strong> que $|J| = n$ et que $A_J$ est inversible (sommet non dégénéré).</li>
+<li><strong>Résoudre</strong> $A_J^Tz_J = -c$ ; compléter par $z_j=0$ hors de $J$.</li>
+<li><strong>Tester</strong> $z\succeq0$ : si oui, c'est fini — écrire le certificat.</li>
+<li><strong>Choisir $k$</strong> avec $z_k&lt;0$ (plus négatif, ou plus petit indice si l'on veut Bland).</li>
+<li><strong>Résoudre</strong> $A_J\Delta x = -(e_k)_J$, c'est-à-dire $a_i^T\Delta x=0$ pour $i\in J\setminus\{k\}$ et $a_k^T\Delta x=-1$.</li>
+<li><strong>Calculer $A\Delta x$</strong> : si $\preceq0$, le LP est non borné ; sinon faire le <strong>test du rapport minimal</strong> sur les $i$ avec $a_i^T\Delta x&gt;0$.</li>
+<li><strong>Mettre à jour</strong> $x$ et $J$, puis recommencer. Vérifier au passage que le coût a bien baissé de $\hat\alpha|z_k|$.</li>
+</ol>
+<h3>Exercices progressifs</h3>
+<p><strong> Niveau 1</strong> — Au sommet courant, $z = (0,\ 2,\ -1,\ 0,\ 3)$. Que fait-on ?</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p>$z$ a une composante négative, $z_3=-1$ : le sommet <strong>n'est pas optimal</strong>. On retire $k=3$ de l'ensemble actif et l'on calcule la direction d'arête correspondante. Si toutes les composantes avaient été $\geq0$, on se serait arrêté avec le certificat dual.</p>
+</div></details>
+
+<p><strong> Niveau 2</strong> — Sur le polyèdre du concept 2, partez de $x=(0,2)$ avec $J=\{3,4\}$ et faites une itération pour $\min\ x_1 - x_2$.</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p>$c = (1,-1)$, $a_3 = (-1,0)$, $a_4=(-1,1)$.
+<em>Étape 1</em> : $A_J^Tz_J = -c = (-1,1)$ donne $-z_3-z_4 = -1$ et $z_4 = 1$, d'où $z_3 = 0$. Donc $z = (0,0,0,1)\succeq0$ : <strong>$x=(0,2)$ est déjà optimal</strong>, de coût $-2$.
+<em>Vérification</em> : la contrainte $-x_1+x_2\leq2$ plafonne $x_2 - x_1$ à $2$, et le coût vaut $x_1-x_2 = -(x_2-x_1)\geq-2$. </p>
+</div></details>
+
+<p><strong> Niveau 3</strong> — Pourquoi $\hat\alpha&gt;0$ est-il garanti quand le sommet courant est non dégénéré ?</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p>Par construction, $A_J\Delta x\preceq0$ : les contraintes actives ne voient pas leur marge diminuer. Donc si $a_i^T\Delta x&gt;0$, nécessairement $i\notin J$, et alors la marge $b_i-a_i^Tx$ est <strong>strictement positive</strong> (contrainte inactive). Tous les rapports du test sont donc strictement positifs, et leur minimum $\hat\alpha$ aussi. <strong>C'est la non-dégénérescence qui garantit cette stricte positivité</strong> : avec un sommet dégénéré, une contrainte active hors de $J$ peut donner une marge nulle, donc $\hat\alpha=0$.</p>
+</div></details>
+
+<p><strong> Niveau 4 — type feuille d'exercices</strong> — Déroulez l'itération 2 de l'exemple du concept 5 : $x=(2,2,1)$, $J=\{4,5,7\}$.</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p><em>Marges</em> : $b-Ax = (2,2,1,0,0,1,0)$ — les contraintes $4$ ($x_1\leq2$), $5$ ($x_2\leq2$) et $7$ ($x_1+x_2+x_3\leq5$) sont actives .</p>
+<p><em>Étape 1 — calcul de $z$.</em> $a_4=(1,0,0)$, $a_5=(0,1,0)$, $a_7=(1,1,1)$ et $-c = (-1,-1,1)$ :
+$$z_4\begin{pmatrix}1\\0\\0\end{pmatrix}+z_5\begin{pmatrix}0\\1\\0\end{pmatrix}+z_7\begin{pmatrix}1\\1\\1\end{pmatrix} = \begin{pmatrix}-1\\-1\\1\end{pmatrix}$$
+La troisième ligne donne $z_7=1$ ; les deux premières $z_4 = -2$ et $z_5=-2$. Donc $z = (0,0,0,-2,-2,0,1)$ . Deux composantes négatives : on retire par exemple $k=5$.</p>
+<p><em>Étape 2 — direction.</em> $a_4^T\Delta x = 0\Rightarrow \Delta x_1=0$ ; $a_7^T\Delta x=0\Rightarrow \Delta x_1+\Delta x_2+\Delta x_3=0$ ; $a_5^T\Delta x=-1\Rightarrow \Delta x_2=-1$. D'où $\Delta x = (0,-1,1)$  — on échange une unité de $x_2$ contre une de $x_3$, ce qui fait baisser le coût $x_1+x_2-x_3$ de $2$ par unité, c'est-à-dire $|z_5|$ .</p>
+<p><em>Étape 3 — rapport minimal.</em> $A\Delta x = (0,1,-1,0,-1,1,0)$ ; les indices avec $a_i^T\Delta x&gt;0$ sont $2$ (rapport $2/1=2$) et $6$ (rapport $1/1=1$). Donc $\hat\alpha=1$, $j=6$.</p>
+<p><em>Mise à jour</em> : $x = (2,2,1)+(0,-1,1) = (2,1,2)$, $J = \{4,6,7\}$ . Le coût passe de $3$ à $1$, soit une baisse de $\hat\alpha|z_5| = 2$ .</p>
+</div></details>
+
+<h2 data-prio="must">Common mistakes</h2>
+<ol>
+<li><strong>Faire le test du rapport sur toutes les contraintes</strong> — seulement celles avec $a_i^T\Delta x&gt;0$ : les autres voient leur marge augmenter ou rester constante.</li>
+<li><strong>Oublier le signe $-1$</strong> dans $a_k^T\Delta x=-1$ — c'est lui qui fait <strong>quitter</strong> la contrainte $k$ vers l'intérieur ; avec $+1$ on sort du polyèdre.</li>
+<li><strong>Conclure « non borné » trop vite</strong> — il faut $A\Delta x\preceq0$ <strong>en entier</strong>, pas seulement quelques composantes.</li>
+<li><strong>Confondre extrémalité et dégénérescence</strong> — la première est géométrique, la seconde dépend de la description $(A,b)$.</li>
+<li><strong>Utiliser un $J$ de taille $\neq n$ en cas de dégénérescence</strong> — il faut en extraire $n$ contraintes actives <strong>indépendantes</strong>.</li>
+<li><strong>Croire qu'un pas nul est une erreur</strong> — $\hat\alpha=0$ est normal en dégénérescence ; le danger est qu'il se répète en boucle (cyclage).</li>
+<li><strong>Oublier la phase I</strong> — le simplexe ne démarre pas sans sommet admissible, et $x=0$ ne l'est pas en général.</li>
+</ol>
+<h2>Ultimate Review</h2>
+<ol>
+<li>Hypothèse : ensemble admissible non vide et <strong>pointu</strong> ($\mathbf{rank}(A)=n$) ; variables libres scindées en $x^+-x^-$.</li>
+<li>Sommet <strong>non dégénéré</strong> : exactement $n$ contraintes actives, $A_J$ carrée inversible, $x=A_J^{-1}b_J$.</li>
+<li>Sommets <strong>adjacents</strong> : $n-1$ contraintes actives communes — reliés par une arête.</li>
+<li>Direction d'arête : $a_i^T\Delta x=0$ ($i\in J\setminus\{k\}$), $a_k^T\Delta x=-1$.</li>
+<li><strong>Test du rapport minimal</strong> : $\hat\alpha = \min_{i:a_i^T\Delta x&gt;0}(b_i-a_i^Tx)/(a_i^T\Delta x)$.</li>
+<li>Certificat : $A_J^Tz_J+c=0$, $z_j=0$ hors de $J$ ; <strong>$z\succeq0$ $\Rightarrow$ optimal</strong> ; $A\Delta x\preceq0$ $\Rightarrow$ non borné.</li>
+<li>Baisse du coût : $c^T(x+\alpha\Delta x) = c^Tx+\alpha z_k$, avec $z_k&lt;0$.</li>
+<li>Convergence : nombre fini de sommets $+$ décroissance stricte. <strong>Dégénérescence $\Rightarrow$ pas nul possible $\Rightarrow$ cyclage</strong> ; parade : <strong>règle de Bland</strong> (plus petit indice partout).</li>
+<li><strong>Phase I</strong> : $\min t$ s.c. $Ax\preceq(1-t)b$, $x\succeq0$, $0\leq t\leq1$ ; départ $(0,1)$ ; $t^\star&gt;0$ $\Rightarrow$ non admissible.</li>
+<li>Implémentation : LU propagée, $O(n^2)$ par itération. Exponentiel dans le pire cas, linéaire en pratique.</li>
+</ol>
+<p><strong>Formulas to know</strong>
+$$A_J^Tz_J+c=0 \qquad a_i^T\Delta x = 0\ (i\in J\setminus\{k\}),\ a_k^T\Delta x=-1 \qquad \hat\alpha=\min_{i:a_i^T\Delta x&gt;0}\frac{b_i-a_i^Tx}{a_i^T\Delta x}$$</p>
+<p><strong>Methods to know</strong> : le protocole d'itération en 8 étapes ; le test du rapport minimal ; la règle de Bland ; la construction de la phase I.</p>
+<div class="rec"><h2>Active Recall</h2><p><strong>Basic</strong> — Quels sont les deux critères d'arrêt du simplexe, et que signifient-ils ?</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p><strong>$z\succeq0$</strong> à l'étape 1 : le candidat dual est admissible et complémentaire, donc $x$ est <strong>optimal</strong> — c'est le certificat de la fiche 28. <strong>$A\Delta x\preceq0$</strong> à l'étape 2 : la demi-droite $x+\alpha\Delta x$ est entièrement admissible et le coût y décroît sans borne, donc le LP est <strong>non borné</strong>.</p>
+</div></details><p><strong>Understanding</strong> — Pourquoi le coût décroît-il exactement de $\hat\alpha\,|z_k|$ à chaque itération ?</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p>Parce que $c = -A_J^Tz_J$ et $A_J\Delta x = -(e_k)_J$, d'où $c^T\Delta x = -z_J^TA_J\Delta x = z_k$. Le coût le long de l'arête vaut donc $c^Tx+\alpha z_k$, et après un pas $\hat\alpha$ il a baissé de $\hat\alpha|z_k|$, puisque $z_k&lt;0$.</p>
+</div></details><p><strong>Application</strong> — À un sommet, $J = \{2,5\}$ dans $\mathbb{R}^2$, et on retire $k=2$. Quelles équations définissent $\Delta x$ ?</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p>$a_5^T\Delta x = 0$ (on reste sur la contrainte conservée) et $a_2^T\Delta x = -1$ (on quitte la contrainte $2$ vers l'intérieur). Deux équations, deux inconnues, système inversible car $A_J$ l'est.</p>
+</div></details><p><strong>Comparison</strong> — Règle du « plus négatif » et règle de Bland : quels avantages respectifs ?</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p><em>Plus négatif</em> : progression rapide en pratique, mais <strong>aucune garantie</strong> contre le cyclage en présence de dégénérescence. <em>Bland</em> : terminaison <strong>garantie</strong>, mais souvent beaucoup plus lente. En pratique on utilise la première et l'on bascule sur Bland si un blocage est détecté.</p>
+</div></details><p><strong>Exam-style</strong> — Expliquez le rôle de la phase I et ce qu'on conclut de sa valeur optimale.</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p>La phase I résout $\min t$ s.c. $Ax\preceq(1-t)b$, $x\succeq0$, $0\leq t\leq1$, dont $(x,t)=(0,1)$ est un sommet admissible <strong>immédiat</strong>. Sa valeur optimale $t^\star$ mesure le relâchement minimal nécessaire : si $t^\star&gt;0$, aucun $x$ ne satisfait $Ax\preceq b$, le problème d'origine est <strong>non admissible</strong> ; si $t^\star=0$, le $x^\star$ obtenu est un <strong>point extrême admissible</strong> du problème d'origine, et sert de départ à la phase II.</p>
+</div></details></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h2>Flashcards</h2>
+<table>
+<thead>
+<tr>
+<th>Question</th>
+<th>Réponse</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Qui et quand a inventé le simplexe ?</td>
+<td>George Dantzig, 1947</td>
+</tr>
+<tr>
+<td>Hypothèse de départ ?</td>
+<td>Ensemble admissible non vide et <strong>pointu</strong> ($\mathbf{rank}(A)=n$)</td>
+</tr>
+<tr>
+<td>Sommet non dégénéré ?</td>
+<td>Exactement $n$ contraintes actives ; $A_J$ carrée inversible</td>
+</tr>
+<tr>
+<td>Sommets adjacents ?</td>
+<td>$n-1$ contraintes actives communes</td>
+</tr>
+<tr>
+<td>Équations de la direction d'arête ?</td>
+<td>$a_i^T\Delta x=0$ pour $i\in J\setminus\{k\}$, $a_k^T\Delta x=-1$</td>
+</tr>
+<tr>
+<td>Test du rapport minimal ?</td>
+<td>$\hat\alpha=\min_{i:a_i^T\Delta x&gt;0}(b_i-a_i^Tx)/(a_i^T\Delta x)$</td>
+</tr>
+<tr>
+<td>Comment calcule-t-on $z$ ?</td>
+<td>$A_J^Tz_J+c=0$ et $z_j=0$ hors de $J$</td>
+</tr>
+<tr>
+<td>Critère d'optimalité ?</td>
+<td>$z\succeq0$</td>
+</tr>
+<tr>
+<td>Critère de non-bornitude ?</td>
+<td>$A\Delta x\preceq0$</td>
+</tr>
+<tr>
+<td>Baisse du coût par itération ?</td>
+<td>$\hat\alpha\,\vert z_k\vert$</td>
+</tr>
+<tr>
+<td>D'où vient la convergence ?</td>
+<td>Nombre fini de sommets + décroissance stricte du coût</td>
+</tr>
+<tr>
+<td>Qu'est-ce que le cyclage ?</td>
+<td>Une suite d'itérations à $\hat\alpha=0$ qui revient au même $J$</td>
+</tr>
+<tr>
+<td>Règle de Bland ?</td>
+<td>Plus petit $k$ avec $z_k&lt;0$ ; plus petit $j$ en cas d'égalité</td>
+</tr>
+<tr>
+<td>Problème de phase I ?</td>
+<td>$\min t$ s.c. $Ax\preceq(1-t)b$, $x\succeq0$, $0\leq t\leq1$</td>
+</tr>
+<tr>
+<td>Coût d'une itération ?</td>
+<td>$O(n^2)$ via une factorisation LU propagée</td>
+</tr>
+<tr>
+<td>Complexité dans le pire cas ?</td>
+<td>Exponentielle pour la plupart des règles ; polynomiale en pratique</td>
+</tr>
+</tbody></table>
+</main>
+
+
+
+
+</body></html>

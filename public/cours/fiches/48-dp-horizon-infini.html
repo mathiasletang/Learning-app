@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fiche 48 — Horizon infini : plus court chemin stochastique et équation de Bellman</title>
+<script>
+window.MathJax={tex:{inlineMath:[["$","$"]],displayMath:[["$$","$$"]],processEscapes:true},
+ options:{skipHtmlTags:["script","noscript","style","textarea","pre","code"]},
+ svg:{fontCache:"global"},
+ startup:{pageReady:()=>MathJax.startup.defaultPageReady().then(()=>{document.body.classList.add("ready")})}};
+setTimeout(function(){document.body.classList.add("ready")},2500);
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+/* ============================================================
+   MathiasLearn — feuille de style des fiches
+   Reprise intégrale des tokens de 00_PARCOURS/*.html
+   + blocs pédagogiques (callouts, méthode, essentiels, recall)
+   ============================================================ */
+:root{--bg:#faf9f7;--card:#fff;--ink:#1a1a1a;--muted:#6b6b6b;--line:#e5e2dd;--accent:#8b5e34;
+ --hl:#fdf8ef;--ok:#2d7d4f;--okbg:#f0f7f3;--warn:#b3402f;--warnbg:#fdf3f1;--blue:#2f5d8b;--bluebg:#f1f5fa}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+ font:17px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;padding:0 16px 100px}
+.nav{position:sticky;top:0;background:rgba(250,249,247,.96);backdrop-filter:blur(8px);
+ border-bottom:1px solid var(--line);margin:0 -16px 30px;padding:11px 16px;z-index:50;
+ display:flex;gap:6px;flex-wrap:wrap;font-size:13px}
+.nav a{color:var(--muted);text-decoration:none;padding:4px 9px;border-radius:5px;white-space:nowrap}
+.nav a:hover{background:var(--line);color:var(--ink)}
+.nav a.on{background:var(--accent);color:#fff}
+main{max-width:780px;margin:0 auto}
+h1{font-size:31px;letter-spacing:-.02em;margin:.4em 0 .5em;line-height:1.25}
+h2{font-size:23px;margin:2.2em 0 .7em;padding-bottom:.3em;border-bottom:1px solid var(--line)}
+h3{font-size:19px;margin:1.9em 0 .5em;color:var(--accent)}
+h4{font-size:17px;margin:1.5em 0 .4em}
+p{margin:.8em 0} a{color:var(--accent)} hr{border:0;border-top:1px solid var(--line);margin:2.6em 0}
+table{border-collapse:collapse;width:100%;margin:1.3em 0;font-size:15.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+th{background:#f3f0eb;font-weight:600}
+tr:nth-child(even) td{background:#fcfbfa}
+code{font-family:"SF Mono",Menlo,Consolas,monospace;font-size:.88em;background:#f2efea;padding:2px 6px;border-radius:4px;white-space:nowrap}
+pre{background:#f2efea;padding:14px 16px;border-radius:8px;overflow-x:auto}
+pre code{background:none;padding:0;white-space:pre}
+blockquote{border-left:3px solid var(--accent);background:var(--hl);margin:1.4em 0;padding:14px 20px;border-radius:0 8px 8px 0}
+blockquote p:first-child{margin-top:0} blockquote p:last-child{margin-bottom:0}
+ul,ol{padding-left:1.5em} li{margin:.35em 0} em{color:#4a4a4a}
+mjx-container[display="true"]{margin:1.1em 0!important;overflow-x:auto;overflow-y:hidden;padding:2px 0}
+mjx-container svg{max-width:100%}
+body:not(.ready) main{opacity:0} main{opacity:1;transition:opacity .25s}
+
+/* --- bandeau de tête de fiche --- */
+.cours{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--accent);
+ border-radius:0 10px 10px 0;padding:18px 22px;margin:0 0 34px}
+.cours h4{margin:0 0 4px;font-size:14px;text-transform:uppercase;letter-spacing:.07em;color:var(--accent)}
+.cours .cs{color:var(--muted);font-size:14.5px;margin:0 0 14px}
+
+/* --- exercices / corrigés --- */
+.ex{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:6px 24px 20px;margin:18px 0}
+.ex>h3:first-child{margin-top:14px}
+details.cor{margin-top:18px;border:1px solid var(--line);border-radius:8px;background:#fcfbfa;overflow:hidden}
+details.cor>summary{cursor:pointer;padding:12px 16px;font-weight:600;font-size:15px;color:var(--accent);
+ list-style:none;display:flex;align-items:center;gap:9px;user-select:none;transition:.15s;min-height:44px}
+details.cor>summary::-webkit-details-marker{display:none}
+details.cor>summary:hover{background:var(--hl)}
+details.cor>summary::before{content:"\25B6";font-size:10px;transition:transform .18s;display:inline-block}
+details.cor[open]>summary::before{transform:rotate(90deg)}
+details.cor[open]>summary{background:var(--okbg);color:var(--ok);border-bottom:1px solid var(--line)}
+.cor .in{padding:4px 20px 16px}
+.cor .in>*:first-child{margin-top:.9em}
+
+/* --- blocs pédagogiques (callouts) ---
+   Générés depuis une citation Markdown dont le premier **gras** commence
+   par un mot-clé : DÉFINITION, THÉORÈME, MÉTHODE, PIÈGE, INTUITION… */
+.cal{border:1px solid var(--line);border-left:4px solid var(--accent);background:var(--card);
+ border-radius:0 10px 10px 0;padding:15px 20px;margin:1.5em 0}
+.cal>p:first-child{margin-top:0}.cal>p:last-child,.cal>ul:last-child,.cal>ol:last-child{margin-bottom:0}
+.cal .lab{display:block;font-size:12.5px;text-transform:uppercase;letter-spacing:.08em;
+ font-weight:700;color:var(--accent);margin-bottom:6px}
+.cal.formel{background:var(--hl)}
+.cal.piege{border-left-color:var(--warn);background:var(--warnbg)}
+.cal.piege .lab{color:var(--warn)}
+.cal.methode{border-left-color:var(--ok);background:var(--okbg)}
+.cal.methode .lab{color:var(--ok)}
+.cal.intu{border-left-color:var(--blue);background:var(--bluebg)}
+.cal.intu .lab{color:var(--blue)}
+.cal.plus{border-left-style:dashed;background:#faf9f7}
+.cal.plus .lab{color:var(--muted)}
+
+/* --- révision express --- */
+.ess{background:var(--card);border:1px solid var(--accent);border-radius:10px;padding:4px 24px 20px;margin:1.6em 0}
+.ess h3{margin-top:1.3em}
+.rec{background:var(--card);border:1px dashed var(--accent);border-radius:10px;padding:4px 24px 18px;margin:1.6em 0}
+.rec ol{counter-reset:none}
+
+/* --- impression / PDF --- */
+@media print{
+ .nav{display:none}
+ body{padding:0;background:#fff;font-size:11.2pt;line-height:1.55}
+ main{max-width:none}
+ h1{font-size:23pt}h2{font-size:15pt;margin-top:1.5em}h3{font-size:12.6pt}
+ h2,h3,h4{break-after:avoid;page-break-after:avoid}
+ table,.cal,blockquote{break-inside:avoid;page-break-inside:avoid}
+ table{display:table;font-size:9.6pt}
+ details.cor{border:1px solid var(--line);background:#fcfbfa}
+ details.cor>summary{display:none}
+ details.cor .in{padding-top:10px}
+ .cal,.ex,.ess,.rec{box-shadow:none}
+ a{color:var(--ink);text-decoration:none}
+}
+@page{margin:16mm 15mm 18mm}
+
+/* --- exemples travaillés --- */
+.exm{background:#fcfbfa;border:1px solid var(--line);border-radius:10px;padding:2px 20px 14px;margin:1.5em 0}
+.exm>h4:first-child{margin:14px 0 .5em;color:var(--accent);font-size:13px;text-transform:uppercase;letter-spacing:.07em}
+
+
+/* --- pastilles de priorité (conventions des fiches de l'app) --- */
+h2[data-prio], h3[data-prio], h4[data-prio]{position:relative}
+h2[data-prio]::before,h3[data-prio]::before,h4[data-prio]::before{
+ content:"";display:inline-block;width:9px;height:9px;border-radius:50%;
+ margin-right:9px;vertical-align:middle;background:var(--muted)}
+[data-prio="must"]::before{background:var(--warn)}
+[data-prio="high"]::before{background:#d98324}
+[data-prio="mid"]::before{background:#c9a227}
+[data-prio="low"]::before{background:var(--ok)}
+/* corrigés des fiches de l'app : même traitement que les corrigés des séries */
+details.cor>summary::after{content:""}
+</style></head><body>
+<div class="nav"><a href="00_COMMENCER_ICI.html">Commencer ici</a><a href="01_NOTATIONS_le-decodeur.html">Notations</a><a href="02_EXERCICES_Serie-0.html">Série 0 — Remise en route</a><a href="03_EXERCICES_Serie-1.html">Série 1 — Convexité</a><a href="04_EXERCICES_Serie-2.html">Série 2 — KKT</a><a href="05_AUTO-EVALUATION.html">Auto-évaluation (quiz)</a><a href="06_FICHE_Optimisation-deux-variables.html">Fiche — Optimisation à 2 variables</a></div>
+<main><h1>Fiche 48 — Horizon infini : plus court chemin stochastique et équation de Bellman</h1>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Matière</strong></td>
+<td>Maths · Optimisation</td>
+</tr>
+<tr>
+<td><strong>Cours source</strong></td>
+<td>Bertsekas, <em>6.231 Dynamic Programming</em>, MIT OpenCourseWare, automne 2015 — cours 10</td>
+</tr>
+<tr>
+<td><strong>Difficulté</strong></td>
+<td> Must know — l'équation de Bellman stationnaire, socle de la macroéconomie dynamique</td>
+</tr>
+<tr>
+<td><strong>Temps d'étude estimé</strong></td>
+<td>2 h 15</td>
+</tr>
+<tr>
+<td><strong>Prérequis</strong></td>
+<td>Fiches 44 à 47 (algorithme DP, politiques, structure des solutions)</td>
+</tr>
+<tr>
+<td><strong>Concepts clés</strong></td>
+<td>Coût total, actualisation, plus court chemin stochastique, terminaison inévitable, itération sur les valeurs, équation de Bellman, unicité, politique stationnaire optimale</td>
+</tr>
+<tr>
+<td><strong>Poids à l'examen</strong></td>
+<td>Deux énoncés à savoir écrire et justifier : <strong>l'équation de Bellman a $J^\star$ pour unique solution</strong>, et <strong>une politique stationnaire est optimale si et seulement si elle atteint le minimum dans cette équation</strong>. Toute la macro dynamique en découle.</td>
+</tr>
+</tbody></table>
+<h2>Vue d'ensemble</h2>
+<p>En horizon fini, la fonction de coût-à-venir $J_k$ <strong>dépendait du temps</strong> et la politique optimale aussi. En horizon infini, le système et le coût sont <strong>stationnaires</strong> : il n'y a plus d'instant privilégié, donc plus de raison que la solution dépende du temps.</p>
+<pre><code>HORIZON FINI      J_N, J_{N−1}, …, J_0     une fonction PAR ÉTAPE, récurrence à rebours
+HORIZON INFINI    J*  UNE SEULE fonction, solution d'une ÉQUATION DE POINT FIXE
+
+     J*(i) = min_u [ g(i,u) + α Σ_j p_ij(u) J*(j) ]      ← ÉQUATION DE BELLMAN
+</code></pre>
+<p>Trois questions se posent alors, et elles structurent tout le chapitre : cette équation a-t-elle une <strong>solution unique</strong> ? l'<strong>itération sur les valeurs</strong> y converge-t-elle ? une politique <strong>stationnaire</strong> optimale existe-t-elle ?</p>
+<blockquote>
+<p><em>Caractéristiques de l'horizon infini : une analyse exigeante, mais une élégance des solutions et des algorithmes — les politiques optimales stationnaires sont probables.</em></p>
+</blockquote>
+<h2 data-prio="mid">Concept 1 — Les types de problèmes à horizon infini</h2>
+<p>Le cadre est <strong>le même que le problème de base</strong>, à deux différences : le nombre d'étapes est <strong>infini</strong>, et le système et le coût sont <strong>stationnaires</strong> (à l'actualisation près).</p>
+<p><strong>Problèmes de coût total</strong> — minimiser
+$$J_\pi(x_0) = \lim_{N\to\infty}\ \mathbb{E}_{w_k,\ k=0,1,\dots}\Big[\sum_{k=0}^{N-1}\alpha^k\,g\big(x_k,\mu_k(x_k),w_k\big)\Big]$$
+(si la limite existe — sinon on prend la limite supérieure).</p>
+<table>
+<thead>
+<tr>
+<th>Famille</th>
+<th>Caractérisation</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Plus court chemin stochastique</strong> (SSP)</td>
+<td>$\alpha=1$ et un <strong>état de terminaison</strong></td>
+</tr>
+<tr>
+<td><strong>Problèmes actualisés</strong></td>
+<td>$\alpha&lt;1$ et $g$ <strong>bornée</strong></td>
+</tr>
+<tr>
+<td>Non actualisés, ou actualisés à $g$ non bornée</td>
+<td>les cas difficiles</td>
+</tr>
+</tbody></table>
+<p><strong>Problèmes de coût moyen par étape</strong> — minimiser
+$$\lim_{N\to\infty}\frac1N\,\mathbb{E}\Big[\sum_{k=0}^{N-1}g\big(x_k,\mu_k(x_k),w_k\big)\Big]$$</p>
+<blockquote>
+<p><strong>La question clé de tout le chapitre</strong>, telle que la pose le cours : <em>la relation entre les fonctions de coût-à-venir optimal à horizon <strong>infini</strong> et à horizon <strong>fini</strong></em>. Si $J_N$ désigne le coût optimal du problème à $N$ étapes, obtenu après $N$ itérations DP depuis un certain $J_0$, converge-t-il vers $J^\star$ ?</p>
+</blockquote>
+<p><strong>Les trois résultats types</strong> pour les problèmes de coût total :</p>
+<ol>
+<li><strong>Convergence de l'itération sur les valeurs</strong> : $J^\star(x)=\lim_{N\to\infty}J_N(x)$ pour tout $x$ ;</li>
+<li><strong>Équation de Bellman</strong> : $J^\star(x)=\min_{u\in U(x)}\mathbb{E}_w\big\{g(x,u,w)+J^\star\big(f(x,u,w)\big)\big\}$ pour tout $x$ ;</li>
+<li><strong>Condition d'optimalité</strong> : si $\mu^\star(x)$ atteint le minimum dans l'équation de Bellman, alors la politique <strong>stationnaire</strong> $\{\mu^\star,\mu^\star,\dots\}$ est optimale.</li>
+</ol>
+<blockquote>
+<p><em>L'équation de Bellman est vérifiée pour <strong>tous</strong> les problèmes déterministes et pour « <strong>presque tous</strong> » les problèmes stochastiques.</em> Elle vaut en particulier pour le SSP et les problèmes actualisés ; il existe des exceptions ailleurs.</p>
+</blockquote>
+<h3>La hiérarchie de difficulté (à connaître pour se situer)</h3>
+<table>
+<thead>
+<tr>
+<th>Niveau</th>
+<th>Caractéristiques</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Faciles</strong></td>
+<td>états et commandes <strong>finis</strong> ; Bellman a une solution <strong>unique</strong> ; itérations sur les valeurs et sur les politiques s'appliquent</td>
+</tr>
+<tr>
+<td><strong>Assez compliqués</strong></td>
+<td>états infinis, actualisés, $g$ bornée (<strong>structure contractante</strong>) ; SSP finis « presque » contractants — Bellman a encore une solution unique</td>
+</tr>
+<tr>
+<td><strong>Difficiles</strong></td>
+<td>états infinis avec $g\geq0$ ou $g\leq0$ ; problèmes déterministes à états infinis ; SSP <strong>sans</strong> structure contractante</td>
+</tr>
+<tr>
+<td><strong>Très grands ou sans modèle</strong></td>
+<td>grand espace d'états, modèle de simulation — il faut la <strong>DP approchée</strong></td>
+</tr>
+</tbody></table>
+<h2 data-prio="must">Concept 2 — Le plus court chemin stochastique</h2>
+<p><strong>Le cadre.</strong> Système à <strong>états finis</strong> : les états $1,\dots,n$ plus un état de <strong>terminaison $t$, absorbant et sans coût</strong>.</p>
+<ul>
+<li>probabilités de transition $p_{ij}(u)$ ;</li>
+<li>contraintes de commande $u\in U(i)$, <strong>ensemble fini</strong> ;</li>
+<li>coût d'une politique $\pi=\{\mu_0,\mu_1,\dots\}$ :
+$$J_\pi(i) = \lim_{N\to\infty}\mathbb{E}\Big[\sum_{k=0}^{N-1}g\big(x_k,\mu_k(x_k)\big)\ \Big|\ x_0=i\Big]$$</li>
+<li>$\pi$ est <strong>optimale</strong> si $J_\pi(i)=J^\star(i)$ pour tout $i$ ;</li>
+<li><strong>notation</strong> : pour une politique <strong>stationnaire</strong> $\pi=\{\mu,\mu,\dots\}$, on écrit $J_\mu(i)$ au lieu de $J_\pi(i)$.</li>
+</ul>
+<p><strong>L'hypothèse fondamentale — la terminaison est inévitable.</strong></p>
+<blockquote>
+<p>Il existe un entier $m$ tel que, <strong>pour toute politique $\pi$</strong> :
+$$\rho_\pi = \max_{i=1,\dots,n}\ \mathbb{P}\{x_m\neq t \mid x_0=i,\ \pi\} &lt; 1$$
+et de plus $\rho = \max_\pi\rho_\pi&lt;1$, <strong>puisque $\rho_\pi$ ne dépend que des $m$ premières composantes de $\pi$</strong> — et qu'il n'y a qu'un nombre fini de telles composantes.</p>
+</blockquote>
+<p><strong>Comment la lire.</strong> $\rho$ est une <strong>borne supérieure sur la probabilité de non-terminaison</strong> pendant les $m$ premières étapes, <strong>quelle que soit la politique employée</strong>. C'est une hypothèse de contrôlabilité : aucune politique ne peut éviter la terminaison indéfiniment.</p>
+<p class="cal piege"> <strong>Elle n'est pas automatique.</strong> Un problème de plus court chemin <strong>acyclique</strong> la satisfait ; un problème <strong>non acyclique</strong> peut ne pas la satisfaire — il suffit qu'une politique fasse tourner en rond avec probabilité $1$.</p>
+<h3>Pourquoi les coûts sont finis</h3>
+<p>Le raisonnement du cours, en trois lignes. Par conditionnement,
+$$\mathbb{P}\{x_{2m}\neq t\mid x_0=i,\pi\} = \mathbb{P}\{x_{2m}\neq t\mid x_m\neq t,\ x_0=i,\pi\}\cdot\mathbb{P}\{x_m\neq t\mid x_0=i,\pi\}\ \leq\ \rho^2$$
+et par récurrence
+$$\mathbb{P}\{x_{km}\neq t\mid x_0=i,\pi\}\ \leq\ \rho^k$$
+Le coût espéré accumulé entre les instants $km$ et $(k+1)m-1$ est donc majoré par $m\rho^k\max_{i,u}|g(i,u)|$, d'où
+$$J_\pi(i)\ \leq\ \sum_{k=0}^\infty m\,\rho^k\max_{i,u}|g(i,u)| = \frac{m}{1-\rho}\,\max_{i,u}|g(i,u)|$$</p>
+<blockquote>
+<p><strong>C'est une majoration uniforme en $\pi$ et en $i$.</strong> Une série géométrique de raison $\rho&lt;1$ contrôle tout : c'est la <strong>structure contractante</strong> annoncée dans la hiérarchie de difficulté, et c'est elle qui rendra l'équation de Bellman bien posée.</p>
+</blockquote>
+<h2 data-prio="must">Concept 3 — Le résultat principal</h2>
+<div class="cal formel"><span class="lab">Théorème.</span>
+<p> Pour toutes conditions initiales $J_0(1),\dots,J_0(n)$, la suite $J_k(i)$ engendrée par l'<strong>itération sur les valeurs</strong>
+$$J_{k+1}(i) = \min_{u\in U(i)}\Big[g(i,u)+\sum_{j=1}^n p_{ij}(u)J_k(j)\Big], \qquad \forall i$$
+<strong>converge vers le coût optimal $J^\star(i)$</strong> pour chaque $i$.</p>
+<p><strong>L'équation de Bellman admet $J^\star$ pour unique solution :</strong>
+$$J^\star(i)=\min_{u\in U(i)}\Big[g(i,u)+\sum_{j=1}^n p_{ij}(u)J^\star(j)\Big],\qquad J^\star(t)=0$$</p>
+<p><strong>Une politique stationnaire $\mu$ est optimale si et seulement si</strong>, pour chaque état $i$, $\mu(i)$ <strong>atteint le minimum</strong> dans l'équation de Bellman.</p>
+</div>
+<p><strong>Les trois affirmations sont distinctes et il faut les séparer.</strong> La première est <strong>algorithmique</strong> (l'itération converge, depuis n'importe où). La deuxième est <strong>caractéristique</strong> (l'équation détermine $J^\star$ sans ambiguïté). La troisième est <strong>constructive</strong> (une fois $J^\star$ connue, la politique optimale se lit immédiatement, et elle est stationnaire).</p>
+<p><strong>L'idée clé de la preuve.</strong> <em>La « queue » de la série de coûts,</em>
+$$\mathbb{E}\Big[\sum_{k=mK}^\infty g\big(x_k,\mu_k(x_k)\big)\Big]$$
+<em>s'évanouit quand $K$ tend vers l'infini.</em> C'est exactement la majoration géométrique du concept 2.</p>
+<h3>Esquisse de la preuve que $J_N\to J^\star$</h3>
+<p>Supposons pour simplifier $J_0(i)=0$ pour tout $i$. Pour tout $K\geq1$, écrivons le coût d'une politique quelconque en séparant les $mK$ premières étapes du reste :
+$$J_\pi(x_0)=\mathbb{E}\Big[\sum_{k=0}^{mK-1}g\big(x_k,\mu_k(x_k)\big)\Big]+\mathbb{E}\Big[\sum_{k=mK}^\infty g\big(x_k,\mu_k(x_k)\big)\Big] \ \leq\ \mathbb{E}\Big[\sum_{k=0}^{mK-1}g\Big] + \sum_{k=K}^\infty \rho^k\,m\max_{i,u}|g(i,u)|$$
+En prenant le minimum des deux membres sur $\pi$ :
+$$J^\star(x_0)\ \leq\ J_{mK}(x_0) + \frac{\rho^K m}{1-\rho}\max_{i,u}|g(i,u)|$$
+et symétriquement
+$$J_{mK}(x_0) - \frac{\rho^Km}{1-\rho}\max_{i,u}|g(i,u)|\ \leq\ J^\star(x_0)$$
+Les deux encadrements donnent $\lim_{K\to\infty}J_{mK}(x_0)=J^\star(x_0)$.</p>
+<p><strong>Deux remarques pour finir la preuve.</strong> $J_{mK}(x_0)$ et $J_{mK+k}(x_0)$ convergent vers <strong>la même limite</strong> pour $k&lt;m$ — <em>quelques étapes supplémentaires très loin dans le futur ne comptent pas</em> — donc $J_N(x_0)\to J^\star(x_0)$ pour toute la suite. Et le choix $J_0=0$ <strong>n'a pas d'importance</strong> : le même argument vaut depuis n'importe quel $J_0$.</p>
+<h2 data-prio="high">Concept 4 — Les problèmes actualisés comme cas particulier</h2>
+<p><strong>Le résultat de structure.</strong> Un problème <strong>actualisé</strong> de facteur $\alpha&lt;1$ <strong>se convertit en un problème SSP</strong>, en interprétant $1-\alpha$ comme une probabilité de terminaison à chaque étape : le coût de la $k$-ième étape est <strong>le même dans les deux problèmes</strong>.</p>
+<p><strong>Tout se transporte donc.</strong></p>
+<ul>
+<li><strong>Itération sur les valeurs</strong> : elle converge vers $J^\star$ depuis tout $J_0$,
+$$J_{k+1}(i)=\min_{u\in U(i)}\Big[g(i,u)+\alpha\sum_{j=1}^np_{ij}(u)J_k(j)\Big]$$</li>
+<li><strong>Équation de Bellman</strong> : $J^\star$ en est l'<strong>unique</strong> solution,
+$$J^\star(i)=\min_{u\in U(i)}\Big[g(i,u)+\alpha\sum_{j=1}^np_{ij}(u)J^\star(j)\Big]$$</li>
+<li><strong>L'itération sur les politiques se termine</strong> avec une politique optimale, et la <strong>programmation linéaire</strong> fonctionne (fiche 49).</li>
+</ul>
+<blockquote>
+<p><strong>L'astuce de conversion mérite d'être retenue.</strong> Actualiser au taux $\alpha$, c'est <strong>exactement</strong> vivre dans un monde où la partie s'arrête à chaque étape avec probabilité $1-\alpha$. C'est pourquoi $\alpha&lt;1$ joue le rôle de l'hypothèse de terminaison inévitable : l'actualisation <strong>est</strong> une terminaison probabiliste déguisée.</p>
+</blockquote>
+<h3>L'exemple du fabricant</h3>
+<p>Un fabricant, à chaque instant :</p>
+<ul>
+<li>reçoit une commande avec probabilité $p$, aucune avec probabilité $1-p$ ;</li>
+<li>peut <strong>traiter toutes</strong> les commandes en attente au coût $K&gt;0$, ou <strong>n'en traiter aucune</strong> ; le coût par commande non satisfaite est $c&gt;0$ par période ;</li>
+<li>le nombre maximal de commandes en attente est $n$.</li>
+</ul>
+<p><strong>L'état</strong> est le nombre de commandes non satisfaites au début d'une période, $i=0,1,\dots,n$. <strong>L'équation de Bellman</strong> s'écrit, pour $i=0,\dots,n-1$ :
+$$J^\star(i)=\min\Big\{\underbrace{K+\alpha(1-p)J^\star(0)+\alpha p\,J^\star(1)}_{\text{traiter}},\ \underbrace{c\,i+\alpha(1-p)J^\star(i)+\alpha p\,J^\star(i+1)}_{\text{ne rien traiter}}\Big\}$$
+et, pour l'état saturé,
+$$J^\star(n)=K+\alpha(1-p)J^\star(0)+\alpha p\,J^\star(1)$$</p>
+<p><strong>Comment lire les deux branches.</strong> Si l'on <strong>traite</strong>, on paie $K$ et l'on repart de zéro : l'état suivant est $0$ ou $1$ selon qu'une commande arrive. Si l'on <strong>ne traite pas</strong>, on paie $ci$ et l'état passe à $i$ ou $i+1$. En $i=n$ on n'a pas le choix : la file est pleine.</p>
+<blockquote>
+<p><strong>La structure attendue de la solution</strong> est une <strong>politique à seuil</strong> : traiter dès que $i$ dépasse un certain niveau. C'est le même type de résultat qu'à la fiche 46 pour la gestion de stock, et il se démontre de la même façon — par une propriété de monotonie qui se propage à travers l'opérateur de Bellman.</p>
+</blockquote>
+<h3>L'exemple du temps moyen d'atteinte</h3>
+<p>Minimiser l'<strong>espérance du temps jusqu'à la terminaison</strong> revient à prendre
+$$g(i,u)=1 \qquad \text{pour tout } i \text{ et tout } u\in U(i)$$
+L'équation de Bellman devient
+$$J^\star(i)=\min_{u\in U(i)}\Big[1+\sum_{j=1}^n p_{ij}(u)J^\star(j)\Big],\qquad i=1,\dots,n$$</p>
+<p><strong>Le cas particulier remarquable.</strong> S'il n'y a <strong>qu'une seule commande</strong> par état, $J^\star(i)$ est le <strong>temps moyen de premier passage</strong> de $i$ vers $t$. Ces temps, notés $m_i$, sont l'unique solution des équations classiques
+$$m_i = 1+\sum_{j=1}^n p_{ij}m_j,\qquad i=1,\dots,n$$</p>
+<blockquote>
+<p><em>Que l'on reconnaît comme une forme de l'équation de Bellman.</em> Les temps moyens de premier passage d'une chaîne de Markov, résultat classique de théorie des probabilités, <strong>sont</strong> une équation de Bellman sans minimisation. La DP en horizon infini contient donc la théorie des chaînes de Markov comme cas dégénéré.</p>
+</blockquote>
+<h3>Comment résoudre l'exercice type (protocole)</h3>
+<ol>
+<li><strong>Identifier la famille</strong> : $\alpha=1$ avec état terminal $\to$ SSP ; $\alpha&lt;1$ avec $g$ bornée $\to$ actualisé ; moyenne temporelle $\to$ coût moyen.</li>
+<li><strong>Vérifier l'hypothèse de terminaison inévitable</strong> (SSP) : existe-t-il $m$ tel qu'aucune politique n'évite $t$ pendant $m$ étapes avec probabilité $1$ ?</li>
+<li><strong>Écrire l'équation de Bellman</strong> en énumérant les commandes possibles état par état.</li>
+<li><strong>Chercher une structure</strong> : la solution est-elle monotone en $i$ ? La politique est-elle à seuil ?</li>
+<li><strong>Résoudre</strong> : par itération sur les valeurs si $n$ est grand, par résolution directe du système si $n$ est petit (fiche 49).</li>
+<li><strong>Lire la politique</strong> : $\mu^\star(i)$ est l'argmin dans l'équation de Bellman — elle est <strong>stationnaire</strong>.</li>
+<li><strong>Vérifier</strong> : la solution trouvée satisfait-elle l'équation de Bellman en <strong>tout</strong> état ? C'est un contrôle complet, puisque la solution est <strong>unique</strong>.</li>
+</ol>
+<h3>Exercices progressifs</h3>
+<p><strong> Niveau 1</strong> — Pourquoi un problème actualisé se ramène-t-il à un SSP ?</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p>En interprétant $1-\alpha$ comme la <strong>probabilité de terminaison à chaque étape</strong>. Dans le problème SSP ainsi construit, la probabilité de survivre $k$ étapes est $\alpha^k$, donc le coût de la $k$-ième étape est encaissé avec probabilité $\alpha^k$ : son espérance est $\alpha^kg(\cdot)$ — <strong>exactement</strong> le coût actualisé.</p>
+<p><strong>Conséquence.</strong> L'hypothèse de terminaison inévitable est automatiquement satisfaite avec $m=1$ et $\rho=\alpha&lt;1$. Tous les résultats du SSP — convergence de l'itération sur les valeurs, unicité de la solution de Bellman, optimalité d'une politique stationnaire — s'appliquent donc <strong>sans condition supplémentaire</strong> aux problèmes actualisés à coût borné.</p>
+</div></details>
+
+<p><strong> Niveau 2</strong> — Une chaîne à deux états $\{1,t\}$ avec une seule commande, $p_{11}=0{,}5$, $p_{1t}=0{,}5$, $g(1)=1$. Que vaut $J^\star(1)$ ?</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p>C'est le temps moyen d'atteinte. L'équation de Bellman sans minimisation donne
+$$J^\star(1)=1+p_{11}J^\star(1)+p_{1t}\underbrace{J^\star(t)}_{=0}=1+0{,}5\,J^\star(1)$$
+d'où $0{,}5\,J^\star(1)=1$, soit $J^\star(1)=2$.</p>
+<p><em>Contrôle direct :</em> le nombre d'étapes avant terminaison suit une loi géométrique de paramètre $0{,}5$, d'espérance $1/0{,}5=2$ .</p>
+<p><em>Vérification de l'hypothèse :</em> $\rho=\mathbb{P}\{x_1\neq t\mid x_0=1\}=0{,}5&lt;1$ avec $m=1$ — la terminaison est bien inévitable.</p>
+</div></details>
+
+<p><strong> Niveau 3</strong> — Pourquoi $\rho=\max_\pi\rho_\pi$ est-il strictement inférieur à $1$, alors qu'il y a une infinité de politiques ?</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p>Parce que <strong>$\rho_\pi$ ne dépend que des $m$ premières composantes de $\pi$</strong>, c'est-à-dire de $(\mu_0,\dots,\mu_{m-1})$. Or chaque $\mu_k$ associe à chacun des $n$ états une commande prise dans un ensemble <strong>fini</strong> $U(i)$ : il n'y a donc qu'un <strong>nombre fini</strong> de valeurs possibles pour le $m$-uplet $(\mu_0,\dots,\mu_{m-1})$, donc un <strong>nombre fini</strong> de valeurs possibles pour $\rho_\pi$.</p>
+<p>Un maximum sur un ensemble <strong>fini</strong> de nombres tous strictement inférieurs à $1$ est strictement inférieur à $1$. $\blacksquare$</p>
+<p><strong>Où l'argument casserait.</strong> Si $U(i)$ était <strong>infini</strong> — commandes continues — le maximum pourrait valoir $1$ sans être atteint, et la structure contractante tomberait. C'est exactement pourquoi le cours classe les problèmes à commandes finies parmi les « faciles ».</p>
+</div></details>
+
+<p><strong> Niveau 4 — type examen</strong> — Montrez que si $\hat J$ résout l'équation de Bellman et si $\mu(i)$ y atteint le minimum pour tout $i$, alors $\hat J = J_\mu$.</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p><strong>Étape 1 — $\hat J$ satisfait l'équation d'évaluation de $\mu$.</strong> Par hypothèse, pour chaque $i$, le minimum dans
+$$\hat J(i)=\min_{u\in U(i)}\Big[g(i,u)+\sum_j p_{ij}(u)\hat J(j)\Big]$$
+est atteint en $u=\mu(i)$. Donc
+$$\hat J(i)=g\big(i,\mu(i)\big)+\sum_j p_{ij}\big(\mu(i)\big)\hat J(j), \qquad i=1,\dots,n \tag{$\ast$}$$</p>
+<p><strong>Étape 2 — $J_\mu$ satisfait la même équation.</strong> C'est l'équation de Bellman <strong>pour une politique unique</strong> (fiche 49) : $J_\mu$ est solution du système linéaire
+$$J_\mu(i)=g\big(i,\mu(i)\big)+\sum_j p_{ij}\big(\mu(i)\big)J_\mu(j)$$</p>
+<p><strong>Étape 3 — unicité.</strong> Sous l'hypothèse de terminaison inévitable, ce système linéaire de $n$ équations à $n$ inconnues a une solution <strong>unique</strong>. En effet, en écriture matricielle $J = g_\mu + P_\mu J$, soit $(I-P_\mu)J=g_\mu$, et $I-P_\mu$ est inversible parce que les puissances $P_\mu^{km}$ sont majorées par $\rho^k\to0$, donc $P_\mu^k\to0$ et la série de Neumann $\sum_kP_\mu^k=(I-P_\mu)^{-1}$ converge.</p>
+<p>Comme $\hat J$ et $J_\mu$ résolvent tous deux ce système, $\hat J = J_\mu$. $\blacksquare$</p>
+<p><strong>La portée du résultat.</strong> C'est la brique qui rend la troisième affirmation du théorème constructive : dès qu'on connaît une solution de l'équation de Bellman, la politique qui y atteint le minimum a <strong>exactement</strong> ce coût. Combiné à l'unicité de la solution ($\hat J=J^\star$), cela donne : <strong>cette politique stationnaire est optimale</strong>. C'est aussi le mécanisme qui justifie l'itération sur les politiques (fiche 49).</p>
+</div></details>
+
+<h2 data-prio="must">Common mistakes</h2>
+<ol>
+<li><strong>Oublier de vérifier la terminaison inévitable</strong> — sans elle, les coûts peuvent être infinis et l'équation de Bellman perdre son unicité.</li>
+<li><strong>Croire l'hypothèse automatique sur tout graphe</strong> — un problème de plus court chemin <strong>non acyclique</strong> peut la violer.</li>
+<li><strong>Confondre $J_\pi$ et $J^\star$</strong> — le premier est le coût d'une politique donnée, le second l'infimum sur toutes.</li>
+<li><strong>Chercher une politique non stationnaire</strong> — en horizon infini, une politique <strong>stationnaire</strong> optimale existe dès que le cadre est « facile ».</li>
+<li><strong>Oublier $J^\star(t)=0$</strong> — l'état de terminaison est <strong>sans coût</strong> ; c'est la condition au bord qui ferme le système.</li>
+<li><strong>Croire que l'itération sur les valeurs dépend de $J_0$</strong> — elle converge vers $J^\star$ depuis <strong>n'importe quelle</strong> initialisation.</li>
+<li><strong>Oublier le facteur $\alpha$ devant la somme</strong> dans le cas actualisé — l'actualisation porte sur le <strong>futur</strong>, donc sur le terme $\sum_jp_{ij}(u)J^\star(j)$, pas sur $g(i,u)$.</li>
+<li><strong>Appliquer les résultats à $g$ non bornée</strong> — les problèmes actualisés à coût non borné font partie des cas <strong>difficiles</strong>.</li>
+</ol>
+<h2>Ultimate Review</h2>
+<ol>
+<li>Horizon infini : même cadre, mais infinité d'étapes et système et coût <strong>stationnaires</strong>.</li>
+<li>Familles : <strong>SSP</strong> ($\alpha=1$ $+$ état terminal), <strong>actualisé</strong> ($\alpha&lt;1$, $g$ bornée), <strong>coût moyen</strong>, et les cas non bornés (difficiles).</li>
+<li><strong>SSP</strong> : états $1,\dots,n$ plus $t$ absorbant sans coût ; $p_{ij}(u)$ ; $U(i)$ <strong>fini</strong>.</li>
+<li><strong>Terminaison inévitable</strong> : il existe $m$ avec $\rho=\max_\pi\max_i\mathbb{P}\{x_m\neq t\mid x_0=i,\pi\}&lt;1$ — fini car $\rho_\pi$ ne dépend que des $m$ premières composantes.</li>
+<li>Conséquence : $\mathbb{P}\{x_{km}\neq t\}\leq\rho^k$ et $J_\pi(i)\leq\frac{m}{1-\rho}\max_{i,u}|g(i,u)|$ — <strong>structure contractante</strong>.</li>
+<li><strong>Itération sur les valeurs</strong> $J_{k+1}(i)=\min_u[g(i,u)+\sum_jp_{ij}(u)J_k(j)]$ converge vers $J^\star$ depuis <strong>tout</strong> $J_0$.</li>
+<li><strong>Équation de Bellman</strong> : $J^\star$ en est l'<strong>unique</strong> solution, avec $J^\star(t)=0$.</li>
+<li><strong>Optimalité</strong> : $\mu$ stationnaire est optimale <strong>si et seulement si</strong> $\mu(i)$ atteint le minimum dans Bellman, pour tout $i$.</li>
+<li><strong>Idée de la preuve</strong> : la queue de la série de coûts s'évanouit géométriquement ; encadrement de $J^\star$ par $J_{mK}\pm\frac{\rho^Km}{1-\rho}\max|g|$.</li>
+<li><strong>Actualisé $=$ SSP</strong> en lisant $1-\alpha$ comme une probabilité de terminaison.</li>
+<li>Avec $g\equiv1$ et une seule commande, Bellman redonne les <strong>temps moyens de premier passage</strong> $m_i=1+\sum_jp_{ij}m_j$.</li>
+</ol>
+<p><strong>Formulas to know</strong>
+$$J_\pi(x_0)=\lim_{N\to\infty}\mathbb{E}\Big[\sum_{k=0}^{N-1}\alpha^kg\big(x_k,\mu_k(x_k),w_k\big)\Big] \qquad \rho=\max_\pi\max_i\mathbb{P}\{x_m\neq t\mid x_0=i,\pi\}&lt;1$$
+$$J^\star(i)=\min_{u\in U(i)}\Big[g(i,u)+\alpha\sum_{j=1}^np_{ij}(u)J^\star(j)\Big],\qquad J^\star(t)=0 \qquad J_\pi(i)\leq\frac{m}{1-\rho}\max_{i,u}|g(i,u)|$$</p>
+<p><strong>Methods to know</strong> : le protocole en 7 étapes ; la majoration géométrique de la queue ; la conversion actualisé $\to$ SSP ; la lecture de la politique dans l'argmin.</p>
+<div class="rec"><h2>Active Recall</h2><p><strong>Basic</strong> — Écrivez l'équation de Bellman d'un problème actualisé et dites ce qu'on sait de ses solutions.</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p>$$J^\star(i)=\min_{u\in U(i)}\Big[g(i,u)+\alpha\sum_{j=1}^np_{ij}(u)J^\star(j)\Big]$$
+Sous les hypothèses du cas « facile » (états et commandes finis, $\alpha&lt;1$, $g$ bornée), <strong>elle admet $J^\star$ pour unique solution</strong>. De plus l'itération sur les valeurs y converge depuis n'importe quel $J_0$, et toute politique stationnaire atteignant le minimum est optimale.</p>
+</div></details><p><strong>Understanding</strong> — Que dit l'hypothèse de terminaison inévitable, et à quoi sert-elle ?</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p>Elle dit qu'il existe un entier $m$ tel que, <strong>pour toute politique</strong>, la probabilité de ne <strong>pas</strong> avoir terminé après $m$ étapes est majorée par un $\rho&lt;1$ uniforme.</p>
+<p><strong>À quoi elle sert :</strong> elle donne $\mathbb{P}\{x_{km}\neq t\}\leq\rho^k$, donc une majoration <strong>géométrique</strong> de la queue de la série de coûts. C'est cette décroissance géométrique qui rend les coûts finis, l'équation de Bellman uniquement soluble, et l'itération sur les valeurs convergente. C'est la <strong>structure contractante</strong> du problème.</p>
+</div></details><p><strong>Application</strong> — Comment convertit-on un problème actualisé en SSP ?</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p>En interprétant $1-\alpha$ comme la <strong>probabilité de terminaison à chaque étape</strong>. La probabilité de survivre $k$ étapes est alors $\alpha^k$, donc le coût de la $k$-ième étape a pour espérance $\alpha^kg(\cdot)$ — exactement le coût actualisé. L'hypothèse de terminaison inévitable est satisfaite avec $m=1$ et $\rho=\alpha$, et tous les résultats du SSP s'appliquent.</p>
+</div></details><p><strong>Comparison</strong> — Horizon fini et horizon infini : qu'est-ce qui change dans la nature de la solution ?</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p>En <strong>horizon fini</strong>, on calcule une <strong>suite</strong> de fonctions $J_N,\dots,J_0$ par une <strong>récurrence à rebours</strong>, et la politique optimale <strong>dépend du temps</strong> ($\mu_k$ varie avec $k$).</p>
+<p>En <strong>horizon infini</strong>, système et coût étant stationnaires, il n'y a plus d'instant privilégié : on cherche <strong>une seule</strong> fonction $J^\star$, solution d'une <strong>équation de point fixe</strong> (Bellman), et la politique optimale est <strong>stationnaire</strong> — une seule règle $\mu^\star$, appliquée à jamais. On passe d'une récurrence à une équation.</p>
+</div></details><p><strong>Exam-style</strong> — Esquissez la preuve que $J_N\to J^\star$ dans un problème SSP.</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p>Prenons $J_0=0$. Pour toute politique $\pi$ et tout $K\geq1$, on sépare le coût en les $mK$ premières étapes et la queue :
+$$J_\pi(x_0)\leq\mathbb{E}\Big[\sum_{k=0}^{mK-1}g\Big]+\sum_{k=K}^\infty\rho^k\,m\max_{i,u}|g(i,u)|$$
+en utilisant $\mathbb{P}\{x_{km}\neq t\}\leq\rho^k$. En minimisant sur $\pi$ :
+$$J^\star(x_0)\leq J_{mK}(x_0)+\frac{\rho^Km}{1-\rho}\max_{i,u}|g(i,u)|$$
+et symétriquement $J_{mK}(x_0)-\frac{\rho^Km}{1-\rho}\max_{i,u}|g|\leq J^\star(x_0)$. Comme $\rho^K\to0$, l'encadrement donne $J_{mK}\to J^\star$.</p>
+<p>Enfin, $J_{mK}$ et $J_{mK+k}$ ($k&lt;m$) ont la même limite — quelques étapes de plus très loin dans le futur ne changent rien — donc toute la suite $J_N$ converge vers $J^\star$. Le choix $J_0=0$ n'importe pas non plus.</p>
+</div></details></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h2>Flashcards</h2>
+<table>
+<thead>
+<tr>
+<th>Question</th>
+<th>Réponse</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Ce qui change en horizon infini ?</td>
+<td>Infinité d'étapes ; système et coût <strong>stationnaires</strong></td>
+</tr>
+<tr>
+<td>Les quatre familles ?</td>
+<td>SSP, actualisé, coût moyen, cas non bornés</td>
+</tr>
+<tr>
+<td>SSP : quel état particulier ?</td>
+<td>Un état de terminaison $t$, <strong>absorbant et sans coût</strong></td>
+</tr>
+<tr>
+<td>Hypothèse de terminaison inévitable ?</td>
+<td>$\exists m$ : $\rho=\max_\pi\max_i\mathbb{P}\{x_m\neq t\mid x_0=i,\pi\}&lt;1$</td>
+</tr>
+<tr>
+<td>Pourquoi $\rho&lt;1$ malgré l'infinité de politiques ?</td>
+<td>$\rho_\pi$ ne dépend que des $m$ premières composantes, en nombre fini</td>
+</tr>
+<tr>
+<td>Majoration du coût d'une politique ?</td>
+<td>$J_\pi(i)\leq\frac{m}{1-\rho}\max_{i,u}\vert g(i,u)\vert$</td>
+</tr>
+<tr>
+<td>Itération sur les valeurs ?</td>
+<td>$J_{k+1}(i)=\min_u[g(i,u)+\sum_jp_{ij}(u)J_k(j)]$</td>
+</tr>
+<tr>
+<td>Depuis quel $J_0$ converge-t-elle ?</td>
+<td><strong>N'importe lequel</strong></td>
+</tr>
+<tr>
+<td>Équation de Bellman (SSP) ?</td>
+<td>$J^\star(i)=\min_u[g(i,u)+\sum_jp_{ij}(u)J^\star(j)]$, $J^\star(t)=0$</td>
+</tr>
+<tr>
+<td>Combien de solutions ?</td>
+<td>Une seule : $J^\star$</td>
+</tr>
+<tr>
+<td>Condition d'optimalité d'une politique stationnaire ?</td>
+<td>$\mu(i)$ atteint le minimum dans Bellman, pour tout $i$</td>
+</tr>
+<tr>
+<td>Idée clé de la preuve ?</td>
+<td>La queue de la série de coûts s'évanouit géométriquement</td>
+</tr>
+<tr>
+<td>Actualisé $\to$ SSP : quelle lecture ?</td>
+<td>$1-\alpha$ est une probabilité de terminaison</td>
+</tr>
+<tr>
+<td>Bellman avec $g\equiv1$ et une commande ?</td>
+<td>Les temps moyens de premier passage $m_i=1+\sum_jp_{ij}m_j$</td>
+</tr>
+</tbody></table>
+</main>
+
+
+
+
+</body></html>

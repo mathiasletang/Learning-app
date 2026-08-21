@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fiche 71 — Estimation paramétrique : vraisemblance, VAR, GMM et quasi-vraisemblance</title>
+<script>
+window.MathJax={tex:{inlineMath:[["$","$"]],displayMath:[["$$","$$"]],processEscapes:true},
+ options:{skipHtmlTags:["script","noscript","style","textarea","pre","code"]},
+ svg:{fontCache:"global"},
+ startup:{pageReady:()=>MathJax.startup.defaultPageReady().then(()=>{document.body.classList.add("ready")})}};
+setTimeout(function(){document.body.classList.add("ready")},2500);
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+/* ============================================================
+   MathiasLearn — feuille de style des fiches
+   Reprise intégrale des tokens de 00_PARCOURS/*.html
+   + blocs pédagogiques (callouts, méthode, essentiels, recall)
+   ============================================================ */
+:root{--bg:#faf9f7;--card:#fff;--ink:#1a1a1a;--muted:#6b6b6b;--line:#e5e2dd;--accent:#8b5e34;
+ --hl:#fdf8ef;--ok:#2d7d4f;--okbg:#f0f7f3;--warn:#b3402f;--warnbg:#fdf3f1;--blue:#2f5d8b;--bluebg:#f1f5fa}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+ font:17px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;padding:0 16px 100px}
+.nav{position:sticky;top:0;background:rgba(250,249,247,.96);backdrop-filter:blur(8px);
+ border-bottom:1px solid var(--line);margin:0 -16px 30px;padding:11px 16px;z-index:50;
+ display:flex;gap:6px;flex-wrap:wrap;font-size:13px}
+.nav a{color:var(--muted);text-decoration:none;padding:4px 9px;border-radius:5px;white-space:nowrap}
+.nav a:hover{background:var(--line);color:var(--ink)}
+.nav a.on{background:var(--accent);color:#fff}
+main{max-width:780px;margin:0 auto}
+h1{font-size:31px;letter-spacing:-.02em;margin:.4em 0 .5em;line-height:1.25}
+h2{font-size:23px;margin:2.2em 0 .7em;padding-bottom:.3em;border-bottom:1px solid var(--line)}
+h3{font-size:19px;margin:1.9em 0 .5em;color:var(--accent)}
+h4{font-size:17px;margin:1.5em 0 .4em}
+p{margin:.8em 0} a{color:var(--accent)} hr{border:0;border-top:1px solid var(--line);margin:2.6em 0}
+table{border-collapse:collapse;width:100%;margin:1.3em 0;font-size:15.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+th{background:#f3f0eb;font-weight:600}
+tr:nth-child(even) td{background:#fcfbfa}
+code{font-family:"SF Mono",Menlo,Consolas,monospace;font-size:.88em;background:#f2efea;padding:2px 6px;border-radius:4px;white-space:nowrap}
+pre{background:#f2efea;padding:14px 16px;border-radius:8px;overflow-x:auto}
+pre code{background:none;padding:0;white-space:pre}
+blockquote{border-left:3px solid var(--accent);background:var(--hl);margin:1.4em 0;padding:14px 20px;border-radius:0 8px 8px 0}
+blockquote p:first-child{margin-top:0} blockquote p:last-child{margin-bottom:0}
+ul,ol{padding-left:1.5em} li{margin:.35em 0} em{color:#4a4a4a}
+mjx-container[display="true"]{margin:1.1em 0!important;overflow-x:auto;overflow-y:hidden;padding:2px 0}
+mjx-container svg{max-width:100%}
+body:not(.ready) main{opacity:0} main{opacity:1;transition:opacity .25s}
+
+/* --- bandeau de tête de fiche --- */
+.cours{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--accent);
+ border-radius:0 10px 10px 0;padding:18px 22px;margin:0 0 34px}
+.cours h4{margin:0 0 4px;font-size:14px;text-transform:uppercase;letter-spacing:.07em;color:var(--accent)}
+.cours .cs{color:var(--muted);font-size:14.5px;margin:0 0 14px}
+
+/* --- exercices / corrigés --- */
+.ex{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:6px 24px 20px;margin:18px 0}
+.ex>h3:first-child{margin-top:14px}
+details.cor{margin-top:18px;border:1px solid var(--line);border-radius:8px;background:#fcfbfa;overflow:hidden}
+details.cor>summary{cursor:pointer;padding:12px 16px;font-weight:600;font-size:15px;color:var(--accent);
+ list-style:none;display:flex;align-items:center;gap:9px;user-select:none;transition:.15s;min-height:44px}
+details.cor>summary::-webkit-details-marker{display:none}
+details.cor>summary:hover{background:var(--hl)}
+details.cor>summary::before{content:"\25B6";font-size:10px;transition:transform .18s;display:inline-block}
+details.cor[open]>summary::before{transform:rotate(90deg)}
+details.cor[open]>summary{background:var(--okbg);color:var(--ok);border-bottom:1px solid var(--line)}
+.cor .in{padding:4px 20px 16px}
+.cor .in>*:first-child{margin-top:.9em}
+
+/* --- blocs pédagogiques (callouts) ---
+   Générés depuis une citation Markdown dont le premier **gras** commence
+   par un mot-clé : DÉFINITION, THÉORÈME, MÉTHODE, PIÈGE, INTUITION… */
+.cal{border:1px solid var(--line);border-left:4px solid var(--accent);background:var(--card);
+ border-radius:0 10px 10px 0;padding:15px 20px;margin:1.5em 0}
+.cal>p:first-child{margin-top:0}.cal>p:last-child,.cal>ul:last-child,.cal>ol:last-child{margin-bottom:0}
+.cal .lab{display:block;font-size:12.5px;text-transform:uppercase;letter-spacing:.08em;
+ font-weight:700;color:var(--accent);margin-bottom:6px}
+.cal.formel{background:var(--hl)}
+.cal.piege{border-left-color:var(--warn);background:var(--warnbg)}
+.cal.piege .lab{color:var(--warn)}
+.cal.methode{border-left-color:var(--ok);background:var(--okbg)}
+.cal.methode .lab{color:var(--ok)}
+.cal.intu{border-left-color:var(--blue);background:var(--bluebg)}
+.cal.intu .lab{color:var(--blue)}
+.cal.plus{border-left-style:dashed;background:#faf9f7}
+.cal.plus .lab{color:var(--muted)}
+
+/* --- révision express --- */
+.ess{background:var(--card);border:1px solid var(--accent);border-radius:10px;padding:4px 24px 20px;margin:1.6em 0}
+.ess h3{margin-top:1.3em}
+.rec{background:var(--card);border:1px dashed var(--accent);border-radius:10px;padding:4px 24px 18px;margin:1.6em 0}
+.rec ol{counter-reset:none}
+
+/* --- impression / PDF --- */
+@media print{
+ .nav{display:none}
+ body{padding:0;background:#fff;font-size:11.2pt;line-height:1.55}
+ main{max-width:none}
+ h1{font-size:23pt}h2{font-size:15pt;margin-top:1.5em}h3{font-size:12.6pt}
+ h2,h3,h4{break-after:avoid;page-break-after:avoid}
+ table,.cal,blockquote{break-inside:avoid;page-break-inside:avoid}
+ table{display:table;font-size:9.6pt}
+ details.cor{border:1px solid var(--line);background:#fcfbfa}
+ details.cor>summary{display:none}
+ details.cor .in{padding-top:10px}
+ .cal,.ex,.ess,.rec{box-shadow:none}
+ a{color:var(--ink);text-decoration:none}
+}
+@page{margin:16mm 15mm 18mm}
+
+/* --- exemples travaillés --- */
+.exm{background:#fcfbfa;border:1px solid var(--line);border-radius:10px;padding:2px 20px 14px;margin:1.5em 0}
+.exm>h4:first-child{margin:14px 0 .5em;color:var(--accent);font-size:13px;text-transform:uppercase;letter-spacing:.07em}
+
+
+/* --- pastilles de priorité (conventions des fiches de l'app) --- */
+h2[data-prio], h3[data-prio], h4[data-prio]{position:relative}
+h2[data-prio]::before,h3[data-prio]::before,h4[data-prio]::before{
+ content:"";display:inline-block;width:9px;height:9px;border-radius:50%;
+ margin-right:9px;vertical-align:middle;background:var(--muted)}
+[data-prio="must"]::before{background:var(--warn)}
+[data-prio="high"]::before{background:#d98324}
+[data-prio="mid"]::before{background:#c9a227}
+[data-prio="low"]::before{background:var(--ok)}
+/* corrigés des fiches de l'app : même traitement que les corrigés des séries */
+details.cor>summary::after{content:""}
+</style></head><body>
+<div class="nav"><a href="00_COMMENCER_ICI.html">Commencer ici</a><a href="01_NOTATIONS_le-decodeur.html">Notations</a><a href="02_EXERCICES_Serie-0.html">Série 0 — Remise en route</a><a href="03_EXERCICES_Serie-1.html">Série 1 — Convexité</a><a href="04_EXERCICES_Serie-2.html">Série 2 — KKT</a><a href="05_AUTO-EVALUATION.html">Auto-évaluation (quiz)</a><a href="06_FICHE_Optimisation-deux-variables.html">Fiche — Optimisation à 2 variables</a></div>
+<main><h1>Fiche 71 — Estimation paramétrique : vraisemblance, VAR, GMM et quasi-vraisemblance</h1>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Matière</strong></td>
+<td>Maths · Économétrie</td>
+</tr>
+<tr>
+<td><strong>Cours source</strong></td>
+<td>Kogan, <em>15.450 Analytics of Finance</em>, MIT Sloan / OpenCourseWare, automne 2010 — cours 7 « Parameter Estimation »</td>
+</tr>
+<tr>
+<td><strong>Difficulté</strong></td>
+<td> Must know — GMM est la méthode d'estimation de l'économétrie financière</td>
+</tr>
+<tr>
+<td><strong>Temps d'étude estimé</strong></td>
+<td>2 h 30</td>
+</tr>
+<tr>
+<td><strong>Prérequis</strong></td>
+<td>Fiche 64 (vraisemblance, Fisher), fiche 58 (VAR), fiche 50 (MCO, MCG), fiche 52 (AIC/BIC)</td>
+</tr>
+<tr>
+<td><strong>Concepts clés</strong></td>
+<td>Consistance, inégalité de Jensen, fonction de vraisemblance, EMV pour observations dépendantes, AR($p$) et VAR($p$), MCO comme EMV, critères d'information, méthode des moments généralisée, conditions d'identification, score comme moment, quasi-maximum de vraisemblance, MCG</td>
+</tr>
+<tr>
+<td><strong>Poids à l'examen</strong></td>
+<td>Trois choses : la <strong>preuve par Jensen</strong> que la vraie densité maximise l'espérance de la log-vraisemblance ; les <strong>conditions d'identification</strong> du GMM ; et le fait que <strong>QMLE soit un cas particulier de GMM</strong> — c'est ce qui le justifie.</td>
+</tr>
+</tbody></table>
+<h2>Vue d'ensemble</h2>
+<blockquote>
+<p><strong>Les trois approches, et leur arbitrage.</strong></p>
+<ul>
+<li>*Si la loi de probabilité $p(X,\theta_0)$ est <strong>entièrement connue</strong>, on peut estimer $\theta_0$ par <strong>maximum de vraisemblance (MLE)</strong>. C'est la méthode préférée : elle offre la <strong>meilleure précision asymptotique</strong>.*</li>
+<li>*Si la loi n'est pas entièrement connue mais qu'on en connaît certaines caractéristiques — les deux premiers moments, par exemple —, on peut estimer par <strong>quasi-maximum de vraisemblance (QMLE)</strong>.*</li>
+<li>*Si l'on ne connaît que <strong>quelques moments</strong> de la loi, mais pas la densité entière, on peut estimer par la <strong>méthode des moments généralisée (GMM)</strong>.*</li>
+</ul>
+<p><em><strong>QMLE et GMM sont moins précises (efficaces) que MLE, mais elles sont plus robustes, puisqu'elles n'exigent pas la connaissance complète de la loi.</strong></em></p>
+</blockquote>
+<pre><code>CONNAISSANCE   ←────────── décroît ──────────→   ROBUSTESSE ↑ PRÉCISION ↓
+   MLE                  QMLE                    GMM
+densité complète   deux premiers moments    quelques moments
+   E(f) = 0 où f = score          ⟵  tout est un cas particulier de GMM
+</code></pre>
+<blockquote>
+<p><strong>Le fil du cours.</strong> GMM est le cadre <strong>le plus général</strong> : le MLE en est un cas particulier — il suffit de prendre le <strong>score</strong> comme fonction de moment —, et le QMLE aussi. C'est ce qui permet de <strong>justifier</strong> l'usage d'un modèle qu'on sait faux : <em>si les conditions de moment restent valides, GMM s'applique</em>.</p>
+</blockquote>
+<h2 data-prio="mid">Concept 1 — Rappels de statistique et de probabilité</h2>
+<p><strong>Le cadre.</strong> Un échantillon $X=(x_1,\dots,x_T)$ de loi jointe $p(X,\theta_0)$ ; un <strong>estimateur</strong> $\hat\theta$ est une fonction de l'échantillon, $\hat\theta(X)$.</p>
+<table>
+<thead>
+<tr>
+<th>Notion</th>
+<th>Définition</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Consistance</strong></td>
+<td>$\underset{T\to\infty}{\mathrm{plim}}\ \hat\theta=\theta_0$</td>
+</tr>
+<tr>
+<td><strong>Absence de biais</strong></td>
+<td>$\mathbb E[\hat\theta]=\theta_0$</td>
+</tr>
+<tr>
+<td><strong>Intervalle de confiance $\alpha$</strong></td>
+<td>intervalle aléatoire $(\hat\theta^L_i,\hat\theta^R_i)$ tel que $\mathrm{Prob}\big[(\hat\theta^L_i,\hat\theta^R_i)\text{ couvre }\theta_{0,i}\big]=\alpha$</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>Loi des grands nombres.</strong> Si les $x_t$ sont i.i.d. de moyenne $\mu$ :
+$$\underset{T\to\infty}{\mathrm{plim}}\ \frac{\sum_{t=1}^Tx_t}{T}=\mu$$
+<em>où $\mathrm{plim}$ est la limite en probabilité : $\mathrm{plim}_{n\to\infty}x_n=y$ signifie que pour tout $\delta&gt;0$, $\mathrm{Prob}[\lvert x_n-y\rvert&gt;\delta]\to0$.</em></p>
+</blockquote>
+<div class="cal formel"><span class="lab">Théorème central limite.</span>
+<p> Si les $x_t$ sont des vecteurs i.i.d. de moyenne $\mu$ et de matrice de variance-covariance $\Omega$ :
+$$\frac{\sum_{t=1}^T(x_t-\mu)}{\sqrt T}\ \Rightarrow\ N(0,\Omega)$$
+<em>où « $\Rightarrow$ » désigne la convergence en loi : $x_n\Rightarrow y$ signifie que $F_{x_n}(z)\to F_y(z)$ en tout point $z$ où $F_y$ est continue.</em></p>
+</div>
+<p><strong>L'exemple minimal.</strong> Pour un échantillon i.i.d. $N(\mu,1)$, l'estimateur usuel de $\mu$ est la moyenne empirique $\hat\mu=\hat{\mathbb E}[x_t]\equiv\frac1T\sum_tx_t$, consistant par la LGN. <em>Comment obtenir des estimateurs consistants dans des situations plus complexes ?</em> — c'est tout le sujet.</p>
+<h2 data-prio="must">Concept 2 — Jensen et le fondement du maximum de vraisemblance</h2>
+<blockquote>
+<p><strong>Inégalité de Jensen.</strong> Si $f$ est <strong>concave</strong>, $w_n\geq0$ et $\sum_{n=1}^Nw_n=1$, alors
+$$\sum_{n=1}^Nw_nf(x_n)\ \leq\ f\left(\sum_{n=1}^Nw_nx_n\right)$$
+<em>Le résultat s'étend au cas continu :</em> $\int w(x)f(x)dx\leq f\big(\int w(x)x\,dx\big)$ si $\int w=1$ et $w\geq0$.</p>
+<p><em>Exemple : si $x$ est une variable aléatoire — un rendement d'actif — et $f$ concave — une fonction d'utilité —, alors $\mathbb E[f(x)]\leq f(\mathbb E[x])$ : c'est l'<strong>aversion au risque</strong>.</em></p>
+</blockquote>
+<blockquote>
+<p><strong>Le fondement du maximum de vraisemblance.</strong> Pour toute densité alternative $p(x,\tilde\theta)$ :
+$$\boxed{\ \mathbb E\big[\ln p(x,\tilde\theta)\big]\ \leq\ \mathbb E\big[\ln p(x,\theta_0)\big]\ }$$</p>
+</blockquote>
+<p><strong>La démonstration</strong>, par Jensen et l'égalité $\int p(x,\tilde\theta)dx=1$ :
+$$\mathbb E\left[\ln\frac{p(x_t,\tilde\theta)}{p(x_t,\theta_0)}\right]\ \leq\ \ln\mathbb E\left[\frac{p(x_t,\tilde\theta)}{p(x_t,\theta_0)}\right]=\ln\int\frac{p(x,\tilde\theta)}{p(x,\theta_0)}p(x,\theta_0)\,dx=\ln\int p(x,\tilde\theta)\,dx=\ln1=0$$</p>
+<blockquote>
+<p><strong>C'est la justification théorique du maximum de vraisemblance</strong> : la <strong>vraie</strong> densité maximise l'espérance de la log-vraisemblance. Il suffit alors de remplacer l'espérance par sa moyenne empirique :
+$$\hat\theta=\underset{\theta}{\arg\max}\ \frac1T\sum_{t=1}^T\ln p(x_t,\theta)=\underset{\theta}{\arg\max}\ \frac1T\ln p(X,\theta)$$</p>
+</blockquote>
+<p class="cal piege"> <strong>C'est exactement l'argument de la fiche 64, sous une autre forme.</strong> L'inégalité $\mathbb E[\ln p(\tilde\theta)]\leq\mathbb E[\ln p(\theta_0)]$ <strong>est</strong> la positivité de la divergence de Kullback-Leibler : $KL(\mathbb P_{\theta_0},\mathbb P_{\tilde\theta})=\mathbb E[\ln p(\theta_0)]-\mathbb E[\ln p(\tilde\theta)]\geq0$. Les deux cours démontrent le même résultat, l'un par la KL, l'autre par Jensen.</p>
+<h2 data-prio="must">Concept 3 — La fonction de vraisemblance</h2>
+<div class="cal formel"><span class="lab">Définition.</span>
+<p> $\mathcal L(\theta)=\ln p(X,\theta)$.
+<em>La fonction de vraisemblance traite les paramètres $\theta$ comme des <strong>variables</strong> et les observations $X$ comme <strong>fixées</strong>.</em></p>
+</div>
+<p>Pour des observations i.i.d.,
+$$\frac1T\mathcal L(\theta)=\frac1T\ln\prod_{t=1}^Tp(x_t,\theta)=\frac1T\sum_{t=1}^T\ln p(x_t,\theta) \qquad\Longrightarrow\qquad \boxed{\ \hat\theta=\underset{\theta}{\arg\max}\ \mathcal L(\theta)\ }$$</p>
+<p><strong>Exemple 1 — le modèle gaussien.</strong> Pour des observations i.i.d. $N(\mu,\sigma^2)$ :
+$$\mathcal L(\theta)=\sum_{t=1}^T\ln\left(\frac{1}{\sqrt{2\pi\sigma^2}}\right)-\frac{(x_t-\mu)^2}{2\sigma^2}$$
+<strong>Conditions d'optimalité :</strong>
+$$\sum_{t=1}^T\frac{(x_t-\hat\mu)}{\hat\sigma^2}=0, \qquad -\frac T{\hat\sigma}+\sum_{t=1}^T\frac{(x_t-\hat\mu)^2}{\hat\sigma^3}=0$$</p>
+<blockquote>
+<p><em>Elles sont <strong>identiques aux conditions GMM</strong> :</em>
+$$\hat{\mathbb E}\big(x_t-\hat\mu\big)=0, \qquad \hat{\mathbb E}\big[(x_t-\hat\mu)^2\big]-\hat\sigma^2=0$$</p>
+</blockquote>
+<p><strong>Exemple 2 — la loi exponentielle.</strong> Pour $T$ observations indépendantes de densité $p(x_t,\lambda)=\lambda\exp(-\lambda x_t)$ :
+$$\mathcal L(\lambda)=\sum_{t=1}^T\big(-\lambda x_t+\ln\lambda\big)$$
+<strong>Condition du premier ordre :</strong> $-\sum_tx_t+\frac T{\hat\lambda}=0$, d'où
+$$\hat\lambda=\left(\frac{\sum_{t=1}^Tx_t}{T}\right)^{-1}=\frac{1}{\bar x}$$</p>
+<h2 data-prio="must">Concept 4 — L'EMV pour observations dépendantes</h2>
+<blockquote>
+<ul>
+<li><em>L'approche MLE fonctionne <strong>même si les observations sont dépendantes</strong>.</em></li>
+<li><em>Il faut que la dépendance <strong>s'éteigne assez vite</strong>.</em></li>
+<li>Considérons une série $x_t,x_{t+1},\dots$ et supposons que la loi de $x_{t+1}$ ne dépende que de $L$ retards.</li>
+<li><strong>Log-vraisemblance conditionnelle</strong> aux $L$ premières observations :
+$$\mathcal L(\theta)=\sum_{t=L}^{T-1}\ln p\big(x_{t+1}\mid x_t,\dots,x_{t+1-L};\theta\big)$$</li>
+<li><em>$\theta$ maximise l'espérance conditionnelle de $\ln p(x_{t+1}\mid\cdot)$, donc maximise la vraisemblance conditionnelle si $T$ est grand et $x_t$ <strong>stationnaire</strong>.</em></li>
+</ul>
+</blockquote>
+<p class="cal piege"> <strong>C'est la décomposition en erreurs de prédiction de la fiche 60</strong>, écrite pour un modèle markovien d'ordre $L$. La vraisemblance jointe d'observations dépendantes se factorise en un produit de <strong>conditionnelles</strong> — chacune calculable.</p>
+<h3>L'AR($p$) : maximum de vraisemblance $=$ moindres carrés</h3>
+<p>$$x_{t+1}=a_0+a_1x_t+\cdots+a_px_{t+1-p}+\varepsilon_{t+1}, \qquad \varepsilon_{t+1}\sim N(0,\sigma^2)$$
+Conditionnellement à $(x_t,\dots,x_{t+1-p})$, $x_{t+1}$ est gaussienne, d'où
+$$\mathcal L(\theta)=\sum_{t=p}^{T-1}\left[-\ln\sqrt{2\pi\sigma^2}-\frac{\big(x_{t+1}-a_0-a_1x_t-\cdots-a_px_{t+1-p}\big)^2}{2\sigma^2}\right]$$</p>
+<blockquote>
+<p><strong>Les estimations MLE de $(a_0,a_1,\dots,a_p)$ sont les mêmes que les MCO :</strong>
+$$\max_{\hat a}\ \mathcal L(\theta)\iff\min_{\hat a}\ \sum_{t=p}^{T-1}\big(x_{t+1}-a_0-a_1x_t-\cdots-a_px_{t+1-p}\big)^2$$</p>
+</blockquote>
+<blockquote>
+<p><strong>La raison est visible dans la formule</strong> : le premier terme ne dépend pas de $a$, et le second est $-\frac{1}{2\sigma^2}$ fois la somme des carrés. Maximiser l'un revient à minimiser l'autre. <strong>C'est le résultat de la fiche 50</strong>, transposé aux séries temporelles.</p>
+</blockquote>
+<h2 data-prio="must">Concept 5 — Le VAR($p$)</h2>
+<p>$$x_{t+1}=a_0+A_1x_t+\cdots+A_px_{t+1-p}+\varepsilon_{t+1}, \qquad \varepsilon_{t+1}\sim N(0,\Sigma)$$
+où $x_t$ et $a_0$ sont de dimension $N$, les $A_n$ sont $N\times N$, et $\varepsilon_t$ est un vecteur de chocs de covariance $\Sigma$.</p>
+<p>$$\mathcal L(\theta)=\sum_{t=p}^{T-1}\left[-\ln\sqrt{(2\pi)^N\lvert\Sigma\rvert}-\frac12\varepsilon_{t+1}^\top\Sigma^{-1}\varepsilon_{t+1}\right]$$</p>
+<p><strong>L'estimation.</strong>
+$$\max_{a_0,A_1,\dots,A_p,\Sigma}\mathcal L(\theta)\iff\min_{a_0,A_1,\dots,A_p,\Sigma}\sum_{t=p}^{T-1}\left[\ln\sqrt{(2\pi)^N\lvert\Sigma\rvert}+\frac12\varepsilon_{t+1}^\top\Sigma^{-1}\varepsilon_{t+1}\right]$$</p>
+<p><strong>Conditions d'optimalité</strong> pour $a_0,A_1,\dots,A_p$ :
+$$\sum_t\big(x_{t-i}\,\varepsilon_{t+1}^\top\big)=0, \quad i=0,1,\dots,p-1, \qquad \sum_t\varepsilon_{t+1}=0$$
+où $\varepsilon_{t+1}=x_{t+1}-\big(a_0+A_1x_t+\cdots+A_px_{t+1-p}\big)$.</p>
+<blockquote>
+<p><em><strong>Les coefficients du VAR peuvent être estimés par MCO, équation par équation. Les écarts-types peuvent aussi être calculés séparément pour chaque équation.</strong></em></p>
+</blockquote>
+<p class="cal piege"> <strong>C'est exactement le théorème d'optimalité de la fiche 58</strong>, redémontré ici par les conditions du premier ordre de la vraisemblance. Les conditions $\sum_tx_{t-i}\varepsilon_{t+1}^\top=0$ disent que les résidus sont <strong>orthogonaux aux régresseurs</strong> — les équations normales de la fiche 50 — et $\Sigma$ <strong>n'y apparaît pas</strong>, d'où l'estimation séparée.</p>
+<h2 data-prio="high">Concept 6 — La sélection de modèle</h2>
+<blockquote>
+<p><em>En pratique, on ne connaît pas le modèle exact. Le MLE peut être adapté pour faire de la <strong>sélection de modèle</strong> : si l'échantillon est assez grand, on peut identifier le bon modèle en <strong>comparant les vraisemblances maximisées</strong> et en les <strong>pénalisant pour le nombre de paramètres</strong> utilisés.</em></p>
+</blockquote>
+<p><strong>Le protocole pour un VAR($p$).</strong> Spécifier l'ordre maximal $\bar p$, en veillant à ce qu'il <strong>croisse avec la taille d'échantillon, mais pas trop vite</strong> :
+$$\lim_{T\to\infty}\bar p=\infty, \qquad \lim_{T\to\infty}\frac{\bar p}{T}=0 \qquad \left(\text{par exemple } \bar p=\tfrac14(\ln T)^2\right)$$
+puis trouver l'ordre optimal
+$$\hat p=\underset{0\leq p\leq\bar p}{\arg\max}\ \frac2T\mathcal L(\theta;p)-\text{pénalité}(p)$$
+avec
+$$\textbf{AIC : } \text{pénalité}(p)=2\cdot\frac{pN^2}{T}, \qquad \textbf{BIC : } \text{pénalité}(p)=\ln(T)\cdot\frac{pN^2}{T}$$</p>
+<blockquote>
+<p><em>Dans les grands échantillons, <strong>le BIC sélectionne des modèles d'ordre inférieur à l'AIC</strong>.</em></p>
+</blockquote>
+<p><strong>L'exemple du cours — la croissance du PIB américain.</strong> Croissance trimestrielle corrigée des variations saisonnières, en taux annualisés, avec $\bar p=7$ :</p>
+<ul>
+<li><strong>AIC</strong> dicte $p=5$, de coefficients $a_1,\dots,a_5=0{,}3185$ ; $0{,}1409$ ; $-0{,}0759$ ; $-0{,}0600$ ; $-0{,}0904$.</li>
+<li><strong>BIC</strong> dicte $p=1$, de coefficient $a_1=0{,}3611$.</li>
+</ul>
+<blockquote>
+<p><strong>L'écart entre les deux verdicts est spectaculaire — $5$ contre $1$ — et illustre exactement ce que la fiche 52 annonçait.</strong> Le BIC pénalise en $\ln(T)$ contre $2$ pour l'AIC ; dès $T&gt;7$, il est plus sévère, et l'écart croît avec l'échantillon. Le comptage $pN^2$ montre pourquoi : chaque retard supplémentaire coûte $N^2$ paramètres.</p>
+</blockquote>
+<h2 data-prio="must">Concept 7 — La méthode des moments généralisée (GMM)</h2>
+<p><strong>Le cadre.</strong> Un échantillon i.i.d. $X=(x_1,\dots,x_T)$ tiré d'une famille de densité $\phi(x;\theta_0)$, et l'on veut estimer un vecteur de paramètres $\theta_0$ de dimension $N$. On considère un vecteur de fonctions $f_j(x,\theta)$ — les <strong>« moments »</strong> — avec $\dim(f)=N$.</p>
+<blockquote>
+<p><strong>Conditions d'identification.</strong> On suppose savoir que
+$$\mathbb E\big[f(x_t,\theta_0)\big]=0 \qquad\text{et}\qquad \sum_{j=1}^N\Big(\mathbb E\big[f_j(x_t,\theta)\big]\Big)^2&gt;0 \ \text{ si } \theta\neq\theta_0$$</p>
+</blockquote>
+<blockquote>
+<p><strong>L'estimateur GMM</strong> $\hat\theta$ est défini par
+$$\boxed{\ \hat{\mathbb E}\big[f(x_t,\hat\theta)\big]\equiv\frac1T\sum_{t=1}^Tf(x_t,\hat\theta)=0\ }$$</p>
+</blockquote>
+<blockquote>
+<p><strong>La logique, en deux temps.</strong> La <strong>première</strong> condition dit que les moments s'annulent à la vraie valeur — c'est ce qui rend l'estimation possible. La <strong>seconde</strong> dit qu'ils ne s'annulent <strong>qu'à</strong> la vraie valeur — c'est l'<strong>identification</strong>, sans laquelle plusieurs $\theta$ résoudraient le système. On remplace ensuite l'espérance par la moyenne empirique et l'on résout : <strong>$N$ équations, $N$ inconnues</strong>.</p>
+</blockquote>
+<p><strong>Exemple — moyenne et variance.</strong> Pour estimer $\theta_0=(\mu_0,\sigma_0)^\top$ avec $\sigma_0\geq0$, on choisit
+$$f_1(x_t,\theta)=x_t-\mu, \qquad f_2(x_t,\theta)=(x_t-\mu)^2-\sigma^2$$
+<em>Il est facile de voir que $\mathbb E[f(x,\theta_0)]=0$, et que $\mathbb E[f(x,\theta)]\neq0$ si $\theta\neq\theta_0$.</em> Les estimations sont
+$$\hat{\mathbb E}(x_t)-\hat\mu=0\ \Rightarrow\ \hat\mu=\hat{\mathbb E}(x_t), \qquad \hat{\mathbb E}\big[(x_t-\hat\mu)^2\big]-\hat\sigma^2=0\ \Rightarrow\ \hat\sigma^2=\hat{\mathbb E}\big[(x_t-\hat\mu)^2\big]$$</p>
+<h2 data-prio="must">Concept 8 — GMM et MLE : le score comme moment</h2>
+<blockquote>
+<p><em>Les <strong>conditions du premier ordre du MLE</strong> peuvent servir de moments dans une estimation GMM.</em> Les conditions d'optimalité pour maximiser $\mathcal L(\theta)=\sum_{t=1}^T\ln p(x_t,\theta)$ sont
+$$\sum_{t=1}^T\frac{\partial\ln p(x_t,\theta)}{\partial\theta}=0$$
+<em>Si l'on pose $f=\partial\ln p(x,\theta)/\partial\theta$ — le <strong>vecteur de score</strong> —, alors <strong>le MLE se réduit à un GMM</strong> de vecteur de moment $f$.</em></p>
+</blockquote>
+<blockquote>
+<p><strong>C'est le résultat structurant du chapitre.</strong> Le GMM <strong>englobe</strong> le MLE. Et l'on comprend pourquoi les conditions d'optimalité du modèle gaussien du concept 3 étaient <em>identiques aux conditions GMM</em> : le score gaussien <strong>est</strong> le vecteur $\big(x_t-\mu,\ (x_t-\mu)^2-\sigma^2\big)$, à normalisation près.</p>
+<p><strong>Et cela donne une méthode de travail</strong> : quand on ne sait pas quels moments choisir, on écrit une vraisemblance — même approximative — et l'on prend son <strong>score</strong>. C'est exactement l'idée du QMLE.</p>
+</blockquote>
+<p><strong>Exemple — un modèle de taux d'intérêt.</strong>
+$$r_{t+1}=a_0+a_1r_t+\varepsilon_{t+1}, \qquad \mathbb E(\varepsilon_{t+1}\mid r_t)=0, \qquad \mathbb E(\varepsilon_{t+1}^2\mid r_t)=b_0+b_1r_t$$
+<em>Pour toute fonction $g(r_t)$,</em>
+$$\mathbb E\big[g(r_t)\varepsilon_{t+1}\big]=\mathbb E\Big[\mathbb E\big[g(r_t)\varepsilon_{t+1}\mid r_t\big]\Big]=\mathbb E\Big[g(r_t)\,\mathbb E[\varepsilon_{t+1}\mid r_t]\Big]=0$$
+En prenant $g(r_t)=1$ et $g(r_t)=r_t$, on obtient les conditions de moment
+$$\mathbb E\Big[(1,r_t)^\top\big(r_{t+1}-a_0-a_1r_t\big)\Big]=0, \qquad \mathbb E\Big[(1,r_t)^\top\Big(\big(r_{t+1}-a_0-a_1r_t\big)^2-b_0-b_1r_t\Big)\Big]=0$$</p>
+<blockquote>
+<p><em>$(a_0,a_1)$ peut être estimé à partir de la <strong>première paire</strong> de conditions de moment. C'est équivalent aux <strong>MCO</strong>, et cela <strong>ignore l'information sur le second moment</strong>.</em></p>
+</blockquote>
+<p class="cal piege"> <strong>Le mécanisme $\mathbb E[g(r_t)\varepsilon_{t+1}]=0$ est le plus productif de tout le GMM.</strong> Une seule hypothèse — $\mathbb E[\varepsilon_{t+1}\mid r_t]=0$ — engendre une <strong>infinité</strong> de conditions de moment valides, une par fonction $g$ de l'information passée. C'est la notion d'<strong>instrument</strong> : n'importe quelle variable connue en $t$ fournit une équation. Reste à choisir lesquelles, et c'est là qu'intervient l'efficacité.</p>
+<h2 data-prio="must">Concept 9 — Le quasi-maximum de vraisemblance</h2>
+<blockquote>
+<ul>
+<li><em>Les estimations du maximum de vraisemblance sont <strong>optimales</strong> : elles ont la <strong>plus petite variance asymptotique</strong>.</em></li>
+<li><em>Quand on connaît précisément $p(X,\theta)$, le MLE est l'approche la plus <strong>efficace</strong>.</em></li>
+<li><em>Le MLE est souvent une façon commode de <strong>déterminer quelles conditions de moment imposer</strong>.</em></li>
+<li><em><strong>Même si le modèle $p(X,\theta)$ est mal spécifié, l'approche MLE peut rester valide tant que les conditions de moment impliquées sont valides.</strong></em></li>
+<li><em>Avec un modèle <strong>incorrect</strong> $q(X,\theta)$, le MLE est un <strong>cas particulier du GMM</strong> : les résultats du GMM s'appliquent.</em></li>
+</ul>
+<p><em><strong>L'approche consistant à utiliser une fonction de vraisemblance incorrecte — typiquement gaussienne — pour estimer s'appelle le quasi-maximum de vraisemblance (QMLE).</strong></em></p>
+</blockquote>
+<p><strong>Exemple 1 — QMLE pour un AR($p$) à erreurs non gaussiennes.</strong>
+$$x_{t+1}=a_0+a_1x_t+\cdots+a_px_{t+1-p}+\varepsilon_{t+1}, \qquad \mathbb E[\varepsilon_{t+1}\mid x_t,\dots,x_{t+1-p}]=0$$
+<em>On <strong>fait comme si</strong> les erreurs étaient gaussiennes pour construire $\mathcal L(\theta)$.</em> Les conditions d'optimalité sont
+$$\sum_t\big(x_{t-i}\varepsilon_{t+1}\big)=0, \quad i=0,\dots,p-1, \qquad \sum_t\varepsilon_{t+1}=0$$</p>
+<blockquote>
+<p><em>Ce sont des <strong>conditions de moment valides</strong> — à vérifier. <strong>Le GMM justifie le QMLE</strong>.</em></p>
+</blockquote>
+<p class="cal piege"> <strong>C'est le point conceptuel décisif.</strong> On a estimé avec une vraisemblance <strong>fausse</strong>, et pourtant l'estimateur est consistant. La raison est que les conditions du premier ordre obtenues coïncident avec des conditions de moment <strong>qui, elles, sont vraies</strong> — elles ne demandent que $\mathbb E[\varepsilon_{t+1}\mid\text{passé}]=0$, pas la normalité. La normalité n'a servi que d'<strong>échafaudage</strong> pour produire les bons moments.</p>
+<p><strong>Exemple 2 — QMLE avec hétéroscédasticité.</strong> Reprenons
+$$r_{t+1}=a_0+a_1r_t+\varepsilon_{t+1}, \qquad \mathbb E(\varepsilon_{t+1}\mid r_t)=0, \qquad \mathbb E(\varepsilon_{t+1}^2\mid r_t)=b_0+b_1r_t$$
+<em>QMLE : on traite $\varepsilon_t$ comme $N(0,b_0+b_1r_{t-1})$, d'où</em>
+$$\mathcal L(\theta)=\sum_{t=1}^{T-1}\left[-\frac12\ln\big(2\pi(b_0+b_1r_t)\big)-\frac{\big(r_{t+1}-a_0-a_1r_t\big)^2}{2(b_0+b_1r_t)}\right]$$</p>
+<blockquote>
+<p><em>$(a_0,a_1)$ <strong>ne peut plus être estimé séparément</strong> de $(b_0,b_1)$.</em> Les conditions d'optimalité pour $(a_0,a_1)$ deviennent
+$$\sum_{t=1}^{T-1}(1,r_t)^\top\ \frac{r_{t+1}-a_0-a_1r_t}{b_0+b_1r_t}=0$$
+<em><strong>Ce ne sont plus les MCO, mais les MCG. Estimations plus précises de $(a_0,a_1)$ : on sous-pondère les résidus à forte variance.</strong></em></p>
+</blockquote>
+<p><strong>La motivation empirique.</strong> <em>Sur le taux des bons du Trésor à 3 mois (marché secondaire, données mensuelles), le nuage des variations de taux contre le niveau retardé montre une <strong>volatilité plus forte quand les taux sont élevés</strong>.</em> D'où la spécification $b_0+b_1r_t$.</p>
+<blockquote>
+<p><strong>La conclusion du cours.</strong> <em>Le QMLE aide à spécifier les moments du GMM. <strong>Ne pas l'utiliser aveuglément</strong> : il faut <strong>vérifier que les conditions de moment sont valides</strong>.</em></p>
+</blockquote>
+<p class="cal piege"> <strong>Et remarquez le lien avec les fiches 50 et 66.</strong> La pondération par $1/(b_0+b_1r_t)$ est exactement celle des <strong>MCG</strong> — division par la variance conditionnelle — et exactement la matrice $W$ de l'algorithme <strong>IRLS</strong>. Trois cours différents, la même correction d'hétéroscédasticité.</p>
+<h2>Comment résoudre l'exercice type (protocole)</h2>
+<ol>
+<li><strong>Évaluer ce qu'on connaît</strong> : densité complète ⟹ <strong>MLE</strong> · deux premiers moments ⟹ <strong>QMLE</strong> · quelques moments ⟹ <strong>GMM</strong>.</li>
+<li><strong>MLE</strong> : écrire $\mathcal L(\theta)=\ln p(X,\theta)$ — conditionnelle si les observations sont dépendantes — puis annuler le gradient.</li>
+<li><strong>Vérifier la simplification</strong> : erreurs gaussiennes ⟹ MLE $=$ <strong>MCO</strong> ; hétéroscédasticité modélisée ⟹ <strong>MCG</strong>.</li>
+<li><strong>GMM</strong> : choisir $N$ fonctions $f_j$ avec $\mathbb E[f(x,\theta_0)]=0$, <strong>vérifier l'identification</strong>, puis résoudre $\frac1T\sum_tf(x_t,\hat\theta)=0$.</li>
+<li><strong>Si l'on manque d'idées de moments</strong> : écrire une vraisemblance approximative et prendre son <strong>score</strong>.</li>
+<li><strong>QMLE</strong> : construire $\mathcal L$ avec une loi commode (gaussienne), en déduire les conditions du premier ordre, et <strong>vérifier qu'elles sont des conditions de moment valides</strong>.</li>
+<li><strong>Sélection d'ordre</strong> : $\hat p=\arg\max\frac2T\mathcal L(\theta;p)-\text{pénalité}(p)$, avec $2pN^2/T$ (AIC) ou $\ln(T)pN^2/T$ (BIC).</li>
+</ol>
+<h3>Comment reconnaître qu'il faut utiliser cette méthode ?</h3>
+<table>
+<thead>
+<tr>
+<th>Indice dans l'énoncé</th>
+<th>Ce qu'il faut faire</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>loi <strong>entièrement spécifiée</strong></td>
+<td><strong>MLE</strong> — précision maximale</td>
+</tr>
+<tr>
+<td>« on ne connaît que les deux premiers moments »</td>
+<td><strong>QMLE</strong></td>
+</tr>
+<tr>
+<td>« on ne connaît que quelques moments »</td>
+<td><strong>GMM</strong></td>
+</tr>
+<tr>
+<td>erreurs gaussiennes dans un AR</td>
+<td>MLE $=$ <strong>MCO</strong></td>
+</tr>
+<tr>
+<td>VAR sans restriction</td>
+<td>MCO <strong>équation par équation</strong></td>
+</tr>
+<tr>
+<td>« quel ordre $p$ choisir ? »</td>
+<td><strong>AIC</strong> ou <strong>BIC</strong>, pénalité en $pN^2/T$</td>
+</tr>
+<tr>
+<td>$\mathbb E[\varepsilon_{t+1}\mid\text{passé}]=0$</td>
+<td>une condition de moment <strong>par instrument</strong> $g$</td>
+</tr>
+<tr>
+<td>variance conditionnelle modélisée</td>
+<td><strong>MCG</strong>, pondérer par $1/\mathrm{var}$</td>
+</tr>
+<tr>
+<td>« le modèle est faux, l'estimateur reste-t-il valide ? »</td>
+<td>oui <strong>si les moments sont valides</strong> — GMM justifie QMLE</td>
+</tr>
+</tbody></table>
+<h3>Exercices progressifs</h3>
+<p><strong> Niveau 1</strong> — Montrez que l'EMV d'un AR($p$) à erreurs gaussiennes coïncide avec les MCO.</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p><strong>Le modèle.</strong> $x_{t+1}=a_0+a_1x_t+\cdots+a_px_{t+1-p}+\varepsilon_{t+1}$ avec $\varepsilon_{t+1}\sim N(0,\sigma^2)$ i.i.d.</p>
+<p><strong>La vraisemblance conditionnelle.</strong> Conditionnellement à $(x_t,\dots,x_{t+1-p})$, la variable $x_{t+1}$ est gaussienne de moyenne $a_0+a_1x_t+\cdots+a_px_{t+1-p}$ et de variance $\sigma^2$, donc
+$$\mathcal L(\theta)=\sum_{t=p}^{T-1}\left[-\ln\sqrt{2\pi\sigma^2}-\frac{\big(x_{t+1}-a_0-a_1x_t-\cdots-a_px_{t+1-p}\big)^2}{2\sigma^2}\right]$$</p>
+<p><strong>La séparation.</strong> Le premier terme, $-\ln\sqrt{2\pi\sigma^2}$, <strong>ne dépend pas de $a$</strong>. Le second est $-\frac{1}{2\sigma^2}$ fois la somme des carrés des résidus, avec $\sigma^2&gt;0$. Donc
+$$\max_{a}\ \mathcal L(\theta)\iff\min_{a}\ \sum_{t=p}^{T-1}\big(x_{t+1}-a_0-a_1x_t-\cdots-a_px_{t+1-p}\big)^2$$
+qui est exactement le critère des <strong>moindres carrés</strong>. $\blacksquare$</p>
+<p><strong>Ce que cela apprend.</strong> Le critère des MCO n'est pas un choix arbitraire : c'est le maximum de vraisemblance <strong>sous hypothèse gaussienne</strong> — le même résultat qu'en fiche 50, ici transposé aux séries temporelles.</p>
+<p class="cal piege"> <strong>Et la réciproque est intéressante.</strong> Si les erreurs ne sont <strong>pas</strong> gaussiennes, les MCO restent une procédure valide — c'est le <strong>QMLE</strong> —, mais ils ne sont plus l'EMV et perdent l'efficacité optimale. Ce qui les sauve est que leurs conditions du premier ordre $\sum_tx_{t-i}\varepsilon_{t+1}=0$ sont des <strong>conditions de moment valides</strong>, dérivant seulement de $\mathbb E[\varepsilon_{t+1}\mid\text{passé}]=0$.</p>
+</div></details>
+
+<p><strong> Niveau 2</strong> — Énoncez les conditions d'identification du GMM et expliquez leur rôle.</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p><strong>Les deux conditions.</strong>
+$$\mathbb E\big[f(x_t,\theta_0)\big]=0 \qquad\text{(1)}$$
+$$\sum_{j=1}^N\Big(\mathbb E\big[f_j(x_t,\theta)\big]\Big)^2&gt;0 \quad\text{si } \theta\neq\theta_0 \qquad\text{(2)}$$</p>
+<p><strong>Le rôle de (1) — la validité.</strong> Les moments <strong>s'annulent à la vraie valeur</strong>. C'est ce qui rend l'estimation possible : la version empirique $\frac1T\sum_tf(x_t,\theta)$ converge vers $0$ en $\theta_0$ par la LGN, donc la solution du système empirique converge vers $\theta_0$.</p>
+<p><strong>Le rôle de (2) — l'identification.</strong> Les moments <strong>ne s'annulent qu'à la vraie valeur</strong>. Sans cette condition, plusieurs $\theta$ vérifieraient $\mathbb E[f(x,\theta)]=0$, et rien ne permettrait de choisir. C'est exactement l'identifiabilité de la fiche 67, formulée en termes de moments.</p>
+<p><strong>La dimension.</strong> $\dim(f)=N=\dim(\theta)$ : <strong>autant d'équations que d'inconnues</strong>. Le système $\frac1T\sum_tf(x_t,\hat\theta)=0$ est donc exactement déterminé.</p>
+<p><strong>L'exemple moyenne-variance.</strong> $f_1=x_t-\mu$, $f_2=(x_t-\mu)^2-\sigma^2$. La condition (1) est immédiate. La condition (2) se vérifie : si $\mu\neq\mu_0$, alors $\mathbb E[f_1]=\mu_0-\mu\neq0$ ; et si $\mu=\mu_0$ mais $\sigma\neq\sigma_0$, alors $\mathbb E[f_2]=\sigma_0^2-\sigma^2\neq0$.</p>
+<p class="cal piege"> <strong>Le cas suridentifié</strong>, que le cours ne traite pas ici mais qu'il faut connaître : si l'on dispose de <strong>plus</strong> de moments que de paramètres, le système n'a en général pas de solution exacte. On minimise alors une forme quadratique $\hat{\mathbb E}[f]^\top W\hat{\mathbb E}[f]$, et le choix de $W$ détermine l'efficacité. C'est le GMM au sens de Hansen.</p>
+</div></details>
+
+<p><strong> Niveau 3</strong> — Pourquoi le QMLE est-il valide alors que le modèle est faux ?</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p><strong>Le paradoxe apparent.</strong> On estime en maximisant une vraisemblance $q(X,\theta)$ dont on <strong>sait</strong> qu'elle n'est pas la vraie densité — typiquement une gaussienne pour des données non gaussiennes. Comment l'estimateur peut-il rester consistant ?</p>
+<p><strong>La réponse : le GMM.</strong> <em>Avec un modèle incorrect $q(X,\theta)$, le MLE est un <strong>cas particulier du GMM</strong>. Les résultats du GMM s'appliquent.</em> Maximiser $q$ revient à annuler son score :
+$$\frac1T\sum_t\frac{\partial\ln q(x_t,\hat\theta)}{\partial\theta}=0$$
+C'est un système GMM de fonction de moment $f=\partial\ln q/\partial\theta$. <strong>La question n'est donc plus « $q$ est-elle la vraie densité ? » mais « $\mathbb E[f(x,\theta_0)]=0$ est-elle vraie ? »</strong> — une exigence bien plus faible.</p>
+<p><strong>L'exemple de l'AR($p$).</strong> En faisant comme si les erreurs étaient gaussiennes, les conditions du premier ordre sont
+$$\sum_t\big(x_{t-i}\varepsilon_{t+1}\big)=0, \quad i=0,\dots,p-1, \qquad \sum_t\varepsilon_{t+1}=0$$
+Or ces conditions n'expriment <strong>que l'orthogonalité des résidus au passé</strong> — elles découlent de la seule hypothèse $\mathbb E[\varepsilon_{t+1}\mid x_t,\dots,x_{t+1-p}]=0$, <strong>sans aucune hypothèse de normalité</strong>. Elles sont donc <strong>valides</strong>, et le GMM garantit la consistance.</p>
+<p><strong>La normalité n'a servi que d'échafaudage.</strong> Elle a permis d'<strong>écrire</strong> une fonction objectif commode, dont les conditions du premier ordre se trouvent être les bons moments. Une fois les moments identifiés, l'échafaudage peut être retiré.</p>
+<p><strong>Ce qu'on perd malgré tout.</strong> <em>Les estimations MLE sont optimales : elles ont la plus petite variance asymptotique.</em> Avec une vraisemblance fausse, on garde la <strong>consistance</strong> mais on perd l'<strong>efficacité</strong> — et surtout, <strong>les écarts-types calculés par la formule MLE sont faux</strong>. Il faut utiliser les écarts-types <strong>robustes</strong> du GMM (fiche suivante du cours).</p>
+<p><strong>L'avertissement du cours.</strong> <em>Le QMLE aide à spécifier les moments du GMM. <strong>Ne pas l'utiliser aveuglément</strong> : vérifier que les conditions de moment sont valides.</em> Un contre-exemple immédiat : si l'on modélisait une variance conditionnelle <strong>fausse</strong> dans l'exemple hétéroscédastique, les conditions pondérées ne seraient plus des moments valides et l'estimateur serait biaisé.</p>
+</div></details>
+
+<p><strong> Niveau 4 — type examen</strong> — Construisez l'estimation d'un modèle de taux hétéroscédastique par GMM puis par QMLE, et comparez.</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p><strong>Le modèle.</strong>
+$$r_{t+1}=a_0+a_1r_t+\varepsilon_{t+1}, \qquad \mathbb E(\varepsilon_{t+1}\mid r_t)=0, \qquad \mathbb E(\varepsilon_{t+1}^2\mid r_t)=b_0+b_1r_t$$
+<strong>La motivation empirique</strong> : sur le taux des bons du Trésor à 3 mois, le nuage des variations contre le niveau retardé montre une <strong>volatilité croissante avec le niveau des taux</strong>.</p>
+<p><strong>Approche 1 — GMM.</strong></p>
+<p><em>Étape 1 — le mécanisme des instruments.</em> Pour toute fonction $g(r_t)$,
+$$\mathbb E\big[g(r_t)\varepsilon_{t+1}\big]=\mathbb E\Big[g(r_t)\,\mathbb E[\varepsilon_{t+1}\mid r_t]\Big]=0$$
+par la loi des espérances itérées.</p>
+<p><em>Étape 2 — choisir $g=1$ et $g=r_t$.</em> On obtient quatre conditions de moment :
+$$\mathbb E\Big[(1,r_t)^\top\big(r_{t+1}-a_0-a_1r_t\big)\Big]=0$$
+$$\mathbb E\Big[(1,r_t)^\top\Big(\big(r_{t+1}-a_0-a_1r_t\big)^2-b_0-b_1r_t\Big)\Big]=0$$</p>
+<p><em>Étape 3 — estimer.</em> $(a_0,a_1)$ s'obtient <strong>de la première paire seule</strong>. <em>C'est équivalent aux MCO, et cela <strong>ignore l'information sur le second moment</strong>.</em> Puis $(b_0,b_1)$ se déduit de la seconde paire, à partir des résidus.</p>
+<p><strong>Approche 2 — QMLE.</strong></p>
+<p><em>On traite $\varepsilon_t$ comme $N(0,b_0+b_1r_{t-1})$</em> et l'on construit
+$$\mathcal L(\theta)=\sum_{t=1}^{T-1}\left[-\frac12\ln\big(2\pi(b_0+b_1r_t)\big)-\frac{\big(r_{t+1}-a_0-a_1r_t\big)^2}{2(b_0+b_1r_t)}\right]$$</p>
+<p><em>Conséquence immédiate</em> : $(a_0,a_1)$ <strong>ne peut plus être estimé séparément</strong> de $(b_0,b_1)$ — les deux blocs sont couplés par la pondération.</p>
+<p><em>Les conditions du premier ordre pour $(a_0,a_1)$</em> :
+$$\sum_{t=1}^{T-1}(1,r_t)^\top\,\frac{r_{t+1}-a_0-a_1r_t}{b_0+b_1r_t}=0$$</p>
+<p><strong>La comparaison.</strong></p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th><strong>GMM (première paire)</strong></th>
+<th><strong>QMLE</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Conditions</td>
+<td>$\sum_t(1,r_t)^\top\varepsilon_{t+1}=0$</td>
+<td>$\sum_t(1,r_t)^\top\frac{\varepsilon_{t+1}}{b_0+b_1r_t}=0$</td>
+</tr>
+<tr>
+<td>Méthode</td>
+<td><strong>MCO</strong></td>
+<td><strong>MCG</strong></td>
+</tr>
+<tr>
+<td>Pondération</td>
+<td>uniforme</td>
+<td>$1/\mathrm{var}$ conditionnelle</td>
+</tr>
+<tr>
+<td>Estimation de $(a,b)$</td>
+<td><strong>séparée</strong></td>
+<td><strong>couplée</strong></td>
+</tr>
+<tr>
+<td>Précision</td>
+<td>moindre</td>
+<td><strong>meilleure</strong></td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><em>Ce ne sont plus les MCO, mais les MCG. Estimations plus précises de $(a_0,a_1)$ : on <strong>sous-pondère les résidus à forte variance</strong>.</em></p>
+</blockquote>
+<p><strong>Pourquoi les MCG sont plus précises.</strong> Les observations où la variance conditionnelle $b_0+b_1r_t$ est grande sont <strong>moins informatives</strong> sur $(a_0,a_1)$ : leur résidu est bruité indépendamment de la valeur des coefficients. Leur donner un poids plus faible réduit la variance de l'estimateur. C'est exactement le théorème de Gauss-Markov généralisé de la fiche 50, et exactement la matrice de poids $W$ de l'IRLS en fiche 66.</p>
+<p><strong>Ce qu'il faut savoir conclure.</strong></p>
+<ol>
+<li>Le GMM à quatre moments et le QMLE utilisent <strong>la même information</strong>, mais le QMLE la <strong>combine plus efficacement</strong> en pondérant.</li>
+<li>Le QMLE reste valide <strong>bien que la loi ne soit pas gaussienne</strong>, parce que ses conditions du premier ordre sont des conditions de moment valides — <em>le GMM justifie le QMLE</em>.</li>
+<li>Il faut néanmoins <strong>vérifier</strong> cette validité, et utiliser des écarts-types <strong>robustes</strong> : la formule d'écart-type du MLE gaussien serait fausse ici.</li></ol></div></details>
+
+<h2 data-prio="must">Common mistakes</h2>
+<ol>
+<li><strong>Croire que le MLE exige des observations i.i.d.</strong> — il fonctionne aussi pour des observations <strong>dépendantes</strong>, via la vraisemblance <strong>conditionnelle</strong>.</li>
+<li><strong>Oublier de conditionner sur les $L$ premières observations</strong> dans un modèle à retards.</li>
+<li><strong>Croire que MCO $=$ MLE toujours</strong> — c'est vrai sous erreurs <strong>gaussiennes homoscédastiques</strong> seulement.</li>
+<li><strong>Oublier que $\Sigma$ n'entre pas dans les conditions d'optimalité du VAR</strong> — c'est ce qui autorise l'estimation équation par équation.</li>
+<li><strong>Se tromper de pénalité</strong> — AIC en $2pN^2/T$, BIC en $\ln(T)pN^2/T$ ; le BIC choisit des ordres <strong>plus faibles</strong>.</li>
+<li><strong>Oublier la condition d'identification du GMM</strong> — la validité des moments ne suffit pas.</li>
+<li><strong>Ne pas exploiter tous les instruments</strong> — $\mathbb E[\varepsilon_{t+1}\mid\text{passé}]=0$ engendre une condition <strong>par fonction $g$</strong> du passé.</li>
+<li><strong>Utiliser les écarts-types du MLE après un QMLE</strong> — ils sont <strong>faux</strong> ; il faut les écarts-types robustes du GMM.</li>
+<li><strong>Appliquer le QMLE aveuglément</strong> — <em>vérifier que les conditions de moment sont valides</em>.</li>
+<li><strong>Croire que GMM et MLE sont des méthodes rivales</strong> — le MLE est un <strong>cas particulier</strong> du GMM, avec le <strong>score</strong> pour moment.</li>
+</ol>
+<h2>Ultimate Review</h2>
+<ol>
+<li><strong>Les trois approches</strong> : <strong>MLE</strong> (densité connue, précision maximale) · <strong>QMLE</strong> (deux premiers moments) · <strong>GMM</strong> (quelques moments). <em>QMLE et GMM sont moins efficaces mais plus <strong>robustes</strong>.</em></li>
+<li><strong>Consistance</strong> : $\mathrm{plim}\ \hat\theta=\theta_0$. <strong>Sans biais</strong> : $\mathbb E[\hat\theta]=\theta_0$.</li>
+<li><strong>LGN</strong> : $\mathrm{plim}\frac1T\sum_tx_t=\mu$. <strong>TCL</strong> : $\frac{1}{\sqrt T}\sum_t(x_t-\mu)\Rightarrow N(0,\Omega)$.</li>
+<li><strong>Jensen</strong> : $f$ concave ⟹ $\sum w_nf(x_n)\leq f(\sum w_nx_n)$ ; d'où $\mathbb E[f(x)]\leq f(\mathbb E[x])$ — l'<strong>aversion au risque</strong>.</li>
+<li><strong>Fondement du MLE</strong> : $\mathbb E[\ln p(x,\tilde\theta)]\leq\mathbb E[\ln p(x,\theta_0)]$, démontré par Jensen et $\int p(x,\tilde\theta)dx=1$.</li>
+<li><strong>Vraisemblance</strong> : $\mathcal L(\theta)=\ln p(X,\theta)$ ; i.i.d. ⟹ $\frac1T\mathcal L=\frac1T\sum_t\ln p(x_t,\theta)$ ; $\hat\theta=\arg\max\mathcal L$.</li>
+<li><strong>Exemples</strong> : gaussien ⟹ conditions <strong>identiques au GMM</strong> ; exponentiel ⟹ $\hat\lambda=1/\bar x$.</li>
+<li><strong>Observations dépendantes</strong> : $\mathcal L(\theta)=\sum_{t=L}^{T-1}\ln p(x_{t+1}\mid x_t,\dots,x_{t+1-L};\theta)$ — dépendance devant s'éteindre assez vite, série <strong>stationnaire</strong>.</li>
+<li><strong>AR($p$) gaussien</strong> : $\max\mathcal L\iff\min\sum(x_{t+1}-a_0-\cdots)^2$ — <strong>MLE $=$ MCO</strong>.</li>
+<li><strong>VAR($p$)</strong> : conditions $\sum_tx_{t-i}\varepsilon_{t+1}^\top=0$ et $\sum_t\varepsilon_{t+1}=0$ ⟹ <strong>MCO équation par équation</strong>, écarts-types séparés.</li>
+<li><strong>Sélection d'ordre</strong> : $\hat p=\arg\max_{0\leq p\leq\bar p}\frac2T\mathcal L(\theta;p)-\text{pénalité}(p)$ avec $\bar p\to\infty$, $\bar p/T\to0$ (ex. $\frac14(\ln T)^2$).</li>
+<li><strong>Pénalités</strong> : AIC $2pN^2/T$, BIC $\ln(T)pN^2/T$ ; <strong>le BIC choisit des ordres plus faibles</strong>. Exemple PIB : AIC ⟹ $p=5$, BIC ⟹ $p=1$.</li>
+<li><strong>GMM</strong> : $\dim(f)=N$ ; <strong>validité</strong> $\mathbb E[f(x_t,\theta_0)]=0$ ; <strong>identification</strong> $\sum_j(\mathbb E[f_j(x_t,\theta)])^2&gt;0$ si $\theta\neq\theta_0$ ; estimateur $\frac1T\sum_tf(x_t,\hat\theta)=0$.</li>
+<li><strong>Exemple moyenne-variance</strong> : $f_1=x_t-\mu$, $f_2=(x_t-\mu)^2-\sigma^2$.</li>
+<li><strong>GMM englobe MLE</strong> : poser $f=\partial\ln p(x,\theta)/\partial\theta$, le <strong>vecteur de score</strong>.</li>
+<li><strong>Instruments</strong> : $\mathbb E[\varepsilon_{t+1}\mid r_t]=0$ ⟹ $\mathbb E[g(r_t)\varepsilon_{t+1}]=0$ pour <strong>toute</strong> fonction $g$.</li>
+<li><strong>QMLE</strong> : utiliser une vraisemblance <strong>incorrecte</strong> — typiquement gaussienne. <strong>Valide si les conditions de moment le sont</strong> ; <em>le GMM justifie le QMLE</em>.</li>
+<li><strong>QMLE hétéroscédastique</strong> : $\sum_t(1,r_t)^\top\frac{\varepsilon_{t+1}}{b_0+b_1r_t}=0$ — ce sont les <strong>MCG</strong>, plus précis, en sous-pondérant les résidus à forte variance.</li>
+</ol>
+<p><strong>Formulas to know</strong>
+$$\mathbb E\big[\ln p(x,\tilde\theta)\big]\leq\mathbb E\big[\ln p(x,\theta_0)\big] \qquad \hat\theta=\underset{\theta}{\arg\max}\ \frac1T\sum_{t=1}^T\ln p(x_t,\theta)$$
+$$\mathcal L(\theta)=\sum_{t=L}^{T-1}\ln p\big(x_{t+1}\mid x_t,\dots,x_{t+1-L};\theta\big) \qquad \hat p=\underset{p}{\arg\max}\ \frac2T\mathcal L(\theta;p)-\text{pénalité}(p)$$
+$$\frac1T\sum_{t=1}^Tf(x_t,\hat\theta)=0 \qquad f=\frac{\partial\ln p(x,\theta)}{\partial\theta} \qquad \mathbb E\big[g(r_t)\varepsilon_{t+1}\big]=0$$</p>
+<p><strong>Methods to know</strong> : la preuve par Jensen ; la construction d'une vraisemblance conditionnelle ; la vérification des deux conditions GMM ; la dérivation de moments par instruments ; la justification du QMLE par le GMM.</p>
+<div class="rec"><h2>Active Recall</h2><p><strong>Basic</strong> — Quelles sont les trois méthodes d'estimation, et selon quel critère les choisit-on ?</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<table>
+<thead>
+<tr>
+<th>Méthode</th>
+<th>Ce qu'elle exige</th>
+<th>Précision</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>MLE</strong></td>
+<td>la <strong>densité complète</strong> $p(X,\theta_0)$</td>
+<td><strong>maximale</strong></td>
+</tr>
+<tr>
+<td><strong>QMLE</strong></td>
+<td>quelques caractéristiques (deux premiers moments)</td>
+<td>intermédiaire</td>
+</tr>
+<tr>
+<td><strong>GMM</strong></td>
+<td>seulement <strong>quelques moments</strong></td>
+<td>moindre</td>
+</tr>
+</tbody></table>
+<p>Le critère est un <strong>arbitrage précision / robustesse</strong> : <em>QMLE et GMM sont moins précises (efficaces) que MLE, mais elles sont <strong>plus robustes</strong>, puisqu'elles n'exigent pas la connaissance complète de la loi.</em></p>
+<p class="cal piege"> Et le <strong>GMM englobe les deux autres</strong> : le MLE est un GMM dont la fonction de moment est le <strong>score</strong> $\partial\ln p/\partial\theta$, et le QMLE est un GMM dont le score provient d'une densité <strong>incorrecte</strong>.</p>
+</div></details><p><strong>Understanding</strong> — Pourquoi la vraie densité maximise-t-elle l'espérance de la log-vraisemblance ?</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p><strong>L'énoncé.</strong> Pour toute densité alternative $p(x,\tilde\theta)$ :
+$$\mathbb E\big[\ln p(x,\tilde\theta)\big]\leq\mathbb E\big[\ln p(x,\theta_0)\big]$$</p>
+<p><strong>La démonstration</strong>, par <strong>Jensen</strong> appliquée à $\ln$, qui est concave, et en utilisant $\int p(x,\tilde\theta)dx=1$ :
+$$\mathbb E\left[\ln\frac{p(x_t,\tilde\theta)}{p(x_t,\theta_0)}\right]\leq\ln\mathbb E\left[\frac{p(x_t,\tilde\theta)}{p(x_t,\theta_0)}\right]=\ln\int\frac{p(x,\tilde\theta)}{p(x,\theta_0)}p(x,\theta_0)dx=\ln\int p(x,\tilde\theta)dx=\ln1=0$$</p>
+<p><strong>La conséquence.</strong> Il suffit de remplacer l'espérance par sa moyenne empirique :
+$$\hat\theta=\underset{\theta}{\arg\max}\ \frac1T\sum_{t=1}^T\ln p(x_t,\theta)$$</p>
+<p class="cal piege"> <strong>C'est le même résultat que la fiche 64, démontré autrement.</strong> L'écart $\mathbb E[\ln p(\theta_0)]-\mathbb E[\ln p(\tilde\theta)]$ <strong>est</strong> la divergence de Kullback-Leibler $KL(\mathbb P_{\theta_0},\mathbb P_{\tilde\theta})$, et l'inégalité <strong>est</strong> sa positivité. Jensen et la KL disent la même chose.</p>
+</div></details><p><strong>Application</strong> — Écrivez les conditions de moment GMM pour $r_{t+1}=a_0+a_1r_t+\varepsilon_{t+1}$ avec $\mathbb E[\varepsilon_{t+1}\mid r_t]=0$.</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p><strong>Le mécanisme.</strong> Pour <strong>toute</strong> fonction $g(r_t)$, la loi des espérances itérées donne
+$$\mathbb E\big[g(r_t)\varepsilon_{t+1}\big]=\mathbb E\Big[\mathbb E\big[g(r_t)\varepsilon_{t+1}\mid r_t\big]\Big]=\mathbb E\Big[g(r_t)\underbrace{\mathbb E[\varepsilon_{t+1}\mid r_t]}_{=0}\Big]=0$$</p>
+<p><strong>Le choix minimal.</strong> Avec $g=1$ et $g=r_t$ — deux instruments pour deux paramètres :
+$$\mathbb E\Big[(1,r_t)^\top\big(r_{t+1}-a_0-a_1r_t\big)\Big]=0$$</p>
+<p><strong>L'estimateur GMM.</strong> On remplace par la moyenne empirique :
+$$\frac1T\sum_t\begin{pmatrix}1\\r_t\end{pmatrix}\big(r_{t+1}-\hat a_0-\hat a_1r_t\big)=0$$
+<em>C'est équivalent aux <strong>MCO</strong></em> — ce sont exactement les équations normales de la fiche 50, avec pour régresseurs la constante et $r_t$.</p>
+<p><strong>Si la variance conditionnelle est modélisée</strong>, $\mathbb E(\varepsilon^2_{t+1}\mid r_t)=b_0+b_1r_t$, on ajoute deux conditions :
+$$\mathbb E\Big[(1,r_t)^\top\Big(\big(r_{t+1}-a_0-a_1r_t\big)^2-b_0-b_1r_t\Big)\Big]=0$$
+mais $(a_0,a_1)$ s'estime <strong>de la première paire seule</strong> — ce qui <em>ignore l'information sur le second moment</em>. Le QMLE, lui, exploite cette information en pondérant, et gagne en précision.</p>
+<p class="cal piege"> <strong>La richesse du mécanisme</strong> : une seule hypothèse engendre une <strong>infinité</strong> de conditions valides, une par instrument. Le choix des instruments détermine l'efficacité — c'est tout le sujet du GMM optimal.</p>
+</div></details><p><strong>Comparison</strong> — MLE et GMM : quel est leur rapport exact ?</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p><strong>Ce ne sont pas des méthodes rivales : le MLE est un cas particulier du GMM.</strong></p>
+<p>Les conditions du premier ordre du MLE sont
+$$\sum_{t=1}^T\frac{\partial\ln p(x_t,\theta)}{\partial\theta}=0$$
+En posant $f=\dfrac{\partial\ln p(x,\theta)}{\partial\theta}$ — le <strong>vecteur de score</strong> —, c'est exactement le système GMM $\frac1T\sum_tf(x_t,\hat\theta)=0$.</p>
+<p><strong>La preuve de validité des moments</strong> est d'ailleurs immédiate : $\mathbb E[\text{score}]=0$ à la vraie valeur, c'est la première identité de la fiche 66.</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th><strong>MLE</strong></th>
+<th><strong>GMM</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Ce qu'il faut connaître</td>
+<td>la densité <strong>entière</strong></td>
+<td>quelques <strong>moments</strong></td>
+</tr>
+<tr>
+<td>Fonction de moment</td>
+<td>le <strong>score</strong></td>
+<td>libre</td>
+</tr>
+<tr>
+<td>Efficacité</td>
+<td><strong>optimale</strong> (Cramér-Rao)</td>
+<td>moindre</td>
+</tr>
+<tr>
+<td>Robustesse</td>
+<td>faible — dépend de la densité</td>
+<td><strong>élevée</strong></td>
+</tr>
+</tbody></table>
+<p><strong>L'exemple qui illustre le lien.</strong> Les conditions d'optimalité du MLE gaussien sont
+$$\hat{\mathbb E}(x_t-\hat\mu)=0, \qquad \hat{\mathbb E}\big[(x_t-\hat\mu)^2\big]-\hat\sigma^2=0$$
+<em>identiques aux conditions GMM</em> de l'exemple moyenne-variance. Le score gaussien <strong>est</strong> le vecteur de moments naturel.</p>
+<p><strong>La conséquence méthodologique.</strong> Quand on ne sait pas quels moments choisir, on <strong>écrit une vraisemblance</strong> — même approximative — et l'on prend son score. <em>Le MLE est souvent une façon commode de déterminer quelles conditions de moment imposer.</em> C'est le principe du <strong>QMLE</strong>.</p>
+</div></details><p><strong>Exam-style</strong> — Expliquez le QMLE, sa justification et ses limites.</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p><strong>La définition.</strong> <em>L'approche consistant à utiliser une fonction de vraisemblance <strong>incorrecte</strong> — typiquement gaussienne — pour estimer s'appelle le <strong>quasi-maximum de vraisemblance</strong>.</em></p>
+<p><strong>La justification, en trois pas.</strong></p>
+<ol>
+<li><em>Avec un modèle incorrect $q(X,\theta)$, le MLE est un <strong>cas particulier du GMM</strong>.</em> Maximiser $q$ revient à annuler son score, donc à résoudre un système GMM de fonction de moment $f=\partial\ln q/\partial\theta$.</li>
+<li>La question devient donc : <strong>les conditions $\mathbb E[f(x,\theta_0)]=0$ sont-elles vraies ?</strong> — une exigence bien plus faible que « $q$ est la vraie densité ».</li>
+<li>Si oui, <em>les résultats du GMM s'appliquent</em> : consistance et normalité asymptotique.</li>
+</ol>
+<p><strong>L'exemple canonique — l'AR($p$).</strong> En faisant comme si les erreurs étaient gaussiennes, les conditions du premier ordre sont
+$$\sum_t\big(x_{t-i}\varepsilon_{t+1}\big)=0,\quad i=0,\dots,p-1, \qquad \sum_t\varepsilon_{t+1}=0$$
+Ces conditions n'expriment <strong>que l'orthogonalité des résidus au passé</strong> — elles découlent de la seule hypothèse $\mathbb E[\varepsilon_{t+1}\mid x_t,\dots,x_{t+1-p}]=0$. <strong>Aucune normalité n'est requise.</strong> <em>Le GMM justifie le QMLE.</em></p>
+<p><strong>L'exemple avec hétéroscédasticité.</strong> En traitant $\varepsilon_t$ comme $N(0,b_0+b_1r_{t-1})$ :
+$$\mathcal L(\theta)=\sum_t\left[-\frac12\ln\big(2\pi(b_0+b_1r_t)\big)-\frac{\big(r_{t+1}-a_0-a_1r_t\big)^2}{2(b_0+b_1r_t)}\right]$$
+Deux conséquences :</p>
+<ul>
+<li>$(a_0,a_1)$ <strong>ne peut plus être estimé séparément</strong> de $(b_0,b_1)$ ;</li>
+<li>les conditions d'optimalité deviennent $\sum_t(1,r_t)^\top\frac{\varepsilon_{t+1}}{b_0+b_1r_t}=0$ — <em>ce ne sont plus les MCO mais les <strong>MCG</strong>, plus précises : on <strong>sous-pondère les résidus à forte variance</strong></em>.</li>
+</ul>
+<p><strong>Les limites — trois points à mentionner.</strong></p>
+<ol>
+<li><strong>Perte d'efficacité.</strong> <em>Les estimations MLE sont optimales : elles ont la plus petite variance asymptotique.</em> Avec une vraisemblance fausse, on garde la consistance mais on perd l'optimalité.</li>
+<li><strong>Écarts-types faux.</strong> La formule d'écart-type du MLE — fondée sur l'information de Fisher — <strong>suppose le modèle correct</strong>. Après un QMLE, il faut les écarts-types <strong>robustes</strong> du GMM.</li>
+<li><strong>La validité n'est pas automatique.</strong> <em>Ne pas l'utiliser aveuglément : vérifier que les conditions de moment sont valides.</em> Si l'on modélisait une variance conditionnelle <strong>fausse</strong> dans l'exemple ci-dessus, les conditions pondérées cesseraient d'être des moments valides et l'estimateur serait biaisé.</li>
+</ol>
+<p><strong>La conclusion du cours.</strong> <em>Le QMLE aide à spécifier les moments du GMM.</em> C'est sa vraie fonction : un <strong>générateur de conditions de moment</strong>, dont la validité doit ensuite être établie indépendamment de la loi supposée.</p>
+</div></details></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h2>Flashcards</h2>
+<table>
+<thead>
+<tr>
+<th>Question</th>
+<th>Réponse</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Les trois méthodes d'estimation ?</td>
+<td><strong>MLE</strong> · <strong>QMLE</strong> · <strong>GMM</strong></td>
+</tr>
+<tr>
+<td>Laquelle est la plus précise ?</td>
+<td>Le <strong>MLE</strong> — densité entièrement connue</td>
+</tr>
+<tr>
+<td>Lesquelles sont plus robustes ?</td>
+<td><strong>QMLE et GMM</strong></td>
+</tr>
+<tr>
+<td>Définition de la consistance ?</td>
+<td>$\mathrm{plim}_{T\to\infty}\hat\theta=\theta_0$</td>
+</tr>
+<tr>
+<td>Énoncé du TCL ?</td>
+<td>$\frac1{\sqrt T}\sum_t(x_t-\mu)\Rightarrow N(0,\Omega)$</td>
+</tr>
+<tr>
+<td>Inégalité de Jensen ?</td>
+<td>$f$ concave ⟹ $\mathbb E[f(x)]\leq f(\mathbb E[x])$</td>
+</tr>
+<tr>
+<td>Que représente-t-elle en finance ?</td>
+<td>L'<strong>aversion au risque</strong></td>
+</tr>
+<tr>
+<td>Le fondement du MLE ?</td>
+<td>$\mathbb E[\ln p(x,\tilde\theta)]\leq\mathbb E[\ln p(x,\theta_0)]$</td>
+</tr>
+<tr>
+<td>Comment se démontre-t-il ?</td>
+<td>Par <strong>Jensen</strong> et $\int p(x,\tilde\theta)dx=1$</td>
+</tr>
+<tr>
+<td>Définition de la vraisemblance ?</td>
+<td>$\mathcal L(\theta)=\ln p(X,\theta)$</td>
+</tr>
+<tr>
+<td>Que traite-t-elle comme fixé ?</td>
+<td>Les <strong>observations</strong> $X$</td>
+</tr>
+<tr>
+<td>EMV de la loi exponentielle ?</td>
+<td>$\hat\lambda=1/\bar x$</td>
+</tr>
+<tr>
+<td>Vraisemblance d'observations dépendantes ?</td>
+<td>$\sum_{t=L}^{T-1}\ln p(x_{t+1}\mid x_t,\dots,x_{t+1-L};\theta)$</td>
+</tr>
+<tr>
+<td>Quelle condition sur la dépendance ?</td>
+<td>Elle doit <strong>s'éteindre assez vite</strong></td>
+</tr>
+<tr>
+<td>EMV d'un AR($p$) gaussien ?</td>
+<td>Identique aux <strong>MCO</strong></td>
+</tr>
+<tr>
+<td>Pourquoi ?</td>
+<td>Le terme en $\sigma$ ne dépend pas de $a$</td>
+</tr>
+<tr>
+<td>Conditions d'optimalité du VAR ?</td>
+<td>$\sum_tx_{t-i}\varepsilon_{t+1}^\top=0$ et $\sum_t\varepsilon_{t+1}=0$</td>
+</tr>
+<tr>
+<td>Comment estimer un VAR ?</td>
+<td>Par <strong>MCO équation par équation</strong></td>
+</tr>
+<tr>
+<td>Critère de sélection d'ordre ?</td>
+<td>$\arg\max\frac2T\mathcal L(\theta;p)-\text{pénalité}(p)$</td>
+</tr>
+<tr>
+<td>Pénalité AIC ?</td>
+<td>$2pN^2/T$</td>
+</tr>
+<tr>
+<td>Pénalité BIC ?</td>
+<td>$\ln(T)pN^2/T$</td>
+</tr>
+<tr>
+<td>Lequel choisit un ordre plus faible ?</td>
+<td>Le <strong>BIC</strong></td>
+</tr>
+<tr>
+<td>Exemple du PIB ?</td>
+<td>AIC ⟹ $p=5$, BIC ⟹ $p=1$</td>
+</tr>
+<tr>
+<td>Condition de validité du GMM ?</td>
+<td>$\mathbb E[f(x_t,\theta_0)]=0$</td>
+</tr>
+<tr>
+<td>Condition d'identification ?</td>
+<td>$\sum_j(\mathbb E[f_j(x_t,\theta)])^2&gt;0$ si $\theta\neq\theta_0$</td>
+</tr>
+<tr>
+<td>Définition de l'estimateur GMM ?</td>
+<td>$\frac1T\sum_tf(x_t,\hat\theta)=0$</td>
+</tr>
+<tr>
+<td>Moments pour moyenne et variance ?</td>
+<td>$x_t-\mu$ et $(x_t-\mu)^2-\sigma^2$</td>
+</tr>
+<tr>
+<td>Comment le MLE devient-il un GMM ?</td>
+<td>En prenant le <strong>score</strong> $\partial\ln p/\partial\theta$ pour moment</td>
+</tr>
+<tr>
+<td>Que donne $\mathbb E[\varepsilon_{t+1}\mid r_t]=0$ ?</td>
+<td>$\mathbb E[g(r_t)\varepsilon_{t+1}]=0$ pour <strong>toute</strong> $g$</td>
+</tr>
+<tr>
+<td>Définition du QMLE ?</td>
+<td>Maximiser une vraisemblance <strong>incorrecte</strong></td>
+</tr>
+<tr>
+<td>Qu'est-ce qui le justifie ?</td>
+<td>Le <strong>GMM</strong> — si les moments sont valides</td>
+</tr>
+<tr>
+<td>Que devient l'estimation avec hétéroscédasticité ?</td>
+<td>Des <strong>MCG</strong>, pas des MCO</td>
+</tr>
+<tr>
+<td>Pourquoi est-ce plus précis ?</td>
+<td>On <strong>sous-pondère</strong> les résidus à forte variance</td>
+</tr>
+<tr>
+<td>Quelle précaution le cours impose-t-il ?</td>
+<td><strong>Vérifier la validité</strong> des conditions de moment</td>
+</tr>
+</tbody></table>
+</main>
+
+
+
+
+</body></html>

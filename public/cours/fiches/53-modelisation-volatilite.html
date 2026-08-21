@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fiche 53 — Modélisation de la volatilité : historique, brownien, sauts, ARCH et GARCH</title>
+<script>
+window.MathJax={tex:{inlineMath:[["$","$"]],displayMath:[["$$","$$"]],processEscapes:true},
+ options:{skipHtmlTags:["script","noscript","style","textarea","pre","code"]},
+ svg:{fontCache:"global"},
+ startup:{pageReady:()=>MathJax.startup.defaultPageReady().then(()=>{document.body.classList.add("ready")})}};
+setTimeout(function(){document.body.classList.add("ready")},2500);
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+/* ============================================================
+   MathiasLearn — feuille de style des fiches
+   Reprise intégrale des tokens de 00_PARCOURS/*.html
+   + blocs pédagogiques (callouts, méthode, essentiels, recall)
+   ============================================================ */
+:root{--bg:#faf9f7;--card:#fff;--ink:#1a1a1a;--muted:#6b6b6b;--line:#e5e2dd;--accent:#8b5e34;
+ --hl:#fdf8ef;--ok:#2d7d4f;--okbg:#f0f7f3;--warn:#b3402f;--warnbg:#fdf3f1;--blue:#2f5d8b;--bluebg:#f1f5fa}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+ font:17px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;padding:0 16px 100px}
+.nav{position:sticky;top:0;background:rgba(250,249,247,.96);backdrop-filter:blur(8px);
+ border-bottom:1px solid var(--line);margin:0 -16px 30px;padding:11px 16px;z-index:50;
+ display:flex;gap:6px;flex-wrap:wrap;font-size:13px}
+.nav a{color:var(--muted);text-decoration:none;padding:4px 9px;border-radius:5px;white-space:nowrap}
+.nav a:hover{background:var(--line);color:var(--ink)}
+.nav a.on{background:var(--accent);color:#fff}
+main{max-width:780px;margin:0 auto}
+h1{font-size:31px;letter-spacing:-.02em;margin:.4em 0 .5em;line-height:1.25}
+h2{font-size:23px;margin:2.2em 0 .7em;padding-bottom:.3em;border-bottom:1px solid var(--line)}
+h3{font-size:19px;margin:1.9em 0 .5em;color:var(--accent)}
+h4{font-size:17px;margin:1.5em 0 .4em}
+p{margin:.8em 0} a{color:var(--accent)} hr{border:0;border-top:1px solid var(--line);margin:2.6em 0}
+table{border-collapse:collapse;width:100%;margin:1.3em 0;font-size:15.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+th{background:#f3f0eb;font-weight:600}
+tr:nth-child(even) td{background:#fcfbfa}
+code{font-family:"SF Mono",Menlo,Consolas,monospace;font-size:.88em;background:#f2efea;padding:2px 6px;border-radius:4px;white-space:nowrap}
+pre{background:#f2efea;padding:14px 16px;border-radius:8px;overflow-x:auto}
+pre code{background:none;padding:0;white-space:pre}
+blockquote{border-left:3px solid var(--accent);background:var(--hl);margin:1.4em 0;padding:14px 20px;border-radius:0 8px 8px 0}
+blockquote p:first-child{margin-top:0} blockquote p:last-child{margin-bottom:0}
+ul,ol{padding-left:1.5em} li{margin:.35em 0} em{color:#4a4a4a}
+mjx-container[display="true"]{margin:1.1em 0!important;overflow-x:auto;overflow-y:hidden;padding:2px 0}
+mjx-container svg{max-width:100%}
+body:not(.ready) main{opacity:0} main{opacity:1;transition:opacity .25s}
+
+/* --- bandeau de tête de fiche --- */
+.cours{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--accent);
+ border-radius:0 10px 10px 0;padding:18px 22px;margin:0 0 34px}
+.cours h4{margin:0 0 4px;font-size:14px;text-transform:uppercase;letter-spacing:.07em;color:var(--accent)}
+.cours .cs{color:var(--muted);font-size:14.5px;margin:0 0 14px}
+
+/* --- exercices / corrigés --- */
+.ex{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:6px 24px 20px;margin:18px 0}
+.ex>h3:first-child{margin-top:14px}
+details.cor{margin-top:18px;border:1px solid var(--line);border-radius:8px;background:#fcfbfa;overflow:hidden}
+details.cor>summary{cursor:pointer;padding:12px 16px;font-weight:600;font-size:15px;color:var(--accent);
+ list-style:none;display:flex;align-items:center;gap:9px;user-select:none;transition:.15s;min-height:44px}
+details.cor>summary::-webkit-details-marker{display:none}
+details.cor>summary:hover{background:var(--hl)}
+details.cor>summary::before{content:"\25B6";font-size:10px;transition:transform .18s;display:inline-block}
+details.cor[open]>summary::before{transform:rotate(90deg)}
+details.cor[open]>summary{background:var(--okbg);color:var(--ok);border-bottom:1px solid var(--line)}
+.cor .in{padding:4px 20px 16px}
+.cor .in>*:first-child{margin-top:.9em}
+
+/* --- blocs pédagogiques (callouts) ---
+   Générés depuis une citation Markdown dont le premier **gras** commence
+   par un mot-clé : DÉFINITION, THÉORÈME, MÉTHODE, PIÈGE, INTUITION… */
+.cal{border:1px solid var(--line);border-left:4px solid var(--accent);background:var(--card);
+ border-radius:0 10px 10px 0;padding:15px 20px;margin:1.5em 0}
+.cal>p:first-child{margin-top:0}.cal>p:last-child,.cal>ul:last-child,.cal>ol:last-child{margin-bottom:0}
+.cal .lab{display:block;font-size:12.5px;text-transform:uppercase;letter-spacing:.08em;
+ font-weight:700;color:var(--accent);margin-bottom:6px}
+.cal.formel{background:var(--hl)}
+.cal.piege{border-left-color:var(--warn);background:var(--warnbg)}
+.cal.piege .lab{color:var(--warn)}
+.cal.methode{border-left-color:var(--ok);background:var(--okbg)}
+.cal.methode .lab{color:var(--ok)}
+.cal.intu{border-left-color:var(--blue);background:var(--bluebg)}
+.cal.intu .lab{color:var(--blue)}
+.cal.plus{border-left-style:dashed;background:#faf9f7}
+.cal.plus .lab{color:var(--muted)}
+
+/* --- révision express --- */
+.ess{background:var(--card);border:1px solid var(--accent);border-radius:10px;padding:4px 24px 20px;margin:1.6em 0}
+.ess h3{margin-top:1.3em}
+.rec{background:var(--card);border:1px dashed var(--accent);border-radius:10px;padding:4px 24px 18px;margin:1.6em 0}
+.rec ol{counter-reset:none}
+
+/* --- impression / PDF --- */
+@media print{
+ .nav{display:none}
+ body{padding:0;background:#fff;font-size:11.2pt;line-height:1.55}
+ main{max-width:none}
+ h1{font-size:23pt}h2{font-size:15pt;margin-top:1.5em}h3{font-size:12.6pt}
+ h2,h3,h4{break-after:avoid;page-break-after:avoid}
+ table,.cal,blockquote{break-inside:avoid;page-break-inside:avoid}
+ table{display:table;font-size:9.6pt}
+ details.cor{border:1px solid var(--line);background:#fcfbfa}
+ details.cor>summary{display:none}
+ details.cor .in{padding-top:10px}
+ .cal,.ex,.ess,.rec{box-shadow:none}
+ a{color:var(--ink);text-decoration:none}
+}
+@page{margin:16mm 15mm 18mm}
+
+/* --- exemples travaillés --- */
+.exm{background:#fcfbfa;border:1px solid var(--line);border-radius:10px;padding:2px 20px 14px;margin:1.5em 0}
+.exm>h4:first-child{margin:14px 0 .5em;color:var(--accent);font-size:13px;text-transform:uppercase;letter-spacing:.07em}
+
+
+/* --- pastilles de priorité (conventions des fiches de l'app) --- */
+h2[data-prio], h3[data-prio], h4[data-prio]{position:relative}
+h2[data-prio]::before,h3[data-prio]::before,h4[data-prio]::before{
+ content:"";display:inline-block;width:9px;height:9px;border-radius:50%;
+ margin-right:9px;vertical-align:middle;background:var(--muted)}
+[data-prio="must"]::before{background:var(--warn)}
+[data-prio="high"]::before{background:#d98324}
+[data-prio="mid"]::before{background:#c9a227}
+[data-prio="low"]::before{background:var(--ok)}
+/* corrigés des fiches de l'app : même traitement que les corrigés des séries */
+details.cor>summary::after{content:""}
+</style></head><body>
+<div class="nav"><a href="00_COMMENCER_ICI.html">Commencer ici</a><a href="01_NOTATIONS_le-decodeur.html">Notations</a><a href="02_EXERCICES_Serie-0.html">Série 0 — Remise en route</a><a href="03_EXERCICES_Serie-1.html">Série 1 — Convexité</a><a href="04_EXERCICES_Serie-2.html">Série 2 — KKT</a><a href="05_AUTO-EVALUATION.html">Auto-évaluation (quiz)</a><a href="06_FICHE_Optimisation-deux-variables.html">Fiche — Optimisation à 2 variables</a></div>
+<main><h1>Fiche 53 — Modélisation de la volatilité : historique, brownien, sauts, ARCH et GARCH</h1>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Matière</strong></td>
+<td>Maths · Finance de marché</td>
+</tr>
+<tr>
+<td><strong>Cours source</strong></td>
+<td>Kempthorne, <em>18.S096 Topics in Mathematics with Applications in Finance</em>, MIT OpenCourseWare, automne 2013 — cours 9 « Volatility Modeling »</td>
+</tr>
+<tr>
+<td><strong>Difficulté</strong></td>
+<td> Must know — la variable centrale de la gestion des risques</td>
+</tr>
+<tr>
+<td><strong>Temps d'étude estimé</strong></td>
+<td>2 h 30</td>
+</tr>
+<tr>
+<td><strong>Prérequis</strong></td>
+<td>Fiche 50 (moindres carrés, maximum de vraisemblance), fiche 52 (ARMA, stationnarité, AIC/BIC)</td>
+</tr>
+<tr>
+<td><strong>Concepts clés</strong></td>
+<td>Volatilité annualisée, moyennes mobiles exponentielles, RiskMetrics, mouvement brownien géométrique, estimateur de Garman-Klass, efficacité relative, diffusion à sauts de Poisson, ARCH, test du multiplicateur de Lagrange, GARCH, variance de long terme, faits stylisés</td>
+</tr>
+<tr>
+<td><strong>Poids à l'examen</strong></td>
+<td>Trois résultats : la <strong>loi des log-rendements</strong> sous le brownien géométrique (attention au $-\sigma^2/2$), l'<strong>équivalence GARCH(1,1) ⟺ ARMA(1,1)</strong> en $\varepsilon_t^2$, et la <strong>variance de long terme</strong> $\alpha_0/(1-\alpha_1-\beta_1)$.</td>
+</tr>
+</tbody></table>
+<h2>Vue d'ensemble</h2>
+<div class="cal formel"><span class="lab">Définition de base.</span>
+<p> La volatilité est l'<strong>écart-type annualisé de la variation du prix</strong> ou de la valeur d'un titre financier.</p>
+</div>
+<p><strong>Les approches d'estimation et de prédiction listées par le cours :</strong></p>
+<ul>
+<li>Mesures de volatilité <strong>historique</strong> ou empirique</li>
+<li>Modèle de <strong>mouvement brownien géométrique</strong></li>
+<li>Modèle de <strong>diffusion à sauts de Poisson</strong></li>
+<li>Modèles <strong>ARCH / GARCH</strong></li>
+<li>Modèles à <strong>volatilité stochastique (SV)</strong></li>
+<li>Volatilité <strong>implicite</strong> issue des options et dérivés</li>
+</ul>
+<pre><code>HISTORIQUE     σ̂ à partir des rendements passés — simple, mais lent à réagir
+GBM            dS/S = μ dt + σ dW — σ constante, l'hypothèse de Black-Scholes
+GARMAN-KLASS   exploiter haut/bas/ouverture : jusqu'à 8× plus efficace
+SAUTS          + Z(t) dπ(t) — pour les krachs que le brownien ne produit jamais
+ARCH/GARCH     σ_t² dépend du passé — la volatilité devient PRÉVISIBLE
+</code></pre>
+<blockquote>
+<p><strong>Le fil directeur du chapitre.</strong> On part d'une volatilité <strong>constante</strong> (GBM), puis on découvre que les données la contredisent — la volatilité <strong>se regroupe</strong> dans le temps — et l'on construit des modèles où $\sigma_t^2$ est <strong>une fonction déterministe du passé observable</strong>. C'est l'idée d'Engle (1982), qui lui a valu le prix Nobel.</p>
+</blockquote>
+<h2 data-prio="mid">Concept 1 — La volatilité historique</h2>
+<p><strong>Le calcul.</strong> On dispose des prix d'un actif en $(T+1)$ instants, $\{P_t,\ t=0,1,\dots,T\}$, d'où $T$ rendements
+$$R_t=\log(P_t/P_{t-1}), \qquad t=1,2,\dots,T$$
+On suppose $\{R_t\}$ <strong>stationnaire en covariance</strong>, avec
+$$\sigma^2=\mathrm{var}(R_t)=E\big[(R_t-E[R_t])^2\big]$$
+et l'on estime
+$$\hat\sigma^2=\frac{1}{T-1}\sum_{t=1}^T(R_t-\bar R)^2, \qquad \bar R=\frac1T\sum_{t=1}^TR_t$$</p>
+<p><strong>L'annualisation.</strong>
+$$\mathrm{vol}=\begin{cases}\sqrt{252}\,\hat\sigma &amp; \text{(prix quotidiens, 252 jours ouvrés par an)}\\[3pt] \sqrt{52}\,\hat\sigma &amp; \text{(prix hebdomadaires)}\\[3pt] \sqrt{12}\,\hat\sigma &amp; \text{(prix mensuels)}\end{cases}$$</p>
+<p class="cal piege"> <strong>Pourquoi une racine carrée ?</strong> Parce que sous indépendance des rendements les <strong>variances</strong> s'additionnent : $\mathrm{var}(\sum_{t=1}^{252}R_t)=252\sigma^2$, donc l'écart-type est multiplié par $\sqrt{252}$. La règle « en racine du temps » n'est valable que <strong>sous indépendance</strong> — dès qu'il y a autocorrélation des rendements, elle est fausse.</p>
+<p class="cal piege"> <strong>Pourquoi les log-rendements et non les rendements arithmétiques ?</strong> Parce qu'ils sont <strong>additifs</strong> dans le temps : $\log(P_T/P_0)=\sum_t\log(P_t/P_{t-1})$. C'est ce qui rend l'agrégation temporelle exacte.</p>
+<h2 data-prio="high">Concept 2 — Prédire la volatilité à partir de son historique</h2>
+<div class="cal formel"><span class="lab">Définition.</span>
+<p> Pour une période $t$, on définit la <strong>volatilité empirique</strong> $\hat\sigma_t$ = écart-type empirique des rendements de la période $t$.</p>
+</div>
+<ul>
+<li>Si $t$ indexe des <strong>mois</strong> avec des données quotidiennes, $\hat\sigma_t$ est l'écart-type empirique des rendements quotidiens du mois $t$.</li>
+<li>Si $t$ indexe des <strong>jours</strong> avec des données quotidiennes, alors $\hat\sigma_t^2=R_t^2$.</li>
+<li>Avec des données <strong>haute fréquence</strong>, $\hat\sigma_t$ quotidien s'obtient en <strong>cumulant les carrés des rendements intra-journaliers</strong>.</li>
+</ul>
+<p class="cal piege"> <strong>La deuxième ligne mérite qu'on s'y arrête.</strong> Avec une seule observation par période, le « carré du rendement » <em>est</em> l'estimateur de la variance. Il est <strong>sans biais</strong> mais extraordinairement <strong>bruité</strong> — sa variance vaut $2\sigma^4$. C'est exactement pourquoi les données intra-journalières valent de l'or : elles réduisent ce bruit d'un facteur égal au nombre de sous-périodes.</p>
+<p><strong>Les prédicteurs.</strong></p>
+<table>
+<thead>
+<tr>
+<th>Méthode</th>
+<th>Formule</th>
+<th>Données utilisées</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Moyenne historique</strong></td>
+<td>$\tilde\sigma_{t+1}^2=\dfrac1t\sum_{j=1}^t\hat\sigma_j^2$</td>
+<td>toutes les données disponibles</td>
+</tr>
+<tr>
+<td><strong>Moyenne mobile simple</strong></td>
+<td>$\tilde\sigma_{t+1}^2=\dfrac1m\sum_{j=0}^{m-1}\hat\sigma_{t-j}^2$</td>
+<td>les $m$ dernières estimations</td>
+</tr>
+<tr>
+<td><strong>Moyenne mobile exponentielle</strong></td>
+<td>$\tilde\sigma_{t+1}^2=(1-\beta)\hat\sigma_t^2+\beta\tilde\sigma_t^2$, $0\leq\beta\leq1$</td>
+<td>toutes les données disponibles</td>
+</tr>
+<tr>
+<td><strong>Moyenne mobile exponentielle pondérée</strong></td>
+<td>$\tilde\sigma_{t+1}^2=\Big(\sum_{j=0}^{m-1}\beta^j\hat\sigma_{t-j}^2\Big)\Big/\Big(\sum_{j=0}^{m-1}\beta^j\Big)$</td>
+<td>les $m$ dernières</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>La moyenne mobile exponentielle est la forme la plus utilisée.</strong> Elle est <strong>récursive</strong> — un seul nombre à stocker — et donne un poids $\beta^j$ à l'observation d'il y a $j$ périodes : la mémoire décroît géométriquement. Le paramètre $\beta$ règle l'arbitrage entre réactivité ($\beta$ petit) et stabilité ($\beta$ grand).</p>
+</blockquote>
+<p><strong>Régression simple.</strong>
+$$\tilde\sigma_{t+1}^2=\gamma_{1,t}\hat\sigma_t^2+\gamma_{2,t}\hat\sigma_{t-1}^2+\cdots+\gamma_{p,t}\hat\sigma_{t-p+1}^2+u_t$$
+<em>La régression peut être ajustée sur toutes les données, ou sur les $m$ dernières (fenêtres glissantes). Note : similaire mais différente d'un modèle autorégressif de $\hat\sigma_t^2$.</em></p>
+<blockquote>
+<p><strong>La nuance signalée par le cours.</strong> Dans une AR, la variable expliquée et les régresseurs sont <strong>le même processus</strong>. Ici la variable expliquée est la <strong>prévision</strong> $\tilde\sigma_{t+1}^2$ et les régresseurs des <strong>estimations empiriques</strong> $\hat\sigma_{t-j}^2$ — deux objets distincts, dont les coefficients $\gamma_{j,t}$ peuvent en outre varier avec $t$.</p>
+</blockquote>
+<p><strong>Les arbitrages.</strong></p>
+<ul>
+<li>Utiliser <strong>plus de données</strong> pour augmenter la <strong>précision</strong> des estimateurs.</li>
+<li>Utiliser des données <strong>plus proches de $t$</strong> pour estimer $\sigma_t$.</li>
+</ul>
+<blockquote>
+<p><strong>C'est un arbitrage biais-variance pur.</strong> Plus de données réduisent la variance mais font entrer des régimes de volatilité anciens — donc du biais. La fenêtre optimale dépend de la vitesse à laquelle la volatilité change.</p>
+</blockquote>
+<p><strong>L'évaluation</strong> se fait <strong>hors échantillon</strong> : distinguer les actifs et les classes d'actifs, considérer différentes fréquences d'échantillonnage et différents horizons de prévision, et appliquer des mesures de performance (MSE, MAE, MAPE, etc.). <strong>Méthodologie de référence : RiskMetrics.</strong></p>
+<h2 data-prio="must">Concept 3 — Le mouvement brownien géométrique</h2>
+<p><strong>Le modèle.</strong> Pour $\{S(t)\}$ le prix d'un titre ou d'un portefeuille au temps $t$ :
+$$\boxed{\ dS(t)=\mu S(t)\,dt+\sigma S(t)\,dW(t)\ }$$
+où $\sigma$ est la <strong>volatilité</strong> du processus de prix, $\mu$ le <strong>rendement moyen</strong> par unité de temps, $dS(t)$ l'incrément infinitésimal de prix et $dW(t)$ l'incrément infinitésimal d'un <strong>mouvement brownien standard</strong> (processus de Wiener).</p>
+<p><strong>Les propriétés du processus de Wiener.</strong></p>
+<ul>
+<li>Les incréments $[W(t')-W(t)]$ sont <strong>gaussiens</strong>, de moyenne nulle et de variance $(t'-t)$.</li>
+<li>Les incréments sur des <strong>intervalles disjoints sont indépendants</strong> : pour $t_1&lt;t_2&lt;t_3&lt;t_4$, $[W(t_2)-W(t_1)]$ et $[W(t_4)-W(t_3)]$ sont indépendants.</li>
+</ul>
+<p><strong>Les données du processus.</strong> Prix $\{S(t),\ t=t_0,t_1,\dots,t_n\}$, rendements
+$$R_j=\log\big[S(t_j)/S(t_{j-1})\big], \qquad j=1,\dots,n$$</p>
+<blockquote>
+<p><strong>Résultat.</strong> Les $R_j$ sont des variables aléatoires <strong>indépendantes</strong> avec
+$$R_j\sim N\big(\mu^\ast\tau_j,\ \sigma^2\tau_j\big), \qquad \tau_j=(t_j-t_{j-1}), \qquad \boxed{\ \mu^\ast=\mu-\sigma^2/2\ }$$
+<em>($\{\log S(t)\}$ est un mouvement brownien de dérive $\mu^\ast$ et de volatilité $\sigma^2$.)</em></p>
+</blockquote>
+<p class="cal piege"> <strong>Le terme $-\sigma^2/2$ est l'erreur classique du chapitre.</strong> Le prix a un rendement espéré $\mu$, mais son <strong>logarithme</strong> dérive à $\mu-\sigma^2/2$. La raison est l'inégalité de Jensen : $\log$ est concave, donc $E[\log S]&lt;\log E[S]$, et l'écart est exactement $\sigma^2/2$ par unité de temps. Conséquence économique : <strong>plus la volatilité est forte, plus la médiane du prix futur est basse à rendement espéré fixé</strong>.</p>
+<p><strong>Estimation par maximum de vraisemblance.</strong> Si $\tau_j\equiv1$ :
+$$\hat\mu^\ast=\bar R=\frac1n\sum_{t=1}^nR_t, \qquad \hat\sigma^2=\frac1n\sum_{t=1}^n(R_t-\bar R)^2$$
+<em>Si $\tau_j$ varie… exercice.</em></p>
+<p class="cal piege"> <strong>Noter le diviseur $n$ et non $n-1$</strong> : ce sont les estimateurs du <strong>maximum de vraisemblance</strong>, donc biaisés pour $\sigma^2$ — exactement comme dans la fiche 50.</p>
+<h2 data-prio="high">Concept 4 — L'estimateur de Garman-Klass</h2>
+<p><strong>L'idée.</strong> <em>On dispose de plus d'information que les seuls prix de clôture : on a aussi le <strong>plus haut</strong>, le <strong>plus bas</strong> et l'<strong>ouverture</strong> de la période.</em> On suppose $\mu=0$, $\tau_j\equiv1$ (par exemple quotidien), et l'on note $f\in(0,1)$ la <strong>fraction de la journée précédant l'ouverture du marché</strong> :
+$$C_j=\log[S(t_j)], \quad O_j=\log[S(t_{j-1}+f)], \quad H_j=\max_{t_{j-1}+f\leq t\leq t_j}\log[S(t)], \quad L_j=\min_{t_{j-1}+f\leq t\leq t_j}\log[S(t)]$$</p>
+<p><strong>Les estimateurs élémentaires (données de la première période).</strong></p>
+<table>
+<thead>
+<tr>
+<th>Estimateur</th>
+<th>Formule</th>
+<th>Espérance</th>
+<th>Variance</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$\hat\sigma_0^2$ — clôture à clôture</td>
+<td>$(C_1-C_0)^2$</td>
+<td>$\sigma^2$</td>
+<td>$2(\sigma^2)^2=2\sigma^4$</td>
+</tr>
+<tr>
+<td>$\hat\sigma_1^2$ — clôture à ouverture</td>
+<td>$\dfrac{(O_1-C_0)^2}{f}$</td>
+<td>$\sigma^2$</td>
+<td>$2\sigma^4$</td>
+</tr>
+<tr>
+<td>$\hat\sigma_2^2$ — ouverture à clôture</td>
+<td>$\dfrac{(C_1-O_1)^2}{1-f}$</td>
+<td>$\sigma^2$</td>
+<td>$2\sigma^4$</td>
+</tr>
+</tbody></table>
+<p><em>Note : $\hat\sigma_1^2$ et $\hat\sigma_2^2$ sont <strong>indépendants</strong> !</em> On peut donc les combiner :
+$$\hat\sigma^2=\tfrac12\hat\sigma_1^2+\tfrac12\hat\sigma_2^2, \qquad E[\hat\sigma^2]=\sigma^2, \qquad \mathrm{var}[\hat\sigma^2]=\sigma^4$$
+d'où l'<strong>efficacité</strong>
+$$\mathrm{Eff}(\hat\sigma^2)=\frac{\mathrm{var}(\hat\sigma_0^2)}{\mathrm{var}(\hat\sigma^2)}=2$$</p>
+<blockquote>
+<p><strong>La logique de tout le concept.</strong> L'indépendance permet de <strong>moyenner</strong> deux estimateurs sans biais, ce qui <strong>divise la variance par deux</strong> — pour exactement le même échantillon de prix. On n'a rien ajouté comme données : on a seulement mieux exploité celles qu'on avait.</p>
+</blockquote>
+<p><strong>Les raffinements successifs.</strong></p>
+<table>
+<thead>
+<tr>
+<th>Estimateur</th>
+<th>Formule</th>
+<th>Efficacité</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Parkinson (1976)</strong>, $f=0$</td>
+<td>$\hat\sigma_3^2=\dfrac{(H_1-L_1)^2}{4\log2}$</td>
+<td>$\approx5{,}2$</td>
+</tr>
+<tr>
+<td><strong>Garman et Klass (1980)</strong>, tout $0&lt;f&lt;1$</td>
+<td>$\hat\sigma_4^2=a\cdot\hat\sigma_1^2+(1-a)\hat\sigma_3^2$, variance minimale pour $a\approx0{,}17$ (indépendant de $f$)</td>
+<td>$\approx6{,}2$</td>
+</tr>
+<tr>
+<td><strong>Meilleur estimateur analytique invariant d'échelle</strong></td>
+<td>$\hat\sigma^2=0{,}511(u_1-d_1)^2-0{,}019\{c_1(u_1+d_1)-2u_1d_1\}-0{,}383c_1^2$</td>
+<td>$\approx7{,}4$</td>
+</tr>
+<tr>
+<td><strong>Estimateur composite</strong> ($0&lt;f&lt;1$)</td>
+<td>$\hat\sigma_{GK}^2=a\dfrac{(O_1-C_0)^2}{f}+(1-a)\dfrac{\hat\sigma^2_{\text{analytique}}}{1-f}$, variance minimale pour $a=0{,}12$</td>
+<td>$\approx8{,}4$</td>
+</tr>
+</tbody></table>
+<p>où les valeurs haut / bas / clôture <strong>normalisées</strong> sont
+$$u_j=H_j-O_j, \qquad d_j=L_j-O_j, \qquad c_j=C_j-O_j$$</p>
+<div class="cal intu"><span class="lab">Ce que « efficacité $8{,}4$ » veut dire concrètement.</span>
+<p> Il faudrait <strong>$8{,}4$ fois plus de jours</strong> d'observation à l'estimateur clôture-à-clôture pour atteindre la même précision. Sur un an de données quotidiennes, c'est l'équivalent de plus de huit ans — sans rien changer aux données collectées. C'est un des meilleurs rapports gain/effort de toute la finance empirique.</p>
+</div>
+<p class="cal piege"> <strong>Les hypothèses restent fortes</strong> : $\mu=0$ (dérive négligeable, raisonnable en quotidien) et surtout un brownien <strong>sans saut</strong>. Les gaps d'ouverture et les cotations discrètes dégradent ces efficacités théoriques en pratique.</p>
+<h2 data-prio="mid">Concept 5 — Diffusions à sauts de Poisson</h2>
+<p>Pour $\{S(t)\}$ le processus de prix du titre ou du portefeuille au temps $t$ :
+$$\frac{dS(t)}{S(t)}=\mu\,dt+\sigma\,dW(t)+\gamma\,Z(t)\,d\pi(t)$$
+où</p>
+<ul>
+<li>$dS(t)$ = incrément infinitésimal de prix ;</li>
+<li>$\mu$ = rendement moyen par unité de temps ;</li>
+<li>$\sigma$ = <strong>volatilité de diffusion</strong> du processus de prix ;</li>
+<li>$dW(t)$ = incrément d'un processus de Wiener standard ;</li>
+<li>$d\pi(t)$ = incrément d'un <strong>processus de Poisson d'intensité $\lambda$</strong>, modélisant le processus de sauts ;</li>
+<li>$\gamma\cdot Z(t)$ = <strong>amplitude</strong> du saut de rendement, avec $Z(t)$ i.i.d. $N(0,1)$ et $\gamma$ l'<strong>échelle</strong> des amplitudes de saut.</li>
+</ul>
+<p><strong>Estimation par maximum de vraisemblance.</strong></p>
+<ul>
+<li>Le modèle est un <strong>mélange poissonien de lois gaussiennes</strong>.</li>
+<li>La fonction génératrice des moments se dérive comme celle d'une <strong>somme aléatoire de variables indépendantes</strong>.</li>
+<li>La fonction de vraisemblance est un <strong>produit de sommes infinies</strong>.</li>
+<li>L'<strong>algorithme EM</strong> s'exprime sous forme close : les <strong>sauts sont traités comme des variables latentes</strong>, ce qui simplifie les calculs, et l'algorithme fournit des estimations <em>a posteriori</em> du <strong>nombre de sauts par période</strong>.</li>
+</ul>
+<div class="cal intu"><span class="lab">Pourquoi ajouter des sauts.</span>
+<p> Un brownien géométrique ne produit <strong>jamais</strong> de krach : ses trajectoires sont continues, et un mouvement de $-20\,\%$ en une séance a une probabilité astronomiquement nulle sous $\sigma$ réaliste. Les sauts de Poisson introduisent des <strong>discontinuités</strong> et, du même coup, des <strong>queues épaisses</strong> — le fait stylisé du concept 9.</p>
+</div>
+<p class="cal piege"> <strong>L'astuce de l'EM mérite d'être comprise.</strong> La vraisemblance directe est un produit de sommes infinies sur le nombre de sauts — impraticable. En traitant le nombre de sauts comme une <strong>donnée manquante</strong>, chaque étape M devient une simple estimation gaussienne pondérée. C'est le même principe que pour les mélanges gaussiens en général.</p>
+<h2 data-prio="must">Concept 6 — Les modèles ARCH</h2>
+<p>Les modèles ARCH sont spécifiés relativement au processus en <strong>temps discret</strong> du prix, $\{S_t,\ t=1,2,\dots\}$. <strong>Engle (1982)</strong> modélise les rendements discrets $y_t=\log(S_t/S_{t-1})$ par
+$$y_t=\mu_t+\varepsilon_t$$
+où $\mu_t$ est le rendement moyen <strong>conditionnel à $\mathcal F_{t-1}$</strong>, l'information disponible jusqu'au temps $(t-1)$, et
+$$\varepsilon_t=Z_t\cdot\sigma_t, \qquad Z_t \text{ i.i.d. avec } E[Z_t]=0,\ \mathrm{var}[Z_t]=1$$
+$$\boxed{\ \sigma_t^2=\alpha_0+\alpha_1\varepsilon_{t-1}^2+\alpha_2\varepsilon_{t-2}^2+\cdots+\alpha_p\varepsilon_{t-p}^2\ }$$
+<strong>Contraintes de paramètres :</strong> $\alpha_j\geq0$, $j=0,1,\dots,p$.</p>
+<p>$\sigma_t^2=\mathrm{var}(R_t\mid\mathcal F_{t-1})$ est l'<strong>hétéroscédasticité conditionnelle</strong> des rendements.</p>
+<blockquote>
+<p><strong>Lisez bien la structure.</strong> $\sigma_t^2$ n'est <strong>pas</strong> aléatoire conditionnellement au passé : c'est une <strong>fonction déterministe</strong> des chocs passés observés. Toute la nouveauté d'Engle tient là — la variance devient <strong>prévisible</strong> sans cesser d'être une variance conditionnelle. Et les contraintes $\alpha_j\geq0$ sont là pour une raison élémentaire : une variance doit rester positive.</p>
+</blockquote>
+<h3>L'équivalence avec un modèle AR</h3>
+<p>Le modèle ARCH implique un <strong>modèle AR en $\varepsilon_t^2$</strong>. On ajoute $(\varepsilon_t^2-\sigma_t^2)=u_t$ des deux côtés :
+$$\varepsilon_t^2=\alpha_0+\alpha_1\varepsilon_{t-1}^2+\alpha_2\varepsilon_{t-2}^2+\cdots+\alpha_p\varepsilon_{t-p}^2+u_t$$
+où
+$$E[u_t\mid\mathcal F_t]=0 \qquad\text{et}\qquad \mathrm{var}[u_t\mid\mathcal F_t]=\mathrm{var}(\varepsilon_t^2)=2\sigma_t^4$$</p>
+<blockquote>
+<p><strong>C'est le pont avec la fiche 52.</strong> Un ARCH($p$) <strong>est</strong> une AR($p$) — non pas sur les rendements, mais sur leurs <strong>carrés</strong>. Tous les outils du chapitre précédent (racines du polynôme caractéristique, stationnarité, Yule-Walker) se transposent directement.</p>
+</blockquote>
+<h3>Le test du multiplicateur de Lagrange</h3>
+<p>$$H_0:\ \alpha_1=\alpha_2=\cdots=\alpha_p=0$$</p>
+<ol>
+<li>Ajuster une <strong>régression linéaire sur les résidus au carré</strong> $\hat\varepsilon_t=y_t-\hat\mu_t$ — c'est-à-dire ajuster un modèle <strong>AR($p$)</strong> à $[\hat\varepsilon_t^2]$, $t=1,\dots,n$.</li>
+<li>La <strong>statistique LM</strong> vaut $nR^2$, où $R^2$ est le coefficient de détermination du modèle AR($p$) ajusté.</li>
+<li>Sous $H_0$, la variable aléatoire $nR^2$ suit approximativement une loi $\chi^2$ à $p$ degrés de liberté.</li>
+</ol>
+<blockquote>
+<p>*Note : les estimations des paramètres par régression linéaire <strong>ne sont pas</strong> les EMV sous hypothèses gaussiennes ; elles correspondent à des estimations de <strong>quasi-maximum de vraisemblance (QMLE)</strong>.*</p>
+</blockquote>
+<p class="cal piege"> <strong>$H_0$ signifie « pas d'effet ARCH », donc volatilité conditionnelle constante.</strong> Rejeter $H_0$, c'est établir la présence de <strong>regroupement de volatilité</strong>. Sur des rendements financiers quotidiens, ce test rejette presque toujours — et de façon spectaculaire.</p>
+<h3>Estimation par maximum de vraisemblance</h3>
+<p><strong>Modèle ARCH.</strong> $y_t=c+\varepsilon_t$, $\varepsilon_t=z_t\sigma_t$, $\sigma_t^2=\alpha_0+\alpha_1\varepsilon_{t-1}^2+\cdots+\alpha_p\varepsilon_{t-p}^2$, $t=0,1,\dots,T$.</p>
+<p><strong>Vraisemblance.</strong>
+$$L(c,\alpha)=p(y_1,\dots,y_n\mid c,\alpha_0,\alpha_1,\dots,\alpha_p)=\prod_{t=1}^np(y_t\mid\mathcal F_{t-1},c,\alpha)=\prod_{t=1}^n\left[\frac{1}{\sqrt{2\pi\sigma_t^2}}\exp\left(\frac{-1}{2}\frac{\varepsilon_t^2}{\sigma_t^2}\right)\right]$$
+où $\varepsilon_t=y_t-c$ et $\sigma_t^2=\alpha_0+\alpha_1\varepsilon_{t-1}^2+\cdots+\alpha_p\varepsilon_{t-p}^2$.</p>
+<p><strong>Contraintes.</strong> $\alpha_i\geq0$ pour $i=1,\dots,p$, et $(\alpha_1+\cdots+\alpha_p)&lt;1$.</p>
+<blockquote>
+<p><strong>La factorisation $\prod_tp(y_t\mid\mathcal F_{t-1})$ est ce qui rend le calcul possible.</strong> C'est la <strong>décomposition en erreurs de prédiction</strong> déjà vue en fiche 52 : chaque facteur est une densité gaussienne <strong>univariée</strong> de variance $\sigma_t^2$, calculable récursivement. On n'a jamais à inverser une matrice de covariance $T\times T$.</p>
+</blockquote>
+<h2 data-prio="must">Concept 7 — Les modèles GARCH</h2>
+<p><strong>Bollerslev (1986)</strong> étend les modèles ARCH :</p>
+<blockquote>
+<p><strong>Modèle GARCH($p,q$).</strong>
+$$\sigma_t^2=\alpha_0+\sum_{i=1}^p\alpha_i\varepsilon_{t-i}^2+\sum_{j=1}^q\beta_j\sigma_{t-j}^2$$
+<strong>Contraintes :</strong> $\alpha_i\geq0\ \forall i$, et $\beta_j\geq0\ \forall j$.</p>
+</blockquote>
+<blockquote>
+<p><strong>Modèle GARCH(1,1).</strong>
+$$\boxed{\ \sigma_t^2=\alpha_0+\alpha_1\varepsilon_{t-1}^2+\beta_1\sigma_{t-1}^2\ }$$
+<strong>Parcimonieux</strong> · <strong>s'ajuste à de nombreuses séries financières</strong></p>
+</blockquote>
+<div class="cal intu"><span class="lab">Pourquoi GARCH(1,1) suffit presque toujours.</span>
+<p> Le terme $\beta_1\sigma_{t-1}^2$ résume <strong>tout</strong> le passé : en développant récursivement, $\sigma_t^2=\frac{\alpha_0}{1-\beta_1}+\alpha_1\sum_{k\geq0}\beta_1^k\varepsilon_{t-1-k}^2$. Autrement dit, <strong>GARCH(1,1) est un ARCH($\infty$) à poids géométriques</strong>, avec trois paramètres seulement. C'est exactement le mouvement AR/MA de la fiche 52, transposé aux carrés.</p>
+</div>
+<h3>L'équivalence avec un ARMA(1,1)</h3>
+<p>Le GARCH(1,1) implique un modèle <strong>ARMA</strong> en $\varepsilon_t^2$. On élimine $\sigma_t^2$ à l'aide de $(\varepsilon_t^2-\sigma_t^2)=u_t$ :
+$$\varepsilon_t^2-u_t=\alpha_0+\alpha_1\varepsilon_{t-1}^2+\beta_1(\varepsilon_{t-1}^2-u_{t-1})$$
+$$\boxed{\ \varepsilon_t^2=\alpha_0+(\alpha_1+\beta_1)\varepsilon_{t-1}^2+u_t-\beta_1u_{t-1}\ }$$
+où $E[u_t\mid\mathcal F_t]=0$ et $\mathrm{var}[u_t\mid\mathcal F_t]=\mathrm{var}(\varepsilon_t^2)=2\sigma_t^4$.</p>
+<blockquote>
+<p><strong>GARCH(1,1) implique donc un ARMA(1,1)</strong> en $\varepsilon_t^2$, avec $u_t=(\varepsilon_t^2-\sigma_t^2)\sim WN(0,2\sigma^4)$.</p>
+</blockquote>
+<p><strong>Stationnarité.</strong> Elle se déduit du modèle ARMA. En écrivant $A(L)\varepsilon_t^2=B(L)u_t$, soit $\varepsilon_t^2=[A(L)]^{-1}B(L)u_t$, le processus est <strong>stationnaire en covariance</strong> si les racines de $A(z)$ sont hors de $\{\lvert z\rvert\leq1\}$, c'est-à-dire
+$$\lvert\alpha_1+\beta_1\rvert&lt;1$$</p>
+<p><strong>Volatilité inconditionnelle / variance de long terme.</strong> Pour GARCH(1,1), en supposant la stationnarité $0&lt;(\alpha_1+\beta_1)&lt;1$ :
+$$\sigma^2=\alpha_0+(\alpha_1+\beta_1)\sigma^2 \qquad\Longrightarrow\qquad \boxed{\ \sigma^2=\frac{\alpha_0}{1-\alpha_1-\beta_1}\ }$$</p>
+<p><strong>Le cas général.</strong> GARCH($p,q$) implique un modèle <strong>ARMA($\max(p,q),q$)</strong>, stationnaire si
+$$0&lt;\Big(\sum_{i=1}^p\alpha_i+\sum_{j=1}^q\beta_j\Big)&lt;1$$
+et de variance de long terme
+$$\sigma^2=\frac{\alpha_0}{1-\sum_{i=1}^{\max(p,q)}(\alpha_i+\beta_i)}$$</p>
+<p class="cal piege"> <strong>La somme $\alpha_1+\beta_1$ est le nombre à regarder en premier sur une sortie de logiciel.</strong> Sur des séries financières réelles elle vaut typiquement $0{,}95$–$0{,}99$ : la volatilité est <strong>très persistante</strong>, le retour à la moyenne est lent. Si l'estimation donne $\alpha_1+\beta_1\geq1$, le modèle n'est <strong>pas stationnaire</strong> et la variance de long terme n'existe pas — c'est le cas limite IGARCH, qui est précisément ce que fait la méthodologie RiskMetrics avec $\alpha_0=0$ et $\alpha_1+\beta_1=1$.</p>
+<h3>Estimation par maximum de vraisemblance</h3>
+<p><strong>Modèle GARCH.</strong> $y_t=c+\varepsilon_t$, $\varepsilon_t=z_t\sigma_t$, $\sigma_t^2=\alpha_0+\sum_{i=1}^p\alpha_i\varepsilon_{t-i}^2+\sum_{j=1}^q\beta_j\sigma_{t-j}^2$.</p>
+<p><strong>Vraisemblance.</strong>
+$$L(c,\alpha,\beta)=\prod_{t=1}^Tp(y_t\mid\mathcal F_{t-1},c,\alpha,\beta)=\prod_{t=1}^T\left[\frac{1}{\sqrt{2\pi\sigma_t^2}}\exp\left(\frac{-1}{2}\frac{\varepsilon_t^2}{\sigma_t^2}\right)\right]$$
+avec $\varepsilon_t=y_t-c$.</p>
+<p><strong>Contraintes.</strong> $\alpha_i\geq0\ \forall i$, $\beta_j\geq0\ \forall j$, et $0&lt;\big(\sum_{i=1}^p\alpha_i+\sum_{j=1}^q\beta_j\big)&lt;1$.</p>
+<h2 data-prio="mid">Concept 8 — Estimation, évaluation et sélection</h2>
+<p><strong>Les sorties de l'estimation.</strong> Estimations du maximum de vraisemblance $\hat c$, $\hat\alpha$, $\hat\beta$, d'où $\hat\varepsilon_t$ et $\hat\sigma_t^2$ pour $t=T,T-1,\dots$</p>
+<p><strong>Les diagnostics.</strong></p>
+<ul>
+<li><strong>Résidus standardisés</strong> $\hat\varepsilon_t/\hat\sigma_t$ : <em>devraient être non corrélés</em>.</li>
+<li><strong>Résidus standardisés au carré</strong> $(\hat\varepsilon_t/\hat\sigma_t)^2$ : <em>devraient être non corrélés</em>.</li>
+</ul>
+<blockquote>
+<p><strong>Les deux diagnostics testent deux choses différentes.</strong> Le premier vérifie qu'il ne reste pas de structure dans la <strong>moyenne</strong> ; le second, qu'il n'en reste pas dans la <strong>variance</strong> — c'est-à-dire que le modèle GARCH a bien absorbé tout le regroupement de volatilité. C'est le second qui compte ici : c'est la raison d'être du modèle.</p>
+</blockquote>
+<p><strong>Tests de normalité des résidus.</strong> Diagrammes quantile-quantile normaux · test de <strong>Jarque-Bera</strong> · test de <strong>Shapiro-Wilk</strong> · test d'adéquation par les <strong>percentiles de l'EMV</strong> · test d'adéquation de <strong>Kolmogorov-Smirnov</strong>.</p>
+<p><strong>Sélection de modèle.</strong> On applique les critères de sélection : <strong>AIC</strong> (critère d'information d'Akaike) et <strong>BIC</strong> (critère d'information bayésien) — voir la fiche 52 pour leurs formules et leur arbitrage.</p>
+<p class="cal piege"> <strong>Un résultat très fréquent en pratique.</strong> Même après un bon ajustement GARCH, les résidus standardisés <strong>restent non gaussiens</strong> : les tests de normalité rejettent. Le GARCH explique une partie des queues épaisses, pas toutes. La réponse usuelle est de remplacer la loi de $Z_t$ par une <strong>loi de Student</strong> à faible nombre de degrés de liberté.</p>
+<h2 data-prio="must">Concept 9 — Les faits stylisés des rendements et de la volatilité</h2>
+<h3>1. Regroupement de volatilité (<em>volatility clustering</em>)</h3>
+<p>$$\text{Les grands } \varepsilon_t^2 \text{ suivent les grands } \varepsilon_{t-1}^2 \qquad \text{Les petits } \varepsilon_t^2 \text{ suivent les petits } \varepsilon_{t-1}^2$$</p>
+<blockquote>
+<p>Les modèles GARCH peuvent <strong>prescrire</strong> que les grands $\sigma_t^2$ suivent les grands $\sigma_{t-1}^2$, et les petits $\sigma_t^2$ les petits $\sigma_{t-1}^2$.</p>
+</blockquote>
+<h3>2. Queues épaisses (<em>heavy tails / fat tails</em>)</h3>
+<p><em>La distribution des rendements a des queues plus épaisses (<strong>kurtosis plus élevée</strong>) que la gaussienne.</em></p>
+<blockquote>
+<p>Les modèles GARCH($p,q$) sont un <strong>mélange stochastique de lois gaussiennes</strong>, de kurtosis plus élevée. — Engle, Bollerslev et Nelson (1994)</p>
+</blockquote>
+<p class="cal piege"> <strong>C'est un point conceptuel important.</strong> Chaque rendement est gaussien <strong>conditionnellement</strong> à $\sigma_t^2$, mais la loi <strong>inconditionnelle</strong> — le mélange sur toutes les valeurs possibles de $\sigma_t^2$ — a des queues plus épaisses qu'une gaussienne. Un mélange de gaussiennes de variances différentes est toujours leptokurtique. Le GARCH produit donc les queues épaisses <strong>sans jamais poser d'hypothèse non gaussienne</strong>.</p>
+<h3>3. Retour à la moyenne de la volatilité</h3>
+<p><strong>Modèle GARCH(1,1).</strong> Volatilité moyenne de long terme :
+$$\sigma^2=\frac{\alpha_0}{1-\alpha_1-\beta_1}$$
+En partant de
+$$\varepsilon_t^2=\alpha_0+(\alpha_1+\beta_1)\varepsilon_{t-1}^2+u_t-\beta_1u_{t-1}$$
+et en substituant $\alpha_0=(1-\alpha_1-\beta_1)\sigma^2$ :
+$$\boxed{\ (\varepsilon_t^2-\sigma^2)=(\alpha_1+\beta_1)(\varepsilon_{t-1}^2-\sigma^2)+u_t-\beta_1u_{t-1}\ }$$
+$$0&lt;(\alpha_1+\beta_1)&lt;1 \qquad\Longrightarrow\qquad \textbf{retour à la moyenne !}$$</p>
+<blockquote>
+<p><strong>C'est un processus d'Ornstein-Uhlenbeck étendu</strong> pour $\sigma_t^2$ avec des erreurs <strong>MA(1)</strong>.</p>
+</blockquote>
+<blockquote>
+<p><strong>Le sens économique.</strong> L'écart à la volatilité de long terme se contracte d'un facteur $(\alpha_1+\beta_1)$ à chaque période. Avec $\alpha_1+\beta_1=0{,}97$, la demi-vie d'un choc de volatilité est $\log(0{,}5)/\log(0{,}97)\approx23$ jours : après un krach, il faut environ un mois pour que la moitié de l'excès de volatilité se résorbe. C'est <strong>exactement</strong> l'AR(1) de la fiche 52, appliqué aux carrés — et l'on retrouve la même famille que le modèle de Vasicek pour les taux.</p>
+</blockquote>
+<h2>Comment résoudre l'exercice type (protocole)</h2>
+<ol>
+<li><strong>Calculer les log-rendements</strong> $R_t=\log(P_t/P_{t-1})$ et leur écart-type ; <strong>annualiser</strong> par $\sqrt{252}$, $\sqrt{52}$ ou $\sqrt{12}$.</li>
+<li><strong>Estimer la moyenne conditionnelle</strong> $\mu_t$ (souvent une constante $c$, parfois une AR courte) et récupérer $\hat\varepsilon_t=y_t-\hat\mu_t$.</li>
+<li><strong>Tester l'effet ARCH</strong> : ajuster une AR($p$) sur $\hat\varepsilon_t^2$, calculer $nR^2$ et comparer à $\chi^2_p$.</li>
+<li>Si rejet, <strong>ajuster un GARCH(1,1)</strong> par maximum de vraisemblance sous les contraintes $\alpha_i,\beta_j\geq0$ et $\sum\alpha_i+\sum\beta_j&lt;1$.</li>
+<li><strong>Lire $\alpha_1+\beta_1$</strong> : persistance et stationnarité ; en déduire $\sigma^2=\alpha_0/(1-\alpha_1-\beta_1)$ et la demi-vie des chocs.</li>
+<li><strong>Diagnostiquer</strong> : $\hat\varepsilon_t/\hat\sigma_t$ et $(\hat\varepsilon_t/\hat\sigma_t)^2$ non corrélés ; normalité par QQ-plot et Jarque-Bera.</li>
+<li><strong>Sélectionner</strong> entre spécifications concurrentes par AIC/BIC.</li>
+</ol>
+<h3>Comment reconnaître qu'il faut utiliser cette méthode ?</h3>
+<table>
+<thead>
+<tr>
+<th>Indice dans l'énoncé</th>
+<th>Ce qu'il faut faire</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>« volatilité annualisée » à partir de données quotidiennes</td>
+<td>$\sqrt{252}\,\hat\sigma$</td>
+</tr>
+<tr>
+<td>« les périodes agitées succèdent aux périodes agitées »</td>
+<td><strong>effet ARCH</strong> ⟹ test LM, puis GARCH</td>
+</tr>
+<tr>
+<td>« queues plus épaisses que la normale »</td>
+<td>mélange de gaussiennes ⟹ <strong>GARCH</strong>, ou sauts de Poisson</td>
+</tr>
+<tr>
+<td>« on dispose du haut, du bas et de l'ouverture »</td>
+<td><strong>Garman-Klass</strong> — gain d'efficacité jusqu'à $8{,}4$</td>
+</tr>
+<tr>
+<td>« krach en une séance »</td>
+<td>le brownien continu ne peut pas ⟹ <strong>diffusion à sauts</strong></td>
+</tr>
+<tr>
+<td>« rendement espéré $\mu$ du prix » et loi du log</td>
+<td>attention au $\mu-\sigma^2/2$</td>
+</tr>
+<tr>
+<td>« volatilité de long terme »</td>
+<td>$\alpha_0/(1-\alpha_1-\beta_1)$</td>
+</tr>
+<tr>
+<td>« pondérer davantage le passé récent »</td>
+<td><strong>moyenne mobile exponentielle</strong> / RiskMetrics</td>
+</tr>
+</tbody></table>
+<h3>Exercices progressifs</h3>
+<p><strong> Niveau 1</strong> — Un GARCH(1,1) estimé donne $\alpha_0=0{,}00001$, $\alpha_1=0{,}08$, $\beta_1=0{,}90$. Le modèle est-il stationnaire ? Quelle est la volatilité annualisée de long terme ?</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p><strong>Stationnarité.</strong> $\alpha_1+\beta_1=0{,}08+0{,}90=0{,}98&lt;1$ : le modèle <strong>est stationnaire en covariance</strong>, avec une persistance élevée.</p>
+<p><strong>Variance de long terme.</strong>
+$$\sigma^2=\frac{\alpha_0}{1-\alpha_1-\beta_1}=\frac{0{,}00001}{1-0{,}98}=\frac{0{,}00001}{0{,}02}=0{,}0005$$</p>
+<p><strong>Volatilité quotidienne.</strong> $\sigma=\sqrt{0{,}0005}\approx0{,}0224$, soit $2{,}24\,\%$ par jour.</p>
+<p><strong>Volatilité annualisée.</strong> $\sqrt{252}\times0{,}0224\approx15{,}87\times0{,}0224\approx0{,}355$, soit environ <strong>$35{,}5\,\%$ par an</strong>.</p>
+<p><strong>Bonus — la demi-vie des chocs.</strong> $\log(0{,}5)/\log(0{,}98)\approx34$ jours : il faut environ sept semaines pour que la moitié d'un excès de volatilité se résorbe. C'est très lent, et c'est typique des marchés actions.</p>
+</div></details>
+
+<p><strong> Niveau 2</strong> — Pourquoi le logarithme du prix dérive-t-il à $\mu-\sigma^2/2$ et non à $\mu$ ?</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p><strong>Le fait.</strong> Sous $dS/S=\mu\,dt+\sigma\,dW$, les log-rendements vérifient $R_j\sim N(\mu^\ast\tau_j,\ \sigma^2\tau_j)$ avec $\mu^\ast=\mu-\sigma^2/2$.</p>
+<p><strong>La raison — l'inégalité de Jensen.</strong> La fonction $\log$ est <strong>strictement concave</strong>, donc $E[\log X]&lt;\log E[X]$ pour toute variable non dégénérée. L'écart est d'autant plus grand que $X$ est dispersée. Ici, l'écart par unité de temps vaut exactement $\sigma^2/2$.</p>
+<p><strong>Le sens économique.</strong> Le prix a bien un rendement <strong>espéré</strong> $\mu$, mais l'espérance est tirée vers le haut par des trajectoires rares et très favorables. La trajectoire <strong>typique</strong> — la médiane — croît moins vite, à $\mu-\sigma^2/2$.</p>
+<p><strong>La conséquence pratique, qui surprend toujours.</strong> Si $\sigma^2/2&gt;\mu$, la médiane du prix <strong>décroît</strong> alors même que l'espérance croît. Pour $\mu=8\,\%$ et $\sigma=45\,\%$ : $\sigma^2/2=10{,}1\,\%&gt;8\,\%$. L'actif a un rendement espéré positif, et pourtant plus d'une trajectoire sur deux perd de l'argent sur le long terme. C'est la « <strong>volatility drag</strong> », et c'est ce qui explique pourquoi les produits à effet de levier s'érodent.</p>
+</div></details>
+
+<p><strong> Niveau 3</strong> — Montrez que GARCH(1,1) est un ARCH($\infty$) et dites ce que cela apporte.</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p><strong>La substitution récursive.</strong> Partant de $\sigma_t^2=\alpha_0+\alpha_1\varepsilon_{t-1}^2+\beta_1\sigma_{t-1}^2$, on remplace $\sigma_{t-1}^2$ par sa propre expression, puis $\sigma_{t-2}^2$, etc. :
+$$\sigma_t^2=\alpha_0(1+\beta_1+\beta_1^2+\cdots)+\alpha_1\big(\varepsilon_{t-1}^2+\beta_1\varepsilon_{t-2}^2+\beta_1^2\varepsilon_{t-3}^2+\cdots\big)$$
+soit, si $\lvert\beta_1\rvert&lt;1$,
+$$\sigma_t^2=\frac{\alpha_0}{1-\beta_1}+\alpha_1\sum_{k=0}^\infty\beta_1^k\,\varepsilon_{t-1-k}^2$$</p>
+<p><strong>C'est bien un ARCH($\infty$)</strong> de coefficients $\alpha_1\beta_1^k$ — décroissance <strong>géométrique</strong> de la mémoire.</p>
+<p><strong>Ce que cela apporte.</strong></p>
+<ol>
+<li><strong>La parcimonie.</strong> Trois paramètres $(\alpha_0,\alpha_1,\beta_1)$ engendrent une infinité de coefficients. Un ARCH pur aurait besoin de $p$ grand pour capter la même persistance, avec autant de paramètres à estimer et une contrainte de positivité à vérifier sur chacun.</li>
+<li><strong>La récursivité.</strong> $\sigma_t^2$ se calcule en une opération à partir de $\sigma_{t-1}^2$ : la vraisemblance s'évalue en $O(T)$.</li>
+<li><strong>La forme de la mémoire.</strong> La décroissance géométrique est empiriquement la bonne : l'influence d'un choc sur la volatilité s'estompe progressivement, pas brutalement au retard $p$.</li>
+</ol>
+<p><strong>Le parallèle exact.</strong> C'est le même mouvement que la fiche 52 : un MA fini est une AR infinie, et un AR fini est une MA infinie. Ici, $\beta_1$ joue le rôle du dénominateur $\phi(L)$ et transforme une somme finie en somme infinie à poids géométriques.</p>
+</div></details>
+
+<p><strong> Niveau 4 — type examen</strong> — Expliquez comment le GARCH produit simultanément le regroupement de volatilité, les queues épaisses et le retour à la moyenne.</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p><strong>1. Le regroupement de volatilité — par construction.</strong> Le modèle pose
+$$\sigma_t^2=\alpha_0+\alpha_1\varepsilon_{t-1}^2+\beta_1\sigma_{t-1}^2$$
+avec $\alpha_1,\beta_1\geq0$. Un grand choc $\varepsilon_{t-1}^2$ <strong>augmente mécaniquement</strong> $\sigma_t^2$, donc l'amplitude attendue du choc suivant. Les grands $\varepsilon_t^2$ suivent les grands $\varepsilon_{t-1}^2$, les petits suivent les petits. C'est l'effet visé, et il est direct.</p>
+<p><strong>2. Les queues épaisses — par mélange, sans hypothèse non gaussienne.</strong> Conditionnellement à $\mathcal F_{t-1}$, $\varepsilon_t=Z_t\sigma_t$ est <strong>gaussien</strong> de variance $\sigma_t^2$. Mais la loi <strong>inconditionnelle</strong> est un <strong>mélange</strong> de gaussiennes de variances différentes. Or tout mélange de gaussiennes centrées de variances distinctes est <strong>leptokurtique</strong> : par la loi de la variance totale,
+$$\mathrm{Kurt}(\varepsilon_t)=3\cdot\frac{E[\sigma_t^4]}{\big(E[\sigma_t^2]\big)^2}\ \geq\ 3$$
+avec égalité <strong>seulement si</strong> $\sigma_t^2$ est constante (Jensen). Dès qu'il y a de l'hétéroscédasticité conditionnelle, la kurtosis dépasse $3$. C'est le résultat d'Engle, Bollerslev et Nelson (1994) : <em>les modèles GARCH sont un mélange stochastique de lois gaussiennes, de kurtosis plus élevée</em>.</p>
+<p><strong>3. Le retour à la moyenne — par la forme ARMA.</strong> En posant $u_t=\varepsilon_t^2-\sigma_t^2$, le GARCH(1,1) s'écrit
+$$\varepsilon_t^2=\alpha_0+(\alpha_1+\beta_1)\varepsilon_{t-1}^2+u_t-\beta_1u_{t-1}$$
+un <strong>ARMA(1,1)</strong> de coefficient autorégressif $(\alpha_1+\beta_1)$. En substituant $\alpha_0=(1-\alpha_1-\beta_1)\sigma^2$ avec $\sigma^2=\alpha_0/(1-\alpha_1-\beta_1)$ :
+$$(\varepsilon_t^2-\sigma^2)=(\alpha_1+\beta_1)(\varepsilon_{t-1}^2-\sigma^2)+u_t-\beta_1u_{t-1}$$
+Quand $0&lt;(\alpha_1+\beta_1)&lt;1$, l'<strong>écart à la variance de long terme se contracte</strong> géométriquement : c'est un processus d'<strong>Ornstein-Uhlenbeck étendu</strong> avec erreurs MA(1).</p>
+<p><strong>La synthèse — et c'est ce qu'il faut savoir dire.</strong> Les trois faits stylisés ne sont <strong>pas</strong> trois hypothèses posées séparément : ils découlent tous de la <strong>même</strong> équation de récurrence à trois paramètres. Le regroupement vient des coefficients positifs, les queues épaisses du mélange que ce regroupement engendre, le retour à la moyenne de la contrainte $\alpha_1+\beta_1&lt;1$. C'est cette économie de moyens qui explique le succès durable du GARCH(1,1).</p>
+<p><strong>La limite qu'il faut mentionner.</strong> Le modèle est <strong>symétrique</strong> en $\varepsilon_{t-1}$ : un choc de $-3\,\%$ et un choc de $+3\,\%$ produisent la même $\sigma_t^2$. Or les marchés actions présentent un <strong>effet de levier</strong> — les baisses augmentent la volatilité davantage que les hausses. D'où les extensions asymétriques (EGARCH de Nelson, GJR-GARCH), et les résidus standardisés qui restent non gaussiens même après un bon ajustement.</p>
+</div></details>
+
+<h2 data-prio="must">Common mistakes</h2>
+<ol>
+<li><strong>Oublier le $-\sigma^2/2$</strong> dans la dérive du log-prix sous le brownien géométrique.</li>
+<li><strong>Annualiser en multipliant par $252$ au lieu de $\sqrt{252}$</strong> — ce sont les <strong>variances</strong> qui s'additionnent, pas les écarts-types.</li>
+<li><strong>Appliquer la règle en racine du temps à des rendements autocorrélés</strong> — elle suppose l'indépendance.</li>
+<li><strong>Diviser par $n-1$ dans l'EMV du brownien géométrique</strong> — l'estimateur du maximum de vraisemblance divise par $n$.</li>
+<li><strong>Confondre $\sigma_t^2$ conditionnelle et $\sigma^2$ inconditionnelle</strong> — la première varie dans le temps, la seconde vaut $\alpha_0/(1-\alpha_1-\beta_1)$.</li>
+<li><strong>Oublier les contraintes de positivité</strong> $\alpha_i\geq0$, $\beta_j\geq0$ — sans elles, $\sigma_t^2$ peut devenir négative.</li>
+<li><strong>Ne pas vérifier $\sum\alpha_i+\sum\beta_j&lt;1$</strong> — sinon le processus n'est pas stationnaire et $\sigma^2$ n'existe pas.</li>
+<li><strong>Croire que le GARCH suppose des rendements non gaussiens</strong> — c'est l'inverse : il les suppose <strong>conditionnellement</strong> gaussiens et produit les queues épaisses par mélange.</li>
+<li><strong>Prendre les estimations de la régression du test LM pour des EMV</strong> — ce sont des <strong>QMLE</strong>.</li>
+<li><strong>Croire qu'un brownien peut produire un krach</strong> — ses trajectoires sont continues ; il faut des <strong>sauts</strong>.</li>
+<li><strong>Utiliser Garman-Klass sans vérifier ses hypothèses</strong> — $\mu=0$ et absence de sauts ; les gaps d'ouverture dégradent l'efficacité annoncée.</li>
+</ol>
+<h2>Ultimate Review</h2>
+<ol>
+<li><strong>Volatilité</strong> = écart-type <strong>annualisé</strong> de la variation de prix. Approches : historique · GBM · sauts de Poisson · ARCH/GARCH · volatilité stochastique · volatilité implicite.</li>
+<li><strong>Historique</strong> : $R_t=\log(P_t/P_{t-1})$, $\hat\sigma^2=\frac{1}{T-1}\sum(R_t-\bar R)^2$ ; annualisation par $\sqrt{252}$, $\sqrt{52}$, $\sqrt{12}$.</li>
+<li><strong>Prédicteurs</strong> : moyenne historique · moyenne mobile simple sur $m$ · <strong>moyenne mobile exponentielle</strong> $\tilde\sigma_{t+1}^2=(1-\beta)\hat\sigma_t^2+\beta\tilde\sigma_t^2$ · EWMA sur $m$ · régression sur les $\hat\sigma_{t-j}^2$. Référence : <strong>RiskMetrics</strong>.</li>
+<li><strong>Arbitrage</strong> : plus de données (précision) contre données récentes (pertinence). Évaluation <strong>hors échantillon</strong> (MSE, MAE, MAPE).</li>
+<li><strong>GBM</strong> : $dS=\mu S\,dt+\sigma S\,dW$ ; incréments de $W$ gaussiens $N(0,t'-t)$ et indépendants sur intervalles disjoints.</li>
+<li><strong>Loi des log-rendements</strong> : $R_j\sim N(\mu^\ast\tau_j,\sigma^2\tau_j)$ avec $\mu^\ast=\mu-\sigma^2/2$ ; EMV $\hat\mu^\ast=\bar R$, $\hat\sigma^2=\frac1n\sum(R_t-\bar R)^2$.</li>
+<li><strong>Garman-Klass</strong> : $\hat\sigma_0^2=(C_1-C_0)^2$, $\hat\sigma_1^2=(O_1-C_0)^2/f$, $\hat\sigma_2^2=(C_1-O_1)^2/(1-f)$, chacun d'espérance $\sigma^2$ et de variance $2\sigma^4$ ; $\hat\sigma_1^2\perp\hat\sigma_2^2$ ⟹ moyenne d'efficacité $2$. Parkinson $\approx5{,}2$, GK $\approx6{,}2$, analytique $\approx7{,}4$, composite $\approx8{,}4$.</li>
+<li><strong>Sauts de Poisson</strong> : $dS/S=\mu\,dt+\sigma\,dW+\gamma Z(t)\,d\pi(t)$, $\pi$ de taux $\lambda$, $Z\sim N(0,1)$ ; EMV = mélange poissonien de gaussiennes, résolu par <strong>EM</strong> avec les sauts en variables latentes.</li>
+<li><strong>ARCH($p$)</strong> (Engle, 1982) : $y_t=\mu_t+\varepsilon_t$, $\varepsilon_t=Z_t\sigma_t$, $\sigma_t^2=\alpha_0+\sum_i\alpha_i\varepsilon_{t-i}^2$, $\alpha_j\geq0$ ; $\sigma_t^2=\mathrm{var}(R_t\mid\mathcal F_{t-1})$.</li>
+<li><strong>Équivalence AR</strong> : $\varepsilon_t^2=\alpha_0+\sum_i\alpha_i\varepsilon_{t-i}^2+u_t$, $E[u_t\mid\mathcal F_t]=0$, $\mathrm{var}[u_t\mid\mathcal F_t]=2\sigma_t^4$.</li>
+<li><strong>Test LM</strong> : $H_0:\alpha_1=\cdots=\alpha_p=0$ ; ajuster une AR($p$) sur $\hat\varepsilon_t^2$ ; $nR^2\sim\chi^2_p$ ; estimations = <strong>QMLE</strong>.</li>
+<li><strong>GARCH($p,q$)</strong> (Bollerslev, 1986) : $\sigma_t^2=\alpha_0+\sum_i\alpha_i\varepsilon_{t-i}^2+\sum_j\beta_j\sigma_{t-j}^2$.</li>
+<li><strong>GARCH(1,1)</strong> ⟹ <strong>ARMA(1,1)</strong> : $\varepsilon_t^2=\alpha_0+(\alpha_1+\beta_1)\varepsilon_{t-1}^2+u_t-\beta_1u_{t-1}$ ; <strong>stationnaire ssi</strong> $\lvert\alpha_1+\beta_1\rvert&lt;1$.</li>
+<li><strong>Variance de long terme</strong> : $\sigma^2=\alpha_0/(1-\alpha_1-\beta_1)$ ; cas général $\alpha_0/[1-\sum(\alpha_i+\beta_i)]$, ARMA($\max(p,q),q$).</li>
+<li><strong>Vraisemblance</strong> : $\prod_t\frac{1}{\sqrt{2\pi\sigma_t^2}}\exp(-\varepsilon_t^2/2\sigma_t^2)$ ; contraintes $\alpha_i,\beta_j\geq0$ et $\sum\alpha_i+\sum\beta_j&lt;1$.</li>
+<li><strong>Diagnostics</strong> : $\hat\varepsilon_t/\hat\sigma_t$ et $(\hat\varepsilon_t/\hat\sigma_t)^2$ non corrélés ; normalité par QQ-plot, Jarque-Bera, Shapiro-Wilk, Kolmogorov-Smirnov ; sélection par AIC/BIC.</li>
+<li><strong>Faits stylisés</strong> : <strong>regroupement</strong> de volatilité · <strong>queues épaisses</strong> (mélange stochastique de gaussiennes) · <strong>retour à la moyenne</strong>, $(\varepsilon_t^2-\sigma^2)=(\alpha_1+\beta_1)(\varepsilon_{t-1}^2-\sigma^2)+u_t-\beta_1u_{t-1}$, processus d'<strong>Ornstein-Uhlenbeck étendu</strong> à erreurs MA(1).</li>
+</ol>
+<p><strong>Formulas to know</strong>
+$$\mathrm{vol}=\sqrt{252}\,\hat\sigma \qquad dS=\mu S\,dt+\sigma S\,dW \qquad R_j\sim N\big((\mu-\tfrac{\sigma^2}{2})\tau_j,\ \sigma^2\tau_j\big)$$
+$$\sigma_t^2=\alpha_0+\alpha_1\varepsilon_{t-1}^2+\beta_1\sigma_{t-1}^2 \qquad \varepsilon_t^2=\alpha_0+(\alpha_1+\beta_1)\varepsilon_{t-1}^2+u_t-\beta_1u_{t-1} \qquad \sigma^2=\frac{\alpha_0}{1-\alpha_1-\beta_1}$$
+$$LM=nR^2\sim\chi^2_p \qquad \tilde\sigma_{t+1}^2=(1-\beta)\hat\sigma_t^2+\beta\tilde\sigma_t^2 \qquad \hat\sigma_3^2=\frac{(H_1-L_1)^2}{4\log2}$$</p>
+<p><strong>Methods to know</strong> : l'annualisation et sa justification ; la dérivation de l'ARMA(1,1) à partir du GARCH(1,1) ; le calcul de la variance de long terme ; le test LM en trois étapes ; le développement du GARCH(1,1) en ARCH($\infty$).</p>
+<div class="rec"><h2>Active Recall</h2><p><strong>Basic</strong> — Écrivez le modèle GARCH(1,1) avec ses contraintes, et donnez sa variance de long terme.</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p>$$y_t=\mu_t+\varepsilon_t, \qquad \varepsilon_t=Z_t\sigma_t, \qquad \sigma_t^2=\alpha_0+\alpha_1\varepsilon_{t-1}^2+\beta_1\sigma_{t-1}^2$$
+avec $Z_t$ i.i.d. de moyenne $0$ et variance $1$.</p>
+<p><strong>Contraintes</strong> : $\alpha_0&gt;0$, $\alpha_1\geq0$, $\beta_1\geq0$ (positivité de la variance) et $\alpha_1+\beta_1&lt;1$ (stationnarité en covariance).</p>
+<p><strong>Variance de long terme</strong> : en prenant l'espérance inconditionnelle, $\sigma^2=\alpha_0+(\alpha_1+\beta_1)\sigma^2$, d'où
+$$\sigma^2=\frac{\alpha_0}{1-\alpha_1-\beta_1}$$</p>
+</div></details><p><strong>Understanding</strong> — Pourquoi dit-on que le GARCH rend la volatilité « prévisible » alors qu'elle reste aléatoire ?</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p>Parce que $\sigma_t^2$ est une fonction <strong>déterministe de l'information passée $\mathcal F_{t-1}$</strong> : connaissant $\varepsilon_{t-1}$ et $\sigma_{t-1}^2$, on calcule $\sigma_t^2$ <strong>exactement</strong>, sans aléa résiduel. Le rendement $\varepsilon_t=Z_t\sigma_t$ reste imprévisible — c'est $Z_t$ qui apporte le hasard — mais son <strong>amplitude attendue</strong> est connue à l'avance.</p>
+<p><strong>La distinction à formuler</strong> : on ne prévoit pas le <strong>signe</strong> ni la <strong>valeur</strong> du rendement (ce serait une opportunité d'arbitrage), on prévoit sa <strong>dispersion</strong>. C'est précisément ce dont on a besoin pour la VaR, le prix des options et le dimensionnement des positions.</p>
+<p><strong>Et l'aléa n'a pas disparu</strong> : $\sigma_{t+2}^2$ vu de $t$ <em>est</em> aléatoire, puisqu'il dépend de $\varepsilon_{t+1}$, encore inconnu. La prévisibilité est <strong>à un pas</strong>.</p>
+</div></details><p><strong>Application</strong> — Un test LM sur $p=5$ retards donne $n=1000$ et $R^2=0{,}12$. Conclusion ?</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p>$$LM=nR^2=1000\times0{,}12=120$$
+à comparer à une $\chi^2$ à $p=5$ degrés de liberté. Le quantile à $99\,\%$ vaut environ $15{,}09$.</p>
+<p>Comme $120\gg15{,}09$, on <strong>rejette massivement $H_0:\alpha_1=\cdots=\alpha_5=0$</strong>. Il y a une <strong>hétéroscédasticité conditionnelle</strong> très marquée : la variance des rendements dépend fortement des chocs passés.</p>
+<p><strong>La suite du travail.</strong> Ajuster un GARCH — commencer par GARCH(1,1), qui suffit presque toujours —, puis vérifier que les <strong>résidus standardisés au carré</strong> $(\hat\varepsilon_t/\hat\sigma_t)^2$ ne sont <strong>plus</strong> autocorrélés : c'est le signe que le modèle a bien absorbé le regroupement de volatilité.</p>
+<p class="cal piege"> Ne pas oublier que les estimations de cette régression auxiliaire sont des <strong>QMLE</strong>, pas des EMV : elles servent au test, pas à l'estimation finale.</p>
+</div></details><p><strong>Comparison</strong> — ARCH($p$) contre GARCH(1,1) : pourquoi le second a-t-il gagné ?</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<table>
+<thead>
+<tr>
+<th></th>
+<th>ARCH($p$)</th>
+<th>GARCH(1,1)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Paramètres</td>
+<td>$p+1$</td>
+<td>$3$</td>
+</tr>
+<tr>
+<td>Mémoire</td>
+<td>s'arrête net au retard $p$</td>
+<td>infinie, décroissance <strong>géométrique</strong></td>
+</tr>
+<tr>
+<td>Contraintes</td>
+<td>$\alpha_j\geq0$ pour chacun des $p$</td>
+<td>trois contraintes</td>
+</tr>
+<tr>
+<td>Calcul</td>
+<td>somme de $p$ termes</td>
+<td><strong>récursif</strong>, un pas</td>
+</tr>
+<tr>
+<td>Forme équivalente</td>
+<td>AR($p$) en $\varepsilon_t^2$</td>
+<td><strong>ARMA(1,1)</strong> en $\varepsilon_t^2$</td>
+</tr>
+</tbody></table>
+<p><strong>La raison de fond.</strong> La volatilité financière est <strong>très persistante</strong> : $\alpha_1+\beta_1\approx0{,}98$ en pratique. Reproduire cette persistance avec un ARCH pur exigerait un $p$ très grand — donc beaucoup de paramètres à estimer, chacun contraint positif, avec une variance d'estimation qui explose.</p>
+<p>GARCH(1,1) obtient la même chose avec <strong>trois</strong> paramètres, puisqu'il est un <strong>ARCH($\infty$)</strong> à poids $\alpha_1\beta_1^k$ :
+$$\sigma_t^2=\frac{\alpha_0}{1-\beta_1}+\alpha_1\sum_{k\geq0}\beta_1^k\varepsilon_{t-1-k}^2$$</p>
+<p><strong>C'est le même argument que AR contre MA en fiche 52</strong> : un terme autorégressif engendre une mémoire infinie pour un seul paramètre. Le cours résume en deux mots : <strong>parcimonieux</strong>, et <strong>s'ajuste à de nombreuses séries financières</strong>.</p>
+</div></details><p><strong>Exam-style</strong> — Un analyste calcule la volatilité annualisée à partir de $252$ rendements quotidiens et obtient $18\,\%$. Il conclut que la volatilité sera de $18\,\%$ l'an prochain. Critiquez.</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p><strong>Le calcul lui-même est correct</strong> : $\hat\sigma^2=\frac{1}{251}\sum(R_t-\bar R)^2$ puis $\sqrt{252}\,\hat\sigma=0{,}18$. C'est bien l'estimateur de la volatilité <strong>historique</strong> annualisée.</p>
+<p><strong>Les cinq critiques.</strong></p>
+<p><strong>1. C'est une estimation du passé, pas une prévision.</strong> L'estimateur suppose $\{R_t\}$ <strong>stationnaire en covariance</strong> — donc que $\sigma$ ne change pas. Or le test LM d'Engle rejette cette hypothèse sur pratiquement toutes les séries financières.</p>
+<p><strong>2. Il ignore le regroupement de volatilité.</strong> Si la fenêtre contient un krach au début et une période calme à la fin, $18\,\%$ mélange deux régimes. Un GARCH(1,1) partirait de $\sigma_T^2$, la volatilité <strong>conditionnelle actuelle</strong>, et convergerait progressivement vers la moyenne de long terme — pas l'inverse.</p>
+<p><strong>3. La prévision correcte est un chemin, pas un nombre.</strong> Sous GARCH(1,1),
+$$E[\sigma_{T+h}^2\mid\mathcal F_T]=\sigma^2+(\alpha_1+\beta_1)^h(\sigma_T^2-\sigma^2)$$
+La volatilité prévue <strong>converge</strong> vers $\sigma^2=\alpha_0/(1-\alpha_1-\beta_1)$ à la vitesse $(\alpha_1+\beta_1)^h$. À horizon un an et avec $\alpha_1+\beta_1=0{,}98$, on est déjà proche de $\sigma^2$ ; à horizon une semaine, c'est $\sigma_T^2$ qui domine.</p>
+<p><strong>4. Le poids uniforme est un mauvais choix.</strong> Toutes les observations pèsent $1/251$, y compris celles d'il y a onze mois. Une <strong>moyenne mobile exponentielle</strong> — la méthodologie <strong>RiskMetrics</strong> — pondère le passé récent davantage.</p>
+<p><strong>5. Une seule observation par jour, c'est du gaspillage.</strong> Avec les prix d'ouverture, haut et bas, l'estimateur de <strong>Garman-Klass</strong> atteint une efficacité de l'ordre de $8$ : la même précision avec huit fois moins de jours. Et avec des données intra-journalières, on cumule les carrés des rendements intra-day.</p>
+<p><strong>Ce qu'il faudrait dire à l'analyste.</strong> « $18\,\%$ est la volatilité <strong>réalisée</strong> des douze derniers mois. Pour prévoir, il faut d'abord tester l'effet ARCH, puis ajuster un GARCH(1,1) : la prévision partira de la volatilité conditionnelle d'aujourd'hui et convergera vers la moyenne de long terme. Et si les prix haut/bas sont disponibles, l'estimation gagnera un ordre de grandeur en précision. »</p>
+</div></details></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h2>Flashcards</h2>
+<table>
+<thead>
+<tr>
+<th>Question</th>
+<th>Réponse</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Définition de la volatilité ?</td>
+<td>Écart-type <strong>annualisé</strong> de la variation de prix</td>
+</tr>
+<tr>
+<td>Annualisation quotidienne ?</td>
+<td>$\sqrt{252}\,\hat\sigma$</td>
+</tr>
+<tr>
+<td>Pourquoi une racine carrée ?</td>
+<td>Les <strong>variances</strong> s'additionnent sous indépendance</td>
+</tr>
+<tr>
+<td>Moyenne mobile exponentielle ?</td>
+<td>$\tilde\sigma_{t+1}^2=(1-\beta)\hat\sigma_t^2+\beta\tilde\sigma_t^2$</td>
+</tr>
+<tr>
+<td>Méthodologie de référence ?</td>
+<td><strong>RiskMetrics</strong></td>
+</tr>
+<tr>
+<td>Équation du brownien géométrique ?</td>
+<td>$dS=\mu S\,dt+\sigma S\,dW$</td>
+</tr>
+<tr>
+<td>Loi des log-rendements ?</td>
+<td>$N\big((\mu-\sigma^2/2)\tau_j,\ \sigma^2\tau_j\big)$</td>
+</tr>
+<tr>
+<td>Pourquoi le $-\sigma^2/2$ ?</td>
+<td>Inégalité de <strong>Jensen</strong> : $\log$ est concave</td>
+</tr>
+<tr>
+<td>EMV de $\sigma^2$ sous GBM ?</td>
+<td>$\frac1n\sum(R_t-\bar R)^2$ — diviseur $n$</td>
+</tr>
+<tr>
+<td>Variance de $(C_1-C_0)^2$ ?</td>
+<td>$2\sigma^4$</td>
+</tr>
+<tr>
+<td>Pourquoi Garman-Klass gagne ?</td>
+<td>$\hat\sigma_1^2$ et $\hat\sigma_2^2$ sont <strong>indépendants</strong> ⟹ moyenne de variance moitié</td>
+</tr>
+<tr>
+<td>Estimateur de Parkinson ?</td>
+<td>$(H_1-L_1)^2/(4\log2)$, efficacité $\approx5{,}2$</td>
+</tr>
+<tr>
+<td>Efficacité de l'estimateur composite ?</td>
+<td>$\approx8{,}4$</td>
+</tr>
+<tr>
+<td>Modèle à sauts de Poisson ?</td>
+<td>$dS/S=\mu\,dt+\sigma\,dW+\gamma Z(t)\,d\pi(t)$</td>
+</tr>
+<tr>
+<td>Comment l'estimer ?</td>
+<td><strong>EM</strong>, les sauts en variables latentes</td>
+</tr>
+<tr>
+<td>Modèle ARCH($p$) ?</td>
+<td>$\sigma_t^2=\alpha_0+\sum_i\alpha_i\varepsilon_{t-i}^2$, $\alpha_j\geq0$</td>
+</tr>
+<tr>
+<td>Que représente $\sigma_t^2$ ?</td>
+<td>$\mathrm{var}(R_t\mid\mathcal F_{t-1})$ — hétéroscédasticité <strong>conditionnelle</strong></td>
+</tr>
+<tr>
+<td>ARCH implique quel modèle en $\varepsilon_t^2$ ?</td>
+<td>Une <strong>AR($p$)</strong></td>
+</tr>
+<tr>
+<td>Statistique du test LM ?</td>
+<td>$nR^2\sim\chi^2_p$ sous $H_0$</td>
+</tr>
+<tr>
+<td>Que sont les estimations de cette régression ?</td>
+<td>Des <strong>QMLE</strong>, pas des EMV</td>
+</tr>
+<tr>
+<td>Modèle GARCH($p,q$) ?</td>
+<td>$\sigma_t^2=\alpha_0+\sum\alpha_i\varepsilon_{t-i}^2+\sum\beta_j\sigma_{t-j}^2$</td>
+</tr>
+<tr>
+<td>GARCH(1,1) implique quel modèle ?</td>
+<td>Un <strong>ARMA(1,1)</strong> en $\varepsilon_t^2$</td>
+</tr>
+<tr>
+<td>Sa forme ARMA ?</td>
+<td>$\varepsilon_t^2=\alpha_0+(\alpha_1+\beta_1)\varepsilon_{t-1}^2+u_t-\beta_1u_{t-1}$</td>
+</tr>
+<tr>
+<td>Condition de stationnarité ?</td>
+<td>$\lvert\alpha_1+\beta_1\rvert&lt;1$</td>
+</tr>
+<tr>
+<td>Variance de long terme ?</td>
+<td>$\alpha_0/(1-\alpha_1-\beta_1)$</td>
+</tr>
+<tr>
+<td>Variance de $u_t$ ?</td>
+<td>$2\sigma_t^4$</td>
+</tr>
+<tr>
+<td>GARCH($p,q$) équivaut à quel ARMA ?</td>
+<td><strong>ARMA($\max(p,q),q$)</strong></td>
+</tr>
+<tr>
+<td>Les deux diagnostics de résidus ?</td>
+<td>$\hat\varepsilon_t/\hat\sigma_t$ et $(\hat\varepsilon_t/\hat\sigma_t)^2$ non corrélés</td>
+</tr>
+<tr>
+<td>Tests de normalité cités ?</td>
+<td>QQ-plot, Jarque-Bera, Shapiro-Wilk, Kolmogorov-Smirnov</td>
+</tr>
+<tr>
+<td>Les trois faits stylisés ?</td>
+<td>Regroupement de volatilité · queues épaisses · retour à la moyenne</td>
+</tr>
+<tr>
+<td>Pourquoi le GARCH a des queues épaisses ?</td>
+<td>C'est un <strong>mélange stochastique de gaussiennes</strong></td>
+</tr>
+<tr>
+<td>Le processus du retour à la moyenne ?</td>
+<td><strong>Ornstein-Uhlenbeck étendu</strong> à erreurs MA(1)</td>
+</tr>
+</tbody></table>
+</main>
+
+
+
+
+</body></html>

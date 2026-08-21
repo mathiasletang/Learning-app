@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fiche 35 — Fonctions convexes (Boyd, chapitre 3)</title>
+<script>
+window.MathJax={tex:{inlineMath:[["$","$"]],displayMath:[["$$","$$"]],processEscapes:true},
+ options:{skipHtmlTags:["script","noscript","style","textarea","pre","code"]},
+ svg:{fontCache:"global"},
+ startup:{pageReady:()=>MathJax.startup.defaultPageReady().then(()=>{document.body.classList.add("ready")})}};
+setTimeout(function(){document.body.classList.add("ready")},2500);
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+/* ============================================================
+   MathiasLearn — feuille de style des fiches
+   Reprise intégrale des tokens de 00_PARCOURS/*.html
+   + blocs pédagogiques (callouts, méthode, essentiels, recall)
+   ============================================================ */
+:root{--bg:#faf9f7;--card:#fff;--ink:#1a1a1a;--muted:#6b6b6b;--line:#e5e2dd;--accent:#8b5e34;
+ --hl:#fdf8ef;--ok:#2d7d4f;--okbg:#f0f7f3;--warn:#b3402f;--warnbg:#fdf3f1;--blue:#2f5d8b;--bluebg:#f1f5fa}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+ font:17px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;padding:0 16px 100px}
+.nav{position:sticky;top:0;background:rgba(250,249,247,.96);backdrop-filter:blur(8px);
+ border-bottom:1px solid var(--line);margin:0 -16px 30px;padding:11px 16px;z-index:50;
+ display:flex;gap:6px;flex-wrap:wrap;font-size:13px}
+.nav a{color:var(--muted);text-decoration:none;padding:4px 9px;border-radius:5px;white-space:nowrap}
+.nav a:hover{background:var(--line);color:var(--ink)}
+.nav a.on{background:var(--accent);color:#fff}
+main{max-width:780px;margin:0 auto}
+h1{font-size:31px;letter-spacing:-.02em;margin:.4em 0 .5em;line-height:1.25}
+h2{font-size:23px;margin:2.2em 0 .7em;padding-bottom:.3em;border-bottom:1px solid var(--line)}
+h3{font-size:19px;margin:1.9em 0 .5em;color:var(--accent)}
+h4{font-size:17px;margin:1.5em 0 .4em}
+p{margin:.8em 0} a{color:var(--accent)} hr{border:0;border-top:1px solid var(--line);margin:2.6em 0}
+table{border-collapse:collapse;width:100%;margin:1.3em 0;font-size:15.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+th{background:#f3f0eb;font-weight:600}
+tr:nth-child(even) td{background:#fcfbfa}
+code{font-family:"SF Mono",Menlo,Consolas,monospace;font-size:.88em;background:#f2efea;padding:2px 6px;border-radius:4px;white-space:nowrap}
+pre{background:#f2efea;padding:14px 16px;border-radius:8px;overflow-x:auto}
+pre code{background:none;padding:0;white-space:pre}
+blockquote{border-left:3px solid var(--accent);background:var(--hl);margin:1.4em 0;padding:14px 20px;border-radius:0 8px 8px 0}
+blockquote p:first-child{margin-top:0} blockquote p:last-child{margin-bottom:0}
+ul,ol{padding-left:1.5em} li{margin:.35em 0} em{color:#4a4a4a}
+mjx-container[display="true"]{margin:1.1em 0!important;overflow-x:auto;overflow-y:hidden;padding:2px 0}
+mjx-container svg{max-width:100%}
+body:not(.ready) main{opacity:0} main{opacity:1;transition:opacity .25s}
+
+/* --- bandeau de tête de fiche --- */
+.cours{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--accent);
+ border-radius:0 10px 10px 0;padding:18px 22px;margin:0 0 34px}
+.cours h4{margin:0 0 4px;font-size:14px;text-transform:uppercase;letter-spacing:.07em;color:var(--accent)}
+.cours .cs{color:var(--muted);font-size:14.5px;margin:0 0 14px}
+
+/* --- exercices / corrigés --- */
+.ex{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:6px 24px 20px;margin:18px 0}
+.ex>h3:first-child{margin-top:14px}
+details.cor{margin-top:18px;border:1px solid var(--line);border-radius:8px;background:#fcfbfa;overflow:hidden}
+details.cor>summary{cursor:pointer;padding:12px 16px;font-weight:600;font-size:15px;color:var(--accent);
+ list-style:none;display:flex;align-items:center;gap:9px;user-select:none;transition:.15s;min-height:44px}
+details.cor>summary::-webkit-details-marker{display:none}
+details.cor>summary:hover{background:var(--hl)}
+details.cor>summary::before{content:"\25B6";font-size:10px;transition:transform .18s;display:inline-block}
+details.cor[open]>summary::before{transform:rotate(90deg)}
+details.cor[open]>summary{background:var(--okbg);color:var(--ok);border-bottom:1px solid var(--line)}
+.cor .in{padding:4px 20px 16px}
+.cor .in>*:first-child{margin-top:.9em}
+
+/* --- blocs pédagogiques (callouts) ---
+   Générés depuis une citation Markdown dont le premier **gras** commence
+   par un mot-clé : DÉFINITION, THÉORÈME, MÉTHODE, PIÈGE, INTUITION… */
+.cal{border:1px solid var(--line);border-left:4px solid var(--accent);background:var(--card);
+ border-radius:0 10px 10px 0;padding:15px 20px;margin:1.5em 0}
+.cal>p:first-child{margin-top:0}.cal>p:last-child,.cal>ul:last-child,.cal>ol:last-child{margin-bottom:0}
+.cal .lab{display:block;font-size:12.5px;text-transform:uppercase;letter-spacing:.08em;
+ font-weight:700;color:var(--accent);margin-bottom:6px}
+.cal.formel{background:var(--hl)}
+.cal.piege{border-left-color:var(--warn);background:var(--warnbg)}
+.cal.piege .lab{color:var(--warn)}
+.cal.methode{border-left-color:var(--ok);background:var(--okbg)}
+.cal.methode .lab{color:var(--ok)}
+.cal.intu{border-left-color:var(--blue);background:var(--bluebg)}
+.cal.intu .lab{color:var(--blue)}
+.cal.plus{border-left-style:dashed;background:#faf9f7}
+.cal.plus .lab{color:var(--muted)}
+
+/* --- révision express --- */
+.ess{background:var(--card);border:1px solid var(--accent);border-radius:10px;padding:4px 24px 20px;margin:1.6em 0}
+.ess h3{margin-top:1.3em}
+.rec{background:var(--card);border:1px dashed var(--accent);border-radius:10px;padding:4px 24px 18px;margin:1.6em 0}
+.rec ol{counter-reset:none}
+
+/* --- impression / PDF --- */
+@media print{
+ .nav{display:none}
+ body{padding:0;background:#fff;font-size:11.2pt;line-height:1.55}
+ main{max-width:none}
+ h1{font-size:23pt}h2{font-size:15pt;margin-top:1.5em}h3{font-size:12.6pt}
+ h2,h3,h4{break-after:avoid;page-break-after:avoid}
+ table,.cal,blockquote{break-inside:avoid;page-break-inside:avoid}
+ table{display:table;font-size:9.6pt}
+ details.cor{border:1px solid var(--line);background:#fcfbfa}
+ details.cor>summary{display:none}
+ details.cor .in{padding-top:10px}
+ .cal,.ex,.ess,.rec{box-shadow:none}
+ a{color:var(--ink);text-decoration:none}
+}
+@page{margin:16mm 15mm 18mm}
+
+/* --- exemples travaillés --- */
+.exm{background:#fcfbfa;border:1px solid var(--line);border-radius:10px;padding:2px 20px 14px;margin:1.5em 0}
+.exm>h4:first-child{margin:14px 0 .5em;color:var(--accent);font-size:13px;text-transform:uppercase;letter-spacing:.07em}
+
+
+/* --- pastilles de priorité (conventions des fiches de l'app) --- */
+h2[data-prio], h3[data-prio], h4[data-prio]{position:relative}
+h2[data-prio]::before,h3[data-prio]::before,h4[data-prio]::before{
+ content:"";display:inline-block;width:9px;height:9px;border-radius:50%;
+ margin-right:9px;vertical-align:middle;background:var(--muted)}
+[data-prio="must"]::before{background:var(--warn)}
+[data-prio="high"]::before{background:#d98324}
+[data-prio="mid"]::before{background:#c9a227}
+[data-prio="low"]::before{background:var(--ok)}
+/* corrigés des fiches de l'app : même traitement que les corrigés des séries */
+details.cor>summary::after{content:""}
+</style></head><body>
+<div class="nav"><a href="24-lp-formulation.html">Programmation linéaire : formulation et géométrie</a><a href="25-lp-affine-par-morceaux.html">Optimisation affine par morceaux : tout ramener à un LP</a><a href="26-lp-polyedres.html">Polyèdres : faces, points extrêmes, test du rang</a><a href="27-lp-convexite-cones.html">Enveloppes convexes, cônes et décomposition d'un polyèdre</a><a href="28-lp-dualite.html">Dualité en programmation linéaire</a><a href="29-lp-sensibilite-jeux.html">Dualité II : sensibilité, prix implicites et jeux à somme nulle</a><a href="30-lp-simplexe.html">L'algorithme du simplexe</a><a href="31-lp-reseaux-unimodularite.html">Flots dans les réseaux et unimodularité totale</a><a href="32-lp-commande.html">Applications en automatique : suivi de consigne et robustesse</a><a href="33-lp-nombres-entiers.html">Programmation linéaire en nombres entiers et séparation-évaluation</a><a href="34-boyd-ensembles-convexes.html">Ensembles convexes</a><a href="35-boyd-fonctions-convexes.html" class="on">Fonctions convexes</a><a href="36-boyd-problemes-convexes.html">Problèmes d'optimisation convexe</a><a href="37-boyd-familles-standard.html">Les familles standard : LP, QP, SOCP, GP, SDP</a><a href="38-boyd-dualite.html">Dualité lagrangienne</a><a href="39-boyd-minimisation-sans-contrainte.html">Minimisation sans contrainte : gradient et Newton</a><a href="40-boyd-contraintes-egalite.html">Minimisation sous contraintes d'égalité</a><a href="41-boyd-points-interieurs.html">Méthodes de points intérieurs</a><a href="42-sous-gradients.html">Sous-gradients et sous-différentiel</a><a href="43-methode-sous-gradient.html">La méthode du sous-gradient</a></div>
+<main><h1>Fiche 35 — Fonctions convexes (Boyd, chapitre 3)</h1>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Matière</strong></td>
+<td>Maths · Optimisation</td>
+</tr>
+<tr>
+<td><strong>Cours source</strong></td>
+<td>Boyd &amp; Vandenberghe, <em>Convex Optimization</em>, chapitre 3 « Convex functions », p. 67–126</td>
+</tr>
+<tr>
+<td><strong>Difficulté</strong></td>
+<td> Must know — avec le chapitre 2, tout le socle M1</td>
+</tr>
+<tr>
+<td><strong>Temps d'étude estimé</strong></td>
+<td>3 h</td>
+</tr>
+<tr>
+<td><strong>Prérequis</strong></td>
+<td>Fiche 34 (ensembles convexes, épigraphe, cônes), fiche 9 (hessienne)</td>
+</tr>
+<tr>
+<td><strong>Concepts clés</strong></td>
+<td>Convexité, extension à valeurs étendues, conditions du premier et du second ordre, épigraphe, sous-niveaux, Jensen, calcul de convexité, composition, minimisation partielle, perspective, conjuguée, quasiconvexité</td>
+</tr>
+<tr>
+<td><strong>Poids à l'examen</strong></td>
+<td>La question type est « cette fonction est-elle convexe ? » — et la bonne réponse passe <strong>toujours</strong> par le calcul de convexité (§3.2), jamais par la définition. Les règles de <strong>composition</strong> sont le point le plus discriminant.</td>
+</tr>
+</tbody></table>
+<h2>Vue d'ensemble</h2>
+<p>Le chapitre 3 refait, pour les fonctions, exactement ce que le chapitre 2 a fait pour les ensembles : un catalogue, puis un calcul. Mais il ajoute une idée qui les relie :</p>
+<pre><code>FONCTION convexe  ⟺  son ÉPIGRAPHE est un ensemble convexe
+</code></pre>
+<p>Tout le chapitre 2 devient donc disponible pour les fonctions, et réciproquement. Trois caractérisations coexistent, à utiliser selon ce dont on dispose :</p>
+<table>
+<thead>
+<tr>
+<th>Ce que l'on a</th>
+<th>Caractérisation</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>rien (fonction quelconque)</td>
+<td>la <strong>corde</strong> est au-dessus du graphe</td>
+</tr>
+<tr>
+<td>$f$ dérivable</td>
+<td>la <strong>tangente</strong> est sous le graphe : $f(y)\geq f(x)+\nabla f(x)^T(y-x)$</td>
+</tr>
+<tr>
+<td>$f$ deux fois dérivable</td>
+<td>la <strong>hessienne</strong> est $\succeq0$</td>
+</tr>
+<tr>
+<td>une construction</td>
+<td>le <strong>calcul de convexité</strong> (§3.2) — la voie de loin la plus rapide</td>
+</tr>
+</tbody></table>
+<h2 data-prio="must">Concept 1 — Définition et premières remarques</h2>
+<p><strong>Définition.</strong> $f:\mathbb{R}^n\to\mathbb{R}$ est <strong>convexe</strong> si $\mathbf{dom}\,f$ est un ensemble convexe et si, pour tous $x,y\in\mathbf{dom}\,f$ et $\theta\in[0,1]$,
+$$f(\theta x+(1-\theta)y) \leq \theta f(x) + (1-\theta)f(y) \tag{3.1}$$
+Géométriquement : le segment joignant $(x,f(x))$ à $(y,f(y))$ — la <strong>corde</strong> — est <strong>au-dessus</strong> du graphe.</p>
+<p>$f$ est <strong>strictement convexe</strong> si l'inégalité est stricte dès que $x\neq y$ et $0&lt;\theta&lt;1$ ; <strong>concave</strong> si $-f$ est convexe.</p>
+<p><strong>Deux faits immédiats.</strong></p>
+<ul>
+<li>Toute fonction <strong>affine</strong> vérifie (3.1) avec <strong>égalité</strong> : elle est à la fois convexe et concave. Réciproquement, une fonction à la fois convexe et concave est affine.</li>
+<li><strong>Restriction à une droite</strong> : $f$ est convexe <strong>si et seulement si</strong> pour tout $x\in\mathbf{dom}\,f$ et tout $v$, la fonction $g(t) = f(x+tv)$ est convexe (sur son domaine).</li>
+</ul>
+<blockquote>
+<p><strong>La restriction à une droite est l'outil de secours universel.</strong> Quand aucune règle du §3.2 ne s'applique, on se ramène à une fonction d'<strong>une</strong> variable, où l'on sait tout faire. Boyd l'utilise pour $\log\det X$.</p>
+</blockquote>
+<p><strong>Régularité.</strong> Une fonction convexe est <strong>continue sur l'intérieur relatif de son domaine</strong> ; ses discontinuités ne peuvent se trouver que sur la frontière relative.</p>
+<h3>Extension à valeurs étendues</h3>
+<p>On prolonge $f$ à tout $\mathbb{R}^n$ par
+$$\tilde f(x) = \begin{cases} f(x) &amp; x\in\mathbf{dom}\,f\\ +\infty &amp; x\notin\mathbf{dom}\,f\end{cases}$$
+et l'on retrouve $\mathbf{dom}\,f = \{x\mid\tilde f(x)&lt;\infty\}$. L'intérêt est <strong>notationnel</strong> : l'inégalité (3.1) s'écrit alors pour <strong>tous</strong> $x,y$ sans préciser le domaine, et la somme $f_1+f_2$ a automatiquement pour domaine $\mathbf{dom}\,f_1\cap\mathbf{dom}\,f_2$.</p>
+<p><em>Exemple 3.1 — fonction indicatrice.</em> Pour $C$ convexe,
+$$\tilde I_C(x) = \begin{cases}0 &amp; x\in C\\ +\infty &amp; x\notin C\end{cases}$$
+<strong>Le tour de passe-passe à retenir</strong> : minimiser $f$ <strong>sur $C$</strong> revient à minimiser $f+\tilde I_C$ <strong>sur $\mathbb{R}^n$</strong> — une contrainte devient un terme de l'objectif.</p>
+<h2 data-prio="must">Concept 2 — Condition du premier ordre</h2>
+<p>Si $f$ est dérivable (gradient défini sur $\mathbf{dom}\,f$ ouvert), alors $f$ est convexe <strong>si et seulement si</strong> $\mathbf{dom}\,f$ est convexe et
+$$f(y) \geq f(x) + \nabla f(x)^T(y-x) \qquad \forall x,y\in\mathbf{dom}\,f \tag{3.2}$$</p>
+<p><strong>Ce que cela dit.</strong> L'approximation de Taylor au premier ordre est un <strong>minorant global</strong> de $f$. Réciproquement, si l'approximation de Taylor au premier ordre est toujours un minorant global, la fonction est convexe.</p>
+<blockquote>
+<p><strong>C'est la propriété la plus importante des fonctions convexes</strong>, selon Boyd lui-même : <em>on déduit une information globale (un minorant partout) d'une information locale (valeur et dérivée en un point).</em> Conséquence immédiate : si $\nabla f(x)=0$, alors $f(y)\geq f(x)$ pour tout $y$ — <strong>$x$ est un minimiseur global</strong>.</p>
+</blockquote>
+<p><strong>Variante stricte.</strong> $f$ est strictement convexe ssi $f(y)&gt;f(x)+\nabla f(x)^T(y-x)$ pour $x\neq y$.</p>
+<p><strong>Démonstration (celle de Boyd, en deux temps).</strong></p>
+<p><em>Cas $n=1$.</em> Si $f$ est convexe, pour $0&lt;t\leq1$ la convexité donne $f(x+t(y-x))\leq(1-t)f(x)+tf(y)$, soit après division par $t$
+$$f(y)\geq f(x) + \frac{f(x+t(y-x))-f(x)}{t}$$
+et la limite $t\to0$ donne (3.2). Réciproquement, en posant $z=\theta x+(1-\theta)y$ et en appliquant (3.2) deux fois, en $x$ puis en $y$ depuis $z$ :
+$$f(x)\geq f(z)+f'(z)(x-z), \qquad f(y)\geq f(z)+f'(z)(y-z)$$
+puis en multipliant par $\theta$ et $1-\theta$ et en additionnant, les termes en $f'(z)$ s'annulent et il reste $\theta f(x)+(1-\theta)f(y)\geq f(z)$.</p>
+<p><em>Cas général.</em> On restreint à la droite : $g(t)=f(ty+(1-t)x)$, avec $g'(t) = \nabla f(ty+(1-t)x)^T(y-x)$, et l'on applique le cas $n=1$ : $g(1)\geq g(0)+g'(0)$ est exactement (3.2). $\blacksquare$</p>
+<h2 data-prio="must">Concept 3 — Condition du second ordre</h2>
+<p>Si $f$ est deux fois dérivable, $f$ est convexe <strong>si et seulement si</strong> $\mathbf{dom}\,f$ est convexe et
+$$\nabla^2f(x)\succeq0 \qquad \forall x\in\mathbf{dom}\,f$$
+Sur $\mathbb{R}$, cela se réduit à $f''(x)\geq0$ : la dérivée est croissante. Géométriquement, la courbure du graphe est dirigée vers le haut.</p>
+<p><strong>Convexité stricte.</strong> $\nabla^2f(x)\succ0$ partout <strong>entraîne</strong> la stricte convexité. La réciproque est <strong>fausse</strong> : $f(x)=x^4$ est strictement convexe mais $f''(0)=0$.</p>
+<p><em>Exemple 3.2 — fonctions quadratiques.</em> Pour $f(x)=\tfrac12x^TPx+q^Tx+r$ avec $P\in\mathbf{S}^n$, on a $\nabla^2f(x)=P$ partout, donc
+$$f \text{ convexe} \iff P\succeq0, \qquad f \text{ strictement convexe} \iff P\succ0$$</p>
+<div class="cal formel"><span class="lab">⚠️ Remarque 3.1 de Boyd — l'hypothèse sur le domaine ne se retire pas.</span>
+<p> La fonction $f(x)=1/x^2$ de domaine $\{x\neq0\}$ vérifie $f''(x)&gt;0$ <strong>partout sur son domaine</strong>, et pourtant elle <strong>n'est pas convexe</strong> : son domaine n'est pas convexe. Vérifier la hessienne sans vérifier le domaine est l'erreur la plus fréquente du chapitre.</p>
+</div>
+<h2 data-prio="high">Concept 4 — Le catalogue (§3.1.5)</h2>
+<p><strong>Sur $\mathbb{R}$.</strong></p>
+<table>
+<thead>
+<tr>
+<th>Fonction</th>
+<th>Convexité</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$e^{ax}$</td>
+<td>convexe sur $\mathbb{R}$, pour tout $a\in\mathbb{R}$</td>
+</tr>
+<tr>
+<td>$x^a$</td>
+<td>convexe sur $\mathbb{R}_{++}$ si $a\geq1$ ou $a\leq0$ ; <strong>concave</strong> si $0\leq a\leq1$</td>
+</tr>
+<tr>
+<td>$\lvert x\rvert^p$, $p\geq1$</td>
+<td>convexe sur $\mathbb{R}$</td>
+</tr>
+<tr>
+<td>$\log x$</td>
+<td>concave sur $\mathbb{R}_{++}$</td>
+</tr>
+<tr>
+<td>$x\log x$</td>
+<td>convexe sur $\mathbb{R}_{++}$ (entropie négative)</td>
+</tr>
+</tbody></table>
+<p><strong>Sur $\mathbb{R}^n$ et $\mathbf{S}^n$.</strong></p>
+<table>
+<thead>
+<tr>
+<th>Fonction</th>
+<th>Convexité</th>
+<th>Preuve de Boyd</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>toute <strong>norme</strong> $\|x\|$</td>
+<td>convexe</td>
+<td>$\|\theta x+(1-\theta)y\| \leq \|\theta x\|+\|(1-\theta)y\| = \theta\|x\|+(1-\theta)\|y\|$ — triangulaire $+$ homogénéité</td>
+</tr>
+<tr>
+<td>$\max_i x_i$</td>
+<td>convexe</td>
+<td>$\max_i(\theta x_i+(1-\theta)y_i)\leq\theta\max_ix_i+(1-\theta)\max_iy_i$</td>
+</tr>
+<tr>
+<td>$x^2/y$ (quadratique-sur-linéaire)</td>
+<td>convexe sur $\mathbb{R}\times\mathbb{R}_{++}$</td>
+<td>$\nabla^2f = \frac{2}{y^3}\begin{pmatrix}y\\-x\end{pmatrix}\begin{pmatrix}y\\-x\end{pmatrix}^T\succeq0$</td>
+</tr>
+<tr>
+<td>$\log(e^{x_1}+\dots+e^{x_n})$</td>
+<td>convexe</td>
+<td>hessienne $\frac{1}{(\mathbf1^Tz)^2}\big((\mathbf1^Tz)\mathbf{diag}(z)-zz^T\big)$, positive par <strong>Cauchy-Schwarz</strong></td>
+</tr>
+<tr>
+<td>$(\prod_ix_i)^{1/n}$ (moyenne géométrique)</td>
+<td><strong>concave</strong> sur $\mathbb{R}^n_{++}$</td>
+<td>même argument de Cauchy-Schwarz</td>
+</tr>
+<tr>
+<td>$\log\det X$</td>
+<td><strong>concave</strong> sur $\mathbf{S}^n_{++}$</td>
+<td>restriction à une droite</td>
+</tr>
+</tbody></table>
+<p><strong>Le calcul de $\log\det$, à connaître.</strong> Sur la droite $X = Z+tV$ avec $Z\succ0$ :
+$$g(t) = \log\det(Z+tV) = \log\det\big(Z^{1/2}(I+tZ^{-1/2}VZ^{-1/2})Z^{1/2}\big) = \sum_{i=1}^n\log(1+t\lambda_i) + \log\det Z$$
+où les $\lambda_i$ sont les valeurs propres de $Z^{-1/2}VZ^{-1/2}$. Donc
+$$g'(t) = \sum_i\frac{\lambda_i}{1+t\lambda_i}, \qquad g''(t) = -\sum_i\frac{\lambda_i^2}{(1+t\lambda_i)^2} \leq 0$$
+et $f$ est <strong>concave</strong>. $\blacksquare$</p>
+<blockquote>
+<p><strong>Le mémo du log-sum-exp.</strong> $\max_i x_i \leq \log\sum_ie^{x_i}\leq\max_ix_i+\log n$ : c'est l'approximation <strong>lisse</strong> du maximum, et son gradient est le <strong>softmax</strong>. On la retrouve en apprentissage statistique et dans les modèles de choix discret.</p>
+</blockquote>
+<h2 data-prio="must">Concept 5 — Sous-niveaux et épigraphe : le pont avec le chapitre 2</h2>
+<p><strong>Ensembles de sous-niveau.</strong>
+$$C_\alpha = \{x\in\mathbf{dom}\,f \mid f(x)\leq\alpha\}$$
+Les sous-niveaux d'une fonction <strong>convexe</strong> sont <strong>convexes</strong>, pour tout $\alpha$. Preuve immédiate depuis (3.1).</p>
+<p class="cal piege"> <strong>La réciproque est fausse</strong> : $f(x)=-e^x$ a tous ses sous-niveaux convexes (des intervalles) sans être convexe — elle est même strictement concave. Les fonctions dont tous les sous-niveaux sont convexes forment une classe plus large : les <strong>quasiconvexes</strong> (concept 9).</p>
+<p><em>Exemple 3.3 — inégalité arithmético-géométrique.</em> Avec $G(x) = (\prod x_i)^{1/n}$ et $A(x)=\frac1n\sum x_i$, l'ensemble $\{x\in\mathbb{R}^n_+ \mid G(x)\geq\alpha A(x)\}$ est convexe : c'est le sur-niveau $0$ de la fonction <strong>concave</strong> $G-\alpha A$. Il est de plus positivement homogène : c'est un <strong>cône convexe</strong>.</p>
+<p><strong>Épigraphe.</strong>
+$$\mathbf{epi}\,f = \{(x,t) \mid x\in\mathbf{dom}\,f,\ f(x)\leq t\} \subseteq \mathbb{R}^{n+1}$$</p>
+<blockquote>
+<p><strong>Le théorème de liaison :</strong> <em>une fonction est convexe <strong>si et seulement si</strong> son épigraphe est un ensemble convexe.</em> (Et concave ssi son <strong>hypographe</strong> $\{(x,t)\mid t\leq f(x)\}$ est convexe.)</p>
+</blockquote>
+<p><em>Exemple 3.4 — fonction matricielle fractionnaire.</em> $f(x,Y)=x^TY^{-1}x$ est convexe sur $\mathbb{R}^n\times\mathbf{S}^n_{++}$, car
+$$\mathbf{epi}\,f = \Big\{(x,Y,t) \ \Big|\ \begin{pmatrix}Y &amp; x\\ x^T &amp; t\end{pmatrix}\succeq0,\ Y\succ0\Big\}$$
+par la condition du <strong>complément de Schur</strong> — et c'est une LMI en $(x,Y,t)$, donc un convexe (fiche 34). Pour $n=1$ on retrouve $x^2/y$.</p>
+<p><strong>Lecture géométrique de la condition du premier ordre.</strong> Si $(y,t)\in\mathbf{epi}\,f$ alors $t\geq f(y)\geq f(x)+\nabla f(x)^T(y-x)$, ce qui s'écrit
+$$\begin{pmatrix}\nabla f(x)\\ -1\end{pmatrix}^T\begin{pmatrix}y-x\\ t-f(x)\end{pmatrix}\leq0$$
+Le vecteur $(\nabla f(x),-1)$ définit donc un <strong>hyperplan d'appui</strong> à $\mathbf{epi}\,f$ au point $(x,f(x))$ — la condition du premier ordre <strong>est</strong> le théorème d'appui du chapitre 2, appliqué à l'épigraphe.</p>
+<h2 data-prio="high">Concept 6 — Inégalité de Jensen</h2>
+<p>L'inégalité (3.1) elle-même s'appelle <strong>inégalité de Jensen</strong>. Elle s'étend :</p>
+<ul>
+<li>aux combinaisons convexes finies : $f\big(\sum_i\theta_ix_i\big)\leq\sum_i\theta_if(x_i)$ ;</li>
+<li>aux intégrales : $f\big(\int_Sp(x)x\,dx\big)\leq\int_Sf(x)p(x)\,dx$ pour $p\geq0$ d'intégrale $1$ ;</li>
+<li><strong>à l'espérance</strong>, forme la plus générale :
+$$f(\mathbb{E}\,x) \leq \mathbb{E}\,f(x) \tag{3.5}$$</li>
+</ul>
+<p><strong>Cette inégalité caractérise la convexité</strong> : si $f$ n'est pas convexe, il existe une variable aléatoire $x$ à valeurs dans $\mathbf{dom}\,f$ telle que $f(\mathbb{E}x)&gt;\mathbb{E}f(x)$.</p>
+<div class="cal formel"><span class="lab">Remarque 3.2 de Boyd, à retenir.</span>
+<p> Si $z$ est un vecteur aléatoire <strong>centré</strong>, alors $\mathbb{E}f(x+z)\geq f(x)$ : <em>ajouter un bruit centré ne peut pas faire baisser, en moyenne, la valeur d'une fonction convexe.</em> C'est la raison profonde pour laquelle le bruit dégrade un coût convexe.</p>
+</div>
+<p><strong>Applications classiques (§3.1.9).</strong></p>
+<p><em>Inégalité arithmético-géométrique.</em> $-\log$ est convexe ; Jensen avec $\theta=1/2$ donne
+$$-\log\frac{a+b}{2} \leq \frac{-\log a-\log b}{2} \ \Longrightarrow\ \sqrt{ab}\leq\frac{a+b}{2}$$
+La version générale $a^\theta b^{1-\theta}\leq\theta a+(1-\theta)b$ s'obtient avec un $\theta$ quelconque.</p>
+<p><em>Inégalité de Hölder.</em> Pour $p&gt;1$ avec $1/p+1/q=1$ :
+$$\sum_{i=1}^n x_iy_i \leq \Big(\sum_i|x_i|^p\Big)^{1/p}\Big(\sum_i|y_i|^q\Big)^{1/q}$$
+Elle s'obtient en appliquant l'inégalité arithmético-géométrique générale à $a = |x_i|^p/\sum_j|x_j|^p$, $b=|y_i|^q/\sum_j|y_j|^q$ et $\theta=1/p$, puis en sommant sur $i$.</p>
+<h2 data-prio="must">Concept 7 — Le calcul de convexité (§3.2)</h2>
+<p>C'est la section à maîtriser : elle rend inutile tout calcul de hessienne.</p>
+<h3>Somme pondérée positive et composition affine</h3>
+<ul>
+<li>$wf$ est convexe pour $w\geq0$ ; une <strong>somme</strong> de convexes est convexe. Les fonctions convexes forment donc elles-mêmes un <strong>cône convexe</strong>.</li>
+<li>Cela s'étend aux intégrales : si $f(x,y)$ est convexe en $x$ pour chaque $y$ et $w(y)\geq0$, alors $g(x)=\int_Aw(y)f(x,y)\,dy$ est convexe.</li>
+<li><strong>Composition affine</strong> : si $f$ est convexe, $g(x) = f(Ax+b)$ l'est aussi.</li>
+</ul>
+<h3>Maximum et supremum ponctuels</h3>
+<p>Si $f_1,\dots,f_m$ sont convexes, $f(x)=\max_i f_i(x)$ l'est. Et cela s'étend au <strong>supremum sur un ensemble infini</strong> :
+$$g(x) = \sup_{y\in A} f(x,y) \quad\text{est convexe si } f(\cdot,y) \text{ l'est pour chaque } y \tag{3.7}$$
+<strong>En termes d'épigraphes</strong> : $\mathbf{epi}\,g = \bigcap_{y\in A}\mathbf{epi}\,f(\cdot,y)$ — le résultat n'est que l'intersection de convexes du chapitre 2.</p>
+<table>
+<thead>
+<tr>
+<th>Exemple</th>
+<th>Fonction</th>
+<th>Écriture en supremum</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>3.5</strong> affine par morceaux</td>
+<td>$\max_i(a_i^Tx+b_i)$</td>
+<td>max de fonctions affines</td>
+</tr>
+<tr>
+<td><strong>3.6</strong> somme des $r$ plus grandes composantes</td>
+<td>$\sum_{i=1}^r x_{[i]}$</td>
+<td>$\max\{x_{i_1}+\dots+x_{i_r}\}$ sur les choix d'indices</td>
+</tr>
+<tr>
+<td><strong>3.7</strong> fonction d'appui</td>
+<td>$S_C(x)=\sup_{y\in C}x^Ty$</td>
+<td>sup de linéaires</td>
+</tr>
+<tr>
+<td><strong>3.8</strong> distance au point le plus éloigné</td>
+<td>$\sup_{y\in C}\|x-y\|$</td>
+<td>sup de convexes</td>
+</tr>
+<tr>
+<td><strong>3.10</strong> plus grande valeur propre</td>
+<td>$\lambda_{\max}(X) = \sup\{y^TXy \mid \|y\|_2=1\}$</td>
+<td>sup de <strong>linéaires en $X$</strong></td>
+</tr>
+<tr>
+<td><strong>3.11</strong> norme spectrale</td>
+<td>$\|X\|_2 = \sup\{u^TXv \mid \|u\|_2=\|v\|_2=1\}$</td>
+<td>sup de linéaires en $X$</td>
+</tr>
+</tbody></table>
+<p><em>Exemple 3.9 (concavité par l'infimum).</em> Le coût optimal des moindres carrés pondérés $g(w) = \inf_x\sum_iw_i(a_i^Tx-b_i)^2$ est <strong>concave</strong> en $w$ : c'est un infimum de fonctions <strong>linéaires</strong> de $w$.</p>
+<p><strong>La réciproque (importante).</strong> Presque toute fonction convexe est le supremum ponctuel d'une famille de fonctions <strong>affines</strong> : si $f$ est convexe avec $\mathbf{dom}\,f=\mathbb{R}^n$,
+$$f(x) = \sup\{g(x) \mid g \text{ affine},\ g(z)\leq f(z)\ \forall z\}$$
+La preuve prend un <strong>hyperplan d'appui</strong> à $\mathbf{epi}\,f$ en $(x,f(x))$ et montre qu'il n'est pas vertical.</p>
+<h3>Composition (§3.2.4) — le point technique</h3>
+<p>Pour $f = h\circ g$ avec $h:\mathbb{R}\to\mathbb{R}$ et $g:\mathbb{R}^n\to\mathbb{R}$, la dérivée seconde dans le cas scalaire régulier s'écrit
+$$f''(x) = h''(g(x))\,g'(x)^2 + h'(g(x))\,g''(x) \tag{3.9}$$
+d'où les <strong>quatre règles</strong> :</p>
+<table>
+<thead>
+<tr>
+<th>$h$</th>
+<th>$g$</th>
+<th>$f = h\circ g$</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>convexe et <strong>croissante</strong></td>
+<td>convexe</td>
+<td><strong>convexe</strong></td>
+</tr>
+<tr>
+<td>convexe et <strong>décroissante</strong></td>
+<td>concave</td>
+<td><strong>convexe</strong></td>
+</tr>
+<tr>
+<td>concave et <strong>croissante</strong></td>
+<td>concave</td>
+<td><strong>concave</strong></td>
+</tr>
+<tr>
+<td>concave et <strong>décroissante</strong></td>
+<td>convexe</td>
+<td><strong>concave</strong></td>
+</tr>
+</tbody></table>
+<p class="cal piege"> <strong>La monotonie de $h$ ne s'oublie pas.</strong> $h(u)=u^2$ est convexe mais pas croissante sur $\mathbb{R}$, donc $g$ convexe n'entraîne <strong>pas</strong> $g^2$ convexe : prendre $g(x)=x^2-1$, dont le carré $(x^2-1)^2$ n'est pas convexe. La monotonie doit s'entendre sur l'<strong>extension à valeurs étendues</strong> de $h$ — c'est la subtilité que Boyd détaille.</p>
+<h3>Minimisation partielle (§3.2.5)</h3>
+<p>Si $f$ est convexe <strong>en $(x,y)$</strong> et $C$ un convexe non vide, alors
+$$g(x) = \inf_{y\in C} f(x,y) \tag{3.16}$$
+est convexe en $x$ (pourvu que $g(x)&gt;-\infty$). Son domaine est la <strong>projection</strong> de $\mathbf{dom}\,f$ sur les coordonnées $x$.</p>
+<blockquote>
+<p><strong>La symétrie à retenir.</strong> Le <strong>sup</strong> préserve la convexité même sur des fonctions séparées ; l'<strong>inf</strong> ne la préserve que si $f$ est convexe <strong>conjointement</strong> en $(x,y)$. C'est la différence entre l'intersection d'épigraphes et leur projection.</p>
+</blockquote>
+<h3>Perspective d'une fonction (§3.2.6)</h3>
+<p>$$g(x,t) = t\,f(x/t), \qquad \mathbf{dom}\,g = \{(x,t)\mid x/t\in\mathbf{dom}\,f,\ t&gt;0\}$$
+La perspective <strong>préserve la convexité</strong> (et la concavité). Exemples classiques : la perspective de $x^Tx$ est $x^Tx/t$ (quadratique-sur-linéaire) ; celle de $-\log x$ est $t\log(t/x)$, l'<strong>entropie relative</strong>.</p>
+<h2 data-prio="high">Concept 8 — La fonction conjuguée (§3.3)</h2>
+<p><strong>Définition.</strong>
+$$f^\star(y) = \sup_{x\in\mathbf{dom}\,f}\ \big(y^Tx - f(x)\big) \tag{3.18}$$
+Son domaine est l'ensemble des $y$ pour lesquels le supremum est <strong>fini</strong>.</p>
+<p><strong>$f^\star$ est toujours convexe</strong>, que $f$ le soit ou non — c'est un supremum de fonctions <strong>affines</strong> de $y$.</p>
+<p><strong>Lecture géométrique (figure 3.8).</strong> $f^\star(y)$ est l'<strong>écart maximal</strong> entre la droite $y\mapsto yx$ et le graphe de $f$. Si $f$ est dérivable, cet écart est atteint là où $f'(x)=y$ : la conjuguée réindexe la fonction <strong>par sa pente</strong> au lieu de son abscisse.</p>
+<p><strong>Inégalité de Fenchel</strong> (dite de Young si $f$ est dérivable) — conséquence immédiate de la définition :
+$$f(x) + f^\star(y) \geq x^Ty \qquad \forall x,y$$
+<em>Exemple :</em> pour $f(x)=\tfrac12x^TQx$ avec $Q\succ0$, on obtient
+$$x^Ty \leq \tfrac12x^TQx + \tfrac12y^TQ^{-1}y$$</p>
+<div class="cal intu"><span class="lab">Pourquoi c'est central.</span>
+<p> La conjuguée est l'outil qui produit les <strong>fonctions duales</strong> du chapitre 5 (fiche 37) : la fonction duale de Lagrange s'exprime presque toujours à l'aide d'une conjuguée. Retenir la définition et Fenchel suffit à ce stade.</p>
+</div>
+<h2 data-prio="high">Concept 9 — Quasiconvexité (§3.4)</h2>
+<p><strong>Définition.</strong> $f$ est <strong>quasiconvexe</strong> (ou <em>unimodale</em>) si son domaine et <strong>tous</strong> ses sous-niveaux $S_\alpha=\{x\in\mathbf{dom}\,f\mid f(x)\leq\alpha\}$ sont convexes. $f$ est <strong>quasiconcave</strong> si $-f$ est quasiconvexe (tous les <strong>sur-niveaux</strong> convexes), et <strong>quasilinéaire</strong> si elle est les deux — auquel cas tous ses <strong>ensembles de niveau</strong> $\{f=\alpha\}$ sont convexes.</p>
+<p>Sur $\mathbb{R}$, la quasiconvexité signifie que chaque sous-niveau est un <strong>intervalle</strong> : la fonction descend puis remonte, sans « bosse » intermédiaire.</p>
+<p><strong>Convexe $\Rightarrow$ quasiconvexe</strong>, jamais l'inverse : $-e^x$, $\log x$, $\lceil x\rceil$ sont quasiconvexes sans être convexes.</p>
+<p><strong>Condition du premier ordre.</strong> Si $f$ est dérivable, $f$ est quasiconvexe <strong>si et seulement si</strong> $\mathbf{dom}\,f$ est convexe et
+$$f(y)\leq f(x) \ \Longrightarrow\ \nabla f(x)^T(y-x)\leq0 \tag{3.20}$$</p>
+<p><strong>Comparez avec la condition du premier ordre convexe.</strong> La convexité dit <em>combien</em> $f$ descend ; la quasiconvexité dit seulement <em>dans quelle direction</em>. C'est nettement plus faible — et c'est pourquoi $\nabla f(x)=0$ n'entraîne <strong>pas</strong> l'optimalité globale pour une fonction quasiconvexe.</p>
+<div class="cal intu"><span class="lab">Pourquoi l'économiste s'y intéresse.</span>
+<p> La convexité des <strong>préférences</strong> n'est rien d'autre que la <strong>quasiconcavité</strong> de la fonction d'utilité : les courbes d'indifférence délimitent des sur-niveaux convexes. La microéconomie n'a jamais besoin de plus que la quasiconcavité — hypothèse strictement plus faible que la concavité.</p>
+</div>
+<h3>Comment résoudre l'exercice type (protocole)</h3>
+<ol>
+<li><strong>Vérifier le domaine</strong> : est-il convexe ? Sinon, tout s'arrête là (remarque 3.1).</li>
+<li><strong>Chercher dans le catalogue</strong> (§3.1.5) : norme, max, log-sum-exp, quadratique-sur-linéaire, $\log\det$…</li>
+<li><strong>Décomposer par le calcul</strong> (§3.2) : somme positive ? composition affine ? max ou sup ? composition avec les règles de monotonie ? minimisation partielle ? perspective ?</li>
+<li><strong>Sinon, restreindre à une droite</strong> : poser $g(t)=f(x+tv)$ et étudier $g''$.</li>
+<li><strong>Sinon seulement</strong>, calculer la hessienne et étudier son signe.</li>
+<li><strong>Pour la non-convexité</strong>, exhiber deux points et un $\theta$ — ou un point où $\nabla^2f\not\succeq0$.</li>
+<li><strong>Si l'objectif n'est pas convexe</strong>, tester la <strong>quasi</strong>convexité par les sous-niveaux : cela suffit à beaucoup de méthodes.</li>
+</ol>
+<h3>Exercices progressifs</h3>
+<p><strong> Niveau 1</strong> — $f(x)=\|Ax-b\|_2^2$ est-elle convexe ?</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p><strong>Oui</strong>, par composition affine : $f = h\circ g$ avec $g(x)=Ax-b$ <strong>affine</strong> et $h(u)=\|u\|_2^2$ convexe. La composition d'une convexe avec une <strong>affine</strong> préserve la convexité <strong>sans condition de monotonie</strong> (§3.2.2).
+<em>Contrôle par la hessienne :</em> $\nabla^2f = 2A^TA\succeq0$ .</p>
+</div></details>
+
+<p><strong> Niveau 2</strong> — $f(x) = e^{g(x)}$ avec $g$ convexe : convexe ?</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p><strong>Oui.</strong> $h(u)=e^u$ est convexe <strong>et croissante</strong>, $g$ est convexe : première ligne du tableau de composition, donc $f$ est convexe.
+<em>Contre-test :</em> si $h$ n'était pas croissante — par exemple $h(u)=u^2$ — la conclusion tomberait. Avec $g(x)=x^2-1$ convexe, $h(g(x)) = (x^2-1)^2$ a une dérivée seconde $12x^2-4$, négative en $0$ : <strong>pas convexe</strong>.</p>
+</div></details>
+
+<p><strong> Niveau 3</strong> — Montrez que $f(x) = x^2/y$ est convexe sur $\mathbb{R}\times\mathbb{R}_{++}$, par <strong>deux</strong> méthodes.</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p><em>Méthode 1 — hessienne.</em> Pour $y&gt;0$,
+$$\nabla^2f(x,y) = \frac{2}{y^3}\begin{pmatrix}y^2 &amp; -xy\\ -xy &amp; x^2\end{pmatrix} = \frac{2}{y^3}\begin{pmatrix}y\\-x\end{pmatrix}\begin{pmatrix}y\\-x\end{pmatrix}^T$$
+C'est $\frac{2}{y^3}vv^T$ avec $y^3&gt;0$ : une matrice de la forme $vv^T$ est toujours $\succeq0$ (car $z^Tvv^Tz = (v^Tz)^2\geq0$). </p>
+<p><em>Méthode 2 — perspective.</em> $f$ est la <strong>perspective</strong> de $u\mapsto u^2$ : $g(x,y)=y\,(x/y)^2 = x^2/y$. La perspective préserve la convexité (§3.2.6), et $u^2$ est convexe. </p>
+<p><em>Méthode 3 — épigraphe.</em> $\mathbf{epi}\,f = \{(x,y,t)\mid \begin{pmatrix}y&amp;x\\x&amp;t\end{pmatrix}\succeq0,\ y&gt;0\}$ par complément de Schur : une LMI, donc convexe (exemple 3.4).</p>
+</div></details>
+
+<p><strong> Niveau 4 — type examen</strong> — Montrez que $f(X)=\lambda_{\max}(X)$ est convexe sur $\mathbf{S}^n$, puis que $g(X)=\lambda_{\min}(X)$ est <strong>concave</strong>.</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p><strong>Convexité de $\lambda_{\max}$.</strong> Par le quotient de Rayleigh,
+$$\lambda_{\max}(X) = \sup\{y^TXy \mid \|y\|_2 = 1\}$$
+Pour chaque $y$ fixé, $X\mapsto y^TXy$ est une fonction <strong>linéaire</strong> de $X$ (c'est $\mathbf{tr}(Xyy^T)$). Donc $\lambda_{\max}$ est un <strong>supremum ponctuel de fonctions linéaires</strong>, donc convexe (§3.2.3, exemple 3.10). $\blacksquare$</p>
+<p><strong>Concavité de $\lambda_{\min}$.</strong> De même,
+$$\lambda_{\min}(X) = \inf\{y^TXy \mid \|y\|_2=1\}$$
+est un <strong>infimum</strong> de fonctions linéaires, donc <strong>concave</strong>. (On peut aussi écrire $\lambda_{\min}(X) = -\lambda_{\max}(-X)$ et conclure par composition avec l'application affine $X\mapsto -X$.)</p>
+<p><strong>Ce que l'exercice enseigne.</strong> Une fonction définie par un problème d'optimisation hérite de la convexité de la <strong>manière</strong> dont on optimise : un $\sup$ de linéaires est convexe, un $\inf$ de linéaires est concave. Ce seul principe donne $\lambda_{\max}$, la norme spectrale, la fonction d'appui, et — au chapitre 5 — la <strong>fonction duale de Lagrange</strong>, qui est toujours concave pour cette exacte raison.</p>
+</div></details>
+
+<h2 data-prio="must">Common mistakes</h2>
+<ol>
+<li><strong>Oublier de vérifier que $\mathbf{dom}\,f$ est convexe</strong> — la remarque 3.1 de Boyd est explicite : $1/x^2$ sur $\{x\neq0\}$ a une dérivée seconde positive et n'est pas convexe.</li>
+<li><strong>Oublier la monotonie de $h$</strong> dans les règles de composition — c'est l'erreur la plus fréquente du chapitre.</li>
+<li><strong>Croire que $\nabla^2f\succ0$ est nécessaire à la stricte convexité</strong> — $x^4$ est strictement convexe avec $f''(0)=0$.</li>
+<li><strong>Croire que « tous les sous-niveaux convexes » implique convexe</strong> — cela ne donne que la <strong>quasi</strong>convexité ($-e^x$).</li>
+<li><strong>Appliquer l'inf à une fonction convexe en $x$ seulement</strong> — la minimisation partielle exige la convexité <strong>conjointe</strong> en $(x,y)$.</li>
+<li><strong>Confondre $f^\star$ et $f^{-1}$</strong> — la conjuguée n'est pas une réciproque ; c'est une réindexation par la pente.</li>
+<li><strong>Croire qu'un point stationnaire est optimal pour une quasiconvexe</strong> — la condition du premier ordre quasiconvexe est bien plus faible que la convexe.</li>
+<li><strong>Calculer une hessienne quand une règle suffit</strong> — long, et souvent faux sur des fonctions matricielles.</li>
+</ol>
+<h2>Ultimate Review</h2>
+<ol>
+<li>Définition : la <strong>corde au-dessus du graphe</strong>, avec $\mathbf{dom}\,f$ convexe.</li>
+<li>$f$ convexe $\iff$ sa restriction à toute droite l'est.</li>
+<li><strong>Premier ordre</strong> : $f(y)\geq f(x)+\nabla f(x)^T(y-x)$ — la tangente minore globalement. D'où : $\nabla f(x)=0\Rightarrow$ minimum <strong>global</strong>.</li>
+<li><strong>Second ordre</strong> : $\nabla^2f\succeq0$ sur un domaine convexe. $\nabla^2f\succ0\Rightarrow$ strictement convexe, mais pas la réciproque.</li>
+<li><strong>$f$ convexe $\iff$ $\mathbf{epi}\,f$ convexe</strong> — le pont avec le chapitre 2. Les sous-niveaux sont convexes, mais la réciproque est fausse.</li>
+<li><strong>Jensen</strong> : $f(\mathbb{E}x)\leq\mathbb{E}f(x)$ ; il <strong>caractérise</strong> la convexité. AG et Hölder en découlent.</li>
+<li><strong>Calcul</strong> : somme positive, composition affine, max/sup ponctuel, composition (4 règles avec monotonie), minimisation partielle (convexité <strong>conjointe</strong>), perspective $tf(x/t)$.</li>
+<li>Un <strong>sup de linéaires</strong> est convexe ; un <strong>inf de linéaires</strong> est concave — d'où $\lambda_{\max}$, la norme spectrale, la fonction d'appui.</li>
+<li><strong>Conjuguée</strong> $f^\star(y)=\sup_x(y^Tx-f(x))$ : toujours convexe ; <strong>Fenchel</strong> $f(x)+f^\star(y)\geq x^Ty$.</li>
+<li><strong>Quasiconvexe</strong> : tous les sous-niveaux convexes. Condition du premier ordre : $f(y)\leq f(x)\Rightarrow\nabla f(x)^T(y-x)\leq0$.</li>
+</ol>
+<p><strong>Formulas to know</strong>
+$$f(\theta x+(1-\theta)y)\leq\theta f(x)+(1-\theta)f(y) \qquad f(y)\geq f(x)+\nabla f(x)^T(y-x) \qquad \nabla^2f\succeq0$$
+$$\mathbf{epi}\,f=\{(x,t)\mid f(x)\leq t\} \qquad g(x,t)=tf(x/t) \qquad f^\star(y)=\sup_x\big(y^Tx-f(x)\big)$$</p>
+<p><strong>Methods to know</strong> : le protocole en 7 étapes ; les quatre règles de composition ; la restriction à une droite ; l'écriture en supremum de linéaires.</p>
+<div class="rec"><h2>Active Recall</h2><p><strong>Basic</strong> — Énoncez les conditions du premier et du second ordre, avec leurs hypothèses.</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p><em>Premier ordre</em> ($f$ dérivable, $\mathbf{dom}\,f$ ouvert et <strong>convexe</strong>) : $f$ convexe $\iff f(y)\geq f(x)+\nabla f(x)^T(y-x)$ pour tous $x,y\in\mathbf{dom}\,f$.
+<em>Second ordre</em> ($f$ deux fois dérivable, $\mathbf{dom}\,f$ ouvert et <strong>convexe</strong>) : $f$ convexe $\iff \nabla^2f(x)\succeq0$ pour tout $x\in\mathbf{dom}\,f$.
+Dans les deux cas, la convexité du <strong>domaine</strong> est une hypothèse séparée qui ne se déduit pas du reste.</p>
+</div></details><p><strong>Understanding</strong> — Pourquoi la condition du premier ordre est-elle « la propriété la plus importante » des fonctions convexes ?</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p>Parce qu'elle transforme une information <strong>locale</strong> (valeur et gradient en un point) en une information <strong>globale</strong> (un minorant valable partout). Conséquence directe : $\nabla f(x)=0$ entraîne $f(y)\geq f(x)$ pour <strong>tout</strong> $y$, donc l'optimalité <strong>globale</strong>. C'est ce qui rend l'optimisation convexe faisable : annuler le gradient suffit.</p>
+</div></details><p><strong>Application</strong> — $f(x)=\max\{x_1,\ \|x\|_2,\ e^{x_2}\}$ est-elle convexe ?</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p><strong>Oui.</strong> Chacune des trois fonctions est convexe : $x_1$ est linéaire, $\|x\|_2$ est une norme, $e^{x_2}$ est convexe (exponentielle composée avec une forme linéaire). Le <strong>maximum ponctuel</strong> de fonctions convexes est convexe (§3.2.3). Aucun calcul de hessienne n'est nécessaire — et il serait d'ailleurs impossible, $f$ n'étant pas dérivable partout.</p>
+</div></details><p><strong>Comparison</strong> — Supremum et infimum : lequel préserve la convexité, et à quelles conditions ?</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p>Le <strong>supremum</strong> ponctuel d'une famille de convexes est convexe, sans autre hypothèse — c'est l'intersection des épigraphes. L'<strong>infimum</strong> ne préserve la convexité que dans le cas de la <strong>minimisation partielle</strong> : il faut que $f(x,y)$ soit convexe <strong>conjointement</strong> en $(x,y)$, et $C$ convexe. Un infimum de fonctions convexes en $x$ seulement n'a aucune raison d'être convexe.</p>
+</div></details><p><strong>Exam-style</strong> — Montrez que le log-sum-exp est convexe et encadrez-le par le maximum.</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p><em>Convexité.</em> Avec $z=(e^{x_1},\dots,e^{x_n})$, la hessienne vaut
+$$\nabla^2f(x) = \frac{1}{(\mathbf1^Tz)^2}\Big((\mathbf1^Tz)\,\mathbf{diag}(z) - zz^T\Big)$$
+et pour tout $v$,
+$$v^T\nabla^2f(x)v = \frac{1}{(\mathbf1^Tz)^2}\Big(\Big(\sum_iz_i\Big)\Big(\sum_iv_i^2z_i\Big) - \Big(\sum_iv_iz_i\Big)^2\Big)\geq0$$
+par <strong>Cauchy-Schwarz</strong> $(a^Ta)(b^Tb)\geq(a^Tb)^2$ appliqué à $a_i=\sqrt{z_i}$ et $b_i = v_i\sqrt{z_i}$. Donc $\nabla^2f\succeq0$ et $f$ est convexe.</p>
+<p><em>Encadrement.</em> $e^{\max_ix_i}\leq\sum_ie^{x_i}\leq n\,e^{\max_ix_i}$, d'où en prenant le logarithme
+$$\max_i x_i \ \leq\ \log\sum_ie^{x_i} \ \leq\ \max_ix_i+\log n$$
+Le log-sum-exp est donc une approximation lisse du maximum, à $\log n$ près.</p>
+</div></details></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h2>Flashcards</h2>
+<table>
+<thead>
+<tr>
+<th>Question</th>
+<th>Réponse</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Définition de la convexité ?</td>
+<td>$f(\theta x+(1-\theta)y)\leq\theta f(x)+(1-\theta)f(y)$, $\mathbf{dom}\,f$ convexe</td>
+</tr>
+<tr>
+<td>Condition du premier ordre ?</td>
+<td>$f(y)\geq f(x)+\nabla f(x)^T(y-x)$ — la tangente minore</td>
+</tr>
+<tr>
+<td>Condition du second ordre ?</td>
+<td>$\nabla^2f(x)\succeq0$ sur un domaine convexe</td>
+</tr>
+<tr>
+<td>$\nabla^2f\succ0$ implique quoi ?</td>
+<td>Stricte convexité — la réciproque est fausse ($x^4$)</td>
+</tr>
+<tr>
+<td>$f$ convexe $\iff$ ? (ensembles)</td>
+<td>Son <strong>épigraphe</strong> est convexe</td>
+</tr>
+<tr>
+<td>Sous-niveaux convexes implique convexe ?</td>
+<td><strong>Non</strong> — seulement quasiconvexe ($-e^x$)</td>
+</tr>
+<tr>
+<td>Inégalité de Jensen ?</td>
+<td>$f(\mathbb{E}x)\leq\mathbb{E}f(x)$ — elle caractérise la convexité</td>
+</tr>
+<tr>
+<td>Les quatre règles de composition ?</td>
+<td>$h$ convexe croissante $\circ$ $g$ convexe ; convexe décroissante $\circ$ concave ; et les deux duales pour la concavité</td>
+</tr>
+<tr>
+<td>Composition affine ?</td>
+<td>$f(Ax+b)$ convexe si $f$ l'est — sans condition de monotonie</td>
+</tr>
+<tr>
+<td>Sup ponctuel de convexes ?</td>
+<td>Convexe — intersection des épigraphes</td>
+</tr>
+<tr>
+<td>Minimisation partielle ?</td>
+<td>$\inf_yf(x,y)$ convexe si $f$ convexe <strong>conjointement</strong> en $(x,y)$</td>
+</tr>
+<tr>
+<td>Perspective d'une fonction ?</td>
+<td>$g(x,t)=tf(x/t)$, $t&gt;0$ — préserve la convexité</td>
+</tr>
+<tr>
+<td>Conjuguée ?</td>
+<td>$f^\star(y)=\sup_x(y^Tx-f(x))$ — <strong>toujours</strong> convexe</td>
+</tr>
+<tr>
+<td>Inégalité de Fenchel ?</td>
+<td>$f(x)+f^\star(y)\geq x^Ty$</td>
+</tr>
+<tr>
+<td>$\lambda_{\max}(X)$ est ?</td>
+<td>Convexe — sup de $y^TXy$ sur $\|y\|_2=1$, donc de linéaires</td>
+</tr>
+<tr>
+<td>$\log\det X$ est ?</td>
+<td><strong>Concave</strong> sur $\mathbf{S}^n_{++}$</td>
+</tr>
+<tr>
+<td>Moyenne géométrique ?</td>
+<td><strong>Concave</strong> sur $\mathbb{R}^n_{++}$</td>
+</tr>
+<tr>
+<td>Quasiconvexe ?</td>
+<td>Tous les sous-niveaux sont convexes</td>
+</tr>
+<tr>
+<td>Condition du premier ordre quasiconvexe ?</td>
+<td>$f(y)\leq f(x)\Rightarrow\nabla f(x)^T(y-x)\leq0$</td>
+</tr>
+</tbody></table>
+</main>
+
+
+
+
+</body></html>

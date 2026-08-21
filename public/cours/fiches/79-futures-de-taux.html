@@ -1,0 +1,1052 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fiche 79 — Futures de taux d'intérêt : T-bond, eurodollar, couverture par duration</title>
+<script>
+window.MathJax={tex:{inlineMath:[["$","$"]],displayMath:[["$$","$$"]],processEscapes:true},
+ options:{skipHtmlTags:["script","noscript","style","textarea","pre","code"]},
+ svg:{fontCache:"global"},
+ startup:{pageReady:()=>MathJax.startup.defaultPageReady().then(()=>{document.body.classList.add("ready")})}};
+setTimeout(function(){document.body.classList.add("ready")},2500);
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+/* ============================================================
+   MathiasLearn — feuille de style des fiches
+   Reprise intégrale des tokens de 00_PARCOURS/*.html
+   + blocs pédagogiques (callouts, méthode, essentiels, recall)
+   ============================================================ */
+:root{--bg:#faf9f7;--card:#fff;--ink:#1a1a1a;--muted:#6b6b6b;--line:#e5e2dd;--accent:#8b5e34;
+ --hl:#fdf8ef;--ok:#2d7d4f;--okbg:#f0f7f3;--warn:#b3402f;--warnbg:#fdf3f1;--blue:#2f5d8b;--bluebg:#f1f5fa}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+ font:17px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;padding:0 16px 100px}
+.nav{position:sticky;top:0;background:rgba(250,249,247,.96);backdrop-filter:blur(8px);
+ border-bottom:1px solid var(--line);margin:0 -16px 30px;padding:11px 16px;z-index:50;
+ display:flex;gap:6px;flex-wrap:wrap;font-size:13px}
+.nav a{color:var(--muted);text-decoration:none;padding:4px 9px;border-radius:5px;white-space:nowrap}
+.nav a:hover{background:var(--line);color:var(--ink)}
+.nav a.on{background:var(--accent);color:#fff}
+main{max-width:780px;margin:0 auto}
+h1{font-size:31px;letter-spacing:-.02em;margin:.4em 0 .5em;line-height:1.25}
+h2{font-size:23px;margin:2.2em 0 .7em;padding-bottom:.3em;border-bottom:1px solid var(--line)}
+h3{font-size:19px;margin:1.9em 0 .5em;color:var(--accent)}
+h4{font-size:17px;margin:1.5em 0 .4em}
+p{margin:.8em 0} a{color:var(--accent)} hr{border:0;border-top:1px solid var(--line);margin:2.6em 0}
+table{border-collapse:collapse;width:100%;margin:1.3em 0;font-size:15.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+th{background:#f3f0eb;font-weight:600}
+tr:nth-child(even) td{background:#fcfbfa}
+code{font-family:"SF Mono",Menlo,Consolas,monospace;font-size:.88em;background:#f2efea;padding:2px 6px;border-radius:4px;white-space:nowrap}
+pre{background:#f2efea;padding:14px 16px;border-radius:8px;overflow-x:auto}
+pre code{background:none;padding:0;white-space:pre}
+blockquote{border-left:3px solid var(--accent);background:var(--hl);margin:1.4em 0;padding:14px 20px;border-radius:0 8px 8px 0}
+blockquote p:first-child{margin-top:0} blockquote p:last-child{margin-bottom:0}
+ul,ol{padding-left:1.5em} li{margin:.35em 0} em{color:#4a4a4a}
+mjx-container[display="true"]{margin:1.1em 0!important;overflow-x:auto;overflow-y:hidden;padding:2px 0}
+mjx-container svg{max-width:100%}
+body:not(.ready) main{opacity:0} main{opacity:1;transition:opacity .25s}
+
+/* --- bandeau de tête de fiche --- */
+.cours{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--accent);
+ border-radius:0 10px 10px 0;padding:18px 22px;margin:0 0 34px}
+.cours h4{margin:0 0 4px;font-size:14px;text-transform:uppercase;letter-spacing:.07em;color:var(--accent)}
+.cours .cs{color:var(--muted);font-size:14.5px;margin:0 0 14px}
+
+/* --- exercices / corrigés --- */
+.ex{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:6px 24px 20px;margin:18px 0}
+.ex>h3:first-child{margin-top:14px}
+details.cor{margin-top:18px;border:1px solid var(--line);border-radius:8px;background:#fcfbfa;overflow:hidden}
+details.cor>summary{cursor:pointer;padding:12px 16px;font-weight:600;font-size:15px;color:var(--accent);
+ list-style:none;display:flex;align-items:center;gap:9px;user-select:none;transition:.15s;min-height:44px}
+details.cor>summary::-webkit-details-marker{display:none}
+details.cor>summary:hover{background:var(--hl)}
+details.cor>summary::before{content:"\25B6";font-size:10px;transition:transform .18s;display:inline-block}
+details.cor[open]>summary::before{transform:rotate(90deg)}
+details.cor[open]>summary{background:var(--okbg);color:var(--ok);border-bottom:1px solid var(--line)}
+.cor .in{padding:4px 20px 16px}
+.cor .in>*:first-child{margin-top:.9em}
+
+/* --- blocs pédagogiques (callouts) ---
+   Générés depuis une citation Markdown dont le premier **gras** commence
+   par un mot-clé : DÉFINITION, THÉORÈME, MÉTHODE, PIÈGE, INTUITION… */
+.cal{border:1px solid var(--line);border-left:4px solid var(--accent);background:var(--card);
+ border-radius:0 10px 10px 0;padding:15px 20px;margin:1.5em 0}
+.cal>p:first-child{margin-top:0}.cal>p:last-child,.cal>ul:last-child,.cal>ol:last-child{margin-bottom:0}
+.cal .lab{display:block;font-size:12.5px;text-transform:uppercase;letter-spacing:.08em;
+ font-weight:700;color:var(--accent);margin-bottom:6px}
+.cal.formel{background:var(--hl)}
+.cal.piege{border-left-color:var(--warn);background:var(--warnbg)}
+.cal.piege .lab{color:var(--warn)}
+.cal.methode{border-left-color:var(--ok);background:var(--okbg)}
+.cal.methode .lab{color:var(--ok)}
+.cal.intu{border-left-color:var(--blue);background:var(--bluebg)}
+.cal.intu .lab{color:var(--blue)}
+.cal.plus{border-left-style:dashed;background:#faf9f7}
+.cal.plus .lab{color:var(--muted)}
+
+/* --- révision express --- */
+.ess{background:var(--card);border:1px solid var(--accent);border-radius:10px;padding:4px 24px 20px;margin:1.6em 0}
+.ess h3{margin-top:1.3em}
+.rec{background:var(--card);border:1px dashed var(--accent);border-radius:10px;padding:4px 24px 18px;margin:1.6em 0}
+.rec ol{counter-reset:none}
+
+/* --- impression / PDF --- */
+@media print{
+ .nav{display:none}
+ body{padding:0;background:#fff;font-size:11.2pt;line-height:1.55}
+ main{max-width:none}
+ h1{font-size:23pt}h2{font-size:15pt;margin-top:1.5em}h3{font-size:12.6pt}
+ h2,h3,h4{break-after:avoid;page-break-after:avoid}
+ table,.cal,blockquote{break-inside:avoid;page-break-inside:avoid}
+ table{display:table;font-size:9.6pt}
+ details.cor{border:1px solid var(--line);background:#fcfbfa}
+ details.cor>summary{display:none}
+ details.cor .in{padding-top:10px}
+ .cal,.ex,.ess,.rec{box-shadow:none}
+ a{color:var(--ink);text-decoration:none}
+}
+@page{margin:16mm 15mm 18mm}
+
+/* --- exemples travaillés --- */
+.exm{background:#fcfbfa;border:1px solid var(--line);border-radius:10px;padding:2px 20px 14px;margin:1.5em 0}
+.exm>h4:first-child{margin:14px 0 .5em;color:var(--accent);font-size:13px;text-transform:uppercase;letter-spacing:.07em}
+
+
+/* --- pastilles de priorité (conventions des fiches de l'app) --- */
+h2[data-prio], h3[data-prio], h4[data-prio]{position:relative}
+h2[data-prio]::before,h3[data-prio]::before,h4[data-prio]::before{
+ content:"";display:inline-block;width:9px;height:9px;border-radius:50%;
+ margin-right:9px;vertical-align:middle;background:var(--muted)}
+[data-prio="must"]::before{background:var(--warn)}
+[data-prio="high"]::before{background:#d98324}
+[data-prio="mid"]::before{background:#c9a227}
+[data-prio="low"]::before{background:var(--ok)}
+/* corrigés des fiches de l'app : même traitement que les corrigés des séries */
+details.cor>summary::after{content:""}
+</style></head><body>
+<div class="nav"><a href="00_COMMENCER_ICI.html">Commencer ici</a><a href="01_NOTATIONS_le-decodeur.html">Notations</a><a href="02_EXERCICES_Serie-0.html">Série 0 — Remise en route</a><a href="03_EXERCICES_Serie-1.html">Série 1 — Convexité</a><a href="04_EXERCICES_Serie-2.html">Série 2 — KKT</a><a href="05_AUTO-EVALUATION.html">Auto-évaluation (quiz)</a><a href="06_FICHE_Optimisation-deux-variables.html">Fiche — Optimisation à 2 variables</a></div>
+<main><h1>Fiche 79 — Futures de taux d'intérêt : T-bond, eurodollar, couverture par duration</h1>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Matière</strong></td>
+<td>Maths · Finance de marché</td>
+</tr>
+<tr>
+<td><strong>Cours source</strong></td>
+<td>John C. Hull, <em>Options, Futures, and Other Derivatives</em>, 8ᵉ éd., Pearson — chapitre 6 « Interest Rate Futures »</td>
+</tr>
+<tr>
+<td><strong>Difficulté</strong></td>
+<td> High — beaucoup de conventions, mais des exercices très mécaniques</td>
+</tr>
+<tr>
+<td><strong>Temps d'étude estimé</strong></td>
+<td>1 h 45</td>
+</tr>
+<tr>
+<td><strong>Prérequis</strong></td>
+<td>Fiches 75, 76, 77, 78</td>
+</tr>
+<tr>
+<td><strong>Concepts clés</strong></td>
+<td>Conventions de décompte des jours, prix pied de coupon et prix pied, futures T-bond, facteur de conversion, moins-disante à livrer, <em>wild card play</em>, futures eurodollar, ajustement de convexité, prolongement de la courbe LIBOR, ratio de couverture par duration, adossement des durations, gestion GAP</td>
+</tr>
+<tr>
+<td><strong>Poids à l'examen</strong></td>
+<td>Le <strong>facteur de conversion</strong>, la <strong>moins-disante à livrer</strong>, la <strong>règle des 25 dollars par point de base</strong>, l'<strong>ajustement de convexité</strong> et $N^\ast=\frac{PD_P}{V_FD_F}$.</td>
+</tr>
+</tbody></table>
+<h2>Vue d'ensemble</h2>
+<pre><code>CONVENTIONS  Actual/actual (Trésor US) · 30/360 (corporate) · Actual/360 (monétaire)
+             prix caisse = prix coté + INTÉRÊTS COURUS
+T-BOND       le vendeur choisit l'obligation  →  FACTEUR DE CONVERSION
+             moins-disante : min[ prix coté − (règlement × facteur) ]
+EURODOLLAR   cotation 100 − R  ·  1 pb = 25 dollars  ·  prix = 10 000[100 − 0,25(100 − Q)]
+             taux forward = taux futures − ½ σ² T₁T₂        ← ajustement de convexité
+COUVRIR      N* = P·D_P / (V_F·D_F)      taux ↑  ⇒  prix futures ↓
+</code></pre>
+<p><strong>Le fil du chapitre.</strong> Deux contrats dominent aux États-Unis — <strong>T-bond</strong> (taux longs) et <strong>eurodollar</strong> (taux courts). Ils sont difficiles à valoriser exactement, non pas à cause des maths, mais parce que le <strong>vendeur détient des options</strong> : quelle obligation livrer, quel jour, et jusqu'à quelle heure décider. <strong>Toutes ces options font baisser le prix futures.</strong></p>
+<h2 data-prio="mid">Concept 1 — Les conventions de décompte des jours</h2>
+<div class="cal formel"><span class="lab">Définition.</span>
+<p> Le <em>day count</em> définit <strong>la façon dont les intérêts s'accumulent au cours du temps</strong>. On connaît l'intérêt gagné sur une <strong>période de référence</strong> (par exemple entre deux coupons) et on veut celui d'une autre période.</p>
+</div>
+<p>$$\text{intérêt}=\frac{\text{nombre de jours entre les deux dates}}{\text{nombre de jours dans la période de référence}}\times\text{intérêt de la période de référence}$$</p>
+<p>La convention s'écrit $X/Y$ : <strong>$X$</strong> définit le comptage du <strong>numérateur</strong>, <strong>$Y$</strong> celui du <strong>dénominateur</strong>.</p>
+<table>
+<thead>
+<tr>
+<th>Convention</th>
+<th>Où</th>
+<th>Règle</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Actual/actual (in period)</strong></td>
+<td>obligations du <strong>Trésor US</strong></td>
+<td>jours <strong>réels</strong> au numérateur et au dénominateur</td>
+</tr>
+<tr>
+<td><strong>30/360</strong></td>
+<td>obligations <strong>corporate et municipales</strong> US</td>
+<td><strong>30 jours par mois, 360 par an</strong></td>
+</tr>
+<tr>
+<td><strong>Actual/360</strong></td>
+<td>instruments <strong>monétaires</strong> US</td>
+<td>numérateur réel, dénominateur <strong>360</strong></td>
+</tr>
+</tbody></table>
+<p><strong>Le même calcul, deux conventions.</strong> Nominal 100, coupons le 1ᵉʳ mars et le 1ᵉʳ septembre, taux <strong>8 %</strong> (donc <strong>4</strong> à chaque date). Intérêt du 1ᵉʳ mars au 3 juillet :</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Numérateur</th>
+<th>Dénominateur</th>
+<th>Intérêt</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Actual/actual</strong></td>
+<td>124 jours réels</td>
+<td>184 jours réels</td>
+<td>$\dfrac{124}{184}\times4=\mathbf{2{,}6957}$</td>
+</tr>
+<tr>
+<td><strong>30/360</strong></td>
+<td>$(4\times30)+2=122$</td>
+<td>$6\times30=180$</td>
+<td>$\dfrac{122}{180}\times4=\mathbf{2{,}7111}$</td>
+</tr>
+</tbody></table>
+<p class="cal piege"> <strong>Le piège spectaculaire.</strong> <em>Entre le 28 février et le 1ᵉʳ mars 2013, vous avez le choix entre une obligation d'État et une obligation corporate américaines. Elles paient le même coupon et ont le même prix coté. Sans risque de défaut, laquelle préférez-vous ?</em> On croit être indifférent — <strong>il faut nettement préférer la corporate</strong>. En <strong>30/360</strong>, il y a <strong>3 jours</strong> entre le 28 février et le 1ᵉʳ mars ; en <strong>actual/actual</strong>, il n'y en a <strong>qu'un</strong>. <em>Vous gagneriez environ <strong>trois fois</strong> plus d'intérêts en détenant la corporate !</em></p>
+<p class="cal piege"> <strong>Actual/360 gonfle discrètement le taux.</strong> <em>L'intérêt gagné en 90 jours est exactement le quart du taux coté, et l'intérêt gagné sur une année entière de 365 jours vaut <strong>365/360</strong> fois le taux coté.</em></p>
+<p><strong>Les variantes internationales.</strong> Instruments monétaires en <strong>actual/365</strong> en Australie, au Canada et en Nouvelle-Zélande · <strong>LIBOR</strong> en actual/360 dans toutes les devises <strong>sauf la livre</strong> (actual/365) · obligations en euro et en livre habituellement en <strong>actual/actual</strong>.</p>
+<h3>1.1 Les cotations</h3>
+<p><strong>Bons du Trésor US — le taux d'escompte.</strong> <em>Le prix des instruments monétaires est parfois coté avec un <strong>taux d'escompte</strong> : l'intérêt gagné en pourcentage de la <strong>valeur faciale finale</strong>, et non du prix initial payé.</em></p>
+<p>$$\boxed{P=\frac{360}{n}(100-Y)}$$
+où $P$ = <strong>prix coté</strong>, $Y$ = <strong>prix caisse</strong>, $n$ = durée résiduelle en <strong>jours calendaires</strong>.</p>
+<details class="cor">
+<summary><strong>Exercice résolu — décoder un bon du Trésor coté 8</strong></summary><div class="in">
+
+<p><strong>Énoncé.</strong> Bon du Trésor <strong>91 jours</strong> coté <strong>8</strong>, nominal 100.</p>
+<p><em>Étape 1 — lire la cotation.</em> <em>Le taux d'intérêt gagné est 8 % de la valeur faciale <strong>par 360 jours</strong>.</em>
+<em>Étape 2 — l'intérêt sur la vie du bon.</em> $100\times0{,}08\times\dfrac{91}{360}=\mathbf{2{,}0222}$.
+<em>Étape 3 — le prix caisse.</em> $Y=100-2{,}0222=\mathbf{97{,}9778}$.
+<em>Étape 4 — le <strong>vrai</strong> taux sur 91 jours.</em> Il se calcule sur ce <strong>qu'on a payé</strong>, pas sur le nominal :
+$$\frac{2{,}0222}{100-2{,}0222}=\frac{2{,}0222}{97{,}9778}=\mathbf{2{,}064\,\%}$$</p>
+<p class="cal piege"> <strong>C'est toute la différence entre un taux d'escompte et un taux de rendement.</strong> Le premier divise par <strong>100</strong>, le second par le <strong>prix payé</strong>. Le taux d'escompte <strong>sous-estime toujours</strong> le rendement réel.</p>
+</div></details>
+
+<p><strong>Obligations du Trésor — trente-deuxièmes et intérêts courus.</strong> <em>Les prix sont cotés en dollars et <strong>trente-deuxièmes</strong> de dollar, pour un nominal de 100.</em> Ainsi une cotation <strong>90-05</strong> vaut $90+\dfrac5{32}=90{,}15625$, soit <strong>90 156,25 dollars</strong> pour un nominal de 100 000.</p>
+<p>$$\boxed{\text{prix caisse (*dirty price*)}=\text{prix coté (*clean price*)}+\text{intérêts courus depuis le dernier coupon}}$$</p>
+<details class="cor">
+<summary><strong>Exercice résolu — du prix coté au prix caisse</strong></summary><div class="in">
+
+<p><strong>Énoncé.</strong> Le <strong>5 mars 2010</strong>, obligation à coupon <strong>11 %</strong> échéant le <strong>10 juillet 2018</strong>, cotée <strong>95-16</strong>.</p>
+<p><em>Étape 1 — convertir la cotation.</em> $95+\dfrac{16}{32}=\mathbf{95{,}50}$.
+<em>Étape 2 — repérer les dates de coupon.</em> Coupons <strong>semestriels</strong> sur les obligations d'État (le dernier à maturité) : le précédent est le <strong>10 janvier 2010</strong>, le suivant le <strong>10 juillet 2010</strong>.
+<em>Étape 3 — compter les jours.</em> Du 10 janvier au 5 mars : <strong>54</strong> jours. Du 10 janvier au 10 juillet : <strong>181</strong> jours.
+<em>Étape 4 — le coupon semestriel.</em> $11\,\%/2=\mathbf{5{,}50}$ par 100 de nominal.
+<em>Étape 5 — les intérêts courus, en actual/actual.</em>
+$$\frac{54}{181}\times5{,}50=\mathbf{1{,}64}$$
+<em>Étape 6 — le prix caisse.</em> $95{,}50+1{,}64=\mathbf{97{,}14}$ par 100 — soit <strong>97 140 dollars</strong> pour un nominal de 100 000.</p>
+</div></details>
+
+<h2 data-prio="must">Concept 2 — Le contrat futures sur T-bond</h2>
+<p><strong>L'actif livrable.</strong> <em>Toute obligation d'État ayant <strong>plus de 15 ans</strong> à courir le premier jour du mois de livraison et <strong>non remboursable avant 15 ans</strong></em>. Nominal du contrat : <strong>100 000 dollars</strong>.</p>
+<table>
+<thead>
+<tr>
+<th>Contrat</th>
+<th>Maturité résiduelle livrable</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>T-bond</strong></td>
+<td>$&gt;15$ ans, non rappelable avant 15 ans</td>
+</tr>
+<tr>
+<td><strong>T-note 10 ans</strong></td>
+<td>entre <strong>6,5 et 10</strong> ans</td>
+</tr>
+<tr>
+<td><strong>T-note 5 ans</strong></td>
+<td>entre <strong>4,167 et 5,25</strong> ans</td>
+</tr>
+<tr>
+<td><strong>T-note 2 ans</strong></td>
+<td>entre <strong>1,75 et 5,25</strong> ans</td>
+</tr>
+</tbody></table>
+<p class="cal piege"> <strong>Lire une cotation à trois chiffres après le tiret.</strong> Le troisième chiffre indique des <strong>quarts de trente-deuxième</strong> : <code>0</code> $=0$, <code>2</code> $=\frac14$, <code>5</code> $=\frac12$, <code>7</code> $=\frac34$.</p>
+<table>
+<thead>
+<tr>
+<th>Cotation</th>
+<th>Décomposition</th>
+<th>Valeur</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>124-150</strong></td>
+<td>$124+\dfrac{15}{32}$</td>
+<td><strong>124,46875</strong></td>
+</tr>
+<tr>
+<td><strong>120-105</strong></td>
+<td>$120+\dfrac{10{,}5}{32}$</td>
+<td><strong>120,328125</strong></td>
+</tr>
+<tr>
+<td><strong>117-157</strong></td>
+<td>$117+\dfrac{15{,}75}{32}$</td>
+<td><strong>117,492188</strong></td>
+</tr>
+<tr>
+<td><strong>108-302</strong></td>
+<td>$108+\dfrac{30{,}25}{32}$</td>
+<td><strong>108,945313</strong></td>
+</tr>
+</tbody></table>
+<h3>2.1 Le facteur de conversion</h3>
+<p><strong>Le problème.</strong> Le vendeur choisit <strong>quelle</strong> obligation livrer, parmi des titres de coupons et de maturités très différents. Il faut donc <strong>ajuster le prix reçu</strong>.</p>
+<p>$$\boxed{\text{caisse reçue par 100 de nominal}=(\text{dernier prix de règlement}\times\text{facteur de conversion})+\text{intérêts courus}}$$</p>
+<p><em>Exemple : règlement <strong>90-00</strong>, facteur <strong>1,3800</strong>, intérêts courus <strong>3</strong> → $(1{,}3800\times90{,}00)+3{,}00=\mathbf{127{,}20}$ par 100 de nominal, soit <strong>127 200 dollars</strong> pour un contrat.</em></p>
+<blockquote>
+<p><strong>La définition exacte du facteur.</strong> *Le facteur de conversion d'une obligation est <strong>le prix coté qu'elle aurait, par dollar de principal, le premier jour du mois de livraison, sous l'hypothèse que le taux d'intérêt de toutes les maturités égale 6 % par an (capitalisation semestrielle)</strong>.*</p>
+</blockquote>
+<p><strong>Les règles d'arrondi</strong> — elles <em>permettent à la bourse de produire des tables exhaustives</em> :</p>
+<ul>
+<li>la maturité et les dates de coupon sont <strong>arrondies à l'inférieur au trimestre le plus proche</strong> ;</li>
+<li>si, après arrondi, l'obligation dure un <strong>nombre exact</strong> de semestres → le <strong>premier coupon est supposé payé dans 6 mois</strong> ;</li>
+<li>sinon (il reste <strong>3 mois</strong> en plus) → le premier coupon est supposé payé <strong>après 3 mois</strong>, et <strong>on retranche les intérêts courus</strong>.</li>
+</ul>
+<details class="cor">
+<summary><strong>Exercice résolu — les deux cas de facteur de conversion</strong></summary><div class="in">
+
+<p><strong>Cas 1 — nombre exact de semestres.</strong> Obligation <strong>10 %</strong>, <strong>20 ans et 2 mois</strong> à courir.</p>
+<p><em>Étape 1 — arrondir.</em> On la traite comme ayant <strong>exactement 20 ans</strong>.
+<em>Étape 2 — le calendrier.</em> Premier coupon dans <strong>6 mois</strong>, puis tous les 6 mois pendant 20 ans, principal à la fin. <strong>40 périodes</strong>, coupon <strong>5</strong> par période.
+<em>Étape 3 — actualiser à 3 % par semestre.</em>
+$$\sum_{i=1}^{40}\frac{5}{1{,}03^i}+\frac{100}{1{,}03^{40}}=115{,}57+30{,}66=\mathbf{146{,}23}$$
+<em>Étape 4 — diviser par le nominal.</em> Facteur $=146{,}23/100=\mathbf{1{,}4623}$.</p>
+<p><strong>Cas 2 — trois mois en plus.</strong> Obligation <strong>8 %</strong>, <strong>18 ans et 4 mois</strong> à courir.</p>
+<p><em>Étape 1 — arrondir.</em> On la traite comme ayant <strong>18 ans et 3 mois</strong> (arrondi <strong>à l'inférieur</strong> au trimestre).
+<em>Étape 2 — se placer 3 mois plus tard.</em> À cette date, il reste <strong>36 semestres exacts</strong>, coupon <strong>4</strong>. On y ajoute le coupon <strong>4</strong> payé à cette date même :
+$$4+\sum_{i=1}^{36}\frac{4}{1{,}03^i}+\frac{100}{1{,}03^{36}}=4+87{,}33+34{,}50=\mathbf{125{,}83}$$
+<em>Étape 3 — ramener à aujourd'hui.</em> Le taux trimestriel est $\sqrt{1{,}03}-1=\mathbf{1{,}4889\,\%}$, donc
+$$\frac{125{,}83}{1{,}014889}=\mathbf{123{,}99}$$
+<em>Étape 4 — retrancher les intérêts courus.</em> Trois mois de coupon sur un semestre à 4 : $\mathbf{2{,}0}$ → $123{,}99-2{,}00=\mathbf{121{,}99}$.
+<em>Étape 5 — le facteur.</em> $\mathbf{1{,}2199}$.</p>
+<p class="cal piege"> <strong>Pourquoi la racine carrée.</strong> Le taux <strong>semestriel</strong> est 3 % ; le taux <strong>trimestriel</strong> équivalent vérifie $(1+i)^2=1{,}03$, d'où $i=\sqrt{1{,}03}-1$. <strong>Ne jamais diviser 3 % par 2</strong> ici.</p>
+</div></details>
+
+<h3>2.2 L'obligation moins-disante à livrer</h3>
+<p>Le vendeur <strong>reçoit</strong> $(\text{règlement}\times\text{facteur})+\text{courus}$ et <strong>paie</strong> $\text{prix coté}+\text{courus}$. Les intérêts courus s'annulent :</p>
+<p>$$\boxed{\text{moins-disante}=\arg\min\big[\text{prix coté}-(\text{dernier règlement}\times\text{facteur de conversion})\big]}$$</p>
+<details class="cor">
+<summary><strong>Exercice résolu — choisir entre trois obligations (exemple 6.1)</strong></summary><div class="in">
+
+<p><strong>Données.</strong> Dernier règlement <strong>93-08</strong>, soit <strong>93,25</strong>.</p>
+<table>
+<thead>
+<tr>
+<th>Obligation</th>
+<th>Prix coté</th>
+<th>Facteur</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>99,50</td>
+<td>1,0382</td>
+</tr>
+<tr>
+<td>2</td>
+<td>143,50</td>
+<td>1,5188</td>
+</tr>
+<tr>
+<td>3</td>
+<td>119,75</td>
+<td>1,2615</td>
+</tr>
+</tbody></table>
+<p><em>Étape 1 — coût de livraison de chacune.</em>
+$$1:\ 99{,}50-(93{,}25\times1{,}0382)=\mathbf{2{,}69}$$
+$$2:\ 143{,}50-(93{,}25\times1{,}5188)=\mathbf{1{,}87}$$
+$$3:\ 119{,}75-(93{,}25\times1{,}2615)=\mathbf{2{,}12}$$
+<em>Étape 2 — choisir le minimum.</em> <strong>L'obligation 2</strong> est la moins-disante à livrer.</p>
+<p class="cal piege"> <strong>Le piège de lecture.</strong> L'obligation la moins chère <strong>en prix coté</strong> (la n° 1, à 99,50) n'est <strong>pas</strong> la moins-disante. C'est <strong>l'écart au prix de facture</strong> qui compte, jamais le prix nu.</p>
+</div></details>
+
+<p><strong>Ce qui détermine la moins-disante — quatre régularités.</strong></p>
+<table>
+<thead>
+<tr>
+<th>Situation</th>
+<th>Obligation favorisée</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Rendements <strong>supérieurs à 6 %</strong></td>
+<td><strong>faible coupon, longue maturité</strong></td>
+</tr>
+<tr>
+<td>Rendements <strong>inférieurs à 6 %</strong></td>
+<td><strong>fort coupon, courte maturité</strong></td>
+</tr>
+<tr>
+<td>Courbe <strong>croissante</strong></td>
+<td><strong>longue</strong> maturité</td>
+</tr>
+<tr>
+<td>Courbe <strong>décroissante</strong></td>
+<td><strong>courte</strong> maturité</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>Le <em>wild card play</em> — la deuxième option du vendeur.</strong> La cotation du futures T-bond <strong>cesse à 14 h</strong> (heure de Chicago), mais les obligations continuent d'être traitées au comptant <strong>jusqu'à 16 h</strong>, et le vendeur a <strong>jusqu'à 20 h</strong> pour émettre son avis d'intention de livrer. <em>Si l'avis est émis, le prix de facture est calculé sur le <strong>prix de règlement du jour</strong> — celui d'avant la cloche de 14 h.</em></p>
+<p><strong>La stratégie.</strong> <em>Si les prix obligataires baissent après 14 h le premier jour du mois de livraison, le vendeur peut émettre son avis à, disons, 15 h 45, puis acheter les obligations au comptant pour les livrer au prix futures de 14 h. Si le prix ne baisse pas, il garde sa position ouverte et attend le lendemain, où la même stratégie peut être utilisée.</em></p>
+<p class="cal piege"> <em><strong>Comme les autres options ouvertes au vendeur, le wild card play n'est pas gratuit. Sa valeur se reflète dans le prix futures, qui est plus bas qu'il ne le serait sans cette option.</strong></em></p>
+</blockquote>
+<h3>2.3 Le prix futures théorique</h3>
+<p><em>Un prix théorique exact est <strong>difficile</strong> à déterminer parce que les options du vendeur — calendrier et choix de l'obligation — <strong>ne se valorisent pas facilement</strong>.</em> Mais <strong>si l'on suppose connues la moins-disante et la date de livraison</strong>, le T-bond futures est un futures sur un titre versant un <strong>revenu connu</strong>, donc (5.2) s'applique :</p>
+<p>$$\boxed{F_0=(S_0-I)e^{rT}}\;\text{(6.1)}$$</p>
+<p class="cal piege"> <em>En pratique, pour estimer la moins-disante, les analystes supposent habituellement que les taux zéro à la maturité du futures <strong>égaleront les taux forward d'aujourd'hui</strong>.</em></p>
+<details class="cor">
+<summary><strong>Exercice résolu — le prix futures T-bond complet (exemple 6.2)</strong></summary><div class="in">
+
+<p><strong>Données.</strong> Moins-disante : obligation <strong>12 %</strong>, facteur <strong>1,6000</strong>. Livraison dans <strong>270 jours</strong>. Dernier coupon il y a <strong>60 jours</strong>, prochain dans <strong>122 jours</strong>, le suivant dans <strong>305 jours</strong>. Courbe <strong>plate</strong> à <strong>10 %</strong> continu. Prix <strong>coté</strong> actuel : <strong>115</strong>.</p>
+<p><em>Étape 1 — passer au prix caisse.</em>
+$$115+\frac{60}{60+122}\times6=115+1{,}978=\mathbf{116{,}978}$$
+<em>Étape 2 — valeur actuelle du coupon intermédiaire.</em> Il tombe dans $122/365=0{,}3342$ an :
+$$I=6e^{-0{,}1\times0{,}3342}=\mathbf{5{,}803}$$
+<em>Étape 3 — appliquer (6.1).</em> $T=270/365=0{,}7397$ an :
+$$F^{\text{caisse}}=(116{,}978-5{,}803)e^{0{,}1\times0{,}7397}=111{,}175\times1{,}07677=\mathbf{119{,}711}$$
+<em>Étape 4 — revenir au prix coté.</em> À la livraison, il y a <strong>148 jours</strong> de courus (270 − 122), sur une période de coupon de $148+35=183$ jours :
+$$F^{\text{coté}}=119{,}711-6\times\frac{148}{183}=119{,}711-4{,}852=\mathbf{114{,}859}$$
+<em>Étape 5 — diviser par le facteur.</em> <em>Par définition du facteur de conversion, 1,6000 obligations standard équivalent à chaque obligation 12 %</em> :
+$$\frac{114{,}859}{1{,}6000}=\mathbf{71{,}79}$$</p>
+<p class="cal piege"> <strong>Les quatre passages obligés, dans l'ordre.</strong> coté → <strong>caisse</strong> (+courus) · retrancher <strong>la VA des coupons</strong> · capitaliser à $e^{rT}$ · caisse → <strong>coté</strong> (−courus à la livraison) · diviser par le <strong>facteur</strong>. Sauter l'un d'eux fausse tout.</p>
+</div></details>
+
+<h2 data-prio="must">Concept 3 — Le futures eurodollar</h2>
+<blockquote>
+<p><strong>L'eurodollar</strong> est <em>un dollar déposé dans une banque américaine ou étrangère <strong>hors des États-Unis</strong></em>. Le taux eurodollar est celui auquel une banque dépose auprès d'une autre : <em>essentiellement le même que le LIBOR</em>.</p>
+</blockquote>
+<blockquote>
+<p><strong>Le contrat.</strong> <em>Un futures eurodollar 3 mois est un futures sur l'intérêt qui sera payé — par quelqu'un empruntant au taux eurodollar — sur <strong>1 million de dollars</strong> pour une <strong>période future de trois mois</strong>.</em> Échéances mars, juin, septembre, décembre <strong>jusqu'à 10 ans</strong> dans le futur (en 2010, on pouvait donc se positionner sur les taux de <strong>2020</strong>).</p>
+</blockquote>
+<p><strong>Le mécanisme de règlement.</strong> Le contrat s'achève le <strong>troisième mercredi</strong> du mois de livraison. Il est réglé quotidiennement jusqu'à cette date, où le <strong>prix de règlement final</strong> est fixé à
+$$\boxed{100-R}$$
+$R$ étant le <strong>taux eurodollar 3 mois réellement observé</strong> ce jour-là, en capitalisation <strong>trimestrielle</strong> et convention <strong>actual/360</strong>. <em>Si le taux s'avère être 0,75 %, le règlement final est <strong>99,2500</strong>.</em></p>
+<p><strong>La règle des 25 dollars.</strong>
+$$1\ \text{point de base}=0{,}01\ \text{de cotation}\ \Longleftrightarrow\ \mathbf{25\ \text{dollars}}\ \text{par contrat}$$
+car $1\,000\,000\times0{,}0001\times0{,}25=\mathbf{25}$. <em>La règle est donc cohérente avec le fait que le contrat verrouille un taux sur 1 million pour trois mois.</em></p>
+<p class="cal piege"> <strong>Le sens de la position.</strong> <em>La cotation vaut 100 moins le taux futures : un investisseur <strong>long gagne quand les taux baissent</strong>, un investisseur <strong>court gagne quand les taux montent</strong>.</em> C'est l'inverse de l'intuition « long = je parie sur la hausse ».</p>
+<p><strong>Le prix du contrat.</strong>
+$$\boxed{\text{prix}=10\,000\times\big[100-0{,}25\times(100-Q)\big]}\;\text{(6.2)}$$
+<em>Pour $Q=99{,}3100$ : $10\,000\times[100-0{,}25\times0{,}69]=\mathbf{998\,275}$ dollars. Pour $Q=99{,}5300$ : $\mathbf{998\,825}$ — une différence de <strong>550 dollars</strong>, cohérente avec $22\ \text{pb}\times25$.</em></p>
+<details class="cor">
+<summary><strong>Exercice résolu — verrouiller un taux de placement (exemple 6.3)</strong></summary><div class="in">
+
+<p><strong>Énoncé.</strong> Un investisseur veut fixer le taux d'un placement de <strong>100 millions</strong> sur trois mois à partir du <strong>19 septembre 2012</strong>. Le futures eurodollar septembre 2012 cote <strong>96,50</strong>.</p>
+<p><em>Étape 1 — lire le taux verrouillé.</em> $100-96{,}50=\mathbf{3{,}5\,\%}$ par an.
+<em>Étape 2 — choisir le sens.</em> Il <strong>place</strong> : il craint la <strong>baisse</strong> des taux. Un long gagne quand les taux baissent → il <strong>achète</strong>.
+<em>Étape 3 — dimensionner.</em> $100\,000\,000/1\,000\,000=\mathbf{100}$ contrats.
+<em>Étape 4 — le dénouement.</em> Le taux 3 mois s'avère être <strong>2,6 %</strong> → règlement final <strong>97,40</strong>.
+<em>Étape 5 — le gain futures.</em> La cotation est montée de $96{,}50$ à $97{,}40$, soit <strong>90 points de base</strong> :
+$$100\times25\times90=\mathbf{225\,000}\ \text{dollars}$$
+<em>Étape 6 — l'intérêt réellement gagné.</em> $100\,000\,000\times0{,}25\times0{,}026=\mathbf{650\,000}$.
+<em>Étape 7 — le total.</em> $650\,000+225\,000=\mathbf{875\,000}$ — exactement l'intérêt à 3,5 % : $100\,000\,000\times0{,}25\times0{,}035=875\,000$ .</p>
+<p class="cal piege"> <strong>La couverture n'est pourtant pas parfaite, pour deux raisons.</strong> (a) <em>Les futures sont réglés <strong>quotidiennement</strong>, pas tout à la fin.</em> (b) <em>Le règlement final a lieu le <strong>19 septembre 2012</strong>, alors que l'intérêt du placement est perçu <strong>trois mois plus tard</strong>.</em>
+<em>L'ajustement du second point :</em> réduire la taille de la couverture du facteur $1/(1+0{,}035\times0{,}25)=\mathbf{0{,}9913}$ → acheter <strong>99</strong> contrats plutôt que 100.</p>
+</div></details>
+
+<p><strong>La lecture de la structure par terme.</strong> <em>Le taux futures pour la période de 3 mois commençant le 16 juin 2010 était de <strong>0,69 %</strong> ; le 15 septembre 2010, <strong>0,95 %</strong> ; le 15 décembre 2010, <strong>1,105 %</strong> ; et le 16 décembre 2015, <strong>4,42 %</strong></em> — une courbe nettement croissante.</p>
+<p><strong>Les contrats analogues à l'étranger.</strong> <em>Euroyen</em> (CME Group) · <strong><em>Euribor</em> 3 mois</strong> et <em>Euroswiss</em> (LIFFE, Euronext).</p>
+<h2 data-prio="must">Concept 4 — Taux forward contre taux futures : l'ajustement de convexité</h2>
+<p><strong>Les deux différences avec un FRA.</strong> Le futures eurodollar est réglé <strong>quotidiennement</strong>, avec règlement final en $T_1$ reflétant le taux réalisé entre $T_1$ et $T_2$ ; le FRA n'est pas réglé quotidiennement et son règlement final a lieu en $T_2$.</p>
+<table>
+<thead>
+<tr>
+<th>Différence</th>
+<th>Nature</th>
+<th>Effet</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>1</strong></td>
+<td>futures <strong>réglé quotidiennement</strong> vs contrat sans règlement quotidien (payoff en $T_1$)</td>
+<td><strong>abaisse</strong> le forward par rapport au futures</td>
+</tr>
+<tr>
+<td><strong>2</strong></td>
+<td>payoff en $T_1$ vs payoff en $T_2$</td>
+<td><strong>abaisse</strong> aussi, mais <strong>beaucoup moins</strong> pour les contrats longs</td>
+</tr>
+</tbody></table>
+<details class="cor">
+<summary><strong>Pourquoi chacune des deux différences abaisse le taux forward</strong></summary><div class="in">
+
+<p><strong>Différence 1 — le règlement quotidien.</strong> Supposez un contrat de payoff $R_M-R_F$ en $T_1$, et l'<strong>option</strong> de passer au règlement quotidien. <em>Le règlement quotidien tend à produire des <strong>entrées de trésorerie quand les taux sont élevés</strong> et des <strong>sorties quand ils sont bas</strong>. Vous trouveriez donc attractif d'y passer, parce que vous avez tendance à avoir <strong>plus d'argent sur votre compte de marge quand les taux sont hauts</strong>.</em> Le marché fixerait donc $R_F$ <strong>plus haut</strong> pour l'alternative avec règlement quotidien. *Dit autrement : <strong>passer du règlement quotidien au règlement en $T_1$ réduit $R_F$</strong>.*</p>
+<p><strong>Différence 2 — la date du payoff.</strong> Supposez le payoff $R_M-R_F$ en <strong>$T_2$</strong> au lieu de $T_1$ (cas du FRA ordinaire). *Si $R_M$ est <strong>élevé</strong>, le payoff est <strong>positif</strong> ; comme les taux sont hauts, le coût pour vous de recevoir ce payoff en $T_2$ plutôt qu'en $T_1$ est <strong>relativement élevé</strong>. Si $R_M$ est <strong>bas</strong>, le payoff est <strong>négatif</strong> ; comme les taux sont bas, le bénéfice de payer en $T_2$ plutôt qu'en $T_1$ est <strong>relativement faible</strong>. Globalement vous préféreriez le payoff en $T_1$ — s'il est en $T_2$, vous devez être compensé par une <strong>réduction de $R_F$</strong>.*</p>
+<p class="cal piege"> <strong>Retenez le raisonnement, pas seulement la formule.</strong> Les deux arguments reposent sur la <strong>corrélation entre le signe du flux et le niveau des taux</strong> — exactement le mécanisme qui, en section 5.8, séparait prix forward et prix futures.</p>
+</div></details>
+
+<p>$$\boxed{\text{taux forward}=\text{taux futures}-\tfrac12\sigma^2T_1T_2}\;\text{(6.3)}$$</p>
+<p>où $T_1$ = maturité du <strong>futures</strong>, $T_2$ = maturité du <strong>taux sous-jacent</strong> au futures, et $\sigma$ = <strong>écart-type de la variation du taux court sur un an</strong>. <em>Les deux taux sont exprimés en capitalisation continue.</em> La formule <em>repose sur le modèle de taux de <strong>Ho-Lee</strong></em> (chapitre 30).</p>
+<details class="cor">
+<summary><strong>Exercice résolu — l'ajustement de convexité à 8 ans (exemple 6.4)</strong></summary><div class="in">
+
+<p><strong>Énoncé.</strong> $\sigma=0{,}012$, futures eurodollar <strong>8 ans</strong> coté <strong>94</strong>.</p>
+<p><em>Étape 1 — les deux maturités.</em> $T_1=8$ et $T_2=8{,}25$ (le taux sous-jacent court <strong>3 mois de plus</strong>).
+<em>Étape 2 — l'ajustement.</em>
+$$\tfrac12\times0{,}012^2\times8\times8{,}25=\mathbf{0{,}00475}\quad\text{soit }\mathbf{47{,}5}\text{ points de base}$$
+<em>Étape 3 — le taux futures, dans sa convention d'origine.</em> $100-94=6\,\%$ par an, <strong>actual/360 trimestriel</strong> — c'est-à-dire <strong>1,5 % par 90 jours</strong>.
+<em>Étape 4 — convertir en continu actual/365.</em>
+$$\frac{365}{90}\ln(1{,}015)=4{,}0556\times0{,}014889=\mathbf{6{,}038\,\%}$$
+<em>Étape 5 — appliquer (6.3).</em> $6{,}038-0{,}475=\mathbf{5{,}563\,\%}$ par an, continu.</p>
+<p><strong>Comment l'ajustement grandit.</strong></p>
+<table>
+<thead>
+<tr>
+<th>Maturité du futures (ans)</th>
+<th>2</th>
+<th>4</th>
+<th>6</th>
+<th>8</th>
+<th>10</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Ajustement (points de base)</td>
+<td><strong>3,2</strong></td>
+<td><strong>12,2</strong></td>
+<td><strong>27,0</strong></td>
+<td><strong>47,5</strong></td>
+<td><strong>73,8</strong></td>
+</tr>
+</tbody></table>
+<p><em>La taille de l'ajustement est approximativement <strong>proportionnelle au carré</strong> de la maturité : quand la maturité double de 2 à 4 ans, l'ajustement <strong>quadruple</strong> environ.</em></p>
+<p class="cal piege"> <strong>Négliger l'ajustement est sans conséquence à un an et catastrophique à dix.</strong> 3,2 pb à 2 ans se perdent dans le bruit ; <strong>73,8 pb</strong> à 10 ans déplacent toute la courbe.</p>
+</div></details>
+
+<p><strong>Prolonger la courbe zéro LIBOR.</strong> <em>La courbe jusqu'à 1 an est déterminée par les LIBOR 1, 3, 6 et 12 mois. Une fois l'ajustement de convexité fait, les futures eurodollar servent souvent à la prolonger.</em> On suppose que <em>le taux forward calculé à partir du $i$-ème contrat s'applique à la période $[T_i,T_{i+1}]$</em>, ce qui permet un <strong>bootstrap</strong> : à partir de (4.5),</p>
+<p>$$\boxed{R_{i+1}=\frac{F_i(T_{i+1}-T_i)+R_iT_i}{T_{i+1}}}\;\text{(6.4)}$$</p>
+<details class="cor">
+<summary><strong>Exercice résolu — prolonger la courbe (exemple 6.5)</strong></summary><div class="in">
+
+<p><strong>Données.</strong> Taux zéro LIBOR <strong>400 jours</strong> : <strong>4,80 %</strong> continu. Forwards 90 jours issus des futures : <strong>5,30 %</strong> à partir de 400 jours · <strong>5,50 %</strong> à partir de 491 jours · <strong>5,60 %</strong> à partir de 589 jours.</p>
+<p><em>Étape 1 — le taux 491 jours.</em>
+$$R=\frac{0{,}053\times91+0{,}048\times400}{491}=\frac{4{,}823+19{,}2}{491}=\mathbf{0{,}04893}\quad(4{,}893\,\%)$$
+<em>Étape 2 — le taux 589 jours.</em>
+$$R=\frac{0{,}055\times98+0{,}04893\times491}{589}=\frac{5{,}39+24{,}024}{589}=\mathbf{0{,}04994}\quad(4{,}994\,\%)$$
+<em>Étape 3 — poursuivre.</em> Le forward suivant (5,60 %) détermine la courbe jusqu'à l'échéance du contrat suivant.</p>
+<p class="cal piege"> <strong>La petite approximation assumée.</strong> <em>Même si le taux sous-jacent au futures eurodollar est un taux <strong>90 jours</strong>, on suppose qu'il s'applique aux <strong>91 ou 98 jours</strong> qui séparent les échéances des contrats.</em> Hull le signale explicitement — c'est acceptable, pas exact.</p>
+</div></details>
+
+<h2 data-prio="must">Concept 5 — Couverture par duration</h2>
+<table>
+<thead>
+<tr>
+<th>Symbole</th>
+<th>Sens</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$V_F$</td>
+<td><strong>prix du contrat</strong> pour un futures de taux</td>
+</tr>
+<tr>
+<td>$D_F$</td>
+<td><strong>duration de l'actif sous-jacent</strong> au futures, <strong>à la maturité du futures</strong></td>
+</tr>
+<tr>
+<td>$P$</td>
+<td>valeur <strong>forward</strong> du portefeuille couvert à la fin de la couverture (<em>en pratique on prend sa valeur d'aujourd'hui</em>)</td>
+</tr>
+<tr>
+<td>$D_P$</td>
+<td><strong>duration du portefeuille</strong> à la fin de la couverture</td>
+</tr>
+</tbody></table>
+<p><strong>La construction.</strong> Sous l'hypothèse que $\Delta y$ est <strong>le même pour toutes les maturités</strong> — c'est-à-dire que seuls des <strong>déplacements parallèles</strong> se produisent :
+$$\Delta P\approx-PD_P\,\Delta y\qquad\text{et}\qquad\Delta V_F\approx-V_FD_F\,\Delta y$$
+$$\Longrightarrow\qquad\boxed{N^\ast=\frac{PD_P}{V_FD_F}}\;\text{(6.5)}$$</p>
+<p>C'est le <strong>ratio de couverture par duration</strong>, aussi appelé <strong>ratio de sensibilité au prix</strong>. <em>Son emploi a pour effet de rendre <strong>nulle</strong> la duration de la position entière.</em></p>
+<p class="cal piege"> <strong>Taux et prix futures bougent en sens opposés.</strong> <em>Quand les taux montent, un prix de futures de taux <strong>baisse</strong>.</em> Donc :</p>
+<table>
+<thead>
+<tr>
+<th>L'entreprise perd si…</th>
+<th>Position à prendre</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>les taux <strong>baissent</strong></td>
+<td><strong>longue</strong></td>
+</tr>
+<tr>
+<td>les taux <strong>montent</strong></td>
+<td><strong>courte</strong></td>
+</tr>
+</tbody></table>
+<p class="cal piege"> <strong>Le risque de changement de moins-disante.</strong> <em>Quand l'instrument de couverture est un futures T-bond, le hedger doit fonder $D_F$ sur l'hypothèse qu'une obligation particulière sera livrée</em> — il doit <strong>estimer</strong> laquelle sera la moins-disante. <em>Si l'environnement de taux change ensuite au point qu'une <strong>autre</strong> obligation semble devenir la moins-disante, la couverture doit être ajustée et sa performance peut être moins bonne que prévu.</em></p>
+<p><strong>Le choix du contrat.</strong> <em>Le hedger essaie de choisir le futures dont la duration du sous-jacent est <strong>aussi proche que possible</strong> de celle de l'actif couvert</em> : <strong>eurodollar</strong> pour les expositions <strong>courtes</strong>, <strong>T-bond et T-note</strong> pour les expositions <strong>longues</strong>.</p>
+<details class="cor">
+<summary><strong>Exercice résolu — couvrir 10 millions d'obligations d'État (exemple 6.6)</strong></summary><div class="in">
+
+<p><strong>Énoncé.</strong> 2 août. Un gérant a <strong>10 millions</strong> en obligations d'État et craint une forte volatilité des taux sur <strong>3 mois</strong>. Il utilise le futures T-bond <strong>décembre</strong>, coté <strong>93-02</strong>. Duration du portefeuille dans 3 mois : <strong>6,80 ans</strong>. Moins-disante attendue : obligation <strong>20 ans à 12 %</strong>, rendement <strong>8,80 %</strong>, duration <strong>9,20 ans</strong> à la maturité du futures.</p>
+<p><em>Étape 1 — le prix du contrat.</em> $93\text{-}02=93+\dfrac2{32}=93{,}0625$ ; nominal 100 000 → $V_F=\mathbf{93\,062{,}50}$ dollars.
+<em>Étape 2 — le sens.</em> Il détient des obligations : il perd si les <strong>taux montent</strong> → position <strong>courte</strong>.
+<em>Étape 3 — appliquer (6.5).</em>
+$$N^\ast=\frac{10\,000\,000}{93\,062{,}50}\times\frac{6{,}80}{9{,}20}=107{,}45\times0{,}73913=\mathbf{79{,}42}$$
+<em>Étape 4 — arrondir.</em> Le gérant <strong>vend 79 contrats</strong>.
+<em>Étape 5 — vérifier la logique.</em> <em>Si les taux montent, gain sur la position courte et perte sur le portefeuille ; s'ils baissent, perte sur la position courte et gain sur le portefeuille.</em></p>
+<p class="cal piege"> <strong>Les deux durations ne jouent pas le même rôle.</strong> $D_P$ est celle du portefeuille <strong>à la fin de la couverture</strong> ; $D_F$ est celle de la <strong>moins-disante</strong>, <strong>à la maturité du futures</strong>. Utiliser les durations d'aujourd'hui est une approximation courante mais délibérée.</p>
+</div></details>
+
+<h2 data-prio="high">Concept 6 — Adossement des durations et gestion GAP</h2>
+<blockquote>
+<p><strong>Adossement des durations</strong> (<em>duration matching</em>) ou <strong>immunisation de portefeuille</strong> : les institutions financières font en sorte que la <strong>duration moyenne des actifs égale la duration moyenne des passifs</strong> (<em>les passifs pouvant être vus comme des positions courtes en obligations</em>). <em>Un petit déplacement <strong>parallèle</strong> des taux n'a alors qu'un effet minime : le gain (la perte) sur les actifs compense la perte (le gain) sur les passifs.</em></p>
+</blockquote>
+<p class="cal piege"> <strong>La faiblesse, énoncée sans détour.</strong> <em>L'adossement des durations n'immunise <strong>pas</strong> contre les déplacements <strong>non parallèles</strong>. En pratique, les taux courts sont habituellement <strong>plus volatils</strong> que les taux longs et <strong>imparfaitement corrélés</strong> avec eux. Il arrive même que les taux courts et longs bougent <strong>en sens opposés</strong>. L'adossement n'est donc qu'une <strong>première étape</strong>.</em></p>
+<blockquote>
+<p><strong>La gestion GAP.</strong> L'approche courante consiste à <strong>découper la courbe zéro en segments</strong> appelés <em><strong>buckets</strong></em> — le premier de 0 à 1 mois, le second de 1 à 3 mois, et ainsi de suite. <em>Le comité de gestion actif-passif examine alors l'effet, sur la valeur du portefeuille de la banque, d'une variation des taux zéro correspondant à <strong>un seul bucket</strong>, les autres restant inchangés.</em></p>
+<p><strong>En cas de décalage</strong>, deux leviers : <strong>modifier les taux de dépôt et de crédit</strong> (mécanisme de la section 4.10, fiche 77) ou utiliser des <strong>swaps, FRA, futures obligataires, futures eurodollar</strong> et autres dérivés de taux.</p>
+</blockquote>
+<h2>Comment reconnaître le type d'exercice</h2>
+<table>
+<thead>
+<tr>
+<th>Signal</th>
+<th>Ce qu'on demande</th>
+<th>Outil</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Deux dates et un coupon</td>
+<td><strong>intérêts courus</strong></td>
+<td>jours/jours × coupon, dans la bonne convention</td>
+</tr>
+<tr>
+<td>Une cotation « 95-16 » ou « 124-150 »</td>
+<td><strong>conversion</strong></td>
+<td>$/32$, troisième chiffre = <strong>quarts</strong> de $1/32$</td>
+</tr>
+<tr>
+<td>Un bon du Trésor coté « 8 »</td>
+<td><strong>prix caisse et vrai taux</strong></td>
+<td>$P=\frac{360}n(100-Y)$ puis intérêt / prix payé</td>
+</tr>
+<tr>
+<td>Une liste d'obligations + facteurs + règlement</td>
+<td><strong>moins-disante</strong></td>
+<td>minimiser $\text{coté}-(\text{règlement}\times\text{facteur})$</td>
+</tr>
+<tr>
+<td>Un coupon et une maturité, sans autre donnée</td>
+<td><strong>facteur de conversion</strong></td>
+<td>actualiser à <strong>3 % par semestre</strong>, arrondir au trimestre</td>
+</tr>
+<tr>
+<td>Une cotation eurodollar et un taux réalisé</td>
+<td><strong>gain</strong></td>
+<td>$(\Delta\text{pb})\times25\times n_{\text{contrats}}$</td>
+</tr>
+<tr>
+<td>$\sigma$ et une maturité longue</td>
+<td><strong>ajustement de convexité</strong></td>
+<td>$\frac12\sigma^2T_1T_2$</td>
+</tr>
+<tr>
+<td>Des forwards successifs et un taux zéro</td>
+<td><strong>prolonger la courbe</strong></td>
+<td>$R_{i+1}=\frac{F_i(T_{i+1}-T_i)+R_iT_i}{T_{i+1}}$</td>
+</tr>
+<tr>
+<td>Deux durations et deux valeurs</td>
+<td><strong>nombre de contrats</strong></td>
+<td>$N^\ast=\frac{PD_P}{V_FD_F}$</td>
+</tr>
+</tbody></table>
+<h2>Comment résoudre ce type d'exercice</h2>
+<p><strong>Protocole prix futures T-bond — 5 étapes.</strong></p>
+<ol>
+<li>Prix <strong>coté</strong> → prix <strong>caisse</strong> : ajouter les intérêts courus $\frac{\text{jours écoulés}}{\text{jours de la période}}\times$ coupon.</li>
+<li>Calculer $I$ = <strong>valeur actuelle</strong> des coupons tombant <strong>pendant la vie du futures</strong>.</li>
+<li>$F^{\text{caisse}}=(S_0-I)e^{rT}$.</li>
+<li>Prix caisse → prix <strong>coté</strong> : retrancher les intérêts courus <strong>à la date de livraison</strong>.</li>
+<li><strong>Diviser par le facteur de conversion</strong>.</li>
+</ol>
+<p><strong>Protocole couverture par duration — 4 étapes.</strong></p>
+<ol>
+<li>Convertir la cotation du futures en <strong>prix du contrat</strong> $V_F$ (× nominal / 100).</li>
+<li>Déterminer le <strong>sens</strong> : détenteur d'obligations → <strong>court</strong> ; futur emprunteur → <strong>court</strong> ; futur prêteur → <strong>long</strong>.</li>
+<li>$N^\ast=\dfrac{PD_P}{V_FD_F}$, avec $D_F$ = duration de la <strong>moins-disante à la maturité du futures</strong>.</li>
+<li><strong>Arrondir</strong> et énoncer explicitement les limites : déplacements <strong>parallèles</strong> seulement, moins-disante <strong>supposée fixe</strong>.</li>
+</ol>
+<h2 data-prio="must">Common mistakes</h2>
+<table>
+<thead>
+<tr>
+<th>Erreur</th>
+<th>Correction</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Lire « 117-157 » comme $117+15{,}7/32$</td>
+<td>Le 3ᵉ chiffre est en <strong>quarts</strong> de $1/32$ : $117+15{,}75/32$</td>
+</tr>
+<tr>
+<td>Oublier les intérêts courus dans le prix caisse</td>
+<td>$\text{caisse}=\text{coté}+\text{courus}$, <strong>toujours</strong></td>
+</tr>
+<tr>
+<td>Prendre le taux d'escompte pour un rendement</td>
+<td>Le rendement divise par le <strong>prix payé</strong>, pas par 100</td>
+</tr>
+<tr>
+<td>Choisir la moins-disante sur le <strong>prix coté</strong></td>
+<td>Minimiser $\text{coté}-(\text{règlement}\times\text{facteur})$</td>
+</tr>
+<tr>
+<td>Diviser 3 % par 2 pour un trimestre</td>
+<td>Le taux trimestriel est $\sqrt{1{,}03}-1=1{,}4889\,\%$</td>
+</tr>
+<tr>
+<td>Oublier de retrancher les courus dans le cas « 3 mois de plus »</td>
+<td>La règle du facteur de conversion l'exige explicitement</td>
+</tr>
+<tr>
+<td>Croire qu'un long eurodollar gagne si les taux montent</td>
+<td>La cotation est $100-R$ : <strong>long = pari sur la baisse</strong></td>
+</tr>
+<tr>
+<td>Confondre 1 pb de cotation et 1 pb de prix</td>
+<td>1 pb $=$ <strong>25 dollars</strong> par contrat</td>
+</tr>
+<tr>
+<td>Ignorer l'ajustement de convexité sur un contrat long</td>
+<td><strong>73,8 pb</strong> à 10 ans — ce n'est pas du bruit</td>
+</tr>
+<tr>
+<td>Confondre $T_1$ et $T_2$ dans l'ajustement</td>
+<td>$T_1$ = maturité du <strong>futures</strong>, $T_2=T_1+0{,}25$</td>
+</tr>
+<tr>
+<td>Croire que l'adossement des durations immunise contre tout</td>
+<td>Seulement les <strong>déplacements parallèles</strong></td>
+</tr>
+<tr>
+<td>Utiliser la duration du portefeuille <strong>aujourd'hui</strong> sans le dire</td>
+<td>$D_P$ est celle <strong>à la fin de la couverture</strong></td>
+</tr>
+</tbody></table>
+<h2>Ultimate Review</h2>
+<p><strong>Conventions.</strong> Actual/actual (Trésor US) · 30/360 (corporate) · Actual/360 (monétaire, LIBOR sauf GBP) · $\text{caisse}=\text{coté}+\text{courus}$ · $P=\frac{360}n(100-Y)$ pour les T-bills · cotations en $1/32$, 3ᵉ chiffre en <strong>quarts</strong> de $1/32$.</p>
+<p><strong>T-bond.</strong> Facture $=(\text{règlement}\times\text{facteur})+\text{courus}$ · facteur = prix à <strong>6 % semestriel</strong>, maturité <strong>arrondie au trimestre inférieur</strong> · moins-disante $=\min[\text{coté}-(\text{règlement}\times\text{facteur})]$ · $F_0=(S_0-I)e^{rT}$, puis <strong>retirer les courus</strong> et <strong>diviser par le facteur</strong>.</p>
+<p><strong>Eurodollar.</strong> Règlement final $100-R$ le <strong>3ᵉ mercredi</strong> · <strong>1 pb = 25 dollars</strong> · prix $=10\,000[100-0{,}25(100-Q)]$ · <strong>long = pari sur la baisse des taux</strong> · ajustement : $\text{forward}=\text{futures}-\frac12\sigma^2T_1T_2$ · bootstrap : $R_{i+1}=\frac{F_i(T_{i+1}-T_i)+R_iT_i}{T_{i+1}}$.</p>
+<p><strong>Couverture.</strong> $N^\ast=\dfrac{PD_P}{V_FD_F}$ · taux ↑ ⇒ prix futures ↓ · eurodollar pour le <strong>court</strong>, T-bond pour le <strong>long</strong>.</p>
+<p><strong>Les chiffres du chapitre.</strong> Intérêts 1ᵉʳ mars→3 juillet : <strong>2,6957</strong> (actual/actual) contre <strong>2,7111</strong> (30/360) · T-bill 91 jours coté 8 → vrai taux <strong>2,064 %</strong> · 95-16 le 5 mars 2010 → caisse <strong>97,14</strong> · facteurs <strong>1,4623</strong> et <strong>1,2199</strong> · moins-disante : coûts <strong>2,69 / 1,87 / 2,12</strong> → obligation <strong>2</strong> · exemple 6.2 → <strong>71,79</strong> · prix du contrat eurodollar à 99,31 → <strong>998 275</strong> · ajustements de convexité <strong>3,2 / 12,2 / 27,0 / 47,5 / 73,8</strong> pb · exemple 6.4 → <strong>5,563 %</strong> · exemple 6.5 → <strong>4,893 %</strong> et <strong>4,994 %</strong> · exemple 6.6 → <strong>79 contrats</strong>.</p>
+<p><strong>Les trois options du vendeur de T-bond</strong> — <em>toutes font baisser le prix futures</em> : livrer <strong>n'importe quel jour</strong> du mois · choisir <strong>quelle obligation</strong> · émettre l'avis jusqu'à <strong>20 h</strong> au prix de règlement de <strong>14 h</strong> (<em>wild card play</em>).</p>
+<div class="rec"><h2>Active Recall</h2><details class="cor">
+<summary>Pourquoi préférer une obligation corporate à une obligation d'État entre le 28 février et le 1ᵉʳ mars 2013 ?</summary><div class="in">
+
+<p>À cause de la <strong>convention de décompte</strong>. En <strong>30/360</strong> (corporate), il y a <strong>3 jours</strong> entre le 28 février et le 1ᵉʳ mars (on complète le mois à 30). En <strong>actual/actual</strong> (Trésor US), il n'y en a <strong>qu'un</strong>. À coupon et prix cotés identiques, la corporate rapporte donc <strong>environ trois fois plus</strong> d'intérêts sur cette journée.</p>
+</div></details><details class="cor">
+<summary>Un bon du Trésor 91 jours est coté 8. Quel est son prix caisse et son vrai taux ?</summary><div class="in">
+
+<p>Le taux d'escompte s'applique à la <strong>valeur faciale</strong> : intérêt $=100\times0{,}08\times\frac{91}{360}=\mathbf{2{,}0222}$, donc prix caisse $Y=\mathbf{97{,}9778}$. Le <strong>vrai</strong> taux se calcule sur le prix payé : $\frac{2{,}0222}{97{,}9778}=\mathbf{2{,}064\,\%}$ sur 91 jours. Le taux d'escompte <strong>sous-estime</strong> toujours le rendement.</p>
+</div></details><details class="cor">
+<summary>Décoder la cotation 117-157 et expliquer la règle.</summary><div class="in">
+
+<p>$117+\dfrac{15{,}75}{32}=\mathbf{117{,}492188}$. Le troisième chiffre code des <strong>quarts de trente-deuxième</strong> : <code>0</code>$=0$, <code>2</code>$=\frac14$, <code>5</code>$=\frac12$, <code>7</code>$=\frac34$. Donc <code>157</code> signifie $15$ et $\frac34$ de trente-deuxièmes. Vérifications : <code>120-105</code> $=120+\frac{10{,}5}{32}=120{,}328125$ ; <code>108-302</code> $=108+\frac{30{,}25}{32}=108{,}945313$.</p>
+</div></details><details class="cor">
+<summary>Définir le facteur de conversion et calculer celui d'une obligation 10 % à 20 ans et 2 mois.</summary><div class="in">
+
+<p>C'est <em>le prix coté qu'aurait l'obligation, par dollar de principal, le premier jour du mois de livraison, si le taux de <strong>toutes</strong> les maturités valait <strong>6 % semestriel</strong></em>.</p>
+<p>Arrondi au trimestre inférieur : <strong>20 ans exactement</strong>, premier coupon dans 6 mois, <strong>40 périodes</strong>, coupon <strong>5</strong>, taux <strong>3 % par période</strong> :
+$$\sum_{i=1}^{40}\frac{5}{1{,}03^i}+\frac{100}{1{,}03^{40}}=146{,}23\ \Longrightarrow\ \text{facteur}=\mathbf{1{,}4623}$$</p>
+</div></details><details class="cor">
+<summary>Trois obligations, règlement 93,25 : (99,50 ; 1,0382), (143,50 ; 1,5188), (119,75 ; 1,2615). Laquelle livrer ?</summary><div class="in">
+
+<p>On minimise $\text{coté}-(\text{règlement}\times\text{facteur})$ : $99{,}50-96{,}81=\mathbf{2{,}69}$ · $143{,}50-141{,}63=\mathbf{1{,}87}$ · $119{,}75-117{,}63=\mathbf{2{,}12}$. <strong>L'obligation 2</strong>, alors même qu'elle est de loin la <strong>plus chère</strong> en prix coté — les intérêts courus s'annulent entre ce qu'on reçoit et ce qu'on paie, seul compte l'écart au prix de facture.</p>
+</div></details><details class="cor">
+<summary>Expliquer le *wild card play* et son effet sur le prix futures.</summary><div class="in">
+
+<p>La cotation du futures cesse à <strong>14 h</strong>, le comptant continue jusqu'à <strong>16 h</strong>, et le vendeur a jusqu'à <strong>20 h</strong> pour émettre son avis de livraison — <strong>facturé au prix de règlement de 14 h</strong>. Si les prix obligataires <strong>baissent</strong> après 14 h, il émet l'avis à 15 h 45 et <strong>achète au comptant moins cher</strong> pour livrer au prix de 14 h. Sinon, il attend le lendemain. <em>Comme les autres options du vendeur, elle n'est pas gratuite : sa valeur se reflète dans un <strong>prix futures plus bas</strong>.</em></p>
+</div></details><details class="cor">
+<summary>Un futures eurodollar passe de 99,31 à 99,27. Que gagne ou perd un long d'un contrat, et pourquoi 25 dollars par point de base ?</summary><div class="in">
+
+<p>La cotation baisse de <strong>4 points de base</strong> → le long <strong>perd $4\times25=\mathbf{100}$ dollars</strong> (le court gagne autant). La règle vient de la définition du contrat : 1 pb de taux sur 1 million pendant 3 mois vaut
+$$1\,000\,000\times0{,}0001\times0{,}25=\mathbf{25}\ \text{dollars}$$</p>
+</div></details><details class="cor">
+<summary>Pourquoi le taux forward est-il inférieur au taux futures eurodollar ?</summary><div class="in">
+
+<p>Deux effets, tous deux dans le même sens. <strong>(1) Le règlement quotidien</strong> : il produit des entrées de trésorerie <strong>quand les taux sont hauts</strong> et des sorties quand ils sont bas — vous avez donc plus d'argent placé au taux fort. Cette option est attractive, le marché la fait payer par un $R_F$ <strong>plus haut</strong> pour le futures. <strong>(2) La date du payoff</strong> : recevoir en $T_2$ plutôt qu'en $T_1$ coûte cher quand les taux sont hauts (payoff positif) et rapporte peu quand ils sont bas (payoff négatif) — il faut compenser par un $R_F$ <strong>plus bas</strong>. L'ajustement : $\text{forward}=\text{futures}-\frac12\sigma^2T_1T_2$.</p>
+</div></details><details class="cor">
+<summary>Avec $\sigma=0{,}012$ et un futures eurodollar 8 ans coté 94, calculer le taux forward continu.</summary><div class="in">
+
+<p><em>Ajustement</em> : $\frac12\times0{,}012^2\times8\times8{,}25=0{,}00475=\mathbf{47{,}5}$ pb.
+<em>Taux futures</em> : $100-94=6\,\%$ actual/360 trimestriel $=1{,}5\,\%$ par 90 jours, soit $\frac{365}{90}\ln(1{,}015)=\mathbf{6{,}038\,\%}$ continu actual/365.
+<em>Forward</em> : $6{,}038-0{,}475=\mathbf{5{,}563\,\%}$.
+L'ajustement croît comme le <strong>carré</strong> de la maturité : 3,2 pb à 2 ans, 12,2 à 4 ans, 73,8 à 10 ans.</p>
+</div></details><details class="cor">
+<summary>Un gérant a 10 M en obligations (duration 6,80), futures T-bond à 93-02, moins-disante de duration 9,20. Que fait-il ?</summary><div class="in">
+
+<p>$V_F=(93+\frac2{32})\times1\,000=\mathbf{93\,062{,}50}$ dollars.
+$$N^\ast=\frac{10\,000\,000\times6{,}80}{93\,062{,}50\times9{,}20}=\mathbf{79{,}42}\ \longrightarrow\ \textbf{vendre 79 contrats}$$
+<strong>Vendre</strong>, parce qu'il perd si les taux <strong>montent</strong> et qu'un prix de futures de taux <strong>baisse</strong> quand les taux montent. Deux réserves : la couverture ne vaut que pour un déplacement <strong>parallèle</strong>, et elle suppose la <strong>moins-disante inchangée</strong>.</p>
+</div></details><details class="cor">
+<summary>Qu'est-ce que la gestion GAP, et quel défaut de l'adossement des durations corrige-t-elle ?</summary><div class="in">
+
+<p>L'adossement des durations n'immunise que contre les déplacements <strong>parallèles</strong> — or <em>les taux courts sont plus volatils que les longs, imparfaitement corrélés, et bougent parfois en sens opposés</em>. La <strong>gestion GAP</strong> découpe la courbe zéro en <strong>segments (<em>buckets</em>)</strong> — 0-1 mois, 1-3 mois, etc. — et le comité ALM examine l'effet, sur la valeur du portefeuille, d'une variation des taux <strong>d'un seul bucket</strong>, les autres restant fixes. En cas de décalage : ajuster les <strong>taux de dépôt et de crédit</strong>, ou utiliser <strong>swaps, FRA, futures</strong>.</p>
+</div></details></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h2>Flashcards</h2>
+<table>
+<thead>
+<tr>
+<th>Question</th>
+<th>Réponse</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Convention du Trésor US ?</td>
+<td><strong>Actual/actual (in period)</strong></td>
+</tr>
+<tr>
+<td>Convention des obligations corporate US ?</td>
+<td><strong>30/360</strong></td>
+</tr>
+<tr>
+<td>Convention du marché monétaire US ?</td>
+<td><strong>Actual/360</strong></td>
+</tr>
+<tr>
+<td>Convention du LIBOR ?</td>
+<td><strong>Actual/360</strong>, sauf la <strong>livre</strong> (actual/365)</td>
+</tr>
+<tr>
+<td>Intérêt sur 365 jours en actual/360 ?</td>
+<td><strong>365/360</strong> fois le taux coté</td>
+</tr>
+<tr>
+<td>Prix caisse ?</td>
+<td>Prix coté <strong>+ intérêts courus</strong></td>
+</tr>
+<tr>
+<td>Autres noms ?</td>
+<td><em>Clean price</em> / <em>dirty price</em></td>
+</tr>
+<tr>
+<td>Formule du prix coté d'un T-bill ?</td>
+<td>$P=\frac{360}{n}(100-Y)$</td>
+</tr>
+<tr>
+<td>T-bill 91 jours coté 8 : vrai taux ?</td>
+<td><strong>2,064 %</strong> sur la période</td>
+</tr>
+<tr>
+<td>Cotation « 90-05 » ?</td>
+<td>$90+\frac5{32}=\mathbf{90{,}15625}$</td>
+</tr>
+<tr>
+<td>Que code le 3ᵉ chiffre d'une cotation futures ?</td>
+<td>Des <strong>quarts</strong> de $1/32$ (0, ¼, ½, ¾)</td>
+</tr>
+<tr>
+<td>Nominal d'un contrat T-bond ?</td>
+<td><strong>100 000 dollars</strong></td>
+</tr>
+<tr>
+<td>Maturité livrable au T-bond ?</td>
+<td><strong>&gt; 15 ans</strong>, non rappelable avant 15 ans</td>
+</tr>
+<tr>
+<td>Maturité livrable au T-note 10 ans ?</td>
+<td>Entre <strong>6,5 et 10 ans</strong></td>
+</tr>
+<tr>
+<td>Caisse reçue par le vendeur ?</td>
+<td>$(\text{règlement}\times\text{facteur})+\text{courus}$</td>
+</tr>
+<tr>
+<td>Définition du facteur de conversion ?</td>
+<td>Prix coté de l'obligation <strong>à 6 % semestriel</strong></td>
+</tr>
+<tr>
+<td>Arrondi utilisé ?</td>
+<td>Au <strong>trimestre inférieur</strong></td>
+</tr>
+<tr>
+<td>Cas « 3 mois en plus » ?</td>
+<td>Premier coupon <strong>à 3 mois</strong>, on <strong>retranche les courus</strong></td>
+</tr>
+<tr>
+<td>Taux trimestriel équivalent à 3 % semestriel ?</td>
+<td>$\sqrt{1{,}03}-1=\mathbf{1{,}4889\,\%}$</td>
+</tr>
+<tr>
+<td>Critère de la moins-disante ?</td>
+<td>$\min[\text{coté}-(\text{règlement}\times\text{facteur})]$</td>
+</tr>
+<tr>
+<td>Rendements &gt; 6 % : quelle obligation ?</td>
+<td><strong>Faible coupon, longue maturité</strong></td>
+</tr>
+<tr>
+<td>Rendements &lt; 6 % ?</td>
+<td><strong>Fort coupon, courte maturité</strong></td>
+</tr>
+<tr>
+<td>Courbe croissante ?</td>
+<td>Maturité <strong>longue</strong> favorisée</td>
+</tr>
+<tr>
+<td><em>Wild card play</em> ?</td>
+<td>Avis jusqu'à <strong>20 h</strong> au prix de règlement de <strong>14 h</strong></td>
+</tr>
+<tr>
+<td>Effet des options du vendeur sur $F_0$ ?</td>
+<td>Elles le font <strong>baisser</strong></td>
+</tr>
+<tr>
+<td>Prix futures T-bond ?</td>
+<td>$(S_0-I)e^{rT}$, puis <strong>−courus</strong>, puis <strong>/facteur</strong></td>
+</tr>
+<tr>
+<td>Qu'est-ce qu'un eurodollar ?</td>
+<td>Un dollar déposé dans une banque <strong>hors des États-Unis</strong></td>
+</tr>
+<tr>
+<td>Nominal du contrat eurodollar ?</td>
+<td><strong>1 million</strong> de dollars, <strong>3 mois</strong></td>
+</tr>
+<tr>
+<td>Quand se règle-t-il ?</td>
+<td>Le <strong>3ᵉ mercredi</strong> du mois de livraison</td>
+</tr>
+<tr>
+<td>Prix de règlement final ?</td>
+<td>$\mathbf{100-R}$</td>
+</tr>
+<tr>
+<td>Valeur d'un point de base ?</td>
+<td><strong>25 dollars</strong> par contrat</td>
+</tr>
+<tr>
+<td>Formule du prix du contrat ?</td>
+<td>$10\,000[100-0{,}25(100-Q)]$</td>
+</tr>
+<tr>
+<td>Un long eurodollar gagne quand… ?</td>
+<td>Les taux <strong>baissent</strong></td>
+</tr>
+<tr>
+<td>Horizon des échéances eurodollar ?</td>
+<td>Jusqu'à <strong>10 ans</strong></td>
+</tr>
+<tr>
+<td>Les deux différences futures/FRA ?</td>
+<td><strong>Règlement quotidien</strong> · <strong>date du payoff</strong> ($T_1$ vs $T_2$)</td>
+</tr>
+<tr>
+<td>Sens de ces deux effets ?</td>
+<td>Les deux <strong>abaissent</strong> le taux forward</td>
+</tr>
+<tr>
+<td>Formule de l'ajustement de convexité ?</td>
+<td>$\text{forward}=\text{futures}-\frac12\sigma^2T_1T_2$</td>
+</tr>
+<tr>
+<td>Que représente $\sigma$ ?</td>
+<td>L'<strong>écart-type de la variation du taux court sur un an</strong></td>
+</tr>
+<tr>
+<td>Modèle sous-jacent à la formule ?</td>
+<td><strong>Ho-Lee</strong></td>
+</tr>
+<tr>
+<td>Ajustement à 10 ans (σ = 0,012) ?</td>
+<td><strong>73,8</strong> points de base</td>
+</tr>
+<tr>
+<td>Comment croît l'ajustement ?</td>
+<td>Comme le <strong>carré</strong> de la maturité</td>
+</tr>
+<tr>
+<td>Formule de prolongement de la courbe ?</td>
+<td>$R_{i+1}=\frac{F_i(T_{i+1}-T_i)+R_iT_i}{T_{i+1}}$</td>
+</tr>
+<tr>
+<td>Ratio de couverture par duration ?</td>
+<td>$N^\ast=\dfrac{PD_P}{V_FD_F}$</td>
+</tr>
+<tr>
+<td>Autre nom de ce ratio ?</td>
+<td>Ratio de <strong>sensibilité au prix</strong></td>
+</tr>
+<tr>
+<td>Effet d'une hausse des taux sur un prix de futures de taux ?</td>
+<td>Il <strong>baisse</strong></td>
+</tr>
+<tr>
+<td>L'entreprise perd si les taux montent : quelle position ?</td>
+<td><strong>Courte</strong></td>
+</tr>
+<tr>
+<td>Quel contrat pour une exposition courte ? longue ?</td>
+<td><strong>Eurodollar</strong> / <strong>T-bond et T-note</strong></td>
+</tr>
+<tr>
+<td>Risque propre à la couverture T-bond ?</td>
+<td>Le changement de <strong>moins-disante</strong></td>
+</tr>
+<tr>
+<td>Adossement des durations : contre quoi protège-t-il ?</td>
+<td>Les déplacements <strong>parallèles</strong> seulement</td>
+</tr>
+<tr>
+<td>Qu'est-ce qu'un <em>bucket</em> ?</td>
+<td>Un <strong>segment</strong> de la courbe zéro en gestion GAP</td>
+</tr>
+</tbody></table>
+</main>
+
+
+
+
+</body></html>

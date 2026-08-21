@@ -1,0 +1,1102 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fiche 55 — Value at Risk : variance-covariance, simulation historique et Monte-Carlo</title>
+<script>
+window.MathJax={tex:{inlineMath:[["$","$"]],displayMath:[["$$","$$"]],processEscapes:true},
+ options:{skipHtmlTags:["script","noscript","style","textarea","pre","code"]},
+ svg:{fontCache:"global"},
+ startup:{pageReady:()=>MathJax.startup.defaultPageReady().then(()=>{document.body.classList.add("ready")})}};
+setTimeout(function(){document.body.classList.add("ready")},2500);
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+/* ============================================================
+   MathiasLearn — feuille de style des fiches
+   Reprise intégrale des tokens de 00_PARCOURS/*.html
+   + blocs pédagogiques (callouts, méthode, essentiels, recall)
+   ============================================================ */
+:root{--bg:#faf9f7;--card:#fff;--ink:#1a1a1a;--muted:#6b6b6b;--line:#e5e2dd;--accent:#8b5e34;
+ --hl:#fdf8ef;--ok:#2d7d4f;--okbg:#f0f7f3;--warn:#b3402f;--warnbg:#fdf3f1;--blue:#2f5d8b;--bluebg:#f1f5fa}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+ font:17px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;padding:0 16px 100px}
+.nav{position:sticky;top:0;background:rgba(250,249,247,.96);backdrop-filter:blur(8px);
+ border-bottom:1px solid var(--line);margin:0 -16px 30px;padding:11px 16px;z-index:50;
+ display:flex;gap:6px;flex-wrap:wrap;font-size:13px}
+.nav a{color:var(--muted);text-decoration:none;padding:4px 9px;border-radius:5px;white-space:nowrap}
+.nav a:hover{background:var(--line);color:var(--ink)}
+.nav a.on{background:var(--accent);color:#fff}
+main{max-width:780px;margin:0 auto}
+h1{font-size:31px;letter-spacing:-.02em;margin:.4em 0 .5em;line-height:1.25}
+h2{font-size:23px;margin:2.2em 0 .7em;padding-bottom:.3em;border-bottom:1px solid var(--line)}
+h3{font-size:19px;margin:1.9em 0 .5em;color:var(--accent)}
+h4{font-size:17px;margin:1.5em 0 .4em}
+p{margin:.8em 0} a{color:var(--accent)} hr{border:0;border-top:1px solid var(--line);margin:2.6em 0}
+table{border-collapse:collapse;width:100%;margin:1.3em 0;font-size:15.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+th{background:#f3f0eb;font-weight:600}
+tr:nth-child(even) td{background:#fcfbfa}
+code{font-family:"SF Mono",Menlo,Consolas,monospace;font-size:.88em;background:#f2efea;padding:2px 6px;border-radius:4px;white-space:nowrap}
+pre{background:#f2efea;padding:14px 16px;border-radius:8px;overflow-x:auto}
+pre code{background:none;padding:0;white-space:pre}
+blockquote{border-left:3px solid var(--accent);background:var(--hl);margin:1.4em 0;padding:14px 20px;border-radius:0 8px 8px 0}
+blockquote p:first-child{margin-top:0} blockquote p:last-child{margin-bottom:0}
+ul,ol{padding-left:1.5em} li{margin:.35em 0} em{color:#4a4a4a}
+mjx-container[display="true"]{margin:1.1em 0!important;overflow-x:auto;overflow-y:hidden;padding:2px 0}
+mjx-container svg{max-width:100%}
+body:not(.ready) main{opacity:0} main{opacity:1;transition:opacity .25s}
+
+/* --- bandeau de tête de fiche --- */
+.cours{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--accent);
+ border-radius:0 10px 10px 0;padding:18px 22px;margin:0 0 34px}
+.cours h4{margin:0 0 4px;font-size:14px;text-transform:uppercase;letter-spacing:.07em;color:var(--accent)}
+.cours .cs{color:var(--muted);font-size:14.5px;margin:0 0 14px}
+
+/* --- exercices / corrigés --- */
+.ex{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:6px 24px 20px;margin:18px 0}
+.ex>h3:first-child{margin-top:14px}
+details.cor{margin-top:18px;border:1px solid var(--line);border-radius:8px;background:#fcfbfa;overflow:hidden}
+details.cor>summary{cursor:pointer;padding:12px 16px;font-weight:600;font-size:15px;color:var(--accent);
+ list-style:none;display:flex;align-items:center;gap:9px;user-select:none;transition:.15s;min-height:44px}
+details.cor>summary::-webkit-details-marker{display:none}
+details.cor>summary:hover{background:var(--hl)}
+details.cor>summary::before{content:"\25B6";font-size:10px;transition:transform .18s;display:inline-block}
+details.cor[open]>summary::before{transform:rotate(90deg)}
+details.cor[open]>summary{background:var(--okbg);color:var(--ok);border-bottom:1px solid var(--line)}
+.cor .in{padding:4px 20px 16px}
+.cor .in>*:first-child{margin-top:.9em}
+
+/* --- blocs pédagogiques (callouts) ---
+   Générés depuis une citation Markdown dont le premier **gras** commence
+   par un mot-clé : DÉFINITION, THÉORÈME, MÉTHODE, PIÈGE, INTUITION… */
+.cal{border:1px solid var(--line);border-left:4px solid var(--accent);background:var(--card);
+ border-radius:0 10px 10px 0;padding:15px 20px;margin:1.5em 0}
+.cal>p:first-child{margin-top:0}.cal>p:last-child,.cal>ul:last-child,.cal>ol:last-child{margin-bottom:0}
+.cal .lab{display:block;font-size:12.5px;text-transform:uppercase;letter-spacing:.08em;
+ font-weight:700;color:var(--accent);margin-bottom:6px}
+.cal.formel{background:var(--hl)}
+.cal.piege{border-left-color:var(--warn);background:var(--warnbg)}
+.cal.piege .lab{color:var(--warn)}
+.cal.methode{border-left-color:var(--ok);background:var(--okbg)}
+.cal.methode .lab{color:var(--ok)}
+.cal.intu{border-left-color:var(--blue);background:var(--bluebg)}
+.cal.intu .lab{color:var(--blue)}
+.cal.plus{border-left-style:dashed;background:#faf9f7}
+.cal.plus .lab{color:var(--muted)}
+
+/* --- révision express --- */
+.ess{background:var(--card);border:1px solid var(--accent);border-radius:10px;padding:4px 24px 20px;margin:1.6em 0}
+.ess h3{margin-top:1.3em}
+.rec{background:var(--card);border:1px dashed var(--accent);border-radius:10px;padding:4px 24px 18px;margin:1.6em 0}
+.rec ol{counter-reset:none}
+
+/* --- impression / PDF --- */
+@media print{
+ .nav{display:none}
+ body{padding:0;background:#fff;font-size:11.2pt;line-height:1.55}
+ main{max-width:none}
+ h1{font-size:23pt}h2{font-size:15pt;margin-top:1.5em}h3{font-size:12.6pt}
+ h2,h3,h4{break-after:avoid;page-break-after:avoid}
+ table,.cal,blockquote{break-inside:avoid;page-break-inside:avoid}
+ table{display:table;font-size:9.6pt}
+ details.cor{border:1px solid var(--line);background:#fcfbfa}
+ details.cor>summary{display:none}
+ details.cor .in{padding-top:10px}
+ .cal,.ex,.ess,.rec{box-shadow:none}
+ a{color:var(--ink);text-decoration:none}
+}
+@page{margin:16mm 15mm 18mm}
+
+/* --- exemples travaillés --- */
+.exm{background:#fcfbfa;border:1px solid var(--line);border-radius:10px;padding:2px 20px 14px;margin:1.5em 0}
+.exm>h4:first-child{margin:14px 0 .5em;color:var(--accent);font-size:13px;text-transform:uppercase;letter-spacing:.07em}
+
+
+/* --- pastilles de priorité (conventions des fiches de l'app) --- */
+h2[data-prio], h3[data-prio], h4[data-prio]{position:relative}
+h2[data-prio]::before,h3[data-prio]::before,h4[data-prio]::before{
+ content:"";display:inline-block;width:9px;height:9px;border-radius:50%;
+ margin-right:9px;vertical-align:middle;background:var(--muted)}
+[data-prio="must"]::before{background:var(--warn)}
+[data-prio="high"]::before{background:#d98324}
+[data-prio="mid"]::before{background:#c9a227}
+[data-prio="low"]::before{background:var(--ok)}
+/* corrigés des fiches de l'app : même traitement que les corrigés des séries */
+details.cor>summary::after{content:""}
+</style></head><body>
+<div class="nav"><a href="00_COMMENCER_ICI.html">Commencer ici</a><a href="01_NOTATIONS_le-decodeur.html">Notations</a><a href="02_EXERCICES_Serie-0.html">Série 0 — Remise en route</a><a href="03_EXERCICES_Serie-1.html">Série 1 — Convexité</a><a href="04_EXERCICES_Serie-2.html">Série 2 — KKT</a><a href="05_AUTO-EVALUATION.html">Auto-évaluation (quiz)</a><a href="06_FICHE_Optimisation-deux-variables.html">Fiche — Optimisation à 2 variables</a></div>
+<main><h1>Fiche 55 — Value at Risk : variance-covariance, simulation historique et Monte-Carlo</h1>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Matière</strong></td>
+<td>Maths · Finance de marché</td>
+</tr>
+<tr>
+<td><strong>Cours source</strong></td>
+<td>Abbott, <em>18.S096 Topics in Mathematics with Applications in Finance</em>, MIT OpenCourseWare, automne 2013 — cours 7 « Value At Risk (VAR) Models »</td>
+</tr>
+<tr>
+<td><strong>Difficulté</strong></td>
+<td> Must know — la mesure de risque de toutes les salles de marché</td>
+</tr>
+<tr>
+<td><strong>Temps d'étude estimé</strong></td>
+<td>2 h 30</td>
+</tr>
+<tr>
+<td><strong>Prérequis</strong></td>
+<td>Fiche 51 (mesures de risque, cohérence), fiche 53 (volatilité, pondération exponentielle), fiche 54 (matrices de covariance)</td>
+</tr>
+<tr>
+<td><strong>Concepts clés</strong></td>
+<td>Quantile de perte, multiplicateurs $2{,}33$ et $1{,}64$, DV01 et duration, méthode variance-covariance, forme quadratique $X^T\Sigma X$, pondération exponentielle, <em>bucketing</em>, VaR absolue et marginale, simulation historique, statistique d'ordre, Monte-Carlo, factorisation de Cholesky, <em>backtesting</em></td>
+</tr>
+<tr>
+<td><strong>Poids à l'examen</strong></td>
+<td>Trois choses : la <strong>chaîne de calcul</strong> de la VaR à un actif ; l'<strong>ajustement obligataire</strong> par le DV01 (et le piège des unités) ; et savoir <strong>comparer</strong> les trois méthodologies sur hypothèses, forces et faiblesses.</td>
+</tr>
+</tbody></table>
+<h2>Vue d'ensemble</h2>
+<blockquote>
+<p><strong>La mission de la gestion des risques.</strong></p>
+<ol>
+<li><strong>Garantir que la direction est pleinement informée</strong> du profil de risque de la banque.</li>
+<li><strong>Protéger la banque</strong> contre des pertes inacceptablement grandes résultant de la <strong>concentration des risques</strong>.</li>
+<li>Autrement dit : <strong>PAS DE SURPRISES</strong>.</li>
+</ol>
+<p><em>Deux analogies : le <strong>projecteur</strong> et le <strong>livre de coloriage</strong>.</em></p>
+</blockquote>
+<p><strong>Ce qu'on cherche à calculer :</strong> <em>on veut estimer les <strong>1 % pires issues possibles</strong></em> de la distribution des résultats.</p>
+<pre><code>QUESTION      « Combien puis-je perdre, dans les 1 % de pires cas ? »
+1 ACTIF       VaR = position × σ × 2,33
+n ACTIFS      VaR = 2,33 × √(XᵀΣX)          ← variance-covariance
+ALTERNATIVE 1 rejouer l'histoire → nᵉ pire P&amp;L   ← simulation historique
+ALTERNATIVE 2 simuler des chocs corrélés         ← Monte-Carlo
+CONTRÔLE      backtesting : VaR à t contre P&amp;L à t+1
+</code></pre>
+<p><strong>Les méthodologies du cours :</strong></p>
+<ul>
+<li><strong>Exemple de VaR à un actif</strong> : instruments cotés en <strong>prix</strong> · instruments cotés en <strong>taux</strong></li>
+<li><strong>Variance / covariance</strong></li>
+<li><strong>Simulation de Monte-Carlo</strong></li>
+<li><strong>Simulation historique</strong></li>
+</ul>
+<p><strong>Les variables qui interviennent dans les méthodes :</strong></p>
+<ol>
+<li><strong>Sensibilité aux taux d'intérêt</strong> — duration, PV01</li>
+<li><strong>Exposition actions</strong></li>
+<li><strong>Exposition matières premières</strong></li>
+<li><strong>Crédit</strong> — duration de spread</li>
+<li><strong>Distribution / linéarité</strong> du comportement des prix</li>
+<li><strong>Régularité des flux de trésorerie / remboursements anticipés</strong></li>
+<li><strong>Corrélation</strong> entre secteurs et classes d'actifs</li>
+</ol>
+<h2 data-prio="mid">Concept 1 — Pourquoi travailler sur les rendements</h2>
+<blockquote>
+<ul>
+<li><em>La plupart des séries financières suivent des <strong>marches aléatoires</strong>, ce qui signifie entre autres que la <strong>meilleure estimation de la valeur de demain est la valeur d'aujourd'hui</strong>.</em></li>
+<li><em>Comme les marches aléatoires ne sont <strong>pas bornées</strong>, prédire la trajectoire future est difficile si l'on se concentre sur les <strong>niveaux</strong>.</em></li>
+<li><em>Une distribution de fréquence des <strong>niveaux</strong> de l'indice IPC sur 1995-1996 illustre la difficulté.</em></li>
+</ul>
+</blockquote>
+<p>En revanche, la distribution de fréquence des <strong>rendements</strong>, définis comme la <strong>variation en pourcentage</strong> de l'indice, <em>retrouve un profil familier</em> — une forme en cloche exploitable.</p>
+<blockquote>
+<p><strong>Le raisonnement en une phrase.</strong> Un histogramme des niveaux d'un indice n'est pas une distribution de probabilité : c'est un résumé du chemin parcouru, qui dépend entièrement du point de départ et de la période. L'histogramme des <strong>rendements</strong>, lui, décrit un processus à peu près <strong>stationnaire</strong> — et c'est la stationnarité qui autorise à lire un quantile passé comme une prévision. C'est exactement l'hypothèse de la fiche 52.</p>
+</blockquote>
+<h2 data-prio="must">Concept 2 — La VaR à un actif</h2>
+<p><strong>Estimer la volatilité.</strong> <em>Une fois qu'on dispose d'une série temporelle de rendements, on jauge leur dispersion relative par la <strong>variance</strong> : soustraire le rendement moyen de chaque rendement individuel, élever au carré, sommer les carrés sur toutes les observations, et diviser par le nombre d'observations.</em> La <strong>racine carrée</strong> de la variance, appelée <strong>écart-type</strong> ou <strong>volatilité</strong>, sert à estimer le risque.
+$$\text{variance}=\sum_{i=1}^n\frac{(x_i-\bar x)^2}{n-1}$$
+<em>(fonctions Excel : <code>var()</code> et <code>stdev()</code>)</em></p>
+<blockquote>
+<p><strong>Le résultat central.</strong> *Dans une distribution normale, <strong>$2{,}33\times$ l'écart-type</strong> représente le plus grand mouvement possible <strong>99 % du temps</strong> (et <strong>$1{,}64\times$ l'écart-type</strong> pour <strong>95 %</strong>).*</p>
+</blockquote>
+<p class="cal piege"> <strong>Ces deux nombres sont les quantiles de la loi normale standard</strong>, en <strong>unilatéral</strong> : $\Phi^{-1}(0{,}99)=2{,}326$ et $\Phi^{-1}(0{,}95)=1{,}645$. Ils ne valent <strong>que</strong> sous normalité. La suite du chapitre existe en grande partie parce que cette hypothèse est fausse.</p>
+<h3>L'exemple de l'IPC mexicain</h3>
+<ul>
+<li>La variance des rendements quotidiens de l'IPC entre 1/95 et 12/96 était de $0{,}000324$.</li>
+<li>L'écart-type était de $0{,}018012$, soit $1{,}8012\,\%$.</li>
+<li>$2{,}33\times1{,}8012\,\%=0{,}041968$, soit $\mathbf{4{,}1968\,\%}$.</li>
+</ul>
+<blockquote>
+<p><em>On peut conclure qu'on ne devrait pas perdre plus de $4{,}1968\,\%$ de la valeur de la position, <strong>99 % du temps</strong>. Un investissement de MXP 100 dans l'IPC ne subirait des pertes quotidiennes supérieures à MXP 4,2 qu'environ 1 % du temps.</em></p>
+</blockquote>
+<blockquote>
+<p><strong>Et la vérification empirique, que le cours donne franchement.</strong> <em>En fait, l'IPC a perdu plus de $4{,}2\,\%$ <strong>8 fois</strong> depuis le 1/1/95, soit environ <strong>$1{,}5\,\%$</strong> du temps.</em></p>
+<p><em>Si ce chiffre est approximativement exact, il illustre un problème de la VaR sur certains marchés : elle <strong>sous-estime parfois le nombre de grands mouvements</strong>. Ce problème, fréquent au niveau d'un titre ou d'un desk, <strong>disparaît généralement au niveau du portefeuille</strong>.</em></p>
+</blockquote>
+<p class="cal piege"> <strong>$1{,}5\,\%$ au lieu de $1\,\%$ : c'est un dépassement de 50 %.</strong> La cause est connue — les <strong>queues épaisses</strong> de la fiche 53. Et la remarque sur le portefeuille est importante : l'agrégation de nombreuses positions rapproche la distribution de la normale (effet du théorème central limite), ce qui rend la VaR paramétrique bien plus fiable au niveau global qu'au niveau d'un desk.</p>
+<h3>Le protocole en cinq étapes</h3>
+<ol>
+<li><strong>Collecter</strong> les données de prix.</li>
+<li><strong>Créer</strong> la série de rendements.</li>
+<li><strong>Estimer</strong> la variance de la série de rendements.</li>
+<li><strong>Prendre la racine carrée</strong> de la variance pour obtenir la volatilité (écart-type).</li>
+<li><strong>Multiplier</strong> la volatilité par $2{,}33$ et par la taille de la position pour obtenir l'estimation de la perte du pire cas à $99\,\%$.</li>
+</ol>
+<h3>Les mises en garde du cours</h3>
+<ul>
+<li><strong>Positions longues contre courtes : le signe compte.</strong> Simple pour les actions, <strong>demande réflexion pour le change</strong>.</li>
+<li><strong>Intervalles de confiance unilatéraux contre bilatéraux.</strong></li>
+<li><strong>Données erronées.</strong></li>
+<li><strong>Variations en pourcentage contre variations logarithmiques.</strong></li>
+</ul>
+<h2 data-prio="must">Concept 3 — L'ajustement obligataire : DV01 et duration</h2>
+<blockquote>
+<p>*Les instruments de taux exigent un <strong>ajustement</strong> de cette méthode, parce que les séries temporelles généralement disponibles pour les titres obligataires sont des séries de <strong>rendements actuariels (taux)</strong>, alors qu'on s'intéresse au comportement du <strong>prix</strong>. L'ajustement demande d'exprimer la volatilité <strong>en points de base</strong> et la position en termes de <strong>sensibilité à un mouvement de 1 point de base des taux</strong>.*</p>
+</blockquote>
+<p><strong>Les deux formules.</strong>
+$$\textbf{Actions, change, matières premières :}\quad \text{position}\times\text{prix}\times2{,}33 \quad(\text{ou }1{,}64\text{ à }95\,\%)$$
+$$\textbf{Taux :}\quad \underbrace{\text{position}\times PV01}_{\text{sensibilité à 1 pb}}\times\underbrace{\text{cours}\times\text{vol de taux}\times2{,}33}_{\text{mouvement potentiel des taux, en pb}}\times100$$</p>
+<h3>L'exemple du Trésor américain 10 ans</h3>
+<p>Position de USD 100 en UST 10 ans :</p>
+<ul>
+<li><strong>Volatilité des variations en pourcentage des taux UST</strong> depuis le 1/1/03 : $1{,}312\,\%$.</li>
+<li><strong>DV01</strong> = variation de prix au taux de clôture si les taux montaient de <strong>1 point de base</strong> <em>(la duration peut aussi servir ici)</em>.</li>
+<li>Prix au taux de $4{,}644\,\%$ : $100$. Prix au taux de $4{,}654\,\%$ : $99{,}92077$.</li>
+<li>$DV01=99{,}920765-100=-0{,}07923$ <strong>pour $100$ de nominal</strong>.</li>
+<li><em>Cette sensibilité change avec le niveau des taux, mais fournit une bonne approximation.</em></li>
+</ul>
+<p><strong>Le calcul complet.</strong> Taille : USD 100 · maturité : 10 ans · vol : $0{,}01312$ · DV01 : $-0{,}07923$ (pour 100) · clôture au 12/27/06 : $4{,}644\,\%$.
+$$VaR=-0{,}07923\times0{,}04644\times0{,}01312\times2{,}33\times100=1{,}12479$$</p>
+<div class="cal methode"><span class="lab">Comment lire ce calcul — la seule lecture qui fasse tenir les unités.</span>
+<p>
+<strong>Étape 1.</strong> Le taux vaut $4{,}644\,\%$ et sa volatilité <strong>relative</strong> est de $1{,}312\,\%$. La volatilité <strong>absolue</strong> du taux est donc $4{,}644\,\%\times1{,}312\,\%=0{,}0609\,\%=6{,}09$ points de base par jour.
+<strong>Étape 2.</strong> Le mouvement de taux à $99\,\%$ est $2{,}33\times6{,}09=14{,}2$ points de base.
+<strong>Étape 3.</strong> Le DV01 vaut $0{,}07923$ par point de base pour $100$ de nominal.
+<strong>Étape 4.</strong> $VaR=14{,}2\times0{,}07923\approx\mathbf{1{,}12}$ pour une position de $100$. C'est bien le chiffre du cours.</p>
+<p><strong>Le facteur $100$ de la formule est exactement le facteur de conversion d'unités</strong> entre le taux exprimé en décimal et le DV01 exprimé par point de base.</p>
+</div>
+<h3>Duration contre DV01</h3>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Contenu</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Duration</strong></td>
+<td>Mesure la <strong>durée moyenne pondérée</strong> jusqu'aux flux du titre, la pondération étant le flux. Donne aussi la <strong>variation en pourcentage du prix</strong> par variation de taux.</td>
+</tr>
+<tr>
+<td><strong>DV01</strong></td>
+<td>Fournit une mesure similaire, mais souvent <strong>par million de nominal</strong>.</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><em>Les traders obligataires raisonnent en <strong>DV01</strong> ; les gérants de portefeuille raisonnent en <strong>duration</strong>. L'une ou l'autre convient, mais <strong>ATTENTION AUX UNITÉS. C'est l'une des erreurs les plus faciles à commettre !</strong></em></p>
+</blockquote>
+<p class="cal piege"> <strong>Le cours met cet avertissement en capitales, et il faut le prendre au sérieux.</strong> DV01 par $100$ ou par million ? Taux en décimal, en pourcentage ou en points de base ? Volatilité <strong>relative</strong> (des variations en %) ou <strong>absolue</strong> (en pb) ? Chaque confusion introduit un facteur $100$ ou $10\,000$ — une VaR fausse d'un ou deux ordres de grandeur.</p>
+<h3>Le PV01 de spread</h3>
+<ul>
+<li>Pour les titres <strong>porteurs de risque de crédit</strong>, il faut distinguer <strong>risque de taux</strong> et <strong>risque de crédit</strong>.</li>
+<li>Le <strong>spread de crédit</strong> prend en compte le <strong>défaut</strong> (et le <strong>recouvrement</strong>).</li>
+<li>On considère habituellement ces deux risques <strong>séparément</strong>.</li>
+<li>On suppose souvent $PV01=CSPV01$ : <em>si le recouvrement est nul, c'est vrai ; sinon, ça ne l'est pas.</em></li>
+<li>Sources de spreads : <strong>calculés</strong>, <strong>CDS</strong>, <strong>spreads d'asset swap</strong>.</li>
+</ul>
+<h2 data-prio="must">Concept 4 — Ajouter des actifs : covariance et corrélation</h2>
+<blockquote>
+<p><em>La notion de <strong>covariance</strong> permet de considérer la façon dont les prix des actifs se comportent <strong>les uns par rapport aux autres</strong>.</em>
+$$\mathrm{cov}(x,y)=\sum_{i=1}^n\frac{(x_i-\bar x)(y_i-\bar y)}{n-1}$$</p>
+</blockquote>
+<p><strong>Ce que cela signifie.</strong> <em>Cela indique <strong>à quelle distance de sa moyenne</strong> se trouve une variable quand on observe une autre variable à une certaine distance de sa moyenne. Autrement dit, cela dit <strong>de combien (et dans quelle direction)</strong> $y$ bouge quand $x$ bouge. Cela fournit une mesure pour <strong>chaque variable par rapport à chaque autre</strong>.</em></p>
+<p><strong>Pourquoi c'est important.</strong> <em>Si l'on connaît les variances et covariances de <strong>tous</strong> les titres d'un portefeuille, on peut évaluer le risque du <strong>portefeuille entier</strong> — et aussi celui de <strong>n'importe quel sous-portefeuille</strong>. C'est la base d'une grande partie de la théorie moderne du portefeuille.</em></p>
+<h3>Corrélation</h3>
+<p><em>On peut <strong>mettre à l'échelle</strong> la covariance pour obtenir la corrélation :</em>
+$$\rho=\frac{\mathrm{Cov}(a,b)}{\sigma_a\sigma_b}$$</p>
+<ul>
+<li><em>la covariance <strong>n'est pas sans unité</strong></em></li>
+<li><em>la corrélation est un <strong>indice de linéarité</strong></em></li>
+</ul>
+<p><strong>Laquelle utiliser ?</strong> <em>Tant qu'on ajuste les unités, peu importe. L'<strong>intuition</strong> est plus facile avec la corrélation ; les <strong>calculs</strong> sont plus faciles avec la covariance. Si l'on connaît les covariances, on connaît aussi les corrélations — mais <strong>pas l'inverse</strong>.</em></p>
+<p class="cal piege"> <strong>Ce dernier point est plus subtil qu'il n'en a l'air.</strong> La matrice de corrélation seule ne suffit pas : il faut aussi les $n$ volatilités. Or beaucoup de fournisseurs de données livrent l'une <strong>ou</strong> l'autre — vérifiez toujours de quoi vous disposez.</p>
+<h3>Les règles de combinaison</h3>
+<p><strong>Principe de base :</strong>
+$$\mathrm{variance}(a+b)=\mathrm{variance}(a)+\mathrm{variance}(b)+2\,\mathrm{covariance}(a,b) \qquad \sigma_{a+b}^2=\sigma_a^2+\sigma_b^2+2\rho\sigma_a\sigma_b$$</p>
+<p><strong>Avec des quantités.</strong> <em>Jusqu'ici on a examiné des portefeuilles avec une seule « unité » de chaque actif ; la plupart des portefeuilles détiennent plusieurs actions, obligations ou contrats.</em>
+$$\mathrm{var}(xa)=x^2\,\mathrm{var}(a), \qquad \mathrm{var}(xa+yb)=x^2\mathrm{var}(a)+y^2\mathrm{var}(b)+2xy\,\mathrm{cov}(a,b)$$</p>
+<p><strong>Extension à trois puis quatre actifs.</strong>
+$$\mathrm{var}(a+b+c)=\mathrm{var}(a)+\mathrm{var}(b)+\mathrm{var}(c)+2\mathrm{cov}(ab)+2\mathrm{cov}(ac)+2\mathrm{cov}(bc)$$
+$$\mathrm{var}(xa+yb+zc)=x^2\mathrm{var}(a)+y^2\mathrm{var}(b)+z^2\mathrm{var}(c)+2xy\,\mathrm{cov}(ab)+2xz\,\mathrm{cov}(ac)+2yz\,\mathrm{cov}(bc)$$
+$$\mathrm{var}(a+b+c+d)=\sum_i\mathrm{var}(\cdot)+2\mathrm{cov}(ab)+2\mathrm{cov}(ac)+2\mathrm{cov}(ad)+2\mathrm{cov}(bc)+2\mathrm{cov}(bd)+2\mathrm{cov}(cd)$$</p>
+<blockquote>
+<p><em>De toute évidence, cela devient vite ingérable. Si l'on veut étendre à des portefeuilles contenant de nombreux actifs, il faut <strong>simplifier les calculs</strong>. Pour cela, deux concepts nouveaux : un simple et un plus compliqué — les <strong>matrices de covariance et de corrélation</strong>, et l'<strong>algèbre linéaire</strong>.</em></p>
+</blockquote>
+<h2 data-prio="must">Concept 5 — La méthode variance-covariance en forme matricielle</h2>
+<blockquote>
+<p><strong>La remarque qui débloque tout.</strong> <em>Si l'on <strong>somme les éléments</strong> de la matrice de covariance, on obtient la somme des variances $+\ 2\times$ la somme des covariances. On peut en tirer parti.</em></p>
+<p>Autrement dit : <em>si un portefeuille détient <strong>une unité</strong> de chaque titre suivi dans la matrice de covariance, la <strong>variance du portefeuille est la somme des éléments de la matrice</strong>. Cela arrive rarement dans le monde réel ; il faut trouver un moyen de gérer ça.</em></p>
+</blockquote>
+<p><strong>La solution : la forme quadratique.</strong> Avec $X$ le vecteur de positions (ou de sensibilités) et $\Sigma$ la matrice de covariance,
+$$\boxed{\ \sigma_P^2=X^T\Sigma X \qquad\Longrightarrow\qquad VaR_{99\%}=2{,}33\times\sqrt{X^T\Sigma X}\ }$$
+<em>L'algèbre matricielle est un raccourci arithmétique. Elle s'exécute facilement dans un tableur avec les fonctions <code>MMULT()</code> et <code>TRANSPOSE()</code>.</em></p>
+<p><strong>L'exemple du cours.</strong> Positions de $(-100)$ en CAD/USD, $(-50)$ en CHF/USD et $(-25)$ en DEM/USD, avec la matrice
+$$\Sigma=\begin{pmatrix}0{,}000037&amp;-0{,}000018&amp;-0{,}000017\\ -0{,}000018&amp;0{,}000321&amp;0{,}000257\\ -0{,}000017&amp;0{,}000257&amp;0{,}000227\end{pmatrix}$$
+$$X^T\Sigma X=1{,}691875 \ \text{(variance de portefeuille)}, \qquad \sigma_P=1{,}300721, \qquad 2{,}33\,\sigma_P=3{,}0306798$$</p>
+<p><em>Plusieurs choses à retenir : il faut valider les fonctions matricielles par <strong>Ctrl-Maj-Entrée</strong> et non simplement Entrée ; et le <strong>nombre de positions doit égaler le nombre de lignes et de colonnes</strong> de la matrice.</em></p>
+<blockquote>
+<p><strong>Notez que la fonction produit la variance.</strong> Il faut en prendre la <strong>racine carrée</strong> pour obtenir l'écart-type, puis multiplier par $2{,}33$ pour obtenir la VaR à $99\,\%$. Oublier la racine est l'erreur la plus fréquente du calcul.</p>
+</blockquote>
+<h3>Les éléments d'un calcul variance-covariance</h3>
+<ol>
+<li><strong>Collecte des données</strong></li>
+<li><strong>Calcul des rendements</strong></li>
+<li><strong>Tests des données</strong></li>
+<li><strong>Construction de la matrice</strong></li>
+<li><strong>Positions et vecteurs de positions</strong></li>
+<li><strong>Multiplication matricielle</strong></li>
+<li><strong>Calcul du capital</strong></li>
+<li><strong>Interprétation</strong></li>
+</ol>
+<p><strong>Le diagramme de flux</strong> enchaîne : données de marché ⟶ rendements ⟶ <strong>tests</strong> (graphiques, seuil à $2$ écarts-types) ⟶ <strong>matrice de covariance de marché $\Sigma$</strong> ; en parallèle, données de positions ⟶ <strong>vecteur de positions</strong> (incluant les DV01) ; puis <strong>multiplication matricielle $X^T\Sigma X$</strong> ⟶ <strong>VaR de portefeuille</strong>, <strong>VaR absolue de sous-portefeuille</strong>, <strong>VaR marginale de sous-portefeuille</strong>, <strong>analyse de scénarios</strong>.</p>
+<h2 data-prio="high">Concept 6 — Les hypothèses et les choix de mise en œuvre</h2>
+<p><strong>Les décisions à prendre :</strong> obtention des données · période temporelle · <strong>pondération</strong> · <em><strong>bucketing</strong></em> (actifs non corrélés, actifs liés) · lacunes dans les données · fréquence de mise à jour · intervalle de différenciation.</p>
+<h3>La période couverte</h3>
+<p><em>Jusqu'où remonter · disponibilité des données · <strong>changements de régime de cotation</strong> (crise de 2008, Brésil en 1995, introduction de l'euro) · existence d'<strong>anomalies de marché</strong> · possibilité pour les traders d'en tirer parti.</em></p>
+<p class="cal piege"> <strong>Le dernier point est un risque opérationnel réel.</strong> Si le modèle de VaR est connu et figé, un trader peut construire une position dont la VaR mesurée est faible alors que le risque économique est élevé — en exploitant précisément la fenêtre d'estimation ou le <em>bucketing</em>.</p>
+<h3>La pondération exponentielle</h3>
+<p><em>Elle pondère plus fortement les observations récentes, avec une décroissance exponentielle ; il faut estimer $w$, le facteur de pondération. L'équation de la covariance prend habituellement la forme</em>
+$$\mathrm{cov}_w(x,y)=\frac{\sum_{i=1}^nw_i(x_i-\bar x)(y_i-\bar y)}{\sum_{i=1}^nw_i}$$</p>
+<p><strong>Les avantages et inconvénients, selon le cours.</strong> <em>Le choix d'un coefficient de pondération a des <strong>implications majeures</strong> : plus difficile à mettre en œuvre, plus difficile à vérifier, effet majeur sur variances et covariances, et à bien des égards <strong>assez arbitraire</strong>. Cependant, il peut <strong>lisser la volatilité à mesure que les positions vieillissent</strong> et agit conformément à la théorie heuristique de la décision.</em></p>
+<blockquote>
+<p><strong>C'est exactement la moyenne mobile exponentielle de la fiche 53</strong>, appliquée cette fois aux covariances et non seulement aux variances. Le graphique du cours compare des coefficients de $0{,}92$ à $0{,}98$ ainsi qu'une moyenne glissante sur 6 mois : plus $w$ est proche de 1, plus la mesure est lisse et lente.</p>
+</blockquote>
+<h3>Le <em>bucketing</em></h3>
+<p><em>On ne peut pas avoir un compartiment pour chaque position ; on <strong>regroupe</strong>. Ce faisant, on réduit la <strong>granularité</strong>. Bien fait, cela n'entraîne <strong>aucune perte de précision</strong>. Parfois, il faut regrouper les « actifs non corrélés » avec une certaine volatilité.</em></p>
+<h3>Les autres choix</h3>
+<table>
+<thead>
+<tr>
+<th>Question</th>
+<th>Contenu</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Fréquence de mise à jour</strong></td>
+<td>Quotidienne, hebdomadaire ou mensuelle — vraiment une question d'hypothèses sur les marchés. À quelle fréquence les choses bougent-elles ? Les changements de volatilité sont fréquents sur les eurodépôts courts et les taux japonais ; les changements de <strong>structure de corrélation</strong> sont difficiles à estimer.</td>
+</tr>
+<tr>
+<td><strong>Pourcentages ou logarithmes</strong></td>
+<td>Choix fondé surtout sur la <strong>commodité de calcul</strong>. Le seul vrai problème des pourcentages est qu'ils autorisent théoriquement des taux et prix <strong>négatifs</strong>.</td>
+</tr>
+<tr>
+<td><strong>Intervalle de différenciation</strong></td>
+<td>Quotidien / hebdomadaire / mensuel. Peut-on changer d'échelle ? <em>Techniquement oui, mais…</em> problèmes d'<strong>asynchronicité</strong> et de <strong>corrélation sérielle</strong>.</td>
+</tr>
+<tr>
+<td><strong>Unités</strong></td>
+<td>Positions en millions ? Positions de change <strong>cohérentes</strong> (même devise de base, signe correct) ? Signe des positions de taux ?</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>Corrélation, covariance et temps.</strong> <em>L'horizon d'un jour rend l'usage des matrices de corrélation <strong>moins ambigu théoriquement</strong>. Reste la question de la <strong>stabilité des corrélations dans le temps</strong> : elles ont tendance à « basculer » du neutre au directionnel <strong>quand les marchés sont sous tension</strong>. Les horizons courts rendent les approximations linéaires moins problématiques.</em></p>
+</blockquote>
+<p class="cal piege"> <strong>« Les corrélations basculent en période de crise » est le défaut structurel de la méthode variance-covariance.</strong> Elle est calibrée sur des données de régime calme et estime le risque du régime de crise — précisément le moment où les corrélations montent vers $1$ et où la diversification cesse d'exister. D'où l'obligation de compléter par des <strong>tests de résistance</strong>.</p>
+<h2 data-prio="high">Concept 7 — VaR absolue et VaR marginale</h2>
+<h3>VaR absolue</h3>
+<p><em>Quelle est la VaR absolue de chaque compartiment ? Deux façons de la calculer :</em></p>
+<ul>
+<li>prendre la <strong>sensibilité individuelle</strong> de la position et la multiplier par la <strong>volatilité</strong> de la position (pas la variance) ;</li>
+<li>utiliser le <strong>vecteur de positions</strong>, mais en <strong>annulant successivement toutes les positions sauf celle qui nous intéresse</strong>.</li>
+</ul>
+<p><em>Essentiellement, on considère des portefeuilles à un seul actif.</em> Pour un vecteur de sensibilités $(10,20,35,-23,40,100,-67)$, on construit sept vecteurs, chacun ne conservant qu'une composante et mettant les six autres à zéro, et l'on calcule la VaR de chacun.</p>
+<h3>VaR marginale</h3>
+<p><strong>Pourquoi ?</strong> <em>Principalement pour voir <strong>comment une position individuelle contribue à la VaR du portefeuille</strong>. Cela éclaire les <strong>couvertures naturelles</strong> et montre l'<strong>efficacité des portefeuilles de couverture</strong>.</em></p>
+<p><strong>Comment ?</strong> On construit cette fois des vecteurs où l'on <strong>annule la position d'intérêt en gardant toutes les autres</strong>, puis <em>on compare chaque VaR à la VaR originale pour voir la contribution marginale au risque de la position</em>.</p>
+<h3>La formulation par le rapport variance / covariance</h3>
+<p>En simulation historique, le moteur de VaR produit des <strong>vecteurs de P&amp;L</strong> (par exemple 1 043 dates de P&amp;L pour 4 ans d'historique). <em>Pour un jour donné, le vecteur de P&amp;L d'un <strong>parent</strong> est la <strong>somme</strong> des vecteurs de ses <strong>enfants</strong></em> — par exemple $\text{P\&amp;L}_{\text{Firme}}=\text{P\&amp;L}_{\text{IED}}+\text{P\&amp;L}_{\text{FID}}$. En prenant la <strong>variance</strong> comme approximation du risque associé à un vecteur de P&amp;L :
+$$\boxed{\ \text{VaR marginale de l'enfant}=\frac{\mathrm{Cov}(\text{Parent},\text{Enfant})}{\mathrm{Var}(\text{Parent})}\times\text{VaR du Parent}\ }$$
+et donc
+$$\text{VaR du Parent}=\sum_{\text{enfants}}\text{VaR marginale de l'enfant}$$</p>
+<blockquote>
+<p><em>Les marginales sont <strong>relatives au parent immédiat</strong> dans la hiérarchie, et les marginales de tous les enfants <strong>somment toujours</strong> à la VaR du parent seul.</em></p>
+</blockquote>
+<div class="cal intu"><span class="lab">Pourquoi cette définition et pas une autre.</span>
+<p> C'est la seule qui rende les contributions <strong>exactement additives</strong>. La preuve tient en une ligne : si $y=\sum_kc_k$, alors
+$$\mathrm{Var}(y)=\mathrm{Cov}(y,y)=\mathrm{Cov}\Big(y,\sum_kc_k\Big)=\sum_k\mathrm{Cov}(y,c_k)$$
+En divisant par $\mathrm{Var}(y)$, les rapports somment à $1$ — donc les VaR marginales somment à la VaR du parent. <strong>Sommer des VaR autonomes ne donnerait jamais cela</strong> (sous-additivité de la fiche 51) : c'est bien la covariance avec le tout, et non le risque isolé, qui est la bonne mesure de contribution.</p>
+</div>
+<p><strong>Un exemple du cours</strong> (unités : milliers de dollars) :</p>
+<table>
+<thead>
+<tr>
+<th>Unité</th>
+<th>VaR</th>
+<th>VaR marginale</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>FIRM_primary</td>
+<td>$(81\,411)$</td>
+<td>—</td>
+</tr>
+<tr>
+<td>PDT</td>
+<td>$(14\,481)$</td>
+<td>$(2\,822)$</td>
+</tr>
+<tr>
+<td>IEDxPDT</td>
+<td>$(29\,990)$</td>
+<td>$(14\,273)$</td>
+</tr>
+<tr>
+<td>SUPERFID</td>
+<td>$(72\,457)$</td>
+<td>$(64\,316)$</td>
+</tr>
+<tr>
+<td><strong>Somme des marginales</strong></td>
+<td></td>
+<td>$\mathbf{(81\,411)}$</td>
+</tr>
+</tbody></table>
+<p class="cal piege"> <strong>Lisez la troisième ligne : VaR autonome de $29\,990$, contribution marginale de $14\,273$.</strong> L'unité contribue moins de la moitié de son risque isolé, parce que le reste est <strong>absorbé par diversification</strong>. C'est précisément l'information qu'un directeur des risques cherche : où sont les couvertures naturelles.</p>
+<h2 data-prio="must">Concept 8 — La simulation historique</h2>
+<blockquote>
+<p><em>La simulation historique <strong>valorise simplement le portefeuille au marché</strong> en utilisant les taux et prix observés sur une certaine période historique — ou les variations exprimées en écarts-types. Ces chiffres de P&amp;L sont ensuite <strong>classés</strong>, et la <strong>statistique d'ordre</strong> est obtenue en prenant la <strong>$n$-ième pire issue</strong>. $n$ est fonction du seuil de signification (habituellement $1\,\%$) et de la quantité de données disponibles.</em></p>
+</blockquote>
+<p><strong>Le barème du cours</strong> : 1 an $=250$ observations · 2 ans $=500$, $n=5$ · 3 ans $=750$ · 4 ans $=1\,000$, $n=10$.</p>
+<table>
+<thead>
+<tr>
+<th>Quatre forces majeures</th>
+<th>Faiblesses</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Simple</strong></td>
+<td>Besoin de <strong>beaucoup de données</strong> pour un bon échantillon</td>
+</tr>
+<tr>
+<td><strong>Intuitivement séduisante</strong></td>
+<td>Peut exiger un historique pour des choses qui <strong>en ont peu</strong></td>
+</tr>
+<tr>
+<td><strong>Non paramétrique</strong></td>
+<td>Comment supposer que se comporteraient les <strong>produits nouveaux</strong> ?</td>
+</tr>
+<tr>
+<td><strong>Agrégation facile</strong></td>
+<td>Suppose la <strong>stationnarité</strong></td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>« Non paramétrique » est la force décisive.</strong> On ne suppose <strong>ni normalité, ni structure de corrélation</strong> : les queues épaisses, les asymétries et les ruptures de corrélation en période de crise sont <strong>dans les données</strong> et donc automatiquement prises en compte. On peut y voir <em>un Monte-Carlo limité — même idée générale, même architecture de processus, mais non paramétrique</em> ; c'est aussi un <strong>rétro-test du portefeuille courant</strong>.</p>
+</blockquote>
+<h3>Les huit étapes</h3>
+<ol>
+<li><strong>Collecter les données de positions</strong></li>
+<li><em><strong>Bucketer</strong></em> vers les indices de risque</li>
+<li><strong>Calculer les sensibilités</strong> (et deltas, gammas)</li>
+<li><strong>Collecter les données historiques</strong></li>
+<li><strong>Calculer les rendements</strong></li>
+<li><strong>« Choquer » le portefeuille</strong> avec les données de rendements</li>
+<li><strong>Calculer les chiffres de P&amp;L</strong></li>
+<li><strong>Classer les P&amp;L</strong> et prendre la statistique d'ordre</li>
+</ol>
+<p><strong>Étape 1 — les positions.</strong> <em>90 % de la gestion des risques consiste à <strong>savoir ce qu'on possède et où on le possède</strong>.</em> Décisions sur la granularité · importance de données <strong>synchrones</strong> · les dérivés posent des problèmes particuliers (les grecques, le format des données de position — notionnel ou valeur de marché).</p>
+<p><strong>Étape 2 — le <em>bucketing</em>.</strong> Plusieurs méthodes : <strong>VaR égale</strong>, <strong>pondération par la duration</strong>, <strong>positions de couverture</strong>. Les unités sont importantes (tailles de positions, confusion possible avec les taux).</p>
+<p><strong>Étape 3 — les sensibilités.</strong> <em>Très facile pour actions, change et matières premières. Pour les taux : $\text{pos}\times DV01\times\text{cours}\times100$. La <strong>convexité</strong> n'est pas un gros problème. Pour les options : <strong>delta</strong>, ou delta et <strong>gamma</strong> — pour une VaR quotidienne le delta suffit probablement ; il faut le gamma pour une période de détention longue, et peut-être sur les marchés volatils.</em></p>
+<p><strong>Étape 6-7 — le choc et le P&amp;L.</strong> <em>Ces chiffres comportent un peu de bruit, dû à la convexité et au gamma. Ils représentent le P&amp;L <strong>hypothétique</strong> qu'aurait produit la détention de ce portefeuille sur les $n$ derniers jours.</em></p>
+<p><strong>Étape 8 — le classement.</strong> <em>Trier les P&amp;L, prendre le $n$-ième pire. Il est probablement sensé de retenir $1\,\%$, $5\,\%$ et $10\,\%$ ; cela dépend du nombre d'observations. <strong>Important de conserver le détail</strong> : le P&amp;L peut être dominé par très peu de positions.</em></p>
+<blockquote>
+<p><strong>Et ensuite ?</strong> <em>Les chiffres de VaR pris <strong>isolément ne valent rien</strong>. Il faut calculer quotidiennement et comparer.</em> Questions : utiliser le P&amp;L réel ou les variations réelles des indices ? revalorisation complète ou sensibilités ? <em>La VaR doit être utilisée <strong>conjointement</strong> avec les <strong>tests de résistance</strong> et l'<strong>analyse de scénarios</strong>.</em></p>
+</blockquote>
+<p><strong>Les avantages d'une approche empirique</strong>, selon le cours :</p>
+<ol>
+<li><strong>Attrait intuitif</strong></li>
+<li><strong>Facilité de vérification des erreurs</strong></li>
+<li>Activité des <strong>spreads de crédit</strong> intégrée d'office</li>
+<li><strong>Aucune hypothèse maintenue</strong> de normalité multivariée</li>
+<li><strong>Analyse de scénarios automatique</strong></li>
+</ol>
+<h2 data-prio="must">Concept 9 — La simulation de Monte-Carlo</h2>
+<blockquote>
+<p><strong>Description.</strong> <em>1. Méthode de simulation utilisant des suites de nombres aléatoires pour approcher des valeurs qui ne peuvent pas être déterminées analytiquement. 2. L'expression a été forgée pendant le <strong>projet Manhattan</strong>, par analogie avec les jeux de hasard. 3. La seule exigence est que le système soit <strong>descriptible en termes de densités de probabilité</strong>.</em></p>
+</blockquote>
+<p><strong>Applications financières :</strong> produits <strong>dépendants du chemin</strong> · portefeuilles <strong>convexes</strong> pour l'analyse de couverture · exposition au risque pour les portefeuilles à fort risque de <strong>saut</strong> (secteur de l'assurance) · <strong>exposition de crédit</strong> · <strong>VaR</strong>.</p>
+<h3>Les sept étapes</h3>
+<p><strong>a) Génération de nombres aléatoires uniformes.</strong> <em>Trois types :</em></p>
+<ul>
+<li><strong>Vrais aléas</strong> — ne peuvent pas être produits par des ordinateurs, doivent venir d'une source externe comme la désintégration radioactive.</li>
+<li><strong>Quasi-aléatoires</strong> — difficiles à mettre en œuvre, optimisent l'<strong>uniformité</strong>.</li>
+<li><strong>Pseudo-aléatoires</strong> — engendrés par un algorithme, paraissent indépendants et uniformes ; <strong>méthode dominante</strong>, nombreux algorithmes disponibles (voir Knuth).</li>
+</ul>
+<p><strong>b) Conversion en normales.</strong> <em>Il faut prendre une uniforme $(0,1)$ et la convertir en normale $(0,1)$ en appliquant l'inverse de la <strong>fonction de répartition</strong> de la loi normale standard.</em> Voir la <strong>méthode de Box-Muller</strong> dans <em>Numerical Recipes in C</em>.</p>
+<p><strong>c) Construction de la matrice de covariance.</strong> Acheter ou construire (couverture, hypothèses sur données manquantes et pondération) · intervalle de différenciation (quotidien / hebdomadaire / mensuel, scalabilité).</p>
+<p><strong>d) Factorisation de la matrice.</strong> <em>Objectif : obtenir une matrice « <strong>racine carrée</strong> ». C'est <strong>la partie la plus complexe</strong> du calcul de Monte-Carlo.</em></p>
+<table>
+<thead>
+<tr>
+<th>Méthode</th>
+<th>Caractéristiques</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Cholesky</strong></td>
+<td>plus simple en calcul · utilisée par plusieurs logiciels · <strong>exige une matrice définie positive</strong> · construit une triangulaire inférieure telle que $S=LL^T$</td>
+</tr>
+<tr>
+<td><strong>Décomposition en valeurs et vecteurs propres</strong></td>
+<td>plus complexe · <strong>plus robuste</strong> · construit $E$ et $\Lambda$ telles que $S=E\Lambda E^T$</td>
+</tr>
+</tbody></table>
+<p><strong>e) Création des chocs corrélés.</strong></p>
+<blockquote>
+<p><em>Si $R$ est un vecteur aléatoire normal $n\times1$, $\Lambda^{1/2}$ une matrice diagonale $n\times n$ contenant les racines carrées des valeurs propres, et $E$ la matrice des vecteurs propres, alors</em>
+$$R\,\Lambda^{1/2}E^T\ \sim\ N(0,S)$$</p>
+</blockquote>
+<div class="cal intu"><span class="lab">Pourquoi ça marche.</span>
+<p> Si $R\sim N(0,I_n)$ et $A=E\Lambda^{1/2}$, alors $\mathrm{Cov}(AR)=A\,I_n\,A^T=E\Lambda^{1/2}\Lambda^{1/2}E^T=E\Lambda E^T=S$. La factorisation fournit exactement la matrice qui <strong>transporte</strong> un bruit blanc standard vers la structure de corrélation voulue.</p>
+</div>
+<p><strong>Vérifier le processus.</strong> <em>Il est difficile de faire de <strong>petites</strong> erreurs.</em> Moyens de contrôle :</p>
+<ul>
+<li><strong>recréer la matrice de covariance</strong> à partir des tirages ;</li>
+<li>tester les <strong>variances</strong> par des tests $F$ ou du $\chi^2$ : $\hat\sigma^2/\sigma^2\sim F(m-1,k-1)$ ;</li>
+<li>tester les <strong>corrélations</strong> par des tests $z$ : $\hat\rho\sim N\big(\rho,(1-\rho^2)/n\big)$ ;</li>
+<li>le <strong>test M de Box</strong>.</li>
+</ul>
+<p><strong>Problèmes potentiels :</strong> précision · <strong>valeurs propres négatives</strong> · temps de calcul · stockage des données · traçabilité des erreurs.</p>
+<p class="cal piege"> <strong>Les valeurs propres négatives ne sont pas un détail.</strong> Une matrice de covariance empirique construite à partir de séries de longueurs différentes, avec des données manquantes comblées, cesse d'être semi-définie positive. Cholesky <strong>échoue purement et simplement</strong> ; la décomposition spectrale, elle, continue de fonctionner — d'où sa <strong>robustesse</strong> supérieure signalée par le cours. Le remède usuel est de tronquer les valeurs propres négatives à zéro.</p>
+<p><strong>f) Utilisation des chocs pour la revalorisation.</strong> Deux approches de base :</p>
+<ul>
+<li><strong>Revalorisation exacte</strong> — plus exacte, <strong>lourde en calcul</strong>.</li>
+<li><strong>Représentation paramétrique</strong> — peut être très précise, mais les <strong>dérivées croisées</strong> créent du bruit.</li>
+</ul>
+<p><em>(Le cours illustre trois niveaux : revalorisation exacte, représentation partielle, représentation paramétrique complète, ainsi que l'usage de <strong>grilles de valorisation</strong>.)</em></p>
+<p><strong>g) Estimer la VaR.</strong> <em>Une fois revalorisé, calculer le P&amp;L, ordonner les résultats, prendre le $n$-ième plus grand cas. Il faut grouper et trier pour obtenir la VaR des sous-portefeuilles.</em></p>
+<h3>Les faiblesses de Monte-Carlo</h3>
+<ul>
+<li><strong>Hypothèse de normalité multivariée</strong> : corrélation sérielle · <strong>asymétrie</strong> · <strong>kurtosis</strong></li>
+<li>Doit être <strong>ajusté</strong> pour simuler le <strong>retour à la moyenne</strong></li>
+<li>Doit être <strong>ajusté</strong> pour simuler la <strong>diffusion à sauts</strong></li>
+</ul>
+<blockquote>
+<p><strong>C'est le paradoxe de la méthode.</strong> Monte-Carlo est en principe la plus flexible des trois — n'importe quelle densité peut être simulée. Mais <strong>telle qu'elle est mise en œuvre</strong>, avec une matrice de covariance et des tirages gaussiens, elle réintroduit exactement l'hypothèse de normalité que la simulation historique évitait. Les remèdes existent (retour à la moyenne de la fiche 52, sauts de Poisson de la fiche 53) mais doivent être <strong>ajoutés explicitement</strong>.</p>
+</blockquote>
+<p><strong>Un repère utile donné par le cours :</strong> le rapport $VaR_{95\%}/VaR_{99\%}$ vaut $1{,}65/2{,}33\approx71\,\%$ <strong>sous normalité</strong>. Le graphique 2001-2011 montre ce rapport <strong>empirique</strong> oscillant entre $45\,\%$ et $80\,\%$ — un écart au repère normal qui mesure directement l'épaisseur des queues.</p>
+<h2 data-prio="mid">Concept 10 — Le <em>backtesting</em></h2>
+<p><strong>Qu'est-ce qu'un rétro-test ?</strong> *Une comparaison de la VaR et du P&amp;L — habituellement la <strong>VaR au temps $t$</strong> contre le <strong>P&amp;L au temps $t+1$</strong>.*</p>
+<p><strong>Pourquoi rétro-tester ?</strong></p>
+<ul>
+<li><strong>On y est obligé</strong> (exigence réglementaire).</li>
+<li>Cela fournit un <strong>contrôle de réalité</strong> sur les calculs.</li>
+<li>Cela <strong>aide à trouver les erreurs</strong>.</li>
+<li>Cela <strong>identifie les changements de profil de risque</strong>.</li>
+</ul>
+<p><strong>La granularité.</strong> <em>Descendre jusqu'au niveau du desk (il faut documenter les valeurs aberrantes) · souvent il faut <strong>agréger</strong> · mais <strong>l'agrégation masque les pics</strong> · les livres scindés posent problème.</em></p>
+<p><strong>Les difficultés.</strong> Livres scindés · P&amp;L <em>front office</em> ou <em>back office</em> · <strong>moment de reconnaissance du P&amp;L</strong> · réorganisations · maintenance des données · fréquence des mises à jour · <strong>inclure les sauts à la hausse ?</strong></p>
+<blockquote>
+<p><strong>La logique statistique du rétro-test.</strong> Une VaR à $99\,\%$ doit être dépassée environ $1\,\%$ du temps — soit environ $2{,}5$ fois par an sur $250$ jours ouvrés. Le nombre de dépassements suit une <strong>binomiale</strong> $\mathcal B(250;0{,}01)$. Beaucoup plus, et le modèle sous-estime le risque ; beaucoup moins, et il est trop conservateur — ce qui coûte du capital. C'est ce comptage qui fonde les régimes de surcharge en capital des régulateurs.</p>
+</blockquote>
+<h2>Comment résoudre l'exercice type (protocole)</h2>
+<ol>
+<li><strong>Identifier la nature des positions</strong> : prix (actions, change, matières premières) ou <strong>taux</strong> (obligations) ⟹ DV01 obligatoire.</li>
+<li><strong>Construire la série de rendements</strong> et vérifier les données (graphiques, seuil à $2$ écarts-types).</li>
+<li><strong>Estimer</strong> $\sigma$ (ou $\Sigma$), en décidant de la période et de la <strong>pondération</strong>.</li>
+<li><strong>Construire le vecteur de positions</strong> $X$, en y <strong>incorporant les DV01</strong> pour les lignes de taux.</li>
+<li><strong>Calculer</strong> $\sigma_P=\sqrt{X^T\Sigma X}$, puis $VaR=2{,}33\,\sigma_P$ (ou $1{,}64$ à $95\,\%$).</li>
+<li><strong>Décomposer</strong> : VaR absolue (annuler tout sauf la ligne) et VaR marginale (annuler la ligne seule, ou rapport covariance/variance).</li>
+<li><strong>Compléter</strong> par des tests de résistance et une analyse de scénarios — <em>la VaR isolée ne vaut rien</em>.</li>
+<li><strong>Rétro-tester</strong> : VaR à $t$ contre P&amp;L à $t+1$, compter les dépassements.</li>
+</ol>
+<h3>Comment reconnaître qu'il faut utiliser cette méthode ?</h3>
+<table>
+<thead>
+<tr>
+<th>Indice dans l'énoncé</th>
+<th>Ce qu'il faut faire</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>« perte à $99\,\%$ » sur un actif</td>
+<td>$\text{position}\times\sigma\times2{,}33$</td>
+</tr>
+<tr>
+<td>« à $95\,\%$ »</td>
+<td>remplacer $2{,}33$ par $1{,}64$</td>
+</tr>
+<tr>
+<td>position obligataire, données de <strong>taux</strong></td>
+<td><strong>DV01</strong> ; volatilité en <strong>points de base</strong></td>
+</tr>
+<tr>
+<td>plusieurs actifs, matrice fournie</td>
+<td>$2{,}33\sqrt{X^T\Sigma X}$</td>
+</tr>
+<tr>
+<td>« contribution d'un desk au risque total »</td>
+<td><strong>VaR marginale</strong> = $\mathrm{Cov}(\text{parent},\text{enfant})/\mathrm{Var}(\text{parent})\times VaR$</td>
+</tr>
+<tr>
+<td>« sans hypothèse de distribution »</td>
+<td><strong>simulation historique</strong>, statistique d'ordre</td>
+</tr>
+<tr>
+<td>« produit dépendant du chemin », « optionnel »</td>
+<td><strong>Monte-Carlo</strong></td>
+</tr>
+<tr>
+<td>« générer des chocs corrélés »</td>
+<td>factoriser $\Sigma$ (Cholesky ou spectrale), puis $R\Lambda^{1/2}E^T$</td>
+</tr>
+<tr>
+<td>« le modèle est-il correct ? »</td>
+<td><em><strong>backtesting</strong></em> : compter les dépassements</td>
+</tr>
+</tbody></table>
+<h3>Exercices progressifs</h3>
+<p><strong> Niveau 1</strong> — Une position de $1$ M€ en actions a une volatilité quotidienne de $1{,}5\,\%$. Calculez la VaR à $99\,\%$ puis à $95\,\%$.</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p><strong>À $99\,\%$.</strong>
+$$VaR_{99\%}=1\,000\,000\times0{,}015\times2{,}33=34\,950\ \text{€}$$</p>
+<p><strong>À $95\,\%$.</strong>
+$$VaR_{95\%}=1\,000\,000\times0{,}015\times1{,}64=24\,600\ \text{€}$$</p>
+<p><strong>Interprétation.</strong> Un jour sur cent, on s'attend à perdre plus de $34\,950$ € ; un jour sur vingt, plus de $24\,600$ €.</p>
+<p><strong>Le rapport</strong> $24\,600/34\,950=1{,}64/2{,}33\approx70{,}4\,\%$ — c'est exactement le repère normal du cours. Sur des données réelles, ce rapport s'écarte de $71\,\%$ précisément dans la mesure où les queues sont plus épaisses que la gaussienne.</p>
+</div></details>
+
+<p><strong> Niveau 2</strong> — Pourquoi une position obligataire exige-t-elle un traitement différent ?</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p><strong>Le problème.</strong> Pour une action, la série disponible <strong>est</strong> la série de prix : la volatilité des rendements se traduit directement en volatilité de valeur, et $\text{position}\times\text{prix}\times2{,}33\sigma$ suffit.</p>
+<p>Pour une obligation, les séries disponibles sont des <strong>séries de taux</strong>, alors que le risque porte sur le <strong>prix</strong>. Il faut donc un pont entre variation de taux et variation de prix.</p>
+<p><strong>Le pont : le DV01.</strong> C'est la variation de prix pour une hausse de <strong>1 point de base</strong> du taux. Le schéma de calcul devient :
+$$\underbrace{\text{position}\times DV01}_{\text{sensibilité à 1 pb}}\times\underbrace{\text{niveau du taux}\times\text{vol relative}\times2{,}33}_{\text{mouvement de taux à }99\%,\text{ en pb}}$$</p>
+<p><strong>Sur l'exemple du cours.</strong> Taux à $4{,}644\,\%$, volatilité relative de $1{,}312\,\%$ :</p>
+<ul>
+<li>volatilité <strong>absolue</strong> du taux : $4{,}644\times1{,}312\,\%=6{,}09$ pb par jour ;</li>
+<li>mouvement à $99\,\%$ : $2{,}33\times6{,}09=14{,}2$ pb ;</li>
+<li>$DV01=0{,}07923$ pour $100$ de nominal et par pb ;</li>
+<li>$VaR=14{,}2\times0{,}07923\approx\mathbf{1{,}12}$ pour une position de $100$.</li>
+</ul>
+<p class="cal piege"> <strong>Et le piège que le cours signale en capitales : les unités.</strong> DV01 par $100$ ou par million ? Volatilité relative ou absolue ? Taux en décimal, pourcentage ou points de base ? Chaque confusion vaut un facteur $100$ ou $10\,000$.</p>
+</div></details>
+
+<p><strong> Niveau 3</strong> — Un desk a une VaR autonome de $30$ M€ mais une VaR marginale de $14$ M€. Qu'est-ce que cela signifie, et pourquoi les VaR autonomes ne s'additionnent-elles pas ?</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p><strong>L'interprétation.</strong> Isolé, ce desk risque $30$ M€ à $99\,\%$. Mais <strong>fermer le desk</strong> ne réduirait la VaR de la firme que de $14$ M€. Les $16$ M€ d'écart sont <strong>absorbés par la diversification</strong> : les positions du desk sont partiellement <strong>couvertes naturellement</strong> par le reste de la firme.</p>
+<p><strong>Pourquoi les VaR autonomes ne s'additionnent pas.</strong> C'est la sous-additivité de la fiche 51 : sous normalité,
+$$\sigma_{a+b}^2=\sigma_a^2+\sigma_b^2+2\rho\sigma_a\sigma_b\ \leq\ (\sigma_a+\sigma_b)^2$$
+avec égalité <strong>seulement si $\rho=1$</strong>. Dès que la corrélation est inférieure à $1$, le tout risque moins que la somme des parties.</p>
+<p><strong>Pourquoi la définition marginale du cours est la bonne.</strong> Elle est <strong>exactement additive</strong>. Si $y=\sum_kc_k$ :
+$$\mathrm{Var}(y)=\mathrm{Cov}\Big(y,\sum_kc_k\Big)=\sum_k\mathrm{Cov}(y,c_k)$$
+En divisant par $\mathrm{Var}(y)$, les rapports somment à $1$, donc
+$$\sum_k\frac{\mathrm{Cov}(\text{parent},c_k)}{\mathrm{Var}(\text{parent})}\times VaR_{\text{parent}}=VaR_{\text{parent}}$$</p>
+<p><strong>L'usage managérial.</strong> C'est la VaR <strong>marginale</strong> qui doit servir à allouer le capital et à fixer les limites — pas la VaR autonome, qui surestime systématiquement la contribution de chaque unité.</p>
+<p class="cal piege"> <strong>La limite à garder en tête.</strong> Le desk dont la contribution marginale est faible aujourd'hui peut la voir exploser demain : les corrélations <strong>basculent du neutre au directionnel quand les marchés sont sous tension</strong>. La diversification apparente disparaît exactement au moment où l'on en a besoin.</p>
+</div></details>
+
+<p><strong> Niveau 4 — type examen</strong> — Comparez les trois méthodologies : hypothèses, forces, faiblesses, et quand utiliser laquelle.</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<table>
+<thead>
+<tr>
+<th></th>
+<th><strong>Variance-covariance</strong></th>
+<th><strong>Simulation historique</strong></th>
+<th><strong>Monte-Carlo</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Hypothèse centrale</td>
+<td>normalité multivariée, linéarité</td>
+<td><strong>stationnarité</strong> des données</td>
+<td>densité spécifiée (souvent normale multivariée)</td>
+</tr>
+<tr>
+<td>Calcul</td>
+<td>$2{,}33\sqrt{X^T\Sigma X}$</td>
+<td>classer les P&amp;L, $n$-ième pire</td>
+<td>simuler, revaloriser, classer</td>
+</tr>
+<tr>
+<td>Coût</td>
+<td><strong>très faible</strong></td>
+<td>modéré</td>
+<td><strong>élevé</strong></td>
+</tr>
+<tr>
+<td>Non linéarités / options</td>
+<td>mal traitées (linéaire)</td>
+<td>traitées (revalorisation)</td>
+<td><strong>bien traitées</strong></td>
+</tr>
+<tr>
+<td>Queues épaisses</td>
+<td><strong>non</strong></td>
+<td><strong>oui</strong> (dans les données)</td>
+<td>seulement si on les modélise</td>
+</tr>
+<tr>
+<td>Besoin en données</td>
+<td>matrice $\Sigma$</td>
+<td><strong>beaucoup</strong> d'historique</td>
+<td>matrice $\Sigma$ + modèle</td>
+</tr>
+<tr>
+<td>Vérifiabilité</td>
+<td>facile</td>
+<td><strong>facile</strong></td>
+<td><em>« difficile de faire de petites erreurs »</em></td>
+</tr>
+</tbody></table>
+<p><strong>Variance-covariance.</strong> <em>Forces</em> : rapidité, décomposition analytique immédiate en VaR absolue et marginale, tout tient dans un tableur avec <code>MMULT()</code>. <em>Faiblesses</em> : suppose la normalité — d'où le $1{,}5\,\%$ de dépassements observés sur l'IPC au lieu de $1\,\%$ — et l'approximation <strong>linéaire</strong>, qui échoue sur les options. <em>Quand</em> : portefeuilles linéaires, calcul quotidien de masse, horizon court.</p>
+<p><strong>Simulation historique.</strong> <em>Forces</em>, telles que le cours les liste : <strong>simple</strong>, <strong>intuitivement séduisante</strong>, <strong>non paramétrique</strong>, <strong>agrégation facile</strong>. En prime, l'activité des spreads de crédit est intégrée d'office et l'analyse de scénarios est automatique. <em>Faiblesses</em> : besoin de beaucoup de données, absence d'historique pour les <strong>produits nouveaux</strong>, et surtout l'hypothèse de <strong>stationnarité</strong> — on suppose que le passé récent représente l'avenir. <em>Quand</em> : c'est le choix par défaut de la plupart des banques, sauf sur les portefeuilles très optionnels.</p>
+<p><strong>Monte-Carlo.</strong> <em>Forces</em> : la seule méthode qui gère vraiment les produits <strong>dépendants du chemin</strong>, les portefeuilles <strong>convexes</strong>, le <strong>risque de saut</strong> et l'exposition de crédit ; on peut simuler n'importe quelle densité. <em>Faiblesses</em> : coûteuse, et <strong>telle qu'elle est mise en œuvre</strong>, elle réintroduit la normalité multivariée — le retour à la moyenne et la diffusion à sauts doivent être <strong>ajoutés explicitement</strong>. Difficultés numériques : valeurs propres négatives, précision, temps de calcul.</p>
+<p><strong>La conclusion du cours, qui vaut pour les trois.</strong> <em>Les chiffres de VaR pris isolément ne valent rien.</em> Quelle que soit la méthode, il faut :</p>
+<ul>
+<li><strong>calculer quotidiennement et comparer</strong> dans le temps ;</li>
+<li><strong>compléter</strong> par des tests de résistance et une analyse de scénarios — parce que aucune des trois ne couvre le risque de rupture de régime, et que <em>les corrélations basculent du neutre au directionnel quand les marchés sont sous tension</em> ;</li>
+<li><strong>rétro-tester</strong> : VaR à $t$ contre P&amp;L à $t+1$, et compter les dépassements contre la binomiale attendue.</li>
+</ul>
+<p><strong>Et le rappel de la fiche 51 qu'il faut mentionner.</strong> La VaR, quelle que soit la méthode de calcul, <strong>n'est pas une mesure de risque cohérente</strong> : elle n'est <strong>pas sous-additive</strong>, donc elle peut punir la diversification. Elle reste excellente pour le <strong>reporting</strong> — un seuil unique se communique bien — mais pour agréger des risques ou optimiser un portefeuille, la <strong>CVaR</strong> lui est théoriquement supérieure.</p>
+</div></details>
+
+<h2 data-prio="must">Common mistakes</h2>
+<ol>
+<li><strong>Oublier la racine carrée</strong> — $X^T\Sigma X$ est une <strong>variance</strong> ; il faut $\sqrt{X^T\Sigma X}$ avant de multiplier par $2{,}33$.</li>
+<li><strong>Se tromper d'unités sur les obligations</strong> — DV01 par $100$ ou par million, taux en décimal ou en points de base, volatilité relative ou absolue. <em>L'erreur la plus facile à commettre.</em></li>
+<li><strong>Confondre $2{,}33$ et $1{,}64$</strong> — $99\,\%$ contre $95\,\%$, et toujours en <strong>unilatéral</strong>.</li>
+<li><strong>Appliquer la VaR aux niveaux plutôt qu'aux rendements</strong> — les niveaux ne sont pas stationnaires.</li>
+<li><strong>Oublier le signe des positions courtes</strong> — simple pour les actions, <strong>délicat pour le change</strong>.</li>
+<li><strong>Additionner des VaR autonomes</strong> — elles ne s'additionnent pas ; seules les VaR <strong>marginales</strong> le font.</li>
+<li><strong>Croire que la VaR paramétrique capture les queues</strong> — elle suppose la normalité ; le cours observe $1{,}5\,\%$ de dépassements au lieu de $1\,\%$.</li>
+<li><strong>Utiliser Cholesky sur une matrice non définie positive</strong> — elle échoue ; passer à la décomposition spectrale.</li>
+<li><strong>Oublier que les corrélations basculent en crise</strong> — d'où l'obligation de compléter par des tests de résistance.</li>
+<li><strong>Publier une VaR sans rétro-test</strong> — <em>les chiffres de VaR pris isolément ne valent rien</em>.</li>
+<li><strong>Agréger sans conserver le détail</strong> — l'agrégation <strong>masque les pics</strong>, et le P&amp;L peut être dominé par très peu de positions.</li>
+</ol>
+<h2>Ultimate Review</h2>
+<ol>
+<li><strong>Mission</strong> : informer la direction, protéger contre la concentration des risques — <strong>pas de surprises</strong>.</li>
+<li><strong>Objectif</strong> : estimer les <strong>$1\,\%$ pires issues</strong>.</li>
+<li><strong>Pourquoi les rendements</strong> : les niveaux suivent des marches aléatoires non bornées ; les rendements ont une distribution exploitable.</li>
+<li><strong>Multiplicateurs normaux</strong> : $2{,}33\sigma$ à $99\,\%$, $1{,}64\sigma$ à $95\,\%$ ; rapport $\approx71\,\%$.</li>
+<li><strong>VaR à un actif, 5 étapes</strong> : prix ⟶ rendements ⟶ variance ⟶ volatilité ⟶ $\times2{,}33\times$ position.</li>
+<li><strong>Exemple IPC</strong> : $\sigma=1{,}8012\,\%$, $VaR=4{,}1968\,\%$ ; observé : <strong>8 dépassements</strong>, $1{,}5\,\%$ du temps au lieu de $1\,\%$.</li>
+<li><strong>Taux</strong> : $\text{position}\times PV01\times\text{cours}\times\text{vol}\times2{,}33\times100$ ; UST 10 ans ⟹ $VaR=1{,}12$ pour $100$.</li>
+<li><strong>DV01 contre duration</strong> : les traders pensent DV01, les gérants duration ; <strong>attention aux unités</strong>.</li>
+<li><strong>Spread PV01</strong> : distinguer risque de taux et risque de crédit ; $PV01=CSPV01$ seulement si recouvrement nul.</li>
+<li><strong>Covariance</strong> $=\sum(x_i-\bar x)(y_i-\bar y)/(n-1)$ ; <strong>corrélation</strong> $=\mathrm{cov}/(\sigma_a\sigma_b)$, sans unité, indice de linéarité.</li>
+<li><strong>Règles</strong> : $\mathrm{var}(a+b)=\mathrm{var}(a)+\mathrm{var}(b)+2\mathrm{cov}(ab)$ ; $\mathrm{var}(xa+yb)=x^2\mathrm{var}(a)+y^2\mathrm{var}(b)+2xy\,\mathrm{cov}(ab)$.</li>
+<li><strong>Forme matricielle</strong> : $\sigma_P^2=X^T\Sigma X$, $VaR=2{,}33\sqrt{X^T\Sigma X}$ ; <code>MMULT()</code> et <code>TRANSPOSE()</code>, validation par <strong>Ctrl-Maj-Entrée</strong>.</li>
+<li><strong>Choix de mise en œuvre</strong> : période, <strong>pondération exponentielle</strong> $\mathrm{cov}_w=\sum w_i(x_i-\bar x)(y_i-\bar y)/\sum w_i$, <em>bucketing</em>, fréquence, % ou log, intervalle, unités.</li>
+<li><strong>VaR absolue</strong> : annuler toutes les positions sauf une. <strong>VaR marginale</strong> : annuler la position seule, ou $\mathrm{Cov}(\text{parent},\text{enfant})/\mathrm{Var}(\text{parent})\times VaR_{\text{parent}}$ — <strong>exactement additive</strong>.</li>
+<li><strong>Simulation historique</strong> : revaloriser avec les prix passés, classer, <strong>$n$-ième pire</strong>. Forces : simple, intuitive, <strong>non paramétrique</strong>, agrégation facile. Faiblesses : besoin de données, produits nouveaux, <strong>stationnarité</strong>.</li>
+<li><strong>Ses 8 étapes</strong> : positions ⟶ <em>bucketing</em> ⟶ sensibilités ⟶ historique ⟶ rendements ⟶ choc ⟶ P&amp;L ⟶ classement.</li>
+<li><strong>Monte-Carlo, 7 étapes</strong> : uniformes ⟶ normales (<strong>Box-Muller</strong>) ⟶ matrice de covariance ⟶ <strong>factorisation</strong> ⟶ chocs corrélés ⟶ revalorisation ⟶ VaR.</li>
+<li><strong>Factorisation</strong> : <strong>Cholesky</strong> $S=LL^T$ (simple, exige la définie-positivité) ou <strong>spectrale</strong> $S=E\Lambda E^T$ (complexe, robuste). Chocs : $R\Lambda^{1/2}E^T\sim N(0,S)$.</li>
+<li><strong>Vérifications</strong> : recréer $\Sigma$ · $\hat\sigma^2/\sigma^2\sim F(m-1,k-1)$ · $\hat\rho\sim N(\rho,(1-\rho^2)/n)$ · <strong>test M de Box</strong>.</li>
+<li><strong>Faiblesses de Monte-Carlo</strong> : normalité multivariée, corrélation sérielle, asymétrie, kurtosis ; ajustements nécessaires pour le retour à la moyenne et les sauts.</li>
+<li><em><strong>Backtesting</strong></em> : VaR à $t$ contre P&amp;L à $t+1$ ; obligatoire, contrôle de réalité, détection d'erreurs, changements de profil de risque. <strong>L'agrégation masque les pics.</strong></li>
+</ol>
+<p><strong>Formulas to know</strong>
+$$VaR_{99\%}=\text{position}\times\sigma\times2{,}33 \qquad VaR_{95\%}=\text{position}\times\sigma\times1{,}64$$
+$$VaR_{\text{taux}}=\text{position}\times PV01\times\text{cours}\times\text{vol}\times2{,}33\times100 \qquad \sigma_P^2=X^T\Sigma X$$
+$$\text{VaR marginale}=\frac{\mathrm{Cov}(\text{parent},\text{enfant})}{\mathrm{Var}(\text{parent})}\times VaR_{\text{parent}} \qquad R\,\Lambda^{1/2}E^T\sim N(0,S)$$</p>
+<p><strong>Methods to know</strong> : la chaîne en 5 étapes de la VaR à un actif ; la décomposition en unités du calcul obligataire ; les 8 étapes de la simulation historique ; les 7 étapes de Monte-Carlo ; la preuve d'additivité des VaR marginales.</p>
+<div class="rec"><h2>Active Recall</h2><p><strong>Basic</strong> — Quels sont les multiplicateurs de VaR à $99\,\%$ et $95\,\%$, et sous quelle hypothèse ?</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p>$$VaR_{99\%}=2{,}33\times\sigma\times\text{position}, \qquad VaR_{95\%}=1{,}64\times\sigma\times\text{position}$$</p>
+<p>Ce sont les <strong>quantiles unilatéraux de la loi normale standard</strong> : $\Phi^{-1}(0{,}99)\approx2{,}326$ et $\Phi^{-1}(0{,}95)\approx1{,}645$.</p>
+<p><strong>L'hypothèse est la normalité des rendements</strong> — et c'est précisément la faiblesse de la méthode paramétrique. Le cours le montre sur l'IPC : la VaR à $99\,\%$ a été dépassée <strong>$1{,}5\,\%$ du temps</strong> au lieu de $1\,\%$.</p>
+</div></details><p><strong>Understanding</strong> — Pourquoi calcule-t-on la VaR sur les rendements et non sur les niveaux de prix ?</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p>Parce que <em>la plupart des séries financières suivent des <strong>marches aléatoires</strong></em>, dont la meilleure prévision pour demain est la valeur d'aujourd'hui. Les niveaux ne sont donc <strong>pas bornés</strong> et leur histogramme n'est pas une distribution de probabilité : il ne fait que résumer le chemin parcouru, et dépend entièrement du point de départ et de la période — le cours l'illustre par l'histogramme des niveaux de l'IPC, inexploitable.</p>
+<p>Les <strong>rendements</strong>, en revanche, sont approximativement <strong>stationnaires</strong> : leur histogramme <em>retrouve un profil familier</em>, une forme en cloche. Et c'est la stationnarité qui autorise à lire un quantile estimé sur le passé comme une prévision pour demain.</p>
+<p class="cal piege"> C'est exactement l'hypothèse de stationnarité de la fiche 52 — et c'est aussi elle que la simulation historique suppose, comme le cours le signale dans ses faiblesses.</p>
+</div></details><p><strong>Application</strong> — Deux positions, $\sigma_1=2\,\%$ sur $10$ M€ et $\sigma_2=3\,\%$ sur $5$ M€, corrélation $0{,}4$. Quelle est la VaR du portefeuille à $99\,\%$ ?</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p><strong>Étape 1 — les volatilités en euros.</strong>
+$$s_1=10\,000\,000\times0{,}02=200\,000, \qquad s_2=5\,000\,000\times0{,}03=150\,000$$</p>
+<p><strong>Étape 2 — la variance du portefeuille.</strong>
+$$\sigma_P^2=s_1^2+s_2^2+2\rho s_1s_2=200\,000^2+150\,000^2+2\times0{,}4\times200\,000\times150\,000$$
+$$=4{,}0\times10^{10}+2{,}25\times10^{10}+2{,}4\times10^{10}=8{,}65\times10^{10}$$</p>
+<p><strong>Étape 3 — l'écart-type.</strong>
+$$\sigma_P=\sqrt{8{,}65\times10^{10}}\approx294\,109\ \text{€}$$</p>
+<p><strong>Étape 4 — la VaR.</strong>
+$$VaR_{99\%}=2{,}33\times294\,109\approx\mathbf{685\,274}\ \text{€}$$</p>
+<p><strong>Le bénéfice de la diversification.</strong> La somme des VaR autonomes vaut $2{,}33\times(200\,000+150\,000)=815\,500$ €. On économise $130\,226$ €, soit $16\,\%$, uniquement parce que $\rho=0{,}4&lt;1$.</p>
+<p class="cal piege"> <strong>Et si les marchés se tendent, $\rho$ monte vers $1$</strong> et ce bénéfice s'évapore : à $\rho=1$, $\sigma_P=350\,000$ et $VaR=815\,500$ €, exactement la somme des VaR autonomes.</p>
+</div></details><p><strong>Comparison</strong> — Simulation historique contre variance-covariance : laquelle et quand ?</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<table>
+<thead>
+<tr>
+<th></th>
+<th><strong>Variance-covariance</strong></th>
+<th><strong>Simulation historique</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Hypothèse</td>
+<td><strong>normalité</strong> + linéarité</td>
+<td><strong>stationnarité</strong></td>
+</tr>
+<tr>
+<td>Ce qu'elle exige</td>
+<td>une matrice $\Sigma$</td>
+<td><strong>beaucoup</strong> d'historique</td>
+</tr>
+<tr>
+<td>Queues épaisses</td>
+<td>non capturées</td>
+<td><strong>capturées</strong> (dans les données)</td>
+</tr>
+<tr>
+<td>Non-linéarités / options</td>
+<td>mal traitées</td>
+<td>traitées par revalorisation</td>
+</tr>
+<tr>
+<td>Coût</td>
+<td>très faible</td>
+<td>modéré</td>
+</tr>
+<tr>
+<td>Décomposition marginale</td>
+<td>analytique immédiate</td>
+<td>via les vecteurs de P&amp;L</td>
+</tr>
+</tbody></table>
+<p><strong>Variance-covariance</strong> quand : portefeuille <strong>linéaire</strong>, calcul quotidien de masse, besoin de décomposer analytiquement le risque par facteur. C'est la méthode du tableur — <code>MMULT()</code>, <code>TRANSPOSE()</code>, $2{,}33\sqrt{X^T\Sigma X}$.</p>
+<p><strong>Simulation historique</strong> quand : les queues comptent, il y a des options ou des spreads de crédit, on veut éviter toute hypothèse de distribution. Ses quatre forces selon le cours : <strong>simple</strong>, <strong>intuitivement séduisante</strong>, <strong>non paramétrique</strong>, <strong>agrégation facile</strong> — plus l'activité de spread intégrée d'office et l'analyse de scénarios automatique.</p>
+<p><strong>La faiblesse commune</strong> : ni l'une ni l'autre n'anticipe une <strong>rupture de régime</strong>. La première est calibrée sur un régime calme ; la seconde suppose que le passé récent représente l'avenir. D'où l'obligation, dans les deux cas, de compléter par des <strong>tests de résistance</strong>.</p>
+</div></details><p><strong>Exam-style</strong> — Détaillez les sept étapes d'un calcul de VaR par Monte-Carlo et dites où sont les difficultés.</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p><strong>a) Génération de nombres aléatoires uniformes.</strong> Trois types : <strong>vrais aléas</strong> (impossibles par ordinateur, il faut une source physique comme la désintégration radioactive), <strong>quasi-aléatoires</strong> (difficiles, optimisent l'uniformité) et <strong>pseudo-aléatoires</strong> (algorithmiques, méthode dominante, voir Knuth).</p>
+<p><strong>b) Conversion en normales.</strong> Appliquer l'inverse de la fonction de répartition normale aux tirages uniformes, ou la <strong>méthode de Box-Muller</strong>.</p>
+<p><strong>c) Construction de la matrice de covariance.</strong> Acheter ou construire ; décider de la couverture, du traitement des données manquantes, de la pondération et de l'intervalle de différenciation.</p>
+<p><strong>d) Factorisation de la matrice</strong> — <em>la partie la plus complexe</em>. Objectif : une matrice « racine carrée ».</p>
+<ul>
+<li><strong>Cholesky</strong> : $S=LL^T$, triangulaire inférieure. Plus simple, mais <strong>exige une matrice définie positive</strong>.</li>
+<li><strong>Spectrale</strong> : $S=E\Lambda E^T$. Plus complexe, <strong>plus robuste</strong>.</li>
+</ul>
+<p><strong>e) Création des chocs corrélés.</strong> Si $R\sim N(0,I_n)$, alors
+$$R\,\Lambda^{1/2}E^T\sim N(0,S)$$
+<em>Pourquoi</em> : $\mathrm{Cov}(E\Lambda^{1/2}R)=E\Lambda^{1/2}\Lambda^{1/2}E^T=E\Lambda E^T=S$.</p>
+<p><strong>f) Revalorisation.</strong> <strong>Exacte</strong> (plus juste, lourde) ou <strong>paramétrique</strong> (rapide, précise, mais les dérivées croisées créent du bruit) ; on peut aussi utiliser des <strong>grilles de valorisation</strong>.</p>
+<p><strong>g) Estimation de la VaR.</strong> Calculer le P&amp;L, ordonner, prendre le $n$-ième plus grand cas ; grouper et trier pour les sous-portefeuilles.</p>
+<p><strong>Les difficultés.</strong></p>
+<ul>
+<li><strong>Numériques</strong> : <strong>valeurs propres négatives</strong> (une covariance empirique mal construite cesse d'être semi-définie positive — Cholesky échoue, la décomposition spectrale survit), précision, temps de calcul, stockage, traçabilité des erreurs.</li>
+<li><strong>De modèle</strong> : <em>l'hypothèse de normalité multivariée</em> — corrélation sérielle, <strong>asymétrie</strong>, <strong>kurtosis</strong> ignorées. Il faut <strong>ajuster explicitement</strong> pour simuler le retour à la moyenne et la diffusion à sauts.</li>
+</ul>
+<p><strong>Les contrôles indispensables.</strong> <em>Il est difficile de faire de petites erreurs</em> — autrement dit, une erreur de factorisation produit des résultats grossièrement faux, ce qui est plutôt une bonne nouvelle. On vérifie en <strong>recréant la matrice de covariance</strong> à partir des tirages, en testant les variances par $F$ ou $\chi^2$ ($\hat\sigma^2/\sigma^2\sim F(m-1,k-1)$), les corrélations par un test $z$ ($\hat\rho\sim N(\rho,(1-\rho^2)/n)$), et globalement par le <strong>test M de Box</strong>.</p>
+<p><strong>Le paradoxe final, qu'il faut savoir énoncer.</strong> Monte-Carlo est en principe la méthode la plus flexible — n'importe quelle densité est simulable — mais telle qu'elle est mise en œuvre, avec une matrice de covariance et des tirages gaussiens, elle <strong>réintroduit exactement la normalité</strong> que la simulation historique évitait. Sa vraie valeur ajoutée est ailleurs : les produits <strong>dépendants du chemin</strong>, les portefeuilles <strong>convexes</strong>, le <strong>risque de saut</strong> et l'<strong>exposition de crédit</strong>.</p>
+</div></details></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h2>Flashcards</h2>
+<table>
+<thead>
+<tr>
+<th>Question</th>
+<th>Réponse</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>La mission du risk management ?</td>
+<td>Informer, protéger contre la concentration — <strong>pas de surprises</strong></td>
+</tr>
+<tr>
+<td>Que cherche-t-on à estimer ?</td>
+<td>Les <strong>$1\,\%$ pires issues possibles</strong></td>
+</tr>
+<tr>
+<td>Multiplicateur à $99\,\%$ ?</td>
+<td>$2{,}33$</td>
+</tr>
+<tr>
+<td>Multiplicateur à $95\,\%$ ?</td>
+<td>$1{,}64$</td>
+</tr>
+<tr>
+<td>Pourquoi les rendements et non les niveaux ?</td>
+<td>Les niveaux suivent des marches aléatoires <strong>non bornées</strong></td>
+</tr>
+<tr>
+<td>Formule de la variance ?</td>
+<td>$\sum(x_i-\bar x)^2/(n-1)$</td>
+</tr>
+<tr>
+<td>VaR à un actif ?</td>
+<td>$\text{position}\times\sigma\times2{,}33$</td>
+</tr>
+<tr>
+<td>Résultat sur l'IPC ?</td>
+<td>$\sigma=1{,}8012\,\%$, $VaR=4{,}1968\,\%$</td>
+</tr>
+<tr>
+<td>Dépassements observés ?</td>
+<td><strong>8 fois</strong>, soit $1{,}5\,\%$ au lieu de $1\,\%$</td>
+</tr>
+<tr>
+<td>Ce problème disparaît où ?</td>
+<td>Au niveau du <strong>portefeuille</strong></td>
+</tr>
+<tr>
+<td>Pourquoi les obligations diffèrent ?</td>
+<td>Les séries disponibles sont des <strong>taux</strong>, le risque porte sur le <strong>prix</strong></td>
+</tr>
+<tr>
+<td>Qu'est-ce que le DV01 ?</td>
+<td>La variation de prix pour <strong>1 point de base</strong> de taux</td>
+</tr>
+<tr>
+<td>Duration contre DV01 ?</td>
+<td>Traders : DV01 ; gérants : duration. <strong>Attention aux unités !</strong></td>
+</tr>
+<tr>
+<td>Quand $PV01=CSPV01$ ?</td>
+<td>Si le <strong>recouvrement est nul</strong></td>
+</tr>
+<tr>
+<td>Formule de la covariance ?</td>
+<td>$\sum(x_i-\bar x)(y_i-\bar y)/(n-1)$</td>
+</tr>
+<tr>
+<td>Corrélation ?</td>
+<td>$\mathrm{Cov}(a,b)/(\sigma_a\sigma_b)$ — sans unité</td>
+</tr>
+<tr>
+<td>Connaît-on les covariances à partir des corrélations ?</td>
+<td><strong>Non</strong> — l'inverse seulement</td>
+</tr>
+<tr>
+<td>Variance d'une somme ?</td>
+<td>$\mathrm{var}(a)+\mathrm{var}(b)+2\mathrm{cov}(a,b)$</td>
+</tr>
+<tr>
+<td>Variance avec quantités ?</td>
+<td>$x^2\mathrm{var}(a)+y^2\mathrm{var}(b)+2xy\,\mathrm{cov}(ab)$</td>
+</tr>
+<tr>
+<td>Forme matricielle de la variance ?</td>
+<td>$X^T\Sigma X$</td>
+</tr>
+<tr>
+<td>VaR matricielle à $99\,\%$ ?</td>
+<td>$2{,}33\sqrt{X^T\Sigma X}$</td>
+</tr>
+<tr>
+<td>Fonctions Excel ?</td>
+<td><code>MMULT()</code> et <code>TRANSPOSE()</code>, <strong>Ctrl-Maj-Entrée</strong></td>
+</tr>
+<tr>
+<td>Covariance pondérée exponentiellement ?</td>
+<td>$\sum w_i(x_i-\bar x)(y_i-\bar y)/\sum w_i$</td>
+</tr>
+<tr>
+<td>Que fait le <em>bucketing</em> ?</td>
+<td>Réduit la <strong>granularité</strong> — sans perte de précision s'il est bien fait</td>
+</tr>
+<tr>
+<td>Problème des corrélations en crise ?</td>
+<td>Elles <strong>basculent</strong> du neutre au directionnel</td>
+</tr>
+<tr>
+<td>VaR absolue ?</td>
+<td>Annuler toutes les positions sauf celle d'intérêt</td>
+</tr>
+<tr>
+<td>VaR marginale ?</td>
+<td>$\mathrm{Cov}(\text{parent},\text{enfant})/\mathrm{Var}(\text{parent})\times VaR_{\text{parent}}$</td>
+</tr>
+<tr>
+<td>Propriété clé de la VaR marginale ?</td>
+<td>Les marginales <strong>somment</strong> à la VaR du parent</td>
+</tr>
+<tr>
+<td>Principe de la simulation historique ?</td>
+<td>Revaloriser avec les prix passés, classer, <strong>$n$-ième pire</strong></td>
+</tr>
+<tr>
+<td>Ses quatre forces ?</td>
+<td>Simple · intuitive · <strong>non paramétrique</strong> · agrégation facile</td>
+</tr>
+<tr>
+<td>Sa faiblesse centrale ?</td>
+<td>Suppose la <strong>stationnarité</strong></td>
+</tr>
+<tr>
+<td>Première étape de la simulation historique ?</td>
+<td><strong>Savoir ce qu'on possède</strong> — 90 % du métier</td>
+</tr>
+<tr>
+<td>Origine du nom Monte-Carlo ?</td>
+<td>Le <strong>projet Manhattan</strong>, par analogie avec les jeux de hasard</td>
+</tr>
+<tr>
+<td>Seule exigence de Monte-Carlo ?</td>
+<td>Que le système soit descriptible par des <strong>densités</strong></td>
+</tr>
+<tr>
+<td>Uniforme vers normale ?</td>
+<td>Inverse de la fonction de répartition — <strong>Box-Muller</strong></td>
+</tr>
+<tr>
+<td>Cholesky ?</td>
+<td>$S=LL^T$, simple, exige une matrice <strong>définie positive</strong></td>
+</tr>
+<tr>
+<td>Décomposition spectrale ?</td>
+<td>$S=E\Lambda E^T$, plus complexe, <strong>plus robuste</strong></td>
+</tr>
+<tr>
+<td>Création de chocs corrélés ?</td>
+<td>$R\,\Lambda^{1/2}E^T\sim N(0,S)$</td>
+</tr>
+<tr>
+<td>Tester les corrélations simulées ?</td>
+<td>$\hat\rho\sim N(\rho,(1-\rho^2)/n)$</td>
+</tr>
+<tr>
+<td>Problème numérique majeur ?</td>
+<td><strong>Valeurs propres négatives</strong></td>
+</tr>
+<tr>
+<td>Qu'est-ce qu'un rétro-test ?</td>
+<td>VaR à $t$ contre P&amp;L à $t+1$</td>
+</tr>
+<tr>
+<td>Danger de l'agrégation en rétro-test ?</td>
+<td>Elle <strong>masque les pics</strong></td>
+</tr>
+<tr>
+<td>Rapport $VaR_{95}/VaR_{99}$ sous normalité ?</td>
+<td>$1{,}65/2{,}33\approx71\,\%$</td>
+</tr>
+</tbody></table>
+</main>
+
+
+
+
+</body></html>

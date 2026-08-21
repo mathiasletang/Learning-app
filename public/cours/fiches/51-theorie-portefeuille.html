@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fiche 51 — Théorie du portefeuille : Markowitz, Tobin, utilité et mesures de risque</title>
+<script>
+window.MathJax={tex:{inlineMath:[["$","$"]],displayMath:[["$$","$$"]],processEscapes:true},
+ options:{skipHtmlTags:["script","noscript","style","textarea","pre","code"]},
+ svg:{fontCache:"global"},
+ startup:{pageReady:()=>MathJax.startup.defaultPageReady().then(()=>{document.body.classList.add("ready")})}};
+setTimeout(function(){document.body.classList.add("ready")},2500);
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+/* ============================================================
+   MathiasLearn — feuille de style des fiches
+   Reprise intégrale des tokens de 00_PARCOURS/*.html
+   + blocs pédagogiques (callouts, méthode, essentiels, recall)
+   ============================================================ */
+:root{--bg:#faf9f7;--card:#fff;--ink:#1a1a1a;--muted:#6b6b6b;--line:#e5e2dd;--accent:#8b5e34;
+ --hl:#fdf8ef;--ok:#2d7d4f;--okbg:#f0f7f3;--warn:#b3402f;--warnbg:#fdf3f1;--blue:#2f5d8b;--bluebg:#f1f5fa}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+ font:17px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;padding:0 16px 100px}
+.nav{position:sticky;top:0;background:rgba(250,249,247,.96);backdrop-filter:blur(8px);
+ border-bottom:1px solid var(--line);margin:0 -16px 30px;padding:11px 16px;z-index:50;
+ display:flex;gap:6px;flex-wrap:wrap;font-size:13px}
+.nav a{color:var(--muted);text-decoration:none;padding:4px 9px;border-radius:5px;white-space:nowrap}
+.nav a:hover{background:var(--line);color:var(--ink)}
+.nav a.on{background:var(--accent);color:#fff}
+main{max-width:780px;margin:0 auto}
+h1{font-size:31px;letter-spacing:-.02em;margin:.4em 0 .5em;line-height:1.25}
+h2{font-size:23px;margin:2.2em 0 .7em;padding-bottom:.3em;border-bottom:1px solid var(--line)}
+h3{font-size:19px;margin:1.9em 0 .5em;color:var(--accent)}
+h4{font-size:17px;margin:1.5em 0 .4em}
+p{margin:.8em 0} a{color:var(--accent)} hr{border:0;border-top:1px solid var(--line);margin:2.6em 0}
+table{border-collapse:collapse;width:100%;margin:1.3em 0;font-size:15.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+th{background:#f3f0eb;font-weight:600}
+tr:nth-child(even) td{background:#fcfbfa}
+code{font-family:"SF Mono",Menlo,Consolas,monospace;font-size:.88em;background:#f2efea;padding:2px 6px;border-radius:4px;white-space:nowrap}
+pre{background:#f2efea;padding:14px 16px;border-radius:8px;overflow-x:auto}
+pre code{background:none;padding:0;white-space:pre}
+blockquote{border-left:3px solid var(--accent);background:var(--hl);margin:1.4em 0;padding:14px 20px;border-radius:0 8px 8px 0}
+blockquote p:first-child{margin-top:0} blockquote p:last-child{margin-bottom:0}
+ul,ol{padding-left:1.5em} li{margin:.35em 0} em{color:#4a4a4a}
+mjx-container[display="true"]{margin:1.1em 0!important;overflow-x:auto;overflow-y:hidden;padding:2px 0}
+mjx-container svg{max-width:100%}
+body:not(.ready) main{opacity:0} main{opacity:1;transition:opacity .25s}
+
+/* --- bandeau de tête de fiche --- */
+.cours{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--accent);
+ border-radius:0 10px 10px 0;padding:18px 22px;margin:0 0 34px}
+.cours h4{margin:0 0 4px;font-size:14px;text-transform:uppercase;letter-spacing:.07em;color:var(--accent)}
+.cours .cs{color:var(--muted);font-size:14.5px;margin:0 0 14px}
+
+/* --- exercices / corrigés --- */
+.ex{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:6px 24px 20px;margin:18px 0}
+.ex>h3:first-child{margin-top:14px}
+details.cor{margin-top:18px;border:1px solid var(--line);border-radius:8px;background:#fcfbfa;overflow:hidden}
+details.cor>summary{cursor:pointer;padding:12px 16px;font-weight:600;font-size:15px;color:var(--accent);
+ list-style:none;display:flex;align-items:center;gap:9px;user-select:none;transition:.15s;min-height:44px}
+details.cor>summary::-webkit-details-marker{display:none}
+details.cor>summary:hover{background:var(--hl)}
+details.cor>summary::before{content:"\25B6";font-size:10px;transition:transform .18s;display:inline-block}
+details.cor[open]>summary::before{transform:rotate(90deg)}
+details.cor[open]>summary{background:var(--okbg);color:var(--ok);border-bottom:1px solid var(--line)}
+.cor .in{padding:4px 20px 16px}
+.cor .in>*:first-child{margin-top:.9em}
+
+/* --- blocs pédagogiques (callouts) ---
+   Générés depuis une citation Markdown dont le premier **gras** commence
+   par un mot-clé : DÉFINITION, THÉORÈME, MÉTHODE, PIÈGE, INTUITION… */
+.cal{border:1px solid var(--line);border-left:4px solid var(--accent);background:var(--card);
+ border-radius:0 10px 10px 0;padding:15px 20px;margin:1.5em 0}
+.cal>p:first-child{margin-top:0}.cal>p:last-child,.cal>ul:last-child,.cal>ol:last-child{margin-bottom:0}
+.cal .lab{display:block;font-size:12.5px;text-transform:uppercase;letter-spacing:.08em;
+ font-weight:700;color:var(--accent);margin-bottom:6px}
+.cal.formel{background:var(--hl)}
+.cal.piege{border-left-color:var(--warn);background:var(--warnbg)}
+.cal.piege .lab{color:var(--warn)}
+.cal.methode{border-left-color:var(--ok);background:var(--okbg)}
+.cal.methode .lab{color:var(--ok)}
+.cal.intu{border-left-color:var(--blue);background:var(--bluebg)}
+.cal.intu .lab{color:var(--blue)}
+.cal.plus{border-left-style:dashed;background:#faf9f7}
+.cal.plus .lab{color:var(--muted)}
+
+/* --- révision express --- */
+.ess{background:var(--card);border:1px solid var(--accent);border-radius:10px;padding:4px 24px 20px;margin:1.6em 0}
+.ess h3{margin-top:1.3em}
+.rec{background:var(--card);border:1px dashed var(--accent);border-radius:10px;padding:4px 24px 18px;margin:1.6em 0}
+.rec ol{counter-reset:none}
+
+/* --- impression / PDF --- */
+@media print{
+ .nav{display:none}
+ body{padding:0;background:#fff;font-size:11.2pt;line-height:1.55}
+ main{max-width:none}
+ h1{font-size:23pt}h2{font-size:15pt;margin-top:1.5em}h3{font-size:12.6pt}
+ h2,h3,h4{break-after:avoid;page-break-after:avoid}
+ table,.cal,blockquote{break-inside:avoid;page-break-inside:avoid}
+ table{display:table;font-size:9.6pt}
+ details.cor{border:1px solid var(--line);background:#fcfbfa}
+ details.cor>summary{display:none}
+ details.cor .in{padding-top:10px}
+ .cal,.ex,.ess,.rec{box-shadow:none}
+ a{color:var(--ink);text-decoration:none}
+}
+@page{margin:16mm 15mm 18mm}
+
+/* --- exemples travaillés --- */
+.exm{background:#fcfbfa;border:1px solid var(--line);border-radius:10px;padding:2px 20px 14px;margin:1.5em 0}
+.exm>h4:first-child{margin:14px 0 .5em;color:var(--accent);font-size:13px;text-transform:uppercase;letter-spacing:.07em}
+
+
+/* --- pastilles de priorité (conventions des fiches de l'app) --- */
+h2[data-prio], h3[data-prio], h4[data-prio]{position:relative}
+h2[data-prio]::before,h3[data-prio]::before,h4[data-prio]::before{
+ content:"";display:inline-block;width:9px;height:9px;border-radius:50%;
+ margin-right:9px;vertical-align:middle;background:var(--muted)}
+[data-prio="must"]::before{background:var(--warn)}
+[data-prio="high"]::before{background:#d98324}
+[data-prio="mid"]::before{background:#c9a227}
+[data-prio="low"]::before{background:var(--ok)}
+/* corrigés des fiches de l'app : même traitement que les corrigés des séries */
+details.cor>summary::after{content:""}
+</style></head><body>
+<div class="nav"><a href="00_COMMENCER_ICI.html">Commencer ici</a><a href="01_NOTATIONS_le-decodeur.html">Notations</a><a href="02_EXERCICES_Serie-0.html">Série 0 — Remise en route</a><a href="03_EXERCICES_Serie-1.html">Série 1 — Convexité</a><a href="04_EXERCICES_Serie-2.html">Série 2 — KKT</a><a href="05_AUTO-EVALUATION.html">Auto-évaluation (quiz)</a><a href="06_FICHE_Optimisation-deux-variables.html">Fiche — Optimisation à 2 variables</a></div>
+<main><h1>Fiche 51 — Théorie du portefeuille : Markowitz, Tobin, utilité et mesures de risque</h1>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Matière</strong></td>
+<td>Maths · Finance de marché</td>
+</tr>
+<tr>
+<td><strong>Cours source</strong></td>
+<td>Kempthorne, <em>18.S096 Topics in Mathematics with Applications in Finance</em>, MIT OpenCourseWare, automne 2013 — cours 14 « Portfolio Theory »</td>
+</tr>
+<tr>
+<td><strong>Difficulté</strong></td>
+<td> Must know — le cœur de la finance de marché quantitative</td>
+</tr>
+<tr>
+<td><strong>Temps d'étude estimé</strong></td>
+<td>2 h 45</td>
+</tr>
+<tr>
+<td><strong>Prérequis</strong></td>
+<td>Fiche 7 (multiplicateurs de Lagrange), fiche 9 (matrices définies positives), fiche 37 (programmes quadratiques)</td>
+</tr>
+<tr>
+<td><strong>Concepts clés</strong></td>
+<td>Analyse moyenne-variance, frontière efficiente, actif sans risque, portefeuille de marché, théorème de séparation de Tobin, droite de marché des capitaux, prix de marché du risque, utilité de von Neumann-Morgenstern, aversion au risque d'Arrow-Pratt, contraintes de gestion, VaR, CVaR, mesures de risque cohérentes</td>
+</tr>
+<tr>
+<td><strong>Poids à l'examen</strong></td>
+<td>Trois choses à savoir faire : <strong>dériver</strong> le portefeuille de variance minimale par Lagrange, <strong>démontrer</strong> la séparation de Tobin, et <strong>critiquer</strong> la VaR à l'aide des quatre axiomes de cohérence.</td>
+</tr>
+</tbody></table>
+<h2>Vue d'ensemble</h2>
+<p>Un investisseur dispose de $m$ actifs risqués. Comment répartir sa richesse ? Markowitz (1952) répond : <strong>résumez chaque portefeuille par deux nombres</strong> — son rendement espéré et sa variance — puis optimisez. Tout le chapitre découle de ce choix.</p>
+<pre><code>DONNÉES     R = (R₁,…,R_m)   E[R] = μ   Cov[R] = Σ
+PORTEFEUILLE w, avec wᵀ1ₘ = 1  →  R_w = wᵀR
+RÉSUMÉ       μ_w = wᵀμ        σ²_w = wᵀΣw
+PROBLÈME     min ½ wᵀΣw   s.c.  wᵀμ = μ₀,  wᵀ1ₘ = 1
+RÉPONSE      frontière efficiente = parabole dans le plan (μ₀, σ²₀)
++ ACTIF SANS RISQUE  →  la frontière devient une DROITE (la CML)
+                     →  tous les investisseurs détiennent le MÊME
+                        portefeuille risqué : le portefeuille de marché
+</code></pre>
+<p>Le chapitre pose ensuite les trois questions critiques : <strong>pourquoi</strong> la moyenne-variance serait-elle rationnelle (utilité VNM) ? <strong>quelles contraintes</strong> ajouter en pratique ? et <strong>la variance est-elle une bonne mesure du risque</strong> (VaR, CVaR, cohérence) ?</p>
+<h2 data-prio="mid">Concept 1 — Le cadre moyenne-variance</h2>
+<p><strong>Analyse mono-période.</strong> $m$ actifs risqués, $i=1,\dots,m$, dont les rendements sur la période forment un <strong>vecteur aléatoire à $m$ dimensions</strong>
+$$R=[R_1,R_2,\dots,R_m]^T$$
+de moyenne et de covariance
+$$E[R]=\mu=\begin{pmatrix}\mu_1\\ \vdots\\ \mu_m\end{pmatrix}, \qquad \mathrm{Cov}[R]=\Sigma=\begin{pmatrix}\sigma_{1,1}&amp;\cdots&amp;\sigma_{1,m}\\ \vdots&amp;\ddots&amp;\vdots\\ \sigma_{m,1}&amp;\cdots&amp;\sigma_{m,m}\end{pmatrix}$$</p>
+<p><strong>Portefeuille.</strong> Un $m$-vecteur de <strong>poids</strong> indiquant la fraction de la richesse détenue dans chaque actif :
+$$w=(w_1,\dots,w_m)^T \quad\text{avec}\quad \sum_{i=1}^mw_i=1 \quad\text{soit}\quad w^T\mathbf{1}_m=1$$</p>
+<p><strong>Rendement du portefeuille.</strong> $R_w=w^TR$ est une variable aléatoire de
+$$\mu_w=E[R_w]=w^T\mu, \qquad \sigma_w^2=\mathrm{var}[R_w]=w^T\Sigma w$$</p>
+<blockquote>
+<p><strong>Le principe d'évaluation.</strong> <em>On évalue les différents portefeuilles $w$ par le couple moyenne-variance $(\mu_w,\sigma_w^2)$, avec une préférence pour un rendement espéré $\mu_w$ <strong>plus élevé</strong> et une variance $\sigma^2_w$ <strong>plus faible</strong>.</em></p>
+</blockquote>
+<p class="cal piege"> <strong>Tout le pouvoir et toute la fragilité de la théorie sont dans cette réduction à deux nombres.</strong> Deux portefeuilles de même $(\mu,\sigma^2)$ sont déclarés <strong>équivalents</strong>, même si l'un a des pertes extrêmes bien pires. Le concept 9 revient sur ce point.</p>
+<h2 data-prio="must">Concept 2 — Problème I : minimisation du risque</h2>
+<div class="cal formel"><span class="lab">Problème I — minimisation du risque.</span>
+<p> Pour un rendement moyen cible $\mu_0$ donné, choisir le portefeuille $w$ qui
+$$\text{Minimise : } \tfrac12\,w^T\Sigma w \qquad \text{s.c. } w^T\mu=\mu_0,\quad w^T\mathbf{1}_m=1$$</p>
+</div>
+<p>C'est un <strong>problème d'optimisation convexe (minimisation) sous contraintes linéaires</strong> — donc un programme quadratique — et on lui applique la <strong>méthode des multiplicateurs de Lagrange</strong>.</p>
+<p><strong>Étape 1 — le lagrangien.</strong>
+$$L(w,\lambda_1,\lambda_2)=\tfrac12\,w^T\Sigma w+\lambda_1(\mu_0-w^T\mu)+\lambda_2(1-w^T\mathbf{1}_m)$$</p>
+<p><strong>Étape 2 — les conditions du premier ordre.</strong>
+$$\frac{\partial L}{\partial w}=0_m=\Sigma w-\lambda_1\mu-\lambda_2\mathbf{1}_m, \qquad \frac{\partial L}{\partial\lambda_1}=0=\mu_0-w^T\mu, \qquad \frac{\partial L}{\partial\lambda_2}=0=1-w^T\mathbf{1}_m$$</p>
+<p><strong>Étape 3 — résoudre $w$ en fonction de $\lambda_1,\lambda_2$.</strong> La première équation donne directement
+$$\boxed{\ w_0=\lambda_1\Sigma^{-1}\mu+\lambda_2\Sigma^{-1}\mathbf{1}_m\ }$$</p>
+<blockquote>
+<p><strong>La forme de la solution est déjà toute l'histoire.</strong> Quel que soit le rendement cible $\mu_0$, le portefeuille optimal est une <strong>combinaison linéaire de deux portefeuilles fixes</strong> : $\Sigma^{-1}\mu$ et $\Sigma^{-1}\mathbf{1}_m$. Seuls les coefficients changent. C'est le <strong>théorème des deux fonds</strong>, et c'est le germe de la séparation de Tobin du concept 5.</p>
+</blockquote>
+<p><strong>Étape 4 — résoudre $\lambda_1,\lambda_2$ par substitution.</strong> En réinjectant $w_0$ dans les deux contraintes :
+$$\mu_0=w_0^T\mu=\lambda_1(\mu^T\Sigma^{-1}\mu)+\lambda_2(\mu^T\Sigma^{-1}\mathbf{1}_m)$$
+$$1=w_0^T\mathbf{1}_m=\lambda_1(\mu^T\Sigma^{-1}\mathbf{1}_m)+\lambda_2(\mathbf{1}_m^T\Sigma^{-1}\mathbf{1}_m)$$
+soit, en posant les <strong>trois scalaires fondamentaux</strong>
+$$a=\mu^T\Sigma^{-1}\mu, \qquad b=\mu^T\Sigma^{-1}\mathbf{1}_m, \qquad c=\mathbf{1}_m^T\Sigma^{-1}\mathbf{1}_m$$
+le système $2\times2$
+$$\begin{pmatrix}\mu_0\\1\end{pmatrix}=\begin{pmatrix}a&amp;b\\b&amp;c\end{pmatrix}\begin{pmatrix}\lambda_1\\\lambda_2\end{pmatrix}$$</p>
+<p><strong>Étape 5 — la variance du portefeuille optimal.</strong>
+$$\begin{aligned}\sigma_0^2=w_0^T\Sigma w_0&amp;=\lambda_1^2(\mu^T\Sigma^{-1}\mu)+2\lambda_1\lambda_2(\mu^T\Sigma^{-1}\mathbf{1}_m)+\lambda_2^2(\mathbf{1}_m^T\Sigma^{-1}\mathbf{1}_m)\\ &amp;=\begin{pmatrix}\lambda_1&amp;\lambda_2\end{pmatrix}\begin{pmatrix}a&amp;b\\b&amp;c\end{pmatrix}\begin{pmatrix}\lambda_1\\\lambda_2\end{pmatrix}\end{aligned}$$
+En substituant $\binom{\lambda_1}{\lambda_2}=\binom{a\ b}{b\ c}^{-1}\binom{\mu_0}{1}$ :
+$$\sigma_0^2=\begin{pmatrix}\mu_0&amp;1\end{pmatrix}\begin{pmatrix}a&amp;b\\b&amp;c\end{pmatrix}^{-1}\begin{pmatrix}\mu_0\\1\end{pmatrix}=\boxed{\ \frac{c\mu_0^2-2b\mu_0+a}{ac-b^2}\ }$$</p>
+<blockquote>
+<p><strong>Le résultat central.</strong> <em>Le portefeuille optimal a une variance $\sigma_0^2$ <strong>parabolique</strong> dans le rendement moyen $\mu_0$.</em> Dans le plan $(\mu_0,\sigma_0^2)$ la frontière est une <strong>parabole</strong> ; dans le plan $(\sigma_0,\mu_0)$ — écart-type contre rendement, la représentation usuelle des professionnels — c'est une <strong>hyperbole</strong>, dont la branche supérieure est la <strong>frontière efficiente</strong>.</p>
+</blockquote>
+<p class="cal piege"> <strong>Interprétation du minimum.</strong> Le sommet de la parabole, obtenu en annulant $2c\mu_0-2b$, est atteint en $\mu_0=b/c$ : c'est le <strong>portefeuille de variance minimale globale</strong>, de poids $w=\Sigma^{-1}\mathbf{1}_m/c$. En dessous de ce rendement, la frontière est <strong>inefficiente</strong> : on peut avoir plus de rendement pour la même variance.</p>
+<h2 data-prio="high">Concept 3 — Trois problèmes, une seule frontière</h2>
+<p>Le cours pose deux formulations alternatives du même arbitrage.</p>
+<div class="cal formel"><span class="lab">Problème II — maximisation du rendement espéré.</span>
+<p> Pour une variance cible $\sigma_0^2$ donnée :
+$$\text{Maximise : } E(R_w)=w^T\mu \qquad \text{s.c. } w^T\Sigma w=\sigma_0^2, \quad w^T\mathbf{1}_m=1$$</p>
+</div>
+<div class="cal formel"><span class="lab">Problème III — optimisation par aversion au risque.</span>
+<p> Soit $\lambda\geq0$ l'<strong>indice d'aversion au risque d'Arrow-Pratt</strong>, mesurant l'arbitrage entre risque et rendement :
+$$\text{Maximise : } E(R_w)-\tfrac{\lambda}{2}\mathrm{var}(R_w)=w^T\mu-\tfrac{\lambda}{2}w^T\Sigma w \qquad \text{s.c. } w^T\mathbf{1}_m=1$$</p>
+</div>
+<blockquote>
+<p><strong>Ce qu'il faut retenir.</strong> <em>Les problèmes I, II et III se résolvent par des <strong>lagrangiens équivalents</strong>.</em> Ils décrivent donc <strong>la même</strong> frontière efficiente
+$$\text{Frontière efficiente}=\big\{(\mu_0,\sigma_0^2)=(E(R_{w_0}),\mathrm{var}(R_{w_0}))\ \big|\ w_0 \text{ optimal}\big\}$$
+et l'on parcourt cette frontière en faisant varier $\mu_0$ (problème I), $\sigma_0^2$ (problème II), <strong>ou</strong> $\lambda$ (problème III).</p>
+</blockquote>
+<blockquote>
+<p><strong>Le lien avec la fiche 38.</strong> Le paramètre $\lambda$ du problème III est <strong>exactement</strong> un multiplicateur de Lagrange des problèmes I et II. Faire varier la contrainte ou faire varier son prix dual, c'est le même balayage vu de deux côtés. C'est la lecture « pénalisée » de l'optimisation sous contrainte, et c'est aussi celle de la régularisation en statistique.</p>
+</blockquote>
+<h2 data-prio="must">Concept 4 — L'actif sans risque</h2>
+<p><strong>Hypothèse.</strong> En plus des $m$ actifs risqués, il existe un <strong>actif sans risque</strong> ($i=0$) tel que
+$$R_0\equiv r_0, \quad\text{c.-à-d.}\quad E(R_0)=r_0 \ \text{ et } \ \mathrm{var}(R_0)=0$$</p>
+<p><strong>Le portefeuille.</strong> L'investisseur place $w^T\mathbf{1}_m=\sum_{i=1}^mw_i$ dans les actifs risqués et $1-w^T\mathbf{1}_m$ dans l'actif sans risque. <em>Si l'emprunt est autorisé, $(1-w^T\mathbf{1}_m)$ peut être <strong>négatif</strong></em>.
+$$R_w=w^TR+(1-w^T\mathbf{1}_m)R_0$$
+$$\mu_w=w^T\mu+(1-w^T\mathbf{1}_m)r_0, \qquad \sigma_w^2=w^T\Sigma w$$</p>
+<blockquote>
+<p><strong>Le point technique décisif.</strong> $R_0$ est de <strong>variance nulle</strong> et <strong>non corrélé</strong> avec $R$ : il ne contribue donc <strong>pas du tout</strong> à la variance du portefeuille. La contrainte $w^T\mathbf{1}_m=1$ <strong>disparaît</strong> — il ne reste qu'<strong>une seule</strong> contrainte. C'est ce qui simplifie tout.</p>
+</blockquote>
+<div class="cal formel"><span class="lab">Problème I' — minimisation du risque avec actif sans risque.</span>
+<p>
+$$\text{Minimise : } \tfrac12w^T\Sigma w \qquad \text{s.c. } w^T\mu+(1-w^T\mathbf{1}_m)r_0=\mu_0$$</p>
+</div>
+<p><strong>Résolution.</strong> Le lagrangien s'écrit, en réarrangeant la contrainte,
+$$L(w,\lambda_1)=\tfrac12w^T\Sigma w+\lambda_1\big[(\mu_0-r_0)-w^T(\mu-\mathbf{1}_mr_0)\big]$$
+Les conditions du premier ordre :
+$$\frac{\partial L}{\partial w}=0_m=\Sigma w-\lambda_1[\mu-\mathbf{1}_mr_0], \qquad \frac{\partial L}{\partial\lambda_1}=0=(\mu_0-r_0)-w^T(\mu-\mathbf{1}_mr_0)$$
+d'où
+$$\boxed{\ w_0=\lambda_1\Sigma^{-1}[\mu-\mathbf{1}_mr_0], \qquad \lambda_1=\frac{\mu_0-r_0}{(\mu-\mathbf{1}_mr_0)^T\Sigma^{-1}(\mu-\mathbf{1}_mr_0)}\ }$$
+et l'on place le poids résiduel $(1-w_0^T\mathbf{1}_m)$ dans l'actif sans risque.</p>
+<p><strong>La variance du portefeuille optimal $P$.</strong>
+$$\mathrm{Var}(R_P)=\mathrm{Var}\big(w_0^TR+(1-w_0^T\mathbf{1}_m)r_0\big)=\mathrm{Var}(w_0^TR)=w_0^T\Sigma w_0=\frac{(\mu_0-r_0)^2}{(\mu-\mathbf{1}_mr_0)^T\Sigma^{-1}(\mu-\mathbf{1}_mr_0)}$$</p>
+<blockquote>
+<p><strong>Regardez cette formule.</strong> $\sigma_P^2$ est <strong>proportionnelle au carré</strong> de l'excès de rendement visé $(\mu_0-r_0)$. Donc $\sigma_P$ est <strong>linéaire</strong> en $(\mu_0-r_0)$ : avec un actif sans risque, la frontière efficiente n'est plus une hyperbole mais une <strong>droite</strong> dans le plan $(\sigma,\mu)$. C'est la CML du concept 6.</p>
+</blockquote>
+<p><strong>Le vecteur $\mu-\mathbf{1}_mr_0$ porte un nom</strong> : ce sont les <strong>excès de rendement espérés</strong> (rendements en excès du taux sans risque). Toute la théorie ne dépend des rendements que par ce vecteur — ce qui compte n'est jamais le rendement brut mais <strong>la prime par rapport au sans-risque</strong>.</p>
+<h2 data-prio="must">Concept 5 — Le portefeuille de marché et la séparation de Tobin</h2>
+<p><strong>Définition.</strong> Le <strong>portefeuille de marché</strong> $M$ est le portefeuille optimal <strong>entièrement investi</strong> en actifs risqués :
+$$w_M^T\mathbf{1}_m=1$$
+Or $w_M=\lambda_1\Sigma^{-1}[\mu-\mathbf{1}_mr_0]$ : la condition d'investissement total détermine $\lambda_1$,
+$$\lambda_1(M)=\Big(\mathbf{1}_m^T\Sigma^{-1}[\mu-\mathbf{1}_mr_0]\Big)^{-1}$$</p>
+<p><strong>Ses deux moments.</strong> Avec $R_M=w_M^TR+0\cdot R_0$ :
+$$E(R_M)=w_M^T\mu=\frac{\mu^T\Sigma^{-1}[\mu-\mathbf{1}_mr_0]}{\mathbf{1}_m^T\Sigma^{-1}[\mu-\mathbf{1}_mr_0]}=r_0+\frac{[\mu-\mathbf{1}_mr_0]^T\Sigma^{-1}[\mu-\mathbf{1}_mr_0]}{\mathbf{1}_m^T\Sigma^{-1}[\mu-\mathbf{1}_mr_0]}$$
+$$\mathrm{Var}(R_M)=w_M^T\Sigma w_M=\frac{[\mu-\mathbf{1}_mr_0]^T\Sigma^{-1}[\mu-\mathbf{1}_mr_0]}{\big(\mathbf{1}_m^T\Sigma^{-1}[\mu-\mathbf{1}_mr_0]\big)^2}=\frac{(E(R_M)-r_0)^2}{[\mu-\mathbf{1}_mr_0]^T\Sigma^{-1}[\mu-\mathbf{1}_mr_0]}$$</p>
+<div class="cal formel"><span class="lab">Théorème de séparation de Tobin.</span>
+<p> <em>Tout portefeuille optimal investit dans une <strong>combinaison de l'actif sans risque et du portefeuille de marché</strong>.</em></p>
+</div>
+<p><strong>Démonstration.</strong> Soit $P$ le portefeuille optimal de rendement cible $\mu_0$, de poids risqués $w_P=\lambda_1(P)\Sigma^{-1}[\mu-\mathbf{1}_mr_0]$. <em>$P$ investit dans les <strong>mêmes actifs risqués</strong> que le portefeuille de marché et dans les <strong>mêmes proportions</strong> !</em> La seule différence est le <strong>poids total</strong> $w_M^{\text{tot}}=w_P^T\mathbf{1}_m$ :
+$$w_M^{\text{tot}}=\frac{\lambda_1(P)}{\lambda_1(M)}=\frac{(\mu_0-r_0)\big/\big[(\mu-\mathbf{1}_mr_0)^T\Sigma^{-1}(\mu-\mathbf{1}_mr_0)\big]}{\big(\mathbf{1}_m^T\Sigma^{-1}[\mu-\mathbf{1}_mr_0]\big)^{-1}}=\frac{\mu_0-r_0}{E(R_M)-r_0}$$
+d'où
+$$R_P=(1-w_M^{\text{tot}})r_0+w_M^{\text{tot}}R_M$$
+$$\sigma_P^2=\mathrm{var}(R_P)=\mathrm{var}(w_M^{\text{tot}}R_M)=(w_M^{\text{tot}})^2\sigma_M^2, \qquad E(R_P)=r_0+w_M^{\text{tot}}\big(E(R_M)-r_0\big)$$
+$\blacksquare$</p>
+<div class="cal intu"><span class="lab">Pourquoi c'est un des résultats les plus importants de la finance.</span>
+<p> Le choix du portefeuille se <strong>sépare en deux décisions indépendantes</strong> : (1) <strong>quels actifs risqués détenir</strong>, et dans quelles proportions — la réponse est la <strong>même pour tout le monde</strong>, c'est $M$, et elle ne dépend pas des préférences ; (2) <strong>combien</strong> placer dans le risqué plutôt que dans le sans-risque — c'est là, et là seulement, qu'intervient l'aversion au risque de chacun.</p>
+<p><strong>Conséquence industrielle directe :</strong> c'est la justification théorique de la gestion <strong>indicielle</strong>. Si tout le monde détient le même portefeuille risqué, ce portefeuille <em>est</em> le marché, et il suffit d'acheter l'indice.</p>
+</div>
+<h2 data-prio="high">Concept 6 — Droite de marché des capitaux et prix du risque</h2>
+<p><strong>Définition.</strong> La <strong>Capital Market Line (CML)</strong> est la frontière efficiente des portefeuilles optimaux, représentée dans le plan $(\sigma_P,\mu_P)$ — écart-type contre rendement espéré :
+$$\text{CML}=\big\{(\sigma_P,\mu_P)=\big(\sigma_P,\ r_0+w_M^{\text{tot}}(\mu_M-r_0)\big),\ w_M^{\text{tot}}\geq0\big\}$$</p>
+<p><strong>Prime de risque et prix du risque.</strong> En partant de $E(R_P)=r_0+w_M^{\text{tot}}[E(R_M)-r_0]$ et de $\sigma_P=w_M^{\text{tot}}\sigma_M$ :
+$$E(R_P)=r_0+\frac{\sigma_P}{\sigma_M}\big[E(R_M)-r_0\big]=\boxed{\ r_0+\sigma_P\cdot\frac{E(R_M)-r_0}{\sigma_M}\ }$$</p>
+<blockquote>
+<p><strong>La quantité $\dfrac{E(R_M)-r_0}{\sigma_M}$ est le « prix de marché du risque » (<em>Market Price of Risk</em>).</strong> <em>Le rendement espéré du portefeuille $P$ croît <strong>linéairement</strong> avec son risque $\sigma_P$.</em></p>
+</blockquote>
+<p class="cal piege"> <strong>C'est le ratio de Sharpe du portefeuille de marché.</strong> Il donne le <strong>taux de change</strong> entre risque et rendement : une unité d'écart-type supplémentaire « s'achète » exactement ce nombre de points de rendement espéré. Aucun portefeuille ne peut faire mieux — la CML est une <strong>borne supérieure</strong> pour tous les portefeuilles réalisables.</p>
+<p><strong>Les articles fondateurs cités par le cours</strong> : Markowitz (1952) « Portfolio Selection », <em>Journal of Finance</em> · Tobin (1958) « Liquidity Preference as a Behavior Towards Risk », <em>Review of Economic Studies</em> · Sharpe (1964) « Capital Asset Prices », <em>Journal of Finance</em> · Lintner (1965), <em>Review of Economics and Statistics</em> · Fama (1970) « Efficient Capital Markets », <em>Journal of Finance</em>.</p>
+<h2 data-prio="high">Concept 7 — L'utilité de von Neumann-Morgenstern</h2>
+<p>Jusqu'ici la moyenne-variance a été <strong>postulée</strong>. Ce concept demande : est-elle <strong>rationnelle</strong> ?</p>
+<blockquote>
+<p><em>Le choix rationnel de portefeuille doit appliquer des préférences fondées sur l'<strong>utilité espérée</strong>, et le portefeuille optimal résout le <strong>problème de maximisation de l'utilité espérée</strong>.</em></p>
+</blockquote>
+<p><strong>Le cadre.</strong> Un investisseur de richesse initiale $W_0$ ; l'<strong>action</strong> est le choix du portefeuille $P$ (vecteur de poids $w_P$) ; le <strong>résultat</strong> est la richesse après une période
+$$W=W_0[1+R_P]$$
+La <strong>fonction d'utilité</strong> $u(W):[0,\infty)\to\mathbb{R}$ est une <em>mesure quantitative de la valeur du résultat pour l'investisseur</em>, et l'on maximise
+$$E[u(W)]=E\big[u(W_0[1+R_P])\big]$$</p>
+<p><strong>Propriétés de base.</strong></p>
+<table>
+<thead>
+<tr>
+<th>Propriété</th>
+<th>Signification</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$u'(W)&gt;0$</td>
+<td><strong>croissante</strong> — toujours : plus de richesse vaut mieux que moins</td>
+</tr>
+<tr>
+<td>$u''(W)&lt;0$</td>
+<td><strong>utilité marginale décroissante</strong> — typiquement : le millionième euro apporte moins que le premier</td>
+</tr>
+</tbody></table>
+<p><strong>Les deux mesures d'aversion au risque.</strong>
+$$\text{Aversion absolue : } A(W)=-\frac{u''(W)}{u'(W)}, \qquad \text{Aversion relative : } R(W)=-\frac{W\,u''(W)}{u'(W)}$$</p>
+<h3>Le pont vers la moyenne-variance</h3>
+<p>Si $u$ est régulière (dérivées bornées à l'ordre voulu), le développement de Taylor autour de $\bar w$ donne
+$$u(W)\approx u(\bar w)+u'(\bar w)(W-\bar w)+\tfrac12u''(\bar w)(W-\bar w)^2+\cdots$$
+$$=(\text{constantes})+u'(\bar w)\Big[W-\tfrac12A(\bar w)(W-\bar w)^2\Big]+\cdots$$
+En prenant l'espérance et en posant $\bar w=E[W]$ :
+$$E[u(W)]\ \approx\ E\Big[W-\tfrac{\lambda}{2}(W-\bar w)^2\Big]\ =\ E[W]-\frac{\lambda}{2}\mathrm{Var}[W], \qquad \lambda=A(\bar w)$$</p>
+<blockquote>
+<p><strong>Voilà la justification.</strong> <em>Maximiser l'utilité espérée revient, au second ordre, à maximiser $E[W]-\frac{\lambda}{2}\mathrm{Var}[W]$</em> — <strong>exactement le problème III</strong> du concept 3, avec $\lambda=A(\bar w)$ l'indice d'aversion au risque d'Arrow-Pratt. La moyenne-variance n'est donc pas un caprice : c'est l'<strong>approximation du second ordre</strong> de la théorie de l'utilité.</p>
+</blockquote>
+<p class="cal piege"> <strong>Mais c'est une approximation.</strong> Elle néglige les termes en $(W-\bar w)^3$ et au-delà — <strong>asymétrie et kurtosis</strong>. Le concept 10 montre exactement ce qu'on perd.</p>
+<p><strong>Le catalogue des fonctions d'utilité.</strong></p>
+<table>
+<thead>
+<tr>
+<th>Utilité</th>
+<th>Forme</th>
+<th>Propriété</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Linéaire</strong></td>
+<td>$u(W)=a+bW,\ b&gt;0$</td>
+<td>neutre au risque ($u''=0$)</td>
+</tr>
+<tr>
+<td><strong>Quadratique</strong></td>
+<td>$u(W)=W-\tfrac{\lambda}{2}W^2,\ \lambda&gt;0$, $W&lt;\lambda^{-1}$</td>
+<td>reproduit <strong>exactement</strong> la moyenne-variance</td>
+</tr>
+<tr>
+<td><strong>Exponentielle</strong></td>
+<td>$u(W)=1-e^{-\lambda W},\ \lambda&gt;0$</td>
+<td><strong>CARA</strong> — aversion absolue constante</td>
+</tr>
+<tr>
+<td><strong>Puissance</strong></td>
+<td>$u(W)=W^{(1-\gamma)},\ 0&lt;\gamma&lt;1$</td>
+<td><strong>CRRA</strong> — aversion relative constante</td>
+</tr>
+<tr>
+<td><strong>Logarithmique</strong></td>
+<td>$u(W)=\ln(W)$</td>
+<td>CRRA avec $\gamma=1$</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>La quadratique est le seul cas où la moyenne-variance est exacte</strong> — puisque le développement de Taylor s'arrête au second ordre. C'est aussi son défaut : $u'(W)=1-\lambda W$ devient <strong>négatif</strong> pour $W&gt;1/\lambda$, d'où la restriction du domaine ; au-delà, l'investisseur préférerait être moins riche.</p>
+</blockquote>
+<h2 data-prio="mid">Concept 8 — Les contraintes d'optimisation en pratique</h2>
+<p>Le problème de Markowitz nu ne s'utilise jamais tel quel. Le cours liste les contraintes standard.</p>
+<p><strong>Contraintes simples sur les positions.</strong></p>
+<table>
+<thead>
+<tr>
+<th>Contrainte</th>
+<th>Formulation</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Long seulement</strong></td>
+<td>$w_j\geq0,\ \forall j$</td>
+</tr>
+<tr>
+<td><strong>Bornes de détention</strong></td>
+<td>$L_i\leq w_i\leq U_i$, avec $L,U$ bornes inférieures et supérieures des $m$ positions</td>
+</tr>
+<tr>
+<td><strong>Rotation (turnover)</strong></td>
+<td>$\lvert\Delta w_j\rvert\leq U_i$ par actif, et $\sum_{i=1}^m\lvert\Delta w_j\rvert\leq U$ pour le portefeuille</td>
+</tr>
+</tbody></table>
+<p><strong>Contraintes d'exposition à un indice de référence.</strong> Soit $w_B$ les poids d'un portefeuille <strong>benchmark</strong> (S&amp;P 500, NASDAQ 100, Russell 1000/2000) de rendement $R_B=w_B^TR$ :
+$$\lvert w-w_B\rvert=\sum_{i=1}^m\big\lvert[w-w_B]_i\big\rvert&lt;U_B$$</p>
+<p><strong>Contrainte d'erreur de suivi (<em>tracking error</em>).</strong> On calcule la variance de l'erreur de suivi
+$$TE_P=(R_P-R_B)=[w-w_B]^TR$$
+$$\mathrm{var}(TE_P)=\mathrm{var}\big([w-w_B]^TR\big)=[w-w_B]^T\mathrm{Cov}(R)[w-w_B]=[w-w_B]^T\Sigma[w-w_B]$$
+et l'on impose
+$$[w-w_B]^T\Sigma[w-w_B]\ \leq\ \sigma_{TE}^2$$</p>
+<blockquote>
+<p><strong>C'est la contrainte reine de la gestion institutionnelle.</strong> Un gérant n'est presque jamais jugé sur son rendement absolu mais sur son <strong>écart au benchmark</strong>. Noter que c'est une <strong>contrainte quadratique convexe</strong> : le problème reste un QCQP convexe (fiche 37).</p>
+</blockquote>
+<p><strong>Contraintes sur les facteurs de risque.</strong> Pour un modèle à facteurs
+$$R_{i,t}=\alpha_i+\sum_{k=1}^K\beta_{i,k}f_{k,t}+\varepsilon_{i,t}$$
+on limite l'exposition au facteur $k$ par $\big\lvert\sum_{i=1}^m\beta_{i,k}w_i\big\rvert&lt;U_k$, ou l'on <strong>neutralise</strong> toutes les expositions :
+$$\Big\lvert\sum_{i=1}^m\beta_{i,k}w_i\Big\rvert=0, \qquad k=1,\dots,K$$</p>
+<p><strong>Autres contraintes</strong> : taille minimale de transaction, taille minimale de position, <strong>contraintes d'intégrité</strong> (nombre entier de titres).</p>
+<p class="cal piege"> <strong>Ces trois dernières changent la nature du problème.</strong> Taille minimale et contraintes entières rendent le domaine <strong>non convexe</strong> : on quitte le QP et l'on entre dans la <strong>programmation en nombres entiers mixte</strong> (fiche 33), avec un branch-and-bound et un coût de résolution sans commune mesure.</p>
+<p><strong>La forme générale.</strong> Avec $w$ le portefeuille cible, $x=w-w_0$ les transactions depuis le portefeuille courant $w_0$, et $w_B$ le benchmark :</p>
+<p>$$\textbf{Contraintes linéaires : } A_ww\leq u_w, \qquad A_xx\leq u_x, \qquad A_B(w-w_B)\leq u_B$$
+$$\textbf{Contraintes quadratiques : } w^TQ_ww\leq q_w, \qquad x^TQ_xx\leq q_x, \qquad (w-w_B)^TQ_B(w-w_B)\leq q_B$$</p>
+<h2 data-prio="mid">Concept 9 — Estimer $\mu$ et $\Sigma$</h2>
+<p><strong>La méthode par défaut : moyennes et covariances empiriques.</strong> Elle se justifie par trois arguments — ce sont des estimateurs des <strong>moindres carrés</strong>, ils sont <strong>sans biais</strong>, et ce sont les estimateurs du <strong>maximum de vraisemblance</strong> sous certaines hypothèses gaussiennes (voir la fiche 50).</p>
+<p><strong>Les deux problèmes.</strong></p>
+<ol>
+<li><strong>Le choix de la période d'estimation.</strong></li>
+<li><strong>L'impact de l'erreur d'estimation (!!)</strong> — le double point d'exclamation est celui du cours.</li>
+</ol>
+<div class="cal intu"><span class="lab">Pourquoi ce point est critique.</span>
+<p> L'optimiseur de Markowitz prend $\hat\mu$ et $\hat\Sigma$ pour la vérité. Or il <strong>maximise sur les erreurs</strong> : les actifs dont le rendement a été surestimé par hasard reçoivent des poids énormes. On parle d'<em>« estimation error maximizer »</em>. Et $\Sigma^{-1}$ empire tout : avec $m$ grand devant le nombre d'observations, $\hat\Sigma$ est mal conditionnée, voire singulière — son inverse amplifie le bruit.</p>
+</div>
+<p><strong>Les alternatives listées par le cours.</strong></p>
+<ul>
+<li>Appliquer des <strong>moyennes mobiles exponentielles</strong> (pondérer davantage le passé récent).</li>
+<li>Appliquer des <strong>modèles à facteurs dynamiques</strong>.</li>
+<li>Conduire l'optimisation avec des <strong>modèles simples alternatifs</strong> : le <strong>modèle à indice unique</strong> de Sharpe, ou le <strong>modèle à corrélation constante</strong>.</li>
+</ul>
+<blockquote>
+<p><strong>La logique commune de ces alternatives : réduire le nombre de paramètres.</strong> Estimer $\Sigma$ librement demande $m(m+1)/2$ paramètres — pour $m=500$, plus de $125\,000$. Un modèle à un facteur en demande de l'ordre de $2m$. Moins de paramètres, plus de biais, mais <strong>beaucoup</strong> moins de variance : c'est l'arbitrage biais-variance appliqué à la matrice de covariance.</p>
+</blockquote>
+<h2 data-prio="must">Concept 10 — Mesures de risque alternatives</h2>
+<p>Pour un portefeuille $P$ de poids $w_P$, avec $R_P=w_P^TR$ et $R\sim(\mu,\Sigma)$, on considère des problèmes d'optimisation <strong>remplaçant la variance</strong> par d'autres mesures.</p>
+<p><strong>Écart absolu moyen (MAD).</strong>
+$$MAD(R_P)=E\big(\lvert w^T(R_P-\mu)\rvert\big)=E\Big(\Big\lvert\sum_{i=1}^mw_i(R_i-\mu_i)\Big\rvert\Big)$$
+<em>Résolution par <strong>programmation linéaire</strong> avec contraintes linéaires ou quadratiques.</em></p>
+<p><strong>Semi-variance.</strong>
+$$SemiVar(R_P)=E\Big[\min\big(R_P-E[R_P],\,0\big)^2\Big]$$
+<em>Variance <strong>du côté des pertes</strong> (pondérée par les probabilités).</em></p>
+<blockquote>
+<p><strong>L'idée derrière la semi-variance.</strong> La variance pénalise identiquement les écarts <strong>au-dessus</strong> et <strong>au-dessous</strong> de la moyenne. Or un investisseur ne se plaint pas des bonnes surprises. La semi-variance ne compte que la partie négative.</p>
+</blockquote>
+<p><strong>Value-at-Risk (VaR).</strong> <em>Méthodologie RiskMetrics développée par JP Morgan. La VaR est l'ampleur de la perte au centile qui n'arrive que rarement, c'est-à-dire avec probabilité $\alpha$ ($=0{,}05$, $0{,}01$ ou $0{,}001$) :</em>
+$$VaR_{1-\alpha}(R_P)=\min\{r:\ \Pr(R_P\leq-r)\leq\alpha\}$$
+Usage : <strong>suivi et reporting</strong> des expositions au risque des portefeuilles de trading.</p>
+<p class="cal piege"> <strong>Le défaut fondamental de la VaR.</strong> <em>Elle n'est ni convexe ni sous-additive :</em>
+$$VaR(R_{P_1}+R_{P_2})\ \leq\ VaR(R_{P_1})+VaR(R_{P_2}) \qquad \textbf{peut être faux}$$
+<em>Autrement dit, <strong>la VaR ne s'améliore pas avec la diversification</strong>.</em> Une mesure de risque qui peut punir la diversification est une mesure de risque cassée — et le fait qu'elle ne soit pas convexe la rend en plus pénible à optimiser.</p>
+<p><strong>Conditional Value-at-Risk (CVaR).</strong> Aussi appelée <em>expected shortfall</em>, <em>expected tail loss</em>, ou <em>tail VaR</em> :
+$$CVaR_{1-\alpha}(R_P)=E\big[-R_P\ \big\vert\ -R_P\geq VaR_{1-\alpha}(R_P)\big]$$
+<em>Voir Rockafellar et Uryasev (2000) pour l'optimisation de la CVaR.</em></p>
+<blockquote>
+<p><strong>La différence en une phrase.</strong> La VaR dit « <strong>à partir de quel seuil</strong> la perte devient rare » ; la CVaR dit « <strong>combien on perd en moyenne quand on dépasse ce seuil</strong> ». La VaR ignore complètement la forme de la queue au-delà du seuil — deux portefeuilles de même VaR peuvent avoir des pertes extrêmes totalement différentes.</p>
+</blockquote>
+<h3>Les mesures de risque cohérentes</h3>
+<div class="cal formel"><span class="lab">Définition.</span>
+<p> Une mesure de risque $s(\cdot)$ sur les distributions de rendement de portefeuille est <strong>cohérente</strong> si elle a les quatre propriétés suivantes :</p>
+<table>
+<thead>
+<tr>
+<th>Axiome</th>
+<th>Énoncé</th>
+<th>Sens</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Monotonie</strong></td>
+<td>si $R_P\geq R_{P'}$ presque sûrement, alors $s(R_P)\leq s(R_{P'})$</td>
+<td>un portefeuille toujours meilleur est moins risqué</td>
+</tr>
+<tr>
+<td><strong>Sous-additivité</strong></td>
+<td>$s(R_P+R_{P'})\leq s(R_P)+s(R_{P'})$</td>
+<td><strong>la diversification ne peut pas nuire</strong></td>
+</tr>
+<tr>
+<td><strong>Homogénéité positive</strong></td>
+<td>$s(cR_P)=c\,s(R_P)$ pour tout réel $c&gt;0$</td>
+<td>doubler la position double le risque</td>
+</tr>
+<tr>
+<td><strong>Invariance par translation</strong></td>
+<td>$s(R_P+a)=s(R_P)-a$ pour tout réel $a$</td>
+<td>ajouter du cash réduit le risque d'autant</td>
+</tr>
+</tbody></table>
+</div>
+<blockquote>
+<p><strong>Le verdict du cours.</strong></p>
+<ul>
+<li>$\mathrm{Var}(R_P)$ <strong>n'est pas cohérente</strong> — elle n'est pas monotone.</li>
+<li>La <strong>VaR n'est pas cohérente</strong> — elle n'est pas sous-additive.</li>
+<li>La <strong>CVaR est cohérente</strong>.</li>
+</ul>
+</blockquote>
+<p class="cal piege"> <strong>C'est l'argument technique qui a fait basculer la régulation bancaire</strong> de la VaR vers l'expected shortfall. Et pour l'optimisation, la sous-additivité + l'homogénéité positive donnent la <strong>convexité</strong> : minimiser la CVaR est un problème convexe, minimiser la VaR ne l'est pas.</p>
+<h3>Risque, asymétrie et kurtosis</h3>
+<p>En poussant le développement de Taylor de $u(W)$ deux ordres plus loin, avec $\bar w=E(W)$ et $W=W_0(1+R_P)$ :
+$$u(W)=u(\bar w)+u'(\bar w)(W-\bar w)+\tfrac12u''(\bar w)(W-\bar w)^2+\tfrac{1}{3!}u^{(3)}(\bar w)(W-\bar w)^3+\tfrac{1}{4!}u^{(4)}(\bar w)(W-\bar w)^4+O[(W-\bar w)^5]$$
+En prenant l'espérance :
+$$E[u(W)]=u(\bar w)+0+\tfrac12u''(\bar w)\mathrm{var}(W)+\tfrac{1}{3!}u^{(3)}(\bar w)\,\mathrm{Skew}(W)+\tfrac{1}{4!}u^{(4)}(\bar w)\,\mathrm{Kurtosis}(W)+O[(W-\bar w)^5]$$</p>
+<blockquote>
+<p><strong>Optimisation de portefeuille avec moments supérieurs.</strong>
+$$\text{Max : } E(R_P)-\lambda_1\mathrm{Var}(R_P)+\lambda_2\mathrm{Skew}(R_P)-\lambda_3\mathrm{Kurtosis}(R_P) \qquad \text{s.c. } w^T\mathbf{1}_m=1$$</p>
+</blockquote>
+<p><strong>Les remarques du cours.</strong></p>
+<ul>
+<li>Une <strong>asymétrie positive plus élevée est préférée</strong> (beaucoup de petites pertes, quelques gros gains).</li>
+<li>Des <strong>moments pairs plus faibles</strong> peuvent être préférés (moins de dispersion).</li>
+<li>L'<strong>estimation de l'asymétrie et de la kurtosis est complexe</strong> : sensibilité aux valeurs aberrantes, et nécessité de <strong>grands échantillons</strong>.</li>
+<li>Approches d'optimisation : méthodes <strong>multi-objectifs</strong>, <strong>programmation polynomiale par objectifs (PGP)</strong>.</li>
+</ul>
+<p class="cal piege"> <strong>Le signe des $\lambda$ n'est pas arbitraire</strong> : il vient des signes des dérivées de $u$. $u''&lt;0$ donne le $-\lambda_1$ devant la variance ; $u^{(3)}&gt;0$ (prudence) donne le $+\lambda_2$ devant l'asymétrie ; $u^{(4)}&lt;0$ donne le $-\lambda_3$ devant la kurtosis. La forme du critère <strong>dérive</strong> de la théorie de l'utilité.</p>
+<h2>Comment résoudre l'exercice type (protocole)</h2>
+<ol>
+<li><strong>Poser les données</strong> : $\mu$, $\Sigma$, $r_0$, la cible ($\mu_0$, $\sigma_0^2$, ou $\lambda$).</li>
+<li><strong>Écrire le lagrangien</strong> avec un multiplicateur par contrainte.</li>
+<li><strong>Dériver par rapport à $w$</strong> et résoudre $\Sigma w=\ldots$, soit $w=\Sigma^{-1}(\ldots)$.</li>
+<li><strong>Substituer dans les contraintes</strong> pour obtenir un petit système en les multiplicateurs ($2\times2$ sans actif sans risque, $1\times1$ avec).</li>
+<li><strong>Calculer</strong> $a=\mu^T\Sigma^{-1}\mu$, $b=\mu^T\Sigma^{-1}\mathbf{1}_m$, $c=\mathbf{1}_m^T\Sigma^{-1}\mathbf{1}_m$ si le problème est sans actif sans risque.</li>
+<li><strong>Conclure</strong> : $\sigma_0^2=(c\mu_0^2-2b\mu_0+a)/(ac-b^2)$, ou la formule linéaire de la CML avec actif sans risque.</li>
+<li><strong>Vérifier le signe</strong> des poids et la cohérence économique (poids extrêmes ⟹ erreur d'estimation).</li>
+</ol>
+<h3>Comment reconnaître qu'il faut utiliser cette méthode ?</h3>
+<table>
+<thead>
+<tr>
+<th>Indice dans l'énoncé</th>
+<th>Ce qu'il faut faire</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>« rendement cible » + « minimiser le risque »</td>
+<td>Problème I, lagrangien à <strong>deux</strong> multiplicateurs</td>
+</tr>
+<tr>
+<td>« il existe un actif sans risque » ou « taux $r_0$ »</td>
+<td>Problème I', <strong>une seule</strong> contrainte, la frontière devient une <strong>droite</strong></td>
+</tr>
+<tr>
+<td>« quelle proportion investir dans l'indice ? »</td>
+<td>Séparation de Tobin : $w_M^{\text{tot}}=(\mu_0-r_0)/(E(R_M)-r_0)$</td>
+</tr>
+<tr>
+<td>« aversion au risque $\lambda$ »</td>
+<td>Problème III, maximiser $w^T\mu-\frac{\lambda}{2}w^T\Sigma w$</td>
+</tr>
+<tr>
+<td>« erreur de suivi » ou « benchmark »</td>
+<td>Contrainte <strong>quadratique</strong> sur $[w-w_B]^T\Sigma[w-w_B]$</td>
+</tr>
+<tr>
+<td>« perte à 99 % » ou « perte extrême »</td>
+<td>VaR / CVaR — et penser à la <strong>cohérence</strong></td>
+</tr>
+<tr>
+<td>« la diversification n'aide pas »</td>
+<td>C'est le contre-exemple de <strong>sous-additivité</strong> de la VaR</td>
+</tr>
+</tbody></table>
+<h3>Exercices progressifs</h3>
+<p><strong> Niveau 1</strong> — Pourquoi la frontière efficiente devient-elle une droite dès qu'un actif sans risque est disponible ?</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p>Parce que la variance du portefeuille optimal est
+$$\sigma_P^2=\frac{(\mu_0-r_0)^2}{(\mu-\mathbf{1}_mr_0)^T\Sigma^{-1}(\mu-\mathbf{1}_mr_0)}$$
+donc $\sigma_P$ est <strong>proportionnel à $\lvert\mu_0-r_0\rvert$</strong>. Dans le plan $(\sigma_P,\mu_P)$, la relation est donc <strong>affine</strong> :
+$$\mu_0=r_0+\sigma_P\sqrt{(\mu-\mathbf{1}_mr_0)^T\Sigma^{-1}(\mu-\mathbf{1}_mr_0)}$$</p>
+<p><strong>La raison structurelle.</strong> L'actif sans risque a une variance nulle <strong>et</strong> une corrélation nulle avec tout le reste. Mélanger $R_0$ et un portefeuille risqué fixe dans les proportions $(1-t,t)$ donne $\mu=r_0+t(\mu_M-r_0)$ et $\sigma=t\sigma_M$ : les deux coordonnées sont <strong>linéaires en $t$</strong>, donc le mélange trace un <strong>segment de droite</strong>. Cette droite part de $(0,r_0)$ et touche l'hyperbole des actifs risqués en un seul point — le portefeuille de marché.</p>
+</div></details>
+
+<p><strong> Niveau 2</strong> — Un portefeuille vise $\mu_0=9\,\%$. On a $r_0=2\,\%$ et $E(R_M)=7\,\%$. Quelle fraction investir dans le portefeuille de marché ?</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p>Par la séparation de Tobin :
+$$w_M^{\text{tot}}=\frac{\mu_0-r_0}{E(R_M)-r_0}=\frac{0{,}09-0{,}02}{0{,}07-0{,}02}=\frac{0{,}07}{0{,}05}=1{,}4$$</p>
+<p>On investit <strong>140 %</strong> de la richesse dans le portefeuille de marché, et $1-1{,}4=-0{,}4$ dans l'actif sans risque : on <strong>emprunte 40 %</strong> de sa richesse au taux $r_0$ pour l'investir dans le marché. C'est un portefeuille à <strong>effet de levier</strong>.</p>
+<p>Le risque suit : $\sigma_P=1{,}4\,\sigma_M$. Viser un rendement supérieur à celui du marché coûte $40\,\%$ de risque supplémentaire, exactement.</p>
+<p class="cal piege"> <strong>Ce calcul suppose qu'on peut emprunter au taux sans risque</strong> — hypothèse du modèle, rarement vraie en pratique. Si le taux d'emprunt dépasse $r_0$, la CML se <strong>casse</strong> en un coude au point $w_M^{\text{tot}}=1$.</p>
+</div></details>
+
+<p><strong> Niveau 3</strong> — Montrez que le portefeuille de variance minimale globale ne dépend pas de $\mu$.</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p><strong>Étape 1.</strong> La variance sur la frontière vaut $\sigma_0^2(\mu_0)=(c\mu_0^2-2b\mu_0+a)/(ac-b^2)$. En annulant la dérivée :
+$$\frac{d\sigma_0^2}{d\mu_0}=\frac{2c\mu_0-2b}{ac-b^2}=0 \qquad\Longrightarrow\qquad \mu_0^\star=\frac bc$$</p>
+<p><strong>Étape 2.</strong> On résout le système $\binom{\mu_0^\star}{1}=\binom{a\ b}{b\ c}\binom{\lambda_1}{\lambda_2}$ en $\mu_0^\star=b/c$. La seconde ligne donne $1=\lambda_1b+\lambda_2c$ et la première $b/c=\lambda_1a+\lambda_2b$. En éliminant : $\lambda_1(ac-b^2)=0$, donc $\lambda_1=0$ (puisque $ac-b^2&gt;0$ par Cauchy-Schwarz appliqué au produit scalaire $\langle x,y\rangle=x^T\Sigma^{-1}y$), puis $\lambda_2=1/c$.</p>
+<p><strong>Étape 3.</strong> Donc
+$$w^\star=0\cdot\Sigma^{-1}\mu+\frac1c\Sigma^{-1}\mathbf{1}_m=\frac{\Sigma^{-1}\mathbf{1}_m}{\mathbf{1}_m^T\Sigma^{-1}\mathbf{1}_m}$$
+<strong>$\mu$ n'apparaît nulle part.</strong></p>
+<p><strong>Pourquoi c'est important en pratique.</strong> Les rendements espérés sont <strong>beaucoup</strong> plus difficiles à estimer que les covariances — l'erreur d'estimation sur $\hat\mu$ est de l'ordre de grandeur de $\hat\mu$ lui-même sur des échantillons réalistes. Le portefeuille de variance minimale n'en a pas besoin, ce qui explique sa robustesse empirique remarquable et sa popularité industrielle.</p>
+</div></details>
+
+<p><strong> Niveau 4 — type examen</strong> — Construisez un exemple montrant que la VaR n'est pas sous-additive, et expliquez pourquoi la CVaR échappe au problème.</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p><strong>Le contre-exemple.</strong> Deux obligations indépendantes, chacune valant $100$ si elle ne fait pas défaut et $0$ sinon, avec une probabilité de défaut de $4\,\%$. Prenons $\alpha=5\,\%$.</p>
+<p><strong>Étape 1 — VaR de chaque obligation seule.</strong> La perte vaut $100$ avec probabilité $0{,}04$ et $0$ avec probabilité $0{,}96$. Comme $\Pr(\text{perte}&gt;0)=0{,}04\leq0{,}05$, le quantile à $95\,\%$ de la perte est $0$ :
+$$VaR_{0{,}95}(P_1)=VaR_{0{,}95}(P_2)=0$$</p>
+<p><strong>Étape 2 — VaR du portefeuille des deux.</strong> Le nombre de défauts suit une binomiale $\mathcal{B}(2;0{,}04)$ :
+$$\Pr(0\text{ défaut})=0{,}9216, \quad \Pr(1\text{ défaut})=0{,}0768, \quad \Pr(2\text{ défauts})=0{,}0016$$
+La probabilité d'au moins un défaut vaut $0{,}0784&gt;0{,}05$. Le quantile à $95\,\%$ de la perte est donc $100$ :
+$$VaR_{0{,}95}(P_1+P_2)=100 \ &gt;\ 0+0=VaR_{0{,}95}(P_1)+VaR_{0{,}95}(P_2)$$</p>
+<p><strong>La sous-additivité est violée</strong>, et de la pire manière : <strong>diversifier a fait exploser</strong> la mesure de risque, alors que le portefeuille diversifié est manifestement le moins risqué des trois.</p>
+<p><strong>Étape 3 — pourquoi la CVaR échappe au problème.</strong> La VaR est un <strong>quantile</strong> : elle ne regarde qu'<strong>un point</strong> de la distribution et est aveugle à tout ce qui se passe au-delà. Sur chaque obligation isolée, la perte de $100$ existe bien, mais elle est <strong>juste au-delà</strong> du seuil de $5\,\%$ : la VaR ne la voit pas.</p>
+<p>La CVaR, elle, est une <strong>moyenne de la queue</strong> — elle intègre <em>tout</em> ce qui dépasse le seuil. Sur une obligation seule :
+$$CVaR_{0{,}95}(P_1)=E[\text{perte}\mid\text{perte}\geq0]\ \text{ pondérée sur les }5\,\%\text{ pires}=\frac{0{,}04\times100}{0{,}05}=80$$
+La perte extrême est <strong>comptée</strong>, et la sous-additivité est rétablie.</p>
+<p><strong>La leçon générale.</strong> Un quantile n'est pas une moyenne, et seules les moyennes se comportent bien vis-à-vis de l'addition. C'est aussi pour cela que $CVaR$ est <strong>convexe</strong> (c'est un supremum de fonctions linéaires, par la représentation de Rockafellar-Uryasev) alors que $VaR$ ne l'est pas — et donc que minimiser la CVaR est un problème convexe traitable, contrairement à la VaR.</p>
+</div></details>
+
+<h2 data-prio="must">Common mistakes</h2>
+<ol>
+<li><strong>Oublier la contrainte $w^T\mathbf{1}_m=1$</strong> en présence d'un actif sans risque — elle <strong>disparaît</strong>, puisque le résidu $1-w^T\mathbf{1}_m$ est absorbé par $R_0$.</li>
+<li><strong>Croire que le portefeuille de marché dépend des préférences</strong> — il n'en dépend pas : c'est tout le contenu de la séparation de Tobin. Seul le <strong>poids total</strong> en dépend.</li>
+<li><strong>Confondre les deux plans</strong> : la frontière est une <strong>parabole</strong> dans $(\mu,\sigma^2)$ et une <strong>hyperbole</strong> dans $(\sigma,\mu)$. La CML est une droite dans $(\sigma,\mu)$, pas dans $(\sigma^2,\mu)$.</li>
+<li><strong>Prendre toute la frontière pour efficiente</strong> — la branche située sous le portefeuille de variance minimale ($\mu_0&lt;b/c$) est <strong>dominée</strong>.</li>
+<li><strong>Traiter $\hat\mu$ et $\hat\Sigma$ comme exacts</strong> — l'optimiseur <strong>maximise sur les erreurs d'estimation</strong> et produit des poids extrêmes.</li>
+<li><strong>Croire que la variance est une mesure de risque cohérente</strong> — elle <strong>n'est pas monotone</strong>.</li>
+<li><strong>Utiliser la VaR pour agréger des risques</strong> — elle <strong>n'est pas sous-additive</strong> : la somme des VaR peut être inférieure à la VaR de la somme.</li>
+<li><strong>Oublier le domaine de l'utilité quadratique</strong> — $u'(W)=1-\lambda W$ devient négatif au-delà de $W=1/\lambda$.</li>
+<li><strong>Ajouter des contraintes de taille minimale sans changer de solveur</strong> — le problème devient <strong>non convexe</strong> et sort de la programmation quadratique.</li>
+</ol>
+<h2>Ultimate Review</h2>
+<ol>
+<li><strong>Cadre</strong> : $R\in\mathbb{R}^m$, $E[R]=\mu$, $\mathrm{Cov}[R]=\Sigma$ ; portefeuille $w$ avec $w^T\mathbf{1}_m=1$ ; $\mu_w=w^T\mu$, $\sigma_w^2=w^T\Sigma w$.</li>
+<li><strong>Problème I</strong> : $\min\frac12w^T\Sigma w$ s.c. $w^T\mu=\mu_0$, $w^T\mathbf{1}_m=1$ ⟹ $w_0=\lambda_1\Sigma^{-1}\mu+\lambda_2\Sigma^{-1}\mathbf{1}_m$ (<strong>théorème des deux fonds</strong>).</li>
+<li><strong>Scalaires</strong> $a=\mu^T\Sigma^{-1}\mu$, $b=\mu^T\Sigma^{-1}\mathbf{1}_m$, $c=\mathbf{1}_m^T\Sigma^{-1}\mathbf{1}_m$ ; $\binom{\mu_0}{1}=\binom{a\ b}{b\ c}\binom{\lambda_1}{\lambda_2}$.</li>
+<li><strong>Frontière</strong> : $\sigma_0^2=(c\mu_0^2-2b\mu_0+a)/(ac-b^2)$, <strong>parabole</strong> en $\mu_0$ ; minimum global en $\mu_0=b/c$, atteint par $w=\Sigma^{-1}\mathbf{1}_m/c$ (indépendant de $\mu$).</li>
+<li><strong>Trois problèmes équivalents</strong> : risque minimal (I), rendement maximal (II), aversion au risque $\lambda$ (III) — mêmes lagrangiens, même frontière.</li>
+<li><strong>Avec actif sans risque</strong> : $w_0=\lambda_1\Sigma^{-1}[\mu-\mathbf{1}_mr_0]$, $\lambda_1=(\mu_0-r_0)/[(\mu-\mathbf{1}_mr_0)^T\Sigma^{-1}(\mu-\mathbf{1}_mr_0)]$ ; $\sigma_P$ <strong>linéaire</strong> en $\mu_0-r_0$.</li>
+<li><strong>Portefeuille de marché</strong> : $w_M^T\mathbf{1}_m=1$, $\lambda_1(M)=(\mathbf{1}_m^T\Sigma^{-1}[\mu-\mathbf{1}_mr_0])^{-1}$.</li>
+<li><strong>Tobin</strong> : tout portefeuille optimal est un mélange de $r_0$ et de $M$, avec $w_M^{\text{tot}}=(\mu_0-r_0)/(E(R_M)-r_0)$.</li>
+<li><strong>CML</strong> : $E(R_P)=r_0+\sigma_P\cdot\frac{E(R_M)-r_0}{\sigma_M}$ ; le facteur est le <strong>prix de marché du risque</strong>.</li>
+<li><strong>Utilité VNM</strong> : maximiser $E[u(W_0(1+R_P))]$ ; $A(W)=-u''/u'$, $R(W)=-Wu''/u'$ ; Taylor ⟹ $E[u]\approx E[W]-\frac{\lambda}{2}\mathrm{Var}[W]$ = problème III.</li>
+<li><strong>Utilités</strong> : linéaire (neutre), quadratique (moyenne-variance exacte), exponentielle (<strong>CARA</strong>), puissance et log (<strong>CRRA</strong>).</li>
+<li><strong>Contraintes</strong> : long seulement, bornes, rotation, exposition benchmark, <strong>tracking error</strong> $[w-w_B]^T\Sigma[w-w_B]\leq\sigma_{TE}^2$, expositions factorielles, tailles minimales et entiers (<strong>non convexes</strong>).</li>
+<li><strong>Estimation</strong> : moyennes/covariances empiriques ; <strong>l'erreur d'estimation (!!)</strong> ; remèdes = moyennes mobiles exponentielles, facteurs dynamiques, indice unique de Sharpe, corrélation constante.</li>
+<li><strong>Mesures alternatives</strong> : MAD (⟹ <strong>PL</strong>), semi-variance, VaR, CVaR.</li>
+<li><strong>Cohérence</strong> : monotonie, <strong>sous-additivité</strong>, homogénéité positive, invariance par translation. <strong>Var non cohérente</strong> (pas monotone) · <strong>VaR non cohérente</strong> (pas sous-additive) · <strong>CVaR cohérente</strong>.</li>
+<li><strong>Moments supérieurs</strong> : $\max E(R_P)-\lambda_1\mathrm{Var}+\lambda_2\mathrm{Skew}-\lambda_3\mathrm{Kurt}$ ; asymétrie positive préférée ; estimation difficile.</li>
+</ol>
+<p><strong>Formulas to know</strong>
+$$w_0=\lambda_1\Sigma^{-1}\mu+\lambda_2\Sigma^{-1}\mathbf{1}_m \qquad \sigma_0^2=\frac{c\mu_0^2-2b\mu_0+a}{ac-b^2} \qquad w_{\min}=\frac{\Sigma^{-1}\mathbf{1}_m}{\mathbf{1}_m^T\Sigma^{-1}\mathbf{1}_m}$$
+$$w_0=\lambda_1\Sigma^{-1}[\mu-\mathbf{1}_mr_0] \qquad w_M^{\text{tot}}=\frac{\mu_0-r_0}{E(R_M)-r_0} \qquad E(R_P)=r_0+\sigma_P\frac{E(R_M)-r_0}{\sigma_M}$$
+$$A(W)=-\frac{u''(W)}{u'(W)} \qquad VaR_{1-\alpha}(R_P)=\min\{r:\Pr(R_P\leq-r)\leq\alpha\} \qquad CVaR_{1-\alpha}(R_P)=E[-R_P\mid-R_P\geq VaR_{1-\alpha}]$$</p>
+<p><strong>Methods to know</strong> : la dérivation lagrangienne complète du problème I ; la démonstration de Tobin ; le développement de Taylor de l'utilité ; le contre-exemple de sous-additivité de la VaR.</p>
+<div class="rec"><h2>Active Recall</h2><p><strong>Basic</strong> — Écrivez le problème de minimisation du risque de Markowitz et donnez la forme de sa solution.</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p>$$\min_w \tfrac12w^T\Sigma w \qquad \text{s.c. } w^T\mu=\mu_0,\quad w^T\mathbf{1}_m=1$$
+La solution est
+$$w_0=\lambda_1\Sigma^{-1}\mu+\lambda_2\Sigma^{-1}\mathbf{1}_m$$
+une <strong>combinaison linéaire de deux portefeuilles fixes</strong>, $\Sigma^{-1}\mu$ et $\Sigma^{-1}\mathbf{1}_m$, dont seuls les coefficients dépendent du rendement cible $\mu_0$. C'est le <strong>théorème des deux fonds</strong>.</p>
+</div></details><p><strong>Understanding</strong> — Énoncez le théorème de séparation de Tobin et expliquez sa portée.</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p><strong>Énoncé.</strong> Tout portefeuille optimal investit dans une combinaison de l'<strong>actif sans risque</strong> et du <strong>portefeuille de marché</strong> $M$.</p>
+<p><strong>Le mécanisme.</strong> Avec un actif sans risque, tout portefeuille optimal a des poids risqués $w_P=\lambda_1(P)\Sigma^{-1}[\mu-\mathbf{1}_mr_0]$ : seule la <strong>constante multiplicative</strong> $\lambda_1(P)$ dépend de la cible. Les proportions <strong>relatives</strong> entre actifs risqués sont donc <strong>identiques pour tous</strong>, et égales à celles de $M$.</p>
+<p><strong>Portée.</strong> Le choix de portefeuille se scinde en deux décisions <strong>indépendantes</strong> : quels actifs risqués (réponse universelle : $M$) et combien y placer (réponse personnelle, selon l'aversion au risque). C'est le fondement théorique de la gestion <strong>indicielle</strong> : si tout le monde détient le même portefeuille risqué, ce portefeuille est le marché.</p>
+</div></details><p><strong>Application</strong> — Un gérant est contraint par une erreur de suivi maximale de $3\,\%$ contre le S&amp;P 500. Écrivez la contrainte et dites quelle est la nature du problème.</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p>Avec $w_B$ les poids du S&amp;P 500, l'erreur de suivi est $TE_P=[w-w_B]^TR$, de variance
+$$\mathrm{var}(TE_P)=[w-w_B]^T\Sigma[w-w_B]$$
+La contrainte s'écrit
+$$[w-w_B]^T\Sigma[w-w_B]\ \leq\ (0{,}03)^2=0{,}0009$$</p>
+<p><strong>Nature du problème.</strong> $\Sigma$ est semi-définie positive, donc c'est une <strong>contrainte quadratique convexe</strong> : on reste dans un <strong>QCQP convexe</strong> (fiche 37), efficacement résoluble. Géométriquement, la contrainte confine $w$ dans un <strong>ellipsoïde</strong> centré sur $w_B$.</p>
+<p class="cal piege"> En pratique cette contrainte <strong>domine</strong> souvent le problème : elle colle le portefeuille au benchmark et réduit drastiquement l'espace des poids réalisables.</p>
+</div></details><p><strong>Comparison</strong> — VaR contre CVaR : quelles différences, et laquelle utiliser ?</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<table>
+<thead>
+<tr>
+<th></th>
+<th>VaR</th>
+<th>CVaR</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Nature</td>
+<td><strong>quantile</strong> de la perte</td>
+<td><strong>moyenne de la queue</strong> au-delà du quantile</td>
+</tr>
+<tr>
+<td>Formule</td>
+<td>$\min\{r:\Pr(R_P\leq-r)\leq\alpha\}$</td>
+<td>$E[-R_P\mid-R_P\geq VaR_{1-\alpha}]$</td>
+</tr>
+<tr>
+<td>Regarde la queue ?</td>
+<td><strong>non</strong>, un seul point</td>
+<td><strong>oui</strong>, intégralement</td>
+</tr>
+<tr>
+<td>Sous-additive ?</td>
+<td><strong>non</strong></td>
+<td><strong>oui</strong></td>
+</tr>
+<tr>
+<td>Cohérente ?</td>
+<td><strong>non</strong></td>
+<td><strong>oui</strong></td>
+</tr>
+<tr>
+<td>Convexe à optimiser ?</td>
+<td><strong>non</strong></td>
+<td><strong>oui</strong></td>
+</tr>
+</tbody></table>
+<p><strong>Conclusion.</strong> La <strong>CVaR</strong> est supérieure sur tous les plans théoriques : elle est cohérente, elle voit la queue, et son optimisation est convexe (Rockafellar-Uryasev, 2000). La VaR conserve un usage de <strong>reporting</strong> — un seuil unique est plus facile à communiquer — mais elle est mauvaise pour agréger des risques et mauvaise comme objectif d'optimisation.</p>
+</div></details><p><strong>Exam-style</strong> — Justifiez le critère moyenne-variance à partir de la théorie de l'utilité, puis dites précisément ce que cette justification néglige.</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p><strong>La justification.</strong> L'investisseur maximise $E[u(W)]$ avec $W=W_0(1+R_P)$. Si $u$ est régulière, un développement de Taylor autour de $\bar w=E[W]$ donne
+$$u(W)\approx u(\bar w)+u'(\bar w)(W-\bar w)+\tfrac12u''(\bar w)(W-\bar w)^2$$
+qu'on réécrit $(\text{const})+u'(\bar w)\big[W-\tfrac12A(\bar w)(W-\bar w)^2\big]$ avec $A(W)=-u''/u'$ l'<strong>aversion absolue au risque d'Arrow-Pratt</strong>. En prenant l'espérance :
+$$E[u(W)]\approx E[W]-\frac{\lambda}{2}\mathrm{Var}[W], \qquad \lambda=A(\bar w)$$
+C'est <strong>exactement</strong> le problème III. La moyenne-variance est donc l'<strong>approximation du second ordre</strong> de la maximisation d'utilité, et $\lambda$ y reçoit une interprétation précise.</p>
+<p><strong>Ce qu'elle néglige — les termes d'ordre $\geq3$ :</strong>
+$$+\tfrac{1}{3!}u^{(3)}(\bar w)\,\mathrm{Skew}(W)+\tfrac{1}{4!}u^{(4)}(\bar w)\,\mathrm{Kurtosis}(W)+O[(W-\bar w)^5]$$</p>
+<ul>
+<li>L'<strong>asymétrie</strong> : la moyenne-variance est indifférente entre « beaucoup de petites pertes et quelques gros gains » et l'inverse. Un investisseur réel <strong>préfère l'asymétrie positive</strong>.</li>
+<li>La <strong>kurtosis</strong> : elle ignore l'épaisseur des queues, précisément ce qui compte lors des krachs.</li>
+</ul>
+<p><strong>Quand la justification est-elle exacte ?</strong> Dans deux cas seulement : si $u$ est <strong>quadratique</strong> (le développement s'arrête au second ordre), ou si les rendements sont <strong>gaussiens</strong> (la loi est entièrement déterminée par ses deux premiers moments). Ni l'un ni l'autre n'est vrai en pratique — l'utilité quadratique impose $W&lt;1/\lambda$, et les rendements financiers ont des <strong>queues épaisses</strong>. D'où le critère à moments supérieurs :
+$$\max\ E(R_P)-\lambda_1\mathrm{Var}(R_P)+\lambda_2\mathrm{Skew}(R_P)-\lambda_3\mathrm{Kurtosis}(R_P) \quad \text{s.c. } w^T\mathbf{1}_m=1$$
+dont le cours souligne aussitôt la difficulté : estimer asymétrie et kurtosis est <strong>sensible aux aberrants</strong> et exige de <strong>grands échantillons</strong>.</p>
+</div></details></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h2>Flashcards</h2>
+<table>
+<thead>
+<tr>
+<th>Question</th>
+<th>Réponse</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Rendement et variance d'un portefeuille ?</td>
+<td>$\mu_w=w^T\mu$, $\sigma_w^2=w^T\Sigma w$</td>
+</tr>
+<tr>
+<td>Problème I de Markowitz ?</td>
+<td>$\min\frac12w^T\Sigma w$ s.c. $w^T\mu=\mu_0$, $w^T\mathbf{1}_m=1$</td>
+</tr>
+<tr>
+<td>Forme de la solution ?</td>
+<td>$w_0=\lambda_1\Sigma^{-1}\mu+\lambda_2\Sigma^{-1}\mathbf{1}_m$</td>
+</tr>
+<tr>
+<td>Les trois scalaires $a,b,c$ ?</td>
+<td>$\mu^T\Sigma^{-1}\mu$, $\mu^T\Sigma^{-1}\mathbf{1}_m$, $\mathbf{1}_m^T\Sigma^{-1}\mathbf{1}_m$</td>
+</tr>
+<tr>
+<td>Variance sur la frontière ?</td>
+<td>$(c\mu_0^2-2b\mu_0+a)/(ac-b^2)$ — <strong>parabolique</strong></td>
+</tr>
+<tr>
+<td>Portefeuille de variance minimale ?</td>
+<td>$\Sigma^{-1}\mathbf{1}_m/c$, atteint en $\mu_0=b/c$ ; <strong>ne dépend pas de $\mu$</strong></td>
+</tr>
+<tr>
+<td>Les trois problèmes équivalents ?</td>
+<td>Risque min · rendement max · aversion au risque $\lambda$</td>
+</tr>
+<tr>
+<td>Ce que change l'actif sans risque ?</td>
+<td>La contrainte $w^T\mathbf{1}_m=1$ disparaît ; la frontière devient une <strong>droite</strong></td>
+</tr>
+<tr>
+<td>Solution avec actif sans risque ?</td>
+<td>$w_0=\lambda_1\Sigma^{-1}[\mu-\mathbf{1}_mr_0]$</td>
+</tr>
+<tr>
+<td>Théorème de séparation de Tobin ?</td>
+<td>Tout optimal = mélange de $r_0$ et du portefeuille de marché $M$</td>
+</tr>
+<tr>
+<td>Poids du marché dans $P$ ?</td>
+<td>$w_M^{\text{tot}}=(\mu_0-r_0)/(E(R_M)-r_0)$</td>
+</tr>
+<tr>
+<td>Équation de la CML ?</td>
+<td>$E(R_P)=r_0+\sigma_P\big(E(R_M)-r_0\big)/\sigma_M$</td>
+</tr>
+<tr>
+<td>Prix de marché du risque ?</td>
+<td>$\big(E(R_M)-r_0\big)/\sigma_M$</td>
+</tr>
+<tr>
+<td>Aversion absolue au risque ?</td>
+<td>$A(W)=-u''(W)/u'(W)$</td>
+</tr>
+<tr>
+<td>Aversion relative au risque ?</td>
+<td>$R(W)=-W\,u''(W)/u'(W)$</td>
+</tr>
+<tr>
+<td>Utilité exponentielle ?</td>
+<td>$u(W)=1-e^{-\lambda W}$ — <strong>CARA</strong></td>
+</tr>
+<tr>
+<td>Utilité puissance et log ?</td>
+<td>$W^{1-\gamma}$ et $\ln W$ — <strong>CRRA</strong></td>
+</tr>
+<tr>
+<td>Approximation de Taylor de $E[u]$ ?</td>
+<td>$E[W]-\frac{\lambda}{2}\mathrm{Var}[W]$, avec $\lambda=A(\bar w)$</td>
+</tr>
+<tr>
+<td>Variance de l'erreur de suivi ?</td>
+<td>$[w-w_B]^T\Sigma[w-w_B]$</td>
+</tr>
+<tr>
+<td>Le grand danger de l'estimation ?</td>
+<td>L'optimiseur <strong>maximise sur les erreurs</strong> de $\hat\mu$ et $\hat\Sigma$</td>
+</tr>
+<tr>
+<td>Remèdes cités par le cours ?</td>
+<td>Moyennes mobiles exponentielles, facteurs dynamiques, indice unique de Sharpe, corrélation constante</td>
+</tr>
+<tr>
+<td>Définition de la VaR ?</td>
+<td>$\min\{r:\Pr(R_P\leq-r)\leq\alpha\}$</td>
+</tr>
+<tr>
+<td>Le défaut de la VaR ?</td>
+<td><strong>Non sous-additive</strong> : ne s'améliore pas avec la diversification</td>
+</tr>
+<tr>
+<td>Définition de la CVaR ?</td>
+<td>$E[-R_P\mid-R_P\geq VaR_{1-\alpha}(R_P)]$</td>
+</tr>
+<tr>
+<td>Les quatre axiomes de cohérence ?</td>
+<td>Monotonie · sous-additivité · homogénéité positive · invariance par translation</td>
+</tr>
+<tr>
+<td>Qui est cohérente ?</td>
+<td><strong>CVaR oui</strong> ; Var non (pas monotone) ; VaR non (pas sous-additive)</td>
+</tr>
+<tr>
+<td>Critère à moments supérieurs ?</td>
+<td>$\max E(R_P)-\lambda_1\mathrm{Var}+\lambda_2\mathrm{Skew}-\lambda_3\mathrm{Kurt}$</td>
+</tr>
+</tbody></table>
+</main>
+
+
+
+
+</body></html>

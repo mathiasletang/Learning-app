@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fiche 85 — Arbres binomiaux et valorisation risque-neutre</title>
+<script>
+window.MathJax={tex:{inlineMath:[["$","$"]],displayMath:[["$$","$$"]],processEscapes:true},
+ options:{skipHtmlTags:["script","noscript","style","textarea","pre","code"]},
+ svg:{fontCache:"global"},
+ startup:{pageReady:()=>MathJax.startup.defaultPageReady().then(()=>{document.body.classList.add("ready")})}};
+setTimeout(function(){document.body.classList.add("ready")},2500);
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+/* ============================================================
+   MathiasLearn — feuille de style des fiches
+   Reprise intégrale des tokens de 00_PARCOURS/*.html
+   + blocs pédagogiques (callouts, méthode, essentiels, recall)
+   ============================================================ */
+:root{--bg:#faf9f7;--card:#fff;--ink:#1a1a1a;--muted:#6b6b6b;--line:#e5e2dd;--accent:#8b5e34;
+ --hl:#fdf8ef;--ok:#2d7d4f;--okbg:#f0f7f3;--warn:#b3402f;--warnbg:#fdf3f1;--blue:#2f5d8b;--bluebg:#f1f5fa}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+ font:17px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;padding:0 16px 100px}
+.nav{position:sticky;top:0;background:rgba(250,249,247,.96);backdrop-filter:blur(8px);
+ border-bottom:1px solid var(--line);margin:0 -16px 30px;padding:11px 16px;z-index:50;
+ display:flex;gap:6px;flex-wrap:wrap;font-size:13px}
+.nav a{color:var(--muted);text-decoration:none;padding:4px 9px;border-radius:5px;white-space:nowrap}
+.nav a:hover{background:var(--line);color:var(--ink)}
+.nav a.on{background:var(--accent);color:#fff}
+main{max-width:780px;margin:0 auto}
+h1{font-size:31px;letter-spacing:-.02em;margin:.4em 0 .5em;line-height:1.25}
+h2{font-size:23px;margin:2.2em 0 .7em;padding-bottom:.3em;border-bottom:1px solid var(--line)}
+h3{font-size:19px;margin:1.9em 0 .5em;color:var(--accent)}
+h4{font-size:17px;margin:1.5em 0 .4em}
+p{margin:.8em 0} a{color:var(--accent)} hr{border:0;border-top:1px solid var(--line);margin:2.6em 0}
+table{border-collapse:collapse;width:100%;margin:1.3em 0;font-size:15.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+th{background:#f3f0eb;font-weight:600}
+tr:nth-child(even) td{background:#fcfbfa}
+code{font-family:"SF Mono",Menlo,Consolas,monospace;font-size:.88em;background:#f2efea;padding:2px 6px;border-radius:4px;white-space:nowrap}
+pre{background:#f2efea;padding:14px 16px;border-radius:8px;overflow-x:auto}
+pre code{background:none;padding:0;white-space:pre}
+blockquote{border-left:3px solid var(--accent);background:var(--hl);margin:1.4em 0;padding:14px 20px;border-radius:0 8px 8px 0}
+blockquote p:first-child{margin-top:0} blockquote p:last-child{margin-bottom:0}
+ul,ol{padding-left:1.5em} li{margin:.35em 0} em{color:#4a4a4a}
+mjx-container[display="true"]{margin:1.1em 0!important;overflow-x:auto;overflow-y:hidden;padding:2px 0}
+mjx-container svg{max-width:100%}
+body:not(.ready) main{opacity:0} main{opacity:1;transition:opacity .25s}
+
+/* --- bandeau de tête de fiche --- */
+.cours{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--accent);
+ border-radius:0 10px 10px 0;padding:18px 22px;margin:0 0 34px}
+.cours h4{margin:0 0 4px;font-size:14px;text-transform:uppercase;letter-spacing:.07em;color:var(--accent)}
+.cours .cs{color:var(--muted);font-size:14.5px;margin:0 0 14px}
+
+/* --- exercices / corrigés --- */
+.ex{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:6px 24px 20px;margin:18px 0}
+.ex>h3:first-child{margin-top:14px}
+details.cor{margin-top:18px;border:1px solid var(--line);border-radius:8px;background:#fcfbfa;overflow:hidden}
+details.cor>summary{cursor:pointer;padding:12px 16px;font-weight:600;font-size:15px;color:var(--accent);
+ list-style:none;display:flex;align-items:center;gap:9px;user-select:none;transition:.15s;min-height:44px}
+details.cor>summary::-webkit-details-marker{display:none}
+details.cor>summary:hover{background:var(--hl)}
+details.cor>summary::before{content:"\25B6";font-size:10px;transition:transform .18s;display:inline-block}
+details.cor[open]>summary::before{transform:rotate(90deg)}
+details.cor[open]>summary{background:var(--okbg);color:var(--ok);border-bottom:1px solid var(--line)}
+.cor .in{padding:4px 20px 16px}
+.cor .in>*:first-child{margin-top:.9em}
+
+/* --- blocs pédagogiques (callouts) ---
+   Générés depuis une citation Markdown dont le premier **gras** commence
+   par un mot-clé : DÉFINITION, THÉORÈME, MÉTHODE, PIÈGE, INTUITION… */
+.cal{border:1px solid var(--line);border-left:4px solid var(--accent);background:var(--card);
+ border-radius:0 10px 10px 0;padding:15px 20px;margin:1.5em 0}
+.cal>p:first-child{margin-top:0}.cal>p:last-child,.cal>ul:last-child,.cal>ol:last-child{margin-bottom:0}
+.cal .lab{display:block;font-size:12.5px;text-transform:uppercase;letter-spacing:.08em;
+ font-weight:700;color:var(--accent);margin-bottom:6px}
+.cal.formel{background:var(--hl)}
+.cal.piege{border-left-color:var(--warn);background:var(--warnbg)}
+.cal.piege .lab{color:var(--warn)}
+.cal.methode{border-left-color:var(--ok);background:var(--okbg)}
+.cal.methode .lab{color:var(--ok)}
+.cal.intu{border-left-color:var(--blue);background:var(--bluebg)}
+.cal.intu .lab{color:var(--blue)}
+.cal.plus{border-left-style:dashed;background:#faf9f7}
+.cal.plus .lab{color:var(--muted)}
+
+/* --- révision express --- */
+.ess{background:var(--card);border:1px solid var(--accent);border-radius:10px;padding:4px 24px 20px;margin:1.6em 0}
+.ess h3{margin-top:1.3em}
+.rec{background:var(--card);border:1px dashed var(--accent);border-radius:10px;padding:4px 24px 18px;margin:1.6em 0}
+.rec ol{counter-reset:none}
+
+/* --- impression / PDF --- */
+@media print{
+ .nav{display:none}
+ body{padding:0;background:#fff;font-size:11.2pt;line-height:1.55}
+ main{max-width:none}
+ h1{font-size:23pt}h2{font-size:15pt;margin-top:1.5em}h3{font-size:12.6pt}
+ h2,h3,h4{break-after:avoid;page-break-after:avoid}
+ table,.cal,blockquote{break-inside:avoid;page-break-inside:avoid}
+ table{display:table;font-size:9.6pt}
+ details.cor{border:1px solid var(--line);background:#fcfbfa}
+ details.cor>summary{display:none}
+ details.cor .in{padding-top:10px}
+ .cal,.ex,.ess,.rec{box-shadow:none}
+ a{color:var(--ink);text-decoration:none}
+}
+@page{margin:16mm 15mm 18mm}
+
+/* --- exemples travaillés --- */
+.exm{background:#fcfbfa;border:1px solid var(--line);border-radius:10px;padding:2px 20px 14px;margin:1.5em 0}
+.exm>h4:first-child{margin:14px 0 .5em;color:var(--accent);font-size:13px;text-transform:uppercase;letter-spacing:.07em}
+
+
+/* --- pastilles de priorité (conventions des fiches de l'app) --- */
+h2[data-prio], h3[data-prio], h4[data-prio]{position:relative}
+h2[data-prio]::before,h3[data-prio]::before,h4[data-prio]::before{
+ content:"";display:inline-block;width:9px;height:9px;border-radius:50%;
+ margin-right:9px;vertical-align:middle;background:var(--muted)}
+[data-prio="must"]::before{background:var(--warn)}
+[data-prio="high"]::before{background:#d98324}
+[data-prio="mid"]::before{background:#c9a227}
+[data-prio="low"]::before{background:var(--ok)}
+/* corrigés des fiches de l'app : même traitement que les corrigés des séries */
+details.cor>summary::after{content:""}
+</style></head><body>
+<div class="nav"><a href="00_COMMENCER_ICI.html">Commencer ici</a><a href="01_NOTATIONS_le-decodeur.html">Notations</a><a href="02_EXERCICES_Serie-0.html">Série 0 — Remise en route</a><a href="03_EXERCICES_Serie-1.html">Série 1 — Convexité</a><a href="04_EXERCICES_Serie-2.html">Série 2 — KKT</a><a href="05_AUTO-EVALUATION.html">Auto-évaluation (quiz)</a><a href="06_FICHE_Optimisation-deux-variables.html">Fiche — Optimisation à 2 variables</a></div>
+<main><h1>Fiche 85 — Arbres binomiaux et valorisation risque-neutre</h1>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Matière</strong></td>
+<td>Maths · Finance de marché</td>
+</tr>
+<tr>
+<td><strong>Cours source</strong></td>
+<td>John C. Hull, <em>Options, Futures, and Other Derivatives</em>, 8ᵉ éd., Pearson — chapitre 12 « Binomial Trees » (d'après Cox, Ross et Rubinstein, 1979)</td>
+</tr>
+<tr>
+<td><strong>Difficulté</strong></td>
+<td> Must know — le chapitre qui introduit <strong>la valorisation risque-neutre</strong></td>
+</tr>
+<tr>
+<td><strong>Temps d'étude estimé</strong></td>
+<td>1 h 45</td>
+</tr>
+<tr>
+<td><strong>Prérequis</strong></td>
+<td>Fiches 78, 82, 83</td>
+</tr>
+<tr>
+<td><strong>Concepts clés</strong></td>
+<td>Portefeuille sans risque, delta, absence d'arbitrage, probabilité risque-neutre, arbre à plusieurs pas, options américaines, calage de la volatilité, $u=e^{\sigma\sqrt{\Delta t}}$, théorème de Girsanov, mesures $P$ et $Q$, options sur indices, devises et futures</td>
+</tr>
+<tr>
+<td><strong>Poids à l'examen</strong></td>
+<td>Construire un arbre, <strong>remonter</strong> en calculant $f=e^{-r\Delta t}[pf_u+(1-p)f_d]$, <strong>tester l'exercice anticipé</strong> à chaque nœud · savoir que <strong>la probabilité réelle n'intervient jamais</strong>.</td>
+</tr>
+</tbody></table>
+<h2>Vue d'ensemble</h2>
+<pre><code>IDÉE       deux titres, deux issues  →  on peut TOUJOURS construire un portefeuille sans risque
+DELTA      Δ = (f_u − f_d)/(S₀u − S₀d)      nb d'actions par option vendue
+PRIX       f = e^{−rΔt}[ p f_u + (1 − p) f_d ]        p = (a − d)/(u − d)
+CALAGE     u = e^{σ√Δt}   d = 1/u   a = e^{rΔt}
+AMÉRICAINE à chaque nœud :  f = max( valeur de continuation , payoff d'exercice )
+AUTRES     a = e^{(r−q)Δt} (indice) · e^{(r−r_f)Δt} (devise) · a = 1 (futures)
+</code></pre>
+<p><strong>Pourquoi ce chapitre est important — les trois raisons de Hull.</strong> <em>Premièrement, il explique la <strong>nature des arguments d'absence d'arbitrage</strong> utilisés pour valoriser les options. Deuxièmement, il présente la <strong>procédure numérique</strong> par arbre binomial, largement utilisée pour les options américaines et d'autres dérivés. Troisièmement, il introduit un principe très important, la <strong>valorisation risque-neutre</strong>.</em></p>
+<blockquote>
+<p><strong>Et l'annonce du chapitre 14.</strong> <em>À la limite, quand le pas de temps devient petit, ce modèle est <strong>le même</strong> que le modèle de Black-Scholes-Merton.</em> L'appendice du chapitre démontre la convergence.</p>
+</blockquote>
+<h2 data-prio="must">Concept 1 — Un pas, un portefeuille sans risque</h2>
+<p><strong>Le cadre minimal.</strong> Action à <strong>20</strong> aujourd'hui ; dans <strong>3 mois</strong> elle vaudra <strong>22</strong> ou <strong>18</strong>. On veut valoriser un <strong>call européen</strong> de strike <strong>21</strong>. Ses payoffs : <strong>1</strong> si l'action monte, <strong>0</strong> si elle baisse. Taux sans risque <strong>12 %</strong>.</p>
+<blockquote>
+<p><strong>La seule hypothèse nécessaire est qu'il n'existe pas d'opportunité d'arbitrage.</strong> <em>On construit un portefeuille d'action et d'option tel qu'il n'y ait <strong>aucune incertitude</strong> sur sa valeur dans 3 mois. On argue alors que, <strong>le portefeuille étant sans risque, son rendement doit égaler le taux sans risque</strong>. Cela permet de calculer le coût de sa constitution, donc le prix de l'option.</em></p>
+<p class="cal piege"> <em><strong>Comme il y a deux titres — l'action et l'option — et seulement deux issues possibles, il est TOUJOURS possible de constituer le portefeuille sans risque.</strong></em> C'est cette coïncidence de dimensions qui fait fonctionner tout le chapitre.</p>
+</blockquote>
+<details class="cor">
+<summary><strong>Exercice résolu — le calcul complet, pas à pas</strong></summary><div class="in">
+
+<p><em>Étape 1 — poser le portefeuille.</em> <strong>Long $\Delta$ actions, short 1 call.</strong>
+<em>Étape 2 — écrire sa valeur dans les deux états.</em>
+$$\text{hausse}:\ 22\Delta-1\qquad\qquad\text{baisse}:\ 18\Delta-0=18\Delta$$
+<em>Étape 3 — annuler le risque.</em> Égaler les deux :
+$$22\Delta-1=18\Delta\ \Longrightarrow\ 4\Delta=1\ \Longrightarrow\ \boxed{\Delta=0{,}25}$$
+<em>Étape 4 — vérifier.</em> Hausse : $22\times0{,}25-1=\mathbf{4{,}5}$. Baisse : $18\times0{,}25=\mathbf{4{,}5}$. <strong>Identique dans les deux cas</strong> .
+<em>Étape 5 — actualiser au taux sans risque.</em>
+$$4{,}5\,e^{-0{,}12\times0{,}25}=4{,}5\times0{,}97045=\mathbf{4{,}367}$$
+<em>Étape 6 — identifier le coût de constitution.</em> $20\times0{,}25-f=5-f$.
+<em>Étape 7 — résoudre.</em> $5-f=4{,}367\ \Longrightarrow\ \boxed{f=0{,}633}$.</p>
+<p><strong>Pourquoi c'est le seul prix possible.</strong> <em>Si l'option valait plus de 0,633, le portefeuille coûterait moins de 4,367 et <strong>rapporterait plus que le taux sans risque</strong>. Si elle valait moins, <strong>shorter le portefeuille</strong> donnerait un moyen d'<strong>emprunter à moins que le taux sans risque</strong>.</em></p>
+</div></details>
+
+<p><strong>La généralisation.</strong> L'action passe de $S_0$ à $S_0u$ ($u&gt;1$) ou $S_0d$ ($d&lt;1$) ; l'option vaut alors $f_u$ ou $f_d$.</p>
+<p>$$\boxed{\Delta=\frac{f_u-f_d}{S_0u-S_0d}}\;\text{(12.1)}$$</p>
+<p><em>C'est le <strong>rapport de la variation du prix de l'option à la variation du prix de l'action</strong> entre les deux nœuds.</em></p>
+<p>En égalant le coût $S_0\Delta-f$ à la valeur actualisée $(S_0u\Delta-f_u)e^{-rT}$ et en substituant (12.1) :</p>
+<p>$$\boxed{f=e^{-rT}\big[p\,f_u+(1-p)f_d\big]}\;\text{(12.2)}\qquad\qquad\boxed{p=\frac{e^{rT}-d}{u-d}}\;\text{(12.3)}$$</p>
+<p><strong>Vérification sur l'exemple.</strong> $u=1{,}1$, $d=0{,}9$, $r=0{,}12$, $T=0{,}25$ :
+$$p=\frac{e^{0{,}03}-0{,}9}{0{,}2}=\frac{1{,}03045-0{,}9}{0{,}2}=\mathbf{0{,}6523}\qquad f=e^{-0{,}03}(0{,}6523\times1)=\mathbf{0{,}633}\ \checkmark$$</p>
+<blockquote>
+<p class="cal piege"> <strong>Le résultat le plus contre-intuitif du chapitre.</strong> <em>La formule (12.2) <strong>ne fait pas intervenir les probabilités</strong> de hausse ou de baisse. On obtient le même prix que la probabilité de hausse soit 0,5 ou 0,9. <strong>C'est surprenant et semble contre-intuitif</strong> : il est naturel de croire qu'une probabilité de hausse plus grande augmente la valeur d'un call. <strong>Ce n'est pas le cas.</strong></em></p>
+<p><strong>La raison.</strong> <em>Nous ne valorisons <strong>pas</strong> l'option en termes absolus. Nous calculons sa valeur <strong>en termes du prix de l'action sous-jacente</strong>. <strong>Les probabilités de mouvements futurs sont déjà incorporées dans le prix de l'action</strong> : il n'y a pas à en tenir compte une seconde fois.</em></p>
+</blockquote>
+<h2 data-prio="must">Concept 2 — La valorisation risque-neutre</h2>
+<blockquote>
+<p><strong>Le principe.</strong> <em>Pour valoriser un dérivé, <strong>on peut faire l'hypothèse que les investisseurs sont neutres au risque</strong> — c'est-à-dire qu'ils n'augmentent pas le rendement exigé pour compenser un risque accru. <strong>Le monde où nous vivons n'est évidemment pas neutre au risque.</strong> Il se trouve pourtant que <strong>supposer un monde risque-neutre donne le bon prix de l'option pour le monde où nous vivons</strong>, aussi bien que pour un monde risque-neutre. <strong>Presque miraculeusement, cela contourne le problème que nous ne savons pratiquement rien de l'aversion au risque des acheteurs et vendeurs d'options.</strong></em></p>
+</blockquote>
+<p><strong>L'objection naturelle, et sa réponse.</strong> <em>Les options sont des investissements risqués ; les préférences pour le risque ne devraient-elles pas affecter leur prix ? <strong>La réponse est que, lorsqu'on valorise une option en termes du prix de l'action sous-jacente, les préférences pour le risque sont sans importance. Quand les investisseurs deviennent plus averses au risque, les prix des actions baissent — mais les formules reliant les prix d'options aux prix d'actions restent les mêmes.</strong></em></p>
+<p><strong>Les deux propriétés d'un monde risque-neutre.</strong></p>
+<ol>
+<li><em>Le <strong>rendement espéré</strong> d'une action (ou de tout investissement) est le <strong>taux sans risque</strong>.</em></li>
+<li><em>Le <strong>taux d'actualisation</strong> du payoff espéré d'une option est le <strong>taux sans risque</strong>.</em></li>
+</ol>
+<p><strong>La preuve que $p$ est bien une probabilité risque-neutre.</strong> Avec $p$ comme probabilité de hausse :
+$$\mathbb E(S_T)=pS_0u+(1-p)S_0d=pS_0(u-d)+S_0d$$
+et en substituant (12.3) :
+$$\boxed{\mathbb E(S_T)=S_0e^{rT}}\;\text{(12.4)}$$
+<em>L'action croît donc <strong>en moyenne au taux sans risque</strong> quand $p$ est la probabilité de hausse : elle se comporte <strong>exactement</strong> comme on l'attendrait dans un monde risque-neutre.</em></p>
+<blockquote>
+<p><strong>L'énoncé général.</strong> <em>La valorisation risque-neutre est un résultat général très important : <strong>en supposant le monde risque-neutre, on obtient le bon prix d'un dérivé dans TOUS les mondes, pas seulement dans un monde risque-neutre</strong>. Nous l'avons montré pour un modèle binomial simple ; <strong>on peut montrer que le résultat est vrai quelles que soient les hypothèses faites sur l'évolution du prix de l'action</strong>.</em></p>
+</blockquote>
+<p><strong>La recette en trois temps.</strong> <em>Calculer les <strong>probabilités risque-neutres</strong> des différentes issues · calculer le <strong>payoff espéré</strong> du dérivé · <strong>actualiser au taux sans risque</strong>.</em></p>
+<details class="cor">
+<summary><strong>Exercice résolu — retrouver 0,633 par la voie risque-neutre</strong></summary><div class="in">
+
+<p><em>Étape 1 — poser l'équation de croissance risque-neutre.</em> Le rendement espéré doit être <strong>12 %</strong> :
+$$22p+18(1-p)=20e^{0{,}12\times0{,}25}$$
+<em>Étape 2 — simplifier.</em> $4p=20e^{0{,}03}-18=20\times1{,}03045-18=2{,}609$.
+<em>Étape 3 — résoudre.</em> $p=\mathbf{0{,}6523}$ — <strong>identique</strong> à (12.3) .
+<em>Étape 4 — payoff espéré.</em> $0{,}6523\times1+0{,}3477\times0=\mathbf{0{,}6523}$.
+<em>Étape 5 — actualiser.</em> $0{,}6523\,e^{-0{,}03}=\mathbf{0{,}633}$ .</p>
+<p class="cal piege"> <strong>Le taux d'actualisation du monde réel, lui, est inconnaissable — et gigantesque.</strong> Hull le calcule en note : <em>sachant que la bonne valeur est 0,633, on peut déduire que le taux d'actualisation correct dans le monde réel est <strong>42,58 %</strong></em>, car $0{,}633=0{,}7041\,e^{-0{,}4258\times0{,}25}$ (avec une probabilité réelle de 0,7). <strong>C'est précisément ce que la valorisation risque-neutre permet d'éviter de connaître.</strong></p>
+</div></details>
+
+<h2 data-prio="must">Concept 3 — Arbres à plusieurs pas</h2>
+<p><strong>Le principe.</strong> <em>Appliquer répétitivement les résultats précédents, <strong>en remontant</strong> de la fin vers le début.</em></p>
+<details class="cor">
+<summary><strong>Exercice résolu — l'arbre à deux pas (figures 12.3 et 12.4)</strong></summary><div class="in">
+
+<p><strong>Données.</strong> $S_0=20$ ; à chaque pas $\pm10\,\%$ ; pas de <strong>3 mois</strong> ; $r=12\,\%$ ; call <strong>6 mois</strong>, $K=21$.</p>
+<p><em>Étape 1 — les prix de l'action.</em></p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Pas 0</th>
+<th>Pas 1</th>
+<th>Pas 2</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Haut</td>
+<td></td>
+<td><strong>22</strong></td>
+<td><strong>24,2</strong> (D)</td>
+</tr>
+<tr>
+<td>Milieu</td>
+<td><strong>20</strong> (A)</td>
+<td></td>
+<td><strong>19,8</strong> (E)</td>
+</tr>
+<tr>
+<td>Bas</td>
+<td></td>
+<td><strong>18</strong> (C)</td>
+<td><strong>16,2</strong> (F)</td>
+</tr>
+</tbody></table>
+<p><em>Étape 2 — les payoffs terminaux.</em> D : $24{,}2-21=\mathbf{3{,}2}$ · E et F : <strong>hors la monnaie</strong>, donc <strong>0</strong>.
+<em>Étape 3 — le nœud C.</em> Il mène à E ou F, <strong>tous deux à zéro</strong> → $f_C=\mathbf{0}$.
+<em>Étape 4 — le nœud B.</em> $u=1{,}1$, $d=0{,}9$, $r=0{,}12$, $\Delta t=0{,}25$ → $p=0{,}6523$ :
+$$f_B=e^{-0{,}03}(0{,}6523\times3{,}2+0{,}3477\times0)=\mathbf{2{,}0257}$$
+<em>Étape 5 — le nœud A.</em>
+$$f_A=e^{-0{,}03}(0{,}6523\times2{,}0257+0{,}3477\times0)=\mathbf{1{,}2823}$$</p>
+<p class="cal piege"> <strong>Pourquoi $p$ est le même partout ici.</strong> <em>Cet exemple a été construit de sorte que $u$ et $d$ soient <strong>identiques à chaque nœud</strong> et que les <strong>pas soient de même longueur</strong>. La probabilité risque-neutre calculée par (12.3) est donc <strong>la même à chaque nœud</strong>.</em> Ce n'est pas automatique — c'est une propriété du calage $u=e^{\sigma\sqrt{\Delta t}}$.</p>
+</div></details>
+
+<p><strong>Les formules générales</strong>, avec un pas $\Delta t$ :
+$$f=e^{-r\Delta t}\big[pf_u+(1-p)f_d\big]\;\text{(12.5)}\qquad p=\frac{e^{r\Delta t}-d}{u-d}\;\text{(12.6)}$$</p>
+<p>En substituant deux fois, on obtient la forme <strong>directe</strong> :
+$$\boxed{f=e^{-2r\Delta t}\big[p^2f_{uu}+2p(1-p)f_{ud}+(1-p)^2f_{dd}\big]}\;\text{(12.10)}$$</p>
+<blockquote>
+<p><em>Les quantités $p^2$, $2p(1-p)$ et $(1-p)^2$ sont <strong>les probabilités d'atteindre les nœuds terminaux</strong> haut, milieu et bas. <strong>Le prix de l'option est son payoff espéré en monde risque-neutre, actualisé au taux sans risque</strong> — et ce reste vrai quel que soit le nombre de pas.</em></p>
+</blockquote>
+<details class="cor">
+<summary><strong>Exercice résolu — un put européen à deux pas (figure 12.7)</strong></summary><div class="in">
+
+<p><strong>Données.</strong> Put européen <strong>2 ans</strong>, $K=52$, $S_0=50$. Deux pas de <strong>1 an</strong>, $\pm20\,\%$, $r=5\,\%$.</p>
+<p><em>Étape 1 — les paramètres.</em> $u=1{,}2$, $d=0{,}8$, $\Delta t=1$ :
+$$p=\frac{e^{0{,}05}-0{,}8}{0{,}4}=\frac{1{,}05127-0{,}8}{0{,}4}=\mathbf{0{,}6282}$$
+<em>Étape 2 — les prix terminaux.</em> $72$, $48$, $32$.
+<em>Étape 3 — les payoffs.</em> $f_{uu}=\mathbf{0}$ · $f_{ud}=52-48=\mathbf{4}$ · $f_{dd}=52-32=\mathbf{20}$.
+<em>Étape 4 — la formule directe (12.10).</em>
+$$f=e^{-0{,}1}\big(0{,}6282^2\times0+2\times0{,}6282\times0{,}3718\times4+0{,}3718^2\times20\big)=0{,}90484\times4{,}6333=\mathbf{4{,}1923}$$
+<em>Étape 5 — contrôle par la remontée pas à pas.</em>
+$$f_{\text{haut}}=e^{-0{,}05}(0{,}6282\times0+0{,}3718\times4)=\mathbf{1{,}4147}$$
+$$f_{\text{bas}}=e^{-0{,}05}(0{,}6282\times4+0{,}3718\times20)=\mathbf{9{,}4636}$$
+$$f=e^{-0{,}05}(0{,}6282\times1{,}4147+0{,}3718\times9{,}4636)=\mathbf{4{,}1923}\ \checkmark$$</p>
+</div></details>
+
+<h2 data-prio="must">Concept 4 — Les options américaines</h2>
+<blockquote>
+<p><strong>La procédure.</strong> <em>Remonter l'arbre de la fin vers le début, en <strong>testant à chaque nœud si l'exercice anticipé est optimal</strong>. La valeur aux nœuds terminaux est la même que pour l'européenne. Aux nœuds antérieurs, la valeur est <strong>le plus grand</strong> de :</em>
+$$\boxed{f=\max\Big(\underbrace{e^{-r\Delta t}[pf_u+(1-p)f_d]}_{\text{valeur de continuation}},\ \underbrace{\text{payoff d'exercice immédiat}}_{K-S\ \text{ou}\ S-K}\Big)}$$</p>
+</blockquote>
+<details class="cor">
+<summary><strong>Exercice résolu — le même put, en américain (figure 12.8)</strong></summary><div class="in">
+
+<p><strong>Mêmes données.</strong> Les prix de l'action, leurs probabilités et les valeurs terminales sont <strong>inchangés</strong>.</p>
+<p><em>Étape 1 — nœud B ($S=60$).</em> Continuation $=\mathbf{1{,}4147}$ ; exercice $=52-60=\mathbf{-8}$, <strong>négatif</strong>. <em>L'exercice anticipé n'est clairement pas optimal</em> → $f_B=\mathbf{1{,}4147}$.
+<em>Étape 2 — nœud C ($S=40$).</em> Continuation $=\mathbf{9{,}4636}$ ; exercice $=52-40=\mathbf{12}$. <strong>L'exercice est optimal</strong> → $f_C=\mathbf{12}$.
+<em>Étape 3 — nœud A ($S=50$).</em>
+$$e^{-0{,}05}(0{,}6282\times1{,}4147+0{,}3718\times12{,}0)=\mathbf{5{,}0894}$$
+Exercice immédiat $=52-50=2$ → <strong>non optimal</strong>.
+<em>Étape 4 — le résultat.</em> $\boxed{P=5{,}0894}$ contre $p=4{,}1923$ pour l'européenne : la <strong>prime d'exercice anticipé</strong> vaut <strong>0,897</strong>.</p>
+<p class="cal piege"> <strong>Le nœud C est celui qui fait toute la différence.</strong> C'est là — et seulement là — que l'exercice est optimal, et c'est ce <strong>12 au lieu de 9,4636</strong> qui remonte jusqu'à la racine.</p>
+</div></details>
+
+<h2 data-prio="must">Concept 5 — Le delta, et pourquoi il faut le réajuster</h2>
+<div class="cal formel"><span class="lab">Définition.</span>
+<p> <em>Le <strong>delta</strong> d'une option est le <strong>rapport de la variation du prix de l'option à la variation du prix de l'action</strong>. C'est <strong>le nombre d'unités de l'action qu'il faut détenir pour chaque option vendue</strong> afin de créer un portefeuille sans risque.</em> Construire ce portefeuille s'appelle la <strong>couverture en delta</strong>. <strong>Le delta d'un call est positif, celui d'un put négatif.</strong></p>
+</div>
+<p><strong>Sur l'arbre du call (figure 12.4).</strong></p>
+<table>
+<thead>
+<tr>
+<th>Position dans l'arbre</th>
+<th>Calcul</th>
+<th>$\Delta$</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Premier pas</td>
+<td>$\dfrac{2{,}0257-0}{22-18}$</td>
+<td>$\mathbf{0{,}5064}$</td>
+</tr>
+<tr>
+<td>Second pas, <strong>après hausse</strong></td>
+<td>$\dfrac{3{,}2-0}{24{,}2-19{,}8}$</td>
+<td>$\mathbf{0{,}7273}$</td>
+</tr>
+<tr>
+<td>Second pas, <strong>après baisse</strong></td>
+<td>$\dfrac{0-0}{19{,}8-16{,}2}$</td>
+<td>$\mathbf{0}$</td>
+</tr>
+</tbody></table>
+<p><strong>Sur l'arbre du put (figure 12.7).</strong></p>
+<table>
+<thead>
+<tr>
+<th>Position</th>
+<th>Calcul</th>
+<th>$\Delta$</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Premier pas</td>
+<td>$\dfrac{1{,}4147-9{,}4636}{60-40}$</td>
+<td>$\mathbf{-0{,}4024}$</td>
+</tr>
+<tr>
+<td>Second pas, après hausse</td>
+<td>$\dfrac{0-4}{72-48}$</td>
+<td>$\mathbf{-0{,}1667}$</td>
+</tr>
+<tr>
+<td>Second pas, après baisse</td>
+<td>$\dfrac{4-20}{48-32}$</td>
+<td>$\mathbf{-1{,}0000}$</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p class="cal piege"> <strong>La conséquence pratique, énoncée dès maintenant.</strong> <em><strong>Le delta change avec le temps.</strong></em> <em>Pour maintenir une couverture sans risque avec une option et le sous-jacent, il faut donc <strong>ajuster périodiquement</strong> sa détention d'actions.</em> C'est exactement le sujet du chapitre 18.</p>
+</blockquote>
+<h2 data-prio="must">Concept 6 — Caler la volatilité : le choix de $u$ et $d$</h2>
+<p><strong>La question.</strong> <em>Faut-il caler la volatilité dans le monde <strong>réel</strong> ou dans le monde <strong>risque-neutre</strong> ? <strong>Cela n'a pas d'importance</strong> : pour un $\Delta t$ petit et des valeurs particulières de $u$ et $d$, la volatilité supposée est <strong>la même dans les deux mondes</strong>.</em></p>
+<p><strong>Dans le monde réel</strong>, avec $p^\ast$ la probabilité de hausse et $\mu$ le rendement espéré :
+$$p^\ast S_0u+(1-p^\ast)S_0d=S_0e^{\mu\Delta t}\ \Longrightarrow\ \boxed{p^\ast=\frac{e^{\mu\Delta t}-d}{u-d}}\;\text{(12.11)}$$</p>
+<p><strong>La volatilité</strong> est définie de sorte que $\sigma\sqrt{\Delta t}$ soit l'<strong>écart-type du rendement</strong> sur un court intervalle $\Delta t$, la variance étant $\sigma^2\Delta t$. Sur l'arbre :
+$$p^\ast u^2+(1-p^\ast)d^2-\big[p^\ast u+(1-p^\ast)d\big]^2=\sigma^2\Delta t\;\text{(12.12)}$$</p>
+<p><em>(Justification de Hull en note : le rendement vaut $u-1$ ou $d-1$ ; <strong>retrancher 1 ne change pas la variance</strong>, donc c'est la variance d'une variable valant $u$ avec probabilité $p^\ast$ et $d$ sinon, calculée par $\mathbb E(X^2)-[\mathbb E(X)]^2$.)</em></p>
+<p>En substituant (12.11) dans (12.12) :
+$$e^{\mu\Delta t}(u+d)-ud-e^{2\mu\Delta t}=\sigma^2\Delta t$$
+<em>En ignorant les termes en $\Delta t^2$ et les puissances supérieures</em>, une solution est :</p>
+<p>$$\boxed{u=e^{\sigma\sqrt{\Delta t}}}\;\text{(12.13)}\qquad\qquad\boxed{d=e^{-\sigma\sqrt{\Delta t}}=\frac1u}\;\text{(12.14)}$$</p>
+<p><strong>Ce sont les valeurs proposées par Cox, Ross et Rubinstein (1979).</strong></p>
+<p><strong>Et dans le monde risque-neutre ?</strong> L'espérance est $S_0e^{r\Delta t}$ et la variance du rendement vaut $e^{r\Delta t}(u+d)-ud-e^{2r\Delta t}$ ; <em>en substituant les mêmes $u$ et $d$, on trouve <strong>$\sigma^2\Delta t$</strong> aux termes d'ordre supérieur près.</em></p>
+<blockquote>
+<p class="cal piege"> <strong>Le résultat conceptuel majeur — le théorème de Girsanov, annoncé ici.</strong> <em>Cette analyse montre que, <strong>lorsqu'on passe du monde réel au monde risque-neutre, le rendement espéré de l'action change, mais sa volatilité reste la même</strong> (au moins à la limite $\Delta t\to0$). C'est une illustration d'un résultat général important : <strong>quand on passe d'un monde avec un ensemble de préférences pour le risque à un monde avec un autre ensemble, les taux de croissance espérés changent, mais les volatilités restent inchangées.</strong></em></p>
+<p>*Passer d'un ensemble de préférences à un autre s'appelle <strong>changer de mesure</strong>. La mesure du monde réel est la <strong>mesure $P$</strong>, celle du monde risque-neutre la <strong>mesure $Q$</strong>.* Avec la notation du chapitre : $p$ est la probabilité sous <strong>$Q$</strong>, $p^\ast$ sous <strong>$P$</strong>.</p>
+</blockquote>
+<p><strong>Les quatre formules qui définissent l'arbre.</strong>
+$$u=e^{\sigma\sqrt{\Delta t}}\qquad d=\frac1u\qquad \boxed{p=\frac{a-d}{u-d}}\;\text{(12.15)}\qquad \boxed{a=e^{r\Delta t}}\;\text{(12.16)}$$</p>
+<details class="cor">
+<summary><strong>Exercice résolu — le put américain avec un vrai calage (figure 12.10)</strong></summary><div class="in">
+
+<p><strong>Données.</strong> $S_0=50$, $K=52$, $r=5\,\%$, <strong>2 ans</strong>, <strong>deux pas</strong> ($\Delta t=1$), $\sigma=30\,\%$.</p>
+<p><em>Étape 1 — les paramètres.</em>
+$$u=e^{0{,}3\times1}=\mathbf{1{,}3499}\qquad d=\frac1{1{,}3499}=\mathbf{0{,}7408}\qquad a=e^{0{,}05}=\mathbf{1{,}0513}$$
+$$p=\frac{1{,}0513-0{,}7408}{1{,}3499-0{,}7408}=\frac{0{,}3105}{0{,}6091}=\mathbf{0{,}5097}$$
+<em>(Le livre imprime « 1,053 » au numérateur — coquille sans effet : le résultat 0,5097 est celui de $a=1{,}0513$.)</em></p>
+<p><em>Étape 2 — l'arbre des prix.</em> $50\to67{,}49\to\mathbf{91{,}11}$ · $50\to67{,}49\to\mathbf{50}$ (et $50\to37{,}04\to50$) · $50\to37{,}04\to\mathbf{27{,}44}$.
+<em>Étape 3 — les payoffs terminaux.</em> $91{,}11\to\mathbf{0}$ · $50\to52-50=\mathbf{2}$ · $27{,}44\to52-27{,}44=\mathbf{24{,}56}$.
+<em>Étape 4 — nœud haut ($S=67{,}49$).</em> Continuation $=e^{-0{,}05}(0{,}5097\times0+0{,}4903\times2)=\mathbf{0{,}93}$ ; exercice <strong>négatif</strong> → $\mathbf{0{,}93}$.
+<em>Étape 5 — nœud bas ($S=37{,}04$).</em> Continuation $=e^{-0{,}05}(0{,}5097\times2+0{,}4903\times24{,}56)=\mathbf{12{,}42}$ ; exercice $=52-37{,}04=\mathbf{14{,}96}$ → <strong>on exerce</strong>, valeur $\mathbf{14{,}96}$.
+<em>Étape 6 — la racine.</em>
+$$e^{-0{,}05}(0{,}5097\times0{,}93+0{,}4903\times14{,}96)=\mathbf{7{,}43}$$</p>
+<p class="cal piege"> <strong>Notez la différence avec la figure 12.8 (7,43 contre 5,0894).</strong> <em>Elle vient de ce que l'on avait pris $u=1{,}2$ et $d=0{,}8$ arbitrairement, au lieu de les caler sur $\sigma=30\,\%$.</em> <strong>Le calage n'est pas un détail : il change le prix de 46 %.</strong></p>
+<p><em>Et l'option est bien <strong>exercée à la fin du premier pas si le nœud bas est atteint</strong>.</em></p>
+</div></details>
+
+<h2 data-prio="high">Concept 7 — Augmenter le nombre de pas</h2>
+<blockquote>
+<p><em>Le modèle présenté est <strong>irréaliste de simplicité</strong> : un analyste ne peut espérer qu'une approximation très grossière avec un ou deux pas.</em> En pratique, <em>on divise la vie de l'option en <strong>30 pas ou plus</strong>. Avec 30 pas, il y a <strong>31 prix terminaux</strong> et <strong>$2^{30}$, soit environ un milliard, de trajectoires</strong> implicitement considérées.</em></p>
+</blockquote>
+<p><strong>Les équations ne changent pas</strong> — seulement $\Delta t$. <em>Exemple avec <strong>cinq</strong> pas au lieu de deux, sur les mêmes données :</em>
+$$\Delta t=\frac25=0{,}4\qquad u=e^{0{,}3\sqrt{0{,}4}}=\mathbf{1{,}2089}\qquad d=\mathbf{0{,}8272}\qquad a=e^{0{,}02}=\mathbf{1{,}0202}\qquad p=\mathbf{0{,}5056}$$</p>
+<p><strong>La convergence, chiffrée.</strong></p>
+<table>
+<thead>
+<tr>
+<th>Nombre de pas</th>
+<th>Prix du put <strong>américain</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>2</td>
+<td><strong>7,428</strong></td>
+</tr>
+<tr>
+<td>5</td>
+<td><strong>7,671</strong></td>
+</tr>
+<tr>
+<td>500</td>
+<td><strong>7,47</strong></td>
+</tr>
+</tbody></table>
+<p><em>Le put <strong>européen</strong> de mêmes paramètres vaut <strong>6,76</strong> avec 500 pas — <strong>exactement</strong> la valeur donnée par la formule de Black-Scholes-Merton.</em></p>
+<blockquote>
+<p><strong>Le lien avec le chapitre 14.</strong> <em>À mesure que le nombre de pas augmente (donc que $\Delta t$ diminue), le modèle binomial fait <strong>les mêmes hypothèses</strong> sur le comportement du prix de l'action que le modèle de Black-Scholes-Merton. Le prix d'une option européenne <strong>converge</strong> vers le prix Black-Scholes-Merton.</em></p>
+</blockquote>
+<h2 data-prio="must">Concept 8 — Options sur d'autres actifs : une seule chose change</h2>
+<blockquote>
+<p><strong>Le principe.</strong> <em>On construit et utilise les arbres <strong>exactement de la même façon</strong> que pour les actions, <strong>sauf que l'équation de $p$ change</strong>.</em> La formule (12.2) reste vraie : la valeur à un nœud, <strong>avant</strong> de considérer l'exercice anticipé, est $p$ fois la valeur en cas de hausse plus $1-p$ fois celle en cas de baisse, <strong>actualisée au taux sans risque</strong>.</p>
+</blockquote>
+<p>$$\boxed{u=e^{\sigma\sqrt{\Delta t}},\quad d=\frac1u,\quad p=\frac{a-d}{u-d}\quad\text{— seul }a\text{ change}}$$</p>
+<table>
+<thead>
+<tr>
+<th>Sous-jacent</th>
+<th>Raisonnement</th>
+<th>$a$</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Action sans dividende</strong></td>
+<td>croissance risque-neutre au taux $r$</td>
+<td>$e^{r\Delta t}$</td>
+</tr>
+<tr>
+<td><strong>Action à rendement $q$</strong></td>
+<td><em>le rendement total est $r$ ; les dividendes en fournissent $q$ ; <strong>les plus-values doivent donc fournir $r-q$</strong></em></td>
+<td>$e^{(r-q)\Delta t}$</td>
+</tr>
+<tr>
+<td><strong>Indice</strong></td>
+<td>même hypothèse qu'au chapitre 5 : dividende au taux $q$</td>
+<td>$e^{(r-q)\Delta t}$</td>
+</tr>
+<tr>
+<td><strong>Devise</strong></td>
+<td><em>une devise étrangère est un actif procurant un rendement au taux sans risque étranger</em></td>
+<td>$e^{(r-r_f)\Delta t}$</td>
+</tr>
+<tr>
+<td><strong>Futures</strong></td>
+<td><em><strong>il ne coûte rien de prendre une position sur un futures : en monde risque-neutre, un prix futures doit avoir un taux de croissance espéré NUL</strong></em></td>
+<td>$\mathbf{1}$</td>
+</tr>
+</tbody></table>
+<details class="cor">
+<summary><strong>Trois exercices résolus — indice, devise, futures</strong></summary><div class="in">
+
+<p><strong>Exemple 12.1 — call européen sur indice.</strong> Indice <strong>810</strong>, $\sigma=20\,\%$, $q=2\,\%$, $r=5\,\%$, call <strong>6 mois</strong> $K=800$, <strong>deux pas</strong>.
+$$\Delta t=0{,}25\quad u=e^{0{,}20\sqrt{0{,}25}}=e^{0{,}1}=\mathbf{1{,}1052}\quad d=\mathbf{0{,}9048}$$
+$$a=e^{(0{,}05-0{,}02)\times0{,}25}=e^{0{,}0075}=\mathbf{1{,}0075}\qquad p=\frac{1{,}0075-0{,}9048}{1{,}1052-0{,}9048}=\mathbf{0{,}5126}$$
+<em>Arbre :</em> $810\to895{,}19\to\mathbf{989{,}34}$ · milieu <strong>810</strong> · $810\to732{,}92\to\mathbf{663{,}17}$.
+<em>Payoffs :</em> $\mathbf{189{,}34}$ · $\mathbf{10}$ · $\mathbf{0}$.
+<em>Remontée :</em> nœud haut $=e^{-0{,}0125}(0{,}5126\times189{,}34+0{,}4874\times10)=\mathbf{100{,}66}$ ; nœud bas $=e^{-0{,}0125}(0{,}5126\times10)=\mathbf{5{,}06}$ ; racine $=e^{-0{,}0125}(0{,}5126\times100{,}66+0{,}4874\times5{,}06)=\boxed{\mathbf{53{,}39}}$.</p>
+<p><strong>Exemple 12.2 — call américain sur devise.</strong> AUD à <strong>0,6100</strong> USD, $\sigma=12\,\%$, $r_{\text{AUD}}=7\,\%$, $r_{\text{USD}}=5\,\%$, call <strong>3 mois</strong> $K=0{,}6000$, <strong>trois pas</strong>.
+$$\Delta t=0{,}08333\quad u=e^{0{,}12\sqrt{0{,}08333}}=\mathbf{1{,}0352}\quad d=\mathbf{0{,}9660}$$
+$$a=e^{(0{,}05-0{,}07)\times0{,}08333}=\mathbf{0{,}9983}\qquad p=\frac{0{,}9983-0{,}9660}{1{,}0352-0{,}9660}=\mathbf{0{,}4673}$$
+Valeur de l'option : $\boxed{\mathbf{0{,}019}}$.
+ <strong>Ici $a&lt;1$</strong> parce que $r_f&gt;r$ : le prix de la devise <strong>décroît</strong> en espérance risque-neutre.</p>
+<p><strong>Exemple 12.3 — put américain sur futures.</strong> Prix futures <strong>31</strong>, $\sigma=30\,\%$, $r=5\,\%$, put <strong>9 mois</strong> $K=30$, <strong>trois pas</strong>.
+$$\Delta t=0{,}25\quad u=e^{0{,}3\sqrt{0{,}25}}=e^{0{,}15}=\mathbf{1{,}1618}\quad d=\mathbf{0{,}8607}\quad a=\mathbf{1}$$
+$$p=\frac{1-0{,}8607}{1{,}1618-0{,}8607}=\frac{0{,}1393}{0{,}3011}=\mathbf{0{,}4626}$$
+Valeur de l'option : $\boxed{\mathbf{2{,}84}}$.
+ <strong>$a=1$ mais on actualise quand même à $e^{-r\Delta t}$.</strong> La croissance espérée du <strong>prix futures</strong> est nulle ; l'actualisation du <strong>payoff</strong> reste au taux sans risque. Ne jamais confondre les deux rôles de $r$.</p>
+</div></details>
+
+<h2>Comment reconnaître le type d'exercice</h2>
+<table>
+<thead>
+<tr>
+<th>Signal</th>
+<th>Ce qu'on demande</th>
+<th>Outil</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Deux prix futurs donnés directement</td>
+<td>$u$ et $d$ <strong>imposés</strong></td>
+<td>$p=(a-d)/(u-d)$</td>
+</tr>
+<tr>
+<td>Une <strong>volatilité</strong> donnée</td>
+<td><strong>caler</strong> l'arbre</td>
+<td>$u=e^{\sigma\sqrt{\Delta t}}$, $d=1/u$</td>
+</tr>
+<tr>
+<td>« combien d'actions pour couvrir ? »</td>
+<td><strong>delta</strong></td>
+<td>$(f_u-f_d)/(S_0u-S_0d)$</td>
+</tr>
+<tr>
+<td>Option <strong>américaine</strong></td>
+<td>tester à chaque nœud</td>
+<td>$\max(\text{continuation},\text{exercice})$</td>
+</tr>
+<tr>
+<td>Un rendement de dividende $q$</td>
+<td><strong>indice</strong> ou action à rendement</td>
+<td>$a=e^{(r-q)\Delta t}$</td>
+</tr>
+<tr>
+<td>Deux taux, deux devises</td>
+<td><strong>change</strong></td>
+<td>$a=e^{(r-r_f)\Delta t}$</td>
+</tr>
+<tr>
+<td>Un prix <strong>futures</strong></td>
+<td><strong>futures</strong></td>
+<td>$a=1$</td>
+</tr>
+<tr>
+<td>« et si la probabilité réelle était 0,9 ? »</td>
+<td><strong>piège</strong></td>
+<td><strong>le prix ne change pas</strong></td>
+</tr>
+</tbody></table>
+<h2>Comment résoudre ce type d'exercice</h2>
+<p><strong>Protocole arbre complet — 6 étapes.</strong></p>
+<ol>
+<li>Calculer $\Delta t=T/n$, puis $u=e^{\sigma\sqrt{\Delta t}}$, $d=1/u$, $a$ <strong>selon le sous-jacent</strong>, $p=(a-d)/(u-d)$.</li>
+<li><strong>Vérifier $0&lt;p&lt;1$</strong> — sinon il y a une erreur (ou un arbitrage dans les données).</li>
+<li>Construire l'arbre des prix : le nœud $(i,j)$ vaut $S_0u^jd^{i-j}$.</li>
+<li>Calculer les <strong>payoffs terminaux</strong>.</li>
+<li><strong>Remonter</strong> : à chaque nœud, $e^{-r\Delta t}[pf_u+(1-p)f_d]$ ; pour une <strong>américaine</strong>, prendre le <strong>max</strong> avec le payoff d'exercice.</li>
+<li><strong>Contrôler</strong> : le prix américain doit être $\ge$ le prix européen, et le call américain sans dividende doit <strong>égaler</strong> l'européen (fiche 83).</li>
+</ol>
+<p><strong>Protocole delta — 2 étapes.</strong></p>
+<ol>
+<li>Repérer les <strong>deux nœuds</strong> atteints depuis le nœud courant.</li>
+<li>$\Delta=\dfrac{f_{\text{haut}}-f_{\text{bas}}}{S_{\text{haut}}-S_{\text{bas}}}$ — <strong>positif</strong> pour un call, <strong>négatif</strong> pour un put.</li>
+</ol>
+<h2 data-prio="must">Common mistakes</h2>
+<table>
+<thead>
+<tr>
+<th>Erreur</th>
+<th>Correction</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Utiliser la probabilité <strong>réelle</strong> de hausse</td>
+<td>Elle n'intervient <strong>jamais</strong> — elle est déjà dans $S_0$</td>
+</tr>
+<tr>
+<td>Actualiser au rendement espéré de l'action</td>
+<td>On actualise <strong>toujours</strong> au taux <strong>sans risque</strong></td>
+</tr>
+<tr>
+<td>Oublier le test d'exercice à un nœud intermédiaire</td>
+<td>Une <strong>américaine</strong> se teste à <strong>chaque</strong> nœud</td>
+</tr>
+<tr>
+<td>Choisir $u$ et $d$ arbitrairement quand $\sigma$ est donnée</td>
+<td>$u=e^{\sigma\sqrt{\Delta t}}$ — l'écart de prix atteint <strong>46 %</strong> dans l'exemple</td>
+</tr>
+<tr>
+<td>Écrire $\sqrt{\Delta t}$ comme $\Delta t$ dans $u$</td>
+<td>C'est bien <strong>$\sigma\sqrt{\Delta t}$</strong></td>
+</tr>
+<tr>
+<td>Prendre $a=e^{r\Delta t}$ pour un futures</td>
+<td><strong>$a=1$</strong> — croissance risque-neutre nulle</td>
+</tr>
+<tr>
+<td>Ne pas actualiser un arbre sur futures</td>
+<td>On actualise <strong>quand même</strong> à $e^{-r\Delta t}$</td>
+</tr>
+<tr>
+<td>Oublier que $r_f$ se <strong>retranche</strong> pour une devise</td>
+<td>$a=e^{(r-r_f)\Delta t}$, et $a&lt;1$ si $r_f&gt;r$</td>
+</tr>
+<tr>
+<td>Croire que le delta est constant</td>
+<td>Il <strong>change</strong> à chaque nœud et à chaque instant</td>
+</tr>
+<tr>
+<td>Croire que la volatilité change avec la mesure</td>
+<td><strong>Girsanov</strong> : la <strong>dérive</strong> change, <strong>pas</strong> la volatilité</td>
+</tr>
+</tbody></table>
+<h2>Ultimate Review</h2>
+<p><strong>Les quatre formules de l'arbre.</strong>
+$$u=e^{\sigma\sqrt{\Delta t}}\qquad d=\frac1u\qquad p=\frac{a-d}{u-d}\qquad f=e^{-r\Delta t}\big[pf_u+(1-p)f_d\big]$$</p>
+<p><strong>Le paramètre $a$ selon le sous-jacent.</strong> Action : $e^{r\Delta t}$ · rendement $q$ ou indice : $e^{(r-q)\Delta t}$ · devise : $e^{(r-r_f)\Delta t}$ · <strong>futures : $1$</strong>.</p>
+<p><strong>Le delta.</strong> $\Delta=\dfrac{f_u-f_d}{S_0u-S_0d}$ — nombre d'actions par option <strong>vendue</strong> ; il <strong>change dans le temps</strong>.</p>
+<p><strong>Américaine.</strong> $f=\max(\text{continuation},\text{exercice immédiat})$, testé à <strong>chaque</strong> nœud.</p>
+<p><strong>Les trois piliers conceptuels.</strong> (i) Deux titres, deux issues → <strong>portefeuille sans risque toujours constructible</strong>. (ii) <strong>La probabilité réelle n'intervient pas</strong> — elle est déjà dans $S_0$. (iii) <strong>Girsanov</strong> : changer de mesure change la <strong>dérive</strong>, pas la <strong>volatilité</strong> ; mesure $P$ (réelle) contre mesure $Q$ (risque-neutre).</p>
+<p><strong>Les chiffres du chapitre.</strong> Exemple canonique : $\Delta=0{,}25$, portefeuille <strong>4,5</strong>, $f=\mathbf{0{,}633}$, $p=\mathbf{0{,}6523}$, taux d'actualisation réel implicite <strong>42,58 %</strong> · arbre à deux pas : <strong>2,0257</strong> puis <strong>1,2823</strong> · put européen <strong>4,1923</strong>, américain <strong>5,0894</strong> · put calé ($\sigma=30\,\%$) : $u=1{,}3499$, $p=0{,}5097$, <strong>7,43</strong> · convergence <strong>7,428 / 7,671 / 7,47</strong> ; européen <strong>6,76</strong> $=$ Black-Scholes · indice : $p=0{,}5126$, <strong>53,39</strong> · devise : $p=0{,}4673$, <strong>0,019</strong> · futures : $p=0{,}4626$, <strong>2,84</strong>.</p>
+<div class="rec"><h2>Active Recall</h2><details class="cor">
+<summary>Pourquoi peut-on **toujours** construire un portefeuille sans risque dans un arbre à un pas ?</summary><div class="in">
+
+<p>Parce qu'<em>il y a <strong>deux titres</strong> — l'action et l'option — et seulement <strong>deux issues possibles</strong></em>. On a donc <strong>une inconnue</strong> ($\Delta$) et <strong>une équation</strong> (égalité des valeurs finales) : le système a toujours une solution. C'est cette coïncidence de dimensions qui rend le marché <strong>complet</strong> et fait fonctionner tout l'argument d'absence d'arbitrage.</p>
+</div></details><details class="cor">
+<summary>Action à 20 → 22 ou 18 ; call $K=21$ ; $r=12\,\%$ ; 3 mois. Trouver $\Delta$ puis $f$.</summary><div class="in">
+
+<p>$22\Delta-1=18\Delta\Rightarrow\Delta=\mathbf{0{,}25}$. Portefeuille : $22(0{,}25)-1=18(0{,}25)=\mathbf{4{,}5}$ dans les deux cas. Valeur actuelle : $4{,}5e^{-0{,}03}=\mathbf{4{,}367}$. Coût de constitution $=20(0{,}25)-f=5-f$. Donc $f=5-4{,}367=\boxed{0{,}633}$.</p>
+</div></details><details class="cor">
+<summary>Le prix de l'option change-t-il si la probabilité réelle de hausse passe de 0,5 à 0,9 ?</summary><div class="in">
+
+<p><strong>Non.</strong> <em>La formule (12.2) ne fait pas intervenir les probabilités de hausse ou de baisse.</em> La raison : <em>nous ne valorisons pas l'option en termes absolus mais <strong>en termes du prix de l'action sous-jacente</strong>. <strong>Les probabilités de mouvements futurs sont déjà incorporées dans le prix de l'action</strong> : il n'y a pas à en tenir compte une seconde fois.</em></p>
+</div></details><details class="cor">
+<summary>Qu'est-ce que la valorisation risque-neutre, et pourquoi est-ce « presque miraculeux » ?</summary><div class="in">
+
+<p>C'est l'hypothèse que <em>les investisseurs n'augmentent pas le rendement exigé pour compenser un risque accru</em>. Dans un tel monde : <strong>(1)</strong> le rendement espéré de tout actif est $r$ ; <strong>(2)</strong> on actualise au taux $r$.</p>
+<p>Le miracle : <em>supposer un monde risque-neutre donne <strong>le bon prix pour le monde où nous vivons</strong>, et cela <strong>contourne le problème que nous ne savons pratiquement rien de l'aversion au risque</strong> des acheteurs et vendeurs.</em> Preuve dans l'exemple : le taux d'actualisation correct <strong>du monde réel</strong> serait <strong>42,58 %</strong> — un nombre inconnaissable dont on n'a jamais besoin.</p>
+</div></details><details class="cor">
+<summary>Prouver que $p=(e^{rT}-d)/(u-d)$ est bien une probabilité risque-neutre.</summary><div class="in">
+
+<p>$$\mathbb E(S_T)=pS_0u+(1-p)S_0d=pS_0(u-d)+S_0d$$
+En substituant $p$ :
+$$\mathbb E(S_T)=S_0\big(e^{rT}-d\big)+S_0d=S_0e^{rT}$$
+<em>L'action croît donc <strong>en moyenne au taux sans risque</strong> : elle se comporte exactement comme dans un monde risque-neutre.</em></p>
+</div></details><details class="cor">
+<summary>Comment valorise-t-on une option américaine sur un arbre ?</summary><div class="in">
+
+<p><em>On remonte de la fin vers le début en <strong>testant à chaque nœud si l'exercice anticipé est optimal</strong>.</em> Les valeurs terminales sont celles de l'européenne ; à chaque nœud antérieur, on prend <strong>le plus grand</strong> de la <strong>valeur de continuation</strong> $e^{-r\Delta t}[pf_u+(1-p)f_d]$ et du <strong>payoff d'exercice immédiat</strong>. Dans l'exemple, seul le nœud $S=40$ voit l'exercice optimal ($12&gt;9{,}4636$) — et c'est ce seul nœud qui fait passer le prix de <strong>4,1923</strong> à <strong>5,0894</strong>.</p>
+</div></details><details class="cor">
+<summary>Calculer les deltas du put de la figure 12.7 et en tirer la conclusion pratique.</summary><div class="in">
+
+<p>Premier pas : $\dfrac{1{,}4147-9{,}4636}{60-40}=\mathbf{-0{,}4024}$. Second pas, après hausse : $\dfrac{0-4}{72-48}=\mathbf{-0{,}1667}$ ; après baisse : $\dfrac{4-20}{48-32}=\mathbf{-1{,}0000}$.</p>
+<p><strong>Conclusion :</strong> le delta <strong>change dans le temps</strong>. <em>Pour maintenir une couverture sans risque, il faut <strong>ajuster périodiquement</strong> sa position en actions</em> — c'est le sujet du chapitre 18.</p>
+</div></details><details class="cor">
+<summary>Comment cale-t-on $u$ et $d$ sur la volatilité, et pourquoi cela ne dépend-il pas de la mesure ?</summary><div class="in">
+
+<p>On impose que la variance du rendement sur l'arbre égale $\sigma^2\Delta t$. En substituant $p^\ast=(e^{\mu\Delta t}-d)/(u-d)$, on obtient $e^{\mu\Delta t}(u+d)-ud-e^{2\mu\Delta t}=\sigma^2\Delta t$, dont une solution (en ignorant les termes en $\Delta t^2$) est
+$$u=e^{\sigma\sqrt{\Delta t}},\qquad d=e^{-\sigma\sqrt{\Delta t}}=1/u$$
+<strong>Cox, Ross et Rubinstein, 1979.</strong> Le même calcul avec $r$ au lieu de $\mu$ redonne $\sigma^2\Delta t$ : <em>quand on passe du monde réel au monde risque-neutre, <strong>le rendement espéré change mais la volatilité reste la même</strong></em>. C'est le <strong>théorème de Girsanov</strong>.</p>
+</div></details><details class="cor">
+<summary>Que sont les mesures $P$ et $Q$ ?</summary><div class="in">
+
+<p>$P$ est la <strong>mesure du monde réel</strong> — celle sous laquelle l'action croît au rendement espéré $\mu$, avec probabilité de hausse $p^\ast$. $Q$ est la <strong>mesure risque-neutre</strong> — celle sous laquelle l'action croît au taux $r$, avec probabilité de hausse $p$. <em>Passer de l'une à l'autre s'appelle <strong>changer de mesure</strong> ; cela <strong>modifie les taux de croissance espérés mais laisse les volatilités inchangées</strong>.</em></p>
+</div></details><details class="cor">
+<summary>Pourquoi le put calé sur $\sigma=30\,\%$ vaut-il 7,43 alors qu'il valait 5,0894 avec $u=1{,}2$ ?</summary><div class="in">
+
+<p>Parce que $u=1{,}2$ et $d=0{,}8$ étaient <strong>arbitraires</strong>. Le calage donne $u=e^{0{,}3}=\mathbf{1{,}3499}$ et $d=\mathbf{0{,}7408}$ — un arbre <strong>beaucoup plus large</strong>, donc une volatilité implicite bien supérieure, donc une option plus chère. <strong>Écart : +46 %.</strong> <em>Le calage n'est pas un raffinement : c'est ce qui fait que l'arbre représente le vrai sous-jacent.</em></p>
+</div></details><details class="cor">
+<summary>Comment adapter l'arbre à un indice, à une devise, à un futures ?</summary><div class="in">
+
+<p><strong>Une seule chose change : $a$.</strong> Indice ou action à rendement $q$ : $a=e^{(r-q)\Delta t}$ — <em>le rendement total est $r$, les dividendes en fournissent $q$, donc les plus-values doivent fournir $r-q$</em>. Devise : $a=e^{(r-r_f)\Delta t}$ — <em>une devise est un actif procurant un rendement au taux sans risque étranger</em>. <strong>Futures : $a=1$</strong> — <em>il ne coûte rien de prendre une position, donc en monde risque-neutre le prix futures a une croissance espérée <strong>nulle</strong></em>. $u$, $d$ et l'actualisation à $e^{-r\Delta t}$ sont <strong>inchangés dans tous les cas</strong>.</p>
+</div></details><details class="cor">
+<summary>Combien de trajectoires un arbre à 30 pas considère-t-il, et vers quoi le prix converge-t-il ?</summary><div class="in">
+
+<p><strong>$2^{30}$, soit environ un milliard</strong> de trajectoires, pour <strong>31 prix terminaux</strong>. <em>À mesure que $\Delta t$ diminue, le modèle binomial fait <strong>les mêmes hypothèses</strong> que Black-Scholes-Merton</em>, et le prix d'une option <strong>européenne converge</strong> vers le prix de la formule fermée. Vérification chiffrée : le put européen à 500 pas vaut <strong>6,76</strong>, exactement la valeur de Black-Scholes-Merton ; l'américain vaut <strong>7,47</strong>.</p>
+</div></details></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h2>Flashcards</h2>
+<table>
+<thead>
+<tr>
+<th>Question</th>
+<th>Réponse</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Quelle est la seule hypothèse nécessaire ?</td>
+<td><strong>Pas d'opportunité d'arbitrage</strong></td>
+</tr>
+<tr>
+<td>Pourquoi peut-on toujours couvrir ?</td>
+<td><strong>Deux titres</strong>, <strong>deux issues</strong></td>
+</tr>
+<tr>
+<td>Formule du delta ?</td>
+<td>$\Delta=\dfrac{f_u-f_d}{S_0u-S_0d}$</td>
+</tr>
+<tr>
+<td>Que représente le delta ?</td>
+<td>Nombre d'<strong>actions par option vendue</strong></td>
+</tr>
+<tr>
+<td>Signe du delta d'un call ? d'un put ?</td>
+<td><strong>Positif</strong> / <strong>négatif</strong></td>
+</tr>
+<tr>
+<td>Le delta est-il constant ?</td>
+<td><strong>Non</strong> — il change à chaque nœud</td>
+</tr>
+<tr>
+<td>Formule du prix à un nœud ?</td>
+<td>$f=e^{-r\Delta t}[pf_u+(1-p)f_d]$</td>
+</tr>
+<tr>
+<td>Formule de $p$ ?</td>
+<td>$p=\dfrac{a-d}{u-d}$</td>
+</tr>
+<tr>
+<td>La probabilité réelle intervient-elle ?</td>
+<td><strong>Jamais</strong></td>
+</tr>
+<tr>
+<td>Pourquoi ?</td>
+<td>Elle est <strong>déjà incorporée dans $S_0$</strong></td>
+</tr>
+<tr>
+<td>Les deux propriétés d'un monde risque-neutre ?</td>
+<td>Rendement espéré $=r$ · actualisation à $r$</td>
+</tr>
+<tr>
+<td>Que vaut $\mathbb E(S_T)$ sous $Q$ ?</td>
+<td>$S_0e^{rT}$</td>
+</tr>
+<tr>
+<td>La recette risque-neutre en trois temps ?</td>
+<td>Probabilités $Q$ → payoff espéré → <strong>actualiser à $r$</strong></td>
+</tr>
+<tr>
+<td>Taux d'actualisation réel de l'exemple ?</td>
+<td><strong>42,58 %</strong></td>
+</tr>
+<tr>
+<td>Formule directe à deux pas ?</td>
+<td>$e^{-2r\Delta t}[p^2f_{uu}+2p(1-p)f_{ud}+(1-p)^2f_{dd}]$</td>
+</tr>
+<tr>
+<td>Que sont $p^2$, $2p(1-p)$, $(1-p)^2$ ?</td>
+<td>Les probabilités des <strong>nœuds terminaux</strong></td>
+</tr>
+<tr>
+<td>Règle pour une américaine ?</td>
+<td>$\max(\text{continuation},\text{exercice})$ à <strong>chaque</strong> nœud</td>
+</tr>
+<tr>
+<td>Put européen / américain de l'exemple ?</td>
+<td><strong>4,1923</strong> / <strong>5,0894</strong></td>
+</tr>
+<tr>
+<td>Calage de $u$ ?</td>
+<td>$u=e^{\sigma\sqrt{\Delta t}}$</td>
+</tr>
+<tr>
+<td>Calage de $d$ ?</td>
+<td>$d=1/u=e^{-\sigma\sqrt{\Delta t}}$</td>
+</tr>
+<tr>
+<td>Qui a proposé ce calage ?</td>
+<td><strong>Cox, Ross et Rubinstein (1979)</strong></td>
+</tr>
+<tr>
+<td>Que vaut $a$ pour une action ?</td>
+<td>$e^{r\Delta t}$</td>
+</tr>
+<tr>
+<td>Pour un indice ou un rendement $q$ ?</td>
+<td>$e^{(r-q)\Delta t}$</td>
+</tr>
+<tr>
+<td>Pour une devise ?</td>
+<td>$e^{(r-r_f)\Delta t}$</td>
+</tr>
+<tr>
+<td>Pour un futures ?</td>
+<td>$\mathbf{a=1}$</td>
+</tr>
+<tr>
+<td>Pourquoi $a=1$ pour un futures ?</td>
+<td>Entrer coûte <strong>zéro</strong> → croissance risque-neutre <strong>nulle</strong></td>
+</tr>
+<tr>
+<td>Actualise-t-on quand même sur un arbre de futures ?</td>
+<td><strong>Oui</strong>, à $e^{-r\Delta t}$</td>
+</tr>
+<tr>
+<td>Que dit le théorème de Girsanov ?</td>
+<td>Changer de mesure change la <strong>dérive</strong>, <strong>pas</strong> la volatilité</td>
+</tr>
+<tr>
+<td>Qu'est-ce que la mesure $P$ ? $Q$ ?</td>
+<td>Monde <strong>réel</strong> / monde <strong>risque-neutre</strong></td>
+</tr>
+<tr>
+<td>Combien de pas en pratique ?</td>
+<td><strong>30 ou plus</strong></td>
+</tr>
+<tr>
+<td>Trajectoires implicites avec 30 pas ?</td>
+<td>Environ <strong>un milliard</strong> ($2^{30}$)</td>
+</tr>
+<tr>
+<td>Vers quoi converge le prix européen ?</td>
+<td>Le prix de <strong>Black-Scholes-Merton</strong></td>
+</tr>
+<tr>
+<td>Put américain à 2 / 5 / 500 pas ?</td>
+<td><strong>7,428</strong> / <strong>7,671</strong> / <strong>7,47</strong></td>
+</tr>
+<tr>
+<td>Put européen à 500 pas ?</td>
+<td><strong>6,76</strong> — identique à Black-Scholes</td>
+</tr>
+<tr>
+<td>$p$ de l'exemple sur indice ?</td>
+<td><strong>0,5126</strong>, valeur <strong>53,39</strong></td>
+</tr>
+<tr>
+<td>$p$ de l'exemple sur devise ?</td>
+<td><strong>0,4673</strong>, valeur <strong>0,019</strong></td>
+</tr>
+<tr>
+<td>$p$ de l'exemple sur futures ?</td>
+<td><strong>0,4626</strong>, valeur <strong>2,84</strong></td>
+</tr>
+</tbody></table>
+</main>
+
+
+
+
+</body></html>

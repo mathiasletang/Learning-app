@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fiche 25 — Optimisation affine par morceaux : tout ramener à un LP</title>
+<script>
+window.MathJax={tex:{inlineMath:[["$","$"]],displayMath:[["$$","$$"]],processEscapes:true},
+ options:{skipHtmlTags:["script","noscript","style","textarea","pre","code"]},
+ svg:{fontCache:"global"},
+ startup:{pageReady:()=>MathJax.startup.defaultPageReady().then(()=>{document.body.classList.add("ready")})}};
+setTimeout(function(){document.body.classList.add("ready")},2500);
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+/* ============================================================
+   MathiasLearn — feuille de style des fiches
+   Reprise intégrale des tokens de 00_PARCOURS/*.html
+   + blocs pédagogiques (callouts, méthode, essentiels, recall)
+   ============================================================ */
+:root{--bg:#faf9f7;--card:#fff;--ink:#1a1a1a;--muted:#6b6b6b;--line:#e5e2dd;--accent:#8b5e34;
+ --hl:#fdf8ef;--ok:#2d7d4f;--okbg:#f0f7f3;--warn:#b3402f;--warnbg:#fdf3f1;--blue:#2f5d8b;--bluebg:#f1f5fa}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+ font:17px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;padding:0 16px 100px}
+.nav{position:sticky;top:0;background:rgba(250,249,247,.96);backdrop-filter:blur(8px);
+ border-bottom:1px solid var(--line);margin:0 -16px 30px;padding:11px 16px;z-index:50;
+ display:flex;gap:6px;flex-wrap:wrap;font-size:13px}
+.nav a{color:var(--muted);text-decoration:none;padding:4px 9px;border-radius:5px;white-space:nowrap}
+.nav a:hover{background:var(--line);color:var(--ink)}
+.nav a.on{background:var(--accent);color:#fff}
+main{max-width:780px;margin:0 auto}
+h1{font-size:31px;letter-spacing:-.02em;margin:.4em 0 .5em;line-height:1.25}
+h2{font-size:23px;margin:2.2em 0 .7em;padding-bottom:.3em;border-bottom:1px solid var(--line)}
+h3{font-size:19px;margin:1.9em 0 .5em;color:var(--accent)}
+h4{font-size:17px;margin:1.5em 0 .4em}
+p{margin:.8em 0} a{color:var(--accent)} hr{border:0;border-top:1px solid var(--line);margin:2.6em 0}
+table{border-collapse:collapse;width:100%;margin:1.3em 0;font-size:15.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+th{background:#f3f0eb;font-weight:600}
+tr:nth-child(even) td{background:#fcfbfa}
+code{font-family:"SF Mono",Menlo,Consolas,monospace;font-size:.88em;background:#f2efea;padding:2px 6px;border-radius:4px;white-space:nowrap}
+pre{background:#f2efea;padding:14px 16px;border-radius:8px;overflow-x:auto}
+pre code{background:none;padding:0;white-space:pre}
+blockquote{border-left:3px solid var(--accent);background:var(--hl);margin:1.4em 0;padding:14px 20px;border-radius:0 8px 8px 0}
+blockquote p:first-child{margin-top:0} blockquote p:last-child{margin-bottom:0}
+ul,ol{padding-left:1.5em} li{margin:.35em 0} em{color:#4a4a4a}
+mjx-container[display="true"]{margin:1.1em 0!important;overflow-x:auto;overflow-y:hidden;padding:2px 0}
+mjx-container svg{max-width:100%}
+body:not(.ready) main{opacity:0} main{opacity:1;transition:opacity .25s}
+
+/* --- bandeau de tête de fiche --- */
+.cours{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--accent);
+ border-radius:0 10px 10px 0;padding:18px 22px;margin:0 0 34px}
+.cours h4{margin:0 0 4px;font-size:14px;text-transform:uppercase;letter-spacing:.07em;color:var(--accent)}
+.cours .cs{color:var(--muted);font-size:14.5px;margin:0 0 14px}
+
+/* --- exercices / corrigés --- */
+.ex{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:6px 24px 20px;margin:18px 0}
+.ex>h3:first-child{margin-top:14px}
+details.cor{margin-top:18px;border:1px solid var(--line);border-radius:8px;background:#fcfbfa;overflow:hidden}
+details.cor>summary{cursor:pointer;padding:12px 16px;font-weight:600;font-size:15px;color:var(--accent);
+ list-style:none;display:flex;align-items:center;gap:9px;user-select:none;transition:.15s;min-height:44px}
+details.cor>summary::-webkit-details-marker{display:none}
+details.cor>summary:hover{background:var(--hl)}
+details.cor>summary::before{content:"\25B6";font-size:10px;transition:transform .18s;display:inline-block}
+details.cor[open]>summary::before{transform:rotate(90deg)}
+details.cor[open]>summary{background:var(--okbg);color:var(--ok);border-bottom:1px solid var(--line)}
+.cor .in{padding:4px 20px 16px}
+.cor .in>*:first-child{margin-top:.9em}
+
+/* --- blocs pédagogiques (callouts) ---
+   Générés depuis une citation Markdown dont le premier **gras** commence
+   par un mot-clé : DÉFINITION, THÉORÈME, MÉTHODE, PIÈGE, INTUITION… */
+.cal{border:1px solid var(--line);border-left:4px solid var(--accent);background:var(--card);
+ border-radius:0 10px 10px 0;padding:15px 20px;margin:1.5em 0}
+.cal>p:first-child{margin-top:0}.cal>p:last-child,.cal>ul:last-child,.cal>ol:last-child{margin-bottom:0}
+.cal .lab{display:block;font-size:12.5px;text-transform:uppercase;letter-spacing:.08em;
+ font-weight:700;color:var(--accent);margin-bottom:6px}
+.cal.formel{background:var(--hl)}
+.cal.piege{border-left-color:var(--warn);background:var(--warnbg)}
+.cal.piege .lab{color:var(--warn)}
+.cal.methode{border-left-color:var(--ok);background:var(--okbg)}
+.cal.methode .lab{color:var(--ok)}
+.cal.intu{border-left-color:var(--blue);background:var(--bluebg)}
+.cal.intu .lab{color:var(--blue)}
+.cal.plus{border-left-style:dashed;background:#faf9f7}
+.cal.plus .lab{color:var(--muted)}
+
+/* --- révision express --- */
+.ess{background:var(--card);border:1px solid var(--accent);border-radius:10px;padding:4px 24px 20px;margin:1.6em 0}
+.ess h3{margin-top:1.3em}
+.rec{background:var(--card);border:1px dashed var(--accent);border-radius:10px;padding:4px 24px 18px;margin:1.6em 0}
+.rec ol{counter-reset:none}
+
+/* --- impression / PDF --- */
+@media print{
+ .nav{display:none}
+ body{padding:0;background:#fff;font-size:11.2pt;line-height:1.55}
+ main{max-width:none}
+ h1{font-size:23pt}h2{font-size:15pt;margin-top:1.5em}h3{font-size:12.6pt}
+ h2,h3,h4{break-after:avoid;page-break-after:avoid}
+ table,.cal,blockquote{break-inside:avoid;page-break-inside:avoid}
+ table{display:table;font-size:9.6pt}
+ details.cor{border:1px solid var(--line);background:#fcfbfa}
+ details.cor>summary{display:none}
+ details.cor .in{padding-top:10px}
+ .cal,.ex,.ess,.rec{box-shadow:none}
+ a{color:var(--ink);text-decoration:none}
+}
+@page{margin:16mm 15mm 18mm}
+
+/* --- exemples travaillés --- */
+.exm{background:#fcfbfa;border:1px solid var(--line);border-radius:10px;padding:2px 20px 14px;margin:1.5em 0}
+.exm>h4:first-child{margin:14px 0 .5em;color:var(--accent);font-size:13px;text-transform:uppercase;letter-spacing:.07em}
+
+
+/* --- pastilles de priorité (conventions des fiches de l'app) --- */
+h2[data-prio], h3[data-prio], h4[data-prio]{position:relative}
+h2[data-prio]::before,h3[data-prio]::before,h4[data-prio]::before{
+ content:"";display:inline-block;width:9px;height:9px;border-radius:50%;
+ margin-right:9px;vertical-align:middle;background:var(--muted)}
+[data-prio="must"]::before{background:var(--warn)}
+[data-prio="high"]::before{background:#d98324}
+[data-prio="mid"]::before{background:#c9a227}
+[data-prio="low"]::before{background:var(--ok)}
+/* corrigés des fiches de l'app : même traitement que les corrigés des séries */
+details.cor>summary::after{content:""}
+</style></head><body>
+<div class="nav"><a href="24-lp-formulation.html">Programmation linéaire : formulation et géométrie</a><a href="25-lp-affine-par-morceaux.html" class="on">Optimisation affine par morceaux : tout ramener à un LP</a><a href="26-lp-polyedres.html">Polyèdres : faces, points extrêmes, test du rang</a><a href="27-lp-convexite-cones.html">Enveloppes convexes, cônes et décomposition d'un polyèdre</a><a href="28-lp-dualite.html">Dualité en programmation linéaire</a><a href="29-lp-sensibilite-jeux.html">Dualité II : sensibilité, prix implicites et jeux à somme nulle</a><a href="30-lp-simplexe.html">L'algorithme du simplexe</a><a href="31-lp-reseaux-unimodularite.html">Flots dans les réseaux et unimodularité totale</a><a href="32-lp-commande.html">Applications en automatique : suivi de consigne et robustesse</a><a href="33-lp-nombres-entiers.html">Programmation linéaire en nombres entiers et séparation-évaluation</a><a href="34-boyd-ensembles-convexes.html">Ensembles convexes</a><a href="35-boyd-fonctions-convexes.html">Fonctions convexes</a><a href="36-boyd-problemes-convexes.html">Problèmes d'optimisation convexe</a><a href="37-boyd-familles-standard.html">Les familles standard : LP, QP, SOCP, GP, SDP</a><a href="38-boyd-dualite.html">Dualité lagrangienne</a><a href="39-boyd-minimisation-sans-contrainte.html">Minimisation sans contrainte : gradient et Newton</a><a href="40-boyd-contraintes-egalite.html">Minimisation sous contraintes d'égalité</a><a href="41-boyd-points-interieurs.html">Méthodes de points intérieurs</a><a href="42-sous-gradients.html">Sous-gradients et sous-différentiel</a><a href="43-methode-sous-gradient.html">La méthode du sous-gradient</a></div>
+<main><h1>Fiche 25 — Optimisation affine par morceaux : tout ramener à un LP</h1>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Matière</strong></td>
+<td>Maths · Optimisation</td>
+</tr>
+<tr>
+<td><strong>Cours source</strong></td>
+<td>Vandenberghe, <em>EE236A — Linear Programming</em> (UCLA), Lecture 2 « Piecewise-linear optimization », 24 diapositives</td>
+</tr>
+<tr>
+<td><strong>Difficulté</strong></td>
+<td> Must know — la technique la plus rentable du cours</td>
+</tr>
+<tr>
+<td><strong>Temps d'étude estimé</strong></td>
+<td>2 h</td>
+</tr>
+<tr>
+<td><strong>Prérequis</strong></td>
+<td>Fiche 24 (forme matricielle d'un LP), fiche 11 (convexité)</td>
+</tr>
+<tr>
+<td><strong>Concepts clés</strong></td>
+<td>Fonction affine par morceaux, variable auxiliaire, épigraphe, approximation en norme 1 et en norme infinie, parcimonie, classification linéaire</td>
+</tr>
+<tr>
+<td><strong>Poids à l'examen</strong></td>
+<td>C'est <strong>la</strong> compétence transférable : reconnaître qu'un problème non linéaire en apparence est un LP déguisé, et écrire la reformulation. Presque tous les exercices de modélisation de <code>ZZ_EXERCICES_problems.pdf</code> se jouent là.</td>
+</tr>
+</tbody></table>
+<h2>Vue d'ensemble</h2>
+<p>Un objectif écrit avec des $\max$, des valeurs absolues, des normes $\|\cdot\|_1$ ou $\|\cdot\|_\infty$ <strong>n'est pas linéaire</strong> — et pourtant le problème est un LP. La technique tient en une phrase, et elle se répète à l'identique dans tout le cours :</p>
+<pre><code>OBJECTIF NON LINÉAIRE  →  on ajoute une VARIABLE AUXILIAIRE t
+                       →  on impose « t majore chaque morceau »
+                       →  on minimise t
+</code></pre>
+<p>Pourquoi ça marche : à $x$ fixé, la contrainte $t \geq$ (chaque morceau) force $t \geq f(x)$, et comme on minimise $t$, l'optimum prend $t = f(x)$. <strong>On n'a rien changé au problème, on a juste déplacé la difficulté dans les contraintes</strong> — là où elle devient linéaire. C'est le passage à l'<strong>épigraphe</strong>.</p>
+<h2 data-prio="mid">Concept 1 — Linéaire, affine, affine par morceaux</h2>
+<p><strong>Fonction linéaire.</strong> $f:\mathbb{R}^n\to\mathbb{R}$ est linéaire si
+$$f(\alpha x + \beta y) = \alpha f(x) + \beta f(y) \qquad \forall x,y\in\mathbb{R}^n,\ \forall\alpha,\beta\in\mathbb{R}$$
+<em>Propriété :</em> $f$ est linéaire <strong>si et seulement si</strong> $f(x) = a^Tx$ pour un certain $a$.</p>
+<p><strong>Fonction affine.</strong> $f$ est affine si
+$$f\big(\alpha x + (1-\alpha)y\big) = \alpha f(x) + (1-\alpha)f(y) \qquad \forall x,y\in\mathbb{R}^n,\ \forall\alpha\in\mathbb{R}$$
+<em>Propriété :</em> $f$ est affine <strong>si et seulement si</strong> $f(x) = a^Tx + b$ pour certains $a$ et $b$.</p>
+<p class="cal piege"> La différence tient au coefficient : linéaire autorise <strong>toutes</strong> les combinaisons $\alpha,\beta$ ; affine n'autorise que celles dont les poids somment à $1$. Une fonction affine avec $b\neq0$ n'est pas linéaire, bien que son graphe soit une droite. Le cours parle de « fonction linéaire » pour l'objectif d'un LP, alors qu'un $+b$ ne changerait rien à l'argmin.</p>
+<p><strong>Fonction affine par morceaux (convexe).</strong> $f:\mathbb{R}^n\to\mathbb{R}$ est dite affine par morceaux convexe si
+$$f(x) = \max_{i=1,\dots,m}\ \big(a_i^Tx + b_i\big)$$
+Elle est paramétrée par $m$ vecteurs $a_i \in \mathbb{R}^n$ et $m$ scalaires $b_i$. Son graphe est l'enveloppe supérieure de $m$ hyperplans : une surface « en toit », anguleuse aux intersections.</p>
+<blockquote>
+<p>Le cours note lui-même que <em>piecewise-affine</em> serait plus juste que <em>piecewise-linear</em>, mais que le second est l'usage.</p>
+</blockquote>
+<h2 data-prio="must">Concept 2 — La reformulation reine : minimiser un maximum</h2>
+<p>$$\min_x\ f(x) = \max_{i=1,\dots,m}\big(a_i^Tx+b_i\big)$$</p>
+<p><strong>LP équivalent</strong> (variables $x$ <strong>et</strong> un scalaire auxiliaire $t$) :
+$$\begin{array}{ll}\text{minimiser} &amp; t\\ \text{sous} &amp; a_i^Tx + b_i \leq t, \quad i = 1,\dots,m\end{array}$$</p>
+<p><strong>Pourquoi c'est équivalent.</strong> À $x$ fixé, les $m$ contraintes disent exactement $t \geq \max_i(a_i^Tx+b_i) = f(x)$. Comme on minimise $t$, l'optimum choisit la plus petite valeur permise : $t^\star = f(x)$. Minimiser en $(x,t)$ revient donc à minimiser $f$ en $x$.</p>
+<p><strong>Écriture matricielle.</strong> En posant $\tilde x = \begin{pmatrix}x\\t\end{pmatrix}$ :
+$$\tilde c = \begin{pmatrix}0\\1\end{pmatrix},\qquad \tilde A = \begin{pmatrix} a_1^T &amp; -1\\ \vdots &amp; \vdots\\ a_m^T &amp; -1\end{pmatrix},\qquad \tilde b = \begin{pmatrix}-b_1\\ \vdots\\ -b_m\end{pmatrix}$$
+et le problème est $\min\ \tilde c^T\tilde x$ sous $\tilde A\tilde x \preceq \tilde b$ — un LP standard à $n+1$ variables et $m$ contraintes.</p>
+<h3>Somme de deux fonctions affines par morceaux</h3>
+<p>$$\min_x\ f(x)+g(x) = \max_{i=1,\dots,m}(a_i^Tx+b_i) + \max_{j=1,\dots,p}(c_j^Tx+d_j)$$</p>
+<p><strong>Première idée (mauvaise).</strong> La somme est encore affine par morceaux :
+$$f(x)+g(x) = \max_{\substack{i=1,\dots,m\\ j=1,\dots,p}}\ (a_i+c_j)^Tx + (b_i+d_j)$$
+mais c'est un maximum de $mp$ fonctions affines : le LP aurait $mp$ contraintes.</p>
+<p><strong>Bonne idée : une variable auxiliaire par morceau.</strong>
+$$\begin{array}{ll}\text{minimiser} &amp; t_1 + t_2\\ \text{sous} &amp; a_i^Tx+b_i \leq t_1, \quad i=1,\dots,m\\ &amp; c_j^Tx+d_j\leq t_2, \quad j=1,\dots,p\end{array}$$
+soit <strong>$m+p$</strong> contraintes au lieu de $mp$. À $x$ fixé, les optima sont $t_1 = f(x)$ et $t_2 = g(x)$.</p>
+<p><strong>La leçon générale.</strong> Ajouter des variables auxiliaires <strong>réduit</strong> la taille du problème au lieu de l'augmenter. C'est contre-intuitif et c'est central : ne développez jamais un produit de maxima, introduisez une variable par terme.</p>
+<h2 data-prio="must">Concept 3 — Approximation en norme infinie (Tchebychev)</h2>
+<p>$$\min_x\ \|Ax-b\|_\infty, \qquad A\in\mathbb{R}^{m\times n},\ b\in\mathbb{R}^m$$</p>
+<p>La norme infinie d'un vecteur $y\in\mathbb{R}^m$ s'écrit comme un maximum de fonctions affines :
+$$\|y\|_\infty = \max_{i=1,\dots,m}|y_i| = \max_{i=1,\dots,m}\ \max\{y_i,\ -y_i\}$$</p>
+<p><strong>LP équivalent</strong> (variables $x$ et un scalaire $t$) :
+$$\begin{array}{ll}\text{minimiser} &amp; t\\ \text{sous} &amp; -t\mathbf{1} \preceq Ax-b \preceq t\mathbf{1}\end{array}$$
+À $x$ fixé, l'optimum est $t = \|Ax-b\|_\infty$.</p>
+<p><strong>Forme matricielle.</strong> Avec $\tilde x = (x,t)$ :
+$$\min\ \begin{pmatrix}0\\1\end{pmatrix}^T\tilde x \quad\text{sous}\quad \begin{pmatrix} A &amp; -\mathbf{1}\\ -A &amp; -\mathbf{1}\end{pmatrix}\begin{pmatrix}x\\t\end{pmatrix} \preceq \begin{pmatrix}b\\-b\end{pmatrix}$$</p>
+<h2 data-prio="must">Concept 4 — Approximation en norme 1</h2>
+<p>$$\min_x\ \|Ax-b\|_1$$</p>
+<p>Ici la norme est une <strong>somme</strong> de valeurs absolues :
+$$\|y\|_1 = \sum_{i=1}^m|y_i| = \sum_{i=1}^m \max\{y_i,-y_i\}$$
+On applique donc la leçon du concept 2 : <strong>une variable auxiliaire par terme</strong>, c'est-à-dire un <strong>vecteur</strong> $u\in\mathbb{R}^m$ et non un scalaire.</p>
+<p><strong>LP équivalent :</strong>
+$$\begin{array}{ll}\text{minimiser} &amp; \displaystyle\sum_{i=1}^m u_i\\ \text{sous} &amp; -u \preceq Ax-b \preceq u\end{array}$$
+À $x$ fixé, l'optimum est $u_i = |(Ax-b)_i|$.</p>
+<p><strong>Forme matricielle.</strong> Avec $\tilde x = (x,u)$ :
+$$\min\ \begin{pmatrix}0\\ \mathbf{1}\end{pmatrix}^T \tilde x \quad\text{sous}\quad \begin{pmatrix} A &amp; -I\\ -A &amp; -I\end{pmatrix}\begin{pmatrix}x\\u\end{pmatrix}\preceq\begin{pmatrix}b\\-b\end{pmatrix}$$</p>
+<p class="cal piege"> Ne confondez pas les deux reformulations : <strong>norme infinie $\to$ un scalaire $t$</strong> (on borne le pire résidu), <strong>norme 1 $\to$ un vecteur $u$</strong> (on borne chaque résidu séparément). Utiliser un scalaire pour la norme 1 donnerait $m\cdot\max_i|y_i|$, ce qui n'est pas $\|y\|_1$.</p>
+<h3>Ce que chaque norme fait aux résidus</h3>
+<p>Le cours compare les histogrammes des résidus $Ax-b$ pour $A\in\mathbb{R}^{200\times80}$ tirée au hasard, entre $x_{\text{mc}} = \arg\min\|Ax-b\|_2$ (moindres carrés) et $x_1 = \arg\min\|Ax-b\|_1$.</p>
+<table>
+<thead>
+<tr>
+<th>Norme minimisée</th>
+<th>Ce qu'elle produit</th>
+<th>Quand la choisir</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$\|\cdot\|_2$ (moindres carrés)</td>
+<td>résidus étalés en cloche, tous petits mais <strong>aucun nul</strong></td>
+<td>bruit gaussien, pas de valeur aberrante</td>
+</tr>
+<tr>
+<td>$\|\cdot\|_1$</td>
+<td>beaucoup de résidus <strong>exactement nuls</strong>, mais quelques grands</td>
+<td>données avec valeurs aberrantes ; on veut un ajustement <strong>robuste</strong></td>
+</tr>
+<tr>
+<td>$\|\cdot\|_\infty$</td>
+<td>tous les résidus <strong>de même amplitude</strong> maximale</td>
+<td>on veut garantir une erreur <strong>maximale</strong> faible (conception, tolérances)</td>
+</tr>
+</tbody></table>
+<p><strong>Intuition.</strong> La norme 1 ne pénalise pas davantage un gros écart qu'un petit à somme égale : elle « laisse tomber » quelques points aberrants pour coller parfaitement aux autres. La norme 2 punit le carré : elle refuse tout gros écart et le répartit. La norme infinie ne regarde <strong>que</strong> le pire. C'est le même phénomène qui rend la norme 1 favorable à la <strong>parcimonie</strong> (concept 6).</p>
+<h2 data-prio="high">Concept 5 — Ajustement de données</h2>
+<p><strong>Ajuster une fonction affine</strong> $f(t) = \alpha + \beta t$ à $m$ points $(t_i,y_i)$ : c'est un problème d'approximation $Ax\approx b$ avec
+$$A = \begin{pmatrix}1 &amp; t_1\\ \vdots &amp; \vdots\\ 1 &amp; t_m\end{pmatrix},\qquad x = \begin{pmatrix}\alpha\\ \beta\end{pmatrix},\qquad b = \begin{pmatrix}y_1\\ \vdots\\ y_m\end{pmatrix}$$
+Minimiser $\|Ax-b\|_1$ donne une régression <strong>robuste</strong> (résistante aux points aberrants) ; $\|Ax-b\|_\infty$ donne l'ajustement <strong>minimax</strong> ; les deux sont des LP.</p>
+<h2 data-prio="high">Concept 6 — Reconstruction de signaux parcimonieux</h2>
+<p><strong>Le problème.</strong> $\hat x\in\mathbb{R}^n$ est un signal inconnu, connu pour être <strong>très parcimonieux</strong> (<em>sparse</em>). On dispose de mesures linéaires $y = A\hat x$ avec $A\in\mathbb{R}^{m\times n}$ et $m &lt; n$ : le système est <strong>sous-déterminé</strong>, il a une infinité de solutions.</p>
+<p><strong>Les deux problèmes.</strong>
+$$\begin{array}{ll}\text{minimiser} &amp; \mathbf{card}(x)\\ \text{sous} &amp; Ax = y\end{array} \qquad\qquad \begin{array}{ll}\text{minimiser} &amp; \|x\|_1\\ \text{sous} &amp; Ax=y\end{array}$$
+où $\mathbf{card}(x)$ est le nombre de composantes non nulles. Le premier est combinatoire et hors de portée ; le second est un <strong>LP</strong>. Quand sont-ils équivalents ?</p>
+<p><strong>Définition (du cours).</strong> $A$ <strong>permet la reconstruction exacte des vecteurs $k$-parcimonieux</strong> si
+$$\hat x = \arg\min_{Ax=y}\ \|x\|_1 \qquad\text{dès que}\quad y = A\hat x \ \text{ et } \ \mathbf{card}(\hat x)\leq k$$
+(l'argmin désignant l'unique minimiseur). C'est une propriété <strong>du noyau</strong> de la matrice de mesure $A$.</p>
+<p><strong>Condition du noyau (nécessaire et suffisante).</strong> Pour tout $z\in\mathbf{nullspace}(A)\setminus\{0\}$ et tout ensemble de support $I$ avec $|I|\leq k$ :
+$$\|P_Iz\|_1 &lt; \tfrac12\|z\|_1$$
+où $P_I$ met à zéro les composantes hors de $I$ ; de façon équivalente, $|z_{(1)}|+\dots+|z_{(k)}| &lt; \frac12\|z\|_1$ pour les $k$ plus grandes composantes en valeur absolue.</p>
+<p><strong>Preuve de la suffisance (celle du cours, à savoir refaire).</strong> Soit $\hat x$ $k$-parcimonieux de support $I$ (donc $P_I\hat x = \hat x$) et $y = A\hat x$. Soit $x$ admissible ($Ax=y$), différent de $\hat x$ ; posons $z = x-\hat x$, vecteur non nul du noyau de $A$. Alors
+$$\|x\|_1 = \|\hat x + z\|_1 \geq \|\hat x + P_Iz\|_1 - \|P_Iz\|_1$$
+$$= \sum_{k\in I}|\hat x_k + z_k| + \sum_{k\notin I}|z_k| - \|P_Iz\|_1 \geq \|\hat x\|_1 + \|z\|_1 - 2\|P_Iz\|_1 &gt; \|\hat x\|_1$$
+La deuxième ligne utilise l'inégalité triangulaire, la dernière la condition du noyau. Donc $\hat x$ est bien l'unique minimiseur.</p>
+<p><strong>Nécessité.</strong> Si la condition échoue, il existe $z\neq0$ dans le noyau et $I$ avec $|I|\leq k$ tels que $\|P_Iz\|_1 \geq \frac12\|z\|_1$. On pose $\hat x = -P_Iz$ ($k$-parcimonieux) et $y = A\hat x$ ; alors $x = \hat x + z$ vérifie $Ax=y$ et
+$$\|x\|_1 = \|-P_Iz + z\|_1 = \|z\|_1 - \|P_Iz\|_1 \leq 2\|P_Iz\|_1 - \|P_Iz\|_1 = \|\hat x\|_1$$
+donc $\hat x$ n'est pas l'unique minimiseur en norme 1.</p>
+<p><strong>Pourquoi c'est important.</strong> C'est le fondement du <em>compressed sensing</em> et l'explication théorique du LASSO : remplacer un comptage combinatoire par une norme 1 <strong>ne perd rien</strong>, sous une condition portant uniquement sur la matrice de mesure.</p>
+<h2 data-prio="high">Concept 7 — Classification linéaire</h2>
+<p>On dispose de points $v_1,\dots,v_N$ avec des étiquettes binaires $s_i\in\{-1,1\}$, et l'on cherche un hyperplan qui sépare <strong>strictement</strong> les deux classes : trouver $a$ et $b$ tels que
+$$s_i\,(a^Tv_i + b) &gt; 0 \quad \text{pour tout } i$$</p>
+<p>Quand les classes ne sont pas séparables, on minimise la somme des violations, avec la <strong>perte charnière</strong> (<em>hinge loss</em>) :
+$$\min_{a,b}\ \sum_{i=1}^N \max\{0,\ 1 - s_i(a^Tv_i+b)\}$$
+C'est une somme de $N$ fonctions affines par morceaux (chacune un maximum de deux affines) : par le concept 2, c'est un <strong>LP</strong> à $N$ variables auxiliaires :
+$$\begin{array}{ll}\text{minimiser} &amp; \displaystyle\sum_{i=1}^N u_i\\ \text{sous} &amp; u_i \geq 0,\quad u_i \geq 1 - s_i(a^Tv_i+b),\qquad i=1,\dots,N\end{array}$$</p>
+<h2 data-prio="low">Concept 8 — Les outils de modélisation</h2>
+<p>Le cours termine sur les logiciels de modélisation, qui « simplifient la formulation des LP (et d'autres problèmes) » : ils acceptent l'écriture <strong>naturelle</strong> ($\max$, $\|\cdot\|_1$, valeurs absolues) et effectuent eux-mêmes la conversion en forme standard. On écrit par exemple, directement,
+$$\min\ \|Ax-b\|_1 \quad\text{sous}\quad 0\leq x_k\leq1,\ k=1,\dots,n$$
+et l'outil fabrique le LP à variables auxiliaires du concept 4.</p>
+<p class="cal piege"> Savoir écrire la reformulation <strong>à la main</strong> reste indispensable : c'est ce qui est demandé en examen, et c'est ce qui permet de comprendre pourquoi un problème passe ou ne passe pas.</p>
+<h3>Comment résoudre l'exercice type (protocole)</h3>
+<ol>
+<li><strong>Repérer la non-linéarité</strong> : $\max$, $\min$, $|\cdot|$, $\|\cdot\|_1$, $\|\cdot\|_\infty$, ou une somme de tels termes.</li>
+<li><strong>Vérifier le sens</strong> : on minimise un <strong>max</strong> (ou un $\|\cdot\|$), ou on maximise un <strong>min</strong>. Dans l'autre sens (minimiser un min, maximiser un max), la reformulation <strong>ne marche pas</strong> — le problème n'est pas convexe.</li>
+<li><strong>Compter les variables auxiliaires</strong> : un seul scalaire $t$ si l'objectif est <strong>un</strong> maximum ; un vecteur $u$ si c'est une <strong>somme</strong> de maxima (un par terme).</li>
+<li><strong>Écrire les contraintes de majoration</strong> : chaque morceau $\leq$ la variable auxiliaire associée.</li>
+<li><strong>Remplacer l'objectif</strong> par la variable auxiliaire (ou leur somme).</li>
+<li><strong>Vérifier l'équivalence</strong> : à $x$ fixé, l'optimum des auxiliaires reconstitue bien la valeur d'origine.</li>
+<li><strong>Mettre sous forme matricielle</strong> $\min \tilde c^T\tilde x$ s.c. $\tilde A\tilde x\preceq\tilde b$.</li>
+</ol>
+<h3>Le tableau des reformulations à connaître par cœur</h3>
+<table>
+<thead>
+<tr>
+<th>Objectif</th>
+<th>Variables ajoutées</th>
+<th>Contraintes ajoutées</th>
+<th>Nouvel objectif</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$\max_i(a_i^Tx+b_i)$</td>
+<td>$t\in\mathbb{R}$</td>
+<td>$a_i^Tx+b_i\leq t$</td>
+<td>$t$</td>
+</tr>
+<tr>
+<td>$f(x)+g(x)$, deux max</td>
+<td>$t_1,t_2\in\mathbb{R}$</td>
+<td>chaque morceau $\leq t_1$ ou $t_2$</td>
+<td>$t_1+t_2$</td>
+</tr>
+<tr>
+<td>$\|Ax-b\|_\infty$</td>
+<td>$t\in\mathbb{R}$</td>
+<td>$-t\mathbf 1\preceq Ax-b\preceq t\mathbf 1$</td>
+<td>$t$</td>
+</tr>
+<tr>
+<td>$\|Ax-b\|_1$</td>
+<td>$u\in\mathbb{R}^m$</td>
+<td>$-u\preceq Ax-b\preceq u$</td>
+<td>$\mathbf 1^Tu$</td>
+</tr>
+<tr>
+<td>$\sum_i\max\{0,\,\ell_i(x)\}$</td>
+<td>$u\in\mathbb{R}^N$</td>
+<td>$u_i\geq0$, $u_i\geq \ell_i(x)$</td>
+<td>$\mathbf 1^Tu$</td>
+</tr>
+<tr>
+<td>$\max\ \min_i(a_i^Tx+b_i)$</td>
+<td>$t\in\mathbb{R}$</td>
+<td>$a_i^Tx+b_i\geq t$</td>
+<td>$t$ (à maximiser)</td>
+</tr>
+</tbody></table>
+<h3>Exercices progressifs</h3>
+<p><strong> Niveau 1</strong> — Reformulez en LP : $\min_x\ |x_1-1| + |x_2+2|$.</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p>Somme de deux valeurs absolues, donc <strong>deux</strong> auxiliaires :
+$$\min\ u_1+u_2 \quad\text{s.c.}\quad -u_1\leq x_1-1\leq u_1,\quad -u_2\leq x_2+2\leq u_2$$
+Optimum évident : $x=(1,-2)$, valeur $0$. <em>L'intérêt est la méthode, pas le résultat.</em></p>
+</div></details>
+
+<p><strong> Niveau 2</strong> — Reformulez $\min_x\ \max\{|x_1|,\ |x_2|,\ |x_1+x_2-1|\}$.</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p>C'est <strong>un</strong> maximum, donc <strong>un</strong> scalaire $t$, et chaque valeur absolue donne deux inégalités :
+$$\min\ t \quad\text{s.c.}\quad -t\leq x_1\leq t,\quad -t\leq x_2\leq t,\quad -t\leq x_1+x_2-1\leq t$$
+<em>Valeur optimale :</em> par symétrie $x_1=x_2=s$, on minimise $\max\{|s|,|2s-1|\}$ ; l'égalité $s = 1-2s$ donne $s=1/3$ et $t = 1/3$.</p>
+</div></details>
+
+<p><strong> Niveau 3</strong> — Le problème de suivi de sortie de la fiche 24 : $\min \max_{t=0,\dots,N}|y(t)-y_{\text{des}}(t)|$ sous $|u(t)|\leq U$ et $|u(t+1)-u(t)|\leq S$, avec $y = Hu$ linéaire en $u$. Écrivez le LP.</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p>Les variables sont $u(0),\dots,u(M)$ et un scalaire $s$ :
+$$\begin{array}{ll}\text{minimiser} &amp; s\\ \text{sous} &amp; -s \leq y(t)-y_{\text{des}}(t) \leq s, \quad t=0,\dots,N\\ &amp; -U\leq u(t)\leq U\\ &amp; -S\leq u(t+1)-u(t)\leq S\end{array}$$
+Tout est linéaire en $u$ puisque $y(t) = \sum_k h_k u(t-k)$. <strong>C'est la réponse à la promesse laissée en suspens au slide 1-4</strong> : le problème de commande « se formule comme un LP ».</p>
+</div></details>
+
+<p><strong> Niveau 4 — type feuille d'exercices</strong> — Montrez que $\min_x \|Ax-b\|_\infty$ et $\min_x\|Ax-b\|_1$ ont, en général, des solutions différentes, sur $A = \begin{pmatrix}1\\1\\1\end{pmatrix}$ et $b = (0,\,1,\,10)$.</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p>Ici $x$ est un scalaire et $Ax-b = (x,\ x-1,\ x-10)$.</p>
+<p><em>Norme 1</em> : $\|Ax-b\|_1 = |x|+|x-1|+|x-10|$ — somme de valeurs absolues d'une variable, minimisée à la <strong>médiane</strong> des points $\{0,1,10\}$, soit $x_1^\star = 1$, valeur $1+0+9 = 10$.</p>
+<p><em>Norme infinie</em> : $\|Ax-b\|_\infty = \max\{|x|,|x-1|,|x-10|\}$, minimisé au <strong>milieu de l'étendue</strong>, soit $x_\infty^\star = 5$, valeur $5$.</p>
+<p><strong>Les deux solutions diffèrent</strong> ($1$ contre $5$), et l'écart raconte la différence de philosophie : la norme 1 suit la masse des points et ignore l'aberrant $10$ ; la norme infinie se place à mi-chemin des extrêmes pour minimiser le pire écart. <em>(Pour comparaison, les moindres carrés donneraient la moyenne, $11/3\approx3{,}67$.)</em></p>
+</div></details>
+
+<h2 data-prio="must">Common mistakes</h2>
+<ol>
+<li><strong>Un scalaire là où il faut un vecteur</strong> — norme 1 et somme de max exigent <strong>une auxiliaire par terme</strong> ; seule une norme infinie ou un max unique se contente d'un scalaire.</li>
+<li><strong>Reformuler dans le mauvais sens</strong> — on minimise un $\max$ et on maximise un $\min$. Minimiser un $\min$ ne se ramène pas à un LP : le problème n'est pas convexe.</li>
+<li><strong>Oublier le double sens de la valeur absolue</strong> — $|z|\leq t$ vaut <strong>deux</strong> inégalités $-t\leq z\leq t$. N'en écrire qu'une est l'erreur la plus fréquente.</li>
+<li><strong>Développer un produit de maxima</strong> — $mp$ contraintes au lieu de $m+p$ : correct mais inutilement coûteux, et souvent hors délai.</li>
+<li><strong>Croire que la norme 2 se met en LP</strong> — $\|Ax-b\|_2$ n'est pas affine par morceaux ; c'est un problème quadratique (ou SOCP), pas un LP.</li>
+<li><strong>Oublier les contraintes de positivité des auxiliaires</strong> dans la perte charnière — $u_i\geq0$ <strong>et</strong> $u_i\geq 1-s_i(a^Tv_i+b)$ : c'est le max de deux termes.</li>
+<li><strong>Confondre $\mathbf{card}(x)$ et $\|x\|_1$ sans condition</strong> — leur équivalence n'est pas gratuite : elle exige la condition du noyau sur $A$.</li>
+</ol>
+<h2>Ultimate Review</h2>
+<ol>
+<li>Affine par morceaux convexe : $f(x)=\max_i(a_i^Tx+b_i)$.</li>
+<li>Recette centrale : minimiser $f$ $\iff$ minimiser $t$ sous $a_i^Tx+b_i\leq t$ — passage à l'épigraphe.</li>
+<li>Somme de deux max : <strong>une auxiliaire par terme</strong>, $m+p$ contraintes au lieu de $mp$.</li>
+<li>$\|Ax-b\|_\infty$ : un scalaire $t$, contrainte $-t\mathbf1\preceq Ax-b\preceq t\mathbf1$.</li>
+<li>$\|Ax-b\|_1$ : un vecteur $u$, contrainte $-u\preceq Ax-b\preceq u$, objectif $\mathbf1^Tu$.</li>
+<li>Norme 1 $\to$ ajustement robuste et résidus nuls ; norme 2 $\to$ résidus étalés ; norme infinie $\to$ résidus tous égaux au pire.</li>
+<li>Parcimonie : $\min\mathbf{card}(x)$ et $\min\|x\|_1$ sous $Ax=y$ coïncident <strong>ssi</strong> $\|P_Iz\|_1&lt;\frac12\|z\|_1$ pour tout $z$ du noyau et $|I|\leq k$.</li>
+<li>Classification : perte charnière $\sum_i\max\{0,1-s_i(a^Tv_i+b)\}$, donc un LP.</li>
+</ol>
+<p><strong>Formulas to know</strong>
+$$f(x)=\max_i(a_i^Tx+b_i) \qquad \min t \ \text{ s.c. } a_i^Tx+b_i\leq t \qquad -u\preceq Ax-b\preceq u \qquad \|P_Iz\|_1&lt;\tfrac12\|z\|_1$$</p>
+<p><strong>Methods to know</strong> : le protocole de reformulation en 7 étapes ; le tableau des six reformulations ; la preuve de suffisance de la condition du noyau.</p>
+<div class="rec"><h2>Active Recall</h2><p><strong>Basic</strong> — Écrivez le LP équivalent à $\min_x \max_{i}(a_i^Tx+b_i)$.</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p>$\min\ t$ sous $a_i^Tx + b_i \leq t$ pour $i=1,\dots,m$, avec variables $(x,t)$. À $x$ fixé, l'optimum est $t=f(x)$.</p>
+</div></details><p><strong>Understanding</strong> — Pourquoi ajouter des variables auxiliaires <strong>réduit-il</strong> la taille du problème pour une somme de deux maxima ?</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p>Développer $\max_i + \max_j$ en un seul maximum donne $mp$ fonctions affines, donc $mp$ contraintes. Avec une auxiliaire par terme ($t_1$ pour $f$, $t_2$ pour $g$), on n'écrit que $m$ contraintes pour $f$ et $p$ pour $g$ : $m+p$ au total. Chaque terme est traité séparément au lieu d'être croisé avec l'autre.</p>
+</div></details><p><strong>Application</strong> — Reformulez $\min_x\ \|Ax-b\|_1 + \|x\|_\infty$.</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p>Deux termes, deux jeux d'auxiliaires : un vecteur $u\in\mathbb{R}^m$ pour la norme 1 et un scalaire $t$ pour la norme infinie.
+$$\min\ \mathbf 1^Tu + t \quad\text{s.c.}\quad -u\preceq Ax-b\preceq u,\quad -t\mathbf 1\preceq x\preceq t\mathbf 1$$</p>
+</div></details><p><strong>Comparison</strong> — Norme 1 ou norme infinie pour ajuster des données contenant deux capteurs défaillants ?</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p><strong>Norme 1.</strong> Elle produit un ajustement robuste : elle accepte de laisser deux gros résidus sur les capteurs défaillants pour coller aux autres points. La norme infinie ferait l'inverse — elle ne regarde que le pire résidu, donc elle serait <strong>entièrement dictée par les capteurs défaillants</strong>.</p>
+</div></details><p><strong>Exam-style</strong> — Montrez que $\min_x\|Ax-b\|_\infty$ et $\min_{x,t}\ t$ s.c. $-t\mathbf1\preceq Ax-b\preceq t\mathbf 1$ ont la même valeur optimale.</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p>Si $(x,t)$ est admissible pour le second, alors $|(Ax-b)_i|\leq t$ pour tout $i$, donc $\|Ax-b\|_\infty\leq t$ : la valeur optimale du second <strong>majore</strong> celle du premier. Réciproquement, pour tout $x$, le couple $(x,\ \|Ax-b\|_\infty)$ est admissible pour le second, dont la valeur optimale <strong>minore</strong> donc $\min_x\|Ax-b\|_\infty$. Les deux valeurs coïncident, et à l'optimum $t^\star = \|Ax^\star-b\|_\infty$.</p>
+</div></details></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h2>Flashcards</h2>
+<table>
+<thead>
+<tr>
+<th>Question</th>
+<th>Réponse</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Fonction affine par morceaux convexe ?</td>
+<td>$f(x)=\max_{i=1..m}(a_i^Tx+b_i)$</td>
+</tr>
+<tr>
+<td>$f$ linéaire $\iff$ ?</td>
+<td>$f(x)=a^Tx$</td>
+</tr>
+<tr>
+<td>$f$ affine $\iff$ ?</td>
+<td>$f(x)=a^Tx+b$</td>
+</tr>
+<tr>
+<td>Reformulation de $\min\max_i(a_i^Tx+b_i)$ ?</td>
+<td>$\min t$ s.c. $a_i^Tx+b_i\leq t$</td>
+</tr>
+<tr>
+<td>Somme de deux max : combien de contraintes ?</td>
+<td>$m+p$ avec deux auxiliaires (et non $mp$)</td>
+</tr>
+<tr>
+<td>LP pour $\|Ax-b\|_\infty$ ?</td>
+<td>$\min t$ s.c. $-t\mathbf1\preceq Ax-b\preceq t\mathbf1$</td>
+</tr>
+<tr>
+<td>LP pour $\|Ax-b\|_1$ ?</td>
+<td>$\min \mathbf1^Tu$ s.c. $-u\preceq Ax-b\preceq u$</td>
+</tr>
+<tr>
+<td>Scalaire ou vecteur d'auxiliaires ?</td>
+<td>Un max $\to$ scalaire ; une somme de max $\to$ vecteur</td>
+</tr>
+<tr>
+<td>Effet de la norme 1 sur les résidus ?</td>
+<td>Beaucoup de résidus nuls, quelques grands — ajustement robuste</td>
+</tr>
+<tr>
+<td>Effet de la norme infinie ?</td>
+<td>Tous les résidus de même amplitude maximale</td>
+</tr>
+<tr>
+<td>Condition du noyau (parcimonie) ?</td>
+<td>$\|P_Iz\|_1&lt;\frac12\|z\|_1$ pour tout $z\in\mathbf{nullspace}(A)\setminus\{0\}$, $\vert I\vert\leq k$</td>
+</tr>
+<tr>
+<td>Perte charnière ?</td>
+<td>$\sum_i\max\{0,\ 1-s_i(a^Tv_i+b)\}$ — un LP</td>
+</tr>
+<tr>
+<td>$\|Ax-b\|_2$ est-il un LP ?</td>
+<td>Non — quadratique, pas affine par morceaux</td>
+</tr>
+</tbody></table>
+</main>
+
+
+
+
+</body></html>

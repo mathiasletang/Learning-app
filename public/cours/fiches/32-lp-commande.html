@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fiche 32 — Applications en automatique : suivi de consigne et robustesse</title>
+<script>
+window.MathJax={tex:{inlineMath:[["$","$"]],displayMath:[["$$","$$"]],processEscapes:true},
+ options:{skipHtmlTags:["script","noscript","style","textarea","pre","code"]},
+ svg:{fontCache:"global"},
+ startup:{pageReady:()=>MathJax.startup.defaultPageReady().then(()=>{document.body.classList.add("ready")})}};
+setTimeout(function(){document.body.classList.add("ready")},2500);
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+/* ============================================================
+   MathiasLearn — feuille de style des fiches
+   Reprise intégrale des tokens de 00_PARCOURS/*.html
+   + blocs pédagogiques (callouts, méthode, essentiels, recall)
+   ============================================================ */
+:root{--bg:#faf9f7;--card:#fff;--ink:#1a1a1a;--muted:#6b6b6b;--line:#e5e2dd;--accent:#8b5e34;
+ --hl:#fdf8ef;--ok:#2d7d4f;--okbg:#f0f7f3;--warn:#b3402f;--warnbg:#fdf3f1;--blue:#2f5d8b;--bluebg:#f1f5fa}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+ font:17px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;padding:0 16px 100px}
+.nav{position:sticky;top:0;background:rgba(250,249,247,.96);backdrop-filter:blur(8px);
+ border-bottom:1px solid var(--line);margin:0 -16px 30px;padding:11px 16px;z-index:50;
+ display:flex;gap:6px;flex-wrap:wrap;font-size:13px}
+.nav a{color:var(--muted);text-decoration:none;padding:4px 9px;border-radius:5px;white-space:nowrap}
+.nav a:hover{background:var(--line);color:var(--ink)}
+.nav a.on{background:var(--accent);color:#fff}
+main{max-width:780px;margin:0 auto}
+h1{font-size:31px;letter-spacing:-.02em;margin:.4em 0 .5em;line-height:1.25}
+h2{font-size:23px;margin:2.2em 0 .7em;padding-bottom:.3em;border-bottom:1px solid var(--line)}
+h3{font-size:19px;margin:1.9em 0 .5em;color:var(--accent)}
+h4{font-size:17px;margin:1.5em 0 .4em}
+p{margin:.8em 0} a{color:var(--accent)} hr{border:0;border-top:1px solid var(--line);margin:2.6em 0}
+table{border-collapse:collapse;width:100%;margin:1.3em 0;font-size:15.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+th{background:#f3f0eb;font-weight:600}
+tr:nth-child(even) td{background:#fcfbfa}
+code{font-family:"SF Mono",Menlo,Consolas,monospace;font-size:.88em;background:#f2efea;padding:2px 6px;border-radius:4px;white-space:nowrap}
+pre{background:#f2efea;padding:14px 16px;border-radius:8px;overflow-x:auto}
+pre code{background:none;padding:0;white-space:pre}
+blockquote{border-left:3px solid var(--accent);background:var(--hl);margin:1.4em 0;padding:14px 20px;border-radius:0 8px 8px 0}
+blockquote p:first-child{margin-top:0} blockquote p:last-child{margin-bottom:0}
+ul,ol{padding-left:1.5em} li{margin:.35em 0} em{color:#4a4a4a}
+mjx-container[display="true"]{margin:1.1em 0!important;overflow-x:auto;overflow-y:hidden;padding:2px 0}
+mjx-container svg{max-width:100%}
+body:not(.ready) main{opacity:0} main{opacity:1;transition:opacity .25s}
+
+/* --- bandeau de tête de fiche --- */
+.cours{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--accent);
+ border-radius:0 10px 10px 0;padding:18px 22px;margin:0 0 34px}
+.cours h4{margin:0 0 4px;font-size:14px;text-transform:uppercase;letter-spacing:.07em;color:var(--accent)}
+.cours .cs{color:var(--muted);font-size:14.5px;margin:0 0 14px}
+
+/* --- exercices / corrigés --- */
+.ex{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:6px 24px 20px;margin:18px 0}
+.ex>h3:first-child{margin-top:14px}
+details.cor{margin-top:18px;border:1px solid var(--line);border-radius:8px;background:#fcfbfa;overflow:hidden}
+details.cor>summary{cursor:pointer;padding:12px 16px;font-weight:600;font-size:15px;color:var(--accent);
+ list-style:none;display:flex;align-items:center;gap:9px;user-select:none;transition:.15s;min-height:44px}
+details.cor>summary::-webkit-details-marker{display:none}
+details.cor>summary:hover{background:var(--hl)}
+details.cor>summary::before{content:"\25B6";font-size:10px;transition:transform .18s;display:inline-block}
+details.cor[open]>summary::before{transform:rotate(90deg)}
+details.cor[open]>summary{background:var(--okbg);color:var(--ok);border-bottom:1px solid var(--line)}
+.cor .in{padding:4px 20px 16px}
+.cor .in>*:first-child{margin-top:.9em}
+
+/* --- blocs pédagogiques (callouts) ---
+   Générés depuis une citation Markdown dont le premier **gras** commence
+   par un mot-clé : DÉFINITION, THÉORÈME, MÉTHODE, PIÈGE, INTUITION… */
+.cal{border:1px solid var(--line);border-left:4px solid var(--accent);background:var(--card);
+ border-radius:0 10px 10px 0;padding:15px 20px;margin:1.5em 0}
+.cal>p:first-child{margin-top:0}.cal>p:last-child,.cal>ul:last-child,.cal>ol:last-child{margin-bottom:0}
+.cal .lab{display:block;font-size:12.5px;text-transform:uppercase;letter-spacing:.08em;
+ font-weight:700;color:var(--accent);margin-bottom:6px}
+.cal.formel{background:var(--hl)}
+.cal.piege{border-left-color:var(--warn);background:var(--warnbg)}
+.cal.piege .lab{color:var(--warn)}
+.cal.methode{border-left-color:var(--ok);background:var(--okbg)}
+.cal.methode .lab{color:var(--ok)}
+.cal.intu{border-left-color:var(--blue);background:var(--bluebg)}
+.cal.intu .lab{color:var(--blue)}
+.cal.plus{border-left-style:dashed;background:#faf9f7}
+.cal.plus .lab{color:var(--muted)}
+
+/* --- révision express --- */
+.ess{background:var(--card);border:1px solid var(--accent);border-radius:10px;padding:4px 24px 20px;margin:1.6em 0}
+.ess h3{margin-top:1.3em}
+.rec{background:var(--card);border:1px dashed var(--accent);border-radius:10px;padding:4px 24px 18px;margin:1.6em 0}
+.rec ol{counter-reset:none}
+
+/* --- impression / PDF --- */
+@media print{
+ .nav{display:none}
+ body{padding:0;background:#fff;font-size:11.2pt;line-height:1.55}
+ main{max-width:none}
+ h1{font-size:23pt}h2{font-size:15pt;margin-top:1.5em}h3{font-size:12.6pt}
+ h2,h3,h4{break-after:avoid;page-break-after:avoid}
+ table,.cal,blockquote{break-inside:avoid;page-break-inside:avoid}
+ table{display:table;font-size:9.6pt}
+ details.cor{border:1px solid var(--line);background:#fcfbfa}
+ details.cor>summary{display:none}
+ details.cor .in{padding-top:10px}
+ .cal,.ex,.ess,.rec{box-shadow:none}
+ a{color:var(--ink);text-decoration:none}
+}
+@page{margin:16mm 15mm 18mm}
+
+/* --- exemples travaillés --- */
+.exm{background:#fcfbfa;border:1px solid var(--line);border-radius:10px;padding:2px 20px 14px;margin:1.5em 0}
+.exm>h4:first-child{margin:14px 0 .5em;color:var(--accent);font-size:13px;text-transform:uppercase;letter-spacing:.07em}
+
+
+/* --- pastilles de priorité (conventions des fiches de l'app) --- */
+h2[data-prio], h3[data-prio], h4[data-prio]{position:relative}
+h2[data-prio]::before,h3[data-prio]::before,h4[data-prio]::before{
+ content:"";display:inline-block;width:9px;height:9px;border-radius:50%;
+ margin-right:9px;vertical-align:middle;background:var(--muted)}
+[data-prio="must"]::before{background:var(--warn)}
+[data-prio="high"]::before{background:#d98324}
+[data-prio="mid"]::before{background:#c9a227}
+[data-prio="low"]::before{background:var(--ok)}
+/* corrigés des fiches de l'app : même traitement que les corrigés des séries */
+details.cor>summary::after{content:""}
+</style></head><body>
+<div class="nav"><a href="24-lp-formulation.html">Programmation linéaire : formulation et géométrie</a><a href="25-lp-affine-par-morceaux.html">Optimisation affine par morceaux : tout ramener à un LP</a><a href="26-lp-polyedres.html">Polyèdres : faces, points extrêmes, test du rang</a><a href="27-lp-convexite-cones.html">Enveloppes convexes, cônes et décomposition d'un polyèdre</a><a href="28-lp-dualite.html">Dualité en programmation linéaire</a><a href="29-lp-sensibilite-jeux.html">Dualité II : sensibilité, prix implicites et jeux à somme nulle</a><a href="30-lp-simplexe.html">L'algorithme du simplexe</a><a href="31-lp-reseaux-unimodularite.html">Flots dans les réseaux et unimodularité totale</a><a href="32-lp-commande.html" class="on">Applications en automatique : suivi de consigne et robustesse</a><a href="33-lp-nombres-entiers.html">Programmation linéaire en nombres entiers et séparation-évaluation</a><a href="34-boyd-ensembles-convexes.html">Ensembles convexes</a><a href="35-boyd-fonctions-convexes.html">Fonctions convexes</a><a href="36-boyd-problemes-convexes.html">Problèmes d'optimisation convexe</a><a href="37-boyd-familles-standard.html">Les familles standard : LP, QP, SOCP, GP, SDP</a><a href="38-boyd-dualite.html">Dualité lagrangienne</a><a href="39-boyd-minimisation-sans-contrainte.html">Minimisation sans contrainte : gradient et Newton</a><a href="40-boyd-contraintes-egalite.html">Minimisation sous contraintes d'égalité</a><a href="41-boyd-points-interieurs.html">Méthodes de points intérieurs</a><a href="42-sous-gradients.html">Sous-gradients et sous-différentiel</a><a href="43-methode-sous-gradient.html">La méthode du sous-gradient</a></div>
+<main><h1>Fiche 32 — Applications en automatique : suivi de consigne et robustesse</h1>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Matière</strong></td>
+<td>Maths · Optimisation</td>
+</tr>
+<tr>
+<td><strong>Cours source</strong></td>
+<td>Vandenberghe, <em>EE236A — Linear Programming</em> (UCLA), Lecture 11 « Control applications », 18 diapositives</td>
+</tr>
+<tr>
+<td><strong>Difficulté</strong></td>
+<td> Application — la modélisation compte plus que la théorie</td>
+</tr>
+<tr>
+<td><strong>Temps d'étude estimé</strong></td>
+<td>1 h 30</td>
+</tr>
+<tr>
+<td><strong>Prérequis</strong></td>
+<td>Fiche 25 (reformulations affines par morceaux), fiche 24 (forme matricielle)</td>
+</tr>
+<tr>
+<td><strong>Concepts clés</strong></td>
+<td>Réponse impulsionnelle, matrice de Toeplitz, suivi de consigne, contraintes d'amplitude et de vitesse, conception robuste, formulation compacte, placement de pôles</td>
+</tr>
+<tr>
+<td><strong>Poids à l'examen</strong></td>
+<td>Ce sont des exercices de <strong>modélisation</strong> : traduire un cahier des charges physique en LP. La reformulation compacte du cas robuste (concept 5) est le morceau technique.</td>
+</tr>
+</tbody></table>
+<h2>Vue d'ensemble</h2>
+<p>La fiche 24 avait ouvert sur un problème de commande sans le résoudre : « ce problème se formule comme un LP, donc se résout facilement ». Cette leçon montre comment, et pousse l'idée jusqu'à la <strong>conception robuste</strong> — concevoir une commande qui fonctionne pour <strong>toute une famille</strong> de systèmes, et non pour un modèle unique.</p>
+<p>Le fil directeur est toujours le même, celui de la fiche 25 :</p>
+<pre><code>CAHIER DES CHARGES     erreur crête à minimiser, amplitude et vitesse bornées
+    ↓  la sortie est LINÉAIRE en la commande :  y = Hu
+OBJECTIF ‖Hu − y_des‖∞  →  variable auxiliaire γ  →  LP
+    ↓  incertitude sur le modèle
+PIRE CAS sur une famille  →  encore un LP, à condition de le formuler COMPACTEMENT
+</code></pre>
+<h2 data-prio="mid">Concept 1 — Le modèle : convolution et matrice de Toeplitz</h2>
+<p>Un système linéaire invariant à une entrée $u(t)$ et une sortie $y(t)$ s'écrit comme une <strong>convolution</strong> avec sa <strong>réponse impulsionnelle</strong> $(h_0,h_1,h_2,\dots)$ :
+$$y(t) = h_0u(t) + h_1u(t-1) + h_2u(t-2)+\cdots$$</p>
+<p><strong>Forme matricielle.</strong> En supposant $u(t)=0$ pour $t&lt;0$ et $t&gt;M$, et en posant $y = (y(0),\dots,y(N))$, $u = (u(0),\dots,u(M))$ :
+$$y = Hu, \qquad H = \begin{pmatrix} h_0 &amp; 0 &amp; 0 &amp; \cdots &amp; 0\\ h_1 &amp; h_0 &amp; 0 &amp; \cdots &amp; 0\\ h_2 &amp; h_1 &amp; h_0 &amp; \cdots &amp; 0\\ \vdots &amp; &amp; &amp; \ddots &amp; \vdots\\ h_M &amp; h_{M-1} &amp; h_{M-2} &amp; \cdots &amp; h_0\\ \vdots &amp; &amp; &amp; &amp; \vdots\\ h_N &amp; h_{N-1} &amp; h_{N-2} &amp; \cdots &amp; h_{N-M}\end{pmatrix}$$</p>
+<p>$H$ est une matrice de <strong>Toeplitz</strong> (constante sur chaque diagonale) et <strong>triangulaire inférieure</strong> : la sortie à l'instant $t$ ne dépend que des entrées <strong>passées</strong>. C'est la causalité, lue sur la structure de la matrice.</p>
+<p><strong>Le point à retenir.</strong> $y$ est une fonction <strong>linéaire</strong> de $u$. Tout ce qui s'exprime en normes $\|\cdot\|_1$ ou $\|\cdot\|_\infty$ de $y$ et de $u$ devient donc justiciable de la fiche 25.</p>
+<h2 data-prio="must">Concept 2 — Le problème de suivi de consigne</h2>
+<p><strong>Cahier des charges.</strong> Choisir la séquence d'entrée $u(0),\dots,u(M)$ (avec $M\leq N$) telle que :</p>
+<ul>
+<li>la sortie <strong>minimise l'écart crête</strong> à une sortie désirée $y_{\text{des}}(t)$ :
+$$\min\ \max_{t=0,\dots,N}\ |y(t)-y_{\text{des}}(t)|$$</li>
+<li>l'entrée respecte une contrainte d'<strong>amplitude</strong> : $|u(t)|\leq U$ pour $t=0,\dots,M$ ;</li>
+<li>l'entrée respecte une contrainte de <strong>vitesse de variation</strong> (<em>slew rate</em>) : $|u(t+1)-u(t)|\leq S$ pour $t=0,\dots,M-1$.</li>
+</ul>
+<p>D'autres contraintes <strong>linéaires</strong> sur les entrées ou les sorties peuvent s'ajouter sans changer la nature du problème.</p>
+<p><strong>En notation matricielle :</strong>
+$$\begin{array}{ll}\text{minimiser} &amp; \|Hu-y_{\text{des}}\|_\infty\\ \text{sous} &amp; \|u\|_\infty\leq U\\ &amp; \|Du\|_\infty\leq S\end{array}$$
+où $D$ est la matrice de <strong>différences finies</strong>, de taille $M\times(M+1)$ :
+$$D = \begin{pmatrix} -1 &amp; 1 &amp; 0 &amp; \cdots &amp; 0 &amp; 0\\ 0 &amp; -1 &amp; 1 &amp; \cdots &amp; 0 &amp; 0\\ \vdots &amp; &amp; &amp; \ddots &amp; &amp; \vdots\\ 0 &amp; 0 &amp; 0 &amp; \cdots &amp; -1 &amp; 1\end{pmatrix}$$</p>
+<p><strong>Le LP équivalent</strong> (variables $\gamma$ et $u$), par la recette de la fiche 25 :
+$$\begin{array}{ll}\text{minimiser} &amp; \gamma\\ \text{sous} &amp; -\gamma\mathbf1 \preceq Hu-y_{\text{des}}\preceq \gamma\mathbf1\\ &amp; -U\mathbf1\preceq u\preceq U\mathbf1\\ &amp; -S\mathbf1\preceq Du\preceq S\mathbf1\end{array}$$</p>
+<p><strong>Exemple numérique du cours.</strong> Horizon d'entrée $M=150$, horizon de sortie $N=200$, contrainte d'amplitude $|u(t)|\leq1{,}1$, contrainte de vitesse $|u(t)-u(t-1)|\leq0{,}25$. La solution optimale sature les deux contraintes par plages entières : l'entrée optimale est en « paliers et rampes », caractéristique des solutions de LP — l'optimum est à un <strong>sommet</strong>, donc un maximum de contraintes y sont actives.</p>
+<p class="cal piege"> <strong>Une seule</strong> variable auxiliaire $\gamma$ suffit, car l'objectif est une norme <strong>infinie</strong> (un maximum). Si le cahier des charges demandait de minimiser l'<strong>erreur totale</strong> $\|Hu-y_{\text{des}}\|_1$, il faudrait un <strong>vecteur</strong> d'auxiliaires — voir fiche 25.</p>
+<h2 data-prio="high">Concept 3 — Suivi robuste, version 1 : deux modèles</h2>
+<p><strong>Modèle incertain.</strong> La réponse impulsionnelle peut prendre <strong>deux</strong> valeurs :
+$$(h^1_0,h^1_1,h^1_2,\dots) \qquad\text{ou}\qquad (h^2_0,h^2_1,h^2_2,\dots)$$</p>
+<p><strong>Problème robuste</strong> : minimiser l'erreur crête <strong>dans le pire des cas</strong>
+$$\min\ \max\big\{\|H_1u-y_{\text{des}}\|_\infty,\ \|H_2u-y_{\text{des}}\|_\infty\big\}$$
+sous les mêmes limites d'amplitude et de vitesse. $H_1$ et $H_2$ sont les matrices de Toeplitz des deux réponses impulsionnelles.</p>
+<p><strong>LP équivalent</strong> (variables $\gamma$, $u$) :
+$$\begin{array}{ll}\text{minimiser} &amp; \gamma\\ \text{sous} &amp; -\gamma\mathbf1\preceq H_1u-y_{\text{des}}\preceq\gamma\mathbf1\\ &amp; -\gamma\mathbf1\preceq H_2u-y_{\text{des}}\preceq\gamma\mathbf1\\ &amp; Au\preceq b\end{array}$$
+(les inégalités $Au\preceq b$ regroupant $-U\mathbf1\preceq u\preceq U\mathbf1$ et $-S\mathbf1\preceq Du\preceq S\mathbf1$).</p>
+<p><strong>Le principe.</strong> Un maximum sur un ensemble <strong>fini</strong> de modèles se traite en <strong>empilant</strong> les contraintes : la même variable $\gamma$ majore l'erreur de chacun. C'est encore la recette du concept 2 de la fiche 25.</p>
+<h2 data-prio="must">Concept 4 — Suivi robuste, version 2 : une famille continue</h2>
+<p><strong>Modèle incertain paramétré.</strong>
+$$\begin{pmatrix}h_0\\ h_1\\ \vdots\\ h_N\end{pmatrix} = \begin{pmatrix}\bar h_0\\ \bar h_1\\ \vdots\\ \bar h_N\end{pmatrix} + \begin{pmatrix} v_{01} &amp; v_{02} &amp; \cdots &amp; v_{0K}\\ v_{11} &amp; v_{12} &amp; \cdots &amp; v_{1K}\\ \vdots &amp; &amp; &amp; \vdots\\ v_{N1} &amp; v_{N2} &amp; \cdots &amp; v_{NK}\end{pmatrix}\begin{pmatrix}s_1\\ s_2\\ \vdots\\ s_K\end{pmatrix}$$</p>
+<ul>
+<li>$(\bar h_0,\bar h_1,\dots)$ est la réponse impulsionnelle <strong>nominale</strong>, connue ;</li>
+<li>$s_1,\dots,s_K$ sont des paramètres <strong>inconnus</strong> dans $[-1,1]$.</li>
+</ul>
+<p><strong>Problème robuste :</strong>
+$$\min_u\ \max_{\|s\|_\infty\leq1}\ \Big\|\Big(\bar H + \sum_{k=1}^K s_kV_k\Big)u - y_{\text{des}}\Big\|_\infty \qquad\text{sous}\qquad Au\preceq b$$
+où $\bar H$ et les $V_k$ sont les matrices de Toeplitz construites sur $(\bar h_i)$ et sur les colonnes $(v_{ik})_i$.</p>
+<p><strong>La formulation naïve, et pourquoi elle échoue.</strong> On pourrait énumérer les $2^K$ <strong>sommets</strong> du cube $[-1,1]^K$ (le maximum d'une fonction convexe sur un cube est atteint en un sommet) et empiler les contraintes comme au concept 3 :
+$$\min\ \gamma \quad\text{s.c.}\quad -\gamma\mathbf1\preceq\Big(\bar H+\sum_k s_kV_k\Big)u-y_{\text{des}}\preceq\gamma\mathbf1 \ \text{ pour tout } s\in\{-1,+1\}^K, \qquad Au\preceq b$$
+C'est correct, mais cela produit <strong>$2^{K+1}(N+1)$ inégalités</strong> : inutilisable dès que $K$ dépasse la dizaine.</p>
+<h2 data-prio="must">Concept 5 — La formulation compacte</h2>
+<p>Le cours calcule l'erreur du pire cas <strong>explicitement</strong> comme fonction de $u$ :
+$$\max_{\|s\|_\infty\leq1}\Big\|\Big(\bar H+\sum_{k=1}^Ks_kV_k\Big)u-y_{\text{des}}\Big\|_\infty = \max_{\|s\|_\infty\leq1}\ \max_{i=0,\dots,N}\Big|\big(\bar Hu-y_{\text{des}}\big)_i + \sum_{k=1}^K s_k(V_ku)_i\Big|$$
+On échange les deux maxima, puis on maximise sur $s$ <strong>composante par composante</strong> : pour chaque $i$, le pire $s$ choisit $s_k = \pm1$ de façon à <strong>aligner</strong> chaque terme avec le signe du terme nominal. D'où
+$$\boxed{\ \max_{\|s\|_\infty\leq1}\|\cdots\|_\infty = \max_{i=0,\dots,N}\Big(\big|(\bar Hu-y_{\text{des}})_i\big| + \sum_{k=1}^K\big|(V_ku)_i\big|\Big)\ }$$</p>
+<p><strong>LP équivalent</strong> (variables $\gamma$, $u$, et des vecteurs $w_i$ pour $i=1,\dots,K$) :
+$$\begin{array}{ll}\text{minimiser} &amp; \gamma\\ \text{sous} &amp; -w_i\preceq V_iu\preceq w_i, \qquad i=1,\dots,K\\ &amp; -\gamma\mathbf1 + \displaystyle\sum_{i=1}^K w_i \ \preceq\ \bar Hu-y_{\text{des}} \ \preceq\ \gamma\mathbf1 - \sum_{i=1}^K w_i\\ &amp; Au\preceq b\end{array}$$</p>
+<p><strong>Ce qui s'est passé.</strong> Les $w_i$ majorent $|V_iu|$ composante par composante — c'est la reformulation de la valeur absolue de la fiche 25. La contrainte centrale dit alors que l'erreur nominale <strong>plus</strong> la somme des marges d'incertitude reste sous $\gamma$. On est passé de $2^K$ blocs de contraintes à <strong>$K+1$</strong> blocs : le problème devient <strong>linéaire en $K$</strong> au lieu d'exponentiel.</p>
+<p><strong>La leçon générale.</strong> Face à un « pire cas » sur une famille continue, ne jamais énumérer : chercher l'expression <strong>explicite</strong> du pire cas, puis la reformuler. C'est exactement l'esprit de l'optimisation robuste.</p>
+<h3>Ce que coûte et ce que rapporte la robustesse</h3>
+<p>Sur l'exemple du cours ($K=6$), la comparaison est nette :</p>
+<table>
+<thead>
+<tr>
+<th>Conception</th>
+<th>Sur le système nominal</th>
+<th>Sur le pire système de la famille</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>non robuste</strong> (nominale)</td>
+<td>excellente</td>
+<td>fortement dégradée</td>
+</tr>
+<tr>
+<td><strong>robuste</strong></td>
+<td>un peu moins bonne</td>
+<td><strong>peu dégradée</strong></td>
+</tr>
+</tbody></table>
+<blockquote>
+<p>« Sur le système nominal, la conception robuste fait moins bien que la conception non robuste ; en revanche, la performance ne se dégrade pas beaucoup sur l'ensemble du modèle. »</p>
+</blockquote>
+<p>C'est le compromis fondamental de la robustesse : on <strong>paie</strong> une petite perte au nominal pour <strong>acheter</strong> une garantie sur toute la famille.</p>
+<h2 data-prio="low">Concept 6 — Placement de pôles en commande à faible autorité</h2>
+<p><strong>Le cadre.</strong> Un système linéaire autonome
+$$\dot z(t) = A(x)z(t), \qquad z(0)=z_0, \qquad A(x) = A_0 + x_1A_1+\dots+x_pA_p \in\mathbb{R}^{n\times n}$$
+Les solutions sont de la forme $z_i(t) = \sum_k \rho_{ik}e^{\sigma_kt}\cos(\omega_kt-\phi_{ik})$, où $\lambda_k = \sigma_k\pm j\omega_k$ sont les <strong>valeurs propres</strong> de $A(x)$, et $x\in\mathbb{R}^p$ est le <strong>paramètre de conception</strong>.</p>
+<p><strong>Objectif</strong> : placer les valeurs propres de $A(x)$ dans une région désirée en choisissant $x$.</p>
+<p><strong>La difficulté.</strong> Les valeurs propres sont des fonctions <strong>très compliquées</strong> de $x$ — le problème n'a aucune raison d'être linéaire.</p>
+<p><strong>La parade : la perturbation au premier ordre.</strong> Si $\lambda_i(A_0)$ est une valeur propre <strong>simple</strong>, alors
+$$\lambda_i(A(x)) = \lambda_i(A_0) + \sum_{k=1}^p \frac{w_iA_kv_i}{w_iv_i}\,x_k + o(\|x\|)$$
+où $w_i$ et $v_i$ sont les vecteurs propres <strong>à gauche</strong> et <strong>à droite</strong> : $w_iA_0 = \lambda_i(A_0)w_i$ et $A_0v_i = \lambda_i(A_0)v_i$.</p>
+<p><strong>Commande à « faible autorité ».</strong> On utilise les approximations linéaires du premier ordre pour les $\lambda_i$ ; on peut alors placer chaque $\lambda_i$ dans une région <strong>polyédrale</strong> en imposant des inégalités <strong>linéaires</strong> sur $x$. On ne s'attend à ce que cela fonctionne que pour de <strong>petits</strong> déplacements des valeurs propres — d'où le nom.</p>
+<p><strong>Exemple du cours : la structure en treillis.</strong> 30 nœuds, 83 barres, régie par
+$$M\ddot d(t) + D\dot d(t) + Kd(t) = 0$$
+où $d(t)$ est le vecteur des déplacements des nœuds, $M$ la matrice de masse, $D$ celle d'amortissement, $K$ celle de raideur. Pour augmenter l'amortissement, on fixe des amortisseurs externes sur certaines barres :
+$$D(x) = D_0 + x_1D_1+\dots+x_pD_p, \qquad x_i&gt;0 \ \text{amortissement ajouté sur la barre } i$$
+Le système se réécrit $\dot z = A(x)z$ avec $z = (d,\dot d)$ et
+$$A = \begin{pmatrix} 0 &amp; I\\ -M^{-1}K &amp; -M^{-1}D(x)\end{pmatrix}$$
+<strong>Le problème de conception</strong> — placer approximativement les valeurs propres avec le <strong>moins d'amortissement externe possible</strong> :
+$$\min\ \sum_{i=1}^p x_i \quad\text{s.c.}\quad \lambda_i(M,D(x),K)\in\mathcal{C} \ (i=1,\dots,n), \quad x\succeq0$$
+C'est <strong>un LP</strong> si $\mathcal{C}$ est polyédrale et si l'on utilise l'approximation au premier ordre des $\lambda_i$. Le résultat du cours : les valeurs propres sont effectivement repoussées vers la gauche du plan complexe (système mieux amorti), et la solution indique <strong>où placer les amortisseurs</strong> — un vecteur $x$ largement creux, l'un des effets caractéristiques de la minimisation d'une somme sous contrainte de positivité.</p>
+<h3>Comment résoudre l'exercice type (protocole)</h3>
+<ol>
+<li><strong>Identifier les variables de décision</strong> : la séquence de commande $u$, ou le vecteur de conception $x$.</li>
+<li><strong>Écrire la relation entrée-sortie sous forme matricielle</strong> : $y = Hu$, avec $H$ de Toeplitz triangulaire inférieure.</li>
+<li><strong>Traduire le critère</strong> : « écart crête » $\to\|\cdot\|_\infty$ ; « erreur totale » $\to\|\cdot\|_1$ ; « énergie » $\to\|\cdot\|_2$ (et alors ce n'est <strong>plus</strong> un LP).</li>
+<li><strong>Traduire chaque contrainte physique</strong> : amplitude $\to\|u\|_\infty\leq U$ ; vitesse $\to\|Du\|_\infty\leq S$ ; toute limite linéaire s'ajoute librement.</li>
+<li><strong>Introduire les auxiliaires</strong> : un scalaire $\gamma$ par norme infinie, un vecteur par norme 1.</li>
+<li><strong>Pour le cas robuste</strong> : si la famille est <strong>finie</strong>, empiler les contraintes ; si elle est <strong>continue</strong>, expliciter le pire cas puis reformuler compactement.</li>
+<li><strong>Vérifier la taille</strong> : un modèle correct est linéaire en $K$ ; si le nombre de contraintes explose, c'est qu'on a énuméré.</li>
+</ol>
+<h3>Exercices progressifs</h3>
+<p><strong> Niveau 1</strong> — Écrivez le LP correspondant à $\min\|Hu-y_{\text{des}}\|_\infty$ sous $\|u\|_\infty\leq U$ seulement.</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p>$$\min\ \gamma \quad\text{s.c.}\quad -\gamma\mathbf1\preceq Hu-y_{\text{des}}\preceq\gamma\mathbf1,\qquad -U\mathbf1\preceq u\preceq U\mathbf1$$
+Variables : $u$ et le scalaire $\gamma$. À $u$ fixé, l'optimum est $\gamma = \|Hu-y_{\text{des}}\|_\infty$.</p>
+</div></details>
+
+<p><strong> Niveau 2</strong> — Pourquoi $H$ est-elle triangulaire inférieure, et qu'est-ce que cela traduit physiquement ?</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p>L'entrée $(i,j)$ de $H$ vaut $h_{i-j}$, nulle dès que $j&gt;i$ car la réponse impulsionnelle n'est définie que pour des indices positifs. La sortie à l'instant $i$ ne dépend donc que des entrées aux instants $j\leq i$ : c'est la <strong>causalité</strong>. Un système non causal (qui « anticipe ») aurait des entrées au-dessus de la diagonale.</p>
+</div></details>
+
+<p><strong> Niveau 3</strong> — Le cahier des charges devient : minimiser l'<strong>énergie</strong> $\sum_t u(t)^2$ sous une erreur crête bornée par $\gamma_0$. Est-ce encore un LP ?</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p><strong>Non.</strong> L'objectif $\sum_tu(t)^2 = \|u\|_2^2$ est <strong>quadratique</strong>, pas affine par morceaux : la fiche 25 ne s'applique pas. Les contraintes, elles, restent linéaires ($-\gamma_0\mathbf1\preceq Hu-y_{\text{des}}\preceq\gamma_0\mathbf1$ et les limites d'amplitude et de vitesse). On obtient un <strong>programme quadratique</strong> (QP), résoluble mais par d'autres méthodes.
+<em>Variante qui redonne un LP :</em> minimiser $\|u\|_1$ (l'« effort total ») ou $\|u\|_\infty$ (l'« effort de pointe ») sous les mêmes contraintes.</p>
+</div></details>
+
+<p><strong> Niveau 4 — type feuille d'exercices</strong> — Pour $K=20$ paramètres incertains et $N=200$, comparez le nombre de contraintes de la formulation naïve et de la formulation compacte.</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p><strong>Naïve</strong> : on écrit un bloc de $2(N+1) = 402$ inégalités pour chacun des $2^K = 2^{20}$ sommets du cube, soit
+$$402\times1\,048\,576 \approx 4{,}2\times10^8 \ \text{inégalités}$$
+— totalement hors de portée.</p>
+<p><strong>Compacte</strong> : $K$ blocs de $2(N+1)$ inégalités pour les $-w_i\preceq V_iu\preceq w_i$, plus un bloc de $2(N+1)$ pour la contrainte centrale, soit
+$$402\times(K+1) = 402\times21 = 8\,442 \ \text{inégalités}$$
+— un LP de taille très ordinaire, avec $20\times201$ variables auxiliaires supplémentaires.</p>
+<p><strong>Le rapport est d'environ $50\,000$</strong>, et il croît exponentiellement avec $K$. Voilà pourquoi il faut expliciter le pire cas au lieu de l'énumérer.</p>
+</div></details>
+
+<h2 data-prio="must">Common mistakes</h2>
+<ol>
+<li><strong>Énumérer les $2^K$ sommets</strong> — correct mais inutilisable ; la formulation compacte est linéaire en $K$.</li>
+<li><strong>Mettre une norme 2 dans un LP</strong> — l'énergie $\|u\|_2$ n'est pas affine par morceaux ; seules $\|\cdot\|_1$ et $\|\cdot\|_\infty$ passent.</li>
+<li><strong>Oublier que $D$ a $M$ lignes et $M+1$ colonnes</strong> — il y a une différence de moins que d'instants.</li>
+<li><strong>Un seul $\gamma$ pour une somme d'erreurs</strong> — la norme infinie prend un scalaire, la norme 1 un vecteur.</li>
+<li><strong>Traiter le pire cas comme une moyenne</strong> — le max sur $s$ n'est pas une espérance : il s'obtient en <strong>alignant les signes</strong>, pas en annulant les termes.</li>
+<li><strong>Croire la conception robuste meilleure partout</strong> — elle est <strong>moins bonne</strong> au nominal ; son intérêt est la garantie sur toute la famille.</li>
+<li><strong>Appliquer le placement de pôles hors du régime de faible autorité</strong> — l'approximation au premier ordre n'est valide que pour de petits déplacements de valeurs propres.</li>
+</ol>
+<h2>Ultimate Review</h2>
+<ol>
+<li>$y = Hu$ avec $H$ de <strong>Toeplitz triangulaire inférieure</strong> — la causalité se lit sur la structure.</li>
+<li>Suivi de consigne : $\min\|Hu-y_{\text{des}}\|_\infty$ sous $\|u\|_\infty\leq U$ et $\|Du\|_\infty\leq S$, $D$ matrice de différences.</li>
+<li>LP équivalent : une seule variable $\gamma$, contraintes $-\gamma\mathbf1\preceq Hu-y_{\text{des}}\preceq\gamma\mathbf1$.</li>
+<li>Robuste sur une famille <strong>finie</strong> : empiler les blocs de contraintes avec le <strong>même</strong> $\gamma$.</li>
+<li>Robuste sur une famille <strong>continue</strong> : le pire cas vaut $\max_i(|(\bar Hu-y_{\text{des}})_i| + \sum_k|(V_ku)_i|)$.</li>
+<li>Formulation compacte : auxiliaires $w_i$ avec $-w_i\preceq V_iu\preceq w_i$ ; $K+1$ blocs au lieu de $2^K$.</li>
+<li>Compromis de robustesse : un peu moins bon au nominal, beaucoup plus stable sur la famille.</li>
+<li>Placement de pôles : $\lambda_i(A(x))\simeq\lambda_i(A_0)+\sum_k\frac{w_iA_kv_i}{w_iv_i}x_k$ ; région polyédrale $\Rightarrow$ LP, en <strong>faible autorité</strong>.</li>
+</ol>
+<p><strong>Formulas to know</strong>
+$$y = Hu \qquad \min\gamma \ \text{s.c.}\ -\gamma\mathbf1\preceq Hu-y_{\text{des}}\preceq\gamma\mathbf1 \qquad \max_{\|s\|_\infty\leq1} = \max_i\Big(|(\bar Hu-y_{\text{des}})_i|+\sum_k|(V_ku)_i|\Big)$$</p>
+<p><strong>Methods to know</strong> : le protocole de modélisation en 7 étapes ; l'explicitation du pire cas par alignement des signes ; le comptage des contraintes naïf contre compact.</p>
+<div class="rec"><h2>Active Recall</h2><p><strong>Basic</strong> — Quelle est la structure de la matrice $H$, et que traduit-elle ?</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p>$H$ est de <strong>Toeplitz</strong> (constante sur chaque diagonale, car le système est invariant dans le temps) et <strong>triangulaire inférieure</strong> (car il est <strong>causal</strong> : la sortie à l'instant $t$ ne dépend que des entrées passées). Ses coefficients sont la réponse impulsionnelle.</p>
+</div></details><p><strong>Understanding</strong> — Pourquoi une seule variable auxiliaire $\gamma$ suffit-elle pour l'objectif de suivi ?</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p>Parce que l'objectif est une norme <strong>infinie</strong>, c'est-à-dire <strong>un</strong> maximum : $\gamma$ majore toutes les erreurs à la fois, et l'optimum le fixe à la plus grande. Pour une somme d'erreurs (norme 1), chaque terme aurait besoin de sa propre auxiliaire.</p>
+</div></details><p><strong>Application</strong> — On veut de plus que la sortie reste positive à tout instant. Comment l'ajouter ?</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p>C'est une contrainte <strong>linéaire</strong> en $u$ : $Hu\succeq0$. On l'ajoute au bloc $Au\preceq b$ sous la forme $-Hu\preceq0$, sans changer ni la nature du problème ni le nombre d'auxiliaires. Le cours le note explicitement : « d'autres contraintes linéaires sur les entrées ou les sorties peuvent s'ajouter ».</p>
+</div></details><p><strong>Comparison</strong> — Famille finie et famille continue de modèles : que change la formulation ?</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p><em>Finie</em> ($p$ modèles) : on empile $p$ blocs de contraintes partageant le même $\gamma$ — simple et exact. <em>Continue</em> ($s\in[-1,1]^K$) : l'énumération des $2^K$ sommets est exacte mais explose ; il faut <strong>expliciter</strong> le pire cas ($\max_i$ de la somme des valeurs absolues) et introduire $K$ vecteurs auxiliaires, ce qui rend la taille <strong>linéaire</strong> en $K$.</p>
+</div></details><p><strong>Exam-style</strong> — Démontrez la formule du pire cas du concept 5.</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p>$$\max_{\|s\|_\infty\leq1}\Big\|\Big(\bar H+\sum_ks_kV_k\Big)u-y_{\text{des}}\Big\|_\infty = \max_{\|s\|_\infty\leq1}\max_i\Big|(\bar Hu-y_{\text{des}})_i+\sum_ks_k(V_ku)_i\Big|$$
+On échange les deux maxima (ils portent sur des variables indépendantes). À $i$ fixé, on maximise $|a + \sum_k s_kb_k|$ pour $|s_k|\leq1$ : le maximum s'obtient en choisissant $s_k = \mathrm{sign}(a)\,\mathrm{sign}(b_k)$, ce qui <strong>aligne</strong> chaque terme avec $a$ et donne $|a| + \sum_k|b_k|$. D'où
+$$\max_i\Big(|(\bar Hu-y_{\text{des}})_i| + \sum_k|(V_ku)_i|\Big) \qquad\blacksquare$$</p>
+</div></details></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h2>Flashcards</h2>
+<table>
+<thead>
+<tr>
+<th>Question</th>
+<th>Réponse</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Relation entrée-sortie ?</td>
+<td>$y = Hu$, $H$ de Toeplitz triangulaire inférieure</td>
+</tr>
+<tr>
+<td>Pourquoi triangulaire inférieure ?</td>
+<td>Causalité : la sortie ne dépend que des entrées passées</td>
+</tr>
+<tr>
+<td>Contrainte d'amplitude ?</td>
+<td>$\|u\|_\infty\leq U$, soit $-U\mathbf1\preceq u\preceq U\mathbf1$</td>
+</tr>
+<tr>
+<td>Contrainte de vitesse (slew rate) ?</td>
+<td>$\|Du\|_\infty\leq S$, $D$ matrice de différences $M\times(M+1)$</td>
+</tr>
+<tr>
+<td>LP du suivi de consigne ?</td>
+<td>$\min\gamma$ s.c. $-\gamma\mathbf1\preceq Hu-y_{\text{des}}\preceq\gamma\mathbf1$, plus les limites</td>
+</tr>
+<tr>
+<td>Robuste sur deux modèles ?</td>
+<td>Deux blocs de contraintes, <strong>le même</strong> $\gamma$</td>
+</tr>
+<tr>
+<td>Pire cas sur $\|s\|_\infty\leq1$ ?</td>
+<td>$\max_i(|(\bar Hu-y_{\text{des}})_i|+\sum_k|(V_ku)_i|)$</td>
+</tr>
+<tr>
+<td>Taille de la formulation naïve ?</td>
+<td>$2^K$ blocs — exponentielle</td>
+</tr>
+<tr>
+<td>Taille de la formulation compacte ?</td>
+<td>$K+1$ blocs — linéaire en $K$</td>
+</tr>
+<tr>
+<td>Prix de la robustesse ?</td>
+<td>Un peu moins bon au nominal, bien plus stable sur la famille</td>
+</tr>
+<tr>
+<td>Perturbation d'une valeur propre simple ?</td>
+<td>$\lambda_i(A(x))\simeq\lambda_i(A_0)+\sum_k\frac{w_iA_kv_i}{w_iv_i}x_k$</td>
+</tr>
+<tr>
+<td>Quand le placement de pôles est-il un LP ?</td>
+<td>Région $\mathcal{C}$ polyédrale + approximation au premier ordre</td>
+</tr>
+<tr>
+<td>$\|u\|_2$ dans l'objectif ?</td>
+<td>Ce n'est plus un LP, mais un QP</td>
+</tr>
+</tbody></table>
+</main>
+
+
+
+
+</body></html>

@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fiche 57 — Valorisation risque-neutre et formule de Black-Scholes</title>
+<script>
+window.MathJax={tex:{inlineMath:[["$","$"]],displayMath:[["$$","$$"]],processEscapes:true},
+ options:{skipHtmlTags:["script","noscript","style","textarea","pre","code"]},
+ svg:{fontCache:"global"},
+ startup:{pageReady:()=>MathJax.startup.defaultPageReady().then(()=>{document.body.classList.add("ready")})}};
+setTimeout(function(){document.body.classList.add("ready")},2500);
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+/* ============================================================
+   MathiasLearn — feuille de style des fiches
+   Reprise intégrale des tokens de 00_PARCOURS/*.html
+   + blocs pédagogiques (callouts, méthode, essentiels, recall)
+   ============================================================ */
+:root{--bg:#faf9f7;--card:#fff;--ink:#1a1a1a;--muted:#6b6b6b;--line:#e5e2dd;--accent:#8b5e34;
+ --hl:#fdf8ef;--ok:#2d7d4f;--okbg:#f0f7f3;--warn:#b3402f;--warnbg:#fdf3f1;--blue:#2f5d8b;--bluebg:#f1f5fa}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+ font:17px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;padding:0 16px 100px}
+.nav{position:sticky;top:0;background:rgba(250,249,247,.96);backdrop-filter:blur(8px);
+ border-bottom:1px solid var(--line);margin:0 -16px 30px;padding:11px 16px;z-index:50;
+ display:flex;gap:6px;flex-wrap:wrap;font-size:13px}
+.nav a{color:var(--muted);text-decoration:none;padding:4px 9px;border-radius:5px;white-space:nowrap}
+.nav a:hover{background:var(--line);color:var(--ink)}
+.nav a.on{background:var(--accent);color:#fff}
+main{max-width:780px;margin:0 auto}
+h1{font-size:31px;letter-spacing:-.02em;margin:.4em 0 .5em;line-height:1.25}
+h2{font-size:23px;margin:2.2em 0 .7em;padding-bottom:.3em;border-bottom:1px solid var(--line)}
+h3{font-size:19px;margin:1.9em 0 .5em;color:var(--accent)}
+h4{font-size:17px;margin:1.5em 0 .4em}
+p{margin:.8em 0} a{color:var(--accent)} hr{border:0;border-top:1px solid var(--line);margin:2.6em 0}
+table{border-collapse:collapse;width:100%;margin:1.3em 0;font-size:15.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+th{background:#f3f0eb;font-weight:600}
+tr:nth-child(even) td{background:#fcfbfa}
+code{font-family:"SF Mono",Menlo,Consolas,monospace;font-size:.88em;background:#f2efea;padding:2px 6px;border-radius:4px;white-space:nowrap}
+pre{background:#f2efea;padding:14px 16px;border-radius:8px;overflow-x:auto}
+pre code{background:none;padding:0;white-space:pre}
+blockquote{border-left:3px solid var(--accent);background:var(--hl);margin:1.4em 0;padding:14px 20px;border-radius:0 8px 8px 0}
+blockquote p:first-child{margin-top:0} blockquote p:last-child{margin-bottom:0}
+ul,ol{padding-left:1.5em} li{margin:.35em 0} em{color:#4a4a4a}
+mjx-container[display="true"]{margin:1.1em 0!important;overflow-x:auto;overflow-y:hidden;padding:2px 0}
+mjx-container svg{max-width:100%}
+body:not(.ready) main{opacity:0} main{opacity:1;transition:opacity .25s}
+
+/* --- bandeau de tête de fiche --- */
+.cours{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--accent);
+ border-radius:0 10px 10px 0;padding:18px 22px;margin:0 0 34px}
+.cours h4{margin:0 0 4px;font-size:14px;text-transform:uppercase;letter-spacing:.07em;color:var(--accent)}
+.cours .cs{color:var(--muted);font-size:14.5px;margin:0 0 14px}
+
+/* --- exercices / corrigés --- */
+.ex{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:6px 24px 20px;margin:18px 0}
+.ex>h3:first-child{margin-top:14px}
+details.cor{margin-top:18px;border:1px solid var(--line);border-radius:8px;background:#fcfbfa;overflow:hidden}
+details.cor>summary{cursor:pointer;padding:12px 16px;font-weight:600;font-size:15px;color:var(--accent);
+ list-style:none;display:flex;align-items:center;gap:9px;user-select:none;transition:.15s;min-height:44px}
+details.cor>summary::-webkit-details-marker{display:none}
+details.cor>summary:hover{background:var(--hl)}
+details.cor>summary::before{content:"\25B6";font-size:10px;transition:transform .18s;display:inline-block}
+details.cor[open]>summary::before{transform:rotate(90deg)}
+details.cor[open]>summary{background:var(--okbg);color:var(--ok);border-bottom:1px solid var(--line)}
+.cor .in{padding:4px 20px 16px}
+.cor .in>*:first-child{margin-top:.9em}
+
+/* --- blocs pédagogiques (callouts) ---
+   Générés depuis une citation Markdown dont le premier **gras** commence
+   par un mot-clé : DÉFINITION, THÉORÈME, MÉTHODE, PIÈGE, INTUITION… */
+.cal{border:1px solid var(--line);border-left:4px solid var(--accent);background:var(--card);
+ border-radius:0 10px 10px 0;padding:15px 20px;margin:1.5em 0}
+.cal>p:first-child{margin-top:0}.cal>p:last-child,.cal>ul:last-child,.cal>ol:last-child{margin-bottom:0}
+.cal .lab{display:block;font-size:12.5px;text-transform:uppercase;letter-spacing:.08em;
+ font-weight:700;color:var(--accent);margin-bottom:6px}
+.cal.formel{background:var(--hl)}
+.cal.piege{border-left-color:var(--warn);background:var(--warnbg)}
+.cal.piege .lab{color:var(--warn)}
+.cal.methode{border-left-color:var(--ok);background:var(--okbg)}
+.cal.methode .lab{color:var(--ok)}
+.cal.intu{border-left-color:var(--blue);background:var(--bluebg)}
+.cal.intu .lab{color:var(--blue)}
+.cal.plus{border-left-style:dashed;background:#faf9f7}
+.cal.plus .lab{color:var(--muted)}
+
+/* --- révision express --- */
+.ess{background:var(--card);border:1px solid var(--accent);border-radius:10px;padding:4px 24px 20px;margin:1.6em 0}
+.ess h3{margin-top:1.3em}
+.rec{background:var(--card);border:1px dashed var(--accent);border-radius:10px;padding:4px 24px 18px;margin:1.6em 0}
+.rec ol{counter-reset:none}
+
+/* --- impression / PDF --- */
+@media print{
+ .nav{display:none}
+ body{padding:0;background:#fff;font-size:11.2pt;line-height:1.55}
+ main{max-width:none}
+ h1{font-size:23pt}h2{font-size:15pt;margin-top:1.5em}h3{font-size:12.6pt}
+ h2,h3,h4{break-after:avoid;page-break-after:avoid}
+ table,.cal,blockquote{break-inside:avoid;page-break-inside:avoid}
+ table{display:table;font-size:9.6pt}
+ details.cor{border:1px solid var(--line);background:#fcfbfa}
+ details.cor>summary{display:none}
+ details.cor .in{padding-top:10px}
+ .cal,.ex,.ess,.rec{box-shadow:none}
+ a{color:var(--ink);text-decoration:none}
+}
+@page{margin:16mm 15mm 18mm}
+
+/* --- exemples travaillés --- */
+.exm{background:#fcfbfa;border:1px solid var(--line);border-radius:10px;padding:2px 20px 14px;margin:1.5em 0}
+.exm>h4:first-child{margin:14px 0 .5em;color:var(--accent);font-size:13px;text-transform:uppercase;letter-spacing:.07em}
+
+
+/* --- pastilles de priorité (conventions des fiches de l'app) --- */
+h2[data-prio], h3[data-prio], h4[data-prio]{position:relative}
+h2[data-prio]::before,h3[data-prio]::before,h4[data-prio]::before{
+ content:"";display:inline-block;width:9px;height:9px;border-radius:50%;
+ margin-right:9px;vertical-align:middle;background:var(--muted)}
+[data-prio="must"]::before{background:var(--warn)}
+[data-prio="high"]::before{background:#d98324}
+[data-prio="mid"]::before{background:#c9a227}
+[data-prio="low"]::before{background:var(--ok)}
+/* corrigés des fiches de l'app : même traitement que les corrigés des séries */
+details.cor>summary::after{content:""}
+</style></head><body>
+<div class="nav"><a href="00_COMMENCER_ICI.html">Commencer ici</a><a href="01_NOTATIONS_le-decodeur.html">Notations</a><a href="02_EXERCICES_Serie-0.html">Série 0 — Remise en route</a><a href="03_EXERCICES_Serie-1.html">Série 1 — Convexité</a><a href="04_EXERCICES_Serie-2.html">Série 2 — KKT</a><a href="05_AUTO-EVALUATION.html">Auto-évaluation (quiz)</a><a href="06_FICHE_Optimisation-deux-variables.html">Fiche — Optimisation à 2 variables</a></div>
+<main><h1>Fiche 57 — Valorisation risque-neutre et formule de Black-Scholes</h1>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Matière</strong></td>
+<td>Maths · Finance de marché</td>
+</tr>
+<tr>
+<td><strong>Cours source</strong></td>
+<td>Strela (Morgan Stanley et MIT), <em>18.S096 Topics in Mathematics with Applications in Finance</em>, MIT OpenCourseWare, automne 2013 — cours 19 « Risk Neutral Pricing / Black-Scholes Formula »</td>
+</tr>
+<tr>
+<td><strong>Difficulté</strong></td>
+<td> Must know — le résultat le plus important de la finance moderne</td>
+</tr>
+<tr>
+<td><strong>Temps d'étude estimé</strong></td>
+<td>2 h 30</td>
+</tr>
+<tr>
+<td><strong>Prérequis</strong></td>
+<td>Fiche 56 (lemme d'Itô, Girsanov), fiche 53 (brownien géométrique)</td>
+</tr>
+<tr>
+<td><strong>Concepts clés</strong></td>
+<td>Portefeuille répliquant, arbitrage, arbre binomial, probabilité risque-neutre, mesure martingale, équation de Black-Scholes, équation de la chaleur, formule de Black-Scholes, $d_1$ et $d_2$, densité log-normale, delta-couverture</td>
+</tr>
+<tr>
+<td><strong>Poids à l'examen</strong></td>
+<td>Trois choses : la <strong>dérivation</strong> de l'EDP de Black-Scholes par réplication ; le fait que le prix <strong>ne dépende pas de $\mu$</strong> et savoir l'expliquer ; et la <strong>formule fermée</strong> avec ses $d_1,d_2$.</td>
+</tr>
+</tbody></table>
+<h2>Vue d'ensemble</h2>
+<blockquote>
+<p><strong>L'exemple des deux chevaux.</strong> Une course à deux chevaux : le premier a $20\,\%$ de chances de gagner, le second $80\,\%$. Les parieurs ont misé $10\,000$ dollars sur le premier et $50\,000$ dollars sur le second.</p>
+<p><strong>Si la cote est fixée à $4$ contre $1$ :</strong></p>
+<ul>
+<li>le bookmaker peut gagner $10\,000$ dollars (si le premier cheval gagne) ;</li>
+<li>le bookmaker peut perdre $2\,500$ dollars (si le second gagne) ;</li>
+<li>il <strong>espère</strong> faire $0{,}2\times(10\,000)+0{,}8\times(-2\,500)=0$.</li>
+</ul>
+<p><strong>Si la cote est fixée à $5$ contre $1$ :</strong></p>
+<ul>
+<li>le bookmaker <strong>ne perd ni ne gagne d'argent, quel que soit le cheval qui gagne</strong>.</li>
+</ul>
+</blockquote>
+<p class="cal piege"> <strong>Comparez les deux lignes : c'est toute la leçon du chapitre.</strong> À $4$ contre $1$, le bookmaker gagne zéro <strong>en espérance</strong>, sous les probabilités <strong>réelles</strong> — mais il est <strong>exposé</strong> : il peut perdre. À $5$ contre $1$, il gagne zéro <strong>dans tous les cas</strong> : son livre est <strong>sans risque</strong>.</p>
+<blockquote>
+<p>Et quelles probabilités la cote $5$ contre $1$ reflète-t-elle ? Ni $20\,\%$ ni $80\,\%$, mais $\frac{10\,000}{60\,000}=\frac16$ et $\frac{50\,000}{60\,000}=\frac56$ — <strong>proportionnelles aux montants misés, pas aux vraies chances</strong>. Ces probabilités-là, qui n'ont rien à voir avec la réalité mais qui annulent tout risque, <strong>sont la mesure risque-neutre</strong>.</p>
+</blockquote>
+<pre><code>IDÉE       répliquer exactement le payoff avec actions + cash
+ARBITRAGE  deux portefeuilles de même payoff ont le même prix
+BINOMIAL   f₀ = e^{-r dt}[q f₁ + (1-q) f₂]   avec q ≠ p (la vraie proba)
+CONTINU    f_t = e^{-r(T-t)} E_Q[f_T]        Q = mesure martingale
+EDP        ∂f/∂t + ½σ²S² ∂²f/∂S² + rS ∂f/∂S - rf = 0
+SOLUTION   C = S N(d₁) - K e^{-r(T-t)} N(d₂)
+</code></pre>
+<h2 data-prio="mid">Concept 1 — Les produits dérivés et les trois affirmations</h2>
+<table>
+<thead>
+<tr>
+<th>Produit</th>
+<th>Ce qu'il paye en $T$</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Contrat à terme (<em>forward</em>)</strong></td>
+<td>$S-K$</td>
+</tr>
+<tr>
+<td><strong>Option d'achat européenne (<em>call</em>)</strong></td>
+<td>$\max(S-K,0)$</td>
+</tr>
+<tr>
+<td><strong>Option de vente européenne (<em>put</em>)</strong></td>
+<td>$\max(K-S,0)$</td>
+</tr>
+<tr>
+<td><strong>Option digitale</strong></td>
+<td>$1$ si $S&gt;K$, $0$ sinon</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>Les trois affirmations fondatrices du cours.</strong></p>
+<ul>
+<li><em>Étant donné le prix actuel de l'action et des hypothèses sur la <strong>dynamique</strong> du prix, il n'y a <strong>aucune incertitude</strong> sur le prix d'un dérivé.</em></li>
+<li><em>Le prix est défini <strong>uniquement par le prix de l'action</strong>, et <strong>non par les préférences de risque</strong> des participants au marché.</em></li>
+<li><em>L'appareil mathématique permet de calculer le prix actuel d'un dérivé <strong>et ses risques</strong>, étant données certaines hypothèses sur le marché.</em></li>
+</ul>
+</blockquote>
+<p class="cal piege"> <strong>La deuxième affirmation est la plus surprenante et la plus importante.</strong> Deux investisseurs en désaccord total sur l'avenir de l'action — l'un pense qu'elle va doubler, l'autre qu'elle va s'effondrer — doivent néanmoins s'accorder sur le prix de l'option, dès lors qu'ils s'accordent sur sa <strong>volatilité</strong>. Le concept 6 explique pourquoi.</p>
+<h2 data-prio="must">Concept 2 — Le portefeuille répliquant</h2>
+<p><strong>La tentation naïve.</strong> Considérons un contrat à terme qui paye $S-K$ dans un temps $dt$. On pourrait croire que son prix d'exercice $K$ doit être défini par la probabilité de transition du « <strong>monde réel</strong> » $p$ :
+$$p(S_1-K)+(1-p)(S_2-K)=pS_1+(1-p)S_2-K$$
+$$K_0=pS_1+(1-p)S_2$$
+Si $p=1/2$, alors $K_0=\frac{S_1+S_2}{2}$.</p>
+<p><strong>Pourquoi c'est faux — l'argument d'arbitrage.</strong> Considérons la stratégie suivante :</p>
+<ol>
+<li><strong>Emprunter $S_0$ dollars</strong> pour acheter l'action. Entrer dans le contrat à terme de prix d'exercice $K_0$.</li>
+<li>Dans un temps $dt$, <strong>livrer l'action</strong> en échange de $K_0$ et <strong>rembourser</strong> $S_0e^{r\,dt}$ dollars.</li>
+</ol>
+<ul>
+<li>Si $K_0&gt;S_0e^{r\,dt}$, on a réalisé un <strong>profit sans risque</strong> de $K_0-S_0e^{r\,dt}$.</li>
+<li>Si $K_0&lt;S_0e^{r\,dt}$, on a <strong>certainement perdu</strong> de l'argent (il suffit d'inverser la stratégie pour gagner).</li>
+</ul>
+<blockquote>
+<p><strong>Conclusion — le principe central du chapitre.</strong> <em>Le prix actuel d'une créance dérivée est déterminé par le <strong>prix actuel d'un portefeuille qui réplique exactement le payoff</strong> du dérivé à maturité.</em></p>
+</blockquote>
+<p class="cal piege"> <strong>La probabilité réelle $p$ a complètement disparu.</strong> Le seul prix compatible avec l'absence d'arbitrage est $K_0=S_0e^{r\,dt}$, qui ne fait intervenir que le prix comptant et le taux sans risque. C'est la première apparition du phénomène : <strong>la réplication tue les probabilités réelles</strong>.</p>
+<h2 data-prio="must">Concept 3 — L'arbre binomial à un pas</h2>
+<p><strong>Le cadre.</strong> L'économie comprend une action $S$, un compte monétaire sans risque $B$ de taux d'intérêt $r$, et une créance dérivée $f$. Seuls deux résultats sont possibles en un temps $dt$ :</p>
+<p>$$(S_0,\ B_0,\ f_0)\ \longrightarrow\ \begin{cases}(S_1,\ B_0e^{r\,dt},\ f_1) &amp; \text{avec probabilité } p\\[3pt] (S_2,\ B_0e^{r\,dt},\ f_2) &amp; \text{avec probabilité } 1-p\end{cases}$$</p>
+<p><strong>La réplication.</strong> Pour une créance dérivée générale $f$, on cherche $a$ et $b$ tels que
+$$f_1=aS_1+bB_0e^{r\,dt}, \qquad f_2=aS_2+bB_0e^{r\,dt}$$
+Alors, par absence d'arbitrage,
+$$f_0=aS_0+bB_0$$</p>
+<p><strong>La solution.</strong> On voit facilement que
+$$a=\frac{f_1-f_2}{S_1-S_2}, \qquad b=\frac{S_1f_2-S_2f_1}{(S_1-S_2)B_0e^{r\,dt}}$$
+d'où
+$$f_0=e^{-r\,dt}\left[S_0e^{r\,dt}\,\frac{f_1-f_2}{S_1-S_2}+\frac{S_1f_2-S_2f_1}{S_1-S_2}\right]$$</p>
+<p><strong>La réécriture décisive.</strong> <em>On doit remarquer que</em>
+$$f_0=e^{-r\,dt}\left[f_1\frac{S_0e^{r\,dt}-S_2}{S_1-S_2}+f_2\frac{S_1-S_0e^{r\,dt}}{S_1-S_2}\right]$$
+c'est-à-dire
+$$\boxed{\ f_0=e^{-r\,dt}\big(f_1q+f_2(1-q)\big)\ } \qquad\text{où}\qquad q=\frac{S_0e^{r\,dt}-S_2}{S_1-S_2},\quad 0&lt;q&lt;1$$</p>
+<p><strong>Et de plus :</strong>
+$$S_1q+S_2(1-q)=e^{r\,dt}S_0$$</p>
+<blockquote>
+<p><strong>Lisez ces deux dernières lignes ensemble.</strong> $q$ est un nombre entre $0$ et $1$ : c'est donc <strong>une probabilité</strong>. Sous cette probabilité, deux choses sont vraies :</p>
+<ul>
+<li>le prix du dérivé est l'<strong>espérance actualisée</strong> de son payoff ;</li>
+<li>le prix <strong>espéré de l'action</strong> croît exactement au <strong>taux sans risque</strong> — l'action ne rapporte aucune prime de risque.</li>
+</ul>
+<p>D'où le nom : <strong>probabilité risque-neutre</strong>. Elle décrit un monde où personne n'exige de compensation pour le risque.</p>
+</blockquote>
+<p class="cal piege"> <strong>$q$ n'est PAS $p$</strong>, et $q$ ne dépend <strong>pas</strong> de $p$. Regardez la formule : $q$ ne contient que $S_0$, $S_1$, $S_2$ et $r$. La vraie probabilité $p$ n'intervient <strong>nulle part</strong> — exactement comme dans l'exemple des deux chevaux, où la cote sans risque était déterminée par les mises, non par les chances réelles.</p>
+<h2 data-prio="must">Concept 4 — Le cas continu</h2>
+<blockquote>
+<p><strong>La formule générale de valorisation.</strong>
+$$\boxed{\ f_t=e^{-r(T-t)}E_Q[f_T]\ }$$
+*où $Q$ est la <strong>mesure risque-neutre (martingale)</strong>, sous laquelle*
+$$S_0=e^{-rt}E_Q[S_t]$$</p>
+</blockquote>
+<blockquote>
+<p><strong>La deuxième ligne définit $Q$ et donne son autre nom.</strong> Dire que $S_0=e^{-rt}E_Q[S_t]$, c'est dire que le <strong>prix actualisé</strong> $e^{-rt}S_t$ est une <strong>martingale</strong> sous $Q$ (fiche 56). C'est la version continue de $S_1q+S_2(1-q)=e^{r\,dt}S_0$.</p>
+<p><strong>Et le lien avec Girsanov est direct.</strong> Passer de la mesure réelle à $Q$, c'est <strong>changer la dérive</strong> du brownien — de $\mu$ à $r$ — sans toucher à la volatilité. C'est exactement ce que fait le théorème de Girsanov, et c'est pourquoi la fiche 56 annonçait : <em>convertir un processus non martingale en une martingale par changement de mesure donne une méthode de valorisation des dérivés</em>.</p>
+</blockquote>
+<h2 data-prio="must">Concept 5 — La dérivation de l'équation de Black-Scholes</h2>
+<p><strong>L'hypothèse.</strong> L'action a une dynamique <strong>log-normale</strong> :
+$$dS=\mu S\,dt+\sigma S\,dW$$
+où $dW$ est normalement distribué de moyenne $0$ et d'écart-type $\sqrt{dt}$ — c'est-à-dire que $W$ est un <strong>mouvement brownien</strong>.</p>
+<p><strong>L'objectif.</strong> Trouver un <strong>portefeuille répliquant</strong> tel que
+$$df=a\,dS+b\,dB$$</p>
+<p><strong>Étape 1 — appliquer la formule d'Itô.</strong>
+$$df(S,t)=\frac{\partial f}{\partial t}dt+\frac{\partial f}{\partial S}dS+\frac12\frac{\partial^2f}{\partial S^2}(dS)^2, \qquad (dS)^2=\sigma^2S^2\,dt$$
+<em>(analogue à un développement de Taylor du premier ordre, jusqu'au terme en $dt$).</em></p>
+<p><strong>Étape 2 — substituer.</strong> En remplaçant $dS$, $df$, $dB=rB\,dt$ et $(dS)^2$ dans $df=a\,dS+b\,dB$ :
+$$\left[\frac{\partial f}{\partial t}+\frac{\partial f}{\partial S}\mu S+\frac12\frac{\partial^2f}{\partial S^2}\sigma^2S^2\right]dt+\frac{\partial f}{\partial S}\sigma S\,dW=\big(a\mu S+brB\big)dt+a\sigma S\,dW$$</p>
+<p><strong>Étape 3 — comparer les termes.</strong> L'égalité doit valoir pour le terme en $dW$ et pour le terme en $dt$ séparément :
+$$\boxed{\ a=\frac{\partial f}{\partial S}\ } \qquad\text{et}\qquad brB=\frac{\partial f}{\partial t}+\frac12\frac{\partial^2f}{\partial S^2}\sigma^2S^2$$</p>
+<blockquote>
+<p><strong>La première identité est le « <strong>delta</strong> ».</strong> $a=\partial f/\partial S$ est le <strong>nombre d'actions à détenir</strong> pour répliquer le dérivé — la <strong>stratégie de couverture</strong> (<em>delta-hedging</em>). Ce n'est pas un sous-produit : c'est la moitié du résultat, et celle que les salles de marché utilisent au quotidien.</p>
+</blockquote>
+<p><strong>Étape 4 — l'argument déterministe.</strong> $bB=f-aS$ est <strong>déterministe</strong>, et comme $dB=rB\,dt$ :
+$$d(f-aS)=r(f-aS)\,dt$$</p>
+<p><strong>Étape 5 — substituer une dernière fois</strong> $df=\frac{\partial f}{\partial t}dt+\frac{\partial f}{\partial S}dS+\frac12\frac{\partial^2f}{\partial S^2}\sigma^2S^2\,dt$ et $a=\frac{\partial f}{\partial S}$. Les termes en $dS$ <strong>s'annulent</strong>, et l'on obtient l'<strong>équation de Black-Scholes</strong> :
+$$\boxed{\ \frac{\partial f}{\partial t}+\frac12\sigma^2S^2\frac{\partial^2f}{\partial S^2}+rS\frac{\partial f}{\partial S}-rf=0\ }$$</p>
+<blockquote>
+<p><em>Fischer Black et Myron Scholes — article de <strong>1973</strong>. Myron Scholes et Robert Merton — <strong>prix Nobel 1997</strong>.</em></p>
+</blockquote>
+<blockquote>
+<p><strong>Le cœur de l'argument, en une phrase.</strong> En détenant $a=\partial f/\partial S$ actions contre le dérivé, on <strong>annule exactement le terme en $dW$</strong> : le portefeuille $f-aS$ devient <strong>sans risque</strong>, et doit donc croître au taux sans risque $r$. Toute la démonstration tient dans cette annulation.</p>
+</blockquote>
+<h2 data-prio="must">Concept 6 — Ce que dit l'équation</h2>
+<blockquote>
+<ul>
+<li><em>N'importe quel dérivé <strong>négociable</strong> satisfait l'équation.</em></li>
+<li><em><strong>Il n'y a aucune dépendance en la dérive réelle $\mu$.</strong></em></li>
+<li><em>On dispose d'une <strong>stratégie de couverture</strong> (portefeuille répliquant).</em></li>
+<li><em>Par un <strong>changement de variables</strong>, l'équation de Black-Scholes se transforme en <strong>équation de la chaleur</strong> :</em>
+$$\frac{\partial u}{\partial\tau}=\frac{\partial^2u}{\partial x^2}$$</li>
+</ul>
+</blockquote>
+<p class="cal piege"> <strong>« Aucune dépendance en $\mu$ » est le point le plus contre-intuitif de toute la finance.</strong> Regardez l'équation : $\mu$ n'y figure pas. Il a disparu à l'étape 3, absorbé par la couverture.</p>
+<div class="cal intu"><span class="lab">Pourquoi ?</span>
+<p> Parce que le portefeuille répliquant contient déjà $a$ actions. Si l'action monte plus vite que prévu, le dérivé gagne — mais la couverture aussi, exactement de la même manière. Les deux effets se compensent, et la dérive s'annule. <strong>Seule la volatilité $\sigma$ survit</strong>, parce qu'elle est ce que la couverture ne peut <strong>pas</strong> neutraliser.</p>
+<p><strong>C'est la traduction en EDP du résultat de la fiche 56</strong> : un changement de mesure modifie la dérive mais <strong>laisse la volatilité invariante</strong>.</p>
+</div>
+<blockquote>
+<p><strong>La transformation en équation de la chaleur</strong> n'est pas une curiosité : elle donne accès à tout l'arsenal analytique et numérique développé pour la diffusion thermique depuis Fourier — dont la solution en forme fermée du concept 8.</p>
+</blockquote>
+<h2 data-prio="high">Concept 7 — Conditions aux limites et conditions finales</h2>
+<blockquote>
+<p><em>Les conditions aux limites et finales sont déterminées par le <strong>payoff</strong> du dérivé spécifique.</em></p>
+</blockquote>
+<p><strong>Pour un call européen :</strong>
+$$C(S,T)=\max(S-K,0), \qquad C(0,t)=0, \qquad C(\infty,t)\sim S$$</p>
+<p><strong>Pour un put européen :</strong>
+$$P(S,T)=\max(K-S,0), \qquad P(0,t)=Ke^{-r(T-t)}, \qquad P(\infty,t)=0$$</p>
+<blockquote>
+<p><strong>Chaque condition a un sens économique immédiat.</strong></p>
+<ul>
+<li>$C(0,t)=0$ : si l'action ne vaut rien, elle ne vaudra jamais rien (le zéro est absorbant pour un brownien géométrique) — le call est sans valeur.</li>
+<li>$C(\infty,t)\sim S$ : pour $S$ très grand, l'exercice est certain et le call vaut à peu près l'action.</li>
+<li>$P(0,t)=Ke^{-r(T-t)}$ : si l'action ne vaut rien, le put paiera $K$ à coup sûr en $T$ ; sa valeur aujourd'hui est donc $K$ <strong>actualisé</strong>.</li>
+</ul>
+<p><strong>L'EDP est la même pour tous les dérivés ; c'est la condition finale qui distingue un call d'un put, d'un forward ou d'une digitale.</strong> Autrement dit : une seule équation, une infinité de produits.</p>
+</blockquote>
+<h2 data-prio="must">Concept 8 — La formule de Black-Scholes</h2>
+<blockquote>
+<p><em>Pour un call ou un put européen, l'équation peut être résolue <strong>analytiquement</strong> :</em>
+$$\boxed{\ C_t=S\,N(d_1)-Ke^{-r(T-t)}N(d_2)\ }$$
+$$\boxed{\ P_t=Ke^{-r(T-t)}N(-d_2)-S\,N(-d_1)\ }$$
+<em>où</em>
+$$d_1=\frac{\ln(S/K)+(r+\sigma^2/2)(T-t)}{\sigma\sqrt{T-t}}, \qquad d_2=\frac{\ln(S/K)+(r-\sigma^2/2)(T-t)}{\sigma\sqrt{T-t}}$$
+$$N(x)=\frac{1}{\sqrt{2\pi}}\int_{-\infty}^xe^{-u^2/2}\,du$$</p>
+</blockquote>
+<p><strong>Noter que $d_2=d_1-\sigma\sqrt{T-t}$.</strong></p>
+<div class="cal methode"><span class="lab">Comment lire la formule du call.</span>
+<p> C'est une <strong>différence de deux termes</strong>, tous deux interprétables.</p>
+<ul>
+<li>$Ke^{-r(T-t)}N(d_2)$ : la valeur actuelle du prix d'exercice, multipliée par $N(d_2)$ = la <strong>probabilité risque-neutre d'exercice</strong>, c'est-à-dire $Q(S_T&gt;K)$.</li>
+<li>$S\,N(d_1)$ : la valeur actuelle de l'action qu'on recevra, pondérée par $N(d_1)$. Et $N(d_1)$ est <strong>exactement le delta</strong> $\partial C/\partial S$ du concept 5 — le nombre d'actions à détenir en couverture.</li>
+</ul>
+<p>Autrement dit : <em>« je reçois l'action si j'exerce, je paye $K$ si j'exerce », chaque branche étant pondérée par la probabilité risque-neutre appropriée.</em></p>
+</div>
+<p class="cal piege"> <strong>Ne confondez pas $d_1$ et $d_2$.</strong> Ils diffèrent par le signe devant $\sigma^2/2$ — et c'est encore le terme d'Itô de la fiche 56. $N(d_2)$ est une probabilité d'exercice ; $N(d_1)$ est un delta. Les intervertir donne un prix faux et une couverture fausse.</p>
+<p><strong>La parité call-put</strong> en découle immédiatement, puisque $N(x)+N(-x)=1$ :
+$$C_t-P_t=S-Ke^{-r(T-t)}$$
+qui est aussi, mécaniquement, la valeur du <strong>contrat à terme</strong> de prix d'exercice $K$.</p>
+<h2 data-prio="must">Concept 9 — La formulation risque-neutre de Black-Scholes</h2>
+<blockquote>
+<p><strong>La valorisation risque-neutre.</strong>
+$$f_t=e^{-r(T-t)}E_Q[f_T]$$
+<em>où $Q$ est la mesure risque-neutre sous laquelle</em>
+$$\boxed{\ dS=rS\,dt+\sigma S\,dW\ }$$</p>
+</blockquote>
+<p><strong>Et la densité qui en résulte.</strong> Sous $Q$, la loi de $S_T$ sachant $S_t$ est <strong>log-normale</strong> :
+$$\text{PDF}(S_T)=\frac{1}{S_T\,\sigma\sqrt{2\pi(T-t)}}\exp\left(-\frac{\big(\ln(S_T/S_t)-(r-\sigma^2/2)(T-t)\big)^2}{2\sigma^2(T-t)}\right)$$</p>
+<blockquote>
+<p><strong>Comparez avec l'équation réelle $dS=\mu S\,dt+\sigma S\,dW$ : le seul changement est $\mu\to r$.</strong> C'est tout ce que fait le passage à la mesure risque-neutre — et c'est exactement l'énoncé de Girsanov de la fiche 56.</p>
+<p><strong>Et retrouvez le $-\sigma^2/2$ dans l'exposant</strong> : c'est le terme d'Itô du logarithme, calculé en fiche 56. La densité log-normale sous $Q$ est donc celle de $S_t\exp\big((r-\frac{\sigma^2}{2})(T-t)+\sigma(W_T-W_t)\big)$.</p>
+</blockquote>
+<blockquote>
+<p><strong>Les deux routes vers le même prix.</strong> On peut soit <strong>résoudre l'EDP</strong> avec ses conditions aux limites (approche de Black et Scholes), soit <strong>calculer l'espérance</strong> $e^{-r(T-t)}E_Q[\max(S_T-K,0)]$ en intégrant la densité log-normale (approche martingale). Les deux donnent la même formule : c'est le <strong>théorème de Feynman-Kac</strong> qui les relie.</p>
+</blockquote>
+<h2 data-prio="mid">Concept 10 — Quand la formule fermée n'existe pas</h2>
+<div class="cal methode"><span class="lab">méthodes numériques</span>
+<p><em>Pour des options plus compliquées ou des hypothèses plus générales, il faut recourir aux  :</em></p>
+<ul>
+<li><strong>méthodes de différences finies</strong> ;</li>
+<li><strong>méthodes d'arbres</strong> (équivalentes à un schéma explicite) ;</li>
+<li><strong>simulations de Monte-Carlo</strong>.</li>
+</ul>
+</div>
+<table>
+<thead>
+<tr>
+<th>Méthode</th>
+<th>Ce qu'elle discrétise</th>
+<th>Bien adaptée à</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Différences finies</strong></td>
+<td>l'<strong>EDP</strong></td>
+<td>options à exercice anticipé, faible dimension</td>
+</tr>
+<tr>
+<td><strong>Arbres</strong></td>
+<td>le <strong>processus</strong></td>
+<td>pédagogie, options américaines, faible dimension</td>
+</tr>
+<tr>
+<td><strong>Monte-Carlo</strong></td>
+<td>l'<strong>espérance</strong> $E_Q$</td>
+<td>grande dimension, produits <strong>dépendants du chemin</strong></td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>Le critère de choix est la dimension.</strong> Les différences finies et les arbres coûtent exponentiellement cher en nombre de sous-jacents ; Monte-Carlo a une erreur en $1/\sqrt N$ <strong>indépendante de la dimension</strong>. Au-delà de trois ou quatre facteurs, Monte-Carlo est le seul praticable — c'est exactement l'argument de la fiche 55.</p>
+</blockquote>
+<blockquote>
+<p><strong>La conclusion du cours.</strong> <em>Les services financiers modernes font usage de : <strong>EDP</strong>, <strong>méthodes numériques</strong>, <strong>calcul stochastique</strong>, <strong>simulations</strong>, <strong>statistiques</strong>, et bien, bien plus.</em></p>
+</blockquote>
+<h2>Comment résoudre l'exercice type (protocole)</h2>
+<ol>
+<li><strong>Identifier le payoff</strong> $f_T$ du dérivé — c'est la <strong>condition finale</strong> de l'EDP.</li>
+<li><strong>Poser la dynamique</strong> : $dS=\mu S\,dt+\sigma S\,dW$ sous la mesure réelle.</li>
+<li><strong>Choisir la route</strong> : EDP (si l'on veut une couverture ou un schéma numérique) ou espérance risque-neutre (si l'on veut un prix).</li>
+<li><strong>Route EDP</strong> : appliquer Itô, former le portefeuille $f-aS$ avec $a=\partial f/\partial S$, écrire $\frac{\partial f}{\partial t}+\frac12\sigma^2S^2\frac{\partial^2f}{\partial S^2}+rS\frac{\partial f}{\partial S}-rf=0$, ajouter les conditions aux limites.</li>
+<li><strong>Route martingale</strong> : remplacer $\mu$ par $r$, écrire $f_t=e^{-r(T-t)}E_Q[f_T]$ et intégrer la densité log-normale.</li>
+<li><strong>Pour un call ou un put</strong> : appliquer directement la formule fermée, en calculant $d_1$ puis $d_2=d_1-\sigma\sqrt{T-t}$.</li>
+<li><strong>Vérifier</strong> : le prix ne doit <strong>pas</strong> contenir $\mu$ ; la parité call-put doit être satisfaite ; les cas limites ($S\to0$, $S\to\infty$, $T\to t$) doivent redonner le payoff.</li>
+</ol>
+<h3>Comment reconnaître qu'il faut utiliser cette méthode ?</h3>
+<table>
+<thead>
+<tr>
+<th>Indice dans l'énoncé</th>
+<th>Ce qu'il faut faire</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>« prix d'un dérivé sans arbitrage »</td>
+<td><strong>portefeuille répliquant</strong></td>
+</tr>
+<tr>
+<td>deux états possibles</td>
+<td><strong>arbre binomial</strong>, $q=(S_0e^{rdt}-S_2)/(S_1-S_2)$</td>
+</tr>
+<tr>
+<td>« probabilité risque-neutre »</td>
+<td>celle sous laquelle $E[S]$ croît au taux $r$</td>
+</tr>
+<tr>
+<td>« combien d'actions détenir ? »</td>
+<td>le <strong>delta</strong> $a=\partial f/\partial S$, soit $N(d_1)$ pour un call</td>
+</tr>
+<tr>
+<td>« le prix dépend-il du rendement espéré ? »</td>
+<td><strong>non</strong> — $\mu$ n'apparaît pas dans l'EDP</td>
+</tr>
+<tr>
+<td>call ou put européen, dynamique log-normale</td>
+<td><strong>formule fermée</strong> de Black-Scholes</td>
+</tr>
+<tr>
+<td>payoff exotique ou dépendant du chemin</td>
+<td><strong>Monte-Carlo</strong> sous $Q$</td>
+</tr>
+<tr>
+<td>exercice anticipé possible</td>
+<td><strong>différences finies</strong> ou <strong>arbre</strong></td>
+</tr>
+</tbody></table>
+<h3>Exercices progressifs</h3>
+<p><strong> Niveau 1</strong> — Dans l'arbre binomial, montrez que $q$ ne dépend pas de la probabilité réelle $p$, et interprétez.</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p><strong>La formule.</strong>
+$$q=\frac{S_0e^{r\,dt}-S_2}{S_1-S_2}$$
+Elle ne contient que $S_0$, $S_1$, $S_2$ et $r$ : <strong>$p$ n'y figure pas</strong>.</p>
+<p><strong>Pourquoi.</strong> $q$ vient de la <strong>réplication</strong>, pas d'un calcul de probabilité. On a construit $a$ et $b$ tels que le portefeuille reproduise $f$ <strong>dans les deux états</strong>. Un portefeuille qui reproduit le payoff dans <strong>tous</strong> les cas a la même valeur que le dérivé quelles que soient les chances de chaque état.</p>
+<p><strong>L'interprétation.</strong> $q$ est la probabilité <strong>implicite</strong> dans les prix de marché, celle sous laquelle
+$$S_1q+S_2(1-q)=e^{r\,dt}S_0$$
+c'est-à-dire sous laquelle l'action rapporte <strong>exactement le taux sans risque</strong> : aucune prime de risque.</p>
+<p><strong>Le retour aux deux chevaux.</strong> À la cote $5$ contre $1$, le bookmaker ne risque rien, et les probabilités implicites $\frac16$ et $\frac56$ sont <strong>proportionnelles aux mises</strong> ($10\,000$ et $50\,000$ sur $60\,000$), non aux vraies chances de $20\,\%$ et $80\,\%$. Le prix « juste » n'est pas celui qui annule l'espérance de gain sous les vraies probabilités — c'est celui qui <strong>annule le risque</strong>.</p>
+</div></details>
+
+<p><strong> Niveau 2</strong> — Pourquoi le prix d'une option ne dépend-il pas du rendement espéré $\mu$ de l'action ?</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p><strong>Le fait.</strong> L'équation de Black-Scholes
+$$\frac{\partial f}{\partial t}+\frac12\sigma^2S^2\frac{\partial^2f}{\partial S^2}+rS\frac{\partial f}{\partial S}-rf=0$$
+ne contient <strong>pas</strong> $\mu$. Il a disparu à l'étape 3 de la dérivation.</p>
+<p><strong>Le mécanisme.</strong> Le portefeuille répliquant contient $a=\partial f/\partial S$ actions. En formant $f-aS$, les termes en $dS$ — donc en $\mu\,dt$ <strong>et</strong> en $\sigma\,dW$ — s'annulent <strong>exactement</strong>. Il reste un portefeuille <strong>sans risque</strong>, qui doit donc croître au taux $r$, quelle que soit la dérive de l'action.</p>
+<p><strong>L'intuition financière.</strong> Si l'action monte plus vite que prévu, le call gagne — mais la position en actions du portefeuille de couverture gagne exactement autant. Le vendeur d'option <strong>est couvert</strong> : sa performance ne dépend pas de la direction du sous-jacent. Il n'a donc aucune raison de facturer une prime pour la dérive.</p>
+<p><strong>Ce qui survit et pourquoi.</strong> $\sigma$ reste, parce que la couverture est <strong>continûment réajustée</strong> mais ne peut pas neutraliser l'<strong>amplitude</strong> des mouvements. Plus l'action bouge, plus la couverture coûte cher à maintenir — et c'est ce coût que la prime rémunère.</p>
+<p><strong>La formulation en termes de mesure (fiche 56).</strong> Passer de $\mathbb P$ à $Q$ change la <strong>dérive</strong> ($\mu\to r$) mais <strong>laisse la volatilité invariante</strong>. Comme le prix est $e^{-r(T-t)}E_Q[f_T]$, il ne peut dépendre que de ce qui survit au changement de mesure : $\sigma$, pas $\mu$.</p>
+<p><strong>La conséquence pratique.</strong> Deux investisseurs en désaccord complet sur l'avenir de l'action doivent s'accorder sur le prix de l'option — dès lors qu'ils s'accordent sur sa volatilité. C'est pourquoi les marchés d'options cotent, de fait, des <strong>volatilités</strong> et non des prix.</p>
+</div></details>
+
+<p><strong> Niveau 3</strong> — Calculez le prix d'un call avec $S=100$, $K=100$, $r=5\,\%$, $\sigma=20\,\%$, $T-t=1$ an.</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p><strong>Étape 1 — $d_1$.</strong>
+$$d_1=\frac{\ln(100/100)+(0{,}05+0{,}02)\times1}{0{,}20\times1}=\frac{0+0{,}07}{0{,}20}=0{,}35$$
+(en utilisant $\sigma^2/2=0{,}04/2=0{,}02$).</p>
+<p><strong>Étape 2 — $d_2$.</strong>
+$$d_2=d_1-\sigma\sqrt{T-t}=0{,}35-0{,}20=0{,}15$$</p>
+<p><strong>Étape 3 — les probabilités normales.</strong>
+$$N(0{,}35)\approx0{,}6368, \qquad N(0{,}15)\approx0{,}5596$$</p>
+<p><strong>Étape 4 — le prix.</strong>
+$$C=S\,N(d_1)-Ke^{-r(T-t)}N(d_2)=100\times0{,}6368-100\times e^{-0{,}05}\times0{,}5596$$
+$$=63{,}68-100\times0{,}9512\times0{,}5596=63{,}68-53{,}22=\mathbf{10{,}46}$$</p>
+<p><strong>Les lectures à en tirer.</strong></p>
+<ul>
+<li>$N(d_1)=0{,}6368$ est le <strong>delta</strong> : pour couvrir la vente d'un call, il faut détenir environ $0{,}64$ action.</li>
+<li>$N(d_2)=0{,}5596$ est la <strong>probabilité risque-neutre d'exercice</strong> : $56\,\%$ de chances que $S_T&gt;K$.</li>
+<li>Le call à la monnaie vaut $10{,}5\,\%$ du sous-jacent pour un an et $20\,\%$ de volatilité — un ordre de grandeur utile à mémoriser.</li>
+</ul>
+<p><strong>Vérification par la parité.</strong>
+$$P=C-S+Ke^{-r(T-t)}=10{,}46-100+95{,}12=5{,}58$$
+Le put vaut moins que le call, ce qui est correct : à la monnaie, le taux d'intérêt positif favorise le call, puisqu'on paye $K$ <strong>plus tard</strong>.</p>
+</div></details>
+
+<p><strong> Niveau 4 — type examen</strong> — Dérivez complètement l'équation de Black-Scholes et expliquez chaque étape.</p>
+<details class="cor"><summary>Correction</summary><div class="in">
+
+<p><strong>Étape 0 — les hypothèses.</strong> L'action suit $dS=\mu S\,dt+\sigma S\,dW$ avec $W$ brownien ; le compte monétaire suit $dB=rB\,dt$ ; on cherche un portefeuille répliquant $df=a\,dS+b\,dB$.</p>
+<p><strong>Étape 1 — le lemme d'Itô</strong> (fiche 56) appliqué à $f(S,t)$ :
+$$df=\frac{\partial f}{\partial t}dt+\frac{\partial f}{\partial S}dS+\frac12\frac{\partial^2f}{\partial S^2}(dS)^2, \qquad (dS)^2=\sigma^2S^2\,dt$$
+Le terme en $(dS)^2$ est celui qui n'existe pas en calcul ordinaire ; il vient de $(dW)^2=dt$.</p>
+<p><strong>Étape 2 — développer en $dt$ et $dW$.</strong>
+$$df=\left[\frac{\partial f}{\partial t}+\mu S\frac{\partial f}{\partial S}+\frac12\sigma^2S^2\frac{\partial^2f}{\partial S^2}\right]dt+\sigma S\frac{\partial f}{\partial S}\,dW$$
+et, du côté du portefeuille,
+$$a\,dS+b\,dB=(a\mu S+brB)\,dt+a\sigma S\,dW$$</p>
+<p><strong>Étape 3 — identifier les coefficients.</strong> Deux processus d'Itô sont égaux si et seulement si leurs coefficients en $dt$ <strong>et</strong> en $dW$ coïncident (unicité de la décomposition semi-martingale) :
+$$\text{terme en }dW:\quad \sigma S\frac{\partial f}{\partial S}=a\sigma S \quad\Longrightarrow\quad \boxed{a=\frac{\partial f}{\partial S}}$$
+$$\text{terme en }dt:\quad brB=\frac{\partial f}{\partial t}+\frac12\sigma^2S^2\frac{\partial^2f}{\partial S^2}$$
+<em>(le terme $\mu S\,\partial f/\partial S$ des deux côtés s'annule, puisque $a=\partial f/\partial S$ — <strong>c'est ici que $\mu$ disparaît</strong>).</em></p>
+<p><strong>Étape 4 — l'argument sans risque.</strong> $bB=f-aS$ est un montant investi au taux sans risque, donc <strong>déterministe</strong> au premier ordre. Comme $dB=rB\,dt$ :
+$$d(f-aS)=r(f-aS)\,dt$$</p>
+<p><strong>Étape 5 — conclure.</strong> Le membre de gauche vaut $df-a\,dS$ ; en y substituant Itô et $a=\partial f/\partial S$, les termes en $dS$ <strong>s'annulent</strong> et il reste
+$$\left[\frac{\partial f}{\partial t}+\frac12\sigma^2S^2\frac{\partial^2f}{\partial S^2}\right]dt=r\left(f-S\frac{\partial f}{\partial S}\right)dt$$
+$$\boxed{\ \frac{\partial f}{\partial t}+\frac12\sigma^2S^2\frac{\partial^2f}{\partial S^2}+rS\frac{\partial f}{\partial S}-rf=0\ }$$</p>
+<p><strong>Ce qu'il faut savoir commenter.</strong></p>
+<ol>
+<li><strong>L'idée en une phrase</strong> : détenir $\partial f/\partial S$ actions <strong>annule le terme aléatoire</strong> ; le reste, étant sans risque, doit croître au taux $r$.</li>
+<li><strong>$\mu$ a disparu</strong> — le prix ne dépend pas des anticipations sur le sous-jacent, seulement de sa volatilité.</li>
+<li><strong>$a=\partial f/\partial S$ est le delta</strong> — la dérivation ne donne pas seulement un prix, elle donne la <strong>stratégie de couverture</strong> qui le justifie.</li>
+<li><strong>L'EDP est universelle</strong> : <em>n'importe quel dérivé négociable la satisfait</em>. Ce sont les <strong>conditions finales</strong> qui distinguent un call ($\max(S-K,0)$) d'un put ($\max(K-S,0)$) ou d'une digitale.</li>
+<li><strong>Par changement de variables, elle devient l'équation de la chaleur</strong> $\partial u/\partial\tau=\partial^2u/\partial x^2$ — d'où la solubilité analytique pour call et put.</li>
+</ol>
+<p><strong>Les hypothèses implicites, à mentionner en critique.</strong> Réajustement <strong>continu</strong> de la couverture, absence de coûts de transaction, volatilité <strong>constante</strong>, trajectoires <strong>continues</strong> (aucun saut), possibilité d'emprunter et de vendre à découvert sans limite. Aucune n'est vraie en pratique : les sauts de la fiche 53 et les queues épaisses expliquent le « <em>smile</em> » de volatilité observé sur les marchés, c'est-à-dire le fait que la volatilité implicite dépende du prix d'exercice — ce que le modèle interdit.</p>
+</div></details>
+
+<h2 data-prio="must">Common mistakes</h2>
+<ol>
+<li><strong>Utiliser la probabilité réelle $p$</strong> pour valoriser — c'est $q$, la probabilité risque-neutre, qui intervient ; elle ne dépend pas de $p$.</li>
+<li><strong>Croire que le prix dépend de $\mu$</strong> — $\mu$ n'apparaît nulle part dans l'EDP ni dans la formule.</li>
+<li><strong>Confondre $N(d_1)$ et $N(d_2)$</strong> — $N(d_1)$ est le <strong>delta</strong>, $N(d_2)$ la <strong>probabilité risque-neutre d'exercice</strong>.</li>
+<li><strong>Se tromper de signe devant $\sigma^2/2$</strong> — $+$ dans $d_1$, $-$ dans $d_2$ ; et $d_2=d_1-\sigma\sqrt{T-t}$.</li>
+<li><strong>Oublier d'actualiser $K$</strong> — c'est $Ke^{-r(T-t)}$ et non $K$ dans la formule.</li>
+<li><strong>Oublier le terme d'Itô $\frac12\sigma^2S^2\frac{\partial^2f}{\partial S^2}$</strong> dans la dérivation.</li>
+<li><strong>Croire que la mesure risque-neutre décrit le monde réel</strong> — elle ne décrit rien : c'est un <strong>outil de calcul</strong>, comme la cote du bookmaker.</li>
+<li><strong>Appliquer la formule fermée à une option américaine</strong> — elle vaut pour les options <strong>européennes</strong> ; l'exercice anticipé demande des méthodes numériques.</li>
+<li><strong>Oublier que $\sigma$ est supposée constante</strong> — d'où le <em>smile</em> de volatilité, que le modèle ne peut pas expliquer.</li>
+<li><strong>Confondre condition finale et condition aux limites</strong> — la condition <strong>finale</strong> est le payoff en $T$ ; les conditions aux <strong>limites</strong> sont le comportement en $S=0$ et $S\to\infty$.</li>
+</ol>
+<h2>Ultimate Review</h2>
+<ol>
+<li><strong>Les deux chevaux</strong> : la cote $4$-$1$ annule l'espérance sous les <strong>vraies</strong> probabilités ; la cote $5$-$1$ annule le <strong>risque</strong>. Les probabilités implicites sont proportionnelles aux <strong>mises</strong>, pas aux chances.</li>
+<li><strong>Payoffs</strong> : forward $S-K$ · call $\max(S-K,0)$ · put $\max(K-S,0)$ · digitale $\mathbf 1_{S&gt;K}$.</li>
+<li><strong>Les trois affirmations</strong> : pas d'incertitude sur le prix ; il ne dépend <strong>pas des préférences de risque</strong> ; on obtient prix <strong>et</strong> risques.</li>
+<li><strong>Le principe</strong> : <em>le prix d'une créance dérivée est le prix d'un portefeuille qui <strong>réplique exactement</strong> son payoff</em>.</li>
+<li><strong>Arbre binomial</strong> : $a=\frac{f_1-f_2}{S_1-S_2}$, $b=\frac{S_1f_2-S_2f_1}{(S_1-S_2)B_0e^{rdt}}$, $f_0=aS_0+bB_0$.</li>
+<li><strong>Réécriture</strong> : $f_0=e^{-r\,dt}\big(qf_1+(1-q)f_2\big)$ avec $q=\frac{S_0e^{rdt}-S_2}{S_1-S_2}\in(0,1)$, et $S_1q+S_2(1-q)=e^{rdt}S_0$.</li>
+<li><strong>Cas continu</strong> : $f_t=e^{-r(T-t)}E_Q[f_T]$, $Q$ <strong>mesure risque-neutre (martingale)</strong>, $S_0=e^{-rt}E_Q[S_t]$.</li>
+<li><strong>Dynamique réelle</strong> : $dS=\mu S\,dt+\sigma S\,dW$, $(dS)^2=\sigma^2S^2dt$.</li>
+<li><strong>Réplication</strong> : $df=a\,dS+b\,dB$, $dB=rB\,dt$ ⟹ $a=\frac{\partial f}{\partial S}$ (le <strong>delta</strong>) et $brB=\frac{\partial f}{\partial t}+\frac12\sigma^2S^2\frac{\partial^2f}{\partial S^2}$.</li>
+<li><strong>EDP de Black-Scholes</strong> : $\frac{\partial f}{\partial t}+\frac12\sigma^2S^2\frac{\partial^2f}{\partial S^2}+rS\frac{\partial f}{\partial S}-rf=0$. Black et Scholes 1973 ; Nobel 1997 à Scholes et Merton.</li>
+<li><strong>Ses propriétés</strong> : universelle pour tout dérivé négociable · <strong>aucune dépendance en $\mu$</strong> · fournit la couverture · se transforme en <strong>équation de la chaleur</strong> $\partial u/\partial\tau=\partial^2u/\partial x^2$.</li>
+<li><strong>Conditions</strong> — call : $C(S,T)=\max(S-K,0)$, $C(0,t)=0$, $C(\infty,t)\sim S$. Put : $P(S,T)=\max(K-S,0)$, $P(0,t)=Ke^{-r(T-t)}$, $P(\infty,t)=0$.</li>
+<li><strong>Formule</strong> : $C=S\,N(d_1)-Ke^{-r(T-t)}N(d_2)$ et $P=Ke^{-r(T-t)}N(-d_2)-S\,N(-d_1)$.</li>
+<li><strong>Les $d$</strong> : $d_{1,2}=\frac{\ln(S/K)+(r\pm\sigma^2/2)(T-t)}{\sigma\sqrt{T-t}}$, $d_2=d_1-\sigma\sqrt{T-t}$ ; $N(x)=\frac{1}{\sqrt{2\pi}}\int_{-\infty}^xe^{-u^2/2}du$.</li>
+<li><strong>Interprétation</strong> : $N(d_1)$ = <strong>delta</strong>, $N(d_2)$ = <strong>probabilité risque-neutre d'exercice</strong> ; parité $C-P=S-Ke^{-r(T-t)}$.</li>
+<li><strong>Sous $Q$</strong> : $dS=rS\,dt+\sigma S\,dW$ — seul $\mu\to r$ change ; densité <strong>log-normale</strong> avec $(r-\sigma^2/2)(T-t)$.</li>
+<li><strong>Méthodes numériques</strong> : différences finies · arbres (schéma explicite) · <strong>Monte-Carlo</strong> (seule praticable en grande dimension).</li>
+</ol>
+<p><strong>Formulas to know</strong>
+$$q=\frac{S_0e^{r\,dt}-S_2}{S_1-S_2} \qquad f_t=e^{-r(T-t)}E_Q[f_T] \qquad dS=rS\,dt+\sigma S\,dW \text{ sous } Q$$
+$$\frac{\partial f}{\partial t}+\frac12\sigma^2S^2\frac{\partial^2f}{\partial S^2}+rS\frac{\partial f}{\partial S}-rf=0 \qquad a=\frac{\partial f}{\partial S}$$
+$$C=S\,N(d_1)-Ke^{-r(T-t)}N(d_2) \qquad d_1=\frac{\ln(S/K)+(r+\frac{\sigma^2}{2})(T-t)}{\sigma\sqrt{T-t}} \qquad d_2=d_1-\sigma\sqrt{T-t}$$</p>
+<p><strong>Methods to know</strong> : la construction du portefeuille répliquant binomial ; la réécriture en probabilité risque-neutre ; la dérivation complète de l'EDP en 5 étapes ; le calcul numérique d'un prix de call.</p>
+<div class="rec"><h2>Active Recall</h2><p><strong>Basic</strong> — Écrivez l'équation de Black-Scholes et la formule du call européen.</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p><strong>L'équation :</strong>
+$$\frac{\partial f}{\partial t}+\frac12\sigma^2S^2\frac{\partial^2f}{\partial S^2}+rS\frac{\partial f}{\partial S}-rf=0$$</p>
+<p><strong>La formule du call :</strong>
+$$C_t=S\,N(d_1)-Ke^{-r(T-t)}N(d_2)$$
+$$d_1=\frac{\ln(S/K)+(r+\sigma^2/2)(T-t)}{\sigma\sqrt{T-t}}, \qquad d_2=d_1-\sigma\sqrt{T-t}$$</p>
+<p><strong>Remarquez ce qui n'y est pas : $\mu$.</strong> Ni dans l'équation, ni dans la formule.</p>
+</div></details><p><strong>Understanding</strong> — Qu'est-ce que la mesure risque-neutre, et pourquoi porte-t-elle ce nom ?</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p>C'est la mesure de probabilité $Q$ sous laquelle
+$$S_0=e^{-rt}E_Q[S_t] \qquad\text{c'est-à-dire}\qquad dS=rS\,dt+\sigma S\,dW$$
+Le prix <strong>actualisé</strong> $e^{-rt}S_t$ y est une <strong>martingale</strong> — d'où son autre nom, mesure martingale.</p>
+<p><strong>Pourquoi « risque-neutre ».</strong> Sous $Q$, l'action rapporte <strong>exactement le taux sans risque</strong>, sans aucune prime : c'est ce qu'exigerait un investisseur <strong>indifférent au risque</strong>.</p>
+<p class="cal piege"> <strong>Mais $Q$ ne décrit pas le monde réel.</strong> Personne ne croit que les actions rapportent $r$. $Q$ est un <strong>outil de calcul</strong> — exactement comme la cote du bookmaker à $5$ contre $1$, qui reflète les mises et non les vraies chances des chevaux. Et par Girsanov (fiche 56), $Q$ est <strong>équivalente</strong> à la mesure réelle : les mêmes scénarios restent possibles, seule leur pondération change.</p>
+</div></details><p><strong>Application</strong> — Vous vendez un call. Combien d'actions devez-vous détenir pour vous couvrir ?</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p>Le nombre d'actions est le <strong>delta</strong>, qui sort directement de la dérivation :
+$$a=\frac{\partial C}{\partial S}=N(d_1)$$</p>
+<p>Pour l'exemple numérique ($S=K=100$, $r=5\,\%$, $\sigma=20\,\%$, $T-t=1$), $N(d_1)=N(0{,}35)\approx0{,}64$ : il faut détenir environ <strong>$0{,}64$ action</strong> par call vendu.</p>
+<p><strong>Pourquoi ça marche.</strong> Le portefeuille « $-1$ call $+\ 0{,}64$ action » a un terme en $dW$ <strong>nul</strong> : il est localement sans risque. Une variation du prix de l'action affecte le call et la position en actions <strong>de la même façon</strong>, et les deux effets se compensent.</p>
+<p class="cal piege"> <strong>Mais la couverture doit être <strong>réajustée en continu</strong>.</strong> $N(d_1)$ change avec $S$ et avec $t$ — c'est le <strong>gamma</strong> $\partial^2C/\partial S^2$ qui mesure cette vitesse. En pratique, on réajuste à intervalles discrets, ce qui laisse un risque résiduel ; et les coûts de transaction rendent le réajustement continu impossible. C'est l'écart principal entre le modèle et la réalité.</p>
+</div></details><p><strong>Comparison</strong> — EDP contre valorisation risque-neutre : deux routes vers le même prix ?</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<table>
+<thead>
+<tr>
+<th></th>
+<th><strong>Route EDP</strong></th>
+<th><strong>Route martingale</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Point de départ</td>
+<td>portefeuille <strong>répliquant</strong></td>
+<td>changement de <strong>mesure</strong></td>
+</tr>
+<tr>
+<td>Objet à résoudre</td>
+<td>$\frac{\partial f}{\partial t}+\frac12\sigma^2S^2\frac{\partial^2f}{\partial S^2}+rS\frac{\partial f}{\partial S}-rf=0$</td>
+<td>$f_t=e^{-r(T-t)}E_Q[f_T]$</td>
+</tr>
+<tr>
+<td>Outil</td>
+<td>équations aux dérivées partielles</td>
+<td>Itô, Girsanov, intégration</td>
+</tr>
+<tr>
+<td>Ce qu'elle donne en prime</td>
+<td>la <strong>couverture</strong> $a=\partial f/\partial S$</td>
+<td>la <strong>loi</strong> de $S_T$ sous $Q$</td>
+</tr>
+<tr>
+<td>Bien adaptée à</td>
+<td>différences finies, exercice anticipé</td>
+<td>Monte-Carlo, grande dimension, payoffs exotiques</td>
+</tr>
+</tbody></table>
+<p><strong>Elles donnent le même prix</strong>, et c'est le <strong>théorème de Feynman-Kac</strong> qui l'établit : la solution d'une EDP parabolique de cette forme <strong>est</strong> une espérance conditionnelle le long des trajectoires du processus associé.</p>
+<p><strong>Comment choisir.</strong> La route EDP est naturelle quand on veut couvrir ou quand il y a exercice anticipé (option américaine). La route martingale est naturelle en grande dimension ou pour des payoffs dépendants du chemin, où l'on simule directement $S_T$ sous $Q$ et où l'on moyenne le payoff actualisé.</p>
+<p><strong>Le point commun décisif</strong> : dans les deux cas, $\mu$ a disparu — remplacé par $r$ dans la route martingale, annulé par la couverture dans la route EDP. C'est le même fait vu de deux côtés.</p>
+</div></details><p><strong>Exam-style</strong> — Expliquez l'exemple des deux chevaux et faites le lien avec la valorisation d'options.</p><details class="cor"><summary>Réponse</summary><div class="in">
+
+<p><strong>Les données.</strong> Deux chevaux, $20\,\%$ et $80\,\%$ de chances. Mises : $10\,000$ dollars sur le premier, $50\,000$ dollars sur le second ; total $60\,000$ dollars.</p>
+<p><strong>Cote $4$ contre $1$.</strong> Si le premier gagne, le bookmaker paye $10\,000\times5=50\,000$ et <strong>gagne $10\,000$ dollars</strong>. Si le second gagne, il paye $50\,000\times1{,}25=62\,500$ et <strong>perd $2\,500$ dollars</strong>. Son espérance de gain :
+$$0{,}2\times10\,000+0{,}8\times(-2\,500)=2\,000-2\,000=0$$
+<strong>Espérance nulle, mais risque bien réel</strong> — il peut perdre.</p>
+<p><strong>Cote $5$ contre $1$.</strong> Si le premier gagne : $10\,000\times6=60\,000$, il <strong>rend exactement</strong> ce qu'il a collecté. Si le second gagne : $50\,000\times1{,}2=60\,000$, <strong>idem</strong>. Le bookmaker <em>ne perd ni ne gagne d'argent, quel que soit le cheval qui gagne</em> : son livre est <strong>sans risque</strong>.</p>
+<p><strong>Les probabilités implicites de la cote $5$-$1$.</strong>
+$$\frac{10\,000}{60\,000}=\frac16\approx17\,\%, \qquad \frac{50\,000}{60\,000}=\frac56\approx83\,\%$$
+Elles sont <strong>proportionnelles aux mises</strong>, et non aux vraies chances de $20\,\%$ et $80\,\%$.</p>
+<p><strong>Le lien avec les options — point par point.</strong></p>
+<table>
+<thead>
+<tr>
+<th>Course</th>
+<th>Marché d'options</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Vraies chances $20/80$</td>
+<td>probabilité réelle $p$, dérive $\mu$</td>
+</tr>
+<tr>
+<td>Cote annulant l'<strong>espérance</strong></td>
+<td>prix « actuariel », $K_0=pS_1+(1-p)S_2$</td>
+</tr>
+<tr>
+<td>Cote annulant le <strong>risque</strong></td>
+<td>prix de <strong>non-arbitrage</strong>, $K_0=S_0e^{r\,dt}$</td>
+</tr>
+<tr>
+<td>Probabilités implicites $\frac16,\frac56$</td>
+<td>probabilité <strong>risque-neutre</strong> $q$</td>
+</tr>
+<tr>
+<td>Livre équilibré</td>
+<td>portefeuille <strong>répliquant</strong></td>
+</tr>
+</tbody></table>
+<p><strong>La leçon centrale.</strong> Un prix « juste » n'est <strong>pas</strong> celui qui rend l'espérance de gain nulle sous les vraies probabilités : c'est celui qui permet de <strong>construire une position sans risque</strong>. Et ce prix ne dépend pas des vraies probabilités — ni pour le bookmaker, ni pour le vendeur d'options.</p>
+<p><strong>Et le pendant financier de l'équilibrage du livre</strong>, c'est la <strong>delta-couverture</strong> : détenir $a=\partial f/\partial S=N(d_1)$ actions par call vendu annule le terme en $dW$, exactement comme la cote $5$-$1$ annule l'exposition du bookmaker aux deux issues.</p>
+<p class="cal piege"> <strong>Où l'analogie s'arrête.</strong> Le bookmaker ajuste sa cote <strong>une fois</strong> ; le vendeur d'option doit réajuster sa couverture <strong>en continu</strong>, parce que le delta change avec $S$ et avec $t$. C'est là qu'entrent le gamma, les coûts de transaction, et tout l'écart entre le modèle et la réalité.</p>
+</div></details></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h2>Flashcards</h2>
+<table>
+<thead>
+<tr>
+<th>Question</th>
+<th>Réponse</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Payoff d'un call européen ?</td>
+<td>$\max(S-K,0)$</td>
+</tr>
+<tr>
+<td>Payoff d'un put européen ?</td>
+<td>$\max(K-S,0)$</td>
+</tr>
+<tr>
+<td>Payoff d'une option digitale ?</td>
+<td>$1$ si $S&gt;K$, $0$ sinon</td>
+</tr>
+<tr>
+<td>Le principe de valorisation ?</td>
+<td>Le prix du <strong>portefeuille répliquant</strong></td>
+</tr>
+<tr>
+<td>Prix à terme sans arbitrage ?</td>
+<td>$K_0=S_0e^{r\,dt}$</td>
+</tr>
+<tr>
+<td>Delta de réplication binomiale ?</td>
+<td>$a=(f_1-f_2)/(S_1-S_2)$</td>
+</tr>
+<tr>
+<td>Prix binomial ?</td>
+<td>$f_0=e^{-r\,dt}\big(qf_1+(1-q)f_2\big)$</td>
+</tr>
+<tr>
+<td>Probabilité risque-neutre binomiale ?</td>
+<td>$q=(S_0e^{rdt}-S_2)/(S_1-S_2)$</td>
+</tr>
+<tr>
+<td>$q$ dépend-elle de $p$ ?</td>
+<td><strong>Non</strong>, pas du tout</td>
+</tr>
+<tr>
+<td>Que vérifie $q$ ?</td>
+<td>$S_1q+S_2(1-q)=e^{rdt}S_0$</td>
+</tr>
+<tr>
+<td>Formule de valorisation continue ?</td>
+<td>$f_t=e^{-r(T-t)}E_Q[f_T]$</td>
+</tr>
+<tr>
+<td>Autre nom de $Q$ ?</td>
+<td>Mesure <strong>martingale</strong></td>
+</tr>
+<tr>
+<td>Dynamique sous $Q$ ?</td>
+<td>$dS=rS\,dt+\sigma S\,dW$</td>
+</tr>
+<tr>
+<td>Dynamique réelle ?</td>
+<td>$dS=\mu S\,dt+\sigma S\,dW$</td>
+</tr>
+<tr>
+<td>$(dS)^2=?$</td>
+<td>$\sigma^2S^2\,dt$</td>
+</tr>
+<tr>
+<td>Équation de Black-Scholes ?</td>
+<td>$\frac{\partial f}{\partial t}+\frac12\sigma^2S^2\frac{\partial^2f}{\partial S^2}+rS\frac{\partial f}{\partial S}-rf=0$</td>
+</tr>
+<tr>
+<td>Le delta de couverture ?</td>
+<td>$a=\partial f/\partial S$</td>
+</tr>
+<tr>
+<td>L'EDP dépend-elle de $\mu$ ?</td>
+<td><strong>Non</strong></td>
+</tr>
+<tr>
+<td>En quelle équation se transforme-t-elle ?</td>
+<td>L'<strong>équation de la chaleur</strong> $\partial u/\partial\tau=\partial^2u/\partial x^2$</td>
+</tr>
+<tr>
+<td>Année de l'article ?</td>
+<td><strong>1973</strong> — Black et Scholes</td>
+</tr>
+<tr>
+<td>Prix Nobel ?</td>
+<td><strong>1997</strong> — Scholes et Merton</td>
+</tr>
+<tr>
+<td>Conditions aux limites du call ?</td>
+<td>$C(0,t)=0$, $C(\infty,t)\sim S$</td>
+</tr>
+<tr>
+<td>Conditions aux limites du put ?</td>
+<td>$P(0,t)=Ke^{-r(T-t)}$, $P(\infty,t)=0$</td>
+</tr>
+<tr>
+<td>Formule du call ?</td>
+<td>$S\,N(d_1)-Ke^{-r(T-t)}N(d_2)$</td>
+</tr>
+<tr>
+<td>Formule du put ?</td>
+<td>$Ke^{-r(T-t)}N(-d_2)-S\,N(-d_1)$</td>
+</tr>
+<tr>
+<td>$d_1=?$</td>
+<td>$\frac{\ln(S/K)+(r+\sigma^2/2)(T-t)}{\sigma\sqrt{T-t}}$</td>
+</tr>
+<tr>
+<td>Relation entre $d_1$ et $d_2$ ?</td>
+<td>$d_2=d_1-\sigma\sqrt{T-t}$</td>
+</tr>
+<tr>
+<td>Que représente $N(d_1)$ ?</td>
+<td>Le <strong>delta</strong> de l'option</td>
+</tr>
+<tr>
+<td>Que représente $N(d_2)$ ?</td>
+<td>La <strong>probabilité risque-neutre d'exercice</strong></td>
+</tr>
+<tr>
+<td>Parité call-put ?</td>
+<td>$C-P=S-Ke^{-r(T-t)}$</td>
+</tr>
+<tr>
+<td>Densité de $S_T$ sous $Q$ ?</td>
+<td><strong>Log-normale</strong>, de dérive $(r-\sigma^2/2)(T-t)$</td>
+</tr>
+<tr>
+<td>Les trois méthodes numériques ?</td>
+<td>Différences finies · arbres · <strong>Monte-Carlo</strong></td>
+</tr>
+<tr>
+<td>Quand Monte-Carlo s'impose-t-elle ?</td>
+<td>Grande dimension, produits <strong>dépendants du chemin</strong></td>
+</tr>
+</tbody></table>
+</main>
+
+
+
+
+</body></html>

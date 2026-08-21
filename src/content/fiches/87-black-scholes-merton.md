@@ -41,7 +41,12 @@ $$\boxed{\ln S_T\sim\phi\!\left(\ln S_0+\left(\mu-\frac{\sigma^2}{2}\right)T,\ \
 
 $$\boxed{\mathbb E(S_T)=S_0e^{\mu T}}\;\text{(14.4)}\qquad\qquad\boxed{\mathrm{Var}(S_T)=S_0^2e^{2\mu T}\big(e^{\sigma^2T}-1\big)}\;\text{(14.5)}$$
 
-<details><summary>**Deux exercices résolus — intervalle de confiance et moments (exemples 14.1 et 14.2)**</summary>
+<details class="details--riche">
+<summary>
+
+**Deux exercices résolus — intervalle de confiance et moments (exemples 14.1 et 14.2)**
+
+</summary>
 
 **Exemple 14.1 — l'intervalle à 95 %.** $S_0=40$, $\mu=16\,\%$, $\sigma=20\,\%$, $T=0{,}5$. *Étape 1 — la loi de $\ln S_T$.*
 
@@ -78,7 +83,12 @@ $$\boxed{x\sim\phi\!\left(\mu-\frac{\sigma^2}{2},\ \frac{\sigma^2}{T}\right)}\;\
 
 **Exemple 14.3.** $\mu=17\,\%$, $\sigma=20\,\%$, $T=3$ ans. Moyenne $=0{,}17-0{,}02=\mathbf{15\,\%}$ ; écart-type $=\sqrt{0{,}04/3}=\mathbf{11{,}55\,\%}$. À 95 % : le rendement moyen réalisé sur 3 ans sera entre $15-1{,}96\times11{,}55=\mathbf{-7{,}6\,\%}$ et $15+1{,}96\times11{,}55=\mathbf{+37{,}6\,\%}$ par an.
 
-<details><summary>**Pourquoi $\mathbb E(x)\ne\mu$ — la démonstration, et l'exemple des fonds communs**</summary>
+<details class="details--riche">
+<summary>
+
+**Pourquoi $\mathbb E(x)\ne\mu$ — la démonstration, et l'exemple des fonds communs**
+
+</summary>
 
 **La démonstration mathématique.** Partant de $\mathbb E(S_T)=S_0e^{\mu T}$ et en prenant le logarithme :
 
@@ -126,7 +136,12 @@ $$\boxed{\hat\sigma=\frac{s}{\sqrt\tau}}\qquad\qquad\text{erreur type}\approx\bo
 
 *(La moyenne $\bar u$ est souvent supposée **nulle** dans les estimations de volatilité historique.)*
 
-<details><summary>**Exercice résolu — estimer une volatilité sur 21 jours (exemple 14.4)**</summary>
+<details class="details--riche">
+<summary>
+
+**Exercice résolu — estimer une volatilité sur 21 jours (exemple 14.4)**
+
+</summary>
 
 **Données.** 21 cours de clôture consécutifs → $n=20$ rendements, avec
 
@@ -182,7 +197,12 @@ et la formule habituelle sur les autres intervalles.
 
 ⚠️ *Certaines peuvent être relâchées : $\sigma$ et $r$ peuvent être des **fonctions connues de $t$** ; on peut même **autoriser des taux stochastiques**, pourvu que la loi du prix à maturité reste **log-normale**.*
 
-<details><summary>**La dérivation complète de l'EDP, en six étapes**</summary>
+<details class="details--riche">
+<summary>
+
+**La dérivation complète de l'EDP, en six étapes**
+
+</summary>
 
 *Étape 1 — le processus de l'action.*
 
@@ -214,7 +234,12 @@ $$\boxed{\frac{\partial f}{\partial t}+rS\frac{\partial f}{\partial S}+\frac12\s
 
 $$\text{call}:\ f=\max(S-K,0)\ \text{en}\ t=T\qquad\qquad\text{put}:\ f=\max(K-S,0)\ \text{en}\ t=T$$
 
-<details><summary>**Deux vérifications instructives — le forward, et les fonctions qui ne sont pas des prix**</summary>
+<details class="details--riche">
+<summary>
+
+**Deux vérifications instructives — le forward, et les fonctions qui ne sont pas des prix**
+
+</summary>
 
 **Exemple 14.5 — un forward satisfait l'EDP.** D'après (5.5), $f=S-Ke^{-r(T-t)}$. Alors
 
@@ -249,7 +274,12 @@ $$-rKe^{-r(T-t)}+rS=r\big(S-Ke^{-r(T-t)}\big)=rf\ \checkmark$$
 
 ⚠️ **La mise en garde de Hull, à ne jamais oublier.** *La valorisation risque-neutre est **simplement un artifice** pour obtenir des solutions de l'EDP. **Les solutions obtenues sont valables dans tous les mondes**, pas seulement ceux où les investisseurs sont neutres au risque. Quand on passe d'un monde risque-neutre à un monde averse au risque, **deux choses changent** : le **taux de croissance espéré** du prix de l'action, et le **taux d'actualisation** des payoffs. **Il se trouve que ces deux changements se compensent toujours exactement.***
 
-<details><summary>**Exercice résolu — retrouver le prix d'un forward par la voie risque-neutre**</summary>
+<details class="details--riche">
+<summary>
+
+**Exercice résolu — retrouver le prix d'un forward par la voie risque-neutre**
+
+</summary>
 
 *Étape 1 — le payoff.* Un forward long de prix de livraison $K$ vaut $S_T-K$ en $T$. *Étape 2 — appliquer le principe.* La valeur en 0 est l'espérance **risque-neutre** actualisée :
 
@@ -292,7 +322,12 @@ $$c=e^{-rT}\hat{\mathbb E}\big[\max(S_T-K,0)\big]\;\text{(14.22)}$$
 - ***Aucune formule analytique exacte n'a été produite pour le put américain*** sans dividende — d'où les méthodes numériques du chapitre 20.
 - *En pratique, **$r$ est le taux zéro-coupon sans risque de maturité $T$**, et le temps est mesuré en **jours de bourse restants divisés par le nombre de jours de bourse dans l'année**.*
 
-<details><summary>**Les tests aux valeurs extrêmes — vérifier qu'une formule est la bonne**</summary>
+<details class="details--riche">
+<summary>
+
+**Les tests aux valeurs extrêmes — vérifier qu'une formule est la bonne**
+
+</summary>
 
 **Test 1 — $S_0$ très grand.** *Le call est presque certain d'être exercé ; il devient très semblable à un forward de prix de livraison $K$, donc on attend $S_0-Ke^{-rT}$.* Et c'est bien ce que donne (14.20) : quand $S_0\to\infty$, **$d_1$ et $d_2$ deviennent très grands**, donc $N(d_1),N(d_2)\to1$. Symétriquement, $p\to0$ car $N(-d_1),N(-d_2)\to0$.
 
@@ -306,7 +341,12 @@ $$e^{-rT}\max(S_0e^{rT}-K,0)=\max(S_0-Ke^{-rT},0)$$
 
 </details>
 
-<details><summary>**Exercice résolu — le calcul complet d'un call et d'un put (exemple 14.6)**</summary>
+<details class="details--riche">
+<summary>
+
+**Exercice résolu — le calcul complet d'un call et d'un put (exemple 14.6)**
+
+</summary>
 
 **Données.** $S_0=42$, $K=40$, $r=0{,}1$, $\sigma=0{,}2$, $T=0{,}5$.
 
@@ -340,7 +380,12 @@ $$p=38{,}049\times0{,}2651-42\times0{,}2209=10{,}087-9{,}278=\boxed{\mathbf{0{,}
 
 > **La question, et la réponse contre-intuitive.** *Comment la dilution potentielle devrait-elle affecter la valorisation de warrants et d'options de salariés **en circulation** ? **La réponse est qu'elle ne devrait pas !** Si les marchés sont efficients, **le prix de l'action reflète déjà la dilution potentielle** de tous les warrants et options en circulation.*
 
-<details><summary>**L'argument de dilution, et pourquoi il ne faut pas la compter deux fois**</summary>
+<details class="details--riche">
+<summary>
+
+**L'argument de dilution, et pourquoi il ne faut pas la compter deux fois**
+
+</summary>
 
 **Le décor.** Une entreprise de **100 000 actions** à **50** annonce l'attribution de **100 000 options** de strike **50** à ses salariés.
 
@@ -358,7 +403,12 @@ $$\text{cours après exercice}=\frac{NS_T+MK}{N+M}\qquad\Longrightarrow\qquad \t
 
 > **Conclusion.** *La valeur de chaque warrant est $\dfrac{N}{N+M}$ fois la valeur d'un **call ordinaire**. Le coût total est $M$ fois cela, et **la baisse du cours est $\dfrac{M}{N+M}$ fois la valeur d'un call ordinaire** de strike $K$ et maturité $T$.*
 
-<details><summary>**Exercice résolu — le coût d'une émission de warrants (exemple 14.7)**</summary>
+<details class="details--riche">
+<summary>
+
+**Exercice résolu — le coût d'une émission de warrants (exemple 14.7)**
+
+</summary>
 
 **Données.** $N=1\,000\,000$ actions à **40** ; $M=200\,000$ warrants, $K=60$, **5 ans**, $r=3\,\%$, $\sigma=30\,\%$, pas de dividende.
 
@@ -382,7 +432,12 @@ $$\frac{N}{N+M}=\frac{1\,000\,000}{1\,200\,000}=\mathbf{0{,}8333}$$
 
 ⚠️ ***Il n'est pas possible d'inverser (14.20) pour exprimer $\sigma$ en fonction de $S_0,K,r,T,c$.*** On procède par **recherche itérative**.
 
-<details><summary>**Exercice résolu — trouver une volatilité implicite par dichotomie**</summary>
+<details class="details--riche">
+<summary>
+
+**Exercice résolu — trouver une volatilité implicite par dichotomie**
+
+</summary>
 
 **Données.** $c=1{,}875$, $S_0=21$, $K=20$, $r=0{,}1$, $T=0{,}25$.
 
@@ -422,7 +477,12 @@ $$\boxed{\text{utiliser Black-Scholes avec }S_0\ \longrightarrow\ S_0-D}\qquad D
 
 ⚠️ *En théorie, $\sigma$ n'est alors pas tout à fait la volatilité du prix entier : celle de la composante risquée vaut environ **$\sigma\times S_0/(S_0-D)$**. Mais **l'ajustement n'est nécessaire que si $\sigma$ est estimée sur données historiques** — une volatilité **implicite** est calculée **après** soustraction de $D$ et **est** celle de la composante risquée.*
 
-<details><summary>**Exercice résolu — un call européen avec deux dividendes (exemple 14.9)**</summary>
+<details class="details--riche">
+<summary>
+
+**Exercice résolu — un call européen avec deux dividendes (exemple 14.9)**
+
+</summary>
 
 **Données.** Détachements dans **2 mois** et **5 mois**, **0,50** chacun. $S_0=40$, $K=40$, $\sigma=30\,\%$, $r=9\,\%$, $T=6$ mois.
 
@@ -446,7 +506,12 @@ $$c=39{,}0258\times0{,}5800-40e^{-0{,}045}\times0{,}4959=22{,}635-18{,}964=\boxe
 
 **Le résultat de structure.** *Quand il y a des dividendes, il **ne peut être optimal d'exercer qu'à un instant immédiatement avant une date de détachement**.* Soit $t_1<\cdots<t_n$ les dates de détachement et $D_1,\ldots,D_n$ les dividendes.
 
-<details><summary>**La démonstration des deux critères, et leur lecture**</summary>
+<details class="details--riche">
+<summary>
+
+**La démonstration des deux critères, et leur lecture**
+
+</summary>
 
 **À la dernière date $t_n$.** Exercer donne $S(t_n)-K$. Ne pas exercer : le cours tombe à $S(t_n)-D_n$ et l'option vaut alors **au moins** $S(t_n)-D_n-Ke^{-r(T-t_n)}$ (borne 10.4). Donc si
 
@@ -474,7 +539,12 @@ $$D_i\le Kr(t_{i+1}-t_i)$$
 
 > **L'approximation de Black (1975).** *Calculer les prix des options **européennes** échéant en $T$ **et** en $t_n$, puis prendre **le plus grand des deux** comme prix américain. **Cette approximation semble bien fonctionner dans la plupart des cas.***
 
-<details><summary>**Exercice résolu — l'approximation de Black et ses deux biais (exemple 14.10)**</summary>
+<details class="details--riche">
+<summary>
+
+**Exercice résolu — l'approximation de Black et ses deux biais (exemple 14.10)**
+
+</summary>
 
 **Données.** Mêmes que l'exemple 14.9, mais option **américaine**. $D_1=D_2=0{,}5$, $S_0=K=40$, $r=0{,}09$, $t_1=2/12$, $t_2=5/12$, $T=0{,}5$.
 
@@ -576,7 +646,12 @@ $$d_1=\frac{\ln(S_0/K)+(r+\sigma^2/2)T}{\sigma\sqrt T}\qquad d_2=d_1-\sigma\sqrt
 
 </details>
 
-<details><summary>$S_0=40$, $\mu=16\,\%$, $\sigma=20\,\%$. Donner l'intervalle à 95 % de $S_T$ à 6 mois.</summary>
+<details class="details--riche">
+<summary>
+
+$S_0=40$, $\mu=16\,\%$, $\sigma=20\,\%$. Donner l'intervalle à 95 % de $S_T$ à 6 mois.
+
+</summary>
 
 $\ln S_T\sim\phi(\ln40+(0{,}16-0{,}02)\times0{,}5;\ 0{,}04\times0{,}5)=\phi(3{,}759;0{,}02)$, écart-type $0{,}141$.
 
@@ -586,7 +661,12 @@ $$3{,}759\pm1{,}96\times0{,}141\ \Longrightarrow\ e^{3{,}4824}<S_T<e^{4{,}0356}\
 
 </details>
 
-<details><summary>Pourquoi le rendement réalisé espéré vaut-il $\mu-\sigma^2/2$ et non $\mu$ ?</summary>
+<details class="details--riche">
+<summary>
+
+Pourquoi le rendement réalisé espéré vaut-il $\mu-\sigma^2/2$ et non $\mu$ ?
+
+</summary>
 
 Parce que $\ln$ est **non linéaire**. On a $\ln[\mathbb E(S_T)]=\ln S_0+\mu T$, mais *on **ne peut pas** poser $\ln[\mathbb E(S_T)]=\mathbb E[\ln(S_T)]$*. Par Jensen, $\ln[\mathbb E(S_T)]>\mathbb E[\ln S_T]$, donc $\mathbb E(x)<\mu$ — et précisément $\mathbb E(x)=\mu-\sigma^2/2$.
 
@@ -602,7 +682,12 @@ En mots : $\mu\Delta t$ est proche de la **moyenne arithmétique** des rendement
 
 </details>
 
-<details><summary>Sur 20 rendements quotidiens, $\sum u_i=0{,}09531$ et $\sum u_i^2=0{,}00326$. Estimer $\sigma$ et sa précision.</summary>
+<details class="details--riche">
+<summary>
+
+Sur 20 rendements quotidiens, $\sum u_i=0{,}09531$ et $\sum u_i^2=0{,}00326$. Estimer $\sigma$ et sa précision.
+
+</summary>
 
 $$s=\sqrt{\frac{0{,}00326}{19}-\frac{0{,}09531^2}{380}}=\mathbf{0{,}01216}\ \text{par jour}$$
 
@@ -622,7 +707,12 @@ Le portefeuille n'est sans risque **qu'instantanément** : il faut **rééquilib
 
 </details>
 
-<details><summary>Pourquoi l'absence de $\mu$ dans l'EDP autorise-t-elle la valorisation risque-neutre ?</summary>
+<details class="details--riche">
+<summary>
+
+Pourquoi l'absence de $\mu$ dans l'EDP autorise-t-elle la valorisation risque-neutre ?
+
+</summary>
 
 *L'EDP **ne contient aucune variable affectée par les préférences pour le risque** : prix, temps, volatilité et taux sans risque en sont tous indépendants. Elle **ne le serait pas si elle contenait $\mu$**, qui dépend de l'aversion au risque.*
 
@@ -632,7 +722,12 @@ D'où l'argument : *si les préférences n'entrent pas dans l'équation, **elles
 
 </details>
 
-<details><summary>Que représentent $N(d_1)$ et $N(d_2)$ ?</summary>
+<details class="details--riche">
+<summary>
+
+Que représentent $N(d_1)$ et $N(d_2)$ ?
+
+</summary>
 
 En réécrivant $c=e^{-rT}[S_0N(d_1)e^{rT}-KN(d_2)]$ :
 
@@ -641,7 +736,12 @@ En réécrivant $c=e^{-rT}[S_0N(d_1)e^{rT}-KN(d_2)]$ :
 
 </details>
 
-<details><summary>$S_0=42$, $K=40$, $r=10\,\%$, $\sigma=20\,\%$, $T=0{,}5$. Calculer $c$ et $p$.</summary>
+<details class="details--riche">
+<summary>
+
+$S_0=42$, $K=40$, $r=10\,\%$, $\sigma=20\,\%$, $T=0{,}5$. Calculer $c$ et $p$.
+
+</summary>
 
 $d_1=\dfrac{\ln(1{,}05)+0{,}06}{0{,}14142}=\mathbf{0{,}7693}$ ; $d_2=0{,}7693-0{,}1414=\mathbf{0{,}6278}$ ; $Ke^{-rT}=\mathbf{38{,}049}$. $N(0{,}7693)=0{,}7791$, $N(0{,}6278)=0{,}7349$.
 
@@ -651,7 +751,12 @@ $$c=42(0{,}7791)-38{,}049(0{,}7349)=\mathbf{4{,}76}\qquad p=38{,}049(0{,}2651)-4
 
 </details>
 
-<details><summary>Vérifier que la formule dégénère correctement quand $\sigma\to0$.</summary>
+<details class="details--riche">
+<summary>
+
+Vérifier que la formule dégénère correctement quand $\sigma\to0$.
+
+</summary>
 
 Sans risque, l'action croît à $S_0e^{rT}$ et le call paie $\max(S_0e^{rT}-K,0)$, de valeur actuelle $\max(S_0-Ke^{-rT},0)$.
 

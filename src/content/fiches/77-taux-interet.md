@@ -76,7 +76,12 @@ Quand $m=1$, on parle parfois de **taux annuel équivalent**. Les actuaires appe
 
 $$\boxed{R_c=m\ln\!\left(1+\frac{R_m}{m}\right)};	ext{(4.3)}\qquad\qquad\boxed{R_m=m\left(e^{R_c/m}-1\right)};	ext{(4.4)}$$
 
-<details><summary>**Exercices résolus — les deux sens de conversion (exemples 4.1 et 4.2)**</summary>
+<details class="details--riche">
+<summary>
+
+**Exercices résolus — les deux sens de conversion (exemples 4.1 et 4.2)**
+
+</summary>
 
 **Exemple 4.1 — vers le continu.** Taux coté **10 % par an, capitalisation semestrielle**. *Étape 1.* Identifier : $m=2$, $R_m=0{,}1$. *Étape 2.* Appliquer (4.3) : $R_c=2\ln\!\left(1+\dfrac{0{,}1}{2}\right)=2\ln(1{,}05)$. *Étape 3.* $\ln(1{,}05)=0{,}048790$ → $R_c=\mathbf{0{,}09758}$, soit **9,758 % par an**. *Contrôle de sens.* Le continu est **inférieur** au semestriel — normal : capitaliser plus souvent produit plus, donc il faut un **taux nominal plus faible** pour le même résultat.
 
@@ -152,7 +157,12 @@ $$100=\frac{cA}{m}+100d\qquad\Longrightarrow\qquad\boxed{c=\frac{(100-100d)\,m}{
 
 *(La moitié du coupon annoncé est supposée versée tous les 6 mois.)*
 
-<details><summary>**Le bootstrap complet, ligne par ligne**</summary>
+<details class="details--riche">
+<summary>
+
+**Le bootstrap complet, ligne par ligne**
+
+</summary>
 
 *Étape 1 — les trois zéro-coupon, directement.* Chacun transforme un prix en 100 :
 
@@ -272,7 +282,12 @@ $$\text{vers X en }T_2:\ \boxed{L(R_K-R_M)(T_2-T_1)};	ext{(4.7)}\qquad\text{vers
 
 $$\text{payoff en }T_1\ \text{pour X}=\frac{L(R_K-R_M)(T_2-T_1)}{1+R_M(T_2-T_1)}$$
 
-<details><summary>**Exercice résolu — un FRA sur 3 mois dans 3 ans (exemple 4.3)**</summary>
+<details class="details--riche">
+<summary>
+
+**Exercice résolu — un FRA sur 3 mois dans 3 ans (exemple 4.3)**
+
+</summary>
 
 **Énoncé.** Une entreprise entre dans un FRA lui assurant de **recevoir 4 % fixe** sur **100 millions**, pour une période de **3 mois commençant dans 3 ans**. C'est un échange : elle **paie le LIBOR**, **reçoit 4 %**. Le LIBOR 3 mois s'avère être **4,5 %**.
 
@@ -302,7 +317,12 @@ $$\boxed{V_{\text{FRA}}=L(R_F-R_K)(T_2-T_1)e^{-R_2T_2}};	ext{(4.10)}\qquad\text{
 
 > **La règle de valorisation, en deux points — c'est elle qui servira pour les swaps.** **1.** Calculer le payoff **en supposant que les taux forward se réalisent** (c'est-à-dire $R_M=R_F$). **2.** **Actualiser** ce payoff au taux sans risque.
 
-<details><summary>**Exercice résolu — valoriser un FRA hors du marché (exemple 4.4)**</summary>
+<details class="details--riche">
+<summary>
+
+**Exercice résolu — valoriser un FRA hors du marché (exemple 4.4)**
+
+</summary>
 
 **Énoncé.** Courbe LIBOR du concept 5. On **reçoit 6 %** (capitalisation **annuelle**) et on **paie le LIBOR** sur **100 millions**, entre la fin de l'année 1 et la fin de l'année 2.
 
@@ -348,7 +368,12 @@ $$\boxed{\Delta B=-BD\,\Delta y};	ext{(4.15)}\qquad\qquad\boxed{\frac{\Delta B}{
 
 *(Notez la relation **négative** : quand les rendements montent, les prix baissent.)* *(4.16) est une relation approchée entre variations en pourcentage du prix et variations du rendement. Elle est facile à utiliser, et c'est la raison pour laquelle la duration — proposée pour la première fois par **Macaulay en 1938** — est devenue une mesure si populaire.*
 
-<details><summary>**Exercice résolu — duration d'une obligation 3 ans à coupon 10 % (tableau 4.6)**</summary>
+<details class="details--riche">
+<summary>
+
+**Exercice résolu — duration d'une obligation 3 ans à coupon 10 % (tableau 4.6)**
+
+</summary>
 
 **Données.** Nominal **100**, coupon **10 %** semestriel (donc **5** tous les 6 mois), rendement **12 % continu**.
 
@@ -382,7 +407,12 @@ $$\boxed{D^\ast=\frac{D}{1+y/m}}\qquad\Longrightarrow\qquad\boxed{\Delta B=-BD^\
 
 **Et la *duration en dollars*** $D^{\ast\ast}=D^\ast\times B$, de sorte que $\Delta B=-D^{\ast\ast}\Delta y$.
 
-<details><summary>**Exercice résolu — duration modifiée (exemple 4.6)**</summary>
+<details class="details--riche">
+<summary>
+
+**Exercice résolu — duration modifiée (exemple 4.6)**
+
+</summary>
 
 *Étape 1 — convertir le rendement.* $y=12\,\%$ continu → semestriel : $R_2=2(e^{0{,}06}-1)=\mathbf{12{,}3673\,\%}$. *Étape 2 — duration modifiée.*
 
@@ -429,7 +459,12 @@ $$\boxed{\frac{\Delta B}{B}=-D\,\Delta y+\frac12\,C\,(\Delta y)^2}$$
 
 ⚠️ **L'argument empirique décisif.** La préférence pour la liquidité *est aussi cohérente avec le résultat empirique selon lequel les courbes de taux sont plus souvent croissantes que décroissantes*.
 
-<details><summary>**Le mécanisme bancaire qui engendre la préférence pour la liquidité**</summary>
+<details class="details--riche">
+<summary>
+
+**Le mécanisme bancaire qui engendre la préférence pour la liquidité**
+
+</summary>
 
 **Le point de départ.** Une banque affiche :
 
@@ -488,7 +523,12 @@ Les dépôts 5 ans deviennent **relativement plus attractifs**, les crédits 1 a
 4. $D=\sum t_iw_i$.
 5. Si $y$ est **discret**, diviser par $1+y/m$ pour obtenir $D^\ast$ avant d'appliquer $\Delta B=-BD^\ast\Delta y$.
 
-<details><summary>**Exercice résolu — enchaîner bootstrap, forward et FRA**</summary>
+<details class="details--riche">
+<summary>
+
+**Exercice résolu — enchaîner bootstrap, forward et FRA**
+
+</summary>
 
 **Question.** Avec la courbe LIBOR (3,0 · 4,0 · 4,6 · 5,0 · 5,3 %), quelle est la valeur d'un FRA où l'on **paie 5 % annuel** et **reçoit le LIBOR** sur 50 millions entre la fin de l'année 3 et la fin de l'année 4 ?
 
@@ -571,7 +611,12 @@ Il dépasse le zéro 4 ans **parce que la courbe est croissante**. La formule (4
 
 </details>
 
-<details><summary>Pourquoi un FRA vaut-il zéro quand $R_K=R_F$ ?</summary>
+<details class="details--riche">
+<summary>
+
+Pourquoi un FRA vaut-il zéro quand $R_K=R_F$ ?
+
+</summary>
 
 Parce qu'une grande institution peut **verrouiller le taux forward sans aucun coût**, par un simple couple emprunt/placement au LIBOR. Exemple : emprunter 100 à 3 % **1 an** et placer à 4 % **2 ans** produit $-103{,}05$ en $t=1$ et $+108{,}33$ en $t=2$, soit exactement **5 %** sur la deuxième année. Puisque ce résultat est **gratuit**, un contrat qui le promet ne peut valoir que **zéro** — et *il est d'ailleurs habituel de fixer $R_K=R_F$ à l'initiation*.
 

@@ -9,7 +9,18 @@ const corpus = await Promise.all(
   FICHES.map(async (f) => ({ ...f, markdown: await ficheMarkdown(f.file) })),
 );
 
-const MATH = /\$\$([\s\S]*?)\$\$|\$((?:\\.|[^$\\])+)\$/g;
+/* Le « \\$ » d'un montant n'ouvre pas une formule : sans ce garde-fou,
+   « **100 \\$** » ferait démarrer une formule qui avalerait la page. */
+const MATH = /(?<!\\)\$\$([\s\S]*?)(?<!\\)\$\$|(?<!\\)\$((?:\\.|[^$\\])+)\$/g;
+
+/* Le rendu ne cherche pas de formules dans le code : markdown-it isole les
+   blocs ``` et les `spans` avant que le greffon KaTeX ne passe. Un `$HOME` de
+   shell ou une colonne R `x$nom` n'est pas une formule. */
+const sansCode = (md: string) => md.replace(/```[\s\S]*?```/g, '').replace(/`[^`\n]*`/g, '');
+
+/* Une fiche de chaque origine : écrite à la main, optimisation, finance,
+   langage R, microéconomie. */
+const ECHANTILLON = ['kkt', 'lp-formulation', 'black-scholes-merton', 'r-vecteurs', 'jehle-preferences-utilite'];
 
 describe('fiches de révision — intégrité', () => {
   it('charge toutes les fiches déclarées, sans fichier manquant', () => {
@@ -64,7 +75,7 @@ describe('fiches de révision — intégrité', () => {
     }
   });
 
-  it('range les fiches importées derrière leurs huit cours sources', () => {
+  it('range les fiches importées derrière leurs onze cours sources', () => {
     const cours = new Set(getFiches().map((f) => f.course));
     for (const c of [
       'Vandenberghe · Programmation linéaire (EE236A)',
@@ -75,6 +86,9 @@ describe('fiches de révision — intégrité', () => {
       'Rigollet · Statistiques (18.650)',
       'Kogan · Analytics of Finance (15.450)',
       'Hull · Options, Futures, and Other Derivatives',
+      'R Core Team · Les manuels de R (4.6.1)',
+      'Deisenroth, Faisal & Ong · Mathematics for Machine Learning',
+      'Jehle & Reny · Advanced Microeconomic Theory',
     ]) {
       expect(cours).toContain(c);
     }
@@ -88,7 +102,7 @@ describe('fiches de révision — intégrité', () => {
       expect(f.markdown, f.file).toContain('Active Recall');
       expect(f.markdown, f.file).toContain('Flashcards');
       // Les réponses d'auto-interrogation sont repliées.
-      expect(f.markdown, f.file).toContain('<details>');
+      expect(f.markdown, f.file).toMatch(/<details[ >]/);
       // Le titre porte le numéro de la fiche.
       expect(f.markdown.startsWith('# Fiche '), f.file).toBe(true);
     }
@@ -101,9 +115,9 @@ describe('fiches de révision — intégrité', () => {
     const fautes: string[] = [];
     let total = 0;
     for (const f of corpus) {
-      for (const m of f.markdown.matchAll(MATH)) {
+      for (const m of sansCode(f.markdown).matchAll(MATH)) {
         total++;
-        const source = (m[1] ?? m[2]).trim();
+        const source = m[1] ?? m[2];
         try {
           katex.renderToString(source, { throwOnError: true, displayMode: Boolean(m[1]) });
         } catch (e) {
@@ -111,8 +125,22 @@ describe('fiches de révision — intégrité', () => {
         }
       }
     }
-    expect(total).toBeGreaterThan(20000);
+    expect(total).toBeGreaterThan(60000);
     expect(fautes).toEqual([]);
+  });
+
+  it('ne laisse ni balisage ni délimiteur à la surface du texte rendu', () => {
+    /* Le Markdown n'est pas relu sur la ligne d'ouverture d'un bloc HTML : un
+       résumé de <details> écrit là afficherait ses astérisques et son LaTeX en
+       clair. On regarde donc le texte tel qu'il arrive à l'écran, sur des
+       fiches de chaque origine. */
+    for (const f of corpus.filter((x) => ECHANTILLON.includes(x.id))) {
+      const html = renderMarkdown(f.markdown);
+      const texte = html.replace(/<[^>]*>/g, '');
+      expect(html, f.file).not.toContain('katex-error');
+      expect(texte, f.file).not.toMatch(/\*\*/);
+      expect(texte, f.file).not.toMatch(/\$\$/);
+    }
   });
 
   it('rend le Markdown avec les formules KaTeX composées', () => {
@@ -123,13 +151,16 @@ describe('fiches de révision — intégrité', () => {
   });
 
   it('retrouve les fiches par matière et par id', () => {
-    expect(fichesOfSubject('maths').length).toBe(51);
-    expect(fichesOfSubject('cfa').length).toBe(34);
+    expect(fichesOfSubject('maths').length).toBe(91);
+    expect(fichesOfSubject('cfa').length).toBe(54);
+    expect(fichesOfSubject('code').length).toBe(21);
     expect(getFiche('extrema-lies')?.title).toContain('Lagrange');
     expect(getFiche('kkt')?.course).toContain('Garrigos');
     expect(getFiche('cfa-fixed-income')?.course).toContain('Schweser');
     expect(getFiche('lp-simplexe')?.title).toContain('simplexe');
     expect(getFiche('black-scholes-merton')?.subject).toBe('cfa');
+    expect(getFiche('r-vecteurs')?.subject).toBe('code');
+    expect(getFiche('jehle-kuhn-tucker-inegalites')?.chapter).toContain('Appendice');
     expect(getFiche('inconnue')).toBeUndefined();
   });
 });

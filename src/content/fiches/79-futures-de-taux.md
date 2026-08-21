@@ -65,7 +65,12 @@ $$\boxed{P=\frac{360}{n}(100-Y)}$$
 
 où $P$ = **prix coté**, $Y$ = **prix caisse**, $n$ = durée résiduelle en **jours calendaires**.
 
-<details><summary>**Exercice résolu — décoder un bon du Trésor coté 8**</summary>
+<details class="details--riche">
+<summary>
+
+**Exercice résolu — décoder un bon du Trésor coté 8**
+
+</summary>
 
 **Énoncé.** Bon du Trésor **91 jours** coté **8**, nominal 100.
 
@@ -81,7 +86,12 @@ $$\frac{2{,}0222}{100-2{,}0222}=\frac{2{,}0222}{97{,}9778}=\mathbf{2{,}064\,\%}$
 
 $$\boxed{\text{prix caisse (*dirty price*)}=\text{prix coté (*clean price*)}+\text{intérêts courus depuis le dernier coupon}}$$
 
-<details><summary>**Exercice résolu — du prix coté au prix caisse**</summary>
+<details class="details--riche">
+<summary>
+
+**Exercice résolu — du prix coté au prix caisse**
+
+</summary>
 
 **Énoncé.** Le **5 mars 2010**, obligation à coupon **11 %** échéant le **10 juillet 2018**, cotée **95-16**.
 
@@ -129,7 +139,12 @@ $$\boxed{\text{caisse reçue par 100 de nominal}=(\text{dernier prix de règleme
 - si, après arrondi, l'obligation dure un **nombre exact** de semestres → le **premier coupon est supposé payé dans 6 mois** ;
 - sinon (il reste **3 mois** en plus) → le premier coupon est supposé payé **après 3 mois**, et **on retranche les intérêts courus**.
 
-<details><summary>**Exercice résolu — les deux cas de facteur de conversion**</summary>
+<details class="details--riche">
+<summary>
+
+**Exercice résolu — les deux cas de facteur de conversion**
+
+</summary>
 
 **Cas 1 — nombre exact de semestres.** Obligation **10 %**, **20 ans et 2 mois** à courir.
 
@@ -161,7 +176,12 @@ Le vendeur **reçoit** $(\text{règlement}\times\text{facteur})+\text{courus}$ e
 
 $$\boxed{\text{moins-disante}=\arg\min\big[\text{prix coté}-(\text{dernier règlement}\times\text{facteur de conversion})\big]}$$
 
-<details><summary>**Exercice résolu — choisir entre trois obligations (exemple 6.1)**</summary>
+<details class="details--riche">
+<summary>
+
+**Exercice résolu — choisir entre trois obligations (exemple 6.1)**
+
+</summary>
 
 **Données.** Dernier règlement **93-08**, soit **93,25**.
 
@@ -208,7 +228,12 @@ $$\boxed{F_0=(S_0-I)e^{rT}}\;\text{(6.1)}$$
 
 ⚠️ *En pratique, pour estimer la moins-disante, les analystes supposent habituellement que les taux zéro à la maturité du futures **égaleront les taux forward d'aujourd'hui**.*
 
-<details><summary>**Exercice résolu — le prix futures T-bond complet (exemple 6.2)**</summary>
+<details class="details--riche">
+<summary>
+
+**Exercice résolu — le prix futures T-bond complet (exemple 6.2)**
+
+</summary>
 
 **Données.** Moins-disante : obligation **12 %**, facteur **1,6000**. Livraison dans **270 jours**. Dernier coupon il y a **60 jours**, prochain dans **122 jours**, le suivant dans **305 jours**. Courbe **plate** à **10 %** continu. Prix **coté** actuel : **115**.
 
@@ -262,7 +287,12 @@ $$\boxed{\text{prix}=10\,000\times\big[100-0{,}25\times(100-Q)\big]}\;\text{(6.2
 
 *Pour $Q=99{,}3100$ : $10\,000\times[100-0{,}25\times0{,}69]=\mathbf{998\,275}$ dollars. Pour $Q=99{,}5300$ : $\mathbf{998\,825}$ — une différence de **550 dollars**, cohérente avec $22\ \text{pb}\times25$.*
 
-<details><summary>**Exercice résolu — verrouiller un taux de placement (exemple 6.3)**</summary>
+<details class="details--riche">
+<summary>
+
+**Exercice résolu — verrouiller un taux de placement (exemple 6.3)**
+
+</summary>
 
 **Énoncé.** Un investisseur veut fixer le taux d'un placement de **100 millions** sur trois mois à partir du **19 septembre 2012**. Le futures eurodollar septembre 2012 cote **96,50**.
 
@@ -289,7 +319,12 @@ $$100\times25\times90=\mathbf{225\,000}\ \text{dollars}$$
 | **1** | futures **réglé quotidiennement** vs contrat sans règlement quotidien (payoff en $T_1$) | **abaisse** le forward par rapport au futures |
 | **2** | payoff en $T_1$ vs payoff en $T_2$ | **abaisse** aussi, mais **beaucoup moins** pour les contrats longs |
 
-<details><summary>**Pourquoi chacune des deux différences abaisse le taux forward**</summary>
+<details class="details--riche">
+<summary>
+
+**Pourquoi chacune des deux différences abaisse le taux forward**
+
+</summary>
 
 **Différence 1 — le règlement quotidien.** Supposez un contrat de payoff $R_M-R_F$ en $T_1$, et l'**option** de passer au règlement quotidien. *Le règlement quotidien tend à produire des **entrées de trésorerie quand les taux sont élevés** et des **sorties quand ils sont bas**. Vous trouveriez donc attractif d'y passer, parce que vous avez tendance à avoir **plus d'argent sur votre compte de marge quand les taux sont hauts**.* Le marché fixerait donc $R_F$ **plus haut** pour l'alternative avec règlement quotidien. *Dit autrement : **passer du règlement quotidien au règlement en $T_1$ réduit $R_F$**.*
 
@@ -303,7 +338,12 @@ $$\boxed{\text{taux forward}=\text{taux futures}-\tfrac12\sigma^2T_1T_2}\;\text{
 
 où $T_1$ = maturité du **futures**, $T_2$ = maturité du **taux sous-jacent** au futures, et $\sigma$ = **écart-type de la variation du taux court sur un an**. *Les deux taux sont exprimés en capitalisation continue.* La formule *repose sur le modèle de taux de **Ho-Lee*** (chapitre 30).
 
-<details><summary>**Exercice résolu — l'ajustement de convexité à 8 ans (exemple 6.4)**</summary>
+<details class="details--riche">
+<summary>
+
+**Exercice résolu — l'ajustement de convexité à 8 ans (exemple 6.4)**
+
+</summary>
 
 **Énoncé.** $\sigma=0{,}012$, futures eurodollar **8 ans** coté **94**.
 
@@ -333,7 +373,12 @@ $$\frac{365}{90}\ln(1{,}015)=4{,}0556\times0{,}014889=\mathbf{6{,}038\,\%}$$
 
 $$\boxed{R_{i+1}=\frac{F_i(T_{i+1}-T_i)+R_iT_i}{T_{i+1}}}\;\text{(6.4)}$$
 
-<details><summary>**Exercice résolu — prolonger la courbe (exemple 6.5)**</summary>
+<details class="details--riche">
+<summary>
+
+**Exercice résolu — prolonger la courbe (exemple 6.5)**
+
+</summary>
 
 **Données.** Taux zéro LIBOR **400 jours** : **4,80 %** continu. Forwards 90 jours issus des futures : **5,30 %** à partir de 400 jours · **5,50 %** à partir de 491 jours · **5,60 %** à partir de 589 jours.
 
@@ -379,7 +424,12 @@ C'est le **ratio de couverture par duration**, aussi appelé **ratio de sensibil
 
 **Le choix du contrat.** *Le hedger essaie de choisir le futures dont la duration du sous-jacent est **aussi proche que possible** de celle de l'actif couvert* : **eurodollar** pour les expositions **courtes**, **T-bond et T-note** pour les expositions **longues**.
 
-<details><summary>**Exercice résolu — couvrir 10 millions d'obligations d'État (exemple 6.6)**</summary>
+<details class="details--riche">
+<summary>
+
+**Exercice résolu — couvrir 10 millions d'obligations d'État (exemple 6.6)**
+
+</summary>
 
 **Énoncé.** 2 août. Un gérant a **10 millions** en obligations d'État et craint une forte volatilité des taux sur **3 mois**. Il utilise le futures T-bond **décembre**, coté **93-02**. Duration du portefeuille dans 3 mois : **6,80 ans**. Moins-disante attendue : obligation **20 ans à 12 %**, rendement **8,80 %**, duration **9,20 ans** à la maturité du futures.
 
@@ -501,7 +551,12 @@ On minimise $\text{coté}-(\text{règlement}\times\text{facteur})$ : $99{,}50-96
 
 </details>
 
-<details><summary>Expliquer le *wild card play* et son effet sur le prix futures.</summary>
+<details class="details--riche">
+<summary>
+
+Expliquer le *wild card play* et son effet sur le prix futures.
+
+</summary>
 
 La cotation du futures cesse à **14 h**, le comptant continue jusqu'à **16 h**, et le vendeur a jusqu'à **20 h** pour émettre son avis de livraison — **facturé au prix de règlement de 14 h**. Si les prix obligataires **baissent** après 14 h, il émet l'avis à 15 h 45 et **achète au comptant moins cher** pour livrer au prix de 14 h. Sinon, il attend le lendemain. *Comme les autres options du vendeur, elle n'est pas gratuite : sa valeur se reflète dans un **prix futures plus bas**.*
 
@@ -521,7 +576,12 @@ Deux effets, tous deux dans le même sens. **(1) Le règlement quotidien** : il 
 
 </details>
 
-<details><summary>Avec $\sigma=0{,}012$ et un futures eurodollar 8 ans coté 94, calculer le taux forward continu.</summary>
+<details class="details--riche">
+<summary>
+
+Avec $\sigma=0{,}012$ et un futures eurodollar 8 ans coté 94, calculer le taux forward continu.
+
+</summary>
 
 *Ajustement* : $\frac12\times0{,}012^2\times8\times8{,}25=0{,}00475=\mathbf{47{,}5}$ pb. *Taux futures* : $100-94=6\,\%$ actual/360 trimestriel $=1{,}5\,\%$ par 90 jours, soit $\frac{365}{90}\ln(1{,}015)=\mathbf{6{,}038\,\%}$ continu actual/365. *Forward* : $6{,}038-0{,}475=\mathbf{5{,}563\,\%}$. L'ajustement croît comme le **carré** de la maturité : 3,2 pb à 2 ans, 12,2 à 4 ans, 73,8 à 10 ans.
 

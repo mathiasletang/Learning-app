@@ -109,7 +109,12 @@ $$\text{gain du jour}=200\times(\text{règlement}_t-\text{règlement}_{t-1}),\qq
 | 15 | 1 223,00 | +1 380 | −5 400 | 14 400 |  |
 | 16 (clôture) | 1 226,90 | +780 | **−4 620** | 15 180 |  |
 
-<details><summary>**Reconstruction pas à pas des deux appels de marge**</summary>
+<details class="details--riche">
+<summary>
+
+**Reconstruction pas à pas des deux appels de marge**
+
+</summary>
 
 **Premier appel — jour 7.** *Étape 1 — le gain du jour.* $200\times(1\,229{,}90-1\,236{,}20)=200\times(-6{,}30)=\mathbf{-1\,260}$. *Étape 2 — le nouveau solde.* $9\,240-1\,260=\mathbf{7\,980}$. *Étape 3 — tester le seuil.* $7\,980<9\,000$ (maintien) → **appel déclenché**. L'écart sous le seuil est $9\,000-7\,980=1\,020$ — c'est le chiffre que cite Hull. *Étape 4 — calculer l'appel.* On revient à la **marge initiale** : $12\,000-7\,980=\mathbf{4\,020}$. *Étape 5 — vérifier le jour 8.* Gain $200\times(1\,230{,}80-1\,229{,}90)=+180$ ; solde $7\,980+4\,020+180=\mathbf{12\,180}$ .
 
@@ -173,7 +178,12 @@ $$\text{investisseur}\ \xrightarrow{\text{compte de marge}}\ \text{courtier}\ \x
 
 **Le risque systémique** — la préoccupation centrale des gouvernements depuis 2007. *Le risque qu'un défaut d'une institution financière crée un « effet domino » entraînant les défauts d'autres institutions et menaçant la stabilité du système financier.* Le mécanisme : la banque A fait défaut → B subit une perte énorme sur ses opérations avec A → B fait défaut → C, exposée à A **et** à B, subit une perte massive… Le système a survécu à Drexel (1990) et Lehman (2008), mais pendant la tourmente de 2007-2008 **beaucoup de grandes institutions ont été sauvées plutôt que laissées faire faillite**, précisément par crainte du risque systémique.
 
-<details><summary>**Les deux cas d'école du chapitre : LTCM et AIG**</summary>
+<details class="details--riche">
+<summary>
+
+**Les deux cas d'école du chapitre : LTCM et AIG**
+
+</summary>
 
 **LTCM — quand la collatéralisation ne suffit pas.** Le fonds, créé au milieu des années 1990, **collatéralisait toujours** ses transactions. Stratégie : l'**arbitrage de convergence**. Il trouvait deux obligations X et Y du **même émetteur**, promettant les **mêmes flux**, X étant **moins liquide** que Y. Le marché valorisant la liquidité, $P_X<P_Y$ ; LTCM **achetait X, shortait Y** et attendait la convergence.
 
@@ -286,7 +296,12 @@ Structure d'une ligne : **Open · High · Low · Settlement · Change · Volume 
 
 **Comptabilité.** Les variations de valeur de marché doivent être **reconnues quand elles surviennent**, *sauf* si le contrat est qualifié de **couverture** : alors gains et pertes sont reconnus **dans la même période** que ceux de l'élément couvert (*hedge accounting*).
 
-<details><summary>**Exercice résolu — comptabilisation d'une couverture sur maïs**</summary>
+<details class="details--riche">
+<summary>
+
+**Exercice résolu — comptabilisation d'une couverture sur maïs**
+
+</summary>
 
 **Énoncé.** Exercice comptable clos en décembre. En **septembre 2011**, achat d'un futures maïs **mars 2012**, dénoué **fin février 2012**. Prix : **250** cents/boisseau à l'entrée, **270** fin 2011, **280** au dénouement. Contrat : **5 000 boisseaux**.
 
@@ -322,7 +337,12 @@ $$2011:\ 5\,000\times(2{,}70-2{,}50)=\mathbf{1\,000\ \text{dollars}}\qquad 2012:
 | Issue habituelle | livraison ou règlement en espèces **a lieu** | contrat **dénoué avant** l'échéance |
 | Risque de crédit | **présent** | **quasi nul** |
 
-<details><summary>**Exercice résolu — même gain, chronologie opposée**</summary>
+<details class="details--riche">
+<summary>
+
+**Exercice résolu — même gain, chronologie opposée**
+
+</summary>
 
 **Énoncé.** Le cours à terme 90 jours de la livre est **1,5000**, et c'est aussi le prix futures d'un contrat livrable dans exactement 90 jours. A est long de **£1 M en forward** ; B est long de **£1 M en futures**. Le spot à 90 jours s'avère être **1,7000**. Comparer.
 
@@ -368,7 +388,12 @@ $$2011:\ 5\,000\times(2{,}70-2{,}50)=\mathbf{1\,000\ \text{dollars}}\qquad 2012:
 2. La convertir en variation de prix : $\Delta F^\ast=\dfrac{\text{initiale}-\text{maintien}}{\text{taille de la position}}$.
 3. Le prix critique est $F_0-\Delta F^\ast$ pour un **long**, $F_0+\Delta F^\ast$ pour un **court**.
 
-<details><summary>**Exercice résolu — à partir de quel prix l'appel tombe-t-il ?**</summary>
+<details class="details--riche">
+<summary>
+
+**Exercice résolu — à partir de quel prix l'appel tombe-t-il ?**
+
+</summary>
 
 **Énoncé.** Même position que le tableau 2.1 : long de 2 contrats or (200 onces), entrée à 1 250,00, marge initiale totale 12 000, maintien total 9 000. À partir de quel prix de règlement l'appel de marge est-il déclenché ?
 
@@ -452,7 +477,12 @@ Un groupe prend une **énorme position longue** *et* contrôle la **livraison ph
 
 </details>
 
-<details><summary>Pourquoi le *hedge accounting* reporte-t-il un gain de 2011 sur 2012 dans l'exemple du maïs ?</summary>
+<details class="details--riche">
+<summary>
+
+Pourquoi le *hedge accounting* reporte-t-il un gain de 2011 sur 2012 dans l'exemple du maïs ?
+
+</summary>
 
 Parce que l'objet économique du futures est de **fixer à 250 cents** le prix d'un achat de maïs qui aura lieu **en février 2012**. Reconnaître 1 000 dollars de gain en 2011 afficherait un profit **sans la charge correspondante**. Le traitement de couverture reconnaît la **totalité des 1 500 dollars en 2012**, en même temps que l'achat couvert. Depuis **FAS 133**, ce traitement exige que l'instrument soit **hautement efficace**, avec évaluation **trimestrielle**.
 

@@ -62,11 +62,48 @@ Le stockage passe par `src/app/store.ts` et `src/core/db.ts`.
 - **Rien ne doit être rogné.** Blocs de code, tableaux et formules larges :
   vérifier `scrollWidth === clientWidth`, en 1440 px **et** en 390 px. Un
   contenu coupé sans indice de défilement est une perte d'information.
+  Certaines formules dépassent quoi qu'on fasse (une récurrence de Bellman ne
+  se coupe pas en deux) : elles défilent, et un voile d'ombre apparaît du côté
+  où il reste à lire — deux dégradés, l'un `local` l'autre `scroll`, sans
+  script. Le voile n'est possible que sur un bloc qui a **son propre fond**
+  (`pre`, `.katex-display`) : peint sur un tableau, il laisserait une plaque
+  plate sur le dégradé de la page. Les tableaux gardent la barre de
+  défilement, rendue visible (`scrollbar-width: thin`).
 - Un comparatif à deux entrées est un **tableau**, pas un bloc de code aligné
   à l'espace. Le bloc de code est réservé aux schémas ASCII.
 - Interligne : 1,82 pour la prose pure, **1,7 pour les fiches**
   (`.prose--fiche`). Les paragraphes truffés de maths en ligne ajoutent leur
   propre hauteur et se délitent à 1,82.
+
+## Les fiches : d'où elles viennent, comment on en ajoute
+
+Les fiches 1 à 23 ont été écrites dans l'application ; leurs métadonnées sont
+dans `FICHES_ECRITES` (`src/core/fiches.ts`). Les suivantes ont été rédigées
+ailleurs et **importées**.
+
+- L'entrée est le **HTML d'origine**, dans `public/cours/fiches/*.html`. Il
+  porte le LaTeX en clair (`$…$`, MathJax) : c'est ce qui rend l'import fidèle.
+  Le PDF imprimé depuis ce HTML, lui, ne sert à rien — Chrome y trace les
+  formules en **courbes**, aucun texte n'en ressort. Une fiche sans son HTML
+  n'est pas importable, il faut le demander.
+- `npm run fiches` écrit `src/content/fiches/NN-*.md` et le registre
+  `src/content/fiches-importees.json`. **Les deux sont générés** : on corrige
+  `scripts/importer-fiches.mjs`, jamais le résultat.
+- Le convertisseur ne réécrit rien. Il traduit les conventions :
+  `<h2 data-prio="must">` → `## 🔴 …`, `<p class="cal piege">` → un paragraphe
+  `⚠️` (que `decorateFiche` encadre), `<div class="cal …">` → un
+  `<div class="callout" data-kind="…">` avec son étiquette, `<details class="cor">`
+  → le `<details>` des fiches écrites à la main, et un `$$…$$` pris au milieu
+  d'un paragraphe est isolé sur sa ligne — sinon il ne serait pas encadré.
+- **Le contenu se charge à la demande.** Quatre-vingt-cinq fiches font plus de
+  trois méga-octets de Markdown : `import.meta.glob` sans `eager`, un morceau
+  par fiche. Ne pas revenir à un chargement global « pour simplifier ».
+- Le HTML d'origine est une **source de compilation**, pas une page : il est
+  exclu du précache du service worker (`globIgnores`, `vite.config.ts`).
+- La garantie qui compte est dans `fiches.test.ts` : les 22 000 formules du
+  corpus sont composées par KaTeX avec `throwOnError`. Ces fiches viennent d'un
+  rendu MathJax, plus permissif — une macro inconnue s'afficherait en rouge en
+  pleine page.
 
 ## Couleurs d'accent — ce n'est pas une incohérence
 

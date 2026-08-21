@@ -1,7 +1,19 @@
 // @vitest-environment jsdom
 import { describe, it, expect } from 'vitest';
 import { renderMarkdown, decorateFiche } from './markdown';
-import { getFiches } from './fiches';
+import { FICHES, ficheMarkdown } from './fiches';
+
+/* Le rendu complet passe par jsdom : sur quatre-vingt-cinq fiches il coûterait
+   des minutes. On garde ici un échantillon qui traverse les trois origines —
+   les fiches écrites à la main, celles importées des cours de Boyd, celles de
+   Hull — et le corpus entier est vérifié formule à formule dans fiches.test.ts. */
+const ECHANTILLON = ['kkt', 'cfa-quant', 'lp-formulation', 'boyd-dualite', 'lettres-grecques'];
+const corpus = await Promise.all(
+  FICHES.filter((f) => ECHANTILLON.includes(f.id)).map(async (f) => ({
+    id: f.id,
+    markdown: await ficheMarkdown(f.file),
+  })),
+);
 
 describe('decorateFiche — les conventions émoji deviennent des attributs stylables', () => {
   it("traduit la priorité d'un titre en data-prio et retire l'émoji", () => {
@@ -34,15 +46,29 @@ describe('decorateFiche — les conventions émoji deviennent des attributs styl
   });
 
   it("aucun émoji brut ne survit au rendu d'une fiche réelle", () => {
-    for (const f of getFiches()) {
+    for (const f of corpus) {
       const html = decorateFiche(renderMarkdown(f.markdown));
-      expect(html).not.toMatch(/[🔴🟠🟡🟢⚪🎯📌🧠🃏]|⚠/u);
+      expect(html, f.id).not.toMatch(/[🔴🟠🟡🟢⚪🎯📌🧠🃏]|⚠/u);
     }
   });
 
   it("plus aucun --- ne précède un titre dans le contenu", () => {
-    for (const f of getFiches()) {
-      expect(f.markdown).not.toMatch(/\n---\n\n#{2,3} /);
+    for (const f of corpus) {
+      expect(f.markdown, f.id).not.toMatch(/\n---\n\n#{2,3} /);
     }
+  });
+
+  it("garde les encadrés étiquetés lisibles comme du Markdown", () => {
+    const html = decorateFiche(
+      renderMarkdown(
+        '<div class="callout" data-kind="intu">\n\n' +
+          '<span class="callout__lab">Pourquoi c\'est important.</span>\n\n' +
+          'Le **front** de Pareto, avec $x \\preceq y$.\n\n</div>',
+      ),
+    );
+    expect(html).toContain('callout__lab');
+    expect(html).toContain('data-kind="intu"');
+    expect(html).toContain('<strong>front</strong>'); // le corps reste du Markdown
+    expect(html).toContain('katex'); // et ses formules sont composées
   });
 });

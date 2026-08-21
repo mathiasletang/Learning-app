@@ -8,6 +8,7 @@
    ========================================================================= */
 
 import type { SubjectId } from './subjects';
+import importees from '@/content/fiches-importees.json';
 
 export type FicheDifficulty = 'fondamental' | 'intermediaire' | 'avance';
 
@@ -35,7 +36,8 @@ const COURSE_FACCANONI = 'Faccanoni · Optimisation L3';
 const COURSE_GARRIGOS = 'Garrigos · Optimisation L3';
 const COURSE_QUICKSHEET = 'Schweser · QuickSheet CFA Level 1 (2024)';
 
-export const FICHES: FicheMeta[] = [
+/** Les vingt-trois premières fiches, écrites à la main dans l'application. */
+const FICHES_ECRITES: FicheMeta[] = [
   {
     id: 'fonctions',
     file: '01-fonctions.md',
@@ -291,35 +293,45 @@ export const FICHES: FicheMeta[] = [
   },
 ];
 
+/**
+ * Les fiches importées : produites par `npm run fiches` à partir du HTML
+ * d'origine (public/cours/fiches/*.html), qui porte le LaTeX en clair.
+ * `src/content/fiches-importees.json` est généré — il ne s'édite pas à la main.
+ * Les valeurs de `subject` et `difficulty` sont vérifiées par les tests.
+ */
+const FICHES_IMPORTEES = importees as FicheMeta[];
+
+export const FICHES: FicheMeta[] = [...FICHES_ECRITES, ...FICHES_IMPORTEES];
+
+/* Le contenu se charge à la demande : quatre-vingt-cinq fiches représentent
+   plus de trois méga-octets de Markdown, qui n'ont rien à faire dans le paquet
+   d'ouverture. Une fiche ouverte tient dans son propre morceau, mis en cache
+   par le service worker au premier passage. */
 const ficheFiles = import.meta.glob('../content/fiches/*.md', {
   query: '?raw',
   import: 'default',
-  eager: true,
-}) as Record<string, string>;
+}) as Record<string, () => Promise<string>>;
 
-function markdownOf(file: string): string {
+const cache = new Map<string, string>();
+
+/** Le Markdown d'une fiche. Vide si le fichier a disparu du dossier. */
+export async function ficheMarkdown(file: string): Promise<string> {
+  const enCache = cache.get(file);
+  if (enCache !== undefined) return enCache;
   const entry = Object.entries(ficheFiles).find(([path]) => path.endsWith(`/${file}`));
-  return entry ? entry[1] : '';
+  const md = entry ? await entry[1]() : '';
+  cache.set(file, md);
+  return md;
 }
 
-export interface Fiche extends FicheMeta {
-  markdown: string;
+export function getFiches(): FicheMeta[] {
+  return FICHES;
 }
 
-let _fiches: Fiche[] | null = null;
-
-export function getFiches(): Fiche[] {
-  if (_fiches) return _fiches;
-  _fiches = FICHES.map((meta) => ({ ...meta, markdown: markdownOf(meta.file) })).filter(
-    (f) => f.markdown.length > 0,
-  );
-  return _fiches;
+export function fichesOfSubject(subject: SubjectId): FicheMeta[] {
+  return FICHES.filter((f) => f.subject === subject);
 }
 
-export function fichesOfSubject(subject: SubjectId): Fiche[] {
-  return getFiches().filter((f) => f.subject === subject);
-}
-
-export function getFiche(id: string): Fiche | undefined {
-  return getFiches().find((f) => f.id === id);
+export function getFiche(id: string): FicheMeta | undefined {
+  return FICHES.find((f) => f.id === id);
 }

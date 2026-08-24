@@ -212,6 +212,18 @@ passé en privé : le QuickSheet (`CFA/2024 L1 Quick Sheet.pdf`), écrit à la
 main dans `config.ts`. Même prudence pour `11_Articles-de-reference` (articles
 de revues). MIT OCW est en CC BY-NC-SA, redistribuable avec attribution.
 
+### Un manuel n'est pas une fiche
+
+**Le Cours Python** (176 pages) reste un PDF, écrit à la main dans `config.ts`
+comme les deux cours L3. Ce qui entre dans l'application, c'est son **sommaire**
+(`src/core/python.ts`) : vingt-quatre chapitres, chacun ouvrant le document à
+sa page par un fragment `#page=`. Les numéros imprimés du manuel sont ceux du
+PDF — c'est ce qui rend le saut possible, et c'est vérifié par un test.
+
+Ne pas convertir un livre en fiches : une fiche est un texte de deux heures
+qu'on relit avant un examen, pas un manuel qu'on parcourt. Le partage se fait
+sur cette ligne, pas sur le nombre de pages.
+
 ## Avant de dire que c'est fini
 
 1. `npm run typecheck`

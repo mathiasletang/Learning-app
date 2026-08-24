@@ -11,6 +11,7 @@ import type { SubjectDef } from '@/core/subjects';
 import type { FicheMeta } from '@/core/fiches';
 import type { LibDoc, Level } from '@/core/types';
 import { Icon, Tabs } from '@/ui';
+import { PythonCourse } from './PythonCourse';
 import '@/modules/library/library.css';
 import '@/modules/courses/courses.css';
 
@@ -158,6 +159,9 @@ export function SubjectDocs({ def }: { def: SubjectDef }) {
       <p className="micro" style={{ marginBottom: 'var(--s-8)' }}>
         {inSubject.length} documents · ouvrir un titre le cherche dans votre Drive.
       </p>
+
+      {/* Le manuel Python ouvre la page Code : c'est le cours, le reste suit. */}
+      {def.id === 'code' && <PythonCourse />}
 
       {/* Les fiches de révision — la version travaillée des cours sources. */}
       {fiches.length > 0 && (

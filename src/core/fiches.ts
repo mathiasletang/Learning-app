@@ -301,7 +301,24 @@ const FICHES_ECRITES: FicheMeta[] = [
  */
 const FICHES_IMPORTEES = importees as FicheMeta[];
 
-export const FICHES: FicheMeta[] = [...FICHES_ECRITES, ...FICHES_IMPORTEES];
+/**
+ * Le cours suivi cette année ouvre la liste : c'est celui qu'on révise, pas
+ * celui qu'on a fini. Le reste garde son ordre — les fiches écrites d'abord,
+ * puis les importées dans l'ordre de leur numéro.
+ */
+const COURS_EN_COURS = [
+  'Montaru · Optimisation (TSE, L3)',
+  'Blanchet · Optimisation (TSE, L3)',
+];
+
+const rangCours = (cours: string) => {
+  const i = COURS_EN_COURS.indexOf(cours);
+  return i === -1 ? COURS_EN_COURS.length : i;
+};
+
+export const FICHES: FicheMeta[] = [...FICHES_ECRITES, ...FICHES_IMPORTEES].sort(
+  (a, b) => rangCours(a.course) - rangCours(b.course),
+);
 
 /* Le contenu se charge à la demande : quatre-vingt-cinq fiches représentent
    plus de trois méga-octets de Markdown, qui n'ont rien à faire dans le paquet
@@ -323,6 +340,24 @@ export async function ficheMarkdown(file: string): Promise<string> {
   cache.set(file, md);
   return md;
 }
+
+/**
+ * Le polycopié dont une série de fiches est tirée, quand l'application
+ * l'héberge : les fiches en sont la version travaillée, le polycopié reste
+ * la source qu'on ouvre pour vérifier un énoncé.
+ */
+export const POLYCOPIES: Record<string, { path: string; pages: number; label: string }> = {
+  'Montaru · Optimisation (TSE, L3)': {
+    path: 'TSE/Montaru — Optimisation.pdf',
+    pages: 36,
+    label: "Le polycopié d'Alexandre Montaru",
+  },
+  'Blanchet · Optimisation (TSE, L3)': {
+    path: 'TSE/Blanchet — Optimisation.pdf',
+    pages: 30,
+    label: "Le polycopié d'Adrien Blanchet",
+  },
+};
 
 export function getFiches(): FicheMeta[] {
   return FICHES;

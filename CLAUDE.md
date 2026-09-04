@@ -95,11 +95,21 @@ ailleurs et **importées**.
   `<div class="callout" data-kind="…">` avec son étiquette, `<details class="cor">`
   → le `<details>` des fiches écrites à la main, et un `$$…$$` pris au milieu
   d'un paragraphe est isolé sur sa ligne — sinon il ne serait pas encadré.
-- **Le contenu se charge à la demande.** Cent soixante-six fiches font plus de
-  huit méga-octets de Markdown : `import.meta.glob` sans `eager`, un morceau
+- **Le contenu se charge à la demande.** Cent soixante-seize fiches font plus
+  de huit méga-octets de Markdown : `import.meta.glob` sans `eager`, un morceau
   par fiche. Ne pas revenir à un chargement global « pour simplifier ».
 - Le HTML d'origine est une **source de compilation**, pas une page : il est
   exclu du précache du service worker (`globIgnores`, `vite.config.ts`).
+- **Le registre est du texte, pas du Markdown.** Titres et concepts s'affichent
+  tels quels dans les listes : « dimension $n$ » ou « **au bord** » s'y
+  liraient avec leurs délimiteurs. L'importeur les met à nu (`texteNu`), en
+  traduisant les symboles courants (`\alpha` → α, `\mathbb{R}` → ℝ). Le
+  contenu de la fiche, lui, garde ses formules. Un test le vérifie.
+- **Le cours suivi cette année ouvre la liste** (`COURS_EN_COURS`,
+  `fiches.ts`) : on révise ce qu'on suit, pas ce qu'on a fini. Et quand
+  l'application héberge le polycopié dont une série est tirée (`POLYCOPIES`),
+  il s'offre au-dessus d'elle — les fiches en sont la version travaillée, lui
+  reste la source qu'on ouvre pour vérifier un énoncé.
 - La garantie qui compte est dans `fiches.test.ts` : les 66 000 formules du
   corpus sont composées par KaTeX avec `throwOnError`. Ces fiches viennent d'un
   rendu MathJax, plus permissif — une macro inconnue s'afficherait en rouge en

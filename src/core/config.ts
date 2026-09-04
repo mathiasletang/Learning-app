@@ -30,12 +30,15 @@ export const LOCAL_PDFS: Record<string, string> = {
   '00_L3_Universite-Paris-Cite_Garrigos/cours_optim_L3.pdf': 'cours/cours_optim_L3.pdf',
   'CFA/2024 L1 Quick Sheet.pdf': 'cours/cfa_L1_quick_sheet_2024.pdf',
   'CODE/Le Cours Python.pdf': 'cours/Cours_Python_complet.pdf',
+  'TSE/Montaru — Optimisation.pdf': 'cours/OPTIMISATION.pdf',
+  'TSE/Blanchet — Optimisation.pdf': 'cours/OPTIMISATION 2.pdf',
 };
 
 /** URL locale d'un document, si l'application l'héberge. */
 export function localPdfUrl(path: string): string | null {
   const rel = LOCAL_PDFS[path];
   if (!rel) return null;
-  // `import.meta.env.BASE_URL` gère un déploiement en sous-dossier.
-  return `${import.meta.env.BASE_URL}${rel}`;
+  // `import.meta.env.BASE_URL` gère un déploiement en sous-dossier ;
+  // `encodeURI` gère les noms de fichier qui portent une espace.
+  return `${import.meta.env.BASE_URL}${encodeURI(rel)}`;
 }

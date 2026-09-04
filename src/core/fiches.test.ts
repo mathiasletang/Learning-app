@@ -1,6 +1,8 @@
 import { describe, it, expect } from 'vitest';
 import katex from 'katex';
-import { FICHES, getFiches, getFiche, fichesOfSubject, ficheMarkdown } from './fiches';
+import { existsSync } from 'node:fs';
+import { FICHES, getFiches, getFiche, fichesOfSubject, ficheMarkdown, POLYCOPIES } from './fiches';
+import { LOCAL_PDFS } from './config';
 import { renderMarkdown } from './markdown';
 import { SUBJECT_ORDER } from './subjects';
 
@@ -75,7 +77,7 @@ describe('fiches de révision — intégrité', () => {
     }
   });
 
-  it('range les fiches importées derrière leurs onze cours sources', () => {
+  it('range les fiches importées derrière leurs treize cours sources', () => {
     const cours = new Set(getFiches().map((f) => f.course));
     for (const c of [
       'Vandenberghe · Programmation linéaire (EE236A)',
@@ -89,6 +91,8 @@ describe('fiches de révision — intégrité', () => {
       'R Core Team · Les manuels de R (4.6.1)',
       'Deisenroth, Faisal & Ong · Mathematics for Machine Learning',
       'Jehle & Reny · Advanced Microeconomic Theory',
+      'Montaru · Optimisation (TSE, L3)',
+      'Blanchet · Optimisation (TSE, L3)',
     ]) {
       expect(cours).toContain(c);
     }
@@ -151,7 +155,7 @@ describe('fiches de révision — intégrité', () => {
   });
 
   it('retrouve les fiches par matière et par id', () => {
-    expect(fichesOfSubject('maths').length).toBe(91);
+    expect(fichesOfSubject('maths').length).toBe(101);
     expect(fichesOfSubject('cfa').length).toBe(54);
     expect(fichesOfSubject('code').length).toBe(21);
     expect(getFiche('extrema-lies')?.title).toContain('Lagrange');
@@ -162,5 +166,37 @@ describe('fiches de révision — intégrité', () => {
     expect(getFiche('r-vecteurs')?.subject).toBe('code');
     expect(getFiche('jehle-kuhn-tucker-inegalites')?.chapter).toContain('Appendice');
     expect(getFiche('inconnue')).toBeUndefined();
+  });
+
+  it('tient un registre en texte nu — ni Markdown ni LaTeX dans les listes', () => {
+    /* Titres et concepts s'affichent tels quels dans les listes : « dimension
+       $n$ » ou « **au bord** » s'y liraient avec leurs délimiteurs. Le « $ »
+       de l'opérateur R, lui, est un vrai caractère et reste. */
+    for (const f of FICHES) {
+      expect(f.title, f.id).not.toMatch(/\*\*|\$[^$]+\$/);
+      for (const c of f.concepts) {
+        expect(c, `${f.id} — ${c}`).not.toMatch(/\*\*|\$[^$]+\$/);
+      }
+      expect(f.chapter, f.id).not.toMatch(/\*\*|\$[^$]+\$/);
+    }
+  });
+
+  it('ouvre la liste sur le cours suivi cette année', () => {
+    /* Les fiches de TSE passent devant : c'est le cours qu'on révise, pas
+       celui qu'on a fini. Les deux polycopiés sont servis par l'application. */
+    const maths = fichesOfSubject('maths');
+    expect(maths[0].course).toBe('Montaru · Optimisation (TSE, L3)');
+    expect(maths.filter((f) => f.course.includes('TSE'))).toHaveLength(10);
+    const rangs = [...new Set(maths.map((f) => f.course))];
+    expect(rangs.slice(0, 2)).toEqual([
+      'Montaru · Optimisation (TSE, L3)',
+      'Blanchet · Optimisation (TSE, L3)',
+    ]);
+    for (const cours of rangs.slice(0, 2)) {
+      const poly = POLYCOPIES[cours];
+      expect(poly, cours).toBeDefined();
+      expect(LOCAL_PDFS[poly.path], poly.path).toBeTruthy();
+      expect(existsSync(`public/${LOCAL_PDFS[poly.path]}`)).toBe(true);
+    }
   });
 });

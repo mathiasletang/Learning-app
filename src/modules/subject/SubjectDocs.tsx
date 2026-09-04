@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '@/core/db';
 import { allDocs, docsByFolder, getCourses } from '@/core/content';
-import { fichesOfSubject, DIFFICULTY_LABEL } from '@/core/fiches';
+import { fichesOfSubject, DIFFICULTY_LABEL, POLYCOPIES } from '@/core/fiches';
 import { DRIVE_FOLDER_URL } from '@/core/config';
 import { setDocRead, openResource } from '@/app/actions';
 import { LEVELS, LEVEL_DESC } from '@/core/meta';
@@ -204,6 +204,17 @@ export function SubjectDocs({ def }: { def: SubjectDef }) {
                     <span className="micro tnum">{g.fiches.length}</span>
                   </summary>
                   <div className="source__body">
+                    {POLYCOPIES[g.course] && (
+                      <button
+                        type="button"
+                        className="polycopie"
+                        onClick={() => openResource(POLYCOPIES[g.course].path)}
+                      >
+                        <Icon name="external" size={15} />
+                        {POLYCOPIES[g.course].label}
+                        <span className="micro tnum">{POLYCOPIES[g.course].pages} p.</span>
+                      </button>
+                    )}
                     <FicheList fiches={g.fiches} />
                   </div>
                 </details>

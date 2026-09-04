@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { LOCAL_PDFS, localPdfUrl, driveSearchUrl } from './config';
+import { POLYCOPIES } from './fiches';
 
 /** Chaque référence `["chemin/doc.pdf", "Libellé"]` du parcours. */
 function referencesPdf(node: unknown, out: string[] = []): string[] {
@@ -30,15 +31,18 @@ describe('documents du parcours — hébergement local', () => {
     }
   });
 
-  it('ne sert que des documents que le parcours pointe — pas d’orphelins', () => {
+  it('ne sert que des documents que quelque chose pointe — pas d’orphelins', () => {
     const codes = new Set([
       // Les entrées écrites à la main dans config.ts.
       '00_L3_Toulon_Faccanoni/cours_L3_Faccanoni.pdf',
       '00_L3_Universite-Paris-Cite_Garrigos/cours_optim_L3.pdf',
       'CFA/2024 L1 Quick Sheet.pdf',
     ]);
+    // Un polycopié n'est pas cité par le parcours : il est offert à côté de la
+    // série de fiches qui en est tirée. C'est un point d'entrée, pas un orphelin.
+    const polys = new Set(Object.values(POLYCOPIES).map((p) => p.path));
     for (const path of Object.keys(LOCAL_PDFS)) {
-      if (codes.has(path)) continue;
+      if (codes.has(path) || polys.has(path)) continue;
       expect(refs.has(path), `${path} est servi mais n’est référencé nulle part`).toBe(true);
     }
   });

@@ -372,6 +372,65 @@ function blocs(noeuds, ctx = {}) {
   return out.filter((b) => b && b.trim());
 }
 
+/* ------------------------ métadonnées en texte nu ------------------------ */
+/* Le registre est du texte, pas du Markdown : titres et concepts s'affichent
+   tels quels dans les listes, sans KaTeX ni rendu. « dimension $n$ » doit y
+   arriver « dimension n », et « **au bord** » « au bord ». Le contenu de la
+   fiche, lui, garde ses formules — c'est la vitrine qu'on nettoie. */
+
+const SYMBOLES = {
+  alpha: 'α', beta: 'β', gamma: 'γ', delta: 'δ', epsilon: 'ε', varepsilon: 'ε',
+  zeta: 'ζ', eta: 'η', theta: 'θ', iota: 'ι', kappa: 'κ', lambda: 'λ', mu: 'μ',
+  nu: 'ν', xi: 'ξ', pi: 'π', rho: 'ρ', sigma: 'σ', tau: 'τ', phi: 'φ', varphi: 'φ',
+  chi: 'χ', psi: 'ψ', omega: 'ω', Gamma: 'Γ', Delta: 'Δ', Theta: 'Θ', Lambda: 'Λ',
+  Xi: 'Ξ', Pi: 'Π', Sigma: 'Σ', Phi: 'Φ', Psi: 'Ψ', Omega: 'Ω',
+  in: '∈', notin: '∉', subset: '⊂', subseteq: '⊆', cap: '∩', cup: '∪',
+  partial: '∂', nabla: '∇', infty: '∞', star: '⋆', ast: '∗', cdot: '·',
+  times: '×', to: '→', mapsto: '↦', Rightarrow: '⇒', iff: '⟺', implies: '⟹',
+  leq: '≤', geq: '≥', le: '≤', ge: '≥', neq: '≠', ne: '≠', approx: '≈',
+  succeq: '⪰', preceq: '⪯', succ: '≻', prec: '≺', sum: 'Σ', prod: '∏',
+  forall: '∀', exists: '∃', emptyset: '∅', langle: '⟨', rangle: '⟩',
+};
+const ENSEMBLES = { R: 'ℝ', N: 'ℕ', Z: 'ℤ', Q: 'ℚ', C: 'ℂ', E: '𝔼', P: 'ℙ' };
+
+function nuMath(latex) {
+  return latex
+    .replace(/\\mathbb\{([A-Z])\}/g, (t, l) => ENSEMBLES[l] ?? l)
+    .replace(/\\(?:mathbf|mathrm|text|mathcal|boldsymbol|operatorname)\{([^{}]*)\}/g, '$1')
+    .replace(/\\frac\{([^{}]*)\}\{([^{}]*)\}/g, '$1/$2')
+    .replace(/\\sqrt\{([^{}]*)\}/g, '√$1')
+    .replace(/\\(?:left|right|displaystyle|quad|qquad)\b/g, '')
+    .replace(/\\[,;!:]/g, '')
+    .replace(/\\([a-zA-Z]+)/g, (t, nom) => SYMBOLES[nom] ?? '')
+    .replace(/[{}]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+/* Les concepts sont séparés par des virgules — mais « $v(p,y)$ » et
+   « $2{,}64$ » en contiennent une. On met les formules de côté avant de
+   couper, sinon un concept se scinde au milieu de sa parenthèse. */
+function concepts(texte) {
+  const coffre = [];
+  return protege(texte, coffre)
+    .split(/,\s*/)
+    .map((c) => texteNu(rend(c, coffre)))
+    .filter(Boolean)
+    .slice(0, 6);
+}
+
+/** Une chaîne de métadonnée, débarrassée de son balisage. */
+function texteNu(s) {
+  return s
+    .replace(MATH_RE, (f) => nuMath(f.replace(/^\$\$?|\$\$?$/g, '')))
+    .replace(/\*\*([^*]+)\*\*/g, '$1')
+    .replace(/\*([^*]+)\*/g, '$1')
+    .replace(/`+\s?([^`]*?)\s?`+/g, '$1')
+    .replace(/\\\$/g, '$')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
 /* --------------------------- fiche d'identité --------------------------- */
 
 function identite(md) {
@@ -422,6 +481,8 @@ function matiere(texte) {
    « Auteur · Titre court ». Le libellé sert de titre de groupe dans les
    Documents ; il doit être court et stable, pas la référence complète. */
 const COURS = [
+  [/Montaru/, 'Montaru · Optimisation (TSE, L3)'],
+  [/Blanchet/, 'Blanchet · Optimisation (TSE, L3)'],
   [/EE236A/, 'Vandenberghe · Programmation linéaire (EE236A)'],
   [/Convex Optimization/, 'Boyd & Vandenberghe · Optimisation convexe'],
   [/Subgradient/i, 'Boyd · Sous-gradients (EE364b)'],
@@ -490,17 +551,13 @@ for (const f of fichiers) {
     numero,
     id,
     file: `${nom}.md`,
-    title: titre,
+    title: texteNu(titre),
     chapter: chapitre(champs['Cours source'] ?? ''),
     subject: matiere(champs['Matière'] ?? ''),
     course: cours(champs['Cours source'] ?? ''),
     difficulty: difficulte(champs['Difficulté'] ?? '', dureeEstimee),
     minutes: dureeEstimee,
-    concepts: (champs['Concepts clés'] ?? '')
-      .split(/,\s*/)
-      .map((c) => c.trim())
-      .filter(Boolean)
-      .slice(0, 6),
+    concepts: concepts(champs['Concepts clés'] ?? ''),
   });
 }
 

@@ -1,0 +1,1286 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fiche 609 — Optimisation sous contraintes : Lagrange, cône tangent linéarisé et KKT</title>
+<script>
+window.MathJax={tex:{inlineMath:[["$","$"]],displayMath:[["$$","$$"]],processEscapes:true},
+ options:{skipHtmlTags:["script","noscript","style","textarea","pre","code"]},
+ svg:{fontCache:"global"},
+ startup:{pageReady:()=>MathJax.startup.defaultPageReady().then(()=>{document.body.classList.add("ready")})}};
+setTimeout(function(){document.body.classList.add("ready")},2500);
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+/* ============================================================
+   MathiasLearn — feuille de style des fiches
+   Reprise intégrale des tokens de 00_PARCOURS/*.html
+   + blocs pédagogiques (callouts, méthode, essentiels, recall)
+   ============================================================ */
+:root{--bg:#faf9f7;--card:#fff;--ink:#1a1a1a;--muted:#6b6b6b;--line:#e5e2dd;--accent:#8b5e34;
+ --hl:#fdf8ef;--ok:#2d7d4f;--okbg:#f0f7f3;--warn:#b3402f;--warnbg:#fdf3f1;--blue:#2f5d8b;--bluebg:#f1f5fa}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+ font:17px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;padding:0 16px 100px}
+.nav{position:sticky;top:0;background:rgba(250,249,247,.96);backdrop-filter:blur(8px);
+ border-bottom:1px solid var(--line);margin:0 -16px 30px;padding:11px 16px;z-index:50;
+ display:flex;gap:6px;flex-wrap:wrap;font-size:13px}
+.nav a{color:var(--muted);text-decoration:none;padding:4px 9px;border-radius:5px;white-space:nowrap}
+.nav a:hover{background:var(--line);color:var(--ink)}
+.nav a.on{background:var(--accent);color:#fff}
+main{max-width:780px;margin:0 auto}
+h1{font-size:31px;letter-spacing:-.02em;margin:.4em 0 .5em;line-height:1.25}
+h2{font-size:23px;margin:2.2em 0 .7em;padding-bottom:.3em;border-bottom:1px solid var(--line)}
+h3{font-size:19px;margin:1.9em 0 .5em;color:var(--accent)}
+h4{font-size:17px;margin:1.5em 0 .4em}
+p{margin:.8em 0} a{color:var(--accent)} hr{border:0;border-top:1px solid var(--line);margin:2.6em 0}
+table{border-collapse:collapse;width:100%;margin:1.3em 0;font-size:15.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+th{background:#f3f0eb;font-weight:600}
+tr:nth-child(even) td{background:#fcfbfa}
+code{font-family:"SF Mono",Menlo,Consolas,monospace;font-size:.88em;background:#f2efea;padding:2px 6px;border-radius:4px;overflow-wrap:break-word}
+pre{background:#f2efea;padding:14px 16px;border-radius:8px;overflow-x:auto}
+pre code{background:none;padding:0;white-space:pre}
+blockquote{border-left:3px solid var(--accent);background:var(--hl);margin:1.4em 0;padding:14px 20px;border-radius:0 8px 8px 0}
+blockquote p:first-child{margin-top:0} blockquote p:last-child{margin-bottom:0}
+ul,ol{padding-left:1.5em} li{margin:.35em 0} em{color:#4a4a4a}
+mjx-container[display="true"]{margin:1.1em 0!important;overflow-x:auto;overflow-y:hidden;padding:2px 0}
+mjx-container svg{max-width:100%}
+body:not(.ready) main{opacity:0} main{opacity:1;transition:opacity .25s}
+
+/* --- bandeau de tête de fiche --- */
+.cours{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--accent);
+ border-radius:0 10px 10px 0;padding:18px 22px;margin:0 0 34px}
+.cours h4{margin:0 0 4px;font-size:14px;text-transform:uppercase;letter-spacing:.07em;color:var(--accent)}
+.cours .cs{color:var(--muted);font-size:14.5px;margin:0 0 14px}
+
+/* --- exercices / corrigés --- */
+.ex{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:6px 24px 20px;margin:18px 0}
+.ex>h3:first-child{margin-top:14px}
+details.cor{margin-top:18px;border:1px solid var(--line);border-radius:8px;background:#fcfbfa;overflow:hidden}
+details.cor>summary{cursor:pointer;padding:12px 16px;font-weight:600;font-size:15px;color:var(--accent);
+ list-style:none;display:flex;align-items:center;gap:9px;user-select:none;transition:.15s;min-height:44px}
+details.cor>summary::-webkit-details-marker{display:none}
+details.cor>summary:hover{background:var(--hl)}
+details.cor>summary::before{content:"\25B6";font-size:10px;transition:transform .18s;display:inline-block}
+details.cor[open]>summary::before{transform:rotate(90deg)}
+details.cor[open]>summary{background:var(--okbg);color:var(--ok);border-bottom:1px solid var(--line)}
+.cor .in{padding:4px 20px 16px}
+.cor .in>*:first-child{margin-top:.9em}
+
+/* --- blocs pédagogiques (callouts) ---
+   Générés depuis une citation Markdown dont le premier **gras** commence
+   par un mot-clé : DÉFINITION, THÉORÈME, MÉTHODE, PIÈGE, INTUITION… */
+.cal{border:1px solid var(--line);border-left:4px solid var(--accent);background:var(--card);
+ border-radius:0 10px 10px 0;padding:15px 20px;margin:1.5em 0}
+.cal>p:first-child{margin-top:0}.cal>p:last-child,.cal>ul:last-child,.cal>ol:last-child{margin-bottom:0}
+.cal .lab{display:block;font-size:12.5px;text-transform:uppercase;letter-spacing:.08em;
+ font-weight:700;color:var(--accent);margin-bottom:6px}
+.cal.formel{background:var(--hl)}
+.cal.piege{border-left-color:var(--warn);background:var(--warnbg)}
+.cal.piege .lab{color:var(--warn)}
+.cal.methode{border-left-color:var(--ok);background:var(--okbg)}
+.cal.methode .lab{color:var(--ok)}
+.cal.intu{border-left-color:var(--blue);background:var(--bluebg)}
+.cal.intu .lab{color:var(--blue)}
+.cal.plus{border-left-style:dashed;background:#faf9f7}
+.cal.plus .lab{color:var(--muted)}
+
+/* --- révision express --- */
+.ess{background:var(--card);border:1px solid var(--accent);border-radius:10px;padding:4px 24px 20px;margin:1.6em 0}
+.ess h3{margin-top:1.3em}
+.rec{background:var(--card);border:1px dashed var(--accent);border-radius:10px;padding:4px 24px 18px;margin:1.6em 0}
+.rec ol{counter-reset:none}
+
+/* --- impression / PDF --- */
+@media print{
+ .nav{display:none}
+ body{padding:0;background:#fff;font-size:11.2pt;line-height:1.55}
+ main{max-width:none}
+ h1{font-size:23pt}h2{font-size:15pt;margin-top:1.5em}h3{font-size:12.6pt}
+ h2,h3,h4{break-after:avoid;page-break-after:avoid}
+ table,.cal,blockquote{break-inside:avoid;page-break-inside:avoid}
+ table{display:table;font-size:9.6pt}
+ details.cor{border:1px solid var(--line);background:#fcfbfa}
+ /* Les corriges des series ont un titre generique (« Voir le corrige ») :
+    inutile sur papier. Les fiches de l app ont un VRAI titre — enonce de
+    l exercice, question d Active Recall — qu il faut garder. */
+ details.cor:not(.fiche)>summary{display:none}
+ details.cor.fiche[open]>summary{display:block;background:none;color:var(--ink);
+  font-weight:700;font-size:11.6pt;padding:10px 16px 0;min-height:0;
+  border-bottom:none;break-after:avoid;page-break-after:avoid}
+ details.cor.fiche>summary::before{content:""}
+ details.cor .in{padding-top:10px}
+ .cal,.ex,.ess,.rec{box-shadow:none}
+ a{color:var(--ink);text-decoration:none}
+}
+@page{margin:16mm 15mm 18mm}
+
+/* --- exemples travaillés --- */
+.exm{background:#fcfbfa;border:1px solid var(--line);border-radius:10px;padding:2px 20px 14px;margin:1.5em 0}
+.exm>h4:first-child{margin:14px 0 .5em;color:var(--accent);font-size:13px;text-transform:uppercase;letter-spacing:.07em}
+
+
+/* --- pastilles de priorité (conventions des fiches de l'app) --- */
+h2[data-prio], h3[data-prio], h4[data-prio]{position:relative}
+h2[data-prio]::before,h3[data-prio]::before,h4[data-prio]::before{
+ content:"";display:inline-block;width:9px;height:9px;border-radius:50%;
+ margin-right:9px;vertical-align:middle;background:var(--muted)}
+[data-prio="must"]::before{background:var(--warn)}
+[data-prio="high"]::before{background:#d98324}
+[data-prio="mid"]::before{background:#c9a227}
+[data-prio="low"]::before{background:var(--ok)}
+/* corrigés des fiches de l'app : même traitement que les corrigés des séries */
+details.cor>summary::after{content:""}
+</style></head><body>
+<div class="nav"><a href="00_COMMENCER_ICI.html">Commencer ici</a><a href="01_NOTATIONS_le-decodeur.html">Notations</a><a href="02_EXERCICES_Serie-0.html">Série 0 — Remise en route</a><a href="03_EXERCICES_Serie-1.html">Série 1 — Convexité</a><a href="04_EXERCICES_Serie-2.html">Série 2 — KKT</a><a href="05_AUTO-EVALUATION.html">Auto-évaluation (quiz)</a><a href="06_FICHE_Optimisation-deux-variables.html">Fiche — Optimisation à 2 variables</a></div>
+<main><h1>Fiche 609 — Optimisation sous contraintes : Lagrange, cône tangent linéarisé et KKT</h1>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Matière</strong></td>
+<td>Maths · Optimisation — <strong>cours suivi cette année</strong></td>
+</tr>
+<tr>
+<td><strong>Cours source</strong></td>
+<td>Blanchet, <em>Optimisation</em>, TSE, 9 avril 2024 — <strong>chapitre 3</strong> (Partie II), p. 25–30</td>
+</tr>
+<tr>
+<td><strong>Difficulté</strong></td>
+<td> Must know — l'aboutissement du polycopié</td>
+</tr>
+<tr>
+<td><strong>Temps d'étude estimé</strong></td>
+<td>3 h</td>
+</tr>
+<tr>
+<td><strong>Prérequis</strong></td>
+<td>Fiches 606 (Taylor), 607 (convexité), 608 (Euler, ordre 2) ; comparaison utile : fiches 604 et 605</td>
+</tr>
+<tr>
+<td><strong>Concepts clés</strong></td>
+<td>Point régulier, conditions de Lagrange, <strong>lagrangien</strong>, condition d'ordre 2 sur le plan tangent, interprétation des multiplicateurs, contraintes actives, <strong>cône tangent linéarisé</strong>, cône de Bouligand, qualifications, KKT, théorème de John, <strong>suffisance de KKT sous Slater</strong></td>
+</tr>
+<tr>
+<td><strong>Poids à l'examen</strong></td>
+<td>Ce chapitre apporte trois choses absentes du cours de M. Montaru : le <strong>formalisme du lagrangien</strong>, la <strong>condition nécessaire d'ordre 2 sur le plan tangent</strong> (prop. 3.3, exploitée dans les exercices 3.3 et 3.4), et le <strong>corollaire 3.11</strong> qui rend KKT <strong>suffisant</strong> dans le cas convexe.</td>
+</tr>
+</tbody></table>
+<blockquote>
+<h2 data-prio="must">AVERTISSEMENT DE NOTATION — à lire avant tout</h2>
+<p><strong>Les deux professeurs utilisent $g$ et $h$ dans des rôles INVERSÉS.</strong></p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Contraintes d'<strong>égalité</strong></th>
+<th>Contraintes d'<strong>inégalité</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Montaru</strong> (fiches 604, 605)</td>
+<td>$g_i(x) = 0$</td>
+<td>$h_j(x) \le 0$</td>
+</tr>
+<tr>
+<td><strong>Blanchet</strong> (cette fiche)</td>
+<td>$\boxed{h_i(x) = 0}$</td>
+<td>$\boxed{g_j(x) \le 0}$</td>
+</tr>
+</tbody></table>
+<p><strong>Les multiplicateurs, eux, portent les mêmes lettres dans les deux cours</strong> : $\lambda$ pour les égalités, $\mu$ pour les inégalités. C'est ce qui sauve — <strong>repérez-vous sur $\lambda$ et $\mu$, pas sur $g$ et $h$.</strong></p>
+<p class="cal piege"> <strong>En examen, utilisez la notation du professeur qui pose le sujet.</strong> Cette fiche suit celle de M. Blanchet : $h$ pour les égalités, $g$ pour les inégalités.</p>
+</blockquote>
+<h2>Vue d'ensemble</h2>
+<pre><code>§3.1  CONTRAINTES D'ÉGALITÉ SEULES        K = { h(x) = 0 }
+
+   POINT RÉGULIER (déf. 3.1)   {∇hᵢ(x₀)} est une famille LIBRE
+        │                       (c'est l'hypothèse (Q) de M. Montaru)
+        ▼
+   LAGRANGE (thm 3.2)    ∇f(x*) + Σ λ*ᵢ ∇hᵢ(x*) = 0
+
+   LE LAGRANGIEN         L(x,λ) = f(x) + Σ λᵢ hᵢ(x)
+
+        ∇L = ( ∇ₓL , ∇_λL ) = ( ∇f + Σλᵢ∇hᵢ ,  hᵢ )
+
+        ⟹  x* extremum lié  ⟺  (x*, λ*) est un POINT CRITIQUE de L
+            les n+m conditions se lisent sur UNE SEULE fonction
+
+   ORDRE 2 (prop. 3.3)   ∇²ₓL = ∇²f + Σ λᵢ ∇²hᵢ   doit être ⪰ 0
+                         MAIS SEULEMENT sur le PLAN TANGENT
+                         { d : ⟨∇hᵢ(x*), d⟩ = 0  ∀i }
+
+   MULTIPLICATEURS (prop. 3.4)     d/dε f(x*(ε))|₀ = λ*ⱼ
+                                   f(x*(ε)) = f(x*) + ε λ*ⱼ + o(ε)
+
+
+§3.2  ÉGALITÉS ET INÉGALITÉS              K = { h = 0 , g ≤ 0 }
+
+   ACTIVE en x₀   gⱼ(x₀) = 0   →   j ∈ I(x₀)
+
+   CÔNE TANGENT LINÉARISÉ (prop. 3.8)
+        ⟨∇hᵢ(x), d⟩ = 0                      pour toutes les égalités
+        ⟨∇gⱼ(x), d⟩ &lt; 0    (≤ si gⱼ affine)  pour les inégalités ACTIVES
+
+   QUALIFICATIONS : polyèdre convexe · régulier · Mangasarian-Fromowitz · SLATER
+
+   KKT (thm 3.10)   ∇f + Σλ*ᵢ∇hᵢ + Σμ*ⱼ∇gⱼ = 0
+                    admissibilité · complémentarité μⱼgⱼ(x*) = 0 · positivité μⱼ ≥ 0
+
+   ══════════ L'APPORT PROPRE DE CE COURS ══════════
+   COROLLAIRE 3.11   f convexe, hᵢ AFFINES, gⱼ CONVEXES, Slater vérifiée
+                     ⟹  KKT devient SUFFISANTE
+   ═════════════════════════════════════════════════
+</code></pre>
+<h2 data-prio="must">Concept 1 — Points réguliers et conditions de Lagrange (§3.1)</h2>
+<p>Le problème est
+$$\inf_{x\in K} f(x) \tag{3.1}$$
+où $f:\mathbb{R}^N\to\mathbb{R}$ est de classe $C^1$ et
+$$K := \{x\in\mathbb{R}^N : h_i(x)=0,\ \forall i\in\{1,\dots,m\}\} = \{x\in\mathbb{R}^N : h(x)=0\} \tag{3.2}$$
+avec $h : \mathbb{R}^N\to\mathbb{R}^m$ de classe $C^1$.</p>
+<p><strong>Définition 3.1 (cours) — points réguliers.</strong> Le point $x_0\in K$ est un <strong>point régulier</strong> si la famille $\{\nabla h_i(x_0)\}_{i\in\{1,\dots,m\}}$ est une <strong>famille libre</strong>. Un ensemble est un <strong>ensemble régulier</strong> si l'ensemble des points de cet ensemble est régulier.</p>
+<blockquote>
+<p><strong>C'est exactement la « qualification » (Q) de M. Montaru</strong> (déf. 5.1, fiche 604), sous un autre nom. Retenez le vocabulaire des deux cours : <em>point régulier</em> = <em>point qualifié</em>.</p>
+</blockquote>
+<p><strong>Pour aller plus loin (**) (cours) — le cas linéaire.</strong> <em>Considérons des contraintes linéaires $Ax=b$ avec $A\in\mathcal M_{n,N}$ où $n&lt;N$. Si le rang de $A$ est déficient (c'est-à-dire $\operatorname{rg}(A)=r&lt;n$), alors il existe une matrice $\tilde A\in\mathcal M_{r,n}$ de rang plein composée des lignes $\{l_{i_1},\dots,l_{i_r}\}$ de $A$ telle que $Ax=b \iff \tilde Ax=\tilde b$. <strong>Il est donc toujours possible d'éliminer les lignes redondantes</strong> pour se ramener à une matrice de rang plein.</em></p>
+<blockquote>
+<p><strong>La conséquence pratique est importante</strong> : pour des contraintes <strong>affines</strong>, la régularité n'est <strong>jamais un vrai obstacle</strong> — il suffit de supprimer les équations redondantes. C'est la raison pour laquelle la condition (QCA) de M. Montaru (fiche 605) qualifie automatiquement tous les polyèdres.</p>
+<p class="cal piege"> <strong>Ce n'est plus vrai pour des contraintes non linéaires</strong> : l'exercice 3.2 ci-dessous exhibe deux contraintes quadratiques dont les gradients sont <strong>partout colinéaires</strong> sur $K$, sans qu'on puisse en éliminer une.</p>
+</blockquote>
+<p><strong>Théorème 3.2 (cours) — conditions nécessaires d'optimalité d'ordre 1, conditions de Lagrange.</strong></p>
+<blockquote>
+<p>Soit $x^\ast$ un point <strong>régulier</strong> de $K$. Si $x^\ast$ est un <strong>extremum local</strong> de $f$ sur $K$, alors il existe $\{\lambda^\ast_i\}_{i\in\{1,\dots,m\}}\in\mathbb{R}^m$ (appelés <strong>multiplicateurs de Lagrange</strong>) tels que
+$$\nabla f(x^\ast)+\sum_{i=1}^m\lambda^\ast_i\nabla h_i(x^\ast) = 0 .$$</p>
+</blockquote>
+<p><strong>À savoir (fait en cours) 3.1.</strong> <em>Avoir une intuition des ingrédients de la démonstration du théorème 3.2.</em></p>
+<blockquote>
+<p><strong>Les ingrédients, en trois temps</strong> — c'est la preuve complète que donne M. Montaru (thm 5.7, fiche 604) :</p>
+<ol>
+<li><strong>La régularité fait de $K$ une sous-variété</strong> au voisinage de $x^\ast$, dont l'<strong>espace tangent</strong> est $\operatorname{Vect}\{\nabla h_i(x^\ast)\}^\perp$.</li>
+<li><strong>On dérive $f$ le long d'une courbe</strong> $c$ tracée dans $K$ passant par $x^\ast$ : la fonction $t\mapsto f(c(t))$ a un extremum local en $t=0$, point <strong>intérieur</strong> de son intervalle, donc $(f\circ c)'(0)=0$, soit $\langle\nabla f(x^\ast),\ c'(0)\rangle = 0$.</li>
+<li><strong>Ceci vaut pour tout vecteur tangent</strong>, donc $\nabla f(x^\ast)$ est orthogonal à l'espace tangent, donc appartient à son orthogonal, c'est-à-dire à $\operatorname{Vect}\{\nabla h_i(x^\ast)\}$. ∎</li>
+</ol>
+<p><strong>En une phrase :</strong> <em>le gradient de $f$ ne doit avoir aucune composante le long de la contrainte — sinon on pourrait glisser dessus et améliorer $f$.</em></p>
+</blockquote>
+<details class="cor fiche">
+<summary><strong>Corrigés — exercices 3.1 et 3.2 : le cas simple, puis le cas où la régularité tombe</strong></summary><div class="in">
+
+<h3>Exercice 3.1 — $\min f$ sur $\{(x,y)\in\mathbb{R}^2 : x+y=1\}$ avec $f(x,y)=x^2+y^2$</h3>
+<p><strong>Régularité.</strong> $h(x,y) = x+y-1$, donc $\nabla h = (1,1)\neq0$ <strong>partout</strong> : la famille $\{\nabla h\}$ est libre en tout point. <strong>$K$ est un ensemble régulier.</strong>  <em>(C'est le cas d'une contrainte <strong>affine</strong> : toujours régulier, sauf redondance.)</em></p>
+<p><strong>Existence.</strong> $K$ est fermé (image réciproque de $\{0\}$ par une fonction continue) et <strong>non borné</strong> ; $f(x,y)=\lVert(x,y)\rVert^2$ est <strong>coercitive</strong>. Le théorème 2.12 (fiche 608) donne l'existence. <em>Mieux : $f$ est <strong>fortement convexe</strong> ($\alpha=2$) et $K$ est un fermé <strong>convexe</strong>, donc le <strong>théorème 2.14</strong> donne existence <strong>et unicité</strong> sans autre argument.</em> </p>
+<p><strong>Le système de Lagrange.</strong>
+$$\begin{cases}2x+\lambda = 0\\ 2y+\lambda = 0\\ x+y=1\end{cases}$$
+Les deux premières donnent $x=y=-\dfrac\lambda2$ ; la troisième donne $-\lambda = 1$, soit
+$$\boxed{\lambda = -1, \qquad x^\ast = y^\ast = \tfrac12, \qquad f(x^\ast) = \tfrac14+\tfrac14 = \tfrac12 .}$$</p>
+<p><strong>Contrôle géométrique.</strong> $f$ est le carré de la distance à l'origine ; le minimum sur la droite $x+y=1$ est donc le carré de la distance de $O$ à cette droite :
+$$\left(\frac{\lvert -1\rvert}{\sqrt{1^2+1^2}}\right)^2 = \left(\frac{1}{\sqrt2}\right)^2 = \frac12 . \ \checkmark$$
+Et le pied de la perpendiculaire est bien $\left(\frac12,\frac12\right)$ .</p>
+<h3>Exercice 3.2 — $\min f(x,y,z)=x^2-y+z^2$ sur $\{(x-1)^2+y^2=1 \text{ et } (x+1)^2+y^2=1\}$</h3>
+<p><strong>C'est l'exercice qui montre pourquoi l'hypothèse de régularité n'est pas décorative. Traitez-le lentement.</strong></p>
+<p><strong>Étape 1 — identifier $K$.</strong> Soustrayons les deux équations :
+$$\bigl[(x-1)^2+y^2-1\bigr]-\bigl[(x+1)^2+y^2-1\bigr] = -4x = 0 \implies x = 0 .$$
+En reportant dans la première : $(0-1)^2+y^2 = 1$, donc $y^2 = 0$, donc $y=0$. La variable $z$ est <strong>libre</strong> :
+$$\boxed{K = \{(0,\ 0,\ z) : z\in\mathbb{R}\} \quad \text{— une DROITE, l'axe des } z .}$$</p>
+<p><em>(Géométriquement : deux cercles de rayon $1$ centrés en $(1,0)$ et $(-1,0)$ sont <strong>tangents extérieurement</strong> en l'origine. Leur intersection est le seul point $(0,0)$.)</em></p>
+<p><strong>Étape 2 — la réponse, par le calcul direct.</strong> Sur $K$,
+$$f(0,0,z) = 0-0+z^2 = z^2 \ \ge\ 0,$$
+avec égalité si et seulement si $z=0$.
+$$\boxed{\min_K f = 0, \text{ atteint au seul point } (0,0,0).}$$</p>
+<p><strong>Étape 3 — et pourtant Lagrange ne trouve rien.</strong> Vérifions la régularité. Avec $h_1 = (x-1)^2+y^2-1$ et $h_2 = (x+1)^2+y^2-1$ :
+$$\nabla h_1 = \begin{pmatrix}2(x-1)\\2y\\0\end{pmatrix}, \qquad \nabla h_2 = \begin{pmatrix}2(x+1)\\2y\\0\end{pmatrix}.$$
+<strong>En tout point de $K$</strong>, c'est-à-dire en $(0,0,z)$ :
+$$\nabla h_1 = \begin{pmatrix}-2\\0\\0\end{pmatrix}, \qquad \nabla h_2 = \begin{pmatrix}2\\0\\0\end{pmatrix} = -\nabla h_1 .$$
+<strong>Ils sont colinéaires : la famille n'est PAS libre. Aucun point de $K$ n'est régulier.</strong></p>
+<p><strong>Étape 4 — la conséquence, spectaculaire.</strong> Écrivons quand même le système de Lagrange. Avec $\nabla f = (2x,\ -1,\ 2z)$, en $(0,0,z)$ :
+$$\nabla f + \lambda_1\nabla h_1+\lambda_2\nabla h_2 = \begin{pmatrix}0\\-1\\2z\end{pmatrix}+\lambda_1\begin{pmatrix}-2\\0\\0\end{pmatrix}+\lambda_2\begin{pmatrix}2\\0\\0\end{pmatrix} = \begin{pmatrix}-2\lambda_1+2\lambda_2\\ \mathbf{-1}\\ 2z\end{pmatrix}.$$</p>
+<p><strong>La deuxième composante vaut $-1$, quels que soient $\lambda_1$ et $\lambda_2$.</strong> Elle ne peut <strong>jamais</strong> s'annuler :</p>
+<p>$$\boxed{\text{Le système de Lagrange n'a AUCUNE solution — alors que le minimum existe bel et bien.}}$$</p>
+<blockquote>
+<p><strong>C'est la démonstration la plus claire possible que l'hypothèse de régularité est indispensable.</strong> Sans elle, le théorème 3.2 est <strong>faux</strong> : il existe un extremum, et pourtant aucun multiplicateur ne convient.</p>
+<p><strong>La raison profonde.</strong> Les deux gradients n'engendrent qu'une <strong>droite</strong> ($\operatorname{Vect}(1,0,0)$) au lieu du plan qu'on attendrait de deux contraintes. Or $\nabla f(0,0,0) = (0,-1,0)$ <strong>n'est pas dans cette droite</strong>. L'espace tangent réel à $K$ (l'axe des $z$) est de dimension $1$, alors que la formule $N-m = 3-2 = 1$ le prédit correctement <strong>par coïncidence</strong> — mais l'orthogonalité de la proposition 5.6 tombe.</p>
+<p><strong>Le réflexe à acquérir</strong> : quand deux contraintes se ressemblent, <strong>soustrayez-les d'abord</strong>. Si l'ensemble se simplifie de façon spectaculaire, méfiez-vous de la régularité.</p>
+</blockquote>
+</div></details>
+
+<h2 data-prio="must">Concept 2 — Le lagrangien (§3.1)</h2>
+<p><strong>Cours.</strong> On peut introduire le <strong>lagrangien</strong> du problème de minimisation sous contraintes :
+$$\begin{array}{rccl}\mathcal{L} : &amp; \mathbb{R}^n\times\mathbb{R}^m &amp;\longrightarrow&amp; \mathbb{R}\\ &amp;(x,\lambda) &amp;\longmapsto&amp; f(x)+\displaystyle\sum_{i=1}^m\lambda_ih_i(x)\end{array}$$</p>
+<p>On peut alors calculer
+$$\nabla\mathcal{L}(x,\lambda) = \begin{pmatrix}\nabla_x\mathcal{L}(x,\lambda)\\ \nabla_\lambda\mathcal{L}(x,\lambda)\end{pmatrix} = \begin{pmatrix}\nabla f(x)+\sum_{i=1}^m\lambda_i\nabla h_i(x)\\ h_i(x)\end{pmatrix}$$</p>
+<p><strong>Donc $x^\ast$ est un extremum de $f$ sous la contrainte $K$ si et seulement si $(x^\ast,\lambda^\ast)$ est un point critique de $\mathcal{L}$.</strong></p>
+<blockquote>
+<p><strong>C'est l'apport de formalisme du chapitre, et il vaut la peine d'être compris.</strong></p>
+<pre><code>  SANS le lagrangien          AVEC le lagrangien
+  ──────────────────          ──────────────────
+  n équations : ∇f + Σλᵢ∇hᵢ = 0
+  m équations : hᵢ(x) = 0            ∇L(x,λ) = 0
+  deux systèmes à assembler          UNE SEULE équation, en n+m inconnues
+</code></pre>
+<p><strong>Les $m$ dernières équations sont la contrainte elle-même</strong> : dériver $\mathcal L$ par rapport à $\lambda_i$ redonne $h_i(x)$. <strong>On ne peut donc pas oublier la contrainte</strong> — c'est le principal bénéfice pratique de cette écriture.</p>
+<p class="cal piege"> <strong>Un point critique de $\mathcal L$ n'est PAS un minimum de $\mathcal L$.</strong> En $(x^\ast,\lambda^\ast)$, $\mathcal L$ a typiquement un <strong>point selle</strong> : un minimum en $x$, un maximum en $\lambda$. Ne cherchez jamais à minimiser le lagrangien en $(x,\lambda)$.</p>
+</blockquote>
+<p><strong>Proposition 3.3 (cours) — condition nécessaire d'ordre 2.</strong> Supposons $f$ de classe $C^2$. Considérons la matrice hessienne de $\mathcal L$ <strong>par rapport à la variable $x$</strong> :
+$$\nabla_x^2\mathcal{L}(x,\lambda) = \nabla^2f(x)+\sum_{i=1}^m\lambda_i\,\nabla^2h_i(x).$$
+Soit $x^\ast$ un point régulier de $K$. Si $x^\ast$ est un <strong>minimum local</strong> de $f$ sur $K$, alors $\nabla_x^2\mathcal L$ doit être <strong>semi-définie positive sur le plan tangent à $K$ en $x^\ast$</strong>, c'est-à-dire
+$$\langle\nabla_x^2\mathcal{L}(x,\lambda)\,d,\ d\rangle \ \ge\ 0 \qquad \forall d\in\bigl\{d : \langle\nabla h_i(x^\ast),\ d\rangle = 0,\ \forall i\in\{1,\dots,m\}\bigr\}.$$</p>
+<blockquote>
+<p class="cal piege"> <strong>Deux différences essentielles avec le cas sans contrainte, et ce sont elles qui font l'exercice.</strong></p>
+<ol>
+<li><strong>Ce n'est PAS $\nabla^2f$ qu'on regarde, mais $\nabla_x^2\mathcal L$</strong> — la hessienne de $f$ <strong>corrigée</strong> par les courbures des contraintes, pondérées par les $\lambda_i$. Si les contraintes sont <strong>affines</strong>, $\nabla^2h_i = 0$ et les deux coïncident ; sinon, non.</li>
+<li><strong>La condition n'est exigée que sur le PLAN TANGENT</strong>, pas sur $\mathbb{R}^N$ tout entier. Une matrice peut être <strong>indéfinie</strong> sur $\mathbb{R}^N$ et <strong>définie positive</strong> sur le plan tangent : c'est le cas dans les exercices 3.3 et 3.4, et c'est tout l'intérêt de la proposition.</li>
+</ol>
+<p><strong>La méthode de calcul, en trois étapes :</strong></p>
+<ol>
+<li><strong>paramétrer le plan tangent</strong> : résoudre $\langle\nabla h_i(x^\ast),d\rangle=0$, ce qui donne une base $(d^{(1)},\dots,d^{(N-m)})$ ;</li>
+<li><strong>restreindre</strong> : calculer $\langle\nabla_x^2\mathcal L\,d,d\rangle$ pour $d$ décrivant cet espace ;</li>
+<li><strong>lire le signe</strong> : $\ge0$ pour un minimum, $\le0$ pour un maximum.</li>
+</ol>
+</blockquote>
+<details class="cor fiche">
+<summary><strong>Corrigés — exercices 3.3 et 3.4 : la condition d'ordre 2 sur le plan tangent</strong></summary><div class="in">
+
+<h3>Exercice 3.3 — $\displaystyle\max_{(x,y)\in K} 2xy$ où $K = \{(x,y)\in\mathbb{R}^2 : x+y=1\}$</h3>
+<p><strong>1. Les candidats.</strong> $h(x,y) = x+y-1$, $\nabla h = (1,1) \neq 0$ : <strong>tout point est régulier</strong> .
+$$\nabla f = \begin{pmatrix}2y\\2x\end{pmatrix}, \qquad \nabla f+\lambda\nabla h = 0 \iff \begin{cases}2y+\lambda=0\\ 2x+\lambda=0\end{cases} \iff x = y = -\frac\lambda2 .$$
+Avec la contrainte $x+y=1$ : $-\lambda = 1$, donc
+$$\boxed{\lambda = -1, \qquad (x^\ast,y^\ast) = \left(\tfrac12,\ \tfrac12\right), \qquad f = 2\cdot\tfrac14 = \tfrac12 .}$$
+<strong>Un seul candidat.</strong></p>
+<p><strong>2. La condition d'ordre 2.</strong> La contrainte est <strong>affine</strong>, donc $\nabla^2h = 0$ et
+$$\nabla_x^2\mathcal{L} = \nabla^2f = \begin{pmatrix}0&amp;2\\2&amp;0\end{pmatrix}.$$</p>
+<p class="cal piege"> <strong>Sur $\mathbb{R}^2$ tout entier, cette matrice est INDÉFINIE</strong> : ses valeurs propres sont $+2$ et $-2$. Si l'on s'arrêtait là, on conclurait « point selle » — <strong>et ce serait faux</strong>.</p>
+<p><strong>Le plan tangent.</strong> $\langle\nabla h,d\rangle = d_1+d_2 = 0$, donc
+$$T = \{d = t(1,-1) : t\in\mathbb{R}\} \qquad \text{— une droite, de dimension } N-m = 2-1 = 1 .$$</p>
+<p><strong>La restriction.</strong> Pour $d = t(1,-1)$ :
+$$\langle\nabla_x^2\mathcal{L}\,d,\ d\rangle = 2\cdot2\cdot d_1d_2 = 4\,t\,(-t) = \boxed{-4t^2 \ &lt;\ 0} \quad \text{pour } t\neq0 .$$</p>
+<p><strong>Sur le plan tangent, la forme est définie NÉGATIVE : le candidat est bien un MAXIMUM.</strong> </p>
+<p><strong>Contrôle direct</strong> (l'exercice se résout aussi sans Lagrange) : en substituant $y = 1-x$,
+$$\tilde f(x) = 2x(1-x) = 2x-2x^2, \qquad \tilde f'(x) = 2-4x = 0 \iff x = \tfrac12, \qquad \tilde f'' = -4 &lt; 0 .$$
+<strong>Maximum en $x=\frac12$, de valeur $\frac12$</strong>  — et notez que $\tilde f'' = -4$ est <strong>exactement</strong> la valeur $-4t^2$ trouvée pour $t=1$. <strong>Ce n'est pas une coïncidence</strong> : la restriction au plan tangent <em>est</em> la dérivée seconde de la fonction réduite.</p>
+<h3>Exercice 3.4 — $\displaystyle\max_{(x,y,z)\in K} 2xy+2xz+2yz$ où $K = \{x+y+z=1\}$</h3>
+<p><strong>1. Les candidats.</strong> $h = x+y+z-1$, $\nabla h = (1,1,1)\neq0$ : <strong>régulier partout</strong> .
+$$\nabla f = \begin{pmatrix}2y+2z\\2x+2z\\2x+2y\end{pmatrix}, \qquad \begin{cases}2y+2z+\lambda=0\\ 2x+2z+\lambda=0\\ 2x+2y+\lambda=0\end{cases}$$
+En soustrayant la première de la deuxième : $2x-2y=0$, donc $x=y$. La deuxième moins la troisième : $2z-2y=0$, donc $y=z$. Avec la contrainte $x+y+z=1$ :
+$$\boxed{x^\ast=y^\ast=z^\ast=\tfrac13, \qquad \lambda = -\tfrac43, \qquad f = 3\times2\times\tfrac19 = \tfrac23 \approx 0{,}6666667 .}$$</p>
+<p><strong>2. La condition d'ordre 2.</strong> Contrainte affine, donc
+$$\nabla_x^2\mathcal{L} = \nabla^2f = \begin{pmatrix}0&amp;2&amp;2\\2&amp;0&amp;2\\2&amp;2&amp;0\end{pmatrix}.$$</p>
+<p class="cal piege"> <strong>Sur $\mathbb{R}^3$, cette matrice est INDÉFINIE</strong> (valeurs propres $4$, $-2$, $-2$).</p>
+<p><strong>Le plan tangent.</strong> $\langle\nabla h,d\rangle = d_1+d_2+d_3 = 0$ — un <strong>plan</strong>, de dimension $3-1=2$.</p>
+<p><strong>La restriction — et le calcul élégant.</strong> Pour une telle matrice,
+$$\langle\nabla^2f\,d,\ d\rangle = 4\,(d_1d_2+d_1d_3+d_2d_3).$$
+Or, sur le plan tangent, $(d_1+d_2+d_3)^2 = 0$, ce qui donne
+$$\lVert d\rVert^2 + 2\,(d_1d_2+d_1d_3+d_2d_3) = 0 \qquad\Longrightarrow\qquad d_1d_2+d_1d_3+d_2d_3 = -\frac{\lVert d\rVert^2}{2}.$$</p>
+<p>$$\boxed{\langle\nabla_x^2\mathcal{L}\,d,\ d\rangle = 4\times\left(-\frac{\lVert d\rVert^2}{2}\right) = -2\lVert d\rVert^2 \ &lt;\ 0 \quad \text{pour } d\neq0 .}$$</p>
+<p><strong>Définie négative sur le plan tangent : c'est bien un MAXIMUM.</strong> </p>
+<p><strong>Contrôle numérique</strong> : sur $2\times10^5$ directions $d$ tirées au hasard dans le plan tangent (obtenues en centrant des vecteurs gaussiens), le rapport $\dfrac{\langle\nabla^2f\,d,d\rangle}{\lVert d\rVert^2}$ vaut <strong>$-2{,}000000$ dans tous les cas</strong>, à $10^{-14}$ près.  La forme est donc exactement $-2$ fois l'identité sur le plan tangent.</p>
+<div class="cal intu"><span class="lab">Ce que ces deux exercices enseignent, et pourquoi le cours les met côte à côte.</span>
+<p> Dans les deux cas, $\nabla^2f$ est <strong>indéfinie</strong> sur l'espace entier — la lecture naïve conclurait « point selle ». <strong>La contrainte change tout</strong> : restreinte au plan tangent, la même matrice devient <strong>définie négative</strong>, et le point est un vrai maximum.</p>
+<p><strong>La leçon</strong> : <em>la nature d'un point critique sous contrainte ne se lit jamais sur $\nabla^2f$ seule.</em> Il faut la hessienne du <strong>lagrangien</strong>, et seulement <strong>sur le plan tangent</strong>.</p>
+<p><strong>Le contrôle qui rassure</strong> : dans l'exercice 3.3, la valeur $-4$ trouvée sur le plan tangent est exactement $\tilde f''$ de la fonction réduite $2x(1-x)$. <strong>Quand la contrainte se paramètre facilement, réduisez et vérifiez.</strong></p>
+</div>
+</div></details>
+
+<h2 data-prio="must">Concept 3 — L'interprétation des multiplicateurs (prop. 3.4)</h2>
+<p><strong>Proposition 3.4 (cours) — interprétation des multiplicateurs : <em>un multiplicateur de Lagrange mesure la sensibilité de la contrainte</em>.</strong> Considérons le problème de minimisation de $f$ sous la contrainte <strong>perturbée</strong>
+$$\{x\in\mathbb{R}^N : h_i(x)=0\ \ \forall i\in\{1,\dots,m\}\setminus\{j\} \quad \text{et} \quad h_j(x)+\varepsilon = 0\}.$$
+Supposons que l'on n'a pas de problème de régularité. Si $x^\ast(\varepsilon)$ est solution de ce problème, on a
+$$\boxed{\frac{d}{d\varepsilon}f\bigl(x^\ast(\varepsilon)\bigr)\Big|_{\varepsilon=0} = \lambda^\ast_j}$$
+où $\lambda^\ast_j$ est le $j$-ième multiplicateur de Lagrange de $(3.1)$ sous la contrainte $(3.2)$.</p>
+<p><strong>À savoir 3.2.</strong> <em>Démontrer la proposition 3.4 dans le cas où il n'y a pas de problème de régularité.</em></p>
+<p><strong>Le développement que le cours en tire.</strong> Par définition de la dérivée,
+$$\frac{d}{d\varepsilon}f\bigl(x^\ast(\varepsilon)\bigr) = \frac{f(x^\ast(\varepsilon))-f(x^\ast)}{\varepsilon}+o(1),$$
+donc la conclusion $\frac{d}{d\varepsilon}f(x^\ast(\varepsilon)) = \lambda^\ast_j$ s'écrit
+$$\varepsilon\lambda^\ast_j = f\bigl(x^\ast(\varepsilon)\bigr)-f(x^\ast)+o(\varepsilon),$$
+ou encore
+$$\boxed{f\bigl(x^\ast(\varepsilon)\bigr) = f(x^\ast)+\varepsilon\,\lambda^\ast_j+o(\varepsilon).}$$</p>
+<p><strong>Pour aller plus loin — l'interprétation économique (cours).</strong> <em>Ce résultat donne une interprétation économique aux multiplicateurs de Lagrange : considérons un consommateur qui maximise son utilité $f$ sous les contraintes $\{h_i=0\}$. Notons $f(x^\ast)$ son utilité au niveau de consommation optimale. <strong>Si le consommateur alloue un euro de plus de budget à la contrainte $h_j$, alors il augmente son utilité d'un montant égal à $\lambda^\ast_j$.</strong> Autrement dit, le multiplicateur $\lambda^\ast_j$ est égal à son <strong>gain de productivité marginal</strong>. On appelle ainsi parfois $\lambda^\ast_j$ le <strong>profit marginal de l'argent</strong>, la <strong>valeur interne</strong>, le <strong>prix fantôme</strong> ou le <strong>profit d'opportunité</strong>. $\lambda^\ast_j$ mesure la <strong>sensibilité de la valeur optimale $f(x^\ast)$ à la relaxation de la $j$-ème contrainte</strong>.</em></p>
+<blockquote>
+<p><strong>Les quatre noms sont à connaître</strong> : <em>prix fantôme</em> (<strong>shadow price</strong>), <em>valeur interne</em>, <em>profit marginal de l'argent</em>, <em>profit d'opportunité</em>. Ils désignent tous $\lambda^\ast_j$.</p>
+<p><strong>La formule à retenir</strong>, et c'est la plus utile de tout le chapitre :
+$$f\bigl(x^\ast(\varepsilon)\bigr) \approx f(x^\ast)+\varepsilon\,\lambda^\ast_j .$$
+<em>Relâcher la contrainte $j$ d'une unité fait varier l'optimum de $\lambda^\ast_j$.</em> C'est ce qui permet de <strong>classer les contraintes par ordre d'intérêt</strong> sans refaire aucun calcul.</p>
+</blockquote>
+<details class="cor fiche">
+<summary><strong>Corrigés — exercices 3.5 et 3.6 : $\lambda$ vérifié, du cas trivial au cas complet</strong></summary><div class="in">
+
+<h3>Exercice 3.5 — quatre problèmes en dimension 1</h3>
+<p><em>Le cours propose ici l'illustration la plus dépouillée possible de la proposition 3.4.</em></p>
+<table>
+<thead>
+<tr>
+<th>N°</th>
+<th>Problème</th>
+<th>Ensemble</th>
+<th>Solution</th>
+<th>Valeur optimale</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>$\min_{\{x=0\}}(-x)$</td>
+<td>$\{0\}$</td>
+<td>$x=0$</td>
+<td>$\mathbf{0}$</td>
+</tr>
+<tr>
+<td>2</td>
+<td>$\min_{\{x+\varepsilon=0\}}(-x)$</td>
+<td>$\{-\varepsilon\}$</td>
+<td>$x=-\varepsilon$</td>
+<td>$\boldsymbol{\varepsilon}$</td>
+</tr>
+<tr>
+<td>3</td>
+<td>$\min_{\{x=0\}}(-10x)$</td>
+<td>$\{0\}$</td>
+<td>$x=0$</td>
+<td>$\mathbf{0}$</td>
+</tr>
+<tr>
+<td>4</td>
+<td>$\min_{\{x+\varepsilon=0\}}(-10x)$</td>
+<td>$\{-\varepsilon\}$</td>
+<td>$x=-\varepsilon$</td>
+<td>$\mathbf{10\varepsilon}$</td>
+</tr>
+</tbody></table>
+<p><strong>La dérivée de la valeur optimale.</strong> Pour les problèmes 1-2 : $\dfrac{d}{d\varepsilon}(\varepsilon) = 1$. Pour les problèmes 3-4 : $\dfrac{d}{d\varepsilon}(10\varepsilon) = 10$.</p>
+<p><strong>Et les multiplicateurs ?</strong> Avec $h(x)=x$, donc $\nabla h = 1$ :</p>
+<ul>
+<li>problème 1 : $\nabla f+\lambda\nabla h = -1+\lambda = 0$, donc $\boxed{\lambda = 1}$  ;</li>
+<li>problème 3 : $-10+\lambda = 0$, donc $\boxed{\lambda = 10}$ .</li>
+</ul>
+<p><strong>Les deux coïncident exactement avec les dérivées.</strong>  La proposition 3.4 est vérifiée dans le cas le plus simple possible — et l'on voit clairement que <strong>$\lambda$ mesure « combien on gagne à déplacer la contrainte d'une unité »</strong> : dix fois plus quand l'objectif est dix fois plus pentu.</p>
+<blockquote>
+<p><strong>L'intérêt pédagogique de cet exercice</strong> : ici la contrainte détermine <strong>entièrement</strong> la solution ($K$ est un singleton), donc la valeur optimale se calcule sans aucune optimisation. <strong>Tout ce qui reste, c'est l'effet de la perturbation</strong> — et c'est exactement ce que $\lambda$ mesure.</p>
+</blockquote>
+<h3>Exercice 3.6 — les six questions, avec les deux contraintes en concurrence</h3>
+<p><strong>Le problème :</strong> $\min\ x+y$ sous diverses contraintes. $(3.3)$</p>
+<p><strong>1. Sous $\{(x,y)\in\mathbb{R}^2 : x^2+y^2=1,\ y=0\}$, et les multiplicateurs.</strong></p>
+<p><em>L'ensemble</em> : $y=0$ et $x^2=1$, donc $K = \{(1,0),\ (-1,0)\}$ — <strong>deux points</strong>. Le minimum de $x+y$ y vaut
+$$\boxed{-1, \text{ atteint en } (-1,\ 0).}$$</p>
+<p><em>Régularité en $(-1,0)$</em> : avec $h_1 = x^2+y^2-1$ et $h_2 = y$,
+$$\nabla h_1(-1,0) = \begin{pmatrix}-2\\0\end{pmatrix}, \qquad \nabla h_2(-1,0) = \begin{pmatrix}0\\1\end{pmatrix} \quad \text{— famille LIBRE} $$</p>
+<p><em>Le système</em> : $\nabla f = (1,1)$, donc
+$$\begin{cases}1+\lambda_1(-2)+\lambda_2\cdot0 = 0\\ 1+\lambda_1\cdot0+\lambda_2\cdot1 = 0\end{cases} \implies \boxed{\lambda_1 = \tfrac12, \qquad \lambda_2 = -1 .}$$</p>
+<p><em>(Pour information, en $(1,0)$ — qui est le <strong>maximum</strong> — on trouve $\lambda_1 = -\frac12$, $\lambda_2 = -1$.)</em></p>
+<p><strong>2. Approximativement sous $\{x^2+y^2+\varepsilon=1,\ y=0\}$.</strong> C'est la contrainte $h_1$ qui est perturbée, donc par la proposition 3.4 :
+$$f\bigl(x^\ast(\varepsilon)\bigr) \approx -1+\varepsilon\lambda_1 = \boxed{-1+\frac{\varepsilon}{2}}.$$</p>
+<p><strong>3. Exactement.</strong> L'ensemble devient $y=0$ et $x^2 = 1-\varepsilon$, donc $x = \pm\sqrt{1-\varepsilon}$ et
+$$\min(x+y) = -\sqrt{1-\varepsilon}.$$
+<strong>Développons pour comparer</strong> :
+$$-\sqrt{1-\varepsilon} = -\left(1-\frac\varepsilon2-\frac{\varepsilon^2}{8}+O(\varepsilon^3)\right) = -1+\frac{\varepsilon}{2}+\frac{\varepsilon^2}{8}+O(\varepsilon^3).$$
+<strong>Le terme d'ordre 1 est bien $\frac\varepsilon2 = \varepsilon\lambda_1$</strong>  — la proposition 3.4 est confirmée, et l'on voit que l'erreur est d'ordre $\varepsilon^2$.</p>
+<p><strong>4. Approximativement sous $\{x^2+y^2=1,\ y+\varepsilon=0\}$.</strong> C'est $h_2$ qui est perturbée :
+$$f\bigl(x^\ast(\varepsilon)\bigr) \approx -1+\varepsilon\lambda_2 = \boxed{-1-\varepsilon}.$$</p>
+<p><strong>5. Exactement.</strong> Maintenant $y=-\varepsilon$ et $x^2 = 1-\varepsilon^2$, donc
+$$\min(x+y) = -\sqrt{1-\varepsilon^2}-\varepsilon = -1-\varepsilon+\frac{\varepsilon^2}{2}+O(\varepsilon^4).$$
+<strong>Le terme d'ordre 1 est $-\varepsilon = \varepsilon\lambda_2$</strong> .</p>
+<p><strong>6. Dans laquelle des deux contraintes vaut-il mieux récupérer un budget de $0{,}1$ euro ?</strong></p>
+<p>Comparons, avec $\varepsilon = 0{,}1$ :</p>
+<table>
+<thead>
+<tr>
+<th>Contrainte relâchée</th>
+<th>$\lambda$</th>
+<th>Prédiction $-1+\varepsilon\lambda$</th>
+<th>Valeur <strong>exacte</strong></th>
+<th>Écart</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$h_1$ (le cercle)</td>
+<td>$+\frac12$</td>
+<td>$-0{,}95$</td>
+<td>$-\sqrt{0{,}9} = \mathbf{-0{,}9486833}$</td>
+<td>$1{,}3\times10^{-3}$</td>
+</tr>
+<tr>
+<td>$h_2$ (la droite $y=0$)</td>
+<td>$-1$</td>
+<td>$-1{,}1$</td>
+<td>$-\sqrt{0{,}99}-0{,}1 = \mathbf{-1{,}0949874}$</td>
+<td>$5{,}0\times10^{-3}$</td>
+</tr>
+</tbody></table>
+<p><strong>Il s'agit d'une MINIMISATION : la meilleure option est celle qui donne la plus PETITE valeur.</strong></p>
+<p>$$\boxed{-1{,}0949874 \ &lt;\ -0{,}9486833 : \text{ il vaut mieux relâcher } h_2 .}$$</p>
+<p><strong>Et l'on pouvait le savoir sans aucun calcul exact</strong> : c'est la contrainte de multiplicateur <strong>le plus négatif</strong>, $\lambda_2 = -1$ contre $\lambda_1 = +\frac12$. <strong>La règle : pour un problème de minimisation, on relâche la contrainte dont $\lambda$ est le plus petit.</strong></p>
+<div class="cal piege"><span class="lab">Attention au sens de la comparaison, c'est le piège de la question 6.</span>
+<p class="cal piege">  Chez M. Montaru (fiche 604, §5.4), la même règle est énoncée pour une <strong>maximisation</strong> d'utilité, et c'est alors le <strong>plus grand</strong> $\lambda$ qu'on retient. <strong>Le critère dépend du sens de l'optimisation</strong> — vérifiez toujours si l'énoncé minimise ou maximise avant de conclure.</p>
+<p><strong>Les prédictions au premier ordre sont excellentes</strong> ($1{,}3\times10^{-3}$ et $5{,}0\times10^{-3}$ d'erreur pour $\varepsilon=0{,}1$), ce qui est attendu : l'erreur est en $\varepsilon^2$, soit $\frac{0{,}01}{8}=1{,}25\times10^{-3}$ et $\frac{0{,}01}{2}=5\times10^{-3}$ — <strong>exactement les écarts observés</strong> .</p>
+</div>
+</div></details>
+
+<h2 data-prio="must">Concept 4 — Contraintes actives et cône tangent linéarisé (§3.2.1 et §3.2.2)</h2>
+<p>Le problème devient
+$$\inf_{x\in K}f(x) \tag{3.4} \qquad\text{avec}\qquad K := \left\{x\in\mathbb{R}^N : \begin{array}{l} h_i(x)=0,\ \forall i\in\{1,\dots,m\}\\ g_j(x)\le0,\ \forall j\in\{1,\dots,p\}\end{array}\right\}$$</p>
+<p><strong>Définition 3.5 (cours) — contraintes d'inégalité actives.</strong> L'indice $j$ étant donné, une contrainte d'inégalité $g_j(x)\le0$ est dite <strong>active en $x_0$</strong> si $g_j(x_0)=0$. Sinon, lorsque $g_j(x_0)&lt;0$, elle est dite <strong>inactive en $x_0$</strong>. L'ensemble des indices actifs en $x_0$ est noté
+$$I(x_0) := \{j\in\{1,\dots,p\} : g_j(x_0)=0\}.$$</p>
+<blockquote>
+<p>C'est le $J(a)$ de M. Montaru (fiche 605), rebaptisé $I(x_0)$.</p>
+</blockquote>
+<p><strong>Pour aller plus loin (**) (cours).</strong> <em>On peut voir que $x^\ast$ est un minimum local du problème $(3.4)$ si et seulement si $x^\ast$ est un minimum local sous les contraintes où <strong>les contraintes inactives ont été supprimées</strong> et <strong>les contraintes actives sont traitées comme des égalités</strong>. Ainsi le théorème 3.2 s'applique : si la concaténation des familles $\{\nabla h_i(x^\ast)\}$ et $\{\nabla g_j(x^\ast)\}_{j\in I(x^\ast)}$ forme une famille libre, alors il existe $\lambda^\ast_i$ et $\mu_j$ tels que</em>
+$$\nabla f(x^\ast)+\sum_{i=1}^m\lambda^\ast_i\nabla h_i(x^\ast)+\sum_{j\in I(x^\ast)}\mu_j\nabla g_j(x^\ast) = 0 .$$</p>
+<blockquote>
+<p><strong>C'est l'explication la plus claire de la condition de complémentarité, et elle vaut la peine d'être retenue :</strong> <em>localement, une contrainte inactive n'existe pas, et une contrainte active se comporte comme une égalité.</em> La complémentarité $\mu_jg_j(x^\ast)=0$ n'est que la traduction algébrique de cette phrase.</p>
+<p class="cal piege"> <strong>Ce raisonnement ne donne pas le signe de $\mu_j$.</strong> Traité comme une égalité, le multiplicateur serait quelconque. <strong>C'est le théorème 3.10 qui ajoute $\mu_j\ge0$</strong>, et cette information vient de l'inégalité, pas de l'égalité.</p>
+</blockquote>
+<p><strong>Définition 3.6 (cours) — point admissible.</strong> Un élément de $K$ est dit <strong>point admissible</strong>.</p>
+<p><strong>Définition 3.7 (cours) — direction admissible.</strong> Soit $x$ un point admissible. Une direction $d\in\mathbb{R}^N$ est dite <strong>admissible (pour $x$)</strong> s'il existe $\eta&gt;0$ tel que $x+\alpha d$ soit dans $K$ pour tout $\alpha\in[0,\eta[$.</p>
+<p><strong>Proposition 3.8 (cours) — cône tangent linéarisé (ou cône linéarisant).</strong> Soit $x$ un point admissible. Le vecteur $d$ est une direction admissible si</p>
+<ol>
+<li>$\forall i\in\{1,\dots,m\},\qquad \langle\nabla h_i(x),\ d\rangle = 0$ ; <strong>et</strong></li>
+<li>— si $j\notin I(x)$, <strong>toute</strong> direction est admissible ;
+— si $j\in I(x)$, une direction $d$ est admissible si
+$$\langle\nabla g_j(x),\ d\rangle &lt; 0 \quad \text{si } g_j \text{ n'est pas affine, et} \quad \langle\nabla g_j(x),\ d\rangle \le 0 \quad \text{si } g_j \text{ est affine.}$$</li>
+</ol>
+<p><strong>À savoir 3.3.</strong> <em>Avoir une intuition des ingrédients de la démonstration de la proposition 3.8.</em></p>
+<blockquote>
+<p><strong>L'intuition, contrainte par contrainte.</strong></p>
+<pre><code>  ÉGALITÉ  hᵢ = 0        pour rester dessus, il faut se déplacer
+                         PERPENDICULAIREMENT au gradient
+                         ⟹  ⟨∇hᵢ, d⟩ = 0        (une ÉGALITÉ)
+
+  INÉGALITÉ INACTIVE     gⱼ(x) &lt; 0 : on a de la marge, un petit pas
+  gⱼ &lt; 0                 dans N'IMPORTE QUELLE direction reste admissible
+                         ⟹  aucune condition
+
+  INÉGALITÉ ACTIVE       gⱼ(x) = 0 : on est collé au mur.
+  gⱼ = 0                 Il faut que gⱼ DÉCROISSE dans la direction d
+                         ⟹  ⟨∇gⱼ, d⟩ &lt; 0        (une INÉGALITÉ)
+</code></pre>
+<p><strong>Pourquoi le cas affine autorise le $\le$ large.</strong> Si $g_j$ est <strong>affine</strong>, alors $g_j(x+\alpha d) = g_j(x)+\alpha\langle\nabla g_j,d\rangle$ <strong>exactement</strong>, sans reste. Avec $g_j(x)=0$ et $\langle\nabla g_j,d\rangle = 0$, on obtient $g_j(x+\alpha d)=0\le0$ : la direction reste admissible — <strong>on longe le mur</strong>.</p>
+<p>Si $g_j$ <strong>n'est pas affine</strong>, il reste un terme d'ordre 2 de signe inconnu qui peut faire sortir de $K$. <strong>Il faut alors une marge stricte</strong> pour que le terme d'ordre 1 domine. C'est toute la raison de la distinction.</p>
+</blockquote>
+<p><strong>Pour aller plus loin (***) (cours) — le cône tangent au sens de Bouligand.</strong> <em>On peut définir le <strong>cône tangent</strong> en $x^\ast$ :</em>
+$$\bigl\{d\in\mathbb{R}^N,\ \exists(d_k)_k,\ d_k\to d,\ \exists(\alpha_k)_k,\ \alpha_k\to0 : \forall k,\ x_k = x^\ast+\alpha_kd_k\in K\bigr\}$$
+<em>Plutôt que de travailler avec les directions, on peut même travailler directement sur des <strong>suites admissibles</strong>, ce qui est la façon la plus générale (et la plus intuitive) mais la moins pratique ; le cône obtenu est appelé <strong>cône tangent au sens de Bouligand</strong> ou <strong>cône contingent</strong>.</em></p>
+<p><em>En principe : <strong>cône tangent linéarisé $\subset$ cône tangent $\subset$ suites admissibles</strong>. Ils coïncident dans le cas où les contraintes sont dites <strong>qualifiées</strong>.</em></p>
+<blockquote>
+<p><strong>C'est la définition la plus honnête de la qualification, et le cours le dit explicitement :</strong>
+$$\boxed{\text{« qualifié » = « le cône LINÉARISÉ coïncide avec le VRAI cône tangent ».}}$$
+Autrement dit : <em>l'approximation au premier ordre des contraintes ne trahit pas la géométrie réelle de $K$.</em> Quand elle la trahit — comme à l'exercice 3.2, où deux contraintes distinctes définissent une droite — les conditions de Lagrange et KKT deviennent fausses.</p>
+</blockquote>
+<p><strong>Les conditions de qualification (cours).</strong> <em>Les contraintes sont, par exemple, qualifiées en $x$ si :</em></p>
+<ul>
+<li><strong>$K$ est un polyèdre convexe</strong> : $h$ et $g$ sont <strong>affines</strong> ;</li>
+<li><strong>$K$ est un ensemble régulier</strong> : la concaténation de $\{\nabla h_i(x)\}$ et $\{\nabla g_j(x)\}_{j\in I(x)}$ forme une <strong>famille libre</strong> ;</li>
+<li><strong>conditions de Mangasarian-Fromowitz</strong> : la famille $\{\nabla h_i(x)\}$ est libre, <strong>et</strong> il existe une direction $d$ dans le cône tangent linéarisé en $x$ ;</li>
+<li><strong>critère de qualification de Slater</strong> (proposition 3.9 ci-dessous).</li>
+</ul>
+<p><em>Il y a d'autres conditions de qualification que nous ne verrons pas ici, comme la condition de qualification du <strong>rang constant</strong>, de <strong>dépendance linéaire</strong> ou de <strong>quasi-normalité</strong>.</em></p>
+<p><strong>Proposition 3.9 (cours) — conditions de Slater.</strong> Supposons que les fonctions $\{h_i\}$ et $\{g_j\}$ sont <strong>convexes</strong>. S'il existe $y$ à l'intérieur de $K$ tel que
+$$\forall i,\ h_i(y)=0 \qquad \text{et} \qquad \forall j,\ \begin{cases} g_j(y)&lt;0 &amp; \text{si } g_j \text{ n'est pas affine}\\ g_j(y)\le0 &amp; \text{si } g_j \text{ est affine,}\end{cases}$$
+alors <strong>pour tout $x\in K$ les contraintes sont qualifiées en $x$</strong>.</p>
+<p><strong>Exercice 3.7.</strong> <em>Démontrer la proposition 3.9.</em></p>
+<blockquote>
+<p><strong>L'idée de la démonstration, en trois temps.</strong> Soit $x\in K$ et $d$ dans le cône linéarisé ; il s'agit de montrer que $d$ est une vraie direction tangente.</p>
+<ol>
+<li><strong>Le point de Slater fournit une direction « qui rentre »</strong> : $v = y-x$ vérifie $\langle\nabla g_j(x),v\rangle \le g_j(y)-g_j(x) &lt; 0$ pour toute contrainte non affine active — c'est la caractérisation 2 de la convexité (prop. 2.3, fiche 607), appliquée à $g_j$.</li>
+<li><strong>On perturbe $d$ vers l'intérieur</strong> : $d_t = d+tv$ est <strong>strictement</strong> admissible pour tout $t&gt;0$.</li>
+<li><strong>On fait tendre $t\to0$</strong> : les $d_t$ appartiennent au vrai cône tangent, qui est <strong>fermé</strong>, donc leur limite $d$ aussi. ∎</li>
+</ol>
+<p><strong>Ce que Slater a de remarquable</strong> : <strong>un seul point</strong> à exhiber, et <strong>toute</strong> la contrainte devient qualifiée — pas seulement ce point. C'est la même portée que dans le cours de M. Montaru (prop. 6.7, fiche 605).</p>
+<p class="cal piege"> <strong>Une différence avec M. Montaru, à noter.</strong> M. Blanchet autorise ici $g_j(y)\le0$ pour les contraintes <strong>affines</strong> ; M. Montaru exige $g_j(a_0)&lt;0$ pour <strong>toutes</strong>. <strong>La version de M. Blanchet est plus fine</strong> — et c'est cohérent avec la proposition 3.8, où les contraintes affines admettent déjà l'inégalité large.</p>
+</blockquote>
+<h2 data-prio="must">Concept 5 — Le théorème de Karush-Kuhn-Tucker (§3.2.3)</h2>
+<p><strong>Théorème 3.10 (cours) — théorème de Karush (1939) – Kuhn-Tucker (1951).</strong></p>
+<blockquote>
+<p>Soit $x^\ast$ un point en lequel la <strong>qualification des contraintes est vérifiée</strong>. Si $x^\ast$ est <strong>solution</strong> du problème $(3.4)$, alors il existe $\{\lambda^\ast_i\}\in\mathbb{R}^m$ et $\{\mu^\ast_j\}\in\mathbb{R}^p$ tels que
+$$\nabla f(x^\ast)+\sum_{i=1}^m\lambda^\ast_i\nabla h_i(x^\ast)+\sum_{j=1}^p\mu^\ast_j\nabla g_j(x^\ast) = 0 \tag{3.7}$$
+avec</p>
+<ul>
+<li><strong>admissibilité</strong> : pour tout $i$, $h_i(x^\ast)=0$ et pour tout $j$, $g_j(x^\ast)\le0$ ;</li>
+<li><strong>complémentarité</strong> : pour tout $j$, $\mu_j\,g_j(x^\ast)=0$ ;</li>
+<li><strong>positivité</strong> : pour tout $j$, $\mu_j\ge0$.</li>
+</ul>
+</blockquote>
+<blockquote>
+<p><strong>La date de 1939 n'est pas anecdotique.</strong> Karush a démontré le résultat dans son mémoire de master à Chicago en <strong>1939</strong> ; Kuhn et Tucker l'ont redécouvert et publié en <strong>1951</strong>. Le résultat a longtemps porté le seul nom « Kuhn-Tucker » — d'où le nom complet, rétabli, que le cours emploie.</p>
+<p><strong>La différence de présentation avec M. Montaru</strong> (thm 6.1, fiche 605) : celui-ci liste l'<strong>admissibilité de $\mu_j$</strong> ($\mu_j\ge0$) et la <strong>complémentarité</strong> ; M. Blanchet ajoute une troisième condition qu'il appelle <strong>admissibilité</strong> et qui est simplement l'appartenance de $x^\ast$ à $K$. <strong>Les deux énoncés sont identiques</strong> ; M. Blanchet est seulement plus explicite.</p>
+</blockquote>
+<p><strong>Pour aller plus loin (***) — le théorème de John (1948) (cours).</strong> <em>On peut <strong>relâcher les hypothèses de qualification</strong>. Si $x^\ast$ est solution du problème $(3.4)$, alors il existe $\mu_0\neq0$, $\{\lambda^\ast_i\}$ et $\{\mu^\ast_j\}$ tels que</em>
+$$\mu_0\,\nabla f(x^\ast)+\sum_{i=1}^m\lambda^\ast_i\nabla h_i(x^\ast)+\sum_{j=1}^p\mu^\ast_j\nabla g_j(x^\ast) = 0$$
+<em>avec les mêmes conditions d'admissibilité, de complémentarité et de positivité.</em></p>
+<blockquote>
+<p><strong>C'est la réponse élégante au problème de l'exercice 3.2</strong>, et cela mérite d'être compris.</p>
+<p><strong>Le mécanisme</strong> : en autorisant un coefficient $\mu_0$ <strong>devant $\nabla f$</strong>, on peut poser $\mu_0 = 0$ lorsque la qualification échoue — l'équation devient alors une relation de <strong>dépendance linéaire entre les seuls gradients des contraintes</strong>, ce qui est précisément ce qui se produit en un point non régulier.</p>
+<p><strong>Reprenons l'exercice 3.2.</strong> En $(0,0,0)$, les gradients $\nabla h_1 = (-2,0,0)$ et $\nabla h_2 = (2,0,0)$ sont liés : $\nabla h_1+\nabla h_2 = 0$. Le théorème de John est donc satisfait avec
+$$\mu_0 = 0, \qquad \lambda_1 = \lambda_2 = 1,$$
+<strong>alors que le théorème 3.2 n'avait aucune solution.</strong> </p>
+<p class="cal piege"> <strong>Mais le prix à payer est lourd</strong> : avec $\mu_0=0$, l'équation ne contient <strong>plus $f$ du tout</strong> et n'apprend donc rien sur l'optimum. <strong>Le théorème de John est toujours vrai, et utile seulement quand $\mu_0\neq0$</strong> — c'est-à-dire, précisément, quand on peut normaliser $\mu_0=1$ et retrouver KKT. <em>C'est pourquoi la qualification reste indispensable en pratique.</em></p>
+</blockquote>
+<p><strong>Le lagrangien du problème complet (cours).</strong>
+$$\mathcal{L}(x,\lambda,\mu) = f(x)+\sum_{i=1}^m\lambda_i\,h_i(x)+\sum_{j=1}^p\mu_j\,g_j(x),$$
+et la condition $(3.7)$ s'écrit simplement
+$$\boxed{\nabla_x\mathcal{L}(x^\ast,\lambda^\ast,\mu^\ast) = 0 .}$$</p>
+<p><strong>Pour aller plus loin (***) — condition nécessaire d'ordre 2 (cours).</strong> <em>$\nabla^2\mathcal L$ doit être semi-définie positive pour l'ensemble des directions $d$ telles que</em></p>
+<ul>
+<li><em>pour tout $i$, $\langle\nabla h_i(x),d\rangle = 0$ ;</em></li>
+<li><em>pour tout $j\in I(x)$, $\langle\nabla g_j(x),d\rangle\le0$ ;</em></li>
+<li><em>pour tout $j\in I(x)$ tel que $\mu_j&gt;0$, $\langle\nabla g_j,d\rangle = 0$.</em></li>
+</ul>
+<blockquote>
+<p><strong>La troisième condition est la plus subtile, et la plus instructive.</strong> Une contrainte active <strong>dont le multiplicateur est strictement positif</strong> est dite <strong>fortement active</strong> : elle « pousse » réellement, et se comporte comme une <strong>égalité</strong>. Les contraintes actives avec $\mu_j=0$ (cas dégénéré) ne contraignent que d'un côté, d'où le $\le$ de la deuxième condition.</p>
+</blockquote>
+<h2 data-prio="must">Concept 6 — Quand KKT devient SUFFISANT (corollaire 3.11)</h2>
+<p><strong>Corollaire 3.11 (cours) — conditions de Slater.</strong></p>
+<blockquote>
+<p>Considérons le problème $(3.4)$. Supposons que pour tout $i$, $h_i$ est <strong>affine</strong>, que pour tout $j$, $g_j$ est <strong>convexe</strong>, et que <strong>$f$ est convexe</strong>. Supposons que $x^\ast$ vérifie les conditions de Slater de la proposition 3.9. Alors les <strong>conditions KKT du théorème 3.10 sont SUFFISANTES</strong> pour que $x^\ast$ soit une solution du problème $(3.4)$.</p>
+</blockquote>
+<blockquote>
+<h2><strong>C'est le résultat le plus fort de tout le polycopié, et il n'a pas d'équivalent chez M. Montaru.</strong></h2>
+<p>Jusqu'ici, <strong>toutes</strong> les conditions rencontrées — $f'(t_0)=0$, $\nabla f(a)=0$, extrema liés, KKT — étaient <strong>nécessaires</strong> : elles produisaient des <strong>candidats</strong> qu'il fallait ensuite comparer. Le corollaire 3.11 renverse la situation :</p>
+<p>$$\boxed{\text{Dans le cadre convexe avec Slater, un point qui vérifie KKT EST la solution.}}$$</p>
+<p><strong>Plus de comparaison de valeurs. Plus d'étude de nature. Plus de points non qualifiés à traiter à part.</strong> Le tableau à cinq lignes de la fiche 605 devient inutile.</p>
+<p><strong>Les quatre hypothèses, à vérifier une par une :</strong></p>
+<table>
+<thead>
+<tr>
+<th>Hypothèse</th>
+<th>Ce qu'elle exclut</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$f$ <strong>convexe</strong></td>
+<td>les minima locaux non globaux</td>
+</tr>
+<tr>
+<td>$h_i$ <strong>affines</strong></td>
+<td>une contrainte d'égalité courbe, qui rendrait $K$ non convexe</td>
+</tr>
+<tr>
+<td>$g_j$ <strong>convexes</strong></td>
+<td>un ensemble admissible non convexe</td>
+</tr>
+<tr>
+<td><strong>Slater</strong> vérifiée</td>
+<td>les problèmes où la qualification échoue</td>
+</tr>
+</tbody></table>
+<p class="cal piege"> <strong>La deuxième est la plus restrictive</strong> : elle exclut le cercle $\{x^2+y^2=1\}$ de tous les exercices du chapitre 5 de M. Montaru. <strong>Une contrainte d'égalité doit être AFFINE</strong> pour que $K$ soit convexe — car $\{h=0\}$ n'est convexe, pour $h$ convexe, que si $h$ est affine.</p>
+<p><strong>Où le corollaire s'applique, concrètement</strong> : la <strong>programmation linéaire</strong> (tout est affine), la <strong>programmation quadratique convexe</strong> ($f$ quadratique définie positive, contraintes affines), le problème de <strong>transport optimal</strong> du §1.6 de M. Montaru, et l'essentiel des problèmes d'allocation en économie.</p>
+<p><strong>La vérification type, en une phrase</strong> : <em>« $f$ est convexe, les $h_i$ sont affines, les $g_j$ sont convexes, et le point $y = \dots$ vérifie strictement les inégalités non affines : les conditions de Slater sont satisfaites, donc par le corollaire 3.11, tout point vérifiant KKT est solution. »</em></p>
+</blockquote>
+<h2>Comment reconnaître le type de problème</h2>
+<table>
+<thead>
+<tr>
+<th>Ce que dit l'énoncé</th>
+<th>La bonne réaction</th>
+<th>L'outil</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>égalités seules</td>
+<td><strong>Lagrange</strong></td>
+<td>thm 3.2</td>
+</tr>
+<tr>
+<td>égalités <strong>et</strong> inégalités</td>
+<td><strong>KKT</strong></td>
+<td>thm 3.10</td>
+</tr>
+<tr>
+<td>« déterminer les candidats »</td>
+<td>le système de Lagrange, via $\nabla\mathcal L=0$</td>
+<td>le lagrangien</td>
+</tr>
+<tr>
+<td>« vérifier s'ils sont max ou min »</td>
+<td>ordre 2 <strong>sur le plan tangent</strong></td>
+<td>prop. 3.3</td>
+</tr>
+<tr>
+<td>deux contraintes qui se ressemblent</td>
+<td> <strong>soustrayez-les</strong> : régularité en danger</td>
+<td>exercice 3.2</td>
+</tr>
+<tr>
+<td>contraintes <strong>affines</strong></td>
+<td>régulier après élimination des redondances</td>
+<td>« Pour aller plus loin » (**)</td>
+</tr>
+<tr>
+<td>« interpréter $\lambda$ »</td>
+<td>sensibilité, prix fantôme</td>
+<td>prop. 3.4</td>
+</tr>
+<tr>
+<td>« quelle contrainte relâcher ? »</td>
+<td> le <strong>plus petit</strong> $\lambda$ si l'on <strong>minimise</strong></td>
+<td>exercice 3.6</td>
+</tr>
+<tr>
+<td>$f$ convexe, $h$ affines, $g$ convexes</td>
+<td> <strong>vérifiez Slater</strong> : KKT devient <strong>suffisant</strong></td>
+<td>corollaire 3.11</td>
+</tr>
+<tr>
+<td>qualification en échec</td>
+<td>théorème de <strong>John</strong>, avec $\mu_0$</td>
+<td>« Pour aller plus loin » (***)</td>
+</tr>
+</tbody></table>
+<p><strong>Le signal qui doit déclencher l'usage du corollaire 3.11</strong> : dès que l'énoncé donne (ou permet d'établir) la <strong>convexité de $f$</strong> avec des contraintes <strong>affines</strong>, ne cherchez plus à comparer les candidats — <strong>le premier point KKT trouvé est la réponse</strong>.</p>
+<h2>Comment résoudre ce type d'exercice</h2>
+<p><strong>Protocole « contraintes d'égalité » (§3.1) — cinq étapes.</strong></p>
+<ol>
+<li><strong>Régularité.</strong> Calculer les $\nabla h_i$ et vérifier qu'ils forment une famille libre <strong>sur $K$</strong>. Si deux contraintes se ressemblent, <strong>soustrayez-les</strong> avant tout (exercice 3.2).</li>
+<li><strong>Existence.</strong> Compact → Weierstrass ; fermé + coercivité → théorème 2.12 ; fortement convexe → théorème 2.14 (existence <strong>et</strong> unicité).</li>
+<li><strong>Le système $\nabla\mathcal L = 0$</strong> : $n+m$ équations, $n+m$ inconnues. Les $m$ dernières <strong>sont</strong> la contrainte.</li>
+<li><strong>Ordre 2, sur le plan tangent.</strong> Calculer $\nabla_x^2\mathcal L = \nabla^2f+\sum\lambda_i\nabla^2h_i$, paramétrer $T = \{d : \langle\nabla h_i,d\rangle = 0\}$, et lire le signe de $\langle\nabla_x^2\mathcal L\,d,d\rangle$ <strong>sur $T$ seulement</strong>.</li>
+<li><strong>Comparer</strong> les valeurs des candidats.</li>
+</ol>
+<p><strong>Protocole « avec inégalités » (§3.2) — quatre étapes.</strong></p>
+<ol>
+<li><strong>Écrire toutes les inégalités sous la forme $g_j\le0$</strong> et identifier $I(x)$.</li>
+<li><strong>Qualification</strong>, dans cet ordre de rapidité :<ul>
+<li>tout affine → <strong>polyèdre convexe</strong> → qualifié ;</li>
+<li>cadre convexe + un point strictement admissible → <strong>Slater</strong> (prop. 3.9) → <strong>toute</strong> la contrainte ;</li>
+<li>sinon → <strong>régularité</strong> ou <strong>Mangasarian-Fromowitz</strong>, point par point.</li>
+</ul>
+</li>
+<li><strong>KKT</strong>, en balayant les configurations d'activité $I \subset\{1,\dots,p\}$ : poser $\mu_j=0$ pour $j\notin I$, $g_j=0$ pour $j\in I$, résoudre, puis <strong>éliminer</strong> si le point sort de $K$ ou si un $\mu_j&lt;0$.</li>
+<li><strong>Conclure.</strong><ul>
+<li><em>Cadre convexe + Slater</em> → <strong>corollaire 3.11</strong> : le point trouvé <strong>est</strong> la solution, sans comparaison ;</li>
+<li><em>sinon</em> → comparer les valeurs, <strong>sans oublier les points non qualifiés</strong>.</li>
+</ul>
+</li>
+</ol>
+<p><strong>Comment calculer la restriction au plan tangent, sans erreur.</strong></p>
+<ol>
+<li>Résoudre $\langle\nabla h_i(x^\ast),d\rangle=0$ pour obtenir une <strong>base</strong> $(d^{(1)},\dots,d^{(N-m)})$ de $T$.</li>
+<li>Écrire $d = \sum t_k d^{(k)}$ et développer $\langle\nabla_x^2\mathcal L\,d,\ d\rangle$ en fonction des $t_k$.</li>
+<li>Étudier le signe de cette <strong>forme quadratique en $t$</strong>, de taille $N-m$ — beaucoup plus petite que $N$.</li>
+</ol>
+<p><strong>Le contrôle qui vaut de l'or</strong> : quand la contrainte se <strong>paramètre</strong> (une droite, un cercle), substituez et dérivez deux fois. Dans l'exercice 3.3, $\tilde f'' = -4$ redonne <strong>exactement</strong> la valeur trouvée sur le plan tangent.</p>
+<h2 data-prio="must">Common mistakes</h2>
+<ol>
+<li><strong>Confondre $g$ et $h$ entre les deux cours.</strong> M. Blanchet : $h$ = égalités, $g$ = inégalités. M. Montaru : l'<strong>inverse</strong>. Repérez-vous sur $\lambda$ (égalités) et $\mu$ (inégalités).</li>
+<li><strong>Oublier la régularité.</strong> L'exercice 3.2 montre un minimum qui existe et pour lequel le système de Lagrange n'a <strong>aucune</strong> solution.</li>
+<li><strong>Ne pas soustraire deux contraintes qui se ressemblent.</strong> C'est ce qui révèle instantanément la dégénérescence de l'exercice 3.2.</li>
+<li><strong>Étudier $\nabla^2f$ au lieu de $\nabla_x^2\mathcal L$.</strong> Elles ne coïncident que si les contraintes sont <strong>affines</strong>.</li>
+<li><strong>Étudier le signe sur $\mathbb{R}^N$ au lieu du plan tangent.</strong> Dans les exercices 3.3 et 3.4, la hessienne est <strong>indéfinie</strong> sur l'espace entier et <strong>définie négative</strong> sur le plan tangent.</li>
+<li><strong>Chercher à minimiser le lagrangien en $(x,\lambda)$.</strong> C'est un <strong>point selle</strong>, pas un minimum.</li>
+<li><strong>Oublier que $\nabla_\lambda\mathcal L = 0$ EST la contrainte.</strong> Ces $m$ équations font partie du système.</li>
+<li><strong>Se tromper de sens dans la question « quelle contrainte relâcher ? »</strong> Pour un <strong>minimum</strong>, on veut le $\lambda$ le <strong>plus petit</strong> ; pour un <strong>maximum</strong>, le plus grand.</li>
+<li><strong>Utiliser $\lambda$ pour une grande perturbation.</strong> C'est une <strong>dérivée</strong> : l'erreur est en $\varepsilon^2$ (exercice 3.6 : $1{,}3\times10^{-3}$ et $5{,}0\times10^{-3}$ pour $\varepsilon=0{,}1$).</li>
+<li><strong>Oublier la distinction affine / non affine dans la proposition 3.8.</strong> $&lt;$ strict pour les contraintes non affines, $\le$ large pour les affines.</li>
+<li><strong>Croire le théorème de John utile en pratique.</strong> Avec $\mu_0=0$, l'équation ne contient plus $f$ : elle n'apprend rien sur l'optimum.</li>
+<li><strong>Appliquer le corollaire 3.11 avec une contrainte d'égalité non affine.</strong> L'énoncé exige que les $h_i$ soient <strong>affines</strong> — un cercle ne convient pas, car $\{h=0\}$ ne serait pas convexe.</li>
+</ol>
+<h2>Ultimate Review</h2>
+<p><strong>Le chapitre 3 en un paragraphe.</strong> Sous des contraintes d'<strong>égalité</strong> $h_i=0$, un extremum en un point <strong>régulier</strong> — famille des $\nabla h_i$ libre — vérifie les <strong>conditions de Lagrange</strong> (thm 3.2), qui s'écrivent élégamment $\nabla\mathcal L(x,\lambda)=0$ pour le <strong>lagrangien</strong> $\mathcal L = f+\sum\lambda_ih_i$, les $m$ dernières équations étant la contrainte elle-même. À l'ordre 2, c'est $\nabla_x^2\mathcal L = \nabla^2f+\sum\lambda_i\nabla^2h_i$ qu'il faut examiner, et <strong>uniquement sur le plan tangent</strong> (prop. 3.3) — une matrice indéfinie sur $\mathbb{R}^N$ peut y être définie. Le multiplicateur $\lambda^\ast_j$ est la <strong>dérivée de la valeur optimale</strong> par rapport à un relâchement de la contrainte $j$ : le <strong>prix fantôme</strong> (prop. 3.4). Avec des <strong>inégalités</strong> $g_j\le0$, seules comptent les contraintes <strong>actives</strong> ; le <strong>cône tangent linéarisé</strong> (prop. 3.8) les traduit en conditions sur les directions, avec un $&lt;$ <strong>strict</strong> pour les non affines et un $\le$ large pour les affines. Sous <strong>qualification</strong> — polyèdre convexe, régularité, Mangasarian-Fromowitz ou <strong>Slater</strong> — le théorème de <strong>Karush-Kuhn-Tucker</strong> donne les conditions nécessaires. Et si de plus <strong>$f$ est convexe, les $h_i$ affines, les $g_j$ convexes et Slater vérifiée</strong>, le <strong>corollaire 3.11</strong> rend ces conditions <strong>suffisantes</strong>.</p>
+<p><strong>Les sept énoncés à savoir citer.</strong></p>
+<table>
+<thead>
+<tr>
+<th>N°</th>
+<th>Énoncé</th>
+<th>Usage</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>3.1</strong></td>
+<td>point <strong>régulier</strong> : $\{\nabla h_i\}$ libre</td>
+<td>l'hypothèse à vérifier</td>
+</tr>
+<tr>
+<td><strong>3.2</strong></td>
+<td><strong>Lagrange</strong> : $\nabla f+\sum\lambda_i\nabla h_i = 0$</td>
+<td>les candidats</td>
+</tr>
+<tr>
+<td>—</td>
+<td><strong>lagrangien</strong> $\mathcal L$, et $\nabla\mathcal L = 0$</td>
+<td>une seule équation</td>
+</tr>
+<tr>
+<td><strong>3.3</strong></td>
+<td>$\nabla_x^2\mathcal L\succeq0$ <strong>sur le plan tangent</strong></td>
+<td>la nature du candidat</td>
+</tr>
+<tr>
+<td><strong>3.4</strong></td>
+<td>$(f\circ x^\ast)'(0) = \lambda^\ast_j$</td>
+<td>le <strong>prix fantôme</strong></td>
+</tr>
+<tr>
+<td><strong>3.8</strong></td>
+<td><strong>cône tangent linéarisé</strong></td>
+<td>les directions admissibles</td>
+</tr>
+<tr>
+<td><strong>3.10 / 3.11</strong></td>
+<td><strong>KKT</strong>, et sa <strong>suffisance</strong> dans le cas convexe</td>
+<td>la conclusion</td>
+</tr>
+</tbody></table>
+<p><strong>Les réponses des sept exercices.</strong></p>
+<table>
+<thead>
+<tr>
+<th>Ex.</th>
+<th>Problème</th>
+<th>Réponse</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>3.1</strong></td>
+<td>$\min x^2+y^2$ sur $x+y=1$</td>
+<td>$\frac12$ en $\left(\frac12,\frac12\right)$, $\lambda=-1$</td>
+</tr>
+<tr>
+<td><strong>3.2</strong></td>
+<td>$\min x^2-y+z^2$ sur deux cercles tangents</td>
+<td>$K$ est <strong>l'axe des $z$</strong> ; min $0$ en $(0,0,0)$ ; <strong>aucun point régulier</strong>, Lagrange <strong>sans solution</strong></td>
+</tr>
+<tr>
+<td><strong>3.3</strong></td>
+<td>$\max 2xy$ sur $x+y=1$</td>
+<td>$\frac12$ en $\left(\frac12,\frac12\right)$ ; $\langle\nabla_x^2\mathcal L d,d\rangle = -4t^2 &lt; 0$ sur $T$</td>
+</tr>
+<tr>
+<td><strong>3.4</strong></td>
+<td>$\max 2xy+2xz+2yz$ sur $x+y+z=1$</td>
+<td>$\frac23$ en $\left(\frac13,\frac13,\frac13\right)$, $\lambda=-\frac43$ ; $-2\lVert d\rVert^2$ sur $T$</td>
+</tr>
+<tr>
+<td><strong>3.5</strong></td>
+<td>quatre problèmes en dimension 1</td>
+<td>$\lambda = 1$ et $10$, <strong>égaux</strong> aux dérivées $\frac{d}{d\varepsilon}$</td>
+</tr>
+<tr>
+<td><strong>3.6</strong></td>
+<td>$\min x+y$ sur cercle $\cap$ droite</td>
+<td>$-1$ en $(-1,0)$ ; $\lambda_1=\frac12$, $\lambda_2=-1$ ; <strong>relâcher $h_2$</strong></td>
+</tr>
+<tr>
+<td><strong>3.7</strong></td>
+<td>démontrer Slater</td>
+<td>perturber $d$ vers le point de Slater, puis passer à la limite</td>
+</tr>
+</tbody></table>
+<p><strong>La différence essentielle avec le cours de M. Montaru.</strong> Ce chapitre apporte <strong>trois choses</strong> que l'autre n'a pas :</p>
+<ol>
+<li>le <strong>formalisme du lagrangien</strong> — une seule fonction, une seule équation ;</li>
+<li>la <strong>condition d'ordre 2 sur le plan tangent</strong> (prop. 3.3) — qui permet enfin de <em>classer</em> les candidats des extrema liés, là où M. Montaru s'arrête aux conditions nécessaires ;</li>
+<li>le <strong>corollaire 3.11</strong> — la seule condition <strong>suffisante</strong> de tout le cursus.</li>
+</ol>
+<div class="rec"><h2>Active Recall</h2><details class="cor fiche">
+<summary><strong>1. Quelle est la différence de notation entre les deux cours, et comment ne pas s'y perdre ?</strong></summary><div class="in">
+
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Égalités</th>
+<th>Inégalités</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Montaru</strong></td>
+<td>$g_i=0$</td>
+<td>$h_j\le0$</td>
+</tr>
+<tr>
+<td><strong>Blanchet</strong></td>
+<td>$h_i=0$</td>
+<td>$g_j\le0$</td>
+</tr>
+</tbody></table>
+<p><strong>Les rôles de $g$ et $h$ sont INVERSÉS.</strong></p>
+<p><strong>La parade</strong> : les <strong>multiplicateurs</strong> portent les mêmes lettres dans les deux cours — $\lambda$ pour les <strong>égalités</strong>, $\mu$ pour les <strong>inégalités</strong>. Repérez-vous sur eux, jamais sur $g$ et $h$.</p>
+<p>En examen : utilisez la notation du professeur qui pose le sujet.</p>
+</div></details><details class="cor fiche">
+<summary><strong>2. Définir un point régulier et donner les ingrédients de la preuve du théorème 3.2.</strong></summary><div class="in">
+
+<p><strong>Point régulier</strong> (déf. 3.1) : $x_0\in K$ tel que $\{\nabla h_i(x_0)\}$ soit une <strong>famille libre</strong>. <em>(C'est la qualification (Q) de M. Montaru.)</em></p>
+<p><strong>Les trois ingrédients</strong> (À savoir 3.1) :</p>
+<ol>
+<li>la <strong>régularité</strong> fait de $K$ une <strong>sous-variété</strong> localement, d'espace tangent $\operatorname{Vect}\{\nabla h_i\}^\perp$ ;</li>
+<li>on <strong>dérive $f$ le long d'une courbe</strong> tracée dans $K$ : $(f\circ c)'(0)=0$, soit $\langle\nabla f(x^\ast),c'(0)\rangle=0$ ;</li>
+<li>ceci valant pour <strong>tout</strong> vecteur tangent, $\nabla f(x^\ast)\in\operatorname{Vect}\{\nabla h_i(x^\ast)\}$.</li>
+</ol>
+<p><strong>En une phrase</strong> : le gradient de $f$ ne doit avoir aucune composante <strong>le long</strong> de la contrainte.</p>
+</div></details><details class="cor fiche">
+<summary><strong>3. Résoudre l'exercice 3.2 et expliquer ce qu'il démontre.</strong></summary><div class="in">
+
+<p>$K = \{(x-1)^2+y^2=1\} \cap \{(x+1)^2+y^2=1\}$. <strong>Soustraire les deux équations</strong> donne $-4x=0$, donc $x=0$, puis $y=0$. Donc
+$$K = \{(0,0,z) : z\in\mathbb{R}\} \quad\text{— l'axe des } z .$$
+Sur $K$, $f = z^2$, donc <strong>$\min f = 0$ en $(0,0,0)$</strong>.</p>
+<p><strong>Mais</strong> : $\nabla h_1(0,0,z)=(-2,0,0)$ et $\nabla h_2(0,0,z)=(2,0,0)$ sont <strong>colinéaires</strong> — <strong>aucun point de $K$ n'est régulier</strong>.</p>
+<p><strong>Et le système de Lagrange n'a aucune solution</strong> : sa deuxième composante vaut $-1$ quels que soient $\lambda_1,\lambda_2$.</p>
+<p><strong>Ce que cela démontre</strong> : sans régularité, le théorème 3.2 est <strong>faux</strong>. Un extremum peut exister sans qu'aucun multiplicateur ne convienne. <em>(Le théorème de John le rattrape avec $\mu_0=0$, $\lambda_1=\lambda_2=1$ — mais l'équation ne contient alors plus $f$.)</em></p>
+</div></details><details class="cor fiche">
+<summary><strong>4. Qu'est-ce que le lagrangien, et quel est son intérêt ?</strong></summary><div class="in">
+
+<p>$$\mathcal L(x,\lambda) = f(x)+\sum_{i=1}^m\lambda_ih_i(x), \qquad \nabla\mathcal L = \begin{pmatrix}\nabla f+\sum\lambda_i\nabla h_i\\ h_i\end{pmatrix}.$$</p>
+<p><strong>$x^\ast$ est un extremum lié si et seulement si $(x^\ast,\lambda^\ast)$ est un point critique de $\mathcal L$.</strong></p>
+<p><strong>L'intérêt</strong> : les $n$ conditions de Lagrange <strong>et</strong> les $m$ équations de contrainte deviennent <strong>une seule</strong> équation $\nabla\mathcal L = 0$ en $n+m$ inconnues. Comme $\nabla_\lambda\mathcal L = h_i$, <strong>on ne peut pas oublier la contrainte</strong>.</p>
+<p class="cal piege"> Un point critique de $\mathcal L$ est typiquement un <strong>point selle</strong> (minimum en $x$, maximum en $\lambda$) — ne cherchez jamais à minimiser $\mathcal L$ en $(x,\lambda)$.</p>
+</div></details><details class="cor fiche">
+<summary><strong>5. Énoncer la proposition 3.3 et dire quelles sont ses deux particularités.</strong></summary><div class="in">
+
+<p>Si $x^\ast$ régulier est un <strong>minimum local</strong>, alors
+$$\langle\nabla_x^2\mathcal L\,d,\ d\rangle\ \ge\ 0 \qquad \forall d \text{ tel que } \langle\nabla h_i(x^\ast),d\rangle = 0\ \forall i,$$
+avec $\nabla_x^2\mathcal L = \nabla^2f+\sum\lambda_i\nabla^2h_i$.</p>
+<p><strong>Les deux particularités :</strong></p>
+<ol>
+<li>ce n'est <strong>pas $\nabla^2f$</strong> mais la hessienne <strong>du lagrangien</strong> — $f$ corrigée par la courbure des contraintes ; les deux coïncident seulement si les $h_i$ sont <strong>affines</strong> ;</li>
+<li>la condition n'est exigée que sur le <strong>plan tangent</strong>, pas sur $\mathbb{R}^N$. Une matrice <strong>indéfinie</strong> sur l'espace entier peut y être <strong>définie</strong> — c'est le cas dans les exercices 3.3 et 3.4.</li></ol></div></details><details class="cor fiche">
+<summary><strong>6. Résoudre l'exercice 3.4 et détailler le calcul sur le plan tangent.</strong></summary><div class="in">
+
+<p>$\max 2xy+2xz+2yz$ sur $x+y+z=1$. Le système donne $x=y=z$, donc $x^\ast = \left(\frac13,\frac13,\frac13\right)$, $\lambda=-\frac43$, $f = \frac23$.</p>
+<p><strong>Ordre 2</strong> : la contrainte est affine donc $\nabla_x^2\mathcal L = \nabla^2f = \begin{pmatrix}0&amp;2&amp;2\\2&amp;0&amp;2\\2&amp;2&amp;0\end{pmatrix}$, <strong>indéfinie</strong> sur $\mathbb{R}^3$ (valeurs propres $4,-2,-2$).</p>
+<p><strong>Sur le plan tangent</strong> $\{d_1+d_2+d_3=0\}$ : de $(d_1+d_2+d_3)^2=0$ on tire $d_1d_2+d_1d_3+d_2d_3 = -\frac{\lVert d\rVert^2}{2}$, d'où
+$$\langle\nabla^2f\,d,d\rangle = 4\left(-\frac{\lVert d\rVert^2}{2}\right) = -2\lVert d\rVert^2 &lt; 0 .$$</p>
+<p><strong>Définie négative sur $T$ : c'est un maximum</strong> . <em>(Contrôle numérique : le rapport vaut $-2{,}000000$ sur $2\times10^5$ directions tangentes.)</em></p>
+</div></details><details class="cor fiche">
+<summary><strong>7. Énoncer la proposition 3.4 et ses quatre noms économiques.</strong></summary><div class="in">
+
+<p>En perturbant la contrainte $j$ en $h_j(x)+\varepsilon=0$ :
+$$\frac{d}{d\varepsilon}f\bigl(x^\ast(\varepsilon)\bigr)\Big|_{\varepsilon=0} = \lambda^\ast_j, \qquad \text{soit} \qquad f\bigl(x^\ast(\varepsilon)\bigr) = f(x^\ast)+\varepsilon\lambda^\ast_j+o(\varepsilon).$$</p>
+<p><strong>Les quatre noms</strong> : <strong>prix fantôme</strong> (<em>shadow price</em>), <strong>valeur interne</strong>, <strong>profit marginal de l'argent</strong>, <strong>profit d'opportunité</strong>.</p>
+<p><strong>L'interprétation</strong> : $\lambda^\ast_j$ mesure la <strong>sensibilité de la valeur optimale à la relaxation de la contrainte $j$</strong>. Un euro de budget de plus sur la contrainte $j$ fait varier l'optimum de $\lambda^\ast_j$.</p>
+<p><strong>Vérification minimale (exercice 3.5)</strong> : $\min(-x)$ sur $\{x=0\}$ donne $\lambda=1$, et sur $\{x+\varepsilon=0\}$ la valeur optimale est $\varepsilon$, de dérivée $1$ . Avec $-10x$ : $\lambda=10$ et valeur $10\varepsilon$ .</p>
+</div></details><details class="cor fiche">
+<summary><strong>8. Résoudre l'exercice 3.6 et répondre à sa question 6.</strong></summary><div class="in">
+
+<p>$\min(x+y)$ sur $\{x^2+y^2=1,\ y=0\}$ : $K=\{(\pm1,0)\}$, minimum $-1$ en $(-1,0)$, avec $\lambda_1=\frac12$ et $\lambda_2=-1$.</p>
+<table>
+<thead>
+<tr>
+<th>Contrainte relâchée de $\varepsilon=0{,}1$</th>
+<th>Prédiction</th>
+<th>Exact</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$h_1$ (cercle)</td>
+<td>$-1+\frac\varepsilon2 = -0{,}95$</td>
+<td>$-\sqrt{0{,}9} = -0{,}9486833$</td>
+</tr>
+<tr>
+<td>$h_2$ (droite)</td>
+<td>$-1-\varepsilon = -1{,}1$</td>
+<td>$-\sqrt{0{,}99}-0{,}1 = -1{,}0949874$</td>
+</tr>
+</tbody></table>
+<p><strong>On MINIMISE, donc la plus petite valeur gagne : il vaut mieux relâcher $h_2$</strong>, celle dont $\lambda$ est le <strong>plus petit</strong> ($-1 &lt; \frac12$).</p>
+<p class="cal piege"> Chez M. Montaru, la même règle est énoncée pour une <strong>maximisation</strong>, où c'est le <strong>plus grand</strong> $\lambda$ qu'on retient. <strong>Le critère dépend du sens de l'optimisation.</strong></p>
+<p>Les erreurs de prédiction ($1{,}3\times10^{-3}$ et $5{,}0\times10^{-3}$) sont bien d'ordre $\varepsilon^2$ .</p>
+</div></details><details class="cor fiche">
+<summary><strong>9. Énoncer la proposition 3.8 et expliquer la distinction affine / non affine.</strong></summary><div class="in">
+
+<p>$d$ est une direction admissible si :</p>
+<ol>
+<li>$\langle\nabla h_i(x),d\rangle = 0$ pour toutes les <strong>égalités</strong> ;</li>
+<li>pour les <strong>inégalités actives</strong> : $\langle\nabla g_j(x),d\rangle &lt; 0$ si $g_j$ <strong>n'est pas affine</strong>, et $\le 0$ si $g_j$ <strong>est affine</strong>. Les inégalités <strong>inactives</strong> n'imposent rien.</li>
+</ol>
+<p><strong>Pourquoi le cas affine autorise le $\le$</strong> : si $g_j$ est affine, $g_j(x+\alpha d)=g_j(x)+\alpha\langle\nabla g_j,d\rangle$ <strong>exactement</strong>, sans reste. Avec $g_j(x)=0$ et $\langle\nabla g_j,d\rangle=0$, on reste <strong>sur</strong> le mur, donc dans $K$.</p>
+<p>Si $g_j$ n'est pas affine, un terme d'ordre 2 de signe inconnu peut faire sortir : <strong>il faut une marge stricte</strong> pour que l'ordre 1 domine.</p>
+</div></details><details class="cor fiche">
+<summary><strong>10. Énoncer le corollaire 3.11 et dire pourquoi c'est le résultat le plus fort du cours.</strong></summary><div class="in">
+
+<p>Si <strong>$f$ est convexe</strong>, les <strong>$h_i$ affines</strong>, les <strong>$g_j$ convexes</strong> et <strong>Slater</strong> est vérifiée, alors les conditions <strong>KKT sont SUFFISANTES</strong> : un point qui les vérifie <strong>est</strong> solution.</p>
+<p><strong>Pourquoi c'est le plus fort</strong> : toutes les autres conditions du cursus — $f'(t_0)=0$, $\nabla f(a)=0$, extrema liés, KKT — sont <strong>nécessaires</strong> et ne produisent que des <strong>candidats</strong> à comparer. Ici, <strong>plus de comparaison, plus d'étude de nature, plus de points non qualifiés à traiter</strong>.</p>
+<p class="cal piege"> <strong>L'hypothèse la plus restrictive est « $h_i$ affines »</strong> : elle exclut le cercle $\{x^2+y^2=1\}$, car $\{h=0\}$ n'est convexe, pour $h$ convexe, que si $h$ est affine.</p>
+<p><strong>Où il s'applique</strong> : programmation linéaire, programmation quadratique convexe, transport optimal, allocation en économie.</p>
+</div></details></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h2>Flashcards</h2>
+<table>
+<thead>
+<tr>
+<th>Question</th>
+<th>Réponse</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Chez Blanchet, les égalités s'écrivent ?</td>
+<td>$h_i(x)=0$</td>
+</tr>
+<tr>
+<td>Les inégalités ?</td>
+<td>$g_j(x)\le0$</td>
+</tr>
+<tr>
+<td>Chez Montaru ?</td>
+<td><strong>L'inverse</strong></td>
+</tr>
+<tr>
+<td>Comment ne pas s'y perdre ?</td>
+<td>$\lambda$ = égalités, $\mu$ = inégalités</td>
+</tr>
+<tr>
+<td>Point régulier (déf. 3.1) ?</td>
+<td>$\{\nabla h_i(x_0)\}$ est une <strong>famille libre</strong></td>
+</tr>
+<tr>
+<td>Son autre nom ?</td>
+<td>Point <strong>qualifié</strong></td>
+</tr>
+<tr>
+<td>Théorème 3.2 ?</td>
+<td>$\nabla f(x^\ast)+\sum\lambda^\ast_i\nabla h_i(x^\ast)=0$</td>
+</tr>
+<tr>
+<td>Son hypothèse ?</td>
+<td>$x^\ast$ <strong>régulier</strong></td>
+</tr>
+<tr>
+<td>L'idée de sa preuve ?</td>
+<td>Dériver $f$ le long d'une <strong>courbe</strong> de $K$</td>
+</tr>
+<tr>
+<td>Contraintes affines : régularité ?</td>
+<td>Toujours, après élimination des <strong>redondances</strong></td>
+</tr>
+<tr>
+<td>Lagrangien ?</td>
+<td>$\mathcal L(x,\lambda)=f(x)+\sum\lambda_ih_i(x)$</td>
+</tr>
+<tr>
+<td>$\nabla_\lambda\mathcal L$ vaut ?</td>
+<td>La <strong>contrainte</strong> $h_i(x)$</td>
+</tr>
+<tr>
+<td>$x^\ast$ extremum lié ⟺ ?</td>
+<td>$(x^\ast,\lambda^\ast)$ <strong>point critique</strong> de $\mathcal L$</td>
+</tr>
+<tr>
+<td>Est-ce un minimum de $\mathcal L$ ?</td>
+<td><strong>Non</strong> — un point <strong>selle</strong></td>
+</tr>
+<tr>
+<td>Proposition 3.3 ?</td>
+<td>$\nabla_x^2\mathcal L\succeq0$ <strong>sur le plan tangent</strong></td>
+</tr>
+<tr>
+<td>$\nabla_x^2\mathcal L$ vaut ?</td>
+<td>$\nabla^2f+\sum\lambda_i\nabla^2h_i$</td>
+</tr>
+<tr>
+<td>Quand vaut-elle $\nabla^2f$ ?</td>
+<td>Contraintes <strong>affines</strong></td>
+</tr>
+<tr>
+<td>Le plan tangent ?</td>
+<td>$\{d : \langle\nabla h_i(x^\ast),d\rangle=0\}$</td>
+</tr>
+<tr>
+<td>Sa dimension ?</td>
+<td>$N-m$</td>
+</tr>
+<tr>
+<td>Exercice 3.1 : réponse ?</td>
+<td>$\frac12$ en $\left(\frac12,\frac12\right)$, $\lambda=-1$</td>
+</tr>
+<tr>
+<td>Exercice 3.2 : que vaut $K$ ?</td>
+<td><strong>L'axe des $z$</strong></td>
+</tr>
+<tr>
+<td>Le minimum ?</td>
+<td>$0$ en $(0,0,0)$</td>
+</tr>
+<tr>
+<td>Les gradients y sont ?</td>
+<td><strong>Colinéaires</strong> : aucun point régulier</td>
+</tr>
+<tr>
+<td>Le système de Lagrange ?</td>
+<td><strong>Aucune solution</strong> (2e ligne $=-1$)</td>
+</tr>
+<tr>
+<td>Ce que l'exercice démontre ?</td>
+<td>La régularité est <strong>indispensable</strong></td>
+</tr>
+<tr>
+<td>Exercice 3.3 : le candidat ?</td>
+<td>$\left(\frac12,\frac12\right)$, $f=\frac12$</td>
+</tr>
+<tr>
+<td>$\nabla^2f$ sur $\mathbb{R}^2$ ?</td>
+<td><strong>Indéfinie</strong> ($\pm2$)</td>
+</tr>
+<tr>
+<td>Sur le plan tangent ?</td>
+<td>$-4t^2 &lt; 0$ : <strong>maximum</strong></td>
+</tr>
+<tr>
+<td>Le contrôle par réduction ?</td>
+<td>$\tilde f = 2x(1-x)$, $\tilde f''=-4$ </td>
+</tr>
+<tr>
+<td>Exercice 3.4 : le candidat ?</td>
+<td>$\left(\frac13,\frac13,\frac13\right)$, $f=\frac23$, $\lambda=-\frac43$</td>
+</tr>
+<tr>
+<td>Sur le plan tangent ?</td>
+<td>$-2\lVert d\rVert^2$ : <strong>maximum</strong></td>
+</tr>
+<tr>
+<td>L'astuce du calcul ?</td>
+<td>$(d_1+d_2+d_3)^2=0$</td>
+</tr>
+<tr>
+<td>Proposition 3.4 ?</td>
+<td>$(f\circ x^\ast)'(0)=\lambda^\ast_j$</td>
+</tr>
+<tr>
+<td>Le développement ?</td>
+<td>$f(x^\ast)+\varepsilon\lambda^\ast_j+o(\varepsilon)$</td>
+</tr>
+<tr>
+<td>Les quatre noms de $\lambda$ ?</td>
+<td>Prix fantôme, valeur interne, profit marginal, profit d'opportunité</td>
+</tr>
+<tr>
+<td>Exercice 3.5 : les deux $\lambda$ ?</td>
+<td>$1$ et $10$</td>
+</tr>
+<tr>
+<td>Exercice 3.6 : $\lambda_1$ et $\lambda_2$ ?</td>
+<td>$\frac12$ et $-1$</td>
+</tr>
+<tr>
+<td>Quelle contrainte relâcher ?</td>
+<td>$h_2$ — le <strong>plus petit</strong> $\lambda$ (on minimise)</td>
+</tr>
+<tr>
+<td>Chez Montaru, la règle ?</td>
+<td>Le <strong>plus grand</strong> — mais il <strong>maximise</strong></td>
+</tr>
+<tr>
+<td>L'erreur de la prédiction ?</td>
+<td>D'ordre $\varepsilon^2$</td>
+</tr>
+<tr>
+<td>Contrainte active (déf. 3.5) ?</td>
+<td>$g_j(x_0)=0$</td>
+</tr>
+<tr>
+<td>L'ensemble des actives ?</td>
+<td>$I(x_0)$</td>
+</tr>
+<tr>
+<td>Direction admissible (déf. 3.7) ?</td>
+<td>$x+\alpha d\in K$ pour $\alpha\in[0,\eta[$</td>
+</tr>
+<tr>
+<td>Cône linéarisé, égalités ?</td>
+<td>$\langle\nabla h_i,d\rangle=0$</td>
+</tr>
+<tr>
+<td>Inégalités actives non affines ?</td>
+<td>$\langle\nabla g_j,d\rangle &lt; 0$ <strong>strict</strong></td>
+</tr>
+<tr>
+<td>Inégalités actives affines ?</td>
+<td>$\le0$ <strong>large</strong></td>
+</tr>
+<tr>
+<td>Pourquoi cette différence ?</td>
+<td>L'affine n'a <strong>pas de reste</strong> d'ordre 2</td>
+</tr>
+<tr>
+<td>Cône de Bouligand ?</td>
+<td>Le <strong>vrai</strong> cône tangent, par les suites</td>
+</tr>
+<tr>
+<td>Qualifié signifie ?</td>
+<td>Linéarisé $=$ vrai cône tangent</td>
+</tr>
+<tr>
+<td>Les quatre qualifications citées ?</td>
+<td>Polyèdre convexe, régulier, Mangasarian-Fromowitz, <strong>Slater</strong></td>
+</tr>
+<tr>
+<td>Slater (prop. 3.9) ?</td>
+<td>Un point $y$ vérifiant <strong>strictement</strong> les inégalités non affines</td>
+</tr>
+<tr>
+<td>Sa portée ?</td>
+<td><strong>Toute</strong> la contrainte</td>
+</tr>
+<tr>
+<td>Théorème 3.10 ?</td>
+<td><strong>KKT</strong>, dû à Karush (<strong>1939</strong>) et Kuhn-Tucker (1951)</td>
+</tr>
+<tr>
+<td>Ses trois conditions ?</td>
+<td>Admissibilité, <strong>complémentarité</strong>, <strong>positivité</strong></td>
+</tr>
+<tr>
+<td>$(3.7)$ se réécrit ?</td>
+<td>$\nabla_x\mathcal L(x^\ast,\lambda^\ast,\mu^\ast)=0$</td>
+</tr>
+<tr>
+<td>Théorème de John (1948) ?</td>
+<td>KKT avec un coefficient $\mu_0$ devant $\nabla f$</td>
+</tr>
+<tr>
+<td>Son intérêt ?</td>
+<td>Vrai <strong>sans qualification</strong></td>
+</tr>
+<tr>
+<td>Sa limite ?</td>
+<td>Si $\mu_0=0$, l'équation ne contient plus $f$</td>
+</tr>
+<tr>
+<td><strong>Corollaire 3.11</strong> ?</td>
+<td>Cas convexe + Slater ⟹ KKT <strong>SUFFISANTE</strong></td>
+</tr>
+<tr>
+<td>Ses quatre hypothèses ?</td>
+<td>$f$ convexe, $h_i$ <strong>affines</strong>, $g_j$ convexes, Slater</td>
+</tr>
+<tr>
+<td>La plus restrictive ?</td>
+<td>$h_i$ <strong>affines</strong> — exclut le cercle</td>
+</tr>
+<tr>
+<td>Pourquoi c'est le plus fort du cours ?</td>
+<td>La <strong>seule</strong> condition <strong>suffisante</strong></td>
+</tr>
+<tr>
+<td>Ce qu'il supprime ?</td>
+<td>La comparaison des candidats</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+</main>
+
+
+
+
+</body></html>

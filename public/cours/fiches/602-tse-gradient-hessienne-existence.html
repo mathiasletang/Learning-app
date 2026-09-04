@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fiche 602 — Gradient, hessienne, Taylor à l'ordre 2 et existence en dimension $n$</title>
+<script>
+window.MathJax={tex:{inlineMath:[["$","$"]],displayMath:[["$$","$$"]],processEscapes:true},
+ options:{skipHtmlTags:["script","noscript","style","textarea","pre","code"]},
+ svg:{fontCache:"global"},
+ startup:{pageReady:()=>MathJax.startup.defaultPageReady().then(()=>{document.body.classList.add("ready")})}};
+setTimeout(function(){document.body.classList.add("ready")},2500);
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+/* ============================================================
+   MathiasLearn — feuille de style des fiches
+   Reprise intégrale des tokens de 00_PARCOURS/*.html
+   + blocs pédagogiques (callouts, méthode, essentiels, recall)
+   ============================================================ */
+:root{--bg:#faf9f7;--card:#fff;--ink:#1a1a1a;--muted:#6b6b6b;--line:#e5e2dd;--accent:#8b5e34;
+ --hl:#fdf8ef;--ok:#2d7d4f;--okbg:#f0f7f3;--warn:#b3402f;--warnbg:#fdf3f1;--blue:#2f5d8b;--bluebg:#f1f5fa}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+ font:17px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;padding:0 16px 100px}
+.nav{position:sticky;top:0;background:rgba(250,249,247,.96);backdrop-filter:blur(8px);
+ border-bottom:1px solid var(--line);margin:0 -16px 30px;padding:11px 16px;z-index:50;
+ display:flex;gap:6px;flex-wrap:wrap;font-size:13px}
+.nav a{color:var(--muted);text-decoration:none;padding:4px 9px;border-radius:5px;white-space:nowrap}
+.nav a:hover{background:var(--line);color:var(--ink)}
+.nav a.on{background:var(--accent);color:#fff}
+main{max-width:780px;margin:0 auto}
+h1{font-size:31px;letter-spacing:-.02em;margin:.4em 0 .5em;line-height:1.25}
+h2{font-size:23px;margin:2.2em 0 .7em;padding-bottom:.3em;border-bottom:1px solid var(--line)}
+h3{font-size:19px;margin:1.9em 0 .5em;color:var(--accent)}
+h4{font-size:17px;margin:1.5em 0 .4em}
+p{margin:.8em 0} a{color:var(--accent)} hr{border:0;border-top:1px solid var(--line);margin:2.6em 0}
+table{border-collapse:collapse;width:100%;margin:1.3em 0;font-size:15.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+th{background:#f3f0eb;font-weight:600}
+tr:nth-child(even) td{background:#fcfbfa}
+code{font-family:"SF Mono",Menlo,Consolas,monospace;font-size:.88em;background:#f2efea;padding:2px 6px;border-radius:4px;overflow-wrap:break-word}
+pre{background:#f2efea;padding:14px 16px;border-radius:8px;overflow-x:auto}
+pre code{background:none;padding:0;white-space:pre}
+blockquote{border-left:3px solid var(--accent);background:var(--hl);margin:1.4em 0;padding:14px 20px;border-radius:0 8px 8px 0}
+blockquote p:first-child{margin-top:0} blockquote p:last-child{margin-bottom:0}
+ul,ol{padding-left:1.5em} li{margin:.35em 0} em{color:#4a4a4a}
+mjx-container[display="true"]{margin:1.1em 0!important;overflow-x:auto;overflow-y:hidden;padding:2px 0}
+mjx-container svg{max-width:100%}
+body:not(.ready) main{opacity:0} main{opacity:1;transition:opacity .25s}
+
+/* --- bandeau de tête de fiche --- */
+.cours{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--accent);
+ border-radius:0 10px 10px 0;padding:18px 22px;margin:0 0 34px}
+.cours h4{margin:0 0 4px;font-size:14px;text-transform:uppercase;letter-spacing:.07em;color:var(--accent)}
+.cours .cs{color:var(--muted);font-size:14.5px;margin:0 0 14px}
+
+/* --- exercices / corrigés --- */
+.ex{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:6px 24px 20px;margin:18px 0}
+.ex>h3:first-child{margin-top:14px}
+details.cor{margin-top:18px;border:1px solid var(--line);border-radius:8px;background:#fcfbfa;overflow:hidden}
+details.cor>summary{cursor:pointer;padding:12px 16px;font-weight:600;font-size:15px;color:var(--accent);
+ list-style:none;display:flex;align-items:center;gap:9px;user-select:none;transition:.15s;min-height:44px}
+details.cor>summary::-webkit-details-marker{display:none}
+details.cor>summary:hover{background:var(--hl)}
+details.cor>summary::before{content:"\25B6";font-size:10px;transition:transform .18s;display:inline-block}
+details.cor[open]>summary::before{transform:rotate(90deg)}
+details.cor[open]>summary{background:var(--okbg);color:var(--ok);border-bottom:1px solid var(--line)}
+.cor .in{padding:4px 20px 16px}
+.cor .in>*:first-child{margin-top:.9em}
+
+/* --- blocs pédagogiques (callouts) ---
+   Générés depuis une citation Markdown dont le premier **gras** commence
+   par un mot-clé : DÉFINITION, THÉORÈME, MÉTHODE, PIÈGE, INTUITION… */
+.cal{border:1px solid var(--line);border-left:4px solid var(--accent);background:var(--card);
+ border-radius:0 10px 10px 0;padding:15px 20px;margin:1.5em 0}
+.cal>p:first-child{margin-top:0}.cal>p:last-child,.cal>ul:last-child,.cal>ol:last-child{margin-bottom:0}
+.cal .lab{display:block;font-size:12.5px;text-transform:uppercase;letter-spacing:.08em;
+ font-weight:700;color:var(--accent);margin-bottom:6px}
+.cal.formel{background:var(--hl)}
+.cal.piege{border-left-color:var(--warn);background:var(--warnbg)}
+.cal.piege .lab{color:var(--warn)}
+.cal.methode{border-left-color:var(--ok);background:var(--okbg)}
+.cal.methode .lab{color:var(--ok)}
+.cal.intu{border-left-color:var(--blue);background:var(--bluebg)}
+.cal.intu .lab{color:var(--blue)}
+.cal.plus{border-left-style:dashed;background:#faf9f7}
+.cal.plus .lab{color:var(--muted)}
+
+/* --- révision express --- */
+.ess{background:var(--card);border:1px solid var(--accent);border-radius:10px;padding:4px 24px 20px;margin:1.6em 0}
+.ess h3{margin-top:1.3em}
+.rec{background:var(--card);border:1px dashed var(--accent);border-radius:10px;padding:4px 24px 18px;margin:1.6em 0}
+.rec ol{counter-reset:none}
+
+/* --- impression / PDF --- */
+@media print{
+ .nav{display:none}
+ body{padding:0;background:#fff;font-size:11.2pt;line-height:1.55}
+ main{max-width:none}
+ h1{font-size:23pt}h2{font-size:15pt;margin-top:1.5em}h3{font-size:12.6pt}
+ h2,h3,h4{break-after:avoid;page-break-after:avoid}
+ table,.cal,blockquote{break-inside:avoid;page-break-inside:avoid}
+ table{display:table;font-size:9.6pt}
+ details.cor{border:1px solid var(--line);background:#fcfbfa}
+ /* Les corriges des series ont un titre generique (« Voir le corrige ») :
+    inutile sur papier. Les fiches de l app ont un VRAI titre — enonce de
+    l exercice, question d Active Recall — qu il faut garder. */
+ details.cor:not(.fiche)>summary{display:none}
+ details.cor.fiche[open]>summary{display:block;background:none;color:var(--ink);
+  font-weight:700;font-size:11.6pt;padding:10px 16px 0;min-height:0;
+  border-bottom:none;break-after:avoid;page-break-after:avoid}
+ details.cor.fiche>summary::before{content:""}
+ details.cor .in{padding-top:10px}
+ .cal,.ex,.ess,.rec{box-shadow:none}
+ a{color:var(--ink);text-decoration:none}
+}
+@page{margin:16mm 15mm 18mm}
+
+/* --- exemples travaillés --- */
+.exm{background:#fcfbfa;border:1px solid var(--line);border-radius:10px;padding:2px 20px 14px;margin:1.5em 0}
+.exm>h4:first-child{margin:14px 0 .5em;color:var(--accent);font-size:13px;text-transform:uppercase;letter-spacing:.07em}
+
+
+/* --- pastilles de priorité (conventions des fiches de l'app) --- */
+h2[data-prio], h3[data-prio], h4[data-prio]{position:relative}
+h2[data-prio]::before,h3[data-prio]::before,h4[data-prio]::before{
+ content:"";display:inline-block;width:9px;height:9px;border-radius:50%;
+ margin-right:9px;vertical-align:middle;background:var(--muted)}
+[data-prio="must"]::before{background:var(--warn)}
+[data-prio="high"]::before{background:#d98324}
+[data-prio="mid"]::before{background:#c9a227}
+[data-prio="low"]::before{background:var(--ok)}
+/* corrigés des fiches de l'app : même traitement que les corrigés des séries */
+details.cor>summary::after{content:""}
+</style></head><body>
+<div class="nav"><a href="00_COMMENCER_ICI.html">Commencer ici</a><a href="01_NOTATIONS_le-decodeur.html">Notations</a><a href="02_EXERCICES_Serie-0.html">Série 0 — Remise en route</a><a href="03_EXERCICES_Serie-1.html">Série 1 — Convexité</a><a href="04_EXERCICES_Serie-2.html">Série 2 — KKT</a><a href="05_AUTO-EVALUATION.html">Auto-évaluation (quiz)</a><a href="06_FICHE_Optimisation-deux-variables.html">Fiche — Optimisation à 2 variables</a></div>
+<main><h1>Fiche 602 — Gradient, hessienne, Taylor à l'ordre 2 et existence en dimension $n$</h1>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Matière</strong></td>
+<td>Maths · Optimisation — <strong>cours suivi cette année</strong></td>
+</tr>
+<tr>
+<td><strong>Cours source</strong></td>
+<td>Montaru, <em>Optimisation</em>, TSE, 16 mars 2025 — <strong>chapitre 4, §4.1 et §4.2</strong>, p. 19–21</td>
+</tr>
+<tr>
+<td><strong>Difficulté</strong></td>
+<td> Must know — les objets de tout le reste du cours</td>
+</tr>
+<tr>
+<td><strong>Temps d'étude estimé</strong></td>
+<td>2 h</td>
+</tr>
+<tr>
+<td><strong>Prérequis</strong></td>
+<td>Fiches 600 (compacts, coercivité) et 601 (Taylor-Young en dimension 1)</td>
+</tr>
+<tr>
+<td><strong>Concepts clés</strong></td>
+<td>$C^1$, $C^2$, gradient, Taylor-Young à l'ordre 1 et 2, matrice hessienne, forme quadratique, la fonction $\varphi(t)=f(a+th)$, existence sur un compact, coercivité sur un fermé non borné</td>
+</tr>
+<tr>
+<td><strong>Poids à l'examen</strong></td>
+<td>La <strong>proposition 4.6</strong> ($\varphi(t) = f(a+th)$) est la clé de toutes les preuves du chapitre : elle ramène la dimension $n$ à la dimension 1. Les <strong>théorèmes 4.7 et 4.9</strong> sont la question 1 de chaque exercice.</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>Convention.</strong> Les énoncés numérotés sont ceux de M. Montaru. Les démonstrations et les exemples chiffrés sont des <strong>reconstructions</strong> signalées comme telles — le polycopié annonce que les preuves sont faites au tableau.</p>
+</blockquote>
+<h2>Vue d'ensemble</h2>
+<pre><code>LES DEUX OBJETS DU CHAPITRE 4
+
+  GRADIENT  ∇f(a) ∈ ℝⁿ           un VECTEUR    — l'ordre 1
+     ∇f(a) = ( ∂f/∂x₁(a), … , ∂f/∂xₙ(a) )ᵀ
+
+  HESSIENNE H_f(a) ∈ Sₙ(ℝ)       une MATRICE SYMÉTRIQUE — l'ordre 2
+     H_f(a)ᵢⱼ = ∂²f/∂xᵢ∂xⱼ (a)
+
+
+LES DEUX FORMULES QUI LES METTENT EN JEU
+
+  ordre 1 (prop. 4.3)   f(a+h) = f(a) + ⟨∇f(a), h⟩ + o(h)
+  ordre 2 (prop. 4.5)   f(a+h) = f(a) + ⟨∇f(a), h⟩ + ½⟨h, H_f(a)h⟩ + ε(h)‖h‖²
+                                   └─ linéaire ─┘   └── quadratique ──┘
+
+
+LE PONT AVEC LA DIMENSION 1 (prop. 4.6) — la clé de toutes les preuves
+
+  φ(t) = f(a + th)     « je regarde f le long de la droite qui part de a
+                         dans la direction h »
+
+  φ'(0)  = ⟨∇f(a), h⟩        ←  l'ordre 1 devient un nombre
+  φ''(0) = ⟨h, H_f(a)h⟩      ←  l'ordre 2 devient un nombre
+
+  ⟹  tout énoncé du chapitre 3 se transporte, direction par direction
+
+
+L'EXISTENCE (§4.2) — deux théorèmes, exactement comme au chapitre 2
+
+  A compact       + f continue                 → thm 4.7   min ET max
+  A fermé NON borné + f continue + f coercive  → thm 4.9   min
+                                  f → −∞       → thm 4.9   max
+
+  ⚠ l'existence ne dit RIEN de l'UNICITÉ : f(x₁,x₂) = x₁² est minimale
+     sur TOUTE la droite x₁ = 0
+</code></pre>
+<h2 data-prio="must">Concept 1 — Classes $C^1$, $C^2$ et gradient (déf. 4.1, 4.2)</h2>
+<p><strong>Définition 4.1 (cours).</strong> Soit $U$ un ouvert de $\mathbb{R}^n$ et $f : U \to \mathbb{R}$.</p>
+<ul>
+<li>$f$ est de classe $C^1$ sur $U$ (noté $f \in C^1(U)$) si toutes les dérivées partielles <strong>premières</strong> de $f$ existent et sont <strong>continues</strong> sur $U$.</li>
+<li>$f$ est de classe $C^2$ sur $U$ si toutes les dérivées partielles premières <strong>et secondes</strong> existent et sont continues sur $U$.</li>
+</ul>
+<p><strong>Définition 4.2 (cours).</strong> Si $f \in C^1(U)$, on définit pour tout $x \in U$ le <strong>gradient</strong> de $f$ en $x$ par
+$$\nabla f(x) = \begin{pmatrix} \dfrac{\partial f}{\partial x_1}(x) \\[4pt] \dfrac{\partial f}{\partial x_2}(x) \\[2pt] \vdots \\[2pt] \dfrac{\partial f}{\partial x_n}(x) \end{pmatrix}.$$</p>
+<p class="cal piege"> <strong>Le gradient est un vecteur COLONNE.</strong> Le cours l'écrit ainsi, et ce n'est pas cosmétique : dans $\langle \nabla f(a), h\rangle$ les deux arguments sont des vecteurs de $\mathbb{R}^n$, et dans $\nabla f(a) + \sum \lambda_i \nabla g_i(a) = 0_{\mathbb{R}^n}$ (théorème des extrema liés, ch. 5), l'égalité est entre vecteurs colonnes. Écrire le gradient en ligne conduit vite à des produits matriciels qui ne se composent pas.</p>
+<div class="cal plus"><span class="lab">Enrichissement pédagogique (hors cours) — ce que $C^1$ apporte de plus que « les dérivées partielles existent ».</span>
+<p> L'existence seule des dérivées partielles ne suffit pas à la différentiabilité. Le contre-exemple standard :
+$$f(x,y) = \begin{cases} \dfrac{xy}{x^2+y^2} &amp; \text{si } (x,y)\neq(0,0)\\[4pt] 0 &amp; \text{sinon.}\end{cases}$$
+Ses deux dérivées partielles existent en $(0,0)$ et valent $0$ (car $f$ est nulle sur les deux axes), et pourtant $f$ <strong>n'est même pas continue</strong> en $(0,0)$ : le long de $y=x$, $f(t,t) = \frac{t^2}{2t^2} = \frac12$ pour tout $t \neq 0$, donc $f$ tend vers $\frac12$ et non vers $0$.</p>
+<p><strong>Contrôle numérique</strong> : $f(0{,}001,\ 0{,}001) = 0{,}5$ exactement, alors que $f(0{,}001,\ 0) = 0$. </p>
+<p>C'est pourquoi le cours ne travaille <strong>jamais</strong> avec « les dérivées partielles existent » mais toujours avec <strong>$f \in C^1(U)$</strong> : la <strong>continuité</strong> des dérivées partielles est ce qui garantit la formule de Taylor 4.3. Toutes les fonctions des exercices (polynômes, exponentielles, quotients à dénominateur non nul) sont $C^\infty$, donc la vérification est immédiate — mais elle doit figurer sur la copie.</p>
+</div>
+<h2 data-prio="must">Concept 2 — Taylor-Young à l'ordre 1 (prop. 4.3)</h2>
+<p><strong>Proposition 4.3 (cours) — formule de Taylor-Young à l'ordre 1.</strong> Si $f \in C^1(U)$ et $a \in U$, on a le développement limité
+$$f(a+h) = f(a) + \langle \nabla f(a), h\rangle + o(h)$$
+où $o(h) = \epsilon(h)\lVert h \rVert$ avec $\epsilon(h) \xrightarrow[h\to0]{} 0$.</p>
+<p><strong>Remarque (cours).</strong> Cela veut dire que $f$ est <strong>différentiable</strong> en $a$ et que
+$$df(a).h = \langle \nabla f(a), h\rangle .$$</p>
+<div class="cal intu"><span class="lab">Ce que la formule dit, en français.</span>
+<p> <em>Près de $a$, $f$ se comporte comme une fonction affine</em> : une constante $f(a)$ plus une forme linéaire en $h$. Le gradient est le <strong>seul</strong> vecteur qui réalise cette approximation — c'est ce qui le rend unique et intrinsèque.</p>
+<p><strong>Le rôle du $\lVert h \rVert$ dans le reste.</strong> Écrire $o(h) = \epsilon(h)\lVert h \rVert$ plutôt qu'un simple $\epsilon(h)$ est essentiel : le reste doit être négligeable <strong>devant le terme linéaire</strong>, qui est lui-même d'ordre $\lVert h \rVert$. C'est la transposition exacte de la définition 3.8 du chapitre 3.</p>
+</div>
+<div class="cal plus"><span class="lab">Enrichissement pédagogique (hors cours) — vérification numérique de la proposition 4.3.</span>
+<p> Prenons $f(x,y) = x^2 y + 3y$ en $a = (1,2)$.</p>
+<p>$\dfrac{\partial f}{\partial x} = 2xy$ et $\dfrac{\partial f}{\partial y} = x^2+3$, donc $\nabla f(1,2) = \begin{pmatrix} 4 \\ 4\end{pmatrix}$ et $f(1,2) = 2+6 = 8$.</p>
+<p>Pour $h = (0{,}01,\ 0{,}01)$ :</p>
+<table>
+<thead>
+<tr>
+<th>Quantité</th>
+<th>Valeur</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$f(a+h) = f(1{,}01,\ 2{,}01)$</td>
+<td>$8{,}080401$</td>
+</tr>
+<tr>
+<td>$f(a) + \langle \nabla f(a),h\rangle = 8 + 4(0{,}01)+4(0{,}01)$</td>
+<td>$8{,}08$</td>
+</tr>
+<tr>
+<td>reste</td>
+<td>$4{,}01\times10^{-4}$</td>
+</tr>
+<tr>
+<td>$\lVert h \rVert_2 = 0{,}01\sqrt2$</td>
+<td>$1{,}4142\times10^{-2}$</td>
+</tr>
+<tr>
+<td>$\epsilon(h) = \text{reste}/\lVert h \rVert$</td>
+<td>$2{,}836\times10^{-2}$</td>
+</tr>
+</tbody></table>
+<p>En divisant $h$ par $10$ ($h = (0{,}001,0{,}001)$), le reste passe à $4{,}001\times10^{-6}$ et $\epsilon(h)$ à $2{,}829\times10^{-3}$ : <strong>$\epsilon(h)$ est bien divisé par $10$, donc tend vers $0$</strong>.  C'est précisément l'énoncé de la proposition 4.3.</p>
+</div>
+<h2 data-prio="must">Concept 3 — Hessienne et Taylor-Young à l'ordre 2 (déf. 4.4, prop. 4.5)</h2>
+<p><strong>Définition 4.4 (cours).</strong> Si $f \in C^2(U)$, on définit pour tout $x \in U$ la <strong>matrice hessienne</strong> de $f$ en $x$ par
+$$H_f(x) = \begin{pmatrix} \dfrac{\partial^2 f}{\partial x_1^2}(x) &amp; \cdots &amp; \dfrac{\partial^2 f}{\partial x_1 \partial x_n}(x) \\[6pt] \dfrac{\partial^2 f}{\partial x_2 \partial x_1}(x) &amp; \cdots &amp; \dfrac{\partial^2 f}{\partial x_2 \partial x_n}(x) \\[2pt] \vdots &amp; \ddots &amp; \vdots \\[2pt] \dfrac{\partial^2 f}{\partial x_n \partial x_1}(x) &amp; \cdots &amp; \dfrac{\partial^2 f}{\partial x_n^2}(x)\end{pmatrix} \;\in\; S_n(\mathbb{R}) \quad \text{(matrice symétrique)}.$$</p>
+<div class="cal intu"><span class="lab">Pourquoi elle est symétrique — le théorème de Schwarz.</span>
+<p> Le cours écrit directement $H_f(x) \in S_n(\mathbb{R})$ sans le justifier. La raison est le <strong>théorème de Schwarz</strong> : si $f \in C^2$, alors
+$$\frac{\partial^2 f}{\partial x_i \partial x_j} = \frac{\partial^2 f}{\partial x_j \partial x_i} .$$
+<strong>L'hypothèse $C^2$ est ce qui le rend vrai</strong> — c'est la deuxième raison, après Taylor, pour laquelle le cours impose la continuité des dérivées secondes.</p>
+<p><strong>Conséquence pratique immédiate</strong> : en dimension 2 on n'a que <strong>trois</strong> coefficients à calculer, pas quatre. Le cours les notera $r$, $s$, $t$ au théorème 4.16 :
+$$H_f(a) = \begin{pmatrix} r &amp; s \\ s &amp; t\end{pmatrix}, \qquad r = \frac{\partial^2 f}{\partial x^2}(a),\quad t = \frac{\partial^2 f}{\partial y^2}(a),\quad s = \frac{\partial^2 f}{\partial x\partial y}(a).$$</p>
+</div>
+<p><strong>Proposition 4.5 (cours) — formule de Taylor-Young à l'ordre 2.</strong> Si $f \in C^2(U)$,
+$$f(a+h) = f(a) + \langle \nabla f(a), h\rangle + \tfrac12 \langle h, H_f(a)h\rangle + \epsilon(h)\lVert h \rVert^2, \qquad \epsilon(h)\xrightarrow[h\to0]{}0 .$$</p>
+<p><strong>Remarque (cours).</strong> $Q(h) = \langle h, H_f(a)h\rangle$ est une <strong>forme quadratique</strong> sur $\mathbb{R}^n$ :
+$$Q(h) = \sum_{i,j=1\ldots n} \frac{\partial^2 f}{\partial x_i \partial x_j}(a)\, h_i h_j .$$</p>
+<blockquote>
+<p><strong>C'est LA formule du chapitre 4.</strong> Tout ce qui suit en découle. Si $a$ est un point critique ($\nabla f(a)=0$), le terme linéaire disparaît et il reste
+$$f(a+h) - f(a) = \tfrac12 Q(h) + \epsilon(h)\lVert h \rVert^2 .$$
+<strong>Le signe de $f(a+h)-f(a)$ est donc gouverné par le signe de la forme quadratique $Q$</strong> — d'où toute la théorie des théorèmes 4.15 et 4.16 (fiche 603) :</p>
+<table>
+<thead>
+<tr>
+<th>$Q$</th>
+<th>Conclusion en $a$</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>définie <strong>positive</strong> ($Q(h)&gt;0$ pour $h\neq0$)</td>
+<td><strong>minimum</strong> local</td>
+</tr>
+<tr>
+<td>définie <strong>négative</strong></td>
+<td><strong>maximum</strong> local</td>
+</tr>
+<tr>
+<td><strong>indéfinie</strong> (change de signe)</td>
+<td><strong>point selle</strong></td>
+</tr>
+<tr>
+<td>dégénérée ($Q(h)=0$ pour un $h\neq0$)</td>
+<td><strong>on ne conclut pas</strong></td>
+</tr>
+</tbody></table>
+<p>La dernière ligne est le pendant exact du cas $f''(t_0)=0$ de la fiche 601.</p>
+</blockquote>
+<h2 data-prio="must">Concept 4 — Le pont vers la dimension 1 : $\varphi(t) = f(a+th)$ (prop. 4.6)</h2>
+<p><strong>Proposition 4.6 (cours).</strong> Soit $f \in C^2(U)$, $a \in U$ et $h \in \mathbb{R}^n$. On pose
+$$\varphi(t) = f(a+th),$$
+définie sur $\,]-\epsilon,\epsilon[$ pour $\epsilon$ assez petit. Alors
+$$\varphi'(t) = \langle \nabla f(a+th), h\rangle = \sum_{i=1}^n \frac{\partial f}{\partial x_i}(a+th)\,h_i,$$
+$$\varphi''(t) = \langle h, H_f(a+th)\,h\rangle = \sum_{i=1}^n\sum_{j=1}^n \frac{\partial^2 f}{\partial x_i \partial x_j}(a+th)\,h_i h_j .$$
+En particulier, pour $t=0$ :
+$$\varphi'(0) = \langle \nabla f(a), h\rangle, \qquad \varphi''(0) = \langle h, H_f(a)h\rangle .$$</p>
+<blockquote>
+<p><strong>C'est la proposition la plus utile du chapitre, et la plus discrète.</strong> Elle dit : <em>pour comprendre $f$ en dimension $n$, il suffit de la regarder le long d'une droite à la fois, et on retombe sur le chapitre 3.</em></p>
+<pre><code>                      h
+             a ────────────────►      la droite  t ↦ a + th
+             │
+          φ(t) = f(a + th)            une fonction d'UNE variable
+
+  φ'(0)  = ⟨∇f(a), h⟩       ← la PENTE de f dans la direction h
+  φ''(0) = ⟨h, H_f(a)h⟩     ← la COURBURE de f dans la direction h
+</code></pre>
+<p><strong>Les trois usages qu'en fait le cours</strong> — repérez-les, ils reviennent :</p>
+<ol>
+<li><strong>Prop. 5.9 (fiche 604)</strong> : la pente de $f$ dans la direction $h$ est $\varphi'(0) = \langle \nabla f(a), h\rangle$ ; le gradient normalisé est la direction de plus forte pente.</li>
+<li><strong>Théorème des extrema liés (5.7, fiche 604)</strong> : on compose $f$ avec une <strong>courbe</strong> $c$ tracée dans la contrainte, et on écrit $(f\circ c)'(0)=0$. Même idée, avec une courbe au lieu d'une droite.</li>
+<li><strong>Théorème 4.15 (fiche 603)</strong> : la nature d'un point critique se lit sur le signe de $\varphi''(0) = Q(h)$ <strong>pour toutes les directions $h$</strong>. Un point selle est un point où $\varphi$ a un minimum dans une direction et un maximum dans une autre.</li>
+</ol>
+</blockquote>
+<blockquote>
+<p><strong>Preuve reconstruite de $\varphi'(t) = \langle\nabla f(a+th),h\rangle$.</strong> C'est la règle de dérivation composée : $\varphi = f \circ \gamma$ avec $\gamma(t) = a+th$, dont la dérivée est $\gamma'(t) = h$ (constante). La différentielle donne
+$$\varphi'(t) = df(\gamma(t)).\gamma'(t) = df(a+th).h = \langle \nabla f(a+th), h\rangle ,$$
+la dernière égalité étant la remarque de la proposition 4.3. Pour $\varphi''$, on redérive coordonnée par coordonnée :
+$$\varphi''(t) = \sum_i h_i \frac{d}{dt}\left[\frac{\partial f}{\partial x_i}(a+th)\right] = \sum_i h_i \sum_j \frac{\partial^2 f}{\partial x_j \partial x_i}(a+th)\,h_j = \langle h, H_f(a+th)h\rangle . \qquad \blacksquare$$</p>
+</blockquote>
+<h2 data-prio="must">Concept 5 — L'existence sur un compact (thm 4.7)</h2>
+<p><strong>Théorème 4.7 (cours).</strong> Supposons $f \in C(A)$ et $A$ <strong>compacte</strong>. Alors $f$ admet un minimum global sur $A$ <strong>et</strong> un maximum global sur $A$.</p>
+<p><strong>Rappel (cours).</strong> $A \subset \mathbb{R}^d$ est compacte ssi $A$ est <strong>bornée et fermée</strong> dans $\mathbb{R}^d$.</p>
+<div class="cal formel"><span class="lab">théorème 2.22 (Weierstrass)</span>
+<p>C'est mot pour mot le  de la fiche 600, redonné ici parce qu'on va s'en servir constamment. Rien de neuf ; la seule chose à retenir est qu'il donne les <strong>deux</strong> extrema d'un coup.</p>
+</div>
+<h2 data-prio="must">Concept 6 — La coercivité sur un ensemble non borné (déf. 4.8, thm 4.9)</h2>
+<p><strong>Définition 4.8 (cours).</strong> Supposons $A$ <strong>non bornée</strong> dans $\mathbb{R}^d$. La fonction $f : A \to \mathbb{R}$ est dite <strong>coercive sur $A$</strong> si
+$$\lim_{\substack{\lVert x \rVert \to \infty \\ x \in A}} f(x) = +\infty .$$</p>
+<p class="cal piege"> <strong>Le « $x \in A$ » change tout par rapport à la définition 2.25.</strong> Ici on ne demande le comportement de $f$ que <strong>dans $A$</strong>. Une fonction peut donc être coercive sur $A$ sans l'être sur $\mathbb{R}^d$ — et c'est exactement le cas de l'exercice 4.1 ci-dessous.</p>
+<p><strong>Exercice 4.1 (cours).</strong> Montrer que $f(x,y) = x^4 - y^2$ est coercive sur $A = \mathbb{R}_+ \times [0,1]$.</p>
+<p><strong>Théorème 4.9 (cours).</strong> Soit $A$ <strong>fermée non bornée</strong> dans $\mathbb{R}^d$ et $f \in C(A)$.</p>
+<ul>
+<li>Si $f$ est <strong>coercive</strong> sur $A$, alors $f$ admet un <strong>minimum global</strong> sur $A$.</li>
+<li>Si $\displaystyle\lim_{\lVert x \rVert\to\infty,\ x\in A} f(x) = -\infty$, alors $f$ admet un <strong>maximum global</strong> sur $A$.</li>
+</ul>
+<p><strong>Encadré ATTENTION (cours).</strong> <em>L'existence d'un extremum global ne garantit absolument pas l'unicité du point où cet extremum est pris.</em> Par exemple, $f(x_1,x_2) = x_1^2$ atteint son minimum global sur $\mathbb{R}^2$ (de valeur nulle) sur toute la droite $x_1=0$ : il y a une <strong>infinité</strong> de minima globaux.</p>
+<details class="cor fiche">
+<summary><strong>Exercice résolu — exercice 4.1 du cours : coercivité de $x^4-y^2$ sur $\mathbb{R}_+\times[0,1]$</strong></summary><div class="in">
+
+<p><strong>Énoncé (cours, exercice 4.1).</strong> Montrer que $f(x,y) = x^4 - y^2$ est coercive sur $A = \mathbb{R}_+ \times [0,1]$.</p>
+<p><strong>Ce qui rend l'exercice intéressant.</strong> Sur $\mathbb{R}^2$ tout entier, $f$ n'est <strong>pas</strong> coercive : le long de l'axe $x=0$, $f(0,y) = -y^2 \to -\infty$. C'est la restriction à $A$ qui sauve tout — et c'est précisément le point de la définition 4.8.</p>
+<p><strong>Étape 1 — exploiter la borne sur $y$.</strong> Sur $A$, on a $y \in [0,1]$, donc
+$$0 \le y^2 \le 1 \qquad \Longrightarrow \qquad f(x,y) = x^4 - y^2 \;\ge\; x^4 - 1 .$$
+Le terme parasite est <strong>borné</strong>, c'est tout ce dont on a besoin.</p>
+<p><strong>Étape 2 — relier $x$ à la norme.</strong> Pour $(x,y) \in A$ :
+$$\lVert (x,y) \rVert_2^2 = x^2 + y^2 \le x^2 + 1 \qquad \Longrightarrow \qquad x^2 \ge \lVert (x,y) \rVert_2^2 - 1 .$$
+Donc dès que $\lVert (x,y) \rVert_2 \ge 1$ (ce qui est le cas quand la norme tend vers l'infini) :
+$$x^4 \ge \bigl(\lVert (x,y) \rVert_2^2 - 1\bigr)^2 .$$</p>
+<p><strong>Étape 3 — conclure.</strong> En combinant :
+$$f(x,y) \;\ge\; \bigl(\lVert (x,y) \rVert_2^2 - 1\bigr)^2 - 1 \;=\; \varphi\bigl(\lVert (x,y) \rVert_2\bigr)$$
+avec $\varphi(u) = (u^2-1)^2 - 1 \to +\infty$ quand $u\to+\infty$. <strong>$f$ est donc coercive sur $A$</strong> au sens de la définition 4.8. ∎</p>
+<p><strong>La rédaction avec les quantificateurs</strong> (si l'énoncé la demande) : soit $K&gt;0$. Posons $R = \sqrt{1+\sqrt{K+1}}$. Alors $\lVert (x,y) \rVert_2 \ge R$ entraîne $\lVert (x,y) \rVert^2 - 1 \ge \sqrt{K+1}$, donc $x^4 \ge K+1$ et $f \ge (K+1)-1 = K$. </p>
+<p><strong>Contrôle numérique.</strong> Avec $K = 100$, la formule donne $R = \sqrt{1+\sqrt{101}} = 3{,}3241353$.</p>
+<table>
+<thead>
+<tr>
+<th>$(x,y) \in A$</th>
+<th>$\lVert\cdot\rVert_2$</th>
+<th>$f(x,y)$</th>
+<th>$\ge 100$ ?</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$(3{,}3241,\ 0)$</td>
+<td>$3{,}3241 = R$</td>
+<td>$122{,}0998$</td>
+<td> largement</td>
+</tr>
+<tr>
+<td>$(3{,}1702,\ 1)$</td>
+<td>$3{,}3241 = R$</td>
+<td>$\mathbf{100{,}0000}$</td>
+<td> <strong>exactement au seuil</strong></td>
+</tr>
+<tr>
+<td>$(3{,}1623,\ 1)$</td>
+<td>$3{,}3166 &lt; R$</td>
+<td>$99{,}0000$</td>
+<td>non — norme sous $R$</td>
+</tr>
+</tbody></table>
+<p><strong>La deuxième ligne montre que le $R$ trouvé est EXACTEMENT optimal</strong>, pas seulement suffisant. C'est le pire cas de la contrainte ($y=1$, qui maximise le terme parasite $-y^2$) : pour lui, $x^2 = R^2-1 = \sqrt{101}$, donc $x^4 = 101$ et $f = 101 - 1 = 100 = K$, tout juste. Aucun $R$ plus petit ne conviendrait.</p>
+<p>La troisième ligne, prise juste en dessous du seuil, donne $f = 99 &lt; 100$ : la borne est <strong>serrée des deux côtés</strong>.  Une chaîne de minorations qui produit une constante exactement optimale est le signe qu'aucune inégalité n'a été gaspillée.</p>
+<p><strong>Étape 4 — ce qu'on en déduit.</strong> $A = \mathbb{R}_+\times[0,1]$ est <strong>fermé</strong> (produit de deux fermés, ou intersection d'images réciproques de fermés par des fonctions continues — prop. 2.12) et <strong>non borné</strong> ($x$ n'est pas majoré). $f$ est polynomiale donc continue. Le <strong>théorème 4.9</strong> s'applique : <strong>$f$ admet un minimum global sur $A$</strong>.</p>
+<p class="cal piege"> <strong>Le théorème ne donne pas le maximum.</strong> Et de fait il n'y en a pas : $f(x,0) = x^4 \to +\infty$ sur $A$. On ne peut pas non plus invoquer la seconde partie du théorème 4.9, qui exigerait $f \to -\infty$ — c'est l'inverse qui se produit.</p>
+<p><strong>Où est ce minimum ?</strong> Le chapitre 2 ne le dit pas ; c'est le travail de la fiche 603. Par curiosité : $f$ est minimale quand $x^4$ est le plus petit et $y^2$ le plus grand, soit $x=0$ et $y=1$, donnant $f(0,1) = -1$. Ce point est <strong>sur le bord</strong> de $A$ — le gradient $\nabla f = (4x^3,\ -2y)$ y vaut $(0,-2) \neq 0$. <strong>La condition $\nabla f = 0$ ne s'y applique pas</strong>, il faut l'inéquation d'Euler (prop. 4.14, fiche 603). C'est d'ailleurs pourquoi le cours reprend cette fonction dans l'exercice 4.3.</p>
+</div></details>
+
+<details class="cor fiche">
+<summary><strong>Exercice résolu — gradient, hessienne, Taylor à l'ordre 2 : la vérification complète</strong></summary><div class="in">
+
+<p><strong>Énoncé.</strong> Soit $f(x,y) = x^3 + y^3 - 3xy$ (c'est la fonction de l'exercice 4.7 du cours). Calculer $\nabla f$ et $H_f$, puis vérifier numériquement la formule de Taylor-Young à l'ordre 2 en $a=(1,1)$.</p>
+<p><strong>Étape 1 — les dérivées partielles premières.</strong>
+$$\frac{\partial f}{\partial x} = 3x^2 - 3y, \qquad \frac{\partial f}{\partial y} = 3y^2 - 3x, \qquad \nabla f(x,y) = \begin{pmatrix} 3x^2-3y \\ 3y^2-3x\end{pmatrix}.$$
+En $a=(1,1)$ : $\nabla f(1,1) = \begin{pmatrix} 0 \\ 0\end{pmatrix}$ — <strong>c'est un point critique</strong>.</p>
+<p><strong>Étape 2 — les dérivées partielles secondes.</strong>
+$$\frac{\partial^2 f}{\partial x^2} = 6x, \qquad \frac{\partial^2 f}{\partial y^2} = 6y, \qquad \frac{\partial^2 f}{\partial x \partial y} = -3 .$$
+La dérivée croisée vaut $-3$ <strong>dans les deux ordres</strong> (dérivée de $3x^2-3y$ par rapport à $y$, ou de $3y^2-3x$ par rapport à $x$) : le théorème de Schwarz est vérifié à la main. 
+$$H_f(x,y) = \begin{pmatrix} 6x &amp; -3 \\ -3 &amp; 6y \end{pmatrix}, \qquad H_f(1,1) = \begin{pmatrix} 6 &amp; -3 \\ -3 &amp; 6\end{pmatrix}.$$</p>
+<p><strong>Étape 3 — la formule de Taylor à l'ordre 2 en $(1,1)$.</strong> Comme $\nabla f(1,1)=0$ et $f(1,1) = 1+1-3 = -1$ :
+$$f(1+h_1,\ 1+h_2) = -1 + \tfrac12\bigl(6h_1^2 - 6h_1h_2 + 6h_2^2\bigr) + \epsilon(h)\lVert h \rVert^2 = -1 + 3\bigl(h_1^2 - h_1h_2 + h_2^2\bigr) + \epsilon(h)\lVert h \rVert^2 .$$</p>
+<p><em>(Le facteur $-6h_1h_2$ vient de $\langle h, H_f h\rangle = 6h_1^2 + 2\times(-3)h_1h_2 + 6h_2^2$ — les termes croisés apparaissent <strong>deux fois</strong> dans une forme quadratique. C'est l'erreur de calcul la plus fréquente du chapitre.)</em></p>
+<p><strong>Étape 4 — le reste est ici calculable EXACTEMENT.</strong> $f$ est un polynôme de degré 3, donc son développement s'arrête à l'ordre 3 sans aucune approximation. En développant à la main :
+$$f(1+h_1,\ 1+h_2) = -1 + 3\bigl(h_1^2 - h_1h_2 + h_2^2\bigr) + \bigl(h_1^3 + h_2^3\bigr) .$$
+<em>(Les termes de degré 1 se simplifient exactement — c'est une autre façon de constater que $(1,1)$ est un point critique.)</em></p>
+<p><strong>Le reste de la proposition 4.5 vaut donc exactement $h_1^3+h_2^3$</strong>, et on peut vérifier la formule au chiffre près.</p>
+<p><strong>Étape 5 — vérification numérique.</strong> Avec $h = (0{,}01,\ -0{,}02)$ :</p>
+<table>
+<thead>
+<tr>
+<th>Quantité</th>
+<th>Valeur</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$f(1{,}01,\ 0{,}98)$</td>
+<td>$-0{,}997907$</td>
+</tr>
+<tr>
+<td>approximation d'ordre 2 : $-1 + 3(0{,}0001 + 0{,}0002 + 0{,}0004) = -1 + 0{,}0021$</td>
+<td>$-0{,}9979$</td>
+</tr>
+<tr>
+<td>reste observé</td>
+<td>$-7{,}0\times10^{-6}$</td>
+</tr>
+<tr>
+<td>reste prédit $h_1^3+h_2^3 = 10^{-6} - 8\times10^{-6}$</td>
+<td>$-7{,}0\times10^{-6}$ </td>
+</tr>
+<tr>
+<td>$\lVert h \rVert_2^2 = 10^{-4}+4\times10^{-4}$</td>
+<td>$5{,}0\times10^{-4}$</td>
+</tr>
+<tr>
+<td>$\epsilon(h)$</td>
+<td>$-1{,}4\times10^{-2}$</td>
+</tr>
+</tbody></table>
+<p>En divisant $h$ par $10$, soit $h=(0{,}001,\,-0{,}002)$ : reste $= -7{,}0\times10^{-9}$ (toujours $h_1^3+h_2^3$) et $\epsilon(h) = -1{,}4\times10^{-3}$. <strong>$\epsilon(h)$ est divisé par exactement $10$ : il tend vers $0$</strong>, comme l'annonce la proposition 4.5. </p>
+<p class="cal piege"> <strong>Notez que $\epsilon(h)$ est négatif.</strong> Rien dans la proposition 4.5 n'impose un signe au reste — seulement qu'il tende vers $0$ après division par $\lVert h\rVert^2$. Ici le reste est même <strong>plus grand en valeur absolue</strong> que ce qu'un signe positif suggérerait naïvement, et c'est parfaitement conforme.</p>
+<p><strong>Étape 5 — lire la nature du point critique sur $Q$.</strong> La forme quadratique est
+$$Q(h) = 6h_1^2 - 6h_1h_2 + 6h_2^2 = 6\left[\left(h_1 - \frac{h_2}{2}\right)^2 + \frac{3}{4}h_2^2\right]$$
+(réduction de Gauss, la méthode que le cours mentionne au §4.4). Somme de deux carrés à coefficients <strong>strictement positifs</strong> : $Q$ est <strong>définie positive</strong>, donc $(1,1)$ est un <strong>minimum local</strong> (théorème 4.15, fiche 603).</p>
+<p><strong>Contrôle par le critère $rt-s^2$ du théorème 4.16</strong> : $r=6$, $t=6$, $s=-3$, donc
+$$rt - s^2 = 36 - 9 = 27 &gt; 0 \quad\text{et}\quad r = 6 &gt; 0 \;\Longrightarrow\; \text{minimum local}. \ \checkmark$$</p>
+<p><strong>Ce minimum local est-il global ?</strong> <strong>Non</strong> : $f(t,t) = 2t^3 - 3t^2 \to -\infty$ quand $t\to-\infty$. Par exemple $f(-10,-10) = -2000-300 = -2300 &lt; -1$. C'est la seconde question de l'exercice 4.7 du cours, traitée en fiche 603.</p>
+</div></details>
+
+<details class="cor fiche">
+<summary><strong>Exercice résolu — l'encadré ATTENTION : exister ne veut pas dire être unique</strong></summary><div class="in">
+
+<p><strong>Énoncé.</strong> Illustrer l'encadré ATTENTION du cours avec $f(x_1,x_2)=x_1^2$, puis avec $g(x,y) = x^4+y^4-4xy$ : dans les deux cas, montrer l'existence du minimum global, et compter les points où il est atteint.</p>
+<p><strong>Cas 1 — l'exemple du cours, $f(x_1,x_2)=x_1^2$.</strong></p>
+<p><em>Existence.</em> $f \ge 0$ et $f(0,0)=0$ : le minimum global vaut $0$, sans avoir besoin d'aucun théorème.</p>
+<p><em>Unicité.</em> $f(0,x_2) = 0$ pour <strong>tout</strong> $x_2 \in \mathbb{R}$. L'ensemble des minima globaux est la <strong>droite $x_1=0$</strong> tout entière : une infinité de points.</p>
+<p><em>Pourquoi les théorèmes ne pouvaient rien y faire.</em> $f$ n'est <strong>pas coercive</strong> sur $\mathbb{R}^2$ (elle est nulle sur une droite qui part à l'infini), donc le théorème 4.9 ne s'applique même pas. Le minimum existe pour une autre raison — $f$ est un carré. <strong>L'existence et l'unicité sont deux questions entièrement séparées, et le cours ne fournit d'outil que pour la première.</strong></p>
+<p><strong>Cas 2 — un cas moins évident, $g(x,y) = x^4+y^4-4xy$.</strong></p>
+<p><em>Existence par coercivité.</em> De $2\lvert xy \rvert \le x^2+y^2$ on tire $-4xy \ge -2(x^2+y^2)$, donc
+$$g(x,y) \;\ge\; x^4+y^4-2(x^2+y^2).$$
+La fonction $u \mapsto u^4 - 2u^2$ tend vers $+\infty$, donc le membre de droite tend vers $+\infty$ quand $\lVert (x,y)\rVert\to\infty$ : <strong>$g$ est coercive</strong>. Elle est polynomiale donc continue, et $\mathbb{R}^2$ est fermé non borné : le <strong>théorème 4.9</strong> donne un <strong>minimum global</strong>.</p>
+<p><em>Où est-il ?</em> Les points critiques annulent
+$$\nabla g = \begin{pmatrix} 4x^3-4y \\ 4y^3-4x\end{pmatrix} = 0 \iff \begin{cases} y = x^3 \\ x = y^3\end{cases} \iff x = x^9 \iff x(x^8-1)=0 .$$
+Donc $x \in \{0,\ 1,\ -1\}$, ce qui donne les trois points critiques
+$$(0,0), \qquad (1,1), \qquad (-1,-1).$$</p>
+<p><em>Les valeurs.</em>
+$$g(0,0) = 0, \qquad g(1,1) = 1+1-4 = -2, \qquad g(-1,-1) = 1+1-4 = -2 .$$</p>
+<p><strong>Conclusion : le minimum global vaut $-2$ et il est atteint en DEUX points</strong>, $(1,1)$ et $(-1,-1)$. L'existence était garantie ; l'unicité est fausse. Ici la raison est visible : $g(-x,-y) = g(x,y)$, la fonction est <strong>paire</strong> au sens vectoriel, donc ses minima vont par paires symétriques.</p>
+<p><strong>Contrôle numérique.</strong> Minimisation sur une grille de $[-3,3]^2$ au pas $10^{-3}$ : minimum $-2{,}000000$ atteint en $(1{,}000,\ 1{,}000)$ <strong>et</strong> en $(-1{,}000,\ -1{,}000)$, valeur en $(0,0)$ égale à $0$. </p>
+<p><strong>Ce qu'il faut retenir pour la rédaction.</strong> Quand un exercice demande <em>« déterminer le ou les minima »</em> — la formulation exacte du cours, notez le « <strong>le ou les</strong> » — c'est un avertissement : <strong>comptez les points, ne vous arrêtez pas au premier</strong>. Les énoncés 5.1, 5.2 et l'exemple 8 du cours ont tous plusieurs solutions.</p>
+</div></details>
+
+<h2>Comment reconnaître le type de problème</h2>
+<table>
+<thead>
+<tr>
+<th>Ce que dit l'énoncé</th>
+<th>La bonne réaction</th>
+<th>L'outil</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>« Calculer le gradient »</td>
+<td>vecteur <strong>colonne</strong> des dérivées partielles</td>
+<td>déf. 4.2</td>
+</tr>
+<tr>
+<td>« Calculer la hessienne »</td>
+<td>matrice <strong>symétrique</strong> : 3 coefficients en dimension 2</td>
+<td>déf. 4.4</td>
+</tr>
+<tr>
+<td>« Montrer que $f$ admet un minimum sur $A$ », $A$ borné</td>
+<td>fermé + borné → compact</td>
+<td>thm 4.7</td>
+</tr>
+<tr>
+<td>« … sur $A$ non borné »</td>
+<td><strong>coercivité sur $A$</strong> — pas sur $\mathbb{R}^d$</td>
+<td>déf. 4.8, thm 4.9</td>
+</tr>
+<tr>
+<td>« … un maximum sur $A$ non borné »</td>
+<td>il faut $f \to -\infty$</td>
+<td>thm 4.9, 2ᵉ partie</td>
+</tr>
+<tr>
+<td>« Développement limité de $f$ en $a$ »</td>
+<td>ordre 1 ou 2 selon ce qui est demandé</td>
+<td>prop. 4.3 / 4.5</td>
+</tr>
+<tr>
+<td>« Pente de $f$ dans la direction $h$ »</td>
+<td>$\varphi'(0) = \langle\nabla f(a),h\rangle$</td>
+<td>prop. 4.6</td>
+</tr>
+<tr>
+<td>« Le ou les minima »</td>
+<td><strong>il y en a probablement plusieurs</strong></td>
+<td>encadré ATTENTION</td>
+</tr>
+</tbody></table>
+<p><strong>Le signal de la coercivité restreinte.</strong> Si l'ensemble $A$ <strong>borne certaines variables</strong> ($y\in[0,1]$, $x \le 3$…) et pas les autres, c'est le schéma de l'exercice 4.1 : <em>les variables bornées produisent un terme borné qu'on absorbe dans une constante ; seules les variables libres comptent pour la coercivité.</em></p>
+<h2>Comment résoudre ce type d'exercice</h2>
+<p><strong>Protocole « montrer que $f$ admet un extremum sur $A$ » en dimension $n$ — quatre étapes.</strong></p>
+<ol>
+<li><strong>$f$ est-elle continue ?</strong> Polynomiale, exponentielle, quotient à dénominateur non nul → une phrase. Préciser $C^1$ ou $C^2$ si la suite de l'exercice en a besoin.</li>
+<li><strong>$A$ est-il fermé ?</strong> Proposition 2.12 : décrit par des égalités ou des inégalités <strong>larges</strong> entre fonctions continues.</li>
+<li><strong>$A$ est-il borné ?</strong><ul>
+<li><strong>Oui</strong> → $A$ compact (thm 2.24) → <strong>théorème 4.7</strong> : minimum <strong>et</strong> maximum.</li>
+<li><strong>Non</strong> → passer à l'étape 4.</li>
+</ul>
+</li>
+<li><strong>Coercivité sur $A$</strong> (déf. 4.8). Minorer $f$ par une fonction de la norme seule, <strong>en exploitant les bornes que $A$ impose</strong> :
+$$f(x) \;\ge\; \varphi\bigl(\lVert x \rVert\bigr), \qquad \varphi \to +\infty .$$
+Puis <strong>théorème 4.9</strong> : minimum global. Pour un maximum, il faut $f\to-\infty$.</li>
+</ol>
+<p><strong>Les trois minorations qui couvrent presque tous les exercices.</strong></p>
+<table>
+<thead>
+<tr>
+<th>Situation</th>
+<th>Minoration</th>
+<th>Pourquoi elle marche</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>terme croisé $-cxy$</td>
+<td>$2\lvert xy\rvert \le x^2+y^2$</td>
+<td>ramène le croisé à des carrés</td>
+</tr>
+<tr>
+<td>terme linéaire $-\langle b,x\rangle$</td>
+<td>$\lvert\langle b,x\rangle\rvert \le \lVert b\rVert\lVert x\rVert$ (Cauchy-Schwarz)</td>
+<td>degré 1 contre degré $\ge 2$</td>
+</tr>
+<tr>
+<td>variable bornée par $A$</td>
+<td>remplacer par sa borne : $y\in[0,1] \Rightarrow -y^2 \ge -1$</td>
+<td>absorbe le terme dans une constante</td>
+</tr>
+</tbody></table>
+<p><strong>Le calcul de la forme quadratique — l'erreur à ne pas faire.</strong> En dimension 2,
+$$\langle h, H_f(a)h\rangle = r\,h_1^2 + \mathbf{2}\,s\,h_1h_2 + t\,h_2^2 .$$
+<strong>Le facteur $2$ devant $s$</strong> vient de ce que le terme croisé apparaît deux fois dans la matrice symétrique. L'oublier fausse toute la classification du point critique.</p>
+<h2 data-prio="must">Common mistakes</h2>
+<ol>
+<li><strong>Écrire le gradient en ligne.</strong> Le cours le définit en <strong>colonne</strong> (déf. 4.2) ; c'est ce qui rend cohérente l'égalité vectorielle du théorème des extrema liés.</li>
+<li><strong>Confondre « les dérivées partielles existent » et « $f \in C^1$ ».</strong> Le contre-exemple $\frac{xy}{x^2+y^2}$ a ses deux dérivées partielles en $(0,0)$ et n'y est même pas continue. Le cours travaille <strong>toujours</strong> avec $C^1$ ou $C^2$.</li>
+<li><strong>Oublier le facteur $2$ du terme croisé</strong> dans $\langle h,H_f h\rangle = rh_1^2 + 2sh_1h_2 + th_2^2$.</li>
+<li><strong>Calculer les quatre coefficients de la hessienne en dimension 2.</strong> Elle est <strong>symétrique</strong> (Schwarz) : trois suffisent, et vérifier l'égalité des croisées est un bon contrôle de calcul.</li>
+<li><strong>Tester la coercivité sur $\mathbb{R}^d$ au lieu de $A$.</strong> L'exercice 4.1 est fait pour ça : $x^4-y^2$ n'est pas coercive sur $\mathbb{R}^2$ mais l'est sur $\mathbb{R}_+\times[0,1]$. La définition 4.8 dit bien « <strong>sur $A$</strong> ».</li>
+<li><strong>Appliquer le théorème 4.9 sur un ensemble non fermé.</strong> L'hypothèse « $A$ fermée » y est explicite ; sans elle le minimum peut fuir vers un bord absent.</li>
+<li><strong>Conclure à l'unicité après un théorème d'existence.</strong> L'encadré ATTENTION est là pour ça : $x_1^2$ est minimale sur toute une droite, $x^4+y^4-4xy$ en deux points.</li>
+<li><strong>Croire que le théorème 4.9 donne aussi le maximum.</strong> Il faut alors $f\to-\infty$, une hypothèse <strong>différente</strong> — souvent fausse en même temps que la coercivité.</li>
+<li><strong>Oublier que Taylor-Young est local.</strong> Les propositions 4.3 et 4.5 valent <strong>près de $a$</strong>. Les utiliser pour un $h$ grand est sans fondement — c'est Taylor-Lagrange qu'il faudrait, avec son reste explicite.</li>
+<li><strong>Confondre $o(h)$ et $\epsilon(h)$.</strong> Le cours écrit $o(h) = \epsilon(h)\lVert h\rVert$ à l'ordre 1 et $\epsilon(h)\lVert h\rVert^2$ à l'ordre 2. C'est le <strong>facteur en norme</strong> qui donne son ordre au reste.</li>
+<li><strong>Oublier que le minimum peut être sur le bord.</strong> Dans l'exercice 4.1, il est en $(0,1)$, où $\nabla f = (0,-2) \neq 0$. Chercher les extrema par $\nabla f = 0$ seul l'aurait manqué.</li>
+<li><strong>Utiliser la proposition 4.6 sans normaliser $h$ quand on parle de « pente ».</strong> La proposition 5.9 précise que la direction est un vecteur de <strong>norme 1</strong> ; sans cela, $\varphi'(0)$ dépend de la longueur de $h$ et non seulement de sa direction.</li>
+</ol>
+<h2>Ultimate Review</h2>
+<p><strong>Les paragraphes 4.1 et 4.2 en un paragraphe.</strong> Le gradient est le vecteur colonne des dérivées partielles ; il donne l'approximation affine de $f$ près de $a$ (prop. 4.3). La hessienne est la matrice symétrique des dérivées secondes ; avec le gradient, elle donne l'approximation quadratique (prop. 4.5), dont le terme d'ordre 2 est la <strong>forme quadratique</strong> $Q(h) = \langle h, H_f(a)h\rangle$. <strong>Le signe de $Q$ décidera de la nature des points critiques.</strong> Pour démontrer quoi que ce soit, on regarde $f$ le long d'une droite : $\varphi(t)=f(a+th)$ ramène tout à la dimension 1 (prop. 4.6). Côté existence, deux théorèmes seulement : <strong>4.7</strong> (compact → min et max) et <strong>4.9</strong> (fermé non borné + coercivité <strong>sur $A$</strong> → min). Aucun des deux ne dit un mot de l'unicité, ni de la localisation.</p>
+<p><strong>Les six énoncés à savoir citer.</strong></p>
+<table>
+<thead>
+<tr>
+<th>N°</th>
+<th>Énoncé</th>
+<th>Usage</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>4.2</strong></td>
+<td>$\nabla f(x)$, vecteur colonne</td>
+<td>l'ordre 1</td>
+</tr>
+<tr>
+<td><strong>4.3</strong></td>
+<td>$f(a+h) = f(a)+\langle\nabla f(a),h\rangle+o(h)$</td>
+<td>différentiabilité</td>
+</tr>
+<tr>
+<td><strong>4.4</strong></td>
+<td>$H_f(x)$, symétrique</td>
+<td>l'ordre 2</td>
+</tr>
+<tr>
+<td><strong>4.5</strong></td>
+<td>$+\ \frac12\langle h,H_f(a)h\rangle + \epsilon(h)\lVert h\rVert^2$</td>
+<td><strong>la formule du chapitre</strong></td>
+</tr>
+<tr>
+<td><strong>4.6</strong></td>
+<td>$\varphi'(0)=\langle\nabla f(a),h\rangle$, $\varphi''(0)=\langle h,H_f(a)h\rangle$</td>
+<td>le pont vers la dimension 1</td>
+</tr>
+<tr>
+<td><strong>4.7 / 4.9</strong></td>
+<td>compact → min et max ; coercive → min</td>
+<td>l'existence</td>
+</tr>
+</tbody></table>
+<p><strong>Les trois formules-réflexes.</strong>
+$$f(a+h) = f(a) + \langle\nabla f(a),h\rangle + \tfrac12\langle h,H_f(a)h\rangle + \epsilon(h)\lVert h\rVert^2,$$
+$$\langle h,H_f(a)h\rangle = r h_1^2 + 2s h_1 h_2 + t h_2^2 \quad (n=2), \qquad 2\lvert xy\rvert \le x^2+y^2 .$$</p>
+<p><strong>Ce que ces paragraphes préparent.</strong> Le §4.3 utilisera 4.3 pour l'ordre 1 (équation et inéquation d'Euler), le §4.4 utilisera 4.5 pour l'ordre 2 (théorèmes 4.15 et 4.16), le chapitre 5 utilisera 4.6 pour le théorème des extrema liés. <strong>Rien de ce chapitre n'est décoratif.</strong></p>
+<div class="rec"><h2>Active Recall</h2><details class="cor fiche">
+<summary><strong>1. Définir $C^1(U)$ et donner une fonction dont les dérivées partielles existent sans qu'elle soit continue.</strong></summary><div class="in">
+
+<p>$f \in C^1(U)$ si toutes les dérivées partielles premières <strong>existent et sont continues</strong> sur $U$ (déf. 4.1).</p>
+<p>Contre-exemple : $f(x,y) = \frac{xy}{x^2+y^2}$ prolongée par $f(0,0)=0$. Sur les deux axes $f$ est identiquement nulle, donc $\frac{\partial f}{\partial x}(0,0) = \frac{\partial f}{\partial y}(0,0) = 0$ : les deux dérivées partielles <strong>existent</strong>. Pourtant $f(t,t) = \frac12$ pour tout $t\neq0$, donc $f$ n'est <strong>pas continue</strong> en $(0,0)$.</p>
+<p><strong>Moralité</strong> : l'existence des dérivées partielles ne donne ni la continuité ni la différentiabilité. C'est la <strong>continuité</strong> des dérivées partielles ($C^1$) qui donne la formule 4.3.</p>
+</div></details><details class="cor fiche">
+<summary><strong>2. Écrire les deux formules de Taylor-Young du cours, avec la forme exacte du reste.</strong></summary><div class="in">
+
+<p><strong>Ordre 1 (prop. 4.3)</strong> : $f(a+h) = f(a) + \langle\nabla f(a),h\rangle + o(h)$, où $o(h) = \epsilon(h)\lVert h\rVert$ avec $\epsilon(h)\to0$.</p>
+<p><strong>Ordre 2 (prop. 4.5)</strong> : $f(a+h) = f(a) + \langle\nabla f(a),h\rangle + \frac12\langle h,H_f(a)h\rangle + \epsilon(h)\lVert h\rVert^2$, avec $\epsilon(h)\to0$.</p>
+<p>La <strong>puissance de la norme</strong> dans le reste ($\lVert h\rVert$ puis $\lVert h\rVert^2$) est ce qui donne son ordre à la formule.</p>
+</div></details><details class="cor fiche">
+<summary><strong>3. Pourquoi la hessienne est-elle symétrique ? Combien de coefficients faut-il calculer en dimension 2 et 3 ?</strong></summary><div class="in">
+
+<p>Par le <strong>théorème de Schwarz</strong> : si $f\in C^2$, alors $\frac{\partial^2 f}{\partial x_i\partial x_j} = \frac{\partial^2 f}{\partial x_j\partial x_i}$. L'hypothèse $C^2$ de la définition 4.4 est exactement ce qu'il faut.</p>
+<p>En dimension 2 : <strong>3 coefficients</strong> ($r$, $s$, $t$), pas 4. En dimension 3 : <strong>6</strong>, pas 9. En dimension $n$ : $\frac{n(n+1)}{2}$.</p>
+<p>Vérifier que la dérivée croisée donne bien la même chose dans les deux ordres est un excellent <strong>contrôle de calcul</strong>.</p>
+</div></details><details class="cor fiche">
+<summary><strong>4. Écrire $\langle h, H_f(a)h\rangle$ en dimension 2 avec les notations $r$, $s$, $t$ du cours.</strong></summary><div class="in">
+
+<p>$$\langle h, H_f(a)h\rangle = r\,h_1^2 + 2s\,h_1h_2 + t\,h_2^2$$</p>
+<p>avec $r = \frac{\partial^2 f}{\partial x^2}(a)$, $t = \frac{\partial^2 f}{\partial y^2}(a)$, $s = \frac{\partial^2 f}{\partial x\partial y}(a)$ (notations du théorème 4.16).</p>
+<p class="cal piege"> <strong>Le facteur 2</strong> devant $s$ : le terme croisé apparaît une fois en position $(1,2)$ et une fois en $(2,1)$. L'oublier fausse la classification du point critique.</p>
+</div></details><details class="cor fiche">
+<summary><strong>5. Qu'est-ce que $\varphi(t) = f(a+th)$ ? Que valent $\varphi'(0)$ et $\varphi''(0)$, et à quoi servent-ils ?</strong></summary><div class="in">
+
+<p>C'est la restriction de $f$ à la <strong>droite</strong> passant par $a$ dans la direction $h$ — une fonction d'une seule variable.</p>
+<p>$$\varphi'(0) = \langle\nabla f(a),h\rangle \quad\text{(la pente)}, \qquad \varphi''(0) = \langle h, H_f(a)h\rangle \quad\text{(la courbure)}.$$</p>
+<p><strong>Trois usages dans le cours</strong> : la direction de plus forte pente (prop. 5.9) ; la preuve du théorème des extrema liés, avec une courbe au lieu d'une droite (thm 5.7) ; la classification des points critiques par le signe de $\varphi''(0)$ dans <strong>toutes</strong> les directions (thm 4.15).</p>
+<p>C'est le mécanisme qui permet de transporter tout le chapitre 3 en dimension $n$.</p>
+</div></details><details class="cor fiche">
+<summary><strong>6. Énoncer la définition 4.8 et expliquer pourquoi $x^4-y^2$ est coercive sur $\mathbb{R}_+\times[0,1]$ mais pas sur $\mathbb{R}^2$.</strong></summary><div class="in">
+
+<p><strong>Déf. 4.8</strong> : $A$ non bornée, $f$ est coercive <strong>sur $A$</strong> si $f(x)\to+\infty$ quand $\lVert x\rVert\to\infty$ <strong>avec $x\in A$</strong>.</p>
+<p>Sur $\mathbb{R}^2$ : le long de l'axe $x=0$, $f(0,y) = -y^2\to-\infty$. Pas coercive.</p>
+<p>Sur $A=\mathbb{R}_+\times[0,1]$ : cette direction est <strong>interdite</strong>, car $y$ y est borné par $1$. Donc $y^2\le1$ et $f\ge x^4-1$. Comme $x^2 \ge \lVert(x,y)\rVert^2-1$ sur $A$, on obtient
+$$f(x,y) \ge \bigl(\lVert(x,y)\rVert^2-1\bigr)^2 - 1 \longrightarrow +\infty .$$</p>
+<p><strong>C'est tout l'intérêt du « sur $A$ » de la définition</strong> : restreindre l'ensemble peut créer la coercivité.</p>
+</div></details><details class="cor fiche">
+<summary><strong>7. Quelles sont les deux conclusions du théorème 4.9, et sous quelles hypothèses distinctes ?</strong></summary><div class="in">
+
+<p>$A$ <strong>fermée non bornée</strong> dans $\mathbb{R}^d$, $f \in C(A)$ :</p>
+<ul>
+<li>si $f$ est <strong>coercive</strong> sur $A$ ($f\to+\infty$) → <strong>minimum global</strong> ;</li>
+<li>si $f\to-\infty$ quand $\lVert x\rVert\to\infty$ dans $A$ → <strong>maximum global</strong>.</li>
+</ul>
+<p><strong>Les deux hypothèses sont incompatibles</strong> : une fonction ne peut pas tendre à la fois vers $+\infty$ et vers $-\infty$. Le théorème 4.9 ne donne donc <strong>jamais</strong> les deux extrema à la fois — contrairement au théorème 4.7 sur un compact.</p>
+</div></details><details class="cor fiche">
+<summary><strong>8. Énoncer l'encadré ATTENTION du cours et donner deux exemples.</strong></summary><div class="in">
+
+<p><em>« L'existence d'un extremum global ne garantit absolument pas l'unicité du point où cet extremum est pris. »</em></p>
+<p><strong>L'exemple du cours</strong> : $f(x_1,x_2)=x_1^2$ atteint son minimum global $0$ sur <strong>toute la droite $x_1=0$</strong>.</p>
+<p><strong>Un second</strong> : $g(x,y)=x^4+y^4-4xy$ est coercive (donc a un minimum global par le thm 4.9), et ce minimum, égal à $-2$, est atteint en <strong>deux points</strong> : $(1,1)$ et $(-1,-1)$. Les trois points critiques sont $(0,0)$, $(1,1)$, $(-1,-1)$, de valeurs $0$, $-2$, $-2$.</p>
+<p><strong>Le réflexe</strong> : quand l'énoncé écrit « le ou les minima » — la formulation du cours — c'est un avertissement explicite.</p>
+</div></details><details class="cor fiche">
+<summary><strong>9. Vous devez montrer qu'une fonction est coercive. Quelles sont les trois minorations à connaître ?</strong></summary><div class="in">
+
+<table>
+<thead>
+<tr>
+<th>Situation</th>
+<th>Minoration</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>terme croisé $-cxy$</td>
+<td>$2\lvert xy\rvert \le x^2+y^2$</td>
+</tr>
+<tr>
+<td>terme linéaire $-\langle b,x\rangle$</td>
+<td>$\lvert\langle b,x\rangle\rvert \le \lVert b\rVert\,\lVert x\rVert$ (Cauchy-Schwarz)</td>
+</tr>
+<tr>
+<td>variable bornée par $A$</td>
+<td>remplacer par sa borne ($y\in[0,1] \Rightarrow -y^2 \ge -1$)</td>
+</tr>
+</tbody></table>
+<p>Le but est toujours le même : arriver à $f(x) \ge \varphi(\lVert x\rVert)$ avec $\varphi\to+\infty$, car c'est la seule chose que la définition 4.8 demande.</p>
+<p class="cal piege"> Vérifier le long des axes <strong>ne suffit pas</strong> : $(x-y)^2$ y tend vers $+\infty$ sans être coercive.</p>
+</div></details><details class="cor fiche">
+<summary><strong>10. Où se situe le minimum de $x^4-y^2$ sur $\mathbb{R}_+\times[0,1]$, et pourquoi $\nabla f = 0$ ne le trouve-t-il pas ?</strong></summary><div class="in">
+
+<p>$f$ est minimale quand $x^4$ est minimal et $y^2$ maximal, soit $x=0$ et $y=1$ : le minimum vaut $f(0,1) = -1$.</p>
+<p>Or $\nabla f(x,y) = (4x^3,\ -2y)$, donc $\nabla f(0,1) = (0,-2) \neq 0$. <strong>Le point n'est pas critique.</strong></p>
+<p>La raison : $(0,1)$ est <strong>sur la frontière</strong> de $A$, pas à l'intérieur. La proposition 4.11 exige $a \in \mathring A$. Sur le bord, il faut l'<strong>inéquation d'Euler</strong> (prop. 4.14) avec le cône des directions admissibles — c'est l'objet de l'exercice 4.3 du cours et de la fiche 603.</p>
+<p><strong>C'est la leçon centrale du chapitre 4</strong> : chercher les extrema uniquement par $\nabla f = 0$ manque tous ceux qui sont au bord.</p>
+</div></details></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h2>Flashcards</h2>
+<table>
+<thead>
+<tr>
+<th>Question</th>
+<th>Réponse</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$f \in C^1(U)$ ?</td>
+<td>Dérivées partielles premières existent <strong>et continues</strong></td>
+</tr>
+<tr>
+<td>$f \in C^2(U)$ ?</td>
+<td>Idem pour les secondes</td>
+</tr>
+<tr>
+<td>Gradient (déf. 4.2) ?</td>
+<td>Vecteur <strong>colonne</strong> des dérivées partielles</td>
+</tr>
+<tr>
+<td>Dérivées partielles seules ⟹ continuité ?</td>
+<td><strong>Non</strong> — contre-exemple $\frac{xy}{x^2+y^2}$</td>
+</tr>
+<tr>
+<td>Sa valeur le long de $y=x$ ?</td>
+<td>$\frac12$, alors que $f(0,0)=0$</td>
+</tr>
+<tr>
+<td>Taylor-Young ordre 1 ?</td>
+<td>$f(a+h)=f(a)+\langle\nabla f(a),h\rangle+o(h)$</td>
+</tr>
+<tr>
+<td>Forme du reste ?</td>
+<td>$\epsilon(h)\lVert h\rVert$</td>
+</tr>
+<tr>
+<td>Différentielle ?</td>
+<td>$df(a).h = \langle\nabla f(a),h\rangle$</td>
+</tr>
+<tr>
+<td>Hessienne (déf. 4.4) ?</td>
+<td>Matrice des dérivées secondes, <strong>symétrique</strong></td>
+</tr>
+<tr>
+<td>Pourquoi symétrique ?</td>
+<td>Théorème de <strong>Schwarz</strong>, valable car $f\in C^2$</td>
+</tr>
+<tr>
+<td>Coefficients à calculer en dimension 2 ?</td>
+<td><strong>3</strong> : $r$, $s$, $t$</td>
+</tr>
+<tr>
+<td>Taylor-Young ordre 2 ?</td>
+<td>$+\ \frac12\langle h,H_f(a)h\rangle+\epsilon(h)\lVert h\rVert^2$</td>
+</tr>
+<tr>
+<td>Forme quadratique ?</td>
+<td>$Q(h)=\langle h,H_f(a)h\rangle$</td>
+</tr>
+<tr>
+<td>En dimension 2 ?</td>
+<td>$rh_1^2+\mathbf{2}sh_1h_2+th_2^2$</td>
+</tr>
+<tr>
+<td>L'erreur classique ?</td>
+<td>Oublier le <strong>facteur 2</strong></td>
+</tr>
+<tr>
+<td>Si $\nabla f(a)=0$, que reste-t-il ?</td>
+<td>$f(a+h)-f(a)=\frac12 Q(h)+\epsilon(h)\lVert h\rVert^2$</td>
+</tr>
+<tr>
+<td>Donc la nature de $a$ dépend de ?</td>
+<td>Le <strong>signe de $Q$</strong></td>
+</tr>
+<tr>
+<td>$\varphi(t)$ de la prop. 4.6 ?</td>
+<td>$f(a+th)$ — $f$ le long d'une droite</td>
+</tr>
+<tr>
+<td>$\varphi'(0)$ ?</td>
+<td>$\langle\nabla f(a),h\rangle$ — la <strong>pente</strong></td>
+</tr>
+<tr>
+<td>$\varphi''(0)$ ?</td>
+<td>$\langle h,H_f(a)h\rangle$ — la <strong>courbure</strong></td>
+</tr>
+<tr>
+<td>À quoi sert la prop. 4.6 ?</td>
+<td>Ramener la dimension $n$ à la <strong>dimension 1</strong></td>
+</tr>
+<tr>
+<td>Théorème 4.7 ?</td>
+<td>$A$ compact, $f$ continue ⟹ min <strong>et</strong> max</td>
+</tr>
+<tr>
+<td>Théorème 4.9, 1ʳᵉ partie ?</td>
+<td>$A$ fermé non borné + $f$ coercive ⟹ <strong>minimum</strong></td>
+</tr>
+<tr>
+<td>2ᵉ partie ?</td>
+<td>$f\to-\infty$ ⟹ <strong>maximum</strong></td>
+</tr>
+<tr>
+<td>Les deux à la fois ?</td>
+<td><strong>Impossible</strong> — hypothèses incompatibles</td>
+</tr>
+<tr>
+<td>Coercive <strong>sur $A$</strong> (déf. 4.8) ?</td>
+<td>$f\to+\infty$ quand $\lVert x\rVert\to\infty$ <strong>dans $A$</strong></td>
+</tr>
+<tr>
+<td>Exercice 4.1 du cours ?</td>
+<td>$x^4-y^2$ coercive sur $\mathbb{R}_+\times[0,1]$</td>
+</tr>
+<tr>
+<td>Pourquoi pas sur $\mathbb{R}^2$ ?</td>
+<td>$f(0,y)=-y^2\to-\infty$</td>
+</tr>
+<tr>
+<td>La minoration clé ?</td>
+<td>$y\in[0,1]\Rightarrow f\ge x^4-1$</td>
+</tr>
+<tr>
+<td>Où est ce minimum ?</td>
+<td>En $(0,1)$, valeur $-1$ — <strong>sur le bord</strong></td>
+</tr>
+<tr>
+<td>$\nabla f$ y vaut ?</td>
+<td>$(0,-2)\neq0$ : pas un point critique</td>
+</tr>
+<tr>
+<td>Ce que cela impose ?</td>
+<td>L'<strong>inéquation d'Euler</strong> (prop. 4.14)</td>
+</tr>
+<tr>
+<td>Encadré ATTENTION ?</td>
+<td>Existence <strong>n'implique pas</strong> unicité</td>
+</tr>
+<tr>
+<td>L'exemple du cours ?</td>
+<td>$x_1^2$, minimale sur toute la droite $x_1=0$</td>
+</tr>
+<tr>
+<td>$x^4+y^4-4xy$ : points critiques ?</td>
+<td>$(0,0)$, $(1,1)$, $(-1,-1)$</td>
+</tr>
+<tr>
+<td>Leurs valeurs ?</td>
+<td>$0$, $-2$, $-2$</td>
+</tr>
+<tr>
+<td>Minimum global ?</td>
+<td>$-2$, atteint en <strong>deux</strong> points</td>
+</tr>
+<tr>
+<td>Sa coercivité vient de ?</td>
+<td>$-4xy \ge -2(x^2+y^2)$</td>
+</tr>
+<tr>
+<td>Minoration d'un terme croisé ?</td>
+<td>$2\lvert xy\rvert \le x^2+y^2$</td>
+</tr>
+<tr>
+<td>Minoration d'un terme linéaire ?</td>
+<td><strong>Cauchy-Schwarz</strong></td>
+</tr>
+<tr>
+<td>Minoration si $A$ borne une variable ?</td>
+<td>Remplacer par sa <strong>borne</strong></td>
+</tr>
+<tr>
+<td>Taylor-Young est-il local ou global ?</td>
+<td><strong>Local</strong> — près de $a$ seulement</td>
+</tr>
+<tr>
+<td>Pour du global chiffré ?</td>
+<td>Taylor-<strong>Lagrange</strong> (fiche 601)</td>
+</tr>
+<tr>
+<td>$H_f$ définie positive ⟹ ?</td>
+<td>Minimum local (thm 4.15)</td>
+</tr>
+<tr>
+<td>$H_f$ indéfinie ⟹ ?</td>
+<td><strong>Point selle</strong></td>
+</tr>
+<tr>
+<td>$H_f$ dégénérée ⟹ ?</td>
+<td><strong>On ne conclut pas</strong></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+</main>
+
+
+
+
+</body></html>

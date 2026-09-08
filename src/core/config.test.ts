@@ -3,6 +3,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { LOCAL_PDFS, localPdfUrl, driveSearchUrl } from './config';
 import { POLYCOPIES } from './fiches';
+import { MANUELS } from './manuels';
 
 /** Chaque référence `["chemin/doc.pdf", "Libellé"]` du parcours. */
 function referencesPdf(node: unknown, out: string[] = []): string[] {
@@ -40,7 +41,11 @@ describe('documents du parcours — hébergement local', () => {
     ]);
     // Un polycopié n'est pas cité par le parcours : il est offert à côté de la
     // série de fiches qui en est tirée. C'est un point d'entrée, pas un orphelin.
-    const polys = new Set(Object.values(POLYCOPIES).map((p) => p.path));
+    const polys = new Set([
+      ...Object.values(POLYCOPIES).map((p) => p.path),
+      // Un manuel s'ouvre depuis la page de sa matière, pas depuis le parcours.
+      ...Object.values(MANUELS).map((m) => m.path),
+    ]);
     for (const path of Object.keys(LOCAL_PDFS)) {
       if (codes.has(path) || polys.has(path)) continue;
       expect(refs.has(path), `${path} est servi mais n’est référencé nulle part`).toBe(true);

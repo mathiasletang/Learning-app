@@ -30,6 +30,7 @@ export const LOCAL_PDFS: Record<string, string> = {
   '00_L3_Universite-Paris-Cite_Garrigos/cours_optim_L3.pdf': 'cours/cours_optim_L3.pdf',
   'CFA/2024 L1 Quick Sheet.pdf': 'cours/cfa_L1_quick_sheet_2024.pdf',
   'CODE/Le Cours Python.pdf': 'cours/Cours_Python_complet.pdf',
+  'FIN/Dauphine — Produits et marchés financiers.pdf': 'cours/dauphine_finance_marche.pdf',
   'TSE/Montaru — Optimisation.pdf': 'cours/OPTIMISATION.pdf',
   'TSE/Blanchet — Optimisation.pdf': 'cours/OPTIMISATION 2.pdf',
 };

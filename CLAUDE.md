@@ -224,15 +224,24 @@ de revues). MIT OCW est en CC BY-NC-SA, redistribuable avec attribution.
 
 ### Un manuel n'est pas une fiche
 
-**Le Cours Python** (176 pages) reste un PDF, écrit à la main dans `config.ts`
-comme les deux cours L3. Ce qui entre dans l'application, c'est son **sommaire**
-(`src/core/python.ts`) : vingt-quatre chapitres, chacun ouvrant le document à
-sa page par un fragment `#page=`. Les numéros imprimés du manuel sont ceux du
-PDF — c'est ce qui rend le saut possible, et c'est vérifié par un test.
+Un manuel reste un PDF, écrit à la main dans `config.ts` comme les cours L3.
+Ce qui entre dans l'application, c'est son **sommaire** (`src/core/manuels.ts`,
+un manuel par matière) : chaque chapitre ouvre le document à sa page par un
+fragment `#page=`. Les numéros de page sont ceux du PDF — c'est ce qui rend le
+saut possible, et un test le vérifie.
+
+- **Le Cours Python** (176 p., 24 chapitres) → page Code.
+- **Produits et marchés financiers**, Dauphine L3 (133 p., 8 chapitres) → page
+  CFA · Finance.
 
 Ne pas convertir un livre en fiches : une fiche est un texte de deux heures
 qu'on relit avant un examen, pas un manuel qu'on parcourt. Le partage se fait
 sur cette ligne, pas sur le nombre de pages.
+
+**Ne jamais renommer un PDF depuis l'interface web de GitHub.** Le renommage
+passe par l'éditeur de texte : il a déjà réduit un cours de 5 Mo à deux
+octets. Renommer en local, ou téléverser sous le bon nom. Le test des manuels
+vérifie la taille des fichiers, précisément pour attraper ce cas.
 
 ## Avant de dire que c'est fini
 

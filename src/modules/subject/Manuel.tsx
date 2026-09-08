@@ -1,41 +1,43 @@
-import { COURS_PYTHON, chapitresPython, urlCoursPython } from '@/core/python';
+import { MANUELS, chapitresDe, urlManuel } from '@/core/manuels';
+import type { SubjectId } from '@/core/subjects';
 import { Icon } from '@/ui';
 
 /**
- * Le manuel Python, en tête de la page Code. Un livre de 176 pages ne se
+ * Le manuel d'une matière, en tête de ses documents. Un livre ne se
  * transforme pas en fiche : on le laisse en PDF, mais on en publie le
- * sommaire — vingt-quatre portes d'entrée plutôt qu'une seule.
+ * sommaire — autant de portes d'entrée que de chapitres, plutôt qu'une seule.
  */
-export function PythonCourse() {
-  const url = urlCoursPython();
-  if (!url) return null;
-  const chapitres = chapitresPython();
+export function Manuel({ subject }: { subject: SubjectId }) {
+  const manuel = MANUELS[subject];
+  const url = manuel ? urlManuel(manuel) : '';
+  if (!manuel || !url) return null;
+  const chapitres = chapitresDe(manuel);
 
   return (
     <section className="manuel">
       <div className="manuel__tete">
         <p className="eyebrow">Cours</p>
-        <h2 className="manuel__titre">{COURS_PYTHON.titre}</h2>
-        <p className="manuel__lead">{COURS_PYTHON.lead}</p>
+        <h2 className="manuel__titre">{manuel.titre}</h2>
+        <p className="manuel__lead">{manuel.lead}</p>
         <p className="row row--wrap" style={{ gap: 'var(--s-5)', marginTop: 'var(--s-7)' }}>
           <a className="btn btn--primary" href={url} target="_blank" rel="noopener noreferrer">
             <Icon name="external" size={16} /> Ouvrir le cours
           </a>
           <span className="micro tnum">
-            {COURS_PYTHON.pages} pages · {chapitres.length} chapitres · PDF
+            {manuel.pages} pages · {chapitres.length} chapitres · PDF
           </span>
         </p>
       </div>
 
-      <div className="manuel__sommaire">
-        {COURS_PYTHON.parties.map((partie) => (
-          <div className="manuel__partie" key={partie.titre}>
-            <p className="eyebrow manuel__partie-titre">{partie.titre}</p>
+      <div className="manuel__sommaire" data-colonnes={manuel.parties.length > 1 ? 'deux' : 'une'}>
+        {manuel.parties.map((partie) => (
+          <div className="manuel__partie" key={partie.titre || 'sommaire'}>
+            {partie.titre && <p className="eyebrow manuel__partie-titre">{partie.titre}</p>}
             {partie.chapitres.map((c) => (
               <a
                 key={c.numero}
                 className="manuel__chapitre"
-                href={urlCoursPython(c.page)}
+                href={urlManuel(manuel, c.page)}
                 target="_blank"
                 rel="noopener noreferrer"
               >

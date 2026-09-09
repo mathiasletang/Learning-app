@@ -187,6 +187,41 @@ navigation.
   de la reporter. Une tâche récurrente cochée fait naître son occurrence
   suivante.
 
+### L'emploi du temps de l'université
+
+Les cours d'ADE (UT Capitole) se posent dans les mêmes quatre vues que le
+reste : ce sont des séances comme les autres, matière `cours`, donc hors des
+objectifs et hors de `db.timeLogs`. Pas de cinquième vue, pas d'entrée de
+navigation.
+
+- **Ils ne sont pas de l'utilisateur.** `PlanEvent.source === 'edt'` : ni
+  modification, ni chronomètre, ni case à cocher (`estFige`, `shared.tsx`).
+  Une coche serait écrasée à la synchronisation suivante. Le signe est dessiné
+  — filet gauche en pointillé, pastille en anneau —, jamais une couleur de
+  plus.
+- **Table à part** (`db.edt`, v3), remplacée en bloc à chaque lecture. Les
+  mêler à `db.events` effacerait le planning personnel à chaque
+  synchronisation ; fusionner ligne à ligne laisserait les cours annulés à
+  l'écran pour toujours. La fusion se fait à l'affichage, par `usePlanEvents()`.
+- **Le flux passe par le site**, pas en direct : le serveur d'ADE n'envoie pas
+  d'en-tête CORS, le navigateur refuserait le fichier. La redirection
+  `/edt.ics` de `netlify.toml` est **l'unique endroit** où l'adresse du flux
+  est écrite — `vite.config.ts` la relit pour le développement, et le jeton
+  personnel ne part jamais dans le paquet JavaScript. Cette règle doit rester
+  **avant** le filet SPA `/*`.
+- **Un échec ne détruit rien** : les cours déjà lus restent affichés, et le
+  bandeau le dit. Une réponse qui n'est pas un calendrier (page de connexion,
+  index.html d'un relais absent) est refusée avant d'écrire — sinon
+  l'emploi du temps serait remplacé par zéro cours.
+- **Un cours passé ne peut pas rester « à suivre »** (`nextUp`, `upcoming`) :
+  faute de case à cocher, il resterait ouvert jusqu'à minuit et occuperait
+  l'accueil toute la soirée.
+- Le lecteur iCalendar (`src/core/ics.ts`) est pur et testé. Trois pièges déjà
+  payés : les lignes que la norme coupe à 75 octets (**déplier d'abord**, sinon
+  une salle sur deux est tronquée), l'heure `Z` qui est en UTC quand l'heure
+  nue est murale, et `COUNT` qui compte les occurrences **produites** par la
+  règle, avant retrait des `EXDATE`.
+
 ## Mobile
 
 Tout écran se vérifie à **390 px**, pas seulement en 1440.

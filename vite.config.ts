@@ -1,11 +1,43 @@
-import { defineConfig } from 'vite';
+import { defineConfig, type ProxyOptions } from 'vite';
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
+import { readFileSync } from 'node:fs';
 import { fileURLToPath, URL } from 'node:url';
+
+/**
+ * Le relais de l'emploi du temps, en développement.
+ *
+ * L'adresse du flux ADE est déclarée une seule fois, dans `netlify.toml` :
+ * c'est elle qui sert en production, et la relire ici évite d'en tenir deux
+ * copies qui divergeraient. Si la règle disparaît, le proxy n'est pas monté
+ * et l'application affiche simplement « lecture impossible ».
+ */
+function relaisEdt(): Record<string, ProxyOptions> | undefined {
+  let cible: string | undefined;
+  try {
+    const toml = readFileSync(fileURLToPath(new URL('./netlify.toml', import.meta.url)), 'utf8');
+    cible = /from = "\/edt\.ics"\s*\n\s*to = "([^"]+)"/.exec(toml)?.[1];
+  } catch {
+    /* pas de netlify.toml : rien à relayer */
+  }
+  if (!cible) return undefined;
+  const url = new URL(cible);
+  return {
+    '/edt.ics': {
+      target: url.origin,
+      changeOrigin: true,
+      rewrite: () => url.pathname + url.search,
+    },
+  };
+}
+
+const PROXY = relaisEdt();
 
 // https://vite.dev/config/
 export default defineConfig({
   base: './',
+  server: { proxy: PROXY },
+  preview: { proxy: PROXY },
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),

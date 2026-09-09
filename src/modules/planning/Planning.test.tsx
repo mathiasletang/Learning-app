@@ -3,6 +3,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import { db, resetAll } from '@/core/db';
+import { coursDepuisTexte } from '@/core/edt';
 import { toDayStr, addDays } from '@/core/date';
 import { completeEvent, createTask, scheduleTask, toggleTask } from '@/app/actions';
 import { useApp } from '@/app/store';
@@ -196,5 +197,42 @@ describe('Planning — le planning et les tâches ne font qu’un', () => {
     // « 1 h » figure deux fois — la durée prévue et le temps retenu : on vise
     // la marque de fin, la seule qui atteste que la séance a bien été faite.
     expect(carte.querySelector('.plan__done')?.textContent).toContain('1 h');
+  });
+
+  it('pose les cours de l’emploi du temps dans la journée, sans permettre d’y toucher', async () => {
+    await db.edt.bulkPut(
+      coursDepuisTexte(
+        [
+          'BEGIN:VCALENDAR',
+          'BEGIN:VEVENT',
+          'UID:ADE-1',
+          `DTSTART:${TODAY.replace(/-/g, '')}T081500`,
+          `DTEND:${TODAY.replace(/-/g, '')}T101500`,
+          'SUMMARY:Optimisation - CM',
+          'LOCATION:Amphi Guillaume',
+          'END:VEVENT',
+          'END:VCALENDAR',
+        ].join('\r\n'),
+      ),
+    );
+    monter();
+
+    expect(await screen.findByText('Optimisation - CM')).toBeInTheDocument();
+    expect(screen.getByText(/08:15 → 10:15/)).toBeInTheDocument();
+    // La salle est lisible sans ouvrir quoi que ce soit.
+    expect(screen.getByText('Amphi Guillaume')).toBeInTheDocument();
+
+    const carte = screen.getByText('Optimisation - CM').closest('.timeline__row')!;
+    expect(carte).toHaveAttribute('data-source', 'edt');
+    /* Ni modification, ni chronomètre, ni case à cocher : le cours a lieu, et
+       la prochaine synchronisation écraserait de toute façon la coche. */
+    expect(screen.queryByRole('button', { name: /Modifier « Optimisation/ })).toBeNull();
+    expect(carte.querySelector('.plan__origine')?.textContent).toContain('Emploi du temps');
+
+    /* Et il ne gonfle pas les objectifs d'étude : deux heures d'amphi ne sont
+       pas deux heures de travail personnel. Sans séance ni tâche posée, les
+       jauges n'ont rien à afficher — elles ne s'affichent pas. */
+    expect(document.querySelector('.plan__goals')).toBeNull();
+    expect(await db.events.count()).toBe(0);
   });
 });

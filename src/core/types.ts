@@ -136,6 +136,10 @@ export interface UserPrefs {
   sidebarCollapsed: boolean;
   installPromptDismissed?: boolean;
   persistedRequested?: boolean;
+  /** Dernière lecture réussie de l'emploi du temps (ISO). */
+  edtSyncedAt?: string;
+  /** Motif du dernier échec, s'il y en a un — effacé dès qu'une lecture aboutit. */
+  edtSyncError?: string;
   /* --- Mode personnalisé. Optionnels : les bases déjà en place ne les ont
      pas, et leur absence vaut « réglage d'usine ». --------------------- */
   /** Couleur d'accent choisie, en hexadécimal. */
@@ -266,6 +270,12 @@ export interface PlanEvent {
   link?: string; // route interne, ex. /fiche/lagrange
   linkLabel?: string;
   taskId?: string; // tâche d'origine, tenue à jour avec la séance
+  /**
+   * D'où vient la séance. Absent : elle est de vous, et vous en faites ce que
+   * vous voulez. `edt` : elle vient de l'emploi du temps de l'université — on
+   * la lit, on ne la modifie pas, et la prochaine synchronisation la remplace.
+   */
+  source?: 'edt';
   startedAt?: string; // ISO — séance en cours
   doneAt?: string; // ISO
   doneMinutes?: number; // temps réellement passé, mesuré ou repris du prévu

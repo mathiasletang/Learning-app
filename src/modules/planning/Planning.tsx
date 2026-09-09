@@ -20,7 +20,8 @@ import { createTask, scheduleTask } from '@/app/actions';
 import { Button, PageHead, Tabs } from '@/ui';
 import { EventForm, ScheduleForm, TaskForm } from './forms';
 import { DayTimeline, MonthGrid, TaskRow, WeekGrid, WeekTimeGrid } from './views';
-import { useMediaQuery, useNow } from './shared';
+import { useMediaQuery, useNow, usePlanEvents } from './shared';
+import { EdtBar } from './EdtBar';
 import './planning.css';
 
 type View = 'jour' | 'semaine' | 'mois' | 'taches';
@@ -94,7 +95,7 @@ export function Planning() {
     });
   const setDay = (d: string) => goto(d, 'jour');
 
-  const events = useLiveQuery(() => db.events.toArray(), [], null);
+  const events = usePlanEvents();
   const tasks = useLiveQuery(() => db.tasks.toArray(), [], null);
   const logs = useLiveQuery(() => db.timeLogs.where('date').equals(day).toArray(), [day], []);
 
@@ -138,6 +139,8 @@ export function Planning() {
         lead="Vos séances, vos cours, vos rendez-vous et vos tâches, au même endroit. Une séance d'étude mène directement au travail."
         actions={<Tabs options={VIEWS} value={view} onChange={setView} ariaLabel="Vues du planning" />}
       />
+
+      <EdtBar />
 
       {view === 'semaine' ? (
         <>

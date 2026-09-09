@@ -94,6 +94,17 @@ describe('Planning — la prochaine séance', () => {
     expect(nextUp([], toMinutes('10:00'))).toBeNull();
   });
 
+  it('n’annonce pas le soir un cours du matin qu’on ne peut pas cocher', () => {
+    /* Un cours de l'emploi du temps n'a pas de case à cocher : il reste
+       « ouvert » à jamais. Le repli de fin de journée doit l'ignorer, sans
+       quoi l'accueil afficherait l'amphi de huit heures jusqu'à minuit. */
+    const avecCours = [ev('08:15', 120, { source: 'edt' }), ev('14:00', 60)];
+    expect(nextUp(avecCours, toMinutes('23:00'))?.start).toBe('14:00');
+    expect(nextUp([ev('08:15', 120, { source: 'edt' })], toMinutes('23:00'))).toBeNull();
+    // Avant sa fin, en revanche, c'est bien lui qui vient.
+    expect(nextUp(avecCours, toMinutes('08:00'))?.start).toBe('08:15');
+  });
+
   it('compte les minutes avant le départ, négatives une fois l’heure passée', () => {
     expect(startsIn(ev('14:00', 60), toMinutes('13:18'))).toBe(42);
     expect(startsIn(ev('09:00', 60), toMinutes('10:00'))).toBe(-60);

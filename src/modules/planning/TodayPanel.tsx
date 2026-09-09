@@ -14,7 +14,16 @@ import {
 } from '@/core/planning';
 import { rescheduleTask, toggleTask } from '@/app/actions';
 import { Icon } from '@/ui';
-import { EventActions, EventClock, PriorityMark, SubjectDot, relativeStart, upcoming, useNow } from './shared';
+import {
+  EventActions,
+  EventClock,
+  PriorityMark,
+  SubjectDot,
+  relativeStart,
+  upcoming,
+  useNow,
+  usePlanEvents,
+} from './shared';
 import './planning.css';
 
 /**
@@ -26,7 +35,7 @@ export function TodayPanel() {
   const now = useNow();
   const today = now.day;
 
-  const events = useLiveQuery(() => db.events.where('date').equals(today).toArray(), [today], null);
+  const events = usePlanEvents(today);
   const tasks = useLiveQuery(() => db.tasks.toArray(), [], null);
   const logs = useLiveQuery(() => db.timeLogs.where('date').equals(today).toArray(), [today], []);
 
@@ -41,8 +50,10 @@ export function TodayPanel() {
   const ouvertes = dayTasks.filter((t) => !t.doneAt);
   const goals = dayGoals(jour, dayTasks, logs);
   const restantes = upcoming(jour, now.minutes, 3).filter((e) => e.id !== suivante?.id);
-  /* Le soir, ou une fois tout coché, on bascule du « à venir » au « bilan ». */
-  const bilan = jour.length > 0 && goals.sessions.done === jour.length;
+  /* Le soir, ou une fois tout coché, on bascule du « à venir » au « bilan ».
+     Le compte porte sur les séances d'étude : un cours en amphi ne se coche
+     pas, et l'attendre laisserait le bilan indéfiniment hors d'atteinte. */
+  const bilan = goals.sessions.total > 0 && goals.sessions.done === goals.sessions.total;
 
   return (
     <section className="agenda" aria-label="Votre journée">

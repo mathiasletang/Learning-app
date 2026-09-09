@@ -200,21 +200,7 @@ describe('Planning — le planning et les tâches ne font qu’un', () => {
   });
 
   it('pose les cours de l’emploi du temps dans la journée, sans permettre d’y toucher', async () => {
-    await db.edt.bulkPut(
-      coursDepuisTexte(
-        [
-          'BEGIN:VCALENDAR',
-          'BEGIN:VEVENT',
-          'UID:ADE-1',
-          `DTSTART:${TODAY.replace(/-/g, '')}T081500`,
-          `DTEND:${TODAY.replace(/-/g, '')}T101500`,
-          'SUMMARY:Optimisation - CM',
-          'LOCATION:Amphi Guillaume',
-          'END:VEVENT',
-          'END:VCALENDAR',
-        ].join('\r\n'),
-      ),
-    );
+    await db.edt.bulkPut(coursDepuisTexte(ICS_DU_JOUR));
     monter();
 
     expect(await screen.findByText('Optimisation - CM')).toBeInTheDocument();
@@ -235,4 +221,53 @@ describe('Planning — le planning et les tâches ne font qu’un', () => {
     expect(document.querySelector('.plan__goals')).toBeNull();
     expect(await db.events.count()).toBe(0);
   });
+
+  it('importe un fichier .ics et pose les cours dans la journée', async () => {
+    /* La voie qui ne dépend de rien : ni du serveur d'ADE, ni d'un relais, ni
+       d'une connexion. C'est celle qu'il faut garder verte. */
+    monter();
+    const champ = await screen.findByLabelText('Importer un .ics');
+    await userEvent.upload(champ, fichierIcs('emploi-du-temps.ics', ICS_DU_JOUR));
+
+    expect(await screen.findByText('Optimisation - CM')).toBeInTheDocument();
+    await waitFor(async () => expect(await db.edt.count()).toBe(1));
+    expect(useApp.getState().prefs.edtOrigine).toBe('fichier');
+    expect(useApp.getState().prefs.edtFichier).toBe('emploi-du-temps.ics');
+    // Le bandeau rend compte : combien de cours, et d'où ils viennent.
+    await waitFor(() => {
+      const bandeau = document.querySelector('.plan__edt')?.textContent ?? '';
+      expect(bandeau).toContain('1 cours');
+      expect(bandeau).toContain('importé');
+    });
+  });
+
+  it('refuse un fichier qui n’est pas un calendrier, sans effacer les cours en place', async () => {
+    /* Le point qui compte : se tromper de fichier ne doit pas coûter
+       l'emploi du temps déjà en place. */
+    await db.edt.bulkPut(coursDepuisTexte(ICS_DU_JOUR));
+    monter();
+    expect(await screen.findByText('Optimisation - CM')).toBeInTheDocument();
+
+    const champ = await screen.findByLabelText('Remplacer');
+    await userEvent.upload(champ, fichierIcs('releve.pdf', '%PDF-1.7 rien à voir'));
+
+    await waitFor(() => expect(useApp.getState().prefs.edtSyncError).toMatch(/pas un calendrier/));
+    expect(await db.edt.count()).toBe(1);
+    expect(screen.getByText('Optimisation - CM')).toBeInTheDocument();
+  });
 });
+
+const ICS_DU_JOUR = [
+  'BEGIN:VCALENDAR',
+  'BEGIN:VEVENT',
+  'UID:ADE-1',
+  `DTSTART:${TODAY.replace(/-/g, '')}T081500`,
+  `DTEND:${TODAY.replace(/-/g, '')}T101500`,
+  'SUMMARY:Optimisation - CM',
+  'LOCATION:Amphi Guillaume',
+  'END:VEVENT',
+  'END:VCALENDAR',
+].join('\r\n');
+
+const fichierIcs = (nom: string, contenu: string) =>
+  new File([contenu], nom, { type: 'text/calendar' });

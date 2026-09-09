@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { ageSynchro, coursDepuisTexte, ressembleAUnCalendrier } from './edt';
+import { readFileSync } from 'node:fs';
+import { ageSynchro, coursDepuisTexte, refusDeCalendrier, ressembleAUnCalendrier } from './edt';
 import { isStudy, dayGoals } from './planning';
 
 const cal = (corps: string[]) =>
@@ -145,6 +146,38 @@ describe("L'emploi du temps devient des séances de planning", () => {
     expect(ressembleAUnCalendrier(SEMAINE)).toBe(true);
     expect(ressembleAUnCalendrier('<!doctype html><title>Connexion</title>')).toBe(false);
     expect(ressembleAUnCalendrier('')).toBe(false);
+  });
+
+  it('refuse avant d’écrire ce qui n’est pas un emploi du temps', () => {
+    /* Ce contrôle passe avant l'écriture, et c'est tout son intérêt : un lien
+       de flux périmé renvoie une page de connexion avec un code 200, et
+       remplacerait un emploi du temps correct par zéro cours. */
+    expect(refusDeCalendrier(SEMAINE, coursDepuisTexte(SEMAINE))).toBeNull();
+    expect(refusDeCalendrier('', [])).toBe('fichier vide');
+    expect(refusDeCalendrier('   \n ', [])).toBe('fichier vide');
+    expect(refusDeCalendrier('<!doctype html><title>Connexion</title>', [])).toMatch(
+      /pas un calendrier/,
+    );
+    const sansCours = cal([]);
+    expect(refusDeCalendrier(sansCours, coursDepuisTexte(sansCours))).toBe(
+      'calendrier sans aucun cours',
+    );
+  });
+
+  it('route « /edt.ics » vers la fonction, avant le filet SPA', () => {
+    /* Netlify applique la première règle qui correspond : passée après
+       « /* », la lecture de l'emploi du temps recevrait index.html. Et si la
+       fonction perdait sa constante, le proxy de développement (qui la relit)
+       tomberait sans bruit. */
+    const toml = readFileSync('netlify.toml', 'utf8');
+    const edt = toml.indexOf('from = "/edt.ics"');
+    const spa = toml.indexOf('from = "/*"');
+    expect(edt).toBeGreaterThan(0);
+    expect(edt).toBeLessThan(spa);
+    expect(toml).toMatch(/to = "\/\.netlify\/functions\/edt"/);
+
+    const fonction = readFileSync('netlify/functions/edt.mjs', 'utf8');
+    expect(/const FLUX =\s*'([^']+)'/.exec(fonction)?.[1]).toMatch(/^https:\/\/ade\d*-edt\./);
   });
 
   it('dit l’âge de la dernière lecture en français', () => {

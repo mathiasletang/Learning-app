@@ -203,16 +203,29 @@ navigation.
   mêler à `db.events` effacerait le planning personnel à chaque
   synchronisation ; fusionner ligne à ligne laisserait les cours annulés à
   l'écran pour toujours. La fusion se fait à l'affichage, par `usePlanEvents()`.
-- **Le flux passe par le site**, pas en direct : le serveur d'ADE n'envoie pas
-  d'en-tête CORS, le navigateur refuserait le fichier. La redirection
-  `/edt.ics` de `netlify.toml` est **l'unique endroit** où l'adresse du flux
-  est écrite — `vite.config.ts` la relit pour le développement, et le jeton
-  personnel ne part jamais dans le paquet JavaScript. Cette règle doit rester
-  **avant** le filet SPA `/*`.
-- **Un échec ne détruit rien** : les cours déjà lus restent affichés, et le
-  bandeau le dit. Une réponse qui n'est pas un calendrier (page de connexion,
-  index.html d'un relais absent) est refusée avant d'écrire — sinon
-  l'emploi du temps serait remplacé par zéro cours.
+- **L'import d'un fichier `.ics` est la voie principale**, et la lecture
+  réseau une commodité par-dessus. C'est l'ordre inverse qui a été essayé
+  d'abord, et le relais est tombé : l'import, lui, ne dépend ni d'ADE, ni d'un
+  serveur, ni d'une connexion. Le bouton reste donc toujours offert dans le
+  bandeau, y compris quand tout va bien (« Remplacer »).
+- **Le flux réseau passe par le site**, pas en direct : le serveur d'ADE
+  n'envoie pas d'en-tête CORS, le navigateur refuserait le fichier. C'est
+  `netlify/functions/edt.mjs` qui le lit — **l'unique endroit** où l'adresse
+  du flux est écrite, que `vite.config.ts` relit pour le développement, et le
+  jeton personnel ne part jamais dans le paquet JavaScript. La redirection
+  `/edt.ics` de `netlify.toml` doit rester **avant** le filet SPA `/*` ; un
+  test le vérifie.
+- **Une panne doit se nommer.** Une simple redirection vers ADE ne laissait
+  qu'un « Failed to fetch » muet, indiagnosticable. La fonction renvoie sa
+  raison en clair dans le corps de la réponse (code d'ADE, délai dépassé, lien
+  périmé), et `syncEdt` la reprend telle quelle dans le bandeau.
+- **Un échec ne détruit rien** : les cours déjà en place restent affichés.
+  `refusDeCalendrier()` juge le texte **avant** l'écriture — un fichier vide,
+  une page de connexion renvoyée avec un code 200, un calendrier sans le
+  moindre cours sont refusés. Écrire d'abord et constater ensuite remplacerait
+  un emploi du temps correct par zéro cours.
+- `File.text()` manque aux Safari d'avant 14 — et à jsdom. La lecture d'un
+  fichier passe par `FileReader` (`texteDuFichier`, `actions.ts`).
 - **Un cours passé ne peut pas rester « à suivre »** (`nextUp`, `upcoming`) :
   faute de case à cocher, il resterait ouvert jusqu'à minuit et occuperait
   l'accueil toute la soirée.

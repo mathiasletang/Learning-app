@@ -54,6 +54,7 @@ export class AtelierDB extends Dexie {
   badges!: Table<Badge, string>;
   events!: Table<PlanEvent, string>;
   tasks!: Table<Task, string>;
+  edt!: Table<PlanEvent, string>;
 
   constructor() {
     super('atelier');
@@ -75,6 +76,13 @@ export class AtelierDB extends Dexie {
     this.version(2).stores({
       events: 'id, date, taskId',
       tasks: 'id, due, doneAt',
+    });
+    /* v3 — l'emploi du temps de l'université. Une table à part, et non des
+       lignes de `events` : ces séances ne sont pas de l'utilisateur, elles
+       sont remplacées en bloc à chaque synchronisation. Les mêler aux
+       siennes reviendrait à effacer son planning à chaque lecture du flux. */
+    this.version(3).stores({
+      edt: 'id, date',
     });
   }
 }
@@ -205,9 +213,12 @@ export async function importAll(bundle: ExportBundle, mode: 'replace' | 'merge' 
 export async function resetAll(): Promise<void> {
   await db.transaction(
     'rw',
-    [db.prefs, db.gam, db.steps, db.docs, db.qcmResults, db.qcmSessions, db.flashcards, db.vocabSrs, db.notes, db.timeLogs, db.badges, db.events, db.tasks],
+    [db.prefs, db.gam, db.steps, db.docs, db.qcmResults, db.qcmSessions, db.flashcards, db.vocabSrs, db.notes, db.timeLogs, db.badges, db.events, db.tasks, db.edt],
     async () => {
       await Promise.all([
+        /* L'emploi du temps se retéléchargera tout seul : il n'est pas dans
+           la sauvegarde, il n'a pas à survivre à une remise à zéro. */
+        db.edt.clear(),
         db.prefs.clear(),
         db.gam.clear(),
         db.steps.clear(),

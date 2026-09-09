@@ -17,7 +17,7 @@ import {
 import type { PlanEvent, Task } from '@/core/types';
 import { rescheduleTask, toggleTask } from '@/app/actions';
 import { Button, Icon } from '@/ui';
-import { EventActions, EventClock, PriorityMark, SubjectDot, useNow } from './shared';
+import { EventActions, EventClock, PriorityMark, SubjectDot, estFige, useNow } from './shared';
 
 /* ------------------------------- Journée --------------------------------- */
 
@@ -53,14 +53,21 @@ export function DayTimeline({
   return (
     <ol className="timeline">
       {sortEvents(events).map((ev) => {
+        /* « heure passée » invite à cocher une séance oubliée. Un cours a
+           simplement eu lieu : rien à cocher, donc rien à signaler. */
         const passe =
-          enCours && !ev.allDay && toMinutes(ev.start) + ev.minutes < now.minutes && !isDone(ev);
+          enCours &&
+          !ev.allDay &&
+          !estFige(ev) &&
+          toMinutes(ev.start) + ev.minutes < now.minutes &&
+          !isDone(ev);
         return (
           <li
             key={ev.id}
             className="timeline__row"
             data-done={isDone(ev)}
             data-running={isRunning(ev)}
+            data-source={ev.source}
           >
             <span className="timeline__hour tnum">{ev.allDay ? 'jour' : ev.start}</span>
             <span
@@ -75,14 +82,18 @@ export function DayTimeline({
                   {subjectMeta(ev.subject).label}
                   {passe && <span className="plan__late"> · heure passée</span>}
                 </span>
-                <button
-                  type="button"
-                  className="btn btn--ghost btn--icon timeline__edit"
-                  aria-label={`Modifier « ${ev.title} »`}
-                  onClick={() => onEdit(ev)}
-                >
-                  <Icon name="settings" size={15} />
-                </button>
+                {/* Un cours importé ne s'ouvre pas dans le formulaire : il se
+                    change dans ADE, et rien d'autre. */}
+                {!estFige(ev) && (
+                  <button
+                    type="button"
+                    className="btn btn--ghost btn--icon timeline__edit"
+                    aria-label={`Modifier « ${ev.title} »`}
+                    onClick={() => onEdit(ev)}
+                  >
+                    <Icon name="settings" size={15} />
+                  </button>
+                )}
               </div>
 
               <h3 className="timeline__title">{ev.title}</h3>
@@ -239,12 +250,16 @@ export function WeekGrid({
             ) : (
               <>
                 {jour.map((ev) => (
-                  <span key={ev.id} className="week__event" data-done={isDone(ev)}>
-                    <span
-                      className="week__bullet"
-                      style={{ background: `var(${subjectMeta(ev.subject).colorVar})` }}
-                      aria-hidden
-                    />
+                  <span
+                    key={ev.id}
+                    className="week__event"
+                    data-done={isDone(ev)}
+                    data-source={ev.source}
+                    style={
+                      { '--_c': `var(${subjectMeta(ev.subject).colorVar})` } as React.CSSProperties
+                    }
+                  >
+                    <span className="week__bullet" aria-hidden />
                     <span className="tnum week__time">{ev.start}</span>
                     <span className="week__title">{ev.title}</span>
                   </span>
@@ -369,6 +384,7 @@ export function WeekTimeGrid({
                 className="grid__event"
                 data-done={isDone(event)}
                 data-running={isRunning(event)}
+                data-source={event.source}
                 style={
                   {
                     top: (f - from * 60) * PX_PAR_MINUTE,
@@ -378,7 +394,9 @@ export function WeekTimeGrid({
                     '--_c': `var(${subjectMeta(event.subject).colorVar})`,
                   } as React.CSSProperties
                 }
-                onClick={() => onEdit(event)}
+                // Un cours ne se modifie pas : le clic ouvre sa journée, où se
+                // lisent la salle et ce qui l'entoure.
+                onClick={() => (estFige(event) ? onOpenDay(day) : onEdit(event))}
               >
                 <span className="grid__eventtitle">{event.title}</span>
                 <span className="grid__eventtime tnum">{event.start}</span>
@@ -447,6 +465,7 @@ export function MonthGrid({
                     key={ev.id}
                     className="month__event"
                     data-done={isDone(ev)}
+                    data-source={ev.source}
                     style={{ '--_c': `var(${subjectMeta(ev.subject).colorVar})` } as React.CSSProperties}
                   >
                     <span className="month__bullet" aria-hidden />

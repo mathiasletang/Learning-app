@@ -2,6 +2,7 @@ import { Suspense, lazy, useEffect } from 'react';
 import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useApp } from './store';
+import { syncEdt } from './actions';
 import { Layout } from './Layout';
 import { Dashboard } from '@/modules/dashboard/Dashboard';
 import { Subject } from '@/modules/subject/Subject';
@@ -46,6 +47,10 @@ export function App() {
 
   useEffect(() => {
     void useApp.getState().init();
+    /* L'emploi du temps se relit au démarrage, en silence et sans bloquer
+       l'affichage : les cours déjà en base suffisent à peindre la journée, et
+       la lecture ne sert qu'à la corriger. */
+    void syncEdt();
   }, []);
 
   if (!loaded) return <Splash />;

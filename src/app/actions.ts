@@ -4,8 +4,14 @@
    et du store (le core reste pur).
    ========================================================================= */
 
-import { db } from '@/core/db';
+import { db, getPrefs } from '@/core/db';
 import { driveSearchUrl, localPdfUrl } from '@/core/config';
+import {
+  coursDepuisTexte,
+  ressembleAUnCalendrier,
+  EDT_FRAICHEUR_MS,
+  EDT_URL,
+} from '@/core/edt';
 import { toDayStr } from '@/core/date';
 import { schedule, initialSrs, type Grade } from '@/core/srs';
 import {
@@ -340,4 +346,53 @@ export async function completeEvent(event: PlanEvent): Promise<number> {
 /** Rouvrir une séance cochée par erreur — le temps déjà compté reste acquis. */
 export async function reopenEvent(id: string): Promise<void> {
   await updateEvent(id, { doneAt: undefined, startedAt: undefined });
+}
+
+/* ---------------------------- Emploi du temps ---------------------------- */
+
+export interface ResultatSynchro {
+  ok: boolean;
+  /** Nombre de cours lus — présent seulement en cas de succès. */
+  cours?: number;
+  erreur?: string;
+}
+
+/**
+ * Relit l'emploi du temps de l'université et remplace les cours en base.
+ *
+ * Remplacement en bloc, dans une transaction : une salle qui change, un cours
+ * annulé, un rattrapage ajouté doivent disparaître ou apparaître, et fusionner
+ * ligne à ligne laisserait les annulations à l'écran pour toujours.
+ *
+ * Un échec ne détruit rien : sans réseau, les cours déjà lus restent affichés
+ * — c'est tout l'intérêt de les avoir mis en base plutôt que de les relire à
+ * chaque ouverture.
+ */
+export async function syncEdt(force = false): Promise<ResultatSynchro> {
+  const prefs = await getPrefs();
+  if (!force && prefs.edtSyncedAt) {
+    const age = Date.now() - Date.parse(prefs.edtSyncedAt);
+    if (age >= 0 && age < EDT_FRAICHEUR_MS) return { ok: true };
+  }
+
+  try {
+    const reponse = await fetch(EDT_URL, { cache: 'no-store' });
+    if (!reponse.ok) throw new Error(`réponse ${reponse.status}`);
+    const texte = await reponse.text();
+    /* Sans relais configuré, on reçoit index.html : le vérifier évite d'effacer
+       l'emploi du temps et de le remplacer par zéro cours. */
+    if (!ressembleAUnCalendrier(texte)) throw new Error('réponse illisible (calendrier attendu)');
+
+    const cours = coursDepuisTexte(texte);
+    await db.transaction('rw', db.edt, async () => {
+      await db.edt.clear();
+      if (cours.length) await db.edt.bulkPut(cours);
+    });
+    await app().patchPrefs({ edtSyncedAt: new Date().toISOString(), edtSyncError: undefined });
+    return { ok: true, cours: cours.length };
+  } catch (e) {
+    const erreur = e instanceof Error ? e.message : 'échec de la lecture';
+    await app().patchPrefs({ edtSyncError: erreur });
+    return { ok: false, erreur };
+  }
 }

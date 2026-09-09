@@ -121,17 +121,24 @@ export function sortEvents(events: PlanEvent[]): PlanEvent[] {
 export const isDone = (e: PlanEvent) => !!e.doneAt;
 export const isRunning = (e: PlanEvent) => !!e.startedAt && !e.doneAt;
 
+/** Une séance qu'on ne peut pas cocher : elle vient de l'emploi du temps. */
+const subie = (e: PlanEvent) => e.source === 'edt';
+
 /**
  * La prochaine séance : celle qui est en cours s'il y en a une, sinon la
  * première à venir, sinon — la journée étant entamée — la première encore
  * ouverte. On ne renvoie jamais une séance déjà faite.
+ *
+ * Le dernier recours écarte les cours passés : ils resteront « ouverts »
+ * pour toujours, faute de case à cocher, et sinon l'accueil annoncerait le
+ * cours de huit heures comme « à suivre » jusqu'à minuit.
  */
 export function nextUp(events: PlanEvent[], nowMinutes: number): PlanEvent | null {
   const open = sortEvents(events).filter((e) => !isDone(e));
   return (
     open.find(isRunning) ??
     open.find((e) => toMinutes(e.start) + e.minutes >= nowMinutes) ??
-    open[0] ??
+    open.find((e) => !subie(e)) ??
     null
   );
 }

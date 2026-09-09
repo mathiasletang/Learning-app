@@ -1,5 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useLiveQuery } from 'dexie-react-hooks';
+import { db } from '@/core/db';
 import { toDayStr } from '@/core/date';
 import {
   elapsedMinutes,
@@ -29,6 +31,33 @@ export const SUBJECT_ICON: Record<PlanSubject, IconName> = {
 };
 
 export const PRIORITY_ORDER: Priority[] = ['high', 'mid', 'low'];
+
+/** Une séance qu'on subit : elle vient de l'emploi du temps, pas de vous. */
+export const estFige = (e: PlanEvent) => e.source === 'edt';
+
+/**
+ * Toutes les séances d'un jeu unique : les vôtres et les cours de
+ * l'université. Deux tables en base — une seule journée à l'écran, sans quoi
+ * il faudrait regarder à deux endroits pour savoir si l'après-midi est libre.
+ *
+ * `day` restreint la lecture à une date : l'accueil n'a que faire de l'année.
+ */
+export function usePlanEvents(day?: string): PlanEvent[] | null {
+  const miennes = useLiveQuery(
+    () => (day ? db.events.where('date').equals(day).toArray() : db.events.toArray()),
+    [day],
+    null,
+  );
+  const cours = useLiveQuery(
+    () => (day ? db.edt.where('date').equals(day).toArray() : db.edt.toArray()),
+    [day],
+    null,
+  );
+  return useMemo(
+    () => (miennes === null ? null : [...miennes, ...(cours ?? [])]),
+    [miennes, cours],
+  );
+}
 
 /**
  * L'heure courante, rafraîchie toutes les trente secondes.
@@ -97,6 +126,17 @@ export function PriorityMark({ priority }: { priority: Priority }) {
 export function EventActions({ event, compact }: { event: PlanEvent; compact?: boolean }) {
   const navigate = useNavigate();
   const meta = subjectMeta(event.subject);
+
+  /* Un cours de l'emploi du temps ne se lance pas, ne se chronomètre pas et ne
+     se coche pas : il a lieu, qu'on le veuille ou non. La prochaine
+     synchronisation écraserait de toute façon la coche. */
+  if (estFige(event)) {
+    return (
+      <span className="micro plan__origine">
+        <Icon name="school" size={14} /> Emploi du temps
+      </span>
+    );
+  }
 
   if (event.doneAt) {
     return (
@@ -183,5 +223,9 @@ export function EventClock({ event, nowMs }: { event: PlanEvent; nowMs: number }
 export function upcoming(events: PlanEvent[], nowMinutes: number, max: number): PlanEvent[] {
   const open = events.filter((e) => !e.doneAt);
   const àVenir = open.filter((e) => toMinutes(e.start) + e.minutes >= nowMinutes);
-  return (àVenir.length ? àVenir : open).slice(0, max);
+  /* Le repli montre ce qui traîne — mais un cours passé ne traîne pas, il a
+     eu lieu : sans cette exclusion, la journée finirait par ne plus lister
+     que des amphis terminés. */
+  const restant = open.filter((e) => !estFige(e));
+  return (àVenir.length ? àVenir : restant).slice(0, max);
 }

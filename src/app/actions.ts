@@ -8,9 +8,10 @@ import { db, getPrefs } from '@/core/db';
 import { driveSearchUrl, localPdfUrl } from '@/core/config';
 import {
   coursDepuisTexte,
-  ressembleAUnCalendrier,
+  refusDeCalendrier,
   EDT_FRAICHEUR_MS,
   EDT_URL,
+  type OrigineEdt,
 } from '@/core/edt';
 import { toDayStr } from '@/core/date';
 import { schedule, initialSrs, type Grade } from '@/core/srs';
@@ -358,15 +359,84 @@ export interface ResultatSynchro {
 }
 
 /**
- * Relit l'emploi du temps de l'université et remplace les cours en base.
+ * Écrit un calendrier en base, quelle que soit sa provenance.
  *
  * Remplacement en bloc, dans une transaction : une salle qui change, un cours
  * annulé, un rattrapage ajouté doivent disparaître ou apparaître, et fusionner
  * ligne à ligne laisserait les annulations à l'écran pour toujours.
  *
- * Un échec ne détruit rien : sans réseau, les cours déjà lus restent affichés
- * — c'est tout l'intérêt de les avoir mis en base plutôt que de les relire à
- * chaque ouverture.
+ * Rien n'est écrit tant que le texte n'a pas été jugé recevable : un fichier
+ * qui n'est pas un calendrier, ou un calendrier sans le moindre cours, laisse
+ * l'emploi du temps en place. Le remplacer par zéro cours serait pire que ne
+ * rien faire.
+ */
+async function enregistreEdt(
+  texte: string,
+  origine: OrigineEdt,
+  fichier?: string,
+): Promise<ResultatSynchro> {
+  const cours = coursDepuisTexte(texte);
+  const refus = refusDeCalendrier(texte, cours);
+  if (refus) {
+    await app().patchPrefs({ edtSyncError: refus });
+    return { ok: false, erreur: refus };
+  }
+
+  await db.transaction('rw', db.edt, async () => {
+    await db.edt.clear();
+    await db.edt.bulkPut(cours);
+  });
+  await app().patchPrefs({
+    edtSyncedAt: new Date().toISOString(),
+    edtSyncError: undefined,
+    edtOrigine: origine,
+    edtFichier: origine === 'fichier' ? fichier : undefined,
+  });
+  return { ok: true, cours: cours.length };
+}
+
+/**
+ * Le contenu d'un fichier, en texte.
+ *
+ * `File.text()` ferait la même chose en une ligne, mais il manque aux Safari
+ * antérieurs à 14 — donc à un iPhone qui n'a pas été mis à jour — et à jsdom,
+ * où tournent les tests. `FileReader` est là depuis toujours.
+ */
+function texteDuFichier(fichier: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const lecteur = new FileReader();
+    lecteur.onload = () => resolve(String(lecteur.result ?? ''));
+    lecteur.onerror = () => reject(new Error('fichier illisible'));
+    lecteur.readAsText(fichier);
+  });
+}
+
+/**
+ * Importe un fichier `.ics` choisi par l'utilisateur.
+ *
+ * C'est la voie principale, et la seule qui ne dépende de rien : ni du
+ * serveur d'ADE, ni d'un relais, ni même d'une connexion. Le fichier
+ * s'obtient depuis ADE — « Exporter » sur son planning — ou depuis n'importe
+ * quel agenda qui sait produire un iCalendar.
+ */
+export async function importerEdt(fichier: File): Promise<ResultatSynchro> {
+  try {
+    return await enregistreEdt(await texteDuFichier(fichier), 'fichier', fichier.name);
+  } catch (e) {
+    const erreur = e instanceof Error ? e.message : 'fichier illisible';
+    await app().patchPrefs({ edtSyncError: erreur });
+    return { ok: false, erreur };
+  }
+}
+
+/**
+ * Relit l'emploi du temps sur le réseau, si le relais du site répond.
+ *
+ * Un échec ne détruit rien : les cours déjà en base restent affichés — c'est
+ * tout l'intérêt de les avoir enregistrés plutôt que de les relire à chaque
+ * ouverture. La fonction Netlify renvoie sa raison en clair dans le corps de
+ * la réponse ; on la reprend telle quelle, faute de quoi il ne resterait que
+ * « Failed to fetch », qui ne se diagnostique pas.
  */
 export async function syncEdt(force = false): Promise<ResultatSynchro> {
   const prefs = await getPrefs();
@@ -377,21 +447,20 @@ export async function syncEdt(force = false): Promise<ResultatSynchro> {
 
   try {
     const reponse = await fetch(EDT_URL, { cache: 'no-store' });
-    if (!reponse.ok) throw new Error(`réponse ${reponse.status}`);
     const texte = await reponse.text();
-    /* Sans relais configuré, on reçoit index.html : le vérifier évite d'effacer
-       l'emploi du temps et de le remplacer par zéro cours. */
-    if (!ressembleAUnCalendrier(texte)) throw new Error('réponse illisible (calendrier attendu)');
-
-    const cours = coursDepuisTexte(texte);
-    await db.transaction('rw', db.edt, async () => {
-      await db.edt.clear();
-      if (cours.length) await db.edt.bulkPut(cours);
-    });
-    await app().patchPrefs({ edtSyncedAt: new Date().toISOString(), edtSyncError: undefined });
-    return { ok: true, cours: cours.length };
+    if (!reponse.ok) {
+      throw new Error(texte.trim().slice(0, 160) || `réponse ${reponse.status}`);
+    }
+    return await enregistreEdt(texte, 'reseau');
   } catch (e) {
-    const erreur = e instanceof Error ? e.message : 'échec de la lecture';
+    /* « Failed to fetch » : la requête n'a même pas abouti (relais absent,
+       hors ligne). Le dire en français, avec la porte de sortie. */
+    const erreur =
+      e instanceof TypeError
+        ? "le relais réseau n'a pas répondu — importez le fichier .ics"
+        : e instanceof Error
+          ? e.message
+          : 'échec de la lecture';
     await app().patchPrefs({ edtSyncError: erreur });
     return { ok: false, erreur };
   }

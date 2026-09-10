@@ -18,12 +18,19 @@ import type { PlanEvent } from './types';
 /**
  * Le flux d'ADE n'autorise pas les requêtes d'une autre origine : le
  * navigateur refuserait de le lire. Le fichier est donc servi par
- * l'application elle-même, qui le relaie (`netlify.toml` en production,
+ * l'application elle-même (`netlify/functions/edt.mjs` en production,
  * `vite.config.ts` en développement). Effet de bord heureux : l'adresse
  * personnelle du flux, avec son jeton, ne part jamais dans le paquet
  * JavaScript.
+ *
+ * Ce chemin dépend d'un serveur, donc il peut tomber — c'est arrivé. L'import
+ * d'un fichier `.ics`, lui, ne dépend de rien : c'est la voie principale, et
+ * la lecture réseau n'est qu'une commodité par-dessus.
  */
 export const EDT_URL = `${import.meta.env.BASE_URL}edt.ics`;
+
+/** D'où viennent les cours en base : lus sur le réseau, ou importés à la main. */
+export type OrigineEdt = 'reseau' | 'fichier';
 
 /** L'établissement, tel qu'il s'affiche dans le bandeau de synchronisation. */
 export const EDT_SOURCE = 'UT Capitole';
@@ -135,6 +142,22 @@ export function coursDepuisTexte(source: string): PlanEvent[] {
 /** Un flux vide ou une page d'erreur renvoyée à la place du calendrier. */
 export function ressembleAUnCalendrier(source: string): boolean {
   return /BEGIN:VCALENDAR/i.test(source);
+}
+
+/**
+ * Pourquoi ce texte ne peut pas devenir un emploi du temps — ou `null` s'il
+ * le peut.
+ *
+ * Ce contrôle passe **avant** l'écriture, et c'est tout son intérêt : un lien
+ * périmé renvoie une page de connexion avec un code 200, un mauvais fichier
+ * s'importe sans broncher. Écrire d'abord et constater ensuite remplacerait
+ * un emploi du temps correct par zéro cours.
+ */
+export function refusDeCalendrier(source: string, cours: PlanEvent[]): string | null {
+  if (!source.trim()) return 'fichier vide';
+  if (!ressembleAUnCalendrier(source)) return "ce n'est pas un calendrier (BEGIN:VCALENDAR attendu)";
+  if (cours.length === 0) return 'calendrier sans aucun cours';
+  return null;
 }
 
 /** « il y a 3 min », « il y a 2 h » — l'âge de la dernière synchronisation. */

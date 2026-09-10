@@ -7,18 +7,22 @@ import { fileURLToPath, URL } from 'node:url';
 /**
  * Le relais de l'emploi du temps, en développement.
  *
- * L'adresse du flux ADE est déclarée une seule fois, dans `netlify.toml` :
- * c'est elle qui sert en production, et la relire ici évite d'en tenir deux
- * copies qui divergeraient. Si la règle disparaît, le proxy n'est pas monté
- * et l'application affiche simplement « lecture impossible ».
+ * L'adresse du flux ADE est déclarée une seule fois, dans la fonction
+ * `netlify/functions/edt.mjs` : c'est elle qui sert en production, et la
+ * relire ici évite d'en tenir deux copies qui divergeraient. Si la constante
+ * disparaît, le proxy n'est pas monté et l'application se rabat sur l'import
+ * d'un fichier .ics — le chemin qui, lui, ne dépend d'aucun réseau.
  */
 function relaisEdt(): Record<string, ProxyOptions> | undefined {
   let cible: string | undefined;
   try {
-    const toml = readFileSync(fileURLToPath(new URL('./netlify.toml', import.meta.url)), 'utf8');
-    cible = /from = "\/edt\.ics"\s*\n\s*to = "([^"]+)"/.exec(toml)?.[1];
+    const source = readFileSync(
+      fileURLToPath(new URL('./netlify/functions/edt.mjs', import.meta.url)),
+      'utf8',
+    );
+    cible = /const FLUX =\s*'([^']+)'/.exec(source)?.[1];
   } catch {
-    /* pas de netlify.toml : rien à relayer */
+    /* pas de fonction : rien à relayer */
   }
   if (!cible) return undefined;
   const url = new URL(cible);

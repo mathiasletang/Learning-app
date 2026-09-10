@@ -140,6 +140,10 @@ export interface UserPrefs {
   edtSyncedAt?: string;
   /** Motif du dernier échec, s'il y en a un — effacé dès qu'une lecture aboutit. */
   edtSyncError?: string;
+  /** Comment les cours en base sont arrivés : lus sur le réseau, ou importés. */
+  edtOrigine?: 'reseau' | 'fichier';
+  /** Nom du fichier importé, pour qu'on sache lequel est en place. */
+  edtFichier?: string;
   /* --- Mode personnalisé. Optionnels : les bases déjà en place ne les ont
      pas, et leur absence vaut « réglage d'usine ». --------------------- */
   /** Couleur d'accent choisie, en hexadécimal. */

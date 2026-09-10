@@ -9,22 +9,23 @@
 [build.environment]
   NODE_VERSION = "22"
 
-# L'emploi du temps ADE, relayé par le site.
+[functions]
+  directory = "netlify/functions"
+
+# L'emploi du temps ADE, lu par la fonction `netlify/functions/edt.mjs`.
 #
-# Deux raisons, et la première suffit : le serveur de l'université n'autorise
-# pas la lecture depuis une autre origine (pas d'en-tête CORS), donc le
-# navigateur refuserait le fichier si l'application allait le chercher
-# elle-même. La seconde est un bénéfice : l'adresse personnelle du flux, avec
-# son jeton, reste ici et ne part pas dans le paquet JavaScript.
+# Une redirection directe vers ADE remplissait le même office, mais quand elle
+# échouait le navigateur n'annonçait qu'un « Failed to fetch » muet. La
+# fonction, elle, renvoie la raison de la panne en clair — c'est ce texte que
+# le bandeau du planning affiche.
 #
 # Cette règle doit précéder le filet SPA : Netlify applique la première qui
-# correspond, et « /* » avale tout.
-#
-# `src/core/edt.ts` lit « /edt.ics » ; `vite.config.ts` relaie la même adresse
-# en développement, en la relisant dans ce fichier — une seule copie du lien.
+# correspond, et « /* » avale tout. `src/core/edt.ts` lit « /edt.ics » ;
+# `vite.config.ts` relaie la même adresse en développement, en la relisant
+# dans la fonction — une seule copie du lien.
 [[redirects]]
   from = "/edt.ics"
-  to = "https://ade25-edt.ut-capitole.fr/jsp/custom/modules/plannings/anonymous_cal.jsp?data=85e44687e1f9f3bce466d6b763250e02ea8788bf661273b6eea88f88eea8b2ba2272ddeda3f0d6d2186b3007f886e39664a45b4b3d24fa442cda746606522eeb1734c074be874daa5e596df0122d69ceb6dae3922da8827f3c5f88c4ff251c2214a1e096c86a8c4438f46ca9703c81ad,1"
+  to = "/.netlify/functions/edt"
   status = 200
   force = true
 
